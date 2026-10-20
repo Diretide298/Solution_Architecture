@@ -1,0 +1,46 @@
+id: CHG-R8SCR-003
+date: '2026-10-20'
+source: audit
+kind: spec
+summary: 'The reads and the step-up the first r8 round bound on GST-040, GST-059, GST-068, ADM-018, CMS-007 and
+  CMS-103 are now reached from what each screen shows, and no guest screen loads the guest''s own record before
+  sign-in without saying so. GST-040 (Help & support) no longer reads a case: its client-verified prototype view shows
+  none, and the case thread is GST-068''s, read with getMyCase when the guest opens a row (shownBy "View").
+  GST-059 resolves today''s plan with listMyVisitPlans in the background, only when signed in. ADM-018 sends the
+  step-up challenge as the grant form opens and checks the code on its confirm. The publish gates of CMS-007 and
+  CMS-103 read getPublishReviewPolicy and diffConfigVersion. Bindings only: no visible field changes.'
+decision:
+  what: 'screens/P02-guest-mobile-app.yaml GST-040 (getMyCase removed; build notes), GST-068 (getMyCase onAction,
+    shownBy View), GST-059 (listMyVisitPlans background, signed in only); screens/P09-platform-admin-console.yaml
+    ADM-018 (createMfaChallenge background, verifyMfaChallenge on the grant form''s confirm; overlay body says the
+    order); screens/P13-white-label-cms.yaml CMS-007 and CMS-103 (publishGate operation). check-approved-ui passes
+    with 0 changes.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: R8 blocker cause list, second round, surface lane extra (check-screen-wiring S-OP-UNREACHED and
+  check-preauth-session PS-UNDECLARED-SIGNIN on fix/r8-integration at 0becfb83, none of them present at r7
+  807a1c24). The bindings came from the first round (CHG-R8SCR-002: WHITE-C14, GPS-C15, IDENTITY-C14, WHITE-C18,
+  WHITE-C19; tickets 27891, 28694). Prototype read: sources/designs/guest-rev3-28-september/TICVAI Guest Booking
+  Mobile v2.dc.html, views helpsupport and cases.'
+keys_touched:
+  screens: [GST-040, GST-059, GST-068, ADM-018, CMS-007, CMS-103]
+  operations: [getMyCase, listMyVisitPlans, createMfaChallenge, verifyMfaChallenge, getPublishReviewPolicy, diffConfigVersion]
+  files:
+  - screens/P02-guest-mobile-app.yaml
+  - screens/P09-platform-admin-console.yaml
+  - screens/P13-white-label-cms.yaml
+root_class: 'A-SCREEN: a declared operation no component reaches (R273)'
+tickets:
+  started: []
+  unstarted:
+  - '27891, 28694 (the walk that asked for the bindings).'
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: R8 blocker walk, second round'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: open
+notes: 'x-ticvai-consumed-by of getMyCase still names GST-040 until the lead''s refresh rewrites it (S-CONSUMED-MIRROR,
+  derived).'

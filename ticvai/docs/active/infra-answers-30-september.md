@@ -165,6 +165,8 @@ monthly partitions are made by a kernel job, not by `pg_partman`.
 - The Terraform sets `high_availability.mode = "SameZone"` for the shared tier and `ZoneRedundant` only for
   dedicated and isolated tiers. The LLD promises zone-redundant for production. Decide which one is true.
 - Azure also has a **built-in PgBouncer** (port 6432). It is an alternative to running pgbouncer ourselves.
+  **Decided 20 October 2026 (the lead, r8 cause FOUNDATION-AI-C53): the built-in PgBouncer**, turned on in
+  Terraform (`pgbouncer.enabled`, transaction mode); no self-run pair in Block A.
 
 ### Recommendation
 

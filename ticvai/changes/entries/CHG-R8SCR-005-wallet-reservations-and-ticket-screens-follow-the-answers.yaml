@@ -1,0 +1,45 @@
+id: CHG-R8SCR-005
+date: '2026-10-20'
+source: audit
+kind: spec
+summary: 'Guest wallet, reservation and ticket screens follow the lead''s answers of 20 October, bindings and build
+  notes only. GST-011 is built to its definition (no Top up, no exit settlement), and its game card panel opens from
+  a deep link with cardCode and cardKind, read on open, as WEB-021''s does (ORDERS-MONEY-C07, option A). WEB-031''s
+  resource availability panel reads listProductStartTimes, since a guest never names a resource; Pay now waits for
+  the client (ORDERS-MONEY-C08, option A). The navigation the walk found missing on GST-048, GST-045, GST-012, GST-001
+  and GST-003, and the Scan a ticket button, are written as build notes and pending client changes; the scan-and-claim
+  operation is requested of the core lane (ORDERS-MONEY-C05). WEB-019, WEB-030 and WEB-031 read the guest''s own
+  refund requests, resale listings and group bookings in the background, joined onto the rows the approved screens
+  already draw (the first round''s CHG-R8SPN-012 bindings were unreached).'
+decision:
+  what: 'screens/P02-guest-mobile-app.yaml GST-011 (getGameCard onLoad, cardKind entry parameter, purpose and notes),
+    GST-001, GST-003, GST-012, GST-045, GST-048 (build notes); screens/P01-guest-web-storefront.yaml WEB-019, WEB-030,
+    WEB-031 (listOwn* reads background; WEB-031 listProductStartTimes replaces getResourceAvailability; build note).
+    Visible changes are in the lane''s pending list for the client (ORDERS-MONEY-C05, C07, C08).'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: R8 blocker cause list, second round (surface lane): tickets 28313, 28228, 28189, 28235, 28340, 28351
+  (ADAM gaps 28313/1, 28313/7, 28228/3, 28228/7, 28235/2, 28340/1, 28351/2, 28189/1); answers.json of 20 October
+  2026; check-screen-wiring S-OP-UNREACHED on fix/r8-integration for WEB-019, WEB-030, WEB-031 (absent at r7).'
+keys_touched:
+  screens: [GST-001, GST-003, GST-011, GST-012, GST-045, GST-048, WEB-019, WEB-030, WEB-031]
+  operations: [getGameCard, listOwnRefundRequests, listOwnResaleListings, listOwnGroupBookings,
+    listProductStartTimes, getResourceAvailability]
+  files:
+  - screens/P01-guest-web-storefront.yaml
+  - screens/P02-guest-mobile-app.yaml
+root_class: 'screen-api gap: a screen action needs a value or a route the screen does not declare'
+tickets:
+  started: []
+  unstarted:
+  - '28313, 28228, 28189, 28235, 28340, 28351 (the walk that found the gaps).'
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: R8 blocker walk, second round'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: open
+notes: 'If the lead lets shownBy name an element of a partial-match client-verified prototype (check-screen-wiring),
+  the three listOwn reads can become onLoad with shownBy; today the rule takes exact matches only.'

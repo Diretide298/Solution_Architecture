@@ -1,10 +1,19 @@
 /**
  * Cell module.
  *
- * One instance of this module is one deployment cell: a single tenant in a
- * single jurisdiction (Project Direction §3.3.1). Splitting at Region is
- * mandatory rather than load-driven — a venue operating in a jurisdiction
- * expects its infrastructure in that jurisdiction.
+ * One instance of this module is one deployment cell of one environment: a
+ * region of one jurisdiction, holding a database per tenant (ADR-0038,
+ * ADR-0040). Tenants are rows in the control database (ADR-0039), never inputs
+ * of this module: a tenant is placed on a cell, it does not make one (r8 cause
+ * FOUNDATION-AI-C55, 20 October 2026). Splitting at Region is mandatory rather
+ * than load-driven — a venue operating in a jurisdiction expects its
+ * infrastructure in that jurisdiction.
+ *
+ * Environments (the lead, 20 October 2026, FOUNDATION-AI-C52 option B and
+ * FOUNDATION-AI-C23): dev runs on laptops with docker compose and has no cell;
+ * `staging` is one shared pre-production environment in the Softlabs Azure
+ * subscription, with its Terraform state there (environments/staging); the
+ * client hosts `production` later. The environment is part of every name.
  *
  * Everything holding personal data stays in-region, including backups and DR
  * replicas (§3.3.10). "Cross-region DR" means a second region within the same
@@ -21,11 +30,14 @@ terraform {
 }
 
 locals {
-  cell_name = "${var.tenant_slug}-${var.jurisdiction}"
+  # <environment>-<cell>, e.g. stg-ae1: the environment is in every resource name, so staging and production
+  # never collide in one subscription (FOUNDATION-AI-C52).
+  env_short = { staging = "stg", production = "prd" }[var.environment]
+  cell_name = "${local.env_short}-${var.cell}"
 
   tags = merge(var.tags, {
+    Environment  = var.environment
     Cell         = local.cell_name
-    TenantId     = var.tenant_id
     Jurisdiction = var.jurisdiction
     Tier         = var.tier
     ManagedBy    = "terraform"
@@ -107,6 +119,22 @@ resource "azurerm_postgresql_flexible_server_configuration" "max_connections" {
   name      = "max_connections"
   server_id = azurerm_postgresql_flexible_server.primary.id
   value     = var.max_connections
+}
+
+# The pooler is Azure's built-in PgBouncer on port 6432 (the lead, 20 October 2026, r8 cause
+# FOUNDATION-AI-C53): no self-run pgbouncer pair in Block A. Services connect on 6432 in transaction mode;
+# OBS-TENANT-POOL reads SHOW POOLS / SHOW DATABASES through the admin console with a monitoring role and
+# alerts on one tenant's share of its pool (docs/architecture/observability.md).
+resource "azurerm_postgresql_flexible_server_configuration" "pgbouncer_enabled" {
+  name      = "pgbouncer.enabled"
+  server_id = azurerm_postgresql_flexible_server.primary.id
+  value     = "true"
+}
+
+resource "azurerm_postgresql_flexible_server_configuration" "pgbouncer_pool_mode" {
+  name      = "pgbouncer.pool_mode"
+  server_id = azurerm_postgresql_flexible_server.primary.id
+  value     = "TRANSACTION"
 }
 
 # Read replicas. Reads route here by default; access validation deliberately
@@ -239,7 +267,7 @@ resource "azurerm_kubernetes_cluster" "cell" {
     name                         = "system"
     vm_size                      = var.system_node_size
     auto_scaling_enabled         = true
-    min_count                    = 2
+    min_count                    = var.system_min_nodes
     max_count                    = 4
     zones                        = var.zones
     vnet_subnet_id               = local.aks_subnet_ids.system
@@ -256,7 +284,9 @@ resource "azurerm_kubernetes_cluster" "cell" {
     pod_cidr            = var.pod_cidr
     service_cidr        = var.service_cidr
     dns_service_ip      = var.dns_service_ip
-    outbound_type       = "userAssignedNATGateway"
+    # Pre-production may run without the NAT gateway (FOUNDATION-AI-C52): egress then goes through the
+    # cluster's load balancer and has no fixed IP for provider allow-lists.
+    outbound_type = var.nat_gateway_enabled ? "userAssignedNATGateway" : "loadBalancer"
   }
 
   oidc_issuer_enabled       = true
@@ -324,9 +354,10 @@ resource "azurerm_kubernetes_cluster_node_pool" "ai_gpu" {
 }
 
 # Data pool, part 1: Qdrant, one node per zone, replication factor 2 (ADR-0049).
-# Self-hosted open-source Qdrant from the official Helm chart, installed at bootstrap.
+# Self-hosted open-source Qdrant from the official Helm chart, installed at bootstrap: the second Terraform
+# stage (helm and kubernetes providers) run after this module, with cert-manager for its TLS (FOUNDATION-AI-C22).
 resource "azurerm_kubernetes_cluster_node_pool" "qdrant" {
-  count = local.is_dedicated ? 1 : 0
+  count = local.is_dedicated && var.qdrant_enabled ? 1 : 0
 
   name                  = "qdrant"
   kubernetes_cluster_id = azurerm_kubernetes_cluster.cell[0].id

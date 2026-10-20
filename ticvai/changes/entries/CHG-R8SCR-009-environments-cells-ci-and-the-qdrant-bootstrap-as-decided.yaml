@@ -1,0 +1,54 @@
+id: CHG-R8SCR-009
+date: '2026-10-20'
+source: audit
+kind: spec
+summary: 'The setup tickets get what the lead decided on 20 October. Dev runs on laptops; staging is one shared
+  pre-production environment in the Softlabs subscription, with its Terraform state there; the client hosts
+  production later (FOUNDATION-AI-C23, C52 option B). The cell module is a region holding a database per tenant,
+  not one tenant: tenant id and slug leave its inputs, the environment and the cell name every resource, and staging
+  turns the heavy parts down with switches (C55). CI is GitLab CI in every repository and @ticvai/api-client is
+  published to the group''s npm registry and pinned by exact version (ADR-0007 amendment; C37 option A). The Qdrant
+  chart, ingress and cert-manager are installed by a second Terraform stage after the cell module (C22 option A).
+  The second AI engineer is named in the roster as planned (C28).'
+decision:
+  what: 'repos/ticvai-infra/terraform: modules/cell (environment and cell inputs, switches system_min_nodes,
+    nat_gateway_enabled, qdrant_enabled; no tenant inputs; validated with terraform 1.9.8), environments/staging
+    (root module, azurerm backend, backend.hcl.example), environments/production/ae1.tfvars and om1.tfvars (were
+    environments/cells/miral-*); repos/ticvai-*/.gitlab-ci.yml replacing .github/workflows; docs/adr/0007
+    amendment, 0049 TLS; docs/registers/external-dependencies.md CI row; repos/ticvai-docs/setup/dependencies.md,
+    repos/ticvai-docs/setup/git-and-mrs.md, repos/ticvai-docs/setup/backend-patterns.md,
+    repos/ticvai-docs/repos/infra.md; docs/active/deployment-configs-costed.md,
+    decisions/answers-3-october-gate-and-hosting.md; docs/active/block-a-extra-tasks.json SETUP-QDRANT detail;
+    docs/active/team.json plannedNames.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: R8 blocker cause list, second round (surface lane): tickets 27627, 27644, 27626, 27640, 27637 (ADAM
+  gaps 27627/0, 27627/1, 27627/2, 27644/2, 27626/0, 27626/1, 27640/0, 27637/0); answers.json of 20 October 2026.'
+keys_touched:
+  files:
+  - repos/ticvai-infra/terraform/modules/cell/main.tf
+  - repos/ticvai-infra/terraform/modules/cell/variables.tf
+  - repos/ticvai-infra/terraform/modules/cell/network.tf
+  - repos/ticvai-infra/terraform/modules/cell/outputs.tf
+  - repos/ticvai-infra/terraform/environments/staging/main.tf
+  - docs/adr/0007-hybrid-repository-topology.md
+  - docs/adr/0049-vectors-live-in-qdrant-one-collection-per-tenant.md
+  - docs/registers/external-dependencies.md
+  - docs/active/team.json
+  - docs/active/block-a-extra-tasks.json
+root_class: 'decision-not-recorded: a ticket''s done-when depends on a choice the package did not write down'
+tickets:
+  started: []
+  unstarted:
+  - '27627, 27644, 27626, 27640, 27637 (the walk that found the gaps).'
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: R8 blocker walk, second round'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-terraform-pools.py
+status: open
+notes: 'The SETUP-ENV, SETUP-CI, SETUP-CLIENTS and onboarding ticket texts are written by tools/build-service-docs.py
+  (the storage-core lane''s); the requested wording is in the surface report. The infra project-bible copy of
+  ADR-0038/0040 comes from tools/derive-mirrors.py at the lead''s refresh.'

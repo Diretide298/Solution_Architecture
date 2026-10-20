@@ -1,0 +1,45 @@
+id: CHG-R8SAT-005
+date: '2026-10-20'
+source: audit
+kind: contract
+summary: 'More satellite contract parts the core and storage-sat lanes asked of this lane. white-label:
+  previewGuidedChoice, the live preview of a draft Help me choose (new, staff, TENANT_CONFIGURE), the
+  guidedChoiceRecords query, and the custom-domain operations say how a mapping is confirmed and that one call goes
+  per host (WHITE-C26, FOUNDATION-AI-C39, APPROVALS-TENANCY-C11). ai: runGuidedChoiceSuggestionJob, the service-only
+  automatic half of suggestGuidedChoice (FOUNDATION-AI-C39). seating: a standing zone is held by quantity
+  (createSeatHold zoneId and quantity, SeatAvailability.zones, 409 zone-unavailable) and the seatHoldRecords query
+  (GPS-C38, ORDERS-MONEY-C19). subscription: the membership view carries its catalogue product and variant
+  (GPS-C39). getPreview reads a preview back until it expires (IDENTITY-C63). assets: MediaUsage.surface names the other modules'' uses (ORDERS-MONEY-C29; breaking for compat, an
+  entry is requested of the lead).'
+decision:
+  what: 'contracts/satellite/white-label.yaml, ai.yaml, seating.yaml, subscription.yaml, assets.yaml. New operations
+    pass the gates: a permission or a service-only reason, no list without paging.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: R8 blocker cause list, second round: the core and storage-sat lanes'' requests to the surface lane
+  (relayed by the coordinator) and answers.json of 20 October 2026.'
+keys_touched:
+  operations: [previewGuidedChoice, runGuidedChoiceSuggestionJob, createSeatHold, getSeatAvailability,
+    verifyCustomDomain, relinquishCustomDomain, setPrimaryDomain, listMembershipCommercialPricing, getMediaAsset,
+    getPreview]
+  schemas: [GuidedChoicePreviewRequest, GuidedChoicePreview, CreateSeatHoldRequest, SeatAvailability,
+    MembershipCommercialPricingChannelAssociationView, MediaUsage]
+  files:
+  - contracts/satellite/white-label.yaml
+  - contracts/satellite/ai.yaml
+  - contracts/satellite/seating.yaml
+  - contracts/satellite/subscription.yaml
+  - contracts/satellite/assets.yaml
+root_class: 'cross-lane hand-over: a cause''s satellite half'
+tickets:
+  started: []
+  unstarted:
+  - 'the tickets of the causes named (see the core and storage-sat reports).'
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: R8 blocker walk, second round'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-contract-compat.py
+status: open

@@ -1,0 +1,7 @@
+# Copy to backend.hcl (git-ignored) and fill in. The storage account is in the Softlabs Azure subscription
+# (the lead, 20 October 2026, r8 cause FOUNDATION-AI-C23); the infra owner (SETUP-ENV) creates it once, with
+# versioning and soft delete on, before the first terraform init.
+resource_group_name  = "rg-ticvai-tfstate"
+storage_account_name = "<the state storage account the infra owner created>"
+container_name       = "tfstate"
+key                  = "staging/ae1.tfstate"

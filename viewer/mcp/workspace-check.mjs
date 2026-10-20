@@ -112,7 +112,7 @@ async function waitFor(url) {
 
 try {
   // ── 1. the starters carry the markers the refresh looks for ────────
-  for (const role of ['backend', 'frontend']) {
+  for (const role of ['backend', 'frontend', 'ai']) {
     const md = lf(starter(role, 'CLAUDE.md'));
     check(`the ${role} starter CLAUDE.md marks "Working a ticket (ADAM)" as ADAM's`,
       /<!-- ADAM:start working-a-ticket -->\n\n?## Working a ticket \(ADAM\)[\s\S]*<!-- ADAM:end working-a-ticket -->/.test(md));

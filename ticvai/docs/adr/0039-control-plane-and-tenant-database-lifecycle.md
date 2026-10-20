@@ -149,3 +149,5 @@ tables that join to each other is the defect this ADR is correcting.
 
 **Leave the canary at cell granularity.** Rejected on the arithmetic: the point of a canary is that
 its failure is cheap, and a first cell holding two hundred tenant databases is not a cheap failure.
+
+**Amended 20 October 2026 (r8 cause IDENTITY-C59): content blocks are tenant data.** `ContentBlock` lives in `whitelabel.content_block` in the tenant database (scope row security), not in the control database: a block is a tenant's page content, read and written by its own white label module; the old control table is retired by the migration owner (storage-core).

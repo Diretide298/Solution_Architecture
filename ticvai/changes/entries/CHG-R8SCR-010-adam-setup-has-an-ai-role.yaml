@@ -1,0 +1,37 @@
+id: CHG-R8SCR-010
+date: '2026-10-20'
+source: audit
+kind: spec
+summary: 'ADAM setup has an ai role, so the second AI engineer''s onboarding ticket ("run setup.cmd once, for AI")
+  can be followed (FOUNDATION-AI-C29, the lead''s option A). setup.cmd -Role ai clones ticvai-ai from the team''s
+  GitLab and adds only ADAM''s files: a CLAUDE.md for the AI engine and the five ADAM commands, whose test step runs
+  ruff, mypy and pytest. The connector''s workspace refresh and the viewer''s /connector/workspace route know the
+  role.'
+decision:
+  what: 'viewer/mcp/setup/setup.ps1 (Role ai, team repository ticvai/ai, the role''s standards, the closing hint);
+    viewer/mcp/setup/starters/ai (CLAUDE.md, .claude/commands, .claude/settings.json); viewer/mcp/update.mjs (role
+    ai, told by its /ticket running pytest); viewer/lib/workspace-files.mjs and server.mjs (role ai served);
+    viewer/mcp/workspace-check.mjs (the ai starter''s markers); repos/ticvai-docs/setup/dependencies.md (the ai role).'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: R8 blocker cause list, second round (surface lane): ticket 27637 (ADAM gap 27637/1); answers.json of
+  20 October 2026.'
+keys_touched:
+  files:
+  - repos/ticvai-docs/setup/dependencies.md
+root_class: 'decision-not-recorded: a ticket names a step its tool cannot do'
+tickets:
+  started: []
+  unstarted:
+  - '27637 SETUP-ONBOARD-SECOND-AI-ENGINEER.'
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: R8 blocker walk, second round'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-ticket-text.py
+status: open
+notes: 'An ADAM change: it reaches developers only when the lead deploys ADAM and rebuilds the setup zip from HEAD
+  (update.mjs is part of the connector''s build id). The ticvai-ai repository URL
+  (http://gitlab.softlabsgroup.in/ticvai/ticvai-ai.git) is assumed beside ticvai-backend; the lead confirms it.'

@@ -1,0 +1,51 @@
+id: CHG-R8SCR-004
+date: '2026-10-20'
+source: audit
+kind: spec
+summary: 'Seven screen causes of the second r8 round, bindings and build notes only (no visible field changes).
+  WEB-004 Book chooses its screen from the product''s published booking flow (getPublishedBookingFlow; each Book
+  edge names its flow type). POS-003 takes no inventory hold of its own: the cart''s hold (addCartLine) is the only
+  one, and its edge to the seat map carries the performance only (F58 step 2 follows). GST-052 Use this plan sends
+  a party and dates (carried from GST-051, or today and one adult on the cold entry, proposed). BO-015''s calendar
+  takes the day-start hour from the venue settings the app shell loads and its category options from
+  listProductCategories; the rule is written once on calendarView. WEB-045 is WEB-025''s page at its own route,
+  built once. A signed-out guest sent to sign-in from a no-access state is brought back (one rule in
+  _patterns.yaml; returnTo and returnParams on GST-042 and WEB-016). Thirteen guest screens whose no-access text
+  still names staff permissions carry a build note, and their corrected wording waits for the client.'
+decision:
+  what: 'screens/P01-guest-web-storefront.yaml WEB-004, WEB-016, WEB-045 and the GPS-C09 notes; P02 GST-042,
+    GST-051, GST-052 and the GPS-C09 notes; P04 POS-003; P08 BO-015; _components.yaml calendarView;
+    _patterns.yaml meta.rules guestSignInReturn; flows/F58 step 2 and its branch. Causes GPS-C06, GPS-C09, GPS-C11,
+    GPS-C14, GPS-C18, WHITE-C12, WHITE-C13. Visible wording that needs the client is in the lane''s pending list
+    (GPS-C09: 13 emptyNoAccess texts), not applied.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: R8 blocker cause list, second round (surface lane): tickets 28685, 28204, 28165, 28160, 28195,
+  27890, 27891 (ADAM gaps 28685/1, 28204/1, 28165/0, 28165/3, 28160/1, 28195/0, 27890/1, 27890/2, 27891/0).'
+keys_touched:
+  screens: [WEB-004, WEB-016, WEB-045, GST-042, GST-051, GST-052, POS-003, BO-015, WEB-012, WEB-013, WEB-017,
+    WEB-024, WEB-039, GST-010, GST-011, GST-021, GST-028, GST-058, GST-062, GST-069, GST-071]
+  operations: [getPublishedBookingFlow, acquireInventoryHold, listInventoryHolds, generateVisitPlan, listProductCategories]
+  files:
+  - screens/P01-guest-web-storefront.yaml
+  - screens/P02-guest-mobile-app.yaml
+  - screens/P04-point-of-sale.yaml
+  - screens/P08-venue-back-office.yaml
+  - screens/_components.yaml
+  - screens/_patterns.yaml
+  - flows/F58-a-ticket-is-sold-at-a-till.yaml
+root_class: 'screen-api gap: a screen action needs a value or a route the screen does not declare'
+tickets:
+  started: []
+  unstarted:
+  - '28685, 28204, 28165, 28160, 28195, 27890, 27891 (the walk that found the gaps).'
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: R8 blocker walk, second round'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: open
+notes: 'The sign-in return edges are a rule, not drawn per screen: check-navigation does not yet read
+  _patterns.yaml meta.rules (a generators-lane request in the surface report).'

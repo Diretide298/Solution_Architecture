@@ -2745,18 +2745,34 @@ paths:
         **Posts a `gameCreditLoaded` ledger entry** (decided 28 September, audit R191): the amount paid to the liability account `finance.setAccountMappings` holds for that event type, in the fiscal period open for the load date. Until this date the load wrote no ledger row.
         Bonus credits from a promotion are tracked separately because they are typically non-refundable and are spent first.
 
-        **Where the credits go and what comes back** (4 October 2026, CHG-FXC-006; the Sprint 1-2 judging found a Wallet
-        response and a wallet lock for a card that has no wallet). The card is found by `cardCode` (`games.card.card_code`).
-        * **A card with a `walletId`** (registered to a guest with a wallet): the movement is a wallet movement under the
-          one-balance-writer rule: `wallet.balance` locked for one guarded statement, a `wallet.wallet_transaction` (kind
-          `topUp`, `reason` `gameCard:{cardCode}`), and a `wallet.credit_lot` per kind of credit (`source_kind` `topUp` for
-          paid credits, `promotion` for bonus credits, `source_reference` `gameCard:{cardCode}`). Returns that Wallet.
-        * **An anonymous card** (`walletId` null): the card row is the balance. `games.card.credits` and `bonus_credits`
-          change in one guarded update on the locked row. Returns the card as a Wallet view: `id` the card's `id`,
-          `subjectId` the nil UUID `00000000-0000-0000-0000-000000000000` (no guest), `balance` the paid credits,
-          `bonusBalance` the bonus credits, `currency` the venue's, `status` the card's status.
-        Either way the movement emits `wallet.credited` (`kind` `gameCreditLoad`, `walletId` the wallet or the card's id)
-        through `platform.outbox` in the same transaction, and the ledger posts `gameCreditLoaded` from it.
+        **Where the credits go and what comes back** (4 October 2026, CHG-FXC-006; corrected by the lead's answer of
+        20 October 2026, r8 cause APPROVALS-TENANCY-C30, option A). The card is read by `cardCode` through
+        `games#cardRecords` (`games.card.card_code`) and must be `active` (409 otherwise). **This operation never
+        writes `games.card`**: that table is VenueOps's, in another deployable (ADR-0055), and its only writer here is
+        the games consumer of `wallet.credited` (`x-ticvai-write-via`).
+        * **A card with a `walletId`** (registered to a guest with a wallet): **the wallet moves by the money paid**,
+          `amountPaid`, under the one-balance-writer rule: `wallet.balance` locked for one guarded statement, a
+          `wallet.wallet_transaction` (kind `topUp`, `reason` `gameCard:{cardCode}`) for `amountPaid`. **Credits are a
+          counted attribute of the lots, not money**: one `wallet.credit_lot` per kind of credit, of credit type
+          `gameCredit` for the paid credits (`issuedCredits` = `credits`, `issuedAmount` = `amountPaid`, `source_kind`
+          `topUp`) and `gameBonusCredit` for the bonus (`issuedCredits` = `bonusCredits`, `issuedAmount` zero,
+          `source_kind` `promotion`), `source_reference` `gameCard:{cardCode}`. No conversion between credits and money is
+          held anywhere: the credits a payment buys are what the till sold. Returns that Wallet.
+        * **An anonymous card** (`walletId` null): no wallet row and no `wallet_transaction` is written. The load is
+          handed to the games consumer through `wallet.credited` (v2: `cardId`, `credits`, `bonusCredits`,
+          `amountPaid`, `loadId` = this request's `id`, the consumer's idempotency key), which adds the credits to
+          `games.card.credits` and `bonus_credits` on its locked row. The answer is the card as a Wallet view **as it
+          will stand once the consumer applies the load**: `id` the card's `id`, `subjectId` the nil UUID
+          `00000000-0000-0000-0000-000000000000` (no guest), `balance` the card's paid credits read now plus
+          `credits`, `bonusBalance` likewise with `bonusCredits`, `currency` the venue's, `status` the card's status.
+          A screen that reads the card again before the consumer has run may briefly see the old figures.
+        Either way the load emits `wallet.credited` (`kind` `gameCreditLoad`, `walletId` the wallet or the card's id)
+        through `platform.outbox` in the same transaction, and the ledger posts `gameCreditLoaded` from it for
+        `amountPaid`.
+
+        **Two credit types are seeded for every tenant** (loaded with the other seed data at provisioning,
+        SETUP-SEED): `gameCredit` (category `ride`, `monetary` false) and `gameBonusCredit` (category
+        `bonus`, `monetary` false). Proposed, client to confirm the two types and their names.
       tags:
       - card
       x-ticvai-permission: WALLET_OPERATE
@@ -2788,6 +2804,8 @@ paths:
                   default: 0
                 amountPaid:
                   $ref: ../shared/common.yaml#/components/schemas/Money
+                  description: 'What the guest paid for these credits: the amount the wallet moves by for a registered
+                    card, and the amount the ledger posts as the liability (r8, APPROVALS-TENANCY-C30).'
                 orderId:
                   type: string
                 recordedAt:
@@ -2798,7 +2816,8 @@ paths:
           headers:
             X-Consistency-Token:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
-          description: Loaded
+          description: Loaded (a registered card), or handed to the games consumer with the card as it will stand (an
+            anonymous card)
           content:
             application/json:
               schema:
@@ -4799,6 +4818,14 @@ components:
           $ref: ../shared/common.yaml#/components/schemas/Money
         remainingAmount:
           $ref: ../shared/common.yaml#/components/schemas/Money
+        issuedCredits:
+          type: integer
+          minimum: 0
+          nullable: true
+          description: '**Game credits are counted, not priced** (the lead, 20 October 2026, r8 cause
+            APPROVALS-TENANCY-C30, option A): the credits a game-card load put on this lot (credit types
+            `gameCredit` and `gameBonusCredit`); `issuedAmount` is the money paid for them (zero for bonus). Null on
+            every other lot.'
         issuedAt:
           type: string
           format: date-time

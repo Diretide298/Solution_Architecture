@@ -46,6 +46,18 @@ transitions:
   trigger: operation
   guard: Restored
   isReversal: true
+- from: ready
+  to: processing
+  operation: replaceMediaAsset
+  trigger: operation
+  guard: 'A new file replaces this one (r8, ORDERS-MONEY-C29): the old file is kept as a version row (the first
+    replace writes version 1) and the derivatives are regenerated; allowed from ready and archived only, else 409
+    assetNotReplaceable'
+- from: archived
+  to: processing
+  operation: replaceMediaAsset
+  trigger: operation
+  guard: 'A new file replaces an archived one (r8, ORDERS-MONEY-C29); as from ready'
 notes: '`processing` is the state most systems omit and the one that breaks things. An upload completes
   before its derivatives exist, and a screen showing "done" too early produces a broken image.
 

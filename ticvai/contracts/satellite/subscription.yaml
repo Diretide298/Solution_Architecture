@@ -201,6 +201,12 @@ paths:
         `billingEntity` carries the company to be invoiced and its documents before verification; nothing is
         provisioned until it is verified.
 
+        **The plan choice is saved on the application too** (the lead, 20 October 2026, r8 cause
+        APPROVALS-TENANCY-C16, option B): `requestedPlanId` carries the plan and term the prospect picked on
+        SGN-012 and SGN-019 (sent from SGN-020). A prospect never calls `setSubscription`, which is
+        staff-only; platform staff set the first subscription from `requestedPlanId` when the application is
+        approved and provisioned.
+
         '
       tags:
       - subscription
@@ -1909,12 +1915,17 @@ paths:
         - "P17 SGN-024 Subscription Confirmation & Commercial Activation"
       security:
       - bearerAuth: []
-      - prospectAuth: []
       x-ticvai-audience:
       - staff
-      - prospect
       summary: Assign or change a subscription
-      description: 'Upgrades take effect immediately. **Downgrades are checked first**: if the target
+      description: '**Staff only** (the lead, 20 October 2026, r8 cause APPROVALS-TENANCY-C16, option B). A prospect
+        has no tenant and holds no permission, so it never calls this: its plan choice travels on the onboarding
+        application (`submitOnboardingApplication`, `requestedPlanId`), and platform staff set the first
+        subscription from it once the application is verified and the tenant is provisioned. `prospectAuth` and
+        the `prospect` audience are removed.
+
+
+        Upgrades take effect immediately. **Downgrades are checked first**: if the target
         plan licenses fewer modules than the tenant currently has enabled, or lower limits than they are
         currently using, the change is refused and the conflicts are named.
 
@@ -2180,7 +2191,9 @@ paths:
               - reason
               properties:
                 moduleKey:
-                  type: string
+                  $ref: '#/components/schemas/ModuleKey'
+                  description: 'The add-on to remove, by its licence module key: the shared `ModuleKey` (plan and
+                    licence vocabulary), never a white-label feature key (r8, APPROVALS-TENANCY-C17).'
                 reason:
                   type: string
                   minLength: 3
@@ -3965,7 +3978,7 @@ paths:
         **Order.** Soonest first, by `effectiveFrom` ascending, then by `productId`.'
       tags:
       - drafted
-      x-ticvai-permission: PLATFORM_TENANT_VIEW
+      x-ticvai-permission: MEMBERSHIP_VIEW
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -4077,7 +4090,7 @@ paths:
         rather than rewriting active member contracts; publication of that version goes through approveMembershipProductValidation.'
       tags:
       - drafted
-      x-ticvai-permission: PLATFORM_CELL_MANAGE
+      x-ticvai-permission: MEMBERSHIP_MANAGE
       x-ticvai-scope-level: tenant
       x-ticvai-config-scope: tenant
       # Added 20 September when `IS_CONFIG` was widened to see `Tier`. A membership
@@ -4139,7 +4152,7 @@ paths:
         naming the failing rule; the same evaluation serves purchase, activation and renewal.'
       tags:
       - drafted
-      x-ticvai-permission: PLATFORM_CELL_MANAGE
+      x-ticvai-permission: MEMBERSHIP_MANAGE
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -4253,7 +4266,7 @@ paths:
         can trace each benefit to what grants it.'
       tags:
       - drafted
-      x-ticvai-permission: PLATFORM_CELL_MANAGE
+      x-ticvai-permission: MEMBERSHIP_MANAGE
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -4307,7 +4320,7 @@ paths:
         **Order.** Sorted by `membershipCode` ascending.'
       tags:
       - drafted
-      x-ticvai-permission: PLATFORM_TENANT_VIEW
+      x-ticvai-permission: MEMBERSHIP_VIEW
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -4434,7 +4447,7 @@ paths:
         **Order.** Sorted by `membershipCode` ascending.'
       tags:
       - drafted
-      x-ticvai-permission: PLATFORM_TENANT_VIEW
+      x-ticvai-permission: MEMBERSHIP_VIEW
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -4515,7 +4528,7 @@ paths:
         from the old expiry.'
       tags:
       - drafted
-      x-ticvai-permission: PLATFORM_CELL_MANAGE
+      x-ticvai-permission: MEMBERSHIP_MANAGE
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -4559,7 +4572,7 @@ paths:
         one membership product version; without `version`, the latest.
       tags:
       - drafted
-      x-ticvai-permission: PLATFORM_CELL_MANAGE
+      x-ticvai-permission: MEMBERSHIP_VIEW
       x-ticvai-audience:
       - staff
       x-ticvai-scope-level: tenant
@@ -4637,7 +4650,7 @@ paths:
         like every other action. Any other action on the wrong status answers 409 `invalid-product-transition`.'
       tags:
       - drafted
-      x-ticvai-permission: PLATFORM_CELL_MANAGE
+      x-ticvai-permission: MEMBERSHIP_MANAGE
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -4893,7 +4906,7 @@ paths:
         is written to the lifecycle history.'
       tags:
       - drafted
-      x-ticvai-permission: PLATFORM_CELL_MANAGE
+      x-ticvai-permission: MEMBERSHIP_MANAGE
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -4954,7 +4967,7 @@ paths:
         **Order.** Sorted by `membershipId` descending (a UUIDv7, so newest first).'
       tags:
       - drafted
-      x-ticvai-permission: PLATFORM_TENANT_VIEW
+      x-ticvai-permission: MEMBERSHIP_VIEW
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -5141,7 +5154,7 @@ paths:
         **Order.** Sorted by `membershipId` descending (a UUIDv7, so newest first).'
       tags:
       - drafted
-      x-ticvai-permission: PLATFORM_TENANT_VIEW
+      x-ticvai-permission: MEMBERSHIP_VIEW
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -5230,7 +5243,7 @@ paths:
         **Order.** Sorted by `membershipId` descending (a UUIDv7, so newest first).'
       tags:
       - drafted
-      x-ticvai-permission: PLATFORM_TENANT_VIEW
+      x-ticvai-permission: MEMBERSHIP_VIEW
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -5660,7 +5673,7 @@ paths:
         **Order.** Soonest first, by `expiryDate` ascending, then by `membershipId`.'
       tags:
       - drafted
-      x-ticvai-permission: PLATFORM_TENANT_VIEW
+      x-ticvai-permission: MEMBERSHIP_VIEW
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -9582,7 +9595,7 @@ paths:
         `retired` or `expired` answers 409.'
       tags:
       - subscription
-      x-ticvai-permission: PLATFORM_CELL_MANAGE
+      x-ticvai-permission: MEMBERSHIP_MANAGE
       x-ticvai-scope-level: tenant
       x-ticvai-config-scope: tenant
       x-ticvai-offline-capable: false
@@ -9645,6 +9658,9 @@ paths:
       - query: payments#instalmentPolicyRecords
         route: service
         for: 'whether payments supports instalments for the product (422 instalments-not-supported) (CHG-MOD-003)'
+      - query: catalogue#taxProfileRecords
+        route: service
+        for: 'that `taxProfile` names an active catalogue.tax_profile row (422 unknown-profile) (r8, GPS-C34)'
       x-ticvai-singleton: true
       x-ticvai-singleton-note: 'One per membership product, the one the body''s `membershipCode` names, within the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
@@ -9669,14 +9685,24 @@ paths:
         checks read what this saves.
 
 
-        Rules: `basePricingProfile` and `taxProfile` must name an active pricing and tax profile (422 otherwise);
+        **What each reference names** (r8, GPS-C34; ticket 29883). `basePricingProfile` is the id of a catalogue
+        price list (`listPriceLists`, read through catalogue#priceListRecords); `taxProfile` is the id of a
+        catalogue tax profile (`listTaxProfiles`, catalogue.tax_profile, read through catalogue#taxProfileRecords).
+        `feeProfile` and `upgradePricePolicy` name no entity yet: each is a code the venue keeps in its own price
+        and fee rules, stored as given and shown back as given, never checked against a table, until the client
+        names those entities (proposed, client to confirm). Pricing stays in pricing: none of the four is a
+        price.
+
+
+        Rules: `basePricingProfile` must name an active price list and `taxProfile` an active tax profile (422
+        unknown-profile otherwise);
         `autoRenewPayment` in `paymentTerms` needs the product''s `autoRenewEligible` (422); `installments`
         only where the payments module supports them (422). A recurring `billingFrequency` without `autoRenewPayment`
         or `installments`, or a billing cycle longer than the product''s term, is refused (422, 29 September, build:
         2.14.19). A product `retired` or `expired` answers 409.'
       tags:
       - subscription
-      x-ticvai-permission: PLATFORM_CELL_MANAGE
+      x-ticvai-permission: MEMBERSHIP_MANAGE
       x-ticvai-scope-level: tenant
       x-ticvai-config-scope: tenant
       x-ticvai-offline-capable: false
@@ -11835,18 +11861,22 @@ components:
           description: The membership product (subscription.membership_product) being associated.
         basePricingProfile:
           type: string
-          description: Base Pricing Profile id
+          description: 'Base Pricing Profile: the id of an active catalogue price list (`listPriceLists`) (r8,
+            GPS-C34)'
         taxProfile:
           type: string
-          description: Tax Profile id
+          description: 'Tax Profile: the id of an active catalogue.tax_profile row (`listTaxProfiles`) (r8, GPS-C34)'
         feeProfile:
           type: string
           nullable: true
-          description: Fee Profile id
+          description: 'Fee Profile: a code the venue keeps in its fee rules; no entity holds fee profiles yet, so it
+            is stored as given and not checked (proposed, client to confirm; r8, GPS-C34)'
         upgradePricePolicy:
           type: string
           nullable: true
-          description: Upgrade Price Policy id (pack p.14); pro-rata credit on upgrade per MoM 1 Sep §4.9
+          description: 'Upgrade Price Policy (pack p.14); pro-rata credit on upgrade per MoM 1 Sep §4.9. A code the
+            venue keeps in its price rules; no entity holds upgrade policies yet, so it is stored as given and not
+            checked (proposed, client to confirm; r8, GPS-C34)'
         promotionalPricingEligibility:
           type: boolean
           default: false
@@ -17321,7 +17351,13 @@ components:
           readOnly: true
           description: The tenant the add-on was sold to — the `tenantId` in the path, never the body.
         moduleKey:
-          type: string
+          $ref: '#/components/schemas/ModuleKey'
+          description: '**The licence vocabulary, not the white-label one** (the lead, 20 October 2026, r8 cause
+            APPROVALS-TENANCY-C17, option B): an add-on licenses a shared `ModuleKey` (`ticketing`, `fnb`,
+            `retail`, ...), or the add-on key `poweredByRemoval` that lets a tenant switch "Powered by TICVAI"
+            off. White label''s feature keys (`ticketsAndBooking`, `diningAndFnb`, `shop`, ...) are mapped to
+            these once, on `ModuleKey` in common.yaml and `x-ticvai-licence-module` in white-label.yaml, and
+            never stored here.'
         limitOverrides:
           type: array
           items:
@@ -19969,6 +20005,19 @@ components:
         the workshop pack''s own display and configuration directory for this screen; each property names
         the sentence it came from. **Not a row** - the screen is a view over the module''s existing state.'
       properties:
+        catalogueProductId:
+          type: string
+          format: uuid
+          nullable: true
+          description: 'The catalogue product this membership is sold as (`MembershipProduct.catalogueProductId`,
+            subscription.membership_product.catalogue_product_id), so BO-291 can read and send back its channel
+            availability and prices (r8, GPS-C39)'
+        variantId:
+          type: string
+          format: uuid
+          nullable: true
+          description: 'The variant of that product the price list prices (its default variant), for setPrices
+            (r8, GPS-C39); read from catalogue at read time, not stored here'
         basePricingProfile:
           type: string
           description: Base Pricing Profile id

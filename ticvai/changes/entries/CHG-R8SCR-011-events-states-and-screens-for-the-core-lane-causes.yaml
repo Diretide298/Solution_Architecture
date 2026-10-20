@@ -1,0 +1,59 @@
+id: CHG-R8SCR-011
+date: '2026-10-20'
+source: audit
+kind: spec
+summary: 'Event, state, screen and ADR parts of causes the core lane carried, made by this lane at its request. New
+  events identity.guestRegistered, shift.opened, tenantDomain.rejected and catalogue.productWithdrawn;
+  tenantDomain.mapped v2 carries the domain row; shift.closed has an identity consumer; order.paid names its line
+  ids; a registered device starts unknown. Screens: GST-048 asks only what the guest decides and lists variants when
+  a suggestion has none; WEB-006, GST-008, GST-050, GST-075 start the cart in the background; WEB-013 Add to wallet
+  sends reprintOrder; WEB-032''s dead link says only that the offer is no longer available; GST-016 defines its tabs;
+  GST-019''s full invoice asks the address; build notes on POS-004, POS-005, WEB-012, WEB-013, EMP-002 and on the
+  screens whose visible wording waits for the client (GST-012, GST-027, WEB-041, POS-003, POS-000, EMP-001,
+  SCN-001, WEB-032). ADR-0013 C102 and C103 settled, ADR-0030 relaxed for promotions, ADR-0045 cart before contact,
+  ADR-0063 bundle key; OFFLINE-JOURNAL and OFFLINE-BUNDLE texts; F59 step 4.'
+decision:
+  what: 'events/identity-guestRegistered.yaml, shift-opened.yaml, tenantDomain-rejected.yaml,
+    catalogue-productWithdrawn.yaml (new); events/tenantDomain-mapped.yaml, shift-closed.yaml, order-paid.yaml,
+    device-statusChanged.yaml; states/registered-device.yaml; screens P01, P02, P04, P06, P07 (bindings, entry
+    state, notes; visible wording in the lane''s pending list); docs/adr/0013, 0030, 0045, 0063;
+    docs/active/block-a-extra-tasks.json; flows/F59. Causes FOUNDATION-AI-C04, C13, C14, C39, C45, C46,
+    IDENTITY-C01, C28, C29, C45, C51, C52, C55, APPROVALS-TENANCY-C11, C27, ORDERS-MONEY-C01, C06, C11, C13, C40,
+    GPS-C13, C23, C37.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: R8 blocker cause list, second round: the core lane''s requests to the surface lane (relayed by the
+  coordinator) and answers.json of 20 October 2026.'
+keys_touched:
+  screens: [GST-008, GST-012, GST-016, GST-019, GST-027, GST-048, GST-050, GST-075, WEB-006, WEB-012, WEB-013,
+    WEB-032, WEB-041, POS-000, POS-003, POS-004, POS-005, EMP-001, EMP-002, SCN-001]
+  files:
+  - events/identity-guestRegistered.yaml
+  - events/shift-opened.yaml
+  - events/tenantDomain-rejected.yaml
+  - events/catalogue-productWithdrawn.yaml
+  - events/tenantDomain-mapped.yaml
+  - events/shift-closed.yaml
+  - events/order-paid.yaml
+  - events/device-statusChanged.yaml
+  - states/registered-device.yaml
+  - docs/adr/0013-local-first-point-of-sale.md
+  - docs/adr/0030-deep-link-cold-entry.md
+  - docs/adr/0045-every-order-carries-a-proven-contact.md
+  - docs/adr/0063-encryption-keys-and-biometric-templates.md
+  - docs/active/block-a-extra-tasks.json
+root_class: 'cross-lane hand-over: a cause''s non-contract half'
+tickets:
+  started: []
+  unstarted:
+  - 'the tickets of the causes named (see the core lane''s report).'
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: R8 blocker walk, second round'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-states.py
+status: open
+notes: 'shift.opened, the identity consumer on shift.closed and identity.guestRegistered''s emitter rely on the core
+  lane''s identity.open_shift_marker and registerGuest emits, merged at the integration branch, not on this branch.'

@@ -1,6 +1,9 @@
+# Production, UAE cell ae1 (the client hosts production later; the lead, 20 October 2026).
+# A cell is a region with a database per tenant (ADR-0038, ADR-0040): Miral is a tenant placed on it,
+# a row in the control database (ADR-0039), not an input here (FOUNDATION-AI-C55).
 # Miral, UAE cell. Covers the Abu Dhabi and Dubai regions.
-tenant_id    = "00000000-0000-0000-0000-000000000000"
-tenant_slug  = "miral"
+environment  = "production"
+cell         = "ae1"
 jurisdiction = "ae"
 tier         = "dedicated"
 location     = "uaenorth"

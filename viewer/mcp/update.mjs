@@ -5,7 +5,7 @@
  *     node update.mjs --check          # say whether an update exists, write nothing
  *     node update.mjs --install-hooks  # put the usage hooks into settings.json (setup runs this)
  *     node update.mjs --remove-hooks   # take ADAM's hooks out again (uninstall runs this)
- *     node update.mjs --refresh-workspace <folder> [--role backend|frontend] [--from <starters>]
+ *     node update.mjs --refresh-workspace <folder> [--role backend|frontend|ai] [--from <starters>]
  *                                      # replace ADAM's command files, and CLAUDE.md between ADAM's markers
  *
  * **This downloads code and runs it afterwards, so it is written like something
@@ -411,11 +411,13 @@ const REFRESH_DIR = argAfter('--refresh-workspace');
 const lf = (text) => String(text).replace(/\r\n/g, '\n');
 const readOrNull = (file) => readFile(file, 'utf8').catch(() => null);
 
-/** backend or frontend, from the folder's own files; null when they do not say. */
+/** backend, frontend or ai, from the folder's own files; null when they do not say. */
 async function roleOf(folder) {
   const ticket = await readOrNull(path.join(folder, '.claude', 'commands', 'ticket.md')) ?? '';
   const claude = await readOrNull(path.join(folder, 'CLAUDE.md')) ?? '';
   if (/dotnet test/i.test(ticket)) return 'backend';
+  // An AI engineer's folder (the `ai` role, 20 Oct 2026): its /ticket runs pytest.
+  if (/`pytest`/.test(ticket)) return 'ai';
   if (/lint, typecheck|screen or contract|repository for the ticket's platform/i.test(ticket)) return 'frontend';
   if (/dotnet/i.test(claude)) return 'backend';
   if (/workspace|pnpm|package\.json/i.test(claude)) return 'frontend';
@@ -552,9 +554,9 @@ async function refreshOnly() {
     return;
   }
   const role = argAfter('--role') ?? await roleOf(folder);
-  if (!['backend', 'frontend'].includes(role)) {
-    say(`workspace: could not tell a backend from a frontend folder in ${folder}. `
-      + 'Run again with  --role backend  or  --role frontend.');
+  if (!['backend', 'frontend', 'ai'].includes(role)) {
+    say(`workspace: could not tell a backend, frontend or AI folder in ${folder}. `
+      + 'Run again with  --role backend,  --role frontend  or  --role ai.');
     process.exit(2);
   }
   let source;

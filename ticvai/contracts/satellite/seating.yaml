@@ -186,6 +186,22 @@ x-ticvai-queries:
       a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked
       from another deployable through Catalogue's service route (serviceAuth).
     served: [service]
+  seatHoldRecords:
+    module: seating
+    table: seating.seat_reservation
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The seat holds asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (performanceId, a hold''s status); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The holds found, each as Seating stores it (with its expiry); an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/SeatHold'}
+    rule: >-
+      A data read, not a rule question (r8, ORDERS-MONEY-C19; ADR-0055 rule 2 as amended 14 October). Seating answers
+      with its seat holds, as it stores them and as the caller's scope lets it see them; Orders' holdOrder reads a
+      held seat's expiry through it rather than reading seating.seat_reservation. It decides nothing. It is asked
+      from another deployable through the service route (serviceAuth).
+    served: [service]
   zoneRecords:
     module: seating
     table: seating.zone
@@ -1704,7 +1720,8 @@ paths:
                 $ref: '#/components/schemas/SeatHold'
         '409':
           description: 'One or more seats are no longer available, or the selection breaks a seating rule.
-            The response names the offending seats.
+            The response names the offending seats. For a standing zone, `zone-unavailable`: fewer places left
+            than `quantity`, with the zone''s `remaining` (r8, GPS-C38).
 
             '
           content:
@@ -4936,6 +4953,26 @@ components:
                 type: integer
               price:
                 $ref: ../shared/common.yaml#/components/schemas/Money
+        zones:
+          type: array
+          description: '**The standing zones and what is left in each** (r8, GPS-C38): a zone has no seats, so it is
+            sold by quantity (`createSeatHold` `zoneId` and `quantity`). `keepTogether` says whether the venue keeps a
+            party in one zone (a party larger than `remaining` is then refused rather than split).'
+          items:
+            type: object
+            required: [zoneId, name, remaining]
+            properties:
+              zoneId:
+                type: string
+                format: uuid
+              name:
+                type: string
+              remaining:
+                type: integer
+                minimum: 0
+              keepTogether:
+                type: boolean
+                default: true
         sections:
           type: array
           description: 'The map''s sections with what a guest screen needs to show the view from each
@@ -4996,7 +5033,9 @@ components:
       required:
       - id
       - performanceId
-      - seatIds
+      description: '**Seats or a standing zone, exactly one** (r8, GPS-C38): `seatIds` holds named seats; `zoneId` with
+        `quantity` holds places in a standing zone (a zone has no seats), refused `409` `zone-unavailable` when the
+        zone has fewer left. Both, or neither, is `400`.'
       properties:
         id:
           type: string
@@ -5004,6 +5043,15 @@ components:
         performanceId:
           type: string
           format: uuid
+        zoneId:
+          type: string
+          format: uuid
+          description: A standing zone of the performance's map (`SeatAvailability.zones`), with `quantity` (r8, GPS-C38).
+        quantity:
+          type: integer
+          minimum: 1
+          maximum: 50
+          description: The places held in `zoneId`; the same per-booking limits as `seatIds` (r8, GPS-C38).
         seatIds:
           type: array
           minItems: 1

@@ -93,6 +93,10 @@ screens:
   wave: 1
   permission: SESSION_FORCE_LOGOUT
   capability: C11
+  notes: 'Build note (r8 second round, IDENTITY-C01, from the core lane): login is online-only for tills and staff
+    handhelds in r8 (identity login x-ticvai-offline-note); build the offline state as "signing in needs a
+    connection", not the cached-list sign-in above. The wording waits for the client (pending entry
+    IDENTITY-C01).'
   purpose: Authenticate the operator at the terminal and resolve the session every other screen on this
     app reads.
   implementation:
@@ -2114,10 +2118,10 @@ screens:
     - to: POS-004
       trigger: Sell — Seat Map
       carries:
-      - holdId
       - performanceId
-      provenance: derived — POS-004 declares entryState.params holdId, performanceId and POS-003 holds
-        holdId, performanceId, so an edge into it carries them
+      provenance: 'r8 second round (GPS-C11): carries the picked performance only. POS-003 takes no hold of its
+        own (the cart''s hold is the only one, taken by addCartLine), so it has no holdId to hand on; POS-004''s
+        seated step makes its own seat hold (createSeatHold)'
     - to: POS-006
       trigger: Held Orders
       provenance: 'derived — POS-006 declares entryState.params orderId and POS-003 holds none of them.
@@ -2143,7 +2147,17 @@ screens:
     Build note (r8, GPS-C12, decided by the lead 20 October 2026): POS-003 is the drawer step of POS-002,
     not a page. Build the date and the session (calendar and available times) here. The quantities and Add
     to cart belong to POS-002''s quantity step, where every variant arrives. Not built: the five back-office
-    tables, Resolve by code, and the inventoryHoldId deep link.'
+    tables, Resolve by code, and the inventoryHoldId deep link.
+
+
+    Build note (r8 second round, GPS-C11): the no-access state''s last sentence (`ORDER_CREATE` for
+    `acquireInventoryHold`) no longer applies: this screen takes no hold. Its removal changes a
+    client-approved state and waits for the client (pending entry GPS-C11); build the state without it.
+
+
+    Build note (r8 second round, GPS-C37 and FOUNDATION-AI-C45, from the core lane): Block A takes no standing
+    lease, so contended timed entry is online-only at the till; build the offline state as "needs a
+    connection", not the lease text above. The wording waits for the client (pending entry GPS-C37).'
   density: touchLarge
   pattern: listDetail
   patternReason: '`listProductVariants` reads the population and `getAvailability` reads one of them —
@@ -2217,8 +2231,9 @@ screens:
         - InventoryHold.acquiredAt
         - InventoryHold.expiresAt
         - InventoryHold.releasedAt
-        operation: listInventoryHolds
         provenance: contract catalogue.yaml GET /inventory-holds
+        notes: 'Never drawn (GPS-C12) and bound to nothing (r8 second round, GPS-C11): the till lists no holds;
+          the cart''s countdown is the only hold the cashier sees.'
       - kind: dataTable
         label: Every product
         bindsTo: Product
@@ -2251,11 +2266,11 @@ screens:
       components:
       - kind: secondaryButton
         label: Acquire inventory hold
-        operation: acquireInventoryHold
         provenance: contract catalogue.yaml POST /inventory-holds
         notes: '**Not a cashier control** (v2, POSV2-10): the terminal takes its lease when the line is
-          added and the cashier sees only the cart''s countdown. Kept for the terminal''s own lease (ADR-0013),
-          never drawn as a button.'
+          added and the cashier sees only the cart''s countdown. Never drawn as a button, and bound to nothing
+          since r8 (GPS-C11): `addCartLine` (on POS-002''s quantity step) takes the cart''s hold, which is the
+          only hold; this screen calls no `acquireInventoryHold`.'
       - kind: secondaryButton
         label: Resolve product by code
         operation: resolveProductByCode
@@ -2300,12 +2315,6 @@ screens:
     contract: catalogue
     purpose: Per-session remaining
     trigger: onLoad
-  - operationId: acquireInventoryHold
-    contract: catalogue
-    purpose: Hold capacity for this terminal
-    trigger: onAction
-    invalidates:
-    - listProductVariants
   - operationId: listProductVariants
     contract: catalogue
     purpose: Ticket types
@@ -2317,10 +2326,6 @@ screens:
   - operationId: listAlternativeCodes
     contract: catalogue
     purpose: External identifiers for a product
-    trigger: onLoad
-  - operationId: listInventoryHolds
-    contract: catalogue
-    purpose: List leases
     trigger: onLoad
   - operationId: listProducts
     contract: catalogue
@@ -2335,8 +2340,8 @@ screens:
     - name: inventoryHoldId
       from: deepLink
       optional: true
-      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listInventoryHolds`
-        and the user picks one; an edge that holds one may still carry it to open on that record.'
+      notes: 'Not built (GPS-C12): the till lists no inventory holds and this screen takes none (GPS-C11); a link
+        carrying it opens the sale step as if it were absent.'
     - name: productId
       from: POS-002
     coldEntry: '**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent
@@ -2376,13 +2381,11 @@ screens:
   - id: formAcquireInventoryHold
     component: modal
     trigger: Acquire inventory hold
-    body: '**Collects what `acquireInventoryHold` sends before it is called.** Required: `id`, `channelCapacityId`,
-      `requestedUnits`, `ttlSeconds`. Optional: `channel`. Dismissing sends nothing; the screen behind
-      is unchanged.'
+    body: '**Never opened** (r8 second round, GPS-C11): its button is never drawn and this screen takes no hold;
+      the cart''s hold, taken by `addCartLine`, is the only one. Kept only because the approved snapshot lists it.'
     bindsTo: AcquireLeaseRequest
     confirm:
       label: Acquire inventory hold
-      operation: acquireInventoryHold
     dismiss:
       label: Cancel
       discards:
@@ -2461,7 +2464,19 @@ screens:
 
     **Built as step three of the POS-002 sale drawer (section, then seats), not a page of its own: the
     plan''s default of 4 October 2026, carried by the tickets (block-a-extra-tasks.json screenNotes),
-    closing the 3 August question ''whether this survives as a screen'' (Chinmay to confirm)** (CHG-FXS-005)'
+    closing the 3 August question ''whether this survives as a screen'' (Chinmay to confirm)** (CHG-FXS-005)
+
+
+    Build note (r8 second round, GPS-C13, from the core lane): this step holds the seats and carries `holdId`
+    to POS-005, which creates the order and the payment; when `createOrder` answers 409 `hold-not-active` (the
+    hold lapsed while the cashier took payment details) POS-005 sends the cashier back here to pick again.
+
+
+    Build note (r8 second round, GPS-C38, from the core lane): a standing zone is sold by quantity: the zone
+    and what is left come with `getSeatAvailability` (`zones`), the hold is `createSeatHold` with `zoneId` and
+    `quantity`, and a 409 `zone-unavailable` shows the zone''s state as unavailable with what is left, keeping
+    the party together where the venue asks it (`keepTogether`). The cart line names its zone hold through
+    `inventoryHoldId`.'
   density: touchLarge
   boardFrames:
   - Seat Board 3.dc.html#seat-3a
@@ -2628,6 +2643,13 @@ screens:
     contract: orders
     purpose: Take a payment against an order
     trigger: onAction
+  - operationId: listPerformances
+    contract: catalogue
+    purpose: 'The cold entry (r8, GPS-C05): a link to a performance that has happened offers the next performance
+      of the same event, the first upcoming one `listPerformances` returns for the performance''s `eventId`
+      (`getPerformance`). Not called on the ordinary way in.'
+    trigger: background
+    provenance: r8 second round, GPS-C05 (ticket 28206)
   entryState:
     params:
     - name: holdId
@@ -2637,6 +2659,11 @@ screens:
         a link or an edge that holds one opens it instead.'
     - name: performanceId
       from: deepLink
+    - name: eventId
+      from: navigation
+      optional: true
+      notes: 'r8 (GPS-C05): read from `Performance.eventId` (`getPerformance`); `listPerformances` takes it on the
+        cold entry.'
     coldEntry: '**A link to a performance that has happened.** Offers the next performance of the same
       event.'
   wireframe:
@@ -2839,7 +2866,12 @@ screens:
     **Receipt** (CHG-FIN-011): the receipt printed or emailed on payment is the simplified tax invoice
     titled "Tax Invoice", issued automatically when the order is paid (POS-026). Foreign cash tendered
     here is recorded at its base equivalent and change is given in base currency (DI-282, unchanged by
-    CHG-FIN-001).'
+    CHG-FIN-001).
+
+
+    Build note (r8 second round, GPS-C13, from the core lane): this screen creates the order (with the
+    `holdId` POS-004 carried) and the payment; a 409 `hold-not-active` from `createOrder` sends the cashier
+    back to the seat map (POS-004) to pick again, with the guest''s other lines kept.'
   density: touchLarge
   boardFrames:
   - Retail Board 3.dc.html#ret-3e
@@ -6552,7 +6584,14 @@ screens:
     board’s platforms.** These packs label by board position (`GM-6C`) rather than naming the screen,
     so the title is the only join — *Till Configuration* matched at 1.0. **A cross-platform title match
     was refused**: `Outlet Management` scored 0.85 against a partner-portal screen, which is how a mapping
-    goes wrong quietly.'
+    goes wrong quietly.
+
+
+    Build note (r8 second round, APPROVALS-TENANCY-C24): the screen now reads `getWorkstation`, `listShifts`,
+    `listDenominations` and `listSaleBoards` (see apis); the no-access state should also name their
+    permissions (`SCOPE_VIEW`, `REPORT_VIEW_WORKSTATION`, `SHIFT_OPEN`). That wording changes a
+    client-approved state and waits for the client (pending entry APPROVALS-TENANCY-C24); build a field whose
+    read is refused as disabled, naming its permission.'
   density: touchLarge
   boardFrames:
   - POS Frontline Board 2.dc.html#pos-2b
@@ -6581,14 +6620,17 @@ screens:
         provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
       - kind: selectField
         label: Cashier
-        operation: allocateDepositBox
-        notes: Picked from the staff on shift; the deposit box is allocated to them on this workstation.
+        operation: listShifts
+        notes: 'Picked from the staff on shift; the deposit box is allocated to them on this workstation. Options:
+          the cashiers of the open shifts (`listShifts`, status open) at this till''s venue (r8, APPROVALS-TENANCY-C24);
+          the pick is sent with `allocateDepositBox`.'
         provenance: contract shift.yaml allocateDepositBox
         bindsTo: DepositBox.cashierPrincipalId
       - kind: numberField
         label: Float by denomination
-        operation: allocateDepositBox
-        notes: The float, as a total or by denomination. Ids, statuses, expected and counted totals and
+        operation: listDenominations
+        notes: The denominations come from `listDenominations` (r8, APPROVALS-TENANCY-C24); the float is sent with
+          `allocateDepositBox`. The float, as a total or by denomination. Ids, statuses, expected and counted totals and
           the variance are computed or closing data and are not fields (design-notes corrections platform-foundation
           POS-016).
         provenance: contract shift.yaml allocateDepositBox
@@ -6610,15 +6652,17 @@ screens:
       - kind: numberField
         label: Drawer limit for this till (override)
         bindsTo: ConfigureWorkstationRequest.cashDrawerLimit
-        operation: configureWorkstation
-        notes: Empty uses the venue default (`VenueSettings.cashDrawerLimit`); the till warns and offers
+        operation: getWorkstation
+        notes: Shown as `getWorkstation` returns it and saved with the rest of the workstation by `configureWorkstation`
+          (r8, APPROVALS-TENANCY-C24). Empty uses the venue default (`VenueSettings.cashDrawerLimit`); the till warns and offers
           a lift above it (DEC-179; CHG-CSP-016).
         provenance: contract tenancy.yaml PUT /workstations/{workstationId}
       - kind: selectField
         label: Sale board (till override)
         bindsTo: ConfigureWorkstationRequest.saleBoardId
-        operation: configureWorkstation
-        notes: Empty inherits the outlet's board; set only to override it on this till (BO-109 "Per outlet,
+        operation: listSaleBoards
+        notes: Options from `listSaleBoards` for this till's venue, the current value from `getWorkstation`, saved by
+          `configureWorkstation` (r8, APPROVALS-TENANCY-C24). Empty inherits the outlet's board; set only to override it on this till (BO-109 "Per outlet,
           with a till override"; DEC-183; CHG-CSP-006).
         provenance: contract tenancy.yaml PUT /workstations/{workstationId}
       - kind: primaryButton
@@ -6671,11 +6715,37 @@ screens:
     provenance: decided 29 September, readiness close-out (QA wiring note)
     invalidates:
     - listDevices
+    - getDeviceAssignment
+    - getWorkstation
   - operationId: getDeviceAssignment
     contract: tenancy
-    purpose: Show where the selected device is assigned
+    purpose: 'Show where the selected device is assigned; it also fills the Assign peripheral form, which sends
+      the record back whole (r8, APPROVALS-TENANCY-C24)'
     trigger: onLoad
     provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
+  - operationId: getWorkstation
+    contract: tenancy
+    purpose: 'This till as saved (`workstationId` from the session): it fills the drawer limit and sale board
+      fields and the Configure workstation form, which `configureWorkstation` sends back whole; its linked
+      `devices` are this till''s peripherals (r8, APPROVALS-TENANCY-C24)'
+    trigger: onLoad
+    provenance: r8 second round, APPROVALS-TENANCY-C24 (tickets 27793, 27794)
+  - operationId: listShifts
+    contract: shift
+    purpose: 'The cashier picker: the open shifts (status open) at this till''s venue, and so the staff on shift;
+      also the custodian picker of the Assign peripheral form (r8, APPROVALS-TENANCY-C24)'
+    trigger: onLoad
+    provenance: r8 second round, APPROVALS-TENANCY-C24 (tickets 27793, 27794)
+  - operationId: listDenominations
+    contract: shift
+    purpose: The denominations the float is counted in (r8, APPROVALS-TENANCY-C24)
+    trigger: onLoad
+    provenance: r8 second round, APPROVALS-TENANCY-C24 (tickets 27793, 27794)
+  - operationId: listSaleBoards
+    contract: tenancy
+    purpose: The sale boards a till may override its outlet's board with (r8, APPROVALS-TENANCY-C24)
+    trigger: onLoad
+    provenance: r8 second round, APPROVALS-TENANCY-C24 (tickets 27793, 27794)
   entryState:
     params:
     - name: workstationId
@@ -6713,7 +6783,13 @@ screens:
     trigger: Assign peripheral to this till
     body: '**Collects what `setDeviceAssignment` sends before it is called.** Till peripherals come from
       device management, not the gate-reader write: the workstation it is assigned to (`assignedWorkstationId`),
-      who holds it and where it is. Dismissing sends nothing; the screen behind is unchanged.'
+      who holds it and where it is. Dismissing sends nothing; the screen behind is unchanged. **The form opens
+      filled with the assignment as `getDeviceAssignment` returns it and sends it back whole** (r8,
+      APPROVALS-TENANCY-C24): the call replaces the record, so the owner, asset tag and dates set on BO-732 are
+      sent as read and never erased; only the workstation and the custodian (picked from the staff on shift,
+      `listShifts`) are edited here. A peripheral assigned here is custody and location, not a binding: it does
+      not appear in `listDevices` (which lists by workstation); this till''s peripherals are the `devices` linked
+      on the workstation (`getWorkstation`, saved by `configureWorkstation`).'
     bindsTo: DeviceAssignment
     confirm:
       label: Assign peripheral to this till

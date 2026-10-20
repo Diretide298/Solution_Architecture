@@ -10142,6 +10142,80 @@ paths:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /venues/{venueId}/guided-choice-suggestion-jobs:
+    parameters:
+    - name: venueId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: runGuidedChoiceSuggestionJob
+      x-ticvai-agreed: '20 October 2026: r8 cause FOUNDATION-AI-C39 (the core lane''s request); shape follows
+        suggestGuidedChoice'
+      summary: Run the Help me choose job from an event (service callers)
+      description: '**The automatic half of `suggestGuidedChoice`** (r8, FOUNDATION-AI-C39). AI''s own consumers
+        call it: of `catalogue.productPublished` with `productsUploaded`, of `catalogue.productWithdrawn` with
+        `mappedProductWithdrawn` (for each published guided choice whose answers point at the product, found
+        through white-label''s `guidedChoiceRecords`), and the nightly check with `productsUncovered` when published
+        products fall in no answer. It runs the same job as `suggestGuidedChoice` and lands its draft the same
+        way; `suggestGuidedChoice`''s public body keeps only `manual`. Nothing is published.'
+      tags:
+      - configure
+      x-ticvai-permission: null
+      x-ticvai-auth: service
+      security:
+      - serviceAuth: []
+      x-ticvai-audience:
+      - service
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-via:
+      - query: white-label#guidedChoiceRecords
+        route: service
+        for: 'the published guided choices whose answers point at a withdrawn product (mappedProductWithdrawn)'
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - trigger
+              properties:
+                trigger:
+                  type: string
+                  enum:
+                  - productsUploaded
+                  - mappedProductWithdrawn
+                  - productsUncovered
+                productIds:
+                  type: array
+                  items:
+                    type: string
+                    format: uuid
+                  description: The products the event named (uploaded, withdrawn or uncovered).
+      responses:
+        '202':
+          description: 'Accepted: the job runs and lands a draft for review'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AiGuidedChoiceSuggestion'
+        '409':
+          description: A suggestion for this venue is already running (`suggestion-in-progress`).
+          x-ticvai-problem-types:
+          - suggestion-in-progress
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /guided-choice-suggestions/{suggestionId}:
     parameters:
     - name: suggestionId
@@ -11604,6 +11678,22 @@ components:
           description: 'The product recommended. **Exactly one of `productId`, `promotionId` or `couponRef`, `rewardId`
             or `challengeId` is set, by `kind`** (29 September, build): `offer` carries a promotion or coupon, `reward`
             a loyalty reward, `challenge` a challenge, every other kind a product.'
+        variantId:
+          type: string
+          format: uuid
+          nullable: true
+          description: '**What the guest adds to the cart, when there is nothing to choose** (r8, ORDERS-MONEY-C40, the
+            lead''s option A): for a product item whose product has one default variant, that variant, resolved from
+            the Pricing price reference the item carries; the add-to-cart asks only the quantity (and a date for a
+            timed product). Null when the product has several variants: the screen lets the guest choose
+            (`catalogue.listProductVariants`, option B). Null on non-product kinds (offer, reward, challenge),
+            which have their own action, never addCartLine.'
+        performanceId:
+          type: string
+          format: uuid
+          nullable: true
+          description: For a timed product with exactly one bookable performance in the context the engine was given
+            (the cart's date), that performance (r8, ORDERS-MONEY-C40); otherwise null and the screen asks for the date.
         promotionId:
           type: string
           format: uuid

@@ -52,7 +52,8 @@
     The ADAM project id (for example ticvai). Asked for when not given.
 
 .PARAMETER Role
-    backend or frontend - which CLAUDE.md, commands and standards the folder gets. Asked for when not given.
+    backend, frontend or ai - which CLAUDE.md, commands and standards the folder gets. Asked for when not given.
+    ai is an AI engineer's folder: a clone of ticvai-ai with ADAM's files (20 Oct 2026).
 
 .PARAMETER Folder
     The project folder. A new or empty one is created from the team's repository or the
@@ -109,7 +110,7 @@ param(
     [string]$ViewerUrl = 'https://adam.ainfinite.ai',
     [string]$Email = '',
     [string]$Project = '',
-    [ValidateSet('', 'backend', 'frontend')]
+    [ValidateSet('', 'backend', 'frontend', 'ai')]
     [string]$Role = '',
     [string]$Folder = '',
     [string]$RepoUrl = '',
@@ -137,6 +138,9 @@ $Starters = Join-Path $Here 'starters'
 # -RepoUrl overrides the list. ASCII only (see the note at the top).
 $TeamRepos = @{
     'ticvai/backend' = 'http://gitlab.softlabsgroup.in/ticvai/ticvai-backend.git'
+    # The AI engine (20 Oct 2026, r8 cause FOUNDATION-AI-C29): an AI engineer's folder is a clone of ticvai-ai with
+    # ADAM's files added; its starter has no code, only ADAM's CLAUDE.md and commands.
+    'ticvai/ai' = 'http://gitlab.softlabsgroup.in/ticvai/ticvai-ai.git'
 }
 # The frontend is one repository per app (13 Oct 2026; before that, one Nx workspace with every
 # app in it). The lead's call: "first we run adam setup and then within that git clone". A new
@@ -163,6 +167,9 @@ $Roles = [ordered]@{
     frontend = [pscustomobject]@{ Label = 'Frontend (your app''s repository: React Native or React web)'; Check = 'pnpm'; Docs = @(
         'naming-and-style', 'frontend-patterns', 'api-conventions', 'quality-gates', 'git-and-mrs',
         'llm-conventions', 'data-and-storage', 'config-and-secrets', 'dependencies', 'adding-things', 'quickstart') }
+    ai       = [pscustomobject]@{ Label = 'AI engine (ticvai-ai: Python, FastAPI, Qdrant)'; Check = 'python'; Docs = @(
+        'naming-and-style', 'llm-conventions', 'quality-gates', 'api-conventions', 'backend-patterns', 'git-and-mrs',
+        'data-and-storage', 'config-and-secrets', 'dependencies', 'adding-things', 'quickstart') }
 }
 # The connector itself. `version.mjs` and `update.mjs` are part of it and not
 # an extra: without them an install has no way to tell it is out of date and
@@ -1176,6 +1183,9 @@ if ($scope -eq 'user') {
     if ($Role -eq 'backend' -and $create) {
         Write-Host '     Build it once:' -NoNewline
         Write-Host '  dotnet test' -ForegroundColor Gray
+    } elseif ($Role -eq 'ai') {
+        Write-Host '     Install it once:' -NoNewline
+        Write-Host "  pip install -e '.[dev,qdrant]'; pytest" -ForegroundColor Gray
     } elseif ($Role -eq 'frontend' -and $script:StarterCode) {
         Write-Host '     Install it once:' -NoNewline
         Write-Host '  pnpm install' -ForegroundColor Gray

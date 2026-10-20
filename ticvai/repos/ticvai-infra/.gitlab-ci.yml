@@ -1,0 +1,30 @@
+# GitLab CI (the lead, 20 October 2026, r8 cause FOUNDATION-AI-C37, option A: GitLab CI with shared runners in every
+# repository; ADR-0007 amendment). Replaces the GitHub Actions workflows this repository shipped.
+
+stages: [check, validate]
+
+bible-check:
+  stage: check
+  image: alpine:3.20
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+  script:
+    - apk add --no-cache git >/dev/null
+    - test -f project-bible/overview.md || { echo "project-bible missing. Run ./update-bible.sh from the workspace root."; exit 1; }
+    - echo "Bible synced at $(cat project-bible/.synced-at 2>/dev/null || echo unknown)"
+    # project-bible/ is a copy of ticvai-docs: an edit here is overwritten by the next ./update-bible.sh run,
+    # so it is flagged rather than lost.
+    - git fetch -q origin "$CI_MERGE_REQUEST_TARGET_BRANCH_NAME"
+    - |
+      if git diff --name-only "origin/$CI_MERGE_REQUEST_TARGET_BRANCH_NAME...HEAD" | grep -q '^project-bible/'; then
+        echo "WARNING: project-bible/ was modified. It is a copy of ticvai-docs and will be overwritten on the next sync. Change ticvai-docs instead."
+      fi
+
+terraform:
+  stage: validate
+  image:
+    name: hashicorp/terraform:1.9.8
+    entrypoint: [""]
+  script:
+    - terraform fmt -check -recursive terraform
+    - cd terraform/environments/staging && terraform init -backend=false -input=false && terraform validate

@@ -1,0 +1,45 @@
+id: CHG-R8SCR-008
+date: '2026-10-20'
+source: audit
+kind: spec
+summary: 'Three screen causes of the second r8 round, bindings, entry state and navigation metadata only (no visible
+  field changes). Screens opened with one id resolve the other with a read they now bind: WEB-006 the event from
+  the product, WEB-007 and GST-049 the event from the performance, POS-004 the next performance on its cold entry;
+  GST-006 opens with either a performance or a product; WEB-004''s Book edge to WEB-007 carries the product
+  (GPS-C05). The till configuration reads what it shows: getWorkstation, the staff on shift, the denominations and
+  the sale boards, and the peripheral form sends the assignment back whole (APPROVALS-TENANCY-C24). The partner and
+  staff doors land by permission from a landing table; their approved exits are landing targets, not a launcher;
+  the back office lands on BO-100; their challenge and method ids are optional, and the stale F10 provenance is
+  corrected (IDENTITY-C07, option A).'
+decision:
+  what: 'screens/P01 WEB-004, WEB-006, WEB-007; P02 GST-006, GST-049; P04 POS-004, POS-016; P10 PTR-001; P12
+    SUP-001; flows/F01 step 3. POS-016''s no-access wording for the new reads is in the pending list for the client.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: R8 blocker cause list, second round (surface lane): tickets 28152, 28158, 28202, 28197, 28206, 27793,
+  27794, 27773, 27786 (ADAM gaps 28152/0, 28158/0, 28202/2, 28197/0, 28206/4, 27794/2, 27794/8, 27793/0, 27793/1,
+  27786/5, 27773/6); answers.json of 20 October 2026 (IDENTITY-C07).'
+keys_touched:
+  screens: [WEB-004, WEB-006, WEB-007, GST-006, GST-049, POS-004, POS-016, PTR-001, SUP-001]
+  operations: [getProduct, getPerformance, listPerformances, getWorkstation, listShifts, listDenominations,
+    listSaleBoards, getDeviceAssignment, setDeviceAssignment]
+  files:
+  - screens/P01-guest-web-storefront.yaml
+  - screens/P02-guest-mobile-app.yaml
+  - screens/P04-point-of-sale.yaml
+  - screens/P10-partner-reseller-portal.yaml
+  - screens/P12-support-agent-console.yaml
+  - flows/F01-guest-online-purchase.yaml
+root_class: 'screen-api gap: a screen action needs a value or a route the screen does not declare'
+tickets:
+  started: []
+  unstarted:
+  - '28152, 28158, 28202, 28197, 28206, 27793, 27794, 27773, 27786 (the walk that found the gaps).'
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: R8 blocker walk, second round'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-screens.py
+status: open

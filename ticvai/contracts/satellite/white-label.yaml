@@ -186,6 +186,22 @@ x-ticvai-queries:
       a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked
       from another deployable through WhiteLabel's service route (serviceAuth).
     served: [service]
+  guidedChoiceRecords:
+    module: white-label
+    table: whitelabel.guided_choice
+    inputs:
+      where: {type: object, additionalProperties: true, description: 'The rows whose columns equal these values (venueId, status); status published is the usual ask.'}
+    returns:
+      type: array
+      description: 'The guided choices found, each with its questions and answers and their targets, as WhiteLabel stores them.'
+      items: {$ref: '#/components/schemas/GuidedChoice'}
+    rule: >-
+      A data read, not a rule question (r8, FOUNDATION-AI-C39; ADR-0055 rule 2 as amended 14 October). WhiteLabel
+      answers with its whitelabel.guided_choice rows and their answers' targets, as it stores them and as the
+      caller's scope lets it see them. The AI job that re-runs Help me choose after a product is withdrawn asks it
+      which published choices point at the product. It is asked from another deployable through WhiteLabel's
+      service route (serviceAuth).
+    served: [service]
   guidedChoiceAnswerRecords:
     module: white-label
     table: whitelabel.guided_choice_answer
@@ -396,6 +412,11 @@ paths:
       description: '**Verification and issuance are one act from the tenant''s point of view and two states
         in the model.** A tenant who has published the record wants a working domain, not a green tick.
 
+        **Connected means the edge resolves it** (r8, APPROVALS-TENANCY-C11): after the mapping is sent
+        (`setTenantDomainMapping`, which reaches the control plane as `tenantDomain.mapped`), the domain is shown
+        connected only once `resolveTenantHost` answers the hostname with this tenant; a `tenantDomain.rejected`
+        (hostname taken by another tenant) shows the refusal instead.
+
         **Retried by a job rather than by the tenant.** DNS propagation takes hours and a tenant clicking
         *verify* every ten minutes is a tenant who will give up before it resolves.
 
@@ -458,6 +479,10 @@ paths:
       description: '**Refused while it is the only active domain for a live app.** Releasing the hostname
         a tenant''s guests are using takes their storefront down, and the confirmation should say so rather
         than the request succeeding.
+
+        **One mapping call per host** (r8, APPROVALS-TENANCY-C11): the release is sent as one
+        `setTenantDomainMapping` for this hostname; when it was the primary custom domain, the control plane''s
+        consumer promotes the platform subdomain, so no second call is made here.
 
         **A live app is an app with a published configuration (decided 28 September, audit R096)**: the
         tenant has a current `ConfigVersion` (`TenantAppStatus.isPublished` true) for the app the domain
@@ -523,6 +548,9 @@ paths:
       description: '**One primary domain per kind; the others redirect to it** (CHG-CSA-043). The domain must be
         `active`, or 409 `domain-not-active`. The tenant''s platform subdomain redirects to the primary too, and is
         primary again when none is.
+
+        **One mapping call per host** (r8, APPROVALS-TENANCY-C11): this sends one `setTenantDomainMapping` for the
+        new primary; demoting the channel''s other primary is the control plane consumer''s, from the same event.
 
         '
       tags:
@@ -3769,6 +3797,41 @@ paths:
                 $ref: '#/components/schemas/Preview'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /tenant-config/preview/{previewId}:
+    parameters:
+    - name: previewId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    get:
+      operationId: getPreview
+      x-ticvai-audience:
+      - staff
+      summary: Read a preview while its link lives
+      description: '**A preview is read back by its id until it expires** (r8, IDENTITY-C63; the storage-sat lane''s
+        request). `createPreview` keeps it in Redis under `cache:preview:{tenantId}:{previewId}` until `expiresAt`,
+        not in a table; this answers it as created (its link and rendered outputs), so a reviewer who reloads the
+        page sees the same preview. After `expiresAt` it is gone: 404, and the screen offers to create a new one.'
+      tags:
+      - publishing
+      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-scope-level: tenant
+      x-ticvai-read-routing: primary
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: The preview, as created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Preview'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /tenant-config/validate:
     post:
       operationId: validateTenantConfig
@@ -4533,6 +4596,60 @@ paths:
                 $ref: '#/components/schemas/GuidedChoice'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /venues/{venueId}/guided-choice-previews:
+    parameters:
+    - name: venueId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: previewGuidedChoice
+      x-ticvai-read-via:
+      - query: catalogue#productRecords
+        route: service
+        for: 'the products each combination of answers leaves, by the same answer filter listProducts applies for a
+          guest (r8, WHITE-C26)'
+      - query: catalogue#productEligibilityRuleRecords
+        route: service
+        for: 'the age and height limits an age or level answer filters on (r8, WHITE-C26)'
+      x-ticvai-audience:
+      - staff
+      summary: What a draft Help me choose leaves, combination by combination
+      description: '**The live preview of a draft set-up** (r8, WHITE-C26; the core lane made catalogue''s listProducts
+        say that drafts preview through this). The body is the draft''s questions and answers as CMS-101 holds them,
+        saved or not; the answer is, for every combination of answers a guest can give, how many of the venue''s
+        products it leaves and up to three of their ids, so the editor sees a combination that leaves nothing
+        before publishing. Nothing is stored and nothing is published; the guest filter is the one listProducts
+        applies, so the preview and the published behaviour cannot differ. A set-up with `behaviour` `recommend`
+        is answered with each last answer''s `target` instead of a count.'
+      tags:
+      - content
+      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: replica
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GuidedChoicePreviewRequest'
+      responses:
+        '200':
+          description: The products each combination leaves
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GuidedChoicePreview'
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /guided-choices/{guidedChoiceId}:
@@ -6771,6 +6888,53 @@ components:
           nullable: true
           description: Required when `kind` is `bookingFlow` (decided 29 September, W12; BUILD-YOUR-EXPERIENCE
             "each answer points to one booking flow"). One of the venue's enabled `BookingFlow`s.
+    GuidedChoicePreviewRequest:
+      x-ticvai-persistence: none — request only
+      type: object
+      description: 'What `previewGuidedChoice` takes: a draft set-up''s behaviour and questions, in
+        `GuidedChoice`''s shape, saved or not (r8, WHITE-C26).'
+      required: [behaviour, questions]
+      properties:
+        behaviour:
+          type: string
+          enum: [filter, recommend]
+        questions:
+          type: array
+          minItems: 1
+          maxItems: 4
+          description: Same shape and bounds as `GuidedChoice.questions`.
+          items:
+            type: object
+    GuidedChoicePreview:
+      x-ticvai-persistence: none — computed on read
+      type: object
+      description: 'One row per combination of answers a guest can give (at most the product of the questions''
+        answer counts, four questions of a few answers each), in question order (r8, WHITE-C26).'
+      required: [combinations]
+      properties:
+        combinations:
+          type: array
+          items:
+            type: object
+            required: [answerKeys, productsLeft]
+            properties:
+              answerKeys:
+                type: array
+                items: { type: string }
+                description: The answer picked on each question, in order.
+              productsLeft:
+                type: integer
+                minimum: 0
+                description: The venue's products the combination leaves (filter behaviour); 0 is the case to fix.
+              sampleProductIds:
+                type: array
+                maxItems: 3
+                items: { type: string, format: uuid }
+              target:
+                type: object
+                nullable: true
+                additionalProperties: true
+                description: The result the combination ends on (recommend behaviour), as the last answer's `target`.
     GuidedChoice:
       x-ticvai-persistence: whitelabel.guided_choice + whitelabel.guided_choice_question + whitelabel.guided_choice_answer
       type: object
@@ -7257,16 +7421,19 @@ components:
           productKinds: [rental]
           steps:
           - {stepKey: location, requirement: conditional}
+          # r8 (GPS-C28): date, then the length, then the start time, because the start times a room type offers
+          # depend on the length (listProductStartTimes takes the length variant); the room type is the product the
+          # flow is for, chosen before it. partySize carries the attendees the room must hold.
           - {stepKey: date, requirement: required, settingsOwned: [dateStripDays]}
-          - {stepKey: time, requirement: required, settingsOwned: [timesPerPage, dayPartFilter, dayPartBoundaries]}
           - {stepKey: duration, requirement: required, stepSettings: [{name: minHours, type: integer, default: 1}, {name: maxHours, type: integer, default: 8}, {name: stepMinutes, type: integer, default: 60}]}
+          - {stepKey: time, requirement: required, settingsOwned: [timesPerPage, dayPartFilter, dayPartBoundaries]}
           - {stepKey: partySize, requirement: optional, stepSettings: [{name: minGuests, type: integer, default: 1}, {name: maxGuests, type: integer}]}
           - {stepKey: extras, requirement: optional, settingsOwned: [extrasStep, quantitiesOnAddOns]}
           - {stepKey: review, requirement: optional}
           - {stepKey: payment, requirement: required, settingsOwned: [signInAt]}
           orderConstraints:
-          - {kind: before, stepKey: date, otherStepKey: time}
-          - {kind: before, stepKey: time, otherStepKey: duration}
+          - {kind: before, stepKey: date, otherStepKey: duration}
+          - {kind: before, stepKey: duration, otherStepKey: time}
         - key: cabanaMap
           productKinds: [rental]
           steps:
@@ -11726,6 +11893,31 @@ components:
         publishedAt:
           type: string
           format: date-time
+        guestSignIn:
+          type: object
+          readOnly: true
+          additionalProperties: false
+          description: '**What the guest sign-in buttons need before anyone is signed in** (r8, IDENTITY-C21): the
+            public client ids of the tenant''s enabled social and UAE PASS providers, derived on read from Identity''s
+            provider rows (no stored column, nothing secret). A provider the tenant has not enabled is absent, and
+            its button is not drawn.'
+          properties:
+            apple:
+              type: object
+              additionalProperties: false
+              properties:
+                clientId: { type: string }
+            google:
+              type: object
+              additionalProperties: false
+              properties:
+                clientId: { type: string }
+            uaePass:
+              type: object
+              additionalProperties: false
+              properties:
+                authorizationUrl: { type: string, format: uri }
+                clientId: { type: string }
         brand:
           $ref: '#/components/schemas/BrandIdentity'
         assetsBaseUrl:

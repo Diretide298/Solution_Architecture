@@ -299,15 +299,15 @@ paths:
       description: 'BL-152. **The metric comes from the closed set**, so a rule cannot watch something
         nothing produces.
 
-        **PUT semantics — an upsert of one rule, keyed on the body''s `id`.** The collection path
-        carries no id, so the body names the rule: a client-generated `id` that does not exist creates
-        the rule (`201`); an `id` that exists replaces that rule whole (`200`). **Replace means every
+        **PUT semantics — an upsert of one rule, keyed on the path''s `alertRuleId`** (the body''s `id`, when
+        sent, must equal it): an id that does not exist creates the rule (`201`); an id that exists replaces
+        that rule whole (`200`). **Replace means every
         field** — an optional field left out of the body returns to its default, it does not keep its
         stored value. Other rules are never touched; removing a rule is `isActive: false`.
 
-        **The target is the body''s `scopePath`**, which names the venue the rule watches and must
-        lie inside the caller''s scope (`403` otherwise). An `id` that exists at a scope the caller
-        cannot reach is also `403`, never a silent second rule with the same id.
+        **The target is the caller''s session venue** (r8, APPROVALS-TENANCY-C07, option A): the rule
+        watches that venue and the server sets `scopePath` (readOnly). An id that exists at a scope the
+        caller cannot reach is `403`, never a silent second rule with the same id.
 
         '
       tags:
@@ -380,6 +380,12 @@ paths:
         **Venue scope is the rule; the filters below narrow inside it.** A till screen asks for its own
         workstation or shift, a replenishment screen for one item. Each alert carries its rule''s name
         and metric, so a list can be read without a second call to `listAlertRules`.
+
+        **A shift-variance alert goes only to those who may act on it** (r8, APPROVALS-TENANCY-C36; the rule
+        is shift.yaml submitShiftCount''s): one carrying `observedValue` and `threshold` for a till''s count is
+        listed only for a caller holding one of the rule''s `recipientRoleIds` or `OVERSHORT_ACCEPT` at the
+        venue; anyone else gets no such alert in the list (it is left out, not masked), so a cashier never
+        sees the variance of their own count.
 
         '
       tags:

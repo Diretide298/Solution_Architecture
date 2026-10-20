@@ -1,8 +1,11 @@
-# wallet.credited v1 — published by wallet
+# wallet.credited v2 — published by wallet
 # Added 29 September (system-design review SD-033, SD-027).
+# v2 (20 October 2026, r8 cause APPROVALS-TENANCY-C30, the lead's option A): a game-card load carries the load
+# itself (cardId, credits, bonusCredits, amountPaid, loadId), and an anonymous card's load writes no wallet
+# transaction, so walletTransactionId is absent on it. The games consumer is built to v2.
 
 name: wallet.credited
-version: 1
+version: 2
 publisher: wallet
 description: Money reached a wallet's available balance (top-up, refund, adjustment, a released hold).
 aggregate: wallet
@@ -16,27 +19,52 @@ emittedBy:
 payload:
 - field: walletId
   type: uuid
+  notes: The wallet, or the card's id for an anonymous game card.
 - field: walletTransactionId
   type: uuid
+  required: false
+  notes: 'Absent on an anonymous game card''s load or adjustment (v2): no wallet transaction is written for it.'
 - field: amount
   type: Money
 - field: availableAfter
   type: Money
 - field: kind
   type: string
+- field: loadId
+  type: uuid
+  required: false
+  notes: 'v2. On kind gameCreditLoad: the loadGameCredits request''s `id`; the games consumer''s idempotency key.'
+- field: cardId
+  type: uuid
+  required: false
+  notes: v2. On kind gameCreditLoad or a card adjustment, the games.card the credits go to.
+- field: credits
+  type: integer
+  required: false
+  notes: v2. On kind gameCreditLoad, the paid credits loaded (a count, not money).
+- field: bonusCredits
+  type: integer
+  required: false
+  notes: v2. On kind gameCreditLoad, the bonus credits loaded.
+- field: amountPaid
+  type: Money
+  required: false
+  notes: v2. On kind gameCreditLoad, what the guest paid; the ledger posts gameCreditLoaded for it.
 consumers:
 - context: ledger
-  purpose: Increase the stored-value liability for a funded top-up
-  idempotencyKey: walletTransactionId
+  purpose: Increase the stored-value liability for a funded top-up, and post gameCreditLoaded for amountPaid on a
+    game-card load
+  idempotencyKey: walletTransactionId, or loadId on an anonymous game card's load (v2)
   onFailure: retryThenDeadLetter
   isCritical: true
 - context: games
-  purpose: Keep games.card's credit and points balance in step with the wallet when loadGameCredits or
-    adjustGameCard moved a game card (kind gameCreditLoad or adjustment). WalletService runs in commerce and the
-    games schema is VenueOpsService's, in operations (ADR-0055 rule 4, ADAM CR-002, CHG-R6-020)
+  purpose: 'Keep games.card''s credit and points balance in step when loadGameCredits or adjustGameCard moved a game
+    card (kind gameCreditLoad or adjustment). On an anonymous card this consumer is the only writer of the card''s
+    credits (v2): it adds `credits` and `bonusCredits` to games.card on its locked row. WalletService runs in
+    commerce and the games schema is VenueOpsService''s, in operations (ADR-0055 rule 4, ADAM CR-002, CHG-R6-020)'
   writes:
   - games.card
-  idempotencyKey: walletTransactionId
+  idempotencyKey: loadId on a game-card load (v2), walletTransactionId otherwise
   onFailure: retryThenDeadLetter
   isCritical: true
 retention: 30 days after publication

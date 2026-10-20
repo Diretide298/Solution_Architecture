@@ -4577,6 +4577,11 @@ paths:
 
         Every record captures the notice version, the channel, the purpose, the source and the timestamp.
 
+        **A third path, with the same rules** (r8, IDENTITY-C55): the consents a guest gives on the registration
+        form arrive as `identity.guestRegistered`, and Marketing''s consumer records each one through these
+        rules with source `registration` (idempotency: the event id and the purpose), so a registration never
+        leaves a consent unrecorded.
+
         **Two callers, two rules.** A guest recording their own consent uses a guest token and may only
         act on their own subject. An agent recording on a guest''s behalf uses a staff token, requires
         `GUEST_MANAGE`, and the resulting record names them in `recordedByPrincipalId` — consent captured

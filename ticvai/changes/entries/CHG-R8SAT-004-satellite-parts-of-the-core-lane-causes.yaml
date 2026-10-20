@@ -1,0 +1,47 @@
+id: CHG-R8SAT-004
+date: '2026-10-20'
+source: audit
+kind: contract
+summary: 'Satellite contract parts of causes the core lane carried, made by this lane at the core lane''s request
+  (additive). reporting: setAlertRule targets the caller''s session venue and is keyed by its path id; listAlerts
+  lists a shift-variance alert only to its recipients or an OVERSHORT_ACCEPT holder (APPROVALS-TENANCY-C07, C36).
+  payments: the instalment policy is not checked against a product it does not name; createInstalmentPlan checks the
+  term (too-many-instalments); eligibleProductKinds map to catalogue product kinds, proposed (ORDERS-MONEY-C16, whole
+  cause). ai: AiRecommendationItem carries variantId and performanceId when there is nothing to choose
+  (ORDERS-MONEY-C40, whole cause). white-label: PublishedTenantConfig.guestSignIn, the providers'' public client ids
+  (IDENTITY-C21); meetingRoomHourly runs date, length, start time (GPS-C28). resources: ProductStartTime.maxCapacity
+  (GPS-C28). marketing-crm: recordConsent''s registration path (IDENTITY-C55).'
+decision:
+  what: 'contracts/satellite/reporting.yaml, payments.yaml, ai.yaml, white-label.yaml, resources.yaml,
+    marketing-crm.yaml; handoff/design-notes/ticketing-backoffice.yaml (instalment policy). check-contract-compat
+    finds none of these breaking.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: R8 blocker cause list, second round: the core lane''s requests to the surface lane
+  (audit/r8b-core-report, relayed by the coordinator; causes APPROVALS-TENANCY-C07, C36, ORDERS-MONEY-C16, C40,
+  IDENTITY-C21, C55, GPS-C28) and answers.json of 20 October 2026.'
+keys_touched:
+  operations: [setAlertRule, listAlerts, setInstalmentPolicy, createInstalmentPlan, getPublishedTenantConfig,
+    listProductStartTimes, recordConsent]
+  schemas: [PayInstalmentPolicy, AiRecommendationItem, PublishedTenantConfig, ProductStartTime]
+  files:
+  - contracts/satellite/reporting.yaml
+  - contracts/satellite/payments.yaml
+  - contracts/satellite/ai.yaml
+  - contracts/satellite/white-label.yaml
+  - contracts/satellite/resources.yaml
+  - contracts/satellite/marketing-crm.yaml
+  - handoff/design-notes/ticketing-backoffice.yaml
+root_class: 'contract-decision gap: an operation''s caller, rule or response contradicts who uses it'
+tickets:
+  started: []
+  unstarted:
+  - 'the tickets of the causes named (see the core lane''s report).'
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: R8 blocker walk, second round'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-contract-compat.py
+status: open

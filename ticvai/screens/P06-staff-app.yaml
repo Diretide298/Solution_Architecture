@@ -93,7 +93,13 @@ screens:
     no method enrolled is refused at the door. `login` answers 200 with `hasMfaMethod` false; the handheld
     shows the existing denied state with a message saying to enrol once on the browser sign-in (ADM-001)
     or on their own phone (EMP-042), and flow F64 ends at `blockedAtMfa`. Nothing is enrolled on this screen:
-    no enrolment form is added.'
+    no enrolment form is added.
+
+
+    Build note (r8 second round, IDENTITY-C01, from the core lane): login is online-only for tills and staff
+    handhelds in r8 (identity login x-ticvai-offline-note); build the offline state as "signing in needs a
+    connection", not the cached-list sign-in above. The wording waits for the client (pending entry
+    IDENTITY-C01).'
   density: comfortable
   pattern: form
   patternReason: 'A sign-in on a shared handheld: number and PIN, the venue''s SSO where it has one, the
@@ -325,7 +331,12 @@ screens:
 
     **Roles come from the login response EMP-001 holds (LoginResponse.availableRoles, preloaded) 4 October
     2026; selectRole sends the picked roleId. A role carries its venue scope, so there is no separate
-    venue pick** (CHG-FXS-003)'
+    venue pick** (CHG-FXS-003)
+
+
+    Build note (r8 second round, IDENTITY-C45, from the core lane): the scope comes with the grant, not the
+    role: each card names its venue (`RoleSummary.scope.name`) and Select role sends that card''s `grantId`,
+    so two grants of one role at two venues are two cards.'
   density: comfortable
   pattern: listDetail
   patternReason: '`listMfaMethods` reads the population and `getCurrentSession` reads one of them — list,
@@ -11003,6 +11014,7 @@ screens:
     - TableReservation.subjectId
     - TableReservation.guestName
     - TableReservation.contactPoint
+    - VenueSettings.calendarDayStartHour
   wireframe:
     status: notStarted
     provenance: generated
