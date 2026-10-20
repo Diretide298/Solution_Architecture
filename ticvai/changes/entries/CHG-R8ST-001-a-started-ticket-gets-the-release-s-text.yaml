@@ -1,0 +1,41 @@
+id: CHG-R8ST-001
+date: '2026-10-20'
+source: audit
+kind: process
+proposed: '2026-10-20T23:30'
+summary: 'A started ticket whose plan text changed gets the release''s text as one comment per release. op-release.rb
+  kept a started ticket''s description and posted one comment, ever, that its spec lives in ADAM, so a text the plan
+  corrected after the ticket started reached nobody reading OpenProject: ARCH-TESTS, KERNEL-ID, SETUP-HOSTS and
+  PLATFORM-RLS still read "Written at release r6" after CHG-R8WFC-008 rewrote them. The descriptions phase now
+  compares every started, open ticket''s text (its newest text comment, else its description) with the release''s
+  and, when they differ, posts "The text of this ticket changed in release rN." with the text; never twice for one
+  release, and nothing when only the release line differs. ADAM''s pull shows the same text (viewer, no entry).'
+decision:
+  what: 'tools/op-release.rb descriptions phase: the text rule (text_update, text_note) on every started, open ticket
+    that is not held; the dry run lists them ("text #id KEY (status)") with a count and one sample, APPLY posts them
+    in the phase''s transaction, BATCH applies. tools/tests/test_op_release_text.py runs the rule under Ruby 2.6.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: r8 re-walk part 1, class started-ticket-text-fix-not-delivered (audit/ticvai/r8-blockers/rewalk-part1.md).
+  The lead, 20 October: "Whatever we find we should also fix the source so that next gen can clear those out by
+  default".'
+keys_touched:
+  files:
+  - tools/op-release.rb
+  - tools/tests/test_op_release_text.py
+root_class: 'a started ticket''s text frozen at the release it started in'
+tickets:
+  started:
+  - 'ARCH-TESTS (#27688), KERNEL-ID (#27689), SETUP-HOSTS (#27643), PLATFORM-RLS (#27698), and every other started,
+    open ticket whose text differs from r8''s at the next push (128 of the 1,517 the r8 rehearsal pulled, all from r6).'
+  unstarted: []
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: r8 re-walk, a release fix'
+triage: fix-forward
+prevention:
+  type: generator-rule
+  ref: tools/op-release.rb::text_update
+status: open
+notes: 'The comment carries the text, so a developer who never pulls through ADAM sees it too. A ticket whose text
+  did not change gets nothing; a closed or held ticket gets nothing.'
