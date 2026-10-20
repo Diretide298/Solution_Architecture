@@ -1,0 +1,34 @@
+id: CHG-R8INT-030
+date: '2026-10-20'
+source: audit
+kind: process
+summary: 'The wallet setup screens BO-1088 and BO-1144 (guest transfer rules) are a known C-REACH failure of
+  check-plan-closure in refresh-safe, with the reason "approved screen would have to change; listed for the client
+  note". They are reached only from hubs outside Block A; the link that would reach them starts on the client-approved
+  BO-101, so it waits on the client. They stay visible in the check (not baselined) until the client decides.'
+decision:
+  what: 'tools/refresh-safe-baseline.json: checkers.check-plan-closure, one pattern accepting C-REACH with exactly two
+    new findings (the line carries counts, not screen ids), and its why naming the two screens.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: the r8 gate residue (item 4): ADM-634 and CMS-078 were fixed at the source (CHG-R8RES-004, -005); for
+  BO-1088 and BO-1144 the options were a link from BO-101 (an approved screen: the client''s approval) or moving the
+  three wallet setup operations to a later block (family transfers read those rules). The lead chose the first, in his
+  words on 20 October: "Accepting both as recommended".'
+keys_touched:
+  screens: [BO-1088, BO-1144, BO-101]
+  files:
+  - tools/refresh-safe-baseline.json
+root_class: 'a known gate failure waiting on the client, not yet named where refresh-safe reads it'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: a decision of the lead; no ADAM CR is needed'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/refresh-safe.sh
+status: open
+notes: 'For the Friday client note: the BO-101 links to BO-1088 and BO-1144, beside the five reads of CHG-R8INT-027.'
