@@ -1,0 +1,70 @@
+id: CHG-R8WFC-001
+date: '2026-10-20'
+source: audit
+kind: spec
+summary: 'A write whose body picks the record it replaces is declared keyed by that body field, not a venue singleton:
+  124 PUTs flagged x-ticvai-singleton by the 14 October shapes pass now carry x-ticvai-body-key and a note that says
+  "keyed by the body''s gateId, not a singleton: one record per gate within the caller''s venue". 121 of them already
+  named the field in their note (setGateLane gateId, setAttractionAccess attractionId); 3 waiver builder writes
+  (setDigitalWaiverForm and two more) and approveManualOverrideSupervisor said "one per venue" while their body named
+  the record. approveManualOverrideSupervisor now says what it writes: the override scan_event row overrideAccess
+  writes, keyed by the denied scan, with its 409 and the one column its reason category and note share.'
+decision:
+  what: 'contracts/ (18 files): x-ticvai-singleton and x-ticvai-singleton-note replaced by x-ticvai-body-key and
+    x-ticvai-body-key-note on 124 PUT operations; where the key is optional in the schema (60 of them) the note says a
+    body without it is refused 400 validation and the schema stays optional so an r1 client still validates.
+    contracts/spine/access.yaml approveManualOverrideSupervisor: a 409 scan-not-denied / scan-already-overridden, and
+    ManualOverrideSupervisorApprovalInput fields mapped with x-ticvai-stored-as (supervisorId to
+    overridden_by_principal_id, scanId to overrides_scan_id, selectType and reasonNote to override_reason as
+    "category: note"; originalDecision x-ticvai-persisted false). tools/check-contract-shapes.py: C-SINGLETON-KEYED and
+    C-BODY-KEY, and C-NO-ADDRESS accepts a body key that is in the body.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: the r8 sample walk of 20 October 2026 (outside git), class singleton-misclassified-keyed-write on
+  SVC-ACCESS-ACCESS-1 (#28331): approveManualOverrideSupervisor said "one per venue, a PUT replaces it whole" while
+  its description said "the write is keyed by the denied scan ... the override is its own row", so a developer could
+  not tell whether it replaced a venue row, inserted a scan_event row or wrote nothing. Its source is
+  tools/applied/shp-contract-shapes-14-october/decide.py, whose kind S stamped the singleton flag on every
+  C-NO-ADDRESS write, including those whose note named the body field that picks the record.'
+keys_touched:
+  operations: [approveManualOverrideSupervisor, setGateLane, setAttractionAccess, setDigitalWaiverForm,
+    setSignatorySignatureGuardian, setLocalizationBrandingCustomer]
+  files:
+  - contracts/spine/access.yaml
+  - contracts/spine/approvals.yaml
+  - contracts/spine/catalogue.yaml
+  - contracts/spine/orders.yaml
+  - contracts/spine/shift.yaml
+  - contracts/satellite/accreditation.yaml
+  - contracts/satellite/fnb.yaml
+  - contracts/satellite/games.yaml
+  - contracts/satellite/inventory.yaml
+  - contracts/satellite/marketing-crm.yaml
+  - contracts/satellite/platform-ops.yaml
+  - contracts/satellite/promotions.yaml
+  - contracts/satellite/rental.yaml
+  - contracts/satellite/resources.yaml
+  - contracts/satellite/seating.yaml
+  - contracts/satellite/subscription.yaml
+  - contracts/satellite/wallet.yaml
+  - contracts/satellite/white-label.yaml
+  - tools/check-contract-shapes.py
+root_class: 'a shapes pass that answered "no key in the path" with one flag for two different things: one record per
+  scope, and one record per body key'
+tickets:
+  started: []
+  unstarted: [28331]
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: r8 walk fix, a release fix'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-contract-shapes.py
+status: open
+notes: 'No started ticket builds any of the 124 operations (adam-links.json, statuses read 20 October 12:51). The five
+  writes whose only required id is venueId and whose note says one per venue (setVirtualTicketIdentity,
+  setFacePassEnrollment, simulateOfflineResilienceTesting, setGateOfflinePolicy, setDeviceBindingPolicy) and
+  setSessionVenue (one per session) stay singletons: their body id is the scope or the value set, not a record key.
+  The walk counted 55 of 235 with a required id; the rule here is wider (the note names the key, or a required id
+  other than venueId or tenantId), which is 124.'

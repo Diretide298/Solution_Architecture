@@ -4138,8 +4138,8 @@ paths:
       - query: catalogue#productRecords
         route: service
         for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per membership product, the one the body''s `membershipCode` names, within the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [membershipCode]
+      x-ticvai-body-key-note: 'Keyed by the body''s `membershipCode`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per membership product within the caller''s tenant; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body. **Required in fact**: a body without `membershipCode` is refused `400 validation`; the schema leaves it optional only so a client built at r1 still validates.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Membership___Annual_Pass_Management_Reference.pdf'' pp.5-7 (13.1.2
@@ -4199,8 +4199,8 @@ paths:
       - query: catalogue#productRecords
         route: service
         for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per membership product, the one the body''s `membershipCode` names, within the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [membershipCode]
+      x-ticvai-body-key-note: 'Keyed by the body''s `membershipCode`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per membership product within the caller''s tenant; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body. **Required in fact**: a body without `membershipCode` is refused `400 validation`; the schema leaves it optional only so a client built at r1 still validates.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Membership___Annual_Pass_Management_Reference.pdf'' pp.7-8 (13.1.3
@@ -4255,8 +4255,8 @@ paths:
       - query: catalogue#productRecords
         route: service
         for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per membership product, the one the body''s `membershipCode` names, within the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [membershipCode]
+      x-ticvai-body-key-note: 'Keyed by the body''s `membershipCode`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per membership product within the caller''s tenant; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body. **Required in fact**: a body without `membershipCode` is refused `400 validation`; the schema leaves it optional only so a client built at r1 still validates.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Membership___Annual_Pass_Management_Reference.pdf'' pp.8-9 (13.1.4
@@ -4313,8 +4313,8 @@ paths:
       - query: catalogue#productRecords
         route: service
         for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per membership product, the one the body''s `membershipCode` names, within the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [membershipCode]
+      x-ticvai-body-key-note: 'Keyed by the body''s `membershipCode`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per membership product within the caller''s tenant; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body. **Required in fact**: a body without `membershipCode` is refused `400 validation`; the schema leaves it optional only so a client built at r1 still validates.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Membership___Annual_Pass_Management_Reference.pdf'' pp.9-11 (13.1.5
@@ -4434,8 +4434,8 @@ paths:
       - query: catalogue#productRecords
         route: service
         for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per membership product, the one the body''s `membershipCode` names, within the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [membershipCode]
+      x-ticvai-body-key-note: 'Keyed by the body''s `membershipCode`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per membership product within the caller''s tenant; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body. **Required in fact**: a body without `membershipCode` is refused `400 validation`; the schema leaves it optional only so a client built at r1 still validates.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Membership___Annual_Pass_Management_Reference.pdf'' pp.12-14 (13.1.7
@@ -4573,8 +4573,8 @@ paths:
       - query: catalogue#productRecords
         route: service
         for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per membership product, the one the body''s `membershipCode` names, within the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [membershipCode]
+      x-ticvai-body-key-note: 'Keyed by the body''s `membershipCode`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per membership product within the caller''s tenant; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body. **Required in fact**: a body without `membershipCode` is refused `400 validation`; the schema leaves it optional only so a client built at r1 still validates.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Membership___Annual_Pass_Management_Reference.pdf'' pp.15-16 (13.1.9
@@ -4685,8 +4685,8 @@ paths:
       - query: catalogue#productRecords
         route: service
         for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per membership product, the one the body''s `membershipCode` names, within the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [membershipCode]
+      x-ticvai-body-key-note: 'Keyed by the body''s `membershipCode`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per membership product within the caller''s tenant; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body. **Required in fact**: a body without `membershipCode` is refused `400 validation`; the schema leaves it optional only so a client built at r1 still validates.'
       x-ticvai-write-via:
       - table: approvals.request
         operation: createApprovalRequest
@@ -4949,8 +4949,8 @@ paths:
       - query: orders#salesOrderRecords
         route: service
         for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per membership, the one the body''s `membershipId` names, within the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [membershipId]
+      x-ticvai-body-key-note: 'Keyed by the body''s `membershipId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per membership within the caller''s tenant; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body. **Required in fact**: a body without `membershipId` is refused `400 validation`; the schema leaves it optional only so a client built at r1 still validates.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Membership___Annual_Pass_Management_Reference.pdf'' pp.22-24 (13.2.2
@@ -6006,8 +6006,8 @@ paths:
       - query: identity#principalRecords
         route: service
         for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per partner, the one the body''s `partnerId` names, within the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [partnerId]
+      x-ticvai-body-key-note: 'Keyed by the body''s `partnerId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per partner within the caller''s tenant; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body. **Required in fact**: a body without `partnerId` is refused `400 validation`; the schema leaves it optional only so a client built at r1 still validates.'
       x-ticvai-api-scope: partner.write
       x-ticvai-audience:
       - partner
@@ -6360,8 +6360,8 @@ paths:
       operationId: setPartnerBrandVenue
       x-ticvai-consumed-by:
         - "P10 PTR-027 Partner Brand, Venue & Business Scope Assignment"
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per partner, the one the body''s `partnerId` names, within the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [partnerId]
+      x-ticvai-body-key-note: 'Keyed by the body''s `partnerId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per partner within the caller''s tenant; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body. **Required in fact**: a body without `partnerId` is refused `400 validation`; the schema leaves it optional only so a client built at r1 still validates.'
       x-ticvai-api-scope: partner.write
       x-ticvai-audience:
       - partner
@@ -6605,8 +6605,8 @@ paths:
       - query: orders#salesOrderRecords
         route: service
         for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per partner, the one the body''s `partnerId` names, within the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [partnerId]
+      x-ticvai-body-key-note: 'Keyed by the body''s `partnerId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per partner within the caller''s tenant; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body. **Required in fact**: a body without `partnerId` is refused `400 validation`; the schema leaves it optional only so a client built at r1 still validates.'
       x-ticvai-write-via:
       - table: approvals.request
         operation: createApprovalRequest
@@ -6911,8 +6911,8 @@ paths:
       - query: finance#legalEntityRecords
         route: service
         for: 'its read of ledger.legal_entity, Ledger''s data (CHG-MOD-001)'
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per partner agreement, the one the body''s `agreementId` names, within the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [agreementId]
+      x-ticvai-body-key-note: 'Keyed by the body''s `agreementId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per partner agreement within the caller''s tenant; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body. **Required in fact**: a body without `agreementId` is refused `400 validation`; the schema leaves it optional only so a client built at r1 still validates.'
       x-ticvai-write-via:
       - table: approvals.request
         operation: createApprovalRequest
@@ -6980,8 +6980,8 @@ paths:
       - query: catalogue#productRecords
         route: service
         for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per partner agreement, the one the body''s `agreementId` names, within the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [agreementId]
+      x-ticvai-body-key-note: 'Keyed by the body''s `agreementId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per partner agreement within the caller''s tenant; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body. **Required in fact**: a body without `agreementId` is refused `400 validation`; the schema leaves it optional only so a client built at r1 still validates.'
       x-ticvai-write-via:
       - table: approvals.request
         operation: createApprovalRequest
@@ -7328,8 +7328,8 @@ paths:
       - query: orders#salesOrderRecords
         route: service
         for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per partner agreement, the one the body''s `agreementId` names, within the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [agreementId]
+      x-ticvai-body-key-note: 'Keyed by the body''s `agreementId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per partner agreement within the caller''s tenant; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body. **Required in fact**: a body without `agreementId` is refused `400 validation`; the schema leaves it optional only so a client built at r1 still validates.'
       x-ticvai-write-via:
       - table: approvals.request
         operation: createApprovalRequest
@@ -7490,8 +7490,8 @@ paths:
       - query: approvals#requestRecords
         route: service
         for: 'its read of approvals.request, Tenancy''s data (CHG-MOD-001)'
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per partner, the one the body''s `partnerId` names, within the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [partnerId]
+      x-ticvai-body-key-note: 'Keyed by the body''s `partnerId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per partner within the caller''s tenant; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body. **Required in fact**: a body without `partnerId` is refused `400 validation`; the schema leaves it optional only so a client built at r1 still validates.'
       x-ticvai-write-via:
       - table: approvals.request
         operation: createApprovalRequest
@@ -9636,8 +9636,8 @@ paths:
       - query: catalogue#productRecords
         route: service
         for: 'the membership product''s catalogue product (404, 409) (CHG-MOD-003)'
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per membership product, the one the body''s `membershipCode` names, within the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [membershipCode]
+      x-ticvai-body-key-note: 'Keyed by the body''s `membershipCode`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per membership product within the caller''s tenant; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: writers pass; DM4 open (subscription.membership_usage_policy had no writer,
@@ -9730,8 +9730,8 @@ paths:
       - query: catalogue#taxProfileRecords
         route: service
         for: 'that `taxProfile` names an active catalogue.tax_profile row (422 unknown-profile) (r8, GPS-C34)'
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per membership product, the one the body''s `membershipCode` names, within the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [membershipCode]
+      x-ticvai-body-key-note: 'Keyed by the body''s `membershipCode`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per membership product within the caller''s tenant; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: writers pass; DM4 open (the commercial columns of subscription.membership_product

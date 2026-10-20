@@ -817,8 +817,8 @@ paths:
         - "P08 BO-1101 Funding Limits & Velocity Controls"
         - "P08 BO-417 Top-Up Configuration"
         - "P08 BO-418 Top-Up Bonus Rule Configuration"
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per wallet type, the one the body''s `walletTypeId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [walletTypeId]
+      x-ticvai-body-key-note: 'Keyed by the body''s `walletTypeId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per wallet type within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body. **Required in fact**: a body without `walletTypeId` is refused `400 validation`; the schema leaves it optional only so a client built at r1 still validates.'
       x-ticvai-conflict-policy: serverWins
       summary: Amounts, channels, bonuses, limits and velocity
       description: '**Board 2 is the 27 August minute, one screen for one**, and the matrix agrees on
@@ -3564,8 +3564,8 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-1175 Integration Profile & System Mapping"
         - "P08 BO-1179 Integration Monitoring & Exception Workbench"
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per API client, the one the body''s `apiClientId` names, within the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [apiClientId]
+      x-ticvai-body-key-note: 'Keyed by the body''s `apiClientId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per API client within the caller''s tenant; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body.'
       x-ticvai-agreed: '29 September: VM close-out; pack ''Wallet_Configuration_Backend_Structure_v1.0.pdf''
         board 10 pp.118 and 122 (Field mapping, Currency mapping, Status mapping, Credit-type mapping,
         Date/time mapping, Correct mapping); shape follows setWalletAccountingMapping'

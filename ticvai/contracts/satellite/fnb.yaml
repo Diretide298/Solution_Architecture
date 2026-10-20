@@ -200,8 +200,8 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setFnbReservationPolicy
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per outlet, the one the body''s `outletId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [outletId]
+      x-ticvai-body-key-note: 'Keyed by the body''s `outletId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per outlet within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body. **Required in fact**: a body without `outletId` is refused `400 validation`; the schema leaves it optional only so a client built at r1 still validates.'
       x-ticvai-names-for-context: [fnb.service_charge_policy, orders.order_fee]
       summary: Set turn times and seating buffers
       description: '**The booking keeps its own duration as the snapshot.** A turn time revised in
@@ -5326,8 +5326,8 @@ paths:
       operationId: setFnbDeliveryPolicy
       x-ticvai-consumed-by:
         - "P08 BO-044 F&B Outlets"
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per outlet, the one the body''s `outletId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [outletId]
+      x-ticvai-body-key-note: 'Keyed by the body''s `outletId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per outlet within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body.'
       summary: Set takeaway and delivery rules
       description: '**Design gap, 23 September.** The dining design offers takeaway with a collection time
         and delivery to an address with a delivery window, a minimum order, a fee, free delivery above a

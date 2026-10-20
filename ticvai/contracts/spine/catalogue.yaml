@@ -6323,8 +6323,8 @@ paths:
       - query: access#entitlementRecords
         route: service
         for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per product, the one the body''s `productId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [productId]
+      x-ticvai-body-key-note: 'Keyed by the body''s `productId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per product within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body. **Required in fact**: a body without `productId` is refused `400 validation`; the schema leaves it optional only so a client built at r1 still validates.'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Product_Lifecycle___Catalogue_Governance_Reference.pdf'' pp.9-10
@@ -6627,8 +6627,8 @@ paths:
       operationId: setCatalogueReview
       x-ticvai-consumed-by:
         - "P08 ADM-127 AI Catalogue Builder & Configuration Review"
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per catalogue builder session, the one the body''s `sessionId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [sessionId]
+      x-ticvai-body-key-note: 'Keyed by the body''s `sessionId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per catalogue builder session within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body. **Required in fact**: a body without `sessionId` is refused `400 validation`; the schema leaves it optional only so a client built at r1 still validates.'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Product_Lifecycle___Catalogue_Governance_Reference.pdf'' pp.12-13
@@ -6863,8 +6863,8 @@ paths:
         - "P08 ADM-129 Approval Workflow Designer"
         - "P08 ADM-319 Approval Workflow Library"
         - "P08 BO-637 Approval Workflow Builder"
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per workflow, the one the body''s `workflowId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [workflowId]
+      x-ticvai-body-key-note: 'Keyed by the body''s `workflowId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per workflow within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body. **Required in fact**: a body without `workflowId` is refused `400 validation`; the schema leaves it optional only so a client built at r1 still validates.'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Product_Lifecycle___Catalogue_Governance_Reference.pdf'' pp.17-18
@@ -6923,8 +6923,8 @@ paths:
       - query: orders#salesOrderRecords
         route: in-process
         for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per pricing change request, the one the body''s `changeRequestId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [changeRequestId]
+      x-ticvai-body-key-note: 'Keyed by the body''s `changeRequestId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per pricing change request within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body. **Required in fact**: a body without `changeRequestId` is refused `400 validation`; the schema leaves it optional only so a client built at r1 still validates.'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Product_Lifecycle___Catalogue_Governance_Reference.pdf'' pp.18-19
@@ -7766,8 +7766,8 @@ paths:
       operationId: setProductCatalogue
       x-ticvai-consumed-by:
         - "P08 ADM-260 Product & Catalogue Assignment"
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per sales channel, the one the body''s `channelId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [channelId]
+      x-ticvai-body-key-note: 'Keyed by the body''s `channelId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per sales channel within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body. **Required in fact**: a body without `channelId` is refused `400 validation`; the schema leaves it optional only so a client built at r1 still validates.'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Sales_Channel_Management_Reference.pdf'' pp.7-8 (Assignment Methods,
@@ -7817,8 +7817,8 @@ paths:
       operationId: setChannelPricingCommercial
       x-ticvai-consumed-by:
         - "P08 ADM-261 Channel Pricing & Commercial Profile Assignment"
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per sales channel, the one the body''s `channelId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [channelId]
+      x-ticvai-body-key-note: 'Keyed by the body''s `channelId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per sales channel within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body. **Required in fact**: a body without `channelId` is refused `400 validation`; the schema leaves it optional only so a client built at r1 still validates.'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Sales_Channel_Management_Reference.pdf'' pp.8-9 (Pricing Associations,
@@ -8190,8 +8190,8 @@ paths:
       operationId: setChannelFeePayment
       x-ticvai-consumed-by:
         - "P08 ADM-266 Channel Fees, Payment & Fulfillment Configuration"
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per sales channel, the one the body''s `channelId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [channelId]
+      x-ticvai-body-key-note: 'Keyed by the body''s `channelId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per sales channel within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body. **Required in fact**: a body without `channelId` is refused `400 validation`; the schema leaves it optional only so a client built at r1 still validates.'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Sales_Channel_Management_Reference.pdf'' pp.14-16 (Fee Associations,
@@ -8240,8 +8240,8 @@ paths:
       operationId: publishChannelReadinessValidation
       x-ticvai-consumed-by:
         - "P08 ADM-267 Channel Publication, Readiness & AI Validation"
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per sales channel, the one the body''s `channelId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [channelId]
+      x-ticvai-body-key-note: 'Keyed by the body''s `channelId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per sales channel within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body. **Required in fact**: a body without `channelId` is refused `400 validation`; the schema leaves it optional only so a client built at r1 still validates.'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Sales_Channel_Management_Reference.pdf'' pp.16-18 (Readiness Checklist,
@@ -9478,8 +9478,8 @@ paths:
       operationId: setProductServicePrice
       x-ticvai-consumed-by:
         - "P08 ADM-052 Product & Service Price Assignment"
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per price assignment, the one the body''s `assignmentId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [assignmentId]
+      x-ticvai-body-key-note: 'Keyed by the body''s `assignmentId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per price assignment within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body. **Required in fact**: a body without `assignmentId` is refused `400 validation`; the schema leaves it optional only so a client built at r1 still validates.'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.13-14 (10.1.5 Supported
@@ -9709,8 +9709,8 @@ paths:
       operationId: setPriceHierarchyInheritance
       x-ticvai-consumed-by:
         - "P08 ADM-055 Price Hierarchy & Inheritance Configuration"
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per price hierarchy, the one the body''s `hierarchyId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [hierarchyId]
+      x-ticvai-body-key-note: 'Keyed by the body''s `hierarchyId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per price hierarchy within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body. **Required in fact**: a body without `hierarchyId` is refused `400 validation`; the schema leaves it optional only so a client built at r1 still validates.'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.17-18 (10.1.8 Example
@@ -10976,8 +10976,8 @@ paths:
       operationId: setTaxProfileJurisdiction
       x-ticvai-consumed-by:
         - "P08 ADM-069 Tax Profile & Jurisdiction Configuration"
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per tax profile, the one the body''s `taxProfileCode` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [taxProfileCode]
+      x-ticvai-body-key-note: 'Keyed by the body''s `taxProfileCode`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per tax profile within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body. **Required in fact**: a body without `taxProfileCode` is refused `400 validation`; the schema leaves it optional only so a client built at r1 still validates.'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.40-41 (10.3.2 Tax
@@ -11025,8 +11025,8 @@ paths:
       operationId: setTaxRuleTreatment
       x-ticvai-consumed-by:
         - "P08 ADM-070 Tax Rule & Treatment Builder"
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per tax rule, the one the body''s `taxRuleId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [taxRuleId]
+      x-ticvai-body-key-note: 'Keyed by the body''s `taxRuleId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per tax rule within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body. **Required in fact**: a body without `taxRuleId` is refused `400 validation`; the schema leaves it optional only so a client built at r1 still validates.'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.41-43 (10.3.3 Tax
@@ -11164,8 +11164,8 @@ paths:
       operationId: setFeeApplicabilityCharging
       x-ticvai-consumed-by:
         - "P08 ADM-072 Fee Applicability & Charging Rule Builder"
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per fee rule, the one the body''s `ruleId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [ruleId]
+      x-ticvai-body-key-note: 'Keyed by the body''s `ruleId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per fee rule within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body. **Required in fact**: a body without `ruleId` is refused `400 validation`; the schema leaves it optional only so a client built at r1 still validates.'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.44-46 (10.3.5 Conditions,
@@ -12027,8 +12027,8 @@ paths:
       operationId: approvePricingWorkflowAuthority
       x-ticvai-consumed-by:
         - "P08 ADM-083 Pricing Approval Workflow & Authority Matrix"
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per pricing approval policy, the one the body''s `policyId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [policyId]
+      x-ticvai-body-key-note: 'Keyed by the body''s `policyId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per pricing approval policy within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body. **Required in fact**: a body without `policyId` is refused `400 validation`; the schema leaves it optional only so a client built at r1 still validates.'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.64-66 (Approval
@@ -12083,8 +12083,8 @@ paths:
       x-ticvai-consumed-by:
         - "P08 ADM-084 Pricing Publication & Effective-Date Scheduler"
         - "P08 BO-443 Pricing Audit, Approval & Publication"
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per pricing change request, the one the body''s `changeRequestId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [changeRequestId]
+      x-ticvai-body-key-note: 'Keyed by the body''s `changeRequestId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per pricing change request within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body. **Required in fact**: a body without `changeRequestId` is refused `400 validation`; the schema leaves it optional only so a client built at r1 still validates.'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.66-67 (Publication
@@ -12785,8 +12785,8 @@ paths:
       operationId: setDynamicPricingStrategy
       x-ticvai-consumed-by:
         - "P08 ADM-089 Dynamic Pricing Strategy Builder"
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per pricing strategy, the one the body''s `strategyCode` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [strategyCode]
+      x-ticvai-body-key-note: 'Keyed by the body''s `strategyCode`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per pricing strategy within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body. **Required in fact**: a body without `strategyCode` is refused `400 validation`; the schema leaves it optional only so a client built at r1 still validates.'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.76-78 (Strategy
@@ -12837,8 +12837,8 @@ paths:
       operationId: setDemandOccupancyAvailability
       x-ticvai-consumed-by:
         - "P08 ADM-090 Demand, Occupancy & Availability Rule Builder"
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per pricing rule, the one the body''s `ruleId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [ruleId]
+      x-ticvai-body-key-note: 'Keyed by the body''s `ruleId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per pricing rule within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body. **Required in fact**: a body without `ruleId` is refused `400 validation`; the schema leaves it optional only so a client built at r1 still validates.'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.78-79 (Supported
@@ -12890,8 +12890,8 @@ paths:
       operationId: setBookingVelocityTime
       x-ticvai-consumed-by:
         - "P08 ADM-091 Booking Velocity & Time-to-Event Rule Builder"
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per pricing rule, the one the body''s `ruleId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [ruleId]
+      x-ticvai-body-key-note: 'Keyed by the body''s `ruleId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per pricing rule within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body. **Required in fact**: a body without `ruleId` is refused `400 validation`; the schema leaves it optional only so a client built at r1 still validates.'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.80-81 (Booking
@@ -17933,8 +17933,8 @@ paths:
       operationId: setChannelSyncSetting
       x-ticvai-consumed-by:
         - "P08 ADM-270 Product, Price & Availability Synchronization"
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per sales channel and data domain, the one the body''s `salesChannelId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [salesChannelId]
+      x-ticvai-body-key-note: 'Keyed by the body''s `salesChannelId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per sales channel and data domain within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body.'
       summary: Set how one kind of data synchronises with a channel
       description: '**The person''s half of `catalogue.channel_sync`** (29 September, writers pass). Creates or
         updates the row for a `salesChannelId` and `domain`, setting `direction`, `frequency`, `isPaused` and the
@@ -18294,8 +18294,8 @@ paths:
       x-ticvai-consumed-by:
         - "P08 ADM-053 Package, Bundle & Add-On Pricing"
         - "P08 BO-011 Packages & Bundles"
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per package product, the one the body''s `productId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [productId]
+      x-ticvai-body-key-note: 'Keyed by the body''s `productId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per package product within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body.'
       summary: Set how a package, bundle or add-on is priced
       description: '**The pricing model of a package, bundle or add-on** (29 September, writers pass). Creates or
         updates the `catalogue.package_pricing` row for a `productId` and `priceListId`: the model
@@ -18628,8 +18628,8 @@ paths:
         - "P08 ADM-095 Dynamic Pricing Guardrails & Commercial Protection"
         - "P08 ADM-096 Dynamic Pricing Automation Policy & Control"
         - "P08 ADM-114 Automation Policy & Autonomous Pricing Orchestrator"
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per scope node, the one the body''s `scopeId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [scopeId]
+      x-ticvai-body-key-note: 'Keyed by the body''s `scopeId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per scope node within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body. **Required in fact**: a body without `scopeId` is refused `400 validation`; the schema leaves it optional only so a client built at r1 still validates.'
       summary: Set the guardrails and automation level of dynamic pricing at one scope
       description: '**Guardrails and automation policy, one row per scope** (29 September, writers pass). Creates or
         updates the `catalogue.dynamic_pricing_control` for `scopeLevel` and `scopeId`: price floors and ceilings,

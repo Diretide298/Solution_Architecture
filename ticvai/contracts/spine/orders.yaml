@@ -2011,8 +2011,8 @@ paths:
       operationId: setResaleFeePolicy
       x-ticvai-consumed-by:
         - "P08 ADM-283 Resale Fees, Commission & Seller Proceeds"
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per event or product, the one the body''s `eventId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [eventId]
+      x-ticvai-body-key-note: 'Keyed by the body''s `eventId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per event or product within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body. **Required in fact**: a body without `eventId` is refused `400 validation`; the schema leaves it optional only so a client built at r1 still validates.'
       summary: Set resale commission and the price ceiling
       description: '**`priceCapPercent` is regulated in several jurisdictions and the package has said
         so**: the resale backlog entry records that anti-scalping limits bind in some markets and that
@@ -8389,8 +8389,8 @@ paths:
       - query: catalogue#productRecords
         route: in-process
         for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per upgrade path, the one the body''s `pathCode` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [pathCode]
+      x-ticvai-body-key-note: 'Keyed by the body''s `pathCode`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per upgrade path within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body. **Required in fact**: a body without `pathCode` is refused `400 validation`; the schema leaves it optional only so a client built at r1 still validates.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Ticket Upgrade, Exchange & Conversion_Reference.pdf p.5; MoM 1 Sep 4.9 (paths, eligibility, pro-rata, guest-app upgrades, group upgrades by request); shape fixed (rewritten from the pack page)'
@@ -10586,8 +10586,8 @@ paths:
       - query: identity#subjectRecords
         route: in-process
         for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per customer, the one the body''s `customerId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [customerId]
+      x-ticvai-body-key-note: 'Keyed by the body''s `customerId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per customer within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body. **Required in fact**: a body without `customerId` is refused `400 validation`; the schema leaves it optional only so a client built at r1 still validates.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Order___Reservation_Management_Reference.pdf p.11; MoM 1 Sep 4.11 (guest checkout or registration per channel; customer category decides what is collected); shape fixed (3 non-field properties removed; enums customerType)'
@@ -11272,8 +11272,8 @@ paths:
       operationId: setAfterSaleFinancial
       x-ticvai-consumed-by:
         - "P08 BO-321 After-Sales Financial Settlement & Adjustment Workspace"
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per order, the one the body''s `orderId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [orderId]
+      x-ticvai-body-key-note: 'Keyed by the body''s `orderId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per order within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body. **Required in fact**: a body without `orderId` is refused `400 validation`; the schema leaves it optional only so a client built at r1 still validates.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Order___Reservation_Management_Reference.pdf p.32; MoM 1 Sep 4.11-4.12 (orders, holds, amendments, deposits); shape fixed (5 non-field properties removed; enums paymentStatus; added refundDue, commitPolicy, orderId)'

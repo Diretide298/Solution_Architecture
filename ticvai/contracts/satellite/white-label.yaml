@@ -2479,8 +2479,8 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-840 Mobile App CMS"
         - "P13 CMS-007 Page Builder"
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per site template, the one the body''s `templateKey` names, within the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [templateKey]
+      x-ticvai-body-key-note: 'Keyed by the body''s `templateKey`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per site template within the caller''s tenant; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body. **Required in fact**: a body without `templateKey` is refused `400 validation`; the schema leaves it optional only so a client built at r1 still validates.'
       x-ticvai-audience:
       - staff
       x-ticvai-config-scope: tenant

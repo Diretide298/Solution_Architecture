@@ -2758,8 +2758,8 @@ paths:
         - "P08 BO-1016 Companion Seat Rules"
         - "P08 BO-1017 Wheelchair Companion Rules"
         - "P08 BO-1021 Flexible Spacing Rules"
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per seat map, the one the body''s `seatMapId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [seatMapId]
+      x-ticvai-body-key-note: 'Keyed by the body''s `seatMapId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per seat map within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body. **Required in fact**: a body without `seatMapId` is refused `400 validation`; the schema leaves it optional only so a client built at r1 still validates.'
       summary: Which seats are killed, buffered, paired or reserved for access
       description: 'Board 7. **Four rules that all move the same seats and are decided by different
         people.**
@@ -2851,8 +2851,8 @@ paths:
         - "P08 BO-1018 Accessible Seating Master"
         - "P08 BO-1019 Accessible Route Mapping"
         - "P08 BO-1020 Accessible Filters & Eligibility"
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per seat map, the one the body''s `seatMapId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [seatMapId]
+      x-ticvai-body-key-note: 'Keyed by the body''s `seatMapId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per seat map within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body. **Required in fact**: a body without `seatMapId` is refused `400 validation`; the schema leaves it optional only so a client built at r1 still validates.'
       summary: Define accessible seats, routes and eligibility
       tags:
       - seating
@@ -3143,8 +3143,8 @@ paths:
         - "P08 BO-1037 Family Seating Recommendations"
         - "P08 BO-1038 Accessibility Recommendations"
         - "P08 BO-1041 Scoring Rules & Model Governance"
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per seat map, the one the body''s `seatMapId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [seatMapId]
+      x-ticvai-body-key-note: 'Keyed by the body''s `seatMapId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per seat map within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body. **Required in fact**: a body without `seatMapId` is refused `400 validation`; the schema leaves it optional only so a client built at r1 still validates.'
       summary: Scoring for best seat, best value, closest, family and accessible
       description: 'Board 9, and it is the 21 August minute made configurable: *"best-seat ranking (e.g.
         last-row-is-best vs. first-row-is-best, depending on venue sightlines) must be configurable per

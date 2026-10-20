@@ -3524,8 +3524,8 @@ paths:
       operationId: setCodeDistributionManager
       x-ticvai-consumed-by:
         - "P08 ADM-164 Code Distribution & Assignment Manager"
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per code batch, the one the body''s `batchId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [batchId]
+      x-ticvai-body-key-note: 'Keyed by the body''s `batchId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per code batch within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body. **Required in fact**: a body without `batchId` is refused `400 validation`; the schema leaves it optional only so a client built at r1 still validates.'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.42; no promotions minutes on file (the 3 September walkthrough was not minuted), so our build plan; shape fixed (6 non-field properties removed; enums assigneeType; added batchId, partner)'
@@ -4554,8 +4554,8 @@ paths:
       operationId: simulateBundlePreviewRecommendation
       x-ticvai-consumed-by:
         - "P08 ADM-187 Bundle Preview, Simulation & AI Recommendation"
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per bundle, the one the body''s `bundleId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [bundleId]
+      x-ticvai-body-key-note: 'Keyed by the body''s `bundleId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per bundle within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body. **Required in fact**: a body without `bundleId` is refused `400 validation`; the schema leaves it optional only so a client built at r1 still validates.'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.73; MoM 14 Aug (AI advisory in phase one); shape fixed (rewritten from the pack page)'
