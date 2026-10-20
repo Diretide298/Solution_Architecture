@@ -6333,8 +6333,9 @@ paths:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
-          x-ticvai-problem-types: [identity-document-expired, document-kind-not-accepted]
-          description: The document has expired, or its kind is not accepted by the tenant's policy
+          x-ticvai-problem-types: [identity-document-expired, document-kind-not-accepted, selfie-required]
+          description: The document has expired, or its kind is not accepted by the tenant's policy, or the policy
+            asks for a selfie and none was sent (`selfie-required`, CHG-R8MIG-027)
           content:
             application/problem+json:
               schema:
@@ -7734,13 +7735,16 @@ components:
         documentAssetId:
           type: string
           format: uuid
-          description: The uploaded scan or photo of the document.
+          description: The uploaded scan or photo of the document. **A guest makes it** with assets
+            `createGuestUpload` and `completeGuestUpload` (purpose `identityDocument`); this is the completed upload's
+            `uploadId`, which must be the caller's own (R8 blocker IDENTITY-C66, CHG-R8MIG-027).
         selfieAssetId:
           type: string
           format: uuid
           nullable: true
           description: A live photo for the reviewer to compare, where the policy asks for one. Deleted with the
-            scan.
+            scan. The caller's own completed guest upload with purpose `selfie`; required when the policy's
+            `selfieRequired` is true (422 `selfie-required`).
         reason:
           type: string
           enum:
@@ -7836,6 +7840,15 @@ components:
           nullable: true
           readOnly: true
           description: When the scan (and any selfie) was deleted under the policy's retention.
+        selfieUploadId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          x-ticvai-references: none
+          description: '**The selfie sent with the document** (R8 blocker IDENTITY-C66, CHG-R8MIG-027): the
+            `assets.guest_upload` id of the request''s `selfieAssetId`, kept for the reviewer and deleted with the scan
+            (`documentImageDeletedAt`, then null). Null when none was sent.'
     IdentityGuestVerificationPolicy:
       type: object
       x-ticvai-persistence: identity.guest_verification_policy

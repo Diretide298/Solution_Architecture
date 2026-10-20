@@ -598,6 +598,108 @@ paths:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
+  /media/guest-uploads:
+    post:
+      operationId: createGuestUpload
+      security:
+      - guestAuth: []
+      x-ticvai-self-scoped: subject
+      x-ticvai-audience: [guest]
+      summary: A guest requests a signed upload URL for an identity document or a selfie
+      description: >
+        **How a guest produces the `documentAssetId` and `selfieAssetId` that `submitGuestIdentityDocument`
+        needs** (R8 blocker IDENTITY-C66, CHG-R8MIG-027). The same direct-to-storage transfer as `createUpload`,
+        narrowed for a guest: the upload belongs to the caller's own subject, its `purpose` is `identityDocument`
+        or `selfie`, the content type is image/jpeg, image/png or (a document only) application/pdf, and the file
+        is at most 10 MB (proposed, client to confirm). Refused 400 `media-type-not-permitted` or `media-too-large`
+        before any transfer. The file goes to the tenant's private document store, never to the media library,
+        and is deleted under the verification policy's `documentImageRetention`, or 24 hours after upload when
+        no verification uses it. Confirm with `completeGuestUpload`.
+      tags: [upload]
+      x-ticvai-permission: null
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [purpose, contentType, sizeBytes]
+              properties:
+                purpose:
+                  type: string
+                  enum: [identityDocument, selfie]
+                contentType: { type: string, maxLength: 100 }
+                sizeBytes: { type: integer, minimum: 1 }
+      responses:
+        '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Signed URL issued
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/UploadTicket' }
+        '400':
+          x-ticvai-problem-types: [media-type-not-permitted, media-too-large]
+          description: Content type not permitted for the purpose, or larger than 10 MB.
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+
+  /media/guest-uploads/{uploadId}/complete:
+    parameters:
+      - name: uploadId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: completeGuestUpload
+      security:
+      - guestAuth: []
+      x-ticvai-self-scoped: subject
+      x-ticvai-audience: [guest]
+      summary: A guest confirms an upload
+      description: >
+        Verifies the transfer and marks the guest's upload `uploaded` (R8 blocker IDENTITY-C66, CHG-R8MIG-027).
+        The returned `uploadId` is what `submitGuestIdentityDocument` takes as `documentAssetId` or
+        `selfieAssetId`. Another guest's upload, or an unknown id, is `404`. No derivative, fingerprint or
+        library entry is made; the file is scanned like any upload and a flagged file is refused when submitted.
+      tags: [upload]
+      x-ticvai-permission: null
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Uploaded
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/GuestUpload' }
+        '404':
+          $ref: '../shared/common.yaml#/components/responses/NotFound'
+        '409':
+          description: >
+            The transfer never finished (`transferIncomplete`), the ticket expired (`uploadExpired`), or the stored
+            file is larger than the ticket allowed (`sizeExceeded`).
+          x-ticvai-problem-types: [transfer-incomplete, upload-expired, size-exceeded]
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/UploadRefusedProblem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+
   /media/collections:
     get:
       operationId: listCollections
@@ -2309,6 +2411,51 @@ components:
           description: Of those, how many are published to guests right now.
         derivativesRegenerating: { type: boolean }
 
+    GuestUpload:
+      type: object
+      x-ticvai-persistence: assets.guest_upload
+      description: >
+        **A file a guest uploaded for identity verification** (R8 blocker IDENTITY-C66, CHG-R8MIG-027): an identity
+        document's scan or a selfie, the caller's own (row-level security by subject), kept apart from the media
+        library and deleted under the verification policy's retention. `createGuestUpload` writes it `pending`,
+        `completeGuestUpload` makes it `uploaded`, the retention job `deleted`.
+      required: [uploadId, subjectId, purpose, status, createdAt]
+      properties:
+        uploadId:
+          type: string
+          format: uuid
+          readOnly: true
+          x-ticvai-column: id
+        subjectId:
+          type: string
+          format: uuid
+          readOnly: true
+          x-ticvai-references: none
+          description: The guest who uploaded it, from the session.
+        purpose:
+          type: string
+          enum: [identityDocument, selfie]
+        contentType:
+          type: string
+          maxLength: 100
+        sizeBytes:
+          type: integer
+          minimum: 1
+        storageKey:
+          type: string
+          writeOnly: true
+          maxLength: 500
+          description: Where the file is in the private document store; never returned.
+        status:
+          type: string
+          enum: [pending, uploaded, deleted]
+        createdAt:
+          type: string
+          format: date-time
+        deletedAt:
+          type: string
+          format: date-time
+          nullable: true
     UploadTicket:
       x-ticvai-persistence: "assets.media_upload"
       type: object
