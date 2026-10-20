@@ -1,0 +1,46 @@
+id: CHG-R8INT-023
+date: '2026-10-20'
+source: audit
+kind: contract
+summary: 'A plan version is its own row: control.plan is keyed (id, version), and every key into it names the version
+  too: control.contract, control.tenant, control.tier_allowance and control.tier_module by a declared
+  `x-ticvai-references-version: planVersion`, and the plan''s own child tables control.plan_module and
+  control.plan_limit by a plan_version column derive-schema now adds to the child of any parent keyed [id, version].
+  Without the last part the two children''s foreign keys would have pointed at a key that no longer exists, and
+  derive-ddl would have written none.'
+decision:
+  what: 'contracts/satellite/subscription.yaml: Plan `x-ticvai-primary-key: [id, version]`; Subscription.planId
+    `x-ticvai-references: control.plan` + `x-ticvai-references-version: planVersion` (planVersion was already
+    there); SubscriptionTierAllowance.tierId, SubscriptionTierModule.tierId and Tenant.planId
+    `x-ticvai-references-version: planVersion` with a new readOnly planVersion property (nullable on Tenant).
+    tools/derive-schema.py: a derived child of a parent keyed [id, <version>] carries `<parent>_<version>` and names
+    it on its parent key (referencesVersionColumn); tools/derive-ddl.py keys that pair to the parent''s pair.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'R8 blocker APPROVALS-TENANCY-C15 (storage-sat request 8 in audit/ticvai/r8-blockers/r8b-storage-core-report.md,
+  generator support done in 50d04ebb, the contract marks left for the merge): a subscriber on an earlier plan version
+  keeps the modules and limits they were sold, so the plan row is per version. Finding: a trial derive at the
+  integration branch reported control.contract, plan_module and plan_limit "point at a table with no addressable
+  key" once Plan was keyed (id, version).'
+keys_touched:
+  schemas: [Plan, Subscription, SubscriptionTierAllowance, SubscriptionTierModule, Tenant]
+  files:
+  - contracts/satellite/subscription.yaml
+  - tools/derive-schema.py
+  - tools/derive-ddl.py
+root_class: 'a versioned parent key whose derived children kept a single-column key'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: r8 integration'
+triage: blocker
+prevention:
+  type: generator-rule
+  ref: tools/derive-schema.py
+status: open
+notes: 'control.plan is first created by this release''s control file, so the key is right at creation (the trial
+  derive writes FOREIGN KEY (plan_id, plan_version) REFERENCES control.plan(id, version) for all six, guarded; the
+  existing control.tenant key in the names file, NOT VALID). tier_allowance.plan_version and tenant.plan_version are
+  nullable (the server fills them); a null version leaves that row''s key unchecked (MATCH SIMPLE).'

@@ -2342,6 +2342,9 @@ def main() -> int:
                     vprop = (contract_props.get(str(c.get("source") or "")) or {}).get("x-ticvai-references-version")
                     vcol = next((x["column"] for x in cols[t]
                                  if str(x.get("source") or "").rsplit(".", 1)[-1] == str(vprop)), None) if vprop else None
+                    # A derived child of a versioned parent names its version column itself (derive-schema,
+                    # CHG-R8INT-023): `plan_module.plan_id` with `plan_version`.
+                    vcol = vcol or c.get("referencesVersionColumn")
                     ppk = DECLARED_PK.get(ref) or []
                     if (c.get("enforced") == "yes" and vcol and len(ppk) == 2
                             and area(schema) == area(tgt_s)):

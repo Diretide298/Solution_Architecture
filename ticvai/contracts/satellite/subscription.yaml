@@ -12032,8 +12032,14 @@ components:
         tierId:
           x-ticvai-column: plan_id
           x-ticvai-references: control.plan
+          x-ticvai-references-version: planVersion
           type: string
           format: uuid
+        planVersion:
+          type: string
+          readOnly: true
+          description: The version of the plan this row belongs to (with `tierId`, the key of the plan row; R8 blocker
+            APPROVALS-TENANCY-C15, CHG-R8INT-023). Set by the server to the plan's latest version when written.
         code:
           type: string
           maxLength: 100
@@ -12076,8 +12082,14 @@ components:
         tierId:
           x-ticvai-column: plan_id
           x-ticvai-references: control.plan
+          x-ticvai-references-version: planVersion
           type: string
           format: uuid
+        planVersion:
+          type: string
+          readOnly: true
+          description: The version of the plan this row belongs to (with `tierId`, the key of the plan row; R8 blocker
+            APPROVALS-TENANCY-C15, CHG-R8INT-023). Set by the server to the plan's latest version when written.
         code:
           type: string
           maxLength: 100
@@ -16949,9 +16961,16 @@ components:
           nullable: true
         planId:
           x-ticvai-references: control.plan
+          x-ticvai-references-version: planVersion
           type: string
           format: uuid
           nullable: true
+        planVersion:
+          type: string
+          nullable: true
+          readOnly: true
+          description: The version of the plan the tenant is on (with `planId`, the key of the plan row; R8 blocker
+            APPROVALS-TENANCY-C15, CHG-R8INT-023). Null when `planId` is.
         planName:
           type: string
           nullable: true
@@ -17218,6 +17237,10 @@ components:
           description: How long a burst may last.
     Plan:
       x-ticvai-persistence: control.plan + control.plan_module + control.plan_limit
+      # Each version is its own row, so a subscriber on an earlier one keeps reading it (R8 blocker
+      # APPROVALS-TENANCY-C15, storage-sat request 8; r8 integration, CHG-R8INT-023). control.plan is first created by
+      # this release's control migration, so the key is right at creation.
+      x-ticvai-primary-key: [id, version]
       description: '**A plan''s modules and limits are rows, keyed on `plan_id`.** `licensedModules`
         and `limits` are required on every plan, and `control.plan` alone had no column for
         either — so the licence position, the downgrade check and every module gate had nothing to
@@ -17293,6 +17316,9 @@ components:
           type: string
           format: uuid
         planId:
+          x-ticvai-references: control.plan
+          # Keyed with planVersion to the plan row sold (R8 blocker APPROVALS-TENANCY-C15, CHG-R8INT-023).
+          x-ticvai-references-version: planVersion
           type: string
           format: uuid
         planName:

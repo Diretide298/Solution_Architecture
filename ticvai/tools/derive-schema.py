@@ -967,6 +967,23 @@ def main() -> int:
             "description": f"The parent row. Derived from {parent_schema}.{key}.",
             "table": child, "references": parent_table,
         }]
+        # **A child of a versioned parent names the version too** (r8 integration, CHG-R8INT-023; R8 blocker
+        # APPROVALS-TENANCY-C15). A parent keyed `x-ticvai-primary-key: [id, <version>]` (control.plan) has no key
+        # on `id` alone, so `plan_module.plan_id` could reference nothing and derive-ddl wrote no foreign key at
+        # all. The child carries `<parent>_<version>` beside `<parent>_id`, and derive-ddl keys the pair to the
+        # parent's pair, as `x-ticvai-references-version` does for a declared reference.
+        _vpk = body.get("x-ticvai-primary-key")
+        if parent_cols and isinstance(_vpk, list) and len(_vpk) == 2 and _vpk[0] == "id":
+            _vprop = str(_vpk[1])
+            _vtype, _ = resolve_type(properties_of(body, all_schemas).get(_vprop) or {}, all_schemas, persisted)
+            _vcol = snake(parent_table.split(".")[-1]) + "_" + snake(_vprop)
+            parent_cols[0]["referencesVersionColumn"] = _vcol
+            parent_cols.append({
+                "column": _vcol, "type": _vtype or "text", "required": "yes",
+                "source": f"{owner.get(child, '')}.{parent_schema}.{_vprop}",
+                "description": f"The parent row's {_vprop}; with {parent_cols[0]['column']}, the key of the parent row.",
+                "table": child,
+            })
         cols = list(parent_cols)
         for prop, pspec in (items.get("properties") or {}).items():
             if isinstance(pspec, dict) and pspec.get("x-ticvai-persisted") is False:
