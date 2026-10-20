@@ -150035,7 +150035,7 @@ screens:
   name: Credit & Balance Type Configuration
   module: Orders & Money
   requiresModule: core
-  wave: 3
+  wave: 1
   permission: WALLET_VIEW
   source:
     pack: Wallet_Configuration_Backend_Structure_v1.0.pdf
@@ -157960,7 +157960,7 @@ screens:
   name: Peer-to-Peer Transfer Configuration
   module: Orders & Money
   requiresModule: core
-  wave: 3
+  wave: 1
   permission: WALLET_CONFIGURE
   source:
     pack: Wallet_Configuration_Backend_Structure_v1.0.pdf
@@ -157999,6 +157999,8 @@ screens:
       components:
       - kind: selectField
         label: P2P enabled
+        bindsTo: WalletTransferRules.peerToPeerAllowed
+        operation: getWalletTransferRules
         provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 76 §Configure
       - kind: selectField
         label: Eligible wallet types
@@ -158093,6 +158095,11 @@ screens:
     purpose: Whether guests may transfer
     trigger: onAction
     provenance: board reading, 19 September 2026
+  - operationId: getWalletTransferRules
+    contract: wallet
+    purpose: The transfer rules as saved, with their version for If-Match
+    trigger: onLoad
+    provenance: defined 21 October 2026 (r8 gate, CHG-R8RW-007; closes the CHG-WIR-027 gap)
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1144
@@ -158103,11 +158110,6 @@ screens:
     rather than here. **Pack actions reconciled 29 September (VM close-out):** Wallet ID, Customer ID,
     Membership ID, Contact selection, API are choices sent by `setWalletTransferRules` (field gap: add
     recipientLookupMethods walletId|customerId|membershipId|contact|api).'
-  gaps:
-  - operation: null
-    why: 'Contract gap recorded 2 October 2026 (CHG-WIR-027): A read (get or list) of the wallet transfer
-      rules that setWalletTransferRules writes.'
-    source: contracts/satellite/wallet.yaml#setWalletTransferRules | screens/P08-venue-back-office.yaml#BO-1144
 - id: BO-1145
   name: Transfer Eligibility, Limits & Approval Rules
   module: Orders & Money

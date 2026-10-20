@@ -417,6 +417,16 @@
    "status": {
     "$ref": "#/components/schemas/OrderStatus"
    },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "sale",
+     "walletTopUp"
+    ],
+    "readOnly": true,
+    "default": "sale",
+    "description": "**What the order is for** (r8 re-walk, CHG-R8RW-001). Set by the server from the lines, never taken from a body: `walletTopUp` when the order's one line is a catalogue product of kind `walletTopUp` (money loaded onto a guest's wallet, priced at the amount loaded), else `sale` (tickets, goods, food, any other catalogue sale; every order made before r8). Wallet `topUpWallet` credits only a captured payment whose order is `walletTopUp`, so a payment taken for tickets or goods can never be turned into wallet credit. New values may be added; a client treats one it does not know as `sale`."
+   },
    "currency": {
     "type": "string",
     "pattern": "^[A-Z]{3}$",

@@ -30,8 +30,10 @@
 #                 unexplained ones are listed and never touched
 #   descriptions  pointer bodies (C7): a New ticket's description becomes its pointer; a started ticket keeps its
 #                 text and gets ONE comment that its spec lives in ADAM (found again by its wording, so never
-#                 twice); New tickets are retitled to the plan (RETITLE=all: started ones too).
-#                 BATCH=n: at most n rewrites and n comments this run, earliest build order first
+#                 twice); New tickets are retitled to the plan (RETITLE=all: started ones too). A started, open ticket
+#                 whose text differs from the release's (its newest text comment, else its description) gets that
+#                 text as one comment per release ("The text of this ticket changed in release rN.").
+#                 BATCH=n: at most n rewrites, n comments and n text comments this run, earliest build order first
 #   health        read-only summary in the style of op-check.rb
 #
 # ONLY=phase,phase runs just those (guard always runs), e.g. ONLY=descriptions BATCH=200 for the staged pointers.
@@ -690,16 +692,41 @@ if rel_run?("retire")
 end
 
 # --------------------------------------------------------------------------------------------------- descriptions
+# text rule: begin (tests/test_op_release_text.py runs this block under Ruby 2.6)
 norm = lambda do |text|
   text.to_s.gsub("\r\n", "\n").split("\n").reject { |l| l.start_with?(RELEASE_PREFIX) }.join("\n").strip
 end
+# A started ticket keeps its description, so a plan text that changed after it started reached nobody reading
+# OpenProject (r8 re-walk, started-ticket-text-fix-not-delivered: ARCH-TESTS, KERNEL-ID, SETUP-HOSTS, PLATFORM-RLS
+# still said r6 after CHG-R8WFC-008). Chinmay, 20 October 2026: "fix the source so that next gen can clear those out
+# by default". So a started, open ticket whose text differs from the release's gets the release's text as ONE comment
+# per release: what it shows is its newest such comment's text, else its description; the same text (bar the release
+# line) is no comment, and a comment already made for this release is never made twice.
+TEXT_MARKER = "The text of this ticket changed in release"
+text_shown = lambda do |description, notes|
+  last = notes.reverse.find { |n| n.to_s.include?(TEXT_MARKER) }
+  last ? last.to_s.gsub("\r\n", "\n").split("\n\n", 2)[1].to_s : description.to_s
+end
+text_update = lambda do |description, notes, want, release|
+  next :already if notes.any? { |n| n.to_s.include?("#{TEXT_MARKER} #{release}.") }
+  norm.call(text_shown.call(description, notes)) == norm.call(want) ? :same : :post
+end
+text_note = lambda do |release, id, want|
+  "**#{TEXT_MARKER} #{release}.** The description above is the text this work started against, left as it is. " \
+  "From #{release} the plan's text is the one below; ADAM's pull (`/ticket #{id}`) shows it too. Build to it." \
+  "\n\n#{want.to_s.strip}"
+end
+# text rule: end
 if rel_run?("descriptions")
   rel_phase("descriptions")
   wps = load_wps.call
   commented = Journal.where(journable_type: "WorkPackage", journable_id: wps.keys)
                      .where("notes LIKE ?", "%#{COMMENT_MARKER}%").pluck(:journable_id).to_set
-  rewrite, comment, retitle, kept_titles = [], [], [], []
-  same = already_pointer = already_commented = closed = held_skipped = 0
+  text_notes = Hash.new { |h, k| h[k] = [] }
+  Journal.where(journable_type: "WorkPackage", journable_id: wps.keys).where("notes LIKE ?", "%#{TEXT_MARKER}%")
+         .order(:id).pluck(:journable_id, :notes).each { |i, n| text_notes[i] << n }
+  rewrite, comment, retitle, kept_titles, texts = [], [], [], [], []
+  same = already_pointer = already_commented = closed = held_skipped = texts_already = 0
   ordered = tickets.sort_by { |t| [t["sequence"] || 999_999, t["key"]] }
   ordered.each do |t|
     # A held ticket keeps its text and title while it is held: its hold comment says why; the pointer comes with the
@@ -726,6 +753,12 @@ if rel_run?("descriptions")
       closed += 1
     else
       comment << [id, t["key"], w.status.name, B["comment"].gsub("%ID%", id.to_s).gsub("%KEY%", t["key"])]
+    end
+    if w.status_id != NEW_ID && !w.status.is_closed
+      case text_update.call(w.description, text_notes[id], want, RELEASE)
+      when :post then texts << [id, t["key"], w.status.name, text_note.call(RELEASE, id, want)]
+      when :already then texts_already += 1
+      end
     end
     if w.subject != t["subject"]
       if w.status_id == NEW_ID || ENV["RETITLE"] == "all"
@@ -754,6 +787,15 @@ if rel_run?("descriptions")
   end
   sample = cm.first
   rel_say "  e.g. comment on ##{sample[0]}: #{sample[3]}" if sample
+  tx = BATCH ? texts.first(BATCH) : texts
+  rel_say "started tickets whose text changed: #{texts.size} to get #{RELEASE}'s text as a comment, " \
+      "#{texts_already} already have it" + (BATCH ? " (BATCH=#{BATCH}: #{tx.size} this run)" : "")
+  rel_list(tx.map { |i, k, s, _| "text ##{i} #{k} (#{s})" })
+  sample = tx.first
+  if sample
+    rel_say "  e.g. text comment on ##{sample[0]}:"
+    sample[3].split("\n").each { |l| rel_say "    | #{l}" }
+  end
   if APPLY
     now = Time.now
     rel_quietly do
@@ -765,12 +807,20 @@ if rel_run?("descriptions")
           w.add_journal(author, text)
           w.save!(validate: false)
         end
+        tx.each do |i, _, _, text|
+          w = WorkPackage.find(i)
+          w.add_journal(author, text)
+          w.save!(validate: false)
+        end
       end
     end
     rel_say "done: #{rw.size} rewritten, #{cm.size} commented, #{retitle.size} retitled"
+    rel_say "done: #{tx.size} started tickets given #{RELEASE}'s text"
   end
   results << "descriptions: #{rw.size} rewritten, #{cm.size} commented, #{retitle.size} retitled" +
              (rewrite.size > rw.size || comment.size > cm.size ? "; #{rewrite.size - rw.size + comment.size - cm.size} left for the next BATCH" : "")
+  results << "descriptions: #{tx.size} started tickets #{APPLY ? 'given' : 'to be given'} #{RELEASE}'s text as a comment" +
+             (texts.size > tx.size ? "; #{texts.size - tx.size} left for the next BATCH" : "")
 end
 
 # --------------------------------------------------------------------------------------------------------- health

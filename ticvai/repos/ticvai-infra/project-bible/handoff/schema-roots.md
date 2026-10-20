@@ -30,7 +30,7 @@ tables**, and the distribution is the honest shape of the package:
 | `ledger.legal_entity` | 332 |
 | `access.admission_rules` | 237 |
 | `platform.configuration_profile` | 223 |
-| `catalogue.variant` | 151 |
+| `catalogue.variant` | 152 |
 | `access.hardware_model` | 82 |
 | `resources.resource_type` | 74 |
 
@@ -133,7 +133,7 @@ at `role` rather than the reverse. **The direction was the bug, not the data.**
 
 ## `identity` — 38 tables
 
-**Root: `identity.principal`**  ·  own 25 · reach 387 · out 3
+**Root: `identity.principal`**  ·  own 25 · reach 388 · out 3
 
 - **1 step from the root** — `access_decision`, `access_override`, `access_review_campaign`, `access_review_item`, `authz_audit`, `delegated_access`, `guest_identity_verification`, `membership_history`, `mfa_challenge`, `mfa_method`, `mfa_recovery_code`, `module_access`, `principal_credential`, `principal_external_identity`, `refresh_token`, `role_permission`, `session`
 - **2 steps from the root** — `principal_credential_history`
@@ -241,15 +241,14 @@ at `role` rather than the reverse. **The direction was the bug, not the data.**
 
   Standalone configuration, or a table whose foreign key is not declared. **Not a defect on its own** — a password policy belongs to a scope rather than to a principal — but it is where an undeclared key hides.
 
-## `platform` — 23 tables
+## `games` — 23 tables
 
-**Root: `platform.scope`**  ·  own 11 · reach 212 · out 1
+**Root: `games.game`**  ·  own 6 · reach 6 · out 3
 
-- **1 step from the root** — `audit_record`, `outlet`, `region_settings`, `sale_board`, `tenant`, `venue_settings`, `workstation`
-- **2 steps from the root** — `device`, `outlet_opening_hour`, `sale_board_page`
-- **3 steps from the root** — `sale_board_tile`
+- **1 step from the root** — `gameplay_transaction`, `operational_config`, `play`, `pricing`, `pricing_exception`, `reader`
+- **2 steps from the root** — `reader_deployment`, `reader_sync_status`
 
-- **Reaches the root through nothing** — `audit_read`, `configuration_profile`, `connectivity_policy`, `dead_letter`, `denomination`, `idempotency_record`, `offline_policy`, `outbox`, `outbox_sequence`, `profile_deployment`, `schema_version`
+- **Reaches the root through nothing** — `attraction_type`, `authorisation`, `card`, `card_expiry_rules`, `credit_ledger`, `entitlement`, `kiosk_config`, `prize`, `prize_cost`, `reader_profile`, `redemption`, `redemption_line`, `redemption_rules`, `validation_rules`
 
   Standalone configuration, or a table whose foreign key is not declared. **Not a defect on its own** — a password policy belongs to a scope rather than to a principal — but it is where an undeclared key hides.
 
@@ -263,14 +262,15 @@ at `role` rather than the reverse. **The direction was the bug, not the data.**
 
   Standalone configuration, or a table whose foreign key is not declared. **Not a defect on its own** — a password policy belongs to a scope rather than to a principal — but it is where an undeclared key hides.
 
-## `games` — 23 tables
+## `platform` — 23 tables
 
-**Root: `games.game`**  ·  own 6 · reach 6 · out 3
+**Root: `platform.scope`**  ·  own 11 · reach 212 · out 1
 
-- **1 step from the root** — `gameplay_transaction`, `operational_config`, `play`, `pricing`, `pricing_exception`, `reader`
-- **2 steps from the root** — `reader_deployment`, `reader_sync_status`
+- **1 step from the root** — `audit_record`, `outlet`, `region_settings`, `sale_board`, `tenant`, `venue_settings`, `workstation`
+- **2 steps from the root** — `device`, `outlet_opening_hour`, `sale_board_page`
+- **3 steps from the root** — `sale_board_tile`
 
-- **Reaches the root through nothing** — `attraction_type`, `authorisation`, `card`, `card_expiry_rules`, `credit_ledger`, `entitlement`, `kiosk_config`, `prize`, `prize_cost`, `reader_profile`, `redemption`, `redemption_line`, `redemption_rules`, `validation_rules`
+- **Reaches the root through nothing** — `audit_read`, `configuration_profile`, `connectivity_policy`, `dead_letter`, `denomination`, `idempotency_record`, `offline_policy`, `outbox`, `outbox_sequence`, `profile_deployment`, `schema_version`
 
   Standalone configuration, or a table whose foreign key is not declared. **Not a defect on its own** — a password policy belongs to a scope rather than to a principal — but it is where an undeclared key hides.
 
@@ -347,17 +347,6 @@ at `role` rather than the reverse. **The direction was the bug, not the data.**
 
   Standalone configuration, or a table whose foreign key is not declared. **Not a defect on its own** — a password policy belongs to a scope rather than to a principal — but it is where an undeclared key hides.
 
-## `venuemap` — 9 tables
-
-**Root: `venuemap.map`**  ·  own 5 · reach 7 · out 4
-
-- **1 step from the root** — `import_job`, `map_version`, `path`, `placed_resource`, `point`
-- **2 steps from the root** — `visit_plan_item`
-
-- **Reaches the root through nothing** — `visit_plan`, `visit_plan_preset`
-
-  Standalone configuration, or a table whose foreign key is not declared. **Not a defect on its own** — a password policy belongs to a scope rather than to a principal — but it is where an undeclared key hides.
-
 ## `subscription` — 9 tables
 
 **Root: `subscription.membership_product`**  ·  own 6 · reach 6 · out 2
@@ -366,6 +355,17 @@ at `role` rather than the reverse. **The direction was the bug, not the data.**
 - **2 steps from the root** — `membership_household_policy_role_limit`
 
 - **Reaches the root through nothing** — `partner_quote`
+
+  Standalone configuration, or a table whose foreign key is not declared. **Not a defect on its own** — a password policy belongs to a scope rather than to a principal — but it is where an undeclared key hides.
+
+## `venuemap` — 9 tables
+
+**Root: `venuemap.map`**  ·  own 5 · reach 7 · out 4
+
+- **1 step from the root** — `import_job`, `map_version`, `path`, `placed_resource`, `point`
+- **2 steps from the root** — `visit_plan_item`
+
+- **Reaches the root through nothing** — `visit_plan`, `visit_plan_preset`
 
   Standalone configuration, or a table whose foreign key is not declared. **Not a defect on its own** — a password policy belongs to a scope rather than to a principal — but it is where an undeclared key hides.
 

@@ -1,5 +1,5 @@
 id: LLD-wallet
-title: wallet — 70 operations
+title: wallet — 71 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -199,15 +199,15 @@ operations:
   reads:
   - cache:idempotency
   - wallet.accounting_mapping
+  - wallet.balance
   - wallet.credit_lot
   - wallet.credit_type
-  - wallet.wallet
   writes:
   - cache:idempotency
   - platform.outbox
   - wallet.adjustment
+  - wallet.balance
   - wallet.credit_lot
-  - wallet.wallet
   - wallet.wallet_transaction
 - operation: getCreditConsumptionPolicy
   verb: GET
@@ -365,6 +365,17 @@ operations:
   reads:
   - wallet.risk_rule
   - wallet.risk_rule_set
+  writes: []
+- operation: getWalletTransferRules
+  verb: GET
+  path: /wallet-transfer-rules
+  scope: tenant
+  permission: WALLET_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - wallet.transfer_rule
   writes: []
 - operation: holdWalletFunds
   verb: POST

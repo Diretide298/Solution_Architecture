@@ -78,7 +78,7 @@ operationsByContract:
     scope: workstation
     permission: ORDER_CREATE
     offline: false
-    reads: 4
+    reads: 5
     writes: 4
   - operation: createShopAndDrop
     verb: POST
@@ -368,7 +368,7 @@ tables:
   - retail
   foreignWriters: null
 - table: retail.sale_line
-  columns: 14
+  columns: 15
   store: postgres
   parent: retail.sale
   writtenBy:

@@ -134,6 +134,36 @@ x-ticvai-queries:
       turn time from table visits). F&B answers with its fnb.table_visit rows, as it stores them and as the caller's
       scope lets it see them. It decides nothing.
     served: [in-process, service]
+  tableReservationRecords:
+    module: fnb
+    table: fnb.table_reservation
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The fnb.table_reservation rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as outletId or status); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as F&B stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/TableReservation'}
+    rule: >-
+      A data read, not a rule question (r8 re-walk, CHG-R8RW-005: reporting getKpiValues computes noShowRate from
+      the reservations due in the period). F&B answers with its fnb.table_reservation rows, as it stores them and as
+      the caller's scope lets it see them. It decides nothing.
+    served: [in-process, service]
+  waitlistEntryRecords:
+    module: fnb
+    table: fnb.waitlist_entry
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The fnb.waitlist_entry rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as outletId or status); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as F&B stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/RestaurantWaitlist'}
+    rule: >-
+      A data read, not a rule question (r8 re-walk, CHG-R8RW-005: reporting getKpiValues computes waitQuoteAccuracy
+      from the waitlist parties told their table was ready in the period). F&B answers with its fnb.waitlist_entry
+      rows, as it stores them and as the caller's scope lets it see them. It decides nothing.
+    served: [in-process, service]
   productionPlanRecords:
     module: fnb
     table: fnb.production_plan

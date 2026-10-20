@@ -7,20 +7,20 @@
  "audience": "staff",
  "formFactor": "web",
  "offlineCapable": false,
- "generated": "2026-10-20",
+ "generated": "2026-10-21",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 1663,
-  "operations": 1894,
+  "operations": 1895,
   "contracts": 31,
   "modules": 19,
   "undrawn": 0,
   "operationsWithNoScreen": 206
  },
  "waves": {
-  "wave1": 141,
+  "wave1": 143,
   "wave2": 58,
-  "wave3": 1464
+  "wave3": 1462
  },
  "modules": [
   {
@@ -207,22 +207,22 @@
   },
   {
    "contract": "wallet",
-   "operations": 61
-  },
-  {
-   "contract": "ai",
-   "operations": 56
+   "operations": 62
   },
   {
    "contract": "resources",
    "operations": 56
   },
   {
-   "contract": "inventory",
-   "operations": 53
+   "contract": "ai",
+   "operations": 56
   },
   {
    "contract": "seating",
+   "operations": 53
+  },
+  {
+   "contract": "inventory",
    "operations": 53
   },
   {
@@ -230,11 +230,11 @@
    "operations": 47
   },
   {
-   "contract": "tenancy",
+   "contract": "payments",
    "operations": 46
   },
   {
-   "contract": "payments",
+   "contract": "tenancy",
    "operations": 46
   },
   {
@@ -250,11 +250,11 @@
    "operations": 41
   },
   {
-   "contract": "identity",
+   "contract": "workforce",
    "operations": 41
   },
   {
-   "contract": "workforce",
+   "contract": "identity",
    "operations": 41
   },
   {
@@ -6274,7 +6274,7 @@
    "id": "BO-1088",
    "name": "Credit & Balance Type Configuration",
    "module": "Orders & Money",
-   "wave": 3,
+   "wave": 1,
    "route": "/orders-money/credit-balance-type-configuration-bo-1088",
    "operations": 3,
    "drawn": true
@@ -6832,9 +6832,9 @@
    "id": "BO-1144",
    "name": "Peer-to-Peer Transfer Configuration",
    "module": "Orders & Money",
-   "wave": 3,
+   "wave": 1,
    "route": "/orders-money/peer-to-peer-transfer-configuration-bo-1144",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {

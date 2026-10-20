@@ -158097,7 +158097,7 @@ screens:
     provenance: board reading, 19 September 2026
   - operationId: getWalletTransferRules
     contract: wallet
-    purpose: 'The transfer rules as saved, with their version for If-Match'
+    purpose: The transfer rules as saved, with their version for If-Match
     trigger: onLoad
     provenance: defined 21 October 2026 (r8 gate, CHG-R8RW-007; closes the CHG-WIR-027 gap)
   wireframe:

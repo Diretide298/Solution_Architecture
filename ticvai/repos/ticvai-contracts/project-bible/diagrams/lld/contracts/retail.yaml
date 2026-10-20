@@ -115,6 +115,7 @@ operations:
   reads:
   - cache:idempotency
   - inventory.kit_component
+  - retail.merchandise
   - retail.sale
   - retail.sale_line
   writes:

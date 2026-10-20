@@ -882,6 +882,27 @@
    "note": {
     "type": "string",
     "maxLength": 500
+   },
+   "removedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**When `removeLicenceAddOn` ended the add-on** (r8 re-walk, CHG-R8RW-003); null while it is in force. A removed add-on is kept, not deleted, as the record of the removal; it counts in no `LicencePosition` and blocks no new add-on for the module (`add-on-already-active`)."
+   },
+   "removedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "Who removed it (the caller of `removeLicenceAddOn`); null while it is in force."
+   },
+   "removalReason": {
+    "type": "string",
+    "maxLength": 500,
+    "nullable": true,
+    "readOnly": true,
+    "description": "Why it was removed (`removeLicenceAddOn`'s `reason`); null while it is in force."
    }
   }
  },

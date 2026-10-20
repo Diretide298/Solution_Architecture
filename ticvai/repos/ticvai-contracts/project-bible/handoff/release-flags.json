@@ -6,8 +6,8 @@
  },
  "counts": {
   "appModules": 306,
-  "operations": 2562,
-  "sharedOperations": 1396
+  "operations": 2563,
+  "sharedOperations": 1401
  },
  "appModules": {
   "AM-ACCREDITATION-P08": {
@@ -1471,8 +1471,12 @@
    "screens": [],
    "operations": [
     "finance#closeFiscalPeriod",
+    "finance#createRecognitionSchedule",
+    "finance#getDeferredRevenue",
     "finance#getUnifiedReconciliation",
-    "finance#listFiscalPeriods"
+    "finance#listFiscalPeriods",
+    "finance#listRecognitionSchedules",
+    "finance#runRecognition"
    ]
   },
   "AM-FINANCE-TAX-P01": {
@@ -7447,6 +7451,7 @@
     "wallet#diffWalletConfigurationVersion",
     "wallet#getWalletFundingRules",
     "wallet#getWalletRiskRules",
+    "wallet#getWalletTransferRules",
     "wallet#listCreditTypes",
     "wallet#listWalletConfigurationVersions",
     "wallet#listWalletDisputes",
@@ -7489,6 +7494,7 @@
     "BO-1045",
     "BO-1088",
     "BO-1094",
+    "BO-1144",
     "BO-1162",
     "BO-117",
     "BO-1183",
@@ -7688,6 +7694,7 @@
     "wallet#diffWalletConfigurationVersion",
     "wallet#getWalletFundingRules",
     "wallet#getWalletRiskRules",
+    "wallet#getWalletTransferRules",
     "wallet#listCreditTypes",
     "wallet#listWalletConfigurationVersions",
     "wallet#listWalletTypes",
@@ -7695,6 +7702,7 @@
     "wallet#restoreWalletConfigurationVersion",
     "wallet#setWalletFundingRules",
     "wallet#setWalletRiskRuleStatus",
+    "wallet#setWalletTransferRules",
     "wallet#updateCreditType",
     "white-label#listBookingFlows"
    ]

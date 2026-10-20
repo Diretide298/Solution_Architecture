@@ -1189,7 +1189,7 @@
   "name": "Credit & Balance Type Configuration",
   "module": "Orders & Money",
   "requiresModule": "core",
-  "wave": 3,
+  "wave": 1,
   "permission": "WALLET_VIEW",
   "source": {
    "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",

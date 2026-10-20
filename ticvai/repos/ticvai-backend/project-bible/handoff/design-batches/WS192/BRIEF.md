@@ -1,6 +1,6 @@
 # WS192 — Wallet Configuration Backend Structure v1.0 board 7
 
-**10 screens · 20 operations · 23 schemas · 7 permissions**
+**10 screens · 21 operations · 23 schemas · 7 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·

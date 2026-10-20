@@ -244,6 +244,24 @@ x-ticvai-queries:
       process within commerce, through the C# query interface Orders implements, and asked from another
       deployable through Orders' service route (serviceAuth).
     served: [in-process, service]
+  orderLineDiscountRecords:
+    module: orders
+    table: orders.order_line_discount
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The orders.order_line_discount rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as orderLineId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Orders stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/OrderLineDiscount'}
+    rule: >-
+      A data read, not a rule question (r8 re-walk, CHG-R8RW-004 and CHG-R8RW-005: reporting getKpiValues sums discounts
+      for grossSales and discounts, and retail createRetailSale copies a line's discount onto its sale line). Orders
+      answers with its orders.order_line_discount rows (SD-008, one per discount applied to an order line), as it
+      stores them and as the caller's scope lets it see them. It decides nothing. It is asked in process within
+      commerce, through the C# query interface Orders implements, and asked from another deployable through Orders'
+      service route (serviceAuth).
+    served: [in-process, service]
   paymentRecords:
     module: orders
     table: orders.payment
@@ -4852,6 +4870,13 @@ paths:
         `seatLimitExceeded` (problem type `seat-limit-exceeded`, as `seating.createSeatHold`), no longer
         400.
 
+        **A wallet top-up is an order of its own** (r8 re-walk, CHG-R8RW-001). A line whose variant is a
+        catalogue product of kind `walletTopUp` makes the order `kind` `walletTopUp`: it must be the order''s
+        only line, with `quantity` 1, and it is priced at its `quotedUnitPrice` (the amount being loaded) with
+        no tax and no promotion. Any other mix is refused 422 `top-up-order-mixed` and nothing is written. The
+        till or guest app then pays the order with `createPayment` and sends the payment''s id to wallet
+        `topUpWallet`, which credits the wallet.
+
         Offline-capable. The client writes to its local journal, acknowledges the cashier, and replays
         through `/sync/orders` on reconnect.
 
@@ -4923,9 +4948,11 @@ paths:
                 $ref: '#/components/schemas/OrderRefusedProblem'
         '422':
           description: More seats for one performance than the channel allows (`seatLimitExceeded`,
-            decided 29 September, rev 3 REV3-7).
+            decided 29 September, rev 3 REV3-7). A `walletTopUp` line with other lines, or with `quantity`
+            above 1 (`top-up-order-mixed`, r8 re-walk, CHG-R8RW-001).
           x-ticvai-problem-types:
           - seat-limit-exceeded
+          - top-up-order-mixed
           content:
             application/problem+json:
               schema:
@@ -23916,6 +23943,20 @@ components:
           type: string
         status:
           $ref: '#/components/schemas/OrderStatus'
+        kind:
+          type: string
+          enum:
+          - sale
+          - walletTopUp
+          readOnly: true
+          default: sale
+          description: '**What the order is for** (r8 re-walk, CHG-R8RW-001). Set by the server from the lines,
+            never taken from a body: `walletTopUp` when the order''s one line is a catalogue product of kind
+            `walletTopUp` (money loaded onto a guest''s wallet, priced at the amount loaded), else `sale`
+            (tickets, goods, food, any other catalogue sale; every order made before r8). Wallet `topUpWallet`
+            credits only a captured payment whose order is `walletTopUp`, so a payment taken for tickets or goods
+            can never be turned into wallet credit. New values may be added; a client treats one it does not
+            know as `sale`.'
         currency:
           type: string
           pattern: ^[A-Z]{3}$

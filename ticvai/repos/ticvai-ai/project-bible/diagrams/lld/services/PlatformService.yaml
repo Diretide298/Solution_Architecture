@@ -913,7 +913,7 @@ operationsByContract:
     permission: PLATFORM_TENANT_MANAGE
     offline: false
     reads: 6
-    writes: 3
+    writes: 2
   - operation: requestBurstEnvironment
     verb: POST
     path: /burst-environments
@@ -2425,7 +2425,7 @@ tables:
   - subscription
   foreignWriters: null
 - table: control.licence_add_on
-  columns: 7
+  columns: 10
   store: postgres
   parent: control.tenant
   writtenBy:

@@ -222,7 +222,7 @@
  "counts": {
   "core": 516,
   "setup": 260,
-  "allOperations": 2844
+  "allOperations": 2845
  },
  "services": {
   "AccessService": {
@@ -298,7 +298,7 @@
   "WalletService": {
    "core": 8,
    "setup": 6,
-   "total": 70
+   "total": 71
   },
   "WhiteLabelService": {
    "core": 93,

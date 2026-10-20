@@ -3401,7 +3401,7 @@ tables:
   - orders
   foreignWriters: null
 - table: orders.sales_order
-  columns: 26
+  columns: 27
   store: postgres
   parent: null
   writtenBy:

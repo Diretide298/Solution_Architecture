@@ -1738,7 +1738,6 @@ operations:
   - control.tenant
   writes:
   - cache:idempotency
-  - control.contract
   - control.licence_add_on
 - operation: requestBurstEnvironment
   verb: POST

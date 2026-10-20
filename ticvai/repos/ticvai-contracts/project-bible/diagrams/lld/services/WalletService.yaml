@@ -1,5 +1,5 @@
 id: LLD-WalletService
-title: WalletService — 70 operations, 32 tables
+title: WalletService — 71 operations, 32 tables
 generatedBy: tools/derive-diagrams.py
 tier: commerce
 deployable: commerce
@@ -18,7 +18,7 @@ ifDown: '**It holds a liability owed to a customer.** A wallet that double-spend
   not a bug report. Deduction order across credit lots is FEFO and is decided here, once, rather than
   per caller.'
 coverage:
-  operations: 70
+  operations: 71
   inAFlow: 3
   percent: 4%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
@@ -31,7 +31,7 @@ schemas:
   largestTable: wallet.wallet_type
 operationsByContract:
 - contract: wallet
-  count: 70
+  count: 71
   operations:
   - operation: activateGiftCard
     verb: POST
@@ -232,6 +232,14 @@ operationsByContract:
     permission: WALLET_VIEW
     offline: false
     reads: 2
+    writes: 0
+  - operation: getWalletTransferRules
+    verb: GET
+    path: /wallet-transfer-rules
+    scope: tenant
+    permission: WALLET_VIEW
+    offline: false
+    reads: 1
     writes: 0
   - operation: holdWalletFunds
     verb: POST

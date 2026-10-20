@@ -9,7 +9,7 @@ about: '**A multi-tenant venue platform.** One tenant operates several venues; a
   contracts persist to 26 schemas, and every artefact in the package is drawn by resolving against that
   join rather than by being written twice.'
 scale:
-  operations: 2844
+  operations: 2845
   contracts: 33
   tables: 1153
   tablesNote: '**Postgres tables only.** `status.json` reports 379 because it counts five non-table
@@ -51,7 +51,7 @@ actors:
   - P08
   - P15
   - P16
-  operations: 2638
+  operations: 2639
   note: Sells, admits, cooks, counts, configures. **Authority is carried by the person, not the device**
     (ADR-0002) — which is what makes a shared handheld safe.
 - actor: partner
@@ -518,7 +518,7 @@ services:
     workers: []
 stores:
 - store: postgres
-  operations: 2830
+  operations: 2831
   usedBy:
   - service: CatalogueService
     operations: 470
@@ -545,7 +545,7 @@ stores:
   - service: LedgerService
     operations: 72
   - service: WalletService
-    operations: 70
+    operations: 71
   - service: InventoryService
     operations: 59
   - service: ReportingService
@@ -557,7 +557,7 @@ stores:
   note: '**One Postgres per cell**, 26 schemas inside it. Not one database per tenant (ADR-0005) — tenancy
     is a partition key, not a deployment boundary.'
 - store: redis
-  operations: 2064
+  operations: 2065
   usedBy:
   - service: CatalogueService
     operations: 415
@@ -586,7 +586,7 @@ stores:
   - service: ReportingService
     operations: 37
   - service: WalletService
-    operations: 34
+    operations: 35
   - service: RetailService
     operations: 17
   - service: CrossRegionService
@@ -683,7 +683,7 @@ layers:
 - layer: frontend
   holds: 477 screens, 93 flows, 15 platforms, 12 apps
 - layer: contracts
-  holds: 2844 operations across 28 contracts — the join
+  holds: 2845 operations across 28 contracts — the join
 - layer: backend
   holds: 1153 tables in 26 schemas, 910 relationships
 - layer: domain

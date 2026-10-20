@@ -69,7 +69,7 @@ servicesCalled:
 - service: MarketingService
   operationCalls: 237
 - service: WalletService
-  operationCalls: 222
+  operationCalls: 223
 - service: AiService
   operationCalls: 119
 - service: PlatformService
@@ -27702,7 +27702,7 @@ screens:
   name: Credit & Balance Type Configuration
   module: Orders & Money
   requiresModule: core
-  wave: 3
+  wave: 1
   density: compact
   operations:
   - createCreditType
@@ -29074,9 +29074,10 @@ screens:
   name: Peer-to-Peer Transfer Configuration
   module: Orders & Money
   requiresModule: core
-  wave: 3
+  wave: 1
   density: compact
   operations:
+  - getWalletTransferRules
   - setWalletTransferRules
   states:
   - emptyFirstRun

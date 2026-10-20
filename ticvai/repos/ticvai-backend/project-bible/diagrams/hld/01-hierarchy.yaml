@@ -34,7 +34,7 @@ levels:
 - level: tenant
   branch: root
   parent: null
-  operations: 610
+  operations: 611
   configurations: 113
   configuredBy:
   - claimCustomDomain

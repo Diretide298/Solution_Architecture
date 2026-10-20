@@ -3138,22 +3138,6 @@
    ],
    "reason": "r8 walk fix, CHG-R8WFC-004: reviewed against the description; the operation's own tables are stated on its contract, and this keeps only what no contract fact of its own module states (another module's table, a cache, or a table the schemas wrongly imply). Earlier: emits order.exchanged (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)); r8 cause IDENTITY-C61 (CHG-R8GEN-009): the difference is settled or refunded under orders.refund_policy against the order lines (orders.refund)"
   },
-  "expireCreditLots": {
-   "reads": [
-    "wallet.accounting_mapping",
-    "wallet.credit_lot",
-    "wallet.credit_type",
-    "wallet.wallet"
-   ],
-   "writes": [
-    "wallet.adjustment",
-    "wallet.credit_lot",
-    "wallet.wallet",
-    "wallet.wallet_transaction"
-   ],
-   "reason": "Apply mode updates credit_lot status/expires_at, wallet balance and a wallet_transaction; extension/forfeit recorded with reason and approver in wallet.adjustment; breakage policy from accounting_mapping; preview writes nothing (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
-   "carried": true
-  },
   "explainMetricChange": {
    "reads": [
     "ai.insight",

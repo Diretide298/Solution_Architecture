@@ -4048,7 +4048,7 @@
      "key": "WALLET_VIEW",
      "label": "balances, lots, liability, disputes",
      "group": "Wallet and stored value",
-     "operationCount": 24,
+     "operationCount": 25,
      "operations": [
       "diffWalletConfigurationVersion",
       "getCreditConsumptionPolicy",

@@ -304,7 +304,7 @@
   "name": "Peer-to-Peer Transfer Configuration",
   "module": "Orders & Money",
   "requiresModule": "core",
-  "wave": 3,
+  "wave": 1,
   "permission": "WALLET_CONFIGURE",
   "source": {
    "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
@@ -349,6 +349,8 @@
       {
        "kind": "selectField",
        "label": "P2P enabled",
+       "bindsTo": "WalletTransferRules.peerToPeerAllowed",
+       "operation": "getWalletTransferRules",
        "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 76 §Configure"
       },
       {
@@ -500,6 +502,13 @@
     "purpose": "Whether guests may transfer",
     "trigger": "onAction",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "getWalletTransferRules",
+    "contract": "wallet",
+    "purpose": "The transfer rules as saved, with their version for If-Match",
+    "trigger": "onLoad",
+    "provenance": "defined 21 October 2026 (r8 gate, CHG-R8RW-007; closes the CHG-WIR-027 gap)"
    }
   ],
   "wireframe": {
@@ -508,13 +517,6 @@
    "workshopBoard": "wireframes/WS192 Wallet Configuration Backend Structure v1.0 Board 7.dc.html#bo-1144"
   },
   "apisNote": "Regenerated 9 September 2026 from Wallet_Configuration_Backend_Structure_v1.0.pdf page 76. 0 of 0 labels bound to a contract property; 26 of 39 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Wallet ID, Customer ID, Membership ID, Contact selection, API are choices sent by `setWalletTransferRules` (field gap: add recipientLookupMethods walletId|customerId|membershipId|contact|api).",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-027): A read (get or list) of the wallet transfer rules that setWalletTransferRules writes.",
-    "source": "contracts/satellite/wallet.yaml#setWalletTransferRules | screens/P08-venue-back-office.yaml#BO-1144"
-   }
-  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",

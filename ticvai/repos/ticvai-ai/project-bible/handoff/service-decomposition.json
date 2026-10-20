@@ -622,7 +622,7 @@
    "why": "**Eight domains need a wallet and none of them owns it.** A Gold Membership issues F&B credit, parking credits and ride credits into the same wallet, so subscription, games and F&B all read it; `getWalletLiability` aggregates outstanding value across every credit type, so it has to see all of them. The 13 wallet types in the client's library are compositions of owner, credit type and scope rather than thirteen kinds, which is only expressible in one place. **Split out of `retail` on 19 September**, where 13 of retail's 37 operations were the entire wallet runtime while `wallet.yaml` held only its rules.",
    "scale": "Read-heavy on the sale path — every till and reader resolves a balance — and write-heavy on top-up. **Latency-critical in a way LedgerService is not**, which is why the two are separate: the ledger is append-only and batch-tolerant, a balance check is neither.",
    "risk": "**It holds a liability owed to a customer.** A wallet that double-spends is a financial loss, not a bug report. Deduction order across credit lots is FEFO and is decided here, once, rather than per caller.",
-   "operations": 70,
+   "operations": 71,
    "tables": 32,
    "readsFrom": {
     "OrderService": 3,

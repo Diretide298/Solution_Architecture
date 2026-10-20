@@ -2270,15 +2270,17 @@ paths:
         for: 'the limits the remaining add-ons raise, the other half of LicencePosition'
       x-ticvai-writes:
       - table: control.licence_add_on
-        for: 'the add-on row removed'
-      - table: control.contract
-        for: 'the change to the tenant''s contract the removal is recorded on, with `reason`'
+        for: 'the add-on row ended, not deleted: valid_to, removed_at, removed_by_principal_id and removal_reason (the
+          body''s `reason`) (r8 re-walk, CHG-R8RW-003)'
       summary: Remove an add-on
       description: '**Takes a licensed add-on away from a tenant** (r8 walk fix, CHG-R8WFC-003: the operation had no
-        description). The add-on keyed by the body''s `moduleKey` is removed from the tenant''s `control.licence_add_on`
-        rows and the removal is recorded on its contract with `reason`; the answer is the tenant''s
-        `LicencePosition` after it: the plan''s modules and limits (control.tenant.plan_id -> control.plan_module,
-        control.plan_limit) and the add-ons that remain (control.licence_add_on, control.licence_add_on_limit).
+        description). The tenant''s add-on in force for the body''s `moduleKey` is ended, not deleted (r8 re-walk,
+        CHG-R8RW-003): its `control.licence_add_on` row gets `validTo` today, `removedAt` now, `removedByPrincipalId`
+        the caller and `removalReason` the body''s `reason`, so the row is the record of who removed it, when and
+        why. Nothing else is written; the tenant''s contract row does not change. The answer is the
+        tenant''s `LicencePosition` after it: the plan''s modules and limits (control.tenant.plan_id ->
+        control.plan_module, control.plan_limit) and the add-ons still in force (control.licence_add_on rows with no
+        `removedAt`, and their control.licence_add_on_limit rows).
 
 
         **The 409, and how the control plane knows** (r8 walk fix, CHG-R8WFC-003). Whether the tenant has the module
@@ -2316,6 +2318,9 @@ paths:
                   type: string
                   minLength: 3
                   maxLength: 500
+                  description: Why the add-on is removed. Kept on the ended add-on row as `removalReason` (r8 re-walk,
+                    CHG-R8RW-003).
+                  x-ticvai-stored-as: control.licence_add_on.removal_reason
       responses:
         '200':
           headers:
@@ -17548,6 +17553,26 @@ components:
         note:
           type: string
           maxLength: 500
+        removedAt:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+          description: '**When `removeLicenceAddOn` ended the add-on** (r8 re-walk, CHG-R8RW-003); null while it is in
+            force. A removed add-on is kept, not deleted, as the record of the removal; it counts in no
+            `LicencePosition` and blocks no new add-on for the module (`add-on-already-active`).'
+        removedByPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          description: Who removed it (the caller of `removeLicenceAddOn`); null while it is in force.
+        removalReason:
+          type: string
+          maxLength: 500
+          nullable: true
+          readOnly: true
+          description: Why it was removed (`removeLicenceAddOn`'s `reason`); null while it is in force.
     LicencePosition:
       x-ticvai-persistence: none — union of the tenant's plan (control.tenant.plan_id -> control.plan_module,
         control.plan_limit) and its add-ons (control.licence_add_on, control.licence_add_on_limit

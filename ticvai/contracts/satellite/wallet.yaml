@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI — Wallet Configuration
   version: 1.0.0
-  x-ticvai-screen-count: 62
+  x-ticvai-screen-count: 63
   x-ticvai-tier: satellite
   x-ticvai-module: 4 — Bundles and Promotions
   x-ticvai-platforms:
@@ -1355,7 +1355,6 @@ paths:
       operationId: getWalletTransferRules
       x-ticvai-consumed-by:
         - "P08 BO-1144 Peer-to-Peer Transfer Configuration"
-        - "P08 BO-1145 Transfer Eligibility, Limits & Approval Rules"
       summary: The peer-to-peer transfer rules in force
       description: |-
         **Added 21 October 2026 (r8 gate, CHG-R8RW-007; the contract gap CHG-WIR-027 of 2 October): `setWalletTransferRules`

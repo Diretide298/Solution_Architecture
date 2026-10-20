@@ -2,7 +2,7 @@
 
 Generated 17 August 2026
 
-**2844 operations · 1149 tables · 2453 screens · 208 state models · 97 events · 98 flows · 71 ADRs**
+**2845 operations · 1149 tables · 2453 screens · 208 state models · 97 events · 98 flows · 71 ADRs**
 
 **Conflicts: 92 raised, 0 blocking.** See `conflict-status.md`.
 
@@ -28,7 +28,7 @@ provenance and what each one rules out — including the six that were wrong fir
 
 | | |
 |---|---|
-| `contracts/` | **2844 operations** across 25 files — 267 spine, 470 satellite |
+| `contracts/` | **2845 operations** across 25 files — 267 spine, 470 satellite |
 | `screens/` | 364 definitions across 16 platforms, all specified |
 | `frontend/` | 10 app manifests, with build readiness |
 | `states/` · `events/` | 208 state models · 97 events, cross-checked |
@@ -52,7 +52,7 @@ fixed**, and they are under-specified rather than wrong.
 
 ## What this is
 
-A design package. **2844 operations, 1149 tables and 2453 screens are specified and none of it
+A design package. **2845 operations, 1149 tables and 2453 screens are specified and none of it
 has been executed** — no SQL is written, no code is built, and every number above is an
 assertion until something runs.
 

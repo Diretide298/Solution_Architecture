@@ -7,7 +7,7 @@
 | Tier | commerce: The sale path. Highest availability, highest write rate. |
 | Contracts | `wallet` |
 | Schemas owned | `wallet` |
-| Operations in the slice | 14 of 70 |
+| Operations in the slice | 14 of 71 |
 | Scale | Read-heavy on the sale path — every till and reader resolves a balance — and write-heavy on top-up. Latency-critical in a way LedgerService is not, which is why the two are separate: the ledger is append-only and batch-tolerant, a balance check is neither. |
 | If it is down | It holds a liability owed to a customer. A wallet that double-spends is a financial loss, not a bug report. Deduction order across credit lots is FEFO and is decided here, once, rather than per caller. |
 
@@ -1006,7 +1006,8 @@ Boards 7.2 and 7.3. **Peer-to-peer transfer is a money-transmission question bef
 **`POST /wallets/{subjectId}/top-ups`**: Add value to a wallet
 
 Creates a liability, not revenue. Recognition happens when the value is spent, or as breakage if the wallet expires.
-**Paid first, then credited** (r8 walk fix, CHG-R8WFC-003; the 402 named a payment the body never identified). The till or the guest app takes the money with Orders' payment operations (`createPayment`, and `capturePayment` where the provider authorises first) and sends that payment's id as `paymentId`. Wallet reads it through `orders#paymentRecords` in process: a payment that is `captured` and whose amount covers `amount` is credited, and its id is kept as the new credit lot's `source_reference` (`source_kind` `topUp`), so one payment funds one top-up; a payment that is `declined` or `failed`, or not captured, is refused `402 payment-declined` and nothing is credited; a payment already used for a top-up is refused `409 payment-already-used`. `tender` stays the receipt's label.
+**Paid first, on a top-up order, then credited** (r8 walk fix, CHG-R8WFC-003; r8 re-walk, CHG-R8RW-001). The till or the guest app first makes a top-up order with Orders' `createOrder`: one line for the venue's catalogue product of kind `walletTopUp`, priced at `amount`, which makes the order `kind` `walletTopUp`. It pays that order with `createPayment` (and `capturePayment` where the provider authorises first) and sends the payment's id as `paymentId`. Wallet reads the payment through `orders#paymentRecords` and its order through `orders#salesOrderRecords`, in process.
+**Only a top-up payment can become wallet credit.** The payment must be `captured`; its order must be of kind `walletTopUp`, for this wallet's subject (`subjectId`), with a `grossAmount` equal to `amount`. A payment taken on any other order (tickets, goods, food) is refused `422 payment-not-for-top-up`, as is one whose order's subject or amount differs, and nothing is credited. A payment that is `declined` or `failed`, or not captured, is refused `402 payment-declined`. A payment already used for a top-up is refused `409 payment-already-used`: its id is kept as the new credit lot's `source_reference` (`source_kind` `topUp`), so one payment funds one top-up. `bonusAmount` is not paid for and is not compared. `tender` stays the receipt's label.
 
 |  |  |
 |---|---|
@@ -1040,7 +1041,7 @@ Creates a liability, not revenue. Recognition happens when the value is spent, o
 | amount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | amount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | tender | string | yes |  |
-| paymentId | string (uuid) |  | The orders.payment that paid for this top-up (r8 walk fix, CHG-R8WFC-003). |
+| paymentId | string (uuid) |  | The orders.payment that paid for this top-up (r8 walk fix, CHG-R8WFC-003): a captured payment of an order of kind walletTopUp (r8 re-walk, CHG-R8RW-001). |
 | bonusAmount | object |  | Promotional bonus on top of the paid amount. |
 | bonusAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | bonusAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
@@ -1089,6 +1090,7 @@ Creates a liability, not revenue. Recognition happens when the value is spent, o
 |---|---|---|
 | 201 |  | Topped up |
 | 402 |  | Payment declined, failed or not captured (the body's paymentId) |
+| 422 |  | The body's paymentId did not pay a top-up: its order is not of kind walletTopUp, or is for another subject, or its gross amount is not amount. |
 | 409 |  | The body's paymentId has already funded a top-up (r8 walk fix, CHG-R8WFC-003) |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
@@ -1460,11 +1462,11 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-56 operations, added to this service in later releases without changing any of the above.
+57 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
 | card | `adjustGameCard` |
 | giftCard | `blockGiftCard`, `issueGiftCard` |
 | retail | `activateGiftCard`, `closeWallet`, `getWalletExitBalance`, `redeemGiftCard`, `reinstateWallet`, `settleWalletAtExit`, `suspendWallet` |
-| wallet | `adjustWallet`, `captureWalletHold`, `createSharedWallet`, `createVoucherType`, `createWalletType`, `diffWalletConfigurationVersion`, `expireCreditLots`, `getCreditConsumptionPolicy`, `getWalletBalance`, `getWalletFundingRules`, `getWalletLiability`, `getWalletMovementSummary`, `getWalletPreCloseChecks`, `getWalletReconciliation`, `getWalletRefundPolicy`, `getWalletRiskRules`, `holdWalletFunds`, `linkWalletCredential`, `listCreditLots`, `listCreditTypes`, `listSharedWallets`, `listVoucherTypes`, `listWalletConfigurationVersions`, `listWalletDisputes`, `listWalletHolds`, `listWalletTypes`, `raiseWalletDispute`, `releaseWalletHold`, `resolveWalletDispute`, `reverseWalletFunding`, `setCreditConsumptionPolicy`, `setCreditEligibilityRules`, `setGiftCardProduct`, `setSharedWalletMembers`, `setWalletAccountingMapping`, `setWalletAuthenticationPolicy`, `setWalletChannelRules`, `setWalletIntegrationMapping`, `setWalletReconciliationSources`, `setWalletRefundPolicy`, `setWalletRestriction`, `setWalletRiskRuleStatus`, `setWalletRiskRules`, `simulateCreditConsumption`, `updateWalletType`, `withdrawWalletDispute` |
+| wallet | `adjustWallet`, `captureWalletHold`, `createSharedWallet`, `createVoucherType`, `createWalletType`, `diffWalletConfigurationVersion`, `expireCreditLots`, `getCreditConsumptionPolicy`, `getWalletBalance`, `getWalletFundingRules`, `getWalletLiability`, `getWalletMovementSummary`, `getWalletPreCloseChecks`, `getWalletReconciliation`, `getWalletRefundPolicy`, `getWalletRiskRules`, `getWalletTransferRules`, `holdWalletFunds`, `linkWalletCredential`, `listCreditLots`, `listCreditTypes`, `listSharedWallets`, `listVoucherTypes`, `listWalletConfigurationVersions`, `listWalletDisputes`, `listWalletHolds`, `listWalletTypes`, `raiseWalletDispute`, `releaseWalletHold`, `resolveWalletDispute`, `reverseWalletFunding`, `setCreditConsumptionPolicy`, `setCreditEligibilityRules`, `setGiftCardProduct`, `setSharedWalletMembers`, `setWalletAccountingMapping`, `setWalletAuthenticationPolicy`, `setWalletChannelRules`, `setWalletIntegrationMapping`, `setWalletReconciliationSources`, `setWalletRefundPolicy`, `setWalletRestriction`, `setWalletRiskRuleStatus`, `setWalletRiskRules`, `simulateCreditConsumption`, `updateWalletType`, `withdrawWalletDispute` |

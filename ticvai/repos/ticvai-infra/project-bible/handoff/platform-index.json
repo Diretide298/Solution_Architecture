@@ -104,16 +104,16 @@
   "operator": "venue",
   "counts": {
    "screens": 1663,
-   "operations": 1894,
+   "operations": 1895,
    "contracts": 31,
    "modules": 19,
    "undrawn": 0,
    "operationsWithNoScreen": 206
   },
   "waves": {
-   "wave1": 141,
+   "wave1": 143,
    "wave2": 58,
-   "wave3": 1464
+   "wave3": 1462
   }
  },
  "P09": {

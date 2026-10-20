@@ -2330,6 +2330,12 @@
        "type": "string",
        "format": "uuid"
       },
+      "orderLineId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true,
+       "description": "The order line the amounts were copied from (`CreateRetailSaleLine.orderLineId`; r8 re-walk, CHG-R8RW-004). Null on a sale recorded before r8."
+      },
       "name": {
        "type": "string"
       },

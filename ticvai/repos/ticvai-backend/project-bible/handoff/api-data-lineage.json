@@ -3370,6 +3370,7 @@
     "held_until",
     "hold_label",
     "id",
+    "kind",
     "net_amount",
     "order_number",
     "principal_id",
@@ -3502,6 +3503,7 @@
     "held_until",
     "hold_label",
     "id",
+    "kind",
     "net_amount",
     "order_number",
     "principal_id",
@@ -3635,6 +3637,7 @@
     "held_until",
     "hold_label",
     "id",
+    "kind",
     "net_amount",
     "order_number",
     "principal_id",
@@ -3775,6 +3778,7 @@
     "held_until",
     "hold_label",
     "id",
+    "kind",
     "net_amount",
     "order_number",
     "principal_id",
@@ -3908,6 +3912,7 @@
     "held_until",
     "hold_label",
     "id",
+    "kind",
     "net_amount",
     "order_number",
     "principal_id",
@@ -4042,6 +4047,7 @@
     "held_until",
     "hold_label",
     "id",
+    "kind",
     "net_amount",
     "order_number",
     "principal_id",
@@ -4831,6 +4837,7 @@
     "held_until",
     "hold_label",
     "id",
+    "kind",
     "net_amount",
     "order_number",
     "principal_id",
@@ -5078,6 +5085,7 @@
     "held_until",
     "hold_label",
     "id",
+    "kind",
     "net_amount",
     "order_number",
     "principal_id",
@@ -5277,6 +5285,7 @@
     "held_until",
     "hold_label",
     "id",
+    "kind",
     "net_amount",
     "order_number",
     "principal_id",
@@ -13415,7 +13424,6 @@
   ],
   "writes": [
    "cache:idempotency",
-   "control.contract",
    "control.licence_add_on"
   ],
   "routing": "",
@@ -20726,6 +20734,7 @@
     "merchandise_id",
     "name",
     "not_returnable_reason",
+    "order_line_id",
     "override_reason",
     "quantity",
     "returned_quantity",
@@ -20742,6 +20751,7 @@
   "reads": [
    "cache:idempotency",
    "inventory.kit_component",
+   "retail.merchandise",
    "retail.sale",
    "retail.sale_line"
   ],
@@ -20793,6 +20803,7 @@
     "merchandise_id",
     "name",
     "not_returnable_reason",
+    "order_line_id",
     "override_reason",
     "quantity",
     "returned_quantity",
@@ -20806,6 +20817,21 @@
     "query": "inventory#kitComponentRecords",
     "route": "in-process",
     "for": "its read of inventory.kit_component, Inventory's data (CHG-MOD-001)"
+   },
+   {
+    "query": "inventory#movementRecords",
+    "route": "in-process",
+    "for": "the stock on hand each line (or kit component) draws on, from its movements (409 insufficientStock) (r8 re-walk, CHG-R8RW-004)"
+   },
+   {
+    "query": "orders#orderLineDiscountRecords",
+    "route": "service",
+    "for": "the discounts Orders applied to those lines, summed onto each sale line (r8 re-walk, CHG-R8RW-004)"
+   },
+   {
+    "query": "orders#orderLineRecords",
+    "route": "service",
+    "for": "the order lines the sale lines name (orderLineId): unit price, tax, net and gross as Orders priced them (422 order-line-mismatch) (r8 re-walk, CHG-R8RW-004)"
    }
   ]
  },
@@ -20858,6 +20884,7 @@
     "merchandise_id",
     "name",
     "not_returnable_reason",
+    "order_line_id",
     "override_reason",
     "quantity",
     "returned_quantity",
@@ -20916,6 +20943,7 @@
     "merchandise_id",
     "name",
     "not_returnable_reason",
+    "order_line_id",
     "override_reason",
     "quantity",
     "returned_quantity",
@@ -21321,6 +21349,11 @@
     "query": "orders#paymentRecords",
     "route": "in-process",
     "for": "the top-up's payment (402 payment-declined) (CHG-MOD-003)"
+   },
+   {
+    "query": "orders#salesOrderRecords",
+    "route": "in-process",
+    "for": "the order the payment paid: its kind must be walletTopUp, its subject this wallet's and its gross amount this top-up's (422 payment-not-for-top-up) (r8 re-walk, CHG-R8RW-001)"
    }
   ]
  },
@@ -35665,6 +35698,7 @@
     "held_until",
     "hold_label",
     "id",
+    "kind",
     "net_amount",
     "order_number",
     "principal_id",
@@ -44412,6 +44446,7 @@
     "held_until",
     "hold_label",
     "id",
+    "kind",
     "net_amount",
     "order_number",
     "principal_id",
@@ -49304,6 +49339,7 @@
     "held_until",
     "hold_label",
     "id",
+    "kind",
     "net_amount",
     "order_number",
     "principal_id",
@@ -71534,16 +71570,16 @@
   "reads": [
    "cache:idempotency",
    "wallet.accounting_mapping",
+   "wallet.balance",
    "wallet.credit_lot",
-   "wallet.credit_type",
-   "wallet.wallet"
+   "wallet.credit_type"
   ],
   "writes": [
    "cache:idempotency",
    "platform.outbox",
    "wallet.adjustment",
+   "wallet.balance",
    "wallet.credit_lot",
-   "wallet.wallet",
    "wallet.wallet_transaction"
   ],
   "routing": null,
@@ -72434,14 +72470,29 @@
     "for": "recognisedRevenue and deferredRevenue: the revenue postings of the period (ledger.posting)"
    },
    {
+    "query": "fnb#tableReservationRecords",
+    "route": "in-process",
+    "for": "noShowRate: the reservations due in the period and those marked noShow (fnb.table_reservation) (r8 re-walk, CHG-R8RW-005)"
+   },
+   {
     "query": "fnb#tableVisitRecords",
     "route": "in-process",
     "for": "covers and tableTurnTime, where F&B is on (fnb.table_visit)"
    },
    {
+    "query": "fnb#waitlistEntryRecords",
+    "route": "in-process",
+    "for": "waitQuoteAccuracy: the waitlist parties told their table was ready in the period, against their quoted wait (fnb.waitlist_entry) (r8 re-walk, CHG-R8RW-005)"
+   },
+   {
     "query": "marketing-crm#loyaltyPositionRecords",
     "route": "in-process",
     "for": "the loyalty KPIs, split by tierCode (marketing.loyalty_position)"
+   },
+   {
+    "query": "orders#orderLineDiscountRecords",
+    "route": "service",
+    "for": "grossSales and discounts: the discounts applied to the order lines of the period (orders.order_line_discount) (r8 re-walk, CHG-R8RW-005)"
    },
    {
     "query": "orders#orderLineRecords",
@@ -72457,6 +72508,11 @@
     "query": "orders#refundRecords",
     "route": "service",
     "for": "takings and refunds: the money paid back in the period (orders.refund)"
+   },
+   {
+    "query": "tenancy#venueSettingsRecords",
+    "route": "service",
+    "for": "the venue's businessDayCutoff, which closes the default period, its business day (platform.venue_settings) (r8 re-walk, CHG-R8RW-005)"
    }
   ]
  },
@@ -96279,6 +96335,7 @@
     "held_until",
     "hold_label",
     "id",
+    "kind",
     "net_amount",
     "order_number",
     "principal_id",
@@ -133229,5 +133286,41 @@
    "postgres",
    "redis"
   ]
+ },
+ "getWalletTransferRules": {
+  "contract": "wallet",
+  "verb": "GET",
+  "path": "/wallet-transfer-rules",
+  "reads": [
+   "wallet.transfer_rule"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": "WALLET_VIEW",
+  "offline": false,
+  "summary": "The peer-to-peer transfer rules in force",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "WalletService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "readColumns": {
+   "wallet.transfer_rule": [
+    "approval_above_amount",
+    "id",
+    "is_both_parties_identified",
+    "is_peer_to_peer_allowed",
+    "is_within_shared_wallet_only",
+    "maximum_per_day",
+    "maximum_per_transfer",
+    "scope_path",
+    "transferable_credit_type_ids"
+   ]
+  }
  }
 }

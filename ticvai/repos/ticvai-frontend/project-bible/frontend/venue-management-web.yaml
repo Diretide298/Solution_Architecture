@@ -80,9 +80,9 @@ deployment:
   releaseCadence: weekly
 screenCount: 1838
 byWave:
-  wave1: 171
+  wave1: 173
   wave2: 58
-  wave3: 1609
+  wave3: 1607
 screens:
 - id: BO-001
   name: Queue Directory
@@ -8754,7 +8754,7 @@ screens:
   route: /orders-money/credit-balance-type-configuration-bo-1088
   repo: ticvai-venue-management
   path: src/routes/orders-money/CreditBalanceTypeConfiguration.tsx
-  wave: 3
+  wave: 1
   status: notStarted
 - id: BO-1089
   name: Wallet Feature Profile
@@ -9202,7 +9202,7 @@ screens:
   route: /orders-money/peer-to-peer-transfer-configuration-bo-1144
   repo: ticvai-venue-management
   path: src/routes/orders-money/PeerToPeerTransferConfiguration.tsx
-  wave: 3
+  wave: 1
   status: notStarted
 - id: BO-1145
   name: Transfer Eligibility, Limits & Approval Rules

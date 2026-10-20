@@ -15810,6 +15810,7 @@
    "orders.sales_order",
    "payments.provider_connection",
    "pii.subject_biometric",
+   "retail.merchandise",
    "retail.sale",
    "retail.sale_line",
    "retail.shop_and_drop",
@@ -116611,7 +116612,7 @@
    "wallet.credit_type"
   ],
   "storedProcedures": [],
-  "wave": 3,
+  "wave": 1,
   "offline": false,
   "specified": true,
   "exits": [
@@ -117998,16 +117999,16 @@
   "reads": [
    "cache:idempotency",
    "wallet.accounting_mapping",
+   "wallet.balance",
    "wallet.credit_lot",
-   "wallet.credit_type",
-   "wallet.wallet"
+   "wallet.credit_type"
   ],
   "writes": [
    "cache:idempotency",
    "platform.outbox",
    "wallet.adjustment",
+   "wallet.balance",
    "wallet.credit_lot",
-   "wallet.wallet",
    "wallet.wallet_transaction"
   ],
   "storedProcedures": [],
@@ -119274,16 +119275,16 @@
   "reads": [
    "cache:idempotency",
    "wallet.accounting_mapping",
+   "wallet.balance",
    "wallet.credit_lot",
-   "wallet.credit_type",
-   "wallet.wallet"
+   "wallet.credit_type"
   ],
   "writes": [
    "cache:idempotency",
    "platform.outbox",
    "wallet.adjustment",
+   "wallet.balance",
    "wallet.credit_lot",
-   "wallet.wallet",
    "wallet.wallet_transaction"
   ],
   "storedProcedures": [],
@@ -120150,13 +120151,15 @@
   "app": "venue-management-web",
   "route": "/orders-money/peer-to-peer-transfer-configuration-bo-1144",
   "operations": [
-   "setWalletTransferRules"
+   "setWalletTransferRules",
+   "getWalletTransferRules"
   ],
   "services": [
    "WalletService"
   ],
   "stores": [
-   "postgres"
+   "postgres",
+   "redis"
   ],
   "reads": [
    "cache:idempotency",
@@ -120167,7 +120170,7 @@
    "wallet.transfer_rule"
   ],
   "storedProcedures": [],
-  "wave": 3,
+  "wave": 1,
   "offline": false,
   "specified": true,
   "exits": [
@@ -157079,7 +157082,6 @@
   ],
   "writes": [
    "cache:idempotency",
-   "control.contract",
    "control.licence_add_on",
    "control.licence_add_on_limit"
   ],
@@ -157632,7 +157634,6 @@
   ],
   "writes": [
    "cache:idempotency",
-   "control.contract",
    "control.licence_add_on",
    "control.licence_add_on_limit"
   ],

@@ -193,12 +193,16 @@
    },
    "kind": {
     "type": "string",
+    "description": "`expiry`, `forfeiture` and `extension` (r8 re-walk, CHG-R8RW-002) are `expireCreditLots`' acts, one row per wallet per act; `affectedLotIds` names the lots, and an extension's `amount` is zero.",
     "enum": [
      "reversal",
      "chargeback",
      "goodwill",
      "correction",
-     "writeOff"
+     "writeOff",
+     "expiry",
+     "forfeiture",
+     "extension"
     ]
    },
    "amount": {

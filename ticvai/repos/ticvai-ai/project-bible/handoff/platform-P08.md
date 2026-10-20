@@ -5,12 +5,12 @@
 | | |
 |---|---|
 | Screens | 1663 |
-| Operations | 1894 |
+| Operations | 1895 |
 | Contracts | 31 |
 | Modules | 19 |
 | Undrawn | 0 |
 | Operations with no screen | 206 |
-| Waves | wave1 141 · wave2 58 · wave3 1464 |
+| Waves | wave1 143 · wave2 58 · wave3 1462 |
 
 ## Gaps
 
@@ -772,7 +772,7 @@
 | `BO-1085` | Wallet Creation & Provisioning Rules | Orders & Money | 3 | 3 | yes |
 | `BO-1086` | Wallet Ownership & Account Association | Orders & Money | 3 | 4 | yes |
 | `BO-1087` | Wallet Currency & Monetary Configuration | Orders & Money | 3 | 2 | yes |
-| `BO-1088` | Credit & Balance Type Configuration | Orders & Money | 3 | 3 | yes |
+| `BO-1088` | Credit & Balance Type Configuration | Orders & Money | 1 | 3 | yes |
 | `BO-1089` | Wallet Feature Profile | Orders & Money | 3 | 2 | yes |
 | `BO-109` | Menu Builder & POS Layout Designer | Sell | 1 | 5 | yes |
 | `BO-1090` | Wallet Lifecycle Configuration | Orders & Money | 3 | 2 | yes |
@@ -834,7 +834,7 @@
 | `BO-1141` | Device, Terminal & Acceptance Point Mapping | Orders & Money | 3 | 2 | yes |
 | `BO-1142` | Wallet Transaction Simulator, Monitoring & Channel Audit | Orders & Money | 3 | 2 | yes |
 | `BO-1143` | Wallet Operations Command Center | Orders & Money | 3 | 2 | yes |
-| `BO-1144` | Peer-to-Peer Transfer Configuration | Orders & Money | 3 | 1 | yes |
+| `BO-1144` | Peer-to-Peer Transfer Configuration | Orders & Money | 1 | 2 | yes |
 | `BO-1145` | Transfer Eligibility, Limits & Approval Rules | Orders & Money | 3 | 1 | yes |
 | `BO-1146` | Refund-to-Wallet Policy Configuration | Orders & Money | 1 | 4 | yes |
 | `BO-1147` | Refund Routing & Credit Restoration Engine | Orders & Money | 3 | 4 | yes |

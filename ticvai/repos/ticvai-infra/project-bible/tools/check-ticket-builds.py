@@ -39,12 +39,21 @@ handoff/service-decomposition.json and docs/adr/):
                   so its pull carries no file (OFFLINE-JOURNAL, PLATFORM-RLS); exempt only with the task's
                   `linksNothingBecause` (infrastructure, tooling), printed on every run
 
+**21 October 2026, CHG-R8INT-035** (r8: the database update tasks missed V0107, V0110 and V0111, found only by the
+upgrade test from r7, and V0112 came with the re-walk fixes; Chinmay, 20 October: "fix the source so that next gen can
+clear those out by default"):
+
+  B-DB-FILES      a database update task (a hand-written task building `file backend/<db>/V01xx__*.sql`) skips a
+                  forward migration of that database the last release tag (r<N>) did not have, in its `builds` or in
+                  its text
+
 Read-only. Exit 1 on a finding not in `handoff/audit-baseline.json` (tools/audit_guard.py).
 
     python3 tools/check-ticket-builds.py [--all]
 """
 import csv
 import re
+import subprocess
 import importlib.util
 import sys
 from collections import defaultdict
@@ -56,6 +65,7 @@ import ticket_done as td  # noqa: E402
 
 RULES = {
     "B-UNRESOLVED": "a ticket builds an id that is no operation, screen, table, service or ADR (r1 gate G2, CHG-RONEP-003)",
+    "B-DB-FILES": "a database update task skips a forward migration its database gained since the last release (CHG-R8INT-035)",
     "B-AI-EMPTY": "a Block A AI engine task names no operation, table or ADR it builds (r1 gate G2, CHG-RONEP-003)",
     "B-HOSTED-MODEL": "a task plans an LLM we host, against Chinmay's 3 October decision (CHG-RONEP-004; embeddings are ours, CHG-R11-001)",
     "B-MODULE-TEST": "a module test names nothing it tests, in its builds or its done-when (r1 gate G1, CHG-RONEP-003)",
@@ -310,6 +320,44 @@ def main() -> int:
         if not [b for b in builds.get(k) or [] if not b.startswith("adr ")]:
             guard.add("B-BARE-TASK", k, f"{k} links only ADRs or nothing: name the operations, tables or screens it "
                                         "builds in block-a-extra-tasks.json `builds`")
+    # B-DB-FILES (CHG-R8INT-035): a database update task names every forward migration its database gained since the
+    # last release tag (the tasks say "every file since r7"), in `builds` and in its text, so the next derived V01xx
+    # cannot be left off it again
+    fwd = re.compile(r"^V(01\d\d)([a-z]?)__.+\.sql$")
+    order = lambda f: (int(fwd.match(f).group(1)), fwd.match(f).group(2))  # noqa: E731
+    on_disk = defaultdict(set)
+    for f in (g.ROOT / "backend").glob("*/V*.sql"):
+        if fwd.match(f.name):
+            on_disk[f.parent.name].add(f.name)
+    shipped, last = set(), None
+    try:
+        tags = subprocess.run(["git", "tag", "--merged", "HEAD"], cwd=g.ROOT, capture_output=True, text=True,
+                              check=True).stdout.split()
+        nums = [int(x[1:]) for x in tags if re.fullmatch(r"r\d+", x)]
+        if nums:
+            last = f"r{max(nums)}"
+            shipped = set(subprocess.run(["git", "ls-tree", "-r", "--name-only", last, "--", "backend"], cwd=g.ROOT,
+                                         capture_output=True, text=True, check=True).stdout.split())
+    except (OSError, subprocess.CalledProcessError) as exc:
+        guard.note(f"B-DB-FILES: no release tag to compare with ({exc}); every forward migration counts as new")
+    for t in extra.get("tasks") or []:
+        named = defaultdict(set)
+        for b in t.get("builds") or []:
+            kind, _, name = b.partition(" ")
+            parts = name.split("/")
+            if kind == "file" and len(parts) == 3 and parts[0] == "backend" and fwd.match(parts[2]):
+                named[parts[1]].add(parts[2])
+        for db, files in sorted(named.items()):
+            for f in sorted(on_disk[db], key=order):
+                if f"backend/{db}/{f}" in shipped:
+                    continue
+                if f not in files:
+                    guard.add("B-DB-FILES", f"{t['key']}:{db}/{f}", f"{t['key']} updates the {db} database but does "
+                              f"not build `file backend/{db}/{f}`, new since {last or 'the first release'}: add it to "
+                              "`builds` and to the task's file list")
+                elif f"backend/{db}/{f}" not in (t.get("detail") or ""):
+                    guard.add("B-DB-FILES", f"{t['key']}:{db}/{f}:text", f"{t['key']} builds backend/{db}/{f} but its "
+                              "text does not name it among the files to apply")
     guard.note(f"{n} build ids on {sum(1 for b in builds.values() if b)} tickets, {n_tests} module tests, "
                f"{n_setup} setup and rest tickets checked")
     kernel_storage(guard, tables)

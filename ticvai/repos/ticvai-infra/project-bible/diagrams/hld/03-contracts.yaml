@@ -227,12 +227,12 @@ contracts:
   ref: diagrams/lld/contracts/finance.yaml
 - contract: wallet
   tier: satellite
-  operations: 70
+  operations: 71
   holds: null
   service: WalletService
   verbs:
     POST: 31
-    GET: 23
+    GET: 24
     PUT: 16
   guestCallable: 12
   offlineCapable: 1

@@ -95,6 +95,9 @@ A module or limit increase sold separately. Add-ons survive a plan change unless
 | validFrom | string (date) |  |  |
 | validTo | string (date) |  | (nullable) |
 | note | string |  | (max length 500) |
+| removedAt | string (date-time) |  | When removeLicenceAddOn ended the add-on (r8 re-walk, CHG-R8RW-003); null while it is in force. (read-only; nullable) |
+| removedByPrincipalId | string (uuid) |  | Who removed it (the caller of removeLicenceAddOn); null while it is in force. (read-only; nullable) |
+| removalReason | string |  | Why it was removed (removeLicenceAddOn's reason); null while it is in force. (max length 500; read-only; nullable) |
 
 **Response**: `LicencePosition`
 
@@ -1586,6 +1589,9 @@ Every table this service owns that the slice reads or writes, with its columns a
 | valid_from | date | no |  |
 | valid_to | date | no |  |
 | note | text | no |  |
+| removed_at | timestamptz | no | When removeLicenceAddOn ended the add-on (r8 re-walk, CHG-R8RW-003); null while it is in force. |
+| removed_by_principal_id | uuid | no | Who removed it (the caller of removeLicenceAddOn); null while it is in force. |
+| removal_reason | text | no | Why it was removed (removeLicenceAddOn's reason); null while it is in force. |
 | id | uuid | yes | Synthesised key. |
 
 ### `control.licence_add_on_limit`

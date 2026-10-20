@@ -778,6 +778,7 @@ By receipt number, order number or the barcode printed on the receipt. A guest a
 | items[].lines | array of object | yes |  |
 | items[].lines[].lineId | string |  |  |
 | items[].lines[].merchandiseId | string (uuid) |  |  |
+| items[].lines[].orderLineId | string (uuid) |  | The order line the amounts were copied from (CreateRetailSaleLine.orderLineId; r8 re-walk, CHG-R8RW-004). (nullable) |
 | items[].lines[].name | string |  |  |
 | items[].lines[].quantity | integer |  |  |
 | items[].lines[].overrideReason | string |  | The reason given with a manual price override (CreateRetailSaleLine.overrideReason); null when the price was not overridden. (max length 200; nullable) |
@@ -908,6 +909,7 @@ By receipt number, order number or the barcode printed on the receipt. A guest a
 
 **Not offline-capable.** Stock depletes in real time and a specific unit cannot be leased the way a timed product can, so a terminal without a connection cannot complete a retail sale.
 **The order is Orders', made before this call; this records the retail side of it** (r8 walk fix, CHG-R8WFC-003; was "creates an order in the Order & Payment context ... in one transaction", which no route made true: Retail runs in the operations deployable and Orders in commerce, and they share no transaction, ADR-0055). The till sells merchandise on its one cart and order (`createOrder`, "one cart, one order, one receipt"), priced there with any coupon, and sends that order's id as `orderId`. This call then writes the sale, its lines and a `saleDepletion` movement in the inventory ledger (Inventory runs in the same deployable) in one transaction of its own. A retry with the same Idempotency-Key answers the sale already written. There is no second stock counter maintained by the till.
+**The amounts are the ones Orders priced** (r8 re-walk, CHG-R8RW-004). Each body line names its order line (`orderLineId`); Retail reads those lines through `orders#orderLineRecords` and their discounts through `orders#orderLineDiscountRecords`, and copies them, computing nothing: a sale line's `unitPrice` is the order line's `serverUnitPrice`, its `discount` the sum of the line's discount amounts (coupon, promotion or a cashier's manual price) and its `lineTotal` the order line's `grossAmount`; the sale's `subtotal`, `taxAmount` and `grossAmount` are the sums of the named lines' `netAmount`, `taxAmount` and `grossAmount`, and its `discountAmount` the sum of the line discounts. A line whose `orderLineId` is missing, is not a line of `orderId`, or differs from the body line in item or quantity is refused `422 order-line-mismatch`, and nothing is written. Each line's item is read from `retail.merchandise` (its stock item, and whether it is serialised), and stock on hand from Inventory's movements (`inventory#movementRecords`).
 **A kit sells as one line and leaves stock as its components** (4.4.20, 29 September build). Where the line's item has an `inventory.kit_component` bill of materials (inventory `setInventoryKitDefinition`), one `saleDepletion` is posted per component, quantity times the line quantity, and none for the kit; `insufficientStock` is judged on the components.
 
 |  |  |
@@ -918,7 +920,7 @@ By receipt number, order number or the barcode printed on the receipt. A guest a
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `inventory.kit_component`, `retail.sale`, `retail.sale_line` |
+| Reads | `cache:idempotency`, `inventory.kit_component`, `retail.merchandise`, `retail.sale`, `retail.sale_line` |
 | Writes | `cache:idempotency`, `inventory.movement`, `retail.sale`, `retail.sale_line` |
 | Called by | POS-002, POS-005 |
 | State model | SerialisedItem ([states/serialised-item.yaml](../../../states/serialised-item.yaml)): moves `reserved` -> `sold`, `inStock` -> `sold` |
@@ -940,9 +942,10 @@ By receipt number, order number or the barcode printed on the receipt. A guest a
 | lines | array of CreateRetailSaleLine | yes | (min items 1) |
 | lines[].id | string (uuid) | yes |  |
 | lines[].merchandiseId | string (uuid) | yes |  |
+| lines[].orderLineId | string (uuid) |  | The order line this sale line is (r8 re-walk, CHG-R8RW-004): a line of the body's orderId for the same item and quantity, whose price, discount and tax the sale line copies. |
 | lines[].quantity | integer | yes | (min 1) |
 | lines[].serialNumbers | array of string |  | Required where the item is serialised. |
-| lines[].overridePrice | object |  | Manual price override. |
+| lines[].overridePrice | object |  | Not applied here (r8 re-walk, CHG-R8RW-004). |
 | lines[].overridePrice.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | lines[].overridePrice.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | lines[].overridePrice.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
@@ -966,6 +969,7 @@ By receipt number, order number or the barcode printed on the receipt. A guest a
 | lines | array of object | yes |  |
 | lines[].lineId | string |  |  |
 | lines[].merchandiseId | string (uuid) |  |  |
+| lines[].orderLineId | string (uuid) |  | The order line the amounts were copied from (CreateRetailSaleLine.orderLineId; r8 re-walk, CHG-R8RW-004). (nullable) |
 | lines[].name | string |  |  |
 | lines[].quantity | integer |  |  |
 | lines[].overrideReason | string |  | The reason given with a manual price override (CreateRetailSaleLine.overrideReason); null when the price was not overridden. (max length 200; nullable) |
@@ -1012,6 +1016,7 @@ By receipt number, order number or the barcode printed on the receipt. A guest a
 | 201 |  | Sold; stock depleted |
 | 400 | BadRequest | Validation failed |
 | 409 |  | Insufficient stock (insufficientStock), a serialised item has no serial number (serialNumberRequired), or the terminal is offline (terminalOffline). |
+| 422 |  | A body line's orderLineId is missing, is not a line of orderId, or names a different item or quantity (r8 re-walk, CHG-R8RW-004). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getRetailSale
@@ -1054,6 +1059,7 @@ Also the receipt lookup a returns desk starts from. Returns whether each line is
 | lines | array of object | yes |  |
 | lines[].lineId | string |  |  |
 | lines[].merchandiseId | string (uuid) |  |  |
+| lines[].orderLineId | string (uuid) |  | The order line the amounts were copied from (CreateRetailSaleLine.orderLineId; r8 re-walk, CHG-R8RW-004). (nullable) |
 | lines[].name | string |  |  |
 | lines[].quantity | integer |  |  |
 | lines[].overrideReason | string |  | The reason given with a manual price override (CreateRetailSaleLine.overrideReason); null when the price was not overridden. (max length 200; nullable) |
@@ -1147,6 +1153,7 @@ Also the receipt lookup a returns desk starts from. Returns whether each line is
 | items[].lines | array of object | yes |  |
 | items[].lines[].lineId | string |  |  |
 | items[].lines[].merchandiseId | string (uuid) |  |  |
+| items[].lines[].orderLineId | string (uuid) |  | The order line the amounts were copied from (CreateRetailSaleLine.orderLineId; r8 re-walk, CHG-R8RW-004). (nullable) |
 | items[].lines[].name | string |  |  |
 | items[].lines[].quantity | integer |  |  |
 | items[].lines[].overrideReason | string |  | The reason given with a manual price override (CreateRetailSaleLine.overrideReason); null when the price was not overridden. (max length 200; nullable) |
@@ -1354,6 +1361,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | sale_id | text | yes | The parent row. |
 | line_id | text | no |  |
 | merchandise_id | uuid | no |  |
+| order_line_id | uuid | no | The order line the amounts were copied from (CreateRetailSaleLine.orderLineId; r8 re-walk, CHG-R8RW-004). |
 | name | text | no |  |
 | quantity | integer | no |  |
 | override_reason | text | no | The reason given with a manual price override (CreateRetailSaleLine.overrideReason); null when the price was not overridden. |

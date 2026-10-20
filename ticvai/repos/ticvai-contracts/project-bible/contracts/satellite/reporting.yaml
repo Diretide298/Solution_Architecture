@@ -2265,6 +2265,25 @@ paths:
       - query: marketing-crm#loyaltyPositionRecords
         route: in-process
         for: 'the loyalty KPIs, split by tierCode (marketing.loyalty_position)'
+      # The seeded KPIs the walk fix left without a source (r8 re-walk, CHG-R8RW-005).
+      - query: orders#orderLineDiscountRecords
+        route: service
+        for: 'grossSales and discounts: the discounts applied to the order lines of the period (orders.order_line_discount)
+          (r8 re-walk, CHG-R8RW-005)'
+      - query: fnb#tableReservationRecords
+        route: in-process
+        for: 'noShowRate: the reservations due in the period and those marked noShow (fnb.table_reservation) (r8 re-walk,
+          CHG-R8RW-005)'
+      - query: fnb#waitlistEntryRecords
+        route: in-process
+        for: 'waitQuoteAccuracy: the waitlist parties told their table was ready in the period, against their quoted wait
+          (fnb.waitlist_entry) (r8 re-walk, CHG-R8RW-005)'
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s businessDayCutoff, which closes the default period, its business day (platform.venue_settings)
+          (r8 re-walk, CHG-R8RW-005)'
+      x-ticvai-calls:
+      - finance.getDeferredRevenue
       summary: Current values, against target, with movement
       description: 'BI boards 1 and 10.3. **The scorecard read.** Value, target, variance, direction and
         freshness in one call — a dashboard assembling those from four places will render three of them
@@ -2275,14 +2294,17 @@ paths:
         an id: `takings`, the money taken in the period less the money paid back (currency; defined in
         `ReportingSystemKpi`, CHG-FIN-010), and `admissions`, admitted in-direction scans in the period
         (count, from `access.scan_event`). With no `period`, the period is today in the venue''s time zone:
-        the venue''s business day (closing at its `businessDayCutoff`, tenancy `VenueSettings`, default 00:00; CHG-R6-032).
+        the venue''s business day (closing at its `businessDayCutoff`, tenancy `VenueSettings`, default 00:00; CHG-R6-032),
+        read through `tenancy#venueSettingsRecords` for the venue in scope (r8 re-walk, CHG-R8RW-005).
         The back-office hubs and the Queue Monitor read their takings and admissions tiles here.
         **Takings is not revenue** and never feeds a Gross sales, Net revenue, Recognised revenue or
         Deferred revenue tile (CHG-FIN-002).
 
         **The finance measures are seeded too** (decided 2 October 2026, Chinmay; CHG-FIN-007):
         `grossSales`, `discounts`, `refunds`, `netRevenue`, `recognisedRevenue`, `deferredRevenue` and
-        `taxCollected`, each with its formula in `ReportingSystemKpi`. The formulas follow the D-185
+        `taxCollected`, each with its formula in `ReportingSystemKpi`. Each is computed from its owner''s
+        declared query (`x-ticvai-read-via` above), and `deferredRevenue` from finance `getDeferredRevenue`
+        (`x-ticvai-calls`; r8 re-walk, CHG-R8RW-005). The formulas follow the D-185
         default (gross sales excluding VAT; net revenue is gross sales less discounts less refunds);
         **client finance sign-off is pending**. `groupBy` splits them by `venue`, `channel`, `product`,
         `attraction` or `businessUnit` (the dimensions their order lines carry), and `takings` also by
@@ -3258,18 +3280,18 @@ components:
         | Code | Unit | Source | Seeded for |
         |---|---|---|---|
         | `takings` | currency | **Money taken through the tills and channels, less money paid back** (CHG-FIN-010, 2 October 2026): captured `orders.payment.amount` (base currency) in the period less completed `orders.refund.amount` in the period, by tender; `groupBy=tender`, `workstationId` or `shiftId`. **A cash-control measure, not revenue**: it includes VAT, deposits and gift-card sales, and it is what a drawer and a settlement are reconciled against. For one shift, cash takings + opening float + float entries − lifts is the expected drawer, which the cashier never sees (CHG-FIN-003) | every tenant (R283) |
-        | `grossSales` | currency | Sales at the price before discounts, **excluding VAT**: the sum of `orders.order_line.net_amount` plus its `orders.order_line_discount.amount`, on orders paid in the period (D-185 default; CHG-FIN-007) | every tenant |
-        | `discounts` | currency | The sum of `orders.order_line_discount.amount` on orders paid in the period, excluding VAT (CHG-FIN-007) | every tenant |
+        | `grossSales` | currency | Sales at the price before discounts, **excluding VAT**: the sum of `orders.order_line.net_amount` plus its `orders.order_line_discount.amount`, on orders paid in the period (D-185 default; CHG-FIN-007); read through `orders#orderLineRecords` and `orders#orderLineDiscountRecords` (CHG-R8RW-005) | every tenant |
+        | `discounts` | currency | The sum of `orders.order_line_discount.amount` on orders paid in the period, excluding VAT (CHG-FIN-007); read through `orders#orderLineDiscountRecords` (CHG-R8RW-005) | every tenant |
         | `refunds` | currency | Completed `orders.refund.amount` in the period less the tax it reversed (`taxReversalEntryId`), excluding VAT (CHG-FIN-007) | every tenant |
         | `netRevenue` | currency | `grossSales` − `discounts` − `refunds` (D-185 default, BOARDREQ MOM-2760; client finance sign-off pending; CHG-FIN-007) | every tenant |
         | `recognisedRevenue` | currency | Credits less debits of `ledger.journal_line` on `revenue` accounts posted in the period: what the recognition rules (`RecognitionMethod`) released, POS sales on the day, tickets on the visit (CHG-FIN-007) | every tenant |
-        | `deferredRevenue` | currency | The balance of the deferred-revenue liability accounts at period end (`finance.getDeferredRevenue`): paid and not yet recognised (CHG-FIN-007) | every tenant |
+        | `deferredRevenue` | currency | The balance of the deferred-revenue liability accounts at period end, as finance `getDeferredRevenue` answers it (declared in `getKpiValues`'' `x-ticvai-calls`, CHG-R8RW-005): paid and not yet recognised (CHG-FIN-007) | every tenant |
         | `taxCollected` | currency | Output tax: `orders.order_line.tax_amount` on orders paid in the period less the tax reversed by refunds completed in it; labelled with the jurisdiction''s tax name (VAT in the UAE) (CHG-FIN-007) | every tenant |
         | `admissions` | count | admitted in-direction `access.scan_event` in the period | every tenant (R283) |
         | `tableTurnTime` | duration | mean `closed_at` minus `opened_at` of `fnb.table_visit` closed in the period (`higherIsBetter` false; workbook Q205, CHG-CSA-020) | F&B module |
-        | `noShowRate` | percentage | `fnb.table_reservation` marked no-show over those due in the period (`higherIsBetter` false) | F&B module |
+        | `noShowRate` | percentage | `fnb.table_reservation` with status `noShow` over those whose `starts_at` falls in the period, cancelled ones left out (`higherIsBetter` false); read through `fnb#tableReservationRecords` (CHG-R8RW-005) | F&B module |
         | `covers` | count | the sum of covers of `fnb.table_visit` opened in the period; `groupBy=serverPrincipalId` gives covers per server | F&B module |
-        | `waitQuoteAccuracy` | percentage | waitlist parties seated within their quoted wait over those seated in the period (`fnb.restaurant_waitlist`) | F&B module |
+        | `waitQuoteAccuracy` | percentage | F&B waitlist parties told their table was ready (`notifiedAt`) within their quoted wait (`recordedAt` plus `quotedWaitMinutes`) over those told in the period, read through `fnb#waitlistEntryRecords` (CHG-R8RW-005; a waitlist entry keeps no seated time, so the quote is judged at the ready call) | F&B module |
         | `accreditationApplications` | count | `accreditation.application` submitted in the period; `groupBy=status` gives applications by status | accreditation module (12.1.50) |
         | `accreditationTimeToDecision` | duration | mean `decided_at` minus `submitted_at` of `accreditation.application` decided in the period (`higherIsBetter` false) | accreditation module |
         | `accreditationCredentialsIssued` | count | `accreditation.credential` with `issued_at` in the period; `groupBy=kind` | accreditation module |

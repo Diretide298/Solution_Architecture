@@ -1101,7 +1101,6 @@ control.config_package_application,previous_package_id,control.config_package,ch
 control.config_package_diff,package_id,control.config_package,child,convention,,
 control.contract,plan_id,control.plan,reference,declared,,yes
 control.contract,tenant_id,control.tenant,reference,declared,,yes
-control.contract,via removeLicenceAddOn,control.licence_add_on,ambient,lineage,,
 control.contract,via setSubscription,control.tenant,ambient,lineage,,
 control.contract,via terminateTenant,control.tenant,ambient,lineage,,
 control.credit_note,invoice_id,control.invoice,reference,declared,,yes
@@ -1119,6 +1118,7 @@ control.integration_listing,developer_id,control.developer_account,reference,dec
 control.invoice,tenant_id,control.tenant,reference,declared,,yes
 control.invoice,via generateInvoice,control.invoice_line,ambient,lineage,,
 control.invoice_line,invoice_id,control.invoice,child,declared,,yes
+control.licence_add_on,removed_by_principal_id,identity.principal,reference,convention,yes,
 control.licence_add_on,tenant_id,control.tenant,reference,convention,,
 control.licence_add_on,via addLicenceAddOn,control.licence_add_on_limit,ambient,lineage,,
 control.licence_add_on_limit,licence_add_on_id,control.licence_add_on,child,declared,,yes
@@ -2892,6 +2892,7 @@ retail.sale,outlet_id,platform.outlet,reference,declared,yes,yes
 retail.sale,shift_id,orders.pos_shift,reference,declared,yes,
 retail.sale,subject_id,pii.subject,reference,declared,yes,
 retail.sale_line,merchandise_id,retail.merchandise,reference,declared,,
+retail.sale_line,order_line_id,orders.order_line,reference,convention,yes,
 retail.sale_line,sale_id,retail.sale,child,declared,,yes
 retail.shop_and_drop,collected_by_principal_id,identity.principal,reference,declared,yes,
 retail.shop_and_drop,collection_location_id,fnb.delivery_location,reference,declared,yes,yes
