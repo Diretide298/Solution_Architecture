@@ -649,7 +649,9 @@
    "postgres"
   ],
   "audience": [
-   "staff"
+   "staff",
+   "guest",
+   "anonymous"
   ],
   "readColumns": {
    "catalogue.event": [
@@ -6880,7 +6882,8 @@
    "orders.cash_count_line",
    "orders.pos_shift",
    "orders.pos_shift_approval",
-   "orders.pos_shift_incident"
+   "orders.pos_shift_incident",
+   "platform.outbox"
   ],
   "routing": "",
   "scope": "workstation",
@@ -6955,8 +6958,8 @@
    },
    {
     "query": "tenancy#deviceRecords",
-    "route": "in-process",
-    "for": "its read of the registered device, Tenancy's data (CHG-MOD-001; R8 lineage request)"
+    "route": "service",
+    "for": "its read of the registered device, Tenancy's data, through Tenancy's service route, the only one the query serves (CHG-MOD-001; R8 lineage request; CHG-R8INT-005)"
    },
    {
     "query": "tenancy#venueSettingsRecords",
@@ -13016,6 +13019,7 @@
     "last_seen_at",
     "locale",
     "os_version",
+    "pending_session_end_installation_id",
     "platform",
     "registered_at",
     "revoked_at",
@@ -13062,6 +13066,7 @@
     "last_seen_at",
     "locale",
     "os_version",
+    "pending_session_end_installation_id",
     "platform",
     "registered_at",
     "revoked_at",
@@ -15505,8 +15510,7 @@
    "redis"
   ],
   "audience": [
-   "staff",
-   "prospect"
+   "staff"
   ],
   "lineageNote": "adds subscription.plan read for the plan-not-offered check",
   "fixNote": "18 October 2026: CHG-CRA-003: the plan catalogue and the records about a tenant moved from subscription to the control database (ADAM CR-150, CR-097)",
@@ -15870,7 +15874,8 @@
     "message",
     "progress_percent",
     "scheduled_for",
-    "status"
+    "status",
+    "target_tier"
    ]
   }
  },
@@ -15912,7 +15917,8 @@
     "message",
     "progress_percent",
     "scheduled_for",
-    "status"
+    "status",
+    "target_tier"
    ]
   }
  },
@@ -16294,7 +16300,8 @@
     "message",
     "progress_percent",
     "scheduled_for",
-    "status"
+    "status",
+    "target_tier"
    ]
   }
  },
@@ -22760,6 +22767,7 @@
     "image_asset_ref",
     "inventory_item_id",
     "is_active",
+    "is_droppable",
     "is_returnable",
     "list_price",
     "name",
@@ -22807,6 +22815,7 @@
     "image_asset_ref",
     "inventory_item_id",
     "is_active",
+    "is_droppable",
     "is_returnable",
     "list_price",
     "name",
@@ -22854,6 +22863,7 @@
     "image_asset_ref",
     "inventory_item_id",
     "is_active",
+    "is_droppable",
     "is_returnable",
     "list_price",
     "name",
@@ -22925,6 +22935,7 @@
   ],
   "readColumns": {
    "retail.sale": [
+    "cashier_principal_id",
     "created_at",
     "discount_amount",
     "gross_amount",
@@ -22932,6 +22943,7 @@
     "net_amount",
     "order_id",
     "outlet_id",
+    "receipt_barcode",
     "receipt_number",
     "recorded_at",
     "reprint_count",
@@ -22948,6 +22960,7 @@
     "merchandise_id",
     "name",
     "not_returnable_reason",
+    "override_reason",
     "quantity",
     "returned_quantity",
     "sale_id",
@@ -22989,6 +23002,7 @@
   "lineageNote": "one saleDepletion inventory.movement per kit component (or per ordinary item), none for the kit (4.4.20)",
   "readColumns": {
    "retail.sale": [
+    "cashier_principal_id",
     "created_at",
     "discount_amount",
     "gross_amount",
@@ -22996,6 +23010,7 @@
     "net_amount",
     "order_id",
     "outlet_id",
+    "receipt_barcode",
     "receipt_number",
     "recorded_at",
     "reprint_count",
@@ -23012,6 +23027,7 @@
     "merchandise_id",
     "name",
     "not_returnable_reason",
+    "override_reason",
     "quantity",
     "returned_quantity",
     "sale_id",
@@ -23051,6 +23067,7 @@
   ],
   "readColumns": {
    "retail.sale": [
+    "cashier_principal_id",
     "created_at",
     "discount_amount",
     "gross_amount",
@@ -23058,6 +23075,7 @@
     "net_amount",
     "order_id",
     "outlet_id",
+    "receipt_barcode",
     "receipt_number",
     "recorded_at",
     "reprint_count",
@@ -23074,6 +23092,7 @@
     "merchandise_id",
     "name",
     "not_returnable_reason",
+    "override_reason",
     "quantity",
     "returned_quantity",
     "sale_id",
@@ -23106,6 +23125,7 @@
   ],
   "readColumns": {
    "retail.sale": [
+    "cashier_principal_id",
     "created_at",
     "discount_amount",
     "gross_amount",
@@ -23113,6 +23133,7 @@
     "net_amount",
     "order_id",
     "outlet_id",
+    "receipt_barcode",
     "receipt_number",
     "recorded_at",
     "reprint_count",
@@ -23129,6 +23150,7 @@
     "merchandise_id",
     "name",
     "not_returnable_reason",
+    "override_reason",
     "quantity",
     "returned_quantity",
     "sale_id",
@@ -23661,7 +23683,8 @@
     "id",
     "issued_at",
     "kind",
-    "status"
+    "status",
+    "subject_id"
    ]
   }
  },
@@ -23698,7 +23721,8 @@
     "id",
     "issued_at",
     "kind",
-    "status"
+    "status",
+    "subject_id"
    ]
   }
  },
@@ -23739,7 +23763,8 @@
     "id",
     "issued_at",
     "kind",
-    "status"
+    "status",
+    "subject_id"
    ]
   }
  },
@@ -23915,7 +23940,6 @@
   ],
   "writes": [
    "cache:idempotency",
-   "retail.shop_and_drop",
    "retail.shop_and_drop_line"
   ],
   "routing": "",
@@ -24023,6 +24047,12 @@
     "query": "inventory#stockEarmarkRecords",
     "route": "in-process",
     "for": "its read of inventory.stock_earmark, Inventory's data (CHG-MOD-001)"
+   }
+  ],
+  "writeVia": [
+   {
+    "table": "inventory.stock_earmark",
+    "operation": "createStockReservation"
    }
   ]
  },
@@ -25830,6 +25860,7 @@
     "custom_metadata",
     "description",
     "duration_seconds",
+    "extracted_text",
     "filename",
     "height",
     "id",
@@ -25886,6 +25917,7 @@
     "custom_metadata",
     "description",
     "duration_seconds",
+    "extracted_text",
     "filename",
     "height",
     "id",
@@ -25960,6 +25992,7 @@
     "custom_metadata",
     "description",
     "duration_seconds",
+    "extracted_text",
     "filename",
     "height",
     "id",
@@ -26065,6 +26098,7 @@
     "custom_metadata",
     "description",
     "duration_seconds",
+    "extracted_text",
     "filename",
     "height",
     "id",
@@ -26170,6 +26204,7 @@
     "custom_metadata",
     "description",
     "duration_seconds",
+    "extracted_text",
     "filename",
     "height",
     "id",
@@ -30082,8 +30117,10 @@
     "message_count",
     "module",
     "principal_id",
+    "profile_key",
     "scope_path",
-    "started_at"
+    "started_at",
+    "subject_id"
    ]
   }
  },
@@ -30122,8 +30159,10 @@
     "message_count",
     "module",
     "principal_id",
+    "profile_key",
     "scope_path",
-    "started_at"
+    "started_at",
+    "subject_id"
    ]
   }
  },
@@ -30199,9 +30238,12 @@
     "decided_at",
     "decided_by_principal_id",
     "decision_reason",
+    "draft_text",
     "expires_at",
+    "field_path",
     "id",
     "kind",
+    "locale",
     "payload",
     "plan_id",
     "proposed_at",
@@ -30209,7 +30251,9 @@
     "status",
     "summary",
     "target_contract",
+    "target_kind",
     "target_operation",
+    "target_ref",
     "translation_job_id"
    ]
   }
@@ -30401,7 +30445,14 @@
     "supersedes_document_id",
     "title"
    ]
-  }
+  },
+  "readVia": [
+   {
+    "query": "assets#mediaAssetRecords",
+    "route": "service",
+    "for": "the source asset's status and extracted text (assets.media_asset.extracted_text): 404 unknown asset, 409 asset not ready (R8 blocker ORDERS-MONEY-C19)"
+   }
+  ]
  },
  "generateConfiguration": {
   "contract": "ai",
@@ -30674,9 +30725,12 @@
     "decided_at",
     "decided_by_principal_id",
     "decision_reason",
+    "draft_text",
     "expires_at",
+    "field_path",
     "id",
     "kind",
+    "locale",
     "payload",
     "plan_id",
     "proposed_at",
@@ -30684,7 +30738,9 @@
     "status",
     "summary",
     "target_contract",
+    "target_kind",
     "target_operation",
+    "target_ref",
     "translation_job_id"
    ]
   }
@@ -30730,9 +30786,12 @@
     "decided_at",
     "decided_by_principal_id",
     "decision_reason",
+    "draft_text",
     "expires_at",
+    "field_path",
     "id",
     "kind",
+    "locale",
     "payload",
     "plan_id",
     "proposed_at",
@@ -30740,7 +30799,9 @@
     "status",
     "summary",
     "target_contract",
+    "target_kind",
     "target_operation",
+    "target_ref",
     "translation_job_id"
    ]
   }
@@ -30922,6 +30983,7 @@
     "enabled_capabilities",
     "fallback_provider_id",
     "global_endpoint_exclusions",
+    "glossary_terms",
     "guest_capability_scope",
     "has_guardrail_short_circuit",
     "hnsw",
@@ -30984,6 +31046,7 @@
     "enabled_capabilities",
     "fallback_provider_id",
     "global_endpoint_exclusions",
+    "glossary_terms",
     "guest_capability_scope",
     "has_guardrail_short_circuit",
     "hnsw",
@@ -32648,12 +32711,15 @@
    "whitelabel.footer_config_column": [
     "footer_config_id",
     "heading",
-    "id"
+    "id",
+    "links",
+    "sort_order"
    ],
    "whitelabel.footer_config_social_link": [
     "footer_config_id",
     "id",
     "platform",
+    "sort_order",
     "url"
    ],
    "whitelabel.homepage_layout": [
@@ -34252,6 +34318,8 @@
   "note": "Now snapshots booking flows.",
   "readColumns": {
    "whitelabel.config_version": [
+    "activation_failed_at",
+    "activation_failure",
     "approval_request_id",
     "content_hash",
     "id",
@@ -34306,6 +34374,8 @@
   ],
   "readColumns": {
    "whitelabel.config_version": [
+    "activation_failed_at",
+    "activation_failure",
     "approval_request_id",
     "content_hash",
     "id",
@@ -34421,12 +34491,15 @@
    "whitelabel.footer_config_column": [
     "footer_config_id",
     "heading",
-    "id"
+    "id",
+    "links",
+    "sort_order"
    ],
    "whitelabel.footer_config_social_link": [
     "footer_config_id",
     "id",
     "platform",
+    "sort_order",
     "url"
    ],
    "whitelabel.homepage_layout": [
@@ -34563,11 +34636,13 @@
    "ai.index_source": [
     "chunk_strategy",
     "collection",
+    "collection_id",
     "contract",
     "entry_count",
     "id",
     "invalidated_by",
     "is_active",
+    "kind",
     "last_indexed_at",
     "parent_field",
     "payload_fields",
@@ -34609,11 +34684,13 @@
    "ai.index_source": [
     "chunk_strategy",
     "collection",
+    "collection_id",
     "contract",
     "entry_count",
     "id",
     "invalidated_by",
     "is_active",
+    "kind",
     "last_indexed_at",
     "parent_field",
     "payload_fields",
@@ -36824,7 +36901,8 @@
    "redis"
   ],
   "audience": [
-   "guest"
+   "guest",
+   "anonymous"
   ],
   "audienceNote": "Narrowed 31 August: created implicitly by the first add, never called directly.",
   "readColumns": {
@@ -39421,7 +39499,8 @@
     "id",
     "issued_at",
     "kind",
-    "status"
+    "status",
+    "subject_id"
    ]
   }
  },
@@ -39463,7 +39542,8 @@
     "id",
     "issued_at",
     "kind",
-    "status"
+    "status",
+    "subject_id"
    ]
   }
  },
@@ -45991,12 +46071,12 @@
   "path": "/content-blocks",
   "reads": [
    "cache:idempotency",
-   "control.content_block",
-   "marketing.segment"
+   "marketing.segment",
+   "whitelabel.content_block"
   ],
   "writes": [
    "cache:idempotency",
-   "control.content_block"
+   "whitelabel.content_block"
   ],
   "routing": "",
   "scope": "tenant",
@@ -46012,8 +46092,15 @@
   "audience": [
    "staff"
   ],
+  "readVia": [
+   {
+    "query": "marketing-crm#segmentRecords",
+    "route": "in-process",
+    "for": "its read of marketing.segment, Marketing's data (CHG-MOD-001)"
+   }
+  ],
   "readColumns": {
-   "control.content_block": [
+   "whitelabel.content_block": [
     "approved_by_principal_id",
     "audience_segment_id",
     "body",
@@ -46028,19 +46115,7 @@
     "scope_path",
     "status"
    ]
-  },
-  "readVia": [
-   {
-    "query": "marketing-crm#segmentRecords",
-    "route": "in-process",
-    "for": "its read of marketing.segment, Marketing's data (CHG-MOD-001)"
-   },
-   {
-    "query": "platform-ops#contentBlockRecords",
-    "route": "in-process",
-    "for": "its read of control.content_block, Platform's data (CHG-MOD-001)"
-   }
-  ]
+  }
  },
  "publishContentBlock": {
   "contract": "white-label",
@@ -46048,14 +46123,14 @@
   "path": "/content-blocks/{blockId}/publish",
   "reads": [
    "cache:idempotency",
-   "control.content_block",
    "identity.principal",
+   "whitelabel.content_block",
    "whitelabel.publish_review_policy"
   ],
   "writes": [
    "cache:idempotency",
    "cache:resolution",
-   "control.content_block"
+   "whitelabel.content_block"
   ],
   "routing": "",
   "scope": "tenant",
@@ -46081,8 +46156,21 @@
    "bump": "INCR resver:{tenantId}:{resolver}",
    "affects": "every scope in the tenant: the bump is one counter per resolver, so the scope written, its ancestors and every descendant that inherits from it re-resolve on their next read"
   },
+  "readVia": [
+   {
+    "query": "identity#principalRecords",
+    "route": "service",
+    "for": "its read of identity.principal, Identity's data (CHG-MOD-001)"
+   }
+  ],
+  "writeVia": [
+   {
+    "table": "approvals.request",
+    "operation": "createApprovalRequest"
+   }
+  ],
   "readColumns": {
-   "control.content_block": [
+   "whitelabel.content_block": [
     "approved_by_principal_id",
     "audience_segment_id",
     "body",
@@ -46097,25 +46185,7 @@
     "scope_path",
     "status"
    ]
-  },
-  "readVia": [
-   {
-    "query": "identity#principalRecords",
-    "route": "service",
-    "for": "its read of identity.principal, Identity's data (CHG-MOD-001)"
-   },
-   {
-    "query": "platform-ops#contentBlockRecords",
-    "route": "in-process",
-    "for": "its read of control.content_block, Platform's data (CHG-MOD-001)"
-   }
-  ],
-  "writeVia": [
-   {
-    "table": "approvals.request",
-    "operation": "createApprovalRequest"
-   }
-  ]
+  }
  },
  "submitOnboardingApplication": {
   "contract": "subscription",
@@ -46645,6 +46715,7 @@
     "label",
     "label_localised",
     "options",
+    "presentation",
     "show_when",
     "type"
    ]
@@ -46666,6 +46737,7 @@
    "marketing.consent_record",
    "marketing.form_definition",
    "marketing.form_submission",
+   "marketing.form_submission_sale_link",
    "marketing.waiver_requirement",
    "pii.subject"
   ],
@@ -46673,6 +46745,7 @@
    "cache:idempotency",
    "marketing.consent_record",
    "marketing.form_submission",
+   "marketing.form_submission_sale_link",
    "marketing.waiver_requirement",
    "marketing.waiver_requirement_event"
   ],
@@ -46708,6 +46781,15 @@
     "subject_id",
     "submitted_at",
     "synced_at"
+   ],
+   "marketing.form_submission_sale_link": [
+    "id",
+    "order_id",
+    "order_line_id",
+    "owner_role",
+    "scope_path",
+    "submission_id",
+    "unit_index"
    ],
    "pii.subject": [
     "id"
@@ -46919,7 +47001,14 @@
    "pii.subject": [
     "id"
    ]
-  }
+  },
+  "readVia": [
+   {
+    "query": "tenancy#regionSettingsRecords",
+    "route": "in-process",
+    "for": "the minor age, RegionSettings.minorAgeThreshold in platform.region_settings, Tenancy's data (IDENTITY-C19; CHG-R8SPN-024)"
+   }
+  ]
  },
  "setPasswordPolicy": {
   "contract": "identity",
@@ -46949,6 +47038,7 @@
   ],
   "readColumns": {
    "identity.password_policy": [
+    "access_token_minutes",
     "device_restriction",
     "forces_change_on_first_logon",
     "id",
@@ -46962,9 +47052,11 @@
     "pin_lockout_after_attempts",
     "pin_reuse_prevention",
     "recovery_methods",
+    "refresh_token_hours",
     "require_breach_check",
     "reuse_prevention_count",
-    "scope_path"
+    "scope_path",
+    "session_max_hours"
    ]
   }
  },
@@ -48249,12 +48341,15 @@
    "whitelabel.footer_config_column": [
     "footer_config_id",
     "heading",
-    "id"
+    "id",
+    "links",
+    "sort_order"
    ],
    "whitelabel.footer_config_social_link": [
     "footer_config_id",
     "id",
     "platform",
+    "sort_order",
     "url"
    ]
   }
@@ -48712,9 +48807,9 @@
     "for": "its read of marketing.message_template_version, Marketing's data (CHG-MOD-001)"
    },
    {
-    "query": "platform-ops#contentBlockRecords",
+    "query": "white-label#contentBlockRecords",
     "route": "service",
-    "for": "its read of control.content_block, Platform's data (CHG-MOD-001)"
+    "for": "its read of whitelabel.content_block, WhiteLabel's data (CHG-MOD-001; moved from control, R8 blocker IDENTITY-C59)"
    }
   ]
  },
@@ -49073,7 +49168,7 @@
   ],
   "routing": "",
   "scope": "tenant",
-  "perm": "GUEST_VIEW",
+  "perm": null,
   "offline": false,
   "summary": "Send a verification link, or consume one",
   "source": "hand-mapped",
@@ -56010,7 +56105,7 @@
   ],
   "routing": "primary",
   "scope": "tenant",
-  "perm": "PLATFORM_CELL_MANAGE",
+  "perm": "MEMBERSHIP_MANAGE",
   "offline": false,
   "summary": "Membership Product Validation, Approval, Publication & Versioning",
   "source": "hand-mapped 29 September (readiness close-out)",
@@ -64416,7 +64511,7 @@
   "writes": [],
   "routing": "replica",
   "scope": "tenant",
-  "perm": "PLATFORM_TENANT_VIEW",
+  "perm": "MEMBERSHIP_VIEW",
   "offline": false,
   "summary": "Membership Activation, Assignment & Credential Management",
   "source": "hand-mapped 29 September (readiness close-out)",
@@ -64470,7 +64565,7 @@
   "writes": [],
   "routing": "replica",
   "scope": "tenant",
-  "perm": "PLATFORM_TENANT_VIEW",
+  "perm": "MEMBERSHIP_VIEW",
   "offline": false,
   "summary": "Membership & Annual Pass Command Center",
   "source": "hand-mapped 29 September (readiness close-out)",
@@ -64515,7 +64610,7 @@
   "writes": [],
   "routing": "replica",
   "scope": "tenant",
-  "perm": "PLATFORM_TENANT_VIEW",
+  "perm": "MEMBERSHIP_VIEW",
   "offline": false,
   "summary": "Membership Commercial, Pricing & Channel Association",
   "source": "hand-mapped 29 September (readiness close-out)",
@@ -64559,7 +64654,7 @@
   "writes": [],
   "routing": "replica",
   "scope": "tenant",
-  "perm": "PLATFORM_TENANT_VIEW",
+  "perm": "MEMBERSHIP_VIEW",
   "offline": false,
   "summary": "Membership Freeze, Suspension & Reactivation Management",
   "source": "hand-mapped 29 September (readiness close-out)",
@@ -64679,7 +64774,7 @@
   "writes": [],
   "routing": "replica",
   "scope": "tenant",
-  "perm": "PLATFORM_TENANT_VIEW",
+  "perm": "MEMBERSHIP_VIEW",
   "offline": false,
   "summary": "Membership Analytics, Renewal Intelligence & AI Retention Center",
   "source": "hand-mapped 29 September (readiness close-out)",
@@ -64735,7 +64830,7 @@
   "writes": [],
   "routing": "replica",
   "scope": "tenant",
-  "perm": "PLATFORM_TENANT_VIEW",
+  "perm": "MEMBERSHIP_VIEW",
   "offline": false,
   "summary": "Membership Upgrade, Downgrade & Product Migration Operations",
   "source": "hand-mapped 29 September (readiness close-out)",
@@ -64784,7 +64879,7 @@
   "writes": [],
   "routing": "replica",
   "scope": "tenant",
-  "perm": "PLATFORM_TENANT_VIEW",
+  "perm": "MEMBERSHIP_VIEW",
   "offline": false,
   "summary": "Membership Usage, Visit & Consumption Rules",
   "source": "hand-mapped 29 September (readiness close-out)",
@@ -73940,7 +74035,7 @@
   ],
   "routing": "primary",
   "scope": "tenant",
-  "perm": "PLATFORM_CELL_MANAGE",
+  "perm": "MEMBERSHIP_MANAGE",
   "offline": false,
   "summary": "Member 360° Membership Account Workspace",
   "source": "hand-mapped 29 September (readiness close-out)",
@@ -73995,7 +74090,7 @@
   ],
   "routing": "primary",
   "scope": "tenant",
-  "perm": "PLATFORM_CELL_MANAGE",
+  "perm": "MEMBERSHIP_MANAGE",
   "offline": false,
   "summary": "Membership Eligibility & Qualification Rule Builder",
   "source": "hand-mapped 29 September (readiness close-out)",
@@ -74034,7 +74129,7 @@
   ],
   "routing": "primary",
   "scope": "tenant",
-  "perm": "PLATFORM_CELL_MANAGE",
+  "perm": "MEMBERSHIP_MANAGE",
   "offline": false,
   "summary": "Membership Entitlement & Admission Benefit Builder",
   "source": "hand-mapped 29 September (readiness close-out)",
@@ -74083,7 +74178,7 @@
   ],
   "routing": "primary",
   "scope": "tenant",
-  "perm": "PLATFORM_CELL_MANAGE",
+  "perm": "MEMBERSHIP_MANAGE",
   "offline": false,
   "summary": "Membership Product & Tier Builder",
   "source": "hand-mapped 29 September (readiness close-out)",
@@ -75209,7 +75304,7 @@
   ],
   "routing": "primary",
   "scope": "tenant",
-  "perm": "PLATFORM_CELL_MANAGE",
+  "perm": "MEMBERSHIP_MANAGE",
   "offline": false,
   "summary": "Renewal, Auto-Renewal & Membership Continuity Configuration",
   "source": "hand-mapped 29 September (readiness close-out)",
@@ -82723,6 +82818,7 @@
     "id",
     "issued_amount",
     "issued_at",
+    "issued_credits",
     "remaining_amount",
     "scope_path",
     "source_kind",
@@ -83285,6 +83381,7 @@
    "assets.asset_version": [
     "asset_id",
     "checksum",
+    "content_type",
     "created_at",
     "created_by",
     "file_name",
@@ -83293,6 +83390,7 @@
     "note",
     "scope_path",
     "size_bytes",
+    "storage_key",
     "version"
    ]
   }
@@ -85060,7 +85158,8 @@
   "summary": "A device reports interference",
   "source": "derived",
   "audience": [
-   "staff"
+   "staff",
+   "device"
   ],
   "service": "TenancyService",
   "stores": [
@@ -97583,6 +97682,7 @@
     "label",
     "label_localised",
     "options",
+    "presentation",
     "show_when",
     "type"
    ]
@@ -97946,6 +98046,7 @@
     "label",
     "label_localised",
     "options",
+    "presentation",
     "show_when",
     "type"
    ]
@@ -98407,6 +98508,11 @@
     "query": "promotions#couponCodeRecords",
     "route": "in-process",
     "for": "its read of promotions.coupon_code, Catalogue's data (CHG-MOD-001)"
+   },
+   {
+    "query": "promotions#promotionRecords",
+    "route": "in-process",
+    "for": "its lookup of a promotion's own code, promotions.promotion, Promotions' data (ORDERS-MONEY-C11; CHG-R8SPN-026)"
    }
   ]
  },
@@ -98501,6 +98607,7 @@
   ],
   "readColumns": {
    "identity.password_policy": [
+    "access_token_minutes",
     "device_restriction",
     "forces_change_on_first_logon",
     "id",
@@ -98514,9 +98621,11 @@
     "pin_lockout_after_attempts",
     "pin_reuse_prevention",
     "recovery_methods",
+    "refresh_token_hours",
     "require_breach_check",
     "reuse_prevention_count",
-    "scope_path"
+    "scope_path",
+    "session_max_hours"
    ]
   }
  },
@@ -109540,7 +109649,7 @@
   ],
   "routing": "primary",
   "scope": "tenant",
-  "perm": "PLATFORM_CELL_MANAGE",
+  "perm": "MEMBERSHIP_MANAGE",
   "offline": false,
   "summary": "Save a membership product's commercial references, payment eligibility and sales period",
   "source": "hand-mapped 29 September (readiness close-out)",
@@ -109566,6 +109675,11 @@
     "for": "its read of catalogue.product, Catalogue's data (CHG-MOD-001)"
    },
    {
+    "query": "catalogue#taxProfileRecords",
+    "route": "service",
+    "for": "that `taxProfile` names an active catalogue.tax_profile row (422 unknown-profile) (r8, GPS-C34)"
+   },
+   {
     "query": "payments#instalmentPolicyRecords",
     "route": "service",
     "for": "whether payments supports instalments for the product (422 instalments-not-supported) (CHG-MOD-003)"
@@ -109589,7 +109703,7 @@
   ],
   "routing": "primary",
   "scope": "tenant",
-  "perm": "PLATFORM_CELL_MANAGE",
+  "perm": "MEMBERSHIP_MANAGE",
   "offline": false,
   "summary": "Save a membership product's usage, visit and consumption rules",
   "source": "hand-mapped 29 September (readiness close-out)",
@@ -110560,7 +110674,6 @@
     "allow_downward",
     "allow_upward",
     "allowed_endpoints",
-    "bands",
     "base_band_code",
     "base_price",
     "base_price_source",
@@ -114119,6 +114232,7 @@
     "execution_result",
     "feature_set_version",
     "governance_outcome",
+    "hash_version",
     "human_decision",
     "id",
     "inputs_ref",
@@ -118388,11 +118502,6 @@
     "for": "its read of marketing.message_template, Marketing's data (CHG-MOD-001)"
    },
    {
-    "query": "platform-ops#contentBlockRecords",
-    "route": "service",
-    "for": "its read of control.content_block, Platform's data (CHG-MOD-001)"
-   },
-   {
     "query": "promotions#promotionRecords",
     "route": "service",
     "for": "its read of promotions.promotion, Catalogue's data (CHG-MOD-001)"
@@ -118401,6 +118510,11 @@
     "query": "white-label#bannerRecords",
     "route": "service",
     "for": "its read of whitelabel.banner, WhiteLabel's data (CHG-MOD-001)"
+   },
+   {
+    "query": "white-label#contentBlockRecords",
+    "route": "service",
+    "for": "its read of whitelabel.content_block, WhiteLabel's data (CHG-MOD-001; moved from control, R8 blocker IDENTITY-C59)"
    },
    {
     "query": "white-label#contentPageRecords",
@@ -120195,6 +120309,7 @@
     "execution_result",
     "feature_set_version",
     "governance_outcome",
+    "hash_version",
     "human_decision",
     "id",
     "inputs_ref",
@@ -120968,14 +121083,7 @@
     "require_stored_card",
     "scope_path"
    ]
-  },
-  "readVia": [
-   {
-    "query": "catalogue#productRecords",
-    "route": "in-process",
-    "for": "the product's term (422 too-many-instalments) (CHG-MOD-003)"
-   }
-  ]
+  }
  },
  "setInventoryKitDefinition": {
   "contract": "inventory",
@@ -125084,12 +125192,15 @@
    "whitelabel.footer_config_column": [
     "footer_config_id",
     "heading",
-    "id"
+    "id",
+    "links",
+    "sort_order"
    ],
    "whitelabel.footer_config_social_link": [
     "footer_config_id",
     "id",
     "platform",
+    "sort_order",
     "url"
    ],
    "whitelabel.homepage_layout": [
@@ -125151,8 +125262,8 @@
   "readVia": [
    {
     "query": "payments#providerConnectionRecords",
-    "route": "in-process",
-    "for": "its read of payments.provider_connection, for `paymentTokenisation` (lineage request, r8)"
+    "route": "service",
+    "for": "its read of payments.provider_connection, for `paymentTokenisation`, through the service route: White-label runs in operations, Payments in commerce (lineage request, r8; CHG-R8INT-005)"
    }
   ]
  },
@@ -129112,7 +129223,7 @@
   "writes": [],
   "routing": "replica",
   "scope": "tenant",
-  "perm": "PLATFORM_CELL_MANAGE",
+  "perm": "MEMBERSHIP_VIEW",
   "offline": false,
   "summary": "A membership product's validation, as the approver sees it",
   "source": "derived",
@@ -129608,7 +129719,8 @@
     "message",
     "progress_percent",
     "scheduled_for",
-    "status"
+    "status",
+    "target_tier"
    ]
   }
  },
@@ -129617,7 +129729,7 @@
   "verb": "GET",
   "path": "/content-blocks",
   "reads": [
-   "control.content_block"
+   "whitelabel.content_block"
   ],
   "writes": [],
   "routing": "replica",
@@ -129635,7 +129747,7 @@
    "redis"
   ],
   "readColumns": {
-   "control.content_block": [
+   "whitelabel.content_block": [
     "approved_by_principal_id",
     "audience_segment_id",
     "body",
@@ -129650,14 +129762,7 @@
     "scope_path",
     "status"
    ]
-  },
-  "readVia": [
-   {
-    "query": "platform-ops#contentBlockRecords",
-    "route": "in-process",
-    "for": "its read of control.content_block, Platform's data (CHG-MOD-001)"
-   }
-  ]
+  }
  },
  "listCorrectiveActions": {
   "contract": "fnb",
@@ -129831,11 +129936,11 @@
   "path": "/content-blocks/{blockId}",
   "reads": [
    "cache:idempotency",
-   "control.content_block"
+   "whitelabel.content_block"
   ],
   "writes": [
    "cache:idempotency",
-   "control.content_block"
+   "whitelabel.content_block"
   ],
   "routing": null,
   "scope": "tenant",
@@ -129852,7 +129957,7 @@
    "redis"
   ],
   "readColumns": {
-   "control.content_block": [
+   "whitelabel.content_block": [
     "approved_by_principal_id",
     "audience_segment_id",
     "body",
@@ -129867,14 +129972,7 @@
     "scope_path",
     "status"
    ]
-  },
-  "readVia": [
-   {
-    "query": "platform-ops#contentBlockRecords",
-    "route": "in-process",
-    "for": "its read of control.content_block, Platform's data (CHG-MOD-001)"
-   }
-  ]
+  }
  },
  "listTableCombinations": {
   "contract": "fnb",
@@ -131497,5 +131595,1106 @@
    "postgres",
    "redis"
   ]
+ },
+ "runGuidedChoiceSuggestionJob": {
+  "contract": "ai",
+  "verb": "POST",
+  "path": "/venues/{venueId}/guided-choice-suggestion-jobs",
+  "reads": [
+   "ai.guided_choice_suggestion",
+   "cache:idempotency"
+  ],
+  "writes": [
+   "ai.guided_choice_suggestion",
+   "cache:idempotency"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": null,
+  "offline": false,
+  "summary": "Run the Help me choose job from an event (service callers)",
+  "source": "derived",
+  "audience": [
+   "service"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ],
+  "readVia": [
+   {
+    "query": "white-label#guidedChoiceRecords",
+    "route": "service",
+    "for": "the published guided choices whose answers point at a withdrawn product (mappedProductWithdrawn)"
+   }
+  ],
+  "readColumns": {
+   "ai.guided_choice_suggestion": [
+    "created_at",
+    "decision_record_id",
+    "guided_choice_id",
+    "id",
+    "model_version",
+    "product_count",
+    "prompt_template_version",
+    "questions",
+    "scope_path",
+    "status",
+    "trigger",
+    "venue_id",
+    "wording_source"
+   ]
+  }
+ },
+ "recordSaleOwnerAnswers": {
+  "contract": "marketing-crm",
+  "verb": "POST",
+  "path": "/internal/sale-owner-answers",
+  "reads": [
+   "cache:idempotency",
+   "marketing.form_submission",
+   "marketing.form_submission_sale_link"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "marketing.form_submission",
+   "marketing.form_submission_sale_link"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": null,
+  "offline": false,
+  "summary": "Keep one owner's answers to a product's owner form, for one sale",
+  "source": "derived",
+  "audience": [
+   "service"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "readVia": [
+   {
+    "query": "identity#subjectRecords",
+    "route": "service",
+    "for": "the owner's subjectId must be a subject, as submitForm checks: pii.subject, Identity's data"
+   },
+   {
+    "query": "orders#orderLineRecords",
+    "route": "service",
+    "for": "a ticket owner's order line must be on the order and its unit within the line's quantity: orders.order_line, Orders' data"
+   },
+   {
+    "query": "orders#salesOrderRecords",
+    "route": "service",
+    "for": "the order must exist, be of the sent venue, and a reservation owner must be its buyer: orders.sales_order, Orders' data"
+   }
+  ],
+  "readColumns": {
+   "marketing.form_submission": [
+    "answers",
+    "captured_at_channel",
+    "expires_at",
+    "form_id",
+    "form_version",
+    "id",
+    "ip_address",
+    "on_behalf_of_subject_id",
+    "signature_asset_id",
+    "subject_id",
+    "submitted_at",
+    "synced_at"
+   ],
+   "marketing.form_submission_sale_link": [
+    "id",
+    "order_id",
+    "order_line_id",
+    "owner_role",
+    "scope_path",
+    "submission_id",
+    "unit_index"
+   ]
+  }
+ },
+ "getGuestCouponCode": {
+  "contract": "promotions",
+  "verb": "GET",
+  "path": "/guest-coupon-codes/{code}",
+  "reads": [],
+  "writes": [],
+  "routing": "primary",
+  "scope": "venue",
+  "perm": null,
+  "offline": false,
+  "summary": "What a guest is told about a coupon code",
+  "source": "derived",
+  "audience": [
+   "guest"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getGuestBundle": {
+  "contract": "promotions",
+  "verb": "GET",
+  "path": "/guest-bundles/{bundleId}",
+  "reads": [
+   "promotions.bundle_choice_group",
+   "promotions.bundle_choice_option",
+   "promotions.bundle_component"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": null,
+  "offline": true,
+  "summary": "What a guest is shown of a bundle",
+  "source": "derived",
+  "audience": [
+   "guest"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "readColumns": {
+   "promotions.bundle_choice_group": [
+    "allow_duplicates",
+    "bundle_id",
+    "choose",
+    "id",
+    "label",
+    "unavailable_behaviour"
+   ],
+   "promotions.bundle_choice_option": [
+    "bundle_choice_group_id",
+    "id",
+    "is_default",
+    "quantity",
+    "variant_id"
+   ],
+   "promotions.bundle_component": [
+    "bundle_id",
+    "component_kind",
+    "id",
+    "is_optional",
+    "menu_item_id",
+    "quantity",
+    "redeem_at_outlet_ids",
+    "substitute_variant_ids",
+    "substitution_approval",
+    "substitution_price_effect",
+    "substitution_triggers",
+    "variant_id",
+    "venue_id"
+   ]
+  }
+ },
+ "getVisitPlannerOptions": {
+  "contract": "venue-map",
+  "verb": "GET",
+  "path": "/venues/{venueId}/visit-planner-options",
+  "reads": [
+   "venuemap.visit_plan_preset"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "VENUE_MAP_VIEW",
+  "offline": true,
+  "summary": "What a guest can choose from when planning a visit",
+  "source": "derived",
+  "audience": [
+   "staff",
+   "guest"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "readVia": [
+   {
+    "query": "promotions#bundleRecords",
+    "route": "service",
+    "for": "the venue's published Fast Track bundles, Promotions' data (R8 blocker GPS-C21)"
+   }
+  ],
+  "readColumns": {
+   "venuemap.visit_plan_preset": [
+    "description",
+    "description_localised",
+    "id",
+    "interest_tags",
+    "is_active",
+    "is_built_in",
+    "must_include_point_ids",
+    "name",
+    "name_localised",
+    "pace",
+    "preset_key",
+    "scope_path",
+    "sort_order",
+    "updated_at"
+   ]
+  }
+ },
+ "listVisitPlanPresets": {
+  "contract": "venue-map",
+  "verb": "GET",
+  "path": "/venues/{venueId}/visit-plan-presets",
+  "reads": [
+   "venuemap.visit_plan_preset"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "PRODUCT_VIEW",
+  "offline": false,
+  "summary": "A venue's ready-made day plans, as staff edit them",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "readColumns": {
+   "venuemap.visit_plan_preset": [
+    "description",
+    "description_localised",
+    "id",
+    "interest_tags",
+    "is_active",
+    "is_built_in",
+    "must_include_point_ids",
+    "name",
+    "name_localised",
+    "pace",
+    "preset_key",
+    "scope_path",
+    "sort_order",
+    "updated_at"
+   ]
+  }
+ },
+ "setVisitPlanPreset": {
+  "contract": "venue-map",
+  "verb": "PUT",
+  "path": "/venues/{venueId}/visit-plan-presets/{presetKey}",
+  "reads": [
+   "cache:idempotency",
+   "venuemap.visit_plan_preset"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "venuemap.visit_plan_preset"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "PRODUCT_CONFIGURE",
+  "offline": false,
+  "summary": "Add or replace one of a venue's ready-made day plans",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "readColumns": {
+   "venuemap.visit_plan_preset": [
+    "description",
+    "description_localised",
+    "id",
+    "interest_tags",
+    "is_active",
+    "is_built_in",
+    "must_include_point_ids",
+    "name",
+    "name_localised",
+    "pace",
+    "preset_key",
+    "scope_path",
+    "sort_order",
+    "updated_at"
+   ]
+  }
+ },
+ "getPreview": {
+  "contract": "white-label",
+  "verb": "GET",
+  "path": "/tenant-config/preview/{previewId}",
+  "reads": [],
+  "writes": [],
+  "routing": "primary",
+  "scope": "tenant",
+  "perm": "TENANT_CONFIGURE",
+  "offline": false,
+  "summary": "Read a preview while its link lives",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "WhiteLabelService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "previewGuidedChoice": {
+  "contract": "white-label",
+  "verb": "POST",
+  "path": "/venues/{venueId}/guided-choice-previews",
+  "reads": [],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "TENANT_CONFIGURE",
+  "offline": false,
+  "summary": "What a draft Help me choose leaves, combination by combination",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "WhiteLabelService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "readVia": [
+   {
+    "query": "catalogue#productEligibilityRuleRecords",
+    "route": "service",
+    "for": "the age and height limits an age or level answer filters on (r8, WHITE-C26)"
+   },
+   {
+    "query": "catalogue#productRecords",
+    "route": "service",
+    "for": "the products each combination of answers leaves, by the same answer filter listProducts applies for a guest (r8, WHITE-C26)"
+   }
+  ]
+ },
+ "getBundleSigningKeys": {
+  "contract": "catalogue",
+  "verb": "GET",
+  "path": "/catalogue/bundle-signing-keys",
+  "reads": [],
+  "writes": [],
+  "routing": "replica",
+  "scope": "workstation",
+  "perm": "PRODUCT_VIEW",
+  "offline": false,
+  "summary": "The public keys a till verifies catalogue bundles with",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getChannelAvailability": {
+  "contract": "catalogue",
+  "verb": "GET",
+  "path": "/channel-availability",
+  "reads": [],
+  "writes": [],
+  "routing": "primary",
+  "scope": "venue",
+  "perm": "PRODUCT_VIEW",
+  "offline": false,
+  "summary": "One product's channel publication, as publishChannelAvailability last stored it",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listProductTags": {
+  "contract": "catalogue",
+  "verb": "GET",
+  "path": "/product-tags",
+  "reads": [
+   "catalogue.product_tag"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "PRODUCT_VIEW",
+  "offline": false,
+  "summary": "The venue's tags, the master list products and promotions pick from",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "readColumns": {
+   "catalogue.product_tag": [
+    "code",
+    "description",
+    "display_order",
+    "id",
+    "is_active",
+    "name",
+    "name_localised",
+    "scope_path"
+   ]
+  }
+ },
+ "setProductTagDefinition": {
+  "contract": "catalogue",
+  "verb": "PUT",
+  "path": "/product-tags/{productTagId}",
+  "reads": [
+   "cache:idempotency",
+   "catalogue.product_tag"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "catalogue.product_tag"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "PRODUCT_CONFIGURE",
+  "offline": false,
+  "summary": "Create or replace one tag of the venue's list",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "readVia": [
+   {
+    "query": "white-label#guidedChoiceAnswerRecords",
+    "route": "service",
+    "for": "a tag code a published Help me choose answer filters on cannot change: whitelabel.guided_choice_answer, WhiteLabel's data"
+   }
+  ],
+  "readColumns": {
+   "catalogue.product_tag": [
+    "code",
+    "description",
+    "display_order",
+    "id",
+    "is_active",
+    "name",
+    "name_localised",
+    "scope_path"
+   ]
+  }
+ },
+ "setProductClassification": {
+  "contract": "catalogue",
+  "verb": "PUT",
+  "path": "/products/{productId}/classification",
+  "reads": [
+   "cache:idempotency"
+  ],
+  "writes": [
+   "cache:idempotency"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "PRODUCT_CONFIGURE",
+  "offline": false,
+  "summary": "File a product under a category and give it its tags, both from the master lists",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listProductCategoryUsage": {
+  "contract": "catalogue",
+  "verb": "GET",
+  "path": "/product-categories/usage",
+  "reads": [],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "PRODUCT_VIEW",
+  "offline": false,
+  "summary": "How many products each category holds",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getProductChannelTexts": {
+  "contract": "catalogue",
+  "verb": "GET",
+  "path": "/products/{productId}/channel-texts",
+  "reads": [
+   "catalogue.product_channel_text"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "PRODUCT_VIEW",
+  "offline": false,
+  "summary": "The product's texts per sales channel, in each of the tenant's languages",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "readVia": [
+   {
+    "query": "white-label#tenantConfigRecords",
+    "route": "service",
+    "for": "before the tenant's first publish, its working draft's languages: whitelabel.tenant_config, WhiteLabel's data"
+   },
+   {
+    "query": "white-label#tenantLanguageRecords",
+    "route": "service",
+    "for": "the tenant's enabled (published) languages, which `missingTranslations` is counted against: whitelabel.config_version, WhiteLabel's data"
+   }
+  ],
+  "readColumns": {
+   "catalogue.product_channel_text": [
+    "id",
+    "kiosk_label",
+    "partner_description",
+    "pos_button_label",
+    "product_id",
+    "receipt_name",
+    "scope_path",
+    "terms_and_conditions",
+    "visit_instructions",
+    "web_description"
+   ]
+  }
+ },
+ "setProductChannelTexts": {
+  "contract": "catalogue",
+  "verb": "PUT",
+  "path": "/products/{productId}/channel-texts",
+  "reads": [
+   "cache:idempotency",
+   "catalogue.product_channel_text"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "catalogue.product_channel_text"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "PRODUCT_CONFIGURE",
+  "offline": false,
+  "summary": "Set the product's texts per sales channel",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "readVia": [
+   {
+    "query": "white-label#tenantConfigRecords",
+    "route": "service",
+    "for": "before the tenant's first publish, its working draft's languages: whitelabel.tenant_config, WhiteLabel's data"
+   },
+   {
+    "query": "white-label#tenantLanguageRecords",
+    "route": "service",
+    "for": "every key must be an enabled (published) language of the tenant: whitelabel.config_version, WhiteLabel's data"
+   }
+  ],
+  "readColumns": {
+   "catalogue.product_channel_text": [
+    "id",
+    "kiosk_label",
+    "partner_description",
+    "pos_button_label",
+    "product_id",
+    "receipt_name",
+    "scope_path",
+    "terms_and_conditions",
+    "visit_instructions",
+    "web_description"
+   ]
+  }
+ },
+ "getProductOwnerForms": {
+  "contract": "catalogue",
+  "verb": "GET",
+  "path": "/products/{productId}/owner-forms",
+  "reads": [
+   "catalogue.product_owner_form"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "PRODUCT_VIEW",
+  "offline": false,
+  "summary": "Which form a sale of this product asks the buyer, and which it asks each ticket owner",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "readVia": [
+   {
+    "query": "marketing-crm#formDefinitionRecords",
+    "route": "service",
+    "for": "each linked form's name, kind, status and published version: marketing.form_definition, Marketing's data"
+   }
+  ],
+  "readColumns": {
+   "catalogue.product_owner_form": [
+    "applies_to",
+    "form_id",
+    "id",
+    "product_id",
+    "scope_path"
+   ]
+  }
+ },
+ "setProductOwnerForms": {
+  "contract": "catalogue",
+  "verb": "PUT",
+  "path": "/products/{productId}/owner-forms",
+  "reads": [
+   "cache:idempotency",
+   "catalogue.product_owner_form"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "catalogue.product_owner_form"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "PRODUCT_CONFIGURE",
+  "offline": false,
+  "summary": "Link a product to the forms its sale asks",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "readVia": [
+   {
+    "query": "marketing-crm#formDefinitionRecords",
+    "route": "service",
+    "for": "each form must be a published `dataCapture` or `registration` form of the product's venue: marketing.form_definition, Marketing's data"
+   }
+  ],
+  "readColumns": {
+   "catalogue.product_owner_form": [
+    "applies_to",
+    "form_id",
+    "id",
+    "product_id",
+    "scope_path"
+   ]
+  }
+ },
+ "listOwnerFormCandidates": {
+  "contract": "catalogue",
+  "verb": "GET",
+  "path": "/owner-form-candidates",
+  "reads": [],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "PRODUCT_CONFIGURE",
+  "offline": false,
+  "summary": "The forms a product can link for its reservation owner or ticket owner",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "readVia": [
+   {
+    "query": "marketing-crm#formDefinitionRecords",
+    "route": "service",
+    "for": "the venue's published `dataCapture` and `registration` forms: marketing.form_definition, Marketing's data"
+   }
+  ]
+ },
+ "getProductSalePermissionRules": {
+  "contract": "catalogue",
+  "verb": "GET",
+  "path": "/products/{productId}/sale-permission-rules",
+  "reads": [
+   "catalogue.product_sale_permission"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "PRODUCT_VIEW",
+  "offline": false,
+  "summary": "Who can sell this product",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "readVia": [
+   {
+    "query": "identity#principalRecords",
+    "route": "in-process",
+    "for": "the display name of a `principal` rule's target: identity.principal, Identity's data"
+   },
+   {
+    "query": "identity#roleRecords",
+    "route": "in-process",
+    "for": "the name of a `role` rule's target: identity.role, Identity's data"
+   },
+   {
+    "query": "tenancy#activeVenues",
+    "route": "service",
+    "for": "the name of a `venue` rule's target: platform.scope, Tenancy's data"
+   },
+   {
+    "query": "tenancy#workstationRecords",
+    "route": "in-process",
+    "for": "the name of a `workstation` rule's target: platform.workstation, Tenancy's data"
+   }
+  ],
+  "readColumns": {
+   "catalogue.product_sale_permission": [
+    "effect",
+    "id",
+    "level",
+    "note",
+    "product_id",
+    "scope_path",
+    "target_id"
+   ]
+  }
+ },
+ "setProductSalePermissionRules": {
+  "contract": "catalogue",
+  "verb": "PUT",
+  "path": "/products/{productId}/sale-permission-rules",
+  "reads": [
+   "cache:idempotency",
+   "catalogue.product_sale_permission"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "catalogue.product_sale_permission"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "PRODUCT_CONFIGURE",
+  "offline": false,
+  "summary": "Set who can sell this product",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "readVia": [
+   {
+    "query": "identity#delegatedAccessRecords",
+    "route": "in-process",
+    "for": "a `principal` rule's target must hold a grant reaching the product's venue, and the caller's grants bound the `venue` targets: identity.delegated_access, Identity's data"
+   },
+   {
+    "query": "identity#principalRecords",
+    "route": "in-process",
+    "for": "a `principal` rule's target must be an active staff principal: identity.principal, Identity's data"
+   },
+   {
+    "query": "identity#roleRecords",
+    "route": "in-process",
+    "for": "a `role` rule's target must be a role of the tenant: identity.role, Identity's data"
+   },
+   {
+    "query": "tenancy#activeVenues",
+    "route": "service",
+    "for": "a `venue` rule's target must be an active venue the caller's grants reach: platform.scope, Tenancy's data"
+   },
+   {
+    "query": "tenancy#workstationRecords",
+    "route": "in-process",
+    "for": "a `workstation` rule's target must be a workstation of the product's venue: platform.workstation, Tenancy's data"
+   }
+  ],
+  "readColumns": {
+   "catalogue.product_sale_permission": [
+    "effect",
+    "id",
+    "level",
+    "note",
+    "product_id",
+    "scope_path",
+    "target_id"
+   ]
+  }
+ },
+ "checkProductSalePermission": {
+  "contract": "catalogue",
+  "verb": "POST",
+  "path": "/sale-permission-checks",
+  "reads": [],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "PRODUCT_CONFIGURE",
+  "offline": false,
+  "summary": "Would this seller, here, be allowed to sell these products",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listSalePermissionTargets": {
+  "contract": "catalogue",
+  "verb": "GET",
+  "path": "/sale-permission-targets",
+  "reads": [],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "PRODUCT_CONFIGURE",
+  "offline": false,
+  "summary": "What a sale permission rule can name at one level, with names",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "readVia": [
+   {
+    "query": "identity#delegatedAccessRecords",
+    "route": "in-process",
+    "for": "which principals hold a grant reaching the venue, and which venues the caller's own grants reach: identity.delegated_access, Identity's data"
+   },
+   {
+    "query": "identity#principalRecords",
+    "route": "in-process",
+    "for": "the staff a `principal` rule can name: identity.principal, Identity's data"
+   },
+   {
+    "query": "identity#roleRecords",
+    "route": "in-process",
+    "for": "the roles a `role` rule can name: identity.role, Identity's data"
+   },
+   {
+    "query": "tenancy#activeVenues",
+    "route": "service",
+    "for": "the venues a `venue` rule can name: platform.scope, Tenancy's data"
+   },
+   {
+    "query": "tenancy#workstationRecords",
+    "route": "in-process",
+    "for": "the workstations a `workstation` rule can name: platform.workstation, Tenancy's data"
+   }
+  ]
+ },
+ "getProductDashboard": {
+  "contract": "catalogue",
+  "verb": "GET",
+  "path": "/product-dashboard",
+  "reads": [],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "PRODUCT_VIEW",
+  "offline": false,
+  "summary": "The products dashboard's counts",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listProductAttentionItems": {
+  "contract": "catalogue",
+  "verb": "GET",
+  "path": "/product-dashboard/attention",
+  "reads": [],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "PRODUCT_VIEW",
+  "offline": false,
+  "summary": "The products that need someone to act, and why",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listStepUpSupervisors": {
+  "contract": "identity",
+  "verb": "GET",
+  "path": "/auth/step-up-supervisors",
+  "reads": [],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": null,
+  "offline": false,
+  "summary": "Who may sign a supervisor step-up here",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "IdentityService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getSessionVenue": {
+  "contract": "identity",
+  "verb": "GET",
+  "path": "/auth/session/venue",
+  "reads": [
+   "identity.session"
+  ],
+  "writes": [],
+  "routing": "primary",
+  "scope": "tenant",
+  "perm": null,
+  "offline": false,
+  "summary": "Which venue this back-office session is working in, and which it may switch to",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "IdentityService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "readVia": [
+   {
+    "query": "tenancy#activeVenues",
+    "route": "service",
+    "for": "the names of the venues the session may act at, and that each is active: platform.scope, Tenancy's data"
+   }
+  ],
+  "readColumns": {
+   "identity.session": [
+    "id",
+    "working_venue_id"
+   ]
+  }
+ },
+ "setSessionVenue": {
+  "contract": "identity",
+  "verb": "PUT",
+  "path": "/auth/session/venue",
+  "reads": [
+   "cache:idempotency",
+   "identity.session"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "identity.session"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": null,
+  "offline": false,
+  "summary": "Switch the back-office session to another venue it may act at",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "IdentityService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "readVia": [
+   {
+    "query": "tenancy#activeVenues",
+    "route": "service",
+    "for": "the chosen venue must be an active venue the session's grants reach: platform.scope, Tenancy's data"
+   }
+  ],
+  "readColumns": {
+   "identity.session": [
+    "id",
+    "working_venue_id"
+   ]
+  }
  }
 }

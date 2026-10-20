@@ -1,0 +1,44 @@
+id: CHG-R8INT-010
+date: '2026-10-20'
+source: audit
+kind: spec
+summary: 'The lineage follows the merged contracts: derive-lineage and derive-read-columns re-run for every operation
+  the lanes added or changed after the generators lane merged (core, storage-sat, surface, products wave 1, and this
+  pass''s planner operations). registerGuest''s override no longer carries the outbox write its contract now derives.
+  Two check-cross-module-reads findings are false positives and go in the baseline: getProductDashboard and
+  listProductAttentionItems name "entitlement" as a product kind (ProductKind''s text), not Access''s table.'
+decision:
+  what: 'handoff/api-data-lineage.json (derive-lineage --apply, then derive-read-columns --apply against a schema
+    reference derived from the same contracts; the schema reference itself is left to the release derive);
+    handoff/api-data-lineage-overrides.json: platform.outbox out of registerGuest''s writes; handoff/audit-baseline.json
+    check-cross-module-reads XR-FACT: getProductDashboard:access.entitlement and
+    listProductAttentionItems:access.entitlement, with this entry as the reason.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Since CHG-R8GEN-001 the lineage is derived from the contracts, and the lanes that merged after the generators
+  lane added operations and read-vias without the derive, so check-lineage, check-read-columns, check-permission-
+  vocabulary (PV-LINEAGE) and check-cross-module-reads (XR-LINEAGE) failed. The ProductKind finding is the products
+  wave''s: "entitlement" there is the kind of product a dashboard counts, a word the fact table maps to
+  access.entitlement. Finding: r8 integration check run of 20 October 2026.'
+keys_touched:
+  operations: [registerGuest, getProductDashboard, listProductAttentionItems, getVisitPlannerOptions,
+    listVisitPlanPresets, setVisitPlanPreset]
+  files:
+  - handoff/api-data-lineage.json
+  - handoff/api-data-lineage-overrides.json
+  - handoff/audit-baseline.json
+root_class: 'derived lineage out of step with the contracts'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: r8 integration pass'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-lineage.py
+status: open
+notes: 'With the schema reference derived from the merged contracts, check-lineage passes (0 errors; LN-TEXT warning)
+  and check-read-columns passes; on the committed, stale schema reference check-lineage reports the new tables as "in
+  no schema" until the release derive writes it.'

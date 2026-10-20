@@ -12060,8 +12060,7 @@
     "identity.guest_credential",
     "identity.guest_session",
     "pii.subject",
-    "pii.subject_contact",
-    "platform.outbox"
+    "pii.subject_contact"
    ],
    "notWrites": [
     "identity.mfa_method"
