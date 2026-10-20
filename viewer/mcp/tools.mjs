@@ -1131,6 +1131,45 @@ export function ticketStatements(files, ticket) {
   return out.filter((s) => !s.helper || called(s)).map(({ helper: _h, ...s }) => s);
 }
 
+/**
+ * The server-level changes a database's package files make, read from their text (function bodies included):
+ * the roles they create, with their attributes, the role memberships they grant and the role settings they set,
+ * as the script's CLUSTER_SQL prints each item. A ticket's file may make these and no others (review 6: never
+ * from watching the server, which another session can write to at the same time). r8 has one: V0105's
+ * `CREATE ROLE ticvai_parent_visible NOLOGIN ...`, and its `GRANT ticvai_parent_visible TO %I` for whoever runs it.
+ */
+export function serverAllowances(files) {
+  const roles = new Map();
+  const memberships = new Set();
+  const settings = new Set();
+  const ATTRS = [['SUPERUSER', 'superuser'], ['BYPASSRLS', 'bypassrls'], ['CREATEROLE', 'createrole'],
+    ['CREATEDB', 'createdb'], ['REPLICATION', 'replication'], ['LOGIN', 'login']];
+  const item = (name, opts, login) => name + ATTRS
+    .filter(([word]) => new RegExp(`(^|\\s)${word}\\b`, 'i').test(opts) || (word === 'LOGIN' && login && !/\bNOLOGIN\b/i.test(opts)))
+    .map(([, label]) => ` (${label})`).join('');
+  for (const { text } of files) {
+    const s = String(text).replace(/--[^\n]*/g, ' ');
+    for (const m of s.matchAll(/\bCREATE\s+(ROLE|USER)\s+(?:IF\s+NOT\s+EXISTS\s+)?("?[\w$]+"?)([^;']*)/gi)) {
+      const name = m[2].replace(/"/g, '');
+      roles.set(name, item(name, ` ${m[3]}`, m[1].toUpperCase() === 'USER'));
+    }
+    for (const m of s.matchAll(/\bGRANT\s+("?[\w$]+"?)\s+TO\s+("?[\w$%]+"?)/gi)) {
+      const role = m[1].replace(/"/g, '');
+      if (/^(ALL|SELECT|INSERT|UPDATE|DELETE|USAGE|EXECUTE|CREATE|CONNECT|TEMP|TEMPORARY|TRUNCATE|REFERENCES|TRIGGER|SET|MAINTAIN)$/i.test(role)) continue;
+      const member = m[2].replace(/"/g, '');
+      memberships.add(`${/%/.test(member) ? '*' : member} in ${role}`);
+    }
+    for (const m of s.matchAll(/\bALTER\s+ROLE\s+("?[\w$]+"?)\s+(?:IN\s+DATABASE\s+\S+\s+)?SET\s+([\w.]+)\s*(?:=|TO)\s*([^;']*)/gi)) {
+      settings.add(`${m[1].replace(/"/g, '')}: ${m[2]}=${m[3].trim()}`);
+    }
+  }
+  return {
+    'server roles': [...roles.values()].sort(),
+    'server role memberships': [...memberships].sort(),
+    'server role settings': [...settings].sort(),
+  };
+}
+
 /** One database's check for expected-schema.json: the tables' shape and the statements behind it. */
 export function expectedCheck(model, ticket, statements, { database, sources = [] } = {}) {
   const out = {};
@@ -1214,7 +1253,7 @@ async function writeExpectedSchema(client, wp, touches, folder, release) {
       if (!texts.length) throw new Error(`no DDL for ${database} in this package`);
       const statements = ticketStatements(texts, ticket);
       const used = [...new Set(statements.map((s) => s.file))].map((f) => `backend/${database}/${f}`);
-      checks.push(expectedCheck(schemaModel(texts), ticket, statements, { database, sources: used }));
+      checks.push({ ...expectedCheck(schemaModel(texts), ticket, statements, { database, sources: used }), server: serverAllowances(texts) });
     }
     const body = {
       about: 'What this ticket\'s migration must leave behind, from the package DDL: the tables\' end state, and '
@@ -1265,8 +1304,8 @@ function databaseSection(db, key) {
     + 'Do not rebuild the other migrations, and do not run dotnet unless this ticket changes C#. Before opening the merge '
     + `request, run ${db.databases.map((d) => `\`node .claude/scripts/db-ticket.mjs --full ${d}\``).join(' and ')} once: `
     + 'every migration applied once, in order, to an empty database, as SqlMigrationRunner does.\n\n'
-    + 'No `.claude/scripts/db-ticket.mjs` in this folder? Run ADAM\'s setup on it again: it adds the files that '
-    + 'are missing and changes nothing else.\n';
+    + 'No `.claude/scripts/db-ticket.mjs` in this folder, or no "A [DB] ticket" in CLAUDE.md? Run `/update-adam` '
+    + 'here: it adds both (running ADAM\'s setup on the folder again does the same).\n';
   if (db.absent.length) {
     out += `\nNot in the package DDL, so the check cannot pass until it is (a change request): ${db.absent.map((t) => `\`${t}\``).join(', ')}.\n`;
   }

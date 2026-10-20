@@ -175,12 +175,23 @@ section('the snapshot compare');
   const rows = script.backfills({ after: { 'rows a.t': '3', 'rows k.old': '0' }, expected: { 'rows a.t': '0' }, owned: ['a.t'] });
   ok(rows.length === 1 && /a\.t: 3 rows/.test(rows[0]) && script.diffSnapshots({ before: { 'rows a.t': '0' }, after: { 'rows a.t': '3' }, expected: { 'rows a.t': '0' }, owned: ['a.t'] }).length === 0,
     'rows left in the ticket\'s own table are listed as a backfill, not a difference', rows.join(' | '));
-  // r8's package makes a role itself (platform.visible_parent_ids_setup): the same change by the
-  // ticket's file is not a difference; anything more is.
-  const pkg = script.serverChanges({ 'server roles': ['postgres (superuser)'] }, { 'server roles': ['postgres (superuser)', 'ticvai_parent_visible'] });
-  const same = script.serverDiffs(script.serverChanges({ 'server roles': ['postgres (superuser)'] }, { 'server roles': ['postgres (superuser)', 'ticvai_parent_visible'] }), pkg);
-  const more = script.serverDiffs(script.serverChanges({ 'server roles': ['postgres (superuser)'] }, { 'server roles': ['postgres (superuser)', 'probe', 'ticvai_parent_visible'] }), pkg);
-  ok(same.length === 0 && more.length === 1 && /added probe\)/.test(more[0]), 'a role the package\'s own statements make is not a difference; another is', more.join(' | '));
+  // r8's package makes a role itself (V0105's platform.visible_parent_ids_setup): read from the package's text,
+  // the same change by the ticket's file is not a difference; anything more, or anything removed, is.
+  const allowed = tools.serverAllowances([{ name: 'V0105.sql', text: "CREATE FUNCTION f() RETURNS void LANGUAGE plpgsql AS $$ BEGIN\n"
+    + "  CREATE ROLE ticvai_parent_visible NOLOGIN NOSUPERUSER NOBYPASSRLS NOCREATEDB NOCREATEROLE;\n"
+    + "  EXECUTE format('GRANT ticvai_parent_visible TO %I WITH INHERIT TRUE, SET TRUE', current_user);\n"
+    + "  EXECUTE 'GRANT USAGE ON SCHEMA platform TO ticvai_parent_visible';\nEND $$;" }]);
+  ok(JSON.stringify(allowed) === JSON.stringify({ 'server roles': ['ticvai_parent_visible'], 'server role memberships': ['* in ticvai_parent_visible'], 'server role settings': [] })
+    && JSON.stringify(script.allowancesIn([allowed && "CREATE ROLE ticvai_parent_visible NOLOGIN"])['server roles']) === '["ticvai_parent_visible"]',
+  'the server changes the package makes are read from its text: the role, and its membership for whoever runs it', JSON.stringify(allowed));
+  const change = (before, after) => script.serverChanges({ 'server roles': before }, { 'server roles': after });
+  const same = script.serverDiffs(change(['postgres (superuser)'], ['postgres (superuser)', 'ticvai_parent_visible']), allowed);
+  const more = script.serverDiffs(change(['postgres (superuser)'], ['postgres (superuser)', 'probe (login)', 'ticvai_parent_visible']), allowed);
+  const gone = script.serverDiffs(change(['postgres (superuser)', 'ticvai_parent_visible'], ['postgres (superuser)']), allowed);
+  const member = script.serverDiffs(script.serverChanges({ 'server role memberships': [] }, { 'server role memberships': ['app in ticvai_parent_visible', 'app in pg_read_all_data'] }), allowed);
+  ok(same.length === 0 && more.length === 1 && /added probe \(login\)\)/.test(more[0]) && gone.length === 1 && /removed ticvai_parent_visible/.test(gone[0])
+    && member.length === 1 && /added app in pg_read_all_data\)/.test(member[0]),
+  'a role or membership the package\'s text makes is not a difference; another, or one removed, is', [...more, ...gone, ...member].join(' | '));
   const r8 = script.splitSql ? tools.doInner("DO $$ BEGIN IF to_regclass('a.i') IS NOT NULL THEN DROP INDEX a.i; END IF; END $$") : [];
   ok(r8.length === 1 && /^DROP INDEX a\.i$/.test(r8[0]) && tools.statementTarget("DO $$ BEGIN IF true THEN ALTER TABLE a.t RENAME COLUMN x TO y; END IF; END $$") === 'a.t'
     && tools.statementTarget('DROP INDEX IF EXISTS a.i', new Map([['i', 'a.t']])) === 'a.t'
@@ -568,6 +579,61 @@ if (!dockerUp) {
   const membership = docker(['exec', CONTAINER, 'psql', '-U', 'postgres', '-Atc', "SELECT count(*) FROM pg_auth_members a JOIN pg_roles m ON m.oid = a.member JOIN pg_roles g ON g.oid = a.roleid WHERE m.rolname = 'postgres' AND g.rolname = 'pg_read_all_data'"]).stdout.trim();
   ok(/Revoked 1 role membership a file had granted \(postgres in pg_read_all_data\)/.test(cleaned.out) && membership === '0',
     '--clean revokes the role memberships granted after the container was first set up', `${cleaned.out} [${membership}]`);
+
+  // Review 6: a file's server changes are read inside its own transaction, under a lock every migration
+  // transaction in the container takes, and are allowed only when the package's text makes them.
+  const idOf = (dir) => createHash('sha256').update(realpathSync.native(dir).toLowerCase()).digest('hex').slice(0, 8);
+  const forget = (dir) => {
+    for (const n of readdirSync(tmpdir()).filter((x) => x.startsWith(`adam-db-ticket-${idOf(dir)}-`) && x.endsWith('.json'))) rmSync(path.join(tmpdir(), n), { force: true });
+  };
+  // The other folder's file sleeps a second inside its transaction, so its runs overlap this folder's: with a
+  // lock that is not server-wide (an advisory lock is per database) it saw probe_stray appear and was blamed.
+  const twinFile = path.join(twin, 'db', 'tenant', 'V0005__subscription.sql');
+  const twinText = readFileSync(twinFile, 'utf8');
+  writeFileSync(twinFile, `${twinText}SELECT pg_sleep(1);\n`);
+  const verdicts = [];
+  for (let i = 0; i < 3; i++) {
+    docker(['exec', CONTAINER, 'psql', '-U', 'postgres', '-qc', 'DROP ROLE IF EXISTS probe_stray']);
+    forget(repo);
+    writeFileSync(ticketFile, `${good}DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'probe_stray') THEN CREATE ROLE probe_stray LOGIN; END IF; END $$;\n`);
+    const [stray, other] = await Promise.all([runAsync(repo, '9005'), runAsync(twin, '9005')]);
+    verdicts.push(`${stray.code}:${/this file changed server roles \(added probe_stray \(login\)\)/.test(stray.out)}:${other.code}${other.code === 0 ? '' : ` [twin: ${other.out.trim()}]`}`);
+  }
+  writeFileSync(twinFile, twinText);
+  const strayKept = docker(['exec', CONTAINER, 'psql', '-U', 'postgres', '-Atc', "SELECT shobj_description((SELECT oid FROM pg_database WHERE datname = 'postgres'), 'pg_database')"]).stdout;
+  ok(verdicts.every((v) => v === '1:true:0') && !/probe_stray/.test(strayKept),
+    '**a role the package does not make, inside a DO block: DIFFERENT on every run, with no kept snapshot and another folder running at the same time; never kept by --clean**',
+    `${verdicts.join(' | ')} ${strayKept}`);
+  docker(['exec', CONTAINER, 'psql', '-U', 'postgres', '-qc', 'DROP ROLE IF EXISTS probe_stray']);
+  writeFileSync(ticketFile, good);
+
+  // A role an earlier file makes (as r8's apply_parent_across_rls does) is in two folders' templates: --clean in
+  // one keeps it, so the other's unchanged ticket still matches.
+  const roleFolder = (name) => {
+    const dir = path.join(SCRATCH, name);
+    mkdirSync(path.join(dir, 'db', 'tenant'), { recursive: true });
+    mkdirSync(path.join(dir, '.adam', 'work', '88'), { recursive: true });
+    writeFileSync(path.join(dir, 'db', 'tenant', 'V0001__base.sql'), 'CREATE SCHEMA IF NOT EXISTS platform;\n'
+      + 'CREATE TABLE IF NOT EXISTS platform.schema_version (version text PRIMARY KEY, description text, checksum text, execution_ms int);\n'
+      + "CREATE SCHEMA IF NOT EXISTS a;\nCREATE OR REPLACE FUNCTION platform.visible_ids() RETURNS int LANGUAGE sql AS 'SELECT 1';\n");
+    writeFileSync(path.join(dir, 'db', 'tenant', 'V0002__fnb.sql'),
+      "DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'probe_pkg_visible') THEN CREATE ROLE probe_pkg_visible NOLOGIN; END IF; END $$;\n"
+      + 'GRANT EXECUTE ON FUNCTION platform.visible_ids() TO probe_pkg_visible;\nALTER FUNCTION platform.visible_ids() OWNER TO probe_pkg_visible;\n');
+    writeFileSync(path.join(dir, 'db', 'tenant', 'V0003__t.sql'), 'CREATE TABLE IF NOT EXISTS a.t (id int);\n');
+    writeFileSync(path.join(dir, '.adam', 'work', '88', 'expected-schema.json'), JSON.stringify({ checks: [{ database: 'tenant', migration: 'V0003__t.sql',
+      tables: { 'a.t': {} }, statements: [{ file: '010-a.sql', sql: 'CREATE TABLE IF NOT EXISTS a.t (id int)' }] }] }));
+    return dir;
+  };
+  const cA = roleFolder('roles-a');
+  const cB = roleFolder('roles-b');
+  const b1 = runScript(cB, '88');
+  const a1 = runScript(cA, '88');
+  const aClean = runScript(cA, '--clean');
+  const b2 = runScript(cB, '88');
+  ok(b1.code === 0 && a1.code === 0 && aClean.code === 0 && !/probe_pkg_visible/.test(aClean.out) && b2.code === 0 && /MATCH: 1 table/.test(b2.out),
+    '**folder A --clean keeps the role folder B\'s template relies on: B\'s unchanged ticket still MATCH**', `${aClean.out}\n${b2.out}`);
+  runScript(cB, '--clean');
+  docker(['exec', CONTAINER, 'psql', '-U', 'postgres', '-qc', 'DROP ROLE IF EXISTS probe_pkg_visible']);
 
   // Another folder's databases, last used more than two weeks ago: kept while that folder holds its
   // lock (it may be building), dropped once it does not, with its kept snapshots.

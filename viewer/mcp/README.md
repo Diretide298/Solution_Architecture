@@ -153,7 +153,7 @@ workspace folder, and a re-run of setup replace ADAM's five command files there
 (`.claude/commands/ticket|board|cr|done|update-adam.md`, the old ones kept in `.adam/backup-workspace-*`), reading
 them from the viewer's `/connector/workspace?role=` (the same starters the zip carries) or, for setup, from the
 unzipped starters. `CLAUDE.md` is the team's: only the part between `<!-- ADAM:start name -->` and
-`<!-- ADAM:end name -->` is replaced; a `CLAUDE.md` made before the markers is left exactly as it is, with one
+`<!-- ADAM:end name -->` is replaced; a section of a `CLAUDE.md` made before the markers is left exactly as it is, with one
 line saying which section to replace and the new text in `.adam/new-claude-sections.md`. Missing files are not
 created here (setup adds them and keeps them out of git). Two exceptions, for the backend's [DB] check (20 October
 2026): ADAM's script `.claude/scripts/db-ticket.mjs` is added or refreshed (kept out of git through

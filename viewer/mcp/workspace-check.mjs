@@ -232,8 +232,8 @@ try {
   check('a second refresh changes nothing', changed(dbSettled, tree(noDb)).length === 0, changed(dbSettled, tree(noDb)).join(', '));
   writeFileSync(path.join(noDb, ...SCRIPT), `${starter('backend', ...SCRIPT)}\n// an older build\n`);
   const k2 = updater(noDb, ['--refresh-workspace', noDb, '--from', STARTERS]);
-  check('an older ADAM script is replaced, the old one kept in .adam', read(noDb, ...SCRIPT) === starter('backend', ...SCRIPT)
-    && /refreshed \.claude\/scripts\/db-ticket\.mjs/.test(k2.text)
+  check('an older ADAM script is replaced, the old one kept in .adam, and the line says where', read(noDb, ...SCRIPT) === starter('backend', ...SCRIPT)
+    && /refreshed \.claude\/scripts\/db-ticket\.mjs \(the old one is in [^)]*backup-workspace-/.test(k2.text)
     && Object.keys(tree(noDb)).some((n) => /^\.adam[\\/]backup-workspace-.*db-ticket\.mjs$/.test(n)), k2.text);
   writeFileSync(path.join(noDb, ...SCRIPT), 'console.log("the team\'s own");\n');
   updater(noDb, ['--refresh-workspace', noDb, '--from', STARTERS]);
@@ -241,10 +241,13 @@ try {
   const bareDb = oldWorkspace('be-bare-db', 'backend', { markers: false });
   writeFileSync(path.join(bareDb, 'CLAUDE.md'), read(bareDb, 'CLAUDE.md').replace(/## A \[DB\] ticket[\s\S]*?(?=## Searching pulled files)/, ''));
   const bareBefore = read(bareDb, 'CLAUDE.md');
-  updater(bareDb, ['--refresh-workspace', bareDb, '--from', STARTERS]);
+  const bareRun = updater(bareDb, ['--refresh-workspace', bareDb, '--from', STARTERS]);
   const bareAfter = read(bareDb, 'CLAUDE.md');
   check('**a backend CLAUDE.md from before the markers gets "A [DB] ticket" added at its end, every line of it unchanged**',
     bareAfter.startsWith(bareBefore) && bareAfter.endsWith(`<!-- ADAM:start db-ticket -->\n${dbInner}<!-- ADAM:end db-ticket -->\n`), bareAfter.slice(-200));
+  check('and one line on what has no markers: that section was left as it is, not the whole file',
+    /CLAUDE\.md's "Working a ticket \(ADAM\)" section has no ADAM markers, so it was left as it is/.test(bareRun.text)
+      && !/left exactly as it is/.test(bareRun.text) && /"A \[DB\] ticket" refreshed between its ADAM markers/.test(bareRun.text), bareRun.text);
 
   // ── 6. a folder that is not an ADAM workspace is not written to ────
   const empty = path.join(T, 'empty');

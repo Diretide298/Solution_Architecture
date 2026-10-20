@@ -390,7 +390,7 @@ async function hooksOnly() {
 //
 //   **CLAUDE.md is the team's.** Only a section between ADAM's markers (`<!-- ADAM:start name -->` ...
 //   `<!-- ADAM:end name -->`, in the starters) is replaced, and the text around it is never touched. A CLAUDE.md
-//   that has ADAM's section but no markers (made before them) is left exactly as it is: one line says which
+//   that has ADAM's section but no markers (made before them) keeps that section as it is: one line says which
 //   section to replace, and the new text is written to `.adam/new-claude-sections.md` to copy from.
 //   A section that is new (`add`: "A [DB] ticket") and nowhere in the file yet, marked or not, is added whole with
 //   its markers - after the "Working a ticket (ADAM)" section's end marker when there is one, else at the end -
@@ -559,7 +559,8 @@ async function refreshWorkspace(folder, source, quiet) {
     await mkdir(path.dirname(target), { recursive: true });
     await writeFile(target, text, 'utf8');
     if (have === null) await excludeInGit(folder, `/.claude/scripts/${name}`);
-    scriptsDone.push(`${have === null ? 'added' : 'refreshed'} .claude/scripts/${name}`);
+    scriptsDone.push(have === null ? `added .claude/scripts/${name}`
+      : `refreshed .claude/scripts/${name} (the old one is in ${kept})`);
     changed.push(name);
   }
   if (scriptsDone.length) say(`workspace: ${scriptsDone.join(', ')} in ${folder}.`);
@@ -616,8 +617,12 @@ async function refreshWorkspace(folder, source, quiet) {
       + 'heading here. Keep the ADAM:start and ADAM:end comment lines around it: with them, /update-adam refreshes '
       + 'the section for you from then on.\n\n'
       + unmarked.map((n) => `<!-- section: ${SECTIONS[n].title} -->\n${sections[n]}`).join('\n'), 'utf8');
-    say('workspace: CLAUDE.md has no ADAM markers, so it was left exactly as it is. Replace its '
-      + `${unmarked.map((n) => `"${SECTIONS[n].title}"`).join(' and ')} with the new text in ${fresh}.`);
+    // One wording whether or not another section was added on the same run: it names only what has no markers.
+    const titles = unmarked.map((n) => `"${SECTIONS[n].title}"`).join(' and ');
+    const one = unmarked.length === 1;
+    say(`workspace: CLAUDE.md's ${titles} ${one ? 'section has' : 'sections have'} no ADAM markers, so `
+      + `${one ? 'it was' : 'they were'} left as ${one ? 'it is' : 'they are'}. Replace ${one ? 'it' : 'them'} with the `
+      + `new text in ${fresh}.`);
   }
   if (!changed.length && !unmarked.length && !quiet) {
     say(`workspace: already current - nothing to refresh in ${folder}.`);

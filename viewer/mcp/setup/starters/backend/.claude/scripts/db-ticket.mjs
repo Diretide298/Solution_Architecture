@@ -61,7 +61,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const VERSION = 4; // a template or a kept snapshot from another version is not reused
+const VERSION = 5; // a template or a kept snapshot from another version is not reused
 const IMAGE = 'pgvector/pgvector:pg16';
 const UNUSED_DAYS = 14; // another folder's databases unused this long are dropped
 
@@ -447,8 +447,8 @@ const CLUSTER_SQL = `(SELECT json_build_object(
 
 /**
  * What changed on the server between two CLUSTER_SQL answers, item by item: { key: { added, removed } }.
- * The package's own statements may change it too (r8's platform.visible_parent_ids_setup makes the
- * role ticvai_parent_visible); a ticket's file may then make the same change and nothing else.
+ * Both answers are taken inside the file's own transaction, which holds the server-wide migration lock,
+ * so nothing but the file can have changed the server in between.
  */
 export function serverChanges(before, after) {
   const out = {};
@@ -462,18 +462,75 @@ export function serverChanges(before, after) {
   return out;
 }
 
-/** The server changes a ticket's file made that the package's own statements do not make. */
-export function serverDiffs(mine, packages = {}) {
+/**
+ * The server changes a ticket's file made that the package's own text does not make. `allowed` is the
+ * check's `server` in expected-schema.json, read by adam_pull from the package's files: the roles they
+ * create (with their attributes), the memberships they grant ("* in r" for one granted to whoever runs it)
+ * and the role settings they set. Nothing is ever allowed to go.
+ */
+export function serverDiffs(mine, allowed = {}) {
+  const ok = (key, x) => (allowed[key] ?? []).some((a) => a === x
+    || (a.startsWith('* in ') && x.endsWith(` in ${a.slice(5)}`)));
   const out = [];
   for (const [key, { added, removed }] of Object.entries(mine)) {
-    const a = added.filter((x) => !(packages[key]?.added ?? []).includes(x));
-    const r = removed.filter((x) => !(packages[key]?.removed ?? []).includes(x));
-    if (!a.length && !r.length) continue;
-    out.push(`this file changed ${key} (${[a.length ? `added ${a.join(', ')}` : '', r.length ? `removed ${r.join(', ')}` : ''].filter(Boolean).join('; ')})`
-      + "; that is the server's, shared by every database here, and stays: run --clean afterwards");
+    const a = added.filter((x) => !ok(key, x));
+    if (!a.length && !removed.length) continue;
+    out.push(`this file changed ${key} (${[a.length ? `added ${a.join(', ')}` : '', removed.length ? `removed ${removed.join(', ')}` : ''].filter(Boolean).join('; ')})`
+      + "; the package's files make no such change. That is the server's, shared by every database here, and stays: run --clean afterwards");
   }
   return out;
 }
+
+/**
+ * The server changes SQL texts make, read from the text (function bodies included), as CLUSTER_SQL prints each
+ * item: the roles created with their attributes, the memberships granted ("* in r" when granted to whoever runs
+ * it) and the role settings. The same reading adam_pull does on the package's files (tools.mjs serverAllowances),
+ * applied here to the check's own package statements too.
+ */
+export function allowancesIn(texts) {
+  const roles = new Map();
+  const memberships = new Set();
+  const settings = new Set();
+  const ATTRS = [['SUPERUSER', 'superuser'], ['BYPASSRLS', 'bypassrls'], ['CREATEROLE', 'createrole'],
+    ['CREATEDB', 'createdb'], ['REPLICATION', 'replication'], ['LOGIN', 'login']];
+  const item = (name, opts, login) => name + ATTRS
+    .filter(([word]) => new RegExp(`(^|\\s)${word}\\b`, 'i').test(opts) || (word === 'LOGIN' && login && !/\bNOLOGIN\b/i.test(opts)))
+    .map(([, label]) => ` (${label})`).join('');
+  for (const text of texts) {
+    const s = String(text).replace(/--[^\n]*/g, ' ');
+    for (const m of s.matchAll(/\bCREATE\s+(ROLE|USER)\s+(?:IF\s+NOT\s+EXISTS\s+)?("?[\w$]+"?)([^;']*)/gi)) {
+      const name = m[2].replace(/"/g, '');
+      roles.set(name, item(name, ` ${m[3]}`, m[1].toUpperCase() === 'USER'));
+    }
+    for (const m of s.matchAll(/\bGRANT\s+("?[\w$]+"?)\s+TO\s+("?[\w$%]+"?)/gi)) {
+      const role = m[1].replace(/"/g, '');
+      if (/^(ALL|SELECT|INSERT|UPDATE|DELETE|USAGE|EXECUTE|CREATE|CONNECT|TEMP|TEMPORARY|TRUNCATE|REFERENCES|TRIGGER|SET|MAINTAIN)$/i.test(role)) continue;
+      memberships.add(`${/%/.test(m[2]) ? '*' : m[2].replace(/"/g, '')} in ${role}`);
+    }
+    for (const m of s.matchAll(/\bALTER\s+ROLE\s+("?[\w$]+"?)\s+(?:IN\s+DATABASE\s+\S+\s+)?SET\s+([\w.]+)\s*(?:=|TO)\s*([^;']*)/gi)) {
+      settings.add(`${m[1].replace(/"/g, '')}: ${m[2]}=${m[3].trim()}`);
+    }
+  }
+  return { 'server roles': [...roles.values()], 'server role memberships': [...memberships], 'server role settings': [...settings] };
+}
+
+const mergeAllowances = (...all) => Object.fromEntries(['server roles', 'server role memberships', 'server role settings']
+  .map((k) => [k, [...new Set(all.flatMap((a) => a?.[k] ?? []))]]));
+
+/** The roles a SQL text creates, by name (function bodies included): an earlier migration's roles, for --clean. */
+export function rolesCreatedIn(text) {
+  return [...String(text).replace(/--[^\n]*/g, ' ').matchAll(/\bCREATE\s+(?:ROLE|USER)\s+(?:IF\s+NOT\s+EXISTS\s+)?"?([\w$]+)"?/gi)].map((m) => m[1]);
+}
+
+/**
+ * One lock for every migration transaction in the container: they run one at a time, whichever folder and
+ * database runs them. It is on the server's own role tables, which every database shares (an advisory lock is
+ * per database, so two folders' copies would not wait for each other). SHARE ROW EXCLUSIVE conflicts with
+ * itself and with what CREATE ROLE, ALTER ROLE, GRANT role and ALTER ROLE ... SET take, so while a file runs
+ * no other session can change a role either; reading them (the snapshot, logging in) is not held up.
+ */
+const MIGRATION_LOCK = 'LOCK TABLE pg_catalog.pg_authid, pg_catalog.pg_auth_members, pg_catalog.pg_db_role_setting '
+  + 'IN SHARE ROW EXCLUSIVE MODE;\n';
 /** Role memberships as "member>role", for --clean to compare with those the container started with. */
 const MEMBERS_SQL = `coalesce((SELECT json_agg(m.rolname || '>' || g.rolname ORDER BY 1) FROM pg_auth_members a
   JOIN pg_roles m ON m.oid = a.member JOIN pg_roles g ON g.oid = a.roleid WHERE m.rolname !~ '^pg_')::text, '[]')`;
@@ -605,12 +662,15 @@ function statementsOf(file) {
  * SQL that runs one file's statements, as it is or recorded the way SqlMigrationRunner records it.
  * AT lines say which statement was running when one fails.
  */
-function fileSql(file, folder, { record, label: which }) {
+function fileSql(file, folder, { record, label: which, server = null }) {
   const text = readSql(file);
   const name = path.basename(file);
   const statements = statementsOf(file);
-  let out = 'BEGIN;\n';
+  // The server-wide lock first: no other migration transaction, of this folder or another, runs while this one
+  // does, so `server` (the roles and settings before and after) shows exactly what this file changed.
+  let out = `BEGIN;\n${MIGRATION_LOCK}${server ? tag(`${server}0`, CLUSTER_SQL) : ''}`;
   statements.forEach((s, i) => { out += tag('AT', quote(`${which}|${name}|${i + 1}|${s.line}`)) + execute(s.sql); });
+  if (server) out += tag(`${server}1`, CLUSTER_SQL);
   if (record) {
     out += `INSERT INTO platform.schema_version (version, description, checksum, execution_ms) VALUES (${quote(name)}, `
       + `${quote(`applied from ${folder}`)}, ${quote(checksum(text))}, 0);\n`;
@@ -794,17 +854,24 @@ async function tidy(id, { unusedDays = UNUSED_DAYS } = {}) {
   return dropped;
 }
 
-/** Adds the roles and memberships the package's own statements made to those --clean keeps. */
-async function notePackageRoles(server) {
-  const roles = (server['server roles']?.added ?? []).map((r) => r.replace(/ \(.*$/, ''));
-  const members = (server['server role memberships']?.added ?? []).map((m) => m.replace(' in ', '>'));
-  if (CONTAINER !== DEFAULT_CONTAINER || (!roles.length && !members.length)) return;
-  const r = session('postgres', tag('SETUP', "coalesce(shobj_description((SELECT oid FROM pg_database WHERE datname = 'postgres'), 'pg_database'), '')"));
-  let marker = {};
-  try { marker = JSON.parse(r.last('SETUP') || '{}'); } catch { marker = {}; }
-  marker.adamRoles = [...new Set([...(marker.adamRoles ?? []), ...roles])];
-  marker.adamMembers = [...new Set([...(marker.adamMembers ?? []), ...members])];
-  session('postgres', `COMMENT ON DATABASE postgres IS ${quote(JSON.stringify(marker))};\n`);
+/**
+ * Adds to those --clean keeps the roles and memberships named in text, never seen on the server: the package's
+ * (the check's `server`, read by adam_pull from its files) and the roles the folder's earlier migrations create.
+ * Noted by every run, so --clean in one folder keeps a role another folder's template relies on.
+ */
+async function notePackageRoles(roles, memberships) {
+  if (CONTAINER !== DEFAULT_CONTAINER || (!roles.length && !memberships.length)) return;
+  await withLock('container', async () => {
+    const r = session('postgres', tag('SETUP', "coalesce(shobj_description((SELECT oid FROM pg_database WHERE datname = 'postgres'), 'pg_database'), '')"));
+    let marker = {};
+    try { marker = JSON.parse(r.last('SETUP') || '{}'); } catch { marker = {}; }
+    const roleSet = [...new Set([...(marker.adamRoles ?? []), ...roles])];
+    const memberSet = [...new Set([...(marker.adamMembers ?? []), ...memberships.map((m) => m.replace(' in ', '>'))])];
+    if (roleSet.length === (marker.adamRoles ?? []).length && memberSet.length === (marker.adamMembers ?? []).length) return;
+    marker.adamRoles = roleSet;
+    marker.adamMembers = memberSet;
+    session('postgres', `COMMENT ON DATABASE postgres IS ${quote(JSON.stringify(marker))};\n`);
+  });
 }
 
 /** Kept snapshots older than a week go, any folder's; with `all`, every one of this folder's. */
@@ -860,6 +927,14 @@ async function checkOne(root, id, key, check, args, out, image) {
   const refused = dataDiffs(mine, owned, name).filter((d) => /may not be in a ticket's file/.test(d));
   if (refused.length) return { diffs: refused, gaps: [], empty: false, owned, data: [] };
 
+  // The roles this folder's migrations rely on, from text: the package's (from its files) and those the earlier
+  // files create. --clean in any folder keeps them.
+  const allowed = mergeAllowances(check.server, allowancesIn(statements.map((s) => s.sql)));
+  await notePackageRoles([
+    ...(allowed['server roles'] ?? []).map((r) => r.replace(/ \(.*$/, '')),
+    ...earlier.flatMap((f) => rolesCreatedIn(readSql(path.join(path.dirname(file), f)))),
+  ], allowed['server role memberships'] ?? []);
+
   const base = await ensureBase(names, path.dirname(file), earlier, folder, image);
   out(`- previous state: ${plural(earlier.length, 'earlier file')} (template ${base.action}`
     + `${base.applied ? `, ${base.applied} applied in ${secs(base.ms)}` : ''})`
@@ -879,10 +954,11 @@ async function checkOne(root, id, key, check, args, out, image) {
   // The ticket's file on one copy: snapshot, apply (recorded), snapshot, apply again (not recorded),
   // snapshot. The package's statements on the other copy, at the same time.
   const time = tag('T', 'extract(epoch FROM clock_timestamp())');
-  const aSql = tag('C0', CLUSTER_SQL) + (cached ? '' : snap('SNAP0')) + time
-    + fileSql(file, folder, { record: true, label: 'first run' }) + time + snap('SNAP1')
-    + fileSql(file, folder, { record: false, label: 'second run' }) + snap('SNAP2') + tag('C2', CLUSTER_SQL);
-  let b = `${tag('CB0', CLUSTER_SQL)}SET check_function_bodies = off;\nBEGIN;\n`;
+  const aSql = (cached ? '' : snap('SNAP0')) + time
+    + fileSql(file, folder, { record: true, label: 'first run', server: 'S' }) + time + snap('SNAP1')
+    + fileSql(file, folder, { record: false, label: 'second run', server: 'R' }) + snap('SNAP2');
+  // The package's statements hold the same server-wide lock, so its role-making and the file's never overlap.
+  let b = `SET check_function_bodies = off;\nBEGIN;\n${MIGRATION_LOCK}`;
   statements.forEach((s, i) => {
     b += tag('AT', quote(`the package's statements|${s.file}|${i + 1}|-`));
     if (s.guard) {
@@ -894,7 +970,7 @@ async function checkOne(root, id, key, check, args, out, image) {
       b += execute(s.sql);
     }
   });
-  b += `COMMIT;\n${snap('SNAPB')}${tag('CB2', CLUSTER_SQL)}`;
+  b += `COMMIT;\n${snap('SNAPB')}`;
   const [a, e] = await Promise.all([sessionAsync(names.ticket, aSql), cached ? null : sessionAsync(names.expect, b)]);
   if (!a.ok) return { failed: failure(a) };
   const [t0, t1] = (a.tags.T ?? []).map(Number);
@@ -911,21 +987,22 @@ async function checkOne(root, id, key, check, args, out, image) {
         + `with. That is a change request against the package (CLAUDE.md, "When the package is wrong"):\n${failure(e)}`,
     };
   }
-  const known = cached ?? {
-    before: JSON.parse(a.last('SNAP0')), expected: JSON.parse(e.last('SNAPB')), deferred: e.tags.DEFER ?? [],
-    server: serverChanges(JSON.parse(e.last('CB0')), JSON.parse(e.last('CB2'))),
-  };
+  const known = cached ?? { before: JSON.parse(a.last('SNAP0')), expected: JSON.parse(e.last('SNAPB')), deferred: e.tags.DEFER ?? [] };
   if (!cached) {
     try { writeFileSync(cacheFile, JSON.stringify(known)); } catch { /* the next run works it out again */ }
-    // A role the package's own statements make is part of the container from now on: --clean keeps it.
-    await notePackageRoles(known.server);
   }
   const { deferred } = known;
   out(`- the package's statements: ${statements.length} applied to a second copy${cached ? ' (kept from an earlier run)' : ''}`
     + `${deferred.length ? `; ${plural(deferred.length, 'foreign key')} left for a later migration (the table is not created yet)` : ''}`);
   for (const d of deferred) out(`  - ${d}`);
 
-  const server = serverDiffs(serverChanges(JSON.parse(a.last('C0')), JSON.parse(a.last('C2'))), known.server ?? {});
+  // The file's own server changes, each run read inside its own transaction: the first may make only what the
+  // package's files make; the second must make none at all.
+  const server = [
+    ...serverDiffs(serverChanges(JSON.parse(a.last('S0')), JSON.parse(a.last('S1'))), allowed),
+    ...Object.entries(serverChanges(JSON.parse(a.last('R0')), JSON.parse(a.last('R1')))).map(([key, { added, removed }]) =>
+      `the second run changed ${key} (${[added.length ? `added ${added.join(', ')}` : '', removed.length ? `removed ${removed.join(', ')}` : ''].filter(Boolean).join('; ')})`),
+  ];
   const diffs = [...dataDiffs(mine, owned, name), ...server, ...again, ...diffSnapshots({ before: known.before, after, expected: known.expected, owned })];
   const gaps = [...(check.notInPackageDdl ?? []), ...(check.keysNotInPackageDdl ?? [])];
   return { diffs, gaps, empty: !statements.length, owned, data: backfills({ after, expected: known.expected, owned }) };
@@ -1052,7 +1129,7 @@ async function clean(id) {
     // Memberships granted since the container was first seen, between roles that stay.
     const q = (n) => `"${String(n).replace(/"/g, '""')}"`;
     const members = marker.adamMembers ? JSON.parse(s.last('MEMBERS') || '[]')
-      .filter((p) => !marker.adamMembers.includes(p)).map((p) => p.split('>'))
+      .filter((p) => !marker.adamMembers.includes(p) && !marker.adamMembers.includes(`*>${p.split('>')[1]}`)).map((p) => p.split('>'))
       .filter(([member]) => !extra.includes(member)) : [];
     if (members.length) must(session('postgres', members.map(([member, role]) => `REVOKE ${q(role)} FROM ${q(member)};\n`).join('')));
     if (members.length) console.log(`Revoked ${plural(members.length, 'role membership')} a file had granted (${members.map(([m, g]) => `${m} in ${g}`).join(', ')}).`);
