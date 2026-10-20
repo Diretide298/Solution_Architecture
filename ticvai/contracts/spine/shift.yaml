@@ -1218,8 +1218,8 @@ paths:
           description: >
             Shift is not closed (problem type `shift-not-closed`), the fiscal period has closed
             over it (`fiscal-period-closed`), or another shift is now open or suspended on the same
-            workstation (`shift-already-open`: the check `openShift` makes, under the same lock, so
-            two shifts are never open on one till)
+            till (`shift-already-open`: the check `openShift` makes on the shift rows, under the same lock,
+            so two shifts are never open on one till)
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
@@ -2298,7 +2298,7 @@ components:
         openingFloat: { $ref: '#/components/schemas/DepositBox/properties/openingFloat' }
         openingDenominations: { $ref: '#/components/schemas/DepositBox/properties/openingDenominations' }
         withdrawnTotal: { $ref: '#/components/schemas/DepositBox/properties/withdrawnTotal' }
-        overDrawerLimit: { $ref: '#/components/schemas/DepositBox/properties/overDrawerLimit' }
+        overDrawerLimit: { $ref: '#/components/schemas/DepositBox/properties/overDrawerLimit', readOnly: true }  # computed on read, never sent (CHG-R8INT-015)
         foreignHoldings: { $ref: '#/components/schemas/DepositBox/properties/foreignHoldings' }
         expectedTotal: { $ref: '#/components/schemas/DepositBox/properties/expectedTotal' }
         countedTotal: { $ref: '#/components/schemas/DepositBox/properties/countedTotal' }

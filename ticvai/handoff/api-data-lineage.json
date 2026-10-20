@@ -21577,12 +21577,6 @@
     "route": "in-process",
     "for": "its read of inventory.stock_earmark, Inventory's data (CHG-MOD-001)"
    }
-  ],
-  "writeVia": [
-   {
-    "table": "inventory.stock_earmark",
-    "operation": "createStockReservation"
-   }
   ]
  },
  "listAssets": {
@@ -42133,6 +42127,7 @@
    "whitelabel.publish_review_policy"
   ],
   "writes": [
+   "approvals.request",
    "cache:idempotency",
    "cache:resolution",
    "whitelabel.content_block"
@@ -42155,6 +42150,7 @@
    "store": "cache:resolution",
    "role": "evicts",
    "resolvers": [
+    "approvals.request",
     "tenant-config"
    ],
    "key": "res:{tenantId}:{resolver}:{scopePath}",

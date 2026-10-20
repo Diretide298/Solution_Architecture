@@ -11283,9 +11283,10 @@
     "whitelabel.publish_review_policy"
    ],
    "writes": [
+    "approvals.request",
     "cache:resolution"
    ],
-   "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001); r8 cause IDENTITY-C67 (CHG-R8GEN-009): the review path reads the tenant's publish review policy, as publishTenantConfig does after CR-154",
+   "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001); r8 cause IDENTITY-C67 (CHG-R8GEN-009): the review path reads the tenant's publish review policy, as publishTenantConfig does after CR-154; the review path's approval request, written through createApprovalRequest (x-ticvai-write-via, a cross-deployable route; r8 integration, CHG-R8INT-015)",
    "carried": true
   },
   "publishForecastVersion": {

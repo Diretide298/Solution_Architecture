@@ -11107,7 +11107,7 @@ components:
       description: '`visitPlanner` (decided 29 September, MOB-1 and the Plan tab in Block A) is the Plan tab
         and WEB-050; off, the tab and the page are not shown. **`x-ticvai-licence-module` maps each feature to the
         licence module (`ModuleKey` in common.yaml) that licenses it**, proposed from the screens'' `requiresModule`
-        and for the product owner to confirm; `core` is always licensed.'
+        and for the client to confirm; `core` is always licensed.'
     KioskAssignment:
       x-ticvai-persistence: whitelabel.kiosk_assignment
       type: object

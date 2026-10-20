@@ -1,0 +1,44 @@
+id: CHG-R8INT-015
+date: '2026-10-20'
+source: audit
+kind: contract
+summary: 'The last of the refresh rehearsal''s contract findings this pass can close: three 4xx texts no longer read
+  as another module''s entity (suspendTenant and reactivateTenant say "which refusal comes first", reopenShift says
+  "the same till", the two ModuleKey notes say "the client confirms"); allocateDepositBox''s request copy of
+  overDrawerLimit is read-only, as the computed field it points at; reserveMerchandise calls createStockReservation in
+  process (Retail and Inventory share the operations deployable, so it is not a cross-deployable route), and
+  publishContentBlock''s lineage writes the approval request its route names.'
+decision:
+  what: 'contracts/satellite/subscription.yaml (two 409 texts), contracts/spine/shift.yaml (reopenShift 409 text,
+    AllocateDepositBoxRequest.overDrawerLimit readOnly), contracts/shared/common.yaml and
+    contracts/satellite/white-label.yaml (ModuleKey notes), contracts/satellite/retail.yaml (reserveMerchandise
+    x-ticvai-calls instead of x-ticvai-write-via), handoff/api-data-lineage-overrides.json (publishContentBlock writes
+    approvals.request), handoff/api-data-lineage.json re-derived, handoff/cross-deployable-writes.md rewritten by
+    check-cross-deployable-writes --write.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'The coordinator''s addendum to the r8 integration brief (20 October 2026): check-error-sources E-READ-VIA and
+  E-SCHEMA-READ-VIA read "order", "workstation" and "product" in those texts as Orders'', Tenancy''s and Catalogue''s
+  entities; check-stored-request-fields read overDrawerLimit as stored (the $ref points into DepositBox''s properties,
+  so its readOnly was not seen); check-cross-deployable-writes X-STALE: a route for a write inside one deployable,
+  and a route whose table the lineage did not write. Finding: refresh rehearsal of 20 October 2026.'
+keys_touched:
+  operations: [suspendTenant, reactivateTenant, reopenShift, allocateDepositBox, reserveMerchandise,
+    publishContentBlock, setModuleEnablement]
+  schemas: [ModuleKey, AllocateDepositBoxRequest]
+  files:
+  - contracts/satellite/retail.yaml
+  - handoff/api-data-lineage-overrides.json
+  - handoff/cross-deployable-writes.md
+root_class: 'a gate finding the refresh rehearsal found on the integration branch'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: r8 integration pass'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-cross-deployable-writes.py
+status: open

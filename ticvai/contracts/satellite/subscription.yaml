@@ -1496,7 +1496,7 @@ paths:
             round 3): the 409 approvals'' `createApprovalRequest` declares for an open request on the same subject,
             answered as it gives it (`refusedReason` `openRequestExists`, `requestId` the open request,
             `currentStatus` its status), so nothing is raised and the caller can point at the open request. This is
-            not the retired `approval-required`. **The order** (review 3 N-3): the tenant''s own state refusals answer
+            not the retired `approval-required`. **Which refusal comes first** (review 3 N-3): the tenant''s own state refusals answer
             first; `open-request-exists` comes only when the tenant''s state would allow a suspension, that is for an
             `active` tenant (with or without a suspension already granted and pending) about which a suspension or a
             reactivation request is still open.'
@@ -1599,7 +1599,7 @@ paths:
             `createApprovalRequest` declares for an open request on the same subject, answered as it gives it
             (`refusedReason` `openRequestExists`, `requestId` the open request, `currentStatus` its status), so
             nothing is raised and the caller can point at the open request. This is not the retired
-            `approval-required`. **The order** (review 3 N-3): the tenant''s own state refusals answer first;
+            `approval-required`. **Which refusal comes first** (review 3 N-3): the tenant''s own state refusals answer first;
             `open-request-exists` comes only when the tenant''s state would allow a reactivation (`suspended`,
             `terminating`, or `active` with a pending suspension) and a request about this tenant is still open, for
             example a second reactivation, or a reactivation of a tenant with a pending suspension while a further

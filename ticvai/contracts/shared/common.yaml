@@ -417,7 +417,7 @@ components:
 
         **The white-label app feature list (`white-label.ModuleKey`) is a different, finer vocabulary, and this is
         the map between them** (R8 blocker fix, IDENTITY-C31; **proposed from the screens'' `requiresModule`, the
-        product owner confirms**). A feature is licensed when the licence module on its row is licensed, and
+        client confirms**). A feature is licensed when the licence module on its row is licensed, and
         `getModuleEnablement` / `setModuleEnablement` use this for `isLicensed` and for the "not licensed" refusal:
 
         | white-label feature | licence module here |
