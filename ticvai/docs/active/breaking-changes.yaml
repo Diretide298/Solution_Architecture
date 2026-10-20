@@ -1349,3 +1349,15 @@ changes:
     tag: r8
     producer-tickets: [SVC-MARKETING-LOYALTY-1, SVC-MARKETING-LOYALTY-2, SVC-MARKETING-LOYALTY-3]
     consumer-tickets: [AM-MARKETING-CRM-P01, AM-MARKETING-CRM-P02, AM-REPORTING-P08, AM-SETUP-CUSTOMER-MARKETING-P08, AM-SETUP-CUSTOMER-MARKETING-P08-REST, TEST-AM-MARKETING-CRM-P01, TEST-AM-SETUP-CUSTOMER-MARKETING-P08]
+  - id: BC-463
+    contract: wallet
+    operation: reverseWalletFunding
+    change: "gained enum value(s) ['expiry', 'extension', 'forfeiture']"
+    reason: 'r8 re-walk (CHG-R8RW-002, VM-WALLET-WALLET-1): expireCreditLots records each expire, forfeit or extend as
+      one wallet.adjustment row per wallet, and WalletAdjustment.kind (adjustment_kind_chk) allowed none of these acts,
+      so the walk fix promised a row the schema refused. The kind gains expiry, forfeiture and extension; a value added
+      to a response enum cannot be additive. reverseWalletFunding itself never writes them.'
+    approved-by: 'Chinmay, 20 October 2026: the r8 re-walk rulings (item 5, widen wallet.adjustment.kind, one row per wallet per act)'
+    tag: r8
+    producer-tickets: [AM-WALLET-CASHLESS-P08-2, VM-WALLET-WALLET-1]
+    consumer-tickets: [AM-WALLET-CASHLESS-P08-5]

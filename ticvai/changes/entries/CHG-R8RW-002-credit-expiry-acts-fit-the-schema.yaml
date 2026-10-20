@@ -1,0 +1,42 @@
+id: CHG-R8RW-002
+date: '2026-10-20'
+source: audit
+kind: contract
+proposed: '2026-10-20T23:20'
+summary: 'expireCreditLots records its acts in a way the schema allows: WalletAdjustment.kind gains expiry, forfeiture
+  and extension (adjustment_kind_chk widened in the forward migration), one wallet.adjustment row per wallet per act
+  (lotIds may span wallets; affectedLotIds names that wallet''s lots, amount the total taken off, zero for an
+  extension); an expiry or forfeiture takes the amount off wallet.balance through the one balance writer (SD-027)
+  with a wallet_transaction per lot. The operation now declares its tables (x-ticvai-reads/x-ticvai-writes:
+  wallet.balance written, wallet.wallet no longer), and its carried lineage override is removed.'
+decision:
+  what: 'contracts/satellite/wallet.yaml expireCreditLots description, x-ticvai-reads, x-ticvai-writes; WalletAdjustment.kind
+    enum and description; handoff/api-data-lineage-overrides.json drops the carried expireCreditLots entry;
+    docs/active/breaking-changes.yaml BC-463.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: the r8 re-walk of 20 October 2026, part 2 (audit/ticvai/r8-blockers/rewalk-part2.md, outside git),
+  VM-WALLET-WALLET-1 #28319, fix-text-contradicts-schema: CHG-R8WFC-003 said each act is one wallet.adjustment row,
+  but no adjustment kind fitted, adjustment.wallet_id holds one wallet while an act spans wallets, and the text took
+  the amount off the balance while the lineage wrote wallet.wallet and not wallet.balance.'
+keys_touched:
+  operations: [expireCreditLots, reverseWalletFunding]
+  files:
+  - contracts/satellite/wallet.yaml
+  - handoff/api-data-lineage-overrides.json
+  - docs/active/breaking-changes.yaml
+root_class: 'a walk fix whose own text promised what the schema cannot hold (CHG-R8WFC-003)'
+tickets:
+  started: []
+  unstarted:
+  - 28319
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: r8 re-walk, a release fix'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-contract-storage.py
+status: open
+notes: 'The next refresh writes the CHECK widening into the forward migration (DROP CONSTRAINT adjustment_kind_chk, ADD
+  ... NOT VALID, VALIDATE), proved on PostgreSQL 16 with every migration, fresh (rewalk-fix-report.md).'

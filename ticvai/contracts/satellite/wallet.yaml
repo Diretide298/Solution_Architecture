@@ -634,18 +634,42 @@ paths:
         recorded with a reason and an approver** rather than done by editing a date.
 
 
-        **How finance is told, and who the approver is** (r8 walk fix, CHG-R8WFC-003). In `mode` `apply`, an
-        `expire` or `forfeit` closes each lot, writes one `wallet.wallet_transaction` taking its remaining amount
-        off the balance, and emits `wallet.creditExpired` per lot to the outbox in the same transaction; the
-        ledger consumes it and posts the breakage on the accounts `wallet.accounting_mapping` names. Each act is
-        recorded as one `wallet.adjustment` row: `reason` is required for `extend` and `forfeit` in `apply`
-        (`400 validation` without it), and the approver is the caller, who holds `WALLET_OPERATE`
-        (`performed_by` and `approved_by` are both the caller''s principal; no second person is asked). A
-        `preview` writes and emits nothing.
+        **How finance is told, and who the approver is** (r8 walk fix, CHG-R8WFC-003; r8 re-walk, CHG-R8RW-002).
+        In `mode` `apply`, an `expire` or `forfeit` sets each lot''s `status` to `expired` or `forfeited` and its
+        `remainingAmount` to zero, takes that amount off the wallet''s `wallet.balance` row through the one
+        balance writer (SD-027: the row locked for one guarded statement) with one `wallet.wallet_transaction`
+        per lot, and emits `wallet.creditExpired` per lot to the outbox, all in the same transaction; the ledger
+        consumes it and posts the breakage on the accounts `wallet.accounting_mapping` names. An `extend` sets
+        each lot''s `expiresAt` to `extendToDate` and moves no money.
+
+        **Each act is recorded as one `wallet.adjustment` row per wallet** (`lotIds` may span wallets): `kind`
+        `expiry`, `forfeiture` or `extension`, `walletId` the wallet, `affectedLotIds` that wallet''s lots in
+        the act, `amount` the total taken off its balance (zero for an extension), `reason`, `at`. `reason` is
+        required for `extend` and `forfeit` in `apply` (`400 validation` without it), and the approver is the
+        caller, who holds `WALLET_OPERATE` (`performedBy` and `approvedBy` are both the caller''s principal; no
+        second person is asked). A `preview` writes and emits nothing.
 
         '
       x-ticvai-emits:
       - wallet.creditExpired
+      x-ticvai-reads:
+      - table: wallet.credit_lot
+        for: 'the lots asked for, or those past expiry at asOf (r8 re-walk, CHG-R8RW-002)'
+      - table: wallet.credit_type
+        for: 'each lot''s credit type, for its breakage treatment (r8 re-walk, CHG-R8RW-002)'
+      - table: wallet.accounting_mapping
+        for: 'the breakage accounts wallet.creditExpired carries to the ledger (r8 re-walk, CHG-R8RW-002)'
+      - table: wallet.balance
+        for: 'the wallet''s balance row, locked by the one balance writer (SD-027) (r8 re-walk, CHG-R8RW-002)'
+      x-ticvai-writes:
+      - table: wallet.credit_lot
+        for: 'status expired or forfeited and remaining amount zero, or expiresAt moved for an extension (r8 re-walk, CHG-R8RW-002)'
+      - table: wallet.balance
+        for: 'an expiry or forfeiture takes the lots'' remaining amount off the balance (SD-027) (r8 re-walk, CHG-R8RW-002)'
+      - table: wallet.wallet_transaction
+        for: 'one movement per lot an expiry or forfeiture closes (r8 re-walk, CHG-R8RW-002)'
+      - table: wallet.adjustment
+        for: 'one row per wallet per act, kind expiry, forfeiture or extension (r8 re-walk, CHG-R8RW-002)'
       tags:
       - wallet
       x-ticvai-permission: WALLET_OPERATE
@@ -5126,12 +5150,17 @@ components:
           format: uuid
         kind:
           type: string
+          description: '`expiry`, `forfeiture` and `extension` (r8 re-walk, CHG-R8RW-002) are `expireCreditLots`''
+            acts, one row per wallet per act; `affectedLotIds` names the lots, and an extension''s `amount` is zero.'
           enum:
           - reversal
           - chargeback
           - goodwill
           - correction
           - writeOff
+          - expiry
+          - forfeiture
+          - extension
         amount:
           x-ticvai-column: adjustment_amount
           $ref: ../shared/common.yaml#/components/schemas/Money
