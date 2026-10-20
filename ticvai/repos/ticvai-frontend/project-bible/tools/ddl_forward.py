@@ -427,6 +427,12 @@ class Model:
         naming it follow (index names do not change on a table rename; `ALTER INDEX ... RENAME` moves those)."""
         self.tables[new] = self.tables.pop(old)
         pat = re.compile(r"(?<![\w.])" + re.escape(old) + r"(?![\w])")
+        # **A move takes the table's indexes into its new schema** (CHG-R8WFM-001): PostgreSQL's SET SCHEMA moves them
+        # with it, and an index is keyed by its schema, so a moved table's index kept under the old schema read as one
+        # dropped beside one added.
+        new_sch = new.split(".", 1)[0]
+        old_sch = old.split(".", 1)[0]
+        on_old = re.compile(r" ON (?:ONLY )?" + re.escape(old) + r"\s*\(")
         stmts, order = {}, []
         for k, st in self.order:
             nk = k
@@ -434,6 +440,9 @@ class Model:
                 nk = (k[0], new) + k[2:]
             elif k[0] == "stmt":
                 nk = ("stmt", pat.sub(new, k[1]))
+            elif (k[0] == "index" and new_sch != old_sch and k[1].split(".", 1)[0] == old_sch
+                  and on_old.search(self.stmts[k])):
+                nk = ("index", new_sch + "." + k[1].split(".", 1)[1])
             stmts[nk] = pat.sub(new, self.stmts[k])
             order.append((nk, pat.sub(new, st)))
         self.stmts, self.order = stmts, order
@@ -508,6 +517,8 @@ class Model:
             s = norm(stmt)
             if re.match(r"INSERT INTO platform\.schema_version\b", s, re.I):
                 continue
+            if POLICY_RENAME.match(s):
+                continue   # a renamed table's policies take its name (CHG-R8WFM-001): the model keys no policy name
             g = None if RETIRE_GUARD.match(s) else GUARD.match(s)
             from_guard = bool(g)
             if g:
@@ -787,6 +798,281 @@ def move_sql(old: str, new: str) -> str:
         return f"ALTER TABLE {old} RENAME TO {nn}"
     sql = f"ALTER TABLE {old} SET SCHEMA {ns}"
     return sql + (f"; ALTER TABLE {ns}.{on} RENAME TO {nn}" if on != nn else "")
+
+
+# ---- declared renames, written (CHG-R8WFM-001) -----------------------------------------------------------------------
+# **A rename the package declares is written, not listed** (r8 sample walk, 20 October 2026: table-rename-not-in-
+# migrations, column-rename-not-in-migrations, spec-ahead-of-migrations; the lead's ruling in WALK-FIX-MIGRATIONS-BRIEF).
+# The contracts, ADAM's table summaries and the [DB] tickets had used catalogue.inventory_reservation, inventory.
+# inventory_item, sync.dsar_request and the rest since 12-14 October, while every database built from backend/ still had
+# catalogue.inventory_hold, inventory.item and platform.dsar_request: the "table renamed" rows of migration-review.md
+# waited for a person no ticket named. A declared rename has no data question (the rows stay, only the name moves), so
+# it is written as guarded blocks in an early names file, with the objects PostgreSQL does not rename for it: its
+# indexes, keys and checks named for the table or the column, its implicit primary key, and its row-level security
+# policies (`<table>_scope`, `<table>_read` ...). Each block does nothing when the old name is gone or the new one is
+# there, so the file applies twice and on a database whose migrations already used the new names. What the rename
+# leaves (a type change, a NOT NULL, a widened check) is the next forward migration's, which runs after it.
+
+POLICY_RENAME = re.compile(r"^DO \$\$ DECLARE p name; BEGIN IF to_regclass\('[^']+'\) IS NOT NULL THEN FOR p IN SELECT "
+                           r"polname FROM pg_policy\b", re.I)
+# The longest table name whose policies keep it whole: platform.rls_policy_name cuts at 57 (`_scope`), the split
+# helpers at 55 (`_read`, `_append`, `_update`, `_delete`).
+POLICY_BASE = 55
+
+
+def guard_rename_table(old: str, new: str) -> str:
+    """`ALTER TABLE old RENAME TO new` within a schema, when old is there and new is not."""
+    return (f"DO $$ BEGIN IF to_regclass('{old}') IS NOT NULL AND to_regclass('{new}') IS NULL THEN "
+            f"ALTER TABLE {old} RENAME TO {new.split('.', 1)[1]}; END IF; END $$")
+
+
+def guard_move_table(old: str, schema: str) -> str:
+    """`ALTER TABLE old SET SCHEMA schema`, when old is there and the moved name is not. Postgres moves its indexes,
+    keys, checks and policies with it, under the same names."""
+    return (f"DO $$ BEGIN IF to_regclass('{old}') IS NOT NULL AND to_regclass('{schema}.{old.split('.', 1)[1]}') IS NULL "
+            f"THEN ALTER TABLE {old} SET SCHEMA {schema}; END IF; END $$")
+
+
+def guard_rename_policies(t: str, old_rel: str, new_rel: str) -> str:
+    """Every policy on `t` named for `old_rel` takes `new_rel`'s name, as the generated helpers name it (`_scope` cut at
+    57, the others at 55). Run after the table rename, so `t` is the new name."""
+    n = len(old_rel) + 1
+    return (f"DO $$ DECLARE p name; BEGIN IF to_regclass('{t}') IS NOT NULL THEN FOR p IN SELECT polname FROM pg_policy "
+            f"WHERE polrelid = to_regclass('{t}') AND left(polname, {n}) = '{old_rel}_' LOOP EXECUTE format('ALTER "
+            f"POLICY %I ON {t} RENAME TO %I', p, CASE WHEN substr(p, {n}) = '_scope' THEN left('{new_rel}', 57) ELSE "
+            f"left('{new_rel}', 55) END || substr(p, {n})); END LOOP; END IF; END $$")
+
+
+def _pg_name(rel: str, label: str) -> str:
+    """The name PostgreSQL gives an implicit constraint (`<rel>_<label>`), cut to 63 bytes as makeObjectName does."""
+    return rel[:63 - len(label) - 1] + "_" + label
+
+
+def _sig(kind: str, st: str) -> str:
+    """A statement with its own object name blanked: two that differ only by name are the same object."""
+    if kind == "index":
+        return re.sub(r"^(CREATE (?:UNIQUE )?INDEX (?:CONCURRENTLY )?(?:IF NOT EXISTS )?)\S+( ON )", r"\1?\2", norm(st),
+                      count=1, flags=re.I)
+    if kind == "constraint":
+        return re.sub(r"(ADD CONSTRAINT )\S+ ", r"\1? ", norm(st), count=1, flags=re.I)
+    return re.sub(r"^CONSTRAINT \S+ ", "CONSTRAINT ? ", norm(st), count=1, flags=re.I)
+
+
+def _index_table(st: str) -> str:
+    m = re.match(rf"CREATE (?:UNIQUE )?INDEX (?:CONCURRENTLY )?(?:IF NOT EXISTS )?{NAME} ON (?:ONLY )?({QNAME})",
+                 norm(st), re.I)
+    return unq(m.group(1)) if m else ""
+
+
+def _pair(olds: dict, news: dict) -> list:
+    """[(old name, new name)] for the objects whose statements match but for the name: `olds`/`news` {name: sig}."""
+    out, used = [], set(olds) & set(news)
+    by_sig = {}
+    for n, s in sorted(news.items()):
+        if n not in olds:
+            by_sig.setdefault(s, []).append(n)
+    for o, s in sorted(olds.items()):
+        if o in news:
+            continue
+        cand = [n for n in by_sig.get(s, ()) if n not in used]
+        if cand:
+            out.append((o, cand[0]))
+            used.add(cand[0])
+    return out
+
+
+def _code(sql: str) -> str:
+    """A migration's statements without comments or its commented rollback: what a database runs."""
+    sql = re.split(r"^-- =+\n-- ROLLBACK\b", sql, maxsplit=1, flags=re.M)[0]
+    return "\n".join(split_statements(sql))
+
+
+def declared_rename_items(old: "Model", new: "Model", renames: dict | None) -> list:
+    """The declared renames the old side still has under their old names, as guarded blocks (CHG-R8WFM-001). Each item:
+    {"group", "kind", "stmt" (tagged), "back" (rollback), "olds" (names a file before it must not still need),
+    "news" (names a file before it would need)}. Items of one group (a table and what follows it, or one renamed
+    column and its keys) are placed together; the table renames come first, then the columns, then the names that
+    follow them."""
+    import copy
+    renames = renames or {}
+    rt = {n: o for o, n in (renames.get("tables") or {}).items()
+          if o in old.tables and o not in new.tables and n in new.tables and n not in old.tables}
+    rc = {}
+    for (t, oc), nc in (renames.get("columns") or {}).items():
+        was = old.tables.get(rt.get(t, t))
+        if was is not None and oc in was.cols and nc != oc and t in new.tables and nc in new.tables[t].cols:
+            rc[(t, nc)] = oc
+    if not rt and not rc:
+        return []
+    tmp = copy.deepcopy(old)
+    for t, o in sorted(rt.items()):
+        tmp.rename_table(o, t)
+    for (t, nc), oc in sorted(rc.items()):
+        if t in tmp.tables and oc in tmp.tables[t].cols:
+            tmp.rename_column(t, oc, nc)
+    items = []
+
+    def add(group, kind, table, detail, stmt, back, olds=(), news=(), other=""):
+        items.append({"group": group, "kind": kind, "stmt": tag(table, kind, detail, stmt, other), "back": back,
+                      "olds": list(olds), "news": list(news)})
+
+    def word(name: str):
+        return re.compile(r"(?<![\w.])" + re.escape(name) + r"(?![\w])")
+
+    def names_for(t: str, cols=None) -> list:
+        """(kind, old, new) for the indexes, keys and checks on `t` (only those naming one of `cols`, if given) whose
+        renamed statement matches a new one but for its name."""
+        out = []
+
+        def touches(st):
+            return cols is None or any(re.search(r"(?<![\w])" + re.escape(c) + r"(?![\w])", st) for c in cols)
+        oi = {k[1].split(".", 1)[1]: _sig("index", st) for k, st in tmp.stmts.items()
+              if k[0] == "index" and _index_table(st) == t and touches(st)}
+        ni = {k[1].split(".", 1)[1]: _sig("index", st) for k, st in new.stmts.items()
+              if k[0] == "index" and _index_table(st) == t and touches(st)}
+        out += [("rename index", a, b) for a, b in _pair(oi, ni)]
+        oc_ = {k[2]: _sig("constraint", st) for k, st in tmp.stmts.items() if k[0] == "constraint" and k[1] == t
+               and touches(st)}
+        nc_ = {k[2]: _sig("constraint", st) for k, st in new.stmts.items() if k[0] == "constraint" and k[1] == t
+               and touches(st)}
+        out += [("rename constraint", a, b) for a, b in _pair(oc_, nc_)]
+        a_t, b_t = tmp.tables.get(t), new.tables.get(t)
+        if a_t is not None and b_t is not None:
+            for c, d in sorted(b_t.cols.items()):
+                if c not in a_t.cols or (cols is not None and c not in cols):
+                    continue
+                for x, y in zip(re.findall(r"CONSTRAINT (\S+) ", a_t.cols[c]), re.findall(r"CONSTRAINT (\S+) ", d)):
+                    if x != y:
+                        out.append(("rename constraint", x, y))
+            if cols is None:
+                named = lambda cs: {re.match(r"CONSTRAINT (\S+) ", c).group(1): _sig("", c) for c in cs
+                                    if re.match(r"CONSTRAINT (\S+) ", c)}
+                out += [("rename constraint", a, b) for a, b in _pair(named(a_t.constraints), named(b_t.constraints))]
+        return out
+
+    for t in sorted(rt):
+        o = rt[t]
+        (os_, on), (ns, nn) = o.split(".", 1), t.split(".", 1)
+        g, olds, news = ("table", t), [word(o), re.compile(rf"table_schema = '{os_}' AND table_name = '{on}'")], [word(t)]
+        if os_ != ns:
+            add(g, "move table", t, f"{o} to {ns}", guard_move_table(o, ns), f"ALTER TABLE {ns}.{on} SET SCHEMA {os_};",
+                olds, news)
+            if on != nn:
+                add(g, "rename table", t, f"{ns}.{on} to {nn}", guard_rename_table(f"{ns}.{on}", t),
+                    f"ALTER TABLE {t} RENAME TO {on};", olds, news)
+        else:
+            add(g, "rename table", t, f"{o} to {nn}", guard_rename_table(o, t), f"ALTER TABLE {t} RENAME TO {on};",
+                olds, news)
+        for (tt, nc), oc in sorted(rc.items()):
+            if tt == t:
+                add(g, "rename column", t, f"{oc} to {nc}", guard_rename_column(t, oc, nc),
+                    f"ALTER TABLE {t} RENAME COLUMN {nc} TO {oc};", olds, news)
+        for kind, a, b in names_for(t):
+            if kind == "rename index":
+                add(g, kind, t, f"{a} to {b}", guard_rename_index(t, a, b), f"ALTER INDEX {ns}.{b} RENAME TO {a};",
+                    olds, news)
+            else:
+                add(g, kind, t, f"{a} to {b}", guard_rename_constraint(t, a, b),
+                    f"ALTER TABLE {t} RENAME CONSTRAINT {b} TO {a};", olds, news)
+        if on != nn:
+            a_t, b_t = tmp.tables[t], new.tables[t]
+            implicit = lambda tb: (any(re.search(r"\bPRIMARY KEY\b", d, re.I) for d in tb.cols.values())
+                                   or any(c.upper().startswith("PRIMARY KEY") for c in tb.constraints))
+            if implicit(a_t) and implicit(b_t):
+                pa, pb = _pg_name(on, "pkey"), _pg_name(nn, "pkey")
+                add(g, "rename constraint", t, f"{pa} to {pb}", guard_rename_constraint(t, pa, pb),
+                    f"ALTER TABLE {t} RENAME CONSTRAINT {pb} TO {pa};", olds, news)
+            has_rls = any((rls_call(st) or ("drop_rls_policies",))[0] != "drop_rls_policies"
+                          and rls_call(st)[1] == t for k, st in tmp.stmts.items() if k[0] == "stmt")
+            if has_rls and len(on) < POLICY_BASE:
+                add(g, "rename policy", t, f"{on}_* to {nn}_*", guard_rename_policies(t, on, nn),
+                    guard_rename_policies(t, nn, on) + ";", olds, news)
+    for (t, nc), oc in sorted(rc.items()):
+        if t in rt:
+            continue
+        g = ("column", t, nc)
+        olds = [re.compile(rf"'{re.escape(t)}'::regclass, '{oc}'")]
+        news = [re.compile(rf"'{re.escape(t)}'::regclass, '{nc}'")]
+        add(g, "rename column", t, f"{oc} to {nc}", guard_rename_column(t, oc, nc),
+            f"ALTER TABLE {t} RENAME COLUMN {nc} TO {oc};", olds, news)
+        for kind, a, b in names_for(t, cols={nc}):
+            sch = t.split(".", 1)[0]
+            if kind == "rename index":
+                add(g, kind, t, f"{a} to {b}", guard_rename_index(t, a, b), f"ALTER INDEX {sch}.{b} RENAME TO {a};",
+                    olds, news)
+            else:
+                add(g, kind, t, f"{a} to {b}", guard_rename_constraint(t, a, b),
+                    f"ALTER TABLE {t} RENAME CONSTRAINT {b} TO {a};", olds, news)
+    return items
+
+
+def place_renames(items: list, frozen: dict, taken: set) -> tuple:
+    """({version: (the file it runs after, [items])}, [unplaced items]) for `declared_rename_items` (CHG-R8WFM-001).
+
+    `frozen`: {file name: text} of the forward files already written, in the order a database applies them (by name).
+    A group runs **after the last frozen file that still names its old name** (V0105 re-applies platform.dsar_request's
+    policy by that name, so its move cannot run before V0105) and **before the first that names its new name** (V0104
+    applies row-level security on four columns by their new names). Every other group takes the earliest slot any
+    group needs, the one before the first frozen file that needs a new name (V0103a, before V0104), so every later
+    file sees the new names; with no such file, the slot after the last frozen file. A slot is named for the file it
+    runs after, with the next free letter (V0103a after V0103, V0105a after V0105), which sorts between the two by name,
+    the order SqlMigrationRunner applies. A group whose old name a frozen file needs after one needs its new name
+    cannot be placed: it stays a review row for a person."""
+    files = sorted(frozen)
+    code = {f: _code(frozen[f]) for f in files}
+    groups, order = {}, []
+    for it in items:
+        if it["group"] not in groups:
+            groups[it["group"]] = []
+            order.append(it["group"])
+        groups[it["group"]].append(it)
+    bounds = {}
+    for g in order:
+        first = groups[g][0]
+        lo = max((f for f in files if any(rx.search(code[f]) for rx in first["olds"])), default=None)
+        hi = min((f for f in files if any(rx.search(code[f]) for rx in first["news"])), default=None)
+        bounds[g] = (lo, hi)
+    his = [hi for _, hi in bounds.values() if hi]
+
+    def before(f):
+        i = files.index(f)
+        return files[i - 1] if i > 0 else None
+    default = before(min(his)) if his else (files[-1] if files else None)
+    slots, unplaced = {}, []
+    for g in order:
+        lo, hi = bounds[g]
+        after = default if lo is None or (default and lo <= default) else lo
+        if after is None or (hi and not after < hi):
+            unplaced += groups[g]
+            continue
+        slots.setdefault(after, []).extend(groups[g])
+    out = {}
+    for after, its in sorted(slots.items()):
+        m = re.match(r"V(\d+)([a-z]?)__", after)
+        letters = "abcdefghijklmnopqrstuvwxyz"
+        start = letters.index(m.group(2)) + 1 if m.group(2) else 0
+        version = next((f"V{m.group(1)}{x}" for x in letters[start:] if f"V{m.group(1)}{x}" not in taken), None)
+        if version is None:
+            unplaced += its
+            continue
+        taken.add(version)
+        rank = {"move table": 0, "rename table": 0, "rename column": 1}
+        out[version] = (after, sorted(its, key=lambda x: rank.get(x["kind"], 2)))
+    return out, unplaced
+
+
+def early_plan(area: str, its: list) -> "Plan":
+    """A Plan holding only the early names file's blocks (render_recon writes it)."""
+    p = Plan(area)
+    p.recon = [x["stmt"] for x in its]
+    p.recon_rollback = [x["back"] for x in its]
+    kinds = [x["kind"] for x in its]
+    p.recon_counts = {"renames": kinds.count("rename column"),
+                      "keys": kinds.count("rename constraint"),
+                      "indexes": kinds.count("rename index"),
+                      "tables": len({x["group"] for x in its if x["kind"] in ("rename table", "move table")}),
+                      "policies": kinds.count("rename policy")}
+    return p
 
 
 def _renamed_name(new_name: str, rc: dict, tables) -> str:
@@ -1430,8 +1716,10 @@ def render_recon(p: Plan, version: str, baseline: str, stamp: str, before: str =
     body = "\n\n".join(x.rstrip().rstrip(";") + ";" for x in p.recon)
     checksum = _h.sha256(body.encode("utf-8")).hexdigest()
     c = p.recon_counts
-    what = (f"{c['renames']} column rename(s), {c['keys']} key(s) added, renamed or dropped, {c['indexes']} index(es) "
-            "renamed or dropped")
+    what = ((f"{c['tables']} table(s) renamed or moved, " if c.get("tables") else "")
+            + f"{c['renames']} column rename(s), {c['keys']} key(s) added, renamed or dropped, {c['indexes']} index(es) "
+            "renamed or dropped"
+            + (f", the row-level security policies of {c['policies']} table(s) renamed" if c.get("policies") else ""))
     desc = f"after {baseline}, names the contracts use: {what}"
     lines = [
         f"-- {version} -- {p.area} database, after {baseline} ({stamp}): the names the contracts use.",
@@ -1448,10 +1736,12 @@ def render_recon(p: Plan, version: str, baseline: str, stamp: str, before: str =
         f"-- {what}.",
     ] + ([
         "--",
-        f"-- **This file runs before {before}**, which applies row-level security on these columns by their new",
-        f"-- names: without it a database built from the files in name order stops at {before}. The other renames,",
-        f"-- with the keys and indexes that follow them, are in {rest}; its blocks for these columns find them renamed",
-        "-- and do nothing.",
+        f"-- **This file runs before {before}**: the renames the package declares (tools/derive-schema-history.py",
+        "-- RENAMES and COLUMN_RENAMES), each with the keys, indexes, checks and row-level security policies named for",
+        f"-- it, so {before} and every file after it see the names the contracts use (a frozen file that applies",
+        "-- row-level security on a column by its new name stops a fresh database without it). A table moved into another",
+        "-- schema keeps its objects' names. A rename a frozen file still needs under its old name runs in the names",
+        f"-- file after that one. The keys and indexes that do not follow a rename are in {rest}.",
     ] if before else []) + [
         "",
         body,

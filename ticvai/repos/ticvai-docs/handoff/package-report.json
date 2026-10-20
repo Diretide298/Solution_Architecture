@@ -9,9 +9,9 @@
   "foreignKeys": 815,
   "indexes": 2924,
   "tablesWritten": 1123,
-  "relationships": 3246,
+  "relationships": 3248,
   "states": 208,
-  "events": 96,
+  "events": 97,
   "flows": 98,
   "flowsDerived": 193,
   "adrs": 71,
@@ -52,7 +52,7 @@
   },
   {
    "link": "Operations with resolved lineage",
-   "done": 2807,
+   "done": 2809,
    "total": 2844,
    "percent": 99,
    "note": "names the tables it reads and writes -- the join the DDL cannot make itself"
@@ -87,9 +87,9 @@
   }
  ],
  "boundaries": {
-  "edgesTotal": 3246,
-  "insideOneService": 2011,
-  "crossingTwoServices": 1235,
+  "edgesTotal": 3248,
+  "insideOneService": 2008,
+  "crossingTwoServices": 1240,
   "endpointNotOwned": 0,
   "note": "A reference inside one service is a foreign key the database enforces. A reference across two is a distributed read somebody has to design.",
   "heaviest": [
@@ -111,7 +111,7 @@
    {
     "from": "OrderService",
     "to": "IdentityService",
-    "edges": 60
+    "edges": 64
    },
    {
     "from": "TenancyService",
@@ -157,7 +157,7 @@
   "topTargets": [
    {
     "table": "identity.principal",
-    "edges": 357
+    "edges": 362
    },
    {
     "table": "platform.scope",
@@ -196,7 +196,7 @@
     "edges": 19
    }
   ],
-  "inTopThreeTargets": 646
+  "inTopThreeTargets": 651
  },
  "services": [
   {
@@ -220,7 +220,7 @@
    "tables": 114,
    "screens": 101,
    "operationsOnAScreen": 286,
-   "edgesOut": 153,
+   "edgesOut": 157,
    "edgesIn": 78
   },
   {
@@ -329,7 +329,7 @@
    "screens": 36,
    "operationsOnAScreen": 79,
    "edgesOut": 27,
-   "edgesIn": 470
+   "edgesIn": 475
   },
   {
    "service": "LedgerService",
@@ -388,7 +388,7 @@
    "tables": 13,
    "screens": 19,
    "operationsOnAScreen": 22,
-   "edgesOut": 25,
+   "edgesOut": 26,
    "edgesIn": 9
   },
   {
@@ -657,7 +657,7 @@
    "contract": "white-label",
    "operations": 110,
    "onAScreen": 107,
-   "withLineage": 101,
+   "withLineage": 103,
    "withPermission": 100,
    "percentOnAScreen": 97
   },
@@ -856,7 +856,7 @@
   "requirementsPartial": 12,
   "operationsNoScreen": 275,
   "screensNoOperation": 63,
-  "operationsNoLineage": 37,
+  "operationsNoLineage": 35,
   "tablesNotReached": 11,
   "permissionsWithoutLabel": 70,
   "capabilityPairs": 291,

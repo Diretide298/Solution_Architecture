@@ -1848,6 +1848,51 @@
    "recordedAt"
   ],
   "properties": {
+   "tipAmount": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true,
+    "readOnly": true,
+    "description": "**The tip recorded against this payment** (`addTip`; r8 walk fix, CHG-R8WFC-002). Null until one is recorded; a payment holds at most one tip, so `addTip` answers `409 tipAlreadyRecorded` once this is set. Money held for staff, posted to a liability, never to sales. The retired stub table `orders.payment_tip` (CHG-STO-008: \"no field carries a tip\") is not brought back: the tip is four columns of the payment it belongs to."
+   },
+   "tipSource": {
+    "type": "string",
+    "enum": [
+     "terminalPrompt",
+     "cashierEntered",
+     "guestApp",
+     "serviceCharge"
+    ],
+    "nullable": true,
+    "readOnly": true,
+    "description": "Where the tip came from (`addTip`'s `source`); null with no tip."
+   },
+   "tipAllocatedToPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The staff member the venue allocates the tip to (`addTip`'s `allocateToPrincipalId`); null when tips are pooled or there is no tip.",
+    "x-ticvai-references": "identity.principal"
+   },
+   "tipRecordedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "When the till or app recorded the tip (`addTip`'s `recordedAt`); null with no tip."
+   },
+   "tipRecordedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "Who recorded it, from the session (the attribution a cashier-entered tip needs, as a manual discount does); null with no tip.",
+    "x-ticvai-references": "identity.principal"
+   },
    "id": {
     "type": "string",
     "format": "uuid"
@@ -2221,6 +2266,31 @@
      }
     ],
     "description": "Price variance above this is an exception requiring review rather than a routine posting (CF-38). Venue-configured.\n**A venue setting with a tenant default** (decided 28 September, audit R094). **Proposed default, client to correct (audit R094): AED 5.00 per order line.**\n"
+   }
+  }
+ },
+ "SupervisorStepUp": {
+  "type": "object",
+  "description": "**A supervisor signs the act in place, on the device making the call** (decided 28 September, audit R144). Used where the decision is a same-device step-up rather than an approval request: reopening a shift, recounting a stock count, a retail return above the venue threshold, and (proposed by the coordinator, client to confirm) closing a stock transfer short and cancelling a performance.\n\n**The verification rule, the same on every operation that takes it:** the server checks `credential` against `principalId`; that principal must hold the operation's `x-ticvai-permission` at the operation's scope, must be active at that venue, and must not be the person whose act is being reversed where the operation says so. Any failure is a `403` (`supervisor-step-up-refused`) and nothing is written. **No approval request is raised**, and the operation declares `x-ticvai-step-up: pin`.\n\n**Where `principalId` comes from, on every operation that takes this** (decided 20 October 2026, Chinmay, R8 blocker cause GPS-C31, option A; CHG-R8SPN-035). The PIN prompt shows a picker filled by `identity.listStepUpSupervisors` with the operation's permission: the active principals who hold it at the caller's venue, by display name. The supervisor picks their own name and types their PIN; the prompt sends the picked `principalId` (or, where the prompt asks for an employee number instead, `supervisorUsername`). **Nobody signs their own act**: a `principalId` (or resolved `supervisorUsername`) equal to the caller's own principal is refused `403 supervisor-step-up-refused`, even when the caller holds the permission, and the picker leaves the caller out.\n",
+  "required": [
+   "credential"
+  ],
+  "properties": {
+   "principalId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The supervisor signing. Recorded against the act. **Exactly one of `principalId` or `supervisorUsername`** is sent (neither, or both, is `400`; not in the schema as a oneOf, so an r1 client still validates)."
+   },
+   "supervisorUsername": {
+    "type": "string",
+    "maxLength": 200,
+    "description": "**The supervisor's employee number**, which is what the step-up prompt asks for (R8 blocker fix, IDENTITY-C44). The server resolves it to the principal (`identity.principal.username`, within the tenant) before it checks the PIN; an unknown one is refused exactly as a wrong PIN, `403 supervisor-step-up-refused`, so the prompt does not reveal which employee numbers exist. The act is recorded against the resolved principal. Exactly one of this or `principalId`."
+   },
+   "credential": {
+    "type": "string",
+    "maxLength": 512,
+    "writeOnly": true,
+    "description": "The supervisor's staff PIN, as they sign in at a till with it. **A PIN, never a password** (audit R123 (7)). Never stored or returned. Exactly the tenant's `PasswordPolicy.pinLength` digits (4, 6 or 8, the tenant's choice; CHG-CRD-002), which the prompt's keypad takes from `WorkstationContext.pinLength`. The operation never reads Identity's tables to check it; it asks Identity's `verifySupervisorStepUp` query (`x-ticvai-read-via`, CHG-CRD-004), and a wrong PIN counts towards `PasswordPolicy.pinLockoutAfterAttempts` as at sign-in."
    }
   }
  },

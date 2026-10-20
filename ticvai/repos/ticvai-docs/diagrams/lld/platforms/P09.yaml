@@ -747,6 +747,7 @@ screens:
   - policyKind<-deepLink
   - version<-deepLink
   - tenantId<-navigation
+  - challengeId<-navigation
   goesTo:
   - ADM-001
   - ADM-002

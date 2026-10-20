@@ -610,7 +610,7 @@
   "perm": "PRICE_CONFIGURE",
   "offline": false,
   "summary": "Set prices in bulk",
-  "source": "path-inferred",
+  "source": "declared (contract x-ticvai-reads/x-ticvai-writes or a reviewed override; r8 walk fix)",
   "service": "CatalogueService",
   "stores": [
    "postgres",
@@ -1027,7 +1027,7 @@
   "perm": "PRODUCT_CONFIGURE",
   "offline": false,
   "summary": "Compute, sign and publish a catalogue bundle",
-  "source": "path-inferred",
+  "source": "declared (contract x-ticvai-reads/x-ticvai-writes or a reviewed override; r8 walk fix)",
   "service": "CatalogueService",
   "stores": [
    "postgres",
@@ -1101,7 +1101,7 @@
   "perm": "PRODUCT_VIEW",
   "offline": false,
   "summary": "Report that a workstation applied a bundle",
-  "source": "path-inferred",
+  "source": "declared (contract x-ticvai-reads/x-ticvai-writes or a reviewed override; r8 walk fix)",
   "service": "CatalogueService",
   "stores": [
    "postgres",
@@ -1921,7 +1921,7 @@
   "perm": "PERFORMANCE_CONFIGURE",
   "offline": false,
   "summary": "Cancel a performance",
-  "source": "path-inferred",
+  "source": "declared (contract x-ticvai-reads/x-ticvai-writes or a reviewed override; r8 walk fix)",
   "service": "CatalogueService",
   "stores": [
    "postgres",
@@ -2460,7 +2460,14 @@
     "tenant_category",
     "time_zone"
    ]
-  }
+  },
+  "readVia": [
+   {
+    "query": "orders#transactionsExistInScope",
+    "route": "in-process",
+    "for": "whether any order exists in the region, before a currencyCode or currencyScale change (409 currency-change-refused; r8 walk fix, CHG-R8WFC-003)"
+   }
+  ]
  },
  "listWorkstations": {
   "contract": "tenancy",
@@ -3196,7 +3203,7 @@
   "perm": null,
   "offline": false,
   "summary": "Device heartbeat and status",
-  "source": "path-inferred",
+  "source": "declared (contract x-ticvai-reads/x-ticvai-writes or a reviewed override; r8 walk fix)",
   "service": "TenancyService",
   "stores": [
    "postgres"
@@ -3343,7 +3350,12 @@
     "tender",
     "tender_amount",
     "tender_currency",
-    "terminal_id"
+    "terminal_id",
+    "tip_allocated_to_principal_id",
+    "tip_amount",
+    "tip_recorded_at",
+    "tip_recorded_by_principal_id",
+    "tip_source"
    ],
    "orders.sales_order": [
     "channel",
@@ -3470,7 +3482,12 @@
     "tender",
     "tender_amount",
     "tender_currency",
-    "terminal_id"
+    "terminal_id",
+    "tip_allocated_to_principal_id",
+    "tip_amount",
+    "tip_recorded_at",
+    "tip_recorded_by_principal_id",
+    "tip_source"
    ],
    "orders.sales_order": [
     "channel",
@@ -3598,7 +3615,12 @@
     "tender",
     "tender_amount",
     "tender_currency",
-    "terminal_id"
+    "terminal_id",
+    "tip_allocated_to_principal_id",
+    "tip_amount",
+    "tip_recorded_at",
+    "tip_recorded_by_principal_id",
+    "tip_source"
    ],
    "orders.sales_order": [
     "channel",
@@ -3733,7 +3755,12 @@
     "tender",
     "tender_amount",
     "tender_currency",
-    "terminal_id"
+    "terminal_id",
+    "tip_allocated_to_principal_id",
+    "tip_amount",
+    "tip_recorded_at",
+    "tip_recorded_by_principal_id",
+    "tip_source"
    ],
    "orders.sales_order": [
     "channel",
@@ -3861,7 +3888,12 @@
     "tender",
     "tender_amount",
     "tender_currency",
-    "terminal_id"
+    "terminal_id",
+    "tip_allocated_to_principal_id",
+    "tip_amount",
+    "tip_recorded_at",
+    "tip_recorded_by_principal_id",
+    "tip_source"
    ],
    "orders.sales_order": [
     "channel",
@@ -3990,7 +4022,12 @@
     "tender",
     "tender_amount",
     "tender_currency",
-    "terminal_id"
+    "terminal_id",
+    "tip_allocated_to_principal_id",
+    "tip_amount",
+    "tip_recorded_at",
+    "tip_recorded_by_principal_id",
+    "tip_source"
    ],
    "orders.sales_order": [
     "channel",
@@ -4020,7 +4057,14 @@
     "venue_id",
     "workstation_id"
    ]
-  }
+  },
+  "readVia": [
+   {
+    "query": "identity#verifySupervisorStepUp",
+    "route": "in-process",
+    "for": "the PIN step-up in `supervisorStepUp` is checked by Identity (r8 walk fix, CHG-R8WFC-005); same deployable (commerce)"
+   }
+  ]
  },
  "listOrderRefunds": {
   "contract": "orders",
@@ -4202,7 +4246,7 @@
   "perm": "ORDER_REFUND_BULK",
   "offline": false,
   "summary": "Refund every order against an event, performance or date",
-  "source": "path-inferred",
+  "source": "declared (contract x-ticvai-reads/x-ticvai-writes or a reviewed override; r8 walk fix)",
   "service": "OrderService",
   "stores": [
    "postgres",
@@ -4444,7 +4488,12 @@
     "tender",
     "tender_amount",
     "tender_currency",
-    "terminal_id"
+    "terminal_id",
+    "tip_allocated_to_principal_id",
+    "tip_amount",
+    "tip_recorded_at",
+    "tip_recorded_by_principal_id",
+    "tip_source"
    ]
   },
   "readVia": [
@@ -4518,7 +4567,12 @@
     "tender",
     "tender_amount",
     "tender_currency",
-    "terminal_id"
+    "terminal_id",
+    "tip_allocated_to_principal_id",
+    "tip_amount",
+    "tip_recorded_at",
+    "tip_recorded_by_principal_id",
+    "tip_source"
    ]
   }
  },
@@ -4568,7 +4622,12 @@
     "tender",
     "tender_amount",
     "tender_currency",
-    "terminal_id"
+    "terminal_id",
+    "tip_allocated_to_principal_id",
+    "tip_amount",
+    "tip_recorded_at",
+    "tip_recorded_by_principal_id",
+    "tip_source"
    ]
   }
  },
@@ -4630,7 +4689,12 @@
     "tender",
     "tender_amount",
     "tender_currency",
-    "terminal_id"
+    "terminal_id",
+    "tip_allocated_to_principal_id",
+    "tip_amount",
+    "tip_recorded_at",
+    "tip_recorded_by_principal_id",
+    "tip_source"
    ]
   },
   "readVia": [
@@ -4747,7 +4811,12 @@
     "tender",
     "tender_amount",
     "tender_currency",
-    "terminal_id"
+    "terminal_id",
+    "tip_allocated_to_principal_id",
+    "tip_amount",
+    "tip_recorded_at",
+    "tip_recorded_by_principal_id",
+    "tip_source"
    ],
    "orders.sales_order": [
     "channel",
@@ -4989,7 +5058,12 @@
     "tender",
     "tender_amount",
     "tender_currency",
-    "terminal_id"
+    "terminal_id",
+    "tip_allocated_to_principal_id",
+    "tip_amount",
+    "tip_recorded_at",
+    "tip_recorded_by_principal_id",
+    "tip_source"
    ],
    "orders.sales_order": [
     "channel",
@@ -5183,7 +5257,12 @@
     "tender",
     "tender_amount",
     "tender_currency",
-    "terminal_id"
+    "terminal_id",
+    "tip_allocated_to_principal_id",
+    "tip_amount",
+    "tip_recorded_at",
+    "tip_recorded_by_principal_id",
+    "tip_source"
    ],
    "orders.sales_order": [
     "channel",
@@ -5245,7 +5324,7 @@
   "perm": "ORDER_EXCHANGE",
   "offline": false,
   "summary": "Exchange lines for different products or dates",
-  "source": "path-inferred",
+  "source": "declared (contract x-ticvai-reads/x-ticvai-writes or a reviewed override; r8 walk fix)",
   "service": "OrderService",
   "stores": [
    "postgres",
@@ -5285,7 +5364,7 @@
   "perm": "ORDER_RESCHEDULE",
   "offline": false,
   "summary": "Move an order to another performance",
-  "source": "path-inferred",
+  "source": "declared (contract x-ticvai-reads/x-ticvai-writes or a reviewed override; r8 walk fix)",
   "service": "OrderService",
   "stores": [
    "postgres",
@@ -5329,7 +5408,7 @@
   "perm": "ORDER_REPRINT",
   "offline": true,
   "summary": "Reprint or resend tickets",
-  "source": "path-inferred",
+  "source": "declared (contract x-ticvai-reads/x-ticvai-writes or a reviewed override; r8 walk fix)",
   "service": "OrderService",
   "stores": [
    "postgres",
@@ -5686,7 +5765,7 @@
   "perm": "ORDER_CANCEL",
   "offline": false,
   "summary": "Cancel a reservation",
-  "source": "path-inferred",
+  "source": "declared (contract x-ticvai-reads/x-ticvai-writes or a reviewed override; r8 walk fix)",
   "service": "OrderService",
   "stores": [
    "postgres",
@@ -6728,7 +6807,7 @@
   "perm": "ACCESS_POINT_CONFIGURE",
   "offline": false,
   "summary": "Remove a blacklist entry",
-  "source": "path-inferred",
+  "source": "declared (contract x-ticvai-reads/x-ticvai-writes or a reviewed override; r8 walk fix)",
   "service": "AccessService",
   "stores": [
    "postgres",
@@ -7754,6 +7833,7 @@
   ],
   "readColumns": {
    "orders.no_sale_event": [
+    "approved_by_principal_id",
     "count_this_shift",
     "id",
     "note",
@@ -7763,7 +7843,14 @@
     "shift_id",
     "workstation_id"
    ]
-  }
+  },
+  "readVia": [
+   {
+    "query": "identity#verifySupervisorStepUp",
+    "route": "in-process",
+    "for": "the PIN step-up in `supervisorStepUp` is checked by Identity (r8 walk fix, CHG-R8WFC-005); same deployable (commerce)"
+   }
+  ]
  },
  "listCashMovements": {
   "contract": "shift",
@@ -8670,7 +8757,7 @@
   "perm": "SESSION_FORCE_LOGOUT",
   "offline": false,
   "summary": "Supervisor termination of an abandoned session",
-  "source": "path-inferred",
+  "source": "declared (contract x-ticvai-reads/x-ticvai-writes or a reviewed override; r8 walk fix)",
   "service": "IdentityService",
   "stores": [
    "redis"
@@ -12185,7 +12272,7 @@
   "perm": "LEDGER_APPROVE",
   "offline": false,
   "summary": "Begin closing a period",
-  "source": "path-inferred",
+  "source": "derived",
   "service": "LedgerService",
   "stores": [
    "postgres",
@@ -12244,7 +12331,7 @@
   "perm": "LEDGER_APPROVE",
   "offline": false,
   "summary": "Abandon a close in progress",
-  "source": "path-inferred",
+  "source": "derived",
   "service": "LedgerService",
   "stores": [
    "postgres",
@@ -12375,7 +12462,7 @@
   "perm": "LEDGER_APPROVE",
   "offline": false,
   "summary": "Close a period and lock postings",
-  "source": "path-inferred",
+  "source": "declared (contract x-ticvai-reads/x-ticvai-writes or a reviewed override; r8 walk fix)",
   "service": "LedgerService",
   "stores": [
    "postgres",
@@ -12846,7 +12933,7 @@
   "perm": "PLATFORM_TENANT_TERMINATE",
   "offline": false,
   "summary": "Begin termination",
-  "source": "path-inferred",
+  "source": "declared (contract x-ticvai-reads/x-ticvai-writes or a reviewed override; r8 walk fix)",
   "service": "PlatformService",
   "stores": [
    "postgres",
@@ -13216,7 +13303,7 @@
   "perm": "PLATFORM_TENANT_VIEW",
   "offline": false,
   "summary": "Preview the effect of a plan change",
-  "source": "path-inferred",
+  "source": "declared (contract x-ticvai-reads/x-ticvai-writes or a reviewed override; r8 walk fix)",
   "service": "PlatformService",
   "stores": [
    "postgres",
@@ -13320,7 +13407,11 @@
   "path": "/tenants/{tenantId}/licences/add-ons",
   "reads": [
    "cache:idempotency",
-   "control.licence_add_on"
+   "control.licence_add_on",
+   "control.licence_add_on_limit",
+   "control.plan_limit",
+   "control.plan_module",
+   "control.tenant"
   ],
   "writes": [
    "cache:idempotency",
@@ -13332,7 +13423,7 @@
   "perm": "PLATFORM_TENANT_MANAGE",
   "offline": false,
   "summary": "Remove an add-on",
-  "source": "path-inferred",
+  "source": "declared (contract x-ticvai-reads/x-ticvai-writes or a reviewed override; r8 walk fix)",
   "service": "PlatformService",
   "stores": [
    "postgres",
@@ -13345,6 +13436,18 @@
    "control.licence_add_on": [
     "id",
     "tenant_id"
+   ],
+   "control.plan_limit": [
+    "id",
+    "plan_id"
+   ],
+   "control.plan_module": [
+    "id",
+    "plan_id"
+   ],
+   "control.tenant": [
+    "id",
+    "plan_id"
    ]
   },
   "fixNote": "18 October 2026: CHG-CRA-003: the plan catalogue and the records about a tenant moved from subscription to the control database (ADAM CR-150, CR-097)"
@@ -13602,7 +13705,7 @@
   "perm": "PLATFORM_CELL_MANAGE",
   "offline": false,
   "summary": "Begin decommissioning a cell",
-  "source": "path-inferred",
+  "source": "declared (contract x-ticvai-reads/x-ticvai-writes or a reviewed override; r8 walk fix)",
   "service": "PlatformService",
   "stores": [
    "postgres",
@@ -13629,7 +13732,7 @@
   "perm": "PLATFORM_CELL_MANAGE",
   "offline": false,
   "summary": "Halt a decommission",
-  "source": "path-inferred",
+  "source": "declared (contract x-ticvai-reads/x-ticvai-writes or a reviewed override; r8 walk fix)",
   "service": "PlatformService",
   "stores": [
    "postgres",
@@ -16916,7 +17019,7 @@
   "perm": "ORDER_MODIFY",
   "offline": true,
   "summary": "Record waste",
-  "source": "path-inferred",
+  "source": "declared (contract x-ticvai-reads/x-ticvai-writes or a reviewed override; r8 walk fix)",
   "service": "FnbService",
   "stores": [
    "postgres",
@@ -18046,7 +18149,7 @@
   "perm": "PRODUCT_VIEW",
   "offline": false,
   "summary": "Recommend seats for a party",
-  "source": "path-inferred",
+  "source": "declared (contract x-ticvai-reads/x-ticvai-writes or a reviewed override; r8 walk fix)",
   "service": "CatalogueService",
   "stores": [
    "postgres"
@@ -18999,7 +19102,7 @@
   "perm": "LEDGER_APPROVE",
   "offline": false,
   "summary": "Close a transfer accepting the balance will not arrive",
-  "source": "path-inferred",
+  "source": "declared (contract x-ticvai-reads/x-ticvai-writes or a reviewed override; r8 walk fix)",
   "service": "InventoryService",
   "stores": [
    "postgres",
@@ -20552,7 +20655,7 @@
   "perm": "PRODUCT_VIEW",
   "offline": false,
   "summary": "Price and stock check by barcode",
-  "source": "path-inferred",
+  "source": "declared (contract x-ticvai-reads/x-ticvai-writes or a reviewed override; r8 walk fix)",
   "service": "RetailService",
   "stores": [
    "postgres"
@@ -20839,7 +20942,7 @@
   "perm": "ORDER_REPRINT",
   "offline": false,
   "summary": "Reprint or resend a receipt",
-  "source": "path-inferred",
+  "source": "declared (contract x-ticvai-reads/x-ticvai-writes or a reviewed override; r8 walk fix)",
   "service": "RetailService",
   "stores": [
    "postgres",
@@ -21499,6 +21602,10 @@
     "collected_by_principal_id",
     "collection_location_id",
     "collection_point_name",
+    "disposal_decided_at",
+    "disposal_decided_by_principal_id",
+    "disposal_method",
+    "disposal_note",
     "drop_reference",
     "dropped_at",
     "entitlement_id",
@@ -21564,6 +21671,10 @@
     "collected_by_principal_id",
     "collection_location_id",
     "collection_point_name",
+    "disposal_decided_at",
+    "disposal_decided_by_principal_id",
+    "disposal_method",
+    "disposal_note",
     "drop_reference",
     "dropped_at",
     "entitlement_id",
@@ -21626,6 +21737,10 @@
     "collected_by_principal_id",
     "collection_location_id",
     "collection_point_name",
+    "disposal_decided_at",
+    "disposal_decided_by_principal_id",
+    "disposal_method",
+    "disposal_note",
     "drop_reference",
     "dropped_at",
     "entitlement_id",
@@ -22204,7 +22319,7 @@
   "perm": "ASSET_VIEW",
   "offline": false,
   "summary": "Service history",
-  "source": "path-inferred",
+  "source": "declared (contract x-ticvai-reads/x-ticvai-writes or a reviewed override; r8 walk fix)",
   "service": "VenueOpsService",
   "stores": [
    "postgres"
@@ -23988,7 +24103,7 @@
   "perm": "ASSET_LIBRARY_VIEW",
   "offline": false,
   "summary": "Assets whose licence is expiring or expired",
-  "source": "path-inferred",
+  "source": "declared (contract x-ticvai-reads/x-ticvai-writes or a reviewed override; r8 walk fix)",
   "service": "VenueOpsService",
   "stores": [
    "postgres"
@@ -24354,7 +24469,7 @@
   "perm": "REPORT_MANAGE",
   "offline": false,
   "summary": "Retire a report definition",
-  "source": "path-inferred",
+  "source": "declared (contract x-ticvai-reads/x-ticvai-writes or a reviewed override; r8 walk fix)",
   "service": "ReportingService",
   "stores": [
    "postgres",
@@ -26532,7 +26647,7 @@
   "perm": "PRICE_CONFIGURE",
   "offline": false,
   "summary": "Pause a live promotion",
-  "source": "path-inferred",
+  "source": "declared (contract x-ticvai-reads/x-ticvai-writes or a reviewed override; r8 walk fix)",
   "service": "CatalogueService",
   "stores": [
    "postgres",
@@ -26565,7 +26680,7 @@
   "perm": "PRICE_CONFIGURE",
   "offline": false,
   "summary": "End a promotion early",
-  "source": "path-inferred",
+  "source": "declared (contract x-ticvai-reads/x-ticvai-writes or a reviewed override; r8 walk fix)",
   "service": "CatalogueService",
   "stores": [
    "postgres",
@@ -26595,7 +26710,7 @@
   "perm": "PRICE_CONFIGURE",
   "offline": false,
   "summary": "Pull a scheduled promotion before it starts",
-  "source": "path-inferred",
+  "source": "declared (contract x-ticvai-reads/x-ticvai-writes or a reviewed override; r8 walk fix)",
   "service": "CatalogueService",
   "stores": [
    "postgres",
@@ -26688,7 +26803,7 @@
   "perm": "PRICE_VIEW",
   "offline": false,
   "summary": "Analyse stacking against live promotions",
-  "source": "path-inferred",
+  "source": "declared (contract x-ticvai-reads/x-ticvai-writes or a reviewed override; r8 walk fix)",
   "service": "CatalogueService",
   "stores": [
    "postgres"
@@ -26718,7 +26833,7 @@
   "perm": "PRICE_VIEW",
   "offline": false,
   "summary": "Redemption count and discount given",
-  "source": "path-inferred",
+  "source": "declared (contract x-ticvai-reads/x-ticvai-writes or a reviewed override; r8 walk fix)",
   "service": "CatalogueService",
   "stores": [
    "postgres"
@@ -26950,7 +27065,7 @@
   "perm": "PRICE_CONFIGURE",
   "offline": false,
   "summary": "Assign a coupon to a named guest",
-  "source": "path-inferred",
+  "source": "declared (contract x-ticvai-reads/x-ticvai-writes or a reviewed override; r8 walk fix)",
   "service": "CatalogueService",
   "stores": [
    "postgres",
@@ -27745,7 +27860,7 @@
   "perm": "PRICE_VIEW",
   "offline": true,
   "summary": "Evaluate promotions against a cart",
-  "source": "path-inferred",
+  "source": "declared (contract x-ticvai-reads/x-ticvai-writes or a reviewed override; r8 walk fix)",
   "service": "CatalogueService",
   "stores": [
    "postgres",
@@ -29280,7 +29395,7 @@
   "perm": null,
   "offline": false,
   "summary": "Leave a queue",
-  "source": "path-inferred",
+  "source": "declared (contract x-ticvai-reads/x-ticvai-writes or a reviewed override; r8 walk fix)",
   "service": "VenueOpsService",
   "stores": [
    "postgres",
@@ -29307,7 +29422,7 @@
   "perm": "QUEUE_REDEEM",
   "offline": true,
   "summary": "Admit a party at the ride",
-  "source": "path-inferred",
+  "source": "declared (contract x-ticvai-reads/x-ticvai-writes or a reviewed override; r8 walk fix)",
   "service": "VenueOpsService",
   "stores": [
    "postgres",
@@ -29334,7 +29449,7 @@
   "perm": "QUEUE_OVERRIDE",
   "offline": true,
   "summary": "Admit against a failed redemption",
-  "source": "path-inferred",
+  "source": "declared (contract x-ticvai-reads/x-ticvai-writes or a reviewed override; r8 walk fix)",
   "service": "VenueOpsService",
   "stores": [
    "postgres",
@@ -29363,7 +29478,7 @@
   "perm": "QUEUE_MANAGE",
   "offline": false,
   "summary": "Call the next parties forward",
-  "source": "path-inferred",
+  "source": "declared (contract x-ticvai-reads/x-ticvai-writes or a reviewed override; r8 walk fix)",
   "service": "VenueOpsService",
   "stores": [
    "postgres",
@@ -29474,7 +29589,7 @@
   "perm": "QUEUE_MANAGE",
   "offline": true,
   "summary": "Manually set a wait time",
-  "source": "path-inferred",
+  "source": "declared (contract x-ticvai-reads/x-ticvai-writes or a reviewed override; r8 walk fix)",
   "service": "VenueOpsService",
   "stores": [
    "postgres",
@@ -29641,7 +29756,7 @@
   "perm": "QUEUE_MANAGE",
   "offline": false,
   "summary": "Feed health",
-  "source": "path-inferred",
+  "source": "declared (contract x-ticvai-reads/x-ticvai-writes or a reviewed override; r8 walk fix)",
   "service": "VenueOpsService",
   "stores": [
    "postgres"
@@ -30525,7 +30640,7 @@
   "perm": "TENANT_CONFIGURE",
   "offline": false,
   "summary": "Enable or clear maintenance mode, and set the live app status",
-  "source": "path-inferred",
+  "source": "declared (contract x-ticvai-reads/x-ticvai-writes or a reviewed override; r8 walk fix)",
   "service": "WhiteLabelService",
   "stores": [
    "postgres",
@@ -30555,7 +30670,7 @@
   "perm": "TENANT_CONFIGURE",
   "offline": false,
   "summary": "Read brand identity",
-  "source": "path-inferred",
+  "source": "declared (contract x-ticvai-reads/x-ticvai-writes or a reviewed override; r8 walk fix)",
   "service": "WhiteLabelService",
   "stores": [
    "postgres"
@@ -30581,7 +30696,7 @@
   "perm": "TENANT_CONFIGURE",
   "offline": false,
   "summary": "Set logo, favicon and splash",
-  "source": "path-inferred",
+  "source": "declared (contract x-ticvai-reads/x-ticvai-writes or a reviewed override; r8 walk fix)",
   "service": "WhiteLabelService",
   "stores": [
    "postgres",
@@ -30616,7 +30731,7 @@
   "perm": "TENANT_CONFIGURE",
   "offline": false,
   "summary": "Read app icon set",
-  "source": "path-inferred",
+  "source": "declared (contract x-ticvai-reads/x-ticvai-writes or a reviewed override; r8 walk fix)",
   "service": "WhiteLabelService",
   "stores": [
    "postgres"
@@ -30642,7 +30757,7 @@
   "perm": "TENANT_CONFIGURE",
   "offline": false,
   "summary": "Set app icons",
-  "source": "path-inferred",
+  "source": "declared (contract x-ticvai-reads/x-ticvai-writes or a reviewed override; r8 walk fix)",
   "service": "WhiteLabelService",
   "stores": [
    "postgres",
@@ -30675,7 +30790,7 @@
   "perm": "TENANT_CONFIGURE",
   "offline": false,
   "summary": "Read colour theme",
-  "source": "path-inferred",
+  "source": "declared (contract x-ticvai-reads/x-ticvai-writes or a reviewed override; r8 walk fix)",
   "service": "WhiteLabelService",
   "stores": [
    "postgres",
@@ -30713,7 +30828,7 @@
   "perm": "TENANT_CONFIGURE",
   "offline": false,
   "summary": "Set colour theme",
-  "source": "path-inferred",
+  "source": "declared (contract x-ticvai-reads/x-ticvai-writes or a reviewed override; r8 walk fix)",
   "service": "WhiteLabelService",
   "stores": [
    "postgres",
@@ -30746,7 +30861,7 @@
   "perm": "TENANT_CONFIGURE",
   "offline": false,
   "summary": "Read font configuration",
-  "source": "path-inferred",
+  "source": "declared (contract x-ticvai-reads/x-ticvai-writes or a reviewed override; r8 walk fix)",
   "service": "WhiteLabelService",
   "stores": [
    "postgres"
@@ -30772,7 +30887,7 @@
   "perm": "TENANT_CONFIGURE",
   "offline": false,
   "summary": "Set fonts",
-  "source": "path-inferred",
+  "source": "declared (contract x-ticvai-reads/x-ticvai-writes or a reviewed override; r8 walk fix)",
   "service": "WhiteLabelService",
   "stores": [
    "postgres",
@@ -30799,7 +30914,7 @@
   "perm": "TENANT_CONFIGURE",
   "offline": false,
   "summary": "Configure the header",
-  "source": "path-inferred",
+  "source": "declared (contract x-ticvai-reads/x-ticvai-writes or a reviewed override; r8 walk fix)",
   "service": "WhiteLabelService",
   "stores": [
    "postgres",
@@ -31147,7 +31262,7 @@
   "perm": "TENANT_CONFIGURE",
   "offline": false,
   "summary": "Delete a banner",
-  "source": "path-inferred",
+  "source": "declared (contract x-ticvai-reads/x-ticvai-writes or a reviewed override; r8 walk fix)",
   "service": "WhiteLabelService",
   "stores": [
    "postgres",
@@ -31445,7 +31560,7 @@
   "perm": "TENANT_CONFIGURE",
   "offline": false,
   "summary": "Delete a content page",
-  "source": "path-inferred",
+  "source": "declared (contract x-ticvai-reads/x-ticvai-writes or a reviewed override; r8 walk fix)",
   "service": "WhiteLabelService",
   "stores": [
    "postgres",
@@ -31878,7 +31993,7 @@
   "perm": "TENANT_CONFIGURE",
   "offline": false,
   "summary": "Set enabled languages and default",
-  "source": "path-inferred",
+  "source": "declared (contract x-ticvai-reads/x-ticvai-writes or a reviewed override; r8 walk fix)",
   "service": "WhiteLabelService",
   "stores": [
    "postgres",
@@ -31905,7 +32020,7 @@
   "perm": "TENANT_CONFIGURE",
   "offline": false,
   "summary": "Generate a preview link",
-  "source": "path-inferred",
+  "source": "declared (contract x-ticvai-reads/x-ticvai-writes or a reviewed override; r8 walk fix)",
   "service": "WhiteLabelService",
   "stores": [
    "postgres",
@@ -32283,7 +32398,7 @@
   "perm": "TENANT_CONFIGURE",
   "offline": false,
   "summary": "Compare a version against the working draft",
-  "source": "path-inferred",
+  "source": "declared (contract x-ticvai-reads/x-ticvai-writes or a reviewed override; r8 walk fix)",
   "service": "WhiteLabelService",
   "stores": [
    "postgres"
@@ -35530,7 +35645,12 @@
     "tender",
     "tender_amount",
     "tender_currency",
-    "terminal_id"
+    "terminal_id",
+    "tip_allocated_to_principal_id",
+    "tip_amount",
+    "tip_recorded_at",
+    "tip_recorded_by_principal_id",
+    "tip_source"
    ],
    "orders.sales_order": [
     "channel",
@@ -36878,7 +36998,12 @@
     "tender",
     "tender_amount",
     "tender_currency",
-    "terminal_id"
+    "terminal_id",
+    "tip_allocated_to_principal_id",
+    "tip_amount",
+    "tip_recorded_at",
+    "tip_recorded_by_principal_id",
+    "tip_source"
    ]
   }
  },
@@ -37545,6 +37670,10 @@
     "collected_by_principal_id",
     "collection_location_id",
     "collection_point_name",
+    "disposal_decided_at",
+    "disposal_decided_by_principal_id",
+    "disposal_method",
+    "disposal_note",
     "drop_reference",
     "dropped_at",
     "entitlement_id",
@@ -44263,7 +44392,12 @@
     "tender",
     "tender_amount",
     "tender_currency",
-    "terminal_id"
+    "terminal_id",
+    "tip_allocated_to_principal_id",
+    "tip_amount",
+    "tip_recorded_at",
+    "tip_recorded_by_principal_id",
+    "tip_source"
    ],
    "orders.sales_order": [
     "channel",
@@ -49150,7 +49284,12 @@
     "tender",
     "tender_amount",
     "tender_currency",
-    "terminal_id"
+    "terminal_id",
+    "tip_allocated_to_principal_id",
+    "tip_amount",
+    "tip_recorded_at",
+    "tip_recorded_by_principal_id",
+    "tip_source"
    ],
    "orders.sales_order": [
     "channel",
@@ -71401,6 +71540,7 @@
   ],
   "writes": [
    "cache:idempotency",
+   "platform.outbox",
    "wallet.adjustment",
    "wallet.credit_lot",
    "wallet.wallet",
@@ -72230,10 +72370,17 @@
   "verb": "GET",
   "path": "/kpi-values",
   "reads": [
+   "access.scan_event",
    "accreditation.application",
    "accreditation.credential",
    "accreditation.holder",
    "accreditation.validity",
+   "fnb.table_visit",
+   "ledger.posting",
+   "marketing.loyalty_position",
+   "orders.order_line",
+   "orders.payment",
+   "orders.refund",
    "reporting.kpi_definition",
    "reporting.kpi_target"
   ],
@@ -72257,6 +72404,11 @@
   "lineageNote": "accreditation system KPIs read the analytical replica of the accreditation tables",
   "readVia": [
    {
+    "query": "access#scanEventRecords",
+    "route": "service",
+    "for": "admissions: admitted in-direction scans in the period (access.scan_event)"
+   },
+   {
     "query": "accreditation#applicationRecords",
     "route": "service",
     "for": "its read of accreditation.application, Tenancy's data (CHG-MOD-001)"
@@ -72275,6 +72427,36 @@
     "query": "accreditation#validityRecords",
     "route": "service",
     "for": "its read of accreditation.validity, Tenancy's data (CHG-MOD-001)"
+   },
+   {
+    "query": "finance#postingRecords",
+    "route": "service",
+    "for": "recognisedRevenue and deferredRevenue: the revenue postings of the period (ledger.posting)"
+   },
+   {
+    "query": "fnb#tableVisitRecords",
+    "route": "in-process",
+    "for": "covers and tableTurnTime, where F&B is on (fnb.table_visit)"
+   },
+   {
+    "query": "marketing-crm#loyaltyPositionRecords",
+    "route": "in-process",
+    "for": "the loyalty KPIs, split by tierCode (marketing.loyalty_position)"
+   },
+   {
+    "query": "orders#orderLineRecords",
+    "route": "service",
+    "for": "grossSales, discounts, netRevenue and taxCollected, split by the dimensions order lines carry (orders.order_line)"
+   },
+   {
+    "query": "orders#paymentRecords",
+    "route": "service",
+    "for": "takings: the money taken in the period, by tender, workstation and shift (orders.payment)"
+   },
+   {
+    "query": "orders#refundRecords",
+    "route": "service",
+    "for": "takings and refunds: the money paid back in the period (orders.refund)"
    }
   ]
  },
@@ -89284,7 +89466,12 @@
     "tender",
     "tender_amount",
     "tender_currency",
-    "terminal_id"
+    "terminal_id",
+    "tip_allocated_to_principal_id",
+    "tip_amount",
+    "tip_recorded_at",
+    "tip_recorded_by_principal_id",
+    "tip_source"
    ]
   }
  },
@@ -96072,7 +96259,12 @@
     "tender",
     "tender_amount",
     "tender_currency",
-    "terminal_id"
+    "terminal_id",
+    "tip_allocated_to_principal_id",
+    "tip_amount",
+    "tip_recorded_at",
+    "tip_recorded_by_principal_id",
+    "tip_source"
    ],
    "orders.sales_order": [
     "channel",
@@ -113220,7 +113412,10 @@
   "contract": "white-label",
   "verb": "POST",
   "path": "/deep-links",
-  "reads": [],
+  "reads": [
+   "whitelabel.config_version",
+   "whitelabel.custom_domain"
+  ],
   "writes": [],
   "routing": null,
   "scope": "tenant",
@@ -113781,7 +113976,10 @@
   "contract": "white-label",
   "verb": "GET",
   "path": "/deep-links",
-  "reads": [],
+  "reads": [
+   "whitelabel.config_version",
+   "whitelabel.custom_domain"
+  ],
   "writes": [],
   "routing": "replica",
   "scope": "tenant",

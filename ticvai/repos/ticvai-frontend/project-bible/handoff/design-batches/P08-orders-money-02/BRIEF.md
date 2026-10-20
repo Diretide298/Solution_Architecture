@@ -166,7 +166,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-041` | Cash Movements | C | 18 | 28 | 6 | 1 | 0 | 6 | — | notStarted (generated) |
 | `BO-042` | Banking & Safe | C | 28 | 26 | 6 | 18 | 0 | 0 | — | notStarted (generated) |
 | `BO-043` | Daily Reconciliation | A | 37 | 66 | 6 | 24 | 3 | 0 | — | notStarted (generated) |
-| `BO-047` | Order Corrections & Exceptions | C | 136 | 39 | 6 | 70 | 0 | 0 | — | notStarted (generated) |
+| `BO-047` | Order Corrections & Exceptions | C | 140 | 39 | 6 | 70 | 0 | 0 | — | notStarted (generated) |
 | `BO-048` | Retail Products | A | 32 | 19 | 6 | 29 | 1 | 0 | — | notStarted (generated) |
 | `BO-059` | Sales Reports | D | 76 | 20 | 6 | 93 | 3 | 0 | — | notStarted (generated) |
 | `BO-061` | Scheduled Reports | D | 26 | 12 | 6 | 7 | 0 | 0 | — | notStarted (generated) |

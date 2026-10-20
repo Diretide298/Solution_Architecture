@@ -103,13 +103,13 @@
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| supervisorId | string | yes | Approving supervisor |
-| scanId | string | yes | The denied scan being overridden |
-| selectType | enum (guestService, ticketingError, operationalException, managementAuthorization, technicalFailure, eventException, other) | yes | Override reason category |
-| reasonNote | string |  | Free-text justification |
+| supervisorId | string | yes | Approving supervisor. |
+| scanId | string | yes | The denied scan being overridden, and the key of this write (x-ticvai-body-key). |
+| selectType | enum (guestService, ticketingError, operationalException, managementAuthorization, technicalFailure, eventException, other) | yes | Override reason category. |
+| reasonNote | string |  | Free-text justification, stored after the category in override_reason (see selectType). |
 | accessPointId | string |  | Gate |
 | deviceId | string |  | Device |
-| originalDecision | string |  | Original validation decision, read only and never rewritten |
+| originalDecision | string |  | Original validation decision, read only and never rewritten. |
 
 **Response**: `ManualOverrideSupervisorApprovalView`
 
@@ -128,6 +128,7 @@
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Manual Override & Supervisor Approval |
+| 409 |  | The body's scanId was not a denial (scan-not-denied), or has already been overridden (scan-already-overridden), exactly as overrideAccess refuses it (r8 walk fix, CHG-R8WFC-001). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### bindCredentialDevice

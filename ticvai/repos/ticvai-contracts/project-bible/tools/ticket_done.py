@@ -361,8 +361,9 @@ def baseline_functions(root) -> dict:
 
 AFTER_R1_FILE = re.compile(r"^V0[1-9]\d\d[a-z]?__(?:names_(?:early_)?)?after_r1_\d{8}\.sql$")
 # A block of the names file (ddl_forward.tag): `-- <table> | <kind> | <detail> [| <other table>]` (R8-MIG-001)
-NAMES_TAG = re.compile(r"^-- (\w+\.\w+) \| (rename column|rename constraint|rename index|create index|drop index|"
-                       r"drop foreign key|foreign key) \| (\S+(?: to \S+)?)(?: \| (\w+\.\w+))?$")
+NAMES_TAG = re.compile(r"^-- (\w+\.\w+) \| (rename table|move table|rename policy|rename column|rename constraint|"
+                       r"rename index|create index|drop index|drop foreign key|foreign key) \| (\S+(?: to \S+)?)"
+                       r"(?: \| (\w+\.\w+))?$")
 _AR1 = [
     (re.compile(r"^CREATE TABLE IF NOT EXISTS (\w+\.\w+)"), None),
     (re.compile(r"^ALTER TABLE (?:ONLY )?(\w+\.\w+) ADD COLUMN (?:IF NOT EXISTS )?(\w+)"), "column"),
@@ -727,6 +728,23 @@ def parent_policy_sentences(moved: dict, orphans: dict) -> dict:
         out.setdefault(mp, []).append(
             f"**Also apply {child}'s row-level security here** (its `platform.apply_parent_rls` call, "
             f"920-row-level-security.sql, through {parent}): {mc} creates {child} before {parent} exists.")
+    return out
+
+
+# **The apply notes reach the pointer too** (CHG-R8WFM-004; r8 sample walk, part 1: the two package defects bypassed to
+# apply the DDL). CHG-R8MIG-008 wrote them into the plan's description (MIG-BASELINE: function-body checks off;
+# MIG-PII: the two enum types 010-pii.sql names and no file creates), but a pointer carries only `carried` sentences,
+# so the release bundle and the pulled tickets had neither.
+TYPES_NOTE = re.compile(r"\*\*Create the types the copied DDL names first\*\*.*?with the same CHECK\.")
+
+
+def apply_notes(r) -> list:
+    """The apply notes of a migration task's description, for its pointer (CHG-R8WFM-004)."""
+    d = r.get("description") or ""
+    out = []
+    if BASELINE_BODIES in d:
+        out.append("Apply note: " + BASELINE_BODIES)
+    out += ["Apply note: " + m.group(0) for m in TYPES_NOTE.finditer(d)]
     return out
 
 

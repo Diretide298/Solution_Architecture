@@ -727,3 +727,70 @@ def test_a_column_a_new_composite_key_covers_is_not_relaxed():
     assert not [s for s in p.statements if "DROP NOT NULL" in s], p.statements
     assert not [r for r in p.review if r[1] == "platform.configuration_profile.version"], p.review
     assert [r for r in p.review if r[0] == "constraint added" and "PRIMARY KEY (id, version)" in r[2]]
+
+
+# ---- declared renames written (CHG-R8WFM-001, r8 sample walk) -------------------------------------------------------
+
+WFM_OLD = ("CREATE TABLE IF NOT EXISTS wallet.hold (id uuid PRIMARY KEY, wallet_hold_amount numeric(18,4) NOT NULL, "
+           "status text NOT NULL CONSTRAINT hold_status_chk CHECK (status IN ('held', 'released')));\n"
+           "CREATE INDEX IF NOT EXISTS hold_status_idx ON wallet.hold (status);\n"
+           "SELECT platform.apply_tenant_rls('wallet.hold'::regclass);\n")
+WFM_NEW = ("CREATE TABLE IF NOT EXISTS wallet.fund_reservation (id uuid PRIMARY KEY, reserved_amount numeric(18,4) NOT NULL, "
+           "status text NOT NULL CONSTRAINT fund_reservation_status_chk CHECK (status IN ('held', 'released', 'sold')));\n"
+           "CREATE INDEX IF NOT EXISTS fund_reservation_status_idx ON wallet.fund_reservation (status);\n"
+           "SELECT platform.apply_tenant_rls('wallet.fund_reservation'::regclass);\n")
+WFM_REN = {"tables": {"wallet.hold": "wallet.fund_reservation"},
+       "columns": {("wallet.fund_reservation", "wallet_hold_amount"): "reserved_amount"}}
+
+
+def test_a_declared_table_rename_is_written_with_its_names_guarded():
+    items = fwd.declared_rename_items(model(WFM_OLD), model(WFM_NEW), WFM_REN)
+    kinds = [(i["kind"], i["stmt"].splitlines()[0]) for i in items]
+    assert kinds[0] == ("rename table", "-- wallet.fund_reservation | rename table | wallet.hold to fund_reservation")
+    body = "\n".join(i["stmt"] for i in items)
+    assert "to_regclass('wallet.hold') IS NOT NULL AND to_regclass('wallet.fund_reservation') IS NULL" in body
+    assert "RENAME COLUMN wallet_hold_amount TO reserved_amount" in body
+    assert "ALTER INDEX wallet.hold_status_idx RENAME TO fund_reservation_status_idx" in body
+    assert "RENAME CONSTRAINT hold_status_chk TO fund_reservation_status_chk" in body
+    assert "RENAME CONSTRAINT hold_pkey TO fund_reservation_pkey" in body
+    assert any(i["kind"] == "rename policy" for i in items)
+
+
+def test_once_the_early_file_is_folded_the_diff_sees_one_table_and_widens_its_check():
+    items = fwd.declared_rename_items(model(WFM_OLD), model(WFM_NEW), WFM_REN)
+    early = fwd.render_recon(fwd.early_plan("tenant", items), "V0103a", "r1", "20261020", before="V0104__x.sql", rest="V0109")
+    old = model(WFM_OLD)
+    old.apply_forward(early)
+    assert fwd.declared_rename_items(old, model(WFM_NEW), WFM_REN) == []
+    p = fwd.diff("tenant", old, model(WFM_NEW), WFM_REN)
+    assert not [r for r in p.review if r[0] in ("table renamed", "after rename", "table dropped")]
+    assert any("fund_reservation_status_chk CHECK (status IN ('held', 'released', 'sold')) NOT VALID" in s
+               for s in p.statements)
+    assert not p.recon
+
+
+def test_a_move_runs_after_the_last_frozen_file_that_names_its_old_name():
+    old = model("CREATE TABLE IF NOT EXISTS platform.dsar_request (id uuid PRIMARY KEY);\n")
+    new = model("CREATE TABLE IF NOT EXISTS sync.dsar_request (id uuid PRIMARY KEY);\n")
+    items = fwd.declared_rename_items(old, new, {"tables": {"platform.dsar_request": "sync.dsar_request"}})
+    assert items[0]["kind"] == "move table"
+    frozen = {"V0103__a.sql": "SELECT 1;", "V0104__b.sql": "SELECT 1;",
+              "V0105__c.sql": "SELECT platform.drop_rls_policies('platform.dsar_request'::regclass);",
+              "V0107__d.sql": "SELECT 1;"}
+    placed, unplaced = fwd.place_renames(items, frozen, {"V0103", "V0104", "V0105", "V0107"})
+    assert not unplaced and all(after >= "V0105__c.sql" for after, _ in placed.values())
+    frozen["V0104__b.sql"] = "SELECT platform.apply_parent_rls('x.y'::regclass, 'new_col', 'x.z'::regclass, 'id');"
+    other = {"group": ("column", "x.y", "new_col"), "kind": "rename column", "stmt": "-- x.y | rename column | a to new_col SELECT 1",
+             "back": "", "olds": [], "news": [__import__("re").compile(r"'x\.y'::regclass, 'new_col'")]}
+    placed, unplaced = fwd.place_renames(items + [other], frozen, {"V0103", "V0104", "V0105", "V0107"})
+    assert sorted(placed) == ["V0103a", "V0105a"] and not unplaced
+
+
+def test_a_rename_both_a_later_and_an_earlier_frozen_file_need_is_not_placed():
+    old = model("CREATE TABLE IF NOT EXISTS wallet.hold (id uuid PRIMARY KEY);\n")
+    new = model("CREATE TABLE IF NOT EXISTS wallet.fund_reservation (id uuid PRIMARY KEY);\n")
+    items = fwd.declared_rename_items(old, new, {"tables": {"wallet.hold": "wallet.fund_reservation"}})
+    frozen = {"V0104__a.sql": "SELECT platform.apply_tenant_rls('wallet.fund_reservation'::regclass);",
+              "V0105__b.sql": "SELECT platform.apply_tenant_rls('wallet.hold'::regclass);"}
+    placed, unplaced = fwd.place_renames(items, frozen, set())
+    assert not placed and unplaced

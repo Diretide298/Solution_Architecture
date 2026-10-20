@@ -333,7 +333,7 @@ crossServiceWrites:
   kind: strong
 - from: WalletService
   to: TenancyService
-  writes: 11
+  writes: 12
   reads: 0
   kind: strong
 - from: OrderService

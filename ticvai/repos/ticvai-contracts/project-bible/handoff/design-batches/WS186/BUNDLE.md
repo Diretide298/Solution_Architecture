@@ -111,7 +111,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-1085` | Wallet Creation & Provisioning Rules | C | 17 | 20 | 6 | 0 | 1 | 6 | — | notStarted (—) |
 | `BO-1086` | Wallet Ownership & Account Association | C | 6 | 0 | 6 | 16 | 1 | 6 | — | notStarted (—) |
 | `BO-1087` | Wallet Currency & Monetary Configuration | C | 16 | 20 | 6 | 0 | 1 | 6 | — | notStarted (—) |
-| `BO-1088` | Credit & Balance Type Configuration | C | 30 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-1088` | Credit & Balance Type Configuration | A | 30 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-1089` | Wallet Feature Profile | C | 0 | 20 | 6 | 0 | 1 | 6 | — | notStarted (—) |
 | `BO-1090` | Wallet Lifecycle Configuration | C | 11 | 20 | 6 | 0 | 1 | 6 | — | notStarted (—) |
 | `BO-1091` | Wallet Numbering, Identity & Digital Credentials | C | 17 | 20 | 6 | 0 | 1 | 6 | — | notStarted (—) |
@@ -917,7 +917,7 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Orders & Money · wave 3 · needs the `core` module |
-| Block | Block C · task VM-BO-1088 |
+| Block | Block A · task APP-SETUP-BO-1088 |
 | Who uses it | venue staff holding `WALLET_CONFIGURE`, `WALLET_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Administrators can define; For each balance type configure) and no display directory — it is settings, not a population |

@@ -1633,7 +1633,7 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | Required when `requiredBillingDocuments[].requiredWhen` | segmented control | optional | — | Always · Trn entered | — | — | `updateRegionSettings` body |
 | Minor age threshold `minorAgeThreshold` | stepper or slider | optional | 18 | min 0; max 21 | — | The age below which a guest is a minor here, set per country (decided 2 October 2026, Chinmay, critical set 1, BO-187: "Guardian consent on the venue's form; minor age per … | `updateRegionSettings` body |
 
-Errors to draw in the form: 400 Validation failed; 403 Authenticated but not permitted at the requested scope; 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 Currency or scale change rejected because transactions exist in this region, or a change to `aiResidencyClass` on a tenant TICVAI locked to `uaeOnly` …; 422 `aiResidencyClass` `globalAllowed` without the three references of `aiResidencyOptIn` (`residency-opt-in-required`; PDPL Article 23; DEC-539; CHG-CSP-009).
+Errors to draw in the form: 400 Validation failed; 403 Authenticated but not permitted at the requested scope; 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 Currency or scale change rejected because transactions exist in this region (`currency-change-refused`), or a change to `aiResidencyClass` on a tenant TICVAI …; 422 `aiResidencyClass` `globalAllowed` without the three references of `aiResidencyOptIn` (`residency-opt-in-required`; PDPL Article 23; DEC-539; CHG-CSP-009).
 
 #### Outputs: what the screen shows and produces
 
@@ -1750,7 +1750,7 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | Empty, no results (`?state=emptyNoResults`) | **Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist |
 | Grant required (`?state=grantRequired`) | **No access into this tenant yet.** A tenant is picked and no platform-staff grant into it is open, so every tenant action is disabled and the screen offers **Open access grant** (`openPlatformStaffGrant`: reason, permissions `REGION_CONFIGURE`, `SCOPE_VIEW`, `TENANT_CONFIGURE`, `TENANT_VIEW`, expiry). The same state returns when the grant reaches `expiresAt` (audit R098; CHG-SBO-001). |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 Currency or scale change rejected because transactions exist in this region, or a change to `aiResidencyClass` on a tenant TICVAI locked to `uaeOnly` …; 422 `aiResidencyClass` `globalAllowed` without the three references of `aiResidencyOptIn` (`residency-opt-in-required`; PDPL Article 23; DEC-539; CHG-CSP-009). |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 Currency or scale change rejected because transactions exist in this region (`currency-change-refused`), or a change to `aiResidencyClass` on a tenant TICVAI …; 422 `aiResidencyClass` `globalAllowed` without the three references of `aiResidencyOptIn` (`residency-opt-in-required`; PDPL Article 23; DEC-539; CHG-CSP-009). |
 
 #### Sample data for the mock-up
 

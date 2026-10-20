@@ -260,7 +260,7 @@
   {
    "table": "orders.payment",
    "schema": "orders",
-   "columns": 18,
+   "columns": 23,
    "burstOperations": 5,
    "written": true,
    "contention": null,
@@ -277,7 +277,7 @@
    "contention": null,
    "contended": false,
    "contentionIndeterminate": false,
-   "note": "**Written in the same transaction as the state change, by the platform, not by an operation.** That is what makes it exactly-once **Hangs off**: reaches `platform.scope` through its keys. **Reached by**: 4 operations rea"
+   "note": "**Written in the same transaction as the state change, by the platform, not by an operation.** That is what makes it exactly-once **Hangs off**: reaches `platform.scope` through its keys. **Reached by**: 3 operations rea"
   },
   {
    "table": "access.entitlement",
@@ -354,7 +354,7 @@
   {
    "table": "orders.order_event",
    "schema": "orders",
-   "columns": 16,
+   "columns": 19,
    "burstOperations": 3,
    "written": true,
    "contention": null,
@@ -434,7 +434,7 @@
    "contention": null,
    "contended": false,
    "contentionIndeterminate": false,
-   "note": "What requires approval where. Versioned, because a request must be decided by the rules it was raised under **Hangs off**: reaches `approvals.request` through its keys. **Reached by**: 9 operations read it and 2 write it"
+   "note": "What requires approval where. Versioned, because a request must be decided by the rules it was raised under **Hangs off**: reaches `approvals.request` through its keys. **Reached by**: 14 operations read it and 3 write i"
   },
   {
    "table": "approvals.rule",
@@ -676,7 +676,7 @@
    "contention": null,
    "contended": false,
    "contentionIndeterminate": false,
-   "note": "One request per action needing authorisation. The subject is a reference, never a copy **Hangs off**: **a root** — nothing above it in its schema; references `identity.principal`. **Reached by**: 36 operations read it an"
+   "note": "One request per action needing authorisation. The subject is a reference, never a copy **Hangs off**: **a root** — nothing above it in its schema; references `approvals.matrix`, `approvals.rule`, `identity.principal`. **"
   },
   {
    "table": "catalogue.channel_envelope",

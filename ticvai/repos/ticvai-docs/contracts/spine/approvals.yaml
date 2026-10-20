@@ -1636,8 +1636,8 @@ paths:
       x-ticvai-consumed-by:
         - "P08 ADM-239 Visual Business Rule Builder"
         - "P08 ADM-323 Condition & Decision Rule Builder"
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per business rule, the one the body''s `ruleId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [ruleId]
+      x-ticvai-body-key-note: 'Keyed by the body''s `ruleId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per business rule within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body. **Required in fact**: a body without `ruleId` is refused `400 validation`; the schema leaves it optional only so a client built at r1 still validates.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack 13.1.2 p.6-7; MoM 10 Aug §5.5 (builder configures who approves
@@ -1797,8 +1797,8 @@ paths:
   /matrix-multi-level:
     put:
       operationId: approveMatrixMultiLevel
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per approval matrix code, the one the body''s `code` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [code]
+      x-ticvai-body-key-note: 'Keyed by the body''s `code`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per approval matrix code within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack 13.1.5 p.11-12; MoM 8 Sep (authority by amount and category, N-of-M
@@ -2058,8 +2058,8 @@ paths:
         - "P08 ADM-325 Workflow Outcome & Action Configuration"
         - "P08 ADM-352 Workflow Event Framework"
         - "P08 ADM-355 Data & Workflow Mapping Studio"
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per workflow, the one the body''s `workflowId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [workflowId]
+      x-ticvai-body-key-note: 'Keyed by the body''s `workflowId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per workflow within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack 13.1.8 p.16-17; MoM 8 Sep (API/webhook/external workflow integration
@@ -2119,8 +2119,8 @@ paths:
         - "P08 ADM-337 Routing Simulator & Conflict Detection"
         - "P08 ADM-367 AI Optimization & What-If Simulator"
         - "P08 BO-643 Approval Policy Validation & Publication"
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per workflow, the one the body''s `workflowId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [workflowId]
+      x-ticvai-body-key-note: 'Keyed by the body''s `workflowId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per workflow within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack 13.1.9 p.18; MoM 8 Sep (builder); our build plan'
@@ -2174,8 +2174,8 @@ paths:
       operationId: approveVersioningGovernance
       x-ticvai-consumed-by:
         - "P08 ADM-247 Versioning, Governance, Approval & Publication"
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per workflow, the one the body''s `workflowId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [workflowId]
+      x-ticvai-body-key-note: 'Keyed by the body''s `workflowId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per workflow within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack 13.1.10 p.19-20; MoM 8 Sep (governance, audit, AI analytics only);
@@ -2320,8 +2320,8 @@ paths:
       - query: identity#principalRecords
         route: in-process
         for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per approval request, the one the body''s `approvalRequestId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [approvalRequestId]
+      x-ticvai-body-key-note: 'Keyed by the body''s `approvalRequestId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per approval request within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body. **Required in fact**: a body without `approvalRequestId` is refused `400 validation`; the schema leaves it optional only so a client built at r1 still validates.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack 13.2.2 p.25-26; MoM 10 Aug §5.5 and 8 Sep (Approve, Reject, Return,
@@ -3084,8 +3084,8 @@ paths:
       x-ticvai-consumed-by:
         - "P08 ADM-342 Authentication & MFA Policy Manager"
         - "P08 ADM-343 Sensitive Action Confirmation"
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per operation, the one the body''s `operationId` names, within the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [operationId]
+      x-ticvai-body-key-note: 'Keyed by the body''s `operationId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per operation within the caller''s tenant; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body.'
       x-ticvai-audience:
       - staff
       summary: Raise what needs a second factor

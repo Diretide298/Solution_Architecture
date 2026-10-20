@@ -2287,7 +2287,7 @@
       "voidEntitlement",
       "voidOrder"
      ],
-     "elevated": false,
+     "elevated": true,
      "segregationConstrained": false
     },
     {
@@ -3324,7 +3324,7 @@
      "operations": [
       "recordNoSale"
      ],
-     "elevated": false,
+     "elevated": true,
      "segregationConstrained": false
     },
     {

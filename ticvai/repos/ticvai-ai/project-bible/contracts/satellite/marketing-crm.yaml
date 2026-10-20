@@ -2147,8 +2147,8 @@ paths:
       - query: platform-ops#seoMetadataRecords
         route: in-process
         for: 'its read of control.seo_metadata, Platform''s data (CHG-MOD-001)'
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per entity and locale, the one the body''s `entityId` names, within the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [entityId]
+      x-ticvai-body-key-note: 'Keyed by the body''s `entityId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per entity and locale within the caller''s tenant; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body.'
       summary: Titles, descriptions, canonicals and hreflang
       description: '22.11.1 and 22.11.11. **SEO is not a marketing nicety for a venue selling online**
         — an attraction that does not appear in search sells through OTAs at OTA commission.
@@ -7487,8 +7487,8 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-027 Newsletter Subscription"
         - "P02 GST-065 Newsletter & Preferences"
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per guest, channel and list, the one the body''s `subjectId` names, within the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [subjectId]
+      x-ticvai-body-key-note: 'Keyed by the body''s `subjectId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per guest, channel and list within the caller''s tenant; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body.'
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -8767,8 +8767,8 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-749 Guest Preference Center"
         - "P13 CMS-024 Communication Preference & Marketing Permission Configuration"
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per communication preference category, the one the body''s `categoryCode` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [categoryCode]
+      x-ticvai-body-key-note: 'Keyed by the body''s `categoryCode`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per communication preference category within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body.'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Privacy__Consent___Preference_Management_Reference.pdf'' pp.8-9 (17.1.4); MoM 20 Aug §4.3 (no opt-in, no promotional communication); MoM 31 Aug §4.6'
@@ -9116,8 +9116,8 @@ paths:
       operationId: setConsentCapturePoint
       x-ticvai-consumed-by:
         - "P13 CMS-027 Consent Capture Point & Customer Journey Configuration"
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per capture point and channel, the one the body''s `capturePoint` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [capturePoint]
+      x-ticvai-body-key-note: 'Keyed by the body''s `capturePoint`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per capture point and channel within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body.'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Privacy__Consent___Preference_Management_Reference.pdf'' pp.12-13 (17.1.7); guardian threshold from setMinorGuardianAge (per country, no shipped default)'
@@ -9406,8 +9406,8 @@ paths:
       operationId: approvePrivacyTesting
       x-ticvai-consumed-by:
         - "P13 CMS-030 Privacy Configuration Testing, Approval & Publication"
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per privacy change set, the one the body''s `changeSetId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [changeSetId]
+      x-ticvai-body-key-note: 'Keyed by the body''s `changeSetId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per privacy change set within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body. **Required in fact**: a body without `changeSetId` is refused `400 validation`; the schema leaves it optional only so a client built at r1 still validates.'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Privacy__Consent___Preference_Management_Reference.pdf'' pp.16-18 (17.1.10); approval runs through the approvals engine (configurable workflow, no hard-coded job titles)'
@@ -9955,8 +9955,8 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-750 Data Subject Requests"
         - "P13 CMS-035 Data Discovery, Access, Export & Correction Workspace"
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per privacy request, the one the body''s `requestId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [requestId]
+      x-ticvai-body-key-note: 'Keyed by the body''s `requestId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per privacy request within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body.'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Privacy__Consent___Preference_Management_Reference.pdf'' pp.28-29 (17.2.5); exportSubjectData already assembles an export from the lineage; MoM 20 Aug §4.3 (access, correction, deletion)'
@@ -10972,8 +10972,8 @@ paths:
       operationId: setCaseInvestigationResolution
       x-ticvai-consumed-by:
         - "P12 SUP-013 Case Investigation & Resolution Workspace"
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per case and linked record, the one the body''s `caseId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [caseId]
+      x-ticvai-body-key-note: 'Keyed by the body''s `caseId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per case and linked record within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body.'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: MoM 31 Aug §4.1 (agents act from the case; AI summariser compiles actions on a case); pack ''Customer Service_Reference.pdf'' pp.11-13 (10.1.5 Related Records, Case Actions)'
@@ -13022,8 +13022,8 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-845 Waiver Template Builder"
         - "P13 CMS-043 Digital Waiver & Form Builder"
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [formId, formVersion]
+      x-ticvai-body-key-note: 'Keyed by the body''s `formId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per waiver or consent-form version within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body. With `formVersion`, the version of that form: the two together are the key, as the description says.'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: MoM 31 Aug §4.9 (drag-and-drop fields, builder fully configurable, conditional questions, mobile view); pack ''Waiver, Consent & Digital Form Management_Reference.pdf'' pp.9-11 (11.1.3)'
@@ -13280,8 +13280,8 @@ paths:
         - "P08 BO-848 Signature Experience Setup"
         - "P08 BO-849 Guardian & Group Signing"
         - "P13 CMS-045 Signatory, Signature & Guardian Rule Configuration"
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [formId, formVersion]
+      x-ticvai-body-key-note: 'Keyed by the body''s `formId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per waiver or consent-form version within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body. With `formVersion`, the version of that form: the two together are the key, as the description says.'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: MoM 31 Aug §4.9 (signatory = participant or parent/guardian; minor/guardian handling); pack ''Waiver, Consent & Digital Form Management_Reference.pdf'' pp.13-14 (11.1.5), which also settles the legal question: signature method and evidence are configured per waiver and approved by the organisation''s legal/compliance reviewer, TICVAI assumes none is sufficient everywhere'
@@ -13778,8 +13778,8 @@ paths:
       operationId: setLocalizationBrandingCustomer
       x-ticvai-consumed-by:
         - "P13 CMS-049 Localization, Branding & Customer Experience Configuration"
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [formId, formVersion]
+      x-ticvai-body-key-note: 'Keyed by the body''s `formId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per waiver or consent-form version within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body. With `formVersion`, the version of that form: the two together are the key, as the description says.'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: MoM 31 Aug §4.9 (mobile view; waiver reachable by QR code; delivery by email/WhatsApp/SMS); pack ''Waiver, Consent & Digital Form Management_Reference.pdf'' pp.19-20 (11.1.9)'
@@ -13891,8 +13891,8 @@ paths:
       operationId: approveWaiverTesting
       x-ticvai-consumed-by:
         - "P13 CMS-050 Waiver Approval, Testing & Publication Workspace"
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per waiver form, the one the body''s `formId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [formId]
+      x-ticvai-body-key-note: 'Keyed by the body''s `formId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per waiver form within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body.'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: MoM 31 Aug §4.9 (approval/testing/publication; templates published vs draft; versioning); pack ''Waiver, Consent & Digital Form Management_Reference.pdf'' pp.19 (Emergency Suspension, Re-Sign Rules), 21-23 (11.1.10); states/form-definition.yaml'

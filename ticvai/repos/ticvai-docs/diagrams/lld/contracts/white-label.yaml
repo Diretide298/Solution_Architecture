@@ -29,7 +29,9 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - whitelabel.config_version
+  - whitelabel.custom_domain
   writes: []
 - operation: claimCustomDomain
   verb: POST
@@ -356,7 +358,9 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - whitelabel.config_version
+  - whitelabel.custom_domain
   writes: []
 - operation: getFeatureToggles
   verb: GET

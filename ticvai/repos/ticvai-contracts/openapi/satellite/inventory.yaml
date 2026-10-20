@@ -478,8 +478,8 @@ paths:
       operationId: setDailyCount
       x-ticvai-consumed-by:
         - "P06 EMP-066 Stock Count & Cycle Count Management"
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per stock location, the one the body''s `locationId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [locationId]
+      x-ticvai-body-key-note: 'Keyed by the body''s `locationId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per stock location within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body. **Required in fact**: a body without `locationId` is refused `400 validation`; the schema leaves it optional only so a client built at r1 still validates.'
       summary: Which items get counted every day
       description: 'Board 2H. **A full count is a shift; a daily count is twenty items and ten minutes.**
         The package had `startStockCount` for the first and nothing for the second, so venues either counted

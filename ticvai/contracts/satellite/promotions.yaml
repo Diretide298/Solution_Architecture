@@ -811,6 +811,9 @@ paths:
         type: string
     post:
       operationId: pausePromotion
+      x-ticvai-consumed-by:
+        - "P08 ADM-141 Promotion Lifecycle & Status Manager"
+        - "P08 BO-010 Promotions & Coupons"
       x-ticvai-writes:
       - table: promotions.promotion
         for: 'what this operation writes (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
@@ -823,9 +826,6 @@ paths:
         for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
       - table: promotions.promotion_channel_publication
         for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
-      x-ticvai-consumed-by:
-        - "P08 ADM-141 Promotion Lifecycle & Status Manager"
-        - "P08 BO-010 Promotions & Coupons"
       x-ticvai-api-scope: ticketing.write
       x-ticvai-audience:
       - staff
@@ -882,6 +882,9 @@ paths:
         type: string
     post:
       operationId: endPromotion
+      x-ticvai-consumed-by:
+        - "P08 ADM-141 Promotion Lifecycle & Status Manager"
+        - "P08 BO-010 Promotions & Coupons"
       x-ticvai-writes:
       - table: promotions.promotion
         for: 'what this operation writes (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
@@ -894,9 +897,6 @@ paths:
         for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
       - table: promotions.promotion_channel_publication
         for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
-      x-ticvai-consumed-by:
-        - "P08 ADM-141 Promotion Lifecycle & Status Manager"
-        - "P08 BO-010 Promotions & Coupons"
       x-ticvai-api-scope: ticketing.write
       x-ticvai-audience:
       - staff
@@ -954,6 +954,9 @@ paths:
         type: string
     post:
       operationId: unschedulePromotion
+      x-ticvai-consumed-by:
+        - "P08 ADM-141 Promotion Lifecycle & Status Manager"
+        - "P08 BO-010 Promotions & Coupons"
       x-ticvai-writes:
       - table: promotions.promotion
         for: 'what this operation writes (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
@@ -962,9 +965,6 @@ paths:
       x-ticvai-reads:
       - table: promotions.promotion
         for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
-      x-ticvai-consumed-by:
-        - "P08 ADM-141 Promotion Lifecycle & Status Manager"
-        - "P08 BO-010 Promotions & Coupons"
       x-ticvai-api-scope: ticketing.write
       x-ticvai-audience:
       - staff
@@ -1076,12 +1076,12 @@ paths:
         format: uuid
     get:
       operationId: analysePromotionConflicts
-      x-ticvai-reads:
-      - table: promotions.promotion
-        for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
       x-ticvai-consumed-by:
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P08 BO-010 Promotions & Coupons"
+      x-ticvai-reads:
+      - table: promotions.promotion
+        for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
         route: in-process
@@ -1127,15 +1127,15 @@ paths:
         format: uuid
     get:
       operationId: getPromotionUsage
-      x-ticvai-reads:
-      - table: promotions.promotion
-        for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
       x-ticvai-consumed-by:
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P08 ADM-138 Promotion Command Center Dashboard"
         - "P08 ADM-140 Promotion Overview"
         - "P08 BO-010 Promotions & Coupons"
         - "P10 PTR-010 Cart & Quote"
+      x-ticvai-reads:
+      - table: promotions.promotion
+        for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
       x-ticvai-api-scope: ticketing.read
       x-ticvai-audience:
       - staff
@@ -1591,6 +1591,8 @@ paths:
         type: string
     post:
       operationId: assignCoupon
+      x-ticvai-consumed-by:
+        - "P08 BO-010 Promotions & Coupons"
       x-ticvai-writes:
       - table: promotions.coupon_code
         for: 'what this operation writes (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
@@ -1599,8 +1601,6 @@ paths:
       x-ticvai-reads:
       - table: promotions.coupon_code
         for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
-      x-ticvai-consumed-by:
-        - "P08 BO-010 Promotions & Coupons"
       x-ticvai-audience:
       - staff
       summary: Assign a coupon to a named guest
@@ -2381,6 +2381,16 @@ paths:
   /promotions/evaluate:
     post:
       operationId: evaluatePromotions
+      x-ticvai-consumed-by:
+        - "P01 WEB-005 Ticket Type Selection"
+        - "P01 WEB-010 Shopping Cart"
+        - "P04 POS-002 Sell — Ticket Catalogue"
+        - "P04 POS-021 Sell — Food & Drink"
+        - "P04 POS-023 Sell — Merchandise"
+        - "P08 ADM-157 Rule Test, Simulation & AI Recommendation Workspace"
+        - "P08 ADM-177 Offer Simulation, Basket Trace & AI Optimization"
+        - "P08 BO-010 Promotions & Coupons"
+        - "P10 PTR-010 Cart & Quote"
       x-ticvai-writes:
       - table: promotions.promotion_evaluation_trace
         for: 'what this operation writes (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
@@ -2393,16 +2403,6 @@ paths:
         for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
       - table: promotions.promotion_rule
         for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
-      x-ticvai-consumed-by:
-        - "P01 WEB-005 Ticket Type Selection"
-        - "P01 WEB-010 Shopping Cart"
-        - "P04 POS-002 Sell — Ticket Catalogue"
-        - "P04 POS-021 Sell — Food & Drink"
-        - "P04 POS-023 Sell — Merchandise"
-        - "P08 ADM-157 Rule Test, Simulation & AI Recommendation Workspace"
-        - "P08 ADM-177 Offer Simulation, Basket Trace & AI Optimization"
-        - "P08 BO-010 Promotions & Coupons"
-        - "P10 PTR-010 Cart & Quote"
       security:
       - guestAuth: []
       - bearerAuth: []

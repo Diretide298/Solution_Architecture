@@ -2925,14 +2925,14 @@ paths:
         type: string
     delete:
       operationId: removeBlacklistEntry
+      x-ticvai-consumed-by:
+        - "P08 BO-033 Blacklist Management"
       x-ticvai-writes:
       - table: access.blacklist
         for: 'what this operation writes (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
       x-ticvai-reads:
       - table: access.blacklist
         for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
-      x-ticvai-consumed-by:
-        - "P08 BO-033 Blacklist Management"
       x-ticvai-audience:
       - staff
       summary: Remove a blacklist entry

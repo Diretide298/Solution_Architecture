@@ -562,10 +562,14 @@
    "scale": "Analytical. Runs against the replica and the analytical store.",
    "risk": "Down stops dashboards. **Nothing operational depends on it.**",
    "readsFrom": {
+    "AccessService": 2,
     "AiService": 2,
     "IdentityService": 2,
-    "AccessService": 1,
+    "FnbService": 1,
     "InventoryService": 1,
+    "LedgerService": 1,
+    "MarketingService": 1,
+    "OrderService": 1,
     "TenancyService": 1
    },
    "writesOutside": {
@@ -626,7 +630,7 @@
     "IdentityService": 1
    },
    "writesOutside": {
-    "TenancyService": 8,
+    "TenancyService": 9,
     "VenueOpsService": 2,
     "OrderService": 1
    }

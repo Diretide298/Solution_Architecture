@@ -111,7 +111,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-1085` | Wallet Creation & Provisioning Rules | C | 17 | 20 | 6 | 0 | 1 | 6 | — | notStarted (—) |
 | `BO-1086` | Wallet Ownership & Account Association | C | 6 | 0 | 6 | 16 | 1 | 6 | — | notStarted (—) |
 | `BO-1087` | Wallet Currency & Monetary Configuration | C | 16 | 20 | 6 | 0 | 1 | 6 | — | notStarted (—) |
-| `BO-1088` | Credit & Balance Type Configuration | C | 30 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-1088` | Credit & Balance Type Configuration | A | 30 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-1089` | Wallet Feature Profile | C | 0 | 20 | 6 | 0 | 1 | 6 | — | notStarted (—) |
 | `BO-1090` | Wallet Lifecycle Configuration | C | 11 | 20 | 6 | 0 | 1 | 6 | — | notStarted (—) |
 | `BO-1091` | Wallet Numbering, Identity & Digital Credentials | C | 17 | 20 | 6 | 0 | 1 | 6 | — | notStarted (—) |

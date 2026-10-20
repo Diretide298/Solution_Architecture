@@ -493,9 +493,6 @@ paths:
   /merchandise/lookup:
     get:
       operationId: lookupMerchandise
-      x-ticvai-reads:
-      - table: retail.merchandise
-        for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
       x-ticvai-consumed-by:
         - "P01 WEB-033 Shop"
         - "P02 GST-026 Retail / Merchandise"
@@ -505,6 +502,9 @@ paths:
         - "P06 EMP-062 Store Stock & SKU Availability"
         - "P06 EMP-069 Barcode, RFID, Serialized Stock & Traceability"
         - "P08 BO-114 Variants, Attributes, Barcode & RFID Management"
+      x-ticvai-reads:
+      - table: retail.merchandise
+        for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
       x-ticvai-read-via:
       - query: tenancy#workstationRecords
         route: service
@@ -809,16 +809,16 @@ paths:
         schema: { type: string, format: uuid }
     post:
       operationId: reprintReceipt
+      x-ticvai-consumed-by:
+        - "P04 POS-005 Payment"
+        - "P04 POS-026 Receipt & Reprint"
+        - "P04 POS-030 Sales Journal"
       x-ticvai-writes:
       - table: retail.sale
         for: 'what this operation writes (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
       x-ticvai-reads:
       - table: retail.sale
         for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
-      x-ticvai-consumed-by:
-        - "P04 POS-005 Payment"
-        - "P04 POS-026 Receipt & Reprint"
-        - "P04 POS-030 Sales Journal"
       x-ticvai-audience: [staff]
       summary: Reprint or resend a receipt
       tags: [sale]

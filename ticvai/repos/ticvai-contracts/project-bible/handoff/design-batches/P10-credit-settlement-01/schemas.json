@@ -212,6 +212,51 @@
    "recordedAt"
   ],
   "properties": {
+   "tipAmount": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true,
+    "readOnly": true,
+    "description": "**The tip recorded against this payment** (`addTip`; r8 walk fix, CHG-R8WFC-002). Null until one is recorded; a payment holds at most one tip, so `addTip` answers `409 tipAlreadyRecorded` once this is set. Money held for staff, posted to a liability, never to sales. The retired stub table `orders.payment_tip` (CHG-STO-008: \"no field carries a tip\") is not brought back: the tip is four columns of the payment it belongs to."
+   },
+   "tipSource": {
+    "type": "string",
+    "enum": [
+     "terminalPrompt",
+     "cashierEntered",
+     "guestApp",
+     "serviceCharge"
+    ],
+    "nullable": true,
+    "readOnly": true,
+    "description": "Where the tip came from (`addTip`'s `source`); null with no tip."
+   },
+   "tipAllocatedToPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The staff member the venue allocates the tip to (`addTip`'s `allocateToPrincipalId`); null when tips are pooled or there is no tip.",
+    "x-ticvai-references": "identity.principal"
+   },
+   "tipRecordedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "When the till or app recorded the tip (`addTip`'s `recordedAt`); null with no tip."
+   },
+   "tipRecordedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "Who recorded it, from the session (the attribution a cashier-entered tip needs, as a manual discount does); null with no tip.",
+    "x-ticvai-references": "identity.principal"
+   },
    "id": {
     "type": "string",
     "format": "uuid"

@@ -1929,19 +1929,56 @@ def frozen_mode(files: dict, tag: str, commit: str, apply: bool) -> None:
 
     plans, extra = [], []
     renames = declared_renames()
-    for area_dir in (CONTROL, "tenant"):
-        old, new = ddl_forward.Model(), ddl_forward.Model()
+    # **The declared renames go first, in an early names file, and everything else is derived after them**
+    # (CHG-R8WFM-001; r8 sample walk, table-rename-not-in-migrations). Pass 1 asks which declared renames the old side
+    # still has and where each may run (ddl_forward.place_renames: after the last frozen file that names its old name,
+    # before the first that names its new one); their files are then folded into the old side at their place by name,
+    # and the diff runs again, so the additive file and the names file are derived against the renamed tables, exactly
+    # as the next refresh, with the early files on disk, derives them. A rename no slot fits stays a review row.
+    early_files = {CONTROL: {}, "tenant": {}}     # area -> {file name: text}, the early names files this run writes
+    early_meta = {CONTROL: {}, "tenant": {}}      # area -> {file name: (version, the file it runs before, items)}
+    taken_versions = {x.name.split("__", 1)[0] for d in (CONTROL, "tenant") for x in (OUT / d).glob("V*.sql")}
+
+    def old_model(area_dir: str):
+        old = ddl_forward.Model()
         for path in sorted(ls_tree(commit, f"backend/{area_dir}")):
             name = path.rsplit("/", 1)[-1]
             if path.endswith(".sql") and not FORWARD_FILE.match(name):
                 old.add_file((show(commit, path) or b"").decode("utf-8"))
-        for fwd in sorted((OUT / area_dir).glob("V*.sql"), key=lambda p: p.name):   # the order a database applies them: by name
-            if FORWARD_FILE.match(fwd.name):
-                text = fwd.read_text(encoding="utf-8")
-                old.apply_forward(re.split(r"^-- =+\n-- ROLLBACK\b", text, maxsplit=1, flags=re.M)[0])
+        fwd = {p.name: p.read_text(encoding="utf-8") for p in (OUT / area_dir).glob("V*.sql") if FORWARD_FILE.match(p.name)}
+        fwd.update(early_files[area_dir])
+        for name in sorted(fwd):   # the order a database applies them: by name
+            old.apply_forward(re.split(r"^-- =+\n-- ROLLBACK\b", fwd[name], maxsplit=1, flags=re.M)[0])
+        return old, fwd
+
+    news = {}
+    for area_dir in (CONTROL, "tenant"):
+        new = ddl_forward.Model()
         for name in sorted(n for n in files if n.startswith(area_dir + "/") and n.endswith(".sql")):
             new.add_file(files[name])
-        plans.append(ddl_forward.diff(area_dir, old, new, renames, retired=RETIRED))
+        news[area_dir] = new
+    for area_dir in (CONTROL, "tenant"):
+        for _pass in range(4):
+            old, fwd = old_model(area_dir)
+            items = ddl_forward.declared_rename_items(old, news[area_dir], renames)
+            if not items:
+                break
+            placed, unplaced = ddl_forward.place_renames(items, fwd, taken_versions)
+            for it in unplaced:
+                print(f"  {area_dir}: a declared rename no slot fits, left for a person: {it['stmt'].splitlines()[0]}")
+            if not placed:
+                break
+            names_sorted = sorted(fwd)
+            for ev, (after, its) in placed.items():
+                nxt = next((n for n in names_sorted if n > after), None)
+                name = f"{ev}__names_early_after_{safe_tag}_{stamp}.sql"
+                early_meta[area_dir][name] = (ev, nxt, its)
+                # folded into the old side for the next pass; written with its final header below
+                early_files[area_dir][name] = ddl_forward.render_recon(
+                    ddl_forward.early_plan(area_dir, its), ev, baseline, stamp, before=nxt or "", rest="")
+    for area_dir in (CONTROL, "tenant"):
+        old, _fwd = old_model(area_dir)
+        plans.append(ddl_forward.diff(area_dir, old, news[area_dir], renames, retired=RETIRED))
     # **Root-level files are documentation of references that are not constraints** (990): nothing
     # applies them, so a change is listed rather than migrated.
     for name in sorted(n for n in files if "/" not in n and n.endswith(".sql")):
@@ -1970,6 +2007,15 @@ def frozen_mode(files: dict, tag: str, commit: str, apply: bool) -> None:
     # number when nothing additive is due, and is one number for both databases like the first.
     recon_n = version_n + (1 if any(p.statements for p in plans) else 0)
     recon_version = f"V{recon_n:04d}"
+    # the early names files of the declared renames (CHG-R8WFM-001), with their final header
+    for area_dir, meta in early_meta.items():
+        for name, (ev, nxt, its) in sorted(meta.items()):
+            ep = ddl_forward.early_plan(area_dir, its)
+            edest = OUT / area_dir / name
+            written.append((edest, ep))
+            if apply:
+                edest.write_text(ddl_forward.render_recon(ep, ev, baseline, stamp, before=nxt or "",
+                                                          rest=recon_version), encoding="utf-8")
     for p in plans:
         if not p.recon:
             continue
@@ -2017,7 +2063,7 @@ def frozen_mode(files: dict, tag: str, commit: str, apply: bool) -> None:
         c = p.counts
         if "__names_" in dest.name:
             r = p.recon_counts
-            print(f"  forward migration {dest.relative_to(ROOT).as_posix()}: {r['renames']} column rename(s), "
+            print(f"  forward migration {dest.relative_to(ROOT).as_posix()}: {r.get('tables', 0)} table(s), {r['renames']} column rename(s), "
                   f"{r['keys']} key(s), {r['indexes']} index(es)" + ("" if apply else " (not written, pass --apply)"))
             continue
         print(f"  forward migration {dest.relative_to(ROOT).as_posix()}: {c['tables']} table(s), "

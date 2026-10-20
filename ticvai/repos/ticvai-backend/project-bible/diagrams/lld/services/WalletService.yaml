@@ -128,7 +128,7 @@ operationsByContract:
     permission: WALLET_OPERATE
     offline: false
     reads: 5
-    writes: 5
+    writes: 6
   - operation: getCreditConsumptionPolicy
     verb: GET
     path: /credit-consumption-policy
@@ -966,7 +966,7 @@ readsFrom:
   operations: 1
 writesOutside:
 - service: TenancyService
-  operations: 8
+  operations: 9
   rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
     published.'
   why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
@@ -982,6 +982,9 @@ writesOutside:
   - operation: captureWalletHold
     tables:
     - platform.idempotency_record
+    - platform.outbox
+  - operation: expireCreditLots
+    tables:
     - platform.outbox
   - operation: holdWalletFunds
     tables:

@@ -647,6 +647,14 @@ The cart is retained, not deleted — a checkout that fails at payment must be r
 | lines[].discounts[].amount | Money | yes | On the wire this is three fields; in the database it is one column. |
 | lines[].discounts[].reason | string |  | A cashier's reason for a manual discount. (max length 200; nullable) |
 | payments | array of Payment |  |  |
+| payments[].tipAmount | object |  | The tip recorded against this payment (addTip; r8 walk fix, CHG-R8WFC-002). (read-only; nullable) |
+| payments[].tipAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| payments[].tipAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| payments[].tipAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| payments[].tipSource | enum (terminalPrompt, cashierEntered, guestApp, serviceCharge) |  | Where the tip came from (addTip's source); null with no tip. (read-only; nullable) |
+| payments[].tipAllocatedToPrincipalId | string (uuid) |  | The staff member the venue allocates the tip to (addTip's allocateToPrincipalId); null when tips are pooled or there is no tip. (read-only; nullable) |
+| payments[].tipRecordedAt | string (date-time) |  | When the till or app recorded the tip (addTip's recordedAt); null with no tip. (read-only; nullable) |
+| payments[].tipRecordedByPrincipalId | string (uuid) |  | Who recorded it, from the session (the attribution a cashier-entered tip needs, as a manual discount does); null with no tip. (read-only; nullable) |
 | payments[].id | string (uuid) | yes |  |
 | payments[].orderId | string (uuid) | yes |  |
 | payments[].tender | TenderKind: enum (cash, card, wallet, voucher, bankTransfer, hotelCharge, installment, giftCard, …) | yes | wallet is a digital wallet (Apple Pay, Google Pay and the like, taken through the gateway), the value the guest channels accept beside card (decided 28 September, audit R080 (a)). |
@@ -1944,6 +1952,11 @@ The media is the join, not the order. That is why this operation is keyed on `me
 | order.lines[].venueId | string (uuid) |  | The order's venue, copied onto the line (ADR-0044's own example; system-design review SD-008, 29 September) so a line is scoped and partitionable without its order. (read-only) |
 | order.lines[].discounts | array of OrderLineDiscount |  | The discounts applied to this line, one row each (system-design review SD-008, 29 September). (read-only) |
 | order.payments | array of Payment |  |  |
+| order.payments[].tipAmount | object |  | The tip recorded against this payment (addTip; r8 walk fix, CHG-R8WFC-002). (read-only; nullable) |
+| order.payments[].tipSource | enum (terminalPrompt, cashierEntered, guestApp, serviceCharge) |  | Where the tip came from (addTip's source); null with no tip. (read-only; nullable) |
+| order.payments[].tipAllocatedToPrincipalId | string (uuid) |  | The staff member the venue allocates the tip to (addTip's allocateToPrincipalId); null when tips are pooled or there is no tip. (read-only; nullable) |
+| order.payments[].tipRecordedAt | string (date-time) |  | When the till or app recorded the tip (addTip's recordedAt); null with no tip. (read-only; nullable) |
+| order.payments[].tipRecordedByPrincipalId | string (uuid) |  | Who recorded it, from the session (the attribution a cashier-entered tip needs, as a manual discount does); null with no tip. (read-only; nullable) |
 | order.payments[].id | string (uuid) | yes |  |
 | order.payments[].orderId | string (uuid) | yes |  |
 | order.payments[].tender | TenderKind: enum (cash, card, wallet, voucher, bankTransfer, hotelCharge, installment, giftCard, …) | yes | wallet is a digital wallet (Apple Pay, Google Pay and the like, taken through the gateway), the value the guest channels accept beside card (decided 28 September, audit R080 (a)). |
@@ -2151,6 +2164,14 @@ Posts to a discount account, never as a price change. A line sold at a reduced p
 | lines[].discounts[].amount | Money | yes | On the wire this is three fields; in the database it is one column. |
 | lines[].discounts[].reason | string |  | A cashier's reason for a manual discount. (max length 200; nullable) |
 | payments | array of Payment |  |  |
+| payments[].tipAmount | object |  | The tip recorded against this payment (addTip; r8 walk fix, CHG-R8WFC-002). (read-only; nullable) |
+| payments[].tipAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| payments[].tipAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| payments[].tipAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| payments[].tipSource | enum (terminalPrompt, cashierEntered, guestApp, serviceCharge) |  | Where the tip came from (addTip's source); null with no tip. (read-only; nullable) |
+| payments[].tipAllocatedToPrincipalId | string (uuid) |  | The staff member the venue allocates the tip to (addTip's allocateToPrincipalId); null when tips are pooled or there is no tip. (read-only; nullable) |
+| payments[].tipRecordedAt | string (date-time) |  | When the till or app recorded the tip (addTip's recordedAt); null with no tip. (read-only; nullable) |
+| payments[].tipRecordedByPrincipalId | string (uuid) |  | Who recorded it, from the session (the attribution a cashier-entered tip needs, as a manual discount does); null with no tip. (read-only; nullable) |
 | payments[].id | string (uuid) | yes |  |
 | payments[].orderId | string (uuid) | yes |  |
 | payments[].tender | TenderKind: enum (cash, card, wallet, voucher, bankTransfer, hotelCharge, installment, giftCard, …) | yes | wallet is a digital wallet (Apple Pay, Google Pay and the like, taken through the gateway), the value the guest channels accept beside card (decided 28 September, audit R080 (a)). |
@@ -2436,6 +2457,14 @@ Offline-capable. The client writes to its local journal, acknowledges the cashie
 | lines[].discounts[].amount | Money | yes | On the wire this is three fields; in the database it is one column. |
 | lines[].discounts[].reason | string |  | A cashier's reason for a manual discount. (max length 200; nullable) |
 | payments | array of Payment |  |  |
+| payments[].tipAmount | object |  | The tip recorded against this payment (addTip; r8 walk fix, CHG-R8WFC-002). (read-only; nullable) |
+| payments[].tipAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| payments[].tipAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| payments[].tipAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| payments[].tipSource | enum (terminalPrompt, cashierEntered, guestApp, serviceCharge) |  | Where the tip came from (addTip's source); null with no tip. (read-only; nullable) |
+| payments[].tipAllocatedToPrincipalId | string (uuid) |  | The staff member the venue allocates the tip to (addTip's allocateToPrincipalId); null when tips are pooled or there is no tip. (read-only; nullable) |
+| payments[].tipRecordedAt | string (date-time) |  | When the till or app recorded the tip (addTip's recordedAt); null with no tip. (read-only; nullable) |
+| payments[].tipRecordedByPrincipalId | string (uuid) |  | Who recorded it, from the session (the attribution a cashier-entered tip needs, as a manual discount does); null with no tip. (read-only; nullable) |
 | payments[].id | string (uuid) | yes |  |
 | payments[].orderId | string (uuid) | yes |  |
 | payments[].tender | TenderKind: enum (cash, card, wallet, voucher, bankTransfer, hotelCharge, installment, giftCard, …) | yes | wallet is a digital wallet (Apple Pay, Google Pay and the like, taken through the gateway), the value the guest channels accept beside card (decided 28 September, audit R080 (a)). |
@@ -2780,6 +2809,14 @@ Scanned at a counter before adding something. Shows what the guest holds so a ca
 | lines[].discounts[].amount | Money | yes | On the wire this is three fields; in the database it is one column. |
 | lines[].discounts[].reason | string |  | A cashier's reason for a manual discount. (max length 200; nullable) |
 | payments | array of Payment |  |  |
+| payments[].tipAmount | object |  | The tip recorded against this payment (addTip; r8 walk fix, CHG-R8WFC-002). (read-only; nullable) |
+| payments[].tipAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| payments[].tipAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| payments[].tipAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| payments[].tipSource | enum (terminalPrompt, cashierEntered, guestApp, serviceCharge) |  | Where the tip came from (addTip's source); null with no tip. (read-only; nullable) |
+| payments[].tipAllocatedToPrincipalId | string (uuid) |  | The staff member the venue allocates the tip to (addTip's allocateToPrincipalId); null when tips are pooled or there is no tip. (read-only; nullable) |
+| payments[].tipRecordedAt | string (date-time) |  | When the till or app recorded the tip (addTip's recordedAt); null with no tip. (read-only; nullable) |
+| payments[].tipRecordedByPrincipalId | string (uuid) |  | Who recorded it, from the session (the attribution a cashier-entered tip needs, as a manual discount does); null with no tip. (read-only; nullable) |
 | payments[].id | string (uuid) | yes |  |
 | payments[].orderId | string (uuid) | yes |  |
 | payments[].tender | TenderKind: enum (cash, card, wallet, voucher, bankTransfer, hotelCharge, installment, giftCard, …) | yes | wallet is a digital wallet (Apple Pay, Google Pay and the like, taken through the gateway), the value the guest channels accept beside card (decided 28 September, audit R080 (a)). |
@@ -3122,6 +3159,14 @@ Held orders expire. A till that accumulates parked sales across a shift cannot b
 | lines[].discounts[].amount | Money | yes | On the wire this is three fields; in the database it is one column. |
 | lines[].discounts[].reason | string |  | A cashier's reason for a manual discount. (max length 200; nullable) |
 | payments | array of Payment |  |  |
+| payments[].tipAmount | object |  | The tip recorded against this payment (addTip; r8 walk fix, CHG-R8WFC-002). (read-only; nullable) |
+| payments[].tipAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| payments[].tipAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| payments[].tipAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| payments[].tipSource | enum (terminalPrompt, cashierEntered, guestApp, serviceCharge) |  | Where the tip came from (addTip's source); null with no tip. (read-only; nullable) |
+| payments[].tipAllocatedToPrincipalId | string (uuid) |  | The staff member the venue allocates the tip to (addTip's allocateToPrincipalId); null when tips are pooled or there is no tip. (read-only; nullable) |
+| payments[].tipRecordedAt | string (date-time) |  | When the till or app recorded the tip (addTip's recordedAt); null with no tip. (read-only; nullable) |
+| payments[].tipRecordedByPrincipalId | string (uuid) |  | Who recorded it, from the session (the attribution a cashier-entered tip needs, as a manual discount does); null with no tip. (read-only; nullable) |
 | payments[].id | string (uuid) | yes |  |
 | payments[].orderId | string (uuid) | yes |  |
 | payments[].tender | TenderKind: enum (cash, card, wallet, voucher, bankTransfer, hotelCharge, installment, giftCard, …) | yes | wallet is a digital wallet (Apple Pay, Google Pay and the like, taken through the gateway), the value the guest channels accept beside card (decided 28 September, audit R080 (a)). |
@@ -3438,6 +3483,11 @@ Lines whose entitlement has been redeemed cannot be removed. The guest has used 
 | order.lines[].venueId | string (uuid) |  | The order's venue, copied onto the line (ADR-0044's own example; system-design review SD-008, 29 September) so a line is scoped and partitionable without its order. (read-only) |
 | order.lines[].discounts | array of OrderLineDiscount |  | The discounts applied to this line, one row each (system-design review SD-008, 29 September). (read-only) |
 | order.payments | array of Payment |  |  |
+| order.payments[].tipAmount | object |  | The tip recorded against this payment (addTip; r8 walk fix, CHG-R8WFC-002). (read-only; nullable) |
+| order.payments[].tipSource | enum (terminalPrompt, cashierEntered, guestApp, serviceCharge) |  | Where the tip came from (addTip's source); null with no tip. (read-only; nullable) |
+| order.payments[].tipAllocatedToPrincipalId | string (uuid) |  | The staff member the venue allocates the tip to (addTip's allocateToPrincipalId); null when tips are pooled or there is no tip. (read-only; nullable) |
+| order.payments[].tipRecordedAt | string (date-time) |  | When the till or app recorded the tip (addTip's recordedAt); null with no tip. (read-only; nullable) |
+| order.payments[].tipRecordedByPrincipalId | string (uuid) |  | Who recorded it, from the session (the attribution a cashier-entered tip needs, as a manual discount does); null with no tip. (read-only; nullable) |
 | order.payments[].id | string (uuid) | yes |  |
 | order.payments[].orderId | string (uuid) | yes |  |
 | order.payments[].tender | TenderKind: enum (cash, card, wallet, voucher, bankTransfer, hotelCharge, installment, giftCard, …) | yes | wallet is a digital wallet (Apple Pay, Google Pay and the like, taken through the gateway), the value the guest channels accept beside card (decided 28 September, audit R080 (a)). |
@@ -3720,6 +3770,11 @@ Prices are re-evaluated. Where a price, a promotion or an availability has moved
 | order.lines[].venueId | string (uuid) |  | The order's venue, copied onto the line (ADR-0044's own example; system-design review SD-008, 29 September) so a line is scoped and partitionable without its order. (read-only) |
 | order.lines[].discounts | array of OrderLineDiscount |  | The discounts applied to this line, one row each (system-design review SD-008, 29 September). (read-only) |
 | order.payments | array of Payment |  |  |
+| order.payments[].tipAmount | object |  | The tip recorded against this payment (addTip; r8 walk fix, CHG-R8WFC-002). (read-only; nullable) |
+| order.payments[].tipSource | enum (terminalPrompt, cashierEntered, guestApp, serviceCharge) |  | Where the tip came from (addTip's source); null with no tip. (read-only; nullable) |
+| order.payments[].tipAllocatedToPrincipalId | string (uuid) |  | The staff member the venue allocates the tip to (addTip's allocateToPrincipalId); null when tips are pooled or there is no tip. (read-only; nullable) |
+| order.payments[].tipRecordedAt | string (date-time) |  | When the till or app recorded the tip (addTip's recordedAt); null with no tip. (read-only; nullable) |
+| order.payments[].tipRecordedByPrincipalId | string (uuid) |  | Who recorded it, from the session (the attribution a cashier-entered tip needs, as a manual discount does); null with no tip. (read-only; nullable) |
 | order.payments[].id | string (uuid) | yes |  |
 | order.payments[].orderId | string (uuid) | yes |  |
 | order.payments[].tender | TenderKind: enum (cash, card, wallet, voucher, bankTransfer, hotelCharge, installment, giftCard, …) | yes | wallet is a digital wallet (Apple Pay, Google Pay and the like, taken through the gateway), the value the guest channels accept beside card (decided 28 September, audit R080 (a)). |
@@ -3901,7 +3956,9 @@ The recipient receives a claim link. **Ownership moves only when they claim it**
 Only before settlement and only within the same shift. After that it is a refund — the money has moved.
 **Voids the whole order**, never one line: a single F&B line removed after preparation is voided by voiding its order (`fnb.amendFnbOrder`, `fnb.cancelFnbOrder` point here).
 **The reason comes from the void reason list** (`VoidReason`; decided 28 September, audit R125 (4)), the one list every void takes, F&B included. `other` requires a `note` (audit R222); the notes are reviewed quarterly to add real reasons.
-**Appends to `orders.order_event`** (the order and reservation lifecycle log) one row per state change it makes, with the previous and new state, the actor and the correlation id (decided 29 September, writers pass).
+**Appends to `orders.order_event`** (the order and reservation lifecycle log) one row per state change it makes, with the previous and new state, the actor and the correlation id (decided 29 September, writers pass). **The void's `reason` and `note` are kept on that row**, as `OrderEvent.reasonCode` and `OrderEvent.note` (r8 walk fix, CHG-R8WFC-002): the quarterly review of `other` notes reads them there.
+
+**The supervisor's approval, and its reject path** (r8 walk fix, CHG-R8WFC-005; POS-014's approved "AUTHORISATION REQUIRED" modal). A caller who holds `ORDER_VOID` acts alone and sends no step-up. A cashier who does not is not simply refused at the till: the modal asks a supervisor to approve, and the call carries `supervisorStepUp` (common.yaml `SupervisorStepUp`, verified by Identity in process: the supervisor holds `ORDER_VOID` at the till's venue and is not the caller); the act is recorded with that supervisor as `approvedByPrincipalId`. Without the permission and without a verified step-up the call is `403` (`supervisor-step-up-refused`) and nothing is written. **The supervisor declining is the modal's reject path and sends nothing**: the order stays as it was and the till shows the reason the supervisor picked; no record is written for a request that was declined. A step-up needs the server, so offline only a caller who holds `ORDER_VOID` can do this.
 
 |  |  |
 |---|---|
@@ -3911,6 +3968,7 @@ Only before settlement and only within the same shift. After that it is a refund
 | Wave | 1 |
 | Offline | yes |
 | Conflict policy | append |
+| Step-up auth | pin |
 | Reads | `cache:idempotency`, `orders.order_line`, `orders.order_line_discount`, `orders.order_line_eligibility`, `orders.payment`, `orders.sales_order` |
 | Writes | `cache:idempotency`, `orders.order_event`, `orders.order_line`, `orders.payment`, `orders.sales_order`, `platform.outbox` |
 | Called by | BO-022, BO-023, BO-026, BO-047, BO-319, EMP-034, POS-006, POS-014 |
@@ -3930,6 +3988,10 @@ Only before settlement and only within the same shift. After that it is a refund
 | id | string (uuid) | yes | Client-generated UUIDv7 of this void, and its idempotency key — it must equal the Idempotency-Key header. |
 | reason | VoidReason: enum (guestChangedMind, enteredInError, itemUnavailable, qualityIssue, duplicate, other) | yes | The void reason list (decided 28 September, audit R125 (4)): the one list voidOrder takes, and the list fnb.amendFnbOrder and fnb.cancelFnbOrder point to. |
 | note | string |  | Required when reason is other (audit R222); optional otherwise. (min length 3; max length 500; nullable) |
+| supervisorStepUp | object |  | The supervisor approving for a cashier without ORDER_VOID (r8 walk fix, CHG-R8WFC-005). |
+| supervisorStepUp.principalId | string (uuid) |  | The supervisor signing. |
+| supervisorStepUp.supervisorUsername | string |  | The supervisor's employee number, which is what the step-up prompt asks for (R8 blocker fix, IDENTITY-C44). (max length 200) |
+| supervisorStepUp.credential | string | yes | The supervisor's staff PIN, as they sign in at a till with it. (max length 512) |
 | recordedAt | string (date-time) | yes |  |
 
 **Response**: `Order`
@@ -4038,6 +4100,14 @@ Only before settlement and only within the same shift. After that it is a refund
 | lines[].discounts[].amount | Money | yes | On the wire this is three fields; in the database it is one column. |
 | lines[].discounts[].reason | string |  | A cashier's reason for a manual discount. (max length 200; nullable) |
 | payments | array of Payment |  |  |
+| payments[].tipAmount | object |  | The tip recorded against this payment (addTip; r8 walk fix, CHG-R8WFC-002). (read-only; nullable) |
+| payments[].tipAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| payments[].tipAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| payments[].tipAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| payments[].tipSource | enum (terminalPrompt, cashierEntered, guestApp, serviceCharge) |  | Where the tip came from (addTip's source); null with no tip. (read-only; nullable) |
+| payments[].tipAllocatedToPrincipalId | string (uuid) |  | The staff member the venue allocates the tip to (addTip's allocateToPrincipalId); null when tips are pooled or there is no tip. (read-only; nullable) |
+| payments[].tipRecordedAt | string (date-time) |  | When the till or app recorded the tip (addTip's recordedAt); null with no tip. (read-only; nullable) |
+| payments[].tipRecordedByPrincipalId | string (uuid) |  | Who recorded it, from the session (the attribution a cashier-entered tip needs, as a manual discount does); null with no tip. (read-only; nullable) |
 | payments[].id | string (uuid) | yes |  |
 | payments[].orderId | string (uuid) | yes |  |
 | payments[].tender | TenderKind: enum (cash, card, wallet, voucher, bankTransfer, hotelCharge, installment, giftCard, …) | yes | wallet is a digital wallet (Apple Pay, Google Pay and the like, taken through the gateway), the value the guest channels accept beside card (decided 28 September, audit R080 (a)). |
@@ -4844,6 +4914,11 @@ BL-029. **A wallet pass is a live object, not a download.** Its value over a PDF
 | items[].lines[].venueId | string (uuid) |  | The order's venue, copied onto the line (ADR-0044's own example; system-design review SD-008, 29 September) so a line is scoped and partitionable without its order. (read-only) |
 | items[].lines[].discounts | array of OrderLineDiscount |  | The discounts applied to this line, one row each (system-design review SD-008, 29 September). (read-only) |
 | items[].payments | array of Payment |  |  |
+| items[].payments[].tipAmount | object |  | The tip recorded against this payment (addTip; r8 walk fix, CHG-R8WFC-002). (read-only; nullable) |
+| items[].payments[].tipSource | enum (terminalPrompt, cashierEntered, guestApp, serviceCharge) |  | Where the tip came from (addTip's source); null with no tip. (read-only; nullable) |
+| items[].payments[].tipAllocatedToPrincipalId | string (uuid) |  | The staff member the venue allocates the tip to (addTip's allocateToPrincipalId); null when tips are pooled or there is no tip. (read-only; nullable) |
+| items[].payments[].tipRecordedAt | string (date-time) |  | When the till or app recorded the tip (addTip's recordedAt); null with no tip. (read-only; nullable) |
+| items[].payments[].tipRecordedByPrincipalId | string (uuid) |  | Who recorded it, from the session (the attribution a cashier-entered tip needs, as a manual discount does); null with no tip. (read-only; nullable) |
 | items[].payments[].id | string (uuid) | yes |  |
 | items[].payments[].orderId | string (uuid) | yes |  |
 | items[].payments[].tender | TenderKind: enum (cash, card, wallet, voucher, bankTransfer, hotelCharge, installment, giftCard, …) | yes | wallet is a digital wallet (Apple Pay, Google Pay and the like, taken through the gateway), the value the guest channels accept beside card (decided 28 September, audit R080 (a)). |
@@ -5665,6 +5740,7 @@ BL-116. **The keystone.** Recurring membership billing, wallet auto-reload, one-
 
 A separate operation rather than a line on the order, because a tip is not revenue — it is money held for staff and posts to a liability, not to sales. Treating it as a line inflates takings and understates what is owed.
 Where the terminal captured the tip, this records what it reported. Where the guest wrote it on a slip, a cashier enters it, and that path needs the same attribution as a manual discount.
+**Where the tip is kept** (r8 walk fix, CHG-R8WFC-002). On the payment it belongs to, in `orders.payment`: `tipAmount`, `tipSource`, `tipAllocatedToPrincipalId`, `tipRecordedAt` and `tipRecordedByPrincipalId` (the caller, from the session). A payment holds one tip: where `tip_amount` is already set the call is refused `409 tipAlreadyRecorded`, and a payment that is not `captured` `409 notCaptured`. The answer is the payment with its tip.
 
 |  |  |
 |---|---|
@@ -5701,6 +5777,14 @@ Where the terminal captured the tip, this records what it reported. Where the gu
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
+| tipAmount | object |  | The tip recorded against this payment (addTip; r8 walk fix, CHG-R8WFC-002). (read-only; nullable) |
+| tipAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| tipAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| tipAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| tipSource | enum (terminalPrompt, cashierEntered, guestApp, serviceCharge) |  | Where the tip came from (addTip's source); null with no tip. (read-only; nullable) |
+| tipAllocatedToPrincipalId | string (uuid) |  | The staff member the venue allocates the tip to (addTip's allocateToPrincipalId); null when tips are pooled or there is no tip. (read-only; nullable) |
+| tipRecordedAt | string (date-time) |  | When the till or app recorded the tip (addTip's recordedAt); null with no tip. (read-only; nullable) |
+| tipRecordedByPrincipalId | string (uuid) |  | Who recorded it, from the session (the attribution a cashier-entered tip needs, as a manual discount does); null with no tip. (read-only; nullable) |
 | id | string (uuid) | yes |  |
 | orderId | string (uuid) | yes |  |
 | tender | TenderKind: enum (cash, card, wallet, voucher, bankTransfer, hotelCharge, installment, giftCard, …) | yes | wallet is a digital wallet (Apple Pay, Google Pay and the like, taken through the gateway), the value the guest channels accept beside card (decided 28 September, audit R080 (a)). |
@@ -5780,6 +5864,14 @@ Captures an authorised payment. **Writes one `payments.payment_attempt` row for 
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
+| tipAmount | object |  | The tip recorded against this payment (addTip; r8 walk fix, CHG-R8WFC-002). (read-only; nullable) |
+| tipAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| tipAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| tipAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| tipSource | enum (terminalPrompt, cashierEntered, guestApp, serviceCharge) |  | Where the tip came from (addTip's source); null with no tip. (read-only; nullable) |
+| tipAllocatedToPrincipalId | string (uuid) |  | The staff member the venue allocates the tip to (addTip's allocateToPrincipalId); null when tips are pooled or there is no tip. (read-only; nullable) |
+| tipRecordedAt | string (date-time) |  | When the till or app recorded the tip (addTip's recordedAt); null with no tip. (read-only; nullable) |
+| tipRecordedByPrincipalId | string (uuid) |  | Who recorded it, from the session (the attribution a cashier-entered tip needs, as a manual discount does); null with no tip. (read-only; nullable) |
 | id | string (uuid) | yes |  |
 | orderId | string (uuid) | yes |  |
 | tender | TenderKind: enum (cash, card, wallet, voucher, bankTransfer, hotelCharge, installment, giftCard, …) | yes | wallet is a digital wallet (Apple Pay, Google Pay and the like, taken through the gateway), the value the guest channels accept beside card (decided 28 September, audit R080 (a)). |
@@ -5883,6 +5975,14 @@ A card payment returns `pendingConfirmation` when the terminal has been instruct
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
+| tipAmount | object |  | The tip recorded against this payment (addTip; r8 walk fix, CHG-R8WFC-002). (read-only; nullable) |
+| tipAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| tipAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| tipAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| tipSource | enum (terminalPrompt, cashierEntered, guestApp, serviceCharge) |  | Where the tip came from (addTip's source); null with no tip. (read-only; nullable) |
+| tipAllocatedToPrincipalId | string (uuid) |  | The staff member the venue allocates the tip to (addTip's allocateToPrincipalId); null when tips are pooled or there is no tip. (read-only; nullable) |
+| tipRecordedAt | string (date-time) |  | When the till or app recorded the tip (addTip's recordedAt); null with no tip. (read-only; nullable) |
+| tipRecordedByPrincipalId | string (uuid) |  | Who recorded it, from the session (the attribution a cashier-entered tip needs, as a manual discount does); null with no tip. (read-only; nullable) |
 | id | string (uuid) | yes |  |
 | orderId | string (uuid) | yes |  |
 | tender | TenderKind: enum (cash, card, wallet, voucher, bankTransfer, hotelCharge, installment, giftCard, …) | yes | wallet is a digital wallet (Apple Pay, Google Pay and the like, taken through the gateway), the value the guest channels accept beside card (decided 28 September, audit R080 (a)). |
@@ -5958,6 +6058,14 @@ This queries the provider directly and reconciles. A background reconciler runs 
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
+| tipAmount | object |  | The tip recorded against this payment (addTip; r8 walk fix, CHG-R8WFC-002). (read-only; nullable) |
+| tipAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| tipAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| tipAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| tipSource | enum (terminalPrompt, cashierEntered, guestApp, serviceCharge) |  | Where the tip came from (addTip's source); null with no tip. (read-only; nullable) |
+| tipAllocatedToPrincipalId | string (uuid) |  | The staff member the venue allocates the tip to (addTip's allocateToPrincipalId); null when tips are pooled or there is no tip. (read-only; nullable) |
+| tipRecordedAt | string (date-time) |  | When the till or app recorded the tip (addTip's recordedAt); null with no tip. (read-only; nullable) |
+| tipRecordedByPrincipalId | string (uuid) |  | Who recorded it, from the session (the attribution a cashier-entered tip needs, as a manual discount does); null with no tip. (read-only; nullable) |
 | id | string (uuid) | yes |  |
 | orderId | string (uuid) | yes |  |
 | tender | TenderKind: enum (cash, card, wallet, voucher, bankTransfer, hotelCharge, installment, giftCard, …) | yes | wallet is a digital wallet (Apple Pay, Google Pay and the like, taken through the gateway), the value the guest channels accept beside card (decided 28 September, audit R080 (a)). |
@@ -6753,6 +6861,14 @@ Releases held capacity immediately rather than waiting for expiry. A guest cance
 | lines[].discounts[].amount | Money | yes | On the wire this is three fields; in the database it is one column. |
 | lines[].discounts[].reason | string |  | A cashier's reason for a manual discount. (max length 200; nullable) |
 | payments | array of Payment |  |  |
+| payments[].tipAmount | object |  | The tip recorded against this payment (addTip; r8 walk fix, CHG-R8WFC-002). (read-only; nullable) |
+| payments[].tipAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| payments[].tipAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| payments[].tipAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| payments[].tipSource | enum (terminalPrompt, cashierEntered, guestApp, serviceCharge) |  | Where the tip came from (addTip's source); null with no tip. (read-only; nullable) |
+| payments[].tipAllocatedToPrincipalId | string (uuid) |  | The staff member the venue allocates the tip to (addTip's allocateToPrincipalId); null when tips are pooled or there is no tip. (read-only; nullable) |
+| payments[].tipRecordedAt | string (date-time) |  | When the till or app recorded the tip (addTip's recordedAt); null with no tip. (read-only; nullable) |
+| payments[].tipRecordedByPrincipalId | string (uuid) |  | Who recorded it, from the session (the attribution a cashier-entered tip needs, as a manual discount does); null with no tip. (read-only; nullable) |
 | payments[].id | string (uuid) | yes |  |
 | payments[].orderId | string (uuid) | yes |  |
 | payments[].tender | TenderKind: enum (cash, card, wallet, voucher, bankTransfer, hotelCharge, installment, giftCard, …) | yes | wallet is a digital wallet (Apple Pay, Google Pay and the like, taken through the gateway), the value the guest channels accept beside card (decided 28 September, audit R080 (a)). |
@@ -8424,6 +8540,7 @@ Fails if another shift is already open on this workstation. Where the venue is c
 
 Change for a guest, a dropped coin, correcting a float. Legitimate and routine.
 **Recorded because it is the classic cover for theft.** A drawer that opens forty times in a shift with four sales is a conversation, and it is only a conversation if someone can see the count. A reason is required for the same reason it is required on a manual discount — attributable, not forbidden.
+**The supervisor's approval, and its reject path** (r8 walk fix, CHG-R8WFC-005; POS-014's approved "AUTHORISATION REQUIRED" modal). A caller who holds `CASH_NO_SALE` acts alone and sends no step-up. A cashier who does not is not simply refused at the till: the modal asks a supervisor to approve, and the call carries `supervisorStepUp` (common.yaml `SupervisorStepUp`, verified by Identity in process: the supervisor holds `CASH_NO_SALE` at the till's venue and is not the caller); the act is recorded with that supervisor as `approvedByPrincipalId`. Without the permission and without a verified step-up the call is `403` (`supervisor-step-up-refused`) and nothing is written. **The supervisor declining is the modal's reject path and sends nothing**: the drawer stays shut and the till shows the reason the supervisor picked; no record is written for a request that was declined. A step-up needs the server, so offline only a caller who holds `CASH_NO_SALE` can do this.
 
 |  |  |
 |---|---|
@@ -8433,6 +8550,7 @@ Change for a guest, a dropped coin, correcting a float. Legitimate and routine.
 | Wave | 1 |
 | Offline | yes |
 | Conflict policy | append |
+| Step-up auth | pin |
 | Reads | `cache:idempotency`, `orders.no_sale_event` |
 | Writes | `cache:idempotency`, `orders.no_sale_event` |
 | Called by | POS-014, POS-020 |
@@ -8452,11 +8570,16 @@ Change for a guest, a dropped coin, correcting a float. Legitimate and routine.
 | reason | enum (changeForGuest, correctFloat, retrieveDroppedCash, tillCheck, other) | yes |  |
 | note | string |  | (max length 300) |
 | recordedAt | string (date-time) | yes |  |
+| supervisorStepUp | object |  | The supervisor approving for a cashier without CASH_NO_SALE (r8 walk fix, CHG-R8WFC-005). |
+| supervisorStepUp.principalId | string (uuid) |  | The supervisor signing. |
+| supervisorStepUp.supervisorUsername | string |  | The supervisor's employee number, which is what the step-up prompt asks for (R8 blocker fix, IDENTITY-C44). (max length 200) |
+| supervisorStepUp.credential | string | yes | The supervisor's staff PIN, as they sign in at a till with it. (max length 512) |
 
 **Response**: `NoSaleEvent`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
+| approvedByPrincipalId | string (uuid) |  | The supervisor whose step-up approved it for a cashier without CASH_NO_SALE; null when the cashier held it (r8 walk fix, CHG-R8WFC-005). (read-only; nullable) |
 | id | string (uuid) | yes |  |
 | shiftId | string (uuid) | yes |  |
 | workstationId | string (uuid) |  |  |
@@ -8471,6 +8594,7 @@ Change for a guest, a dropped coin, correcting a float. Legitimate and routine.
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Recorded |
+| 403 |  | The caller lacks CASH_NO_SALE and no supervisor step-up was sent, or it was refused (r8 walk fix, CHG-R8WFC-005) |
 | 409 |  | Shift is not open (problem type shift-not-open) |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
@@ -9692,6 +9816,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
+| approved_by_principal_id | uuid | no | The supervisor whose step-up approved it for a cashier without CASH_NO_SALE; null when the cashier held it (r8 walk fix, CHG-R8WFC-005). |
 | id | uuid | yes |  |
 | shift_id | uuid | yes |  |
 | workstation_id | uuid | no |  |
@@ -9705,6 +9830,9 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
+| reason_code | text | no | The reason the act was given with, where it takes one (r8 walk fix, CHG-R8WFC-002): a void's VoidReason (voidOrder), as sent. |
+| approved_by_principal_id | uuid | no | The supervisor whose step-up approved the act for a caller without its permission (a void, r8 walk fix, CHG-R8WFC-005); null otherwise. |
+| note | text | no | The free-text note sent with the act (voidOrder's note, required when the reason is other; the notes are reviewed quarterly). |
 | id | uuid | yes |  |
 | order_id | uuid | no | The order; null on a reservation's own events before it is converted. |
 | reservation_id | uuid | no |  |
@@ -9793,6 +9921,11 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
+| tip_amount | numeric(18,4) | no | The tip recorded against this payment (addTip; r8 walk fix, CHG-R8WFC-002). |
+| tip_source | text | no | Where the tip came from (addTip's source); null with no tip. |
+| tip_allocated_to_principal_id | uuid | no | The staff member the venue allocates the tip to (addTip's allocateToPrincipalId); null when tips are pooled or there is no tip. |
+| tip_recorded_at | timestamptz | no | When the till or app recorded the tip (addTip's recordedAt); null with no tip. |
+| tip_recorded_by_principal_id | uuid | no | Who recorded it, from the session (the attribution a cashier-entered tip needs, as a manual discount does); null with no tip. |
 | id | uuid | yes |  |
 | order_id | uuid | yes |  |
 | tender | text | yes |  |

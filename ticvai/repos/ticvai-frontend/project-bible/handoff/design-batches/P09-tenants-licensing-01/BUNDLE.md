@@ -386,7 +386,7 @@ Errors to draw in the form: 409 The tenant is terminated (`tenant-terminated`, a
 | Create tenant (secondary button) | `createTenant` POST `/tenants` | CreateTenantRequest | Tenant | 409 Code already in use | opens modal first |
 | Provision cell (secondary button) | `provisionCell` POST `/tenants/{tenantId}/cells` | ProvisionCellRequest | Cell | 400 Placement is outside the region's jurisdiction, or the target cloud has no region in that country.; 409 A cell already exists for this region | opens modal first |
 | Reactivate tenant (secondary button) | `reactivateTenant` POST `/tenants/{tenantId}/reactivate` | — | TenantChangeRequested | 409 Tenant is terminated, not suspended; termination is not reversible here (`tenant-terminated`). (TenantChangeConflictProblem); 422 No approval route (`no-approval-route`; CHG-R8SPN-015): approvals' … | — |
-| Remove licence add on (destructive button) | `removeLicenceAddOn` DELETE `/tenants/{tenantId}/licences/add-ons` | inline | LicencePosition | 409 Module is currently enabled by the tenant. (DowngradeConflictProblem) | — |
+| Remove licence add on (destructive button) | `removeLicenceAddOn` DELETE `/tenants/{tenantId}/licences/add-ons` | inline | LicencePosition | 409 Module is currently enabled by the tenant (`module-in-use`, asked of the tenant's cell; see the description). (DowngradeConflictProblem) | — |
 | Save SSO config (secondary button) | `setSsoConfig` PUT `/tenants/sso-config` | SsoProviderConfig | SsoProviderConfig | 400 Metadata unreachable, or no group mappings supplied | opens modal first |
 | Suspend tenant (destructive button) | `suspendTenant` POST `/tenants/{tenantId}/suspend` | inline | TenantChangeRequested | 409 The tenant is already `suspended` (`tenant-already-suspended`), or is not `active` (`onboarding`, `terminating` or `terminated`; `tenant-not-active`). (TenantChangeConflictProblem); 422 No approval route … | — |
 | Terminate tenant (destructive button) | `terminateTenant` POST `/tenants/{tenantId}/terminate` | inline | TerminationSchedule | 400 Confirmation code does not match; 409 Unsettled ledger balances exist | — |
@@ -893,7 +893,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Module key `moduleKey` | select | required | — | Core · Ticketing · Access · Fnb · Retail · Inventory · Seating · Membership · Marketing · Resources · Queue · Transport … | — | The add-on to remove, by its licence module key: the shared `ModuleKey` (plan and licence vocabulary), never a white-label feature key (r8, APPROVALS-TENANCY-C17). | `removeLicenceAddOn` body |
 | Reason `reason` | text area | required | — | min length 3; max length 500 | — | — | `removeLicenceAddOn` body |
 
-Errors to draw in the form: 409 Module is currently enabled by the tenant. (DowngradeConflictProblem)
+Errors to draw in the form: 409 Module is currently enabled by the tenant (`module-in-use`, asked of the tenant's cell; see the description). (DowngradeConflictProblem)
 
 **Form: Add licence add on** (modal, opened by *Add licence add on*; *Add licence add on* calls `addLicenceAddOn`, *Cancel* sends nothing)
 
@@ -1001,7 +1001,7 @@ Errors to draw in the form: 409 An add-on for this module is already in force fo
 |---|---|---|---|---|---|
 | Confirm (confirm dialog) | navigation or local | — | — | — | — |
 | Add licence add on (primary button) | `addLicenceAddOn` POST `/tenants/{tenantId}/licences/add-ons` | LicenceAddOn | LicencePosition | 409 An add-on for this module is already in force for the tenant over an overlapping period (`add-on-already-active`). | opens modal first |
-| Remove licence add on (destructive button) | `removeLicenceAddOn` DELETE `/tenants/{tenantId}/licences/add-ons` | inline | LicencePosition | 409 Module is currently enabled by the tenant. (DowngradeConflictProblem) | opens confirmDialog first |
+| Remove licence add on (destructive button) | `removeLicenceAddOn` DELETE `/tenants/{tenantId}/licences/add-ons` | inline | LicencePosition | 409 Module is currently enabled by the tenant (`module-in-use`, asked of the tenant's cell; see the description). (DowngradeConflictProblem) | opens confirmDialog first |
 
 **Rules for what is shown** (from the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process; these refine the tables above and win where they differ)
 
@@ -1031,7 +1031,7 @@ Errors to draw in the form: 409 An add-on for this module is already in force fo
 | Empty, no results (`?state=emptyNoResults`) | Never shown: `listTenantCells` takes no filter, so an empty list is always the first-run state above. |
 | Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `getTenantLicences` requires to show this screen, and names that permission (the screen's other reads need `PLATFORM_CELL_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_TENANT_MANAGE` for `addLicenceAddOn` … |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 409 An add-on for this module is already in force for the tenant over an overlapping period (`add-on-already-active`).; 409 Module is currently enabled by the tenant. (DowngradeConflictProblem) |
+| Validation and conflict | the form keeps what was entered and marks the problem: 409 An add-on for this module is already in force for the tenant over an overlapping period (`add-on-already-active`).; 409 Module is currently enabled by the tenant (`module-in-use`, asked of the tenant's cell; see the description). (DowngradeConflictProblem) |
 
 #### Edge cases to draw
 
@@ -2070,7 +2070,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Module key `moduleKey` | select | required | — | Core · Ticketing · Access · Fnb · Retail · Inventory · Seating · Membership · Marketing · Resources · Queue · Transport … | — | The add-on to remove, by its licence module key: the shared `ModuleKey` (plan and licence vocabulary), never a white-label feature key (r8, APPROVALS-TENANCY-C17). | `removeLicenceAddOn` body |
 | Reason `reason` | text area | required | — | min length 3; max length 500 | — | — | `removeLicenceAddOn` body |
 
-Errors to draw in the form: 409 Module is currently enabled by the tenant. (DowngradeConflictProblem)
+Errors to draw in the form: 409 Module is currently enabled by the tenant (`module-in-use`, asked of the tenant's cell; see the description). (DowngradeConflictProblem)
 
 **Form: Add licence add on** (modal, opened by *Add licence add on*; *Add licence add on* calls `addLicenceAddOn`, *Cancel* sends nothing)
 
@@ -2190,7 +2190,7 @@ Errors to draw in the form: 409 An add-on for this module is already in force fo
 |---|---|---|---|---|---|
 | Add licence add on (primary button) | `addLicenceAddOn` POST `/tenants/{tenantId}/licences/add-ons` | LicenceAddOn | LicencePosition | 409 An add-on for this module is already in force for the tenant over an overlapping period (`add-on-already-active`). | opens modal first |
 | Preview subscription change (secondary button) | `previewSubscriptionChange` POST `/tenants/{tenantId}/subscription/preview` | SetSubscriptionRequest | SubscriptionPreview | — | opens modal first |
-| Remove licence add on (destructive button) | `removeLicenceAddOn` DELETE `/tenants/{tenantId}/licences/add-ons` | inline | LicencePosition | 409 Module is currently enabled by the tenant. (DowngradeConflictProblem) | opens confirmDialog first |
+| Remove licence add on (destructive button) | `removeLicenceAddOn` DELETE `/tenants/{tenantId}/licences/add-ons` | inline | LicencePosition | 409 Module is currently enabled by the tenant (`module-in-use`, asked of the tenant's cell; see the description). (DowngradeConflictProblem) | opens confirmDialog first |
 
 **Rules for what is shown** (from the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process; these refine the tables above and win where they differ)
 
@@ -2216,7 +2216,7 @@ Errors to draw in the form: 409 An add-on for this module is already in force fo
 | Empty, no results (`?state=emptyNoResults`) | Never shown: `listTenantCells` takes no filter, so an empty list is always the first-run state above. |
 | Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `getEntitlementUsage` requires to show this screen, and names that permission (the screen's other reads need `PLATFORM_CELL_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_TENANT_MANAGE` for `addLicenceAddOn` … |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 409 An add-on for this module is already in force for the tenant over an overlapping period (`add-on-already-active`).; 409 Module is currently enabled by the tenant. (DowngradeConflictProblem) |
+| Validation and conflict | the form keeps what was entered and marks the problem: 409 An add-on for this module is already in force for the tenant over an overlapping period (`add-on-already-active`).; 409 Module is currently enabled by the tenant (`module-in-use`, asked of the tenant's cell; see the description). (DowngradeConflictProblem) |
 
 #### Edge cases to draw
 

@@ -708,7 +708,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | `accountId` (navigation) |
 | Route | `/commercial/b2b-invoice-on-account-payment-terms-configuration-t96-adm-603` |
 
-**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys. **Saving** (r8 walk fix, CHG-R8WFC-006). The fields bound to `B2bPaymentTerms` are saved with `setB2bPaymentTerms` for the picked account (a PUT of the whole terms, so every bound field is sent). The approved layout has no save control; until the client approves one (docs/active/approved-ui-changes.yaml), the save control is a pending client-approval item, and the ticket builds the bound fields and the call. `setInstalmentPolicy` has no field here: it stays in `apis` for the instalment policy panel the pack names, which this layout does not draw (a gap, not built in Block A).
 
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** How an approved B2B customer may buy without paying in full: credit limit, payment terms, billing cycle, purchase order, deposit (the client gave 20 to 30% upfront for schools and corporates), when the balance is due, and what happens at the limit. What happens at the limit is the decision, not the limit; most venues want "allow with override" behind an approval. The same screen holds which products may be paid in instalments.
 
@@ -725,15 +725,15 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
 |---|---|---|---|---|---|---|---|
 | Customer/account | select field | — | — | — | — | The B2B credit accounts (`listB2bCreditAccounts`); the picked account's id is the `accountId` the terms are read and saved for (r8, ORDERS-MONEY-C28). | — |
-| Credit agreement | select field | — | — | — | — | — | — |
-| Payment term | select field | — | — | — | — | — | — |
-| Currency | select field | — | — | — | — | — | — |
-| Billing cycle | select field | — | — | — | — | — | — |
-| Invoice requirement | select field | — | — | — | — | — | — |
-| Purchase order requirement | select field | — | — | — | — | — | — |
-| Approval requirement | select field | — | — | — | — | — | — |
-| Transaction maximum | select field | — | — | — | — | — | — |
-| Outstanding balance limit | select field | — | — | — | — | — | — |
+| Credit agreement | select field | — | — | — | — | Not bound (r8 walk fix, CHG-R8WFC-006). No field: `B2bPaymentTerms` holds no agreement reference; shown read-only and empty until the contract carries one. | — |
+| Payment term | number field (days) | optional | 30 | — | — | Bound in the r8 walk fix (CHG-R8WFC-006): sends `paymentTermDays` to `setB2bPaymentTerms`. | `B2bPaymentTerms.paymentTermDays` |
+| Currency | money field | optional | — | A jsonb price cannot be summed in SQL. | AED, 2 decimals shown (up to 4 accepted), currency from the … | Bound in the r8 walk fix (CHG-R8WFC-006): sends `creditLimit` to `setB2bPaymentTerms`. The currency of `creditLimit` (Money carries it); not a field of its own. | `B2bPaymentTerms.creditLimit` |
+| Billing cycle | radio group | optional | — | Per booking · Weekly · Fortnightly · Monthly | — | Bound in the r8 walk fix (CHG-R8WFC-006): sends `billingCycle` to `setB2bPaymentTerms`. | `B2bPaymentTerms.billingCycle` |
+| Invoice requirement | select field | — | — | — | — | Not bound (r8 walk fix, CHG-R8WFC-006). No field: invoicing is the account's billing cycle (`billingCycle`); shown read-only until the contract carries a separate requirement. | — |
+| Purchase order requirement | toggle | optional | off | — | — | Bound in the r8 walk fix (CHG-R8WFC-006): sends `purchaseOrderRequired` to `setB2bPaymentTerms`. | `B2bPaymentTerms.purchaseOrderRequired` |
+| Approval requirement | text field | optional | — | — | — | Bound in the r8 walk fix (CHG-R8WFC-006): sends `overrideApprovalRole` to `setB2bPaymentTerms`. The role whose approval lets a sale go past the limit. | `B2bPaymentTerms.overrideApprovalRole` |
+| Transaction maximum | select field | — | — | — | — | Not bound (r8 walk fix, CHG-R8WFC-006). No field: `B2bPaymentTerms` has no per-transaction maximum; shown read-only until the contract carries one. | — |
+| Outstanding balance limit | money field | optional | — | A jsonb price cannot be summed in SQL. | AED, 2 decimals shown (up to 4 accepted), currency from the … | Bound in the r8 walk fix (CHG-R8WFC-006): sends `creditLimit` to `setB2bPaymentTerms`. | `B2bPaymentTerms.creditLimit` |
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
 

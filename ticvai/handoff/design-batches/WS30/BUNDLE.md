@@ -653,7 +653,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Sell · wave 3 · needs the `membership` module |
 | Block | Block B · ticket #29266 (VM-BO-295) |
-| Who uses it | venue staff holding `GUEST_MANAGE`, `MEMBERSHIP_MANAGE` (1 configure, 1 ?); in the flows as venue manager |
+| Who uses it | venue staff holding `GUEST_MANAGE`, `MEMBERSHIP_MANAGE` (2 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Display; Show) and no metric row |
 | Offline | online only |
@@ -781,7 +781,7 @@ Every member 360° membership:
 
 #### Permissions
 
-- `setMemberMembershipAccount` → `MEMBERSHIP_MANAGE` (tier not set) · staff
+- `setMemberMembershipAccount` → `MEMBERSHIP_MANAGE` (configure) · staff
 - `recordBenefitUsage` → `GUEST_MANAGE` (configure) · staff, service
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
@@ -835,7 +835,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Sell · wave 3 · needs the `membership` module |
 | Block | Block B · ticket #29869 (VM-BO-296) |
-| Who uses it | venue staff holding `MEMBERSHIP_VIEW`, `ORDER_MODIFY` (1 ?, 1 operate); in the flows as venue manager |
+| Who uses it | venue staff holding `MEMBERSHIP_VIEW`, `ORDER_MODIFY` (1 read, 1 operate); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Display) and no metric row |
 | Offline | online only |
@@ -950,7 +950,7 @@ Every membership activation credential:
 
 #### Permissions
 
-- `listMembershipActivationCredential` → `MEMBERSHIP_VIEW` (tier not set) · staff
+- `listMembershipActivationCredential` → `MEMBERSHIP_VIEW` (read) · staff
 - `resolveMembershipActivation` → `ORDER_MODIFY` (operate) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
@@ -1359,7 +1359,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Sell · wave 3 · needs the `membership` module |
 | Block | Block B · ticket #29881 (VM-BO-298) |
-| Who uses it | venue staff holding `MEMBERSHIP_VIEW`, `ORDER_MODIFY`, `PRODUCT_CONFIGURE` (1 ?, 1 operate, 1 configure); in the flows as venue manager |
+| Who uses it | venue staff holding `MEMBERSHIP_VIEW`, `ORDER_MODIFY`, `PRODUCT_CONFIGURE` (1 read, 1 operate, 1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Freeze Configuration Consumption; Capture) and no display directory — it is settings, not a population |
 | Offline | online only |
@@ -1445,7 +1445,7 @@ member:
 
 #### Permissions
 
-- `listMembershipFreezeSuspension` → `MEMBERSHIP_VIEW` (tier not set) · staff
+- `listMembershipFreezeSuspension` → `MEMBERSHIP_VIEW` (read) · staff
 - `freezeEntitlement` → `PRODUCT_CONFIGURE` (configure) · staff, guest
 - `reinstateEntitlement` → `PRODUCT_CONFIGURE` (configure) · staff
 - `suspendEntitlement` → `ORDER_MODIFY` (operate) · staff
@@ -1506,7 +1506,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Sell · wave 3 · needs the `membership` module |
 | Block | Block B · ticket #29870 (VM-BO-299) |
-| Who uses it | venue staff holding `MEMBERSHIP_VIEW`, `ORDER_MODIFY` (1 ?, 1 operate); in the flows as venue manager |
+| Who uses it | venue staff holding `MEMBERSHIP_VIEW`, `ORDER_MODIFY` (1 read, 1 operate); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
@@ -1599,7 +1599,7 @@ listMembershipUpgradeDowngrade (MembershipUpgradeDowngradeProductMigrationOperat
 
 #### Permissions
 
-- `listMembershipUpgradeDowngrade` → `MEMBERSHIP_VIEW` (tier not set) · staff
+- `listMembershipUpgradeDowngrade` → `MEMBERSHIP_VIEW` (read) · staff
 - `migrateMembership` → `ORDER_MODIFY` (operate) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
@@ -2104,7 +2104,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Sell · wave 3 · needs the `membership` module |
 | Block | Block B · ticket #29868 (VM-BO-303) |
-| Who uses it | venue staff holding `MEMBERSHIP_VIEW` (1 ?); in the flows as venue manager |
+| Who uses it | venue staff holding `MEMBERSHIP_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | commandCentre (compact density): the pack gives this screen a metric directory (§Display; Forecast) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant … |
 | Offline | online only |
@@ -2214,7 +2214,7 @@ metric tiles:
 
 #### Permissions
 
-- `listMembershipRenewalRetention` → `MEMBERSHIP_VIEW` (tier not set) · staff
+- `listMembershipRenewalRetention` → `MEMBERSHIP_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 

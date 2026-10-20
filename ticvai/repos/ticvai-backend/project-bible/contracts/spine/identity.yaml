@@ -1919,6 +1919,24 @@ paths:
       x-ticvai-consumed-by:
         - "P04 POS-000 Sign In"
         - "P08 BO-053 Staff Directory"
+      x-ticvai-writes:
+      - table: identity.principal_credential
+        for: 'what this operation writes (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
+      - table: identity.session
+        for: 'what this operation writes (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
+      x-ticvai-reads:
+      - table: identity.delegated_access
+        for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
+      - table: identity.password_policy
+        for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
+      - table: identity.principal
+        for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
+      - table: identity.principal_credential
+        for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
+      - table: identity.role_permission
+        for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
+      - table: identity.session
+        for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
       # The decision's identity.authz_audit row is the authorisation layer's, appended for every decision a request
       # takes (CHG-R6-014), not this operation's own write; named to say the decision is audited (r8 gate,
       # CHG-R8GT2-003; check-parameter-columns P-NAMED-TABLE).

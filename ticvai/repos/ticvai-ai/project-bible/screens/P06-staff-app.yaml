@@ -7885,7 +7885,7 @@ screens:
   module: Operations
   requiresModule: maintenance
   wave: 1
-  permission: INCIDENT_VIEW
+  permission: INCIDENT_REPORT
   capability: C00
   implementation:
     app: venue-staff-app
@@ -7932,8 +7932,25 @@ screens:
       operation: reportIncident
       carries:
       - incidentId
-  notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
-    to be written.
+  notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+
+
+    **Who may open it, and the reporter''s own list** (r8 walk fix, CHG-R8WFC-006). The screen is gated
+    on `INCIDENT_REPORT`, which every member of staff holds ("reportable by any member of staff"), not
+    on `INCIDENT_VIEW`, which only incident managers hold. Its list is `listIncidents` with `reportedBy=me`,
+    which a reporter without `INCIDENT_VIEW` may call for their own reports only; `emptyFirstRun` ("nothing
+    reported yet by you today") is that list empty for today. A caller who also holds `INCIDENT_VIEW`
+    may drop the filter.
+
+
+    **Photos and people before the report exists** (r8 walk fix, CHG-R8WFC-006). `uploadIncidentMedia`
+    and `addIncidentPerson` act on an incident that exists. The form keeps each photo on the device as
+    it is added (shown, and removable there, before sending) and the people involved in its own state;
+    **Send** calls `reportIncident` (the client generates the incident id), then `uploadIncidentMedia`
+    for each kept photo and `addIncidentPerson` for each person, the same order the offline capture already
+    takes on reconnect. A photo removed before Send is never uploaded, so no remove-media operation is
+    needed.'
   density: comfortable
   pattern: listDetail
   patternReason: '`listIncidents` reads the population and `getIncident` reads one of them — list, select,

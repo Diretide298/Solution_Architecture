@@ -1,0 +1,41 @@
+# wallet.creditExpired v1 - published by wallet
+# Added 20 October 2026 (r8 walk fix, CHG-R8WFC-003): expireCreditLots said expiry "becomes breakage - recognised
+# revenue - and finance needs to be told", and no event or ledger write told it.
+
+name: wallet.creditExpired
+version: 1
+publisher: wallet
+description: Unspent credit left a wallet because it expired or was forfeited; the stored-value liability it was
+  becomes breakage.
+aggregate: wallet
+emittedWhen: expireCreditLots applies an expire or forfeit (mode apply), one event per credit lot it closes
+emittedBy:
+- wallet.expireCreditLots
+payload:
+- field: walletId
+  type: uuid
+- field: creditLotId
+  type: uuid
+- field: walletTransactionId
+  type: uuid
+  notes: The wallet_transaction row that took the remaining amount off the balance
+- field: action
+  type: string
+  notes: expire or forfeit
+- field: amount
+  type: Money
+  notes: The lot's remaining amount at expiry, the breakage
+- field: creditTypeId
+  type: uuid
+- field: effectiveDate
+  type: date
+  notes: The date the breakage is recognised (asOf, or today)
+consumers:
+- context: ledger
+  purpose: Post the breakage - reduce the stored-value liability and recognise breakage revenue, on the accounts the
+    wallet's accounting mapping (wallet.accounting_mapping, breakage_policy) names
+  idempotencyKey: walletTransactionId
+  onFailure: retryThenDeadLetter
+  isCritical: true
+retention: 30 days after publication
+notes: An extension changes no balance and emits nothing. Ordering per wallet, as wallet.debited.

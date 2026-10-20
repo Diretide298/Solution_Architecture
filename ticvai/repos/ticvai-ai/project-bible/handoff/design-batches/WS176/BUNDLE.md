@@ -981,7 +981,7 @@ Answered questions: draw the decision, not the old default. Where a decision and
 | Required when `requiredBillingDocuments[].requiredWhen` | segmented control | optional | — | Always · Trn entered | — | — | `updateRegionSettings` body |
 | Minor age threshold `minorAgeThreshold` | stepper or slider | optional | 18 | min 0; max 21 | — | The age below which a guest is a minor here, set per country (decided 2 October 2026, Chinmay, critical set 1, BO-187: "Guardian consent on the venue's form; minor age per … | `updateRegionSettings` body |
 
-Errors to draw in the form: 400 Validation failed; 403 Authenticated but not permitted at the requested scope; 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 Currency or scale change rejected because transactions exist in this region, or a change to `aiResidencyClass` on a tenant TICVAI locked to `uaeOnly` …; 422 `aiResidencyClass` `globalAllowed` without the three references of `aiResidencyOptIn` (`residency-opt-in-required`; PDPL Article 23; DEC-539; CHG-CSP-009).
+Errors to draw in the form: 400 Validation failed; 403 Authenticated but not permitted at the requested scope; 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 Currency or scale change rejected because transactions exist in this region (`currency-change-refused`), or a change to `aiResidencyClass` on a tenant TICVAI …; 422 `aiResidencyClass` `globalAllowed` without the three references of `aiResidencyOptIn` (`residency-opt-in-required`; PDPL Article 23; DEC-539; CHG-CSP-009).
 
 **Form: Save AI residency** (modal, opened by *Save AI residency*; *Save AI residency* calls `updateRegionSettings`, *Cancel* sends nothing)
 
@@ -1008,7 +1008,7 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | Required when `requiredBillingDocuments[].requiredWhen` | segmented control | optional | — | Always · Trn entered | — | — | `updateRegionSettings` body |
 | Minor age threshold `minorAgeThreshold` | stepper or slider | optional | 18 | min 0; max 21 | — | The age below which a guest is a minor here, set per country (decided 2 October 2026, Chinmay, critical set 1, BO-187: "Guardian consent on the venue's form; minor age per … | `updateRegionSettings` body |
 
-Errors to draw in the form: 400 Validation failed; 403 Authenticated but not permitted at the requested scope; 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 Currency or scale change rejected because transactions exist in this region, or a change to `aiResidencyClass` on a tenant TICVAI locked to `uaeOnly` …; 422 `aiResidencyClass` `globalAllowed` without the three references of `aiResidencyOptIn` (`residency-opt-in-required`; PDPL Article 23; DEC-539; CHG-CSP-009).
+Errors to draw in the form: 400 Validation failed; 403 Authenticated but not permitted at the requested scope; 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 Currency or scale change rejected because transactions exist in this region (`currency-change-refused`), or a change to `aiResidencyClass` on a tenant TICVAI …; 422 `aiResidencyClass` `globalAllowed` without the three references of `aiResidencyOptIn` (`residency-opt-in-required`; PDPL Article 23; DEC-539; CHG-CSP-009).
 
 **Form: Save notes and coins** (modal, opened by *Save notes and coins*; *Save notes and coins* calls `setDenominations`, *Cancel* sends nothing)
 
@@ -1104,7 +1104,7 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | Empty, no results (`?state=emptyNoResults`) | Never shown: nothing on this screen filters. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 Currency or scale change rejected because transactions exist in this region, or a change to `aiResidencyClass` on a tenant TICVAI locked to `uaeOnly` …; 422 A zero or negative value, or two entries with the same value and kind (problem type `denomination-invalid`).; 422 `aiResidencyClass` `globalAllowed` without the three references of `aiResidencyOptIn` … |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 Currency or scale change rejected because transactions exist in this region (`currency-change-refused`), or a change to `aiResidencyClass` on a tenant TICVAI …; 422 A zero or negative value, or two entries with the same value and kind (problem type `denomination-invalid`).; 422 `aiResidencyClass` `globalAllowed` without the three references of `aiResidencyOptIn` … |
 
 #### Edge cases to draw
 

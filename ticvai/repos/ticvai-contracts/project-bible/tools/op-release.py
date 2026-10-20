@@ -278,7 +278,7 @@ def build(rows, mp, sched, lineage, retire_plan, unexplained, release, held=None
             assignee, n = r["assignee"] or None, None
         summ = summary_line(subject)
         builds = builds_of(r, part, lineage)
-        carry = list(_done.carried(r))
+        carry = list(_done.carried(r)) + _done.apply_notes(r)
         m_ = SCREEN.search(base) if r["track"] == "Frontend" or base.startswith("VM-") else None
         if m_ and SCREEN_NOTES.get(m_.group(1)):
             carry.append("Decided: " + " ".join(str(SCREEN_NOTES[m_.group(1)]).split()))

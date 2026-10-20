@@ -30,7 +30,7 @@ scale:
   screens: 2453
   flows: 291
   stateModels: 208
-  events: 96
+  events: 97
   decisions: 72
   requirements: 3184
   buildPercent: 0

@@ -5901,6 +5901,8 @@ paths:
   /refunds/bulk:
     post:
       operationId: createBulkRefund
+      x-ticvai-consumed-by:
+        - "P08 BO-023 Refunds & Exchanges"
       x-ticvai-writes:
       - table: orders.order_event
         for: 'what this operation writes (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
@@ -5909,8 +5911,6 @@ paths:
       x-ticvai-reads:
       - table: orders.refund
         for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
-      x-ticvai-consumed-by:
-        - "P08 BO-023 Refunds & Exchanges"
       x-ticvai-audience:
       - staff
       summary: Refund every order against an event, performance or date
@@ -7263,6 +7263,19 @@ paths:
         format: uuid
     post:
       operationId: exchangeOrderLines
+      x-ticvai-consumed-by:
+        - "P04 POS-006 Held Orders"
+        - "P04 POS-010 Add to Existing Ticket"
+        - "P04 POS-011 Returns, Refunds & Exchanges"
+        - "P06 EMP-034 Walk-up sale"
+        - "P08 BO-022 Order Detail"
+        - "P08 BO-023 Refunds & Exchanges"
+        - "P08 BO-026 Group Bookings"
+        - "P08 BO-047 Order Corrections & Exceptions"
+        - "P08 BO-315 Order Amendment Workspace"
+        - "P10 PTR-002 Partner Dashboard"
+        - "P10 PTR-008 Booking Creation"
+        - "P10 PTR-015 Order History"
       x-ticvai-writes:
       - table: orders.order_event
         for: 'what this operation writes (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
@@ -7279,19 +7292,6 @@ paths:
         for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
       - table: orders.sales_order
         for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
-      x-ticvai-consumed-by:
-        - "P04 POS-006 Held Orders"
-        - "P04 POS-010 Add to Existing Ticket"
-        - "P04 POS-011 Returns, Refunds & Exchanges"
-        - "P06 EMP-034 Walk-up sale"
-        - "P08 BO-022 Order Detail"
-        - "P08 BO-023 Refunds & Exchanges"
-        - "P08 BO-026 Group Bookings"
-        - "P08 BO-047 Order Corrections & Exceptions"
-        - "P08 BO-315 Order Amendment Workspace"
-        - "P10 PTR-002 Partner Dashboard"
-        - "P10 PTR-008 Booking Creation"
-        - "P10 PTR-015 Order History"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
         route: in-process
@@ -7363,6 +7363,18 @@ paths:
         format: uuid
     post:
       operationId: rescheduleOrder
+      x-ticvai-consumed-by:
+        - "P04 POS-006 Held Orders"
+        - "P06 EMP-034 Walk-up sale"
+        - "P08 BO-022 Order Detail"
+        - "P08 BO-023 Refunds & Exchanges"
+        - "P08 BO-026 Group Bookings"
+        - "P08 BO-047 Order Corrections & Exceptions"
+        - "P08 BO-281 Group Amendments, Cancellation & Refund Operations"
+        - "P08 BO-315 Order Amendment Workspace"
+        - "P10 PTR-002 Partner Dashboard"
+        - "P10 PTR-008 Booking Creation"
+        - "P10 PTR-015 Order History"
       x-ticvai-writes:
       - table: orders.order_event
         for: 'what this operation writes (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
@@ -7377,18 +7389,6 @@ paths:
         for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
       - table: orders.sales_order
         for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
-      x-ticvai-consumed-by:
-        - "P04 POS-006 Held Orders"
-        - "P06 EMP-034 Walk-up sale"
-        - "P08 BO-022 Order Detail"
-        - "P08 BO-023 Refunds & Exchanges"
-        - "P08 BO-026 Group Bookings"
-        - "P08 BO-047 Order Corrections & Exceptions"
-        - "P08 BO-281 Group Amendments, Cancellation & Refund Operations"
-        - "P08 BO-315 Order Amendment Workspace"
-        - "P10 PTR-002 Partner Dashboard"
-        - "P10 PTR-008 Booking Creation"
-        - "P10 PTR-015 Order History"
       x-ticvai-read-via:
       - query: catalogue#performanceRecords
         route: in-process
@@ -7486,18 +7486,6 @@ paths:
         format: uuid
     post:
       operationId: reprintOrder
-      x-ticvai-writes:
-      - table: orders.order_event
-        for: 'what this operation writes (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
-      - table: orders.order_line
-        for: 'what this operation writes (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
-      - table: orders.sales_order
-        for: 'what this operation writes (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
-      x-ticvai-reads:
-      - table: orders.order_line
-        for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
-      - table: orders.sales_order
-        for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
       x-ticvai-consumed-by:
         - "P01 WEB-013 Booking Confirmation"
         - "P02 GST-010 Booking Confirmation"
@@ -7519,6 +7507,18 @@ paths:
         - "P10 PTR-008 Booking Creation"
         - "P10 PTR-015 Order History"
         - "P10 PTR-016 Voucher / Ticket Download"
+      x-ticvai-writes:
+      - table: orders.order_event
+        for: 'what this operation writes (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
+      - table: orders.order_line
+        for: 'what this operation writes (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
+      - table: orders.sales_order
+        for: 'what this operation writes (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
+      x-ticvai-reads:
+      - table: orders.order_line
+        for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
+      - table: orders.sales_order
+        for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
       x-ticvai-api-scope: ticketing.write
       security:
       - guestAuth: []
@@ -8122,6 +8122,11 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     delete:
       operationId: cancelReservation
+      x-ticvai-consumed-by:
+        - "P01 WEB-031 My Reservations"
+        - "P02 GST-016 My Reservations"
+        - "P02 GST-017 Reservation Details"
+        - "P04 POS-031 Reservations & Group Arrivals"
       x-ticvai-writes:
       - table: orders.order_event
         for: 'what this operation writes (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
@@ -8130,11 +8135,6 @@ paths:
       x-ticvai-reads:
       - table: orders.reservation
         for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
-      x-ticvai-consumed-by:
-        - "P01 WEB-031 My Reservations"
-        - "P02 GST-016 My Reservations"
-        - "P02 GST-017 Reservation Details"
-        - "P04 POS-031 Reservations & Group Arrivals"
       x-ticvai-audience:
       - staff
       - guest

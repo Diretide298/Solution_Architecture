@@ -1,6 +1,6 @@
 # P06-operations-03 — P06 · Operations (3 of 5)
 
-**10 screens · 50 operations · 78 schemas · 23 permissions**
+**10 screens · 50 operations · 79 schemas · 23 permissions**
 
 Platform P06 Venue Staff App · ships as **venue-staff-mobile** ·
 staff audience · mobileApp ·
@@ -181,7 +181,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `EMP-031` | Queue monitor | D | 10 | 23 | 6 | 19 | 1 | 6 | — | notStarted (generated) |
 | `EMP-032` | Manual wait entry | A | 3 | 10 | 6 | 4 | 1 | 0 | — | notStarted (generated) |
 | `EMP-033` | Capacity view | B | 3 | 14 | 6 | 3 | 0 | 0 | — | notStarted (generated) |
-| `EMP-034` | Walk-up sale | C | 136 | 34 | 6 | 93 | 1 | 0 | — | notStarted (generated) |
+| `EMP-034` | Walk-up sale | C | 140 | 34 | 6 | 93 | 1 | 0 | — | notStarted (generated) |
 | `EMP-025` | Break management | D | 9 | 9 | 6 | 4 | 2 | 0 | — | notStarted (generated) |
 | `EMP-026` | Incident report | A | 29 | 14 | 6 | 10 | 1 | 0 | — | notStarted (generated) |
 | `EMP-027` | Incident detail | D | 20 | 14 | 7 | 1 | 0 | 0 | — | notStarted (generated) |

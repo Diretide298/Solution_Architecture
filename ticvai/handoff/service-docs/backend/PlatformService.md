@@ -1521,7 +1521,6 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | yes | Synthesised key. |
 | tenant_id | uuid | yes |  |
 | plan_id | uuid | yes |  |
 | plan_name | text | no |  |
@@ -1533,6 +1532,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | scheduled_change | jsonb | no | A downgrade waiting for the next renewal (decided 28 September, audit R214 (1)). |
 | current_price | numeric(18,4) | no |  |
 | billing_period | text | no |  |
+| id | uuid | yes | Synthesised key. |
 
 ### `control.developer_account`
 
@@ -1603,7 +1603,6 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | yes | Synthesised key. |
 | module_code | text | yes | Values are ModuleKeys (4 October 2026, CHG-FXC-010; ADM-424): the vocabulary of white-label.ModuleEnablement.moduleKey, so a dependency is checked against what setModuleEnablement switches. |
 | name | text | no |  |
 | description | text | no |  |
@@ -1618,6 +1617,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | provisioning_minutes | integer | no |  |
 | requires_professional_services | boolean | no |  |
 | status | text | no |  |
+| id | uuid | yes | Synthesised key. |
 
 ### `control.plan`
 
@@ -1644,22 +1644,22 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | yes | Synthesised key. |
 | plan_id | uuid | yes | The parent row. |
 | plan_version | text | yes | The parent row's version; with plan_id, the key of the parent row. |
 | metric | text | yes |  |
 | limit_value | integer | no | Null means unlimited. |
 | is_overage_allowed | boolean | no |  |
 | overage_unit_price | numeric(18,4) | no |  |
+| id | uuid | yes | Synthesised key. |
 
 ### `control.plan_module`
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | yes | Synthesised key. |
 | plan_id | uuid | yes | The parent row. |
 | plan_version | text | yes | The parent row's version; with plan_id, the key of the parent row. |
 | licensed_module | text | yes | One value from ModuleKey. |
+| id | uuid | yes | Synthesised key. |
 
 ### `control.production_access_request`
 

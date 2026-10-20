@@ -751,7 +751,7 @@
     }
    ]
   },
-  "notes": "**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: \"they are venue screens\"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.",
+  "notes": "**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: \"they are venue screens\"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.\n\n**Saving** (r8 walk fix, CHG-R8WFC-006). The fields bound to `B2bPaymentTerms` are saved with `setB2bPaymentTerms` for the picked account (a PUT of the whole terms, so every bound field is sent). The approved layout has no save control; until the client approves one (docs/active/approved-ui-changes.yaml), the save control is a pending client-approval item, and the ticket builds the bound fields and the call. `setInstalmentPolicy` has no field here: it stays in `apis` for the instalment policy panel the pack names, which this layout does not draw (a gap, not built in Block A).",
   "density": "compact",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Define) and no display directory — it is settings, not a population",
@@ -791,47 +791,68 @@
       {
        "kind": "selectField",
        "label": "Credit agreement",
-       "provenance": "pack Payment_Payment_Orchestration.pdf, page 95 §Define"
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 95 §Define",
+       "notes": "Not bound (r8 walk fix, CHG-R8WFC-006). No field: `B2bPaymentTerms` holds no agreement reference; shown read-only and empty until the contract carries one."
       },
       {
        "kind": "selectField",
        "label": "Payment term",
-       "provenance": "pack Payment_Payment_Orchestration.pdf, page 95 §Define"
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 95 §Define",
+       "operation": "setB2bPaymentTerms",
+       "bindsTo": "B2bPaymentTerms.paymentTermDays",
+       "notes": "Bound in the r8 walk fix (CHG-R8WFC-006): sends `paymentTermDays` to `setB2bPaymentTerms`."
       },
       {
        "kind": "selectField",
        "label": "Currency",
-       "provenance": "pack Payment_Payment_Orchestration.pdf, page 95 §Define"
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 95 §Define",
+       "operation": "setB2bPaymentTerms",
+       "bindsTo": "B2bPaymentTerms.creditLimit",
+       "notes": "Bound in the r8 walk fix (CHG-R8WFC-006): sends `creditLimit` to `setB2bPaymentTerms`. The currency of `creditLimit` (Money carries it); not a field of its own."
       },
       {
        "kind": "selectField",
        "label": "Billing cycle",
-       "provenance": "pack Payment_Payment_Orchestration.pdf, page 95 §Define"
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 95 §Define",
+       "operation": "setB2bPaymentTerms",
+       "bindsTo": "B2bPaymentTerms.billingCycle",
+       "notes": "Bound in the r8 walk fix (CHG-R8WFC-006): sends `billingCycle` to `setB2bPaymentTerms`."
       },
       {
        "kind": "selectField",
        "label": "Invoice requirement",
-       "provenance": "pack Payment_Payment_Orchestration.pdf, page 95 §Define"
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 95 §Define",
+       "notes": "Not bound (r8 walk fix, CHG-R8WFC-006). No field: invoicing is the account's billing cycle (`billingCycle`); shown read-only until the contract carries a separate requirement."
       },
       {
        "kind": "selectField",
        "label": "Purchase order requirement",
-       "provenance": "pack Payment_Payment_Orchestration.pdf, page 95 §Define"
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 95 §Define",
+       "operation": "setB2bPaymentTerms",
+       "bindsTo": "B2bPaymentTerms.purchaseOrderRequired",
+       "notes": "Bound in the r8 walk fix (CHG-R8WFC-006): sends `purchaseOrderRequired` to `setB2bPaymentTerms`."
       },
       {
        "kind": "selectField",
        "label": "Approval requirement",
-       "provenance": "pack Payment_Payment_Orchestration.pdf, page 95 §Define"
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 95 §Define",
+       "operation": "setB2bPaymentTerms",
+       "bindsTo": "B2bPaymentTerms.overrideApprovalRole",
+       "notes": "Bound in the r8 walk fix (CHG-R8WFC-006): sends `overrideApprovalRole` to `setB2bPaymentTerms`. The role whose approval lets a sale go past the limit."
       },
       {
        "kind": "selectField",
        "label": "Transaction maximum",
-       "provenance": "pack Payment_Payment_Orchestration.pdf, page 95 §Define"
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 95 §Define",
+       "notes": "Not bound (r8 walk fix, CHG-R8WFC-006). No field: `B2bPaymentTerms` has no per-transaction maximum; shown read-only until the contract carries one."
       },
       {
        "kind": "selectField",
        "label": "Outstanding balance limit",
-       "provenance": "pack Payment_Payment_Orchestration.pdf, page 95 §Define"
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 95 §Define",
+       "operation": "setB2bPaymentTerms",
+       "bindsTo": "B2bPaymentTerms.creditLimit",
+       "notes": "Bound in the r8 walk fix (CHG-R8WFC-006): sends `creditLimit` to `setB2bPaymentTerms`."
       }
      ]
     }

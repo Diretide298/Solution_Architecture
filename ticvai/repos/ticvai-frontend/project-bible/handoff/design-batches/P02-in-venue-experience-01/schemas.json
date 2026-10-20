@@ -545,6 +545,40 @@
    "collectBy"
   ],
   "properties": {
+   "disposalMethod": {
+    "type": "string",
+    "enum": [
+     "donated",
+     "destroyed",
+     "returnedToStock",
+     "heldLonger"
+    ],
+    "nullable": true,
+    "readOnly": true,
+    "description": "What `disposeShopAndDrop` decided for an uncollected item; null until it is called. `heldLonger` leaves the item `uncollected` (r8 walk fix, CHG-R8WFC-002)."
+   },
+   "disposalNote": {
+    "type": "string",
+    "maxLength": 300,
+    "nullable": true,
+    "readOnly": true,
+    "description": "The note sent with that decision; null when none was sent."
+   },
+   "disposalDecidedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "When the decision was recorded (the server's time)."
+   },
+   "disposalDecidedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "Who authorised it, the caller, from the session (\"recorded with who authorised it\").",
+    "x-ticvai-references": "identity.principal"
+   },
    "id": {
     "type": "string"
    },

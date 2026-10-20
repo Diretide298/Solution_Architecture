@@ -2202,6 +2202,14 @@ paths:
         format: uuid
     post:
       operationId: recommendSeats
+      x-ticvai-consumed-by:
+        - "P01 WEB-007 Interactive Seat Selection"
+        - "P02 GST-049 Interactive Seat Selection"
+        - "P08 BO-015 Performance Calendar"
+        - "P08 BO-019 Closures & Blackouts"
+        - "P08 BO-1001 View Preview, Compare & Heat Map"
+        - "P08 BO-1002 AI Conversational Seat Assistant"
+        - "P08 BO-1039 Seat Upgrade Recommendations"
       x-ticvai-reads:
       - table: catalogue.performance
         for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
@@ -2221,14 +2229,6 @@ paths:
         for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
       - table: seating.seat_reservation_item
         for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
-      x-ticvai-consumed-by:
-        - "P01 WEB-007 Interactive Seat Selection"
-        - "P02 GST-049 Interactive Seat Selection"
-        - "P08 BO-015 Performance Calendar"
-        - "P08 BO-019 Closures & Blackouts"
-        - "P08 BO-1001 View Preview, Compare & Heat Map"
-        - "P08 BO-1002 AI Conversational Seat Assistant"
-        - "P08 BO-1039 Seat Upgrade Recommendations"
       security:
       - guestAuth: []
       - bearerAuth: []

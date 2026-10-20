@@ -72,12 +72,16 @@
    "operations": 9
   },
   {
+   "contract": "tenancy",
+   "operations": 8
+  },
+  {
    "contract": "identity",
    "operations": 8
   },
   {
-   "contract": "tenancy",
-   "operations": 8
+   "contract": "reporting",
+   "operations": 5
   },
   {
    "contract": "marketing-crm",
@@ -88,24 +92,16 @@
    "operations": 5
   },
   {
-   "contract": "reporting",
-   "operations": 5
-  },
-  {
    "contract": "finance",
    "operations": 5
-  },
-  {
-   "contract": "seating",
-   "operations": 4
   },
   {
    "contract": "approvals",
    "operations": 4
   },
   {
-   "contract": "access",
-   "operations": 2
+   "contract": "seating",
+   "operations": 4
   },
   {
    "contract": "wallet",
@@ -116,11 +112,15 @@
    "operations": 2
   },
   {
-   "contract": "games",
-   "operations": 1
+   "contract": "access",
+   "operations": 2
   },
   {
    "contract": "inventory",
+   "operations": 1
+  },
+  {
+   "contract": "games",
    "operations": 1
   }
  ],

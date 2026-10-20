@@ -107,7 +107,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-1143` | Wallet Operations Command Center | C | 2 | 46 | 6 | 3 | 0 | 6 | — | notStarted (—) |
-| `BO-1144` | Peer-to-Peer Transfer Configuration | C | 21 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-1144` | Peer-to-Peer Transfer Configuration | A | 21 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-1145` | Transfer Eligibility, Limits & Approval Rules | C | 19 | 0 | 6 | 0 | 1 | 3 | — | notStarted (—) |
 | `BO-1146` | Refund-to-Wallet Policy Configuration | A | 28 | 9 | 6 | 0 | 3 | 6 | — | notStarted (—) |
 | `BO-1147` | Refund Routing & Credit Restoration Engine | C | 6 | 40 | 6 | 6 | 0 | 6 | — | notStarted (—) |

@@ -110,6 +110,32 @@ def sprint_end_index(n):
     return sp["last"] + 1
 
 
+def due_of(extra_tasks) -> dict:
+    """{key: day index} for the hand-written tasks that say they are due on a date (block-a-extra-tasks.json `due`,
+    an ISO date; CHG-R8INT-032, the lead, 20 October 2026: the r8 database updates go to the sprint running now).
+
+    The scheduler places such a task on the first working day on or after that date, whatever its build order
+    and its waits, so it lands in that date's sprint whatever the plan around it holds. It is a chore of under a
+    day done between tickets: it holds no slot on its owner's calendar, so no other ticket moves (holding one moved
+    613 tickets' sprints: a ten-day task that crossed it had to start after it), it re-paces nothing (pace_model
+    leaves it out), and build-service-docs.py gives it no module test and counts it in nobody's load. It names its
+    owner (`assignee`)."""
+    out = {}
+    for t in extra_tasks or ():
+        if not t.get("due"):
+            continue
+        try:
+            d = dt.date.fromisoformat(str(t["due"]))
+        except ValueError:
+            raise SystemExit(f"block-a-extra-tasks.json {t.get('key')}: due {t['due']!r} is not an ISO date") from None
+        if not START <= d <= DAYS[-1]:
+            raise SystemExit(f"block-a-extra-tasks.json {t.get('key')}: due {d} is outside the calendar ({START} on)")
+        if not t.get("assignee"):
+            raise SystemExit(f"block-a-extra-tasks.json {t.get('key')}: a task with `due` names its `assignee`")
+        out[t["key"]] = float(index_of(d))
+    return out
+
+
 # ---------------------------------------------------------------------------------------------- modules
 MODULE_OF_CONTRACT = {
     "identity": "Identity, Roles & Security", "tenancy": "Tenancy, Venues & Devices",
@@ -308,8 +334,9 @@ def pace_model(team, items):
     if not tpd:
         return (lambda i: PLAN_PACE), f"{PLAN_PACE:.2f} points per developer per day (Block A's plan of record)", PLAN_PACE
     # a task of a decided app-module scheduled after a block (`paceExclude`, CHG-R4-003) does not re-pace the work already
-    # pushed: the average a developer-day is measured on the plan without it
-    pts = [float(it.get("points") or 0) for it in items if it.get("track") != "AI" and not it.get("paceExclude")]
+    # pushed: the average a developer-day is measured on the plan without it; nor does a task due now (`due`, CHG-R8INT-032)
+    pts = [float(it.get("points") or 0) for it in items if it.get("track") != "AI" and not it.get("paceExclude")
+           and it.get("due") is None]
     avg = sum(pts) / max(len(pts), 1)
     base = float(tpd) * avg
     to, a, b = float(cfg.get("rampTo") or 1.0), int(cfg.get("rampFromSprint") or 5), int(cfg.get("rampFullSprint") or 11)
@@ -659,6 +686,8 @@ def schedule(items, people, caps=None, svc_owner=None, backend_owners=(), helper
     `freeze` {block: (start, end)}: the block-test windows. Inside block X's window no task starts except a test,
     or later-block work none of whose waits is a task of block X (items carry `block`).
 
+    `due` (a day index, due_of) with `who`: the item is placed at that day, whatever its order, holding no slot.
+
     Returns {key: {"start", "end", "who"}} in working days from 5 October (fractions of a day)."""
     caps = caps or {}
     svc_owner = svc_owner or {}
@@ -705,6 +734,13 @@ def schedule(items, people, caps=None, svc_owner=None, backend_owners=(), helper
         if len(hard) < len(deps) and it["track"] != "Frontend":
             ready = max(ready, INTERFACES_DAY)
         ready = max(ready, float(it.get("notBefore") or 0.0))
+        if it.get("due") is not None and it.get("who"):
+            # **a task due on a date** (`due`, a day index: due_of; CHG-R8INT-032) sits at that date, whatever its build
+            # order and waits, and lands in that date's sprint. A chore of under a day done between tickets, it holds no
+            # slot, so no ticket around it moves (a held slot made a ten-day task that crossed it start after it)
+            dur = duration(it, pace_of, pace_at, float(it["due"]))
+            start[k], end[k], who_of[k], dur_of[k] = float(it["due"]), float(it["due"]) + dur, it["who"], dur
+            continue
         wire = max([end[d] for d in deps if d not in hard] or [0.0])
         if it.get("client") or (not it.get("who") and not choose):
             start[k], end[k] = 0.0, 0.0

@@ -1,6 +1,6 @@
 # WS32 — Order   Reservation Management board 2
 
-**9 screens · 18 operations · 31 schemas · 9 permissions**
+**9 screens · 18 operations · 32 schemas · 9 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·

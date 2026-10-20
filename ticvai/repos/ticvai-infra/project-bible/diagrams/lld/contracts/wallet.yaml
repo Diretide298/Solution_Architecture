@@ -204,6 +204,7 @@ operations:
   - wallet.wallet
   writes:
   - cache:idempotency
+  - platform.outbox
   - wallet.adjustment
   - wallet.credit_lot
   - wallet.wallet

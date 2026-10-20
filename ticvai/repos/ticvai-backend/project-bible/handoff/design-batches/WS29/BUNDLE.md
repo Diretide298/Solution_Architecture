@@ -160,7 +160,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Sell · wave 3 · needs the `membership` module |
 | Block | Block B · ticket #29857 (VM-BO-284) |
-| Who uses it | venue staff holding `MEMBERSHIP_MANAGE`, `MEMBERSHIP_VIEW` (2 ?); in the flows as venue manager |
+| Who uses it | venue staff holding `MEMBERSHIP_MANAGE`, `MEMBERSHIP_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Display; Identify) and no metric row |
 | Offline | online only |
@@ -576,8 +576,8 @@ products:
 
 #### Permissions
 
-- `listMembershipAnnualPass` → `MEMBERSHIP_VIEW` (tier not set) · staff
-- `approveMembershipProductValidation` → `MEMBERSHIP_MANAGE` (tier not set) · staff · step-up mfa
+- `listMembershipAnnualPass` → `MEMBERSHIP_VIEW` (read) · staff
+- `approveMembershipProductValidation` → `MEMBERSHIP_MANAGE` (configure) · staff · step-up mfa
 - `createMfaChallenge` → no permission · staff, partner, guest
 - `verifyMfaChallenge` → no permission · staff, partner, guest
 
@@ -641,7 +641,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Sell · wave 3 · needs the `membership` module |
 | Block | Block B · ticket #29249 (VM-BO-285) |
-| Who uses it | venue staff holding `MEMBERSHIP_MANAGE`, `PRODUCT_CONFIGURE` (1 ?, 1 configure); in the flows as venue manager |
+| Who uses it | venue staff holding `MEMBERSHIP_MANAGE`, `PRODUCT_CONFIGURE` (2 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Capture; Define; Configure) and no display directory — it is settings, not a population |
 | Offline | online only |
@@ -778,7 +778,7 @@ form example:
 
 #### Permissions
 
-- `setMembershipProductTier` → `MEMBERSHIP_MANAGE` (tier not set) · staff
+- `setMembershipProductTier` → `MEMBERSHIP_MANAGE` (configure) · staff
 - `setMembershipProgramme` → `PRODUCT_CONFIGURE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
@@ -831,7 +831,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Sell · wave 3 · needs the `membership` module |
 | Block | Block B · ticket #29240 (VM-BO-286) |
-| Who uses it | venue staff holding `MEMBERSHIP_MANAGE` (1 ?); in the flows as venue manager |
+| Who uses it | venue staff holding `MEMBERSHIP_MANAGE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure; Configure whether qualification requires) and no display directory — it is settings, not a population |
 | Offline | online only |
@@ -905,7 +905,7 @@ form example:
 
 #### Permissions
 
-- `setMembershipEligibilityQualification` → `MEMBERSHIP_MANAGE` (tier not set) · staff
+- `setMembershipEligibilityQualification` → `MEMBERSHIP_MANAGE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -1062,7 +1062,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Sell · wave 3 · needs the `membership` module |
 | Block | Block B · ticket #29880 (VM-BO-288) |
-| Who uses it | venue staff holding `MEMBERSHIP_MANAGE`, `PRODUCT_CONFIGURE`, `PRODUCT_VIEW` (1 ?, 1 configure, 1 read); in the flows as venue manager |
+| Who uses it | venue staff holding `MEMBERSHIP_MANAGE`, `PRODUCT_CONFIGURE`, `PRODUCT_VIEW` (2 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population |
 | Offline | online only |
@@ -1158,7 +1158,7 @@ tier:
 
 #### Permissions
 
-- `setMembershipEntitlementAdmission` → `MEMBERSHIP_MANAGE` (tier not set) · staff
+- `setMembershipEntitlementAdmission` → `MEMBERSHIP_MANAGE` (configure) · staff
 - `setMembershipBenefit` → `PRODUCT_CONFIGURE` (configure) · staff
 - `setPlanBenefits` → `PRODUCT_CONFIGURE` (configure) · staff
 - `listEntitlementTemplates` → `PRODUCT_VIEW` (read) · staff
@@ -1227,7 +1227,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Sell · wave 3 · needs the `membership` module |
 | Block | Block B · ticket #29788 (VM-BO-289) |
-| Who uses it | venue staff holding `MEMBERSHIP_MANAGE`, `MEMBERSHIP_VIEW`, `PRODUCT_CONFIGURE`, `PRODUCT_VIEW` (2 ?, 1 configure, 1 read); in the flows as venue manager |
+| Who uses it | venue staff holding `MEMBERSHIP_MANAGE`, `MEMBERSHIP_VIEW`, `PRODUCT_CONFIGURE`, `PRODUCT_VIEW` (2 configure, 2 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Maintain counters such as) and no metric row |
 | Offline | online only |
@@ -1370,10 +1370,10 @@ listMembershipUsageVisit (MembershipUsageVisitConsumptionRulesView):
 
 #### Permissions
 
-- `listMembershipUsageVisit` → `MEMBERSHIP_VIEW` (tier not set) · staff
+- `listMembershipUsageVisit` → `MEMBERSHIP_VIEW` (read) · staff
 - `setPlanBenefits` → `PRODUCT_CONFIGURE` (configure) · staff
 - `listEntitlementTemplates` → `PRODUCT_VIEW` (read) · staff
-- `setMembershipUsagePolicy` → `MEMBERSHIP_MANAGE` (tier not set) · staff
+- `setMembershipUsagePolicy` → `MEMBERSHIP_MANAGE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -1575,7 +1575,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Sell · wave 3 · needs the `membership` module |
 | Block | Block A · ticket #29883 (VM-BO-291) |
-| Who uses it | venue staff holding `MEMBERSHIP_MANAGE`, `MEMBERSHIP_VIEW`, `PRICE_CONFIGURE`, `PRICE_VIEW`, `PRODUCT_CONFIGURE`, `PRODUCT_VIEW` (2 ?, 2 configure, 2 read); in the flows as venue manager |
+| Who uses it | venue staff holding `MEMBERSHIP_MANAGE`, `MEMBERSHIP_VIEW`, `PRICE_CONFIGURE`, `PRICE_VIEW`, `PRODUCT_CONFIGURE`, `PRODUCT_VIEW` (3 configure, 3 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure sale through; Configure) and no display directory — it is settings, not a population |
 | Offline | online only |
@@ -1706,13 +1706,13 @@ config:
 
 #### Permissions
 
-- `listMembershipCommercialPricing` → `MEMBERSHIP_VIEW` (tier not set) · staff
+- `listMembershipCommercialPricing` → `MEMBERSHIP_VIEW` (read) · staff
 - `setPrices` → `PRICE_CONFIGURE` (configure) · staff
 - `getChannelAvailability` → `PRODUCT_VIEW` (read) · staff
 - `publishChannelAvailability` → `PRODUCT_CONFIGURE` (configure) · staff
 - `listPriceLists` → `PRICE_VIEW` (read) · staff, partner
 - `listTaxProfiles` → `PRODUCT_VIEW` (read) · staff
-- `setMembershipCommercialConfig` → `MEMBERSHIP_MANAGE` (tier not set) · staff
+- `setMembershipCommercialConfig` → `MEMBERSHIP_MANAGE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -1768,7 +1768,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Sell · wave 3 · needs the `membership` module |
 | Block | Block B · ticket #29265 (VM-BO-292) |
-| Who uses it | venue staff holding `MEMBERSHIP_MANAGE` (1 ?); in the flows as venue manager |
+| Who uses it | venue staff holding `MEMBERSHIP_MANAGE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure; At renewal, configure whether) and no display directory — it is settings, not a population |
 | Offline | online only |
@@ -1845,7 +1845,7 @@ form example:
 
 #### Permissions
 
-- `setRenewalAutoMembership` → `MEMBERSHIP_MANAGE` (tier not set) · staff
+- `setRenewalAutoMembership` → `MEMBERSHIP_MANAGE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -1900,7 +1900,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Sell · wave 3 · needs the `membership` module |
 | Block | Block B · ticket #29864 (VM-BO-293) |
-| Who uses it | venue staff holding `MEMBERSHIP_MANAGE`, `MEMBERSHIP_VIEW` (2 ?); in the flows as venue manager |
+| Who uses it | venue staff holding `MEMBERSHIP_MANAGE`, `MEMBERSHIP_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Synchronize relevant configuration with; AI Configuration Review) and no display directory — it is settings, not a population |
 | Offline | online only |
@@ -2104,10 +2104,10 @@ form example:
 
 #### Permissions
 
-- `approveMembershipProductValidation` → `MEMBERSHIP_MANAGE` (tier not set) · staff · step-up mfa
+- `approveMembershipProductValidation` → `MEMBERSHIP_MANAGE` (configure) · staff · step-up mfa
 - `createMfaChallenge` → no permission · staff, partner, guest
 - `verifyMfaChallenge` → no permission · staff, partner, guest
-- `getMembershipProductValidation` → `MEMBERSHIP_VIEW` (tier not set) · staff
+- `getMembershipProductValidation` → `MEMBERSHIP_VIEW` (read) · staff
 
 **A refused user sees:** Shown when the caller lacks `PLATFORM_CELL_MANAGE`, which `approveMembershipProductValidation` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 

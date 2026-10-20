@@ -10,9 +10,9 @@
   "foreignKeys": 815,
   "indexes": 2924,
   "tablesWritten": 1123,
-  "relationships": 3246,
+  "relationships": 3248,
   "states": 208,
-  "events": 96,
+  "events": 97,
   "flows": 98,
   "flowsDerived": 193,
   "adrs": 71,
@@ -26,7 +26,7 @@
   "design": [
    {
     "name": "API data lineage resolved",
-    "done": 2807,
+    "done": 2809,
     "total": 2844,
     "percent": 99,
     "note": "Every operation maps to the tables it reads and writes."

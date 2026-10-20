@@ -948,7 +948,7 @@ Currency, decimal scale, time zone, date format and fiscal year. These inherit t
 
 **`PUT /regions/{regionId}/settings`**: Update region settings
 
-Changing `currencyCode` or `currencyScale` after transactions exist is rejected. The ledger is append-only; a scale change would silently reinterpret historic amounts.
+Changing `currencyCode` or `currencyScale` after transactions exist is rejected. The ledger is append-only; a scale change would silently reinterpret historic amounts. **"Transactions exist"** (r8 walk fix, CHG-R8WFC-003) is Orders' answer to `orders#transactionsExistInScope` for the region's scope path, asked in process (both run in `commerce`): any order at or beneath the region, in any status. A change to either field is then refused `409 currency-change-refused`; the same values sent again are not a change.
 **PUT semantics** (pull audit R103). The target is the region in the path, which has one settings row. Where it has none yet the body creates it, which is how setup fills `platform.region_settings`; otherwise the body replaces it whole, and an omitted optional field returns to its default. `placement` and `cellName` are set by the Control Plane, `readOnly`, and ignored on input. `404` means the region does not exist or is outside the caller's scope; until the first save `getRegionSettings` answers `404` as well.
 
 |  |  |
@@ -1045,7 +1045,7 @@ Changing `currencyCode` or `currencyScale` after transactions exist is rejected.
 | 400 | BadRequest | Validation failed |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
-| 409 |  | Currency or scale change rejected because transactions exist in this region, or a change to aiResidencyClass on a tenant TICVAI locked to uaeOnly (residency-class-locked; CHG-CSP-009), or globalAllow… |
+| 409 |  | Currency or scale change rejected because transactions exist in this region (currency-change-refused), or a change to aiResidencyClass on a tenant TICVAI locked to uaeOnly (residency-class-locked; CH… |
 | 422 |  | aiResidencyClass globalAllowed without the three references of aiResidencyOptIn (residency-opt-in-required; PDPL Article 23; DEC-539; CHG-CSP-009). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 

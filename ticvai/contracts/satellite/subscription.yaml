@@ -1680,6 +1680,8 @@ paths:
         format: uuid
     post:
       operationId: terminateTenant
+      x-ticvai-consumed-by:
+        - "P09 ADM-005 Tenant Directory"
       x-ticvai-writes:
       - table: control.contract
         for: 'what this operation writes (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
@@ -1690,8 +1692,6 @@ paths:
         for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
       - table: control.tenant
         for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
-      x-ticvai-consumed-by:
-        - "P09 ADM-005 Tenant Directory"
       x-ticvai-audience:
       - staff
       summary: Begin termination
@@ -2087,17 +2087,17 @@ paths:
         format: uuid
     post:
       operationId: previewSubscriptionChange
-      x-ticvai-reads:
-      - table: control.contract
-        for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
-      - table: control.plan
-        for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
       x-ticvai-consumed-by:
         - "P09 ADM-008 Subscription & Plan Management"
         - "P09 ADM-011 Licence & Seat Management"
         - "P09 ADM-414 Order & Commercial Pricing Review"
         - "P09 ADM-463 Subscription & Commercial Change Management"
         - "P17 SGN-022 Order & Commercial Pricing Review"
+      x-ticvai-reads:
+      - table: control.contract
+        for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
+      - table: control.plan
+        for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
       x-ticvai-read-via:
       - query: tenancy#tenantRecords
         route: service
@@ -2601,14 +2601,14 @@ paths:
         type: string
     post:
       operationId: decommissionCell
+      x-ticvai-consumed-by:
+        - "P09 ADM-003 Cross-Tenant Health Dashboard"
       x-ticvai-writes:
       - table: control.cell
         for: 'what this operation writes (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
       x-ticvai-reads:
       - table: control.cell
         for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
-      x-ticvai-consumed-by:
-        - "P09 ADM-003 Cross-Tenant Health Dashboard"
       x-ticvai-audience:
       - staff
       summary: Begin decommissioning a cell
@@ -2659,14 +2659,14 @@ paths:
         type: string
     post:
       operationId: cancelDecommission
+      x-ticvai-consumed-by:
+        - "P09 ADM-003 Cross-Tenant Health Dashboard"
       x-ticvai-writes:
       - table: control.cell
         for: 'what this operation writes (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
       x-ticvai-reads:
       - table: control.cell
         for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
-      x-ticvai-consumed-by:
-        - "P09 ADM-003 Cross-Tenant Health Dashboard"
       x-ticvai-audience:
       - staff
       summary: Halt a decommission

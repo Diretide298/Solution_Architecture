@@ -1628,13 +1628,20 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-1065 Currency, Timezone & Channels"
         - "P09 ADM-426 Initial Configuration & Regional Defaults"
+      x-ticvai-read-via:
+      - query: orders#transactionsExistInScope
+        route: in-process
+        for: 'whether any order exists in the region, before a currencyCode or currencyScale change (409 currency-change-refused; r8 walk fix, CHG-R8WFC-003)'
       x-ticvai-audience: [staff]
       x-ticvai-config-scope: region
       summary: Update region settings
       description: >
         Changing `currencyCode` or `currencyScale` after transactions exist is rejected.
         The ledger is append-only; a scale change would silently reinterpret historic
-        amounts.
+        amounts. **"Transactions exist"** (r8 walk fix, CHG-R8WFC-003) is Orders' answer to
+        `orders#transactionsExistInScope` for the region's scope path, asked in process (both run in
+        `commerce`): any order at or beneath the region, in any status. A change to either field is
+        then refused `409 currency-change-refused`; the same values sent again are not a change.
 
         **PUT semantics** (pull audit R103). The target is the region in the path, which has one
         settings row. Where it has none yet the body creates it, which is how setup fills
@@ -1667,11 +1674,12 @@ paths:
         '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
         '409':
           description: >
-            Currency or scale change rejected because transactions exist in this region, or a change
+            Currency or scale change rejected because transactions exist in this region
+            (`currency-change-refused`), or a change
             to `aiResidencyClass` on a tenant TICVAI locked to `uaeOnly` (`residency-class-locked`;
             CHG-CSP-009), or `globalAllowed` asked for a tenant whose `tenantCategory` is not `private`
             (`residency-category-refused`, naming the category; CHG-R1S-016).
-          x-ticvai-problem-types: [residency-class-locked, residency-category-refused]
+          x-ticvai-problem-types: [currency-change-refused, residency-class-locked, residency-category-refused]
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
@@ -2462,9 +2470,14 @@ paths:
         schema: { type: string, format: uuid }
     post:
       operationId: recordDeviceHeartbeat
+      x-ticvai-writes:
+      - table: platform.device
+        for: 'what this operation writes (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
       x-ticvai-reads:
       - table: tenancy.device_credential
         for: 'the deviceAuth credential the heartbeat is signed with (APPROVALS-TENANCY-C27) (r8 integration, CHG-R8INT-014; check-parameter-columns P-NAMED-TABLE)'
+      - table: platform.device
+        for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
       security:
       - deviceAuth: []
       - apiKeyAuth: []

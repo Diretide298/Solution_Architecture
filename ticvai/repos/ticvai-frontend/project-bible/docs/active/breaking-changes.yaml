@@ -1300,3 +1300,16 @@ changes:
     tag: r8
     producer-tickets: [SVC-MARKETING-CONSENT-1, SVC-MARKETING-CONSENT-2, SVC-MARKETING-CONSENT-3, SVC-MARKETING-GUEST-4]
     consumer-tickets: [AM-AI-P08, AM-IDENTITY-SECURITY-P01, AM-IDENTITY-SECURITY-P02, AM-MARKETING-CRM-P01, AM-MARKETING-CRM-P02, AM-MARKETING-CRM-P04, AM-MARKETING-CRM-P06, AM-MARKETING-CRM-P08, AM-MARKETING-CRM-P08-2, AM-MARKETING-CRM-P08-BLOCK-A, AM-MARKETING-CRM-P13, AM-MARKETING-CRM-P13-2, AM-SETUP-CUSTOMER-MARKETING-P08-REST, AM-WALLET-CASHLESS-P02, AM-WHITE-LABEL-P13, APP-SETUP-BO-799, APP-SETUP-BO-799-REST, TEST-AM-SETUP-CUSTOMER-MARKETING-P08-REST]
+  - id: BC-450
+    contract: wallet
+    operation: expireCreditLots
+    change: "x-ticvai-emits changed"
+    reason: 'r8 walk fix (CHG-R8WFC-003): expireCreditLots said expiry becomes breakage and finance needs to be told,
+      and nothing told it. It now emits wallet.creditExpired (new, consumed by the ledger), one per lot an expire or
+      forfeit closes. A consumer built at r1 receives an event it did not before; no field of the request or response
+      changes.'
+    approved-by: 'Chinmay, 20 October 2026: "1 ok, 2 keep , 3 yes" (item 1 was this change)'
+    tag: r8
+    operations: [expireCreditLots]
+    producer-tickets: [VM-WALLET-WALLET-1]
+    consumer-tickets: [VM-BO-1111, VM-BO-1130, TEST-AM-WALLET-CASHLESS-P08-BLOCK-A-COMPLETION]

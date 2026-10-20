@@ -2461,8 +2461,8 @@ paths:
       operationId: setResourceSelectionPolicy
       x-ticvai-consumed-by:
         - "P08 BO-897 Customer Resource Selection Configuration"
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per ticket type, the one the body''s `ticketTypeId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [ticketTypeId]
+      x-ticvai-body-key-note: 'Keyed by the body''s `ticketTypeId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per ticket type within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body.'
       summary: Whether the guest may choose the resource, per ticket type
       description: '**Two 26 August decisions meet here and they have to be read together.**
 

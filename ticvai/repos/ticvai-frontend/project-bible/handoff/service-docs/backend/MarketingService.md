@@ -5553,13 +5553,13 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | yes | Synthesised key. |
 | submission_id | uuid | no |  |
 | order_id | uuid | yes | The order (Orders' id; not a database reference). |
 | owner_role | text | yes |  |
 | order_line_id | uuid | no | For a ticket owner, the order line whose credential this owner holds; null for the buyer. |
 | unit_index | integer | no | For a ticket owner, which of the line's credentials (1 to the line's quantity); null for the buyer. |
 | scope_path | text | no | The partition key (ADR-0005). |
+| id | uuid | yes | Synthesised key. |
 
 ### `marketing.guest_device`
 

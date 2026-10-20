@@ -39,7 +39,7 @@ operationsByContract:
     scope: tenant
     permission: TENANT_CONFIGURE
     offline: false
-    reads: 0
+    reads: 2
     writes: 0
   - operation: claimCustomDomain
     verb: POST
@@ -223,7 +223,7 @@ operationsByContract:
     scope: tenant
     permission: TENANT_CONFIGURE
     offline: false
-    reads: 0
+    reads: 2
     writes: 0
   - operation: getFeatureToggles
     verb: GET

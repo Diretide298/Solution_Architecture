@@ -11800,6 +11800,7 @@
    "type": "text"
   },
   "orders.no_sale_event": {
+   "approved_by_principal_id": "uuid",
    "count_this_shift": "integer",
    "id": "uuid",
    "note": "text",
@@ -11812,15 +11813,18 @@
   "orders.order_event": {
    "actor_principal_id": "uuid",
    "actor_system": "text",
+   "approved_by_principal_id": "uuid",
    "channel": "text",
    "correlation_id": "text",
    "event_type": "text",
    "exception_type": "text",
    "id": "uuid",
    "new_state": "text",
+   "note": "text",
    "occurred_at": "timestamptz",
    "order_id": "uuid",
    "previous_state": "text",
+   "reason_code": "text",
    "related_entity_id": "text",
    "related_entity_type": "text",
    "reservation_id": "uuid",
@@ -11926,7 +11930,12 @@
    "tender": "text",
    "tender_amount": "numeric(18,4)",
    "tender_currency": "text",
-   "terminal_id": "uuid"
+   "terminal_id": "uuid",
+   "tip_allocated_to_principal_id": "uuid",
+   "tip_amount": "numeric(18,4)",
+   "tip_recorded_at": "timestamptz",
+   "tip_recorded_by_principal_id": "uuid",
+   "tip_source": "text"
   },
   "orders.payment_allocation_rule": {
    "allocation_level": "text",
@@ -14876,6 +14885,10 @@
    "collected_by_principal_id": "uuid",
    "collection_location_id": "uuid",
    "collection_point_name": "text",
+   "disposal_decided_at": "timestamptz",
+   "disposal_decided_by_principal_id": "uuid",
+   "disposal_method": "text",
+   "disposal_note": "text",
    "drop_reference": "text",
    "dropped_at": "timestamptz",
    "entitlement_id": "uuid",

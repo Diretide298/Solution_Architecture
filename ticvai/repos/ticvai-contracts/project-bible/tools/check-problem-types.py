@@ -22,7 +22,7 @@ import yaml
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # 3 October 2026, after CHG-R1S-021 (and the problem types added with CHG-R1S-007/017/018/020). Lower it as
 # responses are named; never raise it.
-CEILING = 115  # 20 October 2026, the r8 integration pass (was 117, CHG-R8INT-011); 15 October: 117 at the r6 gate (was 168, CHG-SHP-001): 531 operation-specific errors named in the Block A audit
+CEILING = 114  # 20 October 2026, the r8 walk fix (was 115: removeLicenceAddOn 409 named, CHG-R8WFC-003); the r8 integration pass (was 117, CHG-R8INT-011); 15 October: 117 at the r6 gate (was 168, CHG-SHP-001): 531 operation-specific errors named in the Block A audit
 
 
 def main() -> int:

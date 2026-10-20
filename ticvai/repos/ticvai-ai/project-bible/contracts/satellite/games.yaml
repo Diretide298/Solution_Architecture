@@ -1366,8 +1366,8 @@ paths:
         - "P08 BO-439 Normal & VIP Pricing Configuration"
         - "P08 BO-440 Retry Price Configuration"
         - "P08 BO-452 Direct-Pay / Crane & Prize Machine Configuration"
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per game, the one the body''s `gameId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [gameId]
+      x-ticvai-body-key-note: 'Keyed by the body''s `gameId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per game within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body. **Required in fact**: a body without `gameId` is refused `400 validation`; the schema leaves it optional only so a client built at r1 still validates.'
       summary: Standard, group, peak, VIP, retry and calendar prices
       description: 'Board 5. **Retry pricing is the one that is easy to miss and hard to explain
         afterwards.** A second go at a crane priced below the first is a deliberate commercial
@@ -1766,8 +1766,8 @@ paths:
       operationId: setGameKioskConfiguration
       x-ticvai-consumed-by:
         - "P08 BO-493 Self-Service UI Theme, Language & Journey Configuration"
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per kiosk, the one the body''s `kioskDeviceId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [kioskDeviceId]
+      x-ticvai-body-key-note: 'Keyed by the body''s `kioskDeviceId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per kiosk within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body. **Required in fact**: a body without `kioskDeviceId` is refused `400 validation`; the schema leaves it optional only so a client built at r1 still validates.'
       summary: The self-service journey, its theme and its languages
       description: 'Boards 10.2 and 10.10. **A kiosk in an arcade is used by a child holding a
         wristband**, and the configuration that matters is which steps appear, in what language, and

@@ -912,7 +912,7 @@ operationsByContract:
     scope: tenant
     permission: PLATFORM_TENANT_MANAGE
     offline: false
-    reads: 2
+    reads: 6
     writes: 3
   - operation: requestBurstEnvironment
     verb: POST
@@ -2344,7 +2344,7 @@ tables:
 - table: control.contract
   columns: 12
   store: postgres
-  parent: null
+  parent: control.tenant
   writtenBy:
   - subscription
   foreignWriters: null
@@ -2393,7 +2393,7 @@ tables:
 - table: control.go_live_readiness
   columns: 9
   store: postgres
-  parent: null
+  parent: control.tenant
   writtenBy:
   - subscription
   foreignWriters: null

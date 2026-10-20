@@ -273,10 +273,17 @@ operations:
   - staff
   offline: false
   reads:
+  - access.scan_event
   - accreditation.application
   - accreditation.credential
   - accreditation.holder
   - accreditation.validity
+  - fnb.table_visit
+  - ledger.posting
+  - marketing.loyalty_position
+  - orders.order_line
+  - orders.payment
+  - orders.refund
   - reporting.kpi_definition
   - reporting.kpi_target
   writes: []

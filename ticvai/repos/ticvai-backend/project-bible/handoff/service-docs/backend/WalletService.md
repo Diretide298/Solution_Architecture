@@ -1006,6 +1006,7 @@ Boards 7.2 and 7.3. **Peer-to-peer transfer is a money-transmission question bef
 **`POST /wallets/{subjectId}/top-ups`**: Add value to a wallet
 
 Creates a liability, not revenue. Recognition happens when the value is spent, or as breakage if the wallet expires.
+**Paid first, then credited** (r8 walk fix, CHG-R8WFC-003; the 402 named a payment the body never identified). The till or the guest app takes the money with Orders' payment operations (`createPayment`, and `capturePayment` where the provider authorises first) and sends that payment's id as `paymentId`. Wallet reads it through `orders#paymentRecords` in process: a payment that is `captured` and whose amount covers `amount` is credited, and its id is kept as the new credit lot's `source_reference` (`source_kind` `topUp`), so one payment funds one top-up; a payment that is `declined` or `failed`, or not captured, is refused `402 payment-declined` and nothing is credited; a payment already used for a top-up is refused `409 payment-already-used`. `tender` stays the receipt's label.
 
 |  |  |
 |---|---|
@@ -1039,6 +1040,7 @@ Creates a liability, not revenue. Recognition happens when the value is spent, o
 | amount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | amount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | tender | string | yes |  |
+| paymentId | string (uuid) |  | The orders.payment that paid for this top-up (r8 walk fix, CHG-R8WFC-003). |
 | bonusAmount | object |  | Promotional bonus on top of the paid amount. |
 | bonusAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | bonusAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
@@ -1086,7 +1088,8 @@ Creates a liability, not revenue. Recognition happens when the value is spent, o
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Topped up |
-| 402 |  | Payment declined |
+| 402 |  | Payment declined, failed or not captured (the body's paymentId) |
+| 409 |  | The body's paymentId has already funded a top-up (r8 walk fix, CHG-R8WFC-003) |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### updateCreditType

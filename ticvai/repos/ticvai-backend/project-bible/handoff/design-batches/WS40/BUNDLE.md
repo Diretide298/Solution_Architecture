@@ -106,7 +106,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-108` | Revenue Optimization Command Center | A | 0 | 22 | 6 | 1 | 1 | 0 | — | notStarted (generated) |
+| `ADM-108` | Revenue Optimization Command Center | A | 0 | 262 | 6 | 1 | 1 | 0 | — | notStarted (generated) |
 | `ADM-109` | Pricing Simulation Studio | A | 0 | 12 | 6 | 4 | 1 | 0 | — | notStarted (generated) |
 | `ADM-110` | Scenario Modeling & What-If Analysis | B | 0 | 0 | 6 | 1 | 1 | 0 | — | notStarted (generated) |
 | `ADM-111` | A/B Pricing Experiment Studio | B | 0 | 8 | 6 | 1 | 0 | 0 | — | notStarted (generated) |
@@ -170,29 +170,305 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Revenue Opportunity** (metric tile)
+**Revenue Opportunity** (metric tile, from `listRevenue`)
 
-**Incremental Revenue Generated** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| Venue | text | Venue |
+| Event product | text | Event/Product |
+| Performance | text | Performance |
+| Current price | AED 1,234.50 | Current Price |
+| Recommended price | AED 1,234.50 | Recommended Price |
+| Forecast revenue | AED 1,234.50 | Forecast Revenue |
+| Expected uplift | 1,234.5 | Expected Uplift, percent |
+| Confidence | 1,234.5 | Confidence, percent |
+| Automation mode | chip: Advisory, Human in the loop, Conditional autonomous, Autonomous | Automation Mode in force for this scope |
+| Approval status | text | Approval Status: notRequired, pending, approved or rejected |
+| Execution status | text | Execution Status: notStarted, queued, processing, live, partial, failed or rolledBack |
+| Revenue risk | AED 1,234.50 | Revenue Risk if no action is taken |
+| Event proximity | 1,234 | Event Proximity: days until the event |
+| Inventory position | 1,234.5 | Inventory Position: remaining inventory, percent |
+| Demand variance | 1,234.5 | Demand Variance against forecast, percent |
+| Urgency | chip: Low, Medium, High, Critical | Urgency |
+| Optimization | text | Optimisation id |
+| Recommendation | text | Recommendation id |
+| Revenue opportunity | AED 1,234.50 | Revenue Opportunity |
 
-**Active Optimizations** (metric tile)
+**Incremental Revenue Generated** (metric tile, from `listRevenue`)
 
-**Recommendations Awaiting Action** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| Venue | text | Venue |
+| Event product | text | Event/Product |
+| Performance | text | Performance |
+| Current price | AED 1,234.50 | Current Price |
+| Recommended price | AED 1,234.50 | Recommended Price |
+| Forecast revenue | AED 1,234.50 | Forecast Revenue |
+| Expected uplift | 1,234.5 | Expected Uplift, percent |
+| Confidence | 1,234.5 | Confidence, percent |
+| Automation mode | chip: Advisory, Human in the loop, Conditional autonomous, Autonomous | Automation Mode in force for this scope |
+| Approval status | text | Approval Status: notRequired, pending, approved or rejected |
+| Execution status | text | Execution Status: notStarted, queued, processing, live, partial, failed or rolledBack |
+| Revenue risk | AED 1,234.50 | Revenue Risk if no action is taken |
+| Event proximity | 1,234 | Event Proximity: days until the event |
+| Inventory position | 1,234.5 | Inventory Position: remaining inventory, percent |
+| Demand variance | 1,234.5 | Demand Variance against forecast, percent |
+| Urgency | chip: Low, Medium, High, Critical | Urgency |
+| Optimization | text | Optimisation id |
+| Recommendation | text | Recommendation id |
+| Revenue opportunity | AED 1,234.50 | Revenue Opportunity |
 
-**Pending Simulations** (metric tile)
+**Active Optimizations** (metric tile, from `listRevenue`)
 
-**Auto-Executed Changes** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| Venue | text | Venue |
+| Event product | text | Event/Product |
+| Performance | text | Performance |
+| Current price | AED 1,234.50 | Current Price |
+| Recommended price | AED 1,234.50 | Recommended Price |
+| Forecast revenue | AED 1,234.50 | Forecast Revenue |
+| Expected uplift | 1,234.5 | Expected Uplift, percent |
+| Confidence | 1,234.5 | Confidence, percent |
+| Automation mode | chip: Advisory, Human in the loop, Conditional autonomous, Autonomous | Automation Mode in force for this scope |
+| Approval status | text | Approval Status: notRequired, pending, approved or rejected |
+| Execution status | text | Execution Status: notStarted, queued, processing, live, partial, failed or rolledBack |
+| Revenue risk | AED 1,234.50 | Revenue Risk if no action is taken |
+| Event proximity | 1,234 | Event Proximity: days until the event |
+| Inventory position | 1,234.5 | Inventory Position: remaining inventory, percent |
+| Demand variance | 1,234.5 | Demand Variance against forecast, percent |
+| Urgency | chip: Low, Medium, High, Critical | Urgency |
+| Optimization | text | Optimisation id |
+| Recommendation | text | Recommendation id |
+| Revenue opportunity | AED 1,234.50 | Revenue Opportunity |
 
-**Approval Required** (metric tile)
+**Recommendations Awaiting Action** (metric tile, from `listRevenue`)
 
-**Active A/B Tests** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| Venue | text | Venue |
+| Event product | text | Event/Product |
+| Performance | text | Performance |
+| Current price | AED 1,234.50 | Current Price |
+| Recommended price | AED 1,234.50 | Recommended Price |
+| Forecast revenue | AED 1,234.50 | Forecast Revenue |
+| Expected uplift | 1,234.5 | Expected Uplift, percent |
+| Confidence | 1,234.5 | Confidence, percent |
+| Automation mode | chip: Advisory, Human in the loop, Conditional autonomous, Autonomous | Automation Mode in force for this scope |
+| Approval status | text | Approval Status: notRequired, pending, approved or rejected |
+| Execution status | text | Execution Status: notStarted, queued, processing, live, partial, failed or rolledBack |
+| Revenue risk | AED 1,234.50 | Revenue Risk if no action is taken |
+| Event proximity | 1,234 | Event Proximity: days until the event |
+| Inventory position | 1,234.5 | Inventory Position: remaining inventory, percent |
+| Demand variance | 1,234.5 | Demand Variance against forecast, percent |
+| Urgency | chip: Low, Medium, High, Critical | Urgency |
+| Optimization | text | Optimisation id |
+| Recommendation | text | Recommendation id |
+| Revenue opportunity | AED 1,234.50 | Revenue Opportunity |
 
-**Pricing Exceptions** (metric tile)
+**Pending Simulations** (metric tile, from `listRevenue`)
 
-**Revenue at Risk** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| Venue | text | Venue |
+| Event product | text | Event/Product |
+| Performance | text | Performance |
+| Current price | AED 1,234.50 | Current Price |
+| Recommended price | AED 1,234.50 | Recommended Price |
+| Forecast revenue | AED 1,234.50 | Forecast Revenue |
+| Expected uplift | 1,234.5 | Expected Uplift, percent |
+| Confidence | 1,234.5 | Confidence, percent |
+| Automation mode | chip: Advisory, Human in the loop, Conditional autonomous, Autonomous | Automation Mode in force for this scope |
+| Approval status | text | Approval Status: notRequired, pending, approved or rejected |
+| Execution status | text | Execution Status: notStarted, queued, processing, live, partial, failed or rolledBack |
+| Revenue risk | AED 1,234.50 | Revenue Risk if no action is taken |
+| Event proximity | 1,234 | Event Proximity: days until the event |
+| Inventory position | 1,234.5 | Inventory Position: remaining inventory, percent |
+| Demand variance | 1,234.5 | Demand Variance against forecast, percent |
+| Urgency | chip: Low, Medium, High, Critical | Urgency |
+| Optimization | text | Optimisation id |
+| Recommendation | text | Recommendation id |
+| Revenue opportunity | AED 1,234.50 | Revenue Opportunity |
 
-**Forecast Accuracy** (metric tile)
+**Auto-Executed Changes** (metric tile, from `listRevenue`)
 
-**Optimization Success Rate** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| Venue | text | Venue |
+| Event product | text | Event/Product |
+| Performance | text | Performance |
+| Current price | AED 1,234.50 | Current Price |
+| Recommended price | AED 1,234.50 | Recommended Price |
+| Forecast revenue | AED 1,234.50 | Forecast Revenue |
+| Expected uplift | 1,234.5 | Expected Uplift, percent |
+| Confidence | 1,234.5 | Confidence, percent |
+| Automation mode | chip: Advisory, Human in the loop, Conditional autonomous, Autonomous | Automation Mode in force for this scope |
+| Approval status | text | Approval Status: notRequired, pending, approved or rejected |
+| Execution status | text | Execution Status: notStarted, queued, processing, live, partial, failed or rolledBack |
+| Revenue risk | AED 1,234.50 | Revenue Risk if no action is taken |
+| Event proximity | 1,234 | Event Proximity: days until the event |
+| Inventory position | 1,234.5 | Inventory Position: remaining inventory, percent |
+| Demand variance | 1,234.5 | Demand Variance against forecast, percent |
+| Urgency | chip: Low, Medium, High, Critical | Urgency |
+| Optimization | text | Optimisation id |
+| Recommendation | text | Recommendation id |
+| Revenue opportunity | AED 1,234.50 | Revenue Opportunity |
+
+**Approval Required** (metric tile, from `listRevenue`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| Venue | text | Venue |
+| Event product | text | Event/Product |
+| Performance | text | Performance |
+| Current price | AED 1,234.50 | Current Price |
+| Recommended price | AED 1,234.50 | Recommended Price |
+| Forecast revenue | AED 1,234.50 | Forecast Revenue |
+| Expected uplift | 1,234.5 | Expected Uplift, percent |
+| Confidence | 1,234.5 | Confidence, percent |
+| Automation mode | chip: Advisory, Human in the loop, Conditional autonomous, Autonomous | Automation Mode in force for this scope |
+| Approval status | text | Approval Status: notRequired, pending, approved or rejected |
+| Execution status | text | Execution Status: notStarted, queued, processing, live, partial, failed or rolledBack |
+| Revenue risk | AED 1,234.50 | Revenue Risk if no action is taken |
+| Event proximity | 1,234 | Event Proximity: days until the event |
+| Inventory position | 1,234.5 | Inventory Position: remaining inventory, percent |
+| Demand variance | 1,234.5 | Demand Variance against forecast, percent |
+| Urgency | chip: Low, Medium, High, Critical | Urgency |
+| Optimization | text | Optimisation id |
+| Recommendation | text | Recommendation id |
+| Revenue opportunity | AED 1,234.50 | Revenue Opportunity |
+
+**Active A/B Tests** (metric tile, from `listRevenue`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| Venue | text | Venue |
+| Event product | text | Event/Product |
+| Performance | text | Performance |
+| Current price | AED 1,234.50 | Current Price |
+| Recommended price | AED 1,234.50 | Recommended Price |
+| Forecast revenue | AED 1,234.50 | Forecast Revenue |
+| Expected uplift | 1,234.5 | Expected Uplift, percent |
+| Confidence | 1,234.5 | Confidence, percent |
+| Automation mode | chip: Advisory, Human in the loop, Conditional autonomous, Autonomous | Automation Mode in force for this scope |
+| Approval status | text | Approval Status: notRequired, pending, approved or rejected |
+| Execution status | text | Execution Status: notStarted, queued, processing, live, partial, failed or rolledBack |
+| Revenue risk | AED 1,234.50 | Revenue Risk if no action is taken |
+| Event proximity | 1,234 | Event Proximity: days until the event |
+| Inventory position | 1,234.5 | Inventory Position: remaining inventory, percent |
+| Demand variance | 1,234.5 | Demand Variance against forecast, percent |
+| Urgency | chip: Low, Medium, High, Critical | Urgency |
+| Optimization | text | Optimisation id |
+| Recommendation | text | Recommendation id |
+| Revenue opportunity | AED 1,234.50 | Revenue Opportunity |
+
+**Pricing Exceptions** (metric tile, from `listRevenue`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| Venue | text | Venue |
+| Event product | text | Event/Product |
+| Performance | text | Performance |
+| Current price | AED 1,234.50 | Current Price |
+| Recommended price | AED 1,234.50 | Recommended Price |
+| Forecast revenue | AED 1,234.50 | Forecast Revenue |
+| Expected uplift | 1,234.5 | Expected Uplift, percent |
+| Confidence | 1,234.5 | Confidence, percent |
+| Automation mode | chip: Advisory, Human in the loop, Conditional autonomous, Autonomous | Automation Mode in force for this scope |
+| Approval status | text | Approval Status: notRequired, pending, approved or rejected |
+| Execution status | text | Execution Status: notStarted, queued, processing, live, partial, failed or rolledBack |
+| Revenue risk | AED 1,234.50 | Revenue Risk if no action is taken |
+| Event proximity | 1,234 | Event Proximity: days until the event |
+| Inventory position | 1,234.5 | Inventory Position: remaining inventory, percent |
+| Demand variance | 1,234.5 | Demand Variance against forecast, percent |
+| Urgency | chip: Low, Medium, High, Critical | Urgency |
+| Optimization | text | Optimisation id |
+| Recommendation | text | Recommendation id |
+| Revenue opportunity | AED 1,234.50 | Revenue Opportunity |
+
+**Revenue at Risk** (metric tile, from `listRevenue`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| Venue | text | Venue |
+| Event product | text | Event/Product |
+| Performance | text | Performance |
+| Current price | AED 1,234.50 | Current Price |
+| Recommended price | AED 1,234.50 | Recommended Price |
+| Forecast revenue | AED 1,234.50 | Forecast Revenue |
+| Expected uplift | 1,234.5 | Expected Uplift, percent |
+| Confidence | 1,234.5 | Confidence, percent |
+| Automation mode | chip: Advisory, Human in the loop, Conditional autonomous, Autonomous | Automation Mode in force for this scope |
+| Approval status | text | Approval Status: notRequired, pending, approved or rejected |
+| Execution status | text | Execution Status: notStarted, queued, processing, live, partial, failed or rolledBack |
+| Revenue risk | AED 1,234.50 | Revenue Risk if no action is taken |
+| Event proximity | 1,234 | Event Proximity: days until the event |
+| Inventory position | 1,234.5 | Inventory Position: remaining inventory, percent |
+| Demand variance | 1,234.5 | Demand Variance against forecast, percent |
+| Urgency | chip: Low, Medium, High, Critical | Urgency |
+| Optimization | text | Optimisation id |
+| Recommendation | text | Recommendation id |
+| Revenue opportunity | AED 1,234.50 | Revenue Opportunity |
+
+**Forecast Accuracy** (metric tile, from `listRevenue`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| Venue | text | Venue |
+| Event product | text | Event/Product |
+| Performance | text | Performance |
+| Current price | AED 1,234.50 | Current Price |
+| Recommended price | AED 1,234.50 | Recommended Price |
+| Forecast revenue | AED 1,234.50 | Forecast Revenue |
+| Expected uplift | 1,234.5 | Expected Uplift, percent |
+| Confidence | 1,234.5 | Confidence, percent |
+| Automation mode | chip: Advisory, Human in the loop, Conditional autonomous, Autonomous | Automation Mode in force for this scope |
+| Approval status | text | Approval Status: notRequired, pending, approved or rejected |
+| Execution status | text | Execution Status: notStarted, queued, processing, live, partial, failed or rolledBack |
+| Revenue risk | AED 1,234.50 | Revenue Risk if no action is taken |
+| Event proximity | 1,234 | Event Proximity: days until the event |
+| Inventory position | 1,234.5 | Inventory Position: remaining inventory, percent |
+| Demand variance | 1,234.5 | Demand Variance against forecast, percent |
+| Urgency | chip: Low, Medium, High, Critical | Urgency |
+| Optimization | text | Optimisation id |
+| Recommendation | text | Recommendation id |
+| Revenue opportunity | AED 1,234.50 | Revenue Opportunity |
+
+**Optimization Success Rate** (metric tile, from `listRevenue`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| Venue | text | Venue |
+| Event product | text | Event/Product |
+| Performance | text | Performance |
+| Current price | AED 1,234.50 | Current Price |
+| Recommended price | AED 1,234.50 | Recommended Price |
+| Forecast revenue | AED 1,234.50 | Forecast Revenue |
+| Expected uplift | 1,234.5 | Expected Uplift, percent |
+| Confidence | 1,234.5 | Confidence, percent |
+| Automation mode | chip: Advisory, Human in the loop, Conditional autonomous, Autonomous | Automation Mode in force for this scope |
+| Approval status | text | Approval Status: notRequired, pending, approved or rejected |
+| Execution status | text | Execution Status: notStarted, queued, processing, live, partial, failed or rolledBack |
+| Revenue risk | AED 1,234.50 | Revenue Risk if no action is taken |
+| Event proximity | 1,234 | Event Proximity: days until the event |
+| Inventory position | 1,234.5 | Inventory Position: remaining inventory, percent |
+| Demand variance | 1,234.5 | Demand Variance against forecast, percent |
+| Urgency | chip: Low, Medium, High, Critical | Urgency |
+| Optimization | text | Optimisation id |
+| Recommendation | text | Recommendation id |
+| Revenue opportunity | AED 1,234.50 | Revenue Opportunity |
 
 **Every revenue optimization** (data table, from `listRevenue`)
 
@@ -325,7 +601,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (22 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (262 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-108?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Run Simulation, Review Recommendations, Start Experiment, Approve Changes, Pause Automation, Open Execution Monitor.
 - [ ] Every transition is wired: `BO-100`, `ADM-109`, `ADM-110`, `ADM-111`, `ADM-112`, `ADM-114`, `ADM-115`, `ADM-116`, `ADM-117`, `ADM-113`.

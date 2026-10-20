@@ -171,7 +171,7 @@
    "operations": 2
   },
   {
-   "contract": "catalogue",
+   "contract": "finance",
    "operations": 1
   },
   {
@@ -179,11 +179,11 @@
    "operations": 1
   },
   {
-   "contract": "payments",
+   "contract": "catalogue",
    "operations": 1
   },
   {
-   "contract": "finance",
+   "contract": "payments",
    "operations": 1
   }
  ],

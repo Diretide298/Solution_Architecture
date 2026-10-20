@@ -47,6 +47,11 @@
   "purpose": "Help a guest choose and pay, and nothing else.",
   "gaps": [
    {
+    "operation": "createAiConversation",
+    "why": "**Open, waiting on the lead (r8 walk fix, CHG-R8WFC-007).** Nobody signs in at a kiosk, so its session is the anonymous guest session (common.yaml guestAuth: \"the cart operations and nothing that needs a known guest\"), while `createAiConversation` and `sendAiMessage` are `x-ticvai-self-scoped: subject` and every guest `ai.activity` row needs its subject (V0108 activity_subject_id_when_chk). The kiosk holds no credential these operations accept. Do not build the assistant against a guessed credential: build the rest of the kiosk and raise a blocking CR naming this gap. The options are in the r8 walk fix report (a session-bound anonymous conversation with a migration relaxing the subject check, the kiosk calling as its registered device, or the kiosk assistant after r8).",
+    "source": "r8 sample walk, 20 October 2026, APP-KIOSK-KSK-015 (#28867), class screen-op-auth-mismatch"
+   },
+   {
     "operation": "getAvailability",
     "why": "**`getAvailability` declares its response inline**, so the component that shows it names fields but binds to no schema. The contract should name the shape.",
     "source": "contract catalogue.yaml GET /availability"

@@ -207,8 +207,8 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-621 Applicant Type Configuration"
         - "P08 BO-622 Application Requirements Matrix"
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per accreditation programme, the one the body''s `programmeId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [programmeId]
+      x-ticvai-body-key-note: 'Keyed by the body''s `programmeId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per accreditation programme within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body. **Required in fact**: a body without `programmeId` is refused `400 validation`; the schema leaves it optional only so a client built at r1 still validates.'
       x-ticvai-conflict-policy: serverWins
       summary: What each applicant type must supply and pass
       description: 'Board 1.8 — the requirements matrix. **Different applicant types are vetted
@@ -1372,8 +1372,8 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-666 Validity Period Configuration"
         - "P08 BO-669 Temporary & Seasonal Accreditation"
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per accreditation programme, the one the body''s `programmeId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [programmeId]
+      x-ticvai-body-key-note: 'Keyed by the body''s `programmeId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per accreditation programme within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body. **Required in fact**: a body without `programmeId` is refused `400 validation`; the schema leaves it optional only so a client built at r1 still validates.'
       x-ticvai-conflict-policy: serverWins
       summary: Validity periods, renewal windows and expiry behaviour
       description: 'Boards 6.3 and 6.10. **Expiry is the control that keeps an accreditation estate
@@ -1416,8 +1416,8 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-675 Notification Rule Management"
         - "P08 BO-676 Expiry & Renewal Notification Scheduler"
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per accreditation programme, the one the body''s `programmeId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [programmeId]
+      x-ticvai-body-key-note: 'Keyed by the body''s `programmeId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per accreditation programme within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body. **Required in fact**: a body without `programmeId` is refused `400 validation`; the schema leaves it optional only so a client built at r1 still validates.'
       x-ticvai-conflict-policy: serverWins
       summary: Who is told what, and when
       description: 'Boards 7.2 and 7.3. **Expiry notices go to the organisation as well as the

@@ -168,7 +168,7 @@ operationsByContract:
     scope: venue
     permission: REPORT_VIEW_VENUE
     offline: false
-    reads: 6
+    reads: 13
     writes: 0
   - operation: getReport
     verb: GET
@@ -668,13 +668,21 @@ tables:
   - reporting
   foreignWriters: null
 readsFrom:
+- service: AccessService
+  operations: 2
 - service: AiService
   operations: 2
 - service: IdentityService
   operations: 2
-- service: AccessService
+- service: FnbService
   operations: 1
 - service: InventoryService
+  operations: 1
+- service: LedgerService
+  operations: 1
+- service: MarketingService
+  operations: 1
+- service: OrderService
   operations: 1
 - service: TenancyService
   operations: 1

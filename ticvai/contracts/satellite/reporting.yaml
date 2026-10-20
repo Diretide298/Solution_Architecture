@@ -511,7 +511,6 @@ paths:
   /reports:
     get:
       operationId: listReports
-      x-ticvai-permission-note: 'REPORT_VIEW_VENUE admits every report. **On the till (POS-008) a caller who holds REPORT_VIEW_OWN or REPORT_VIEW_WORKSTATION and not REPORT_VIEW_VENUE lists only the seeded till reports (`terminalDayView`)**; anything else is refused 403 for that caller (r8 walk fix, CHG-R8WFC-007: POS-008 promises a cashier''s and a terminal''s day, never the venue-wide report permission).'
       x-ticvai-consumed-by:
         - "P04 POS-008 Reports"
         - "P08 BO-029 Report Builder"
@@ -524,6 +523,7 @@ paths:
         - "P12 SUP-008 Agent Performance & SLA View"
         - "P16 ANL-023 Drag-and-Drop Dashboard Canvas"
         - "P16 ANL-031 Report Catalogue & Library"
+      x-ticvai-permission-note: 'REPORT_VIEW_VENUE admits every report. **On the till (POS-008) a caller who holds REPORT_VIEW_OWN or REPORT_VIEW_WORKSTATION and not REPORT_VIEW_VENUE lists only the seeded till reports (`terminalDayView`)**; anything else is refused 403 for that caller (r8 walk fix, CHG-R8WFC-007: POS-008 promises a cashier''s and a terminal''s day, never the venue-wide report permission).'
       x-ticvai-api-scope: analytics.read
       x-ticvai-audience:
       - staff
@@ -646,7 +646,6 @@ paths:
         format: uuid
     get:
       operationId: getReport
-      x-ticvai-permission-note: 'REPORT_VIEW_VENUE admits every report. **On the till (POS-008) a caller who holds REPORT_VIEW_OWN or REPORT_VIEW_WORKSTATION and not REPORT_VIEW_VENUE reads only the seeded till reports (`terminalDayView`)**; anything else is refused 403 for that caller (r8 walk fix, CHG-R8WFC-007: POS-008 promises a cashier''s and a terminal''s day, never the venue-wide report permission).'
       x-ticvai-consumed-by:
         - "P04 POS-008 Reports"
         - "P08 BO-029 Report Builder"
@@ -656,6 +655,7 @@ paths:
         - "P10 PTR-018 Reports & Sales Performance"
         - "P12 SUP-008 Agent Performance & SLA View"
         - "P16 ANL-023 Drag-and-Drop Dashboard Canvas"
+      x-ticvai-permission-note: 'REPORT_VIEW_VENUE admits every report. **On the till (POS-008) a caller who holds REPORT_VIEW_OWN or REPORT_VIEW_WORKSTATION and not REPORT_VIEW_VENUE reads only the seeded till reports (`terminalDayView`)**; anything else is refused 403 for that caller (r8 walk fix, CHG-R8WFC-007: POS-008 promises a cashier''s and a terminal''s day, never the venue-wide report permission).'
       x-ticvai-api-scope: analytics.read
       x-ticvai-audience:
       - staff
@@ -751,12 +751,6 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     delete:
       operationId: deleteReport
-      x-ticvai-writes:
-      - table: reporting.report_definition
-        for: 'what this operation writes (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
-      x-ticvai-reads:
-      - table: reporting.report_definition
-        for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
       x-ticvai-consumed-by:
         - "P08 BO-029 Report Builder"
         - "P08 BO-058 Reporting Home"
@@ -764,6 +758,12 @@ paths:
         - "P08 BO-060 Attendance & Footfall"
         - "P10 PTR-018 Reports & Sales Performance"
         - "P12 SUP-008 Agent Performance & SLA View"
+      x-ticvai-writes:
+      - table: reporting.report_definition
+        for: 'what this operation writes (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
+      x-ticvai-reads:
+      - table: reporting.report_definition
+        for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
       x-ticvai-api-scope: analytics.write
       x-ticvai-audience:
       - staff
@@ -851,7 +851,6 @@ paths:
         format: uuid
     post:
       operationId: runReport
-      x-ticvai-permission-note: 'REPORT_VIEW_VENUE admits every report. **On the till (POS-008) a caller who holds REPORT_VIEW_OWN or REPORT_VIEW_WORKSTATION and not REPORT_VIEW_VENUE runs only the seeded till report `terminalDayView`, over the caller''s own sales (REPORT_VIEW_OWN) or this workstation''s (REPORT_VIEW_WORKSTATION)**; anything else is refused 403 for that caller (r8 walk fix, CHG-R8WFC-007: POS-008 promises a cashier''s and a terminal''s day, never the venue-wide report permission).'
       x-ticvai-consumed-by:
         - "P04 POS-008 Reports"
         - "P04 POS-020 Shift Exceptions & Alerts"
@@ -875,6 +874,7 @@ paths:
         - "P16 ANL-006 Inventory & Waste Intelligence"
         - "P16 ANL-007 Guest & Conversion Intelligence"
         - "P16 ANL-009 AI Assistant & Action Center"
+      x-ticvai-permission-note: 'REPORT_VIEW_VENUE admits every report. **On the till (POS-008) a caller who holds REPORT_VIEW_OWN or REPORT_VIEW_WORKSTATION and not REPORT_VIEW_VENUE runs only the seeded till report `terminalDayView`, over the caller''s own sales (REPORT_VIEW_OWN) or this workstation''s (REPORT_VIEW_WORKSTATION)**; anything else is refused 403 for that caller (r8 walk fix, CHG-R8WFC-007: POS-008 promises a cashier''s and a terminal''s day, never the venue-wide report permission).'
       x-ticvai-api-scope: analytics.write
       x-ticvai-audience:
       - staff

@@ -28,6 +28,9 @@ build-service-docs.py so the owners it gave and the dates here agree):
 - AI engine tasks carry no points: their length is the engineer-days in block-a-extra-tasks.json (Block A) or
   plan-tasks.csv `days` (the AI review's capabilities, later blocks), never before the review's sprint for them;
 - client tasks start on day 0 and hold no one;
+- **a hand-written task due on a date** (block-a-extra-tasks.json `due`, CHG-R8INT-032; the lead, 20 October 2026: the r8
+  database updates in the sprint running now) is placed at that date, whatever its build order,
+  so it lands in that date's sprint; a chore of under a day, it holds no slot and re-paces nothing (sprint_plan.due_of);
 - **a task the lead holds takes no capacity** (docs/active/held-tasks.yaml, CHG-R8DEC-004; the lead, 20 October 2026):
   it gets no start, no sprint and no owner here and spends none of its owner's days, so the work after it moves up
   (the products wave 1 tasks of Sanket Keluskar and Surendra Loke, while their back-office screens wait for signed
@@ -77,6 +80,7 @@ def main():
     settings = sp.sprint_settings(team)
     extra = json.loads((ROOT / "docs" / "active" / "block-a-extra-tasks.json").read_text(encoding="utf-8"))
     days_of = {t["key"]: float(t["days"]) for t in extra["tasks"] if t.get("days")}
+    due = sp.due_of(extra["tasks"])          # a hand-written task due on a date sits at it (CHG-R8INT-032)
     src = DOCS / "plan-tasks.csv"
     if not src.exists():
         src = DOCS / "tasks.csv"
@@ -147,7 +151,7 @@ def main():
               "paceExclude": r.get("parent") in late_ams,
               "track": r["track"], "service": r["service"], "points": int(r["points"] or 0),
               "days": float(r.get("days") or 0) or days_of.get(r["key"]),
-              "notBefore": float(r.get("notBefore") or 0), "deps": (r["dependsOn"] or "").split(),
+              "notBefore": float(r.get("notBefore") or 0), "due": due.get(r["key"]), "deps": (r["dependsOn"] or "").split(),
               "client": r["area"] == "client", "block": r.get("block") or "A"} for r in rows]
     pace_at, pace_line, _ = sp.pace_model(team, items)     # measured on the whole plan, held tasks included
     held = held_keys() & {it["key"] for it in items}

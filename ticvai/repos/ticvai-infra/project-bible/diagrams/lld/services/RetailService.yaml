@@ -19,7 +19,7 @@ schemas:
   tables: 13
   stores:
   - postgres
-  largestTable: retail.merchandise
+  largestTable: retail.shop_and_drop
 operationsByContract:
 - contract: retail
   count: 25
@@ -375,7 +375,7 @@ tables:
   - retail
   foreignWriters: null
 - table: retail.shop_and_drop
-  columns: 15
+  columns: 19
   store: postgres
   parent: null
   writtenBy:

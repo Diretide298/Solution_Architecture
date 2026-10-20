@@ -3195,14 +3195,14 @@ tables:
   - orders
   foreignWriters: null
 - table: orders.no_sale_event
-  columns: 8
+  columns: 9
   store: postgres
   parent: null
   writtenBy:
   - shift
   foreignWriters: null
 - table: orders.order_event
-  columns: 16
+  columns: 19
   store: postgres
   parent: null
   writtenBy:
@@ -3255,7 +3255,7 @@ tables:
   - orders
   foreignWriters: null
 - table: orders.payment
-  columns: 18
+  columns: 23
   store: postgres
   parent: null
   writtenBy:

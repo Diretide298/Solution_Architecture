@@ -16,13 +16,13 @@ Every number below is counted from the files in this package, not from memory.
 | Permissions | 128 | Every operation declares one or an `x-ticvai-auth` model |
 | **Tables designed** | **1,149** | 3,911 columns |
 | **Tables written as DDL** | **1,149** | `backend/*.sql`, 815 foreign keys. Never executed |
-| Relationships | 3,246 | 362 of 1149 tables carry one; the twelve that do not are correct |
+| Relationships | 3,248 | 362 of 1149 tables carry one; the twelve that do not are correct |
 | Screens defined | **2,453** | Across 16 platforms, all linked to a board |
 | **Screens specified — states written** | **500** | Of 500 |
 | Screens with operations declared | 486 | Of 500 |
 | Operations reaching a screen | 779 | Of 1,032 |
 | State models | **208** | Every one carries transitions — **all modelled** |
-| Domain events | 96 | Publisher, consumers, idempotency keys |
+| Domain events | 97 | Publisher, consumers, idempotency keys |
 | User flows | **98** | 284 branches. Every contract and platform touched |
 | ADRs | 71 | |
 | **Requirements covered by a contract** | **2,778 of 2,990 (93%)** | The remaining 212 are workshop-blocked |

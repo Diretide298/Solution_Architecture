@@ -7,7 +7,7 @@ sourceFiles:
   - _schema.yaml
   why: '**`_schema.yaml` is the shape, not a model.** Every state file validates against it; it has
     no entity and no transitions.'
-title: 208 state models and 96 events
+title: 208 state models and 97 events
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/00-platform.yaml
 about: '**What can happen to a thing, and in what order.** A state model is a lifecycle within one entity;
@@ -3610,6 +3610,9 @@ events:
   description: A custom domain mapping was refused because another tenant holds the hostname.
 - event: wallet-credited
   description: Money reached a wallet's available balance (top-up, refund, adjustment, a released hold).
+- event: wallet-creditExpired
+  description: Unspent credit left a wallet because it expired or was forfeited; the stored-value liability
+    it was becomes breakage.
 - event: wallet-debited
   description: Money left a wallet's available balance, held for a spend or captured.
 - event: whitelabel-contentPublished

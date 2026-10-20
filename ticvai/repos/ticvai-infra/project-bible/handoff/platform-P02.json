@@ -163,11 +163,11 @@
    "operations": 15
   },
   {
-   "contract": "access",
+   "contract": "transport",
    "operations": 12
   },
   {
-   "contract": "transport",
+   "contract": "access",
    "operations": 12
   },
   {
@@ -187,11 +187,11 @@
    "operations": 6
   },
   {
-   "contract": "wallet",
+   "contract": "resources",
    "operations": 6
   },
   {
-   "contract": "resources",
+   "contract": "wallet",
    "operations": 6
   },
   {
@@ -199,7 +199,7 @@
    "operations": 5
   },
   {
-   "contract": "retail",
+   "contract": "seating",
    "operations": 4
   },
   {
@@ -207,7 +207,7 @@
    "operations": 4
   },
   {
-   "contract": "seating",
+   "contract": "retail",
    "operations": 4
   },
   {

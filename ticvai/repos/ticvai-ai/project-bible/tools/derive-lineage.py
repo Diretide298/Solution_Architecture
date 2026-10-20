@@ -434,6 +434,7 @@ def derive(stored: dict) -> dict:
                     "offline": bool(op.get("x-ticvai-offline-capable")),
                     "summary": op.get("summary") or op["operationId"],
                     "source": "derived",
+                    "_declared": bool(op.get("x-ticvai-reads") or op.get("x-ticvai-writes")),
                     "audience": list(aud) if isinstance(aud, list) else ([aud] if aud else []),
                     "service": svc.get(contract),
                     "stores": sto.get(contract, ["postgres"]),
@@ -567,6 +568,17 @@ def expected(stored: dict, fresh: dict, overrides: dict, stale: list = None) -> 
                 e[key] = f[key]
             else:
                 e.pop(key, None)
+        # **A path-inferred entry stops being one when somebody states its tables** (r8 walk, 20 October 2026,
+        # CHG-R8WFC-004). `source` was carried from the hand-kept file, so 86 entries still said "path-inferred" (tables
+        # guessed from the URL) after their contract or a reviewed override had stated them, and the developer could
+        # not tell a guess from a decision. It is relabelled once the operation declares x-ticvai-reads /
+        # x-ticvai-writes, or its override is a reviewed one (not `carried`); check-lineage LN-PATH-INFERRED counts
+        # what is left.
+        if e.get("source") == "path-inferred":
+            if f.get("_declared") or (ov and not ov.get("carried")):
+                e["source"] = "declared (contract x-ticvai-reads/x-ticvai-writes or a reviewed override; r8 walk fix)"
+            elif not ov:
+                e["source"] = "derived"         # nothing but the contract's schemas gives its tables now
         out[o] = e
     import importlib.util as _ilu
     _spec = _ilu.spec_from_file_location("resolution_cache", ROOT / "tools" / "resolution_cache.py")

@@ -895,6 +895,11 @@ paths:
       operationId: getDeepLinkScheme
       x-ticvai-consumed-by:
         - "P13 CMS-009 Navigation & Menus"
+      x-ticvai-reads:
+      - table: whitelabel.custom_domain
+        for: 'the tenant''s primary domain the links are built on (r8 walk fix, CHG-R8WFC-004)'
+      - table: whitelabel.config_version
+        for: 'the published configuration: the targets a link may name and the app-link fallback to the store (r8 walk fix, CHG-R8WFC-004)'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -926,6 +931,11 @@ paths:
       operationId: buildDeepLink
       x-ticvai-consumed-by:
         - "P13 CMS-009 Navigation & Menus"
+      x-ticvai-reads:
+      - table: whitelabel.custom_domain
+        for: 'the tenant''s primary domain the links are built on (r8 walk fix, CHG-R8WFC-004)'
+      - table: whitelabel.config_version
+        for: 'the published configuration: the targets a link may name and the app-link fallback to the store (r8 walk fix, CHG-R8WFC-004)'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '2 October: Chinmay, batch 2 #41, research B4: a link builder in the CMS; shape follows
@@ -1648,6 +1658,16 @@ paths:
       operationId: setMaintenanceMode
       x-ticvai-consumed-by:
         - "P13 CMS-001 Tenant Workspace"
+      x-ticvai-writes:
+      - table: whitelabel.tenant_config
+        for: 'what this operation writes (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
+      x-ticvai-reads:
+      - table: whitelabel.content_page
+        for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
+      - table: whitelabel.module_enablement
+        for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
+      - table: whitelabel.tenant_config
+        for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
       x-ticvai-read-via:
       - query: tenancy#activeVenues
         route: service
@@ -1724,6 +1744,9 @@ paths:
         - "P13 CMS-004 Logo & Assets"
         - "P13 CMS-006 Component Preview"
         - "P13 CMS-104 App Build & Store Publishing"
+      x-ticvai-reads:
+      - table: whitelabel.tenant_config
+        for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -1753,6 +1776,12 @@ paths:
         - "P13 CMS-002 Brand Kit"
         - "P13 CMS-004 Logo & Assets"
         - "P13 CMS-104 App Build & Store Publishing"
+      x-ticvai-writes:
+      - table: whitelabel.tenant_config
+        for: 'what this operation writes (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
+      x-ticvai-reads:
+      - table: whitelabel.tenant_config
+        for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
       x-ticvai-read-via:
       - query: subscription#licenceAddOnRecords
         route: in-process
@@ -1832,6 +1861,9 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-016 White-Label Branding Management"
         - "P13 CMS-004 Logo & Assets"
+      x-ticvai-reads:
+      - table: whitelabel.tenant_config
+        for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -1858,6 +1890,12 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-016 White-Label Branding Management"
         - "P13 CMS-004 Logo & Assets"
+      x-ticvai-writes:
+      - table: whitelabel.tenant_config
+        for: 'what this operation writes (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
+      x-ticvai-reads:
+      - table: whitelabel.tenant_config
+        for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
       x-ticvai-read-via:
       - query: assets#mediaAssetRecords
         route: in-process
@@ -2151,6 +2189,9 @@ paths:
         - "P09 ADM-016 White-Label Branding Management"
         - "P13 CMS-005 Theme Editor"
         - "P13 CMS-006 Component Preview"
+      x-ticvai-reads:
+      - table: whitelabel.tenant_config
+        for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -2177,6 +2218,12 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-016 White-Label Branding Management"
         - "P13 CMS-005 Theme Editor"
+      x-ticvai-writes:
+      - table: whitelabel.tenant_config
+        for: 'what this operation writes (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
+      x-ticvai-reads:
+      - table: whitelabel.tenant_config
+        for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
       x-ticvai-singleton: true
       x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
@@ -2245,6 +2292,9 @@ paths:
       x-ticvai-consumed-by:
         - "P13 CMS-003 Typography"
         - "P13 CMS-006 Component Preview"
+      x-ticvai-reads:
+      - table: whitelabel.tenant_config
+        for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -2270,6 +2320,12 @@ paths:
       operationId: setFonts
       x-ticvai-consumed-by:
         - "P13 CMS-003 Typography"
+      x-ticvai-writes:
+      - table: whitelabel.tenant_config
+        for: 'what this operation writes (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
+      x-ticvai-reads:
+      - table: whitelabel.tenant_config
+        for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
       x-ticvai-singleton: true
       x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
@@ -2328,6 +2384,12 @@ paths:
       operationId: setHeader
       x-ticvai-consumed-by:
         - "P13 CMS-009 Navigation & Menus"
+      x-ticvai-writes:
+      - table: whitelabel.tenant_config
+        for: 'what this operation writes (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
+      x-ticvai-reads:
+      - table: whitelabel.tenant_config
+        for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
       x-ticvai-singleton: true
       x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
@@ -2479,8 +2541,8 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-840 Mobile App CMS"
         - "P13 CMS-007 Page Builder"
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per site template, the one the body''s `templateKey` names, within the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [templateKey]
+      x-ticvai-body-key-note: 'Keyed by the body''s `templateKey`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per site template within the caller''s tenant; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body. **Required in fact**: a body without `templateKey` is refused `400 validation`; the schema leaves it optional only so a client built at r1 still validates.'
       x-ticvai-audience:
       - staff
       x-ticvai-config-scope: tenant
@@ -2742,6 +2804,14 @@ paths:
       operationId: deleteBanner
       x-ticvai-consumed-by:
         - "P13 CMS-008 Content Blocks"
+      x-ticvai-writes:
+      - table: whitelabel.banner
+        for: 'what this operation writes (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
+      - table: whitelabel.tenant_config
+        for: 'what this operation writes (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
+      x-ticvai-reads:
+      - table: whitelabel.tenant_config
+        for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
       x-ticvai-audience:
       - staff
       summary: Delete a banner
@@ -3219,6 +3289,14 @@ paths:
       operationId: deleteContentPage
       x-ticvai-consumed-by:
         - "P13 CMS-007 Page Builder"
+      x-ticvai-writes:
+      - table: whitelabel.content_page
+        for: 'what this operation writes (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
+      - table: whitelabel.tenant_config
+        for: 'what this operation writes (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
+      x-ticvai-reads:
+      - table: whitelabel.tenant_config
+        for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
       x-ticvai-audience:
       - staff
       summary: Delete a content page
@@ -3703,6 +3781,12 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-018 Interface Languages"
         - "P13 CMS-011 Translations"
+      x-ticvai-writes:
+      - table: whitelabel.tenant_config
+        for: 'what this operation writes (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
+      x-ticvai-reads:
+      - table: whitelabel.tenant_config
+        for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
       x-ticvai-singleton: true
       x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
@@ -3771,6 +3855,9 @@ paths:
         - "P13 CMS-006 Component Preview"
         - "P13 CMS-012 RTL Preview"
         - "P13 CMS-014 Publishing Workflow"
+      x-ticvai-reads:
+      - table: whitelabel.tenant_config
+        for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
       x-ticvai-read-via:
       - query: orders#ticketTemplateRecords
         route: service
@@ -4346,6 +4433,11 @@ paths:
         - "P13 CMS-014 Publishing Workflow"
         - "P13 CMS-015 Version History"
         - "P13 CMS-103 Booking Flows"
+      x-ticvai-reads:
+      - table: whitelabel.config_version
+        for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
+      - table: whitelabel.tenant_config
+        for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
       x-ticvai-read-via:
       - query: catalogue#productRecords
         route: service

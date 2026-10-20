@@ -15,7 +15,7 @@
 | Stores | 10 |
 | Foreign Keys | 815 |
 | Indexes | 2924 |
-| Relationships | 3246 |
+| Relationships | 3248 |
 | Flows | 98 |
 | Boards | 218 |
 | Adrs | 71 |
@@ -31,7 +31,7 @@
 | Requirements contracted | 3153 / 3165 | 100% | an operation or schema field demonstrably serves it |
 | Operations declaring a service | 2844 / 2844 | 100% | the operation is owned by one of the seventeen deployables |
 | Operations declaring a permission | 2654 / 2844 | 93% | the checklist a grant screen renders is built from these |
-| Operations with resolved lineage | 2807 / 2844 | 99% | names the tables it reads and writes -- the join the DDL cannot make itself |
+| Operations with resolved lineage | 2809 / 2844 | 99% | names the tables it reads and writes -- the join the DDL cannot make itself |
 | Operations reaching a screen | 2569 / 2844 | 90% | sync, webhook and job operations legitimately have none |
 | Screens naming an operation | 2390 / 2453 | 97% | the rest are static, navigation shells or workshop-blocked |
 | Tables reached by an operation | 1138 / 1149 | 99% | a table nothing reaches is a missing operation or a table that should not exist |
@@ -39,16 +39,16 @@
 
 ## What crosses a service boundary
 
-**3246 declared references. 2011 stay inside one service; 1235 cross two.**
+**3248 declared references. 2008 stay inside one service; 1240 cross two.**
 
-**646 of the 1235 crossings land on three tables** -- `identity.principal`, `platform.scope`, `pii.subject`. The crossings concentrate on the foundation tier rather than spreading, which is what the tier is for.
+**651 of the 1240 crossings land on three tables** -- `identity.principal`, `platform.scope`, `pii.subject`. The crossings concentrate on the foundation tier rather than spreading, which is what the tier is for.
 
 | From | To | Edges |
 |---|---|---:|
 | AccessService | TenancyService | 86 |
 | MarketingService | IdentityService | 77 |
 | CatalogueService | TenancyService | 69 |
-| OrderService | IdentityService | 60 |
+| OrderService | IdentityService | 64 |
 | TenancyService | IdentityService | 55 |
 | CatalogueService | IdentityService | 49 |
 | AiService | IdentityService | 48 |
@@ -60,7 +60,7 @@
 
 | Most-referenced table across a boundary | Edges |
 |---|---:|
-| `identity.principal` | 357 |
+| `identity.principal` | 362 |
 | `platform.scope` | 190 |
 | `pii.subject` | 99 |
 | `platform.outbox` | 61 |
@@ -76,7 +76,7 @@
 | Service | Tier | Ops | On a screen | Tables | Screens | Out | In |
 |---|---|---:|---:|---:|---:|---:|---:|
 | CatalogueService | commerce | 470 | 429 | 143 | 73 | 161 | 106 |
-| OrderService | commerce | 304 | 286 | 114 | 101 | 153 | 78 |
+| OrderService | commerce | 304 | 286 | 114 | 101 | 157 | 78 |
 | VenueOpsService | operations | 297 | 279 | 127 | 53 | 114 | 39 |
 | MarketingService | engagement | 280 | 233 | 132 | 40 | 148 | 15 |
 | AccessService | commerce | 258 | 248 | 77 | 29 | 144 | 18 |
@@ -85,12 +85,12 @@
 | AiService | engagement | 146 | 131 | 79 | 21 | 63 | 3 |
 | FnbService | operations | 138 | 130 | 53 | 57 | 62 | 4 |
 | WhiteLabelService | platform | 110 | 107 | 35 | 25 | 19 | 7 |
-| IdentityService | foundation | 101 | 79 | 44 | 36 | 27 | 470 |
+| IdentityService | foundation | 101 | 79 | 44 | 36 | 27 | 475 |
 | LedgerService | commerce | 72 | 62 | 27 | 20 | 48 | 42 |
 | WalletService | commerce | 70 | 62 | 32 | None | 17 | 6 |
 | InventoryService | operations | 59 | 56 | 23 | 28 | 40 | 22 |
 | ReportingService | platform | 51 | 49 | 25 | 31 | 16 | 0 |
-| RetailService | operations | 25 | 22 | 13 | 19 | 25 | 9 |
+| RetailService | operations | 25 | 22 | 13 | 19 | 26 | 9 |
 | CrossRegionService | platform | 20 | 2 | 7 | 4 | 14 | 5 |
 
 ## Contracts
@@ -128,7 +128,7 @@
 | transport | 32 | 32 | 32 | 19 |
 | venue-map | 26 | 24 | 25 | 20 |
 | wallet | 70 | 62 | 68 | 70 |
-| white-label | 110 | 107 | 101 | 100 |
+| white-label | 110 | 107 | 103 | 100 |
 | workforce | 49 | 46 | 49 | 49 |
 
 ## Platforms
@@ -163,7 +163,7 @@
 | Requirements Partial | 12 |
 | Operations No Screen | 275 |
 | Screens No Operation | 63 |
-| Operations No Lineage | 37 |
+| Operations No Lineage | 35 |
 | Tables Not Reached | 11 |
 | Permissions Without Label | 70 |
 | Capability Pairs | 291 |

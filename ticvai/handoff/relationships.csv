@@ -827,9 +827,9 @@ catalogue.audit_entry,via submitPricingChangeRequest,platform.outbox,ambient,lin
 catalogue.audit_entry,via testChannelConnection,catalogue.channel_connection,ambient,lineage,,
 catalogue.audit_entry,via transitionDynamicPricingStrategy,catalogue.dynamic_pricing_strategy,ambient,lineage,,
 catalogue.audit_entry,via updateChannelIncident,catalogue.channel_incident,ambient,lineage,,
-catalogue.bundle_application,venue_id,platform.scope,reference,precedent,yes,
+catalogue.bundle_application,venue_id,platform.scope,reference,declared,yes,yes
 catalogue.bundle_application,via reportBundleApplied,catalogue.published_bundle,ambient,lineage,,
-catalogue.bundle_application,workstation_id,platform.workstation,reference,convention,yes,
+catalogue.bundle_application,workstation_id,platform.workstation,reference,declared,yes,yes
 catalogue.calculation_step,calculation_profile_id,catalogue.calculation_profile,reference,declared,,yes
 catalogue.calculation_step,rounding_profile_id,catalogue.rounding_profile,reference,convention,,
 catalogue.change_request,approval_policy_id,catalogue.approval_policy,reference,convention,,
@@ -2324,10 +2324,12 @@ orders.membership_migration,order_id,orders.sales_order,reference,convention,,
 orders.membership_renewal,customer_membership_id,identity.customer_membership,reference,declared,yes,yes
 orders.membership_renewal,entitlement_template_id,catalogue.entitlement_template,reference,declared,yes,yes
 orders.membership_renewal,order_id,orders.sales_order,reference,declared,,
+orders.no_sale_event,approved_by_principal_id,identity.principal,reference,declared,yes,
 orders.no_sale_event,principal_id,identity.principal,reference,declared,yes,yes
 orders.no_sale_event,shift_id,orders.pos_shift,reference,declared,,yes
 orders.no_sale_event,workstation_id,platform.workstation,reference,declared,yes,
 orders.order_event,actor_principal_id,identity.principal,reference,convention,yes,
+orders.order_event,approved_by_principal_id,identity.principal,reference,declared,yes,
 orders.order_event,order_id,orders.sales_order,reference,declared,,
 orders.order_event,reservation_id,orders.reservation,reference,convention,,
 orders.order_event,via approveRefund,orders.refund,ambient,lineage,,
@@ -2376,6 +2378,8 @@ orders.order_relationship,order_id,orders.sales_order,reference,declared,,yes
 orders.order_relationship,related_order_id,orders.sales_order,reference,declared,,yes
 orders.payment,order_id,orders.sales_order,reference,declared,,yes
 orders.payment,terminal_id,payments.terminal,reference,convention,yes,
+orders.payment,tip_allocated_to_principal_id,identity.principal,reference,declared,yes,
+orders.payment,tip_recorded_by_principal_id,identity.principal,reference,declared,yes,
 orders.payment,via createInstalmentPlan,payments.instalment,ambient,lineage,yes,
 orders.payment,via createInstalmentPlan,payments.instalment_plan,ambient,lineage,yes,
 orders.payment,via createInstalmentPlan,platform.outbox,ambient,lineage,yes,
@@ -2891,6 +2895,7 @@ retail.sale_line,merchandise_id,retail.merchandise,reference,declared,,
 retail.sale_line,sale_id,retail.sale,child,declared,,yes
 retail.shop_and_drop,collected_by_principal_id,identity.principal,reference,declared,yes,
 retail.shop_and_drop,collection_location_id,fnb.delivery_location,reference,declared,yes,yes
+retail.shop_and_drop,disposal_decided_by_principal_id,identity.principal,reference,declared,yes,
 retail.shop_and_drop,entitlement_id,access.entitlement,reference,declared,yes,
 retail.shop_and_drop,sale_id,retail.sale,reference,declared,,
 retail.shop_and_drop,subject_id,pii.subject,reference,declared,yes,
@@ -3066,9 +3071,6 @@ venuemap.visit_plan_item,performance_id,catalogue.performance,reference,declared
 venuemap.visit_plan_item,plan_id,venuemap.visit_plan,child,declared,,yes
 venuemap.visit_plan_item,point_id,venuemap.point,reference,declared,,
 venuemap.visit_plan_item,product_id,catalogue.product,reference,declared,yes,
-wallet.adjustment,via expireCreditLots,wallet.credit_lot,ambient,lineage,,
-wallet.adjustment,via expireCreditLots,wallet.wallet,ambient,lineage,,
-wallet.adjustment,via expireCreditLots,wallet.wallet_transaction,ambient,lineage,,
 wallet.adjustment,wallet_id,wallet.wallet,reference,convention,,
 wallet.auto_reload_setting,payment_token_id,payments.token,reference,convention,yes,
 wallet.auto_reload_setting,subject_id,pii.subject,reference,convention,yes,

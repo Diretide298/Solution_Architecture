@@ -3458,7 +3458,7 @@ The CMS link builder (CHG-CSA-037): given a target, the URL to paste on the tena
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | - |
+| Reads | `whitelabel.config_version`, `whitelabel.custom_domain` |
 | Writes | - |
 | Called by | CMS-009 |
 
@@ -3507,7 +3507,7 @@ The CMS link builder (CHG-CSA-037): given a target, the URL to paste on the tena
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | replica |
-| Reads | - |
+| Reads | `whitelabel.config_version`, `whitelabel.custom_domain` |
 | Writes | - |
 | Called by | CMS-009 |
 

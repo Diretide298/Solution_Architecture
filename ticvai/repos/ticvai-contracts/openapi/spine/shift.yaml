@@ -488,8 +488,8 @@ paths:
       - query: tenancy#denominationRecords
         route: in-process
         for: 'its read of platform.denomination, Tenancy''s data (CHG-MOD-001)'
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per currency, the one the body''s `currencyCode` names, within the caller''s region: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [currencyCode]
+      x-ticvai-body-key-note: 'Keyed by the body''s `currencyCode`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per currency within the caller''s region; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body.'
       summary: Set the notes and coins a region's tills count
       description: >
         **`listDenominations` read a table nothing wrote**, so every till's count screen was empty
@@ -2046,6 +2046,24 @@ paths:
         in a shift with four sales is a conversation, and it is only a conversation if someone
         can see the count. A reason is required for the same reason it is required on a manual
         discount — attributable, not forbidden.
+
+        **The supervisor's approval, and its reject path** (r8 walk fix, CHG-R8WFC-005; POS-014's approved
+        "AUTHORISATION REQUIRED" modal). A caller who holds `CASH_NO_SALE` acts alone and sends no step-up. A
+        cashier who does not is not simply refused at the till: the modal asks a supervisor to approve, and
+        the call carries `supervisorStepUp` (common.yaml `SupervisorStepUp`, verified by Identity in process:
+        the supervisor holds `CASH_NO_SALE` at the till's venue and is not the caller); the act is recorded with
+        that supervisor as `approvedByPrincipalId`. Without the permission and without a verified step-up the
+        call is `403` (`supervisor-step-up-refused`) and nothing is written. **The supervisor declining is
+        the modal's reject path and sends nothing**: the drawer stays shut and the till shows the reason the supervisor
+        picked; no record is written for a request that was declined. A step-up needs the server, so offline
+        only a caller who holds `CASH_NO_SALE` can do this.
+      x-ticvai-step-up: pin
+      x-ticvai-step-up-carrier: body:supervisorStepUp
+      x-ticvai-step-up-reason: A cashier without CASH_NO_SALE opens the drawer only with a supervisor's PIN on the till (POS-014's approval modal).
+      x-ticvai-read-via:
+      - query: identity#verifySupervisorStepUp
+        route: in-process
+        for: 'the PIN step-up in `supervisorStepUp` is checked by Identity (r8 walk fix, CHG-R8WFC-005); same deployable (commerce)'
       tags: [shift]
       x-ticvai-permission: CASH_NO_SALE   # its own right, not SHIFT_SUSPEND (26 September, pull audit R199)
       x-ticvai-scope-level: workstation
@@ -2067,6 +2085,12 @@ paths:
                   enum: [changeForGuest, correctFloat, retrieveDroppedCash, tillCheck, other]
                 note: { type: string, maxLength: 300 }
                 recordedAt: { type: string, format: date-time }
+                supervisorStepUp:
+                  allOf:
+                    - $ref: '../shared/common.yaml#/components/schemas/SupervisorStepUp'
+                  description: The supervisor approving for a cashier without CASH_NO_SALE (r8 walk fix, CHG-R8WFC-005).
+                    Absent when the caller holds it. Its principal is stored as `NoSaleEvent.approvedByPrincipalId`.
+                  x-ticvai-stored-as: orders.no_sale_event.approved_by_principal_id
       responses:
         '201':
           headers:
@@ -2076,6 +2100,12 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/NoSaleEvent' }
+        '403':
+          x-ticvai-problem-types: [supervisor-step-up-refused]
+          description: The caller lacks CASH_NO_SALE and no supervisor step-up was sent, or it was refused (r8 walk fix, CHG-R8WFC-005)
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
         '409':
           x-ticvai-problem-types: [shift-not-open]
           description: Shift is not open (problem type `shift-not-open`)
@@ -3054,6 +3084,14 @@ components:
       x-ticvai-persistence: "orders.no_sale_event"
       required: [id, shiftId, reason, principalId, recordedAt]
       properties:
+        approvedByPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          description: The supervisor whose step-up approved it for a cashier without CASH_NO_SALE; null when the
+            cashier held it (r8 walk fix, CHG-R8WFC-005).
+          x-ticvai-references: identity.principal
         id: { type: string, format: uuid }
         shiftId: { type: string, format: uuid }
         workstationId: { type: string, format: uuid }

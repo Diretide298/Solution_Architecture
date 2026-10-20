@@ -511,6 +511,11 @@
     "required": null
    },
    {
+    "name": "reportedBy",
+    "in": "query",
+    "required": null
+   },
+   {
     "name": null,
     "in": null,
     "required": null

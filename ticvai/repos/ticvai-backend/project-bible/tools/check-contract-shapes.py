@@ -65,7 +65,11 @@ RULES = {
     "C-PROSE-SPLIT": "a word split in contract prose (R138)",
     "C-TWO-IDEMPOTENCY": "a body idempotency key beside the Idempotency-Key header (R153)",
     "C-SEARCH-PARAM": "a search/q parameter that says nothing about what it matches (R182)",
-    "C-NO-ADDRESS": "a PUT/PATCH/DELETE with no path key and no x-ticvai-singleton (R162 R103)",
+    "C-NO-ADDRESS": "a PUT/PATCH/DELETE with no path key and no x-ticvai-singleton or x-ticvai-body-key (R162 R103)",
+    "C-SINGLETON-KEYED": "a write flagged x-ticvai-singleton whose body picks the record (its note names the body's key, "
+                         "or the body requires a record id other than venueId or tenantId): it is x-ticvai-body-key "
+                         "(r8 walk, CHG-R8WFC-001)",
+    "C-BODY-KEY": "x-ticvai-body-key names a field the write's body does not have (r8 walk, CHG-R8WFC-001)",
     "C-COLOUR-PATTERN": "a colour field typed string with no pattern (R246)",
     "C-FIELD-TYPE-DRIFT": "one field typed two ways across an entity's schemas (R237 R227)",
     "C-ID-FORMAT": "an id field typed other than uuid (ADR-0056) (R074)",
@@ -111,6 +115,22 @@ def deref(node, doc, depth=0):
         node = cur
         depth += 1
     return node, None
+
+
+SCOPE_IDS = ("venueId", "tenantId")
+
+
+def _body_fields(node, doc, depth=0):
+    """(properties, required) of a request body schema, through local refs and allOf."""
+    node, _ = deref(node, doc)
+    if not isinstance(node, dict) or depth > 8:
+        return {}, []
+    props, req = dict(node.get("properties") or {}), list(node.get("required") or [])
+    for part in node.get("allOf") or []:
+        p, r = _body_fields(part, doc, depth + 1)
+        props.update(p)
+        req += r
+    return props, req
 
 
 def body_schema(container):
@@ -498,7 +518,26 @@ def extra_rules(guard, ops, docs):
             if node.get("in") == "query" and node.get("name") in ("q", "search", "query", "searchTerm")                     and len(str(node.get("description") or "")) < 12:
                 guard.add("C-SEARCH-PARAM", f"{oid}:{node.get('name')}",
                           f"{oid}: ?{node.get('name')} does not say what it matches")
-        if m in ("put", "patch", "delete") and not path_params and not op.get("x-ticvai-singleton")                 and not (f["item"] or {}).get("x-ticvai-singleton"):
+        # **A write addressed by a key in its body says which** (r8 walk, 20 October 2026, CHG-R8WFC-001). The 14 October
+        # shapes pass stamped `x-ticvai-singleton` ("one per venue, a PUT replaces it whole") on 121 writes whose note
+        # named the body field that picks the record (setGateLane's `gateId`), and on approveManualOverrideSupervisor,
+        # whose body names the denied scan; a developer read "singleton" and could not tell one row from one per gate.
+        # Such a write declares `x-ticvai-body-key: [field]` instead, and the field must be in its body.
+        body_props, body_req = _body_fields(body_node, doc)
+        body_key = op.get("x-ticvai-body-key") or []
+        if isinstance(body_key, str):
+            body_key = [body_key]
+        missing_key = [k for k in body_key if k not in body_props]
+        if missing_key:
+            guard.add("C-BODY-KEY", oid, f"{oid}: x-ticvai-body-key names {', '.join(missing_key)}, not in its body")
+        if op.get("x-ticvai-singleton") and m in ("put", "patch", "delete"):
+            named = re.findall(r"body's `([A-Za-z]+)`", str(op.get("x-ticvai-singleton-note") or ""))
+            ids = [k for k in body_req if k.endswith("Id") and k not in SCOPE_IDS]
+            if named or ids:
+                guard.add("C-SINGLETON-KEYED", oid,
+                          f"{oid}: flagged a singleton, but its body picks the record ({', '.join(named or ids)}): "
+                          f"declare x-ticvai-body-key")
+        if m in ("put", "patch", "delete") and not path_params and not op.get("x-ticvai-singleton")                 and not (f["item"] or {}).get("x-ticvai-singleton") and not (body_key and not missing_key):
             guard.add("C-NO-ADDRESS", oid, f"{oid}: {m.upper()} {path} has no path key and is not a singleton")
         if m in ("put", "patch", "delete") and body_name and (f["contract"], body_name) in append_only:
             guard.add("C-APPEND-ONLY", oid, f"{oid}: {m.upper()} writes {body_name}, declared append-only")

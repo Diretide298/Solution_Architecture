@@ -237,6 +237,7 @@ contracts:
   guestCallable: 12
   offlineCapable: 1
   events:
+  - wallet-creditExpired
   - wallet-credited
   - wallet-debited
   ref: diagrams/lld/contracts/wallet.yaml

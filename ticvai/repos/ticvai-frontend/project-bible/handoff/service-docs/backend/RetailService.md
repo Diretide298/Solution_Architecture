@@ -87,6 +87,10 @@ Records who handed over and against what. Partial collection is permitted — a 
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
+| disposalMethod | enum (donated, destroyed, returnedToStock, heldLonger) |  | What disposeShopAndDrop decided for an uncollected item; null until it is called. (read-only; nullable) |
+| disposalNote | string |  | The note sent with that decision; null when none was sent. (max length 300; read-only; nullable) |
+| disposalDecidedAt | string (date-time) |  | When the decision was recorded (the server's time). (read-only; nullable) |
+| disposalDecidedByPrincipalId | string (uuid) |  | Who authorised it, the caller, from the session ("recorded with who authorised it"). (read-only; nullable) |
 | id | string | yes |  |
 | dropReference | string | yes | Short and readable. |
 | saleId | string |  | The till sale. (nullable) |
@@ -163,6 +167,10 @@ Not a reservation. `reserveMerchandise` holds unsold stock for someone who has n
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
+| disposalMethod | enum (donated, destroyed, returnedToStock, heldLonger) |  | What disposeShopAndDrop decided for an uncollected item; null until it is called. (read-only; nullable) |
+| disposalNote | string |  | The note sent with that decision; null when none was sent. (max length 300; read-only; nullable) |
+| disposalDecidedAt | string (date-time) |  | When the decision was recorded (the server's time). (read-only; nullable) |
+| disposalDecidedByPrincipalId | string (uuid) |  | Who authorised it, the caller, from the session ("recorded with who authorised it"). (read-only; nullable) |
 | id | string | yes |  |
 | dropReference | string | yes | Short and readable. |
 | saleId | string |  | The till sale. (nullable) |
@@ -899,7 +907,7 @@ By receipt number, order number or the barcode printed on the receipt. A guest a
 **`POST /retail-sales`**: Sell merchandise
 
 **Not offline-capable.** Stock depletes in real time and a specific unit cannot be leased the way a timed product can, so a terminal without a connection cannot complete a retail sale.
-Creates an order in the Order & Payment context and a `saleDepletion` movement in the inventory ledger, in one transaction. There is no second stock counter maintained by the till.
+**The order is Orders', made before this call; this records the retail side of it** (r8 walk fix, CHG-R8WFC-003; was "creates an order in the Order & Payment context ... in one transaction", which no route made true: Retail runs in the operations deployable and Orders in commerce, and they share no transaction, ADR-0055). The till sells merchandise on its one cart and order (`createOrder`, "one cart, one order, one receipt"), priced there with any coupon, and sends that order's id as `orderId`. This call then writes the sale, its lines and a `saleDepletion` movement in the inventory ledger (Inventory runs in the same deployable) in one transaction of its own. A retry with the same Idempotency-Key answers the sale already written. There is no second stock counter maintained by the till.
 **A kit sells as one line and leaves stock as its components** (4.4.20, 29 September build). Where the line's item has an `inventory.kit_component` bill of materials (inventory `setInventoryKitDefinition`), one `saleDepletion` is posted per component, quantity times the line quantity, and none for the kit; `insufficientStock` is judged on the components.
 
 |  |  |
@@ -939,7 +947,8 @@ Creates an order in the Order & Payment context and a `saleDepletion` movement i
 | lines[].overridePrice.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | lines[].overridePrice.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | lines[].overrideReason | string |  | (max length 200) |
-| couponCodes | array of string |  |  |
+| couponCodes | array of string |  | Not applied here (r8 walk fix, CHG-R8WFC-003). |
+| orderId | string (uuid) |  | The order the till took payment on (r8 walk fix, CHG-R8WFC-003), as fnb's CreateFnbOrderRequest.salesOrderId does: RetailSale.orderId, stored in retail.sale.order_id. |
 | recordedAt | string (date-time) | yes |  |
 
 **Response**: `RetailSale`
@@ -1361,6 +1370,10 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
+| disposal_method | text | no | What disposeShopAndDrop decided for an uncollected item; null until it is called. |
+| disposal_note | text | no | The note sent with that decision; null when none was sent. |
+| disposal_decided_at | timestamptz | no | When the decision was recorded (the server's time). |
+| disposal_decided_by_principal_id | uuid | no | Who authorised it, the caller, from the session ("recorded with who authorised it"). |
 | id | text | yes |  |
 | drop_reference | text | yes | Short and readable. |
 | sale_id | text | no | The till sale. |

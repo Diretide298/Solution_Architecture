@@ -174638,8 +174638,9 @@ screens:
       Monitor. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation
       seen from the screen side rather than the contract side. **Ruled for r8 (r8 walk fix, CHG-R8WFC-006)**:
       none of the six is built in Block A; each button is drawn disabled and calls nothing, and the screen''s
-      ticket builds the twelve tiles (listRevenue''s summary, `RevenueOptimizationCommandCenterView`), the list and
-      the detail. Removing the buttons changes an approved layout, so they stay until the client decides.'
+      ticket builds the twelve tiles (listRevenue''s summary, `RevenueOptimizationCommandCenterView`),
+      the list and the detail. Removing the buttons changes an approved layout, so they stay until the
+      client decides.'
     source: pack Pricing___Revenue_Management_Reference.pdf, page 114 §Quick Actions
   layout:
     template: dashboard
@@ -174754,27 +174755,33 @@ screens:
       - kind: primaryButton
         label: Run Simulation
         provenance: pack Pricing___Revenue_Management_Reference.pdf, page 114 §Quick Actions
-        notes: 'No operation in Block A (r8 walk fix, CHG-R8WFC-006): drawn disabled, and the ticket builds no call for it. See gaps.'
+        notes: 'No operation in Block A (r8 walk fix, CHG-R8WFC-006): drawn disabled, and the ticket builds
+          no call for it. See gaps.'
       - kind: secondaryButton
         label: Review Recommendations
         provenance: pack Pricing___Revenue_Management_Reference.pdf, page 114 §Quick Actions
-        notes: 'No operation in Block A (r8 walk fix, CHG-R8WFC-006): drawn disabled, and the ticket builds no call for it. See gaps.'
+        notes: 'No operation in Block A (r8 walk fix, CHG-R8WFC-006): drawn disabled, and the ticket builds
+          no call for it. See gaps.'
       - kind: secondaryButton
         label: Start Experiment
         provenance: pack Pricing___Revenue_Management_Reference.pdf, page 114 §Quick Actions
-        notes: 'No operation in Block A (r8 walk fix, CHG-R8WFC-006): drawn disabled, and the ticket builds no call for it. See gaps.'
+        notes: 'No operation in Block A (r8 walk fix, CHG-R8WFC-006): drawn disabled, and the ticket builds
+          no call for it. See gaps.'
       - kind: secondaryButton
         label: Approve Changes
         provenance: pack Pricing___Revenue_Management_Reference.pdf, page 114 §Quick Actions
-        notes: 'No operation in Block A (r8 walk fix, CHG-R8WFC-006): drawn disabled, and the ticket builds no call for it. See gaps.'
+        notes: 'No operation in Block A (r8 walk fix, CHG-R8WFC-006): drawn disabled, and the ticket builds
+          no call for it. See gaps.'
       - kind: secondaryButton
         label: Pause Automation
         provenance: pack Pricing___Revenue_Management_Reference.pdf, page 114 §Quick Actions
-        notes: 'No operation in Block A (r8 walk fix, CHG-R8WFC-006): drawn disabled, and the ticket builds no call for it. See gaps.'
+        notes: 'No operation in Block A (r8 walk fix, CHG-R8WFC-006): drawn disabled, and the ticket builds
+          no call for it. See gaps.'
       - kind: secondaryButton
         label: Open Execution Monitor
         provenance: pack Pricing___Revenue_Management_Reference.pdf, page 114 §Quick Actions
-        notes: 'No operation in Block A (r8 walk fix, CHG-R8WFC-006): drawn disabled, and the ticket builds no call for it. See gaps.'
+        notes: 'No operation in Block A (r8 walk fix, CHG-R8WFC-006): drawn disabled, and the ticket builds
+          no call for it. See gaps.'
   states:
     loading: The revenue optimization list; the counts above it resolve separately.
     error: Could not load. Names which read failed and leaves the revenue optimization untouched.
@@ -208041,12 +208048,12 @@ screens:
     never from the console directly. The id is kept, so its tickets keep their keys.
 
 
-    **Saving** (r8 walk fix, CHG-R8WFC-006). The fields bound to `B2bPaymentTerms` are saved with
-    `setB2bPaymentTerms` for the picked account (a PUT of the whole terms, so every bound field is sent). The
-    approved layout has no save control; until the client approves one (docs/active/approved-ui-changes.yaml),
-    the save control is a pending client-approval item, and the ticket builds the bound fields and the call.
-    `setInstalmentPolicy` has no field here: it stays in `apis` for the instalment policy panel the pack names,
-    which this layout does not draw (a gap, not built in Block A).'
+    **Saving** (r8 walk fix, CHG-R8WFC-006). The fields bound to `B2bPaymentTerms` are saved with `setB2bPaymentTerms`
+    for the picked account (a PUT of the whole terms, so every bound field is sent). The approved layout
+    has no save control; until the client approves one (docs/active/approved-ui-changes.yaml), the save
+    control is a pending client-approval item, and the ticket builds the bound fields and the call. `setInstalmentPolicy`
+    has no field here: it stays in `apis` for the instalment policy panel the pack names, which this layout
+    does not draw (a gap, not built in Block A).'
   density: compact
   pattern: configEditor
   patternReason: the pack gives this screen a configuration directory (§Define) and no display directory
@@ -208083,7 +208090,8 @@ screens:
       - kind: selectField
         label: Credit agreement
         provenance: pack Payment_Payment_Orchestration.pdf, page 95 §Define
-        notes: 'Not bound (r8 walk fix, CHG-R8WFC-006). No field: `B2bPaymentTerms` holds no agreement reference; shown read-only and empty until the contract carries one.'
+        notes: 'Not bound (r8 walk fix, CHG-R8WFC-006). No field: `B2bPaymentTerms` holds no agreement
+          reference; shown read-only and empty until the contract carries one.'
       - kind: selectField
         label: Payment term
         provenance: pack Payment_Payment_Orchestration.pdf, page 95 §Define
@@ -208095,7 +208103,8 @@ screens:
         provenance: pack Payment_Payment_Orchestration.pdf, page 95 §Define
         operation: setB2bPaymentTerms
         bindsTo: B2bPaymentTerms.creditLimit
-        notes: 'Bound in the r8 walk fix (CHG-R8WFC-006): sends `creditLimit` to `setB2bPaymentTerms`. The currency of `creditLimit` (Money carries it); not a field of its own.'
+        notes: 'Bound in the r8 walk fix (CHG-R8WFC-006): sends `creditLimit` to `setB2bPaymentTerms`.
+          The currency of `creditLimit` (Money carries it); not a field of its own.'
       - kind: selectField
         label: Billing cycle
         provenance: pack Payment_Payment_Orchestration.pdf, page 95 §Define
@@ -208105,7 +208114,8 @@ screens:
       - kind: selectField
         label: Invoice requirement
         provenance: pack Payment_Payment_Orchestration.pdf, page 95 §Define
-        notes: 'Not bound (r8 walk fix, CHG-R8WFC-006). No field: invoicing is the account''s billing cycle (`billingCycle`); shown read-only until the contract carries a separate requirement.'
+        notes: 'Not bound (r8 walk fix, CHG-R8WFC-006). No field: invoicing is the account''s billing
+          cycle (`billingCycle`); shown read-only until the contract carries a separate requirement.'
       - kind: selectField
         label: Purchase order requirement
         provenance: pack Payment_Payment_Orchestration.pdf, page 95 §Define
@@ -208117,11 +208127,13 @@ screens:
         provenance: pack Payment_Payment_Orchestration.pdf, page 95 §Define
         operation: setB2bPaymentTerms
         bindsTo: B2bPaymentTerms.overrideApprovalRole
-        notes: 'Bound in the r8 walk fix (CHG-R8WFC-006): sends `overrideApprovalRole` to `setB2bPaymentTerms`. The role whose approval lets a sale go past the limit.'
+        notes: 'Bound in the r8 walk fix (CHG-R8WFC-006): sends `overrideApprovalRole` to `setB2bPaymentTerms`.
+          The role whose approval lets a sale go past the limit.'
       - kind: selectField
         label: Transaction maximum
         provenance: pack Payment_Payment_Orchestration.pdf, page 95 §Define
-        notes: 'Not bound (r8 walk fix, CHG-R8WFC-006). No field: `B2bPaymentTerms` has no per-transaction maximum; shown read-only until the contract carries one.'
+        notes: 'Not bound (r8 walk fix, CHG-R8WFC-006). No field: `B2bPaymentTerms` has no per-transaction
+          maximum; shown read-only until the contract carries one.'
       - kind: selectField
         label: Outstanding balance limit
         provenance: pack Payment_Payment_Orchestration.pdf, page 95 §Define

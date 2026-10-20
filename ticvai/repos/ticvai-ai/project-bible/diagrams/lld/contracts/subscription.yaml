@@ -1732,6 +1732,10 @@ operations:
   reads:
   - cache:idempotency
   - control.licence_add_on
+  - control.licence_add_on_limit
+  - control.plan_limit
+  - control.plan_module
+  - control.tenant
   writes:
   - cache:idempotency
   - control.contract
