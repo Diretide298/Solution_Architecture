@@ -135,3 +135,5 @@ ticvai/_review-*/
 
 # Pull audit: scripts, credentials, developer folders and results stay local
 audit/
+# Reference documents the lead keeps beside the repository (r8 integration, CHG-R8INT-011): never committed
+ref-documents/

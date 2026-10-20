@@ -217,6 +217,11 @@ paths:
   /ai/translate:
     post:
       operationId: proposeTranslations
+      x-ticvai-writes:
+      - table: ai.translation_job
+        for: 'the translation job row, running until completed or failed (FOUNDATION-AI-C40) (r8 integration, CHG-R8INT-014; check-parameter-columns P-NAMED-TABLE)'
+      # The content block is read through white-label#contentBlockRecords (x-ticvai-read-via), never raw (r8 integration, CHG-R8INT-014; check-parameter-columns P-NAMED-TABLE).
+      x-ticvai-names-for-context: [whitelabel.content_block]
       x-ticvai-consumed-by:
         - "P08 BO-785 Template Library"
         - "P08 BO-793 AI Content, Translation & Audit"
@@ -4113,6 +4118,9 @@ paths:
         type: string
     post:
       operationId: pauseAiCapability
+      x-ticvai-writes:
+      - table: ai.outbox
+        for: 'ai.capabilityPaused, written to the AI outbox in the capabilitys transaction (FOUNDATION-AI-C41) (r8 integration, CHG-R8INT-014; check-parameter-columns P-NAMED-TABLE)'
       x-ticvai-consumed-by:
         - "P08 ADM-696 AI Risk, Fairness, Explainability & Safety Center"
         - "P09 ADM-536 Human Override & Manual Control Center"
@@ -10275,6 +10283,9 @@ paths:
       responses:
         '202':
           description: 'Accepted: the job runs and lands a draft for review'
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           content:
             application/json:
               schema:

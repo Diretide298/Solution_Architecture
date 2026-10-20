@@ -1,0 +1,37 @@
+id: CHG-R8INT-018
+date: '2026-10-20'
+source: audit
+kind: spec
+summary: 'The lineage gets back the annotations the integration pass''s own re-derive of CHG-R8INT-014 dropped: 104 of
+  them on marketing and guest entries (pure on identifyGuest, matchGuest, checkGuestCheckoutMatch and
+  previewSegmentDraft; lineageNote, writesNote, fixNote, audienceNote, note and guestCallable on the rest). With pure
+  back, identifyGuest no longer writes marketing.loyalty_position and previewSegmentDraft no longer writes
+  marketing.segment_criterion, so check-package''s consistency-token rule stops reading the lookup as a write.'
+decision:
+  what: 'handoff/api-data-lineage.json: each annotation copied back from 3eb4ab91 where the entry still exists, then
+    tools/derive-lineage.py --apply (two entries'' writes change: identifyGuest, previewSegmentDraft). Reads, writes
+    and every contract field stay the deriver''s.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: the r8 integration pass''s check of its own commits (20 October 2026): bcc01cc3 rewrote the lineage
+  and 52 hand-mapped entries came back as new ones, without the notes and `pure` derive-lineage carries ("what only a
+  person can say ... is carried as it is"). check-package then failed marketing-crm on identifyGuest''s missing
+  X-Consistency-Token, a lookup the contract describes as "a resolver over identifiers, not new data".'
+keys_touched:
+  operations: [identifyGuest, matchGuest, checkGuestCheckoutMatch, previewSegmentDraft]
+  files:
+  - handoff/api-data-lineage.json
+root_class: 'a derived file that lost what only a person can say'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: r8 integration pass'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-write-lineage.py
+status: open
+notes: 'derive-read-columns was not run: on this branch the schema reference is the stale committed one, and the
+  refresh runs it after derive-schema.'

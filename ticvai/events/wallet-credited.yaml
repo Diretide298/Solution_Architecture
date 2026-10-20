@@ -3,6 +3,11 @@
 # v2 (20 October 2026, r8 cause APPROVALS-TENANCY-C30, the lead's option A): a game-card load carries the load
 # itself (cardId, credits, bonusCredits, amountPaid, loadId), and an anonymous card's load writes no wallet
 # transaction, so walletTransactionId is absent on it. The games consumer is built to v2.
+# Versioning (r8 integration, CHG-R8INT-004; events/_schema.yaml): v2 is a major version, because a v1 reader
+# that requires walletTransactionId cannot read an anonymous card's load. Wallet writes both versions to the
+# outbox (one envelope each, `version` 1 and 2; v1 only where walletTransactionId exists) until every consumer
+# listed below is built to v2, then stops v1. In Block A both consumers (ledger, games) are built at r8, so the
+# side-by-side window is the r8 deployment only; a consumer states the version it reads in its inbox filter.
 
 name: wallet.credited
 version: 2

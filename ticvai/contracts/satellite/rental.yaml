@@ -1609,6 +1609,8 @@ paths:
         format: uuid
     post:
       operationId: checkOutRental
+      # The payment is read through orders#paymentRecords (x-ticvai-read-via), never raw (r8 integration, CHG-R8INT-014; check-parameter-columns P-NAMED-TABLE).
+      x-ticvai-names-for-context: [orders.payment]
       x-ticvai-consumed-by:
         - "P06 EMP-077 Safety & Handover Checklist"
         - "P06 EMP-078 Deposit & Financial Handover Validation"

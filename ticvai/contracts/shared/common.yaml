@@ -417,7 +417,7 @@ components:
 
         **The white-label app feature list (`white-label.ModuleKey`) is a different, finer vocabulary, and this is
         the map between them** (R8 blocker fix, IDENTITY-C31; **proposed from the screens'' `requiresModule`, the
-        product owner confirms**). A feature is licensed when the licence module on its row is licensed, and
+        client confirms**). A feature is licensed when the licence module on its row is licensed, and
         `getModuleEnablement` / `setModuleEnablement` use this for `isLicensed` and for the "not licensed" refusal:
 
         | white-label feature | licence module here |
@@ -455,7 +455,13 @@ components:
       - developerApi
       - analytics
       - ai
-      x-ticvai-note: '**`core` is listed and cannot be unlicensed.** It exists so a screen can say it
+      - poweredByRemoval
+      x-ticvai-note: '**`poweredByRemoval` is an add-on key, never a plan module; no screen requires it** (r8,
+        APPROVALS-TENANCY-C17, the lead''s answer B of 20 October 2026). A licence add-on names a ModuleKey
+        (`addLicenceAddOn`), and the one add-on that lets a tenant switch off "Powered by TICVAI" is not a module a
+        venue runs, so it is listed here and nowhere else: no plan, permission group or `requiresModule` names it.
+
+        **`core` is listed and cannot be unlicensed.** It exists so a screen can say it
         belongs to no optional module rather than leaving the field empty — **an empty field and *always
         on* look identical, and only one of them is a decision.**
 

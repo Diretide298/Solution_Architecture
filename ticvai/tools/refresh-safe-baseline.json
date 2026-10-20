@@ -27,9 +27,10 @@
    ]
   },
   "check-screen-permissions": {
-   "why": "DEV-001 (developer portal home): its no-access text names DEVELOPER_VIEW, which listApiVersions and listApiScopes stopped requiring when they became public (R8 blocker FOUNDATION-AI-C17, CHG-R8SAT-001). The text is visible content under check-approved-ui, so it changes only with the client's approval: the new wording is in Friday's client note and audit lane-screens-pending-ui.json (DEV-001-followup), and the screen carries a build note. Added 20 October 2026 (r8 integration). Remove when the approved wording is applied.",
+   "why": "DEV-001 (developer portal home): its no-access text names DEVELOPER_VIEW, which listApiVersions and listApiScopes stopped requiring when they became public (R8 blocker FOUNDATION-AI-C17, CHG-R8SAT-001). The text is visible content under check-approved-ui, so it changes only with the client's approval: the new wording is in Friday's client note and audit lane-screens-pending-ui.json (DEV-001-followup), and the screen carries a build note. Added 20 October 2026 (r8 integration). BO-293 (membership product validation): its no-access text names PLATFORM_CELL_MANAGE, which its operations stopped requiring when the membership operations moved to MEMBERSHIP_VIEW / MEMBERSHIP_MANAGE (GPS-C33, answer A; BC-395); the same rule, parked as GPS-C33 in lane-screens-pending-ui.json (r8 integration, CHG-R8INT-017). Remove each when its approved wording is applied.",
    "known": [
-    "^SP-NOACCESS\\s+P14-developer-portal\\.yaml DEV-001: emptyNoAccess names DEVELOPER_VIEW, which none of its operations requires \\(none\\)$"
+    "^SP-NOACCESS\\s+P14-developer-portal\\.yaml DEV-001: emptyNoAccess names DEVELOPER_VIEW, which none of its operations requires \\(none\\)$",
+    "^SP-NOACCESS\\s+P08-venue-back-office\\.yaml BO-293: emptyNoAccess names PLATFORM_CELL_MANAGE, which none of its operations requires \\(MEMBERSHIP_MANAGE, MEMBERSHIP_VIEW\\)$"
    ]
   }
  },

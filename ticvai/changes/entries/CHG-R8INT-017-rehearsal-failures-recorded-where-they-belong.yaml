@@ -1,0 +1,56 @@
+id: CHG-R8INT-017
+date: '2026-10-20'
+source: audit
+kind: spec
+summary: 'The refresh rehearsal''s remaining failures routed to the integration pass, reproduced on a derived copy of
+  the branch and fixed at the input or the check: the guest browse group records why the app''s What''s On calls
+  listEvents and the web''s one listing does not (N-TWIN-OPS); the five approved screens whose no-access text names a
+  permission their operations no longer ask (WEB-013, GST-010, POS-003, BO-293, DEV-001) are exempted by name in
+  check-screen-patterns while their wording waits for the client, and BO-293 joins DEV-001 as a known
+  check-screen-permissions failure; check-cross-module-reads reads two Identity sentences that say a table is not read
+  as what they say (forceLogout, recordConsentIdentifier); the plan''s departures say where control.content_block went;
+  transferWalletBalance''s wallet.balance write and updatePrincipal''s identity.refresh_token write are baselined with
+  the rest of their tenant-root class.'
+decision:
+  what: 'screens/_guest-pairs.yaml (browse: sanctioned operations); tools/check-screen-patterns.py (seven P3 EXEMPT
+    entries, each naming its parked wording); tools/refresh-safe-baseline.json (check-screen-permissions: BO-293);
+    tools/check-cross-module-reads.py (two NOT_READ phrases); docs/active/block-a-extra-tasks.json (departures: table
+    control.content_block); handoff/audit-baseline.json (check-rls-scope-fit RF-TENANT-ROOT:
+    transferWalletBalance:wallet.balance:write, updatePrincipal:identity.refresh_token:write).'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'The coordinator''s routing of the refresh rehearsal of 20 October 2026 (run 20261020-053851-146136) to the r8
+  integration pass. Findings: check-navigation N-TWIN-OPS (browse, listEvents: new with GPS-C30 on GST-005,
+  CHG-R8INT-007); check-screen-patterns P3 and check-screen-permissions SP-NOACCESS (GPS-C09, GPS-C11, GPS-C33,
+  DEV-001-followup: the operations changed, the approved text did not, and approved UI never changes visibly without
+  the client); check-cross-module-reads XR-FACT on two negative sentences ("Identity is Foundation and never reads
+  `orders.pos_shift`", "Identity may not read that table"); check-plan-closure C-GONE on control.content_block (moved to
+  whitelabel.content_block by IDENTITY-C59, answer A, CHG-R8STO-004); check-rls-scope-fit RF-TENANT-ROOT on two writes
+  the derived lineage now lists, the same class as the baselined topUpWallet, captureWalletHold, logout and
+  updatePrincipal entries: the table''s scope is a storage fact of the identity and wallet contracts, the storage
+  lane''s.'
+keys_touched:
+  operations: [listEvents, forceLogout, recordConsentIdentifier, transferWalletBalance, updatePrincipal]
+  screens: [WEB-002, GST-005, WEB-013, GST-010, POS-003, BO-293, DEV-001]
+  files:
+  - screens/_guest-pairs.yaml
+  - tools/check-screen-patterns.py
+  - tools/refresh-safe-baseline.json
+  - tools/check-cross-module-reads.py
+  - docs/active/block-a-extra-tasks.json
+  - handoff/audit-baseline.json
+root_class: 'a gate finding the refresh rehearsal found on the integration branch'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: r8 integration pass'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-screen-patterns.py
+status: open
+notes: 'Each P3 exemption and the BO-293 known failure goes when the client approves its parked wording
+  (the r8 parked list for the client, lane-screens-pending-ui.json) and the text is applied. The two RF-TENANT-ROOT entries go
+  when wallet.balance and identity.refresh_token get a scope (storage lane) or the operations run at tenant.'

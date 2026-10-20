@@ -1,0 +1,38 @@
+id: CHG-R8INT-012
+date: '2026-10-20'
+source: audit
+kind: process
+summary: 'Three small gate items at the integration: the quickstart copies in the repositories start PostgreSQL as
+  pgvector/pgvector:pg16, the image ADAM''s database-ticket check runs the package''s migrations on (the AI tables need
+  the vector extension); check-problem-types'' ceiling falls to the 115 it counts; the repository ignores
+  ref-documents/, the lead''s reference folder beside it.'
+decision:
+  what: 'repos/ticvai-{ai,backend,contracts,frontend,infra}/project-bible/setup/quickstart.md and
+    repos/ticvai-docs/setup/quickstart.md step 2; tools/check-problem-types.py CEILING 117 -> 115; .gitignore
+    (repository root) ref-documents/.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'The r8 integration brief, items 9, 11 and 12 (20 October 2026). A developer who follows the quickstart with
+  postgres:16 cannot apply the migrations the [DB] tickets carry (CREATE EXTENSION vector). The ceiling only falls
+  (CHG-SHP-001), and the core lane''s problem types brought the count to 115 (CHG-R8SPN-016). Finding: r8 integration
+  brief of 20 October 2026.'
+keys_touched:
+  files:
+  - repos/ticvai-backend/project-bible/setup/quickstart.md
+  - tools/check-problem-types.py
+  - ../.gitignore
+root_class: 'a mirror or ratchet left behind by a change elsewhere'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: r8 integration pass'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-starter-fit.py
+status: open
+notes: 'check-starter-fit SF-DOCS-MIRROR fails until ADAM''s starter (viewer/mcp/setup/starters/docs/quickstart.md)
+  says the same, with the ADAM port; the backend-patterns sentence the ADAM starter gained lands in
+  viewer/mcp/setup/starters/docs/backend-patterns.md with that port too.'

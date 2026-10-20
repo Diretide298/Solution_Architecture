@@ -209,8 +209,10 @@ properties:
                   **The element of the client's prototype that shows what this read returns**
                   (20 October 2026, CHG-R8INT-003), as its text appears there (a list's title,
                   a note's heading). Only on a screen whose layout is an exact, client-verified
-                  prototype view, whose visible YAML is fixed: the read fills what the client
-                  approved, and no component is added. check-screen-wiring counts the read as
+                  prototype view, or a partial one that names its `prototype.view` (CHG-R8INT-008),
+                  whose visible YAML is fixed: the read fills what the client approved, and no
+                  component is added. A read a person sees is never `background` (the lead, 20
+                  October 2026): without such an element it stays onLoad and unreached. check-screen-wiring counts the read as
                   reached and checks the text is in the prototype file (S-SHOWN-BY).
         layout:
           type: object

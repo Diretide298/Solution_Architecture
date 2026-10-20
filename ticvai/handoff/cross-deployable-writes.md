@@ -14,9 +14,9 @@
 
 | | writes |
 |---|---:|
-| Cross-deployable writes in the lineage (63 operations) | 72 |
+| Cross-deployable writes in the lineage (64 operations) | 73 |
 | by event | 29 |
-| by the owner's operation | 43 |
+| by the owner's operation | 44 |
 | on the exception list | 0 |
 
 ## The kernel tables every deployable is granted directly
@@ -57,6 +57,7 @@ Sorted by the owning deployable, then the table.
 | `approvePartnerStatuLifecycle` | operations / PlatformService | `approvals.request` | commerce / TenancyService | operation `createApprovalRequest` |
 | `createPartnerAgreement` | operations / PlatformService | `approvals.request` | commerce / TenancyService | operation `createApprovalRequest` |
 | `createPartnerChangeRequest` | operations / PlatformService | `approvals.request` | commerce / TenancyService | operation `createApprovalRequest` |
+| `publishContentBlock` | operations / WhiteLabelService | `approvals.request` | commerce / TenancyService | operation `createApprovalRequest` |
 | `publishTenantConfig` | operations / WhiteLabelService | `approvals.request` | commerce / TenancyService | operation `createApprovalRequest` |
 | `reactivateTenant` | operations / PlatformService | `approvals.request` | commerce / TenancyService | operation `createApprovalRequest` |
 | `registerPartner` | operations / PlatformService | `approvals.request` | commerce / TenancyService | operation `createApprovalRequest` |

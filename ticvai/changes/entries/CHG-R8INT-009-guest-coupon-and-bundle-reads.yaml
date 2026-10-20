@@ -1,0 +1,34 @@
+id: CHG-R8INT-009
+date: '2026-10-20'
+source: audit
+kind: spec
+summary: 'The guest screens read coupons and bundles in the guest shape: GST-037 and WEB-010 bind getGuestCouponCode,
+  GST-004, GST-056 and WEB-008 bind getGuestBundle (bindings only). The panels'' schema names and the columns the guest
+  shape lacks (redemptionCount, redeemedAt, code, hasBeenSold) are visible, so they are parked for the client.'
+decision:
+  what: 'screens/P01-guest-web-storefront.yaml and screens/P02-guest-mobile-app.yaml: apis and component operations
+    move from getCouponCode and getBundle to getGuestCouponCode and getGuestBundle on the five screens; the bindsTo and
+    column changes are four entries in the screens lane''s pending-UI list, each with a build note.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'ORDERS-MONEY-C32 answer A: the storage-sat lane added the two guest reads (CHG-R8STO-005) instead of a union
+  response, and asked the surface lane to rebind the guest screens, which it could not do before the merge. Finding:
+  R8 blocker cause list (ORDERS-MONEY-C32).'
+keys_touched:
+  operations: [getGuestCouponCode, getGuestBundle, getCouponCode, getBundle]
+  screens: [GST-037, WEB-010, GST-004, GST-056, WEB-008]
+  files:
+  - screens/P01-guest-web-storefront.yaml
+  - screens/P02-guest-mobile-app.yaml
+root_class: 'a request one lane made of another, applied at the integration'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: r8 integration pass'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-approved-ui.py
+status: open

@@ -201,6 +201,11 @@ python3 tools/build-api-list.py
 # workbook (it reads schema-reference.json) and after link-screens-contracts (it reads consumers), so a
 # service that gains an operation has its documentation regenerate rather than go stale.
 python3 tools/build-service-docs.py
+# **The release-flag map, from the plan just written** (r8 integration, CHG-R8INT-014): derive-release-flags reads
+# the app-modules' Builds in handoff/service-docs/tasks.csv and the screens' apis, and writes
+# handoff/release-flags.json, which PLATFORM-FLAGS reads (ADAM CR-164, CHG-CRA-005). It was run by hand since 18
+# October and neither run here nor excused below, so a plan or screen change left the map stale.
+python3 tools/derive-release-flags.py
 # **The Block A schedule is derived, not patched** (30 September): build order, dependencies and each
 # person's pace give every task a start day. op-descriptions.py reads it when ticket text is written.
 # Since the replan of 1 October it schedules every block (A-D) in two-week sprints from plan-tasks.csv, with the

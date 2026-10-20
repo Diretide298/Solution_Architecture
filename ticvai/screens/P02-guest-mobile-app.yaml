@@ -1328,7 +1328,7 @@ screens:
       - kind: cardList
         label: The product for it
         bindsTo: VenuePoint.featuredOffer
-        operation: getBundle
+        operation: getGuestBundle
         notes: '**The right product** (MOB-4): `VenuePoint.featuredOffer` names a product (`getProduct`)
           or a bundle (`getBundle`), on any kind of point. A restaurant proposes **Buy meal combo**: a
           bundle with an admission component and a meal component, so the park ticket is included and
@@ -1434,9 +1434,10 @@ screens:
     purpose: The item's point on the 2D/3D venue map, with its description, media and featured offer (MOB-4)
     trigger: onLoad
     provenance: decided 29 September 2026, MOB-4
-  - operationId: getBundle
+  - operationId: getGuestBundle
     contract: promotions
-    purpose: The featured offer when it is a bundle, e.g. meal combo with admission (MOB-4)
+    purpose: 'The featured offer when it is a bundle, e.g. meal combo with admission (MOB-4), in the guest shape
+      (r8, ORDERS-MONEY-C32, CHG-R8INT-009)'
     trigger: onLoad
     provenance: decided 29 September 2026, MOB-4
   entryState:
@@ -1591,9 +1592,17 @@ screens:
       Anything that spends money, holds capacity or changes the account waits for the connection, and
       its button says so rather than failing.'
   apis:
+  - operationId: listEvents
+    contract: catalogue
+    purpose: 'The venue''s events on sale or live (r8, GPS-C30): `venueId` from the session (a visitor''s chosen
+      venue), then `listPerformances` per event fills This week. The rows of the prototype''s What''s on name the
+      event and its run (an exhibition "Until 30 Nov").'
+    trigger: onLoad
+    shownBy: Until 30 Nov
+    provenance: r8 integration, GPS-C30 (CHG-R8INT-007)
   - operationId: listPerformances
     contract: catalogue
-    purpose: List performances of an event
+    purpose: List performances of each event `listEvents` returned (r8, GPS-C30), over the dates the guest picks
     trigger: onLoad
   - operationId: listProducts
     contract: catalogue
@@ -1603,6 +1612,9 @@ screens:
     params:
     - name: eventId
       from: deepLink
+      optional: true
+      notes: 'Optional (r8, GPS-C30): the screen lists the venue''s events with `listEvents`; a link that names
+        one event opens on it.'
     coldEntry: '**A guest arriving cold on a link that no longer resolves is shown what happened and one
       way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened
       three weeks late all land here, and the person holding the link did nothing wrong. **The screen
@@ -7929,7 +7941,7 @@ screens:
         - CouponCode.redemptionCount
         - CouponCode.discount
         - CouponCode.validFrom
-        operation: getCouponCode
+        operation: getGuestCouponCode
         provenance: contract promotions.yaml GET /coupon-codes/{code}
   states:
     loading: The offers promotions list.
@@ -7955,9 +7967,10 @@ screens:
     contract: promotions
     purpose: Read a promotion
     trigger: onAction
-  - operationId: getCouponCode
+  - operationId: getGuestCouponCode
     contract: promotions
-    purpose: Resolve a code the guest typed
+    purpose: 'Resolve a code the guest typed, in the guest shape (r8, ORDERS-MONEY-C32, CHG-R8INT-009): the staff
+      read `getCouponCode` is the back office''s'
     trigger: onAction
   entryState:
     params:
@@ -9999,8 +10012,10 @@ screens:
   - operationId: listProductVariants
     contract: catalogue
     purpose: 'The variants of a suggested product that carries no `variantId` (r8, ORDERS-MONEY-C40, option B),
-      read when the guest taps it, so the add-to-cart form lets them choose; no component of its own.'
-    trigger: background
+      read when the guest taps it, so the add-to-cart form lets them choose; no component of its own. Not
+      background (r8 integration, CHG-R8INT-008): the guest sees and picks the variants, and the approved screen
+      has no element of its own for them (the prototype has no view of this screen).'
+    trigger: onAction
     provenance: r8 second round, ORDERS-MONEY-C40
   entryState:
     params:
@@ -10595,7 +10610,7 @@ screens:
         provenance: decided 29 September 2026, MOB-6
       - kind: multiSelect
         label: What are you most interested in?
-        operation: listProducts
+        operation: getVisitPlannerOptions
         notes: 'Interest tags from the venue''s points (`VenuePoint.interestTags`): thrill rides, family
           rides, shows, water, shopping.'
         provenance: decided 29 September 2026, MOB-6
@@ -10659,6 +10674,12 @@ screens:
     purpose: The tenant's active venues, for the park-per-day choice in a multi-venue tenant
     trigger: onLoad
     provenance: decided 30 September 2026, client meeting MoM 4.7 (Allam)
+  - operationId: getVisitPlannerOptions
+    contract: venue-map
+    purpose: 'The planner''s choices from the venue''s data (r8, GPS-C21): the interest tags of its parks fill What
+      are you most interested in?, and the ready-made plans and Fast Track bundles come from the same read.'
+    trigger: onLoad
+    provenance: r8 integration, GPS-C21 (CHG-R8INT-007)
   entryState:
     params:
     - name: venueId
@@ -10745,8 +10766,8 @@ screens:
     by `generateVisitPlan` from preset inputs, then edited on GST-053.'
   density: comfortable
   pattern: listDetail
-  patternReason: '`listProducts` reads a population and nothing reads one of them; the detail is the row
-    until a `get` exists'
+  patternReason: '`getVisitPlannerOptions` reads the venue''s ready-made plans and nothing reads one of them; the
+    detail is the row until a `get` exists'
   purpose: Ready-made day plans for this venue that a guest can take instead of answering questions.
   layout:
     template: split
@@ -10756,14 +10777,14 @@ screens:
       components:
       - kind: cardList
         label: Ready-made plans
-        operation: listProducts
+        operation: getVisitPlannerOptions
         notes: 'The venue''s preset plans (e.g. *Thrill day*, *Family day*, *Relaxed day*), each a set
           of planner inputs; **Use this plan** runs `generateVisitPlan` with those inputs and the guest''s
           party size and date. Rules-built, not AI: seeded, not learned, on day one.'
         provenance: decided 29 September 2026, MOB-6
       - kind: dataTable
         label: Every bundle
-        operation: listCatalogueBundles
+        operation: getVisitPlannerOptions
         notes: Bundles a preset plan can include (e.g. Fast Track).
         provenance: contract catalogue.yaml GET /catalogue/bundles
     - name: contextPanel
@@ -10786,14 +10807,13 @@ screens:
       Anything that spends money, holds capacity or changes the account waits for the connection, and
       its button says so rather than failing.'
   apis:
-  - operationId: listProducts
-    contract: catalogue
-    purpose: List products
+  - operationId: getVisitPlannerOptions
+    contract: venue-map
+    purpose: 'The venue''s ready-made plans (its active `VisitPlanPreset` rows, in their order) and the Fast Track
+      bundles a plan can include (r8, GPS-C21): the presets replace the product list and the catalogue''s bundles
+      on this screen; Use this plan sends the preset''s `presetKey` to `generateVisitPlan`.'
     trigger: onLoad
-  - operationId: listCatalogueBundles
-    contract: catalogue
-    purpose: List published bundles
-    trigger: onLoad
+    provenance: r8 integration, GPS-C21 (CHG-R8INT-007)
   - operationId: generateVisitPlan
     contract: venue-map
     purpose: 'Build a rules plan from the preset''s inputs (`presetKey`) with the party and dates this screen
@@ -11584,7 +11604,7 @@ screens:
         - Bundle.description
         - Bundle.price
         - Bundle.savingsAmount
-        operation: getBundle
+        operation: getGuestBundle
         provenance: contract promotions.yaml GET /bundles/{bundleId}
     - name: actionBar
       slot: rowActions
@@ -11608,9 +11628,10 @@ screens:
       Anything that spends money, holds capacity or changes the account waits for the connection, and
       its button says so rather than failing.'
   apis:
-  - operationId: getBundle
+  - operationId: getGuestBundle
     contract: promotions
-    purpose: Read a bundle with components and allocation
+    purpose: 'Read a bundle with its components and choice groups, in the guest shape (r8, ORDERS-MONEY-C32,
+      CHG-R8INT-009)'
     trigger: onLoad
   - operationId: addCartLine
     contract: orders
@@ -12066,8 +12087,10 @@ screens:
     purpose: 'Only when signed in, like `getVisitPlan` (GFIX-6): on the cold entry (no `planId`) it asks for the
       guest''s plans with `date` today, newest first, and takes the first one''s `id` for `getVisitPlan`. No
       component shows the list itself: what it finds fills the Today timeline, and an empty page is the
-      emptyFirstRun state (offer to make a plan on GST-051). Opened with a `planId`, it is not called.'
-    trigger: background
+      emptyFirstRun state (offer to make a plan on GST-051). Opened with a `planId`, it is not called. Not
+      background (r8 integration, CHG-R8INT-008): the guest sees what it finds, and the approved screen has no
+      element of its own for it (the prototype has no view of this screen).'
+    trigger: onLoad
   entryState:
     params:
     - name: planId
@@ -14700,7 +14723,9 @@ screens:
         provenance: decided 29 September, rev 3 REV3-13
       - kind: numberField
         label: Attendees
-        notes: For the visitor list at reception; a room type smaller than the party is not offered.
+        notes: 'For the visitor list at reception; a room type smaller than the party is not offered. Sent as
+          `attributes.attendees` on `addCartLine` (r8, GPS-C28, `OrderLineAttributes.attendees`); a 422
+          `attendees-over-capacity` sends the guest back to How long and Start time.'
         provenance: decided 29 September, rev 3 REV3-13
       - kind: cardList
         label: Add to the booking
@@ -14746,7 +14771,8 @@ screens:
     trigger: onAction
   - operationId: addCartLine
     contract: orders
-    purpose: Add the room type for the booked window, then the add-ons
+    purpose: 'Add the room type for the booked window with the party as `attributes.attendees` (r8, GPS-C28), then
+      the add-ons; 422 `attendees-over-capacity` sends the guest back to the length and start-time steps'
     trigger: onAction
   - operationId: createCart
     contract: orders

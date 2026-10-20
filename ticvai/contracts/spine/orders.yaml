@@ -3310,8 +3310,10 @@ paths:
       x-ticvai-lock: rowExclusive
       x-ticvai-lock-excludes:
       - wallet.wallet_transaction
+      - cache:idempotency
       x-ticvai-lock-excludes-note: 'ADR-0037. **Resolved before the transaction opens, never inside the
-        lock.** A Postgres row l ock costs microseconds and this one measured six milliseconds — the difference
+        lock.** The Idempotency-Key is looked up before it too (r8 integration, CHG-R8INT-014: since the lineage
+        derives `cache:idempotency` for every write that takes the header). A Postgres row l ock costs microseconds and this one measured six milliseconds — the difference
         was a Redis r ound trip and a read the decision does not use. **A lock held across a hop is a
         lock held fo r the latency of the slowest thing on the path.**
 
@@ -5997,6 +5999,10 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     get:
       operationId: listOwnRefundRequests
+      x-ticvai-read-via:
+      - query: finance#fxRateRecords
+        route: in-process
+        for: 'the rate a refund in another currency is shown at (Refund, ledger.fx_rate), Ledger''s data (r8 integration, CHG-R8INT-014)'
       x-ticvai-consumed-by:
         - "P01 WEB-019 Order History"
         - "P02 GST-067 Refunds & Resale"
@@ -6060,6 +6066,10 @@ paths:
         format: uuid
     get:
       operationId: getGuestRefundPolicy
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s refund settings the policy is told from, Tenancy''s data (r8 integration, CHG-R8INT-014)'
       x-ticvai-audience:
       - guest
       security:

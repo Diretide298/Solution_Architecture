@@ -981,6 +981,9 @@ paths:
   /site-package:
     post:
       operationId: exportSitePackage
+      x-ticvai-reads:
+      - table: whitelabel.config_version
+        for: 'the published version''s snapshot the package is built from (r8 integration, CHG-R8INT-014; check-parameter-columns P-NAMED-TABLE)'
       x-ticvai-consumed-by:
         - "P09 ADM-016 White-Label Branding Management"
         - "P13 CMS-014 Publishing Workflow"
@@ -3461,6 +3464,9 @@ paths:
         - "P13 CMS-001 Tenant Workspace"
         - "P13 CMS-007 Page Builder"
       x-ticvai-read-via:
+      - query: subscription#tenantRecords
+        route: in-process
+        for: 'the tenant''s cell address (Tenant.cellHost) a platform operator''s X-Tenant-Id resolves to, Platform''s data (r8 integration, CHG-R8INT-014)'
       - query: subscription#contractRecords
         route: in-process
         for: 'its read of control.contract, Platform''s data (CHG-MOD-001)'
@@ -3517,6 +3523,9 @@ paths:
       - query: subscription#planRecords
         route: in-process
         for: 'its read of control.plan, Platform''s data (CHG-MOD-001)'
+      - query: subscription#moduleListingRecords
+        route: in-process
+        for: 'display name, requiresModules and incompatibleWithModules of each module listed (control.module_listing), Platform''s data (APPROVALS-TENANCY-C41; r8 integration, CHG-R8INT-016)'
       x-ticvai-singleton: true
       x-ticvai-singleton-note: 'One set per tenant, the caller''s tenant: a PUT replaces the whole set, and an entry the body leaves out is removed. There is no key in the path.'
       x-ticvai-audience:
@@ -3529,6 +3538,14 @@ paths:
 
         Disabling one that navigation or the homepage references is rejected, with the references named
         so the tenant can clear them first.
+
+
+        **The server checks the dependency graph** (R8 blocker APPROVALS-TENANCY-C41, option A; r8 integration,
+        CHG-R8INT-016): enabling a module whose `requiresModules` are not all enabled in the same set is refused 409
+        `module-dependency-unmet`, and enabling two modules one lists in `incompatibleWithModules` is refused 409
+        `module-incompatible`, both read from the module listing (`subscription#moduleListingRecords`); the screen''s
+        own check stays as a courtesy. The enablement hangs off the tenant''s current draft tenant configuration
+        (created when there is none), and each row''s display name is copied from the listing.
 
         '
       tags:
@@ -3575,6 +3592,14 @@ paths:
                   $ref: '#/components/schemas/ModuleEnablement'
         '400':
           description: Module not licensed, or still referenced by navigation or homepage
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ModuleReferenceProblem'
+        '409':
+          description: A module enabled without a module it requires, or with one it cannot run beside (the listing's
+            requiresModules and incompatibleWithModules; APPROVALS-TENANCY-C41).
+          x-ticvai-problem-types: [module-dependency-unmet, module-incompatible]
           content:
             application/problem+json:
               schema:
@@ -4644,6 +4669,7 @@ paths:
         format: uuid
     post:
       operationId: previewGuidedChoice
+      x-ticvai-idempotency-exempt: A preview computed in process from the draft answers; it writes nothing, so a replay duplicates no row (r8 integration, CHG-R8INT-014).
       x-ticvai-read-via:
       - query: catalogue#productRecords
         route: service
@@ -5295,8 +5321,8 @@ paths:
         - "P05 KSK-002 Language Select"
       x-ticvai-read-via:
       - query: payments#providerConnectionRecords
-        route: in-process
-        for: 'its read of payments.provider_connection, for `paymentTokenisation` (lineage request, r8)'
+        route: service
+        for: 'its read of payments.provider_connection, for `paymentTokenisation`, through the service route: White-label runs in operations, Payments in commerce (lineage request, r8; CHG-R8INT-005)'
       x-ticvai-audience:
       - anonymous
       - guest
@@ -11100,7 +11126,7 @@ components:
       description: '`visitPlanner` (decided 29 September, MOB-1 and the Plan tab in Block A) is the Plan tab
         and WEB-050; off, the tab and the page are not shown. **`x-ticvai-licence-module` maps each feature to the
         licence module (`ModuleKey` in common.yaml) that licenses it**, proposed from the screens'' `requiresModule`
-        and for the product owner to confirm; `core` is always licensed.'
+        and for the client to confirm; `core` is always licensed.'
     KioskAssignment:
       x-ticvai-persistence: whitelabel.kiosk_assignment
       type: object

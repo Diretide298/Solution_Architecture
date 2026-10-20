@@ -422,8 +422,10 @@ x-ticvai-queries:
       scope lets it see them (the table's row-level security, under the caller's connection and transaction). It
       decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
       a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
-      process within commerce, through the C# query interface Catalogue implements.
-    served: [in-process]
+      process within commerce, through the C# query interface Catalogue implements, and from another deployable
+      (subscription's setMembershipCommercialConfig, GPS-C34) through Catalogue's service route (serviceAuth; r8
+      integration, CHG-R8INT-005).
+    served: [in-process, service]
   variantRecords:
     module: catalogue
     table: catalogue.variant
@@ -19105,6 +19107,9 @@ paths:
   /product-tags/{productTagId}:
     put:
       operationId: setProductTagDefinition
+      x-ticvai-writes:
+      - table: catalogue.audit_entry
+        for: 'the audit row of the tag change (r8 integration, CHG-R8INT-014; check-parameter-columns P-NAMED-TABLE)'
       x-ticvai-consumed-by: []
       x-ticvai-read-via:
       - query: white-label#guidedChoiceAnswerRecords
@@ -19191,7 +19196,7 @@ paths:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
-          description: The code is already used by another tag of the venue (`duplicate-code`), the write changes
+          description: The code is already used by another tag of the same venue (`duplicate-code`), the write changes
             the code of a tag that products or Help me choose answers carry (`tag-code-in-use`), or a known tag is
             addressed with another venue (`tag-venue-mismatch`).
           x-ticvai-problem-types:
@@ -19208,6 +19213,13 @@ paths:
     put:
       operationId: setProductClassification
       x-ticvai-consumed-by: []
+      x-ticvai-writes:
+      - table: catalogue.product
+        for: 'Product.categoryId and Product.segmentTags, the two things it files (r8 integration, CHG-R8INT-019;
+          check-write-lineage W-NOTABLE)'
+      - table: catalogue.audit_entry
+        for: 'the audit row (category classification, the category and tags before and after) (r8 integration,
+          CHG-R8INT-019)'
       summary: File a product under a category and give it its tags, both from the master lists
       description: >-
         **The product form's category drop-down and tag picker write here** (16 October 2026 minutes, 4.6 and
@@ -19428,6 +19440,9 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setProductChannelTexts
+      x-ticvai-writes:
+      - table: catalogue.audit_entry
+        for: 'the audit row (category channelTexts, the texts before and after) (r8 integration, CHG-R8INT-014; check-parameter-columns P-NAMED-TABLE)'
       x-ticvai-consumed-by: []
       x-ticvai-read-via:
       - query: white-label#tenantLanguageRecords
@@ -19570,6 +19585,9 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setProductOwnerForms
+      x-ticvai-writes:
+      - table: catalogue.audit_entry
+        for: 'the audit row (category ownerForms, the links before and after) (r8 integration, CHG-R8INT-014; check-parameter-columns P-NAMED-TABLE)'
       x-ticvai-consumed-by: []
       x-ticvai-read-via:
       - query: marketing-crm#formDefinitionRecords
@@ -19784,6 +19802,9 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setProductSalePermissionRules
+      x-ticvai-writes:
+      - table: catalogue.audit_entry
+        for: 'the audit row (category salePermissions, the rule set before and after) (r8 integration, CHG-R8INT-014; check-parameter-columns P-NAMED-TABLE)'
       x-ticvai-consumed-by: []
       x-ticvai-read-via:
       - query: tenancy#activeVenues
@@ -43799,6 +43820,8 @@ components:
           - continuousRange
         bands:
           type: array
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           description: '**The bands, lowest first** (typed 20 October 2026, R8 blocker cause GPS-C32; CHG-R8SPN-028: it
             was declared an object while every reader and writer used a list, so no valid body could carry it). The
             same shape `DynamicPriceBandsLaddersAdjustmentMatrixView.bands` returns. Stored as the jsonb list it always

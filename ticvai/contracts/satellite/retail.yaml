@@ -1319,6 +1319,10 @@ paths:
         schema: { type: string, format: uuid }
     post:
       operationId: collectShopAndDrop
+      x-ticvai-read-via:
+      - query: fnb#deliveryLocationRecords
+        route: in-process
+        for: 'the collection point''s closing time behind the default collectBy, fnb.delivery_location, F&B''s data (r8 integration, CHG-R8INT-014)'
       x-ticvai-consumed-by:
         - "P04 POS-012 Omnichannel Order & Fulfilment Center"
       x-ticvai-audience: [staff]
@@ -1406,9 +1410,10 @@ paths:
       - query: inventory#stockEarmarkRecords
         route: in-process
         for: 'its read of inventory.stock_earmark, Inventory''s data (CHG-MOD-001)'
-      x-ticvai-write-via:
-      - table: inventory.stock_earmark
-        operation: createStockReservation
+      # Retail and Inventory run in one deployable (operations), so the earmark is an in-process call, not a
+      # cross-deployable route (check-cross-deployable-writes X-STALE; r8 integration, CHG-R8INT-015).
+      x-ticvai-calls:
+      - inventory.createStockReservation
       security:
       - guestAuth: []
       - bearerAuth: []

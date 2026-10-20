@@ -176,7 +176,56 @@ x-ticvai-queries:
       them (the table's row-level security, under the caller's connection and transaction). It decides nothing: an
       asker that refuses or chooses on these rows states that rule in its own operation, and a question with a rule
       of its own (open, live, sellable) is declared as a query of its own. It is asked in process within operations,
-      through the C# query interface Platform implements.
+      through the C# query interface Platform implements, and from another deployable (tenancy's resolveTenantHost)
+      through the service route (serviceAuth; r8 integration, CHG-R8INT-014).
+    served: [in-process, service]
+  cellTenantRecords:
+    module: subscription
+    table: control.cell_tenant
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The control.cell_tenant rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as tenantId or cellId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Platform stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/CellTenant'}
+    rule: >-
+      A data read, not a rule question (ADR-0055 rule 2 as amended 14 October; r8 integration, CHG-R8INT-014).
+      Platform answers with its control.cell_tenant rows, as it stores them. It decides nothing: resolveTenantHost,
+      which asks it, states its own rule (one database that is live, suspended or draining). It is asked from another
+      deployable through Platform's service route (serviceAuth).
+    served: [service]
+  tenantRequestLimits:
+    module: subscription
+    table: control.plan
+    inputs:
+      tenantId: {type: string, format: uuid, description: 'The tenant whose limits the kernel middleware applies.'}
+    returns:
+      $ref: '#/components/schemas/PlanRequestLimits'
+    rule: >-
+      A rule question (R8 blocker FOUNDATION-AI-C20; the generators lane's request, applied at the r8 integration,
+      CHG-R8INT-016). The limits are `Plan.requestLimits` of the plan on the tenant's current contract (control.contract,
+      in force today), in the control database; a tenant with no current contract gets the platform default. Every
+      host's kernel middleware (ADR-0064) asks it through Platform's service route (serviceAuth), caches the answer
+      per tenant for 60 seconds and asks again when the tenant's contract changes plan, so a plan change reaches the
+      token buckets within a minute.
+    served: [service]
+  moduleListingRecords:
+    module: subscription
+    table: control.module_listing
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The control.module_listing rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as moduleKey); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Platform stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/ModuleListing'}
+    rule: >-
+      A data read, not a rule question (ADR-0055 rule 2 as amended 14 October; APPROVALS-TENANCY-C41, r8 integration,
+      CHG-R8INT-016). Platform answers with its control.module_listing rows as it stores them. It decides nothing:
+      white-label's setModuleEnablement, which asks it, states its own rule (requiresModules met,
+      incompatibleWithModules not both enabled). It is asked in process within operations, through the C# query
+      interface Platform implements.
     served: [in-process]
   cellEndpointRecords:
     module: subscription
@@ -1374,6 +1423,9 @@ paths:
         format: uuid
     post:
       operationId: suspendTenant
+      x-ticvai-writes:
+      - table: control.outbox
+        for: 'tenant.suspended, written to the control databases outbox when the suspension takes effect (r8 integration, CHG-R8INT-014; check-parameter-columns P-NAMED-TABLE)'
       x-ticvai-consumed-by:
         - "P09 ADM-005 Tenant Directory"
       x-ticvai-write-via:
@@ -1491,7 +1543,7 @@ paths:
             round 3): the 409 approvals'' `createApprovalRequest` declares for an open request on the same subject,
             answered as it gives it (`refusedReason` `openRequestExists`, `requestId` the open request,
             `currentStatus` its status), so nothing is raised and the caller can point at the open request. This is
-            not the retired `approval-required`. **The order** (review 3 N-3): the tenant''s own state refusals answer
+            not the retired `approval-required`. **Which refusal comes first** (review 3 N-3): the tenant''s own state refusals answer
             first; `open-request-exists` comes only when the tenant''s state would allow a suspension, that is for an
             `active` tenant (with or without a suspension already granted and pending) about which a suspension or a
             reactivation request is still open.'
@@ -1594,7 +1646,7 @@ paths:
             `createApprovalRequest` declares for an open request on the same subject, answered as it gives it
             (`refusedReason` `openRequestExists`, `requestId` the open request, `currentStatus` its status), so
             nothing is raised and the caller can point at the open request. This is not the retired
-            `approval-required`. **The order** (review 3 N-3): the tenant''s own state refusals answer first;
+            `approval-required`. **Which refusal comes first** (review 3 N-3): the tenant''s own state refusals answer first;
             `open-request-exists` comes only when the tenant''s state would allow a reactivation (`suspended`,
             `terminating`, or `active` with a pending suspension) and a request about this tenant is still open, for
             example a second reactivation, or a reactivation of a tenant with a pending suspension while a further

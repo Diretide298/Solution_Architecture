@@ -1,0 +1,39 @@
+id: CHG-R8INT-006
+date: '2026-10-20'
+source: audit
+kind: process
+summary: 'Two checks learn what the surface lane decided and could not teach them: a P17 sign-up copy may bind fewer
+  operations than its P09 twin where the twin''s operation admits no prospect (SGN-019 and SGN-024 no longer
+  "drift" from ADM-410 and ADM-417 after setSubscription became staff-only), and check-navigation reads the
+  guestSignInReturn rule as the edge from each guest screen that offers sign-in and return to its app''s sign-in
+  screen (N-SIGNIN-RETURN). check-navigation''s N-CARRIES-HELD, which reported the deriver unavailable since the
+  generators lane''s fast-loader change, checks again.'
+decision:
+  what: 'tools/check-screens.py: twin_drift (P17 leaves out of both apis lists, and out of the twin''s layout bindings
+    the copy lacks, the twin''s operations that admit no prospect) with self-tests run first (--self-test);
+    tools/check-navigation.py: N-SIGNIN-RETURN with self-tests run first, and the deriver loaded without the YAML shim
+    that broke when derive-carries-from-entrystate began handing yaml the text.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'APPROVALS-TENANCY-C16 (answer B) made setSubscription staff-only, so the sign-up screens bind nothing and
+  check-screens failed them as drifted copies; WHITE-C13 put the sign-in-and-return edge in a rule so approved
+  navigation does not change, and no check read it. The refresh rehearsal of 20 October 2026 found N-CARRIES-HELD
+  failing on "''str'' object has no attribute ''name''" (CHG-R8GEN-016 changed how the deriver loads YAML).
+  Finding: R8 blocker cause list (APPROVALS-TENANCY-C16, WHITE-C13), r8 integration check run of 20 October 2026.'
+keys_touched:
+  screens: [SGN-019, SGN-024, WEB-016, GST-042]
+  files:
+  - tools/check-screens.py
+  - tools/check-navigation.py
+root_class: 'a check that does not know a rule the package decided'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: r8 integration pass'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-navigation.py
+status: open

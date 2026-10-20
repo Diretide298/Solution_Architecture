@@ -73,7 +73,7 @@ steps:
   action: Reviews the cart and may enter a promotion code
   operations:
   - evaluatePromotions
-  - getCouponCode
+  - getGuestCouponCode
   outcome: Final price, with any rejected code explained rather than silently ignored
 - step: 6
   screen: WEB-011

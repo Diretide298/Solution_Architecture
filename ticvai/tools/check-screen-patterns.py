@@ -65,6 +65,15 @@ EXEMPT = {
     ("P3", "POS-008", "REPORT_VIEW"): "the till's day view is the cashier's own or the terminal's "
         "figures (REPORT_VIEW_OWN / REPORT_VIEW_WORKSTATION); runReport and listReports still declare "
         "REPORT_VIEW_VENUE. Asked of the contract owner in the CHG-SPF-003 report",
+    # P3, r8 (20 October 2026): the contract moved and the screen's approved text has not. Each wording is
+    # parked for the client (lane-screens-pending-ui.json); remove the line when the approved text is applied.
+    ("P3", "WEB-013", "GUEST_VIEW"): ("the operations' permission changed in r8 and the no-access text is visible on a client-approved screen: the new wording waits for the client in audit lane-screens-pending-ui.json (GPS-C09: a guest holds no permission), and the check names it until it is applied (r8 integration, CHG-R8INT-017)"),
+    ("P3", "GST-010", "GUEST_VIEW"): ("the operations' permission changed in r8 and the no-access text is visible on a client-approved screen: the new wording waits for the client in audit lane-screens-pending-ui.json (GPS-C09: a guest holds no permission), and the check names it until it is applied (r8 integration, CHG-R8INT-017)"),
+    ("P3", "POS-003", "ORDER_CREATE"): ("the operations' permission changed in r8 and the no-access text is visible on a client-approved screen: the new wording waits for the client in audit lane-screens-pending-ui.json (GPS-C11: getAvailability asks PRODUCT_VIEW), and the check names it until it is applied (r8 integration, CHG-R8INT-017)"),
+    ("P3", "DEV-001", "DEVELOPER_VIEW"): ("the operations' permission changed in r8 and the no-access text is visible on a client-approved screen: the new wording waits for the client in audit lane-screens-pending-ui.json (DEV-001-followup: the reads are public), and the check names it until it is applied (r8 integration, CHG-R8INT-017)"),
+    ("P3", "BO-293", "PLATFORM_CELL_MANAGE"): ("the operations' permission changed in r8 and the no-access text is visible on a client-approved screen: the new wording waits for the client in audit lane-screens-pending-ui.json (GPS-C33: MEMBERSHIP_VIEW and MEMBERSHIP_MANAGE), and the check names it until it is applied (r8 integration, CHG-R8INT-017)"),
+    ("P3", "BO-293", "MEMBERSHIP_VIEW"): ("the operations' permission changed in r8 and the no-access text is visible on a client-approved screen: the new wording waits for the client in audit lane-screens-pending-ui.json (GPS-C33: MEMBERSHIP_VIEW and MEMBERSHIP_MANAGE), and the check names it until it is applied (r8 integration, CHG-R8INT-017)"),
+    ("P3", "BO-293", "MEMBERSHIP_MANAGE"): ("the operations' permission changed in r8 and the no-access text is visible on a client-approved screen: the new wording waits for the client in audit lane-screens-pending-ui.json (GPS-C33: MEMBERSHIP_VIEW and MEMBERSHIP_MANAGE), and the check names it until it is applied (r8 integration, CHG-R8INT-017)"),
 }
 
 # NP: Sprint 1-2 screens the package cannot define, handed to the plan to move out of Sprints 1-2

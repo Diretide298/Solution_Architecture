@@ -1,0 +1,48 @@
+id: CHG-R8INT-005
+date: '2026-10-20'
+source: audit
+kind: contract
+summary: 'The contract requests the surface and generators lanes left for the core lane, applied on the merged branch:
+  ModuleKey gains the add-on key poweredByRemoval (never a plan module); Catalogue''s taxProfileRecords and Payments''
+  providerConnectionRecords are also served on the service route, and getPublishedTenantConfig and openShift read
+  through it; a counted line''s total is stored as orders.cash_count_line.counted_value. BC-397 to BC-401 record the
+  five contracts whose responses return a ModuleKey.'
+decision:
+  what: 'contracts/shared/common.yaml ModuleKey enum and note; contracts/spine/catalogue.yaml taxProfileRecords served
+    [in-process, service]; contracts/satellite/payments.yaml providerConnectionRecords served [in-process, service];
+    contracts/satellite/white-label.yaml getPublishedTenantConfig read-via route service; contracts/spine/shift.yaml
+    openShift read-via tenancy#deviceRecords route service (the only route the query serves) and
+    CountedDenominationLine.total x-ticvai-column counted_value; docs/active/breaking-changes.yaml BC-397..BC-401.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'The requests could not be made on the lanes that found them, because the files were another lane''s: the surface
+  lane (APPROVALS-TENANCY-C17, answer B; GPS-C34) and the generators lane (APPROVALS-TENANCY-C40; the read-vias the
+  lineage now copies). They showed as check-error-sources E-QUERY (taxProfileRecords on the service route),
+  check-stored-request-fields SR-STORED-NO-COLUMN (countedCash[].total on closeShift and submitShiftCount) and
+  check-cross-module-reads XR-ROUTE (openShift, getPublishedTenantConfig). Finding: R8 blocker cause list
+  (APPROVALS-TENANCY-C17, GPS-C34, APPROVALS-TENANCY-C40), r8 integration check run of 20 October 2026.'
+keys_touched:
+  operations: [openShift, closeShift, submitShiftCount, getPublishedTenantConfig, setMembershipCommercialConfig,
+    addLicenceAddOn, removeLicenceAddOn]
+  schemas: [ModuleKey, CountedDenominationLine]
+  files:
+  - contracts/shared/common.yaml
+  - contracts/spine/catalogue.yaml
+  - contracts/spine/shift.yaml
+  - contracts/satellite/payments.yaml
+  - contracts/satellite/white-label.yaml
+  - docs/active/breaking-changes.yaml
+root_class: 'a request one lane made of another, applied at the integration'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: r8 integration pass'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-error-sources.py
+status: open
+notes: 'check-stored-request-fields and check-cross-module-reads (XR-ROUTE) catch the other two. BC-398 names the
+  marketing-crm feature tickets as producers: no service task names its four Block D list operations yet.'
