@@ -122,9 +122,12 @@ def test_pointer_differs_between_releases_only_on_the_release_line():
 
 def test_frontend_pointer_names_its_repository_never_an_apps_folder():
     """CHG-R6-060: a frontend ticket names the GitLab repository of its screen's platform (docs/active/
-    frontend-repos.yaml) and a path relative to it; a platform with no repository says so and names no folder."""
+    frontend-repos.yaml) and a path relative to it; a platform with no repository says so and names no folder.
+    P09 builds in ticvai-web, created by the lead on 20 October 2026 (CHG-R8SCR-007, CHG-R8DEC-003); P10 has none yet."""
     rows = plan() + [row("APP-P09-ADM-001", "Task", "SVC-THING-CORE", track="Frontend", seq="6",
-                         subject="[FE] ADM-001 Platform Login / MFA", area="P09")]
+                         subject="[FE] ADM-001 Platform Login / MFA", area="P09"),
+                     row("APP-P10-PTR-001", "Task", "SVC-THING-CORE", track="Frontend", seq="7",
+                         subject="[FE] PTR-001 Partner Sign In", area="P10")]
     t = by_key(build(rows=rows)[0])
     for key in ("APP-MOB-GST-001", "APP-MOB-GST-001#build"):
         p = t[key]["pointer"]
@@ -132,7 +135,10 @@ def test_frontend_pointer_names_its_repository_never_an_apps_folder():
                 "ticvai-guest-app.git)") in p, p
         assert "suggested location `src/" in p and "apps/" not in p
     p = t["APP-P09-ADM-001"]["pointer"]
-    assert "**No repository yet:** ask the lead" in p and "apps/" not in p and "suggested location" not in p
+    assert "**Repository:** ticvai-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-web.git)" in p, p
+    assert "apps/" not in p
+    p = t["APP-P10-PTR-001"]["pointer"]
+    assert "**No repository yet:** ask the lead" in p and "apps/" not in p and "suggested location" not in p, p
     assert "Repository" not in t["SVC-THING-CORE-1"]["pointer"]
 
 

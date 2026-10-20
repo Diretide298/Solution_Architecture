@@ -8,7 +8,10 @@ decision:
   what: 'docs/active/frontend-repos.yaml P09: `note` and `observed` say the repository was created by the lead
     (observed by Chinmay Parab, 2026-10-20, how: his statement; reachable false and the result saying reachability
     was not checked, because GitLab is private and the package team has no login; nothing inside it known, so the
-    profile stays the default). `assumed: true` and `confirmed: false` are kept.'
+    profile stays the default). `assumed: true` and `confirmed: false` are kept.
+    tools/tests/test_op_release.py test_frontend_pointer_names_its_repository_never_an_apps_folder follows the
+    decision: a P09 ticket names ticvai-web, and a P10 ticket (no repository yet) says so (the lead''s fix round, 20
+    October 2026).'
   by: Chinmay
   date: '2026-10-20'
 why: 'The lead''s answer of 20 October 2026 to the r8 follow-ups, item 7 "create the ticvai-web repository in GitLab":
@@ -17,6 +20,7 @@ why: 'The lead''s answer of 20 October 2026 to the r8 follow-ups, item 7 "create
 keys_touched:
   files:
   - docs/active/frontend-repos.yaml
+  - tools/tests/test_op_release.py
 root_class: 'decision-not-recorded: a ticket names no repository to build in'
 tickets:
   started: []
@@ -25,7 +29,7 @@ tickets:
     is regenerated at the lead''s refresh.'
 release_tag: r8
 decision_owner: Chinmay
-adam_cr: 'none: the lead''s statement of 20 October 2026'
+adam_cr: 'none: a decision of the lead; no ADAM CR is needed (the lead, 20 October 2026)'
 triage: fix-forward
 prevention:
   type: check

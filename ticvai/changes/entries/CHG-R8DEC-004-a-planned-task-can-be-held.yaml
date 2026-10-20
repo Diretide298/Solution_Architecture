@@ -40,7 +40,7 @@ tickets:
   unstarted: []
 release_tag: r8
 decision_owner: Chinmay
-adam_cr: 'none yet: r8 decisions sheet item 2, 20 October 2026; the lead raises the ADAM CR with the batch'
+adam_cr: 'none: a decision of the lead; no ADAM CR is needed (the lead, 20 October 2026)'
 triage: blocker
 prevention:
   type: generator-rule
@@ -50,5 +50,5 @@ notes: '**Which precedent.** Off the board as op-retire''s Deferred: no assignee
   The plan keeps the task''s assignee and sprint (tasks.csv and block-a-schedule.json are not touched), so the person
   it returns to is the plan''s at the release that lifts the hold. **Not run here.** op-release.rb runs on the
   OpenProject server; it was syntax-checked with Ruby 2.6 (the server''s) and its hold lines are held by
-  hold_problems(). The pre-existing failure of test_frontend_pointer_names_its_repository_never_an_apps_folder (P09
-  has a repository since CHG-R8SCR-007) is not this change''s.'
+  hold_problems(). The ticket comment names who decided the hold and when, not the
+  quote (fix round of 20 October). Held tasks take no capacity in the schedule: CHG-R8DEC-006.'

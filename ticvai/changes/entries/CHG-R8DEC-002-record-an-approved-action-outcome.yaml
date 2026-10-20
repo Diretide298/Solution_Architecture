@@ -43,7 +43,7 @@ tickets:
     changes: BO-382 already lists the execution, ADM-005 is unchanged.'
 release_tag: r8
 decision_owner: Chinmay
-adam_cr: 'none yet: r8 decisions sheet item 4, 20 October 2026; the lead raises the ADAM CR with the batch'
+adam_cr: 'none: a decision of the lead; no ADAM CR is needed (the lead, 20 October 2026)'
 triage: fix-forward
 prevention:
   type: check
