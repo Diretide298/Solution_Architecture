@@ -19193,6 +19193,13 @@ paths:
     put:
       operationId: setProductClassification
       x-ticvai-consumed-by: []
+      x-ticvai-writes:
+      - table: catalogue.product
+        for: 'Product.categoryId and Product.segmentTags, the two things it files (r8 integration, CHG-R8INT-019;
+          check-write-lineage W-NOTABLE)'
+      - table: catalogue.audit_entry
+        for: 'the audit row (category classification, the category and tags before and after) (r8 integration,
+          CHG-R8INT-019)'
       summary: File a product under a category and give it its tags, both from the master lists
       description: >-
         **The product form's category drop-down and tag picker write here** (16 October 2026 minutes, 4.6 and

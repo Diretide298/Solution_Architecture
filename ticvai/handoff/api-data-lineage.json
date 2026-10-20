@@ -118638,7 +118638,8 @@
     "route": "service",
     "for": "the products each combination of answers leaves, by the same answer filter listProducts applies for a guest (r8, WHITE-C26)"
    }
-  ]
+  ],
+  "pure": "a preview computed in process from the draft answers: nothing is stored and nothing is published (its contract)"
  },
  "getBundleSigningKeys": {
   "contract": "catalogue",
@@ -118772,7 +118773,9 @@
    "cache:idempotency"
   ],
   "writes": [
-   "cache:idempotency"
+   "cache:idempotency",
+   "catalogue.audit_entry",
+   "catalogue.product"
   ],
   "routing": null,
   "scope": "venue",
@@ -119165,7 +119168,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "pure": "a check: answers whether the seller may sell the products asked and writes nothing (its contract: \"A check that writes nothing\")"
  },
  "listSalePermissionTargets": {
   "contract": "catalogue",
