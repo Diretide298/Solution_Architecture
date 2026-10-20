@@ -67,10 +67,11 @@ And one rule per decision for the CRs of 18 October 2026 (class 9, "rules nobody
                    per legal entity, the next open period, and createPayment's two settings reads.
   BR-HOLD-LAPSE    (CR-169) a seat reservation names its hold and can be `sold`; `convertInventoryHold` moves the
                    envelope's units and states the lapsed-hold rule (unitsGone, nothing refunded automatically).
-  BR-LOGIN-ATTEMPTS (CR-170, 19 October 2026; CHG-CRA-009) every wrong-credentials 401 of login and
-                   verifyMfaChallenge carries attemptsRemaining, counted per submitted username known or not and per
-                   sign-in method, and sso-sign-in-required does not (narrowed, 20 October 2026, CHG-R8DEC-001);
-                   login's 409 says since when and on what; verifyMfaChallenge's 422 carries it too.
+  BR-LOGIN-ATTEMPTS (CR-170, 19 October 2026; CHG-CRA-009) every wrong-credentials 401 of login carries
+                   attemptsRemaining, counted per submitted username known or not and per sign-in method, and
+                   sso-sign-in-required does not; verifyMfaChallenge carries it on its wrong-code 422 and not on its
+                   401, a missing or expired challenge session (narrowed, 20 October 2026, CHG-R8DEC-001); login's 409
+                   says since when and on what.
   BR-GATE-CANCEL   (CR-171, 19 October 2026; CHG-CRA-010) a cancelled gate mode change records who, when and why in
                    its own columns, leaving the scheduler's untouched.
   BR-APPROVED-OUTCOME (20 October 2026, option A; CHG-R8DEC-002) an approved action's outcome has a writer:
@@ -463,8 +464,11 @@ def main() -> int:
     need("BR-LOGIN-ATTEMPTS", "MfaCodeInvalidProblem" in text((vm.get("responses") or {}).get("422") or {})
          and ext("MfaCodeInvalidProblem", "attemptsRemaining"),
          "verifyMfaChallenge's 422 does not carry attemptsRemaining")
-    need("BR-LOGIN-ATTEMPTS", "MfaCodeInvalidProblem" in text((vm.get("responses") or {}).get("401") or {}),
-         "verifyMfaChallenge's 401 does not carry attemptsRemaining (every 401 login and verifyMfaChallenge return)")
+    # Narrowed on 20 October 2026 (CHG-R8DEC-001): a missing or expired challenge session is not a wrong credential.
+    vm401 = text((vm.get("responses") or {}).get("401") or {})
+    need("BR-LOGIN-ATTEMPTS", "MfaCodeInvalidProblem" not in vm401 and "does not carry `attemptsRemaining`" in vm401,
+         "verifyMfaChallenge's 401 carries attemptsRemaining or does not say it does not (a missing or expired challenge "
+         "session is not a wrong credential, CHG-R8DEC-001)")
 
     # -------------------------------------------------------------- BR-GATE-CANCEL (ADAM CR-171; CHG-CRA-010)
     # Decided by Chinmay Parab on 19 October 2026, option B: a cancelled gate mode change records who, when and why

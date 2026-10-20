@@ -565,8 +565,8 @@ paths:
             (`sso-sign-in-required`, 14 October 2026, CHG-CRD-001): `detail` names the provider so the door can offer
             `startSsoAuthorization`. **Every wrong-credentials 401 (`unauthenticated`) carries `attemptsRemaining`**
             (ADAM CR-170, option D, decided 19 October 2026; CHG-CRA-009; the lead''s reading of 19 October 2026,
-            narrowed and confirmed on 20 October 2026, CHG-R8DEC-001: every wrong-credentials 401 `login` and
-            `verifyMfaChallenge` return, never `sso-sign-in-required`): the wrong attempts left before the lock, **counted per
+            narrowed and confirmed on 20 October 2026, CHG-R8DEC-001: every wrong-credentials 401 `login` returns, never
+            `sso-sign-in-required`; `verifyMfaChallenge` carries it on its wrong-code 422, not on its 401): the wrong attempts left before the lock, **counted per
             submitted username whether or not a principal has it, and per sign-in method** (password, PIN, card,
             RFID), so an unknown username has its own counter and its own lock for each method, as a known one
             does, and nothing in the answer reveals which usernames exist. `sso-sign-in-required` checks no
@@ -4498,17 +4498,15 @@ paths:
                     - $ref: '#/components/schemas/Session'
         '401':
           description: 'Missing, expired or superseded session (`unauthenticated`, `session-superseded`), as the
-            shared answer says. **It carries `attemptsRemaining`** (ADAM CR-170; CHG-CRA-009; every wrong-credentials
-            401 `login` and `verifyMfaChallenge` return, the lead''s reading of 19 October 2026 confirmed on 20 October
-            2026, CHG-R8DEC-001; here the credential is the session, and this operation has no SSO answer): the wrong codes
-            left on the challenge in the path, which a 401 does not spend, since no code is checked without the
-            session.'
+            shared answer says. **It does not carry `attemptsRemaining`**: a missing or expired challenge session is
+            not a wrong credential, and no code is checked without it (the lead, 20 October 2026, CHG-R8DEC-001). The
+            count is on the `422` of a wrong code (ADAM CR-170, option D) and on `login`''s wrong-credentials 401.'
           x-ticvai-problem-types:
           - unauthenticated
           - session-superseded
           content:
             application/problem+json:
-              schema: { $ref: '#/components/schemas/MfaCodeInvalidProblem' }
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
         '410':
           description: The challenge has expired or was voided (by a fifth wrong code, or a newer challenge for the
             same purpose). Ask for a new one (CHG-R1S-025; the r1 gate).
@@ -11016,8 +11014,8 @@ components:
               enum: [credentialChange, mfa, roleSelection]
     MfaCodeInvalidProblem:
       x-ticvai-persistence: none — error shape
-      description: '**`verifyMfaChallenge`''s 422 and 401** (ADAM CR-170, CHG-CRA-009): the shared Problem and the
-        wrong codes left on the challenge before it locks (the `429`).'
+      description: '**`verifyMfaChallenge`''s 422** (ADAM CR-170, CHG-CRA-009): the shared Problem and the wrong
+        codes left on the challenge before it locks (the `429`). Not its 401 (CHG-R8DEC-001).'
       allOf:
       - $ref: ../shared/common.yaml#/components/schemas/Problem
       - type: object
