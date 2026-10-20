@@ -1,0 +1,37 @@
+id: CHG-R8INT-031
+date: '2026-10-20'
+source: plan
+kind: plan
+proposed: '2026-10-20T18:40'
+summary: 'PRD-W1-SALE-PERMISSIONS-UI links the three tables its screens work with (catalogue.product_sale_permission,
+  catalogue.sales_channel, catalogue.product) in `builds`, as the other six products wave 1 tasks keep their tables
+  there, so a developer pulling it from ADAM gets linked files. CHG-R8INT-025 had emptied `builds` to stop the five
+  operations counting as built twice; operations stay out, tables are shared by many tasks and never counted twice.'
+decision:
+  what: 'docs/active/block-a-extra-tasks.json PRD-W1-SALE-PERMISSIONS-UI: `builds` = table catalogue.product_sale_permission,
+    table catalogue.sales_channel, table catalogue.product; `linksNothingBecause` removed.'
+  by: Chinmay
+  date: '2026-10-20'
+waivers:
+  cooling_off: {by: Chinmay, date: '2026-10-20', quote: '1 run,2 waive,3 waive, 4 dont worry about it'}
+why: 'Finding: the r8 rehearsal pull (release runbook section 4) of 20 October 2026 failed one of its five criteria on
+  this ticket alone: nothing linked (#990017 PRD-W1-SALE-PERMISSIONS-UI). The lead chose the table links and waived the
+  cooling-off: item 2 of his reply was this change.'
+keys_touched:
+  tickets: [PRD-W1-SALE-PERMISSIONS-UI]
+  files:
+  - docs/active/block-a-extra-tasks.json
+root_class: 'a hand-written task listing as built the operations another task claims'
+tickets:
+  started: []
+  unstarted: [PRD-W1-SALE-PERMISSIONS-UI]
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: a decision of the lead; no ADAM CR is needed'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-plan-closure.py
+status: open
+notes: 'Follows CHG-R8INT-025. The rehearsal pull is what catches a ticket with nothing linked; check-ticket-links
+  accepted linksNothingBecause.'

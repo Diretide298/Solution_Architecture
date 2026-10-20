@@ -926,8 +926,11 @@
    ],
    "subject": "Products wave 1: who can sell a product, screens",
    "detail": "Spec: the contracts at the release tag in ADAM (CHG-R8PRD-002 to 011), from the 16 October 2026 minutes (sources/mom/TICVAI_MoM_2026-10-16_TicketingConfig_Wireframes_Plan.md). The back-office screens are held: build the screen from the products wireframe Pallavi Sawant shares (board ids below; its 21 October revision applies the minutes), not from a generated P08 screen. Screens on the operations of PRD-W1-SALE-PERMISSIONS: the Who can sell section of B1-S04 Identity & Classification (it replaces Venue scope) and B7-S07 Channel Restrictions. Done when: the rules table edits level (everyone, venue, sales channel, workstation, role, staff member), target (picked from listSalePermissionTargets), allow or deny and note, saves the whole set and shows its one-line summary and that a deny always wins; Test a sale calls checkProductSalePermission with a venue, channel, workstation, role and staff member and shows the deciding rule; every refusal (self-grant, no allow, a deny for everyone) is shown in plain words. The target pickers call listSalePermissionTargets with the product's id.",
-   "builds": [],
-   "linksNothingBecause": "a back-office UI built from the products wireframe (the back-office screens are held, so no generated screen): the operations it calls are built by PRD-W1-SALE-PERMISSIONS (getProductSalePermissionRules, setProductSalePermissionRules, checkProductSalePermission, listSalePermissionTargets) and PRD-W1-FRAME (getSessionVenue), and its text names them and the screens (CHG-R8INT-025)"
+   "builds": [
+    "table catalogue.product_sale_permission",
+    "table catalogue.sales_channel",
+    "table catalogue.product"
+   ]
   }
  ],
  "blockA1Operations": {
