@@ -27,7 +27,12 @@ build-service-docs.py so the owners it gave and the dates here agree):
   that starts after it is ready;
 - AI engine tasks carry no points: their length is the engineer-days in block-a-extra-tasks.json (Block A) or
   plan-tasks.csv `days` (the AI review's capabilities, later blocks), never before the review's sprint for them;
-- client tasks start on day 0 and hold no one.
+- client tasks start on day 0 and hold no one;
+- **a task the lead holds takes no capacity** (docs/active/held-tasks.yaml, CHG-R8DEC-004; the lead, 20 October 2026):
+  it gets no start, no sprint and no owner here and spends none of its owner's days, so the work after it moves up
+  (the products wave 1 tasks of Sanket Keluskar and Surendra Loke, while their back-office screens wait for signed
+  wireframes). The output lists it under `held`; a task waiting on a held one is timed as if the held one were not
+  there. The pace is still measured on the whole plan, so a hold does not re-pace the rest.
 
 **Owners** come from the plan (build-service-docs.py), which keeps a pushed ticket's owner from release
 `sprintPlan.stableOwners.since` on (plan item L2) unless run with --rebalance. This script only times them; a
@@ -48,6 +53,22 @@ import sprint_plan as sp  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[1]
 DOCS = ROOT / "handoff" / "service-docs"
+HELD = ROOT / "docs" / "active" / "held-tasks.yaml"
+
+
+def held_keys(path=None) -> set:
+    """The task keys of every hold in docs/active/held-tasks.yaml (CHG-R8DEC-004); none without the file."""
+    import yaml
+    path = HELD if path is None else Path(path)
+    if not path.exists():
+        return set()
+    doc = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+    return {k for h in (doc.get("holds") or {}).values() for k in ((h or {}).get("keys") or [])}
+
+
+def without_held(items, held):
+    """The items the scheduler places: every one but the held (they take no week and no capacity)."""
+    return [it for it in items if it["key"] not in held]
 
 
 def main():
@@ -128,7 +149,9 @@ def main():
               "days": float(r.get("days") or 0) or days_of.get(r["key"]),
               "notBefore": float(r.get("notBefore") or 0), "deps": (r["dependsOn"] or "").split(),
               "client": r["area"] == "client", "block": r.get("block") or "A"} for r in rows]
-    pace_at, pace_line, _ = sp.pace_model(team, items)
+    pace_at, pace_line, _ = sp.pace_model(team, items)     # measured on the whole plan, held tasks included
+    held = held_keys() & {it["key"] for it in items}
+    items = without_held(items, held)
     res = sp.schedule(items, people, caps=caps, svc_owner=svc_owner,
                       backend_owners=(team.get("areas") or {}).get("backend") or [],
                       helper_share=team.get("helperShare") or {}, freeze=freeze,
@@ -184,6 +207,7 @@ def main():
            "sprints": [{"n": s_["n"], "name": s_["name"], "start": s_["start"].isoformat(),
                         "end": s_["end"].isoformat(), "days": s_["days"]} for s_ in sp.SPRINTS],
            "blocks": blocks, "freeze": {b: list(w) for b, w in freeze.items()},
+           "held": sorted(held),
            "holidays": {d.isoformat(): n for d, n in sp.HOLIDAYS.items()}}
     (DOCS / "block-a-schedule.json").write_text(json.dumps(out, indent=1, ensure_ascii=False), encoding="utf-8")
     last = {}
@@ -198,6 +222,7 @@ def main():
               + (f" (it ends {x['testEnds']})" if x['testEnds'] and x['testEnds'] > x['testTo'] else "")
               + (f"; AI engine to {x['aiEngineLastDay']}" if x['aiEngineLastDay'] else ""))
     print(f"  owners: {note}")
+    print(f"  held (docs/active/held-tasks.yaml): {len(held)} task(s) with no week and no capacity")
     print(f"  {len(res)} tasks -> handoff/service-docs/block-a-schedule.json")
 
 
