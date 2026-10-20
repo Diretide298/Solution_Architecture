@@ -11,7 +11,8 @@ decision:
     guest-only one. No response, security or audience change.'
   by: Chinmay
   date: '2026-10-20'
-why: 'Concern 1 of the storage-core merge report (audit/ticvai/r8-blockers/merge-storage-core-report.md): core''s
+why: 'Concern 1 of the storage-core merge report (the r8 merge report of 20 October 2026, kept with the lead''s audit
+  notes outside git): core''s
   Pattern-4 paragraph (CHG-R8SPN-018) and storage-core''s guest-only paragraph (CHG-R8MIG-023) describe different
   cases, but side by side they read as if they disagree.'
 keys_touched:

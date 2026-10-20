@@ -17,7 +17,7 @@ decision:
     it on its parent key (referencesVersionColumn); tools/derive-ddl.py keys that pair to the parent''s pair.'
   by: Chinmay
   date: '2026-10-20'
-why: 'R8 blocker APPROVALS-TENANCY-C15 (storage-sat request 8 in audit/ticvai/r8-blockers/r8b-storage-core-report.md,
+why: 'R8 blocker APPROVALS-TENANCY-C15 (storage-sat request 8 in the r8b storage-core lane report of 20 October 2026, outside git,
   generator support done in 50d04ebb, the contract marks left for the merge): a subscriber on an earlier plan version
   keeps the modules and limits they were sold, so the plan row is per version. Finding: a trial derive at the
   integration branch reported control.contract, plan_module and plan_limit "point at a table with no addressable

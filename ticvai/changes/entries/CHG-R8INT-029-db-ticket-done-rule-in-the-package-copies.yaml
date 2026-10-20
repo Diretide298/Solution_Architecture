@@ -12,7 +12,7 @@ decision:
   by: Chinmay
   date: '2026-10-20'
 why: 'Finding: check-starter-fit SF-DOCS-MIRROR backend-patterns.md after the merge of adam/faster-db-r8 (923784c4); the
-  ADAM report (audit/adam-faster-db-tickets-report.md, I4 and the checks) leaves the package copy to take the starter''s
+  ADAM faster-db-tickets report (in the ADAM workspace, outside git; I4 and the checks) leaves the package copy to take the starter''s
   sentence at the r8 merge.'
 keys_touched:
   files:

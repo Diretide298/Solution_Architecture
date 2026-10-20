@@ -25,7 +25,9 @@ docs/active/ai-phase-plan.json):
   O-NO-TAKEOVER    a module test the last release gave someone `neverTests` names, now owned, in the plan or the
                    schedule, by someone team.json `noTestTakeover` names (Surendra; CHG-R5-005)
   O-MOVE           a task block-a-extra-tasks.json `ownerMoves` moves (CHG-R5-003) still owned, in the plan or the
-                   schedule, by the person it leaves, or by anyone but the person it goes to
+                   schedule, by the person it leaves, or by anyone but the person it goes to. A task the lead holds
+                   (docs/active/held-tasks.yaml, the schedule's `held`) is nobody's in the schedule by design, so
+                   only its plan owner is checked (r8 gate, CHG-R8GT2-005)
   O-LEFT           (15 October 2026, CHG-PPL-001: Tanmay Dukhande left, Narayan Gaonkar took his place) a task owned or
                    accountable, in the plan or the schedule, by someone team.json `successors` says has left; a
                    leaver still in team.json's areas, onboard, pace, people, helpers, serviceOwners or the
@@ -115,16 +117,28 @@ def main() -> int:
     # migrations are one person's.
     by_key = {r["key"]: r for r in rows}
     moves = sp.owner_moves(extra)
+    # **A held task is nobody's in the schedule** (r8 gate, 20 October 2026, CHG-R8GT2-005): derive-block-a-schedule
+    # gives a task the lead holds (docs/active/held-tasks.yaml, CHG-R8DEC-004) no week, no capacity and no owner, and
+    # lists it under `held`; the release push takes it off the board with no assignee. Its plan row keeps the owner
+    # the move gave it, and that is what the move is held to until the hold lifts.
+    held = set(sched.get("held") or [])
+    n_held_moves = 0
     for k, (frm, to) in sorted(moves.items()):
         r = by_key.get(k)
         if r is None:
             guard.note(f"ownerMoves names {k}, which is not in the plan")
             continue
-        for where, who in (("plan", r["assignee"]), ("schedule", assign.get(k))):
+        places = [("plan", r["assignee"])]
+        if k in held:
+            n_held_moves += 1
+        else:
+            places.append(("schedule", assign.get(k)))
+        for where, who in places:
             if who != to:
                 guard.add("O-MOVE", f"{k}:{where}", f"{k} is {who or 'nobody'}'s in the {where}; ownerMoves gives it "
                                                     f"to {to} (from {frm}, CHG-R5-003)")
-    guard.note(f"{len(moves)} owner moves")
+    guard.note(f"{len(moves)} owner moves" + (f", {n_held_moves} of them on held tasks (checked in the plan only)"
+                                              if n_held_moves else ""))
     # **Never a checker** (CHG-R5-004, 7 October: Hrushikant Patkar tests no module): team.json `neverTests`.
     never = sp.never_testers(team)
     for r in rows:

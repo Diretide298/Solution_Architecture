@@ -117,7 +117,7 @@ Worklist and method: [rename-worklist-20-september.md](rename-worklist-20-septem
 
 - [ ] **Settle the rental / payments / subscription collision first.** Their 28 new tables are
       11 payment, 10 rental and 4 subscription-tier — **and we built all three the same week**,
-      in `payments` (16 tables), `rental` (21) and `subscription.contract*`. Theirs went into
+      in `payments` (16 tables), `rental` (21) and `control.contract*`. Theirs went into
       `orders`, `catalogue`, `resources`, `maintenance` and `platform`. **Two schemas for one
       domain, days apart. More expensive than every rename in the file put together**
 - [ ] **Take the 3 declared and the 24 certain.** No judgement needed on either
@@ -404,7 +404,7 @@ Writing `membership_renewal` exposed it. **No `customer_membership`, no `members
 **13 membership operations** and ~30 `Membership*View` schemas each declaring itself *"a projection
 over subscription state, assembled at read time from tables that already exist."* They do not exist.
 
-The three name matches are false friends: `subscription.contract` is the tenant's SaaS plan,
+The three name matches are false friends: `control.contract` is the tenant's SaaS plan,
 `marketing.subscription` is a mailing list, `orders.wallet_pass` is an Apple/Google pass.
 
 **`orders.membership_renewal` cannot be migrated until `orders.customer_membership` lands.**

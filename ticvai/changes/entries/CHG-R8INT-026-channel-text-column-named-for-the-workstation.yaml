@@ -11,7 +11,7 @@ decision:
   by: Chinmay
   date: '2026-10-20'
 why: 'Finding: check-ddl-conventions D-BANNED-NAME catalogue.product_channel_text.pos_button_label on the derived copy of
-  the integration pass (audit/ticvai/r8-blockers/integration-pass-report.md, left 4).'
+  the integration pass (its report of 20 October 2026, outside git, left item 4).'
 keys_touched:
   schemas: [ProductChannelTexts]
   files:

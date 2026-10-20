@@ -47,7 +47,7 @@ status: open
 notes: 'Breaking by check-contract-compat (for the lead''s entry): every marketing-crm response carrying ConsentPurpose gains
   storedPaymentCredential and facePassEnrolment (getGuestProfile, updateGuestProfile, mergeGuestProfiles, getGuestConsents,
   recordConsent, getConsentHistory, listConsentPurposes, listDataProcessingPurpose, setMinorGuardianAge and the rest the
-  check lists). Requested of the surface lane: events/paymentToken-revoked.yaml (emittedBy revokePaymentToken),
+  check lists). Requested of the surface lane: a new event file for paymentToken.revoked (emittedBy revokePaymentToken),
   events/paymentToken-stored.yaml without the consent-record consumer, the states/media.yaml guard naming the reviewer,
   and the GST-071, WEB-021 and GST-069 bindings. The two purpose rows are seeded per tenant with its other consent
   purposes (the seed''s owner). Applied on PostgreSQL 16.'
