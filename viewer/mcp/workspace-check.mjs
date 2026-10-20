@@ -7,7 +7,9 @@
 // only adds files that are missing and /update-adam only replaces the connector. So now:
 //   - /update-adam (update.mjs) and a re-run of setup replace ADAM's five command files in the workspace;
 //   - CLAUDE.md is the team's: only a section between ADAM markers is replaced; a CLAUDE.md with no markers is left
-//     exactly as it is, with one line saying which section to replace and where the new text is.
+//     exactly as it is, with one line saying which section to replace and where the new text is;
+//   - (20 October) a new section a CLAUDE.md never had ("A [DB] ticket") is added whole with its markers, and ADAM's
+//     script .claude/scripts/db-ticket.mjs is added or refreshed, kept out of git like setup's own files.
 //
 // Self-contained: its own viewer on port 8861 (the route is answered before the sign-in, so no accounts service), a
 // stand-in that lies about file names on 8862, and temporary workspaces. Nothing of the developer's is touched: the
@@ -203,6 +205,47 @@ try {
   check('a CLAUDE.md written with Windows line endings keeps them', /\r\n/.test(beMd) && !/[^\r]\n/.test(beMd), JSON.stringify(beMd.slice(0, 80)));
   check('and gets the backend section', lf(beMd).includes('No ticket named? Do not ask for a number') && !beMd.includes('OLD TEXT'));
 
+  // ── 5b. the [DB] ticket's section and script reach a backend folder made before them (20 October 2026) ──
+  const DB_RE = /<!-- ADAM:start db-ticket -->\r?\n[\s\S]*?<!-- ADAM:end db-ticket -->\r?\n/;
+  const SCRIPT = ['.claude', 'scripts', 'db-ticket.mjs'];
+  const dbInner = lf(starter('backend', 'CLAUDE.md')).match(/<!-- ADAM:start db-ticket -->\n([\s\S]*?)<!-- ADAM:end db-ticket -->/)?.[1];
+  check('the backend starter CLAUDE.md marks "A [DB] ticket" as ADAM\'s', Boolean(dbInner) && dbInner.startsWith('## A [DB] ticket'));
+  const noDb = oldWorkspace('be-no-db', 'backend', { markers: true });
+  writeFileSync(path.join(noDb, 'CLAUDE.md'), read(noDb, 'CLAUDE.md').replace(DB_RE, ''));
+  spawnSync('git', ['init', '-q'], { cwd: noDb });
+  const noDbMd = read(noDb, 'CLAUDE.md');
+  const h = updater(noDb, ['--refresh-workspace', noDb, '--from', STARTERS]);
+  const withDb = read(noDb, 'CLAUDE.md');
+  check('**a backend CLAUDE.md that never had "A [DB] ticket" gets it, with its markers, after "Working a ticket (ADAM)"**',
+    withDb.includes(`<!-- ADAM:end working-a-ticket -->\n\n<!-- ADAM:start db-ticket -->\n${dbInner}<!-- ADAM:end db-ticket -->\n`)
+      && (withDb.match(/<!-- ADAM:start db-ticket -->/g) ?? []).length === 1
+      // Everything after the working-a-ticket section, the team's "Ticket kinds" and the rest, is as it was.
+      && withDb.replace(DB_RE, '').split('<!-- ADAM:end working-a-ticket -->\n\n')[1]
+        === noDbMd.split('<!-- ADAM:end working-a-ticket -->\n')[1],
+    h.text);
+  check('and the team\'s own text above and below is where it was', withDb.startsWith('# The team\'s own heading\n\nTeam text above.') && withDb.endsWith('Team text below.\n'));
+  check('**the [DB] check script is added to .claude/scripts**', existsSync(path.join(noDb, ...SCRIPT))
+    && read(noDb, ...SCRIPT) === starter('backend', ...SCRIPT) && /added \.claude\/scripts\/db-ticket\.mjs/.test(h.text), h.text);
+  check('and kept out of git like setup\'s own files', read(noDb, '.git', 'info', 'exclude').split(/\r?\n/).includes('/.claude/scripts/db-ticket.mjs'));
+  const dbSettled = tree(noDb);
+  updater(noDb, ['--refresh-workspace', noDb, '--from', STARTERS]);
+  check('a second refresh changes nothing', changed(dbSettled, tree(noDb)).length === 0, changed(dbSettled, tree(noDb)).join(', '));
+  writeFileSync(path.join(noDb, ...SCRIPT), `${starter('backend', ...SCRIPT)}\n// an older build\n`);
+  const k2 = updater(noDb, ['--refresh-workspace', noDb, '--from', STARTERS]);
+  check('an older ADAM script is replaced, the old one kept in .adam', read(noDb, ...SCRIPT) === starter('backend', ...SCRIPT)
+    && /refreshed \.claude\/scripts\/db-ticket\.mjs/.test(k2.text)
+    && Object.keys(tree(noDb)).some((n) => /^\.adam[\\/]backup-workspace-.*db-ticket\.mjs$/.test(n)), k2.text);
+  writeFileSync(path.join(noDb, ...SCRIPT), 'console.log("the team\'s own");\n');
+  updater(noDb, ['--refresh-workspace', noDb, '--from', STARTERS]);
+  check('a script of the team\'s under the same name is theirs, and stays', read(noDb, ...SCRIPT) === 'console.log("the team\'s own");\n');
+  const bareDb = oldWorkspace('be-bare-db', 'backend', { markers: false });
+  writeFileSync(path.join(bareDb, 'CLAUDE.md'), read(bareDb, 'CLAUDE.md').replace(/## A \[DB\] ticket[\s\S]*?(?=## Searching pulled files)/, ''));
+  const bareBefore = read(bareDb, 'CLAUDE.md');
+  updater(bareDb, ['--refresh-workspace', bareDb, '--from', STARTERS]);
+  const bareAfter = read(bareDb, 'CLAUDE.md');
+  check('**a backend CLAUDE.md from before the markers gets "A [DB] ticket" added at its end, every line of it unchanged**',
+    bareAfter.startsWith(bareBefore) && bareAfter.endsWith(`<!-- ADAM:start db-ticket -->\n${dbInner}<!-- ADAM:end db-ticket -->\n`), bareAfter.slice(-200));
+
   // ── 6. a folder that is not an ADAM workspace is not written to ────
   const empty = path.join(T, 'empty');
   mkdirSync(empty, { recursive: true });
@@ -222,6 +265,10 @@ try {
   check('the viewer answers /connector/workspace before any sign-in, with the five commands and the CLAUDE.md',
     JSON.stringify(route.commands?.map((x) => x.name)) === JSON.stringify(COMMANDS) && route.role === 'frontend'
       && lf(route.claudeMd) === lf(starter('frontend', 'CLAUDE.md')), JSON.stringify(route).slice(0, 200));
+  const backendRoute = await (await fetch(`http://127.0.0.1:${PORTS.viewer}/connector/workspace?role=backend`)).json();
+  check('for the backend it also sends ADAM\'s script, .claude/scripts/db-ticket.mjs',
+    JSON.stringify(backendRoute.scripts?.map((x) => x.name)) === '["db-ticket.mjs"]'
+      && lf(backendRoute.scripts[0].text) === lf(starter('backend', '.claude', 'scripts', 'db-ticket.mjs')), JSON.stringify(backendRoute.scripts?.map((x) => x.name)));
   check('a role that is neither is refused',
     (await fetch(`http://127.0.0.1:${PORTS.viewer}/connector/workspace?role=..%2Fx`)).status === 400);
 

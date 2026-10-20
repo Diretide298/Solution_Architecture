@@ -107,6 +107,7 @@ what "built" and "tested" mean:
 
 A setup ticket links no contract or screen; that is normal, not a gap.
 
+<!-- ADAM:start db-ticket -->
 ## A [DB] ticket
 
 The ticket is one numbered SQL file in `db/<database>/` (the baseline has one in each database). Its
@@ -150,6 +151,7 @@ copies, the --full database) and its kept snapshots, and in its own container re
 membership a file made and resets role settings. Another folder's databases (template, half-built
 template, --full) go by themselves after two weeks unused, or at once when none of them carries a
 date of use (leftovers of an older version), but never while that folder is running.
+<!-- ADAM:end db-ticket -->
 
 ## Searching pulled files
 

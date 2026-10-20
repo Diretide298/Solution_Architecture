@@ -155,7 +155,13 @@ them from the viewer's `/connector/workspace?role=` (the same starters the zip c
 unzipped starters. `CLAUDE.md` is the team's: only the part between `<!-- ADAM:start name -->` and
 `<!-- ADAM:end name -->` is replaced; a `CLAUDE.md` made before the markers is left exactly as it is, with one
 line saying which section to replace and the new text in `.adam/new-claude-sections.md`. Missing files are not
-created here (setup adds them and keeps them out of git). The first `/update-adam` on an older connector brings the
+created here (setup adds them and keeps them out of git). Two exceptions, for the backend's [DB] check (20 October
+2026): ADAM's script `.claude/scripts/db-ticket.mjs` is added or refreshed (kept out of git through
+`.git/info/exclude`, as setup does), and a section a CLAUDE.md never had, `<!-- ADAM:start db-ticket -->`, is added
+whole with its markers after "Working a ticket (ADAM)" (or at the end of a CLAUDE.md without markers), so nobody
+copies it by hand. The project's `.claude/settings.json` is not touched, so an existing folder lacks the permission
+line for the script: Claude asks once before running it (allow it for the folder), or add
+`"Bash(node .claude/scripts/db-ticket.mjs:*)"` to `permissions.allow` by hand. The first `/update-adam` on an older connector brings the
 new updater and cannot use it yet, so run `/update-adam` a second time. `mcp/workspace-check.mjs` holds all of it.
 
 **By hand**, for Git Bash or a machine where the zip is not an option:
