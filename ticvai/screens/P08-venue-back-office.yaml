@@ -5785,8 +5785,9 @@ screens:
     contract: catalogue
     purpose: 'The options of the calendar''s category filter (r8, GPS-C18), read once when the screen opens; the
       chosen category is sent to `listPerformances` as `categoryId`. No component of its own: the filter is
-      part of the calendar.'
-    trigger: background
+      part of the calendar. Not background (r8 integration, CHG-R8INT-008): the user sees the options, and the
+      approved screen has no element of its own for the filter.'
+    trigger: onLoad
     provenance: r8 second round, GPS-C18 (ticket 28195)
   - operationId: getPerformance
     contract: catalogue
@@ -56207,33 +56208,43 @@ screens:
       components:
       - kind: selectField
         label: B2C
+        operation: getChannelAvailability
         provenance: pack Membership___Annual_Pass_Management_Reference.pdf, page 14 §Configure sale through
       - kind: selectField
         label: Mobile App
+        operation: getChannelAvailability
         provenance: pack Membership___Annual_Pass_Management_Reference.pdf, page 14 §Configure sale through
       - kind: selectField
         label: POS
+        operation: getChannelAvailability
         provenance: pack Membership___Annual_Pass_Management_Reference.pdf, page 14 §Configure sale through
       - kind: selectField
         label: Call Center
+        operation: getChannelAvailability
         provenance: pack Membership___Annual_Pass_Management_Reference.pdf, page 14 §Configure sale through
       - kind: selectField
         label: Box Office
+        operation: getChannelAvailability
         provenance: pack Membership___Annual_Pass_Management_Reference.pdf, page 14 §Configure sale through
       - kind: selectField
         label: Kiosk
+        operation: getChannelAvailability
         provenance: pack Membership___Annual_Pass_Management_Reference.pdf, page 14 §Configure sale through
       - kind: selectField
         label: B2B
+        operation: getChannelAvailability
         provenance: pack Membership___Annual_Pass_Management_Reference.pdf, page 14 §Configure sale through
       - kind: selectField
         label: Corporate
+        operation: getChannelAvailability
         provenance: pack Membership___Annual_Pass_Management_Reference.pdf, page 14 §Configure sale through
       - kind: selectField
         label: Reseller
+        operation: getChannelAvailability
         provenance: pack Membership___Annual_Pass_Management_Reference.pdf, page 14 §Configure sale through
       - kind: selectField
         label: API
+        operation: getChannelAvailability
         provenance: pack Membership___Annual_Pass_Management_Reference.pdf, page 14 §Configure sale through
       - kind: selectField
         label: Always Available
@@ -56285,9 +56296,17 @@ screens:
     purpose: Set the membership price in a price list
     trigger: onAction
     provenance: decided 29 September, VM close-out (venue management and configuration)
+  - operationId: getChannelAvailability
+    contract: catalogue
+    purpose: 'The membership product''s channels as published now (r8, GPS-C39): fills the channel fields, and the
+      publish sends that answer back whole with the guest''s changes (capacityLimited and fixedSalesWindow are left
+      to ADM-124).'
+    trigger: onLoad
+    provenance: r8 integration, GPS-C39 (CHG-R8INT-007)
   - operationId: publishChannelAvailability
     contract: catalogue
-    purpose: Choose the channels that sell the membership
+    purpose: 'Choose the channels that sell the membership: the whole map `getChannelAvailability` read, with the
+      changes (r8, GPS-C39)'
     trigger: onAction
     provenance: decided 29 September, VM close-out (venue management and configuration)
   - operationId: listPriceLists
@@ -56298,8 +56317,10 @@ screens:
   - operationId: listTaxProfiles
     contract: catalogue
     purpose: 'The options of the save form''s tax profile picker (r8, GPS-C34): `taxProfile` is a catalogue tax
-      profile''s id. Read once when the screen opens; no component of its own, the picker is in the form.'
-    trigger: background
+      profile''s id. Read once when the screen opens; no component of its own, the picker is in the form. Not
+      background (r8 integration, CHG-R8INT-008): the user sees the options, and the approved screen draws the
+      picker only in the form overlay''s body, not as a component.'
+    trigger: onLoad
     provenance: r8 second round, GPS-C34 (ticket 29883)
   - operationId: setMembershipCommercialConfig
     contract: subscription

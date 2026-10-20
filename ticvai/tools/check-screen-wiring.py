@@ -40,7 +40,10 @@ built from that view, and its visible YAML is fixed (check-approved-ui). A read 
 shows -- GST-067's "Tickets you can act on" rows and "Rules" note, from the guest's own refund requests and listings and
 the venue's refund terms -- names that element in the binding: `shownBy: <the element's text in the prototype>`. Such
 a read counts as reached, and S-SHOWN-BY fails a `shownBy` whose text the prototype file does not hold (as a quoted
-string), or on a screen whose layout is not an exact, client-verified prototype view.
+string), or on a screen whose layout is not an exact, client-verified prototype view. **A partial match that names its
+view counts too** (CHG-R8INT-008): the guest web's Your orders, Transfer & resale and Reservations are partial matches
+whose rows the client approved, and the lead's ruling of 20 October 2026 is that no read a person sees is marked
+`background` to escape S-OP-UNREACHED.
 
 Read-only. Exit 1 on a finding not in `handoff/audit-baseline.json` (see tools/audit_guard.py).
 
@@ -66,13 +69,20 @@ def prototype_text(rel):
     return _PROTO_TEXT[rel]
 
 
-def shown_in_prototype(s, shown):
-    """None when `shown` is a quoted string of the screen's exact client-verified prototype file, else why not."""
+def shown_in_prototype(s, shown, text_of=None):
+    """None when `shown` is a quoted string of the screen's client-verified prototype file, else why not.
+
+    The prototype is the screen's view when it matches it exactly (`match: exact`), or when it matches in part and
+    the screen names the view it is drawn from (`match: partial` with a `prototype.view`; r8 integration,
+    CHG-R8INT-008): Your orders, Transfer & resale and Reservations on the guest web are partial matches whose rows
+    the client approved, and the reads that fill those rows name them."""
     wf = s.get("wireframe") or {}
     proto = wf.get("prototype") if isinstance(wf.get("prototype"), dict) else {}
-    if wf.get("provenance") != "client-verified" or proto.get("match") != "exact" or not proto.get("file"):
-        return "its layout is not an exact, client-verified prototype view"
-    text = prototype_text(proto["file"])
+    view_named = proto.get("match") == "partial" and str(proto.get("view") or "").strip()
+    if wf.get("provenance") != "client-verified" or not (proto.get("match") == "exact" or view_named) \
+            or not proto.get("file"):
+        return "its layout is not an exact, client-verified prototype view, nor a partial one naming its view"
+    text = (text_of or prototype_text)(proto["file"])
     if not text:
         return "its prototype file %s is not present to check against" % proto["file"]
     if not any(q + shown + q in text for q in ("'", '"')):
@@ -84,8 +94,8 @@ RULES = {
     "S-STATE-BOILERPLATE": "empty-state text promises a create action, filter or permission the screen lacks (R250)",
     "S-DUP-REGION": "a region name used twice on one screen (R253)",
     "S-OP-UNREACHED": "a declared operation no component, overlay or transition reaches (R273)",
-    "S-SHOWN-BY": "an api's shownBy names text the screen's exact client-verified prototype does not hold, or the "
-                  "screen's layout is no such prototype (CHG-R8INT-003)",
+    "S-SHOWN-BY": "an api's shownBy names text the screen's client-verified prototype (exact, or partial naming its "
+                  "view) does not hold, or the screen's layout is no such prototype (CHG-R8INT-003, CHG-R8INT-008)",
     "S-ONLOAD-WRITE": "a write operation triggered onLoad (R268)",
     "S-BUTTON-FORM": "a button calls an operation with a required body and nothing collects it (R264)",
     "S-SCREEN-PERMISSION": "permissioned operations and a no-access state, but no screen permission (R255)",
@@ -180,8 +190,44 @@ def required_body(op: dict) -> bool:
     return bool(rb.get("required", False)) or "$ref" in rb
 
 
+def self_test():
+    """shown_in_prototype on made-up screens (CHG-R8INT-008): exact and view-naming partial prototypes accept a
+    quoted string they hold; a partial without a view, a generated layout and an absent string are refused."""
+    files = {"p.html": "row('r3', '2 Jul', 'AED 675 \u00b7 refunded in full', 'Invoice')"}
+    text_of = files.get
+
+    def sc(match, view=None, prov="client-verified"):
+        p = {"file": "p.html", "match": match}
+        if view:
+            p["view"] = view
+        return {"wireframe": {"provenance": prov, "prototype": p}}
+    cases = [
+        ("exact, held", sc("exact"), "AED 675 \u00b7 refunded in full", True),
+        ("partial naming its view, held", sc("partial", "Account > Order history"), "AED 675 \u00b7 refunded in full", True),
+        ("partial without a view", sc("partial"), "AED 675 \u00b7 refunded in full", False),
+        ("partial naming its view, not held", sc("partial", "Account"), "AED 999", False),
+        ("generated layout", sc("exact", prov="generated"), "Invoice", False),
+        ("none", sc("none", "x"), "Invoice", False),
+    ]
+    bad = []
+    for name, s, shown, ok in cases:
+        why = shown_in_prototype(s, shown, text_of)
+        if (why is None) != ok:
+            bad.append(f"shown_in_prototype: {name}: expected {'accepted' if ok else 'refused'}, got {why!r}")
+    return bad
+
+
 def main() -> int:
     g.force_utf8()
+    tests = self_test()
+    for x in tests:
+        print(f"  SELF-TEST  {x}")
+    if tests:
+        print(f"FAIL {len(tests)} self-test(s)")
+        return 1
+    if "--self-test" in sys.argv:
+        print("PASS - the shownBy self-tests")
+        return 0
     guard = g.Guard("check-screen-wiring", RULES)
     ops = g.operations()
     path_index = set()

@@ -1,0 +1,47 @@
+id: CHG-R8INT-007
+date: '2026-10-20'
+source: audit
+kind: contract
+summary: 'The surface lane''s changes for the merge, applied: the visit planner reads its options from the venue
+  (getVisitPlannerOptions, with listVisitPlanPresets and setVisitPlanPreset for the venue''s presets) and GST-051,
+  GST-052 and WEB-050 bind it; What''s On (GST-005) lists the venue''s events with listEvents; the meeting-room booking
+  (GST-075) sends the party as attendees; the membership channels (BO-291) read getChannelAvailability before
+  publishing it back whole. CMS-019''s role list is a visible change, parked for the client.'
+decision:
+  what: 'contracts/satellite/venue-map.yaml: getVisitPlannerOptions (GET /venues/{venueId}/visit-planner-options,
+    public with guest or staff token, VENUE_MAP_VIEW, read-via promotions#bundleRecords), listVisitPlanPresets (paged,
+    PRODUCT_VIEW), setVisitPlanPreset (PUT by presetKey, whole replace, PRODUCT_CONFIGURE, config scope venue, no
+    delete), VisitPlannerOptions. screens: GST-051 and WEB-050 interests from getVisitPlannerOptions; GST-052 ready-made
+    plans and bundles from it (listProducts and listCatalogueBundles leave it); GST-005 listEvents (shownBy the
+    prototype''s event row) with eventId optional; GST-075 attendees on addCartLine; BO-291 getChannelAvailability on
+    the channel fields. CMS-019 parked in the lane''s pending-UI list with a build note.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Each needed an operation another lane added (core: listEvents for guests, attendees, getChannelAvailability;
+  storage-sat: venuemap.visit_plan_preset), so the surface lane listed them for the merge. The lead''s answers of
+  20 October 2026: GPS-C21 answer B (venue-defined presets), GPS-C30, GPS-C28, GPS-C39, IDENTITY-C15. Finding: R8
+  blocker cause list (GPS-C21, GPS-C30, GPS-C28, GPS-C39, IDENTITY-C15).'
+keys_touched:
+  operations: [getVisitPlannerOptions, listVisitPlanPresets, setVisitPlanPreset, listEvents, addCartLine,
+    getChannelAvailability, publishChannelAvailability]
+  screens: [GST-051, GST-052, WEB-050, GST-005, GST-075, BO-291, CMS-019]
+  schemas: [VisitPlannerOptions]
+  files:
+  - contracts/satellite/venue-map.yaml
+  - screens/P01-guest-web-storefront.yaml
+  - screens/P02-guest-mobile-app.yaml
+  - screens/P08-venue-back-office.yaml
+root_class: 'a request one lane made of another, applied at the integration'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: r8 integration pass'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: open
+notes: 'No visible field changed (check-approved-ui passes). listVisitPlanPresets and setVisitPlanPreset have no screen
+  yet: the venue''s preset editor is not in Block A, and the six seeded presets serve until it is.'

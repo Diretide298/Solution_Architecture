@@ -2215,7 +2215,7 @@ screens:
         - Bundle.savingsAmount
         - Bundle.savingsPercentage
         - Bundle.hasBeenSold
-        operation: getBundle
+        operation: getGuestBundle
         provenance: contract promotions.yaml GET /bundles/{bundleId}
         notes: A bundle the recommendation slot names (`kind` bundle), opened from its card; signed catalogue
           snapshots (`listCatalogueBundles`) are the tills', not the guest's (R269).
@@ -2255,9 +2255,9 @@ screens:
     contract: orders
     purpose: Add a suggested add-on or the offered bundle to the cart
     trigger: onAction
-  - operationId: getBundle
+  - operationId: getGuestBundle
     contract: promotions
-    purpose: A bundle offered as an upsell
+    purpose: A bundle offered as an upsell, in the guest shape (r8, ORDERS-MONEY-C32, CHG-R8INT-009)
     trigger: onAction
   - operationId: decideRecommendations
     contract: ai
@@ -2585,7 +2585,7 @@ screens:
         - CouponCode.validFrom
         - CouponCode.validTo
         - CouponCode.redeemedAt
-        operation: getCouponCode
+        operation: getGuestCouponCode
         provenance: contract promotions.yaml GET /coupon-codes/{code}
       - kind: textField
         label: Promo code
@@ -2722,9 +2722,9 @@ screens:
     contract: promotions
     purpose: Evaluate promotions against a cart
     trigger: onAction
-  - operationId: getCouponCode
+  - operationId: getGuestCouponCode
     contract: promotions
-    purpose: 'Look up a code With the guest session the device already holds: signed in, or the anonymous
+    purpose: 'In the guest shape (r8, ORDERS-MONEY-C32, CHG-R8INT-009). Look up a code With the guest session the device already holds: signed in, or the anonymous
       cart session a visitor gets with the first line (ADR-0045) (decided 2 October 2026 by Chinmay, fix
       before Block A starts (GFIX-6)).'
     trigger: onLoad
@@ -4969,9 +4969,10 @@ screens:
     contract: orders
     purpose: 'The guest''s own refund requests and their status, shown on the rows of Your orders (the prototype''s
       "refunded in full" and the request a guest has open on an order), matched by order; no component of its own,
-      since the approved screen draws none (r8 second round: the prototype view is a partial match, so no
-      shownBy). Read once when the screen opens and after Ask for a refund.'
-    trigger: background
+      since the approved screen draws none: the prototype''s Order history row shows it (shownBy, r8 integration,
+      CHG-R8INT-008). Read once when the screen opens and after Ask for a refund.'
+    trigger: onLoad
+    shownBy: AED 675 · refunded in full
     provenance: r8 walk, 20 October 2026 (ORDERS-MONEY-C26, CHG-R8SPN-012)
   - operationId: listMyOrders
     contract: orders
@@ -7257,9 +7258,10 @@ screens:
     contract: orders
     purpose: 'The guest''s own resale listings and their status, shown on the rows of Your orders with tickets
       (the prototype''s "Listed for resale" row), matched by order; no component of its own, since the approved
-      screen draws none (r8 second round: the prototype view is a partial match, so no shownBy). Read once when
-      the screen opens and after Create resale listing.'
-    trigger: background
+      screen draws none: the prototype''s Transfer & resale row shows it (shownBy, r8 integration, CHG-R8INT-008).
+      Read once when the screen opens and after Create resale listing.'
+    trigger: onLoad
+    shownBy: Listed for resale · AED 180
     provenance: r8 walk, 20 October 2026 (ORDERS-MONEY-C26, CHG-R8SPN-012)
   - operationId: transferOrderTickets
     contract: orders
@@ -7614,8 +7616,9 @@ screens:
     purpose: 'The school trips and parties this guest asked for, provisional ones included: they are rows of Your
       reservations beside the reservations (the prototype''s "School group, 32 pupils · invoice due" row), and a
       picked one opens The group booking (`getGroupBooking`). No component of its own, since the approved screen
-      draws none (r8 second round: the prototype view is a partial match, so no shownBy).'
-    trigger: background
+      draws none: the prototype''s Reservations row shows it (shownBy, r8 integration, CHG-R8INT-008).'
+    trigger: onLoad
+    shownBy: Summit Peaks · School group, 32 pupils
     provenance: r8 walk, 20 October 2026 (ORDERS-MONEY-C26, CHG-R8SPN-012)
   - operationId: listGroupPackages
     contract: catalogue
@@ -11217,7 +11220,7 @@ screens:
         provenance: decided 29 September 2026, MOB-6
       - kind: multiSelect
         label: What are you most interested in?
-        operation: listProducts
+        operation: getVisitPlannerOptions
         notes: Interest tags of the venue.
         provenance: decided 29 September 2026, MOB-6
       - kind: multiSelect
@@ -11344,6 +11347,12 @@ screens:
     purpose: The tenant's active venues, for the park-per-day choice in a multi-venue tenant
     trigger: onLoad
     provenance: decided 30 September 2026, client meeting MoM 4.7 (Allam)
+  - operationId: getVisitPlannerOptions
+    contract: venue-map
+    purpose: 'The planner''s choices from the venue''s data (r8, GPS-C21): the interest tags of its parks fill What
+      are you most interested in?, and the ready-made plans and Fast Track bundles come from the same read.'
+    trigger: onLoad
+    provenance: r8 integration, GPS-C21 (CHG-R8INT-007)
   entryState:
     params:
     - name: venueId

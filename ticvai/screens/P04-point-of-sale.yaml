@@ -2647,8 +2647,9 @@ screens:
     contract: catalogue
     purpose: 'The cold entry (r8, GPS-C05): a link to a performance that has happened offers the next performance
       of the same event, the first upcoming one `listPerformances` returns for the performance''s `eventId`
-      (`getPerformance`). Not called on the ordinary way in.'
-    trigger: background
+      (`getPerformance`). Not called on the ordinary way in. Not background (r8 integration, CHG-R8INT-008): the
+      cashier sees the performance it offers, and the approved screen has no element of its own for the offer.'
+    trigger: onLoad
     provenance: r8 second round, GPS-C05 (ticket 28206)
   entryState:
     params:

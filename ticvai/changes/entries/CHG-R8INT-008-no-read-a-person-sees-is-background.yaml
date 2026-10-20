@@ -1,0 +1,46 @@
+id: CHG-R8INT-008
+date: '2026-10-20'
+source: audit
+kind: spec
+summary: 'No read a person sees is marked background. The reads the r8 lanes bound as background to clear
+  S-OP-UNREACHED are bound by the prototype element that shows them where the client''s prototype view shows it
+  (WEB-019, WEB-030, WEB-031: partial matches that name their view, which check-screen-wiring now accepts), and
+  otherwise go back to onLoad (onAction for GST-048, read on a tap) and stay unreached, listed for the client note:
+  GST-059, GST-048, BO-015, BO-291, POS-004.'
+decision:
+  what: 'tools/check-screen-wiring.py: shown_in_prototype accepts a client-verified prototype with `match: partial` and
+    a `prototype.view`, with self-tests run first; screens/_schema.yaml documents it and the rule; screens: shownBy
+    and onLoad on WEB-019 listOwnRefundRequests, WEB-030 listOwnResaleListings, WEB-031 listOwnGroupBookings; onLoad on
+    GST-059 listMyVisitPlans, BO-015 listProductCategories, BO-291 listTaxProfiles, POS-004 listPerformances; onAction
+    on GST-048 listProductVariants.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'The lead''s ruling of 20 October 2026 (r8 integration brief, item 5): "no read a person sees is marked
+  background". The surface lane had marked these background because S-OP-UNREACHED skips background reads and the
+  partial-match prototypes could not take shownBy. Finding: r8 integration check-screen-wiring run of 20 October 2026
+  (ORDERS-MONEY-C26, GPS-C18, GPS-C34, GPS-C05, ORDERS-MONEY-C40).'
+keys_touched:
+  operations: [listOwnRefundRequests, listOwnResaleListings, listOwnGroupBookings, listMyVisitPlans,
+    listProductCategories, listTaxProfiles, listPerformances, listProductVariants]
+  screens: [WEB-019, WEB-030, WEB-031, GST-059, GST-048, BO-015, BO-291, POS-004]
+  files:
+  - tools/check-screen-wiring.py
+  - screens/_schema.yaml
+  - screens/P01-guest-web-storefront.yaml
+  - screens/P02-guest-mobile-app.yaml
+  - screens/P04-point-of-sale.yaml
+  - screens/P08-venue-back-office.yaml
+root_class: 'A-SCREEN: a declared operation no component reaches (R273)'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: r8 integration pass'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: open
+notes: 'Five S-OP-UNREACHED findings are left visible on purpose (GST-059, GST-048, BO-015, BO-291, POS-004): an
+  approved screen lacks the element, which goes in the client note; they are not baselined.'
