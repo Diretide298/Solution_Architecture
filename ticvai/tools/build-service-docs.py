@@ -2235,7 +2235,8 @@ def main() -> int:
             is_ai = t_["epic"] == "AI-ENGINE"
             pts = "" if is_ai else int(t_["points"])
             who = t_.get("assignee") or (min(backend_, key=lambda x: load[x]) if backend_ else "")
-            if not is_ai and who:
+            # a task due now (`due`, CHG-R8INT-032) is not balanced against anyone's load: it names its owner
+            if not is_ai and who and not t_.get("due"):
                 load[who] += pts
             db_tables_ = ticket_done.hand_db_tables(t_)
             for x_ in db_tables_:
@@ -3222,10 +3223,13 @@ def main() -> int:
         step_of(t_["key"])
 
     people, pool_caps, _ = sp.load_team(team)
-    days_ex = {}
+    days_ex, due_ex = {}, {}
     if EXTRA.exists():
         days_ex = {e["key"]: float(e["days"]) for e in json.loads(EXTRA.read_text(encoding="utf-8")).get("tasks") or []
                    if e.get("days")}
+        # **A hand-written task due on a date** (`due`, CHG-R8INT-032; the lead, 20 October 2026, the r8 database updates):
+        # the scheduler places it first, at that date (sprint_plan.due_of), and it has no module test (am_tasks below)
+        due_ex = sp.due_of(json.loads(EXTRA.read_text(encoding="utf-8")).get("tasks") or [])
 
     def pool_of(t_):
         if t_["track"] == "AI":
@@ -3269,6 +3273,7 @@ def main() -> int:
         return [{"key": t_["key"], "who": t_["assignee"] or None, "pool": t_.get("pool") or pool_of(t_),
                  "track": t_["track"], "service": t_["service"], "points": int(t_["points"] or 0),
                  "days": t_.get("days") or days_ex.get(t_["key"]), "notBefore": t_.get("notBefore") or 0,
+                 "due": due_ex.get(t_["key"]),
                  "deps": t_["dependsOn"].split(), "client": t_["area"] == "client",
                  "block": block_of_task(t_["key"]), "peerOf": t_.get("peerOf"),
                  "paceExclude": bool(am_of.get(t_["key"]) and (am_info.get(am_of[t_["key"]]) or {}).get("scheduleAfter")),
@@ -3487,6 +3492,8 @@ def main() -> int:
     TRACK_ORDER["Test"] = 6
     am_tasks = defaultdict(list)
     for t_ in leaf:
+        if t_["key"] in due_ex:            # a chore due now (CHG-R8INT-032) is no part of what a module test tests
+            continue
         am_tasks[am_of[t_["key"]]].append(t_)
 
     # AM-AI-ENGINE-A2 (CHG-RONEP-010) is AI engine work like a later capability: accepted on its own module test, it
