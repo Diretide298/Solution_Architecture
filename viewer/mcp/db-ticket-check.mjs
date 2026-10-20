@@ -138,6 +138,109 @@ INSERT INTO platform.schema_version (version, description, checksum) VALUES ('V0
     'a forward migration also gets the keys into its tables from tables made before it (promotions.voucher.voucher_batch_id_fkey)', JSON.stringify(into?.guard));
   ok(!ticketStatements(tenantFiles, { kind: 'tables', tables: ['promotions.voucher_batch'] }).some((s) => s.guard?.incoming),
     'a first-release migration does not: the cross-schema keys ticket adds those');
+
+  // r8 final re-walk, expected-schema-statements-miss-schema-move (MIG-PLATFORM #27665 and #28358): a table's
+  // statements belong to the ticket that owns its final name, whatever names it had on the way. Its CREATE, keys,
+  // indexes and row-level security under every earlier name, and the RENAME TO or SET SCHEMA itself, in package order.
+  const moves = [
+    { name: '010-p.sql', text: `CREATE TABLE IF NOT EXISTS p.link (id uuid PRIMARY KEY NOT NULL);
+CREATE TABLE IF NOT EXISTS p.request (id uuid PRIMARY KEY NOT NULL, link_id uuid NOT NULL);
+CREATE TABLE IF NOT EXISTS p.hold (id uuid PRIMARY KEY NOT NULL);
+CREATE TABLE IF NOT EXISTS q.line (id uuid PRIMARY KEY NOT NULL, hold_id uuid);` },
+    { name: '900-foreign-keys.sql', text: `ALTER TABLE p.request ADD CONSTRAINT request_link_id_fkey FOREIGN KEY (link_id) REFERENCES p.link(id);
+ALTER TABLE q.line ADD CONSTRAINT line_hold_id_fkey FOREIGN KEY (hold_id) REFERENCES p.hold(id);` },
+    { name: '910-indexes.sql', text: `CREATE INDEX IF NOT EXISTS request_link_id_idx ON p.request (link_id);
+CREATE INDEX IF NOT EXISTS hold_made_idx ON p.hold (id);
+CREATE INDEX IF NOT EXISTS hold_made_idx ON q.line (id);` },
+    { name: '920-row-level-security.sql', text: `SELECT platform.apply_tenant_rls('p.request'::regclass);
+SELECT platform.apply_tenant_rls('p.hold'::regclass);` },
+    { name: 'V0103a__names.sql', text: `DO $$ BEGIN IF to_regclass('p.link') IS NOT NULL AND to_regclass('s.link') IS NULL THEN ALTER TABLE p.link SET SCHEMA s; END IF; END $$;
+DO $$ BEGIN IF to_regclass('p.hold') IS NOT NULL AND to_regclass('p.reservation') IS NULL THEN ALTER TABLE p.hold RENAME TO reservation; END IF; END $$;
+DO $$ BEGIN IF to_regclass('p.hold_made_idx') IS NOT NULL THEN ALTER INDEX p.hold_made_idx RENAME TO reservation_made_idx; END IF; END $$;
+DO $$ DECLARE p name; BEGIN IF to_regclass('p.reservation') IS NOT NULL THEN FOR p IN SELECT polname FROM pg_policy WHERE polrelid = to_regclass('p.reservation') AND left(polname, 5) = 'hold_' LOOP EXECUTE format('ALTER POLICY %I ON p.reservation RENAME TO %I', p, CASE WHEN substr(p, 5) = '_scope' THEN left('reservation', 57) ELSE left('reservation', 55) END || substr(p, 5)); END LOOP; END IF; END $$;` },
+    { name: 'V0105a__names.sql', text: `DO $$ BEGIN IF to_regclass('p.request') IS NOT NULL AND to_regclass('s.request') IS NULL THEN ALTER TABLE p.request SET SCHEMA s; END IF; END $$;` },
+    { name: 'V0108__after.sql', text: `ALTER TABLE s.request ADD COLUMN IF NOT EXISTS cell_results jsonb;
+ALTER TABLE p.reservation ADD COLUMN IF NOT EXISTS note text;
+DO $$ BEGIN IF to_regclass('p.reservation_made_idx') IS NOT NULL THEN DROP INDEX p.reservation_made_idx; END IF; END $$;` },
+  ];
+  // Each picked statement against what it must be, in order: [file, a pattern of its text].
+  const same = (list, want) => list.length === want.length && want.every(([file, rx], i) => list[i].file === file && rx.test(list[i].sql));
+  const brief = (list) => list.map((s) => `${s.file}: ${s.sql.replace(/^DO \$\$ (DECLARE p name; )?BEGIN IF .*? THEN /, '').slice(0, 60)}`);
+  const moved = ticketStatements(moves, { kind: 'tables', tables: ['s.request', 's.link'] });
+  ok(same(moved, [
+    ['010-p.sql', /^CREATE TABLE IF NOT EXISTS p\.link /],
+    ['010-p.sql', /^CREATE TABLE IF NOT EXISTS p\.request /],
+    ['900-foreign-keys.sql', /^ALTER TABLE p\.request ADD CONSTRAINT request_link_id_fkey .* REFERENCES p\.link\(id\)$/],
+    ['910-indexes.sql', /^CREATE INDEX IF NOT EXISTS request_link_id_idx ON p\.request /],
+    ['920-row-level-security.sql', /^SELECT platform\.apply_tenant_rls\('p\.request'/],
+    ['V0103a__names.sql', /ALTER TABLE p\.link SET SCHEMA s;/],
+    ['V0105a__names.sql', /ALTER TABLE p\.request SET SCHEMA s;/],
+    ['V0108__after.sql', /^ALTER TABLE s\.request ADD COLUMN IF NOT EXISTS cell_results/],
+  ]) && moved[2].guard?.table === 'p.request' && moved[2].guard.references === 'p.link',
+  '**a moved table (platform.dsar_request -> sync.dsar_request): its CREATE, key, index and policy under the old schema, the SET SCHEMA itself, then what names it in the new one, in package order**',
+  brief(moved).join(' | '));
+  const renamed = ticketStatements(moves, { kind: 'tables', tables: ['p.reservation'] });
+  ok(same(renamed, [
+    ['010-p.sql', /^CREATE TABLE IF NOT EXISTS p\.hold /],
+    ['910-indexes.sql', /^CREATE INDEX IF NOT EXISTS hold_made_idx ON p\.hold /],
+    ['920-row-level-security.sql', /^SELECT platform\.apply_tenant_rls\('p\.hold'/],
+    ['V0103a__names.sql', /ALTER TABLE p\.hold RENAME TO reservation;/],
+    ['V0103a__names.sql', /ALTER INDEX p\.hold_made_idx RENAME TO reservation_made_idx;/],
+    ['V0103a__names.sql', /ALTER POLICY %I ON p\.reservation RENAME TO %I/],
+    ['V0108__after.sql', /^ALTER TABLE p\.reservation ADD COLUMN IF NOT EXISTS note/],
+    ['V0108__after.sql', /DROP INDEX p\.reservation_made_idx;/],
+  ]), '**a renamed table (catalogue.inventory_hold -> inventory_reservation): the same, with its index and policy renames and a later DROP INDEX under the new name; q.line\'s index of the same name is not its**',
+  brief(renamed).join(' | '));
+  const line = ticketStatements(moves, { kind: 'tables', tables: ['q.line'] });
+  const lineKey = line.find((s) => s.guard?.constraint === 'line_hold_id_fkey');
+  ok(line.length === 3 && /REFERENCES p\.reservation\(id\)$/.test(lineKey?.sql) && lineKey.guard.references === 'p.reservation' && lineKey.guard.table === 'q.line'
+    && line.some((s) => /hold_made_idx ON q\.line/.test(s.sql)) && !line.some((s) => /RENAME/.test(s.sql)),
+  'another ticket\'s key into a renamed table names it as that table\'s ticket left it (REFERENCES p.reservation, not p.hold), guard too', brief(line).join(' | '));
+  const request = ticketStatements(moves, { kind: 'tables', tables: ['s.request'] });
+  const requestKey = request.find((s) => s.guard?.constraint === 'request_link_id_fkey');
+  ok(!request.some((s) => /p\.link SET SCHEMA|TABLE IF NOT EXISTS p\.link/.test(s.sql)) && /REFERENCES s\.link\(id\)$/.test(requestKey?.sql) && requestKey.guard.references === 's.link'
+    && request.some((s) => /p\.request SET SCHEMA s/.test(s.sql)),
+  'a table moved with another ticket\'s: that move is not its, and its key into the other names it where that ticket left it (s.link)', brief(request).join(' | '));
+  const movedModel = schemaModel(moves).tables;
+  const reservation = movedModel.get('p.reservation');
+  ok(movedModel.get('s.request')?.foreignKeys[0]?.references === 's.link' && movedModel.get('q.line')?.foreignKeys[0]?.references === 'p.reservation'
+    && !movedModel.has('p.request') && !movedModel.has('p.hold')
+    && reservation?.rls.policies.map((p) => p.name).join() === 'reservation_scope' && reservation.indexes.length === 0
+    && movedModel.get('q.line')?.indexes.map((i) => i.name).join() === 'hold_made_idx',
+  '**the expected shape: a key into a moved or renamed table names it where it is now (PostgreSQL follows the table), and its policies and indexes are renamed with it**',
+  JSON.stringify([...movedModel.values()].map((t) => [t.name, t.foreignKeys.map((k) => k.references), t.rls.policies.map((p) => p.name), t.indexes.map((i) => i.name)])));
+
+  // The same on the real r8 package: MIG-PLATFORM (#27665) and V1241__sync.sql (#28358).
+  const platform = ['platform.audit_read', 'platform.audit_record', 'platform.denomination', 'platform.device', 'platform.idempotency_record',
+    'platform.outbox', 'platform.outlet', 'platform.outlet_opening_hour', 'platform.region_settings', 'platform.sale_board', 'platform.sale_board_page',
+    'platform.sale_board_tile', 'platform.scope', 'platform.tenant', 'platform.venue_settings', 'platform.workstation', 'sync.dsar_request', 'sync.guest_link'];
+  const mig = ticketStatements(tenantFiles, { kind: 'tables', tables: platform });
+  const at = (rx) => mig.findIndex((s) => rx.test(s.sql));
+  const need = [/^CREATE TABLE IF NOT EXISTS platform\.dsar_request\b/, /^CREATE TABLE IF NOT EXISTS platform\.guest_link\b/,
+    /^ALTER TABLE platform\.dsar_request ADD CONSTRAINT dsar_request_guest_link_id_fkey\b/, /^ALTER TABLE platform\.dsar_request ADD CONSTRAINT dsar_request_request_id_fkey\b/,
+    /^CREATE INDEX IF NOT EXISTS dsar_request_guest_link_id_idx ON platform\.dsar_request\b/, /^CREATE INDEX IF NOT EXISTS dsar_request_request_id_idx ON platform\.dsar_request\b/,
+    /^SELECT platform\.apply_parent_rls\('platform\.dsar_request'/, /^SELECT platform\.apply_tenant_rls\('platform\.guest_link'/,
+    /ALTER TABLE platform\.guest_link SET SCHEMA sync/, /ALTER TABLE platform\.dsar_request SET SCHEMA sync/,
+    /^ALTER TABLE sync\.dsar_request ADD COLUMN IF NOT EXISTS cell_results\b/];
+  const where = need.map(at);
+  ok(where.every((i) => i >= 0) && where[9] < where[10] && where[0] < where[9] && mig[where[9]].file.startsWith('V0105a__')
+    && new Set(mig.map((s) => s.file)).has(mig[where[9]].file),
+  '**MIG-PLATFORM: sync.dsar_request and sync.guest_link get their CREATEs, keys, indexes and policies under platform, the two moves (V0103a, V0105a) and then V0108**',
+  need.map((rx, i) => `${where[i]} ${rx.source.slice(0, 50)}`).join(' | '));
+  const sync = ticketStatements(tenantFiles, { kind: 'tables', tables: ['sync.cross_region_entitlement', 'sync.wallet_authorisation'], forward: true });
+  const syncKey = (name) => sync.find((s) => s.guard?.constraint === name);
+  ok(sync.some((s) => /^CREATE TABLE IF NOT EXISTS platform\.cross_region_entitlement\b/.test(s.sql)) && sync.some((s) => /^CREATE TABLE IF NOT EXISTS platform\.wallet_authorisation\b/.test(s.sql))
+    && sync.some((s) => /ALTER TABLE platform\.cross_region_entitlement SET SCHEMA sync/.test(s.sql)) && sync.some((s) => /ALTER TABLE platform\.wallet_authorisation SET SCHEMA sync/.test(s.sql))
+    && syncKey('cross_region_entitlement_guest_link_id_fkey')?.guard.references === 'sync.guest_link'
+    && syncKey('wallet_authorisation_wallet_hold_id_fkey')?.guard.references === 'wallet.fund_reservation'
+    && /REFERENCES wallet\.fund_reservation\(id\)/.test(syncKey('wallet_authorisation_wallet_hold_id_fkey')?.sql),
+  '**#28358 V1241__sync.sql: its two tables made under platform and moved, and its keys into sync.guest_link and wallet.fund_reservation by the names earlier tickets left them**',
+  `${sync.length} statements: ${brief(sync).slice(0, 6).join(' | ')}`);
+  const hold = ticketStatements(tenantFiles, { kind: 'tables', tables: ['catalogue.inventory_reservation'] });
+  ok(hold.some((s) => /^CREATE TABLE IF NOT EXISTS catalogue\.inventory_hold\b/.test(s.sql)) && hold.some((s) => /ALTER TABLE catalogue\.inventory_hold RENAME TO inventory_reservation/.test(s.sql))
+    && hold.some((s) => /ALTER POLICY %I ON catalogue\.inventory_reservation RENAME/.test(s.sql)),
+  'the real package\'s renames go the same way: catalogue.inventory_reservation gets catalogue.inventory_hold\'s CREATE, the rename and its policy rename',
+  brief(hold).slice(0, 4).join(' | '));
 }
 
 // ---- 2. the snapshot compare --------------------------------------------------------------------
@@ -248,6 +351,9 @@ const expectedOf = {};
       touches: [{ kind: 'table', id: 'platform.outlet' }, { kind: 'table', id: 'fnb.menu' }] },
     9400: { workPackage: { key: '9400', subject: '[DB] Migration V0002__api_client.sql: control api client (1 tables)', description: 'Control database. Tables: control.api_client.' },
       touches: [{ kind: 'table', id: 'control.api_client' }] },
+    // r8 final re-walk: MIG-PLATFORM (#27665) owns two tables r8 moves from platform to sync.
+    9017: { workPackage: { key: '9017', subject: '[DB] Migration V0017__platform.sql: platform (3 tables)', description: 'Tenant database.' },
+      touches: ['platform.scope', 'sync.dsar_request', 'sync.guest_link'].map((id) => ({ kind: 'table', id })) },
   };
   let fileReads = 0;
   let failRead = null;
@@ -308,6 +414,19 @@ const expectedOf = {};
   ok(expectedOf[9400]?.checks?.[0]?.database === 'control' && new Set(servers.map((x) => x.replace(/^\w+ /, ''))).size === 1
     && servers.every((x) => x.endsWith(JSON.stringify(c?.server))) && expectedOf[9300].checks[0].statements.some((s) => /apply_parent(_split)?_across_rls/.test(s.sql)),
   '**every check carries the same server-wide set, control\'s too (the role a tenant file makes is the server\'s)**', servers.join(' | '));
+
+  await pull.run(client, { key: '9017', dir });
+  const moved17 = JSON.parse(read('9017', 'expected-schema.json') ?? 'null')?.checks?.[0];
+  const madeAt = (rx) => moved17?.statements.findIndex((s) => rx.test(s.sql)) ?? -1;
+  ok(moved17 && !moved17.notInPackageDdl && moved17.sources.includes('backend/tenant/V0105a__names_early_after_r1_20261020.sql')
+    && moved17.sources.includes('backend/tenant/V0103a__names_early_after_r1_20261020.sql')
+    && madeAt(/^CREATE TABLE IF NOT EXISTS platform\.dsar_request\b/) >= 0
+    && madeAt(/^CREATE TABLE IF NOT EXISTS platform\.dsar_request\b/) < madeAt(/ALTER TABLE platform\.dsar_request SET SCHEMA sync/)
+    && madeAt(/ALTER TABLE platform\.dsar_request SET SCHEMA sync/) < madeAt(/^ALTER TABLE sync\.dsar_request ADD COLUMN/)
+    && moved17.tables['sync.dsar_request']?.foreignKeys.find((k) => k.name === 'dsar_request_guest_link_id_fkey')?.references === 'sync.guest_link',
+  '**r8 re-walk, MIG-PLATFORM: expected-schema.json makes sync.dsar_request from its CREATE under platform and V0105a\'s move (V0105a in sources), and its key names sync.guest_link**',
+  JSON.stringify({ sources: moved17?.sources, statements: moved17?.statements?.length, absent: moved17?.notInPackageDdl,
+    keys: moved17?.tables?.['sync.dsar_request']?.foreignKeys?.map((k) => `${k.name}->${k.references}`) }));
 
   await pull.run(client, { key: '9034', dir });
   const fk = JSON.parse(read('9034', 'expected-schema.json') ?? 'null')?.checks?.[0];

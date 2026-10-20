@@ -406,6 +406,13 @@ ADAM serving `ticvai/`) and, with Docker, the script on a developer folder made 
 including the files that must fail. `--package` requires the statements tickets are given to make
 exactly the database the whole package makes, tenant and control.
 
+A table's statements belong to the ticket that owns its final name, whatever names it had on the way
+(r8 final re-walk, MIG-PLATFORM #27665 and #28358): `sync.dsar_request` is given `010-platform.sql`'s
+`CREATE TABLE platform.dsar_request`, its keys, indexes and policies under that name, and V0105a's
+`SET SCHEMA sync`, in package order; a rename inside one schema (`catalogue.inventory_hold` to
+`inventory_reservation`) goes the same way. Another ticket's table that the package later renames or
+moves is named by its final name, since its own ticket has made it so by then.
+
 ## What is deliberately not here
 
 A background sync of `.adam/`. Pulling is on request, so the files say when they were pulled

@@ -891,19 +891,19 @@ function alterTable(model, stmt, file, notModelled) {
   const table = model.get(name);
   if (!table) return;
   const rest = stmt.slice(head[0].length);
-  const renamed = /^RENAME\s+TO\s+([\w"]+)$/i.exec(rest);
-  if (renamed) {
+  // A rename (catalogue.inventory_hold -> inventory_reservation) or one of r8's schema moves
+  // (platform.dsar_request -> sync.dsar_request, keeping its name): PostgreSQL follows the table by
+  // its oid, so every key and parent policy that points at it now names the new name too.
+  const renamedTo = tableRename(stmt)?.to;
+  if (renamedTo) {
     model.delete(name);
-    table.name = `${schema}.${ident(renamed[1])}`;
+    table.name = renamedTo;
     model.set(table.name, table);
-    return;
-  }
-  // r8's schema moves (platform.dsar_request -> sync.dsar_request): the table keeps its name in the new schema.
-  const moved = /^SET\s+SCHEMA\s+([\w"]+)$/i.exec(rest);
-  if (moved) {
-    model.delete(name);
-    table.name = `${ident(moved[1])}.${name.split('.').pop()}`;
-    model.set(table.name, table);
+    for (const t of model.values()) {
+      for (const k of t.foreignKeys) if (k.references === name) k.references = renamedTo;
+      for (const p of t.rls.policies) if (p.uses === name) p.uses = renamedTo;
+    }
+    for (const n of notModelled) if (n.table === name) n.table = renamedTo;
     return;
   }
   for (const action of splitTop(rest)) {
@@ -990,7 +990,7 @@ const RLS_MARKER = {
 
 // The r8 helpers that split a table's policy in four (read, append, update, delete), named after the
 // first 55 characters of the table: apply_split_rls and the ones that call it, and append_audit.
-const SPLIT_RLS = new Set(['split', 'read_beneath', 'grant_holder_read', 'grant_holder_subject_read', 'parent_split', 'append_audit']);
+const SPLIT_RLS = new Set(['split', 'read_beneath', 'grant_holder_read', 'grant_holder_subject_read', 'parent_split', 'append_audit', 'own_row']);
 
 function applyRls(model, stmt) {
   const m = /^SELECT\s+platform\.apply_(\w+?)_rls\s*\(([\s\S]*)\)$/i.exec(stmt);
@@ -1030,11 +1030,52 @@ export function doInner(stmt) {
 
 const INDEX_RENAME = /^ALTER\s+INDEX\s+(?:IF\s+EXISTS\s+)?([\w".]+)\s+RENAME\s+TO\s+([\w"]+)/i;
 
+/**
+ * A statement that gives a table another name: `ALTER TABLE a.t RENAME TO u` ({ from: 'a.t', to: 'a.u' }) or
+ * `ALTER TABLE a.t SET SCHEMA b` ({ from: 'a.t', to: 'b.t' }). Null for anything else.
+ */
+export function tableRename(stmt) {
+  const m = /^ALTER\s+TABLE\s+(?:IF\s+EXISTS\s+)?(?:ONLY\s+)?([\w".]+)\s+(?:RENAME\s+TO\s+([\w"]+)|SET\s+SCHEMA\s+([\w"]+))\s*$/i.exec(String(stmt).trim());
+  if (!m) return null;
+  const from = ident(m[1]);
+  const [schema, short] = from.includes('.') ? from.split('.') : ['public', from];
+  return { from, to: m[2] ? `${schema}.${ident(m[2])}` : `${ident(m[3])}.${short}` };
+}
+
+// The tables an index named `raw` can be on: an index lives in its table's schema, so a qualified name
+// (wallet.risk_rules_scope_path_idx) is never payments.risk_rules' index of the same name.
+function tablesOfIndex(model, raw) {
+  const full = ident(raw);
+  const schema = full.includes('.') ? full.split('.')[0] : null;
+  return [...model.values()].filter((t) => !schema || t.name.split('.')[0] === schema);
+}
+
 function renameIndex(model, from, to) {
   const name = ident(from).split('.').pop();
-  for (const t of model.values()) {
+  for (const t of tablesOfIndex(model, from)) {
     const index = t.indexes.find((i) => i.name === name);
     if (index) index.name = ident(to);
+  }
+}
+
+function dropIndex(model, raw) {
+  const name = ident(raw).split('.').pop();
+  for (const t of tablesOfIndex(model, raw)) t.indexes = t.indexes.filter((i) => i.name !== name);
+}
+
+// r8's policy renames after a table rename (V0103a): each policy of the table whose name starts with the old
+// prefix takes the new one, cut as the package's own block cuts it (57 characters before _scope, 55 otherwise).
+const POLICY_RENAME = /polrelid\s*=\s*to_regclass\('([\w".]+)'\)\s+AND\s+left\(polname,\s*(\d+)\)\s*=\s*'([^']+)'[\s\S]*?\bALTER\s+POLICY\b[\s\S]*?CASE\s+WHEN\s+substr\(p,\s*(\d+)\)\s*=\s*'([^']+)'\s+THEN\s+left\('([^']+)',\s*(\d+)\)\s+ELSE\s+left\('([^']+)',\s*(\d+)\)\s+END\s*\|\|\s*substr\(p,\s*(\d+)\)/i;
+
+function renamePolicies(model, stmt) {
+  const m = POLICY_RENAME.exec(stmt);
+  const table = m && model.get(ident(m[1]));
+  if (!table) return;
+  const [, , length, prefix, whenAt, when, then, thenLength, other, otherLength, from] = m;
+  for (const p of table.rls.policies) {
+    if (p.name.slice(0, Number(length)) !== prefix) continue;
+    const head = p.name.slice(Number(whenAt) - 1) === when ? then.slice(0, Number(thenLength)) : other.slice(0, Number(otherLength));
+    p.name = head + p.name.slice(Number(from) - 1);
   }
 }
 
@@ -1056,11 +1097,9 @@ export function schemaModel(files) {
         for (const one of doInner(stmt)) {
           if (/^ALTER\s+TABLE\b/i.test(one) && !/\bADD\s+CONSTRAINT\b/i.test(one)) alterTable(model, one, file, notModelled);
           else if ((m = INDEX_RENAME.exec(one))) renameIndex(model, m[1], m[2]);
-          else if ((m = /^DROP\s+INDEX\s+(?:CONCURRENTLY\s+)?(?:IF\s+EXISTS\s+)?([\w".]+)/i.exec(one))) {
-            const index = ident(m[1]).split('.').pop();
-            for (const t of model.values()) t.indexes = t.indexes.filter((i) => i.name !== index);
-          }
+          else if ((m = /^DROP\s+INDEX\s+(?:CONCURRENTLY\s+)?(?:IF\s+EXISTS\s+)?([\w".]+)/i.exec(one))) dropIndex(model, m[1]);
         }
+        renamePolicies(model, stmt);
         continue;
       }
       if (/^CREATE\s+(?:UNLOGGED\s+)?TABLE\b/i.test(stmt)) createTable(model, stmt, file, notModelled);
@@ -1079,8 +1118,7 @@ export function schemaModel(files) {
         const table = model.get(ident(m[2]));
         if (table) table.rls.policies = table.rls.policies.filter((p) => p.name !== ident(m[1]));
       } else if ((m = /^DROP\s+INDEX\s+(?:CONCURRENTLY\s+)?(?:IF\s+EXISTS\s+)?([\w".]+)/i.exec(stmt))) {
-        const index = ident(m[1]).split('.').pop();
-        for (const t of model.values()) t.indexes = t.indexes.filter((i) => i.name !== index);
+        dropIndex(model, m[1]);
       } else if ((m = /^DROP\s+TABLE\s+(?:IF\s+EXISTS\s+)?([\w".]+)/i.exec(stmt))) {
         model.delete(ident(m[1]));
       }
@@ -1126,7 +1164,7 @@ export function databaseTicket(wp, touches) {
 
 /**
  * The table a package statement makes or changes, or null for one that is not about a table.
- * `indexes` (index name -> table) answers for DROP INDEX and ALTER INDEX, which name only the index.
+ * `indexes` (schema.index -> table) answers for DROP INDEX and ALTER INDEX, which name only the index.
  */
 export function statementTarget(stmt, indexes = null) {
   const s = String(stmt);
@@ -1136,10 +1174,12 @@ export function statementTarget(stmt, indexes = null) {
       const target = statementTarget(one, indexes);
       if (target) return target;
     }
+    // r8's policy renames after a table rename: EXECUTE format('ALTER POLICY %I ON catalogue.channel_envelope RENAME TO %I', ...).
+    if ((m = /\bALTER\s+POLICY\s+[\w"%]+\s+ON\s+([\w".]+)/i.exec(s))) return ident(m[1]);
     return null;
   }
-  if ((m = /^DROP\s+INDEX\s+(?:CONCURRENTLY\s+)?(?:IF\s+EXISTS\s+)?([\w".]+)/i.exec(s))) return indexes?.get(ident(m[1]).split('.').pop()) ?? null;
-  if ((m = INDEX_RENAME.exec(s))) return indexes?.get(ident(m[1]).split('.').pop()) ?? null;
+  if ((m = /^DROP\s+INDEX\s+(?:CONCURRENTLY\s+)?(?:IF\s+EXISTS\s+)?([\w".]+)/i.exec(s))) return indexes?.get(indexKey(indexes, m[1])) ?? null;
+  if ((m = INDEX_RENAME.exec(s))) return indexes?.get(indexKey(indexes, m[1])) ?? null;
   if (/^SELECT\s+platform\.ensure_month_partitions\b/i.test(s)) return null; // a month: depends on the day
   if ((m = /^SELECT\s+platform\.\w+\s*\(\s*'([\w".]+)'\s*::\s*regclass/i.exec(s))) return ident(m[1]);
   if ((m = /^CREATE\s+(?:UNLOGGED\s+)?TABLE\s+(?:IF\s+NOT\s+EXISTS\s+)?([\w".]+)\s+PARTITION\s+OF\s+([\w".]+)\s+DEFAULT\b/i.exec(s))) return ident(m[2]);
@@ -1160,16 +1200,51 @@ function keyGuard(stmt) {
 }
 
 /**
+ * The key of an index in statementTarget's `indexes`: schema.index, since an index lives in its table's schema
+ * (payments.risk_rules and wallet.risk_rules each have a risk_rules_scope_path_idx). An unqualified name is
+ * looked for in any schema; a map keyed by the bare index name answers too.
+ */
+function indexKey(indexes, raw) {
+  const name = ident(raw);
+  if (!indexes || indexes.has(name)) return name;
+  const short = name.split('.').pop();
+  if (indexes.has(short)) return short;
+  if (name.includes('.')) return name;
+  for (const key of indexes.keys()) if (key.endsWith(`.${short}`)) return key;
+  return name;
+}
+
+/** `sql` with every table named in `names` (old -> new) written by its new name; a longer name is never cut. */
+function renameTables(sql, names) {
+  let out = sql;
+  for (const [from, to] of names) {
+    const rx = new RegExp(`(?<![\\w".$])${from.replace(/[.$]/g, '\\$&')}(?![\\w"$])`, 'g');
+    out = out.replace(rx, to);
+  }
+  return out;
+}
+
+/**
  * The package statements a ticket's file must reproduce, in the order the package applies them.
  * `files` is [{ name, text }] for one database. The script applies these to a copy of the previous
  * state and lets PostgreSQL say what the result is, so nothing here has to normalise SQL.
+ *
+ * A table's statements belong to the ticket that owns its final name, whatever names it had on the
+ * way (r8 re-walk, MIG-PLATFORM #27665 and #28358): the package makes platform.dsar_request in 010,
+ * keys, indexes and secures it under that name in 900-920, moves it with ALTER TABLE ... SET SCHEMA
+ * sync in V0105a, and only V0108 names sync.dsar_request. So the statements are read twice: forwards
+ * for what each one is about (an index's table follows its table's renames), then backwards, where
+ * each RENAME TO or SET SCHEMA hands its old name the new name's owner. The rename itself is the new
+ * name's too. A picked statement that names another ticket's table by a name the package later
+ * changes says the final name instead: an earlier ticket's file has already made that table under it
+ * (V1241 is given wallet_authorisation_wallet_hold_id_fkey REFERENCES wallet.fund_reservation, not wallet.hold).
  */
 export function ticketStatements(files, ticket) {
   const ordered = [...files].sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0));
   const want = new Set(ticket.tables.map(ident));
   const keys = new Set((ticket.constraints ?? []).map(ident));
   const out = [];
-  const helpers = []; // after-r1 functions, kept in place until we know whether a picked statement calls one
+  const read = []; // a table ticket's statements, with what each is about, before the owners are known
   const indexes = new Map();
   for (const { name: file, text } of ordered) {
     for (const sql of sqlStatements(text)) {
@@ -1186,21 +1261,57 @@ export function ticketStatements(files, ticket) {
         continue;
       }
       if (fn && /^V\d/.test(file)) {
-        const entry = { file, sql, helper: ident(fn) };
-        helpers.push(entry);
-        out.push(entry);
+        // An after-r1 function, kept in place until we know whether a picked statement calls one.
+        read.push({ file, sql, helper: ident(fn) });
         continue;
       }
       const target = statementTarget(sql, indexes);
       // Which table each index is on, for a later DROP INDEX or ALTER INDEX that names only the index.
       const made = /^CREATE\s+(?:UNIQUE\s+)?INDEX\s+(?:CONCURRENTLY\s+)?(?:IF\s+NOT\s+EXISTS\s+)?((?!ON\s)[\w"]+)\s+ON\b/i.exec(sql);
-      if (made && target) indexes.set(ident(made[1]), target);
+      if (made && target) indexes.set(`${target.split('.')[0]}.${ident(made[1])}`, target);
+      const renames = [];
       for (const one of /^DO\b/i.test(sql) ? doInner(sql) : [sql]) {
         const renamed = INDEX_RENAME.exec(one);
-        if (renamed && indexes.has(ident(renamed[1]).split('.').pop())) indexes.set(ident(renamed[2]), indexes.get(ident(renamed[1]).split('.').pop()));
+        const from = renamed && indexKey(indexes, renamed[1]);
+        if (renamed && indexes.has(from)) {
+          indexes.set(`${from.split('.')[0]}.${ident(renamed[2])}`, indexes.get(from));
+          indexes.delete(from);
+        }
+        // A table's indexes go with it, into its new schema too.
+        const table = tableRename(one);
+        if (table) {
+          renames.push(table);
+          for (const [index, on] of [...indexes]) {
+            if (on !== table.from) continue;
+            indexes.delete(index);
+            indexes.set(`${table.to.split('.')[0]}.${index.split('.').pop()}`, table.to);
+          }
+        }
       }
-      if (target && want.has(target)) out.push({ file, sql, ...(guard ? { guard } : {}) });
-      else if (ticket.forward && guard && want.has(guard.references)) out.push({ file, sql, guard: { ...guard, incoming: true } });
+      read.push({ file, sql, target, guard, renames });
+    }
+  }
+  if (ticket.kind === 'tables') {
+    // Backwards: `final` holds, for each name a later statement renames, the name it ends with.
+    const final = new Map();
+    const last = (n) => final.get(n) ?? n;
+    for (let i = read.length - 1; i >= 0; i--) {
+      const s = read[i];
+      if (s.helper) continue;
+      for (const r of [...s.renames].reverse()) final.set(r.from, last(r.to));
+      s.owner = s.target ? last(s.target) : null;
+      s.into = s.guard ? last(s.guard.references) : null;
+      // Other tickets' tables this statement names by a name that is not their last.
+      s.others = [...final].filter(([from, to]) => from !== to && !want.has(to));
+    }
+    for (const s of read) {
+      if (s.helper) { out.push(s); continue; }
+      const mine = s.owner && want.has(s.owner);
+      const incoming = !mine && ticket.forward && s.guard && want.has(s.into);
+      if (!mine && !incoming) continue;
+      const sql = s.others.length ? renameTables(s.sql, s.others) : s.sql;
+      const guard = s.guard ? keyGuard(sql) : null;
+      out.push({ file: s.file, sql, ...(guard ? { guard: incoming ? { ...guard, incoming: true } : guard } : {}) });
     }
   }
   // An after-r1 helper goes with a table only when one of the table's statements calls it; the
