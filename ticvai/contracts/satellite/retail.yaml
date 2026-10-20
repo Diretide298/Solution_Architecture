@@ -648,6 +648,21 @@ paths:
       - query: inventory#kitComponentRecords
         route: in-process
         for: 'its read of inventory.kit_component, Inventory''s data (CHG-MOD-001)'
+      - query: inventory#movementRecords
+        route: in-process
+        for: 'the stock on hand each line (or kit component) draws on, from its movements (409 insufficientStock) (r8
+          re-walk, CHG-R8RW-004)'
+      - query: orders#orderLineRecords
+        route: service
+        for: 'the order lines the sale lines name (orderLineId): unit price, tax, net and gross as Orders priced them (422
+          order-line-mismatch) (r8 re-walk, CHG-R8RW-004)'
+      - query: orders#orderLineDiscountRecords
+        route: service
+        for: 'the discounts Orders applied to those lines, summed onto each sale line (r8 re-walk, CHG-R8RW-004)'
+      x-ticvai-reads:
+      - table: retail.merchandise
+        for: 'each line''s item: its stock item, and whether it is serialised (409 serialNumberRequired) (r8 re-walk,
+          CHG-R8RW-004)'
       x-ticvai-audience: [staff]
       summary: Sell merchandise
       description: >
@@ -664,6 +679,18 @@ paths:
         `saleDepletion` movement in the inventory ledger (Inventory runs in the same deployable) in one
         transaction of its own. A retry with the same Idempotency-Key answers the sale already written.
         There is no second stock counter maintained by the till.
+
+        **The amounts are the ones Orders priced** (r8 re-walk, CHG-R8RW-004). Each body line names its
+        order line (`orderLineId`); Retail reads those lines through `orders#orderLineRecords` and their
+        discounts through `orders#orderLineDiscountRecords`, and copies them, computing nothing: a sale
+        line's `unitPrice` is the order line's `serverUnitPrice`, its `discount` the sum of the line's
+        discount amounts (coupon, promotion or a cashier's manual price) and its
+        `lineTotal` the order line's `grossAmount`; the sale's `subtotal`, `taxAmount` and `grossAmount` are
+        the sums of the named lines' `netAmount`, `taxAmount` and `grossAmount`, and its `discountAmount` the
+        sum of the line discounts. A line whose `orderLineId` is missing, is not a line of `orderId`, or
+        differs from the body line in item or quantity is refused `422 order-line-mismatch`, and nothing is
+        written. Each line's item is read from `retail.merchandise` (its stock item, and whether it is
+        serialised), and stock on hand from Inventory's movements (`inventory#movementRecords`).
 
         **A kit sells as one line and leaves stock as its components** (4.4.20, 29 September
         build). Where the line's item has an `inventory.kit_component` bill of materials
@@ -700,6 +727,13 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '#/components/schemas/StockConflictProblem' }
+        '422':
+          x-ticvai-problem-types: [order-line-mismatch]
+          description: 'A body line''s `orderLineId` is missing, is not a line of `orderId`, or names a different item or
+            quantity (r8 re-walk, CHG-R8RW-004). Nothing is written.'
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
@@ -1964,6 +1998,14 @@ components:
       properties:
         id: { type: string, format: uuid }
         merchandiseId: { type: string, format: uuid }
+        orderLineId:
+          type: string
+          format: uuid
+          x-ticvai-references: orders.order_line
+          description: '**The order line this sale line is** (r8 re-walk, CHG-R8RW-004): a line of the body''s `orderId`
+            for the same item and quantity, whose price, discount and tax the sale line copies. Stored as the sale
+            line''s `orderLineId`. Required in fact: a line without it is refused `422 order-line-mismatch`; optional
+            in the schema only so a client built at r1 still validates.'
         quantity: { type: integer, minimum: 1 }
         serialNumbers:
           type: array
@@ -1972,7 +2014,11 @@ components:
         overridePrice:
           allOf:
             - $ref: '../shared/common.yaml#/components/schemas/Money'
-          description: Manual price override. Requires PRICE_OVERRIDE and records a reason.
+          description: '**Not applied here** (r8 re-walk, CHG-R8RW-004). A manual price is made on the order before it
+            exists, in Orders (a `manual` order line discount, which requires PRICE_OVERRIDE and records the reason),
+            and reaches this sale through the order line. Kept in the schema only so a client built at r1 still
+            validates.'
+          x-ticvai-persisted: false
         overrideReason: { type: string, maxLength: 200 }
 
     CreateRetailSaleRequest:
@@ -2050,6 +2096,12 @@ components:
             properties:
               lineId: { type: string }
               merchandiseId: { type: string, format: uuid }
+              orderLineId:
+                type: string
+                format: uuid
+                nullable: true
+                description: The order line the amounts were copied from (`CreateRetailSaleLine.orderLineId`; r8 re-walk,
+                  CHG-R8RW-004). Null on a sale recorded before r8.
               name: { type: string }
               quantity: { type: integer }
               overrideReason:

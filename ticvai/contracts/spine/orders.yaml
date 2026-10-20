@@ -244,6 +244,24 @@ x-ticvai-queries:
       process within commerce, through the C# query interface Orders implements, and asked from another
       deployable through Orders' service route (serviceAuth).
     served: [in-process, service]
+  orderLineDiscountRecords:
+    module: orders
+    table: orders.order_line_discount
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The orders.order_line_discount rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as orderLineId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Orders stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/OrderLineDiscount'}
+    rule: >-
+      A data read, not a rule question (r8 re-walk, CHG-R8RW-004 and CHG-R8RW-005: reporting getKpiValues sums discounts
+      for grossSales and discounts, and retail createRetailSale copies a line's discount onto its sale line). Orders
+      answers with its orders.order_line_discount rows (SD-008, one per discount applied to an order line), as it
+      stores them and as the caller's scope lets it see them. It decides nothing. It is asked in process within
+      commerce, through the C# query interface Orders implements, and asked from another deployable through Orders'
+      service route (serviceAuth).
+    served: [in-process, service]
   paymentRecords:
     module: orders
     table: orders.payment

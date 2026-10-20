@@ -1,0 +1,44 @@
+id: CHG-R8RW-004
+date: '2026-10-20'
+source: audit
+kind: contract
+proposed: '2026-10-20T23:50'
+summary: 'createRetailSale''s amounts have a source: each body line names its order line (CreateRetailSaleLine.orderLineId,
+  stored on retail.sale_line), and the sale line copies the order line''s serverUnitPrice, discount (the sum of its
+  orders.order_line_discount rows) and gross; the sale''s subtotal, tax, discount and gross are those lines'' sums.
+  Read through orders#orderLineRecords and the new declared query orders#orderLineDiscountRecords; a line that does not
+  match is refused 422 order-line-mismatch. overridePrice is no longer applied here (a manual price is an Orders manual
+  discount). The lineage states the retail.merchandise read (x-ticvai-reads) and the inventory#movementRecords read for
+  insufficientStock.'
+decision:
+  what: 'contracts/satellite/retail.yaml createRetailSale x-ticvai-read-via, x-ticvai-reads, description, 422;
+    CreateRetailSaleLine.orderLineId and overridePrice; RetailSale.lines[].orderLineId; contracts/spine/orders.yaml
+    x-ticvai-queries orderLineDiscountRecords.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: the r8 re-walk of 20 October 2026, part 2 (audit/ticvai/r8-blockers/rewalk-part2.md, outside git),
+  SVC-RETAIL-SALE-1 #27824, promise-without-route: CHG-R8WFC-003 moved pricing to Orders, but CreateRetailSaleLine had
+  no price, discount or tax field and no read-via to Orders, so retail.sale and retail.sale_line amounts had no
+  source; the lineage omitted the retail.merchandise and inventory.movement reads.'
+keys_touched:
+  operations: [createRetailSale]
+  files:
+  - contracts/satellite/retail.yaml
+  - contracts/spine/orders.yaml
+root_class: 'a walk fix whose own text promised what no route carried (CHG-R8WFC-003)'
+tickets:
+  started: []
+  unstarted:
+  - 27824
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: r8 re-walk, a release fix'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-cross-module-reads.py
+status: open
+notes: 'orderLineId is optional in the schema and refused 422 without it, the package''s pattern for a field an r1
+  client cannot send (orderId, paymentId), so no breaking change is recorded; the sale line''s orderLineId is a new
+  nullable response field. No visible POS field changes. The next refresh adds retail.sale_line.order_line_id in the
+  tenant forward migration.'
