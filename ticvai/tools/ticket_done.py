@@ -38,12 +38,15 @@ def hand_db_tables(task: dict) -> list:
     return [b.split(" ", 1)[1].strip() for b in task.get("builds") or [] if str(b).startswith("table ")]
 
 
-def built_tables(description: str) -> list:
-    """The tables a [DB] ticket's text says it creates: its "Tables: ..." sentence, else the `table` items of its
-    "Builds:" lead (a hand-written migration, CHG-R8MIG-016)."""
+def built_tables(description: str, key: str = "") -> list:
+    """The tables a [DB] ticket's text says it creates: its "Tables: ..." sentence, else, for a hand-written
+    migration (not a MIG- key: MIG-PARTITIONS lists the tables it partitions, which other migrations create), the
+    `table` items of its "Builds:" lead (CHG-R8MIG-016)."""
     m = re.search(r"Tables: (.+?)\. Source", description or "")
     if m:
         return [x.strip() for x in m.group(1).split(", ")]
+    if MIGRATION_KEY.match(key or ""):
+        return []
     return [b.split(" ", 1)[1] for b in listed_builds(description) if b.startswith("table ")]
 
 
@@ -494,8 +497,9 @@ def baseline_wording(root) -> str:
     by_file = {}
     for n, fname in later.items():
         by_file.setdefault(fname, []).append(n)
-    parts += [f"from {fname} (created by no other file): {', '.join(names)}" for fname, names in sorted(by_file.items())]
-    # no V-number here: check-ticket-text T-MIG-DONE keeps file numbers to the subject and MIGRATIONS.md
+    parts += [f"from backend/tenant/{fname} (created by no other file): {', '.join(names)}" for fname, names in sorted(by_file.items())]
+    # no bare V-number here: check-ticket-text T-MIG-DONE keeps file numbers to the subject and MIGRATIONS.md; a
+    # source file is named by its path under backend/ (CHG-R8MIG-024, the refresh rehearsal of 20 October)
     return ("The baseline file named in the subject is one you write in our repository; the package keeps no baseline "
             "file of its own. It creates the helper functions every later migration calls, copied as they are "
             + "; ".join(parts) + " (the row-level security of each schema migration calls the platform.apply_* "

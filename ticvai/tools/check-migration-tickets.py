@@ -89,9 +89,9 @@ def main() -> int:
             guard.note(f"{k} exempt: {EXEMPT[k]}")
             continue
         m = FILE.search(r["subject"])
-        if not m and not td.MIGRATION_KEY.match(k) and td.built_tables(r["description"]):
+        if not m and not td.MIGRATION_KEY.match(k) and td.built_tables(r["description"], k):
             # a hand-written [DB] task (block-a-extra-tasks.json `builds`, CHG-R8MIG-016): its file is its own
-            guard.note(f"{k}: a hand-written migration of {', '.join(td.built_tables(r['description']))}")
+            guard.note(f"{k}: a hand-written migration of {', '.join(td.built_tables(r['description'], k))}")
             continue
         if not m:
             guard.add("M-FILE-NAMED", k, f"{k}: '{r['subject'][:90]}' names no migration file")
@@ -160,8 +160,8 @@ def main() -> int:
     renamed = {r["from"]: r["to"] for r in _renames() if r["from"] in tables and r["to"] not in tables}
     tables = {renamed.get(t, t) for t in tables}
     on_ticket = set()
-    for r in migs.values():
-        on_ticket |= set(td.built_tables(r["description"]))
+    for k, r in migs.items():
+        on_ticket |= set(td.built_tables(r["description"], k))
     lineage = g.load_json(g.ROOT / "handoff" / "api-data-lineage.json", {}) or {}
     op_hold = td.load_holds(g.ROOT)[0]        # stub, provisional, deprecated: not built (CHG-FXP-003)
     reached = {}
@@ -183,7 +183,7 @@ def main() -> int:
     # of its table (build-service-docs, ticket_done.review_sentence), so a row no ticket carries is a change nobody writes.
     made_by = {}
     for k, r in migs.items():
-        for t in td.built_tables(r["description"]):
+        for t in td.built_tables(r["description"], k):
             made_by.setdefault(t.strip(), k)
     moves = td.declared_moves(g.ROOT)
     unplanned = []

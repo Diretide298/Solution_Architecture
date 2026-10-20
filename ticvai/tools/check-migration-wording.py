@@ -22,6 +22,7 @@ are tools/ticket_done.py MIGRATION_WORDING, written by tools/build-service-docs.
                  "Tables no migration creates" in MIGRATIONS.md) passes only when that row cites the file
                  ("Source DDL after r1: <file>"), so the migration planned with its operations applies the change
                  (CHG-GT1-007: CHG-MOD-007 scoped approvals.accreditation_badge in V0104)
+                 A table no operation reaches yet (`storage only:`) passes the same way (CHG-R8MIG-024).
 
 Read-only. Exit 1 on a finding not in `handoff/audit-baseline.json` (tools/audit_guard.py).
 
@@ -73,7 +74,7 @@ def main() -> int:
     if mmd.exists():
         seg = mmd.read_text(encoding="utf-8").split("## Tables no migration creates", 1)
         if len(seg) == 2:
-            for t, why in re.findall(r"^\| `([a-z_]+\.[a-z_0-9]+)` \| \w+ \| [^|]* \| (held: .+?) \|$", seg[1], re.M):
+            for t, why in re.findall(r"^\| `([a-z_]+\.[a-z_0-9]+)` \| \w+ \| [^|]* \| ((?:held|storage only): .+?) \|$", seg[1], re.M):
                 held[t] = why
     # **A table a declared move took to another database** (ADAM CR-150, 18 October 2026; CHG-CRA-003): V0104 changed
     # subscription.plan and four others in the tenant database before they moved to control, where the next forward

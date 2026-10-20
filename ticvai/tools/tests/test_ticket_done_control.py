@@ -135,3 +135,16 @@ def test_a_key_into_a_table_a_later_migration_creates_moves_there():
     words = td.key_move_sentences(moved)
     assert "Leave out the key" in words["VM-MIG-PROMOTIONS"][0] and "Also add the key" in words["MIG-PROMOTIONS-2"][0]
     assert "platform.schema_version" in td.SCHEMA_VERSION_LINE and "Do not copy" in td.SCHEMA_VERSION_LINE
+
+
+def test_the_baseline_names_its_source_files_by_path_never_a_bare_v_number():
+    import re
+    words = td.baseline_wording(Path(__file__).resolve().parents[2])
+    rest = re.sub(r"backend/(?:tenant|control)/V\d+[a-z]?__[\w.-]+\.sql", "", words)
+    assert not re.search(r"\bV\d{3,4}(__|\b)", rest), rest
+
+
+def test_a_mig_task_builds_list_is_not_its_tables():
+    text = "Builds: `table platform.outbox`, `table kernel.inbox`. A job in the workers host."
+    assert td.built_tables(text, "MIG-PARTITIONS") == []
+    assert td.built_tables(text, "PRD-W1-DB") == ["platform.outbox", "kernel.inbox"]

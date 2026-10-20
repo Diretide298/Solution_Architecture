@@ -2004,9 +2004,21 @@ def main() -> int:
         task("VM-DB", "VM", "Feature", "Venue Management: database migrations",
              "Tables the Venue Management backend needs that the first release does not create.", 2, area="VM")
         vm_mig = {}
+        pushed_map_ = (json.loads((OUT / "pms-map.json").read_text(encoding="utf-8"))
+                       if (OUT / "pms-map.json").exists() else {})
         for sch in sorted({t.split(".")[0] for t in new_tables}):
             ts = [t for t in new_tables if t.split(".")[0] == sch]
             k = f"VM-MIG-{sch.upper()}"
+            if k in by_key:
+                # **Its key already holds a pushed forward migration the first release kept whole** (CHG-R8MIG-024;
+                # the refresh rehearsal of 20 October: VM-MIG-APPROVALS, pushed for approvals.escalation, was formed
+                # again for approvals.sla_policy, and the second task with the key lost escalation from every ticket).
+                # This work takes a key nobody holds; the key reconciliation then writes it under the pushed ticket
+                # whose work it is (MIG-APPROVALS-4 for sla_policy).
+                n_ = 2
+                while f"MIG-{sch.upper()}-{n_}" in by_key or f"MIG-{sch.upper()}-{n_}" in pushed_map_:
+                    n_ += 1
+                k = f"MIG-{sch.upper()}-{n_}"
             prior = [m[1] for m in migrations if m[4] == sch]
             n_cols = sum(len(ddl[t]["columns"]) for t in ts)
             pts = points_of(1 + 0.5 * len(ts) + n_cols / 40)
@@ -3876,8 +3888,11 @@ def main() -> int:
             storage_only.append((t, "GAP: read or written by " + ", ".join(sorted(reached[t])[:4])
                                  + " but in no migration"))
         else:
+            # an after-r1 change to it is cited here too, so the migration planned later applies it (CHG-R8MIG-024; the
+            # refresh rehearsal: V0109 keyed ai.translation_job, which V0108 creates and no operation reaches yet)
             storage_only.append((t, "storage only: no operation reads or writes it and no task names it; its "
-                                    "forward migration is planned when an operation first reaches it"))
+                                    "forward migration is planned when an operation first reaches it"
+                                 + "".join(f"; Source DDL after r1: {r_}" for r_ in sorted(held_ar1.get(t, ())))))
     M2 = ["", "## Forward migrations after the first release", "",
           f"**{len(fwd_rows)} forward migrations**, V{FORWARD_TICKET_FIRST:04d} upwards in build order (the Venue "
           "Management waves, then each later app-module). V0100-V0999 are derive-ddl's frozen-mode files in "
