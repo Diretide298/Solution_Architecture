@@ -273,9 +273,16 @@ ACROSS_HELPERS = ("apply_parent_across_rls", "apply_parent_split_across_rls")
 # **A table that was the tenant root's alone has rows only the tenant root wrote** (MOD audit, 14 October 2026,
 # CHG-MOD-007). Until its scope_path arrives, its policy (`apply_tenant_rls`) let no other connection insert a row, so
 # every row it holds sits at the tenant root by construction: the backfill is the tenant root's path, then NOT NULL.
-def scope_path_backfill(t: str, cols, was_tenant_root: bool = False) -> str | None:
+#
+# **A table that was under the venue policy has rows owned by their venue** (r8 gate residue, 20 October 2026,
+# CHG-R8RES-001). `apply_venue_rls` showed a row exactly where `platform.venue_in_scope(venue_id)` held: the venue's
+# own `platform.scope` row by its id, and the tenant root for a null `venue_id`. A scope_path that replaces that policy
+# (ledger.account_mapping, ADAM CR-168, CHG-CRA-007) is backfilled to the same answer, so no row moves: the venue's
+# path, else the tenant root's; then NOT NULL. `was_venue`: the policy in force before this migration was the venue's.
+def scope_path_backfill(t: str, cols, was_tenant_root: bool = False, was_venue: bool = False) -> str | None:
     """The statements that fill and then close a scope_path added nullable to `t`, or None when the owner is unknown.
-    `was_tenant_root`: the table's policy before this migration was the tenant root's alone."""
+    `was_tenant_root`: the table's policy before this migration was the tenant root's alone. `was_venue`: it was
+    `apply_venue_rls`, so `venue_id` (a platform.scope id) owned each row."""
     if t in SCOPE_FOLLOWS and SCOPE_FOLLOWS[t][0] in cols:
         key, parent, _level = SCOPE_FOLLOWS[t]
         return (f"UPDATE {t} x SET scope_path = p.scope_path FROM {parent} p WHERE p.id = x.{key} AND x.scope_path IS "
@@ -287,6 +294,8 @@ def scope_path_backfill(t: str, cols, was_tenant_root: bool = False) -> str | No
                 f"NULL; UPDATE {t} SET scope_path = (SELECT path FROM platform.scope WHERE level = 'tenant') WHERE "
                 f"scope_path IS NULL; ALTER TABLE {t} ALTER COLUMN scope_path SET NOT NULL")
     owner = next((c for c in SCOPE_OWNER_KEYS if c in cols), None)
+    if not owner and was_venue and "venue_id" in cols:
+        owner = "venue_id"
     if not owner and was_tenant_root:
         return (f"UPDATE {t} SET scope_path = (SELECT path FROM platform.scope WHERE level = 'tenant') WHERE "
                 f"scope_path IS NULL; ALTER TABLE {t} ALTER COLUMN scope_path SET NOT NULL")
@@ -727,6 +736,19 @@ def was_tenant_root(model, t: str) -> bool:
     return False
 
 
+def was_venue_rls(model, t: str) -> bool:
+    """`t`'s first policy in `model`, before any scope policy, was `apply_venue_rls`: each row it held then was owned
+    by its `venue_id`, a platform.scope id, and a null one by the tenant root (CHG-R8RES-001). The first, as
+    was_tenant_root reads it, and not the last: once the forward migration that adds the scope_path is applied, the
+    table's last policy is the new one, and the backfill the review names must survive the next derive (the
+    CHG-MOD-007 class: a review row dropped for a column nobody changed)."""
+    for _k, st in model.order:
+        rc = rls_call(st)
+        if rc and rc[1] == t and rc[0] != "drop_rls_policies":
+            return rc[0] == "apply_venue_rls"
+    return False
+
+
 def tables_named(stmt: str, known: set) -> set:
     return {unq(x) for x in re.findall(rf"(?<![\w.]){QNAME}(?![\w(])", stmt)} & known
 
@@ -950,7 +972,7 @@ def diff(area: str, old: Model, new: Model, renames: dict | None = None, retired
                         # CHG-GEN-008: a row with no scope_path is invisible to every grant once the table's policy reads
                         # it, so the backfill is due in the same release as the column, not later. CHG-R6G-002: the
                         # backfill is named when the table holds its owning scope's key, before the NOT NULL.
-                        fill = scope_path_backfill(t, b.cols, was_tenant_root(old, t))
+                        fill = scope_path_backfill(t, b.cols, was_tenant_root(old, t), was_venue_rls(old, t))
                         review("not null", f"{t}.{c}", "added nullable; the schema reference says NOT NULL, and row-"
                                "level security reads it",
                                (f"in the forward migration that adds it, backfill first, then the NOT NULL: {fill}"
@@ -961,7 +983,8 @@ def diff(area: str, old: Model, new: Model, renames: dict | None = None, retired
                         review("not null", f"{t}.{c}", "added nullable; the schema reference says NOT NULL",
                                "backfill, then ALTER COLUMN ... SET NOT NULL in a forward migration")
                 elif a.cols[c] != d and (t, c) not in old.handled:
-                    fill = scope_path_backfill(t, b.cols, was_tenant_root(old, t)) if c == "scope_path" else None
+                    fill = (scope_path_backfill(t, b.cols, was_tenant_root(old, t), was_venue_rls(old, t))
+                            if c == "scope_path" else None)
                     if a.cols[c] == relaxed(d) and fill:
                         # **A scope_path an earlier forward migration added keeps its named backfill** (MOD audit,
                         # 14 October 2026, CHG-MOD-007). Once that migration is in the old side, the column is "still

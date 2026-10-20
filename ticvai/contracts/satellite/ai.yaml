@@ -3402,10 +3402,21 @@ paths:
       x-ticvai-audience:
       - service
       x-ticvai-auth: service
+      # The rows it deletes are its writes (r8 gate residue, check-write-lineage W-NOTABLE; CHG-R8RES-002).
+      x-ticvai-writes:
+      - table: ai.index_entry
+        for: 'the subject''s index entries, deleted with its chunk rows in one transaction'
+      - table: ai.chunk_embedding
+        for: 'the subject''s chunk rows (subject_id), deleted with its index entries; their Qdrant points follow'
+      x-ticvai-no-wrong-state: 'the AI side keeps no state for a subject: a subject with nothing indexed, or already
+        erased, answers 200 with zeros, so a retry or a second call is never refused (CHG-R8RES-007)'
       summary: Remove everything the AI index holds about a guest
       description: '**Erasure reaches the AI data, and can be proven** (R8 blocker FOUNDATION-AI-C42, CHG-R8MIG-025;
-        ADR-0047: nothing cascades). Called by Identity''s erasure job for `deleteGuestAccount`, beside
-        `createDsarRequest`, cell-internal over mTLS. For the subject it deletes, in this order and retried until both
+        ADR-0047: nothing cascades). Called by Identity''s erasure job, cell-internal over mTLS, for a subject
+        Identity has tombstoned (`deleteGuestAccount`''s erasure request): Identity''s tombstone is the record the job
+        works from, and `deleteGuestAccount` does not wait for this call (r8 gate residue, CHG-R8RES-003). **From the release
+        that builds this operation**, the job calls it for each subject it tombstones, and once for every subject
+        tombstoned before then. For the subject it deletes, in this order and retried until both
         are done: the `ai.index_entry` rows with that `subject_id` and the `ai.chunk_embedding` rows with that
         `subject_id` (one transaction), then the Qdrant points with that subject in their payload (by payload filter on
         `subjectId`, which also catches a point whose row went first). **The proof the erasure keeps**: zero rows in
@@ -3424,6 +3435,9 @@ paths:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Erased, with the counts that prove it.
           content:
             application/json:

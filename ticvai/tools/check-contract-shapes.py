@@ -14,7 +14,8 @@ same kind that nothing held:
   C-ERROR-PROBLEM-TYPE     an inline 4xx/5xx with no `x-ticvai-problem-types` and no Problem
                            schema of its own (R075, R133)
   C-ACTION-409             a POST action on an item (`/{id}/verb`) with no 409 for the wrong state
-                           (R078, R095)
+                           (R078, R095); an operation marked `x-ticvai-no-wrong-state: <why>` is exempt and printed
+                           (CHG-R8RES-007)
   C-ENUM-OTHER             `other` in an enum with no note field beside it (R222: allowed only with
                            a required note, decided 28 September)
   C-ENUM-NON-STRING        an enum value YAML read as a boolean (`false`, `no`) (R238)
@@ -340,7 +341,14 @@ def main() -> int:
                 and not last.endswith("s") \
                 and not re.match(r"^(get|list|search|evaluate|preview|calculate|quote|check|validate|"
                                  r"estimate|resolve|decide|run|export|simulate|render|test)", oid):
-            guard.add("C-ACTION-409", oid, f"{oid}: POST {f['path']} acts on an item and declares no 409")
+            # **An action with no wrong state says so, with its reason** (r8 gate residue, 20 October 2026,
+            # CHG-R8RES-007): `x-ticvai-no-wrong-state: <why>` on the operation. eraseSubject acts on a subject the
+            # AI side keeps no state for: a subject with nothing indexed answers zeros, so there is no state to be
+            # wrong in. Printed every run, so the reason stays in view; a baseline entry would hide it.
+            if str(op.get("x-ticvai-no-wrong-state") or "").strip():
+                guard.note(f"C-ACTION-409 exempt {oid}: {str(op['x-ticvai-no-wrong-state']).strip()[:140]}")
+            else:
+                guard.add("C-ACTION-409", oid, f"{oid}: POST {f['path']} acts on an item and declares no 409")
         # --- paging order ----------------------------------------------------------------------
         params = [deref(p, doc)[0] or {} for p in (op.get("parameters") or [])]
         pnames = {str(p.get("name")) for p in params if isinstance(p, dict)}

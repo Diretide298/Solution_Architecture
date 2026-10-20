@@ -829,7 +829,25 @@ def main() -> int:
         sr = json.loads(ref.read_text(encoding="utf-8"))
         lineage = sr.get("lineage") or {}
         NATURAL = ("code", "version", "serial", "key", "slug", "identifier", "media_code")
+        # **A key the contract names is a key** (r8 gate residue, 20 October 2026, CHG-R8RES-009). derive-ddl keys a
+        # table by its schema's `x-ticvai-primary-key` before any convention (identity.open_shift_marker on shift_id,
+        # kernel.inbox on (consumer, event_id)). This rule read only the conventions and the lineage parent, so when
+        # CHG-R8INT-022 made the marker's principal and workstation `x-ticvai-references: none` (a projection event
+        # consumers write keeps no enforced foreign key) the table lost its "parent" here while its DDL kept
+        # `shift_id uuid PRIMARY KEY`: a key the contract declares, read as no key at all.
+        declared_keys = set()
+        for _cf in sorted((ROOT / "contracts").glob("*/*.yaml")):
+            try:
+                _cd = yaml.safe_load(_cf.read_text(encoding="utf-8")) or {}
+            except Exception:  # noqa: BLE001 -- a file that does not parse is reported elsewhere
+                continue
+            for _sch in ((_cd.get("components") or {}).get("schemas") or {}).values():
+                if (isinstance(_sch, dict) and isinstance(_sch.get("x-ticvai-primary-key"), list)
+                        and _sch["x-ticvai-primary-key"] and "." in str(_sch.get("x-ticvai-persistence") or "")):
+                    declared_keys.add(str(_sch["x-ticvai-persistence"]).split("+")[0].strip())
         for tbl, cols in (sr.get("cols") or {}).items():
+            if tbl in declared_keys:
+                continue
             if not cols or ":" in tbl:
                 continue
             names = {c["column"] for c in cols}

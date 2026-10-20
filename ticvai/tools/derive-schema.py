@@ -972,8 +972,20 @@ def main() -> int:
         # on `id` alone, so `plan_module.plan_id` could reference nothing and derive-ddl wrote no foreign key at
         # all. The child carries `<parent>_<version>` beside `<parent>_id`, and derive-ddl keys the pair to the
         # parent's pair, as `x-ticvai-references-version` does for a declared reference.
+        # **Only where the parent says so** (r8 gate residue, CHG-R8RES-006): `x-ticvai-version-key: <version>` on the
+        # parent, naming the second column of its `[id, <version>]` key, and only for the parent's own table (a child
+        # found through a nested array hangs off the middle table, not the versioned row). A two-column key is not
+        # always a version (`[consumer, eventId]`, or an `[id, <something>]` added later), and a column added to every
+        # child of such a parent by accident would be a key nobody decided. An unmarked [id, x] parent with derived
+        # children is printed, so the missing foreign key is seen rather than silent.
         _vpk = body.get("x-ticvai-primary-key")
-        if parent_cols and isinstance(_vpk, list) and len(_vpk) == 2 and _vpk[0] == "id":
+        _vkey = body.get("x-ticvai-version-key")
+        _own = str(body.get("x-ticvai-persistence") or "").split("+")[0].strip()
+        _keyed = parent_cols and isinstance(_vpk, list) and len(_vpk) == 2 and _vpk[0] == "id"
+        if _keyed and not (_vkey and str(_vkey) == str(_vpk[1]) and parent_table == _own):
+            print(f"  note: {child} is a child of {parent_table}, keyed {_vpk} with no x-ticvai-version-key naming "
+                  f"{_vpk[1]!r}: it keeps a one-column key, and derive-ddl writes no foreign key for it")
+        if _keyed and _vkey and str(_vkey) == str(_vpk[1]) and parent_table == _own:
             _vprop = str(_vpk[1])
             _vtype, _ = resolve_type(properties_of(body, all_schemas).get(_vprop) or {}, all_schemas, persisted)
             _vcol = snake(parent_table.split(".")[-1]) + "_" + snake(_vprop)

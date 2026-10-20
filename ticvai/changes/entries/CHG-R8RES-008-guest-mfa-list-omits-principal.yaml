@@ -1,0 +1,30 @@
+id: CHG-R8RES-008
+date: '2026-10-20'
+source: audit
+kind: contract
+summary: 'MfaMethod.principalId is x-ticvai-staff-only: omitted from the response when the caller is a guest. A guest''s
+  own method has it null, so no guest screen (GST-073, WEB-024) changes; listMfaMethods no longer hands a guest a
+  principal-id field (check-contract-shapes C-GUEST-INTERNAL).'
+decision:
+  what: 'contracts/spine/identity.yaml MfaMethod.principalId: x-ticvai-staff-only with the reason (R164).'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: check-contract-shapes C-GUEST-INTERNAL listMfaMethods, new in the refresh rehearsal on 5dc6fe1f; the
+  field came with guest methods in r8 (CHG-R8MIG-007), so it is in no released contract.'
+keys_touched:
+  operations: [listMfaMethods]
+  schemas: [MfaMethod]
+  files:
+  - contracts/spine/identity.yaml
+root_class: 'a shared schema returning a staff field to a guest read'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: r8 gate residue, a release fix'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-contract-shapes.py
+status: open

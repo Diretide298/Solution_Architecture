@@ -1,0 +1,33 @@
+id: CHG-R8RES-007
+date: '2026-10-20'
+source: audit
+kind: contract
+summary: 'eraseSubject says why it declares no 409 (x-ticvai-no-wrong-state): the AI side keeps no state for a
+  subject, and a subject with nothing indexed, or already erased, answers 200 with zeros. check-contract-shapes
+  C-ACTION-409 reads the mark and prints the exemption with its reason on every run, instead of a hand-added baseline
+  entry (the audit baseline says never to add one by hand).'
+decision:
+  what: 'contracts/satellite/ai.yaml eraseSubject: x-ticvai-no-wrong-state with its reason.
+    tools/check-contract-shapes.py C-ACTION-409: an operation with the mark is exempt and printed; the rule''s docstring
+    says so.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: check-contract-shapes C-ACTION-409 eraseSubject, new in the refresh rehearsal on 5dc6fe1f
+  (runs/20261020-144054-199), from CHG-R8MIG-025.'
+keys_touched:
+  operations: [eraseSubject]
+  files:
+  - contracts/satellite/ai.yaml
+  - tools/check-contract-shapes.py
+root_class: 'an action rule with no declared way to say an action has no state to be wrong in'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: r8 gate residue, a release fix'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-contract-shapes.py
+status: open

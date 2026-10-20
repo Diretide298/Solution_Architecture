@@ -2585,6 +2585,12 @@ def main() -> int:
                         # ORDERS-MONEY-C35), so a row names at least one of the two
                         exempt.append(f"{q(k)} IS NOT NULL")
                         continue
+                    if isinstance(v, dict) and list(v) == ["not"] and v["not"] is None:
+                        # `{planVersion: {planId: {not: null}}}`: required wherever the other column is set (r8 gate
+                        # residue, CHG-R8RES-006). Written both ways, two columns are both set or both null: a
+                        # two-column key with one null column is never checked by its foreign key (MATCH SIMPLE).
+                        exempt.append(f"{q(k)} IS NULL")
+                        continue
                     vals = v if isinstance(v, list) else [v]
                     lits = ", ".join(sql_literal(x) for x in vals)
                     exempt.append(f"{q(k)} IS DISTINCT FROM {lits}" if len(vals) == 1
