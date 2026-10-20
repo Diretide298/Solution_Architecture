@@ -4872,12 +4872,12 @@ paths:
 
         **A wallet top-up is a line of a sale** (r8 re-walk, CHG-R8RW-001; r8 gate, 21 October 2026,
         CHG-R8RW-009: the client-approved till adds it to the current sale, "Add top-up to sale ... loads on
-        payment"). A line whose variant is a catalogue product of kind `walletTopUp` loads the order's guest's
+        payment"). A line whose variant is a catalogue product of kind `walletTopUp` loads the order''s guest''s
         wallet: `quantity` 1, priced at its `quotedUnitPrice` (the amount being loaded), no tax and no
         promotion. It may share the order with any other lines. The order must name its guest (`subjectId`).
         A `walletTopUp` line with `quantity` above 1, or on an order with no guest, is refused 422
         `top-up-line-invalid` and nothing is written. Once the order is paid, the till or guest app sends
-        each top-up line's id to wallet `topUpWallet`, which credits the wallet by that line's amount.
+        each top-up line''s id to wallet `topUpWallet`, which credits the wallet by that line''s amount.
 
         Offline-capable. The client writes to its local journal, acknowledges the cashier, and replays
         through `/sync/orders` on reconnect.
