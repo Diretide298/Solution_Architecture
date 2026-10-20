@@ -3478,6 +3478,10 @@ paths:
   /cells/{cellId}/endpoints:
     get:
       operationId: listCellEndpoints
+      x-ticvai-read-via:
+      - query: subscription#cellEndpointRecords
+        route: service
+        for: 'its read of control.cell_endpoint, Platform''s data (CHG-R8MIG-018)'
       summary: Where each service answers inside a cell
       description: >
         **A cross-cell call needs an address and the addresses were not readable.**
@@ -3485,8 +3489,10 @@ paths:
         contract during a rollout, and a caller that assumes otherwise fails in the least debuggable
         way.
 
-        **Served on the control connection** (R8 blocker APPROVALS-TENANCY-C10, CHG-R8MIG-018): the rows are
-        `control.cell_endpoint`, read with `control.cell` in one database, so an unknown cell is `404` by one lookup.
+        **Read from the control plane** (R8 blocker APPROVALS-TENANCY-C10, CHG-R8MIG-018): the rows are
+        `control.cell_endpoint`, which Platform keeps with `control.cell` and serves through
+        `subscription#cellEndpointRecords`; the control plane writes a cell's rows at provisioning, so no rows means a
+        cell it does not know, `404`.
       tags:
       - tenancy
       x-ticvai-permission: SCOPE_VIEW
@@ -4221,6 +4227,7 @@ components:
           type: string
           format: uuid
           readOnly: true
+          x-ticvai-references: platform.device
           description: From the path of `setDeviceAssignment`.
         ownerOrgUnitId:
           type: string

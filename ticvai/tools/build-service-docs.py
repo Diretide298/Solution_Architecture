@@ -1650,6 +1650,13 @@ def main() -> int:
             continue
         for x in sorted(items_):
             if x in ddl and x.split(".")[0] != ident_[1] and x in moved_.values():
+                if ident_[1] == "control" and ddl[x]["db"] != "control":
+                    # **A table that left the control database is a new table in the tenant one** (CHG-R8MIG-024; the
+                    # merged rehearsal of this lane: control.content_block -> whitelabel.content_block). Kept in
+                    # MIG-CONTROL's group it formed a tenant group keyed MIG-CONTROL beside the control database's own,
+                    # and the second task with the key took every control table off the ticket. It is planned with its
+                    # new schema; the control table's drop is its migration-review row.
+                    continue
                 grp_over[x] = ident_[1]
                 if x not in rel:
                     rel.add(x)
