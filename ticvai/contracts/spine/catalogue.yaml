@@ -345,6 +345,9 @@ x-ticvai-queries:
       type: array
       description: 'The rows found, each as Catalogue stores it; an id with no visible row is absent.'
       items: {$ref: '#/components/schemas/Product'}
+    # A Product's media[] are its catalogue.product_media rows (Product persists to both), so an asker reading a
+    # product's image asks this query (r8 gate, CHG-R8GT2-007; check-cross-module-reads XR-FACT).
+    reads: [catalogue.product_media]
     rule: >-
       A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
       October). Catalogue answers with its catalogue.product rows, as it stores them and as the caller's scope
@@ -368,6 +371,22 @@ x-ticvai-queries:
       A data read, not a rule question (CHG-MOD-001; R8 blocker FOUNDATION-AI-C44, CHG-R8MIG-015). Catalogue answers
       with its catalogue.bundle_application rows, as it stores them and as the caller's scope lets it see them; the
       asker takes the latest applied row per workstation. Asked in process within commerce (Tenancy's getWorkstation).
+    served: [in-process, service]
+  publishedBundleRecords:
+    module: catalogue
+    table: catalogue.published_bundle
+    inputs:
+      versions: {type: array, items: {type: string}, description: 'The catalogue.published_bundle rows asked for, by version (the bundle a workstation applied).'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as venueId); versions and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Catalogue stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/CatalogueBundle'}
+    rule: >-
+      A data read, not a rule question (CHG-MOD-001; R8 blocker FOUNDATION-AI-C44, CHG-R8MIG-015; r8 gate,
+      CHG-R8GT2-007). Catalogue answers with its catalogue.published_bundle rows, as it stores them and as the
+      caller's scope lets it see them: the applied bundle's `staleAfter`, and the venue's newest published version.
+      Asked in process within commerce (Tenancy's workstation reads, for `CatalogueState`).
     served: [in-process, service]
   productCategoryRecords:
     module: catalogue
@@ -4184,6 +4203,10 @@ paths:
         type: string
     post:
       operationId: reportBundleApplied
+      x-ticvai-writes:
+      - table: catalogue.bundle_application
+        for: 'the one report row each call appends (BundleApplication; R8 blocker FOUNDATION-AI-C44) (r8 gate,
+          CHG-R8GT2-003; check-parameter-columns P-NAMED-TABLE)'
       x-ticvai-consumed-by:
         - "P06 EMP-018 Offline package"
         - "P08 BO-037 Offline Package Status"
@@ -24955,7 +24978,7 @@ components:
         FOUNDATION-AI-C44, CHG-R8MIG-015). Written by `reportBundleApplied`, append-only, never returned whole: the latest
         `applied` row per workstation is the bundle it runs, which `BundleSummary.appliedByWorkstations` counts and
         Tenancy''s workstation `CatalogueState` reads (catalogue#bundleApplicationRecords). Nothing is written on
-        `platform.workstation`, so Catalogue writes no other module''s table.'
+        Tenancy''s workstation row, so Catalogue writes no other module''s table.'
       required: [id, workstationId, venueId, bundleVersion, appliedAt, outcome]
       properties:
         id:

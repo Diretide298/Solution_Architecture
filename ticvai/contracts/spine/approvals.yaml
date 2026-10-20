@@ -3832,6 +3832,9 @@ paths:
     - name: requestId
       in: path
       required: true
+      # The approved request whose execution is reported: the execution row's approval_request_id (r8 gate,
+      # CHG-R8GT2-003; check-parameter-columns P-PARAM-NO-COLUMN).
+      x-ticvai-column: approvals.approved_action_execution.approval_request_id
       schema:
         type: string
         format: uuid
@@ -6022,7 +6025,7 @@ components:
           readOnly: true
           description: The note `assignApprovalRequest` was given, kept with the assignment (R8 blocker
             APPROVALS-TENANCY-C02, CHG-R8MIG-009).
-        matrixId:
+        approvalMatrixId:
           type: string
           format: uuid
           nullable: true

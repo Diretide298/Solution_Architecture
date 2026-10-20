@@ -1,0 +1,31 @@
+id: CHG-R8GT2-002
+date: '2026-10-20'
+source: audit
+kind: contract
+summary: 'createGuestUpload says it writes the guest''s pending assets.guest_upload row, which its description and
+  GuestUpload already say ("createGuestUpload writes it pending") and which holds the request''s purpose. Its lineage
+  listed only the upload ticket''s assets.media_upload, which has no purpose column.'
+decision:
+  what: 'contracts/satellite/assets.yaml createGuestUpload: `x-ticvai-writes: [{table: assets.guest_upload, for: the
+    pending upload row}]`, so derive-lineage lists the write.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: check-request-fields-stored RF-REQUEST-NOT-STORED "createGuestUpload.purpose: not on UploadTicket
+  (assets.media_upload), no column in assets.media_upload", new at the r8 release rehearsal on 5dc6fe1f; the
+  operation came with CHG-R8MIG-027 (IDENTITY-C66).'
+keys_touched:
+  operations: [createGuestUpload]
+  files:
+  - contracts/satellite/assets.yaml
+root_class: 'a write stated in words that no contract fact gives the lineage'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: r8 gate, a release fix'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-request-fields-stored.py
+status: open

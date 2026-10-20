@@ -23563,7 +23563,7 @@ components:
           nullable: true
           description: '**A bundle line''s picks** (R8 blocker ORDERS-MONEY-C43, the lead''s answer B for r8;
             CHG-R8MIG-023): the bundle and the option the guest chose in each choice group. The line''s `variantId` is
-            the bundle''s own (`Bundle.variantId`); the server prices it at `Bundle.price` and freezes the allocation at
+            the bundle''s own (`Bundle.variantId`); the server prices it at the bundle''s own price and freezes the allocation at
             `createOrder` (ADR-0019). In r8 a bundle''s admission is open-dated, so no date or session is asked.'
           required: [bundleId]
           properties:

@@ -1916,6 +1916,10 @@ paths:
   /auth/sessions/{sessionId}/force-logout:
     post:
       operationId: forceLogout
+      x-ticvai-writes:
+      - table: identity.authz_audit
+        for: 'the one audit row of the decision (R8 blocker IDENTITY-C46) (r8 gate, CHG-R8GT2-003; check-parameter-columns
+          P-NAMED-TABLE)'
       x-ticvai-consumed-by:
         - "P04 POS-000 Sign In"
         - "P08 BO-053 Staff Directory"
@@ -2668,6 +2672,11 @@ paths:
   /delegated-access:
     get:
       operationId: listDelegatedAccess
+      x-ticvai-read-via:
+      - query: tenancy#regionSettingsRecords
+        route: in-process
+        for: 'minorAgeThreshold, for each grant''s overSubjectIsMinor (CHG-R8MIG-009) (r8 gate, CHG-R8GT2-007;
+          check-cross-module-reads XR-FACT)'
       x-ticvai-consumed-by:
         - "P10 PTR-020 Sub-Agent Management"
       x-ticvai-audience:
@@ -2718,6 +2727,11 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createDelegatedAccess
+      x-ticvai-read-via:
+      - query: tenancy#regionSettingsRecords
+        route: in-process
+        for: 'minorAgeThreshold, for the returned grant''s overSubjectIsMinor (CHG-R8MIG-009) (r8 gate, CHG-R8GT2-007;
+          check-cross-module-reads XR-FACT)'
       x-ticvai-consumed-by:
         - "P10 PTR-020 Sub-Agent Management"
       x-ticvai-audience:
@@ -3259,6 +3273,13 @@ paths:
   /auth/guest/social:
     post:
       operationId: guestSocialLogin
+      x-ticvai-reads:
+      - table: pii.subject_identity
+        for: 'the provider and provider subject a returning guest is found by (R8 blocker IDENTITY-C54) (r8 gate,
+          CHG-R8GT2-003; check-parameter-columns P-NAMED-TABLE)'
+      x-ticvai-writes:
+      - table: pii.subject_identity
+        for: 'the link of a new provider identity to the account (R8 blocker IDENTITY-C54) (r8 gate, CHG-R8GT2-003)'
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
         route: in-process
@@ -3346,6 +3367,13 @@ paths:
   /auth/guest/uae-pass:
     post:
       operationId: guestUaePassLogin
+      x-ticvai-reads:
+      - table: pii.subject_identity
+        for: 'the UAE Pass user id a returning guest is found by (R8 blocker IDENTITY-C54) (r8 gate, CHG-R8GT2-003;
+          check-parameter-columns P-NAMED-TABLE)'
+      x-ticvai-writes:
+      - table: pii.subject_identity
+        for: 'the uaePass identity row of a new link (R8 blocker IDENTITY-C54) (r8 gate, CHG-R8GT2-003)'
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
         route: in-process
@@ -3797,6 +3825,14 @@ paths:
         format: uuid
     post:
       operationId: completeSsoAuthorization
+      x-ticvai-reads:
+      - table: identity.principal_external_identity
+        for: 'the IdP user (sub or SAML NameID) looked up for this provider (R8 blockers IDENTITY-C57, C58) (r8 gate,
+          CHG-R8GT2-003; check-parameter-columns P-NAMED-TABLE)'
+      x-ticvai-writes:
+      - table: identity.principal_external_identity
+        for: 'the link of an auto-provisioned principal to its IdP user (R8 blockers IDENTITY-C57, C58) (r8 gate,
+          CHG-R8GT2-003)'
       x-ticvai-read-via:
       - query: tenancy#workstationRecords
         route: in-process
