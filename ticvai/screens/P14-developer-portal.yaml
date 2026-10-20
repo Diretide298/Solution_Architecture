@@ -91,13 +91,13 @@ screens:
       - version
       provenance: derived — DEV-008 declares entryState.params anomalyRuleId, licenceId, listingId, quotaId,
         requestId, version and DEV-001 holds version, so an edge into it carries them
-  notes: 'CF-135. **A portal over artefacts that already exist**, which is why this is frontend scope rather
-    than a contract gap — the twelve domain-13 rows left open after the contract landed are all this screen
-    and its siblings. **The API reference.** A developer arrives at the documentation, not at a sign-up
-    form — registration is what they do after reading. **Declared 20 August** — `isEntryPoint` existed in
-    the schema and five platforms used none, so every screen in them read as unreachable.
-  
-  
+  notes: 'CF-135. **A portal over artefacts that already exist**, which is why this is frontend scope
+    rather than a contract gap — the twelve domain-13 rows left open after the contract landed are all
+    this screen and its siblings. **The API reference.** A developer arrives at the documentation, not
+    at a sign-up form — registration is what they do after reading. **Declared 20 August** — `isEntryPoint`
+    existed in the schema and five platforms used none, so every screen in them read as unreachable.
+
+
     **The reference content is the published OpenAPI document of the selected version, a static file built
     from the release''s public contract and served with the portal (`/reference/{version}/openapi.json`);
     listApiVersions picks the version and listApiScopes groups the operations (ApiScope.operations). The
@@ -418,15 +418,10 @@ screens:
       trigger: They provision a sandbox and build against it
       provenance: flow F27 step 3→4
       operation: createApiClient
-      carries:
-      - clientId
     - to: DEV-008
       trigger: TICVAI decides the request
       provenance: flow F36 step 4→5
       operation: requestProductionAccess
-      carries:
-      - listingId
-      - requestId
   notes: 'CF-135a. **The one credential model** — 2.7.52, 7.1.25 and 7.1.30 each asserted their own. **Rotation
     carries an overlap window and revocation does not**: one is hygiene, the other is what you reach for
     when a secret has leaked, and a grace period defeats it.
@@ -1216,8 +1211,6 @@ screens:
       trigger: TICVAI reviews the integration and certifies it
       provenance: flow F36 step 2→3
       operation: submitIntegrationListing
-      carries:
-      - listingId
   notes: '13.1.49 and 13.1.50, decision D1. **A listing, not an installation** — the integration runs
     on the developer''s own infrastructure, and third-party code does not execute inside TICVAI.
 
@@ -1362,8 +1355,6 @@ screens:
     - to: DEV-003
       trigger: They request production access for the certified integration
       provenance: flow F36 step 3→4, F36 step 5→6
-      carries:
-      - clientId
   notes: '**`DEVELOPER_ADMIN` throughout, and never shown to a developer.** Decision D5 makes the commercial
     model configuration rather than code — this is the surface, and the rates themselves remain CF-135c.
     **Staff audience on a partner platform, and deliberately.** Every operation here — `setApiQuota`,

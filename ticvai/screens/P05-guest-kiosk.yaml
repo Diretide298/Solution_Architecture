@@ -96,8 +96,6 @@ screens:
       operation: getPublishedKioskConfig
       crossesDevice: true
       back: false
-      carries:
-      - kioskConfigId
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written. **The attract loop is the entry.** A kiosk has no login and nobody navigates to it
     — it is what the screen shows when nobody is standing there. **Declared 20 August** — `isEntryPoint`
@@ -344,8 +342,6 @@ screens:
       trigger: Chooses tickets and quantities
       provenance: flow F07 step 3→4
       operation: listProducts
-      carries:
-      - productId
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written.
   density: touchLarge
@@ -640,8 +636,6 @@ screens:
     - to: KSK-008
       trigger: The payment does not resolve
       provenance: flow F57 step 1→2
-      carries:
-      - paymentId
     entryFrom:
     - KSK-003
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
@@ -769,8 +763,6 @@ screens:
       trigger: Takes the printed ticket
       provenance: flow F07 step 7→8, F75 step 5→6
       operation: createPayment
-      carries:
-      - orderId
   notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written. **Card only. No foreign cash** — a kiosk accepting foreign notes needs a note
     reader and a per-currency float, and neither is specified. A guest paying by card in a foreign currency
@@ -874,8 +866,6 @@ screens:
       trigger: Or it resolves and the printer fails
       provenance: flow F57 step 2→3
       operation: inquirePaymentStatus
-      carries:
-      - orderId
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written.
   density: touchLarge
@@ -1608,8 +1598,6 @@ screens:
       operation: handoverToAgent
       crossesDevice: true
       back: false
-      carries:
-      - conversationId
   notes: 'Added 17 August for 2.1.28, which names the kiosk explicitly and was the only surface with no
     AI screen. **Scoped to `guestCapabilityScope`** — ticket selection, promotions, FAQs, recommendations
     and checkout, and nothing else. **No keyboard**: voice or a constrained touch interface, which is
