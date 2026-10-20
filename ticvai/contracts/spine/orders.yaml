@@ -4086,6 +4086,7 @@ paths:
               schema:
                 $ref: '../shared/common.yaml#/components/schemas/Problem'
         '403':
+          x-ticvai-problem-types: [cart-token-mismatch]
           description: '**The cart''s token was not sent, or does not match** (R8 blocker IDENTITY-C49, the lead''s answer A;
             CHG-R8MIG-021): only the device that built the anonymous cart holds its `token`, so it is the proof. Nothing
             is attached.'

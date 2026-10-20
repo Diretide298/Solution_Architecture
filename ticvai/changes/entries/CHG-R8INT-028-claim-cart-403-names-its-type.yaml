@@ -1,0 +1,29 @@
+id: CHG-R8INT-028
+date: '2026-10-20'
+source: audit
+kind: contract
+summary: 'claimCart''s 403 (the anonymous cart''s token not sent, or not matching) names its problem type,
+  cart-token-mismatch, so check-problem-types is back at its ceiling of 115 after the merge of the integration pass.'
+decision:
+  what: 'contracts/spine/orders.yaml claimCart 403: `x-ticvai-problem-types: [cart-token-mismatch]`.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: check-problem-types at the merge commit 98dc1e91: 116 untyped operation-specific error responses against
+  the ceiling of 115. The integration pass lowered the ceiling to 115 (CHG-R8INT-012) on a branch without storage-core''s
+  claimCart 403 (CHG-R8MIG-021), and storage-core''s side had 116 under the old ceiling of 117; the merge combined them.'
+keys_touched:
+  operations: [claimCart]
+  files:
+  - contracts/spine/orders.yaml
+root_class: 'a ratchet lowered on one branch while another branch added to what it counts'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: r8 integration'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-problem-types.py
+status: open
