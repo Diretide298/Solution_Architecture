@@ -529,6 +529,10 @@ def read_ddl() -> dict[str, dict]:
     tables its foreign keys point at. The SQL is the storage truth (backend/MIGRATIONS.md), so the
     migration plan is read from it rather than from the contracts' persistence notes."""
     tables: dict[str, dict] = {}
+    # **A forward file after the early names file names a renamed table by its new name** (CHG-R8WFM-001): V0108 adds
+    # sync.dsar_request.cell_results, which the 010 files create as platform.dsar_request; the new name is resolved to
+    # the table read so far, which takes its new name at the end.
+    back_ = {b: a for a, b in table_moves().items()}
     for db in ("tenant", "control"):
         # **The forward migrations after r1 are DDL too** (3 October, CHG-TBF-002). Since the baseline froze,
         # derive-ddl writes a new table into `backend/<db>/V<nnnn>__after_r1_<date>.sql`, not into 010-<schema>.sql.
@@ -541,10 +545,11 @@ def read_ddl() -> dict[str, dict]:
             name, cols_ = None, []
             for line in f.read_text(encoding="utf-8").splitlines():
                 m = re.match(r'ALTER TABLE (\w+\.\w+) ADD COLUMN IF NOT EXISTS (\w+)\s+(.+?);?$', line)
-                if m and m.group(1) in tables:
-                    have = {c for c, _ in tables[m.group(1)]["columns"]}
+                tn_ = m.group(1) if m and m.group(1) in tables else (back_.get(m.group(1)) if m else None)
+                if m and tn_ in tables:
+                    have = {c for c, _ in tables[tn_]["columns"]}
                     if m.group(2) not in have:
-                        tables[m.group(1)]["columns"].append((m.group(2), m.group(3)))
+                        tables[tn_]["columns"].append((m.group(2), m.group(3)))
                     continue
                 m = re.match(r'CREATE TABLE IF NOT EXISTS (\w+)\."?(\w+)"? \(', line)
                 if m:
