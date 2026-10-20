@@ -243,6 +243,11 @@ const expectedOf = {};
     9006: { workPackage: { key: '9006', subject: '[DB] Migration V0006__transport.sql: transport (1 tables)', description: 'Tenant database.' },
       touches: [{ kind: 'table', id: 'transport.departure' }] },
     9100: { workPackage: { key: '9100', subject: '[BE] Build getPlan', description: 'Builds getPlan.' }, touches: [{ kind: 'table', id: 'subscription.plan' }] },
+    // Review 8: a tenant ticket whose package statements make V0105's role, and a control ticket.
+    9300: { workPackage: { key: '9300', subject: '[DB] Migration V0002__fnb_menu.sql: platform outlet and fnb menu (2 tables)', description: 'Tenant database. Tables: platform.outlet, fnb.menu.' },
+      touches: [{ kind: 'table', id: 'platform.outlet' }, { kind: 'table', id: 'fnb.menu' }] },
+    9400: { workPackage: { key: '9400', subject: '[DB] Migration V0002__api_client.sql: control api client (1 tables)', description: 'Control database. Tables: control.api_client.' },
+      touches: [{ kind: 'table', id: 'control.api_client' }] },
   };
   let fileReads = 0;
   let failRead = null;
@@ -294,12 +299,22 @@ const expectedOf = {};
   'the baseline: one check per database, with 000-002 and the helper functions', JSON.stringify(base?.checks.map((x) => [x.database, x.statements.length])));
   ok(/`db\/tenant\/V0001__baseline\.sql` and `db\/control\/V0001__baseline\.sql`/.test(read('9001', 'README.md')), 'README.md names both files');
 
+  // Review 8: roles are the server's, so every check, of either database, carries the one server-wide set.
+  await pull.run(client, { key: '9300', dir });
+  await pull.run(client, { key: '9400', dir });
+  expectedOf[9300] = JSON.parse(read('9300', 'expected-schema.json') ?? 'null');
+  expectedOf[9400] = JSON.parse(read('9400', 'expected-schema.json') ?? 'null');
+  const servers = [...base.checks, ...expectedOf[9300].checks, ...expectedOf[9400].checks, ...sub.checks].map((x) => `${x.database} ${JSON.stringify(x.server)}`);
+  ok(expectedOf[9400]?.checks?.[0]?.database === 'control' && new Set(servers.map((x) => x.replace(/^\w+ /, ''))).size === 1
+    && servers.every((x) => x.endsWith(JSON.stringify(c?.server))) && expectedOf[9300].checks[0].statements.some((s) => /apply_parent(_split)?_across_rls/.test(s.sql)),
+  '**every check carries the same server-wide set, control\'s too (the role a tenant file makes is the server\'s)**', servers.join(' | '));
+
   await pull.run(client, { key: '9034', dir });
   const fk = JSON.parse(read('9034', 'expected-schema.json') ?? 'null')?.checks?.[0];
   ok(fk?.kind === 'foreign-keys' && fk.statements.length === 2 && Object.keys(fk.tables).length === 0 && !fk.keysNotInPackageDdl,
     'the cross-schema keys ticket: its two keys, and no tables of its own', JSON.stringify(fk?.statements?.map((s) => s.guard?.constraint)));
 
-  failRead = '910-indexes.sql';
+  failRead = 'tenant/910-indexes.sql';
   forgetPackageFiles();
   const broken = await pull.run(client, { key: '9005', dir });
   ok(!read('9005', 'expected-schema.json') && /could not be written \(backend\/tenant\/910-indexes\.sql would not read\)/.test(read('9005', 'README.md'))
@@ -408,6 +423,39 @@ if (!dockerUp) {
   writeFileSync(path.join(control, 'V0001__baseline.sql'), baseline('control'));
   const first = runScript(repo, '9001');
   ok(first.code === 0 && (first.out.match(/MATCH: /g) ?? []).length === 2, 'the baseline: MATCH in both databases', first.out);
+
+  // Review 8, C1: a control ticket before and after a tenant ticket whose package statements make V0105's role
+  // (the server's, once made), in one folder with real r8 tickets. Every one MATCHes, and --clean changes nothing.
+  {
+    const both = path.join(SCRATCH, 'both-databases');
+    for (const db of ['tenant', 'control']) mkdirSync(path.join(both, 'db', db), { recursive: true });
+    for (const k of [9001, 9300, 9400]) {
+      mkdirSync(path.join(both, '.adam', 'work', String(k)), { recursive: true });
+      writeFileSync(path.join(both, '.adam', 'work', String(k), 'expected-schema.json'), JSON.stringify(expectedOf[k], null, 2));
+    }
+    const fileFor = (db, tables) => `${ticketStatements(pkgFiles(db), { kind: 'tables', tables })
+      .filter((s) => !(s.guard && !tables.includes(s.guard.references)))
+      .map((s) => {
+        const add = /^ALTER TABLE ([\w.]+) ADD CONSTRAINT (\w+)/i.exec(s.sql);
+        return add ? `ALTER TABLE ${add[1]} DROP CONSTRAINT IF EXISTS ${add[2]};\n${s.sql};` : `${s.sql};`;
+      }).join('\n')}\n`;
+    writeFileSync(path.join(both, 'db', 'tenant', 'V0001__baseline.sql'), baseline('tenant'));
+    writeFileSync(path.join(both, 'db', 'control', 'V0001__baseline.sql'), baseline('control'));
+    writeFileSync(path.join(both, 'db', 'tenant', 'V0002__fnb_menu.sql'), fileFor('tenant', ['platform.outlet', 'fnb.menu']));
+    writeFileSync(path.join(both, 'db', 'control', 'V0002__api_client.sql'), fileFor('control', ['control.api_client']));
+    const hasRole = () => docker(['exec', CONTAINER, 'psql', '-U', 'postgres', '-Atc', "SELECT count(*) FROM pg_roles WHERE rolname = 'ticvai_parent_visible'"]).stdout.trim();
+    const roleBefore = hasRole();
+    const steps = [['control 9400, before any tenant run', runScript(both, '9400')], ['tenant 9300', runScript(both, '9300')]];
+    const roleAfter = hasRole();
+    steps.push(['control 9400, after it', runScript(both, '9400')], ['baseline 9001 (both databases)', runScript(both, '9001')],
+      ['--clean', runScript(both, '--clean')], ['control 9400, after --clean', runScript(both, '9400')]);
+    const bad = steps.filter(([what, r]) => r.code !== 0 || (what === '--clean' ? !/The server's roles were already exactly what the package makes/.test(r.out)
+      : (r.out.match(/^MATCH: /gm) ?? []).length !== (/9001/.test(what) ? 2 : 1)));
+    ok(roleBefore === '0' && roleAfter === '1' && bad.length === 0,
+      '**review 8: a control ticket MATCHes before and after a tenant ticket that makes the package\'s role, and --clean leaves the server as it is**',
+      `role ${roleBefore} -> ${roleAfter}\n${bad.map(([what, r]) => `${what}: ${r.out}`).join('\n---\n')}`);
+    runScript(both, '--clean');
+  }
 
   writeFileSync(path.join(tenant, 'V0002__kernel.sql'), migrationFor(['kernel.inbox']));
   writeFileSync(path.join(tenant, 'V0008__games.sql'), 'SELECT 1;\n');
@@ -533,7 +581,7 @@ if (!dockerUp) {
   const rolesLeft = psqlAt("SELECT string_agg(rolname, ',' ORDER BY rolname) FROM pg_roles WHERE rolname !~ '^pg_'");
   const memberLeft = psqlAt("SELECT count(*) FROM pg_auth_members a JOIN pg_roles m ON m.oid = a.member JOIN pg_roles g ON g.oid = a.roleid WHERE m.rolname = 'postgres' AND g.rolname = 'pg_read_all_data'");
   ok(cleanedRoles.code === 0 && /Removed 2 roles the package does not make \((probe_back, probe_owner|probe_owner, probe_back)\)/.test(cleanedRoles.out)
-    && /Revoked 1 role membership the package does not make \(postgres in pg_read_all_data\)/.test(cleanedRoles.out) && rolesLeft === 'postgres' && memberLeft === '0',
+    && /Revoked 1 role membership the package does not make \(postgres in pg_read_all_data\)/.test(cleanedRoles.out) && !/probe_/.test(rolesLeft) && memberLeft === '0',
   '--clean removes every role and role membership the package does not make, in the check\'s own container', `${cleanedRoles.out} [${rolesLeft}] [${memberLeft}]`);
   const path1 = check(`SET search_path = subscription, public;\n${good}`);
   ok(path1.code === 0 && /MATCH: 5 tables/.test(path1.out), 'a file that sets search_path still matches (names print the same in every snapshot)', path1.out);
@@ -667,11 +715,12 @@ if (!dockerUp) {
       + 'CREATE TABLE IF NOT EXISTS platform.schema_version (version text PRIMARY KEY, description text, checksum text, execution_ms int);\n'
       + "CREATE SCHEMA IF NOT EXISTS a;\nCREATE OR REPLACE FUNCTION platform.visible_ids() RETURNS int LANGUAGE sql AS 'SELECT 1';\n");
     writeFileSync(path.join(dir, 'db', 'tenant', 'V0002__fnb.sql'), earlier);
-    for (const [key, { file, sql, table = 'a.t', server = PKG_SERVER }] of Object.entries(tickets)) {
+    for (const [key, { file, sql, table = 'a.t', server = PKG_SERVER, extra = [] }] of Object.entries(tickets)) {
       mkdirSync(path.join(dir, '.adam', 'work', key), { recursive: true });
       writeFileSync(path.join(dir, 'db', 'tenant', file), sql);
       writeFileSync(path.join(dir, '.adam', 'work', key, 'expected-schema.json'), JSON.stringify({ checks: [{ database: 'tenant', migration: file,
-        tables: { [table]: {} }, ...(server ? { server } : {}), statements: [{ file: '010-a.sql', sql: `CREATE TABLE IF NOT EXISTS ${table} (id int)` }] }] }));
+        tables: { [table]: {} }, ...(server ? { server } : {}),
+        statements: [{ file: '010-a.sql', sql: `CREATE TABLE IF NOT EXISTS ${table} (id int)` }, ...extra.map((x) => ({ file: '010-a.sql', sql: x }))] }] }));
     }
     return dir;
   };
@@ -789,6 +838,15 @@ if (!dockerUp) {
   ok(waitedOk.code === 0 && /MATCH/.test(waitedOk.out) && /- waited for the server-wide role lock, held by process \d+ in database postgres/.test(waitedOk.out)
     && timedOut.code === 1 && /FAILED: .*waited 5 s for the server-wide role lock in this container, and it is still held by process \d+ in database postgres/.test(timedOut.out) && waitedS < 14,
   'a run that waits for the role lock says what holds it, and gives up after the wait with a message naming it', `${waitedOk.out}\n---\n${timedOut.out} (${waitedS.toFixed(1)} s)`);
+  // Review 8, m1: the ticket's copy and the package's copy of one run take the same lock. A wait for the other copy
+  // says so, and is not counted in the file's time.
+  const ownWait = smallFolder('own-wait', { earlier: 'SELECT 1;\n', tickets: { 69: { file: 'V0003__t.sql', sql: `${T}SELECT pg_sleep(4);\n`, extra: ['SELECT pg_sleep(4)'] } } });
+  const ow = runScript(ownWait, '69');
+  const owSecs = Number(/- first run: \d+ statements? applied in ([\d.]+) s/.exec(ow.out)?.[1] ?? 99);
+  ok(ow.code === 0 && /- waited for the server-wide role lock, held by process \d+ in database adam_\w+_(expect|ticket), .*\(this run's own copy of the (package's statements|ticket's file)\)/.test(ow.out)
+    && !/another folder/.test(ow.out) && owSecs < 6,
+  'review 8 m1: a wait for the run\'s own other copy names it as such, and the first run\'s time leaves the wait out', ow.out);
+  runScript(ownWait, '--clean');
   for (const d of [cA, cB, bypass]) runScript(d, '--clean');
 
   // Another folder's databases, last used more than two weeks ago: kept while that folder holds its
