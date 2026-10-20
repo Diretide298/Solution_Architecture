@@ -1,0 +1,49 @@
+id: CHG-R8ERA-002
+date: '2026-10-20'
+source: plan
+kind: contract
+summary: 'deleteGuestAccount''s erasure job calls ai.eraseSubject again (x-ticvai-calls), now that Block A builds it
+  (CHG-R8ERA-001). The tombstone stays the record and the proof: the AI erasure is owed until a call answers zero left.
+  A failed call undoes nothing; the job retries it with backoff, and its daily sweep calls eraseSubject for every
+  tombstoned subject. This replaces the "catch up from the release that builds it" part of CHG-R8RES-003; the guest''s
+  request and its 202 do not change.'
+decision:
+  what: 'contracts/spine/identity.yaml deleteGuestAccount: x-ticvai-calls [ai.eraseSubject] restored (its comment says
+    why), and the AI-index paragraph of the description rewritten: the job calls eraseSubject after the tombstone; done
+    is rowsLeft 0 and pointsLeft 0; until then the tombstone keeps it owed; the retry is the job''s backoff and its
+    daily sweep over tombstoned subjects; the 202 does not wait. contracts/satellite/ai.yaml eraseSubject: the caller
+    sentence says it is built in Block A and names the retry and the sweep. No screen, field, response, status,
+    operation, event or table changes.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'The lead''s decision of 20 October 2026, "Accepting both as recommended" (CHG-R8ERA-001), puts eraseSubject in
+  Block A. CHG-R8RES-003 (commit e52d0038) had removed the call only because a Block A operation may not call one that
+  Block D builds (check-plan-closure C-CALLS; that ruling still holds and is met). Its tombstone record is kept and its
+  later-release catch-up is replaced: this is a new entry, not an amendment, so the r8 log shows both decisions in the
+  order they were made. ADR-0047, ADR-0049.'
+keys_touched:
+  operations: [deleteGuestAccount, eraseSubject]
+  files:
+  - contracts/spine/identity.yaml
+  - contracts/satellite/ai.yaml
+root_class: 'a call removed for a block placement that the lead then changed'
+tickets:
+  started: []
+  unstarted:
+  - 'SVC-IDENTITY-GUESTAUTH-1 (#27727, deleteGuestAccount #30654: the erasure job calls eraseSubject, retries and
+    sweeps) and AI-ENGINE-ERASE-SUBJECT (eraseSubject).'
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: a decision of the lead; no ADAM CR is needed'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-plan-closure.py
+status: open
+notes: '**Supersedes in part CHG-R8RES-003**: its tombstone record stays; its "the job calls eraseSubject from the
+  release that builds it, and once for every subject tombstoned before" no longer applies: both operations are built in
+  Block A, so the job calls eraseSubject from its first run (and the sweep covers any subject tombstoned without it). **For the lead:** no column records that a subject''s AI erasure is
+  done (pii.subject has is_erased, erased_at and erasure_request_id only), so the daily sweep calls eraseSubject for
+  every tombstoned subject, each answering zeros once erased. A marker column (for example
+  pii.subject.ai_erased_at) would bound the sweep, but it is a migration and is not part of this decision.
+  If SVC-IDENTITY-GUESTAUTH-1 is started by the time r8 ships, it gets this change as a CR comment (rule 7).'

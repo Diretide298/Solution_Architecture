@@ -3414,9 +3414,10 @@ paths:
       description: '**Erasure reaches the AI data, and can be proven** (R8 blocker FOUNDATION-AI-C42, CHG-R8MIG-025;
         ADR-0047: nothing cascades). Called by Identity''s erasure job, cell-internal over mTLS, for a subject
         Identity has tombstoned (`deleteGuestAccount`''s erasure request): Identity''s tombstone is the record the job
-        works from, and `deleteGuestAccount` does not wait for this call (r8 gate residue, CHG-R8RES-003). **From the release
-        that builds this operation**, the job calls it for each subject it tombstones, and once for every subject
-        tombstoned before then. For the subject it deletes, in this order and retried until both
+        works from, and `deleteGuestAccount` does not wait for this call (r8 gate residue, CHG-R8RES-003). **Built in
+        Block A** (the lead, 20 October 2026; CHG-R8ERA-001, AI-ENGINE-ERASE-SUBJECT): the job calls it for each
+        subject it tombstones and retries a failed call until one answers zero left, and its daily sweep calls it for
+        every tombstoned subject, so a retry lost with a stopped job is still made (CHG-R8ERA-002). For the subject it deletes, in this order and retried until both
         are done: the `ai.index_entry` rows with that `subject_id` and the `ai.chunk_embedding` rows with that
         `subject_id` (one transaction), then the Qdrant points with that subject in their payload (by payload filter on
         `subjectId`, which also catches a point whose row went first). **The proof the erasure keeps**: zero rows in

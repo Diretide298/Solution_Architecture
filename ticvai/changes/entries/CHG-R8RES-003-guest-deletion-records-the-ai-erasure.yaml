@@ -37,4 +37,6 @@ prevention:
 status: open
 notes: 'Risk for the lead: until eraseSubject ships, a deleted guest''s AI index rows and Qdrant points (Block A indexes
   through SVC-AI-RETRIEVAL-1) stay until the catch-up call, and no plan task yet builds the job''s catch-up call. The
-  alternative is a plan change (eraseSubject into Block A: kind plan, 24-hour cooling-off).'
+  alternative is a plan change (eraseSubject into Block A: kind plan, 24-hour cooling-off). **Superseded in part**
+  (20 October 2026, evening): the lead took that plan change (CHG-R8ERA-001), and CHG-R8ERA-002 restores the call and
+  replaces the later-release catch-up; the tombstone record stays.'
