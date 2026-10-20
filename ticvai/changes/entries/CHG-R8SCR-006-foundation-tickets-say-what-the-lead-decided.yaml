@@ -40,5 +40,6 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-ticket-text.py
-status: open
+status: closed
+closed_by_commit: '6b80ca39'
 notes: 'handoff/service-docs/tasks.csv and the LLD are regenerated from these at the lead''s refresh.'

@@ -22,4 +22,5 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-step-up.py
-status: open
+status: closed
+closed_by_commit: '46bf74a5'

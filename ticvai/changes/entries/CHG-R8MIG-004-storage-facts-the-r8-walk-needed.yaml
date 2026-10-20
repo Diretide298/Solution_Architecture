@@ -49,7 +49,8 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-contract-storage.py
-status: open
+status: closed
+closed_by_commit: '430094c6'
 notes: 'check-contract-storage (ST-FIELD-NO-COLUMN, ST-TABLE-MISSING) fails a persisted field with no column; the
   generator rule only_not_null_dropped has two tests in tools/tests/test_migration_generator.py. The NOT NULL of
   tenancy.device_assignment.device_id and of the new platform.audit_read columns stay review rows in

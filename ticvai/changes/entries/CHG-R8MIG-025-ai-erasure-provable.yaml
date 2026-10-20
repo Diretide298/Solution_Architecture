@@ -37,6 +37,7 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-contract-storage.py
-status: open
+status: closed
+closed_by_commit: '5119845c'
 notes: 'Requested of the surface lane: ADR-0049 and ai-system-design.md one wording (subject_id on the chunk row), and an
   optional identity.subjectErased event if the AI side should rather listen than be called.'

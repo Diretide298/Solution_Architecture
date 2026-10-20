@@ -42,7 +42,8 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-storage-promises.py
-status: open
+status: closed
+closed_by_commit: '66e921f5'
 notes: 'The two DROP NOT NULLs (ai.activity.principal_id, ai.conversation.principal_id) and the two CHECK changes on
   marketing.customer_badge are listed in handoff/migration-review.md for the migration owner: derive-ddl writes only
   additive statements (request to storage-core: generate a guarded DROP NOT NULL for a relaxation, as it does for a

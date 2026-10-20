@@ -38,6 +38,7 @@ triage: blocker
 prevention:
   type: generator-rule
   ref: tools/ticket_done.py::control_only
-status: open
+status: closed
+closed_by_commit: '42c27396'
 notes: 'tools/tests/test_ticket_done_control.py covers both done-when kinds. A ticket mixing control and tenant work
   keeps the general sentence (its tenant tables are under row-level security).'

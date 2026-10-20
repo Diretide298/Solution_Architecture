@@ -49,7 +49,8 @@ triage: blocker
 prevention:
   type: generator-rule
   ref: tools/ticket_done.py::parent_policy_moves
-status: open
+status: closed
+closed_by_commit: '968d5f7f'
 notes: 'tools/tests/test_ticket_done_control.py covers the move, the type sentence, the baseline sentence and the
   done-when. build-service-docs prints a WARNING for a parent policy whose parent no migration ticket creates (none on
   r8) and for a type on a table no ticket creates. check-migration-wording and check-migration-tickets pass on the

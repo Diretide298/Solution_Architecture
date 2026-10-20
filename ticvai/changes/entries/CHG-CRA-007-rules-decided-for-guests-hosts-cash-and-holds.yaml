@@ -66,7 +66,8 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-business-rules.py
-status: open
+status: closed
+closed_by_commit: 'fe215069'
 notes: 'Prevention: check-business-rules, one rule per decision (BR-GUEST-PII, BR-HOST-ROUTING, BR-CASH-RECEIPT,
   BR-HOLD-LAPSE), shown failing on r6 (40 findings) and passing after. Sibling query: other guest reads of GuestProfile
   take the same marks from the schema (getGuestProfile and the list reads; their text is unchanged); capturePayment

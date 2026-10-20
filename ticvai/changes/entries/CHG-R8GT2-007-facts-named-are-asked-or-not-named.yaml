@@ -43,6 +43,7 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-cross-module-reads.py
-status: open
+status: closed
+closed_by_commit: 'a2245825'
 notes: 'addCartLine, which prices a bundle line, does not name the bundle price and asks no promotions#bundleRecords;
   the check does not see it and this entry does not add it (a question for the orders owner).'

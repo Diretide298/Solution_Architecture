@@ -40,5 +40,6 @@ triage: blocker
 prevention:
   type: generator-rule
   ref: tools/derive-ddl.py::RLS_MARKS
-status: open
+status: closed
+closed_by_commit: '1f0e51cc'
 notes: 'Applied on PostgreSQL 16 (the generated files twice; marketing.customer_badge has its four policies).'

@@ -29,5 +29,6 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-problem-types.py
-status: open
+status: closed
+closed_by_commit: '77d92d5f'
 notes: 'check-problem-types holds the ceiling at 117 and requires problem types on every new error response.'

@@ -43,6 +43,7 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-error-sources.py
-status: open
+status: closed
+closed_by_commit: '11b37542'
 notes: 'The other contract requests the generators lane handed over are listed in the integration report as left,
   each with its size; most need several contracts, an event or a plan change.'

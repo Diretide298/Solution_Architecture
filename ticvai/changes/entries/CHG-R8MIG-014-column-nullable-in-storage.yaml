@@ -43,7 +43,8 @@ triage: blocker
 prevention:
   type: generator-rule
   ref: tools/derive-schema.py::column_nullable
-status: open
+status: closed
+closed_by_commit: '2bb60db8'
 notes: 'check-contract-storage passes after the derive. check-contract-storage ST-REQUIRED-MISMATCH skips a field only
   when readOnly; it does not yet read x-ticvai-column-nullable (no finding today, since a required field in a nullable
   column is reported only for non-readOnly fields of the origin schema: the generators lane is asked to honour the mark).'

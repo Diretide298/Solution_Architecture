@@ -46,7 +46,8 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-cross-module-reads.py
-status: open
+status: closed
+closed_by_commit: '7fb8737e'
 notes: 'Prevention: check-cross-module-reads XR-FACT, which r7 runs and which refused these texts after the rebase;
   XR-LINEAGE holds the lineage''s readVia to the contract (checkOutRental clears at the release derive). Not changed
   here: replayEvents'' committed lineage readVia still names tenancy#outboxRecords for "its read of platform.outbox";

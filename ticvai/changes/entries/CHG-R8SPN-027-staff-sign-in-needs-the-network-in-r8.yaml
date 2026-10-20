@@ -34,7 +34,8 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-contract-compat.py
-status: open
+status: closed
+closed_by_commit: '66603b15'
 client_signoff: pending
 notes: 'Open item for r9: offline sign-in on the handheld scanner and turnstiles. For the client note: the offline-state
   wording of POS-000, EMP-001 and SCN-001 (approved) must change to ''signing in needs a connection''.'

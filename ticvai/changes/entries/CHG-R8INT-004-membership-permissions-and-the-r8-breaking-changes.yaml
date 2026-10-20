@@ -50,6 +50,7 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-contract-compat.py
-status: open
+status: closed
+closed_by_commit: '31781025'
 notes: 'The role grants are proposed (client to correct), like the other grants roles.yaml marks so. check-contract-compat
   does not read events; the event rule is in events/_schema.yaml and each v2 file''s header.'

@@ -34,7 +34,8 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-frontend-repos.py
-status: open
+status: closed
+closed_by_commit: 'd2eeda81'
 notes: '`reachable` stays the boolean false: tools/frontend_repos.py reads any true value as "the inside was read", so a
   "not checked" string there would have put the default profile forward as observed. The words "not checked" are in
   `result`.'

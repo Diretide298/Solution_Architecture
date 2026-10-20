@@ -47,7 +47,8 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-contract-storage.py
-status: open
+status: closed
+closed_by_commit: 'eecc3a3d'
 notes: 'Breaking by check-contract-compat, for the lead''s breaking-changes entry: every approvals operation returning
   decisions[] (decision gains return and requestInformation; principalId no longer guaranteed), and getGroupPackageDefinition,
   setGroupPackageDefinition and listGroupPackages (kind gains corporate, tourOperator, community). The widened CHECKs and

@@ -34,6 +34,7 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-plan-closure.py
-status: open
+status: closed
+closed_by_commit: 'feb24982'
 notes: 'check-migration-tickets passes on the regenerated plan; check-plan-closure C-GONE no longer reports
   platform.cell_endpoint once the departure is recorded.'

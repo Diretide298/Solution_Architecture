@@ -26,5 +26,6 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-ticket-builds.py
-status: open
+status: closed
+closed_by_commit: '67435f71'
 notes: 'A file that does not exist still fails B-UNRESOLVED.'

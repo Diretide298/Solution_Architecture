@@ -61,7 +61,8 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-contract-shapes.py
-status: open
+status: closed
+closed_by_commit: 'ccdd5ef5'
 notes: 'No started ticket builds any of the 124 operations (adam-links.json, statuses read 20 October 12:51). The five
   writes whose only required id is venueId and whose note says one per venue (setVirtualTicketIdentity,
   setFacePassEnrollment, simulateOfflineResilienceTesting, setGateOfflinePolicy, setDeviceBindingPolicy) and

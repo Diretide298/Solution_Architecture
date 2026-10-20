@@ -54,6 +54,7 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-states.py
-status: open
+status: closed
+closed_by_commit: '3d827d79'
 notes: 'shift.opened, the identity consumer on shift.closed and identity.guestRegistered''s emitter rely on the core
   lane''s identity.open_shift_marker and registerGuest emits, merged at the integration branch, not on this branch.'

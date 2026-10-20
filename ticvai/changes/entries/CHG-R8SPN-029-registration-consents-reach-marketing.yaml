@@ -32,5 +32,6 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-write-lineage.py
-status: open
+status: closed
+closed_by_commit: 'd8f40e36'
 notes: 'Lineage: registerGuest gains platform.outbox in its writes at the lead''s derive.'

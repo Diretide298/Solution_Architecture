@@ -48,7 +48,8 @@ triage: blocker
 prevention:
   type: generator-rule
   ref: tools/op-release.py::hold_problems
-status: open
+status: closed
+closed_by_commit: '85a9fe78'
 notes: '**Cooling-off waived.** `proposed` is the lead''s decision of 19 October, about 21:00 IST. The decision was to
   be recorded at the r8 tag on Wednesday 21 October; on 20 October (about 17:00 IST) the lead waived the 24-hour rule so
   the tag need not wait: "The tag we can go for now. Waive 24 hour rule for this one". The hold is not announced or

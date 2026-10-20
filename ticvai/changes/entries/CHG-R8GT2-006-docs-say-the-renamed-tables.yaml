@@ -30,4 +30,5 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-doc-tables.py
-status: open
+status: closed
+closed_by_commit: '05a194c1'

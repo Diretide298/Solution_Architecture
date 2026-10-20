@@ -48,7 +48,8 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-states.py
-status: open
+status: closed
+closed_by_commit: '9ba5b3f5'
 notes: 'Prevention: check-states rule 16 now also requires an operation that raises its own approval request to pass on
   createApprovalRequest''s 422 no-approval-route (self-test case added); it fails on suspendTenant and reactivateTenant
   before this change and passes after. tools/check-states.py is the generators lane''s file: edited at the lead''s

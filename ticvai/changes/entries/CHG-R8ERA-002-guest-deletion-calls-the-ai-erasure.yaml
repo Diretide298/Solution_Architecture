@@ -39,7 +39,8 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-plan-closure.py
-status: open
+status: closed
+closed_by_commit: '691e2b9e'
 notes: '**Supersedes in part CHG-R8RES-003**: its tombstone record stays; its "the job calls eraseSubject from the
   release that builds it, and once for every subject tombstoned before" no longer applies: both operations are built in
   Block A, so the job calls eraseSubject from its first run (and the sweep covers any subject tombstoned without it). **For the lead:** no column records that a subject''s AI erasure is

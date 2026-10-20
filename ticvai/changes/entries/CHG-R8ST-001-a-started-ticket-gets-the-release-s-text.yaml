@@ -36,6 +36,7 @@ triage: fix-forward
 prevention:
   type: generator-rule
   ref: tools/op-release.rb::text_update
-status: open
+status: closed
+closed_by_commit: '861c347f'
 notes: 'The comment carries the text, so a developer who never pulls through ADAM sees it too. A ticket whose text
   did not change gets nothing; a closed or held ticket gets nothing.'

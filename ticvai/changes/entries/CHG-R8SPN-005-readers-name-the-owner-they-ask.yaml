@@ -39,6 +39,7 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-cross-module-reads.py
-status: open
+status: closed
+closed_by_commit: '196f8ffb'
 notes: 'check-cross-module-reads already compares the lineage readVia with the contract''s; it reports each operation
   changed here as drifted until the lineage lane runs derive-lineage --apply.'

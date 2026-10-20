@@ -35,5 +35,6 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-approved-ui.py
-status: open
+status: closed
+closed_by_commit: '85729dc1'
 notes: Offline, only a caller who holds the permission can void or open the drawer (a step-up needs the server).

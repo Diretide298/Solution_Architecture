@@ -45,6 +45,7 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-problem-types.py
-status: open
+status: closed
+closed_by_commit: 'a4224db4'
 notes: 'The problem types are operation-specific, so they are declared on the response (common.yaml''s rule), not added
   to the shared catalogue.'

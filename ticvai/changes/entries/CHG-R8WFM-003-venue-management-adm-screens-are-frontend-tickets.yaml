@@ -26,6 +26,7 @@ triage: blocker
 prevention:
   type: generator-rule
   ref: tools/build-service-docs.py
-status: open
+status: closed
+closed_by_commit: '4a63ad16'
 notes: 'Started tickets keep their subject (op-release.rb); New ones take [FE]. 59 feature leads move with the
   frontend load; the operations these screens call stay on their SVC tickets, already in each screen ticket''s waits.'

@@ -31,5 +31,6 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-frontend-repos.py
-status: open
+status: closed
+closed_by_commit: '16157d95'
 notes: 'The task text is written into handoff/service-docs by the next refresh (build-service-docs, op-descriptions).'

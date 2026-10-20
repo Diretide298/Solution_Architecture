@@ -33,7 +33,8 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-contract-compat.py
-status: open
+status: closed
+closed_by_commit: 'be3fe4b2'
 notes: 'Prevention not added: a check rule "anonymous venue-scope read has a venue key" would flag by-id reads that
   carry the venue in the id, and 15 satellite reads (fnb, marketing-crm, retail, transport) that the satellite lane
   owns. Candidates for that lane are listed in the spine lane report.'

@@ -52,7 +52,8 @@ triage: fix-forward
 prevention:
   type: generator-rule
   ref: tools/ddl_forward.py::early_version
-status: open
+status: closed
+closed_by_commit: 'bc008f68'
 notes: 'Tested on PostgreSQL 16 (pgvector/pgvector:pg16): control and tenant apply from empty end to end with no error and
   V0107 reruns clean; a database already past V0105 that has never seen V0103a applies it with no change (every block is
   guarded; it only adds its schema_version row). tools/tests/test_migration_generator.py: early_version and the early header.

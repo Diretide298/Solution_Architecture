@@ -35,7 +35,8 @@ triage: fix-forward
 prevention:
   type: generator-rule
   ref: tools/ddl_forward.py::guard_add_constraint
-status: open
+status: closed
+closed_by_commit: '7157586d'
 notes: 'tools/tests/test_migration_generator.py: the key is guarded, checked (not NOT VALID, the column is new), and a
   second diff writes nothing. The frozen V0102 and V0104 still stop on a second run (delivered; a runner applies a file
   once by name).'

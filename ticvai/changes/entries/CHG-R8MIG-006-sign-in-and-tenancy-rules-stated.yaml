@@ -43,7 +43,8 @@ triage: blocker
 prevention:
   type: generator-rule
   ref: tools/ddl_forward.py::widened_check
-status: open
+status: closed
+closed_by_commit: 'da2e7af7'
 notes: 'Generator (tools/ddl_forward.py, three tests): a column CHECK that only gains values is written in the forward
   migration (dropped, added NOT VALID, validated), and a foreign key the contract withdraws is dropped, guarded, in the
   names file (ticket_done reads its tag); both were review rows a person had to write. Breaking by check-contract-compat: resolveTenantHost and setTenantDomainMapping responses gain the channel value

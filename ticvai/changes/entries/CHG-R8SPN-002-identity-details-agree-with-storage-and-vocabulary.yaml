@@ -37,7 +37,8 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-contract-compat.py
-status: open
+status: closed
+closed_by_commit: '7782ee60'
 notes: 'Request to the satellite lane: marketing-crm.yaml recordDeviceConsent must send scopePath (its
   marketing.device_consent.scope_path) in the ConsentIdentifierCapture body it posts to Identity. The sessionId
   tightening to format uuid needs an approved breaking change; none is listed.'

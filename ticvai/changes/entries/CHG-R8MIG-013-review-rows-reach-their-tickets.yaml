@@ -41,7 +41,8 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-migration-tickets.py
-status: open
+status: closed
+closed_by_commit: 'b45a120c'
 notes: 'Three rows sit on tables no migration ticket creates yet (approvals.accreditation_badge, and the two retired
   tables orders.payment_tip and platform.device_heartbeat): the check notes them, since the migration that creates such
   a table later takes it as it is then. Verified by running build-service-docs in the lane worktree: check-migration-tickets

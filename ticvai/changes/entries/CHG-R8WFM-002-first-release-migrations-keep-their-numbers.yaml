@@ -34,6 +34,7 @@ triage: blocker
 prevention:
   type: generator-rule
   ref: tools/build-service-docs.py
-status: open
+status: closed
+closed_by_commit: '4a63ad16'
 notes: 'Change notice for Hrushikant: nothing to apply; the seven files keep the numbers they were delivered with. The
   feature leads of some app-modules move with the schedule this order gives (46 features, no task''s assignee).'

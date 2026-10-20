@@ -41,5 +41,6 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-migration-wording.py
-status: open
+status: closed
+closed_by_commit: 'e9e4189c'
 notes: 'Prevention: check-migration-wording MW-AFTER-R1 already fails a migration ticket that does not cite an after-r1 file for a table it changes; it now covers the names file (ticket_done.AFTER_R1_FILE), and tools/tests/test_migration_generator.py holds the generator tests (guarded rename, index follows, key NOT VALID, partitioned key checked, second run writes nothing). Regenerate with derive-ddl.py then build-service-docs.py. The names file is left out of the build-order edges (build-service-docs read_ddl), so V0002-V0034 keep their numbers. Not run against a live PostgreSQL here.'

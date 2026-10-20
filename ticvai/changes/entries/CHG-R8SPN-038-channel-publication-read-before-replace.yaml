@@ -33,5 +33,6 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-contract-compat.py
-status: open
+status: closed
+closed_by_commit: '5cc03d1c'
 notes: 'New operation gates: PRODUCT_VIEW, no config noun, not a list (one product''s publication).'

@@ -41,6 +41,7 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-screen-wiring.py
-status: open
+status: closed
+closed_by_commit: 'd29f42cc'
 notes: 'x-ticvai-consumed-by of getMyCase still names GST-040 until the lead''s refresh rewrites it (S-CONSUMED-MIRROR,
   derived).'

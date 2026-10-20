@@ -38,5 +38,6 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-yaml-keys.py
-status: open
+status: closed
+closed_by_commit: 'eede71ad'
 notes: 'check-yaml-keys runs in run-checks.py; 1,487 authored YAML files, 0 duplicates after this change.'

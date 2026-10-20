@@ -24,6 +24,7 @@ triage: blocker
 prevention:
   type: generator-rule
   ref: tools/build-service-docs.py
-status: open
+status: closed
+closed_by_commit: '4a63ad16'
 notes: 'Only the CI provider. The rest of the walk''s foundation text (ticvai-frontend packages/api-client, the starter
   paths) is not changed here.'

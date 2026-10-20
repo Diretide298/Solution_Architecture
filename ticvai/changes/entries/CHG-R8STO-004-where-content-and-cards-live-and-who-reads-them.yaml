@@ -41,7 +41,8 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-cross-module-reads.py
-status: open
+status: closed
+closed_by_commit: '21f0adb3'
 notes: 'Needs other lanes: storage-core (the move of control.content_block in derive-schema-history, the contact
   column on platform.venue_settings, a row-security mark so a signed-in guest reads a gift card by code); generators
   (lineage of the content-block operations to whitelabel.content_block).'

@@ -29,4 +29,5 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-starter-fit.py
-status: open
+status: closed
+closed_by_commit: '6e569529'

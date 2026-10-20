@@ -31,7 +31,8 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-ticket-text.py
-status: open
+status: closed
+closed_by_commit: 'e989a8bf'
 notes: 'An ADAM change: it reaches developers only when the lead deploys ADAM and rebuilds the setup zip from HEAD
   (update.mjs is part of the connector''s build id). The ticvai-ai repository URL
   (http://gitlab.softlabsgroup.in/ticvai/ticvai-ai.git) is assumed beside ticvai-backend; the lead confirms it.'

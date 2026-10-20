@@ -42,4 +42,5 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-screen-wiring.py
-status: open
+status: closed
+closed_by_commit: '85729dc1'

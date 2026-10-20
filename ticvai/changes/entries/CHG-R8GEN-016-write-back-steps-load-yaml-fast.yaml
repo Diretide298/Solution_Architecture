@@ -24,4 +24,5 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-regenerate-twice.py
-status: open
+status: closed
+closed_by_commit: '44688424'

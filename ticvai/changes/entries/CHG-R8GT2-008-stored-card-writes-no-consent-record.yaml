@@ -33,7 +33,8 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-cross-deployable-writes.py
-status: open
+status: closed
+closed_by_commit: 'fc2c0068'
 notes: 'events/paymentToken-stored.yaml still lists the marketing consumer that records the consent, which the contract
   says no longer happens; CHG-R8MIG-022 asked the surface lane for that edit and for a paymentToken.revoked event file.
   Neither is on this branch.'

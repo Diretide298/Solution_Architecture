@@ -36,6 +36,7 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-cited-sources.py
-status: open
+status: closed
+closed_by_commit: '05a194c1'
 notes: 'CHG-R8MIG-022''s requests of the surface lane (an event file for paymentToken.revoked, paymentToken.stored
   without its consent-record consumer) are still not applied on this branch; this entry only rewords the citation.'

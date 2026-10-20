@@ -62,7 +62,8 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-contract-storage.py
-status: open
+status: closed
+closed_by_commit: 'c78070b7'
 notes: 'Prevention: check-contract-storage ST-GRAPH-TARGET-GONE (a relationship-graph column whose target table the
   package no longer has) and ST-DEFAULT-DESCRIBED (a stored enum whose description names its starting value with no
   declared default); shown failing on r6 (1 + 3 new: control.release.plan_id; connectionStatus, OutboxRepublish.status,

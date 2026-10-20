@@ -52,7 +52,8 @@ triage: blocker
 prevention:
   type: generator-rule
   ref: tools/ddl_forward.py::changed_check_only
-status: open
+status: closed
+closed_by_commit: '3dc0f90e'
 notes: 'Tests in tools/tests/test_migration_generator.py (an added CHECK and a narrowed one, each written once). Applied on
   PostgreSQL 16 from empty, the generated V0108/V0109 twice. On this branch alone the content-block move creates
   whitelabel.content_block from the control table''s columns while the old contract still names control.content_block;

@@ -48,7 +48,8 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-business-rules.py
-status: open
+status: closed
+closed_by_commit: 'bebbf376'
 notes: 'Additive for check-contract-compat (approvals: one more additive change, no new breaking one). The lineage
   entry was copied from the derivation (tools/derive-lineage.py expected()), so the release refresh leaves it as it
   is; check-lineage and check-write-lineage report nothing new for it. The grant consumers are text, not operations:

@@ -38,7 +38,8 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-contract-storage.py
-status: open
+status: closed
+closed_by_commit: 'b156c45c'
 notes: 'Additive by check-contract-compat. The generated forward migration drops order_event.order_id NOT NULL and adds the
   CHECK NOT VALID then VALIDATE (applied on PostgreSQL 16, twice). The WEB-031 request form''s session picker is the
   screens owner''s (requested in the lane report).'

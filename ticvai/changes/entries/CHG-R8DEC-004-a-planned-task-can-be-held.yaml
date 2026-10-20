@@ -45,7 +45,8 @@ triage: blocker
 prevention:
   type: generator-rule
   ref: tools/op-release.py::hold_problems
-status: open
+status: closed
+closed_by_commit: 'e43a0b75'
 notes: '**Which precedent.** Off the board as op-retire''s Deferred: no assignee and no sprint version, with one comment.
   The plan keeps the task''s assignee and sprint (tasks.csv and block-a-schedule.json are not touched), so the person
   it returns to is the plan''s at the release that lifts the hold. **Not run here.** op-release.rb runs on the

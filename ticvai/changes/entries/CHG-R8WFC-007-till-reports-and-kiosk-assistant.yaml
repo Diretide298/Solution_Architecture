@@ -39,7 +39,8 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-screen-permissions.py
-status: open
+status: closed
+closed_by_commit: '85729dc1'
 notes: 'KSK-015 needs the lead: (a) a session-bound anonymous conversation and a migration relaxing ai.activity activity_subject_id_when_chk
   for it, (b) the kiosk calling as its registered device with a device audience on ai.activity, or (c) the kiosk assistant
   after r8.'

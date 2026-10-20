@@ -37,4 +37,5 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-cross-module-reads.py
-status: open
+status: closed
+closed_by_commit: '7f4e92e7'

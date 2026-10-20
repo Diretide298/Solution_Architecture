@@ -31,4 +31,5 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-approved-ui.py
-status: open
+status: closed
+closed_by_commit: 'fba8aaca'

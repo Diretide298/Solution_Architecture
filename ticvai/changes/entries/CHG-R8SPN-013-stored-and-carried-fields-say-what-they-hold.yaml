@@ -34,7 +34,8 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-contract-compat.py
-status: open
+status: closed
+closed_by_commit: '50645781'
 notes: 'Requested from storage-core: platform.workstation.sale_board nullable (DROP NOT NULL in the next forward
   migration). Requested from surface: events/order-paid.yaml lines[] notes name lineId (uuid), variantId, quantity,
   lineTotal and performanceId (null for an untimed line).'

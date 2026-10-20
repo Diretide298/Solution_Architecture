@@ -41,6 +41,7 @@ triage: blocker
 prevention:
   type: generator-rule
   ref: tools/derive-ddl.py::RLS_MARKS
-status: open
+status: closed
+closed_by_commit: '27dacce9'
 notes: 'Applied on PostgreSQL 16 (generated files twice). apiKeyAuth for the kiosk (KSK-006) is not added: the scheme is
   deferred pending the Developer & API workshop (common.yaml); the kiosk reads its cart with its device session.'

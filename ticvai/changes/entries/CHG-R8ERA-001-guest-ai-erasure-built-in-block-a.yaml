@@ -46,7 +46,8 @@ triage: blocker
 prevention:
   type: generator-rule
   ref: tools/derive-delivery-slice.py::TRADING_VERB
-status: open
+status: closed
+closed_by_commit: '181ceea7'
 notes: '**Owner.** The plan''s owner of the Qdrant erasure (AI-ENGINE-QDRANT: "erasure by guest or document payload")
   is the second AI engineer (team.json plannedNames: Mrunali, not yet onboarded). The lead''s answer in team.json
   plannedNamesNote keeps the AI tickets with Kalpita Mejari until Mrunali starts. reindexSource itself is a back-end

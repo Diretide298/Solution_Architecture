@@ -29,6 +29,7 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-plan-closure.py
-status: open
+status: closed
+closed_by_commit: '244a9c87'
 notes: 'As endGuestDeviceSessions at r6. The task that builds it in Block A is whatever the plan generator gives a
   blockAOperations entry.'

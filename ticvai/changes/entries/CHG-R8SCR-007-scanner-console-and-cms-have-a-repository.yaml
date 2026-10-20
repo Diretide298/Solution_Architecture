@@ -34,6 +34,7 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-frontend-repos.py
-status: open
+status: closed
+closed_by_commit: 'd24d6b3b'
 notes: 'The setup CLAUDE.md ships in ADAM''s setup zip: it reaches developers at the next ADAM deploy. The ticket
   text and frontend/*.yaml are regenerated at the lead''s refresh (derive-frontend, build-service-docs).'

@@ -23,4 +23,5 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-write-lineage.py
-status: open
+status: closed
+closed_by_commit: 'a3847035'

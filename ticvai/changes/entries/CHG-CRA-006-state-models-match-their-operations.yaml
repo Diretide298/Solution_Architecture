@@ -44,7 +44,8 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-states.py
-status: open
+status: closed
+closed_by_commit: 'c05d69a4'
 notes: 'Prevention: check-states rule 14 (a requiresApproval transition''s operation takes a granted approvalRequestId
   with 409 approval-required, answers 202 until the decision, or says how the approval enters; the deciding
   operations are the approval) and rule 15 (DECIDED_EDGES: migration-run''s failed -> running through applyMigration

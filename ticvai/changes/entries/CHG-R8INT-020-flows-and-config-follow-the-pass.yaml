@@ -33,5 +33,6 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-flows.py
-status: open
+status: closed
+closed_by_commit: 'ba54f3a1'
 notes: 'The flows name operations only; no screen text changes.'

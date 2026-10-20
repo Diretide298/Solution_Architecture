@@ -50,7 +50,8 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-screen-patterns.py
-status: open
+status: closed
+closed_by_commit: 'fb7f390a'
 notes: 'Each P3 exemption and the BO-293 known failure goes when the client approves its parked wording
   (the r8 parked list for the client, lane-screens-pending-ui.json) and the text is applied. The two RF-TENANT-ROOT entries go
   when wallet.balance and identity.refresh_token get a scope (storage lane) or the operations run at tenant.'

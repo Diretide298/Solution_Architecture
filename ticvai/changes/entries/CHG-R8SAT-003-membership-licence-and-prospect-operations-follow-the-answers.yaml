@@ -52,7 +52,8 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-contract-compat.py
-status: open
+status: closed
+closed_by_commit: '57c57021'
 notes: 'BO-293''s no-access text names PLATFORM_CELL_MANAGE until the client approves the new wording (pending entry
   GPS-C33): check-screen-permissions SP-NOACCESS reports it, as it does DEV-001. CreditLot.issuedCredits needs its
   column at the lead''s derive (check-contract-storage). check-screens reports SGN-019 and SGN-024 drifting from

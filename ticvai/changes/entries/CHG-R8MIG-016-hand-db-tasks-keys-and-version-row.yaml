@@ -42,7 +42,8 @@ triage: blocker
 prevention:
   type: generator-rule
   ref: tools/ticket_done.py::key_moves
-status: open
+status: closed
+closed_by_commit: '854908bf'
 notes: 'tools/tests/test_ticket_done_control.py: a hand-written -DB task claims its tables (and PLATFORM-OUTBOX does not),
   the key move, the schema_version line. Tried end to end in the lane worktree with a test task claiming
   ai.signal_observation: it became a [DB] ticket with the migration text and done-when, the table left "Tables no

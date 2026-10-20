@@ -42,7 +42,8 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-storage-promises.py
-status: open
+status: closed
+closed_by_commit: '3eb4ab91'
 notes: 'PriceLadder.bands is a storage fact in a spine contract, written here as the addendum allows; the storage-core
   lane is told through the integration report. Two S-INPUT-SOURCE findings are built on by started tickets: the lead
   acknowledges them (--acknowledge-started) or fixes them.'

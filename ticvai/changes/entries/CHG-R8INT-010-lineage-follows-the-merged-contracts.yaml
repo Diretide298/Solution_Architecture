@@ -38,7 +38,8 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-lineage.py
-status: open
+status: closed
+closed_by_commit: '684fc315'
 notes: 'With the schema reference derived from the merged contracts, check-lineage passes (0 errors; LN-TEXT warning)
   and check-read-columns passes; on the committed, stale schema reference check-lineage reports the new tables as "in
   no schema" until the release derive writes it.'

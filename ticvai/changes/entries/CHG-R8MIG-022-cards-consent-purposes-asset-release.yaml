@@ -43,7 +43,8 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-contract-compat.py
-status: open
+status: closed
+closed_by_commit: '4517326a'
 notes: 'Breaking by check-contract-compat (for the lead''s entry): every marketing-crm response carrying ConsentPurpose gains
   storedPaymentCredential and facePassEnrolment (getGuestProfile, updateGuestProfile, mergeGuestProfiles, getGuestConsents,
   recordConsent, getConsentHistory, listConsentPurposes, listDataProcessingPurpose, setMinorGuardianAge and the rest the

@@ -36,7 +36,8 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-audience-match.py
-status: open
+status: closed
+closed_by_commit: '8081fc4c'
 notes: 'Screen parts requested of the surface lane: GST-037 binds getGuestCouponCode (GuestCouponCode) instead of getCouponCode and drops redemptionCount; GST-004, GST-056
   and WEB-008 bind getGuestBundle instead of getBundle; ADM-603
   binds listB2bCreditAccounts to the account picker and takes ADM-602 in entryFrom; GST-001 quick-action tiles and

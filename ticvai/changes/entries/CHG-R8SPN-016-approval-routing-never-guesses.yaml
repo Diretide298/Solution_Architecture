@@ -38,7 +38,8 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-problem-types.py
-status: open
+status: closed
+closed_by_commit: 'f7260465'
 notes: 'Requested from the generators lane: a check-business-rules rule BR-APPROVAL-ROUTE (setApprovalMatrix and
   approveMatrixMultiLevel declare 422 condition-not-supported; submitApprovalRequest''s 409 lists
   approval-no-longer-required and approval-no-approver-available).'

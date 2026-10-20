@@ -36,5 +36,6 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-contract-compat.py
-status: open
+status: closed
+closed_by_commit: '247dd3cb'
 client_signoff: pending

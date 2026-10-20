@@ -32,6 +32,7 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-ticket-builds.py
-status: open
+status: closed
+closed_by_commit: '41155cde'
 notes: 'Proved with a probe file backend/control/V0113 (11 findings, one per task) and removed. Without a release tag
   merged into HEAD every forward file counts as new, and the run says so.'

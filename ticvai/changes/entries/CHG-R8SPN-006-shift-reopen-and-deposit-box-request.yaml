@@ -37,6 +37,7 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-contract-compat.py
-status: open
+status: closed
+closed_by_commit: 'd0783434'
 notes: 'Prevention: check-contract-compat shows the enum gain and showed the first draft of the request split as 42
   removed request fields; CreateDepositBoxRequest therefore declares every DepositBox property by reference.'

@@ -48,7 +48,8 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-contract-storage.py
-status: open
+status: closed
+closed_by_commit: '4b7410cd'
 notes: 'The problem types sso-state-invalid (401) and sso-principal-not-provisioned (403) are named in the
   completeSsoAuthorization text; their response entries and catalogue rows are the core lane''s (requested in the lane
   report). Applied on PostgreSQL 16 from empty, the generated forward files twice.'

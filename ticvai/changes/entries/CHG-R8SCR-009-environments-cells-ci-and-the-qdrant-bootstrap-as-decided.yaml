@@ -48,7 +48,8 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-terraform-pools.py
-status: open
+status: closed
+closed_by_commit: 'ef84decb'
 notes: 'The SETUP-ENV, SETUP-CI, SETUP-CLIENTS and onboarding ticket texts are written by tools/build-service-docs.py
   (the storage-core lane''s); the requested wording is in the surface report. The infra project-bible copy of
   ADR-0038/0040 comes from tools/derive-mirrors.py at the lead''s refresh.'

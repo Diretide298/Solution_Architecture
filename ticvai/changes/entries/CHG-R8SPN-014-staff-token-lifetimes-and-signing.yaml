@@ -35,7 +35,8 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-contract-compat.py
-status: open
+status: closed
+closed_by_commit: '50645781'
 client_signoff: pending
 notes: 'The three PasswordPolicy fields are new columns of identity.password_policy; the lead''s release derive makes them.
   repos/ticvai-docs/setup/config-and-secrets.md is a derived mirror and picks the values up at the refresh.'

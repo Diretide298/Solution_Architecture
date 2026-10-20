@@ -36,4 +36,5 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-navigation.py
-status: open
+status: closed
+closed_by_commit: 'f9d5b824'

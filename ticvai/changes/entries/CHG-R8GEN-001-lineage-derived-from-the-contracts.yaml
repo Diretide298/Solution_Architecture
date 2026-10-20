@@ -46,7 +46,8 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-lineage.py
-status: open
+status: closed
+closed_by_commit: '2741c566'
 notes: 'LN-DERIVED fails on a hand edit of handoff/api-data-lineage.json or a contract changed without the derive;
   LN-OVERRIDE holds the override list (python tools/derive-lineage.py --audit lists the overrides a contract now
   derives). To change an operation''s tables, change its contract; an override is for what no contract fact can

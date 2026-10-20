@@ -54,7 +54,8 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-storage-promises.py
-status: open
+status: closed
+closed_by_commit: '21f0adb3'
 notes: 'SP-ARRAY-NOWHERE already catches an array with no column; the class here is a value the text names with no
   field. Requested of the generators lane: a rule that a description saying "stores", "kept on" or "recorded on" a
   named column finds that column in the schema reference.'

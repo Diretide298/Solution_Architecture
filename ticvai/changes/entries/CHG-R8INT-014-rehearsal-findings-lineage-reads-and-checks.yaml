@@ -53,7 +53,8 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-parameter-columns.py
-status: open
+status: closed
+closed_by_commit: 'bcc01cc3'
 notes: 'Left: check-cross-module-reads XR-FACT forceLogout (SupervisorStepUp''s text names orders.pos_shift) and
   recordConsentIdentifier (names marketing.device_consent), both from shared text, not this pass''s; check-package''s
   two build-readiness-21-september.md findings predate r8.'

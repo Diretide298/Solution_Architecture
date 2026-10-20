@@ -30,7 +30,8 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-contract-compat.py
-status: open
+status: closed
+closed_by_commit: '61a78009'
 notes: 'New operation gates: permission PRODUCT_VIEW (as getLatestBundle), no config noun, PageSize and PageCursor with
   order and statuses stated. It is bound by no screen (a till reads it in the background); the generators lane''s
   lineage derive adds its entry (reads nothing from the database).'

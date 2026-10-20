@@ -37,7 +37,8 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-cross-module-reads.py
-status: open
+status: closed
+closed_by_commit: '49c3f6e5'
 notes: 'orderLineId is optional in the schema and refused 422 without it, the package''s pattern for a field an r1
   client cannot send (orderId, paymentId), so no breaking change is recorded; the sale line''s orderLineId is a new
   nullable response field. No visible POS field changes. The next refresh adds retail.sale_line.order_line_id in the

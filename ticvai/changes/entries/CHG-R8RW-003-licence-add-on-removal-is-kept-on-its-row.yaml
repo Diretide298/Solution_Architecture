@@ -33,6 +33,7 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-request-fields-stored.py
-status: open
+status: closed
+closed_by_commit: '6e13d81a'
 notes: 'New readOnly response fields only: additive. The next refresh writes three ADD COLUMN lines for
   control.licence_add_on into the control forward migration (proved on PostgreSQL 16, rewalk-fix-report.md).'

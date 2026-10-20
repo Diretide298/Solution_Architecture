@@ -35,5 +35,6 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-yaml-keys.py
-status: open
+status: closed
+closed_by_commit: 'cd646999'
 notes: 'The new references add their keys to the derived DDL at the next refresh (a forward migration line).'

@@ -36,4 +36,5 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-audience-match.py
-status: open
+status: closed
+closed_by_commit: 'ead781bd'

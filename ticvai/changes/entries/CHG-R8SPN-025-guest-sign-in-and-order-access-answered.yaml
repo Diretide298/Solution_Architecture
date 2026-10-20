@@ -38,7 +38,8 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-contract-compat.py
-status: open
+status: closed
+closed_by_commit: 'ac6bf63d'
 notes: 'verifyGuestEmail''s x-ticvai-permission GUEST_VIEW -> null is a permission change check-contract-compat calls
   breaking; the entry the lead needs is in the core lane report. getOrder''s security gains the no-credential
   alternative ({}), which is additive. Order.orderAccessToken is x-ticvai-persisted false (no column).'

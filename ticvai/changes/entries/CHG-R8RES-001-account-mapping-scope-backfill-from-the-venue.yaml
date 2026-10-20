@@ -34,6 +34,7 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-ddl-conventions.py
-status: open
+status: closed
+closed_by_commit: '92ae7089'
 notes: 'Proposed by the r8 gate-residue pass. The backfill runs in the person''s forward migration (its migration review
   row), as the other scope_path backfills do.'

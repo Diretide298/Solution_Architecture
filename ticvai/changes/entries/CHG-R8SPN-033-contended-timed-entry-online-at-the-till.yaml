@@ -34,6 +34,7 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-contract-compat.py
-status: open
+status: closed
+closed_by_commit: '70f28538'
 notes: 'The OFFLINE-BUNDLE done-when ''never oversells'' must read ''an oversell after an expired hold is accepted and
   flagged for the reconciler'' (task text: surface lane / lead).'

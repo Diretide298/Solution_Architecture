@@ -37,6 +37,7 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-contract-storage.py
-status: open
+status: closed
+closed_by_commit: '2fe27f4b'
 notes: 'The next refresh writes the CHECK widening into the forward migration (DROP CONSTRAINT adjustment_kind_chk, ADD
   ... NOT VALID, VALIDATE), proved on PostgreSQL 16 with every migration, fresh (rewalk-fix-report.md).'

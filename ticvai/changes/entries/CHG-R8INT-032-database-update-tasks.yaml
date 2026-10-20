@@ -50,7 +50,8 @@ triage: fix-forward
 prevention:
   type: generator-rule
   ref: tools/sprint_plan.py::due_of
-status: open
+status: closed
+closed_by_commit: 'bcdb6420'
 notes: 'The local tasks apply the package files with psql, not SqlMigrationRunner: each file records itself in
   platform.schema_version, and setup/backend-patterns.md section 3.4 keeps the package files out of db/tenant. V0108
   alters tables a partial local database may not have; the task says to accept only "does not exist" errors there. The

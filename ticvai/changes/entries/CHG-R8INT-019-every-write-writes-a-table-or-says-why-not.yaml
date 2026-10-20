@@ -33,5 +33,6 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-write-lineage.py
-status: open
+status: closed
+closed_by_commit: '3ecdff3d'
 notes: 'An operation-level contract fact (x-ticvai-writes), not a storage fact: no column or table changes.'

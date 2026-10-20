@@ -43,7 +43,8 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-storage-promises.py
-status: open
+status: closed
+closed_by_commit: '8081fc4c'
 notes: 'The ADR-0058 amendment (the relay drains ai.outbox), ADR-0051 (packs in the image), the AI system design''s
   hash-chain subsection, the events tenant.provisioned and tenant.terminated, the planner-options and preset
   operations and the preview read are requested of the surface lane; backend/MIGRATIONS.md''s kernel list

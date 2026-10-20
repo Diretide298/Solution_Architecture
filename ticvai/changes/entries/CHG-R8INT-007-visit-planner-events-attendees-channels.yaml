@@ -42,6 +42,7 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-screen-wiring.py
-status: open
+status: closed
+closed_by_commit: 'fba8aaca'
 notes: 'No visible field changed (check-approved-ui passes). listVisitPlanPresets and setVisitPlanPreset have no screen
   yet: the venue''s preset editor is not in Block A, and the six seeded presets serve until it is.'

@@ -23,4 +23,5 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-screen-patterns.py
-status: open
+status: closed
+closed_by_commit: 'bdf435c1'

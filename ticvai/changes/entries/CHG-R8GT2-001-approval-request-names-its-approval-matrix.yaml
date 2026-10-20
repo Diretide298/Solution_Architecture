@@ -29,4 +29,5 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-glossary-terms.py
-status: open
+status: closed
+closed_by_commit: 'a2245825'

@@ -23,4 +23,5 @@ triage: blocker
 prevention:
   type: generator-rule
   ref: tools/check-permission-vocabulary.py
-status: open
+status: closed
+closed_by_commit: 'ffcb21eb'

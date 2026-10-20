@@ -35,7 +35,8 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-contract-compat.py
-status: open
+status: closed
+closed_by_commit: '719be698'
 notes: 'If check-contract-compat calls version newly required on deployConfigurationProfile''s request breaking, the core
   lane report carries the breaking-change entry for the lead: before this no client could name a version, so no
   working client exists to break.'

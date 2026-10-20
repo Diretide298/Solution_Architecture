@@ -36,7 +36,8 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-problem-types.py
-status: open
+status: closed
+closed_by_commit: '12d62578'
 notes: 'Prevention: check-problem-types already fails a new error response without its problem types; the responses added
   here name theirs. Derived at the release: handoff/service-docs and the lineage reads (request to the lineage lane:
   approveUnifiedDecision reads approvals.delegation).'

@@ -29,6 +29,7 @@ triage: blocker
 prevention:
   type: generator-rule
   ref: tools/ticket_done.py
-status: open
+status: closed
+closed_by_commit: '4a63ad16'
 notes: 'Both tickets are started: op-release.rb does not rewrite a started ticket''s description, so they get the notes
   only through the release comment or the lead''s acknowledgement.'

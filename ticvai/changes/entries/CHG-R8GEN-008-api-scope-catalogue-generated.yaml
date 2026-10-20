@@ -26,4 +26,5 @@ triage: blocker
 prevention:
   type: generator-rule
   ref: tools/derive-api-scopes.py
-status: open
+status: closed
+closed_by_commit: '53626438'

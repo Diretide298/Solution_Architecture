@@ -35,5 +35,6 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-contract-compat.py
-status: open
+status: closed
+closed_by_commit: '70a78f42'
 notes: 'check-step-up.py passes with the new header.'

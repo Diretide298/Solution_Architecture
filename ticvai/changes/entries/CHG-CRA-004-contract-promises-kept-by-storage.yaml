@@ -82,7 +82,8 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-storage-promises.py
-status: open
+status: closed
+closed_by_commit: '50276b58'
 notes: 'Prevention: check-storage-promises SP-ONE-CURRENT (a persisted isCurrent with no x-ticvai-unique-when) and
   SP-REPLACE-NO-KEY (a PUT replacing a list of rows another operation creates one by one, whose items name none of
   them). Shown failing on r6 (4 + 2 new) and, after, 1 left for the lead: setTableLayout''s tables[] (fnb.dining_table,

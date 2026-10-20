@@ -22,4 +22,5 @@ triage: blocker
 prevention:
   type: generator-rule
   ref: tools/check-lineage.py
-status: open
+status: closed
+closed_by_commit: '7aa0c5c9'

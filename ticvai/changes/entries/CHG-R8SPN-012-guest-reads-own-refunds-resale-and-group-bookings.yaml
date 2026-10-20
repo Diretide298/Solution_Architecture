@@ -39,6 +39,7 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-audience-match.py
-status: open
+status: closed
+closed_by_commit: '638b1491'
 notes: 'Lineage for the four new reads (orders.refund with orders.order for ownership, orders.resale_listing,
   orders.group_booking, orders.refund_policy with its time bands) comes from the lineage derivation on the merged r8 branch.'

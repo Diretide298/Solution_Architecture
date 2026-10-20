@@ -43,7 +43,8 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-screen-wiring.py
-status: open
+status: closed
+closed_by_commit: '675d9c15'
 notes: 'Prevention: check-screen-wiring S-INPUT-SOURCE: on a guest screen (WEB, GST, KSK), each required path
   parameter and id-typed required body field of an onAction operation needs a source: an entry parameter of that
   name, a field of that name in what a single-record read on the screen returns, a read whose response is the thing

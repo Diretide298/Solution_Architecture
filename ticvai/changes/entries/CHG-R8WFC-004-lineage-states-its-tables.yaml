@@ -45,6 +45,7 @@ triage: blocker
 prevention:
   type: generator-rule
   ref: tools/derive-lineage.py::expected
-status: open
+status: closed
+closed_by_commit: '85729dc1'
 notes: 30 path-inferred entries remain, none built in Block A (Blocks B, C and D); they are the reach for the post-r8 light
   release.

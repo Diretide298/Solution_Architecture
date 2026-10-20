@@ -32,5 +32,6 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-screen-patterns.py
-status: open
+status: closed
+closed_by_commit: '244a9c87'
 notes: 'An added operation is additive (check-contract-compat). The screen binding is not visible content.'

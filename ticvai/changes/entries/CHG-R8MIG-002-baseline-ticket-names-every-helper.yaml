@@ -26,5 +26,6 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-migration-wording.py
-status: open
+status: closed
+closed_by_commit: '0411db04'
 notes: 'Prevention: check-migration-wording MW-BASELINE (names every helper function 920 and 930 define). Extending it to the after-r1 functions is left to r9; the wording is generated from the files, so it cannot go stale.'

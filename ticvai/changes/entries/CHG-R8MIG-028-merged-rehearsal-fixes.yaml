@@ -43,5 +43,6 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-migration-tickets.py
-status: open
+status: closed
+closed_by_commit: 'de3a770c'
 notes: 'Verified by the same rehearsal after the fix (see the lane report).'

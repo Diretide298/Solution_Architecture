@@ -32,6 +32,7 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-plan-closure.py
-status: open
+status: closed
+closed_by_commit: 'cfd52b53'
 notes: 'Follows CHG-R8INT-025. The rehearsal pull is what catches a ticket with nothing linked; check-ticket-links
   accepted linksNothingBecause.'

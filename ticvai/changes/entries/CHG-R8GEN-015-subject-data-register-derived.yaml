@@ -24,4 +24,5 @@ triage: blocker
 prevention:
   type: generator-rule
   ref: tools/derive-subject-data-register.py
-status: open
+status: closed
+closed_by_commit: '893fe381'

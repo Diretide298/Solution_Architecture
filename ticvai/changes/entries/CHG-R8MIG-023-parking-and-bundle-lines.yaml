@@ -41,7 +41,8 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-contract-storage.py
-status: open
+status: closed
+closed_by_commit: '085fa265'
 notes: 'Requested of the surface lane: states/parking-entitlement.yaml (plate change from pushed: pushed -> pending),
   the WEB-041 and GST-027 Change plate control enabled only in the allowed states, the GST-056 overlay binding getBundle
   and addCartLine with variantId from Bundle.variantId and the picks in attributes.bundle, and the ADR-0019 sentence that

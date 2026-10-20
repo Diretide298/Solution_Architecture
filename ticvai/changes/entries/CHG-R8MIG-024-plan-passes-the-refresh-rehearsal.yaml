@@ -43,7 +43,8 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-key-stability.py
-status: open
+status: closed
+closed_by_commit: '5332601c'
 notes: 'Verified on a copy of the rehearsal''s refreshed tree (a worktree at 1fba7794 with the rehearsal''s derived files
   and these tools): build-service-docs, derive-block-a-schedule, op-descriptions and adam-links, then
   check-key-stability PASS (16 tests), check-migration-tickets PASS, check-migration-wording PASS, check-ticket-text

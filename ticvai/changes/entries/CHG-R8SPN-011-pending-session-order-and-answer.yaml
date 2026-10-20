@@ -32,5 +32,6 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-problem-types.py
-status: open
+status: closed
+closed_by_commit: '0be42d60'
 notes: 'check-states holds the allow-list once states/operator-session.yaml carries it (screens lane).'

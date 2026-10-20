@@ -41,7 +41,8 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-contract-storage.py
-status: open
+status: closed
+closed_by_commit: '1b27b28c'
 notes: 'Applied on PostgreSQL 16 (control and tenant, the forward files twice). The control operations that write the
   new audit and idempotency rows name them in their lineage when the lineage is derived from the contracts (the
   generators lane). docs/active/cross-deployable-writes.yaml is the docs owner''s.'

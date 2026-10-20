@@ -30,6 +30,7 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-audience-match.py
-status: open
+status: closed
+closed_by_commit: '61a78009'
 notes: 'Requested from the generators lane: a check-business-rules assertion that reporting listAlerts states the
   recipient-role or OVERSHORT_ACCEPT rule for shift-variance alerts.'

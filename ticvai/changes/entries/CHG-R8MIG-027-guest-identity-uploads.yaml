@@ -39,7 +39,8 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-contract-storage.py
-status: open
+status: closed
+closed_by_commit: 'c3cb9377'
 notes: 'The 10 MB limit and the 24-hour unused deletion are proposed, client to confirm. Applied on PostgreSQL 16 (the
   generated files twice). The guest screens that upload (GST identity verification) bind the two operations: the surface
   lane''s part, requested in the lane report.'

@@ -60,7 +60,8 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-contract-storage.py
-status: open
+status: closed
+closed_by_commit: '0cb4d323'
 notes: 'Prevention: check-contract-storage ST-CROSS-DATABASE, a declared reference across the control/tenant boundary
   that is not one of the 15 known crossings (each a person or scope a control row names in its owning database).
   Shown failing on r6 (control.tenant.subscription_id -> subscription.contract) and passing after. Sibling query: the

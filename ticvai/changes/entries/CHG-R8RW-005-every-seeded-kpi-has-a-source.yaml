@@ -35,5 +35,6 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-cross-module-reads.py
-status: open
+status: closed
+closed_by_commit: '2deba3e7'
 notes: 'Declared queries and descriptions only: no schema, column or response shape changes.'

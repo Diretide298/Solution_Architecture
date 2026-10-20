@@ -39,4 +39,5 @@ triage: blocker
 prevention:
   type: generator-rule
   ref: tools/derive-schema.py
-status: open
+status: closed
+closed_by_commit: 'e52d0038'

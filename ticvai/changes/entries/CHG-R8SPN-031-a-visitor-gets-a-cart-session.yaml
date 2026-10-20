@@ -34,4 +34,5 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-audience-match.py
-status: open
+status: closed
+closed_by_commit: '8c461c8a'

@@ -46,6 +46,7 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-screen-wiring.py
-status: open
+status: closed
+closed_by_commit: '2c736ed0'
 notes: 'The sign-in return edges are a rule, not drawn per screen: check-navigation does not yet read
   _patterns.yaml meta.rules (a generators-lane request in the surface report).'

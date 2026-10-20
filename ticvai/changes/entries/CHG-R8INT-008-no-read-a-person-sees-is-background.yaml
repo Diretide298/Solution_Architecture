@@ -41,6 +41,7 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-screen-wiring.py
-status: open
+status: closed
+closed_by_commit: 'fba8aaca'
 notes: 'Five S-OP-UNREACHED findings are left visible on purpose (GST-059, GST-048, BO-015, BO-291, POS-004): an
   approved screen lacks the element, which goes in the client note; they are not baselined.'

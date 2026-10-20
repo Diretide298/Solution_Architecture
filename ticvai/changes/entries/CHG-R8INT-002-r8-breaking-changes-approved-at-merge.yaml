@@ -33,7 +33,8 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-contract-compat.py
-status: open
+status: closed
+closed_by_commit: '63cf7d2c'
 notes: 'BC-393..BC-396 added at the integration pass (setSubscription staff-only, licence add-on ModuleKey, the sixteen
   membership operations'' MEMBERSHIP_VIEW and MEMBERSHIP_MANAGE, MediaUsage.surface values; APPROVALS-TENANCY-C16, C17,
   GPS-C33, ORDERS-MONEY-C29; CHG-R8INT-004). BC-389..BC-392 added at the core merge (sync rejection cashMovement, verifyGuestEmail permission, registerGuest

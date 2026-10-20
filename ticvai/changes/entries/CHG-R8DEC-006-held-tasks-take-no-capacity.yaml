@@ -31,7 +31,8 @@ triage: blocker
 prevention:
   type: generator-rule
   ref: tools/derive-block-a-schedule.py::without_held
-status: open
+status: closed
+closed_by_commit: 'a827694a'
 notes: '**Where the seven products wave 1 tasks land** (build-service-docs.py and this script run in a throwaway
   worktree of this branch, nothing committed): all in Sprint 2, on the same days with and without the holds, because
   they were already placed in their owners'' free gaps after PRD-W1-DB. PRD-W1-DB: day 10.37 (Hrushikant Patkar);

@@ -42,7 +42,8 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-starter-fit.py
-status: open
+status: closed
+closed_by_commit: '87a456e4'
 notes: 'Prevention: check-starter-fit SF-FIXTURE-SEED reads the currencies the reference fixture names (the starter''s
   quality gates, repos/ticvai-backend/project-bible/setup/quality-gates.md section 8, and db/seed/reference-fixture.md) and fails for one with no "denominations (CCY)"
   section in seed-data-proposal.md. Shown failing on r6 (OMR, 1 new) and passing after. Sibling query: the same rule;

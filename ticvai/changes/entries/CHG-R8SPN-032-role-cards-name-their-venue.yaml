@@ -32,6 +32,7 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-problem-types.py
-status: open
+status: closed
+closed_by_commit: 'fafb3701'
 notes: 'Lineage: selectRole and getCurrentSession read identity.delegated_access and platform.scope (Tenancy''s, through
   its scope query) for the cards; the generators lane''s lineage derive adds them.'

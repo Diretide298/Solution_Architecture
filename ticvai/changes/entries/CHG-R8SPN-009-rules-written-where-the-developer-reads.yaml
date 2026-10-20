@@ -36,6 +36,7 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-contract-compat.py
-status: open
+status: closed
+closed_by_commit: '6d0d86d0'
 notes: 'The ModuleKey map is a proposal from the screens'' requiresModule values; five features map to core and the product
   owner confirms them.'

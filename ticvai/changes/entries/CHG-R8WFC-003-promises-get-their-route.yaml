@@ -50,7 +50,8 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-cross-module-reads.py
-status: open
+status: closed
+closed_by_commit: '85729dc1'
 notes: The orderId and paymentId fields are optional in the schema and refused 400 without them, the packages pattern for
   a field an r1 client cannot send (supervisorStepUp), so no breaking change is recorded. check-cross-module-reads XR-FACT
   (text names a fact not asked) is the nearest check; the open-ended reach (728 facts named in text and not asked, its own

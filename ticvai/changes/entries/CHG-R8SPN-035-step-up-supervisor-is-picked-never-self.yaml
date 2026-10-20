@@ -33,7 +33,8 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-step-up.py
-status: open
+status: closed
+closed_by_commit: 'e906aafb'
 notes: 'New operation gates: permission null with a self-scoped reason (comment on the operation), no config noun, PageSize
   and PageCursor with order and statuses stated. Lineage: reads identity.principal, identity.delegated_access,
   identity.role_permission at the generators lane''s derive.'

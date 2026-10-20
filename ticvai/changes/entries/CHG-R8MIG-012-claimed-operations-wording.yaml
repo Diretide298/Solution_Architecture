@@ -33,6 +33,7 @@ triage: fix-forward
 prevention:
   type: generator-rule
   ref: tools/ticket_done.py::claimed_ops_sentence
-status: open
+status: closed
+closed_by_commit: 'e946ed11'
 notes: 'tools/tests/test_ticket_done_control.py: an AI engine task''s sentence names the gateway, any other task''s does
   not. The AI engine tasks'' text is unchanged.'

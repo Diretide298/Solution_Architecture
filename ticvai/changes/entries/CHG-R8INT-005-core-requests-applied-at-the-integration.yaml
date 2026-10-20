@@ -43,6 +43,7 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-error-sources.py
-status: open
+status: closed
+closed_by_commit: '31781025'
 notes: 'check-stored-request-fields and check-cross-module-reads (XR-ROUTE) catch the other two. BC-398 names the
   marketing-crm feature tickets as producers: no service task names its four Block D list operations yet.'

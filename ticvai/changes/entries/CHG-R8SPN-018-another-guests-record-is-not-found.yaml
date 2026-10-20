@@ -33,6 +33,7 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-audience-match.py
-status: open
+status: closed
+closed_by_commit: '719be698'
 notes: 'Requested from the generators lane: a check that no operation with x-ticvai-self-scoped subject and a guest
   audience declares a 403 response.'

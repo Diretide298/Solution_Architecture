@@ -34,7 +34,8 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-plan-closure.py
-status: open
+status: closed
+closed_by_commit: 'e52d0038'
 notes: 'Risk for the lead: until eraseSubject ships, a deleted guest''s AI index rows and Qdrant points (Block A indexes
   through SVC-AI-RETRIEVAL-1) stay until the catch-up call, and no plan task yet builds the job''s catch-up call. The
   alternative is a plan change (eraseSubject into Block A: kind plan, 24-hour cooling-off). **Superseded in part**

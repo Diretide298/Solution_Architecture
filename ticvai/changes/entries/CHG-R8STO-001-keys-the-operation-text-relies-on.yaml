@@ -44,7 +44,8 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-storage-promises.py
-status: open
+status: closed
+closed_by_commit: '66e921f5'
 notes: 'SP-DUPLICATE-409 catches an "already in use" 409 with no x-ticvai-unique. Requested of the generators lane (the
   check''s owner): widen it to read x-ticvai-unique-together, and add a rule for an operation whose text says "one
   per", "upsert keyed on" or "match key" with no unique key over the named fields. The wallet.funding_rule index lands

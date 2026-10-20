@@ -43,7 +43,8 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-request-fields-stored.py
-status: open
+status: closed
+closed_by_commit: '85729dc1'
 notes: RF-ACTION-NOT-STORED finds 364 fields on about 200 operations package-wide, 6 of them on started tickets (they need
   the leads --acknowledge-started) (baselined, the list only falls); per the controllers time-box they are a post-r8 light
   release, not hunted here.

@@ -43,7 +43,8 @@ triage: blocker
 prevention:
   type: generator-rule
   ref: tools/derive-ddl.py::x-ticvai-references-version
-status: open
+status: closed
+closed_by_commit: '50d04ebb'
 notes: 'Applied on PostgreSQL 16 (generated files, twice). The same marks serve the storage-sat lane''s request 8 (control.plan
   keyed (id, version)): Plan x-ticvai-primary-key [id, version] and x-ticvai-references-version planVersion on each
   reference, in contracts/satellite/subscription.yaml.'

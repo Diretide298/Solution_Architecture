@@ -44,4 +44,5 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-states.py
-status: open
+status: closed
+closed_by_commit: '8367368d'

@@ -32,7 +32,8 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-starter-fit.py
-status: open
+status: closed
+closed_by_commit: '63c436da'
 notes: 'check-starter-fit SF-DOCS-MIRROR fails until ADAM''s starter (viewer/mcp/setup/starters/docs/quickstart.md)
   says the same, with the ADAM port; the backend-patterns sentence the ADAM starter gained lands in
   viewer/mcp/setup/starters/docs/backend-patterns.md with that port too.'

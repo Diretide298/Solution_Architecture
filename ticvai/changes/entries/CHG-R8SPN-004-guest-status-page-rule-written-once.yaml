@@ -33,5 +33,6 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-contract-compat.py
-status: open
+status: closed
+closed_by_commit: '33e2af3a'
 notes: 'No prevention beyond the rule being written where KSK-014 can reuse it.'

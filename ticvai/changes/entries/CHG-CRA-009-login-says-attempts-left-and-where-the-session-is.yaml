@@ -39,7 +39,8 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-business-rules.py
-status: open
+status: closed
+closed_by_commit: '8fd29718'
 notes: 'Prevention: check-business-rules BR-LOGIN-ATTEMPTS (the four answers carry their fields; the per-username
   count is stated), failing on r7 (origin/main 807a1c24) and passing after. check-approved-ui 0 new: PTR-001''s visible
   content is unchanged. check-contract-compat: additive (a response shape gaining fields). Where the per-username

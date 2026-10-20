@@ -58,7 +58,8 @@ triage: blocker
 prevention:
   type: generator-rule
   ref: tools/ddl_forward.py
-status: open
+status: closed
+closed_by_commit: '5d82da84'
 notes: 'Change notice for Hrushikant: apply V0103a (renames 18 tables and 20 columns with their keys, indexes, checks
   and policies), V0105a (moves platform.dsar_request to sync), V0108 and V0109, in name order, on every database; each
   block is guarded and the files apply twice. Still for a person: the text -> numeric(18,4) type of

@@ -42,4 +42,5 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-screens.py
-status: open
+status: closed
+closed_by_commit: '5bba3ebd'

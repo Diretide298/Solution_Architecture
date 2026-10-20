@@ -32,7 +32,8 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-write-lineage.py
-status: open
+status: closed
+closed_by_commit: 'e52d0038'
 notes: 'revokePaymentToken''s description says it emits paymentToken.revoked in the same transaction, and no events/
   file declares that event (paymentToken.stored is declared), so its platform.outbox write is not added here. Left for
   the lead: declare the event (the outbox write then follows), or drop the sentence.'

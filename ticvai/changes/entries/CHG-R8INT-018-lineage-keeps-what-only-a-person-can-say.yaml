@@ -32,6 +32,7 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-write-lineage.py
-status: open
+status: closed
+closed_by_commit: '2c30f002'
 notes: 'derive-read-columns was not run: on this branch the schema reference is the stale committed one, and the
   refresh runs it after derive-schema.'

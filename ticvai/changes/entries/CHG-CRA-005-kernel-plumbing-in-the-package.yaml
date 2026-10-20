@@ -82,7 +82,8 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-ticket-builds.py
-status: open
+status: closed
+closed_by_commit: 'f28b0efb'
 notes: 'Prevention: check-ticket-builds B-KERNEL-STORAGE (KERNEL_NEEDS: each kernel ticket''s table, column, index,
   grant, contract field or file), read from the contracts as well as the schema reference so it holds before the
   release derive. Shown failing on r6 (8 new) and passing after. Also held: check-cross-deployable-writes X-KERNEL

@@ -39,7 +39,8 @@ triage: blocker
 prevention:
   type: generator-rule
   ref: tools/derive-schema.py
-status: open
+status: closed
+closed_by_commit: '86533848'
 notes: 'control.plan is first created by this release''s control file, so the key is right at creation (the trial
   derive writes FOREIGN KEY (plan_id, plan_version) REFERENCES control.plan(id, version) for all six, guarded; the
   existing control.tenant key in the names file, NOT VALID). tier_allowance.plan_version and tenant.plan_version are

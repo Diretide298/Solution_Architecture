@@ -34,7 +34,8 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-business-rules.py
-status: open
+status: closed
+closed_by_commit: '1c1af276'
 notes: 'Prevention: check-business-rules BR-GATE-CANCEL, failing on r7 and passing after. Database (derived at the
   release; this branch''s derive kept in D:\wt\fix-cr-answers-1018-derived\round2): the next tenant forward migration
   adds the three columns, gate_mode_change_cancel_reason_chk, gate_mode_change_cancelled_by_principal_id_fkey and its

@@ -40,6 +40,7 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-screen-wiring.py
-status: open
+status: closed
+closed_by_commit: '2467d26f'
 notes: 'If the lead lets shownBy name an element of a partial-match client-verified prototype (check-screen-wiring),
   the three listOwn reads can become onLoad with shownBy; today the rule takes exact matches only.'
