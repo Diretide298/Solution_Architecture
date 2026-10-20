@@ -19027,7 +19027,8 @@ paths:
         sent again. **The wave 1 migration maps every value already stored to exactly one tag** of its product's
         venue (CHG-R8PRD-010; the rule is PRD-W1-DB's): trimmed, compared ignoring case, a value that fits the code
         pattern becomes that code, one outside it a derived code with the original kept as the tag's `name` (literal
-        codes allocated before derived ones, long values truncated before any suffix), and each product's
+        codes allocated before derived ones; a derived code is cut so that it fits 64 characters with its `-2`, `-3`
+        suffix), and each product's
         `segmentTags`, and each Help me choose answer filter of the venue that names them, is rewritten to those
         codes, so no product and no answer loses a tag.
 
