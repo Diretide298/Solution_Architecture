@@ -12024,6 +12024,7 @@ components:
       description: '**Taken from the backend workbook, 20 September.** NEW TABLE. Defines usage/quantity allowances included in a subscription tier.'
       required:
       - tierId
+      - planVersion   # both columns of the plan key, always (r8 gate residue, CHG-R8RES-006)
       - code
       - name
       - isUnlimited
@@ -12075,6 +12076,7 @@ components:
       description: '**Taken from the backend workbook, 20 September.** NEW TABLE. Defines which TICVAI technical modules are commercially included in a subscription tier.'
       required:
       - tierId
+      - planVersion   # both columns of the plan key, always (r8 gate residue, CHG-R8RES-006)
       - code
       - isIncluded
       - isActive
@@ -16909,6 +16911,11 @@ components:
           format: uuid
     Tenant:
       x-ticvai-persistence: control.tenant
+      # The plan key is both columns or neither: a planId with no planVersion would leave the row's key to the plan
+      # unchecked, since a foreign key with a null column is not checked (r8 gate residue, CHG-R8RES-006).
+      x-ticvai-required-when:
+        planVersion: {planId: {not: null}}
+        planId: {planVersion: {not: null}}
       type: object
       required:
       - id
@@ -17241,6 +17248,9 @@ components:
           description: How long a burst may last.
     Plan:
       x-ticvai-persistence: control.plan + control.plan_module + control.plan_limit
+      # The key's second column is the version: plan_module and plan_limit carry plan_version beside plan_id (r8 gate
+      # residue, CHG-R8RES-006; derive-schema keys a derived child to its parent's version only where this says so).
+      x-ticvai-version-key: version
       # Each version is its own row, so a subscriber on an earlier one keeps reading it (R8 blocker
       # APPROVALS-TENANCY-C15, storage-sat request 8; r8 integration, CHG-R8INT-023). control.plan is first created by
       # this release's control migration, so the key is right at creation.

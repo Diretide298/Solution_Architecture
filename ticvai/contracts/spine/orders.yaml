@@ -2887,6 +2887,10 @@ paths:
       operationId: revokePaymentToken
       security:
       - guestAuth: []
+      # The row it marks removed is its write (r8 gate residue, check-write-lineage W-NOTABLE; CHG-R8RES-002).
+      x-ticvai-writes:
+      - table: payments.token
+        for: 'the caller''s token row: revokedAt set and isDefault cleared; the row stays for the audit trail'
       x-ticvai-self-scoped: subject
       x-ticvai-audience:
       - guest

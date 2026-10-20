@@ -1,0 +1,35 @@
+id: CHG-R8RES-005
+date: '2026-10-20'
+source: audit
+kind: contract
+summary: 'completeUpload''s processing job writes the asset''s assets.rendition rows (its derivatives), declared as
+  x-ticvai-writes. getMediaAsset (CMS-010, Block A) reads assets.rendition, and with requestMediaRendition as its only
+  writer the slice made that operation setup and pulled CMS-078, reached only through CMS-071 outside Block A, into
+  Block A. completeUpload is already Block A, so renditions are fed in the slice and requestMediaRendition (an extra
+  size or format) is not needed there.'
+decision:
+  what: 'contracts/satellite/assets.yaml completeUpload: x-ticvai-writes assets.rendition, and a description paragraph
+    saying the derivatives it already generates are the rendition rows getMediaAsset returns as derivatives.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: check-plan-closure C-REACH CMS-078 (CMS-001 > CMS-071 > CMS-078), merge-intpass report item g. The
+  contract already said completeUpload generates derivatives; the lineage did not have the table.'
+keys_touched:
+  operations: [completeUpload, requestMediaRendition, getMediaAsset]
+  tables: [assets.rendition]
+  screens: [CMS-078]
+  files:
+  - contracts/satellite/assets.yaml
+root_class: 'a write a contract describes in prose and does not declare, read by the slice as a missing writer'
+tickets:
+  started: []
+  unstarted:
+  - 'APP-CMS-CMS-078 and APP-SETUP-CMS-078-REST leave Block A (CMS-078 was Block B at r7).'
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: r8 gate residue, a release fix'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-plan-closure.py
+status: open

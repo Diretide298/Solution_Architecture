@@ -574,6 +574,14 @@ paths:
         embedding, stamped with the model version) once the file passes scanning, so
         `findSimilarMediaAssets` sees a new asset without anyone asking for it (decided 29
         September, writers pass; DM4). A quarantined file gets no fingerprint.
+
+        **The derivatives are the asset's `assets.rendition` rows** (r8 gate residue, CHG-R8RES-005): the job
+        writes one row per derivative it generates (its `preset`), `queued` then `ready` or `failed`, which
+        `getMediaAsset` returns as `derivatives` and `listMediaRenditions` lists. `requestMediaRendition` adds a
+        size or format beyond them; an uploaded asset has its derivatives without it.
+      x-ticvai-writes:
+      - table: assets.rendition
+        for: 'the derivatives the processing job generates, one row per preset (CHG-R8RES-005)'
       tags: [upload]
       x-ticvai-permission: ASSET_LIBRARY_MANAGE
       x-ticvai-scope-level: venue

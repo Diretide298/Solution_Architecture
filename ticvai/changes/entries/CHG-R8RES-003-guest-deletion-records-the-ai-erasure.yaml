@@ -1,0 +1,40 @@
+id: CHG-R8RES-003
+date: '2026-10-20'
+source: audit
+kind: contract
+summary: 'deleteGuestAccount (Block A) no longer calls ai.eraseSubject (built in a later block) synchronously: its
+  tombstone (pii.subject is_erased, erased_at, erasure_request_id) is the record the AI erasure works from, and
+  Identity''s erasure job calls eraseSubject from the release that builds it, for each tombstoned subject and once for
+  every subject tombstoned before. The guest''s request and its 202 do not change.'
+decision:
+  what: 'contracts/spine/identity.yaml deleteGuestAccount: x-ticvai-calls [ai.eraseSubject] removed (a comment says
+    why), and a description paragraph on how the AI index is erased from the tombstone. contracts/satellite/ai.yaml
+    eraseSubject: its caller sentence says the same. No screen, field or response changes; no new operation, event or
+    table.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: check-plan-closure C-CALLS, deleteGuestAccount (Block A1) calls eraseSubject, which Block D builds
+  (SVC-AI-RETRIEVAL-3); merge-intpass report, concern 4 (from CHG-R8MIG-025). The lead''s ruling for the gate residue:
+  Block A ships no call to an operation Block D builds; it does its own work and records the erasure for Block D.
+  ADR-0047 (the tombstone), ADR-0049 (erasure of the AI index).'
+keys_touched:
+  operations: [deleteGuestAccount, eraseSubject]
+  files:
+  - contracts/spine/identity.yaml
+  - contracts/satellite/ai.yaml
+root_class: 'a Block A operation calling an operation a later block builds'
+tickets:
+  started: []
+  unstarted:
+  - 'SVC-IDENTITY-GUESTAUTH-1 (deleteGuestAccount) and SVC-AI-RETRIEVAL-3 (eraseSubject).'
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: r8 gate residue, a release fix'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-plan-closure.py
+status: open
+notes: 'Risk for the lead: until eraseSubject ships, a deleted guest''s AI index rows and Qdrant points (Block A indexes
+  through SVC-AI-RETRIEVAL-1) stay until the catch-up call, and no plan task yet builds the job''s catch-up call. The
+  alternative is a plan change (eraseSubject into Block A: kind plan, 24-hour cooling-off).'

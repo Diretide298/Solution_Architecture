@@ -3589,8 +3589,8 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-024 Devices, Wishlist & Consent"
         - "P02 GST-066 Privacy & My Data"
-      x-ticvai-calls:
-      - ai.eraseSubject
+      # No synchronous call to ai.eraseSubject: the tombstone is the record the AI erasure works from (r8 gate
+      # residue, check-plan-closure C-CALLS; CHG-R8RES-003).
       x-ticvai-singleton: true
       x-ticvai-singleton-note: 'The caller''s own account: one per signed-in guest, so there is no key in the path.'
       x-ticvai-audience:
@@ -3628,6 +3628,13 @@ paths:
         `GuestSession.guestLinkId` is set; ADR-0010) does it also call cross-region `createDsarRequest`
         (`kind: erasure`, `serviceAuth`), which raises the cross-cell sync.dsar_request and fans out. A
         guest who never transacted across regions has no link (cross-region.yaml) and raises no DSAR record.
+
+
+        **The AI index is erased from the tombstone, not inside this request** (r8 gate residue, CHG-R8RES-003;
+        ADR-0047, ADR-0049). The tombstone (`is_erased`, `erased_at`, `erasure_request_id`) is the record of the
+        erasure. Identity's erasure job calls `ai.eraseSubject` for a tombstoned subject from the release that builds
+        that operation, and then once for every subject tombstoned before it; `eraseSubject` answers zeros for a
+        subject with nothing indexed, so the catch-up is safe. Neither this request nor its `202` waits for it.
 
       x-ticvai-read-via:
       - query: access#liveEntitlementsForSubject
@@ -10545,6 +10552,8 @@ components:
           nullable: true
           readOnly: true
           x-ticvai-references: identity.principal
+          x-ticvai-staff-only: Omitted from the response when the caller is a guest (R164; r8 gate residue,
+            CHG-R8RES-008). A guest's own method has it null, so a guest screen never shows it.
           description: The principal who enrolled it; null for a guest.
         subjectId:
           type: string

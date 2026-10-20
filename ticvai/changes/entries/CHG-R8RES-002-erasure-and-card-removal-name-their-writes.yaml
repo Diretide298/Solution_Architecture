@@ -1,0 +1,37 @@
+id: CHG-R8RES-002
+date: '2026-10-20'
+source: audit
+kind: contract
+summary: 'eraseSubject and revokePaymentToken declare the tables they write, where derive-lineage reads writes from
+  (x-ticvai-writes): eraseSubject deletes the subject''s ai.index_entry and ai.chunk_embedding rows, and
+  revokePaymentToken marks the caller''s payments.token row removed. check-write-lineage W-NOTABLE no longer finds two
+  write operations that write nothing.'
+decision:
+  what: 'contracts/satellite/ai.yaml eraseSubject: x-ticvai-writes ai.index_entry, ai.chunk_embedding.
+    contracts/spine/orders.yaml revokePaymentToken: x-ticvai-writes payments.token. Both {table, for}, as the
+    operations'' own descriptions already say.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: check-write-lineage W-NOTABLE on eraseSubject and revokePaymentToken (merge-intpass report, concern 4),
+  both new in r8 (CHG-R8MIG-025, CHG-R8MIG-022) and both describing writes the lineage did not have.'
+keys_touched:
+  operations: [eraseSubject, revokePaymentToken]
+  tables: [ai.index_entry, ai.chunk_embedding, payments.token]
+  files:
+  - contracts/satellite/ai.yaml
+  - contracts/spine/orders.yaml
+root_class: 'a write operation whose writes are prose only, not a contract fact the lineage reads'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: r8 gate residue, a release fix'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-write-lineage.py
+status: open
+notes: 'revokePaymentToken''s description says it emits paymentToken.revoked in the same transaction, and no events/
+  file declares that event (paymentToken.stored is declared), so its platform.outbox write is not added here. Left for
+  the lead: declare the event (the outbox write then follows), or drop the sentence.'

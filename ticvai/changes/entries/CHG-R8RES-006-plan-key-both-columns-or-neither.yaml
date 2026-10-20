@@ -1,0 +1,41 @@
+id: CHG-R8RES-006
+date: '2026-10-20'
+source: audit
+kind: contract
+summary: 'The plan version key is both columns or neither. derive-schema''s rule from CHG-R8INT-023 (a derived child of
+  a parent keyed [id, version] carries the version) fires only where the parent says so (x-ticvai-version-key, on Plan)
+  and only for the parent''s own table. control.tier_allowance and control.tier_module require planVersion (their
+  plan_id is NOT NULL, so a null version left the row''s key unchecked); control.tenant requires planVersion wherever
+  planId is set and planId wherever planVersion is (x-ticvai-required-when with a {not: null} condition, which
+  derive-ddl writes as a CHECK).'
+decision:
+  what: 'contracts/satellite/subscription.yaml: Plan `x-ticvai-version-key: version`; SubscriptionTierAllowance and
+    SubscriptionTierModule `required` gains planVersion; Tenant `x-ticvai-required-when` {planVersion: {planId: {not:
+    null}}, planId: {planVersion: {not: null}}}. tools/derive-schema.py: the version rule needs the marker and the
+    parent''s own table, and prints an unmarked [id, x] parent with derived children. tools/derive-ddl.py:
+    x-ticvai-required-when takes {not: null} (required where the other column is set).'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: merge-intpass report concerns 2 and 3 (CHG-R8INT-023, commit 86533848): the rule fired on any [id, x]
+  key, today only control.plan''s children (ConfigurationProfile, keyed [id, version], has none), and a nullable plan
+  version leaves a two-column foreign key unchecked (MATCH SIMPLE). planVersion is new in r8, so requiring it breaks no
+  released contract.'
+keys_touched:
+  schemas: [Plan, SubscriptionTierAllowance, SubscriptionTierModule, Tenant]
+  tables: [control.plan, control.plan_module, control.plan_limit, control.tier_allowance, control.tier_module, control.tenant]
+  files:
+  - contracts/satellite/subscription.yaml
+  - tools/derive-schema.py
+  - tools/derive-ddl.py
+root_class: 'a generator rule keyed on a shape rather than a declared fact; a two-column key with one nullable column'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: r8 gate residue, a release fix'
+triage: blocker
+prevention:
+  type: generator-rule
+  ref: tools/derive-schema.py
+status: open
