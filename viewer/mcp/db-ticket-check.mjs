@@ -175,23 +175,47 @@ section('the snapshot compare');
   const rows = script.backfills({ after: { 'rows a.t': '3', 'rows k.old': '0' }, expected: { 'rows a.t': '0' }, owned: ['a.t'] });
   ok(rows.length === 1 && /a\.t: 3 rows/.test(rows[0]) && script.diffSnapshots({ before: { 'rows a.t': '0' }, after: { 'rows a.t': '3' }, expected: { 'rows a.t': '0' }, owned: ['a.t'] }).length === 0,
     'rows left in the ticket\'s own table are listed as a backfill, not a difference', rows.join(' | '));
-  // r8's package makes a role itself (V0105's platform.visible_parent_ids_setup): read from the package's text,
-  // the same change by the ticket's file is not a difference; anything more, or anything removed, is.
+  // r8's package makes a role itself (V0105's platform.visible_parent_ids_setup). The one parser (tools.mjs) reads
+  // it from the package's text; the script holds the server to exactly that, plus its bootstrap superuser.
   const allowed = tools.serverAllowances([{ name: 'V0105.sql', text: "CREATE FUNCTION f() RETURNS void LANGUAGE plpgsql AS $$ BEGIN\n"
     + "  CREATE ROLE ticvai_parent_visible NOLOGIN NOSUPERUSER NOBYPASSRLS NOCREATEDB NOCREATEROLE;\n"
     + "  EXECUTE format('GRANT ticvai_parent_visible TO %I WITH INHERIT TRUE, SET TRUE', current_user);\n"
     + "  EXECUTE 'GRANT USAGE ON SCHEMA platform TO ticvai_parent_visible';\nEND $$;" }]);
-  ok(JSON.stringify(allowed) === JSON.stringify({ 'server roles': ['ticvai_parent_visible'], 'server role memberships': ['* in ticvai_parent_visible'], 'server role settings': [] })
-    && JSON.stringify(script.allowancesIn([allowed && "CREATE ROLE ticvai_parent_visible NOLOGIN"])['server roles']) === '["ticvai_parent_visible"]',
-  'the server changes the package makes are read from its text: the role, and its membership for whoever runs it', JSON.stringify(allowed));
-  const change = (before, after) => script.serverChanges({ 'server roles': before }, { 'server roles': after });
-  const same = script.serverDiffs(change(['postgres (superuser)'], ['postgres (superuser)', 'ticvai_parent_visible']), allowed);
-  const more = script.serverDiffs(change(['postgres (superuser)'], ['postgres (superuser)', 'probe (login)', 'ticvai_parent_visible']), allowed);
-  const gone = script.serverDiffs(change(['postgres (superuser)', 'ticvai_parent_visible'], ['postgres (superuser)']), allowed);
-  const member = script.serverDiffs(script.serverChanges({ 'server role memberships': [] }, { 'server role memberships': ['app in ticvai_parent_visible', 'app in pg_read_all_data'] }), allowed);
-  ok(same.length === 0 && more.length === 1 && /added probe \(login\)\)/.test(more[0]) && gone.length === 1 && /removed ticvai_parent_visible/.test(gone[0])
-    && member.length === 1 && /added app in pg_read_all_data\)/.test(member[0]),
-  'a role or membership the package\'s text makes is not a difference; another, or one removed, is', [...more, ...gone, ...member].join(' | '));
+  ok(JSON.stringify(allowed) === JSON.stringify({ 'server roles': ['ticvai_parent_visible'], 'server role memberships': ['current_user in ticvai_parent_visible'], 'server role settings': [] })
+    && script.allowancesIn === undefined && script.rolesCreatedIn === undefined,
+  'the server state the package makes is read from its text, by one parser: the role, and its membership for the user running the migration', JSON.stringify(allowed));
+  // Review 7, m3: comments, strings and dollar-quoted values are not statements; EXECUTE's string and a function
+  // body are; and every attribute that matters is read.
+  const read = (text) => JSON.stringify(Object.values(tools.serverAllowances([{ text }])).flat());
+  const parsed = {
+    '/* CREATE ROLE evil SUPERUSER; */ SELECT 1': '[]',
+    "COMMENT ON TABLE a.t IS 'CREATE ROLE evil3 SUPERUSER'": '[]',
+    "CREATE FUNCTION f() RETURNS text LANGUAGE sql AS $$ SELECT 'GRANT pg_read_all_data TO app' $$": '[]',
+    'SELECT $q$CREATE ROLE evil4$q$': '[]',
+    [String.raw`SELECT E'it\'s CREATE ROLE evil5'`]: '[]',
+    "DO $$ BEGIN EXECUTE format('CREATE ROLE %I LOGIN', 'probe_fmt'); END $$": '["probe_fmt (login)"]',
+    "DO $$ BEGIN EXECUTE format('CREATE ROLE %I LOGIN', r); END $$": '[]',
+    "DO $$ BEGIN EXECUTE format('GRANT t TO %I', r); EXECUTE 'GRANT USAGE ON SCHEMA platform, public TO t'; END $$": '[]',
+    "CREATE ROLE t NOLOGIN NOINHERIT CONNECTION LIMIT 1 PASSWORD 'x' VALID UNTIL '2030-01-01'":
+      '["t (noinherit) (connection limit 1) (valid until 2030-01-01 00:00:00) (password)"]',
+    'CREATE ROLE r NOLOGIN IN ROLE pg_read_all_data ADMIN app': '["r","app in r (admin)","r in pg_read_all_data"]',
+    'GRANT ticvai_parent_visible TO CURRENT_USER WITH ADMIN OPTION': '["current_user in ticvai_parent_visible (admin)"]',
+    "ALTER ROLE r SET work_mem = '8MB'": '["r: work_mem=8MB"]',
+  };
+  const misread = Object.entries(parsed).filter(([text, want]) => read(text) !== want).map(([text, want]) => `${text} -> ${read(text)}, not ${want}`);
+  ok(misread.length === 0, 'the parser reads code only (no comment, string or dollar-quoted value), EXECUTE\'s string and format(), and every attribute', misread.join(' | '));
+  const exp = script.expectedServer(allowed, { me: 'postgres', bootstrap: 'postgres' });
+  const boot = 'postgres (superuser) (createrole) (createdb) (replication) (bypassrls) (login)';
+  const at = (roles, members = [], settings = []) => ({ 'server roles': roles, 'server role memberships': members, 'server role settings': settings });
+  const same = script.serverDiffs(at([`${boot} (password)`, 'ticvai_parent_visible'], ['postgres in ticvai_parent_visible']), exp);
+  const stray = script.serverDiffs(at([boot, 'probe (login)']), exp, at([boot, 'probe (login)']));
+  const attr = script.serverDiffs(at([boot, 'ticvai_parent_visible (bypassrls)']), exp, at([boot, 'ticvai_parent_visible']));
+  const admin = script.serverDiffs(at([boot], ['postgres in ticvai_parent_visible (admin)', 'app in ticvai_parent_visible']), exp, at([boot]));
+  ok(same.length === 0
+    && /roles are not what the package makes: probe \(login\) \(on the server before this file ran\), which the package does not make/.test(stray[0]) && /--clean, then this again/.test(stray[0])
+    && /ticvai_parent_visible \(bypassrls\) \(this file changed it from ticvai_parent_visible\), where the package makes ticvai_parent_visible/.test(attr[0])
+    && /postgres in ticvai_parent_visible \(admin\) \(made by this file\), where the package makes postgres in ticvai_parent_visible; app in ticvai_parent_visible \(made by this file\), which the package does not make/.test(admin[0]),
+  'the server must be exactly what the package makes: a role from earlier, an attribute, an ADMIN option or another member is a difference, each named', [...stray, ...attr, ...admin].join(' | '));
   const r8 = script.splitSql ? tools.doInner("DO $$ BEGIN IF to_regclass('a.i') IS NOT NULL THEN DROP INDEX a.i; END IF; END $$") : [];
   ok(r8.length === 1 && /^DROP INDEX a\.i$/.test(r8[0]) && tools.statementTarget("DO $$ BEGIN IF true THEN ALTER TABLE a.t RENAME COLUMN x TO y; END IF; END $$") === 'a.t'
     && tools.statementTarget('DROP INDEX IF EXISTS a.i', new Map([['i', 'a.t']])) === 'a.t'
@@ -251,6 +275,8 @@ const expectedOf = {};
   ok(c?.statements.length > 10 && c.statements.every((s) => SUB.includes(statementTarget(s.sql))) && c.statements.some((s) => s.file === '920-row-level-security.sql')
     && c.statements.some((s) => s.guard?.references === 'platform.tenant'), 'and the package statements that make them, each about one of them, keys guarded',
   c?.statements.map((s) => s.file).join(', '));
+  ok(JSON.stringify(c?.server) === JSON.stringify({ 'server roles': ['ticvai_parent_visible'], 'server role memberships': ['current_user in ticvai_parent_visible'], 'server role settings': [] }),
+    'and the server state the package\'s text makes (r8: V0105\'s role, granted only to the user running the migration)', JSON.stringify(c?.server));
   const readme = read('9005', 'README.md');
   ok(/## Checking this migration/.test(readme) && readme.includes('node .claude/scripts/db-ticket.mjs 9005') && readme.includes('db/tenant/V0005__subscription.sql')
     && /This replaces older instructions for a \[DB\] ticket/.test(readme) && /--full tenant/.test(readme) && !/once a day|pipeline/.test(readme),
@@ -310,7 +336,8 @@ const expectedOf = {};
 // ---- 4. the script, as a developer runs it -----------------------------------------------------
 
 const dockerUp = spawnSync('docker', ['version', '--format', '{{.Server.Version}}'], { encoding: 'utf8' }).status === 0;
-const CONTAINER = 'adam-db-ticket-check';
+// Another name with ADAM_DB_TICKET_CHECK_CONTAINER, so a run never removes a container of that name someone keeps.
+const CONTAINER = process.env.ADAM_DB_TICKET_CHECK_CONTAINER || 'adam-db-ticket-check';
 const docker = (args, input) => spawnSync('docker', args, { input, encoding: 'utf8', maxBuffer: 1 << 30 });
 
 async function startContainer() {
@@ -473,7 +500,7 @@ if (!dockerUp) {
     ['a DELETE inside a WITH', `${good}WITH d AS (DELETE FROM kernel.inbox RETURNING 1) SELECT count(*) FROM d;\n`,
       /writes rows into kernel\.inbox, which is not one of this ticket's tables/, /DIFFERENT/],
     ['a role made inside a DO block (it stays in the server until --clean)', `${good}DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'probe_back') THEN CREATE ROLE probe_back LOGIN; END IF; END $$;\n`,
-      /this file changed server roles .*probe_back/, /run --clean afterwards/],
+      /the server's roles are not what the package makes: .*probe_back \(login\) \(made by this file\), which the package does not make/, /run node \.claude\/scripts\/db-ticket\.mjs --clean, then this again/],
     // What review 4 found: privileges the snapshot did not judge, refused by text; hidden, seen.
     ['role membership for another role', `${good}GRANT pg_write_all_data TO probe_owner;\n`, /changes role membership/, /DIFFERENT/],
     ['role membership for the migration role', `${good}GRANT pg_read_all_data TO CURRENT_USER;\n`, /changes role membership/, /DIFFERENT/],
@@ -482,9 +509,9 @@ if (!dockerUp) {
     ['a privilege on a language', `${good}REVOKE USAGE ON LANGUAGE plpgsql FROM PUBLIC;\n`, /privileges on the database, the server or a language/, /DIFFERENT/],
     ['replica mode through set_config', `${good}SELECT set_config('session_replication_role', 'replica', true);\n`, /through set_config/, /DIFFERENT/],
     ['role membership hidden in a DO block', `${good}DO $$ BEGIN EXECUTE 'GRANT pg_read_all_data TO postgres'; END $$;\n`,
-      /this file changed server role memberships .*postgres in pg_read_all_data/, /run --clean afterwards/],
+      /the server's role memberships are not what the package makes: postgres in pg_read_all_data \(made by this file\)/, /--clean, then this again/],
     ['a role attribute hidden in a DO block', `${good}DO $$ BEGIN EXECUTE 'ALTER ROLE probe_owner BYPASSRLS'; END $$;\n`,
-      /this file changed server roles .*probe_owner \(bypassrls\)/, /DIFFERENT/],
+      /the server's roles are not what the package makes: .*probe_owner \(bypassrls\) \(this file changed it from probe_owner\)/, /DIFFERENT/],
     ['a language privilege hidden in a DO block', `${good}DO $$ BEGIN EXECUTE 'REVOKE USAGE ON LANGUAGE plpgsql FROM PUBLIC'; END $$;\n`,
       /language plpgsql was changed by this file/, /DIFFERENT/],
     ['a connection limit hidden in a DO block', `${good}DO $$ BEGIN EXECUTE format('ALTER DATABASE %I CONNECTION LIMIT 50', current_database()); END $$;\n`,
@@ -495,6 +522,19 @@ if (!dockerUp) {
     const r = check(sql);
     ok(r.code === 1 && a.test(r.out) && b.test(r.out), what, r.out);
   }
+  // Review 7: what the cases left on the server (the check's own probe_owner with BYPASSRLS, probe_back, postgres in
+  // pg_read_all_data) is not the package's, so a good file is DIFFERENT until --clean puts the server back.
+  const psqlAt = (sql) => docker(['exec', CONTAINER, 'psql', '-U', 'postgres', '-Atc', sql]).stdout.trim();
+  const blocked = check(good);
+  ok(blocked.code === 1 && /probe_owner \(bypassrls\) \(on the server before this file ran\), which the package does not make/.test(blocked.out)
+    && /probe_back \(login\) \(on the server before this file ran\)/.test(blocked.out) && /postgres in pg_read_all_data \(on the server before this file ran\)/.test(blocked.out),
+  '**a good file on a server that earlier runs changed: DIFFERENT, naming each role and membership the package does not make**', blocked.out);
+  const cleanedRoles = runScript(repo, '--clean');
+  const rolesLeft = psqlAt("SELECT string_agg(rolname, ',' ORDER BY rolname) FROM pg_roles WHERE rolname !~ '^pg_'");
+  const memberLeft = psqlAt("SELECT count(*) FROM pg_auth_members a JOIN pg_roles m ON m.oid = a.member JOIN pg_roles g ON g.oid = a.roleid WHERE m.rolname = 'postgres' AND g.rolname = 'pg_read_all_data'");
+  ok(cleanedRoles.code === 0 && /Removed 2 roles the package does not make \((probe_back, probe_owner|probe_owner, probe_back)\)/.test(cleanedRoles.out)
+    && /Revoked 1 role membership the package does not make \(postgres in pg_read_all_data\)/.test(cleanedRoles.out) && rolesLeft === 'postgres' && memberLeft === '0',
+  '--clean removes every role and role membership the package does not make, in the check\'s own container', `${cleanedRoles.out} [${rolesLeft}] [${memberLeft}]`);
   const path1 = check(`SET search_path = subscription, public;\n${good}`);
   ok(path1.code === 0 && /MATCH: 5 tables/.test(path1.out), 'a file that sets search_path still matches (names print the same in every snapshot)', path1.out);
   const path2 = check(`SET search_path = subscription, public;\n${good}INSERT INTO module_listing (id, module_code) VALUES ('00000000-0000-0000-0000-000000000002', 'core') ON CONFLICT (id) DO NOTHING;\n`);
@@ -572,68 +612,184 @@ if (!dockerUp) {
   for (let i = 0; i < 60 && docker(['exec', CONTAINER, 'psql', '-U', 'postgres', '-Atc', 'SELECT 1']).status !== 0; i++) await new Promise((r) => { setTimeout(r, 500); });
   const cleaned = runScript(repo, '--clean');
   const left = docker(['exec', CONTAINER, 'psql', '-U', 'postgres', '-Atc', "SELECT count(*) FROM pg_database WHERE datname LIKE 'adam\\_%'"]).stdout.trim();
-  ok(cleaned.code === 0 && /Dropped this folder's \d+ databases \(adam_/.test(cleaned.out) && Number(left) > 0, '--clean drops this folder\'s databases and not the other folder\'s', `${cleaned.out} ${left} left`);
-  const roles = docker(['exec', CONTAINER, 'psql', '-U', 'postgres', '-Atc', "SELECT string_agg(rolname, ',') FROM pg_roles WHERE rolname IN ('probe_back', 'probe_owner')"]).stdout.trim();
-  ok(/Removed 2 roles a file had made \((probe_back, probe_owner|probe_owner, probe_back)\)/.test(cleaned.out) && roles === '',
-    '--clean removes the roles made after the container was first set up, in the check\'s own container', `${cleaned.out} [${roles}]`);
-  const membership = docker(['exec', CONTAINER, 'psql', '-U', 'postgres', '-Atc', "SELECT count(*) FROM pg_auth_members a JOIN pg_roles m ON m.oid = a.member JOIN pg_roles g ON g.oid = a.roleid WHERE m.rolname = 'postgres' AND g.rolname = 'pg_read_all_data'"]).stdout.trim();
-  ok(/Revoked 1 role membership a file had granted \(postgres in pg_read_all_data\)/.test(cleaned.out) && membership === '0',
-    '--clean revokes the role memberships granted after the container was first set up', `${cleaned.out} [${membership}]`);
+  ok(cleaned.code === 0 && /Dropped this folder's \d+ databases \(adam_/.test(cleaned.out) && Number(left) > 0
+    && /The server's roles were already exactly what the package makes/.test(cleaned.out),
+  '--clean drops this folder\'s databases and not the other folder\'s', `${cleaned.out} ${left} left`);
 
-  // Review 6: a file's server changes are read inside its own transaction, under a lock every migration
-  // transaction in the container takes, and are allowed only when the package's text makes them.
+  // Review 6: a file's server state is read inside its own transaction, under a lock every migration
+  // transaction in the container takes. Review 7: and it is judged absolutely, against the package's text.
   const idOf = (dir) => createHash('sha256').update(realpathSync.native(dir).toLowerCase()).digest('hex').slice(0, 8);
   const forget = (dir) => {
     for (const n of readdirSync(tmpdir()).filter((x) => x.startsWith(`adam-db-ticket-${idOf(dir)}-`) && x.endsWith('.json'))) rmSync(path.join(tmpdir(), n), { force: true });
   };
-  // The other folder's file sleeps a second inside its transaction, so its runs overlap this folder's: with a
-  // lock that is not server-wide (an advisory lock is per database) it saw probe_stray appear and was blamed.
+  const marker = () => psqlAt("SELECT shobj_description((SELECT oid FROM pg_database WHERE datname = 'postgres'), 'pg_database')");
+  // The other folder's file sleeps a second inside its transaction, so its runs overlap this folder's. The stray
+  // role is the server's once made, so the other folder may see it too: then it is DIFFERENT, naming only that
+  // role as already on the server before its file ran, never as its own.
   const twinFile = path.join(twin, 'db', 'tenant', 'V0005__subscription.sql');
   const twinText = readFileSync(twinFile, 'utf8');
   writeFileSync(twinFile, `${twinText}SELECT pg_sleep(1);\n`);
+  const STRAY = `${good}DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'probe_stray') THEN CREATE ROLE probe_stray LOGIN; END IF; END $$;\n`;
+  const twinFine = (o) => o.code === 0 || (o.code === 1 && /probe_stray \(login\) \(on the server before this file ran\), which the package does not make/.test(o.out)
+    && !/made by this file|changed it from/.test(o.out) && /DIFFERENT: 1 difference/.test(o.out));
   const verdicts = [];
   for (let i = 0; i < 3; i++) {
-    docker(['exec', CONTAINER, 'psql', '-U', 'postgres', '-qc', 'DROP ROLE IF EXISTS probe_stray']);
+    runScript(repo, '--clean');
     forget(repo);
-    writeFileSync(ticketFile, `${good}DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'probe_stray') THEN CREATE ROLE probe_stray LOGIN; END IF; END $$;\n`);
+    writeFileSync(ticketFile, STRAY);
     const [stray, other] = await Promise.all([runAsync(repo, '9005'), runAsync(twin, '9005')]);
-    verdicts.push(`${stray.code}:${/this file changed server roles \(added probe_stray \(login\)\)/.test(stray.out)}:${other.code}${other.code === 0 ? '' : ` [twin: ${other.out.trim()}]`}`);
+    verdicts.push(`${stray.code}:${/probe_stray \(login\) \(made by this file\), which the package does not make/.test(stray.out)}:${twinFine(other)}${twinFine(other) ? '' : ` [twin: ${other.out.trim()}]`}`);
   }
   writeFileSync(twinFile, twinText);
-  const strayKept = docker(['exec', CONTAINER, 'psql', '-U', 'postgres', '-Atc', "SELECT shobj_description((SELECT oid FROM pg_database WHERE datname = 'postgres'), 'pg_database')"]).stdout;
-  ok(verdicts.every((v) => v === '1:true:0') && !/probe_stray/.test(strayKept),
-    '**a role the package does not make, inside a DO block: DIFFERENT on every run, with no kept snapshot and another folder running at the same time; never kept by --clean**',
-    `${verdicts.join(' | ')} ${strayKept}`);
-  docker(['exec', CONTAINER, 'psql', '-U', 'postgres', '-qc', 'DROP ROLE IF EXISTS probe_stray']);
+  ok(verdicts.every((v) => v === '1:true:true') && !/probe_stray/.test(marker()),
+    '**a role the package does not make, inside a DO block: DIFFERENT on every run, with another folder running at the same time; never kept by --clean**',
+    `${verdicts.join(' | ')} ${marker()}`);
+  // Review 7, C1 (b): the same file again, with nothing in between, is still DIFFERENT; so is an unchanged other
+  // folder; --clean then a fixed file is MATCH.
+  const strayAgain = runScript(repo, '9005');
+  const twinAgain = runScript(twin, '9005');
   writeFileSync(ticketFile, good);
+  const fixedBefore = runScript(repo, '9005');
+  const strayClean = runScript(repo, '--clean');
+  const fixed = runScript(repo, '9005');
+  ok(strayAgain.code === 1 && /probe_stray \(login\) \(on the server before this file ran\)/.test(strayAgain.out) && twinAgain.code === 1 && fixedBefore.code === 1
+    && /Removed 1 role the package does not make \(probe_stray\)/.test(strayClean.out) && fixed.code === 0 && /MATCH: 5 tables/.test(fixed.out),
+  '**a stray role left by an earlier run: DIFFERENT again on the next run and in every folder (the fixed file too), until --clean; then MATCH**',
+  `${strayAgain.out}\n${twinAgain.out}\n${fixedBefore.out}\n${strayClean.out}\n${fixed.out}`);
 
-  // A role an earlier file makes (as r8's apply_parent_across_rls does) is in two folders' templates: --clean in
-  // one keeps it, so the other's unchanged ticket still matches.
-  const roleFolder = (name) => {
+  // A folder of small files, as review 7's reproductions build them: the package's role made by an earlier file.
+  const PKG_ROLE = "DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'ticvai_parent_visible') THEN CREATE ROLE ticvai_parent_visible NOLOGIN NOSUPERUSER NOBYPASSRLS NOCREATEDB NOCREATEROLE; END IF; END $$;\n";
+  const PKG_SERVER = { 'server roles': ['ticvai_parent_visible'], 'server role memberships': ['current_user in ticvai_parent_visible'], 'server role settings': [] };
+  const smallFolder = (name, { earlier = PKG_ROLE, tickets }) => {
     const dir = path.join(SCRATCH, name);
     mkdirSync(path.join(dir, 'db', 'tenant'), { recursive: true });
-    mkdirSync(path.join(dir, '.adam', 'work', '88'), { recursive: true });
     writeFileSync(path.join(dir, 'db', 'tenant', 'V0001__base.sql'), 'CREATE SCHEMA IF NOT EXISTS platform;\n'
       + 'CREATE TABLE IF NOT EXISTS platform.schema_version (version text PRIMARY KEY, description text, checksum text, execution_ms int);\n'
       + "CREATE SCHEMA IF NOT EXISTS a;\nCREATE OR REPLACE FUNCTION platform.visible_ids() RETURNS int LANGUAGE sql AS 'SELECT 1';\n");
-    writeFileSync(path.join(dir, 'db', 'tenant', 'V0002__fnb.sql'),
-      "DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'probe_pkg_visible') THEN CREATE ROLE probe_pkg_visible NOLOGIN; END IF; END $$;\n"
-      + 'GRANT EXECUTE ON FUNCTION platform.visible_ids() TO probe_pkg_visible;\nALTER FUNCTION platform.visible_ids() OWNER TO probe_pkg_visible;\n');
-    writeFileSync(path.join(dir, 'db', 'tenant', 'V0003__t.sql'), 'CREATE TABLE IF NOT EXISTS a.t (id int);\n');
-    writeFileSync(path.join(dir, '.adam', 'work', '88', 'expected-schema.json'), JSON.stringify({ checks: [{ database: 'tenant', migration: 'V0003__t.sql',
-      tables: { 'a.t': {} }, statements: [{ file: '010-a.sql', sql: 'CREATE TABLE IF NOT EXISTS a.t (id int)' }] }] }));
+    writeFileSync(path.join(dir, 'db', 'tenant', 'V0002__fnb.sql'), earlier);
+    for (const [key, { file, sql, table = 'a.t', server = PKG_SERVER }] of Object.entries(tickets)) {
+      mkdirSync(path.join(dir, '.adam', 'work', key), { recursive: true });
+      writeFileSync(path.join(dir, 'db', 'tenant', file), sql);
+      writeFileSync(path.join(dir, '.adam', 'work', key, 'expected-schema.json'), JSON.stringify({ checks: [{ database: 'tenant', migration: file,
+        tables: { [table]: {} }, ...(server ? { server } : {}), statements: [{ file: '010-a.sql', sql: `CREATE TABLE IF NOT EXISTS ${table} (id int)` }] }] }));
+    }
     return dir;
   };
-  const cA = roleFolder('roles-a');
-  const cB = roleFolder('roles-b');
+  const verdict = (r) => `${r.code} ${(r.out.match(/^(MATCH|DIFFERENT|FAILED|Cannot).*$/m)?.[0] ?? r.out.slice(-200)).slice(0, 60)}`;
+  const T = 'CREATE TABLE IF NOT EXISTS a.t (id int);\n';
+
+  // Review 7, C1 (a): BYPASSRLS on the package's role. --clean puts the role back to what the package makes, so the
+  // same file is DIFFERENT again, and stays so; without the ALTER it is MATCH.
+  const bypass = smallFolder('bypass', { tickets: { 66: { file: 'V0003__t.sql', sql: `${T}DO $$ BEGIN ALTER ROLE ticvai_parent_visible BYPASSRLS; END $$;\n` } } });
+  const by1 = runScript(bypass, '66');
+  const byClean = runScript(bypass, '--clean');
+  const byAttr = psqlAt("SELECT rolbypassrls FROM pg_roles WHERE rolname = 'ticvai_parent_visible'");
+  const by2 = runScript(bypass, '66');
+  const by3 = runScript(twin, '9005');
+  runScript(bypass, '--clean');
+  writeFileSync(path.join(bypass, 'db', 'tenant', 'V0003__t.sql'), T);
+  const by4 = runScript(bypass, '66');
+  const BYPASS = /ticvai_parent_visible \(bypassrls\) \(this file changed it from ticvai_parent_visible\), where the package makes ticvai_parent_visible/;
+  ok(by1.code === 1 && BYPASS.test(by1.out) && /Put 1 role back to what the package makes: ticvai_parent_visible \(was ticvai_parent_visible \(bypassrls\)\)/.test(byClean.out)
+    && byAttr === 'f' && by2.code === 1 && BYPASS.test(by2.out)
+    && by3.code === 1 && /ticvai_parent_visible \(bypassrls\) \(on the server before this file ran\)/.test(by3.out) && by4.code === 0 && /MATCH: 1 table/.test(by4.out),
+  '**review 7 C1: BYPASSRLS on ticvai_parent_visible is DIFFERENT, --clean takes it off, the same file is DIFFERENT again (and so is every other folder until --clean); without it, MATCH**',
+  [by1, byClean, by2, by3, by4].map(verdict).join(' | ') + `\n${byClean.out}\n${by2.out}`);
+
+  // The package's own membership, but with ADMIN, or to another member; a role of the package's name made with
+  // attributes the package does not give it; a setting on it.
+  const variants = {
+    admin: `${T}DO $$ BEGIN EXECUTE 'GRANT ticvai_parent_visible TO postgres WITH ADMIN OPTION'; END $$;\n`,
+    other: `${T}DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'probe_app') THEN CREATE ROLE probe_app; END IF; EXECUTE 'GRANT ticvai_parent_visible TO probe_app'; END $$;\n`,
+    setting: `${T}DO $$ BEGIN ALTER ROLE ticvai_parent_visible SET row_security = off; END $$;\n`,
+  };
+  const want = {
+    admin: /postgres in ticvai_parent_visible \(admin\) \(made by this file\), where the package makes postgres in ticvai_parent_visible/,
+    other: /probe_app in ticvai_parent_visible \(made by this file\), which the package does not make/,
+    setting: /ticvai_parent_visible: row_security=off \(made by this file\), which the package does not make/,
+  };
+  const seen = [];
+  for (const [name, sql] of Object.entries(variants)) {
+    writeFileSync(path.join(bypass, 'db', 'tenant', 'V0003__t.sql'), sql);
+    const r = runScript(bypass, '66');
+    const c = runScript(bypass, '--clean');
+    seen.push(`${name}: ${r.code === 1 && want[name].test(r.out) && c.code === 0 && /Revoked|Reset|Removed/.test(c.out) ? 'ok' : `${r.out}\n${c.out}`}`);
+  }
+  // The role must not be there yet, or the file's guarded CREATE ROLE does nothing.
+  psqlAt('DROP ROLE IF EXISTS ticvai_parent_visible');
+  const unseen = smallFolder('unseen', { earlier: 'SELECT 1;\n', tickets: { 67: { file: 'V0003__t.sql',
+    sql: `${T}DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'ticvai_parent_visible') THEN CREATE ROLE ticvai_parent_visible NOLOGIN NOINHERIT CONNECTION LIMIT 1 PASSWORD 'x' VALID UNTIL '2030-01-01'; END IF; END $$;\n` } } });
+  const un = runScript(unseen, '67');
+  const unClean = runScript(unseen, '--clean');
+  const unAfter = psqlAt("SELECT rolinherit || ' ' || rolconnlimit || ' ' || coalesce(rolvaliduntil::text, '-') || ' ' || (rolpassword IS NULL) FROM pg_authid WHERE rolname = 'ticvai_parent_visible'");
+  seen.push(`unseen: ${un.code === 1 && /ticvai_parent_visible \(noinherit\) \(connection limit 1\) \(valid until 2030-01-01 00:00:00\) \(password\) \(made by this file\), where the package makes ticvai_parent_visible/.test(un.out)
+    && unClean.code === 0 && unAfter === 'true -1 - true' ? 'ok' : `${un.out}\n${unClean.out}\n[${unAfter}]`}`);
+  ok(seen.every((s) => /: ok$/.test(s)), 'review 7 m1/m2: the package\'s membership with ADMIN or to another member, a setting on its role, and its role with NOINHERIT, a connection limit, a password and VALID UNTIL are each DIFFERENT; --clean puts each back', seen.join('\n'));
+  runScript(unseen, '--clean');
+
+  // Review 7, I1: the file of another ticket in the same folder is not the package's. Its role is a difference in
+  // every later ticket of the folder, and --clean never keeps it.
+  const chain = smallFolder('chain', { earlier: 'SELECT 1;\n', tickets: {
+    10: { file: 'V0003__x.sql', table: 'a.x', sql: "CREATE TABLE IF NOT EXISTS a.x (id int);\nDO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'probe_x') THEN CREATE ROLE probe_x LOGIN BYPASSRLS; END IF; END $$;\n" },
+    11: { file: 'V0004__y.sql', table: 'a.y', sql: 'CREATE TABLE IF NOT EXISTS a.y (id int);\n' },
+  } });
+  const steps = [runScript(chain, '10'), runScript(chain, '--clean'), runScript(chain, '10'), runScript(chain, '11'), runScript(chain, '--clean'), runScript(chain, '10')];
+  ok(steps[0].code === 1 && /probe_x \(bypassrls\) \(login\) \(made by this file\)/.test(steps[0].out) && /Removed 1 role the package does not make \(probe_x\)/.test(steps[1].out)
+    && steps[2].code === 1 && steps[3].code === 1 && /probe_x \(bypassrls\) \(login\) \(on the server before this file ran\), which the package does not make/.test(steps[3].out)
+    && /Removed 1 role the package does not make \(probe_x\)/.test(steps[4].out) && steps[5].code === 1 && !/probe_x/.test(marker()),
+  '**review 7 I1: the role another ticket\'s earlier file makes is DIFFERENT in the next ticket too, and --clean never keeps it**', steps.map(verdict).join(' | '));
+  runScript(chain, '--clean');
+
+  // A role the package's text makes, made by an earlier file (as r8's apply_parent_across_rls does), is in two
+  // folders' templates: --clean in one keeps it, so the other's unchanged ticket still matches. The same folder
+  // without the package's `server` (a role no package text makes) is DIFFERENT (review 7: no earlier-file allowance).
+  const OWNS = 'GRANT EXECUTE ON FUNCTION platform.visible_ids() TO ticvai_parent_visible;\nALTER FUNCTION platform.visible_ids() OWNER TO ticvai_parent_visible;\n';
+  const cA = smallFolder('roles-a', { earlier: PKG_ROLE + OWNS, tickets: { 88: { file: 'V0003__t.sql', sql: T, server: { 'server roles': ['ticvai_parent_visible'] } } } });
+  const cB = smallFolder('roles-b', { earlier: PKG_ROLE + OWNS, tickets: { 88: { file: 'V0003__t.sql', sql: T, server: { 'server roles': ['ticvai_parent_visible'] } } } });
   const b1 = runScript(cB, '88');
   const a1 = runScript(cA, '88');
   const aClean = runScript(cA, '--clean');
   const b2 = runScript(cB, '88');
-  ok(b1.code === 0 && a1.code === 0 && aClean.code === 0 && !/probe_pkg_visible/.test(aClean.out) && b2.code === 0 && /MATCH: 1 table/.test(b2.out),
-    '**folder A --clean keeps the role folder B\'s template relies on: B\'s unchanged ticket still MATCH**', `${aClean.out}\n${b2.out}`);
-  runScript(cB, '--clean');
-  docker(['exec', CONTAINER, 'psql', '-U', 'postgres', '-qc', 'DROP ROLE IF EXISTS probe_pkg_visible']);
+  ok(b1.code === 0 && a1.code === 0 && aClean.code === 0 && !/ticvai_parent_visible/.test(aClean.out) && b2.code === 0 && /MATCH: 1 table/.test(b2.out),
+    '**folder A --clean keeps the role the package makes, which folder B\'s template relies on: B\'s unchanged ticket still MATCH**', `${aClean.out}\n${b2.out}`);
+  const cC = smallFolder('roles-c', { earlier: PKG_ROLE.replace(/ticvai_parent_visible/g, 'probe_team_role') + OWNS.replace(/ticvai_parent_visible/g, 'probe_team_role'),
+    tickets: { 88: { file: 'V0003__t.sql', sql: T, server: { 'server roles': ['ticvai_parent_visible'] } } } });
+  const c1 = runScript(cC, '88');
+  ok(c1.code === 1 && /probe_team_role \(on the server before this file ran\), which the package does not make/.test(c1.out),
+    '**a role an earlier file of the folder makes that the package does not: DIFFERENT**', c1.out);
+  runScript(cC, '--clean');
+  const bAfter = runScript(cB, '88');
+  ok(bAfter.code === 0 && /template built/.test(bAfter.out),
+    'after a --clean that changed the server\'s roles, another folder\'s template is built again, and its unchanged ticket MATCHes', bAfter.out);
+
+  // Review 7, m4: a wait for the role lock is said, and it ends (ADAM_DB_CHECK_LOCK_WAIT shortens the minute here).
+  const hold = (secs) => {
+    const child = spawn('docker', ['exec', '-i', CONTAINER, 'psql', '-U', 'postgres', '-q', '-c',
+      `BEGIN; LOCK TABLE pg_catalog.pg_authid IN SHARE ROW EXCLUSIVE MODE; SELECT pg_sleep(${secs}); COMMIT;`]);
+    child.done = new Promise((r) => { child.on('close', r); });
+    return child;
+  };
+  const waitRun = (secs) => new Promise((resolve) => {
+    const child = spawn(process.execPath, [SCRIPT, '88'], { cwd: cB, env: { ...OWNED, ADAM_DB_CHECK_LOCK_WAIT: String(secs) } });
+    let out = '';
+    child.stdout.on('data', (d) => { out += d; });
+    child.stderr.on('data', (d) => { out += d; });
+    child.on('close', (code) => resolve({ code, out }));
+  });
+  let holder = hold(6);
+  await new Promise((r) => { setTimeout(r, 1500); });
+  const waitedOk = await waitRun(20);
+  await holder.done;
+  holder = hold(15);
+  await new Promise((r) => { setTimeout(r, 1500); });
+  const t0 = Date.now();
+  const timedOut = await waitRun(3);
+  const waitedS = (Date.now() - t0) / 1000;
+  await holder.done;
+  ok(waitedOk.code === 0 && /MATCH/.test(waitedOk.out) && /- waited for the server-wide role lock, held by process \d+ in database postgres/.test(waitedOk.out)
+    && timedOut.code === 1 && /FAILED: .*waited 5 s for the server-wide role lock in this container, and it is still held by process \d+ in database postgres/.test(timedOut.out) && waitedS < 14,
+  'a run that waits for the role lock says what holds it, and gives up after the wait with a message naming it', `${waitedOk.out}\n---\n${timedOut.out} (${waitedS.toFixed(1)} s)`);
+  for (const d of [cA, cB, bypass]) runScript(d, '--clean');
 
   // Another folder's databases, last used more than two weeks ago: kept while that folder holds its
   // lock (it may be building), dropped once it does not, with its kept snapshots.
@@ -684,6 +840,15 @@ if (!PACKAGE_RUN) {
     }
     ok(!applyError, `${database}: the package applies to an empty database (${files.length} files, ${((Date.now() - t) / 1000).toFixed(0)} s)`, applyError);
     if (applyError) continue;
+    if (database === 'tenant') {
+      // The server's roles once the package has run (as the bootstrap superuser, so V0105 makes its role and grants
+      // it to no one) are exactly what the one parser reads from the package's text (both databases share them).
+      const cluster = JSON.parse(psql('pkg_tenant', `SELECT ${script.CLUSTER_SQL};`).stdout.trim() || 'null');
+      const both = tools.serverAllowances([...pkgFiles('tenant'), ...pkgFiles('control')]);
+      const serverDiff = cluster ? script.serverDiffs(cluster, script.expectedServer(both, cluster)) : ['no answer'];
+      ok(serverDiff.length === 0 && cluster['server roles'].includes('ticvai_parent_visible'),
+        'the roles the package makes on the server are exactly what tools.mjs reads from its text', serverDiff.join(' | ') || JSON.stringify(cluster));
+    }
     const model = schemaModel(files);
     const tables = [...model.tables.keys()];
     // What every ticket would be given, put together: the baseline, then each table's statements.
