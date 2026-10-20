@@ -91,6 +91,10 @@ screens:
       operation: getCurrentSession
       crossesDevice: true
       back: false
+      carries:
+      - challengeId
+      - methodId
+      - providerId
   notes: '**Rebuilt as a sign-in form on 2 October 2026 (CHG-DOOR-002/003; Chinmay, 2 October 2026: fix
     the Block A blockers now).** It was generated as a list over active sessions, MFA methods and SSO
     providers with Force logout and Revoke all sessions on the door, which a person who is not yet signed
@@ -770,9 +774,13 @@ screens:
       trigger: Creates the first principal and grants it the role
       provenance: flow F109 step 4→5
       operation: listTenants
+      carries:
+      - tenantId
     - to: ADM-021
       trigger: Defines the role the first administrator will hold
       provenance: flow F109 step 2→3
+      carries:
+      - tenantId
     entryFrom: []
   notes: 'Purpose derived from the screen name and its operations on 17 August, not from a requirement.
     **Removed 24 August**: generateInvoice, getSubscription, getUsageMetering, listSubscriptionInvoices,
@@ -1552,9 +1560,15 @@ screens:
     - to: ADM-008
       trigger: Subscription & Plan Management
       provenance: flow F96 step 1→2
+      carries:
+      - planId
+      - tenantId
     - to: ADM-012
       trigger: Provisions or assigns a cell
       provenance: flow F16 step 1→2
+      carries:
+      - cellId
+      - tenantId
   notes: 'Purpose derived from the screen name and its operations on 17 August, not from a requirement.
     **Removed 24 August**: generateInvoice, getSubscription, getUsageMetering, listSubscriptionInvoices,
     previewSubscriptionChange, setSubscription. **Eleven P09 screens carried the same nine subscription
@@ -2058,6 +2072,8 @@ screens:
     - to: ADM-007
       trigger: Enables the modules the tenant bought
       provenance: flow F16 step 3→4
+      carries:
+      - tenantId
   notes: 'Purpose derived from the screen name and its operations on 17 August, not from a requirement.
     **Removed 24 August**: generateInvoice, getSubscription, getUsageMetering, listSubscriptionInvoices,
     previewSubscriptionChange, setSubscription. **Eleven P09 screens carried the same nine subscription
@@ -2423,6 +2439,9 @@ screens:
     - to: ADM-012
       trigger: Tenant Isolation & Resource Pool
       provenance: flow F96 step 4→5
+      carries:
+      - cellId
+      - tenantId
   notes: 'Purpose derived from the screen name and its operations on 17 August, not from a requirement.
     **Cross-platform navigation removed 24 August**: BO-074. **A till does not navigate to a back office
     and a guest app does not navigate to either** — those are device handovers, and a flow declares them
@@ -2706,6 +2725,8 @@ screens:
     - to: ADM-011
       trigger: Licence & Seat Management
       provenance: flow F96 step 2→3
+      carries:
+      - tenantId
   notes: 'Purpose derived from the screen name and its operations on 17 August, not from a requirement.
     **Removed 24 August**: addLicenceAddOn, createTenant, provisionCell, reactivateTenant, removeLicenceAddOn,
     setSsoConfig, suspendTenant, terminateTenant, updateTenant. **`ADM-015 API Rate Limit & Quota Management`
@@ -3601,6 +3622,8 @@ screens:
     - to: ADM-007
       trigger: Module & Feature Entitlement
       provenance: flow F96 step 3→4
+      carries:
+      - tenantId
   notes: 'Purpose derived from the screen name and its operations on 17 August, not from a requirement.
     **Removed 24 August**: generateInvoice, getUsageMetering, listSubscriptionInvoices. **Eleven P09 screens
     carried the same nine subscription operations** — a platform dashboard, a tenant directory and a rate-limit
@@ -3908,9 +3931,13 @@ screens:
     - to: ADM-006
       trigger: Builds the scope tree
       provenance: flow F16 step 2→3
+      carries:
+      - tenantId
     - to: ADM-013
       trigger: Tenant Performance Monitor
       provenance: flow F97 step 1→2
+      carries:
+      - cellId
   notes: 'Purpose derived from the screen name and its operations on 17 August, not from a requirement.
     **Removed 24 August**: generateInvoice, getSubscription, getUsageMetering, listSubscriptionInvoices,
     previewSubscriptionChange, setSubscription. **Eleven P09 screens carried the same nine subscription
@@ -4161,6 +4188,8 @@ screens:
     - to: ADM-014
       trigger: Auto-Scaling Configuration
       provenance: flow F97 step 2→3
+      carries:
+      - cellId
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
   density: compact
   pattern: listDetail
@@ -4568,6 +4597,8 @@ screens:
     - to: ADM-011
       trigger: Licence & Seat Management
       provenance: flow F105 step 1→2
+      carries:
+      - tenantId
   notes: 'Purpose derived from the screen name and its operations on 17 August, not from a requirement.
     **Removed 24 August**: generateInvoice, getSubscription, getUsageMetering, listSubscriptionInvoices,
     previewSubscriptionChange, setSubscription. **Eleven P09 screens carried the same nine subscription
@@ -5909,15 +5940,15 @@ screens:
     provenance: design-note correction, 2 October 2026 (ADM-018)
   - operationId: createMfaChallenge
     contract: identity
-    purpose: 'The step-up before a grant (audit R135): sent as the Open access grant form opens, so the
-      code reaches the operator''s second factor while they fill in the reason and the permissions; nothing
-      on the screen is pressed to send it (as on the sign-in screens GST-042 and WEB-016).'
+    purpose: 'The step-up before a grant (audit R135): sent as the Open access grant form opens, so the code
+      reaches the operator''s second factor while they fill in the reason and the permissions; nothing on the
+      screen is pressed to send it (as on the sign-in screens GST-042 and WEB-016).'
     trigger: background
   - operationId: verifyMfaChallenge
     contract: identity
-    purpose: Checks the code the operator enters in the Open access grant form, on its confirm; only when
-      it is accepted does the same press open the grant (`openPlatformStaffGrant`). A wrong code keeps
-      the form open with the reason and permissions kept.
+    purpose: 'Checks the code the operator enters in the Open access grant form, on its confirm; only when it
+      is accepted does the same press open the grant (`openPlatformStaffGrant`). A wrong code keeps the form
+      open with the reason and permissions kept.'
     trigger: onAction
   entryState:
     params:
@@ -5944,10 +5975,6 @@ screens:
     - name: tenantId
       from: navigation
       optional: true
-    - name: challengeId
-      from: navigation
-      optional: true
-      notes: 'Optional: opened without it, the screen makes one with `createMfaChallenge`.'
     coldEntry: '**A version link is expected to point at something superseded — that is what versions
       are for.** The screen opens the requested version read-only, says it is not current, and links to
       the one that is. **An old version is history, not an error.** Arrives with `bannerId`, `pageId`,
@@ -7373,6 +7400,8 @@ screens:
       trigger: Watches the rollout per cell
       provenance: flow F04 step 3→4
       operation: promoteRelease
+      carries:
+      - rolloutId
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
   openQuestions:
   - No contract — new scope, 30 Jul
@@ -9313,6 +9342,8 @@ screens:
     - to: ADM-004
       trigger: Platform Audit Log
       provenance: flow F106 step 1→2
+      carries:
+      - tenantId
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
   openQuestions:
   - No contract — not specified
@@ -10436,6 +10467,8 @@ screens:
       provenance: flow F100 step 1→2
       crossesDevice: true
       back: false
+      carries:
+      - tenantId
   notes: 'Added 17 August. **The key is entered once and never returned** — the screen shows a reference,
     a rotation date and a last-verified date, never a secret. Test before activate. **Not on the wireframe
     board.**

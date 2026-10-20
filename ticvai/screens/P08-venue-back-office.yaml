@@ -1414,6 +1414,8 @@ screens:
       operation: listQueues
       crossesDevice: true
       back: false
+      carries:
+      - queueId
   notes: 'Pulled to Wave 1 on 17 August (CF-101): F09 closes a cancelled event’s queue, and a flow cannot
     step through a screen that is built after it. **Cross-platform navigation removed 24 August**: EMP-032.
     **A till does not navigate to a back office and a guest app does not navigate to either** — those
@@ -2010,6 +2012,8 @@ screens:
     - to: BO-045
       trigger: Menu Management
       provenance: flow F85 step 4→5
+      carries:
+      - menuId
   notes: 'Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
     at all. States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. **Improved 20
@@ -2482,6 +2486,8 @@ screens:
     - to: BO-007
       trigger: Product Directory
       provenance: flow F85 step 3→4, F93 step 3→4
+      carries:
+      - productId
     entryFrom:
     - BO-045
     - BO-137
@@ -2963,6 +2969,9 @@ screens:
     - to: BO-014
       trigger: The priced range is published to the tills
       provenance: flow F78 step 3→4
+      carries:
+      - priceListId
+      - productId
   notes: 'Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
     at all. States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. **Improved 20
@@ -3276,6 +3285,8 @@ screens:
       provenance: flow F90 step 2→3
       crossesDevice: true
       back: false
+      carries:
+      - reportId
   notes: 'Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
     at all. States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. **Improved 20
@@ -4805,6 +4816,9 @@ screens:
     - to: BO-011
       trigger: Packages & Bundles
       provenance: flow F77 step 1→2
+      carries:
+      - productId
+      - version
   notes: 'Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
     at all. States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. **Improved 20
@@ -5769,10 +5783,10 @@ screens:
     trigger: onAction
   - operationId: listProductCategories
     contract: catalogue
-    purpose: 'The options of the calendar''s category filter (r8, GPS-C18), read once when the screen
-      opens; the chosen category is sent to `listPerformances` as `categoryId`. No component of its own:
-      the filter is part of the calendar. Not background (r8 integration, CHG-R8INT-008): the user sees
-      the options, and the approved screen has no element of its own for the filter.'
+    purpose: 'The options of the calendar''s category filter (r8, GPS-C18), read once when the screen opens; the
+      chosen category is sent to `listPerformances` as `categoryId`. No component of its own: the filter is
+      part of the calendar. Not background (r8 integration, CHG-R8INT-008): the user sees the options, and the
+      approved screen has no element of its own for the filter.'
     trigger: onLoad
     provenance: r8 second round, GPS-C18 (ticket 28195)
   - operationId: getPerformance
@@ -6894,6 +6908,8 @@ screens:
       provenance: flow F11 step 5→6
       crossesDevice: true
       back: false
+      carries:
+      - orderId
   notes: 'Restored 20 August when the P15 build was rolled back. **Named `Timed Entry Rules` and carrying
     eleven F&B order operations.** Timed entry is an admission profile; this is the order desk. The client
     board calls it *Active Order Management & Fulfilment Journey*. **Purpose corrected 24 August.** The
@@ -8581,6 +8597,8 @@ screens:
     - to: BO-024
       trigger: Payment Exceptions
       provenance: flow F99 step 1→2
+      carries:
+      - paymentId
   notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
     at all. States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual.
@@ -11072,6 +11090,8 @@ screens:
     - to: BO-129
       trigger: A configuration profile is set for it
       provenance: flow F79 step 1→2
+      carries:
+      - workstationId
   notes: 'Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
     at all. States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. **Improved 20
@@ -11425,6 +11445,8 @@ screens:
       trigger: The fleet is monitored
       provenance: flow F89 step 3→4
       operation: listCatalogueBundles
+      carries:
+      - workstationId
   notes: 'Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
     at all. States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. **Improved 20
@@ -12864,6 +12886,8 @@ screens:
     - to: BO-074
       trigger: Chart of Accounts
       provenance: flow F98 step 1→2
+      carries:
+      - accountId
   notes: 'Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
     at all. States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual.
@@ -13775,6 +13799,9 @@ screens:
       trigger: An item's recipe changed, so its allergens are re-verified
       provenance: flow F31 step 2→3
       operation: applyMenuActions
+      carries:
+      - menuId
+      - menuItemId
   notes: 'Restored 20 August when the P15 build was rolled back. **Operations from the 24 August F&B build
     wired here** — the contract grew and the screens had not caught up, which is how 92 operations reached
     49% of screens.
@@ -15170,11 +15197,15 @@ screens:
     - to: BO-081
       trigger: Inventory Items
       provenance: flow F92 step 1→2
+      carries:
+      - itemId
     - to: EMP-065
       trigger: The delivery arrives
       provenance: flow F35 step 1→2
       crossesDevice: true
       back: false
+      carries:
+      - transferId
   notes: 'Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
     at all. States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. **Improved 20
@@ -17180,11 +17211,16 @@ screens:
     - to: BO-061
       trigger: It is scheduled to the people who need it
       provenance: flow F107 step 1→2
+      carries:
+      - reportId
+      - scheduleId
     - to: EMP-020
       trigger: The answer arrives with its sources
       provenance: flow F20 step 1→2
       crossesDevice: true
       back: false
+      carries:
+      - conversationId
   notes: 'Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
     at all. States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. **Retail board
@@ -22724,16 +22760,22 @@ screens:
     - to: BO-081
       trigger: Inventory Items
       provenance: flow F76 step 1→2
+      carries:
+      - itemId
     - to: BO-137
       trigger: The variance feeds theoretical-against-actual
       provenance: flow F30 step 7→8
       operation: postStockCount
+      carries:
+      - countId
     - to: EMP-066
       trigger: The lines are recounted and re-entered
       provenance: flow F30 step 5→6
       operation: requestRecount
       crossesDevice: true
       back: false
+      carries:
+      - countId
   notes: 'Added 17 August because the contract had operations no screen declared. **Not on the wireframe
     board** — needs drawing. **Improved 20 August against the client design board**, answering 1 board
     screen(s): Stock Count, Reconciliation & Variance. **The id, flows and navigation are unchanged**
@@ -23097,6 +23139,8 @@ screens:
     - to: BO-049
       trigger: The website has already sold four of the damaged units
       provenance: flow F35 step 4→5
+      carries:
+      - itemId
   notes: 'Added 17 August because the contract had operations no screen declared. **Not on the wireframe
     board** — needs drawing. **Improved 20 August against the client design board**, answering 1 board
     screen(s): Transfers, Distribution & Outlet Receiving. **The id, flows and navigation are unchanged**
@@ -24085,6 +24129,8 @@ screens:
       trigger: Approves it
       provenance: flow F14 step 3→4
       operation: listApprovalRequests
+      carries:
+      - requestId
     entryFrom:
     - ADM-248
     - BO-364
@@ -25437,6 +25483,8 @@ screens:
       provenance: flow F100 step 2→3
       crossesDevice: true
       back: false
+      carries:
+      - tenantId
   notes: Added 17 August. **Staff and guest spend shown separately** — a venue can manage the first and
     cannot stop guests asking questions. At the ceiling the manager decides whether to continue; the assistant
     does not stop on its own (CF-14). **Index failures sit beside spend on purpose** - both answer the
@@ -25689,6 +25737,8 @@ screens:
       trigger: The plan is uploaded and read
       provenance: flow F26 step 1→2
       operation: createVenueMap
+      carries:
+      - mapId
   notes: 'CF-123. **A venue may have several maps** — a park map and a floor plan per building are different
     maps, not layers of one, because a guest on the second floor should not be shown the ground floor
     toilets. **Drawn 26 August** — `Seat Board 2.dc.html` frame `seat-2e`. **The frame names this screen
@@ -25825,6 +25875,9 @@ screens:
     - to: BO-094
       trigger: The operator places what the drawing did not carry and links each point to what it is
       provenance: flow F26 step 3→4
+      carries:
+      - mapId
+      - uploadId
   notes: 'CF-123. **Two failure modes on one screen, kept visually apart.** Extraction is deterministic
     and reports which layers it found; labelling is a proposal with a confidence. **A mis-parsed layer
     and a bad suggestion look identical if the screen blurs them**, and the operator is left saying only
@@ -26177,6 +26230,8 @@ screens:
       operation: publishVenueMap
       crossesDevice: true
       back: false
+      carries:
+      - mapId
   notes: 'CF-123. **Publishing is a separate act from saving**, and the screen makes that visible — editing
     a live map under a guest standing in front of it is how a route ends at a wall. **Refuses to publish
     a point linked to a closed outlet**, naming which one: a restaurant point pointing nowhere is worse
@@ -30938,6 +30993,9 @@ screens:
     - to: BO-045
       trigger: The draft is scheduled for Monday rather than published now
       provenance: flow F31 step 3→4, F93 step 1→2
+      carries:
+      - menuId
+      - menuItemId
   notes: '**Added 20 August from the client design board.** The operations existed and no screen called
     them.
 
@@ -31215,6 +31273,8 @@ screens:
     - to: BO-137
       trigger: Recipe Consumption & Theoretical Inventory
       provenance: flow F85 step 1→2
+      carries:
+      - runId
   notes: '**Added 20 August from the client design board.** The operations existed and no screen called
     them.
 
@@ -33298,6 +33358,9 @@ screens:
     - to: BO-126
       trigger: The configuration is deployed and rolled out
       provenance: flow F79 step 3→4
+      carries:
+      - profileId
+      - saleBoardId
   notes: '**Added 20 August from the client design board.** The operations existed and no screen called
     them. **Named in the board contents and not written up in it** — the operations are real, the layout
     is not. **Owns POS board frame(s) POS-1D** (client pack, 24 August). **Assigned by board purpose rather
@@ -33932,6 +33995,8 @@ screens:
     - to: BO-036
       trigger: The failing till is found, with its alerts
       provenance: flow F95 step 1→2
+      carries:
+      - workstationId
   notes: '**Added 20 August from the client design board.** The operations existed and no screen called
     them. **Owns POS board frame(s) POS-5B** (client pack, 24 August). **Assigned by board purpose rather
     than by operation overlap** — three attempts at deriving that mapping produced plausible nonsense,
@@ -34082,6 +34147,8 @@ screens:
       trigger: Its sale board layout is built
       provenance: flow F79 step 2→3
       operation: setConfigurationProfile
+      carries:
+      - profileId
   notes: '**Added 20 August from the client design board.** The operations existed and no screen called
     them. **Owns POS board frame(s) POS-5D** (client pack, 24 August). **Assigned by board purpose rather
     than by operation overlap** — three attempts at deriving that mapping produced plausible nonsense,
@@ -34866,6 +34933,8 @@ screens:
       provenance: flow F33 step 4→5
       crossesDevice: true
       back: false
+      carries:
+      - orderId
   notes: '**Added 20 August from the client design board.** The operations existed and no screen called
     them. **Named in the board contents and not written up in it** — the operations are real, the layout
     is not. **Owns POS board frame(s) POS-5F** (client pack, 24 August). **Assigned by board purpose rather
@@ -38230,14 +38299,20 @@ screens:
       trigger: Works in Anti-Passback & Journey Sequence
       provenance: flow F112 step 5→6
       operation: listAccessRule
+      carries:
+      - ruleId
     - to: BO-159
       trigger: Works in Entitlement Consumption Engine
       provenance: flow F112 step 9→10
       operation: listAccessRule
+      carries:
+      - ruleId
     - to: BO-161
       trigger: Works in Guest, Companion & Eligibility Rules
       provenance: flow F112 step 13→14
       operation: listAccessRule
+      carries:
+      - productId
   density: compact
   purposeNote: Administrator can centrally find, understand, create, clone, modify and govern all admission
     rules.
@@ -41989,10 +42064,14 @@ screens:
       trigger: Works in Face Tag Temporary Enrollment
       provenance: flow F115 step 7→8
       operation: listBiometricAccess
+      carries:
+      - profileId
     - to: BO-189
       trigger: Works in Face Matching & Verification Thresholds
       provenance: flow F115 step 9→10
       operation: listBiometricAccess
+      carries:
+      - profileId
   density: compact
   purposeNote: Authorized administrators can monitor and manage the biometric-access environment from
     one location.
@@ -43347,10 +43426,14 @@ screens:
       trigger: Works in Physical Device Registration & Provisioning
       provenance: flow F116 step 3→4
       operation: listDeviceGate
+      carries:
+      - placementId
     - to: BO-203
       trigger: Works in Hardware Compatibility, Health, Testing & Deployment
       provenance: flow F116 step 17→18
       operation: listDeviceGate
+      carries:
+      - deviceId
   density: compact
   purposeNote: Operations can identify every access-control device and its current operational/configuration
     state from one screen.
@@ -43703,6 +43786,10 @@ screens:
       trigger: Returns to the board's landing screen
       provenance: flow F116 step 4→5
       operation: listPhysicalDeviceRegistration
+      carries:
+      - accessPointId
+      - deviceId
+      - placementId
   density: compact
   purposeNote: Every physical access-control device is uniquely registered, authenticated and assigned
     to its correct topology location.
@@ -43964,6 +44051,8 @@ screens:
       trigger: Returns to the board's landing screen
       provenance: flow F116 step 6→7
       operation: setTurnstileLaneBehavior
+      carries:
+      - accessPointId
   density: compact
   purposeNote: Each gate can execute different configured behaviors according to its mode and the validated
     credential.
@@ -44189,6 +44278,8 @@ screens:
       trigger: Returns to the board's landing screen
       provenance: flow F116 step 10→11
       operation: setReaderScannerPeripheral
+      carries:
+      - accessPointId
   density: compact
   purposeNote: Readers and peripherals can be independently associated with gates and checked against
     required admission capabilities.
@@ -45983,10 +46074,14 @@ screens:
       trigger: Works in Re-entry & Temporary Exit Journey
       provenance: flow F118 step 9→10
       operation: listGuestJourney
+      carries:
+      - profileId
     - to: BO-220
       trigger: Works in Multi-Park & Crossover Journey Orchestrator
       provenance: flow F118 step 11→12
       operation: listGuestJourney
+      carries:
+      - profileId
   density: compact
   pattern: listDetail
   patternReason: the pack gives this screen a display directory (§Show) and no metric row
@@ -47209,6 +47304,8 @@ screens:
       trigger: Works in Live Gate Mode & Lane Control
       provenance: flow F119 step 11→12
       operation: listLiveAccess
+      carries:
+      - accessPointId
   density: compact
   purposeNote: Operations can understand the live access state of the entire venue without opening individual
     device screens.
@@ -48561,10 +48658,14 @@ screens:
       trigger: Works in Policy Scope, Hierarchy & Inheritance
       provenance: flow F120 step 9→10
       operation: listDynamicAccessPolicy
+      carries:
+      - policyId
     - to: BO-243
       trigger: Works in Policy Approval, Audit, Analytics & AI Optimization
       provenance: flow F120 step 17→18
       operation: listDynamicAccessPolicy
+      carries:
+      - policyId
   density: compact
   purposeNote: Administrators can centrally understand the status, scope, performance and conflicts of
     all dynamic access policies.
@@ -49713,18 +49814,26 @@ screens:
       trigger: Works in Credential Sharing & Concurrent Usage Detection
       provenance: flow F121 step 3→4
       operation: listAccessSecurityFraud
+      carries:
+      - alertId
     - to: BO-247
       trigger: Works in Unified Identity & Credential Lock Manager
       provenance: flow F121 step 5→6
       operation: listAccessSecurityFraud
+      carries:
+      - lockId
     - to: BO-248
       trigger: Works in Biometric & Identity Integrity Monitoring
       provenance: flow F121 step 7→8
       operation: listAccessSecurityFraud
+      carries:
+      - alertId
     - to: BO-253
       trigger: Works in Security Analytics, AI Detection & Governance
       provenance: flow F121 step 17→18
       operation: listAccessSecurityFraud
+      carries:
+      - alertId
   density: compact
   purposeNote: Security teams can understand the overall fraud and access-security posture from one screen.
   pattern: listDetail
@@ -50059,6 +50168,8 @@ screens:
       trigger: Returns to the board's landing screen
       provenance: flow F121 step 4→5
       operation: listCredentialSharingConcurrent
+      carries:
+      - alertId
   density: compact
   purposeNote: validation.
   pattern: listDetail
@@ -50340,6 +50451,8 @@ screens:
       trigger: Returns to the board's landing screen
       provenance: flow F121 step 8→9
       operation: listBiometricIdentityIntegrity
+      carries:
+      - alertId
   density: compact
   purposeNote: Identity changes and unusual biometric behavior automatically feed TICVAI's access-risk
     process.
@@ -53603,26 +53716,38 @@ screens:
       trigger: Works in Participants, Guest Lists & Group Structure
       provenance: flow F137 step 3→4
       operation: listGroupBooking
+      carries:
+      - groupBookingId
     - to: BO-277
       trigger: Works in Group Payment, Deposit & Balance Management
       provenance: flow F137 step 5→6
       operation: listGroupBooking
+      carries:
+      - groupBookingId
     - to: BO-278
       trigger: Works in Group Ticket, Seat & Entitlement Allocation
       provenance: flow F137 step 7→8
       operation: listGroupBooking
+      carries:
+      - groupBookingId
     - to: BO-279
       trigger: Works in Group Ticket Fulfillment & Distribution
       provenance: flow F137 step 9→10
       operation: listGroupBooking
+      carries:
+      - groupBookingId
     - to: BO-280
       trigger: Works in Group Arrival, Check-In & Admission Operations
       provenance: flow F137 step 11→12
       operation: listGroupBooking
+      carries:
+      - groupBookingId
     - to: BO-281
       trigger: Works in Group Amendments, Cancellation & Refund Operations
       provenance: flow F137 step 13→14
       operation: listGroupBooking
+      carries:
+      - groupBookingId
   density: compact
   purposeNote: Operations can identify every upcoming group, its readiness and outstanding actions from
     one centralized workspace.
@@ -54964,6 +55089,10 @@ screens:
       trigger: Works in Membership Product Validation, Approval, Publication & Versioning
       provenance: flow F138 step 17→18
       operation: listMembershipAnnualPass
+      carries:
+      - challengeId
+      - membershipCode
+      - version
   density: compact
   purposeNote: Administrators can view, search and manage the complete portfolio of membership and annual-pass
     products from one workspace.
@@ -56169,28 +56298,28 @@ screens:
     provenance: decided 29 September, VM close-out (venue management and configuration)
   - operationId: getChannelAvailability
     contract: catalogue
-    purpose: 'The membership product''s channels as published now (r8, GPS-C39): fills the channel fields,
-      and the publish sends that answer back whole with the guest''s changes (capacityLimited and fixedSalesWindow
-      are left to ADM-124).'
+    purpose: 'The membership product''s channels as published now (r8, GPS-C39): fills the channel fields, and the
+      publish sends that answer back whole with the guest''s changes (capacityLimited and fixedSalesWindow are left
+      to ADM-124).'
     trigger: onLoad
     provenance: r8 integration, GPS-C39 (CHG-R8INT-007)
   - operationId: publishChannelAvailability
     contract: catalogue
-    purpose: 'Choose the channels that sell the membership: the whole map `getChannelAvailability` read,
-      with the changes (r8, GPS-C39)'
+    purpose: 'Choose the channels that sell the membership: the whole map `getChannelAvailability` read, with the
+      changes (r8, GPS-C39)'
     trigger: onAction
     provenance: decided 29 September, VM close-out (venue management and configuration)
   - operationId: listPriceLists
     contract: catalogue
-    purpose: The price lists a membership is priced on, and the options of the save form's base pricing
-      profile picker (r8, GPS-C34)
+    purpose: The price lists a membership is priced on, and the options of the save form's base pricing profile
+      picker (r8, GPS-C34)
     trigger: onLoad
   - operationId: listTaxProfiles
     contract: catalogue
-    purpose: 'The options of the save form''s tax profile picker (r8, GPS-C34): `taxProfile` is a catalogue
-      tax profile''s id. Read once when the screen opens; no component of its own, the picker is in the
-      form. Not background (r8 integration, CHG-R8INT-008): the user sees the options, and the approved
-      screen draws the picker only in the form overlay''s body, not as a component.'
+    purpose: 'The options of the save form''s tax profile picker (r8, GPS-C34): `taxProfile` is a catalogue tax
+      profile''s id. Read once when the screen opens; no component of its own, the picker is in the form. Not
+      background (r8 integration, CHG-R8INT-008): the user sees the options, and the approved screen draws the
+      picker only in the form overlay''s body, not as a component.'
     trigger: onLoad
     provenance: r8 second round, GPS-C34 (ticket 29883)
   - operationId: setMembershipCommercialConfig
@@ -56224,8 +56353,8 @@ screens:
       `basePricingProfile`, `taxProfile`, `salesPeriod`. Optional: `feeProfile`, `upgradePricePolicy`,
       `promotionalPricingEligibility`, `paymentTerms`. Dismissing sends nothing; the screen behind is
       unchanged. **Pickers** (r8, GPS-C34): `basePricingProfile` is picked from the price lists (`listPriceLists`),
-      `taxProfile` from the tax profiles (`listTaxProfiles`); `feeProfile` and `upgradePricePolicy` are
-      typed codes, since no entity holds them yet.'
+      `taxProfile` from the tax profiles (`listTaxProfiles`); `feeProfile` and `upgradePricePolicy` are typed
+      codes, since no entity holds them yet.'
     bindsTo: MembershipCommercialConfigInput
     confirm:
       label: Save membership commercial config
@@ -56544,8 +56673,8 @@ screens:
 
     Build note (r8 second round, GPS-C33, the lead 20 October 2026, option A): the membership-product
     operations now need the venue permissions `MEMBERSHIP_VIEW` and `MEMBERSHIP_MANAGE`, not platform-staff
-    ones; build the no-access state naming `MEMBERSHIP_MANAGE`. The state text above still names `PLATFORM_CELL_MANAGE`
-    until the client approves the new wording (pending entry GPS-C33).'
+    ones; build the no-access state naming `MEMBERSHIP_MANAGE`. The state text above still names
+    `PLATFORM_CELL_MANAGE` until the client approves the new wording (pending entry GPS-C33).'
 - id: BO-294
   name: Member Operations Command Center
   module: Sell
@@ -56606,22 +56735,32 @@ screens:
       trigger: Works in Member 360° Membership Account Workspace
       provenance: flow F139 step 1→2
       operation: listMember
+      carries:
+      - membershipId
     - to: BO-296
       trigger: Works in Membership Activation, Assignment & Credential Management
       provenance: flow F139 step 3→4
       operation: listMember
+      carries:
+      - membershipId
     - to: BO-299
       trigger: Works in Membership Upgrade, Downgrade & Product Migration Operations
       provenance: flow F139 step 9→10
       operation: listMember
+      carries:
+      - membershipId
     - to: BO-300
       trigger: Works in Renewal Operations & Auto-Renewal Management
       provenance: flow F139 step 11→12
       operation: listMember
+      carries:
+      - membershipId
     - to: BO-301
       trigger: Works in Member Exceptions, Overrides & Service Recovery
       provenance: flow F139 step 13→14
       operation: listMember
+      carries:
+      - membershipId
   density: compact
   purposeNote: Membership operations teams can monitor and prioritize the complete member population from
     one centralized workspace.
@@ -58073,6 +58212,8 @@ screens:
       trigger: Works in Order Detail & Transaction Workspace
       provenance: flow F140 step 1→2
       operation: listOrderReservation
+      carries:
+      - orderId
   density: compact
   purposeNote: Authorized users can locate and monitor any TICVAI order/reservation across all channels
     from one centralized operational workspace.
@@ -59329,10 +59470,14 @@ screens:
       trigger: Works in Order Amendment Workspace
       provenance: flow F141 step 1→2
       operation: listAmendmentAfterSale
+      carries:
+      - orderId
     - to: BO-319
       trigger: Works in Void, Reversal & Same-Day Correction Management
       provenance: flow F141 step 9→10
       operation: listAmendmentAfterSale
+      carries:
+      - orderId
   density: compact
   purposeNote: Authorized users can monitor and manage all after-sales order activities from one centralized
     operational workspace.
@@ -60690,10 +60835,14 @@ screens:
       trigger: Works in Order Split, Merge & Transaction Relationship Management
       provenance: flow F142 step 7→8
       operation: listPaymentOrderFinancial
+      carries:
+      - orderId
     - to: BO-330
       trigger: Works in External Payment, Partner & Settlement Reference Mapping
       provenance: flow F142 step 11→12
       operation: listPaymentOrderFinancial
+      carries:
+      - orderId
   density: compact
   purposeNote: Authorized users can monitor the complete payment and financial condition of orders across
     all TICVAI channels from one workspace.
@@ -63465,6 +63614,8 @@ screens:
       trigger: Works in PDF, Printable & POS Ticket Designer
       provenance: flow F169 step 3→4
       operation: listMediaDesign
+      carries:
+      - templateId
   density: compact
   purposeNote: Administrators can locate, create and manage every ticket-media template from one centralized
     Media Design Studio.
@@ -63740,6 +63891,8 @@ screens:
       trigger: Returns to the board's landing screen
       provenance: flow F169 step 2→3
       operation: setDigitalBarcodeTicket
+      carries:
+      - templateId
   density: compact
   purposeNote: Authorized administrators can visually design and configure customer-facing QR/barcode
     tickets without development.
@@ -63860,6 +64013,8 @@ screens:
       trigger: Returns to the board's landing screen
       provenance: flow F169 step 4→5
       operation: setPdfPrintablePos
+      carries:
+      - templateId
   density: compact
   purposeNote: and operational environments.
   pattern: configEditor
@@ -64098,6 +64253,8 @@ screens:
       trigger: Returns to the board's landing screen
       provenance: flow F169 step 6→7
       operation: setAppleWalletPass
+      carries:
+      - templateId
   density: compact
   purposeNote: Administrators can configure, preview, test and publish Apple Wallet presentations of TICVAI
     Virtual Tickets using supported wallet capabilities.
@@ -64247,6 +64404,8 @@ screens:
       trigger: Returns to the board's landing screen
       provenance: flow F169 step 8→9
       operation: setGoogleWalletPass
+      carries:
+      - templateId
   density: compact
   purposeNote: Administrators can independently configure and govern Google Wallet ticket presentations
     while retaining the same underlying Virtual Ticket architecture.
@@ -64391,6 +64550,8 @@ screens:
       trigger: Returns to the board's landing screen
       provenance: flow F169 step 10→11
       operation: setRfidNfcCard
+      carries:
+      - templateId
   density: compact
   purposeNote: cards, wristbands and supported wearable media.
   pattern: configEditor
@@ -64542,6 +64703,8 @@ screens:
       trigger: Returns to the board's landing screen
       provenance: flow F169 step 12→13
       operation: setDigitalCardMembership
+      carries:
+      - templateId
   density: compact
   purposeNote: templates linked to persistent Virtual Tickets or applicable entitlement identities.
   pattern: configEditor
@@ -65015,10 +65178,14 @@ screens:
       trigger: Works in Credential Delivery & Distribution Operations
       provenance: flow F170 step 5→6
       operation: listCredential
+      carries:
+      - credentialId
     - to: BO-359
       trigger: Works in Credential Replacement, Reissue, Revocation & Recovery
       provenance: flow F170 step 9→10
       operation: listCredential
+      carries:
+      - credentialId
   density: compact
   purposeNote: Operations can understand the health, status and exceptions of all issued credentials from
     one central workspace.
@@ -117513,8 +117680,8 @@ screens:
       - kind: secondaryButton
         label: Award to this guest
         operation: awardBadge
-        notes: 'Shown only when the screen was opened from a guest (customerId); sends badgeId, awardedAt
-          now and sourceType `manager`, and no status: the server writes `awarded` (r8, ORDERS-MONEY-C14).'
+        notes: 'Shown only when the screen was opened from a guest (customerId); sends badgeId, awardedAt now and
+          sourceType `manager`, and no status: the server writes `awarded` (r8, ORDERS-MONEY-C14).'
         provenance: defined 4 October 2026 (CHG-FXS-001)
       - kind: secondaryButton
         label: Cancel
@@ -165628,6 +165795,8 @@ screens:
         (setRateStructure…
       provenance: flow F143 step 5→6
       operation: listCommercialPricing
+      carries:
+      - priceListId
   notes: '**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens";
     CHG-MOV-001). It configures a record the venue owns, so the venue''s own staff use it here, inside
     the tenant''s cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098),
@@ -167156,6 +167325,8 @@ screens:
       trigger: Works in Pricing Rule Priority, Conflict Resolution & Testing
       provenance: flow F144 step 17→18
       operation: listPricingRule
+      carries:
+      - ruleId
   notes: '**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens";
     CHG-MOV-001). It configures a record the venue owns, so the venue''s own staff use it here, inside
     the tenant''s cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098),
@@ -167372,6 +167543,8 @@ screens:
       trigger: Returns to the board's landing screen
       provenance: flow F144 step 2→3
       operation: listCustomerSegmentProfile
+      carries:
+      - ruleId
   notes: '**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens";
     CHG-MOV-001). It configures a record the venue owns, so the venue''s own staff use it here, inside
     the tenant''s cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098),
@@ -167494,6 +167667,8 @@ screens:
       trigger: Returns to the board's landing screen
       provenance: flow F144 step 4→5
       operation: listMembershipLoyaltyPricing
+      carries:
+      - ruleId
   notes: '**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens";
     CHG-MOV-001). It configures a record the venue owns, so the venue''s own staff use it here, inside
     the tenant''s cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098),
@@ -167607,6 +167782,8 @@ screens:
       trigger: Returns to the board's landing screen
       provenance: flow F144 step 6→7
       operation: listResidencyNationalityMarket
+      carries:
+      - ruleId
   notes: '**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens";
     CHG-MOV-001). It configures a record the venue owns, so the venue''s own staff use it here, inside
     the tenant''s cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098),
@@ -167723,6 +167900,8 @@ screens:
       trigger: Returns to the board's landing screen
       provenance: flow F144 step 8→9
       operation: listChannelBasedPricing
+      carries:
+      - ruleId
   notes: '**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens";
     CHG-MOV-001). It configures a record the venue owns, so the venue''s own staff use it here, inside
     the tenant''s cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098),
@@ -167810,6 +167989,8 @@ screens:
       trigger: Returns to the board's landing screen
       provenance: flow F144 step 10→11
       operation: listLocationVenueEvent
+      carries:
+      - ruleId
   notes: '**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens";
     CHG-MOV-001). It configures a record the venue owns, so the venue''s own staff use it here, inside
     the tenant''s cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098),
@@ -167929,6 +168110,8 @@ screens:
       trigger: Returns to the board's landing screen
       provenance: flow F144 step 12→13
       operation: listQuantityGroupVolume
+      carries:
+      - ruleId
   notes: '**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens";
     CHG-MOV-001). It configures a record the venue owns, so the venue''s own staff use it here, inside
     the tenant''s cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098),
@@ -168028,6 +168211,8 @@ screens:
       trigger: Returns to the board's landing screen
       provenance: flow F144 step 14→15
       operation: listEffectiveDateSeason
+      carries:
+      - ruleId
   notes: '**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens";
     CHG-MOV-001). It configures a record the venue owns, so the venue''s own staff use it here, inside
     the tenant''s cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098),
@@ -168123,6 +168308,8 @@ screens:
       trigger: Returns to the board's landing screen
       provenance: flow F144 step 16→17
       operation: listTimeslotPerformanceTime
+      carries:
+      - ruleId
   notes: '**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens";
     CHG-MOV-001). It configures a record the venue owns, so the venue''s own staff use it here, inside
     the tenant''s cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098),
@@ -169918,6 +170105,8 @@ screens:
       trigger: Works in Pricing Change Request & Workspace
       provenance: flow F146 step 1→2
       operation: listPricingGovernance
+      carries:
+      - changeId
   notes: '**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens";
     CHG-MOV-001). It configures a record the venue owns, so the venue''s own staff use it here, inside
     the tenant''s cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098),
@@ -170135,6 +170324,8 @@ screens:
       trigger: Returns to the board's landing screen
       provenance: flow F146 step 2→3
       operation: setPricingChangeRequest
+      carries:
+      - changeId
   notes: '**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens";
     CHG-MOV-001). It configures a record the venue owns, so the venue''s own staff use it here, inside
     the tenant''s cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098),
@@ -171350,10 +171541,14 @@ screens:
       trigger: Works in Dynamic Pricing Strategy Builder
       provenance: flow F147 step 1→2
       operation: listDynamicPricingStrategy
+      carries:
+      - strategyId
     - to: ADM-094
       trigger: Works in Dynamic Price Bands, Ladders & Adjustment Matrix
       provenance: flow F147 step 11→12
       operation: listDynamicPricingStrategy
+      carries:
+      - strategyId
   notes: '**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens";
     CHG-MOV-001). It configures a record the venue owns, so the venue''s own staff use it here, inside
     the tenant''s cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098),
@@ -171577,6 +171772,8 @@ screens:
       trigger: Returns to the board's landing screen
       provenance: flow F147 step 2→3
       operation: setDynamicPricingStrategy
+      carries:
+      - strategyId
   notes: '**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens";
     CHG-MOV-001). It configures a record the venue owns, so the venue''s own staff use it here, inside
     the tenant''s cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098),
@@ -171756,6 +171953,8 @@ screens:
       trigger: Returns to the board's landing screen
       provenance: flow F147 step 4→5
       operation: setDemandOccupancyAvailability
+      carries:
+      - strategyId
   notes: '**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens";
     CHG-MOV-001). It configures a record the venue owns, so the venue''s own staff use it here, inside
     the tenant''s cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098),
@@ -171858,6 +172057,8 @@ screens:
       trigger: Returns to the board's landing screen
       provenance: flow F147 step 6→7
       operation: setBookingVelocityTime
+      carries:
+      - strategyId
   notes: '**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens";
     CHG-MOV-001). It configures a record the venue owns, so the venue''s own staff use it here, inside
     the tenant''s cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098),
@@ -171981,6 +172182,8 @@ screens:
       trigger: Returns to the board's landing screen
       provenance: flow F147 step 8→9
       operation: listSeasonalCalendarDay
+      carries:
+      - strategyId
   notes: '**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens";
     CHG-MOV-001). It configures a record the venue owns, so the venue''s own staff use it here, inside
     the tenant''s cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098),
@@ -172143,6 +172346,8 @@ screens:
       trigger: Returns to the board's landing screen
       provenance: flow F147 step 10→11
       operation: listChannelCustomerSegment
+      carries:
+      - strategyId
   notes: '**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens";
     CHG-MOV-001). It configures a record the venue owns, so the venue''s own staff use it here, inside
     the tenant''s cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098),
@@ -172247,6 +172452,8 @@ screens:
       trigger: Returns to the board's landing screen
       provenance: flow F147 step 12→13
       operation: listDynamicPriceBand
+      carries:
+      - strategyId
   notes: '**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens";
     CHG-MOV-001). It configures a record the venue owns, so the venue''s own staff use it here, inside
     the tenant''s cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098),
@@ -172925,6 +173132,8 @@ screens:
       trigger: Works in AI Pricing Recommendation & Explainability Center
       provenance: flow F148 step 15→16
       operation: listPricing
+      carries:
+      - recommendationId
   notes: '**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens";
     CHG-MOV-001). It configures a record the venue owns, so the venue''s own staff use it here, inside
     the tenant''s cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098),
@@ -174406,6 +174615,8 @@ screens:
       trigger: Works in AI Recommendation Review & Decision Queue
       provenance: flow F149 step 9→10
       operation: listRevenue
+      carries:
+      - recommendationId
   notes: '**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens";
     CHG-MOV-001). It configures a record the venue owns, so the venue''s own staff use it here, inside
     the tenant''s cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098),
@@ -176991,14 +177202,20 @@ screens:
       trigger: Works in Change Impact Analysis
       provenance: flow F153 step 9→10
       operation: listProductGovernance
+      carries:
+      - productId
     - to: ADM-134
       trigger: Works in Change Propagation & Dependency Control
       provenance: flow F153 step 11→12
       operation: listProductGovernance
+      carries:
+      - productId
     - to: ADM-137
       trigger: Works in Governance Risk, AI Monitoring & Control Center
       provenance: flow F153 step 17→18
       operation: listProductGovernance
+      carries:
+      - findingId
   notes: '**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens";
     CHG-MOV-001). It configures a record the venue owns, so the venue''s own staff use it here, inside
     the tenant''s cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098),
@@ -178457,14 +178674,20 @@ screens:
     - to: ADM-139
       trigger: Works in Promotion & Campaign Directory
       provenance: flow F154 step 1→2
+      carries:
+      - campaignId
     - to: ADM-140
       trigger: Works in Promotion Overview
       provenance: flow F154 step 3→4
       operation: listPromotions
+      carries:
+      - promotionId
     - to: ADM-141
       trigger: Works in Promotion Lifecycle & Status Manager
       provenance: flow F154 step 5→6
       operation: listPromotions
+      carries:
+      - promotionId
   notes: '**Merged into BO-010 Promotions & Coupons as a section of it** (decided 2 October 2026, Chinmay:
     DEC-100, "merge them with BO-008 to BO-011 so one surface edits each record", and the pre-apply round;
     CHG-MOV-002). It edits the same record as BO-010: it renders inside BO-010''s component, under its
@@ -181342,10 +181565,15 @@ screens:
       trigger: Works in Unique Code Generation & Batch Manager
       provenance: flow F156 step 3→4
       operation: listCouponCodes
+      carries:
+      - batchId
+      - campaignId
     - to: ADM-164
       trigger: Works in Code Distribution & Assignment Manager
       provenance: flow F156 step 11→12
       operation: listCouponCodes
+      carries:
+      - campaignId
   notes: '**Merged into BO-010 Promotions & Coupons as a section of it** (decided 2 October 2026, Chinmay:
     DEC-100, "merge them with BO-008 to BO-011 so one surface edits each record", and the pre-apply round;
     CHG-MOV-002). It edits the same record as BO-010: it renders inside BO-010''s component, under its
@@ -193899,14 +194127,20 @@ screens:
       trigger: Works in Channel Sales Schedule & Availability Windows
       provenance: flow F166 step 9→10
       operation: listSaleChannel
+      carries:
+      - ruleId
     - to: ADM-264
       trigger: Works in Customer & Eligibility Rules by Channel
       provenance: flow F166 step 11→12
       operation: listSaleChannel
+      carries:
+      - ruleId
     - to: ADM-265
       trigger: Works in Channel Sales Rules, Limits & Restrictions
       provenance: flow F166 step 13→14
       operation: listSaleChannel
+      carries:
+      - ruleId
   notes: '**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens";
     CHG-MOV-001). It configures a record the venue owns, so the venue''s own staff use it here, inside
     the tenant''s cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098),
@@ -207812,8 +208046,8 @@ screens:
       - kind: selectField
         label: Customer/account
         operation: listB2bCreditAccounts
-        notes: The B2B credit accounts (`listB2bCreditAccounts`); the picked account's id is the `accountId`
-          the terms are read and saved for (r8, ORDERS-MONEY-C28).
+        notes: 'The B2B credit accounts (`listB2bCreditAccounts`); the picked account''s id is the `accountId` the
+          terms are read and saved for (r8, ORDERS-MONEY-C28).'
         provenance: pack Payment_Payment_Orchestration.pdf, page 95 §Define
       - kind: selectField
         label: Credit agreement

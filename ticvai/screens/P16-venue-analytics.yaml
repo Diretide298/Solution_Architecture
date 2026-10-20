@@ -897,6 +897,9 @@ screens:
     - to: ANL-006
       trigger: Inventory & Waste Intelligence
       provenance: flow F82 step 3→4
+      carries:
+      - dashboardId
+      - reportId
   notes: '**Built 20 August. Answers 2 board screens**: Product Performance & Menu Engineering; Product,
     SKU & Merchandise Performance. **Menu engineering and SKU performance are one analysis.** Both rank
     products by margin against volume; only the vocabulary differs. **Board repointed 24 August.** This
@@ -1108,6 +1111,9 @@ screens:
       trigger: Guest & Conversion Intelligence
       provenance: flow F82 step 1→2
       operation: getStockValuation
+      carries:
+      - dashboardId
+      - reportId
   notes: '**Built 20 August. Answers 2 board screens**: Food Cost, Margin & Profitability Intelligence;
     Promotion, Pricing & Margin Intelligence. Cost against price against what actually sold. **Board repointed
     24 August.** This screen pointed at `wireframes/Retail Board 6.dc.html#ret-6f` — a frame in the client
@@ -1278,6 +1284,8 @@ screens:
       operation: listExpiringBatches
       crossesDevice: true
       back: false
+      carries:
+      - reportId
   notes: '**Built 20 August. Answers 2 board screens**: Inventory, Waste & Production Intelligence; Inventory,
     Sell-Through & Stock Intelligence. **Theoretical against actual is the whole analysis** — a recipe
     says 400 portions, the run says 380, and the gap is waste, theft or a wrong recipe. **Board repointed
@@ -1497,6 +1505,9 @@ screens:
     - to: ANL-004
       trigger: Product Performance
       provenance: flow F82 step 2→3
+      carries:
+      - dashboardId
+      - reportId
   notes: '**Built 20 August. Answers 2 board screens**: Guest, Conversion & Basket Intelligence; Kitchen,
     Service & Fulfilment Performance. Who bought, what else they nearly bought, and how long they waited.
     **Retail board operations wired 24 August.** **Board repointed 24 August.** This screen pointed at
@@ -1876,6 +1887,8 @@ screens:
       provenance: flow F77 step 3→4
       crossesDevice: true
       back: false
+      carries:
+      - reportId
   notes: '**Built 20 August. Answers 5 board screens**: AI Recommendation, Simulation & Optimization Center;
     AI Assistant, Alerts & Management Action Center; Transaction & Exception Monitoring and 2 more. **Five
     board screens, and the collapse is the point.** Every domain drew an AI centre and an alert centre;

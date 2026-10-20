@@ -1,6 +1,6 @@
 # venue-management-web — operated by venue · staff on web
 # Serves: P08 Venue Management — Back Office, P13 Venue CMS — White Label, P16 Venue Analytics — Cross-Domain Reporting
-# Repository: P08 ticvai-venue-management; P13 ticvai-venue-management; P16 none yet (ask the lead) (docs/active/frontend-repos.yaml)
+# Repository: P08 ticvai-venue-management; P13 none yet (ask the lead); P16 none yet (ask the lead) (docs/active/frontend-repos.yaml)
 # Derived by tools/derive-frontend.py from screens/*.yaml. Do not hand-edit.
 
 app: venue-management-web
@@ -26,9 +26,9 @@ repositories:
   repoUrl: http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-venue-management.git
   assumed: false
 - platform: P13
-  repo: ticvai-venue-management
-  repoUrl: http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-venue-management.git
-  assumed: true
+  repo: null
+  repoUrl: null
+  assumed: false
 - platform: P16
   repo: null
   repoUrl: null
@@ -13392,832 +13392,728 @@ screens:
   name: Tenant Workspace
   platform: P13
   route: /white-label/tenant-workspace
-  repo: ticvai-venue-management
-  path: src/routes/white-label/TenantWorkspaceDetail.tsx
+  repo: null
   wave: 1
   status: notStarted
 - id: CMS-002
   name: Brand Kit
   platform: P13
   route: /white-label/brand-kit
-  repo: ticvai-venue-management
-  path: src/routes/white-label/BrandKitDetail.tsx
+  repo: null
   wave: 1
   status: notStarted
 - id: CMS-003
   name: Typography
   platform: P13
   route: /white-label/typography
-  repo: ticvai-venue-management
-  path: src/routes/white-label/TypographyDetail.tsx
+  repo: null
   wave: 1
   status: notStarted
 - id: CMS-004
   name: Logo & Assets
   platform: P13
   route: /white-label/logo-assets
-  repo: ticvai-venue-management
-  path: src/routes/white-label/LogoAssetsDetail.tsx
+  repo: null
   wave: 1
   status: notStarted
 - id: CMS-005
   name: Theme Editor
   platform: P13
   route: /white-label/theme-editor
-  repo: ticvai-venue-management
-  path: src/routes/white-label/ThemeEditorDetail.tsx
+  repo: null
   wave: 1
   status: notStarted
 - id: CMS-006
   name: Component Preview
   platform: P13
   route: /white-label/component-preview
-  repo: ticvai-venue-management
-  path: src/routes/white-label/ComponentPreviewDetail.tsx
+  repo: null
   wave: 1
   status: notStarted
 - id: CMS-007
   name: Page Builder
   platform: P13
   route: /white-label/page-builder
-  repo: ticvai-venue-management
-  path: src/routes/white-label/PageBuilderDetail.tsx
+  repo: null
   wave: 1
   status: notStarted
 - id: CMS-008
   name: Content Blocks
   platform: P13
   route: /white-label/content-blocks
-  repo: ticvai-venue-management
-  path: src/routes/white-label/ContentBlocksDetail.tsx
+  repo: null
   wave: 1
   status: notStarted
 - id: CMS-009
   name: Navigation & Menus
   platform: P13
   route: /white-label/navigation-menus
-  repo: ticvai-venue-management
-  path: src/routes/white-label/NavigationMenusDetail.tsx
+  repo: null
   wave: 1
   status: notStarted
 - id: CMS-010
   name: Media Library
   platform: P13
   route: /white-label/media-library
-  repo: ticvai-venue-management
-  path: src/routes/white-label/MediaLibraryDetail.tsx
+  repo: null
   wave: 1
   status: notStarted
 - id: CMS-013
   name: SEO & Metadata
   platform: P13
   route: /white-label/seo-metadata
-  repo: ticvai-venue-management
-  path: src/routes/white-label/SeoMetadataDetail.tsx
+  repo: null
   wave: 1
   status: notStarted
 - id: CMS-011
   name: Translations
   platform: P13
   route: /white-label/translations
-  repo: ticvai-venue-management
-  path: src/routes/white-label/TranslationsDetail.tsx
+  repo: null
   wave: 1
   status: notStarted
 - id: CMS-012
   name: RTL Preview
   platform: P13
   route: /white-label/rtl-preview
-  repo: ticvai-venue-management
-  path: src/routes/white-label/RtlPreviewDetail.tsx
+  repo: null
   wave: 1
   status: notStarted
 - id: CMS-014
   name: Publishing Workflow
   platform: P13
   route: /white-label/publishing-workflow
-  repo: ticvai-venue-management
-  path: src/routes/white-label/PublishingWorkflowDetail.tsx
+  repo: null
   wave: 1
   status: notStarted
 - id: CMS-015
   name: Version History
   platform: P13
   route: /white-label/version-history
-  repo: ticvai-venue-management
-  path: src/routes/white-label/VersionHistoryDetail.tsx
+  repo: null
   wave: 1
   status: notStarted
 - id: CMS-016
   name: Site Settings
   platform: P13
   route: /white-label/site-settings
-  repo: ticvai-venue-management
-  path: src/routes/white-label/SiteSettingsDetail.tsx
+  repo: null
   wave: 1
   status: notStarted
 - id: CMS-017
   name: Domain & Certificate
   platform: P13
   route: /white-label/domain-certificate
-  repo: ticvai-venue-management
-  path: src/routes/white-label/DomainCertificateDetail.tsx
+  repo: null
   wave: 1
   status: notStarted
 - id: CMS-018
   name: Consent & Legal
   platform: P13
   route: /white-label/consent-legal
-  repo: ticvai-venue-management
-  path: src/routes/white-label/ConsentLegalDetail.tsx
+  repo: null
   wave: 1
   status: notStarted
 - id: CMS-019
   name: User Access
   platform: P13
   route: /white-label/user-access
-  repo: ticvai-venue-management
-  path: src/routes/white-label/UserAccessDetail.tsx
+  repo: null
   wave: 1
   status: notStarted
 - id: CMS-021
   name: Privacy & Consent Configuration Command Center
   platform: P13
   route: /policy/privacy-consent-configuration-command-center-cms-021
-  repo: ticvai-venue-management
-  path: src/routes/policy/PrivacyConsentConfigurationCommandCenter.tsx
+  repo: null
   wave: 3
   status: notStarted
 - id: CMS-022
   name: Data Processing Purpose & Lawful Basis Registry
   platform: P13
   route: /policy/data-processing-purpose-lawful-basis-registry-cms-022
-  repo: ticvai-venue-management
-  path: src/routes/policy/DataProcessingPurposeLawfulBasisRegistry.tsx
+  repo: null
   wave: 3
   status: notStarted
 - id: CMS-023
   name: Consent Purpose & Consent Type Builder
   platform: P13
   route: /policy/consent-purpose-consent-type-builder-cms-023
-  repo: ticvai-venue-management
-  path: src/routes/policy/ConsentPurposeConsentTypeBuilder.tsx
+  repo: null
   wave: 3
   status: notStarted
 - id: CMS-024
   name: Communication Preference & Marketing Permission Configuration
   platform: P13
   route: /policy/communication-preference-marketing-permission-configurat-cms-024
-  repo: ticvai-venue-management
-  path: src/routes/policy/CommunicationPreferenceMarketingPermissionConfig.tsx
+  repo: null
   wave: 3
   status: notStarted
 - id: CMS-025
   name: Cookie, Tracking & Digital Technology Registry
   platform: P13
   route: /policy/cookie-tracking-digital-technology-registry-cms-025
-  repo: ticvai-venue-management
-  path: src/routes/policy/CookieTrackingDigitalTechnologyRegistry.tsx
+  repo: null
   wave: 1
   status: notStarted
 - id: CMS-026
   name: Cookie Banner & Preference Center Designer
   platform: P13
   route: /policy/cookie-banner-preference-center-designer-cms-026
-  repo: ticvai-venue-management
-  path: src/routes/policy/CookieBannerPreferenceCenterDesigner.tsx
+  repo: null
   wave: 1
   status: notStarted
 - id: CMS-027
   name: Consent Capture Point & Customer Journey Configuration
   platform: P13
   route: /policy/consent-capture-point-customer-journey-configuration-cms-027
-  repo: ticvai-venue-management
-  path: src/routes/policy/ConsentCapturePointCustomerJourneyConfiguration.tsx
+  repo: null
   wave: 3
   status: notStarted
 - id: CMS-028
   name: Privacy Notice, Policy & Terms Version Management
   platform: P13
   route: /policy/privacy-notice-policy-terms-version-management-cms-028
-  repo: ticvai-venue-management
-  path: src/routes/policy/PrivacyNoticePolicyTermsVersionManagement.tsx
+  repo: null
   wave: 3
   status: notStarted
 - id: CMS-029
   name: Minor, Guardian & Age-Based Privacy Configuration
   platform: P13
   route: /policy/minor-guardian-age-based-privacy-configuration-cms-029
-  repo: ticvai-venue-management
-  path: src/routes/policy/MinorGuardianAgeBasedPrivacyConfiguration.tsx
+  repo: null
   wave: 3
   status: notStarted
 - id: CMS-030
   name: Privacy Configuration Testing, Approval & Publication
   platform: P13
   route: /policy/privacy-configuration-testing-approval-publication-cms-030
-  repo: ticvai-venue-management
-  path: src/routes/policy/PrivacyConfigurationTestingApprovalPublication.tsx
+  repo: null
   wave: 3
   status: notStarted
 - id: CMS-031
   name: Privacy Operations Command Center
   platform: P13
   route: /policy/privacy-operations-command-center-cms-031
-  repo: ticvai-venue-management
-  path: src/routes/policy/PrivacyOperationsCommandCenter.tsx
+  repo: null
   wave: 3
   status: notStarted
 - id: CMS-032
   name: Customer Privacy, Consent & Preference 360°
   platform: P13
   route: /policy/customer-privacy-consent-preference-360-cms-032
-  repo: ticvai-venue-management
-  path: src/routes/policy/CustomerPrivacyConsentPreference360.tsx
+  repo: null
   wave: 3
   status: notStarted
 - id: CMS-033
   name: Consent Evidence, History & Withdrawal Management
   platform: P13
   route: /policy/consent-evidence-history-withdrawal-management-cms-033
-  repo: ticvai-venue-management
-  path: src/routes/policy/ConsentEvidenceHistoryWithdrawalManagement.tsx
+  repo: null
   wave: 3
   status: notStarted
 - id: CMS-034
   name: Data Subject / Customer Privacy Request Management
   platform: P13
   route: /policy/data-subject-customer-privacy-request-management-cms-034
-  repo: ticvai-venue-management
-  path: src/routes/policy/DataSubjectCustomerPrivacyRequestManagement.tsx
+  repo: null
   wave: 3
   status: notStarted
 - id: CMS-035
   name: Data Discovery, Access, Export & Correction Workspace
   platform: P13
   route: /policy/data-discovery-access-export-correction-workspace-cms-035
-  repo: ticvai-venue-management
-  path: src/routes/policy/DataDiscoveryAccessExportCorrectionWorkspace.tsx
+  repo: null
   wave: 3
   status: notStarted
 - id: CMS-036
   name: Deletion, Anonymization & Restriction Operations
   platform: P13
   route: /policy/deletion-anonymization-restriction-operations-cms-036
-  repo: ticvai-venue-management
-  path: src/routes/policy/DeletionAnonymizationRestrictionOperations.tsx
+  repo: null
   wave: 3
   status: notStarted
 - id: CMS-037
   name: Data Retention, Expiry & Legal Hold Operations
   platform: P13
   route: /policy/data-retention-expiry-legal-hold-operations-cms-037
-  repo: ticvai-venue-management
-  path: src/routes/policy/DataRetentionExpiryLegalHoldOperations.tsx
+  repo: null
   wave: 3
   status: notStarted
 - id: CMS-038
   name: Privacy Compliance, Exception & Investigation Workspace
   platform: P13
   route: /policy/privacy-compliance-exception-investigation-workspace-cms-038
-  repo: ticvai-venue-management
-  path: src/routes/policy/PrivacyComplianceExceptionInvestigationWorkspace.tsx
+  repo: null
   wave: 3
   status: notStarted
 - id: CMS-039
   name: Privacy Audit, Evidence & Compliance Reporting
   platform: P13
   route: /policy/privacy-audit-evidence-compliance-reporting-cms-039
-  repo: ticvai-venue-management
-  path: src/routes/policy/PrivacyAuditEvidenceComplianceReporting.tsx
+  repo: null
   wave: 3
   status: notStarted
 - id: CMS-040
   name: Privacy Analytics & AI Compliance Intelligence
   platform: P13
   route: /policy/privacy-analytics-ai-compliance-intelligence-cms-040
-  repo: ticvai-venue-management
-  path: src/routes/policy/PrivacyAnalyticsAiComplianceIntelligence.tsx
+  repo: null
   wave: 3
   status: notStarted
 - id: CMS-041
   name: Waiver & Consent Command Center
   platform: P13
   route: /policy/waiver-consent-command-center-cms-041
-  repo: ticvai-venue-management
-  path: src/routes/policy/WaiverConsentCommandCenter.tsx
+  repo: null
   wave: 3
   status: notStarted
 - id: CMS-042
   name: Waiver Template Library & Master Setup
   platform: P13
   route: /policy/waiver-template-library-master-setup-cms-042
-  repo: ticvai-venue-management
-  path: src/routes/policy/WaiverTemplateLibraryMasterSetup.tsx
+  repo: null
   wave: 3
   status: notStarted
 - id: CMS-043
   name: Digital Waiver & Form Builder
   platform: P13
   route: /policy/digital-waiver-form-builder-cms-043
-  repo: ticvai-venue-management
-  path: src/routes/policy/DigitalWaiverFormBuilder.tsx
+  repo: null
   wave: 3
   status: notStarted
 - id: CMS-044
   name: Dynamic Fields, Questions & Conditional Logic
   platform: P13
   route: /policy/dynamic-fields-questions-conditional-logic-cms-044
-  repo: ticvai-venue-management
-  path: src/routes/policy/DynamicFieldsQuestionsConditionalLogic.tsx
+  repo: null
   wave: 3
   status: notStarted
 - id: CMS-045
   name: Signatory, Signature & Guardian Rule Configuration
   platform: P13
   route: /policy/signatory-signature-guardian-rule-configuration-cms-045
-  repo: ticvai-venue-management
-  path: src/routes/policy/SignatorySignatureGuardianRuleConfiguration.tsx
+  repo: null
   wave: 3
   status: notStarted
 - id: CMS-046
   name: Product, Event & Experience Association
   platform: P13
   route: /policy/product-event-experience-association-cms-046
-  repo: ticvai-venue-management
-  path: src/routes/policy/ProductEventExperienceAssociation.tsx
+  repo: null
   wave: 3
   status: notStarted
 - id: CMS-047
   name: Waiver Trigger, Eligibility & Completion Rules
   platform: P13
   route: /policy/waiver-trigger-eligibility-completion-rules-cms-047
-  repo: ticvai-venue-management
-  path: src/routes/policy/WaiverTriggerEligibilityCompletionRules.tsx
+  repo: null
   wave: 3
   status: notStarted
 - id: CMS-048
   name: Versioning, Effective Dates & Legal Change Control
   platform: P13
   route: /policy/versioning-effective-dates-legal-change-control-cms-048
-  repo: ticvai-venue-management
-  path: src/routes/policy/VersioningEffectiveDatesLegalChangeControl.tsx
+  repo: null
   wave: 3
   status: notStarted
 - id: CMS-049
   name: Localization, Branding & Customer Experience Configuration
   platform: P13
   route: /policy/localization-branding-customer-experience-configuration-cms-049
-  repo: ticvai-venue-management
-  path: src/routes/policy/LocalizationBrandingCustomerExperienceConfigurat.tsx
+  repo: null
   wave: 3
   status: notStarted
 - id: CMS-050
   name: Waiver Approval, Testing & Publication Workspace
   platform: P13
   route: /policy/waiver-approval-testing-publication-workspace-cms-050
-  repo: ticvai-venue-management
-  path: src/routes/policy/WaiverApprovalTestingPublicationWorkspace.tsx
+  repo: null
   wave: 3
   status: notStarted
 - id: CMS-051
   name: Waiver Operations Command Center
   platform: P13
   route: /policy/waiver-operations-command-center-cms-051
-  repo: ticvai-venue-management
-  path: src/routes/policy/WaiverOperationsCommandCenter.tsx
+  repo: null
   wave: 3
   status: notStarted
 - id: CMS-052
   name: Participant Waiver Status & Tracking
   platform: P13
   route: /policy/participant-waiver-status-tracking-cms-052
-  repo: ticvai-venue-management
-  path: src/routes/policy/ParticipantWaiverStatusTracking.tsx
+  repo: null
   wave: 3
   status: notStarted
 - id: CMS-053
   name: Digital Signing & Collection Operations
   platform: P13
   route: /policy/digital-signing-collection-operations-cms-053
-  repo: ticvai-venue-management
-  path: src/routes/policy/DigitalSigningCollectionOperations.tsx
+  repo: null
   wave: 3
   status: notStarted
 - id: CMS-054
   name: Minor, Guardian & Group Consent Management
   platform: P13
   route: /policy/minor-guardian-group-consent-management-cms-054
-  repo: ticvai-venue-management
-  path: src/routes/policy/MinorGuardianGroupConsentManagement.tsx
+  repo: null
   wave: 3
   status: notStarted
 - id: CMS-055
   name: Waiver Verification & Validation Workspace
   platform: P13
   route: /policy/waiver-verification-validation-workspace-cms-055
-  repo: ticvai-venue-management
-  path: src/routes/policy/WaiverVerificationValidationWorkspace.tsx
+  repo: null
   wave: 3
   status: notStarted
 - id: CMS-056
   name: Missing, Expired & Invalid Waiver Management
   platform: P13
   route: /policy/missing-expired-invalid-waiver-management-cms-056
-  repo: ticvai-venue-management
-  path: src/routes/policy/MissingExpiredInvalidWaiverManagement.tsx
+  repo: null
   wave: 3
   status: notStarted
 - id: CMS-057
   name: On-Site Waiver & Exception Handling
   platform: P13
   route: /policy/on-site-waiver-exception-handling-cms-057
-  repo: ticvai-venue-management
-  path: src/routes/policy/OnSiteWaiverExceptionHandling.tsx
+  repo: null
   wave: 3
   status: notStarted
 - id: CMS-058
   name: Compliance Evidence, Audit & Waiver Repository
   platform: P13
   route: /policy/compliance-evidence-audit-waiver-repository-cms-058
-  repo: ticvai-venue-management
-  path: src/routes/policy/ComplianceEvidenceAuditWaiverRepository.tsx
+  repo: null
   wave: 3
   status: notStarted
 - id: CMS-059
   name: Waiver Analytics, Compliance & Operational Insights
   platform: P13
   route: /policy/waiver-analytics-compliance-operational-insights-cms-059
-  repo: ticvai-venue-management
-  path: src/routes/policy/WaiverAnalyticsComplianceOperationalInsights.tsx
+  repo: null
   wave: 3
   status: notStarted
 - id: CMS-060
   name: AI Waiver Compliance & Risk Intelligence Center
   platform: P13
   route: /policy/ai-waiver-compliance-risk-intelligence-center-cms-060
-  repo: ticvai-venue-management
-  path: src/routes/policy/AiWaiverComplianceRiskIntelligenceCenter.tsx
+  repo: null
   wave: 3
   status: notStarted
 - id: CMS-061
   name: Digital Asset Management Command Center
   platform: P13
   route: /media-library/digital-asset-management-command-center-cms-061
-  repo: ticvai-venue-management
-  path: src/routes/media-library/DigitalAssetManagementCommandCenter.tsx
+  repo: null
   wave: 3
   status: notStarted
 - id: CMS-062
   name: Central Digital Asset Library
   platform: P13
   route: /media-library/central-digital-asset-library-cms-062
-  repo: ticvai-venue-management
-  path: src/routes/media-library/CentralDigitalAssetLibrary.tsx
+  repo: null
   wave: 3
   status: notStarted
 - id: CMS-063
   name: Upload & Asset Ingestion Workspace
   platform: P13
   route: /media-library/upload-asset-ingestion-workspace-cms-063
-  repo: ticvai-venue-management
-  path: src/routes/media-library/UploadAssetIngestionWorkspace.tsx
+  repo: null
   wave: 3
   status: notStarted
 - id: CMS-064
   name: Folder, Collection & Workspace Management
   platform: P13
   route: /media-library/folder-collection-workspace-management-cms-064
-  repo: ticvai-venue-management
-  path: src/routes/media-library/FolderCollectionWorkspaceManagement.tsx
+  repo: null
   wave: 3
   status: notStarted
 - id: CMS-065
   name: Metadata & Taxonomy Management
   platform: P13
   route: /media-library/metadata-taxonomy-management-cms-065
-  repo: ticvai-venue-management
-  path: src/routes/media-library/MetadataTaxonomyManagement.tsx
+  repo: null
   wave: 3
   status: notStarted
 - id: CMS-066
   name: Tags, Keywords & Classification
   platform: P13
   route: /media-library/tags-keywords-classification-cms-066
-  repo: ticvai-venue-management
-  path: src/routes/media-library/TagsKeywordsClassification.tsx
+  repo: null
   wave: 3
   status: notStarted
 - id: CMS-067
   name: Advanced Search & Discovery
   platform: P13
   route: /media-library/advanced-search-discovery-cms-067
-  repo: ticvai-venue-management
-  path: src/routes/media-library/AdvancedSearchDiscovery.tsx
+  repo: null
   wave: 3
   status: notStarted
 - id: CMS-068
   name: Digital Asset 360° Profile
   platform: P13
   route: /media-library/digital-asset-360-profile-cms-068
-  repo: ticvai-venue-management
-  path: src/routes/media-library/DigitalAsset360Profile.tsx
+  repo: null
   wave: 3
   status: notStarted
 - id: CMS-069
   name: Bulk Asset Management Workspace
   platform: P13
   route: /media-library/bulk-asset-management-workspace-cms-069
-  repo: ticvai-venue-management
-  path: src/routes/media-library/BulkAssetManagementWorkspace.tsx
+  repo: null
   wave: 3
   status: notStarted
 - id: CMS-070
   name: Asset Activity, Recent Assets & Library Health
   platform: P13
   route: /media-library/asset-activity-recent-assets-library-health-cms-070
-  repo: ticvai-venue-management
-  path: src/routes/media-library/AssetActivityRecentAssetsLibraryHealth.tsx
+  repo: null
   wave: 3
   status: notStarted
 - id: CMS-071
   name: AI Asset Intelligence Command Center
   platform: P13
   route: /media-library/ai-asset-intelligence-command-center-cms-071
-  repo: ticvai-venue-management
-  path: src/routes/media-library/AiAssetIntelligenceCommandCenter.tsx
+  repo: null
   wave: 3
   status: notStarted
 - id: CMS-072
   name: AI Auto-Tagging & Content Understanding
   platform: P13
   route: /media-library/ai-auto-tagging-content-understanding-cms-072
-  repo: ticvai-venue-management
-  path: src/routes/media-library/AiAutoTaggingContentUnderstanding.tsx
+  repo: null
   wave: 3
   status: notStarted
 - id: CMS-073
   name: Semantic & Natural-Language Asset Search
   platform: P13
   route: /media-library/semantic-natural-language-asset-search-cms-073
-  repo: ticvai-venue-management
-  path: src/routes/media-library/SemanticNaturalLanguageAssetSearch.tsx
+  repo: null
   wave: 3
   status: notStarted
 - id: CMS-074
   name: Visual Similarity & Related Asset Discovery
   platform: P13
   route: /media-library/visual-similarity-related-asset-discovery-cms-074
-  repo: ticvai-venue-management
-  path: src/routes/media-library/VisualSimilarityRelatedAssetDiscovery.tsx
+  repo: null
   wave: 3
   status: notStarted
 - id: CMS-075
   name: Duplicate & Near-Duplicate Management
   platform: P13
   route: /media-library/duplicate-near-duplicate-management-cms-075
-  repo: ticvai-venue-management
-  path: src/routes/media-library/DuplicateNearDuplicateManagement.tsx
+  repo: null
   wave: 3
   status: notStarted
 - id: CMS-076
   name: Asset Version Control & Revision History
   platform: P13
   route: /media-library/asset-version-control-revision-history-cms-076
-  repo: ticvai-venue-management
-  path: src/routes/media-library/AssetVersionControlRevisionHistory.tsx
+  repo: null
   wave: 3
   status: notStarted
 - id: CMS-077
   name: Version Comparison & Replacement Impact
   platform: P13
   route: /media-library/version-comparison-replacement-impact-cms-077
-  repo: ticvai-venue-management
-  path: src/routes/media-library/VersionComparisonReplacementImpact.tsx
+  repo: null
   wave: 3
   status: notStarted
 - id: CMS-078
   name: Transformation & Rendition Management
   platform: P13
   route: /media-library/transformation-rendition-management-cms-078
-  repo: ticvai-venue-management
-  path: src/routes/media-library/TransformationRenditionManagement.tsx
+  repo: null
   wave: 3
   status: notStarted
 - id: CMS-079
   name: Rendition Processing & Delivery Readiness
   platform: P13
   route: /media-library/rendition-processing-delivery-readiness-cms-079
-  repo: ticvai-venue-management
-  path: src/routes/media-library/RenditionProcessingDeliveryReadiness.tsx
+  repo: null
   wave: 3
   status: notStarted
 - id: CMS-080
   name: AI Quality, Intelligence Review & Recommendations
   platform: P13
   route: /media-library/ai-quality-intelligence-review-recommendations-cms-080
-  repo: ticvai-venue-management
-  path: src/routes/media-library/AiQualityIntelligenceReviewRecommendations.tsx
+  repo: null
   wave: 3
   status: notStarted
 - id: CMS-081
   name: DAM Governance & Rights Command Center
   platform: P13
   route: /media-library/dam-governance-rights-command-center-cms-081
-  repo: ticvai-venue-management
-  path: src/routes/media-library/DamGovernanceRightsCommandCenter.tsx
+  repo: null
   wave: 3
   status: notStarted
 - id: CMS-082
   name: Asset Ownership & Responsibility Management
   platform: P13
   route: /media-library/asset-ownership-responsibility-management-cms-082
-  repo: ticvai-venue-management
-  path: src/routes/media-library/AssetOwnershipResponsibilityManagement.tsx
+  repo: null
   wave: 3
   status: notStarted
 - id: CMS-083
   name: Rights, License & Usage Policy Management
   platform: P13
   route: /media-library/rights-license-usage-policy-management-cms-083
-  repo: ticvai-venue-management
-  path: src/routes/media-library/RightsLicenseUsagePolicyManagement.tsx
+  repo: null
   wave: 3
   status: notStarted
 - id: CMS-084
   name: Asset Approval Workflow Management
   platform: P13
   route: /media-library/asset-approval-workflow-management-cms-084
-  repo: ticvai-venue-management
-  path: src/routes/media-library/AssetApprovalWorkflowManagement.tsx
+  repo: null
   wave: 3
   status: notStarted
 - id: CMS-085
   name: Publication Eligibility & Governance Validation
   platform: P13
   route: /media-library/publication-eligibility-governance-validation-cms-085
-  repo: ticvai-venue-management
-  path: src/routes/media-library/PublicationEligibilityGovernanceValidation.tsx
+  repo: null
   wave: 3
   status: notStarted
 - id: CMS-086
   name: Role-Based Asset Access & Permission Management
   platform: P13
   route: /media-library/role-based-asset-access-permission-management-cms-086
-  repo: ticvai-venue-management
-  path: src/routes/media-library/RoleBasedAssetAccessPermissionManagement.tsx
+  repo: null
   wave: 3
   status: notStarted
 - id: CMS-087
   name: Secure Internal & External Sharing
   platform: P13
   route: /media-library/secure-internal-external-sharing-cms-087
-  repo: ticvai-venue-management
-  path: src/routes/media-library/SecureInternalExternalSharing.tsx
+  repo: null
   wave: 3
   status: notStarted
 - id: CMS-088
   name: Rights Expiry, Renewal & Usage Impact
   platform: P13
   route: /media-library/rights-expiry-renewal-usage-impact-cms-088
-  repo: ticvai-venue-management
-  path: src/routes/media-library/RightsExpiryRenewalUsageImpact.tsx
+  repo: null
   wave: 3
   status: notStarted
 - id: CMS-089
   name: Governance Audit Trail & Compliance Evidence
   platform: P13
   route: /media-library/governance-audit-trail-compliance-evidence-cms-089
-  repo: ticvai-venue-management
-  path: src/routes/media-library/GovernanceAuditTrailComplianceEvidence.tsx
+  repo: null
   wave: 3
   status: notStarted
 - id: CMS-090
   name: Governance Risk, Compliance & AI Recommendations
   platform: P13
   route: /media-library/governance-risk-compliance-ai-recommendations-cms-090
-  repo: ticvai-venue-management
-  path: src/routes/media-library/GovernanceRiskComplianceAiRecommendations.tsx
+  repo: null
   wave: 3
   status: notStarted
 - id: CMS-091
   name: Asset Distribution & Delivery Command Center
   platform: P13
   route: /media-library/asset-distribution-delivery-command-center-cms-091
-  repo: ticvai-venue-management
-  path: src/routes/media-library/AssetDistributionDeliveryCommandCenter.tsx
+  repo: null
   wave: 3
   status: notStarted
 - id: CMS-092
   name: Asset Usage & Distribution Map
   platform: P13
   route: /media-library/asset-usage-distribution-map-cms-092
-  repo: ticvai-venue-management
-  path: src/routes/media-library/AssetUsageDistributionMap.tsx
+  repo: null
   wave: 3
   status: notStarted
 - id: CMS-093
   name: Channel & Distribution Configuration
   platform: P13
   route: /media-library/channel-distribution-configuration-cms-093
-  repo: ticvai-venue-management
-  path: src/routes/media-library/ChannelDistributionConfiguration.tsx
+  repo: null
   wave: 3
   status: notStarted
 - id: CMS-094
   name: Secure Delivery URL, CDN & Rendition Delivery
   platform: P13
   route: /media-library/secure-delivery-url-cdn-rendition-delivery-cms-094
-  repo: ticvai-venue-management
-  path: src/routes/media-library/SecureDeliveryUrlCdnRenditionDelivery.tsx
+  repo: null
   wave: 3
   status: notStarted
 - id: CMS-095
   name: Asset Replacement & Propagation Management
   platform: P13
   route: /media-library/asset-replacement-propagation-management-cms-095
-  repo: ticvai-venue-management
-  path: src/routes/media-library/AssetReplacementPropagationManagement.tsx
+  repo: null
   wave: 3
   status: notStarted
 - id: CMS-096
   name: Fallback, Expiry & Distribution Continuity
   platform: P13
   route: /media-library/fallback-expiry-distribution-continuity-cms-096
-  repo: ticvai-venue-management
-  path: src/routes/media-library/FallbackExpiryDistributionContinuity.tsx
+  repo: null
   wave: 3
   status: notStarted
 - id: CMS-097
   name: DAM API & Integration Hub
   platform: P13
   route: /media-library/dam-api-integration-hub-cms-097
-  repo: ticvai-venue-management
-  path: src/routes/media-library/DamApiIntegrationHub.tsx
+  repo: null
   wave: 3
   status: notStarted
 - id: CMS-098
   name: Delivery Monitoring & Integration Health
   platform: P13
   route: /media-library/delivery-monitoring-integration-health-cms-098
-  repo: ticvai-venue-management
-  path: src/routes/media-library/DeliveryMonitoringIntegrationHealth.tsx
+  repo: null
   wave: 3
   status: notStarted
 - id: CMS-099
   name: Asset Usage & Performance Analytics
   platform: P13
   route: /media-library/asset-usage-performance-analytics-cms-099
-  repo: ticvai-venue-management
-  path: src/routes/media-library/AssetUsagePerformanceAnalytics.tsx
+  repo: null
   wave: 3
   status: notStarted
 - id: CMS-100
   name: Distribution Intelligence, AI Insights & Optimization
   platform: P13
   route: /media-library/distribution-intelligence-ai-insights-optimization-cms-100
-  repo: ticvai-venue-management
-  path: src/routes/media-library/DistributionIntelligenceAiInsightsOptimization.tsx
+  repo: null
   wave: 3
   status: notStarted
 - id: CMS-101
   name: Help Me Choose
   platform: P13
   route: /white-label/help-me-choose
-  repo: ticvai-venue-management
-  path: src/routes/white-label/HelpMeChoose.tsx
+  repo: null
   wave: 1
   status: notStarted
 - id: CMS-102
   name: Site Builder
   platform: P13
   route: /white-label/site-builder
-  repo: ticvai-venue-management
-  path: src/routes/white-label/SiteBuilder.tsx
+  repo: null
   wave: 1
   status: notStarted
 - id: CMS-103
   name: Booking Flows
   platform: P13
   route: /white-label/booking-flows
-  repo: ticvai-venue-management
-  path: src/routes/white-label/BookingFlows.tsx
+  repo: null
   wave: 1
   status: notStarted
 - id: CMS-104
   name: App Build & Store Publishing
   platform: P13
   route: /white-label/app-publishing
-  repo: ticvai-venue-management
-  path: src/routes/white-label/AppPublishing.tsx
+  repo: null
   wave: 1
   status: notStarted
 - id: CMS-105
   name: Kiosk Builder
   platform: P13
   route: /white-label/kiosk
-  repo: ticvai-venue-management
-  path: src/routes/white-label/KioskBuilder.tsx
+  repo: null
   wave: 1
   status: notStarted
 - id: ANL-001

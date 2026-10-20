@@ -310,6 +310,9 @@ screens:
     - to: ACC-007
       trigger: A reviewer checks and approves
       provenance: flow F23 step 1→2
+      carries:
+      - applicationId
+      - documentId
   implementation:
     app: accreditation-web
     route: /applicant-journey/registration-form
@@ -1054,6 +1057,8 @@ screens:
     - to: ACC-005
       trigger: The badge is issued
       provenance: flow F23 step 2→3
+      carries:
+      - holderId
   implementation:
     app: accreditation-web
     route: /reviewer-internal/reviewer-application-detail

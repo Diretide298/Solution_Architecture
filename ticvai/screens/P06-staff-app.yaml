@@ -81,25 +81,25 @@ screens:
       trigger: Selects venue and role
       provenance: flow F08 step 1→2, F64 step 1→2
   notes: '**Rebuilt as a sign-in form on 2 October 2026 (CHG-DOOR-002/003; Chinmay, 2 October 2026: fix
-    the Block A blockers now).** It was generated as a list over active sessions, MFA methods and SSO
-    providers with Force logout and Revoke all sessions on the door, which a person who is not yet signed
-    in can never use (platform-foundation process notes). The sequence is the same on every staff and
-    partner door: credentials (or the organisation''s SSO) -> the authentication code only when a permission
-    demands it (R135) -> the role prompt when several roles are held (ADR-0003) -> the landing. Managing
-    sessions moved to the staff directory (BO-053); managing MFA methods stays on each app''s own security
-    or profile screen. On the handheld the role and venue prompt is EMP-002, which follows when several
-    roles or venues are held; one of each goes straight to EMP-003. Enrolling a method happens on EMP-042,
-    not at a shared device. Build note (r8, IDENTITY-C17, decided by the lead 20 October 2026): a person
-    who must use MFA but has no method enrolled is refused at the door. `login` answers 200 with `hasMfaMethod`
-    false; the handheld shows the existing denied state with a message saying to enrol once on the browser
-    sign-in (ADM-001) or on their own phone (EMP-042), and flow F64 ends at `blockedAtMfa`. Nothing is
-    enrolled on this screen: no enrolment form is added.
+    the Block A blockers now).** It was generated as a list over active sessions, MFA methods and SSO providers
+    with Force logout and Revoke all sessions on the door, which a person who is not yet signed in can never
+    use (platform-foundation process notes). The sequence is the same on every staff and partner door: credentials
+    (or the organisation''s SSO) -> the authentication code only when a permission demands it (R135) ->
+    the role prompt when several roles are held (ADR-0003) -> the landing. Managing sessions moved to the
+    staff directory (BO-053); managing MFA methods stays on each app''s own security or profile screen.
+    On the handheld the role and venue prompt is EMP-002, which follows when several roles or venues are
+    held; one of each goes straight to EMP-003. Enrolling a method happens on EMP-042, not at a shared device.
+    Build note (r8, IDENTITY-C17, decided by the lead 20 October 2026): a person who must use MFA but has
+    no method enrolled is refused at the door. `login` answers 200 with `hasMfaMethod` false; the handheld
+    shows the existing denied state with a message saying to enrol once on the browser sign-in (ADM-001)
+    or on their own phone (EMP-042), and flow F64 ends at `blockedAtMfa`. Nothing is enrolled on this screen:
+    no enrolment form is added.
 
 
-    Build note (r8 second round, IDENTITY-C01, from the core lane): login is online-only for tills and
-    staff handhelds in r8 (identity login x-ticvai-offline-note); build the offline state as "signing
-    in needs a connection", not the cached-list sign-in above. The wording waits for the client (pending
-    entry IDENTITY-C01).'
+    Build note (r8 second round, IDENTITY-C01, from the core lane): login is online-only for tills and staff
+    handhelds in r8 (identity login x-ticvai-offline-note); build the offline state as "signing in needs a
+    connection", not the cached-list sign-in above. The wording waits for the client (pending entry
+    IDENTITY-C01).'
   density: comfortable
   pattern: form
   patternReason: 'A sign-in on a shared handheld: number and PIN, the venue''s SSO where it has one, the
@@ -334,9 +334,9 @@ screens:
     venue pick** (CHG-FXS-003)
 
 
-    Build note (r8 second round, IDENTITY-C45, from the core lane): the scope comes with the grant, not
-    the role: each card names its venue (`RoleSummary.scope.name`) and Select role sends that card''s
-    `grantId`, so two grants of one role at two venues are two cards.'
+    Build note (r8 second round, IDENTITY-C45, from the core lane): the scope comes with the grant, not the
+    role: each card names its venue (`RoleSummary.scope.name`) and Select role sends that card''s `grantId`,
+    so two grants of one role at two venues are two cards.'
   density: comfortable
   pattern: listDetail
   patternReason: '`listMfaMethods` reads the population and `getCurrentSession` reads one of them — list,
@@ -2784,6 +2784,8 @@ screens:
     - to: EMP-005
       trigger: Completes a task
       provenance: flow F08 step 5→6, F12 step 2→3, F65 step 2→3
+      carries:
+      - workOrderId
     entryFrom:
     - EMP-006
   notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
@@ -3065,6 +3067,8 @@ screens:
       operation: completeWorkOrder
       crossesDevice: true
       back: false
+      carries:
+      - workOrderId
   notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written. **Cross-platform navigation removed 24 August**: BO-030, BO-078. **A till does
     not navigate to a back office and a guest app does not navigate to either** — those are device handovers,
@@ -3517,6 +3521,8 @@ screens:
       trigger: It appears on the list for whoever is free
       provenance: flow F65 step 1→2
       operation: createWorkOrder
+      carries:
+      - workOrderId
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written.
   density: comfortable
@@ -4348,6 +4354,9 @@ screens:
     - to: EMP-020
       trigger: AI assistant — answer
       provenance: flow F101 step 1→2
+      carries:
+      - conversationId
+      - messageId
   notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written. Pulled to Wave 1 (CF-101). CF-57: the client named AI configuration assistance
     as a Wave 1 priority, and F20 is Wave 1.'
@@ -4526,6 +4535,8 @@ screens:
       operation: sendAiMessage
       crossesDevice: true
       back: false
+      carries:
+      - conversationId
   notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written. Pulled to Wave 1 (CF-101) with EMP-019 — **the question and the answer are one
     screen pair** and splitting them across waves ships half a feature. **Cross-platform navigation removed
@@ -4726,6 +4737,8 @@ screens:
     - to: EMP-032
       trigger: The sensor is wrong, so a wait is entered by hand
       provenance: flow F67 step 1→2
+      carries:
+      - queueId
   notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written. **Removed 24 August**: createQueue, updateQueue. **A handheld reads a queue and
     records a wait; it does not create one.** A queue is a venue configuration — bulk-attach residue,
@@ -4994,6 +5007,8 @@ screens:
       operation: setWaitTime
       crossesDevice: true
       back: false
+      carries:
+      - queueId
   notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written. **Cross-platform navigation removed 24 August**: BO-005. **A till does not navigate
     to a back office and a guest app does not navigate to either** — those are device handovers, and a
@@ -5354,6 +5369,8 @@ screens:
     - to: EMP-035
       trigger: The guest taps a card on the device
       provenance: flow F66 step 1→2
+      carries:
+      - paymentId
   notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written. **Removed 24 August**: createProduct, updateProduct. **Bulk-attach residue, found
     by walking a journey.** A device-settings screen does not read guest loyalty, a venue map does not
@@ -6998,6 +7015,8 @@ screens:
       trigger: A steward reads their own shifts
       provenance: flow F68 step 1→2
       operation: listRotaAssignments
+      carries:
+      - assignmentId
   notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written. **Removed 24 August**: createRotaAssignment, updateRotaAssignment. **Bulk-attach
     residue.** A device-settings screen does not merge guest profiles, a rota view does not author the
@@ -7173,6 +7192,8 @@ screens:
       trigger: They ask to swap one
       provenance: flow F68 step 2→3
       operation: listRotaAssignments
+      carries:
+      - assignmentId
   notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written. **Removed 24 August**: createRotaAssignment, updateRotaAssignment. **Bulk-attach
     residue, found by walking a journey.** A device-settings screen does not read guest loyalty, a venue
@@ -7536,6 +7557,8 @@ screens:
     - to: EMP-025
       trigger: They take a break and come back
       provenance: flow F68 step 4→5
+      carries:
+      - recordId
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written.
   density: comfortable
@@ -7907,6 +7930,8 @@ screens:
       trigger: A supervisor reads it and adds detail
       provenance: flow F69 step 1→2
       operation: reportIncident
+      carries:
+      - incidentId
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written.
   density: comfortable
@@ -11680,14 +11705,21 @@ screens:
     - to: EMP-059
       trigger: Food is ordered with courses
       provenance: flow F29 step 2→3
+      carries:
+      - visitId
     - to: EMP-060
       trigger: Reservation & Table Performance
       provenance: flow F80 step 2→3, F94 step 1→2
+      carries:
+      - outletId
     - to: KIT-002
       trigger: One main comes back wrong
       provenance: flow F29 step 5→6
       crossesDevice: true
       back: false
+      carries:
+      - ticketId
+      - visitId
   notes: '**Added 20 August from the client design board.** P06 had no table or stock operations at all
     — **twenty screens of floor work with nothing behind them** — and every operation these need already
     existed. **Operations from the 24 August F&B build wired here** — the contract grew and the screens
@@ -12089,12 +12121,18 @@ screens:
       trigger: Live Table & Service Management
       provenance: flow F80 step 1→2
       operation: transferOrderItems
+      carries:
+      - ticketId
+      - visitId
     - to: KIT-002
       trigger: The kitchen makes the starters and bumps them
       provenance: flow F29 step 3→4
       operation: createFnbOrder
       crossesDevice: true
       back: false
+      carries:
+      - ticketId
+      - visitId
   notes: '**Added 20 August from the client design board.** P06 had no table or stock operations at all
     — **twenty screens of floor work with nothing behind them** — and every operation these need already
     existed. **Named in the board contents and not written up in it.** **Operations from the 24 August
@@ -13234,6 +13272,8 @@ screens:
       provenance: flow F35 step 3→4
       crossesDevice: true
       back: false
+      carries:
+      - transferId
   notes: '**Added 20 August from the client design board.** P06 had no table or stock operations at all
     — **twenty screens of floor work with nothing behind them** — and every operation these need already
     existed. **Food-safety operations wired 20 August** — boards 5G and 5J of the client F&B pack, and
@@ -13460,6 +13500,8 @@ screens:
       operation: enterCountLine
       crossesDevice: true
       back: false
+      carries:
+      - countId
   notes: '**Added 20 August from the client design board.** P06 had no table or stock operations at all
     — **twenty screens of floor work with nothing behind them** — and every operation these need already
     existed. **Operations from the 24 August F&B build wired here** — the contract grew and the screens
@@ -13681,6 +13723,9 @@ screens:
       operation: signCorrectiveAction
       crossesDevice: true
       back: false
+      carries:
+      - actionId
+      - outletId
   notes: '**Added 20 August from the client design board.** P06 had no table or stock operations at all
     — **twenty screens of floor work with nothing behind them** — and every operation these need already
     existed. **Food-safety operations wired 20 August** — boards 5G and 5J of the client F&B pack, and

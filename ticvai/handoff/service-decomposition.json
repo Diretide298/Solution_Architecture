@@ -26,7 +26,7 @@
     "identity",
     "pii"
    ],
-   "operations": 101,
+   "operations": 98,
    "tables": 41,
    "why": "**Twelve contracts read it and it reads almost nothing.** The one service nothing can be deployed without, and the only writer of `pii` — which is what makes a subject-access export and a deletion request answerable at all (ADR-0023).",
    "scale": "Read-heavy, latency-critical, cached hard. Every request resolves a principal.",
@@ -109,7 +109,7 @@
     "promotions",
     "seating"
    ],
-   "operations": 470,
+   "operations": 451,
    "tables": 138,
    "why": "**What is sold, at what price, in which seat.** Promotions and seating are folded in because both are pricing and availability against the same product — a promotion that cannot see a price list and a seat that cannot see a product are two round trips on the hot path of every sale. **`pricing` joined it on 20 September**, which closes decision 5 of the schema merge — it took all three `pricing` tables and said the schema needed an owner, and that stayed open because the tables had no operations and a service is inferred from the contract that declares them. The operations were written into `catalogue.yaml`, beside the price lists and products a dynamic rule adjusts: a rule that reads `catalogue.price_list` and `catalogue.product` to compute a price belongs on the side of the boundary those live on, or every evaluation is a cross-service call on the sale path.",
    "scale": "Read-heavy, bundle-published to tills. **The catalogue bundle is this service's output** (ADR-0013).",
@@ -148,7 +148,7 @@
     "orders",
     "payments"
    ],
-   "operations": 303,
+   "operations": 299,
    "tables": 114,
    "why": "**The transactional core.** 96 operations, 34 tables, and the highest write rate in the platform. Separate because its scaling profile is unlike anything else — a Saturday evening is ten times a Tuesday morning.\n\n**`shift` belongs here and not in Tenancy.** A shift is venue-scoped, which is what made it look like a tenancy concern — but **venue scope is the platform's default rather than a service boundary**: 675 of 1,014 operations are venue-scoped.\n\n**What decides the service is who owns the tables.** A shift holds cash, `orders.deposit_box` reconciles against payments, and `orders.cash_movement` posts to `ledger.posting` at close. **A till's takings and a till's drawer are the same money counted twice** — separating them makes every settlement a distributed join.\n\n**Guest recurring billing lives here, decided by [ADR-0048](../../docs/adr/0048-guest-recurring-billing-is-commerce.md)** rather than in the Control Plane that provisions cells. `payments.dunning_policy` and `payments.dunning_case` are the two newest tables in the service. **A charge on a schedule fails differently from a charge at a till** — nobody is standing at the counter when a renewal declines, so the recovery path is a queue and a timetable rather than a second card.",
    "scale": "Write-heavy, spiky, latency-critical. **The one that autoscales.**",
@@ -164,10 +164,10 @@
     "WalletService": 1
    },
    "writesOutside": {
-    "TenancyService": 39,
+    "TenancyService": 38,
+    "LedgerService": 12,
     "AccessService": 10,
     "CatalogueService": 10,
-    "LedgerService": 10,
     "MarketingService": 4,
     "CrossRegionService": 2,
     "IdentityService": 2,
@@ -356,7 +356,7 @@
    "schemas": [
     "marketing"
    ],
-   "operations": 280,
+   "operations": 278,
    "tables": 131,
    "why": "**93 operations and 37 tables — the biggest thing in the package, and probably two services eventually.** CRM and campaigns have different write patterns: a guest profile is read constantly and written rarely; a campaign send is a burst of millions of rows nobody reads again.\n\n**Kept as one for now** because splitting a service before it has a load profile is guessing.",
    "scale": "Bursty on send, read-heavy otherwise. **The one to watch for a split.**",
@@ -395,7 +395,7 @@
     "ai",
     "qdrant"
    ],
-   "operations": 145,
+   "operations": 144,
    "tables": 75,
    "why": "**Separate at any size, and not because of size.** ADR-0020 makes it a hard boundary: only this service writes AI tables, and it is read-only against the transactional core. **That boundary caught four wrongly-placed writes in one week** — it survives because it is enforced, and enforcing it across a shared deployment is harder than across a network.",
    "scale": "Latency-tolerant, cost-sensitive, token-metered. Different hardware from everything else.",
@@ -406,6 +406,7 @@
     "CatalogueService": 5,
     "FnbService": 2,
     "OrderService": 2,
+    "PlatformService": 2,
     "TenancyService": 2,
     "WhiteLabelService": 2,
     "InventoryService": 1,
@@ -444,7 +445,7 @@
     "rental",
     "transport"
    ],
-   "operations": 295,
+   "operations": 291,
    "tables": 125,
    "why": "**Six small domains, 102 operations, one team.** Queue, maintenance, bookable resources, venue mapping, media assets and arcade. None is large enough to deploy alone, all are venue-scoped, none is on the critical sale path, and **all six are licensed as optional modules** — a venue that buys none of them should not be running six idle services.",
    "scale": "Low and steady. Queue readings are the only frequent write.",
@@ -495,14 +496,14 @@
    "readsFrom": {
     "CatalogueService": 33,
     "OrderService": 32,
-    "TenancyService": 24,
+    "TenancyService": 25,
     "LedgerService": 14,
-    "AccessService": 12,
+    "AccessService": 13,
     "IdentityService": 12,
     "AiService": 2
    },
    "writesOutside": {
-    "TenancyService": 20,
+    "TenancyService": 19,
     "CrossRegionService": 1,
     "MarketingService": 1,
     "OrderService": 1
@@ -524,20 +525,21 @@
    "schemas": [
     "whitelabel"
    ],
-   "operations": 110,
+   "operations": 108,
    "tables": 34,
    "why": "Branding, content, navigation and the tenant's own app configuration. Separate because **it is the only service a tenant edits directly and publishes from** — its deploy cadence follows tenant appetite, not the platform's.",
    "scale": "Read-heavy and heavily cached. Published, not queried.",
    "risk": "Down freezes the current published config. Guests see the last good version.",
    "readsFrom": {
+    "PlatformService": 7,
     "CatalogueService": 3,
-    "PlatformService": 3,
     "IdentityService": 1,
     "MarketingService": 1,
     "TenancyService": 1
    },
    "writesOutside": {
-    "TenancyService": 4
+    "PlatformService": 3,
+    "TenancyService": 2
    },
    "flowCoverage": {
     "operations": 50,

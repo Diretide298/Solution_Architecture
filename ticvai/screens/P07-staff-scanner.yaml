@@ -89,10 +89,10 @@ screens:
     shown a SHIFT_OPEN no-access state at sign-in.
 
 
-    Build note (r8 second round, IDENTITY-C01, from the core lane): login is online-only for tills and
-    staff handhelds in r8 (identity login x-ticvai-offline-note); build the offline state as "signing
-    in needs a connection", not the cached-list sign-in above. The wording waits for the client (pending
-    entry IDENTITY-C01).'
+    Build note (r8 second round, IDENTITY-C01, from the core lane): login is online-only for tills and staff
+    handhelds in r8 (identity login x-ticvai-offline-note); build the offline state as "signing in needs a
+    connection", not the cached-list sign-in above. The wording waits for the client (pending entry
+    IDENTITY-C01).'
   density: comfortable
   pattern: form
   patternReason: PIN or badge on a gate scanner, then the role - a form, not a list.
@@ -1126,6 +1126,9 @@ screens:
     - to: SCN-003
       trigger: It is valid
       provenance: flow F62 step 2→3
+      carries:
+      - mediaCode
+      - rightId
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written.
   density: comfortable
@@ -1977,6 +1980,9 @@ screens:
       trigger: Waits at the ready screen
       provenance: flow F06 step 3→4, F61 step 3→4
       operation: getOfflinePackage
+      carries:
+      - mediaCode
+      - rightId
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written.
   density: comfortable

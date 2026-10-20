@@ -128,6 +128,9 @@ screens:
     - to: KIT-002
       trigger: Kitchen Display System (KDS)
       provenance: flow F83 step 1→2
+      carries:
+      - ticketId
+      - visitId
   notes: '**Built 20 August from board 3 of the client F&B design set.** **Board repointed 24 August.**
     This screen pointed at `wireframes/FnB Board 3.dc.html#fnb-3a` — a frame in the client pack, which
     is where the design came from and not where this screen is drawn. **`P15 Kitchen Display.dc.html`
@@ -284,23 +287,33 @@ screens:
     - to: KIT-003
       trigger: Order Firing & Course Management
       provenance: flow F83 step 2→3, F88 step 2→3
+      carries:
+      - ticketId
     - to: EMP-058
       trigger: Starters cleared
       provenance: flow F29 step 4→5
       crossesDevice: true
       back: false
+      carries:
+      - ticketId
+      - visitId
     - to: EMP-059
       trigger: The server comps the delayed dish
       provenance: flow F29 step 6→7
       operation: refireItem
       crossesDevice: true
       back: false
+      carries:
+      - visitId
     - to: POS-022
       trigger: The guest is called and takes it
       provenance: flow F108 step 5→6
       operation: setKitchenTicketStatus
       crossesDevice: true
       back: false
+      carries:
+      - orderId
+      - ticketId
   notes: '**Fire and hold leave the station display** (2 October 2026, CHG-CLN-006): the pass fires and
     holds courses (DI-407; KIT-003), and flow F88 step 2 no longer calls them here (CHG-SPO-020).
 
@@ -592,6 +605,8 @@ screens:
     - to: KIT-004
       trigger: Active Order Management & Fulfilment Journey
       provenance: flow F83 step 3→4, F88 step 3→4
+      carries:
+      - orderId
   notes: '**Built 20 August from board 3 of the client F&B design set.** **Starters before mains is the
     entire job of a kitchen pass.** `KitchenTicket.coursing` carries `holdAndFire`, `phased` and `timed`;
     without it a table gets dessert while eating its starter. **Operations from the 24 August F&B build
@@ -832,6 +847,8 @@ screens:
     - to: KIT-008
       trigger: Exceptions, Re-Fire & Unavailable Items
       provenance: flow F83 step 4→5
+      carries:
+      - ticketId
   notes: '**Built 20 August from board 3 of the client F&B design set.** **Board repointed 24 August.**
     This screen pointed at `wireframes/FnB Board 3.dc.html#fnb-3d` — a frame in the client pack, which
     is where the design came from and not where this screen is drawn. **`P15 Kitchen Display.dc.html`
@@ -1203,6 +1220,9 @@ screens:
     - to: KIT-002
       trigger: Kitchen Display System (KDS)
       provenance: flow F88 step 1→2
+      carries:
+      - ticketId
+      - visitId
   notes: '**Built 20 August from board 3 of the client F&B design set.** **No expeditor role is modelled**
     — this reads and sets ticket status like the KDS. Whether an expeditor needs their own state is a
     kitchen question rather than a contract one. **Operations from the 24 August F&B build wired here**
