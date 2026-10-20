@@ -255,6 +255,11 @@ paths:
         **None of these states is final (decided 28 September, audit STATE-MEDIA).** An archived
         asset may be restored to `ready`, and a quarantined one released to `ready` after review;
         the only end of an asset's life is `deleteMediaAsset`.
+
+        **Who releases a quarantined asset** (R8 blocker ORDERS-MONEY-C24, the lead's answer C;
+        CHG-R8MIG-022): the reviewer, a caller who also holds `ASSET_LIBRARY_APPROVE` at the
+        asset's venue, makes the move directly on CMS-010 (`403` without it); the asset records
+        `releasedByPrincipalId` and `releasedAt`. No approval request is raised.
       tags: [asset]
       x-ticvai-permission: ASSET_LIBRARY_MANAGE
       x-ticvai-scope-level: venue
@@ -313,6 +318,8 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '#/components/schemas/MediaStatusRefusedProblem' }
+        '403':
+          $ref: '../shared/common.yaml#/components/responses/Forbidden'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
@@ -2095,6 +2102,20 @@ components:
         version: { type: integer }
         uploadedByPrincipalId: { type: string, format: uuid }
         createdAt: { type: string, format: date-time }
+        releasedByPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          x-ticvai-references: identity.principal
+          description: The reviewer who released the asset from `quarantined` (R8 blocker ORDERS-MONEY-C24,
+            CHG-R8MIG-022); null if it never was.
+        releasedAt:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+          description: When it was released from `quarantined`.
 
     MediaAssetDetail:
       x-ticvai-persistence: "assets.media_asset"

@@ -1,0 +1,53 @@
+id: CHG-R8MIG-022
+date: '2026-10-20'
+source: audit
+kind: contract
+summary: 'A guest can remove a saved card (revokePaymentToken, DELETE /payment-tokens/{tokenId}: own token only, 404
+  otherwise; the provider detaches it, the row keeps revokedAt and is no longer listed). Stored-card and Face Pass
+  consent have purposes of their own (storedPaymentCredential, facePassEnrolment) and a purpose row has an id on the
+  wire; the consent is recorded with recordConsent before storePaymentToken, which no longer has an event write the
+  consent record. A quarantined asset is released by a reviewer holding ASSET_LIBRARY_APPROVE, who is recorded.'
+decision:
+  what: 'R8 blocker causes ORDERS-MONEY-C38 (the lead''s answer A), ORDERS-MONEY-C21 (answer A, as CR-142) and
+    ORDERS-MONEY-C24 (answer C). contracts/spine/orders.yaml revokePaymentToken, PaymentToken.revokedAt,
+    listPaymentTokens and storePaymentToken text (its x-ticvai-write-via to marketing.consent_record removed);
+    contracts/satellite/marketing-crm.yaml ConsentPurpose values and ConsentPurposeConfig.id; contracts/satellite/assets.yaml
+    updateMediaAsset text and 403, MediaAsset releasedByPrincipalId and releasedAt (storage facts and one paragraph in
+    satellite files, shared with the surface and storage-sat lanes).'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: R8 blocker cause list (r8b-storage-core), group orders-money; tickets 28345, 28355, 27837 and 27843 and
+  their ADAM gaps: GST-071 exists so a guest can remove a stored card and no operation did, the screens guessed which
+  consent row to use, and "requires approval" on a quarantine release named no mechanism or reviewer.'
+keys_touched:
+  operations: [revokePaymentToken, listPaymentTokens, storePaymentToken, updateMediaAsset]
+  schemas: [PaymentToken, ConsentPurpose, ConsentPurposeConfig, MediaAsset]
+  tables:
+  - payments.token
+  - marketing.consent_purpose
+  - marketing.consent_record
+  - assets.media_asset
+  files:
+  - contracts/spine/orders.yaml
+  - contracts/satellite/marketing-crm.yaml
+  - contracts/satellite/assets.yaml
+root_class: 'storage gap: an operation promises a key, column or policy its table does not have'
+tickets:
+  started: []
+  unstarted:
+  - '28345, 28355, 27837, 27843.'
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: R8 blocker walk (r8b-storage-core causes)'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-contract-compat.py
+status: open
+notes: 'Breaking by check-contract-compat (for the lead''s entry): every marketing-crm response carrying ConsentPurpose gains
+  storedPaymentCredential and facePassEnrolment (getGuestProfile, updateGuestProfile, mergeGuestProfiles, getGuestConsents,
+  recordConsent, getConsentHistory, listConsentPurposes, listDataProcessingPurpose, setMinorGuardianAge and the rest the
+  check lists). Requested of the surface lane: events/paymentToken-revoked.yaml (emittedBy revokePaymentToken),
+  events/paymentToken-stored.yaml without the consent-record consumer, the states/media.yaml guard naming the reviewer,
+  and the GST-071, WEB-021 and GST-069 bindings. The two purpose rows are seeded per tenant with its other consent
+  purposes (the seed''s owner). Applied on PostgreSQL 16.'

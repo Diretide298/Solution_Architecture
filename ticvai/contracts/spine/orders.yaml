@@ -2737,7 +2737,8 @@ paths:
       - bearerAuth: []
       summary: A guest's saved payment methods
       description: '**Masked, always.** The last four digits and the brand — enough to choose between
-        two saved cards and not enough to use one.
+        two saved cards and not enough to use one. A removed token (`revokedAt` set) is not returned
+        (CHG-R8MIG-022).
 
         
 
@@ -2781,9 +2782,6 @@ paths:
       - query: marketing-crm#consentRecords
         route: service
         for: 'its read of marketing.consent_record, Marketing''s data (CHG-MOD-001)'
-      x-ticvai-write-via:
-      - table: marketing.consent_record
-        event: paymentToken.stored
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -2796,6 +2794,13 @@ paths:
 
         **Requires its own consent purpose.** Storing a card for future use is not the same act as paying
         now, and a token taken without it is a card kept on a guest''s behalf that they never agreed to.
+
+
+        **The consent comes first, by `recordConsent`** (R8 blocker ORDERS-MONEY-C21, the lead''s answer A, as CR-142
+        decided for the web wallet; CHG-R8MIG-022): Save card on GST-071 and WEB-021 records the guest''s consent to the
+        `storedPaymentCredential` purpose (`ConsentPurposeConfig.id`) with `recordConsent`, then calls this, which reads
+        the granted record and refuses `409 consent-not-given` without it (the error offers the consent step). The
+        `paymentToken.stored` event no longer creates a consent record.
 
         '
       tags:
@@ -2858,6 +2863,53 @@ paths:
                 $ref: '#/components/schemas/PaymentProblem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /payment-tokens/{tokenId}:
+    parameters:
+    - name: tokenId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    delete:
+      operationId: revokePaymentToken
+      security:
+      - guestAuth: []
+      x-ticvai-self-scoped: subject
+      x-ticvai-audience:
+      - guest
+      summary: Remove a saved payment method
+      description: '**A guest removes a card they saved** (R8 blocker ORDERS-MONEY-C38, the lead''s answer A;
+        CHG-R8MIG-022): GST-071 and WEB-021 exist so a guest can see and remove stored cards. The caller''s own token
+        only: another guest''s, or an unknown id, is `404`, never `403`, so a token id cannot be probed. The server
+        asks the payment provider to detach the stored credential, then marks the row removed (`revokedAt`; the row
+        stays for the audit trail and `listPaymentTokens` no longer returns it), clears `isDefault`, and emits
+        `paymentToken.revoked` in the same transaction. A token already removed answers `204` again, so a retry is
+        safe. A provider that cannot be reached leaves the row as it was and answers `502`; the guest can try again.
+
+        '
+      tags:
+      - orders
+      x-ticvai-permission: null
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      responses:
+        '204':
+          description: Removed (or already removed).
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+        '502':
+          description: The payment provider could not be reached; nothing changed.
+          x-ticvai-problem-types: [provider-connection-failed]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
   /payment-links:
     post:
       operationId: createPaymentLink
@@ -21724,6 +21776,13 @@ components:
           type: string
           format: date
           nullable: true
+        revokedAt:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+          description: When the guest removed it (`revokePaymentToken`); a removed token is never returned or charged
+            (CHG-R8MIG-022).
         isDefault:
           type: boolean
         consentPurposeId:
