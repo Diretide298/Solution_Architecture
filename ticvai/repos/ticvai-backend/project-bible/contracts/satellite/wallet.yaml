@@ -762,6 +762,14 @@ paths:
         - "P08 BO-417 Top-Up Configuration"
         - "P08 BO-418 Top-Up Bonus Rule Configuration"
       summary: How a wallet may be topped up
+      description: |-
+        **One set of rules per wallet type at the venue** (R8 blocker GPS-C19, CHG-R8STO-001), the one
+        `setWalletFundingRules` writes for the body's `walletTypeId`; a database unique key holds one row per venue and
+        wallet type. `walletTypeId` picks the set; left out, the venue's set with no wallet type (the venue default) is
+        returned. Before the first save it returns the defaults that set would get: no minimum, maximum or preset
+        amounts, every channel and funding source allowed, no bonus rules, auto-reload and recurring funding off, no
+        approval threshold and no velocity limits. The `ETag` header carries the version the PUT takes as `If-Match`.
+        A `walletTypeId` that names no wallet type of the tenant is 404 `wallet-type-not-found`.
       tags:
       - wallet
       x-ticvai-permission: WALLET_VIEW
@@ -769,13 +777,32 @@ paths:
       - staff
       x-ticvai-scope-level: venue
       x-ticvai-read-routing: replica
+      parameters:
+      - name: walletTypeId
+        in: query
+        required: false
+        description: The wallet type whose rules are read. Left out, the venue default (the set with no wallet type).
+        schema:
+          type: string
+          format: uuid
       responses:
         '200':
           description: The rules
+          headers:
+            ETag:
+              schema:
+                type: string
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/WalletFundingRules'
+        '404':
+          description: '`walletTypeId` names no wallet type of the tenant (`wallet-type-not-found`).'
+          x-ticvai-problem-types: [wallet-type-not-found]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
@@ -1889,6 +1916,13 @@ paths:
         `wallet.configuration_version_snapshot` row per configuration area**, read from the area tables
         at that moment; validation alone writes neither (decided 29 September, writers pass; DM6).
 
+        **Publishing with a blocking finding is refused** (R8 blocker APPROVALS-TENANCY-C32): `mode: publish`
+        validates first, and when any finding has `severity: blocking` it answers 409
+        `configuration-has-blocking-findings` with the findings and writes nothing; warnings do not stop it.
+        **The version number** is the highest `version` at the scope plus one, under a database unique key on
+        (scope, version), so two publishes at once cannot take the same number (the one that loses the race
+        is retried by the server).
+
         '
       tags:
       - wallet
@@ -1925,6 +1959,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/WalletConfigurationVersion'
+        '409':
+          description: '`mode: publish` with at least one blocking finding (`configuration-has-blocking-findings`).
+            The problem lists the findings; no version is written.'
+          x-ticvai-problem-types: [configuration-has-blocking-findings]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /wallets/{walletId}/transfer:
@@ -1972,6 +2014,13 @@ paths:
         subject can hold their own wallet and sit in a family or corporate one. `toSubjectId` is
         the guest-to-guest form and resolves to the same wallet `getWallet` returns for that
         subject: their own, never a shared wallet they belong to.
+
+        **Who a guest can name** (r8 walk of tickets 28310 and 28345; lead decision of 20 October 2026, option A).
+        A guest knows no subject id, so in r8 a guest screen offers **linked family members only**: the people from
+        `identity.listDelegations` (`familyMember` or `primaryHolder`), whose `subjectId` it sends as `toSubjectId`.
+        Peer-to-peer to another guest stays off (`WalletTransferRules.peerToPeerAllowed` false) until it is decided.
+        A guest screen sends exactly one of `toSubjectId` and `toWalletId`. The screen reads
+        `Wallet.transferRules` to hide or limit the action.
       tags: [retail]
       x-ticvai-permission: WALLET_OPERATE
       x-ticvai-guest-callable: true
@@ -2427,6 +2476,11 @@ paths:
         **Store credit is a gift card** (Chinmay, 2 October, workbook Q61, the default; DI-796; CHG-CSA-027): a
         refund taken as store credit at the till issues a digital gift card here for the refund amount, never a
         voucher and never a top-up of the guest's wallet.
+
+        **The registered owner** (R8 blocker ORDERS-MONEY-C27, the lead's answer of 20 October 2026): the card's
+        `subjectId` is set at issue to the guest the till or order names (the buyer, or the guest whose refund
+        became store credit) and is null when nobody is named. It records who bought or received it; it never
+        limits who may read or spend it, because the card is a bearer instrument.
       tags: [giftCard]
       x-ticvai-permission: WALLET_OPERATE
       x-ticvai-scope-level: workstation
@@ -2476,13 +2530,17 @@ paths:
       x-ticvai-read-routing: primary   # bearer instrument. Stale balance is double-spend
       summary: Check a gift card balance
       description: >
-        **A guest acts on their own only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-002;
-        `x-ticvai-self-scoped: subject`): a guest caller needs no permission and is answered for a gift card
-        held in their own wallet; any other card code is refused exactly as one that does not exist, never
-        returned. `WALLET_VIEW` is what a staff caller must hold to act for any guest (ADR-0025).
+        **A gift card is a bearer instrument, so any signed-in guest may check a card by its code** (R8
+        blocker ORDERS-MONEY-C27, the lead's answer of 20 October 2026, replacing the own-wallet-only rule of
+        CHG-GCF-002; design input DI-533 "check balance by code (the 16 characters on the card)"). A guest
+        caller needs no permission and gets the card's balance, status and expiry, with `subjectId` left out
+        unless it is the caller's own. An unknown code is 404, exactly as a card the guest may not see would
+        have been; the code is the secret (16 characters from a cryptographic generator) and the guest's
+        requests are held to the existing `429` limits, so codes cannot be guessed by trying.
+        `WALLET_VIEW` is what a staff caller must hold (ADR-0025).
       tags: [giftCard]
       x-ticvai-permission: WALLET_VIEW
-      x-ticvai-self-scoped: subject
+      x-ticvai-guest-callable: true   # a bearer card: any signed-in guest checks it by code (ORDERS-MONEY-C27)
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -2687,18 +2745,34 @@ paths:
         **Posts a `gameCreditLoaded` ledger entry** (decided 28 September, audit R191): the amount paid to the liability account `finance.setAccountMappings` holds for that event type, in the fiscal period open for the load date. Until this date the load wrote no ledger row.
         Bonus credits from a promotion are tracked separately because they are typically non-refundable and are spent first.
 
-        **Where the credits go and what comes back** (4 October 2026, CHG-FXC-006; the Sprint 1-2 judging found a Wallet
-        response and a wallet lock for a card that has no wallet). The card is found by `cardCode` (`games.card.card_code`).
-        * **A card with a `walletId`** (registered to a guest with a wallet): the movement is a wallet movement under the
-          one-balance-writer rule: `wallet.balance` locked for one guarded statement, a `wallet.wallet_transaction` (kind
-          `topUp`, `reason` `gameCard:{cardCode}`), and a `wallet.credit_lot` per kind of credit (`source_kind` `topUp` for
-          paid credits, `promotion` for bonus credits, `source_reference` `gameCard:{cardCode}`). Returns that Wallet.
-        * **An anonymous card** (`walletId` null): the card row is the balance. `games.card.credits` and `bonus_credits`
-          change in one guarded update on the locked row. Returns the card as a Wallet view: `id` the card's `id`,
-          `subjectId` the nil UUID `00000000-0000-0000-0000-000000000000` (no guest), `balance` the paid credits,
-          `bonusBalance` the bonus credits, `currency` the venue's, `status` the card's status.
-        Either way the movement emits `wallet.credited` (`kind` `gameCreditLoad`, `walletId` the wallet or the card's id)
-        through `platform.outbox` in the same transaction, and the ledger posts `gameCreditLoaded` from it.
+        **Where the credits go and what comes back** (4 October 2026, CHG-FXC-006; corrected by the lead's answer of
+        20 October 2026, r8 cause APPROVALS-TENANCY-C30, option A). The card is read by `cardCode` through
+        `games#cardRecords` (`games.card.card_code`) and must be `active` (409 otherwise). **This operation never
+        writes `games.card`**: that table is VenueOps's, in another deployable (ADR-0055), and its only writer here is
+        the games consumer of `wallet.credited` (`x-ticvai-write-via`).
+        * **A card with a `walletId`** (registered to a guest with a wallet): **the wallet moves by the money paid**,
+          `amountPaid`, under the one-balance-writer rule: `wallet.balance` locked for one guarded statement, a
+          `wallet.wallet_transaction` (kind `topUp`, `reason` `gameCard:{cardCode}`) for `amountPaid`. **Credits are a
+          counted attribute of the lots, not money**: one `wallet.credit_lot` per kind of credit, of credit type
+          `gameCredit` for the paid credits (`issuedCredits` = `credits`, `issuedAmount` = `amountPaid`, `source_kind`
+          `topUp`) and `gameBonusCredit` for the bonus (`issuedCredits` = `bonusCredits`, `issuedAmount` zero,
+          `source_kind` `promotion`), `source_reference` `gameCard:{cardCode}`. No conversion between credits and money is
+          held anywhere: the credits a payment buys are what the till sold. Returns that Wallet.
+        * **An anonymous card** (`walletId` null): no wallet row and no `wallet_transaction` is written. The load is
+          handed to the games consumer through `wallet.credited` (v2: `cardId`, `credits`, `bonusCredits`,
+          `amountPaid`, `loadId` = this request's `id`, the consumer's idempotency key), which adds the credits to
+          `games.card.credits` and `bonus_credits` on its locked row. The answer is the card as a Wallet view **as it
+          will stand once the consumer applies the load**: `id` the card's `id`, `subjectId` the nil UUID
+          `00000000-0000-0000-0000-000000000000` (no guest), `balance` the card's paid credits read now plus
+          `credits`, `bonusBalance` likewise with `bonusCredits`, `currency` the venue's, `status` the card's status.
+          A screen that reads the card again before the consumer has run may briefly see the old figures.
+        Either way the load emits `wallet.credited` (`kind` `gameCreditLoad`, `walletId` the wallet or the card's id)
+        through `platform.outbox` in the same transaction, and the ledger posts `gameCreditLoaded` from it for
+        `amountPaid`.
+
+        **Two credit types are seeded for every tenant** (loaded with the other seed data at provisioning,
+        SETUP-SEED): `gameCredit` (category `ride`, `monetary` false) and `gameBonusCredit` (category
+        `bonus`, `monetary` false). Proposed, client to confirm the two types and their names.
       tags:
       - card
       x-ticvai-permission: WALLET_OPERATE
@@ -2730,6 +2804,8 @@ paths:
                   default: 0
                 amountPaid:
                   $ref: ../shared/common.yaml#/components/schemas/Money
+                  description: 'What the guest paid for these credits: the amount the wallet moves by for a registered
+                    card, and the amount the ledger posts as the liability (r8, APPROVALS-TENANCY-C30).'
                 orderId:
                   type: string
                 recordedAt:
@@ -2740,7 +2816,8 @@ paths:
           headers:
             X-Consistency-Token:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
-          description: Loaded
+          description: Loaded (a registered card), or handed to the games consumer with the card as it will stand (an
+            anonymous card)
           content:
             application/json:
               schema:
@@ -3287,7 +3364,11 @@ paths:
         **It reads the version''s `wallet.configuration_version_snapshot` rows and writes their values
         back into the area tables** (wallet types, credit types, funding, consumption, transfer, refund,
         channel, risk, authentication, accounting, integration and reconciliation), which are the
-        working draft (decided 29 September, writers pass; DM6).
+        working draft (decided 29 September, writers pass; DM6). **Rows the snapshot holds are upserted by
+        their id; rows of an area that the snapshot does not hold (created after that version) are
+        deactivated (`is_active` false: wallet and credit types), never deleted**; in an area with no
+        `is_active` they are left as they are and named in a `warning` finding, so nothing that other
+        records point at disappears (R8 blocker APPROVALS-TENANCY-C32).
 
         '
       tags:
@@ -4737,6 +4818,14 @@ components:
           $ref: ../shared/common.yaml#/components/schemas/Money
         remainingAmount:
           $ref: ../shared/common.yaml#/components/schemas/Money
+        issuedCredits:
+          type: integer
+          minimum: 0
+          nullable: true
+          description: '**Game credits are counted, not priced** (the lead, 20 October 2026, r8 cause
+            APPROVALS-TENANCY-C30, option A): the credits a game-card load put on this lot (credit types
+            `gameCredit` and `gameBonusCredit`); `issuedAmount` is the money paid for them (zero for bonus). Null on
+            every other lot.'
         issuedAt:
           type: string
           format: date-time
@@ -4846,12 +4935,18 @@ components:
     WalletFundingRules:
       type: object
       x-ticvai-persistence: wallet.funding_rule
-      description: 'Board 2, which is the 27 August minute one screen for one.'
+      # One set per venue and wallet type; one venue default with no type (R8 blocker GPS-C19, CHG-R8STO-001).
+      x-ticvai-unique-together:
+      - [scope_path, walletTypeId]
+      x-ticvai-unique-nulls: not-distinct
+      description: 'Board 2, which is the 27 August minute one screen for one. One set per wallet type at a venue,
+        and one venue default with no wallet type.'
       properties:
         walletTypeId:
           type: string
           format: uuid
           nullable: true
+          description: The wallet type these rules are for; null for the venue default.
         minimumTopUp:
           $ref: ../shared/common.yaml#/components/schemas/Money
         maximumTopUp:
@@ -5747,7 +5842,11 @@ components:
     WalletConfigurationVersion:
       type: object
       x-ticvai-persistence: wallet.configuration_version
-      description: 'Boards 1.10 and 10.8. **Ten boards of configuration that interact.**'
+      # One version number per scope (R8 blocker APPROVALS-TENANCY-C32, CHG-R8STO-001), as white-label config_version.
+      x-ticvai-unique-together:
+      - [scopePath, version]
+      description: 'Boards 1.10 and 10.8. **Ten boards of configuration that interact.** `version` is the highest
+        at the scope plus one; (scope, version) is unique.'
       properties:
         version:
           type: integer
@@ -5846,6 +5945,21 @@ components:
           description: >
             **Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.
         subjectId: { type: string, format: uuid }
+        transferRules:
+          type: object
+          nullable: true
+          readOnly: true
+          x-ticvai-persisted: false
+          x-ticvai-derived: onRead
+          description: 'What the venue allows this guest to do with a transfer, read from the venue''s `WalletTransferRules`
+            so a guest screen can hide or limit the action (r8 walk of tickets 28310 and 28345). Worked out on read.'
+          properties:
+            peerToPeerAllowed: { type: boolean }
+            withinSharedWalletOnly: { type: boolean }
+            maximumPerTransfer:
+              allOf:
+                - $ref: '../shared/common.yaml#/components/schemas/Money'
+              nullable: true
         balance: { $ref: '../shared/common.yaml#/components/schemas/Money', x-ticvai-column: balance_amount }
         credits:
           type: array
@@ -5875,6 +5989,12 @@ components:
                 description: >
                   **`cash` is money the guest paid and the others are not.** That distinction
                   decides what is refundable, what expires, and what shows as a liability.
+                  Worked out from the lot's credit type `category` (proposed, client to correct):
+                  `cash` -> cash; `bonus`, `promotional`, `loyalty`, `membership`, `giftCard` -> bonus;
+                  `redemption`, `ride`, `attraction`, `fnb`, `retail`, `parking`, `event` -> redemption;
+                  `refund` -> refund; `other` -> bonus. `goodwill` comes only from a lot whose `sourceKind` is
+                  `adjustment` and whose adjustment (`sourceReference`) is of kind `goodwill`, whatever
+                  the category (R8 blocker APPROVALS-TENANCY-C32).
                 x-ticvai-persisted: false   # from the lot's credit type, not a lot column
               amount:
                 x-ticvai-column: remaining_amount
@@ -5938,7 +6058,7 @@ components:
       type: string
       enum: [topUp, spend, refund, adjustment, bonus, expiry, transfer]
     GiftCard:
-      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by activateGiftCard, authoriseStoredValue, blockGiftCard, getGiftCard and others
+      x-ticvai-rls: signed-in-read   # MOD audit, CHG-MOD-007: read below the tenant by activateGiftCard, authoriseStoredValue, blockGiftCard, getGiftCard and others; any signed-in guest too (CHG-R8MIG-011: a card is read by its code, ORDERS-MONEY-C27)
       x-ticvai-persistence: "wallet.gift_card"
       type: object
       required: [cardCode, faceValue, balance, status, issuedAt]
@@ -5951,6 +6071,16 @@ components:
           type: string
           enum: [issued, active, partiallyRedeemed, redeemed, expired, blocked]
         blockedReason: { type: string, nullable: true }
+        subjectId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          x-ticvai-references: pii.subject
+          description: '**The registered owner, if any** (R8 blocker ORDERS-MONEY-C27): the guest named when the card
+            was issued (the buyer, or the guest whose refund became store credit); null for a card sold to nobody in
+            particular. It does not limit who may read or spend the card. Left out of a guest''s response unless it is
+            the caller.'
         issuedAt: { type: string, format: date-time }
         activatedAt: { type: string, format: date-time, nullable: true }
         expiresAt: { type: string, format: date-time, nullable: true }

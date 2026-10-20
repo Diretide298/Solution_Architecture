@@ -516,7 +516,47 @@
     "format": "uuid",
     "nullable": true,
     "readOnly": true,
+    "x-ticvai-references": "ai.translation_job",
     "description": "The `proposeTranslations` job that drafted this proposal; `getTranslationProposals` reads a job's rows by it. Null on every other proposal (CHG-RFM-004)."
+   },
+   "targetKind": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "enum": [
+     "contentBlock",
+     "productName",
+     "emailTemplate",
+     "messageTemplate"
+    ],
+    "description": "For a translation draft, what kind of thing it sits on (`TranslationProposals.drafts[].targetKind`); null on every other proposal (R8 blocker FOUNDATION-AI-C40)."
+   },
+   "targetRef": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "maxLength": 200,
+    "description": "For a translation draft, the id of the block, product or template it sits on (the path id of the target's own write, e.g. a content block's `blockId`); null otherwise (R8 blocker FOUNDATION-AI-C40)."
+   },
+   "locale": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "maxLength": 20,
+    "description": "For a translation draft, the language it is in (the job's `targetLocale`); null otherwise."
+   },
+   "fieldPath": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "maxLength": 300,
+    "description": "For a translation draft, where it goes inside the target, as a dotted path in the target's own body (`TranslationProposals.drafts[].fieldPath`); null otherwise. Empty for a field that is not text."
+   },
+   "draftText": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "For a translation draft, the proposed text; null otherwise. `payload` stays the request body of the target's write, with this text at `fieldPath` (R8 blocker FOUNDATION-AI-C40)."
    },
    "kind": {
     "type": "string",

@@ -6,7 +6,9 @@ version: 1
 publisher: whitelabel
 description: A tenant published content to their guest surfaces — a page, a banner, an FAQ or a policy.
 aggregate: tenantConfig
-emittedWhen: ContentStatus draft to published
+emittedWhen: 'A white-label config version becomes current (ADAM CR-154, 18 October 2026; CHG-CRA-004): at
+  publishTenantConfig for a 201, by white-label''s approval.granted consumer for a 202, and by the scheduled-publish
+  job at scheduledFor. Never at the request of a version that is pending review or scheduled'
 emittedBy:
 - publishTenantConfig
 payload:

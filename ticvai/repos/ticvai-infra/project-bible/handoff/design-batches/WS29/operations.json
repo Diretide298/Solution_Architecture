@@ -4,7 +4,7 @@
   "path": "/membership-product-validation",
   "contract": "subscription",
   "summary": "Membership Product Validation, Approval, Publication & Versioning",
-  "permission": "PLATFORM_CELL_MANAGE",
+  "permission": "MEMBERSHIP_MANAGE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
@@ -56,12 +56,31 @@
   "requestBody": null,
   "responds": null
  },
+ "getChannelAvailability": {
+  "method": "GET",
+  "path": "/channel-availability",
+  "contract": "catalogue",
+  "summary": "One product's channel publication, as publishChannelAvailability last stored it",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "productId",
+    "in": "query",
+    "required": true
+   }
+  ],
+  "requestBody": null,
+  "responds": "ChannelPublicationAvailabilityView"
+ },
  "getMembershipProductValidation": {
   "method": "GET",
   "path": "/membership-product-validation",
   "contract": "subscription",
   "summary": "A membership product's validation, as the approver sees it",
-  "permission": "PLATFORM_CELL_MANAGE",
+  "permission": "MEMBERSHIP_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
@@ -98,7 +117,7 @@
   "path": "/membership-annual-pass",
   "contract": "subscription",
   "summary": "Membership & Annual Pass Command Center",
-  "permission": "PLATFORM_TENANT_VIEW",
+  "permission": "MEMBERSHIP_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
@@ -152,7 +171,7 @@
   "path": "/membership-commercial-pricing",
   "contract": "subscription",
   "summary": "Membership Commercial, Pricing & Channel Association",
-  "permission": "PLATFORM_TENANT_VIEW",
+  "permission": "MEMBERSHIP_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
@@ -191,7 +210,7 @@
   "path": "/membership-usage-visit",
   "contract": "subscription",
   "summary": "Membership Usage, Visit & Consumption Rules",
-  "permission": "PLATFORM_TENANT_VIEW",
+  "permission": "MEMBERSHIP_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
@@ -234,6 +253,40 @@
     "name": "channel",
     "in": "query",
     "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listTaxProfiles": {
+  "method": "GET",
+  "path": "/tax-profiles",
+  "contract": "catalogue",
+  "summary": "The tax profiles",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "legalEntityId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
    },
    {
     "name": null,
@@ -316,7 +369,7 @@
   "path": "/membership-commercial-config",
   "contract": "subscription",
   "summary": "Save a membership product's commercial references, payment eligibility and sales period",
-  "permission": "PLATFORM_CELL_MANAGE",
+  "permission": "MEMBERSHIP_MANAGE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
@@ -335,7 +388,7 @@
   "path": "/membership-eligibility-qualification",
   "contract": "subscription",
   "summary": "Membership Eligibility & Qualification Rule Builder",
-  "permission": "PLATFORM_CELL_MANAGE",
+  "permission": "MEMBERSHIP_MANAGE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
@@ -354,7 +407,7 @@
   "path": "/membership-entitlement-admission",
   "contract": "subscription",
   "summary": "Membership Entitlement & Admission Benefit Builder",
-  "permission": "PLATFORM_CELL_MANAGE",
+  "permission": "MEMBERSHIP_MANAGE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
@@ -373,7 +426,7 @@
   "path": "/membership-product-tier",
   "contract": "subscription",
   "summary": "Membership Product & Tier Builder",
-  "permission": "PLATFORM_CELL_MANAGE",
+  "permission": "MEMBERSHIP_MANAGE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
@@ -416,7 +469,7 @@
   "path": "/membership-usage-policy",
   "contract": "subscription",
   "summary": "Save a membership product's usage, visit and consumption rules",
-  "permission": "PLATFORM_CELL_MANAGE",
+  "permission": "MEMBERSHIP_MANAGE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
@@ -483,7 +536,7 @@
   "path": "/renewal-auto-membership",
   "contract": "subscription",
   "summary": "Renewal, Auto-Renewal & Membership Continuity Configuration",
-  "permission": "PLATFORM_CELL_MANAGE",
+  "permission": "MEMBERSHIP_MANAGE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",

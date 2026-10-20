@@ -25,8 +25,9 @@ trigger:
 
 offlineBehaviour: >
   **Selling, drops and no-sales work offline and the whole platform is built for it** (ADR-0013
-  local-first). A till that stops selling because the network dropped is a queue at the door. Sign-in
-  works offline against the cached operator list.
+  local-first). A till that stops selling because the network dropped is a queue at the door. **Signing in
+  needs a connection in this release** (r8, IDENTITY-C01; identity login's offline note, as F64 says): a
+  cashier already signed in keeps selling offline, but a new sign-in waits for the network.
 
   **Opening and settling do not.** An opening float declared offline is a float nobody can
   reconcile against the safe, and **a settlement computed against a stale catalogue is a variance

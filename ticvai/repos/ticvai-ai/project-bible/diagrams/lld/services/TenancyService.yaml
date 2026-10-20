@@ -1,5 +1,5 @@
 id: LLD-TenancyService
-title: TenancyService — 213 operations, 106 tables
+title: TenancyService — 214 operations, 106 tables
 generatedBy: tools/derive-diagrams.py
 tier: foundation
 deployable: commerce
@@ -21,7 +21,7 @@ why: '**`platform.org_unit` is reached by 304 of 379 tables** — the tenancy sp
 scale: Read-heavy and highly cacheable. Config changes are rare.
 ifDown: Same as identity — nothing runs without a scope.
 coverage:
-  operations: 213
+  operations: 214
   inAFlow: 50
   percent: 23%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
@@ -59,7 +59,7 @@ schemas:
   largestTable: kernel.inbox
 operationsByContract:
 - contract: approvals
-  count: 58
+  count: 59
   operations:
   - operation: actOnWorkflowInstance
     verb: POST
@@ -73,7 +73,7 @@ operationsByContract:
     verb: PUT
     path: /matrix-multi-level
     scope: venue
-    permission: APPROVAL_REQUEST
+    permission: APPROVAL_CONFIGURE
     offline: false
     reads: 3
     writes: 3
@@ -81,7 +81,7 @@ operationsByContract:
     verb: PUT
     path: /role-authority-delegation
     scope: venue
-    permission: APPROVAL_REQUEST
+    permission: APPROVAL_CONFIGURE
     offline: false
     reads: 6
     writes: 2
@@ -97,7 +97,7 @@ operationsByContract:
     verb: PUT
     path: /versioning-governance
     scope: venue
-    permission: APPROVAL_REQUEST
+    permission: APPROVAL_CONFIGURE
     offline: false
     reads: 4
     writes: 3
@@ -107,16 +107,16 @@ operationsByContract:
     scope: venue
     permission: APPROVAL_DECIDE
     offline: false
-    reads: 3
-    writes: 1
+    reads: 6
+    writes: 3
   - operation: cancelApprovalRequest
     verb: POST
     path: /approval-requests/{requestId}/cancel
     scope: venue
     permission: APPROVAL_CONFIGURE
     offline: false
-    reads: 3
-    writes: 1
+    reads: 4
+    writes: 2
   - operation: createApprovalDelegation
     verb: POST
     path: /delegations
@@ -131,8 +131,8 @@ operationsByContract:
     scope: tenant
     permission: APPROVAL_VIEW
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: createApprovalRequest
     verb: POST
     path: /approval-requests
@@ -145,7 +145,7 @@ operationsByContract:
     verb: POST
     path: /automation-autonomou-action
     scope: venue
-    permission: APPROVAL_REQUEST
+    permission: APPROVAL_CONFIGURE
     offline: false
     reads: 4
     writes: 2
@@ -155,7 +155,7 @@ operationsByContract:
     scope: venue
     permission: APPROVAL_DECIDE
     offline: false
-    reads: 6
+    reads: 8
     writes: 8
   - operation: escalateApprovalRequest
     verb: POST
@@ -163,7 +163,7 @@ operationsByContract:
     scope: venue
     permission: APPROVAL_REQUEST
     offline: false
-    reads: 5
+    reads: 6
     writes: 4
   - operation: evaluateApprovalRequirement
     verb: POST
@@ -203,8 +203,8 @@ operationsByContract:
     scope: venue
     permission: APPROVAL_ACT
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: listAccreditationBadges
     verb: GET
     path: /accreditation-badges
@@ -259,7 +259,7 @@ operationsByContract:
     scope: venue
     permission: APPROVAL_VIEW
     offline: false
-    reads: 3
+    reads: 5
     writes: 0
   - operation: listApprovedActionExecutions
     verb: GET
@@ -297,7 +297,7 @@ operationsByContract:
     verb: GET
     path: /process-automation-opportunity
     scope: venue
-    permission: APPROVAL_VIEW
+    permission: REPORT_VIEW_VENUE
     offline: false
     reads: 7
     writes: 0
@@ -369,10 +369,18 @@ operationsByContract:
     verb: GET
     path: /workflow-process-performance
     scope: venue
-    permission: APPROVAL_VIEW
+    permission: REPORT_VIEW_VENUE
     offline: false
     reads: 10
     writes: 0
+  - operation: recordApprovedActionOutcome
+    verb: POST
+    path: /internal/approval-requests/{requestId}/action-outcome
+    scope: tenant
+    permission: null
+    offline: false
+    reads: 2
+    writes: 2
   - operation: recordExternalApprovalDecision
     verb: POST
     path: /approval-requests/{requestId}/external-decision
@@ -387,24 +395,24 @@ operationsByContract:
     scope: venue
     permission: APPROVAL_REQUEST
     offline: false
-    reads: 3
-    writes: 2
+    reads: 4
+    writes: 3
   - operation: resolveApprovedActionExecution
     verb: POST
     path: /approved-action-executions/{executionId}/resolve
     scope: venue
     permission: APPROVAL_ACT
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: resubmitApprovalRequest
     verb: POST
     path: /approval-requests/{requestId}/resubmit
     scope: venue
     permission: APPROVAL_REQUEST
     offline: false
-    reads: 4
-    writes: 3
+    reads: 6
+    writes: 4
   - operation: revokeApprovalDelegation
     verb: DELETE
     path: /delegations/{delegationId}
@@ -419,8 +427,8 @@ operationsByContract:
     scope: tenant
     permission: APPROVAL_CONFIGURE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setApprovalExternalProvider
     verb: PUT
     path: /approval-external-providers/{externalProviderId}
@@ -451,29 +459,29 @@ operationsByContract:
     scope: tenant
     permission: APPROVAL_CONFIGURE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setApproverAvailability
     verb: PUT
     path: /approval-delegations/availability/{availabilityId}
     scope: venue
     permission: APPROVAL_DECIDE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setStepUpPolicy
     verb: PUT
     path: /step-up-policies
     scope: tenant
     permission: APPROVAL_CONFIGURE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setTriggerActionCross
     verb: PUT
     path: /trigger-action-cross
     scope: venue
-    permission: APPROVAL_REQUEST
+    permission: APPROVAL_CONFIGURE
     offline: false
     reads: 3
     writes: 2
@@ -481,7 +489,7 @@ operationsByContract:
     verb: PUT
     path: /visual-business-rule
     scope: venue
-    permission: APPROVAL_REQUEST
+    permission: APPROVAL_CONFIGURE
     offline: false
     reads: 2
     writes: 2
@@ -489,7 +497,7 @@ operationsByContract:
     verb: PUT
     path: /visual-workflow
     scope: venue
-    permission: APPROVAL_REQUEST
+    permission: APPROVAL_CONFIGURE
     offline: false
     reads: 3
     writes: 3
@@ -499,13 +507,13 @@ operationsByContract:
     scope: venue
     permission: APPROVAL_DECIDE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: simulateWorkflowTestingImpact
     verb: PUT
     path: /workflow-testing-impact
     scope: venue
-    permission: APPROVAL_REQUEST
+    permission: APPROVAL_CONFIGURE
     offline: false
     reads: 14
     writes: 2
@@ -515,7 +523,7 @@ operationsByContract:
     scope: venue
     permission: APPROVAL_REQUEST
     offline: false
-    reads: 5
+    reads: 7
     writes: 3
   - operation: withdrawApprovalRequest
     verb: POST
@@ -524,7 +532,7 @@ operationsByContract:
     permission: APPROVAL_REQUEST
     offline: false
     reads: 4
-    writes: 2
+    writes: 3
 - contract: tenancy
   count: 58
   operations:
@@ -534,15 +542,15 @@ operationsByContract:
     scope: venue
     permission: DEVICE_MANAGE
     offline: false
-    reads: 1
-    writes: 2
+    reads: 2
+    writes: 3
   - operation: configureWorkstation
     verb: PUT
     path: /workstations/{workstationId}
     scope: venue
     permission: WORKSTATION_CONFIGURE
     offline: false
-    reads: 4
+    reads: 7
     writes: 3
   - operation: createDeviceFirmware
     verb: POST
@@ -566,7 +574,7 @@ operationsByContract:
     scope: venue
     permission: REGION_CONFIGURE
     offline: false
-    reads: 3
+    reads: 4
     writes: 3
   - operation: createSaleBoard
     verb: POST
@@ -604,7 +612,7 @@ operationsByContract:
     verb: GET
     path: /connectivity-policy
     scope: venue
-    permission: TENANT_CONFIGURE
+    permission: TENANT_VIEW
     offline: false
     reads: 1
     writes: 0
@@ -644,9 +652,9 @@ operationsByContract:
     verb: GET
     path: /offline-policy
     scope: venue
-    permission: TENANT_CONFIGURE
+    permission: TENANT_VIEW
     offline: false
-    reads: 1
+    reads: 2
     writes: 0
   - operation: getOrgUnit
     verb: GET
@@ -678,7 +686,7 @@ operationsByContract:
     scope: venue
     permission: TENANT_VIEW
     offline: true
-    reads: 2
+    reads: 3
     writes: 0
   - operation: getVenueSettingsDefaults
     verb: GET
@@ -699,7 +707,7 @@ operationsByContract:
   - operation: getWorkstationHealth
     verb: GET
     path: /workstations/{workstationId}/health
-    scope: tenant
+    scope: venue
     permission: DEVICE_VIEW
     offline: false
     reads: 2
@@ -710,13 +718,13 @@ operationsByContract:
     scope: venue
     permission: DEVICE_MANAGE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: listAuditRecords
     verb: GET
     path: /audit-records
     scope: venue
-    permission: AI_AUDIT_VIEW
+    permission: AUDIT_VIEW
     offline: false
     reads: 4
     writes: 1
@@ -750,7 +758,7 @@ operationsByContract:
     scope: venue
     permission: DEVICE_VIEW
     offline: false
-    reads: 1
+    reads: 2
     writes: 0
   - operation: listDeviceFirmware
     verb: GET
@@ -822,16 +830,16 @@ operationsByContract:
     scope: workstation
     permission: null
     offline: false
-    reads: 1
-    writes: 2
+    reads: 3
+    writes: 3
   - operation: recordDeviceTamperEvent
     verb: POST
     path: /device-tamper-events
     scope: venue
     permission: DEVICE_VIEW
     offline: true
-    reads: 2
-    writes: 2
+    reads: 3
+    writes: 3
   - operation: registerDevice
     verb: POST
     path: /devices
@@ -846,8 +854,8 @@ operationsByContract:
     scope: tenant
     permission: null
     offline: false
-    reads: 1
-    writes: 2
+    reads: 2
+    writes: 3
   - operation: resolveTenantHost
     verb: GET
     path: /tenant-domains/{hostname}
@@ -902,8 +910,8 @@ operationsByContract:
     scope: venue
     permission: DEVICE_MANAGE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 3
+    writes: 2
   - operation: setDeviceFirmwareStatus
     verb: POST
     path: /device-firmware/{firmwareId}/status
@@ -934,8 +942,8 @@ operationsByContract:
     scope: tenant
     permission: null
     offline: false
-    reads: 2
-    writes: 2
+    reads: 3
+    writes: 3
   - operation: setVenueSettings
     verb: PUT
     path: /venues/{venueId}/settings
@@ -950,8 +958,8 @@ operationsByContract:
     scope: tenant
     permission: TENANT_CONFIGURE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: startDeviceFirmwareRollout
     verb: POST
     path: /device-firmware/rollouts
@@ -974,7 +982,7 @@ operationsByContract:
     scope: venue
     permission: REGION_CONFIGURE
     offline: false
-    reads: 3
+    reads: 4
     writes: 3
   - operation: updateRegionSettings
     verb: PUT
@@ -1025,8 +1033,8 @@ operationsByContract:
     scope: venue
     permission: WORKFORCE_VIEW
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: createRotaAssignment
     verb: POST
     path: /rota-assignments
@@ -1265,14 +1273,14 @@ operationsByContract:
     scope: venue
     permission: WORKFORCE_VIEW
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: requestShiftSwap
     verb: POST
     path: /rota-assignments/{assignmentId}/swap
     scope: venue
     permission: WORKFORCE_VIEW
-    offline: false
+    offline: true
     reads: 4
     writes: 3
   - operation: resolveSyncConflict
@@ -1281,8 +1289,8 @@ operationsByContract:
     scope: tenant
     permission: WORKFORCE_MANAGE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: sendStaffMessage
     verb: POST
     path: /staff-messages
@@ -1297,24 +1305,24 @@ operationsByContract:
     scope: tenant
     permission: WORKFORCE_MANAGE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setIntegrationSource
     verb: PUT
     path: /integration-sources/{sourceId}
     scope: tenant
     permission: WORKFORCE_MANAGE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setJobTitle
     verb: PUT
     path: /job-titles/{jobTitleId}
     scope: venue
     permission: WORKFORCE_MANAGE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setLabourBudget
     verb: PUT
     path: /labour-budgets/{labourBudgetId}
@@ -1329,31 +1337,31 @@ operationsByContract:
     scope: venue
     permission: WORKFORCE_MANAGE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setShiftPattern
     verb: PUT
     path: /shift-patterns/{shiftPatternId}
     scope: venue
     permission: WORKFORCE_MANAGE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setShiftTemplate
     verb: PUT
     path: /shift-templates/{shiftTemplateId}
     scope: venue
     permission: WORKFORCE_MANAGE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setStaffingRules
     verb: PUT
     path: /staffing-rules
     scope: venue
     permission: WORKFORCE_MANAGE
     offline: false
-    reads: 2
+    reads: 3
     writes: 3
   - operation: setWorkAssignment
     verb: PUT
@@ -1361,16 +1369,16 @@ operationsByContract:
     scope: venue
     permission: WORKFORCE_MANAGE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: startSync
     verb: POST
     path: /sync-runs
     scope: tenant
     permission: WORKFORCE_MANAGE
     offline: false
-    reads: 1
-    writes: 2
+    reads: 2
+    writes: 3
   - operation: updateRotaAssignment
     verb: PATCH
     path: /rota-assignments/{assignmentId}
@@ -1412,16 +1420,16 @@ operationsByContract:
     scope: venue
     permission: ACCREDITATION_CONFIGURE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: createBadgePrintJob
     verb: POST
     path: /badge-print-jobs
     scope: venue
     permission: ACCREDITATION_ISSUE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: decideAccreditationApplication
     verb: POST
     path: /accreditation-applications/{applicationId}/decide
@@ -1620,8 +1628,8 @@ operationsByContract:
     scope: venue
     permission: ACCREDITATION_CONFIGURE
     offline: false
-    reads: 0
-    writes: 1
+    reads: 1
+    writes: 2
   - operation: renewAccreditation
     verb: POST
     path: /accreditation-holders/{holderId}/renew
@@ -1660,24 +1668,24 @@ operationsByContract:
     scope: venue
     permission: ACCREDITATION_CONFIGURE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setAccreditationNotificationRules
     verb: PUT
     path: /accreditation-notifications
     scope: venue
     permission: ACCREDITATION_CONFIGURE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setAccreditationRequirements
     verb: PUT
     path: /accreditation-requirements
     scope: venue
     permission: ACCREDITATION_CONFIGURE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setAccreditationStatus
     verb: POST
     path: /accreditation-holders/{holderId}/status
@@ -1692,24 +1700,24 @@ operationsByContract:
     scope: venue
     permission: ACCREDITATION_CONFIGURE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setBadgeTemplate
     verb: PUT
     path: /badge-templates/{badgeTemplateId}
     scope: venue
     permission: ACCREDITATION_CONFIGURE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setHolderAccess
     verb: PUT
     path: /accreditation-holders/{holderId}/access
     scope: venue
     permission: ACCREDITATION_MANAGE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: submitAccreditationApplication
     verb: POST
     path: /accreditation-applications/{applicationId}/submit
@@ -1724,8 +1732,8 @@ operationsByContract:
     scope: venue
     permission: ACCREDITATION_APPLY
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: updateAccreditationApplication
     verb: PUT
     path: /accreditation-applications/{applicationId}
@@ -1740,8 +1748,8 @@ operationsByContract:
     scope: venue
     permission: ACCREDITATION_MANAGE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: updateAccreditationProgramme
     verb: PUT
     path: /accreditation-programmes/{programmeId}
@@ -1764,8 +1772,8 @@ operationsByContract:
     scope: venue
     permission: ACCREDITATION_APPROVE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: withdrawAccreditationApplication
     verb: POST
     path: /accreditation-applications/{applicationId}/withdraw
@@ -1790,17 +1798,24 @@ tables:
   - acknowledgeAnnouncement
   - actOnWorkflowInstance
   - amendAttendance
+  - approveDevice
   - approveMatrixMultiLevel
   - approveRoleAuthorityDelegation
   - approveUnifiedDecision
   - approveVersioningGovernance
+  - assignApprovalRequest
   - broadcastToGuests
+  - cancelApprovalRequest
+  - claimOpenShift
   - cloneAccreditationProgramme
   - configureWorkstation
   - createAccreditationApplication
+  - createAccreditationProgramme
   - createApprovalDelegation
+  - createApprovalEvidencePackage
   - createApprovalRequest
   - createAutomationAutonomouAction
+  - createBadgePrintJob
   - createDeviceFirmware
   - createOrgUnit
   - createOutlet
@@ -1815,67 +1830,110 @@ tables:
   - evaluateApprovalRequirement
   - exportAccreditationData
   - importAccreditationHolders
+  - issueAccreditationBadge
   - issueAccreditationCredential
+  - issueDeviceCredential
   - issueMyAccreditationWalletPass
   - markStaffConversationRead
+  - previewAccessImpact
   - publishAnnouncement
+  - recordApprovedActionOutcome
   - recordAttendance
+  - recordDeviceHeartbeat
+  - recordDeviceTamperEvent
   - recordExternalApprovalDecision
   - registerDevice
   - renewAccreditation
+  - reopenApprovalRequest
   - replaceAccreditationCredential
+  - requestLeave
   - requestShiftSwap
+  - requeueDeadLetter
+  - resolveApprovedActionExecution
   - resolveIdentityConflict
+  - resolveSyncConflict
   - resubmitAccreditationApplication
   - resubmitApprovalRequest
   - revokeApprovalDelegation
   - revokeDeviceCredential
   - rollbackDeviceFirmware
   - sendStaffMessage
+  - setAccessProfile
+  - setAccreditationNotificationRules
+  - setAccreditationRequirements
   - setAccreditationStatus
+  - setAccreditationValidity
+  - setApprovalControlPolicy
   - setApprovalExternalProvider
   - setApprovalMatrix
   - setApprovalRetentionPolicy
+  - setApprovalSlaPolicy
+  - setApproverAvailability
+  - setBadgeTemplate
   - setConfigurationProfile
   - setConnectivityThresholds
   - setDataRetentionSetting
+  - setDeviceAssignment
   - setDeviceFirmwareStatus
+  - setFieldOwnership
+  - setHolderAccess
+  - setIntegrationSource
+  - setJobTitle
   - setLabourBudget
+  - setLeaveType
   - setOfflinePolicy
   - setRolePermissions
+  - setShiftPattern
+  - setShiftTemplate
   - setStaffingRules
+  - setStepUpPolicy
+  - setTenantDomainMapping
   - setTriggerActionCross
   - setVenueSettings
+  - setVenueSettingsDefaults
   - setVisualBusinessRule
   - setVisualWorkflow
+  - setWorkAssignment
+  - signApprovalDecision
   - simulateWorkflowTestingImpact
   - startDeviceFirmwareRollout
+  - startSync
   - submitAccreditationApplication
+  - submitAccreditationDocument
   - submitApprovalRequest
   - updateAccreditationApplication
+  - updateAccreditationHolder
   - updateAccreditationProgramme
   - updateOrgUnit
   - updateOutlet
   - updateRegionSettings
   - updateRotaAssignment
   - updateSaleBoard
+  - verifyAccreditationDocument
   - withdrawAccreditationApplication
   - withdrawApprovalRequest
   readBy:
   - acknowledgeAnnouncement
   - actOnWorkflowInstance
   - amendAttendance
+  - approveDevice
   - approveMatrixMultiLevel
   - approveRoleAuthorityDelegation
   - approveUnifiedDecision
   - approveVersioningGovernance
+  - assignApprovalRequest
   - broadcastToGuests
+  - cancelApprovalRequest
+  - claimOpenShift
   - cloneAccreditationProgramme
   - configureWorkstation
   - createAccreditationApplication
+  - createAccreditationProgramme
   - createApprovalDelegation
+  - createApprovalEvidencePackage
   - createApprovalRequest
   - createAutomationAutonomouAction
+  - createBadgePrintJob
   - createDeviceFirmware
   - createOrgUnit
   - createOutlet
@@ -1890,50 +1948,87 @@ tables:
   - evaluateApprovalRequirement
   - exportAccreditationData
   - importAccreditationHolders
+  - issueAccreditationBadge
   - issueAccreditationCredential
+  - issueDeviceCredential
   - issueMyAccreditationWalletPass
   - listAuditRecords
   - markStaffConversationRead
+  - previewAccessImpact
   - publishAnnouncement
+  - recordApprovedActionOutcome
   - recordAttendance
+  - recordDeviceHeartbeat
+  - recordDeviceTamperEvent
   - recordExternalApprovalDecision
   - registerDevice
   - renewAccreditation
+  - reopenApprovalRequest
   - replaceAccreditationCredential
+  - requestLeave
   - requestShiftSwap
+  - requeueDeadLetter
+  - resolveApprovedActionExecution
   - resolveIdentityConflict
+  - resolveSyncConflict
   - resubmitAccreditationApplication
   - resubmitApprovalRequest
   - revokeApprovalDelegation
   - revokeDeviceCredential
   - rollbackDeviceFirmware
   - sendStaffMessage
+  - setAccessProfile
+  - setAccreditationNotificationRules
+  - setAccreditationRequirements
   - setAccreditationStatus
+  - setAccreditationValidity
+  - setApprovalControlPolicy
   - setApprovalExternalProvider
   - setApprovalMatrix
   - setApprovalRetentionPolicy
+  - setApprovalSlaPolicy
+  - setApproverAvailability
+  - setBadgeTemplate
   - setConfigurationProfile
   - setConnectivityThresholds
   - setDataRetentionSetting
+  - setDeviceAssignment
   - setDeviceFirmwareStatus
+  - setFieldOwnership
+  - setHolderAccess
+  - setIntegrationSource
+  - setJobTitle
   - setLabourBudget
+  - setLeaveType
   - setOfflinePolicy
   - setRolePermissions
+  - setShiftPattern
+  - setShiftTemplate
+  - setStaffingRules
+  - setStepUpPolicy
+  - setTenantDomainMapping
   - setTriggerActionCross
   - setVenueSettings
+  - setVenueSettingsDefaults
   - setVisualBusinessRule
   - setVisualWorkflow
+  - setWorkAssignment
+  - signApprovalDecision
   - simulateWorkflowTestingImpact
   - startDeviceFirmwareRollout
+  - startSync
   - submitAccreditationApplication
+  - submitAccreditationDocument
   - submitApprovalRequest
   - updateAccreditationApplication
+  - updateAccreditationHolder
   - updateAccreditationProgramme
   - updateOrgUnit
   - updateOutlet
   - updateRegionSettings
   - updateRotaAssignment
   - updateSaleBoard
+  - verifyAccreditationDocument
   - withdrawAccreditationApplication
   - withdrawApprovalRequest
   keys:
@@ -2274,7 +2369,7 @@ tables:
   - approvals
   foreignWriters: null
 - table: approvals.decision
-  columns: 13
+  columns: 15
   store: postgres
   parent: null
   writtenBy:
@@ -2320,7 +2415,7 @@ tables:
   - approvals
   foreignWriters: null
 - table: approvals.external_dispatch
-  columns: 14
+  columns: 15
   store: postgres
   parent: null
   writtenBy:
@@ -2339,9 +2434,11 @@ tables:
   parent: null
   writtenBy:
   - approvals
-  foreignWriters: null
+  - white-label
+  foreignWriters:
+  - white-label
 - table: approvals.request
-  columns: 30
+  columns: 35
   store: postgres
   parent: null
   writtenBy:
@@ -2349,11 +2446,13 @@ tables:
   - finance
   - identity
   - subscription
+  - white-label
   - workforce
   foreignWriters:
   - finance
   - identity
   - subscription
+  - white-label
 - table: approvals.retention_policy
   columns: 9
   store: postgres
@@ -2445,7 +2544,7 @@ tables:
   writtenBy: []
   foreignWriters: null
 - table: platform.audit_read
-  columns: 3
+  columns: 7
   store: postgres
   parent: null
   writtenBy:
@@ -2470,12 +2569,6 @@ tables:
   - orders
   - payments
   - platform-ops
-- table: platform.cell_endpoint
-  columns: 11
-  store: postgres
-  parent: null
-  writtenBy: []
-  foreignWriters: null
 - table: platform.configuration_profile
   columns: 9
   store: postgres
@@ -2491,7 +2584,7 @@ tables:
   - tenancy
   foreignWriters: null
 - table: platform.dead_letter
-  columns: 11
+  columns: 16
   store: postgres
   parent: null
   writtenBy:
@@ -2542,7 +2635,7 @@ tables:
   - tenancy
   foreignWriters: null
 - table: platform.outbox
-  columns: 15
+  columns: 16
   store: postgres
   parent: null
   writtenBy:
@@ -2584,6 +2677,12 @@ tables:
   - subscription
   - wallet
   - white-label
+- table: platform.outbox_sequence
+  columns: 3
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
 - table: platform.outlet
   columns: 16
   store: postgres
@@ -2655,14 +2754,14 @@ tables:
   writtenBy: []
   foreignWriters: null
 - table: platform.venue_settings
-  columns: 31
+  columns: 32
   store: postgres
   parent: null
   writtenBy:
   - tenancy
   foreignWriters: null
 - table: platform.workstation
-  columns: 21
+  columns: 22
   store: postgres
   parent: null
   writtenBy:
@@ -2919,9 +3018,9 @@ tables:
 readsFrom:
 - service: IdentityService
   operations: 19
-- service: AccessService
-  operations: 3
 - service: PlatformService
+  operations: 4
+- service: AccessService
   operations: 3
 - service: CatalogueService
   operations: 2

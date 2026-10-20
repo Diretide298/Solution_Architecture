@@ -872,3 +872,431 @@ changes:
     tag: r6
     producer-tickets: [SVC-VENUEOPS-CARD-1]
     consumer-tickets: [VM-BO-454, VM-BO-455, VM-BO-457, VM-BO-462, VM-BO-486, APP-WEB-WEB-021, APP-MOB-GST-011]
+  - id: BC-368
+    contract: payments
+    operation: getPaymentRules
+    change: "paymentPolicyId"
+    reason: 'ADAM CR-147, option 1 (published answer of 18 October 2026; CHG-CRA-002): getPaymentRules already said
+      "payment_policy_id was dropped from all three": no such table exists and it resolved to whitelabel.policy. The
+      rules are scoped by scopePath, channelId and businessArea. The field is removed from the currency, eligibility
+      and fee rule schemas (and PaymentsMethodConfig); a response field cannot be removed additively.'
+    approved-by: 'Chinmay Parab, 18 October 2026 (published CR answers, decisions-final.json: "approved by the lead as a breaking change")'
+    tag: r8
+    producer-tickets: [SVC-ORDER-PAYMENTS-17]
+    consumer-tickets: [AM-PAYMENTS-P08, AM-PAYMENTS-P08-2]
+  - id: BC-369
+    contract: payments
+    operation: setPaymentRules
+    change: "paymentPolicyId"
+    reason: 'As BC-368 (ADAM CR-147; CHG-CRA-002): setPaymentRules neither takes nor returns paymentPolicyId. A client
+      still sending it has it ignored as an unknown field; the four columns lose NOT NULL first and are dropped after.'
+    approved-by: 'Chinmay Parab, 18 October 2026 (published CR answers, decisions-final.json: "approved by the lead as a breaking change")'
+    tag: r8
+    producer-tickets: [SVC-ORDER-PAYMENTS-17]
+    consumer-tickets: [AM-PAYMENTS-API-BLOCK-A, AM-PAYMENTS-P08, TEST-AM-PAYMENTS-API-BLOCK-A]
+  - id: BC-370
+    contract: identity
+    operation: createDelegatedAccess
+    operations: [createDelegatedAccess, listDelegatedAccess, listDelegations, grantDelegation]
+    change: "`permission` is now nullable"
+    reason: 'ADAM CR-158, option A (published answer of 18 October 2026; CHG-CRA-002): a grant names exactly one of a
+      permission or a role, so DelegatedAccess.permission is null on a role grant. A response field that was never null
+      becomes nullable, which a strict client can reject. **check-contract-compat cannot see this change**: it does not
+      compare nullability, so this entry matches nothing it reports (it prints a NOTE) and approves nothing else on the
+      four operations; it is the record of the lead''s approval. CreateGrantRequest requires one of permission and
+      roleId (relaxing the request is additive).'
+    approved-by: 'Chinmay Parab, 18 October 2026 (published CR answers, decisions-final.json: "approved by the lead as a breaking change")'
+    tag: r8
+    producer-tickets: [SVC-IDENTITY-ADMINISTRATION-8]
+    consumer-tickets: [APP-PARTNER-PTR-020, TEST-AM-IDENTITY-SECURITY-P10, SETUP-SEED]
+  - id: BC-371
+    contract: finance
+    operation: postOrderRevenue
+    operations: [postOrderRevenue, recordWriteOff, listJournalEntries, createJournalEntry, getJournalEntry,
+      approveJournalEntry, rejectJournal, reverseJournalEntry, listLedgerEntries]
+    change: "gained enum value(s) ['payment']"
+    reason: 'ADAM CR-168, option A (published answer of 18 October 2026; CHG-CRA-007): JournalSource gains `payment`, the
+      cash receipt createPayment posts (sourceId the payment, reference the order), so postOrderRevenue never mistakes it
+      for revenue. A value added to a response enum cannot be additive; a client switching on `source` shows an unknown
+      value as other. The lead decided the value; check-contract-compat labels it breaking, so the lead confirms the
+      label at merge.'
+    approved-by: 'Chinmay Parab (19 Oct 2026, "confirm both")'
+    tag: r8
+    producer-tickets: [SVC-LEDGER-FINANCE-3, SVC-LEDGER-LEDGER-3, VM-LEDGER-LEDGER-1, VM-LEDGER-LEDGER-2]
+    consumer-tickets: [VM-BO-043, AM-FINANCE-TAX-P08, AM-FINANCE-TAX-P08-BLOCK-A, TEST-AM-FINANCE-TAX-P08-BLOCK-A]
+  - id: BC-372
+    contract: seating
+    operation: createSeatHold
+    operations: [createSeatHold, getSeatHold, extendSeatHold, allocateBlockedSeats]
+    change: "gained enum value(s) ['sold']"
+    reason: 'ADAM CR-169, option A (published answer of 18 October 2026; CHG-CRA-007): a seat reservation gains a `sold`
+      status, set when convertInventoryHold sells the order''s units (after `converted`, when the order was created). A
+      value added to a response enum cannot be additive. The lead decided the status; check-contract-compat labels it
+      breaking, so the lead confirms the label at merge.'
+    approved-by: 'Chinmay Parab (19 Oct 2026, "confirm both")'
+    tag: r8
+    producer-tickets: [SVC-CATALOGUE-HOLD-1]
+    consumer-tickets: [AM-SEATING-MAPS-P01, AM-SEATING-MAPS-P02, AM-SEATING-MAPS-P04, APP-MOB-GST-049, APP-POS-POS-004, APP-WEB-WEB-007]
+  - id: BC-373
+    contract: subscription
+    operation: suspendTenant
+    operations: [suspendTenant, reactivateTenant]
+    change: "answers 202, not 200"
+    reason: 'ADAM CR-172, option (a) (decided by Chinmay Parab on 19 October 2026; CHG-CRA-005): suspendTenant and
+      reactivateTenant raise their own approval request and answer 202 with it (TenantChangeRequested); the tenant is
+      unchanged until approval.granted arrives. A client built at r1 got 200 with the tenant already suspended or
+      reactivated; it now gets 202 with the tenant as it was. The body keeps every field the 200 carried, but the
+      status and its meaning change, which cannot be additive. **check-contract-compat cannot see this change**: it
+      compares the first 2xx body and not its status code, so this entry matches nothing it reports (it prints a NOTE)
+      and approves nothing else on the two operations; it is the record of the lead''s approval.'
+    approved-by: 'Chinmay Parab, 19 October 2026 (ADAM CR-172 option a)'
+    tag: r8
+    producer-tickets: [SVC-PLATFORM-TENANT-1]
+    consumer-tickets: [APP-SETUP-ADM-005, TEST-AM-SETUP-PLATFORM-FOUNDATION-P09]
+  - id: BC-380
+    contract: ai
+    operation: setAiCredential
+    operations: [setAiCredential]
+    change: "x-ticvai-permission changed"
+    reason: 'R8 blocker FOUNDATION-AI-C30 (lead''s answers of 20 October 2026, CHG-R8SAT-001): an AI provider credential is a
+      tenant''s platform secret, so setting it takes PLATFORM_TENANT_MANAGE, not AI_CONFIGURE, and a caller without it gets
+      403. A permission change cannot be additive. Tickets from handoff/service-docs/tasks.csv by operation name.'
+    approved-by: 'Chinmay Parab (20 Oct 2026, the r8 blocker answers; recorded at the r8 merge under his "all of them are on you")'
+    tag: r8
+    producer-tickets: [AI-ENGINE-GATEWAY]
+    consumer-tickets: [AM-AI-ENGINE-A, AM-SETUP-AI-INTELLIGENCE-P09-REST, APP-SETUP-ADM-037, APP-SETUP-ADM-037-REST, TEST-AM-AI-ENGINE-A]
+  - id: BC-381
+    contract: public-api
+    operation: listApiVersions
+    operations: [listApiVersions, listApiScopes]
+    change: "x-ticvai-permission changed"
+    reason: 'R8 blocker FOUNDATION-AI-C17 (lead''s answers of 20 October 2026, CHG-R8SAT-001): the API versions and scopes are
+      public documentation a developer reads before having an account, so the two reads need no permission. A permission
+      change cannot be additive. DEV-001s no-access wording waits for the client (refresh-safe-baseline check-screen-
+      permissions). Tickets from handoff/service-docs/tasks.csv by operation name.'
+    approved-by: 'Chinmay Parab (20 Oct 2026, the r8 blocker answers; recorded at the r8 merge under his "all of them are on you")'
+    tag: r8
+    producer-tickets: [SVC-PLATFORM-PUBLICAPI-7]
+    consumer-tickets: [AM-PUBLIC-API-P08, AM-PUBLIC-API-P10, AM-PUBLIC-API-P14-BLOCK-A, AM-SETUP-PLATFORM-FOUNDATION-P14-REST, APP-SETUP-DEV-003, APP-SETUP-DEV-003-REST, TEST-AM-PUBLIC-API-P14-BLOCK-A]
+  - id: BC-382
+    contract: shift
+    operation: reopenShift
+    operations: [listShifts, openShift, getCurrentShift, getWorkstationShift, getShift, approveShiftOpen, reopenShift, suspendShift, resumeShift, closeShift, acceptShiftVariance, rejectShiftVariance, approveShiftClose]
+    change: "gained enum value(s) ['reopen']"
+    reason: 'R8 blocker APPROVALS-TENANCY-C49 (CHG-R8SPN-006): a reopened shift keeps its reason, supervisor and time as an
+      approval of kind reopen beside open, close and variance, so Shift.approvals[].kind gains reopen. A value added to a
+      response enum cannot be additive; a client switching on kind shows an unknown value as other. Tickets from
+      handoff/service-docs/tasks.csv by operation name.'
+    approved-by: 'Chinmay Parab (20 Oct 2026, the r8 blocker answers; recorded at the r8 merge under his "all of them are on you")'
+    tag: r8
+    producer-tickets: [SVC-ORDER-SHIFT-1, SVC-ORDER-SHIFT-2, SVC-ORDER-SHIFT-3, SVC-ORDER-SHIFT-4, SVC-ORDER-SHIFT-5, SVC-ORDER-SHIFT-6, SVC-ORDER-SHIFT-7, VM-ORDER-SHIFT-1]
+    consumer-tickets: [AM-APPROVALS-P04, AM-FINANCE-TAX-P08-BLOCK-A, AM-FOOD-BEVERAGE-P04, AM-FOOD-BEVERAGE-P06, AM-FOOD-BEVERAGE-P08, AM-FOOD-BEVERAGE-P08-BLOCK-A, AM-IDENTITY-SECURITY-P08, AM-MAINTENANCE-SAFETY-P06-BLOCK-A, AM-ORDERS-RESERVATIONS-P08-BLOCK-A, AM-REPORTING-P08-BLOCK-A, AM-RETAIL-P04, AM-TENANCY-VENUES-P04, AM-WORKFORCE-P04, TEST-AM-FOOD-BEVERAGE-P04]
+  - id: BC-383
+    contract: venue-map
+    operation: generateVisitPlan
+    operations: [generateVisitPlan, getVisitPlan, updateVisitPlan]
+    change: "gained enum value(s) ['balanced']"
+    reason: 'R8 blocker GPS-C04 (lead''s answers of 20 October 2026, CHG-R8SAT-001): the visit planner''s pace gains balanced
+      between relaxed and packed (15-minute gaps, 85% fill, the planner owner''s proposal). A value added to a response enum
+      cannot be additive. Tickets from handoff/service-docs/tasks.csv by operation name.'
+    approved-by: 'Chinmay Parab (20 Oct 2026, the r8 blocker answers; recorded at the r8 merge under his "all of them are on you")'
+    tag: r8
+    producer-tickets: [SVC-VENUEOPS-VISITPLAN-1, SVC-VENUEOPS-VISITPLAN-2]
+    consumer-tickets: [AI-ENGINE-PLANNER, AM-AI-ENGINE-A2, AM-AI-P02, AM-SEATING-MAPS-P01, AM-SEATING-MAPS-P02, AM-TICKETING-P01, AM-TICKETING-P02, TEST-AM-AI-ENGINE-A2, TEST-AM-SEATING-MAPS-P01]
+  - id: BC-384
+    contract: white-label
+    operation: getTenantConfig
+    operations: [getTenantConfig, getNavigation, setNavigation, listBanners, createBanner, updateBanner, updatePromoBlock, createPromoBlock, restoreConfigVersion, getPublishedTenantConfig]
+    change: "gained enum value(s) ['bookingFlow']"
+    reason: 'R8 blocker walk, satellite lane (CHG-R8SAT-001; approved by the lead before the merge): a banner, promo block or
+      navigation item can link straight into a product''s booking flow, so LinkTarget.kind gains bookingFlow (deep link
+      /book/{productId}). A value added to a response enum cannot be additive. Tickets from handoff/service-docs/tasks.csv
+      by operation name.'
+    approved-by: 'Chinmay Parab (20 Oct 2026, the r8 blocker answers; recorded at the r8 merge under his "all of them are on you")'
+    tag: r8
+    producer-tickets: [SVC-WHITELABEL-CONTENT-1, SVC-WHITELABEL-CONTENT-3, SVC-WHITELABEL-CONTENT-6, SVC-WHITELABEL-CONTENT-7, SVC-WHITELABEL-NAVIGATION-1, SVC-WHITELABEL-NAVIGATION-2, SVC-WHITELABEL-OVERVIEW-1, SVC-WHITELABEL-PUBLISHING-3]
+    consumer-tickets: [AM-IDENTITY-SECURITY-P09, AM-WALLET-CASHLESS-P02, AM-WHITE-LABEL-P01, AM-WHITE-LABEL-P02, AM-WHITE-LABEL-P05, AM-WHITE-LABEL-P08, AM-WHITE-LABEL-P09, AM-WHITE-LABEL-P13, APP-KIOSK-KSK-002, TEST-AM-IDENTITY-SECURITY-P09, TEST-AM-WHITE-LABEL-P13]
+  - id: BC-385
+    contract: white-label
+    operation: getTenantConfig
+    operations: [getTenantConfig, restoreConfigVersion, listBookingFlowTypes, listBookingFlows, createBookingFlowDefinition, getPublishedBookingFlow, getBookingFlow, updateBookingFlowDefinition]
+    change: "lost enum value(s) ['cabanaBySize']"
+    reason: 'R8 blocker GPS-C36 (lead''s answer B13 of 20 October 2026: cabanas are booked from the map, with a size filter on the
+      map): the cabanaBySize booking flow type is removed and getMapResourceAvailability takes minCapacity. Removing an
+      enum value cannot be additive; no screen sends it (GST-058 and GST-050 drop the capacity path). Tickets from
+      handoff/service-docs/tasks.csv by operation name.'
+    approved-by: 'Chinmay Parab (20 Oct 2026, the r8 blocker answers; recorded at the r8 merge under his "all of them are on you")'
+    tag: r8
+    producer-tickets: [SVC-WHITELABEL-BOOKINGFLOWS-1, SVC-WHITELABEL-BOOKINGFLOWS-2, SVC-WHITELABEL-OVERVIEW-1, SVC-WHITELABEL-PUBLISHING-3]
+    consumer-tickets: [AM-AI-P01, AM-IDENTITY-SECURITY-P09, AM-MARKETING-CRM-P01, AM-ORDERS-RESERVATIONS-P01, AM-ORDERS-RESERVATIONS-P02, AM-SEATING-MAPS-P01, AM-SETUP-TICKETING-GUEST-COMMERCE-P08-REST, AM-TICKETING-P01, AM-TICKETING-P02, AM-TICKETING-P08, AM-WHITE-LABEL-P08, AM-WHITE-LABEL-P09, AM-WHITE-LABEL-P13, APP-SETUP-BO-007, APP-SETUP-BO-007-REST, APP-SETUP-BO-008, APP-SETUP-BO-008-REST, TEST-AM-IDENTITY-SECURITY-P09, TEST-AM-WHITE-LABEL-P13, VM-BO-115]
+  - id: BC-386
+    contract: ai
+    operation: semanticSearch
+    operations: [semanticSearch]
+    change: "lost enum value(s)"
+    reason: 'R8 blocker ORDERS-MONEY-C37 (lead''s answer A, 20 October 2026; CHG-R8STO): the search index holds six kinds
+      and nothing indexes memberships or documents, so the request kinds lose membership and document and SearchResult.kind
+      is closed to the six. Removing a value cannot be additive; no screen sends either value.'
+    approved-by: 'Chinmay Parab (20 Oct 2026, the r8 blocker answers; recorded at the r8 merge under his "all of them are on you")'
+    tag: r8
+    producer-tickets: [SVC-AI-RETRIEVAL-1]
+    consumer-tickets: [AM-AI-P06, AM-AI-P12, AM-DIGITAL-ASSETS-P13, AM-DIGITAL-ASSETS-P13-2, TEST-AM-DIGITAL-ASSETS-P13]
+  - id: BC-387
+    contract: inventory
+    operation: createStockReservation
+    operations: [listStockReservations, createStockReservation, releaseStockReservation]
+    change: "gained enum value(s) ['retailReservation']"
+    reason: 'R8 blocker APPROVALS-TENANCY-C34 (CHG-R8STO): Retail earmarks stock through Inventory, so a stock reservation''s
+      sourceType gains retailReservation. A value added to a response enum cannot be additive.'
+    approved-by: 'Chinmay Parab (20 Oct 2026, the r8 blocker answers; recorded at the r8 merge under his "all of them are on you")'
+    tag: r8
+    producer-tickets: [SVC-INVENTORY-INVENTORY-3]
+    consumer-tickets: [AM-INVENTORY-P08-2, AM-MAINTENANCE-SAFETY-P06-BLOCK-A, TEST-AM-MAINTENANCE-SAFETY-P06-BLOCK-A]
+  - id: BC-388
+    contract: marketing-crm
+    operation: awardBadge
+    operations: [awardBadge, listCustomerBadges]
+    reason: 'R8 blocker ORDERS-MONEY-C14 (CHG-R8STO): a customer badge''s sourceType (challenge, purchase, manager) and
+      status (awarded, expired, revoked) were free text; they become closed lists, as the API conventions require (section
+      4). A string becoming an enum cannot be additive. BO-826 is the only sender and stops sending status.'
+    approved-by: 'Chinmay Parab (20 Oct 2026, the r8 blocker answers; recorded at the r8 merge under his "all of them are on you")'
+    tag: r8
+    producer-tickets: [SVC-MARKETING-LOYALTY-1]
+    consumer-tickets: [AM-MARKETING-CRM-P01, AM-MARKETING-CRM-P02, AM-ORDERS-RESERVATIONS-P04, AM-SETUP-CUSTOMER-MARKETING-P08, APP-SETUP-BO-826, APP-SETUP-BO-826-REST]
+  - id: BC-389
+    contract: orders
+    operation: listSyncRejections
+    operations: [listSyncRejections, resolveSyncRejection]
+    change: "gained enum value(s) ['cashMovement']"
+    reason: 'R8 blocker FOUNDATION-AI-C13 (lead''s answers of 20 October 2026; CHG-R8SPN): a till''s offline cash movement
+      that the server refuses on sync is a rejection of its own kind, so SyncRejection.kind gains cashMovement. A value added
+      to a response enum cannot be additive.'
+    approved-by: 'Chinmay Parab (20 Oct 2026, the r8 blocker answers; recorded at the r8 merge under his "all of them are on you")'
+    tag: r8
+    producer-tickets: [SVC-ORDER-SYNC-1, VM-ORDER-SYNC-1]
+    consumer-tickets: [AM-ADMISSION-ACCESS-P06, AM-ADMISSION-ACCESS-P07-BLOCK-A, AM-ORDERS-RESERVATIONS-P04, AM-ORDERS-RESERVATIONS-P08, AM-REPORTING-P08-BLOCK-A, AM-TENANCY-VENUES-P08-BLOCK-A, AM-TICKETING-P01, AM-TICKETING-P08, APP-SETUP-BO-133, APP-SETUP-BO-133-REST, TEST-AM-TENANCY-VENUES-P08-BLOCK-A, VM-BO-130]
+  - id: BC-390
+    contract: identity
+    operation: verifyGuestEmail
+    operations: [verifyGuestEmail]
+    change: "x-ticvai-permission changed"
+    reason: 'R8 blocker IDENTITY-C28 (lead''s answers of 20 October 2026; CHG-R8SPN): a guest verifying their own e-mail
+      holds no staff permission, so the operation needs none (the guest''s own session and code are the proof). A
+      permission change cannot be additive.'
+    approved-by: 'Chinmay Parab (20 Oct 2026, the r8 blocker answers; recorded at the r8 merge under his "all of them are on you")'
+    tag: r8
+    producer-tickets: [SVC-IDENTITY-IDENTITY-4]
+    consumer-tickets: [AM-IDENTITY-SECURITY-P01, AM-IDENTITY-SECURITY-P02, AM-IDENTITY-SECURITY-P06-BLOCK-A, AM-MARKETING-CRM-P01, TEST-AM-IDENTITY-SECURITY-P01]
+  - id: BC-391
+    contract: identity
+    operation: registerGuest
+    operations: [registerGuest]
+    change: "x-ticvai-emits changed"
+    reason: 'R8 blocker IDENTITY-C55 (CHG-R8SPN): a new guest account is announced as identity.guestRegistered so the
+      consumers that welcome and profile a guest can react. Adding an emitted event is labelled breaking by the check;
+      consumers move with r8.'
+    approved-by: 'Chinmay Parab (20 Oct 2026, the r8 blocker answers; recorded at the r8 merge under his "all of them are on you")'
+    tag: r8
+    producer-tickets: [SVC-IDENTITY-GUESTAUTH-3]
+    consumer-tickets: [AM-IDENTITY-SECURITY-P01, AM-IDENTITY-SECURITY-P02, AM-IDENTITY-SECURITY-P06-BLOCK-A]
+  - id: BC-392
+    contract: catalogue
+    operation: setPriceLadderMatrix
+    operations: [setPriceLadderMatrix]
+    reason: 'R8 blocker GPS-C32 (CHG-R8SPN): the price ladder''s bands were an untyped object a client could not build or
+      read; they become a typed array of bands, each with its code. A type change cannot be additive; the only consumer is
+      ADM-094 in setup.'
+    approved-by: 'Chinmay Parab (20 Oct 2026, the r8 blocker answers; recorded at the r8 merge under his "all of them are on you")'
+    tag: r8
+    producer-tickets: [SVC-CATALOGUE-CATALOGUE-12, VM-ADM-094]
+    consumer-tickets: [AM-SETUP-TICKETING-GUEST-COMMERCE-P08, AM-SETUP-TICKETING-GUEST-COMMERCE-P08-REST, APP-SETUP-ADM-094-REST, TEST-AM-SETUP-TICKETING-GUEST-COMMERCE-P08-REST]
+  - id: BC-393
+    contract: subscription
+    operation: setSubscription
+    operations: [setSubscription]
+    change: "security changed"
+    reason: 'R8 blocker APPROVALS-TENANCY-C16 (lead''s answer B, 20 October 2026; CHG-R8SCR): a prospect never sets a
+      subscription; the plan choice travels on the onboarding application (submitOnboardingApplication), so
+      setSubscription is staff-only and loses prospectAuth and the prospect audience. Removing a security alternative
+      cannot be additive; SGN-019 and SGN-024 stop calling it.'
+    approved-by: 'Chinmay Parab (20 Oct 2026, the r8 blocker answers; recorded at the r8 merge under his "all of them are on you")'
+    tag: r8
+    producer-tickets: [SVC-PLATFORM-SUBSCRIPTION-1]
+    consumer-tickets: [AM-SETUP-PLATFORM-FOUNDATION-P09, AM-SUBSCRIPTION-LICENSING-P09, AM-SUBSCRIPTION-LICENSING-P09-4, AM-SUBSCRIPTION-LICENSING-P09-5, AM-SUBSCRIPTION-LICENSING-P17, AM-SUBSCRIPTION-LICENSING-P17-2, APP-SETUP-ADM-008, APP-SETUP-ADM-008-REST]
+  - id: BC-394
+    contract: subscription
+    operation: addLicenceAddOn
+    operations: [addLicenceAddOn, removeLicenceAddOn]
+    change: "type string -> enum:ModuleKey"
+    reason: 'R8 blocker APPROVALS-TENANCY-C17 (lead''s answer B, 20 October 2026; CHG-R8SCR): an add-on''s moduleKey was
+      free text, so a key nothing licenses could be sold; it becomes the shared ModuleKey (with the add-on key
+      poweredByRemoval). A string becoming an enum cannot be additive.'
+    approved-by: 'Chinmay Parab (20 Oct 2026, the r8 blocker answers; recorded at the r8 merge under his "all of them are on you")'
+    tag: r8
+    producer-tickets: [SVC-PLATFORM-LICENSING-1, SVC-PLATFORM-LICENSING-3]
+    consumer-tickets: [AM-SETUP-PLATFORM-FOUNDATION-P09, AM-SETUP-PLATFORM-FOUNDATION-P09-REST, AM-SUBSCRIPTION-LICENSING-P09, AM-SUBSCRIPTION-LICENSING-P09-2, APP-SETUP-ADM-005, APP-SETUP-ADM-005-REST, TEST-AM-SETUP-PLATFORM-FOUNDATION-P09-REST]
+  - id: BC-395
+    contract: subscription
+    operation: listMembershipAnnualPass
+    operations: [listMembershipAnnualPass, listMembershipUsageVisit, listMembershipCommercialPricing, listMembershipActivationCredential, listMembershipFreezeSuspension, listMembershipUpgradeDowngrade, listMembershipRenewalRetention, getMembershipProductValidation, setMembershipProductTier, setMembershipEligibilityQualification, setMembershipEntitlementAdmission, setRenewalAutoMembership, approveMembershipProductValidation, setMemberMembershipAccount, setMembershipUsagePolicy, setMembershipCommercialConfig]
+    change: "x-ticvai-permission changed"
+    reason: 'R8 blocker GPS-C33 (lead''s answer A, 20 October 2026; CHG-R8SCR, CHG-R8INT-004): the membership book
+      (BO-284..303) required PLATFORM_TENANT_VIEW and PLATFORM_CELL_MANAGE, Control Plane permissions no tenant role
+      holds, so no venue''s staff could use it; its sixteen operations take the new MEMBERSHIP_VIEW (reads) and
+      MEMBERSHIP_MANAGE (writes). A permission change cannot be additive.'
+    approved-by: 'Chinmay Parab (20 Oct 2026, the r8 blocker answers; recorded at the r8 merge under his "all of them are on you")'
+    tag: r8
+    producer-tickets: [SVC-PLATFORM-DRAFTED-16, SVC-PLATFORM-DRAFTED-2, SVC-PLATFORM-DRAFTED-3, SVC-PLATFORM-DRAFTED-4, SVC-PLATFORM-DRAFTED-5, SVC-PLATFORM-DRAFTED-6, SVC-PLATFORM-DRAFTED-7, SVC-PLATFORM-DRAFTED-8, SVC-PLATFORM-SUBSCRIPTION-21, SVC-PLATFORM-SUBSCRIPTION-7]
+    consumer-tickets: [AM-SETUP-TICKETING-GUEST-COMMERCE-P08, AM-SETUP-TICKETING-GUEST-COMMERCE-P08-REST, AM-SUBSCRIPTION-LICENSING-P08, AM-SUBSCRIPTION-LICENSING-P08-2, AM-TICKETING-P08-7, APP-SETUP-BO-291-REST, TEST-AM-SETUP-TICKETING-GUEST-COMMERCE-P08-REST, TEST-AM-SUBSCRIPTION-LICENSING-P08, TEST-AM-SUBSCRIPTION-LICENSING-P08-2]
+  - id: BC-396
+    contract: assets
+    operation: getMediaAsset
+    operations: [getMediaAsset]
+    change: "gained enum value(s)"
+    reason: 'R8 blocker ORDERS-MONEY-C29 (CHG-R8STO, CHG-R8SAT): a media asset is in use when a media_usage row names it,
+      and every module records its own use, so MediaUsage.surface gains the other modules'' surfaces (AI config source,
+      history import and layout draft, seating section, transport network import, venue map and map version, work-order
+      attachment). A value added to a response enum cannot be additive.'
+    approved-by: 'Chinmay Parab (20 Oct 2026, the r8 blocker answers; recorded at the r8 merge under his "all of them are on you")'
+    tag: r8
+    producer-tickets: [SVC-VENUEOPS-ASSET-1]
+    consumer-tickets: [AM-DIGITAL-ASSETS-P13, AM-DIGITAL-ASSETS-P13-2, AM-DIGITAL-ASSETS-P13-3, TEST-AM-DIGITAL-ASSETS-P13]
+  - id: BC-397
+    contract: ai
+    operation: listAiConversations
+    operations: [listAiConversations, createAiConversation]
+    change: "gained enum value(s) ['poweredByRemoval']"
+    reason: 'R8 blocker APPROVALS-TENANCY-C17 (lead''s answer B, 20 October 2026; CHG-R8INT-005): a licence add-on names
+      the shared ModuleKey, which gains the add-on key poweredByRemoval (never a plan module; no screen requires it,
+      and nothing but a licence add-on carries it). Every response that returns a ModuleKey therefore gains the value.
+      A value added to a response enum cannot be additive; a client that does not know it treats it as no module.'
+    approved-by: 'Chinmay Parab (20 Oct 2026, the r8 blocker answers; recorded at the r8 merge under his "all of them are on you")'
+    tag: r8
+    producer-tickets: [SVC-AI-ASSIST-1]
+    consumer-tickets: [AM-AI-P01, AM-AI-P02, AM-AI-P05-BLOCK-A, AM-AI-P06, AM-AI-P08, AM-AI-P08-2, AM-MARKETING-CRM-P02, AM-WHITE-LABEL-P13, TEST-AM-WHITE-LABEL-P13]
+  - id: BC-398
+    contract: marketing-crm
+    operation: listDataProcessingPurpose
+    operations: [listDataProcessingPurpose, listConsentEvidenceWithdrawal, listPrivacyComplianceExceptions, listPrivacyEvidenceCompliance]
+    change: "gained enum value(s) ['poweredByRemoval']"
+    reason: 'R8 blocker APPROVALS-TENANCY-C17 (lead''s answer B, 20 October 2026; CHG-R8INT-005): a licence add-on names
+      the shared ModuleKey, which gains the add-on key poweredByRemoval (never a plan module; no screen requires it,
+      and nothing but a licence add-on carries it). Every response that returns a ModuleKey therefore gains the value.
+      A value added to a response enum cannot be additive; a client that does not know it treats it as no module.'
+    approved-by: 'Chinmay Parab (20 Oct 2026, the r8 blocker answers; recorded at the r8 merge under his "all of them are on you")'
+    tag: r8
+    producer-tickets: [AM-MARKETING-CRM-P08-2, AM-MARKETING-CRM-P13-2, AM-MARKETING-CRM-P13-3]
+    consumer-tickets: [AM-MARKETING-CRM-P08-2, AM-MARKETING-CRM-P13-2, AM-MARKETING-CRM-P13-3]
+  - id: BC-399
+    contract: public-api
+    operation: listApiLicences
+    operations: [listApiLicences, listApiScopes]
+    change: "gained enum value(s) ['poweredByRemoval']"
+    reason: 'R8 blocker APPROVALS-TENANCY-C17 (lead''s answer B, 20 October 2026; CHG-R8INT-005): a licence add-on names
+      the shared ModuleKey, which gains the add-on key poweredByRemoval (never a plan module; no screen requires it,
+      and nothing but a licence add-on carries it). Every response that returns a ModuleKey therefore gains the value.
+      A value added to a response enum cannot be additive; a client that does not know it treats it as no module.'
+    approved-by: 'Chinmay Parab (20 Oct 2026, the r8 blocker answers; recorded at the r8 merge under his "all of them are on you")'
+    tag: r8
+    producer-tickets: [SVC-PLATFORM-GENERAL-1, SVC-PLATFORM-PUBLICAPI-7]
+    consumer-tickets: [AM-PUBLIC-API-P08, AM-PUBLIC-API-P10, AM-PUBLIC-API-P14-BLOCK-A, AM-SETUP-PLATFORM-FOUNDATION-P14-REST, APP-SETUP-DEV-003, APP-SETUP-DEV-003-REST, APP-SETUP-DEV-008, APP-SETUP-DEV-008-REST, TEST-AM-PUBLIC-API-P14-BLOCK-A, TEST-AM-SETUP-PLATFORM-FOUNDATION-P14-REST]
+  - id: BC-400
+    contract: reporting
+    operation: getCommandCentre
+    operations: [getCommandCentre, createDashboard, getDashboard, updateDashboard]
+    change: "gained enum value(s) ['poweredByRemoval']"
+    reason: 'R8 blocker APPROVALS-TENANCY-C17 (lead''s answer B, 20 October 2026; CHG-R8INT-005): a licence add-on names
+      the shared ModuleKey, which gains the add-on key poweredByRemoval (never a plan module; no screen requires it,
+      and nothing but a licence add-on carries it). Every response that returns a ModuleKey therefore gains the value.
+      A value added to a response enum cannot be additive; a client that does not know it treats it as no module.'
+    approved-by: 'Chinmay Parab (20 Oct 2026, the r8 blocker answers; recorded at the r8 merge under his "all of them are on you")'
+    tag: r8
+    producer-tickets: [SVC-REPORTING-DASHBOARD-1, SVC-REPORTING-DASHBOARD-2, SVC-REPORTING-DASHBOARD-3]
+    consumer-tickets: [AM-REPORTING-P08, AM-REPORTING-P09, AM-REPORTING-P15, AM-REPORTING-P16, AM-REPORTING-P16-2, AM-REPORTING-P16-3, AM-REPORTING-P16-BLOCK-A, AM-SETUP-FINANCE-INSIGHTS-P16, AM-SETUP-FINANCE-INSIGHTS-P16-REST, AM-SETUP-TICKETING-GUEST-COMMERCE-P08-REST, APP-SETUP-ANL-023, APP-SETUP-ANL-023-REST, APP-SETUP-BO-010, APP-SETUP-BO-010-REST, TEST-AM-REPORTING-P16-BLOCK-A, TEST-AM-SETUP-FINANCE-INSIGHTS-P16]
+  - id: BC-401
+    contract: subscription
+    operation: createPlan
+    operations: [createPlan, getPlan, createPlanVersion]
+    change: "gained enum value(s) ['poweredByRemoval']"
+    reason: 'R8 blocker APPROVALS-TENANCY-C17 (lead''s answer B, 20 October 2026; CHG-R8INT-005): a licence add-on names
+      the shared ModuleKey, which gains the add-on key poweredByRemoval (never a plan module; no screen requires it,
+      and nothing but a licence add-on carries it). Every response that returns a ModuleKey therefore gains the value.
+      A value added to a response enum cannot be additive; a client that does not know it treats it as no module.'
+    approved-by: 'Chinmay Parab (20 Oct 2026, the r8 blocker answers; recorded at the r8 merge under his "all of them are on you")'
+    tag: r8
+    producer-tickets: [KERNEL-TENANT-LIMITS, SVC-PLATFORM-PLAN-1, SVC-PLATFORM-PLAN-2]
+    consumer-tickets: [AM-FOUNDATION-PLATFORM, AM-SETUP-PLATFORM-FOUNDATION-P09, AM-SETUP-PLATFORM-FOUNDATION-P09-REST, AM-SUBSCRIPTION-LICENSING-P09-3, AM-SUBSCRIPTION-LICENSING-P09-4, APP-SETUP-ADM-008, APP-SETUP-ADM-008-REST, TEST-AM-FOUNDATION-PLATFORM, TEST-AM-SETUP-PLATFORM-FOUNDATION-P09, TEST-AM-SETUP-PLATFORM-FOUNDATION-P09-REST]
+  - id: BC-402
+    contract: tenancy
+    operation: deployConfigurationProfile
+    operations: [deployConfigurationProfile]
+    change: "request `profileId` removed"
+    reason: 'r8 integration (CHG-R8INT-011; R8 blocker APPROVALS-TENANCY-C07 gave the operation its own request body,
+      CHG-R8SPN-017): the body kept the answer''s fields readOnly so an r1 client''s whole ProfileDeployment stayed
+      valid, profileId among them; it was ignored on input (the path names the profile) and its name uses a word the
+      glossary keeps for Role (check-glossary-terms G-BANNED-NAME). Removing a request field is labelled breaking; a
+      client that still sends it is not refused, since the body does not forbid other properties.'
+    approved-by: 'Chinmay Parab (20 Oct 2026, the r8 integration brief, item 10: fix the glossary finding; recorded under his "all of them are on you")'
+    tag: r8
+    producer-tickets: [VM-TENANCY-TENANCY-1]
+    consumer-tickets: [AM-TENANCY-VENUES-P08, AM-TENANCY-VENUES-P08-BLOCK-A]
+  - id: BC-403
+    contract: tenancy
+    operation: resolveTenantHost
+    operations: [resolveTenantHost, setTenantDomainMapping]
+    change: "gained enum value(s) ['staffApp']"
+    reason: 'R8 blocker FOUNDATION-AI-C26 option A (CHG-R8MIG-006): an installed staff app names its tenant by host, so
+      TenantDomain.channel gains staffApp and resolveTenantHost answers it. A value added to a response enum cannot be
+      additive.'
+    approved-by: 'Chinmay Parab, 20 October 2026 (decision sheet answers)'
+    tag: r8
+    producer-tickets: [SVC-TENANCY-TENANCY-4]
+    consumer-tickets: [AM-TENANCY-VENUES-P08-BLOCK-A]
+  - id: BC-404
+    contract: approvals
+    operation: listApprovalRequests
+    operations: [listApprovalRequests, createApprovalRequest, submitApprovalRequest, decideApprovalRequest, withdrawApprovalRequest, cancelApprovalRequest, reopenApprovalRequest, assignApprovalRequest, escalateApprovalRequest, resubmitApprovalRequest, recordExternalApprovalDecision, getApprovalRequest]
+    change: "decision` gained enum value(s) ['requestInformation', 'return']"
+    reason: 'R8 blocker APPROVALS-TENANCY-C02 (CHG-R8MIG-009): returning a request and asking for more information are
+      stored decisions, so a decision''s `decision` gains return and requestInformation. A value added to a response
+      enum cannot be additive.'
+    approved-by: 'Chinmay Parab, 20 October 2026 (decision sheet answers)'
+    tag: r8
+    producer-tickets: [SVC-TENANCY-REQUEST-1, SVC-TENANCY-REQUEST-2, SVC-TENANCY-REQUEST-3, VM-TENANCY-REQUEST-1]
+    consumer-tickets: [AM-ADMISSION-ACCESS-P08, AM-ADMISSION-ACCESS-P08-5, AM-APPROVALS-P04, AM-APPROVALS-P08, AM-APPROVALS-P08-4, AM-APPROVALS-P08-5, AM-APPROVALS-P08-BLOCK-A, AM-APPROVALS-P09, AM-FOOD-BEVERAGE-P08-BLOCK-A, AM-ORDERS-RESERVATIONS-P04, AM-PAYMENTS-P08, AM-PRICING-PROMOTIONS-P08-4, AM-TICKETING-P08-2, AM-TICKETING-P08-7, AM-WALLET-CASHLESS-P08-7, AM-WORKFORCE-P06, APP-SETUP-BO-045, APP-SETUP-BO-045-REST, TEST-AM-APPROVALS-P04, TEST-AM-APPROVALS-P08-BLOCK-A]
+  - id: BC-405
+    contract: approvals
+    operation: listApprovalRequests
+    operations: [listApprovalRequests, createApprovalRequest, submitApprovalRequest, decideApprovalRequest, withdrawApprovalRequest, cancelApprovalRequest, reopenApprovalRequest, assignApprovalRequest, escalateApprovalRequest, resubmitApprovalRequest, recordExternalApprovalDecision, getApprovalRequest]
+    change: "principalId` is no longer guaranteed"
+    reason: 'R8 blocker APPROVALS-TENANCY-C02 (CHG-R8MIG-009): an external approver''s decision is stored with the
+      approver''s external reference and name and no principal, so a decision''s principalId is null for it (exactly
+      one of the two is set). A response field that may now be absent cannot be additive.'
+    approved-by: 'Chinmay Parab, 20 October 2026 (decision sheet answers)'
+    tag: r8
+    producer-tickets: [SVC-TENANCY-REQUEST-1, SVC-TENANCY-REQUEST-2, SVC-TENANCY-REQUEST-3, VM-TENANCY-REQUEST-1]
+    consumer-tickets: [AM-ADMISSION-ACCESS-P08, AM-ADMISSION-ACCESS-P08-5, AM-APPROVALS-P04, AM-APPROVALS-P08, AM-APPROVALS-P08-4, AM-APPROVALS-P08-5, AM-APPROVALS-P08-BLOCK-A, AM-APPROVALS-P09, AM-FOOD-BEVERAGE-P08-BLOCK-A, AM-ORDERS-RESERVATIONS-P04, AM-PAYMENTS-P08, AM-PRICING-PROMOTIONS-P08-4, AM-TICKETING-P08-2, AM-TICKETING-P08-7, AM-WALLET-CASHLESS-P08-7, AM-WORKFORCE-P06, APP-SETUP-BO-045, APP-SETUP-BO-045-REST, TEST-AM-APPROVALS-P04, TEST-AM-APPROVALS-P08-BLOCK-A]
+  - id: BC-406
+    contract: catalogue
+    operation: getGroupPackageDefinition
+    operations: [getGroupPackageDefinition, setGroupPackageDefinition, listGroupPackages]
+    change: "gained enum value(s) ['community', 'corporate', 'tourOperator']"
+    reason: 'R8 blocker ORDERS-MONEY-C20 / CHG-SGU-024 (CHG-R8MIG-009): the approved group-booking screens draw the
+      corporate, tour-operator and community package types, so GroupPackageDefinition.kind gains them. A value added
+      to a response enum cannot be additive.'
+    approved-by: 'Chinmay Parab, 20 October 2026 (decision sheet answers)'
+    tag: r8
+    producer-tickets: [SVC-CATALOGUE-PRODUCT-1, SVC-CATALOGUE-PRODUCT-2, SVC-CATALOGUE-PRODUCT-3]
+    consumer-tickets: [AM-ORDERS-RESERVATIONS-P01, AM-ORDERS-RESERVATIONS-P02, AM-ORDERS-RESERVATIONS-P08-7, AM-SETUP-TICKETING-GUEST-COMMERCE-P08, AM-SETUP-TICKETING-GUEST-COMMERCE-P08-REST, AM-TICKETING-P01, AM-WHITE-LABEL-P01, APP-SETUP-BO-011, APP-SETUP-BO-011-REST]
+  - id: BC-407
+    contract: marketing-crm
+    operation: getGuestProfile
+    operations: [getGuestProfile, updateGuestProfile, mergeGuestProfiles, getGuestConsents, recordConsent, getConsentHistory, listConsentPurposes, listDataProcessingPurpose, setMinorGuardianAge, listCustomerPrivacyConsent, listConsentEvidenceWithdrawal, claimDeviceConsent]
+    change: "gained enum value(s) ['facePassEnrolment', 'storedPaymentCredential']"
+    reason: 'R8 blocker ORDERS-MONEY-C21 option A (CHG-R8MIG-022): a stored card and a Face Pass enrolment each have a
+      consent purpose of their own, so ConsentPurpose gains storedPaymentCredential and facePassEnrolment (twelve
+      operations return it). A value added to a response enum cannot be additive.'
+    approved-by: 'Chinmay Parab, 20 October 2026 (decision sheet answers)'
+    tag: r8
+    producer-tickets: [SVC-MARKETING-CONSENT-1, SVC-MARKETING-CONSENT-2, SVC-MARKETING-CONSENT-3, SVC-MARKETING-GUEST-4]
+    consumer-tickets: [AM-AI-P08, AM-IDENTITY-SECURITY-P01, AM-IDENTITY-SECURITY-P02, AM-MARKETING-CRM-P01, AM-MARKETING-CRM-P02, AM-MARKETING-CRM-P04, AM-MARKETING-CRM-P06, AM-MARKETING-CRM-P08, AM-MARKETING-CRM-P08-2, AM-MARKETING-CRM-P08-BLOCK-A, AM-MARKETING-CRM-P13, AM-MARKETING-CRM-P13-2, AM-SETUP-CUSTOMER-MARKETING-P08-REST, AM-WALLET-CASHLESS-P02, AM-WHITE-LABEL-P13, APP-SETUP-BO-799, APP-SETUP-BO-799-REST, TEST-AM-SETUP-CUSTOMER-MARKETING-P08-REST]

@@ -14,8 +14,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - rental.damage_assessment
   writes:
+  - cache:idempotency
   - rental.damage_assessment
 - operation: assignRentalEquipment
   verb: POST
@@ -26,8 +28,10 @@ operations:
   - staff
   offline: true
   reads:
+  - cache:idempotency
   - rental.equipment_assignment
   writes:
+  - cache:idempotency
   - rental.equipment_assignment
 - operation: checkOutRental
   verb: POST
@@ -38,9 +42,11 @@ operations:
   - staff
   offline: true
   reads:
+  - cache:idempotency
   - rental.booking
   - rental.participant
   writes:
+  - cache:idempotency
   - rental.booking
 - operation: createRentalAgreement
   verb: POST
@@ -51,9 +57,11 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - rental.agreement
   - rental.agreement_item
   writes:
+  - cache:idempotency
   - rental.agreement
   - rental.agreement_item
 - operation: createRentalBlackout
@@ -65,8 +73,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - rental.blackout
   writes:
+  - cache:idempotency
   - rental.blackout
 - operation: createRentalBooking
   verb: POST
@@ -78,6 +88,7 @@ operations:
   - guest
   offline: false
   reads:
+  - cache:idempotency
   - rental.booking
   - rental.participant
   - rental.quote
@@ -94,8 +105,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - maintenance.asset_category
   writes:
+  - cache:idempotency
   - maintenance.asset_category
 - operation: createRentalPricingProfile
   verb: POST
@@ -106,8 +119,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - rental.pricing_profile
   writes:
+  - cache:idempotency
   - rental.pricing_profile
 - operation: createRentalProduct
   verb: POST
@@ -118,8 +133,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - rental.product
   writes:
+  - cache:idempotency
   - rental.product
 - operation: explainRentalPrice
   verb: POST
@@ -148,6 +165,7 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - rental.booking
   - rental.participant
   - rental.quote
@@ -304,8 +322,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - rental.product
   writes:
+  - cache:idempotency
   - rental.product
 - operation: quoteRentalPrice
   verb: POST
@@ -336,8 +356,10 @@ operations:
   - staff
   offline: true
   reads:
+  - cache:idempotency
   - rental.inspection
   writes:
+  - cache:idempotency
   - rental.inspection
   - rental.inspection_item
 - operation: reportRentalIncident
@@ -349,8 +371,10 @@ operations:
   - staff
   offline: true
   reads:
+  - cache:idempotency
   - rental.incident
   writes:
+  - cache:idempotency
   - rental.incident
 - operation: requestRentalCommercialOverride
   verb: POST
@@ -361,8 +385,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - rental.override
   writes:
+  - cache:idempotency
   - rental.override
 - operation: returnRental
   verb: POST
@@ -373,8 +399,10 @@ operations:
   - staff
   offline: true
   reads:
+  - cache:idempotency
   - rental.settlement
   writes:
+  - cache:idempotency
   - rental.damage_assessment
   - rental.inspection
 - operation: setRentalAgreementRequirements
@@ -386,8 +414,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - rental.agreement_rules
   writes:
+  - cache:idempotency
   - rental.agreement_rules
 - operation: setRentalAvailabilityRules
   verb: PUT
@@ -398,8 +428,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - rental.availability_rules
   writes:
+  - cache:idempotency
   - rental.availability_rules
 - operation: setRentalDepositPolicy
   verb: PUT
@@ -410,8 +442,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - rental.deposit_policy
   writes:
+  - cache:idempotency
   - rental.deposit_policy
 - operation: setRentalDurationRules
   verb: PUT
@@ -422,8 +456,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - rental.duration_rules
   writes:
+  - cache:idempotency
   - rental.duration_rules
 - operation: setRentalFeePolicy
   verb: PUT
@@ -434,8 +470,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - rental.fee_policy
   writes:
+  - cache:idempotency
   - rental.fee_policy
 - operation: setRentalInventoryModel
   verb: PUT
@@ -446,8 +484,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - rental.inventory_model
   writes:
+  - cache:idempotency
   - rental.inventory_model
 - operation: setRentalOperationalRules
   verb: PUT
@@ -458,8 +498,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - rental.operational_rules
   writes:
+  - cache:idempotency
   - rental.operational_rules
 - operation: setRentalProductLocations
   verb: PUT
@@ -470,8 +512,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - rental.location_rule
   writes:
+  - cache:idempotency
   - rental.location_rule
 - operation: signRentalAgreement
   verb: POST
@@ -483,9 +527,11 @@ operations:
   - guest
   offline: false
   reads:
+  - cache:idempotency
   - rental.agreement_signature
   - rental.booking
   writes:
+  - cache:idempotency
   - rental.agreement_signature
 - operation: simulateRentalPricing
   verb: POST
@@ -515,9 +561,11 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - rental.booking
   - rental.participant
   writes:
+  - cache:idempotency
   - rental.booking
 - operation: updateRentalBooking
   verb: PATCH
@@ -528,9 +576,11 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - rental.booking
   - rental.participant
   writes:
+  - cache:idempotency
   - rental.booking
 - operation: updateRentalPricingProfile
   verb: PUT
@@ -541,8 +591,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - rental.pricing_profile
   writes:
+  - cache:idempotency
   - rental.pricing_profile
 - operation: updateRentalProduct
   verb: PUT
@@ -553,8 +605,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - rental.product
   writes:
+  - cache:idempotency
   - rental.product
 - operation: validateRentalProduct
   verb: POST

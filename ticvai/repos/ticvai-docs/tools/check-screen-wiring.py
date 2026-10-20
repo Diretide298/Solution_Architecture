@@ -34,6 +34,17 @@ three rules. `x-ticvai-outbox-replay: true` marks the outbox's own replay call (
 queues and never has to call disabled. S-OFFLINE-CLAIM, like S-OFFLINE-QUEUED, reads an offline state that also refuses ("Nothing here is
 offered offline ... a request queued and never sent is worse") as a refusal, not a promise.
 
+**What the client's prototype already shows** (20 October 2026, r8 integration, CHG-R8INT-003). A client-approved
+screen whose layout is the client's prototype (`wireframe.provenance: client-verified`, `prototype.match: exact`) is
+built from that view, and its visible YAML is fixed (check-approved-ui). A read it gains to fill what the view already
+shows -- GST-067's "Tickets you can act on" rows and "Rules" note, from the guest's own refund requests and listings and
+the venue's refund terms -- names that element in the binding: `shownBy: <the element's text in the prototype>`. Such
+a read counts as reached, and S-SHOWN-BY fails a `shownBy` whose text the prototype file does not hold (as a quoted
+string), or on a screen whose layout is not an exact, client-verified prototype view. **A partial match that names its
+view counts too** (CHG-R8INT-008): the guest web's Your orders, Transfer & resale and Reservations are partial matches
+whose rows the client approved, and the lead's ruling of 20 October 2026 is that no read a person sees is marked
+`background` to escape S-OP-UNREACHED.
+
 Read-only. Exit 1 on a finding not in `handoff/audit-baseline.json` (see tools/audit_guard.py).
 
     python3 tools/check-screen-wiring.py [--all] [--update-baseline]
@@ -46,10 +57,45 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import audit_guard as g  # noqa: E402
 from typed_props import DEVICE_GUEST_PLATFORMS  # noqa: E402
 
+ROOT = Path(__file__).resolve().parents[1]
+_PROTO_TEXT = {}
+
+
+def prototype_text(rel):
+    """The client prototype file's text, read once; empty when the file is absent (a gitignored design file)."""
+    if rel not in _PROTO_TEXT:
+        f = ROOT / rel
+        _PROTO_TEXT[rel] = f.read_text(encoding="utf-8", errors="replace") if f.is_file() else ""
+    return _PROTO_TEXT[rel]
+
+
+def shown_in_prototype(s, shown, text_of=None):
+    """None when `shown` is a quoted string of the screen's client-verified prototype file, else why not.
+
+    The prototype is the screen's view when it matches it exactly (`match: exact`), or when it matches in part and
+    the screen names the view it is drawn from (`match: partial` with a `prototype.view`; r8 integration,
+    CHG-R8INT-008): Your orders, Transfer & resale and Reservations on the guest web are partial matches whose rows
+    the client approved, and the reads that fill those rows name them."""
+    wf = s.get("wireframe") or {}
+    proto = wf.get("prototype") if isinstance(wf.get("prototype"), dict) else {}
+    view_named = proto.get("match") == "partial" and str(proto.get("view") or "").strip()
+    if wf.get("provenance") != "client-verified" or not (proto.get("match") == "exact" or view_named) \
+            or not proto.get("file"):
+        return "its layout is not an exact, client-verified prototype view, nor a partial one naming its view"
+    text = (text_of or prototype_text)(proto["file"])
+    if not text:
+        return "its prototype file %s is not present to check against" % proto["file"]
+    if not any(q + shown + q in text for q in ("'", '"')):
+        return "%s does not hold %r as a quoted string" % (proto["file"], shown)
+    return None
+
+
 RULES = {
     "S-STATE-BOILERPLATE": "empty-state text promises a create action, filter or permission the screen lacks (R250)",
     "S-DUP-REGION": "a region name used twice on one screen (R253)",
     "S-OP-UNREACHED": "a declared operation no component, overlay or transition reaches (R273)",
+    "S-SHOWN-BY": "an api's shownBy names text the screen's client-verified prototype (exact, or partial naming its "
+                  "view) does not hold, or the screen's layout is no such prototype (CHG-R8INT-003, CHG-R8INT-008)",
     "S-ONLOAD-WRITE": "a write operation triggered onLoad (R268)",
     "S-BUTTON-FORM": "a button calls an operation with a required body and nothing collects it (R264)",
     "S-SCREEN-PERMISSION": "permissioned operations and a no-access state, but no screen permission (R255)",
@@ -73,6 +119,7 @@ RULES = {
     "S-MEDIA-LIBRARY": "a screen about the media a guest carries calls the digital-asset library (CF-114, CHG-WIR-025, CHG-R4-013)",
     "S-OFFLINE-REFUSED": "an offline app's screen refuses offline a write its contract marks offline-capable (4.4, CHG-SWP-004)",
     "S-OFFLINE-QUEUED": "a screen promises to queue a write that is not offline-capable, or a web app's screen queues (4.4, CHG-SWP-004)",
+    "S-INPUT-SOURCE": "a guest screen's action needs an id nothing on the screen supplies (CR-142, CHG-CRA-008)",
 }
 # **Two things are called media** (glossary; orders.yaml `getMediaEntitlements`): the QR, wristband or card a
 # guest carries, which orders and access read and write, and the images, video and documents of the asset
@@ -143,8 +190,44 @@ def required_body(op: dict) -> bool:
     return bool(rb.get("required", False)) or "$ref" in rb
 
 
+def self_test():
+    """shown_in_prototype on made-up screens (CHG-R8INT-008): exact and view-naming partial prototypes accept a
+    quoted string they hold; a partial without a view, a generated layout and an absent string are refused."""
+    files = {"p.html": "row('r3', '2 Jul', 'AED 675 \u00b7 refunded in full', 'Invoice')"}
+    text_of = files.get
+
+    def sc(match, view=None, prov="client-verified"):
+        p = {"file": "p.html", "match": match}
+        if view:
+            p["view"] = view
+        return {"wireframe": {"provenance": prov, "prototype": p}}
+    cases = [
+        ("exact, held", sc("exact"), "AED 675 \u00b7 refunded in full", True),
+        ("partial naming its view, held", sc("partial", "Account > Order history"), "AED 675 \u00b7 refunded in full", True),
+        ("partial without a view", sc("partial"), "AED 675 \u00b7 refunded in full", False),
+        ("partial naming its view, not held", sc("partial", "Account"), "AED 999", False),
+        ("generated layout", sc("exact", prov="generated"), "Invoice", False),
+        ("none", sc("none", "x"), "Invoice", False),
+    ]
+    bad = []
+    for name, s, shown, ok in cases:
+        why = shown_in_prototype(s, shown, text_of)
+        if (why is None) != ok:
+            bad.append(f"shown_in_prototype: {name}: expected {'accepted' if ok else 'refused'}, got {why!r}")
+    return bad
+
+
 def main() -> int:
     g.force_utf8()
+    tests = self_test()
+    for x in tests:
+        print(f"  SELF-TEST  {x}")
+    if tests:
+        print(f"FAIL {len(tests)} self-test(s)")
+        return 1
+    if "--self-test" in sys.argv:
+        print("PASS - the shownBy self-tests")
+        return 0
     guard = g.Guard("check-screen-wiring", RULES)
     ops = g.operations()
     path_index = set()
@@ -272,6 +355,13 @@ def main() -> int:
             if isinstance(t, dict) and t.get("operation"):
                 refs.add(t["operation"])
         for a in apis:
+            if a.get("shownBy"):
+                why = shown_in_prototype(s, str(a["shownBy"]))
+                if why:
+                    guard.add("S-SHOWN-BY", f"{sid}:{a['operationId']}",
+                              f"{sid}: {a['operationId']} shownBy {a['shownBy']!r}, but {why}")
+                    continue
+                refs.add(a["operationId"])
             if a["operationId"] not in refs and a.get("trigger") not in ("background", "onInterval"):
                 guard.add("S-OP-UNREACHED", f"{sid}:{a['operationId']}",
                           f"{sid}: declares {a['operationId']} ({a.get('trigger')}) and no component reaches it")
@@ -433,7 +523,86 @@ def main() -> int:
         if len(ids) > 1 and not all(division.get(i) for i in ids):
             guard.add("S-DUP-SCREEN", "+".join(sorted(ids)),
                       f"{plat}: {', '.join(sorted(ids))} declare the same {len(sig)} operations")
+    input_sources(guard, all_screens, ops, by_schema)
     return guard.finish()
+
+
+# **A guest action needs every id it sends from somewhere on the screen** (class 14 of the 18 October triage,
+# CHG-CRA-008). WEB-021's "Add a card" calls storePaymentToken, which requires providerId and consentPurposeId, and
+# nothing on the web screen supplied either: GST-071, its twin in the app, had been bound to getPublishedTenantConfig
+# and listConsentPurposes on 4 October (CHG-FXS-003) and the web screen was not (ADAM CR-142). A guest cannot type an
+# id, so an id-typed required input of an onAction operation needs a source: an entry parameter of that name, a field
+# of that name in what a single-record read on the screen returns, a read on the screen whose response is the thing
+# the id names (`consentPurposeId` <- `ConsentPurposeConfig`), or the guest's session.
+GUEST_SCREEN = re.compile(r"^(WEB|GST|KSK)-")
+SESSION_IDS = {"subjectId", "tenantId", "principalId", "venueId", "workstationId", "sessionId"}
+
+
+def input_sources(guard, all_screens, ops, by_schema) -> None:
+    def deref(node, stem, depth=0):
+        while isinstance(node, dict) and "$ref" in node and depth < 8:
+            m = re.match(r"^(?:\.\./)?(?:[\w-]+/)?([\w-]+)\.yaml#/components/schemas/(\w+)$", str(node["$ref"]))
+            if m:
+                stem, node = m.group(1), by_schema.get((m.group(1), m.group(2))) or {}
+            else:
+                node = by_schema.get((stem, g.ref_name(str(node["$ref"])))) or {}
+            depth += 1
+        return node, stem
+
+    def walk(node, stem, depth, fields, names):
+        if not isinstance(node, dict) or depth > 5:
+            return
+        if "$ref" in node:
+            names.add(g.ref_name(str(node["$ref"])).lower())
+            node, stem = deref(node, stem)
+        for k in ("allOf", "oneOf", "anyOf"):
+            for sub in node.get(k) or []:
+                walk(sub, stem, depth + 1, fields, names)
+        if isinstance(node.get("items"), dict):
+            walk(node["items"], stem, depth + 1, fields, names)
+        for p, ps in (node.get("properties") or {}).items():
+            fields.add(p)
+            walk(ps, stem, depth + 1, fields, names)
+
+    for plat, s in all_screens:
+        sid = s.get("id", "")
+        if not GUEST_SCREEN.match(sid):
+            continue
+        apis = [a for a in s.get("apis") or [] if isinstance(a, dict) and a.get("operationId") in ops]
+        have = set(SESSION_IDS) | {p.get("name") for p in ((s.get("entryState") or {}).get("params") or [])
+                                   if isinstance(p, dict)}
+        kinds: set = set()
+        for a in apis:
+            f = ops[a["operationId"]]
+            if f["method"] != "get" and a.get("trigger") != "onLoad":
+                continue
+            for code, r in (f["op"].get("responses") or {}).items():
+                if not str(code).startswith("2") or not isinstance(r, dict):
+                    continue
+                for media in (r.get("content") or {}).values():
+                    fields, names = set(), set()
+                    walk((media or {}).get("schema") or {}, f["contract"], 0, fields, names)
+                    kinds |= names
+                    if not a["operationId"].startswith("list"):   # a list's fields belong to whichever row is picked
+                        have |= fields
+        for a in apis:
+            if a.get("trigger") != "onAction":
+                continue
+            f = ops[a["operationId"]]
+            need = re.findall(r"\{(\w+)\}", f.get("path") or "")
+            rb = ((f["op"].get("requestBody") or {}).get("content") or {}).get("application/json") or {}
+            body, bst = deref(rb.get("schema") or {}, f["contract"])
+            req = set((body or {}).get("required") or [])
+            for b in (body or {}).get("allOf") or []:
+                req |= set((deref(b, bst)[0] or {}).get("required") or [])
+            need += [r for r in sorted(req) if r.endswith(("Id", "Code")) and r not in need]
+            for n in need:
+                thing = re.sub(r"(Id|Code)$", "", n).lower()
+                if n in have or (thing and any(thing in k for k in kinds)):
+                    continue
+                guard.add("S-INPUT-SOURCE", f"{sid}:{a['operationId']}:{n}",
+                          f"{sid} ({plat[:3]}): {a['operationId']} needs {n} and nothing on the screen supplies it "
+                          f"(an entry parameter, a read's field, or a read of what it names)")
 
 
 if __name__ == "__main__":

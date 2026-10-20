@@ -881,6 +881,13 @@
     "type": "string",
     "format": "uuid"
    },
+   "accessAreaId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "x-ticvai-references": "access.access_area",
+    "description": "**The zone this access point admits to** (R8 blocker FOUNDATION-AI-C12, CHG-R8MIG-004): an `access.access_area` row whose `entityType` is `zone` (named for the table it keys, as every key is). `getOfflinePackage` and `validateAccess` filter accreditation credentials and dynamic policies by it (their `zoneIds` / `allowedZoneIds` must contain it, compared as text); null means the point is venue-wide and no zone filter applies."
+   },
    "scopePath": {
     "type": "string"
    },

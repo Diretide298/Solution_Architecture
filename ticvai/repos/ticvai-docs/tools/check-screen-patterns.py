@@ -27,6 +27,9 @@ The rules live in `tools/screen_patterns.py`, shared with the generators and the
          Sprints 1-2 fail on any; a later sprint's count may only fall
          (NP_LATER_CEILING), each one defined before its sprint is judged
 
+    EF   an emptyNoResults text names a filter no operation the screen binds
+         takes (the 17 August template): the count may only fall (EF_CEILING) (CHG-R8GEN-010)
+
 **An exception is written here with its reason**, never skipped silently, and every exemption used
 is printed. P8 reads Block A from `handoff/service-docs/op-release.json` (what the tickets were cut
 from); when that file is absent it says so and the rule does not run.
@@ -62,6 +65,15 @@ EXEMPT = {
     ("P3", "POS-008", "REPORT_VIEW"): "the till's day view is the cashier's own or the terminal's "
         "figures (REPORT_VIEW_OWN / REPORT_VIEW_WORKSTATION); runReport and listReports still declare "
         "REPORT_VIEW_VENUE. Asked of the contract owner in the CHG-SPF-003 report",
+    # P3, r8 (20 October 2026): the contract moved and the screen's approved text has not. Each wording is
+    # parked for the client (lane-screens-pending-ui.json); remove the line when the approved text is applied.
+    ("P3", "WEB-013", "GUEST_VIEW"): ("the operations' permission changed in r8 and the no-access text is visible on a client-approved screen: the new wording waits for the client in audit lane-screens-pending-ui.json (GPS-C09: a guest holds no permission), and the check names it until it is applied (r8 integration, CHG-R8INT-017)"),
+    ("P3", "GST-010", "GUEST_VIEW"): ("the operations' permission changed in r8 and the no-access text is visible on a client-approved screen: the new wording waits for the client in audit lane-screens-pending-ui.json (GPS-C09: a guest holds no permission), and the check names it until it is applied (r8 integration, CHG-R8INT-017)"),
+    ("P3", "POS-003", "ORDER_CREATE"): ("the operations' permission changed in r8 and the no-access text is visible on a client-approved screen: the new wording waits for the client in audit lane-screens-pending-ui.json (GPS-C11: getAvailability asks PRODUCT_VIEW), and the check names it until it is applied (r8 integration, CHG-R8INT-017)"),
+    ("P3", "DEV-001", "DEVELOPER_VIEW"): ("the operations' permission changed in r8 and the no-access text is visible on a client-approved screen: the new wording waits for the client in audit lane-screens-pending-ui.json (DEV-001-followup: the reads are public), and the check names it until it is applied (r8 integration, CHG-R8INT-017)"),
+    ("P3", "BO-293", "PLATFORM_CELL_MANAGE"): ("the operations' permission changed in r8 and the no-access text is visible on a client-approved screen: the new wording waits for the client in audit lane-screens-pending-ui.json (GPS-C33: MEMBERSHIP_VIEW and MEMBERSHIP_MANAGE), and the check names it until it is applied (r8 integration, CHG-R8INT-017)"),
+    ("P3", "BO-293", "MEMBERSHIP_VIEW"): ("the operations' permission changed in r8 and the no-access text is visible on a client-approved screen: the new wording waits for the client in audit lane-screens-pending-ui.json (GPS-C33: MEMBERSHIP_VIEW and MEMBERSHIP_MANAGE), and the check names it until it is applied (r8 integration, CHG-R8INT-017)"),
+    ("P3", "BO-293", "MEMBERSHIP_MANAGE"): ("the operations' permission changed in r8 and the no-access text is visible on a client-approved screen: the new wording waits for the client in audit lane-screens-pending-ui.json (GPS-C33: MEMBERSHIP_VIEW and MEMBERSHIP_MANAGE), and the check names it until it is applied (r8 integration, CHG-R8INT-017)"),
 }
 
 # NP: Sprint 1-2 screens the package cannot define, handed to the plan to move out of Sprints 1-2
@@ -171,6 +183,9 @@ READ_OUTSIDE_A_CEILING = 574
 # nothing, 4 October 2026 (CHG-FXS-007). Each is defined before its sprint is judged; lower this number
 # when the count falls.
 NP_LATER_CEILING = 191
+# EF: screens whose emptyNoResults names filters their reads do not take, 20 October 2026 (r8 cause ORDERS-MONEY-C04,
+# CHG-R8GEN-010): 28, among them GST-014, GST-018, GST-019 and WEB-030 of the cause. Lower it when the count falls.
+EF_CEILING = 28
 
 BUTTONS = {"primaryButton", "secondaryButton", "destructiveButton", "iconButton"}
 
@@ -259,6 +274,8 @@ def run(only=None):
             found += sp.p8(pk, sid, s, block_a, {})
         if only in (None, "READ") and block_a is not None:
             found += sp.p_read(pk, sid, s)
+        if only in (None, "EF"):
+            found += sp.p_empty_filter(pk, sid, s)
         if only in (None, "NP") and sprints and sid in sprints:
             found += [(r, i, f"{d} (Sprint {sprints[sid]})") for r, i, d in sp.p_np(pk, sid, s)]
     return found, block_a
@@ -297,6 +314,17 @@ def main() -> int:
         if len(later) > NP_LATER_CEILING:
             found += [("NP", "-", f"{len(later)} NP findings in Sprints 3 and later, above the ceiling of "
                                   f"{NP_LATER_CEILING}: a screen planned later needs a person or binds nothing")]
+    ef = [f for f in found if f[0] == "EF"]
+    found = [f for f in found if f[0] != "EF"]
+    if ef:
+        print(f"  ratchet EF {len(ef)} screen(s) whose empty-search text names a filter their reads do not take "
+              f"(ceiling {EF_CEILING}; CHG-R8GEN-010); --list-ef shows them")
+        if "--list-ef" in args:
+            for _, sid, detail in ef:
+                print(f"    EF {sid:<9} {detail}")
+        if len(ef) > EF_CEILING:
+            found += [("EF", "-", f"{len(ef)} EF findings, above the ceiling of {EF_CEILING}: a screen's "
+                                  "emptyNoResults names a filter no operation it binds takes")]
     for rule, sid, detail in found:
         why = next((w for (r, s, phrase), w in EXEMPT.items()
                     if r == rule and s == sid and phrase in detail), None)

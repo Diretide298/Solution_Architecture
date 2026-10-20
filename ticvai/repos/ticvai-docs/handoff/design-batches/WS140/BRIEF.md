@@ -127,7 +127,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-784` | Communications Center | D | 0 | 20 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-785` | Template Library | A | 35 | 12 | 6 | 18 | 1 | 0 | — | notStarted (—) |
+| `BO-785` | Template Library | A | 35 | 14 | 6 | 18 | 1 | 0 | — | notStarted (—) |
 | `BO-786` | Newsletter Builder | D | 0 | 0 | 6 | 12 | 0 | 0 | — | notStarted (—) |
 | `BO-787` | Content Blocks & Product Feed | D | 0 | 0 | 6 | 12 | 0 | 6 | — | notStarted (—) |
 | `BO-788` | Subscriptions & Preferences | D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |

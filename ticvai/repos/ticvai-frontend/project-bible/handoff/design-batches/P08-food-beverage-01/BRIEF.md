@@ -106,7 +106,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-104` | Food & Beverage | A | 1 | 12 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `BO-134` | Kitchen & Preparation Stations | C | 15 | 16 | 6 | 1 | 1 | 6 | — | notStarted (generated) |
 | `BO-135` | Order Routing & KDS/Printer Rules | B–D | 7 | 7 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `BO-136` | F&B Global Settings & Controls | A | 85 | 5 | 6 | 17 | 1 | 0 | — | notStarted (generated) |
+| `BO-136` | F&B Global Settings & Controls | A | 91 | 5 | 6 | 17 | 1 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 

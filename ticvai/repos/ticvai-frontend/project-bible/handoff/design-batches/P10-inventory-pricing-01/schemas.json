@@ -331,6 +331,13 @@
     "format": "uuid",
     "description": "The client UUIDv7 from `CreateOrderRequest.id`."
    },
+   "orderAccessToken": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "**What lets the device that just checked out read the order it paid for** (decided 20 October 2026, Chinmay, R8 blocker cause IDENTITY-C52, option A; CHG-R8SPN-025). Returned only in `checkoutCart`'s answer, null everywhere else: a signed token bound to this order and to the cart's device, valid 24 hours, never stored. `getOrder` accepts it in `X-Order-Access-Token` in place of a session, so a guest who checked out with no account, or whose session ended, still sees the confirmation (WEB-013 keeps it in its navigation state). It reads this order only and grants nothing else."
+   },
    "orderNumber": {
     "x-ticvai-unique": "tenant",
     "type": "string",
@@ -813,6 +820,11 @@
  },
  "Payment": {
   "x-ticvai-persistence": "orders.payment",
+  "x-ticvai-index": [
+   [
+    "providerReference"
+   ]
+  ],
   "type": "object",
   "required": [
    "id",
@@ -1683,6 +1695,17 @@
    "id": {
     "type": "string",
     "format": "uuid"
+   },
+   "listPrice": {
+    "oneOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "**The list price on the caller's channel now**, resolved on read from the price lists (`listProductVariants`; R8 blocker cause GPS-C27, CHG-R8SPN-028). Not stored on the variant and ignored on input. Null where no price list prices it on that channel. The list price, not the total: promotions and bundles are applied at the basket."
    },
    "productId": {
     "type": "string",

@@ -194,18 +194,24 @@
   "requestBody": null,
   "responds": "Cart"
  },
- "getCouponCode": {
+ "getGuestCouponCode": {
   "method": "GET",
-  "path": "/coupon-codes/{code}",
+  "path": "/guest-coupon-codes/{code}",
   "contract": "promotions",
-  "summary": "Look up a code",
-  "permission": "PRICE_VIEW",
-  "offlineCapable": true,
+  "summary": "What a guest is told about a coupon code",
+  "permission": null,
+  "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": false
+   }
+  ],
   "requestBody": null,
-  "responds": "CouponCode"
+  "responds": "GuestCouponCode"
  },
  "getMyProfile": {
   "method": "GET",
@@ -234,6 +240,11 @@
     "name": null,
     "in": null,
     "required": null
+   },
+   {
+    "name": "X-Order-Access-Token",
+    "in": "header",
+    "required": false
    }
   ],
   "requestBody": null,
@@ -531,7 +542,7 @@
   "path": "/auth/guest/verify-email",
   "contract": "identity",
   "summary": "Send a verification link, or consume one",
-  "permission": "GUEST_VIEW",
+  "permission": null,
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",

@@ -292,7 +292,7 @@
     "WEB-001"
    ]
   },
-  "notes": "**P01 Board 4 drew *Help Centre* and *Accessibility Statement* and neither could load content.** `listFaqs` and `listContentPages` were app-only.\n\n**Rev 3 (decided 29 September).** Shows *What's new* (GAP-B2). One implementation with WEB-025, both ids kept (GAP-D3).",
+  "notes": "**P01 Board 4 drew *Help Centre* and *Accessibility Statement* and neither could load content.** `listFaqs` and `listContentPages` were app-only.\n\n**Rev 3 (decided 29 September).** Shows *What's new* (GAP-B2). One implementation with WEB-025, both ids kept (GAP-D3).\n\nBuild note (r8 second round, WHITE-C12): **WEB-045 is not a page of its own.** It is WEB-025's Help centre page reached at its own route (`/help-centre-and-accessibility`, the header's *Policies and accessibility* and the footer's *Accessibility*), opened scrolled to its policies and accessibility pages; it is built once: this screen's component is a thin route that renders WEB-025's page, and this id stays for its route and its tickets. The case actions (Ask for help, Reply) and their reads stay WEB-025's; the offline state's *raising a case is disabled* is about that shared page. **No results** is the page's search box (*Search help articles* in the prototype): it filters the FAQs, help pages and policies already loaded, by title, on the device; no operation takes a query, and nothing is read again.",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listFaqs` reads a population and nothing reads one of them; the detail is the row until a `get` exists",

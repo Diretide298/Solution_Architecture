@@ -188,9 +188,9 @@ screens:
         link or optional), and WEB-019 opens on its own'
     - to: WEB-021
       trigger: Wallet & Gift Cards
-      provenance: 'derived — WEB-021 declares entryState.params cardCode, walletId and WEB-001 holds none
-        of them. The edge carries nothing: cardCode, walletId only pre-select (deep link or optional),
-        and WEB-021 opens on its own'
+      provenance: 'derived — WEB-021 declares entryState.params cardCode, cardKind, walletId and WEB-001
+        holds none of them. The edge carries nothing: cardCode, cardKind, walletId only pre-select (deep
+        link or optional), and WEB-021 opens on its own'
     - to: WEB-022
       trigger: Membership Plans
       carries:
@@ -848,28 +848,43 @@ screens:
       provenance: flow F01 step 2→3
       carries:
       - productId
+      operation: getPublishedBookingFlow
+      precondition: 'the product''s published flow (`getPublishedBookingFlow` `flowTypeKey`) is none of
+        the four below, or nothing resolves (404): the ticket counters open as the side panel'
     - to: WEB-006
       trigger: 'Book (a dated product: date first, then time, then tickets)'
       carries:
       - productId
       provenance: 'decided 29 September, rev 3 REV3-2: the dated flow runs date → time → ticket; flow
         F01 step 2→3'
+      operation: getPublishedBookingFlow
+      precondition: '`flowTypeKey` is `datedDayPass`, `timedEntry` or `seatedDateTimeSeatMap`, or it is
+        `seatedFixedPerformance` and the event has more than one on-sale performance (`listPerformances`)'
     - to: WEB-007
       trigger: Book (a fixture with one on-sale performance opens straight on the seat map)
       carries:
       - performanceId
+      - productId
       provenance: 'decided 29 September, rev 3 23SEP-16 and REV3-4: WEB-006 is skipped when the event
         has exactly one on-sale performance'
+      operation: getPublishedBookingFlow
+      precondition: '`flowTypeKey` is `seatedFixedPerformance` and `listPerformances` returns exactly
+        one on-sale performance, whose id the edge carries'
     - to: WEB-047
       trigger: Book (a cabana, lounger or other spot placed on the venue map)
       carries:
       - productId
       provenance: decided 29 September, rev 3 REV3-15 and GAP-C2
+      operation: getPublishedBookingFlow
+      precondition: '`flowTypeKey` is `cabanaMap` (placed on a map is the flow type the venue chose on
+        CMS-103; the product needs no field of its own)'
     - to: WEB-048
       trigger: Book (a space sold by the hour, e.g. a meeting room)
       carries:
       - productId
       provenance: decided 29 September, rev 3 REV3-13
+      operation: getPublishedBookingFlow
+      precondition: '`flowTypeKey` is `meetingRoomHourly`'
   notes: '**Renamed 31 August** from *Event / Attraction Detail*. **A guest surface is one product with
     two renderings** — a screen named differently on web and app is two screens to a developer and one
     journey to a guest. **Cross-surface parity, 31 August**: added getAvailability, getWaitTimes. **A
@@ -1060,12 +1075,22 @@ screens:
     contract: queue
     purpose: Wait times across a venue
     trigger: onLoad
+  - operationId: getPublishedBookingFlow
+    contract: white-label
+    purpose: 'Which screen Book opens (r8, GPS-C06): the product''s published flow (its own, then its
+      category''s, then the venue default for its kind), read with `productId`; its `flowTypeKey` chooses
+      among the Book transitions (each names its condition). Public, so it runs before sign-in.'
+    trigger: onLoad
+    provenance: r8 second round, GPS-C06 (ticket 28685)
   entryState:
     params:
     - name: eventId
       from: WEB-002
     - name: productId
       from: WEB-001
+    - name: venueId
+      from: session
+      notes: 'r8 (GPS-C06): the venue of the site the guest is on, for `getPublishedBookingFlow`.'
     coldEntry: Resolves from the session; a cold arrival is the ordinary case.
     preloaded:
     - Performance.id
@@ -1126,13 +1151,15 @@ screens:
       trigger: Interactive Seat Selection
       carries:
       - eventId
-      provenance: derived — WEB-007 declares entryState.params eventId, holdId, performanceId and WEB-005
-        holds eventId, so an edge into it carries them
+      - productId
+      provenance: derived — WEB-007 declares entryState.params eventId, holdId, performanceId, productId
+        and WEB-005 holds eventId, productId, so an edge into it carries them
     - to: WEB-008
       trigger: Add-ons & Upsell
-      provenance: 'derived — WEB-008 declares entryState.params bundleId and WEB-005 holds none of them.
-        The edge carries nothing: bundleId only pre-selects (deep link or optional), and WEB-008 opens
-        on its own'
+      carries:
+      - bundleId
+      provenance: derived — WEB-008 declares entryState.params bundleId and WEB-005 holds bundleId, so
+        an edge into it carries them
     - to: WEB-010
       trigger: Shopping Cart
       carries:
@@ -1436,9 +1463,10 @@ screens:
       - performanceId
     - to: WEB-008
       trigger: Add-ons & Upsell
-      provenance: 'derived — WEB-008 declares entryState.params bundleId and WEB-006 holds none of them.
-        The edge carries nothing: bundleId only pre-selects (deep link or optional), and WEB-008 opens
-        on its own'
+      carries:
+      - bundleId
+      provenance: derived — WEB-008 declares entryState.params bundleId and WEB-006 holds bundleId, so
+        an edge into it carries them
     - to: WEB-010
       trigger: Reviews the cart and may enter a promotion code
       provenance: flow F01 step 4→5
@@ -1461,6 +1489,7 @@ screens:
       carries:
       - eventId
       - performanceId
+      - productId
   notes: 'Availability is read live and never cached beyond a few seconds. A guest selecting a session
     that filled while they were reading is a worse outcome than a slightly slower screen. **Wired 24 August
     from review**: acquireInventoryHold. **The operations existed and this screen could not call them**
@@ -1676,6 +1705,22 @@ screens:
     purpose: 'The published booking flow for this product: which steps it has and in what order (W12)'
     trigger: onLoad
     provenance: decided 29 September 2026, W12
+  - operationId: getProduct
+    contract: catalogue
+    purpose: 'Resolves the event from the product (r8, GPS-C05): WEB-004 opens this screen with `productId`
+      only, and `Product.eventId` is the event `listPerformances` and `getAvailability` need. Not called
+      when the edge carried `eventId`. No component of its own: what it finds drives the date and time
+      pickers.'
+    trigger: background
+    provenance: r8 second round, GPS-C05 (ticket 28152)
+  - operationId: createCart
+    contract: orders
+    purpose: 'Started by the runtime the first time a line is added, before the first addCartLine, against
+      the guest or the anonymous cart token (2.1.31); never a button or a form (GFIX-3). With the guest
+      session the device already holds: signed in, or the anonymous cart session a visitor gets with the
+      first line (ADR-0045; r8, GPS-C23).'
+    trigger: background
+    provenance: r8 second round, GPS-C23 (the core lane's request)
   wireframe:
     status: review
     provenance: client-verified
@@ -1700,10 +1745,18 @@ screens:
     params:
     - name: performanceId
       from: navigation
+      optional: true
+      notes: 'r8 (GPS-C05): picked on this screen; an edge that holds one opens on that time.'
     - name: cartId
       from: navigation
+    - name: productId
+      from: WEB-004
+      notes: 'r8 (GPS-C05): what WEB-004''s Book carries; `getPublishedBookingFlow` and `checkBookingEligibility`
+        take it, and `getProduct` turns it into the event.'
     - name: eventId
       from: WEB-004
+      optional: true
+      notes: 'r8 (GPS-C05): read from `Product.eventId` (`getProduct`) when the edge carries only `productId`.'
     - name: venueId
       from: session
     - name: entryId
@@ -1766,6 +1819,7 @@ screens:
     - WEB-006
     - WEB-004
     - WEB-049
+    - WEB-005
     exitTo:
     - WEB-001
     - WEB-005
@@ -1775,9 +1829,10 @@ screens:
     transitions:
     - to: WEB-005
       trigger: Ticket Type Selection
-      provenance: 'derived — WEB-005 declares entryState.params cartId, productId and WEB-007 holds none
-        of them. The edge carries nothing: cartId only pre-selects (deep link or optional); WEB-005 finds
-        productId (listProducts) itself, and WEB-005 opens on its own'
+      carries:
+      - productId
+      provenance: derived — WEB-005 declares entryState.params cartId, productId and WEB-007 holds productId,
+        so an edge into it carries them
     - to: WEB-008
       trigger: Add-ons & Upsell
       provenance: 'derived — WEB-008 declares entryState.params bundleId and WEB-007 holds none of them.
@@ -1788,8 +1843,9 @@ screens:
       carries:
       - eventId
       - performanceId
-      provenance: derived — WEB-006 declares entryState.params cartId, entryId, eventId, performanceId
-        and WEB-007 holds eventId, performanceId, so an edge into it carries them
+      - productId
+      provenance: derived — WEB-006 declares entryState.params cartId, entryId, eventId, performanceId,
+        productId and WEB-007 holds eventId, performanceId, productId, so an edge into it carries them
     - to: WEB-010
       trigger: Reviews the cart
       provenance: flow F02 step 2→3
@@ -1829,7 +1885,14 @@ screens:
 
 
     **29 September (W2).** Sections first, zoom into a section, scroll or pinch out (or *Whole map*) back
-    to the full map; held seats are kept.'
+    to the full map; held seats are kept.
+
+
+    Build note (r8 second round, GPS-C38, from the core lane): a standing zone is sold by quantity: the
+    zone and what is left come with `getSeatAvailability` (`zones`), the hold is `createSeatHold` with
+    `zoneId` and `quantity`, and a 409 `zone-unavailable` shows the zone''s state as unavailable with
+    what is left, keeping the party together where the venue asks it (`keepTogether`). The cart line names
+    its zone hold through `inventoryHoldId`.'
   density: compact
   boardFrames:
   - Seat Board 3.dc.html#seat-3b
@@ -1957,12 +2020,28 @@ screens:
     purpose: 'The published booking flow for this product: which steps it has and in what order (W12)'
     trigger: onLoad
     provenance: decided 29 September 2026, W12
+  - operationId: getPerformance
+    contract: catalogue
+    purpose: 'Resolves a deep-linked performance (r8, GPS-C05): its `eventId` drives `listPerformances`
+      (time bar, fixture strip) and its `startsAt` and `status` the cold entry (a performance that has
+      happened offers the next one of the same event). No component of its own.'
+    trigger: background
+    provenance: r8 second round, GPS-C05 (ticket 28197)
   entryState:
     params:
     - name: performanceId
       from: deepLink
     - name: eventId
       from: WEB-006
+      optional: true
+      notes: 'r8 (GPS-C05): read from `Performance.eventId` (`getPerformance`) when a deep link or the
+        WEB-004 edge carries only `performanceId`.'
+    - name: productId
+      from: WEB-004
+      optional: true
+      notes: 'r8 (GPS-C05): carried by the WEB-004 edge and the deep link, for `getPublishedBookingFlow`.
+        When it is absent the screen asks `getPublishedBookingFlow` by `flowTypeKey`: `seatedFixedPerformance`,
+        or `seatedDateTimeSeatMap` when the venue''s `seatEventDateMode` puts the date over the map.'
     - name: holdId
       from: navigation
       optional: true
@@ -1997,8 +2076,9 @@ screens:
   - id: formRecommendSeats
     component: modal
     trigger: Recommend seats
-    body: '**How many seats, and best available or together.** The party size is the tickets already chosen;
-      the guest only picks the preference, then `recommendSeats` places them.'
+    body: '**How many seats, and best available or together.** The guest sets the party size (a How many
+      seats stepper, at most `maxSeatsPerGuestOrder`) and picks the preference, then `recommendSeats`
+      places them. Tickets are chosen after seats, so there are none to count yet.'
     bindsTo: SeatRecommendationRequest
     confirm:
       label: Recommend seats
@@ -2063,17 +2143,16 @@ screens:
       carries:
       - cartId
       - performanceId
-      provenance: derived — WEB-006 declares entryState.params cartId, entryId, eventId, performanceId
-        and WEB-008 holds cartId, performanceId, so an edge into it carries them
+      provenance: derived — WEB-006 declares entryState.params cartId, entryId, eventId, performanceId,
+        productId and WEB-008 holds cartId, performanceId, so an edge into it carries them
     - to: WEB-010
       trigger: Shopping Cart
       carries:
       - cartId
-      - code
       - lineId
       - performanceId
       provenance: derived — WEB-010 declares entryState.params cartId, code, holdId, lineId, performanceId
-        and WEB-008 holds cartId, code, lineId, performanceId, so an edge into it carries them
+        and WEB-008 holds cartId, lineId, performanceId, so an edge into it carries them
     - to: WEB-016
       trigger: Continue — sign in or use a guest code (when sign-in is asked after add-ons)
       carries:
@@ -2142,7 +2221,7 @@ screens:
         - Bundle.savingsAmount
         - Bundle.savingsPercentage
         - Bundle.hasBeenSold
-        operation: getBundle
+        operation: getGuestBundle
         provenance: contract promotions.yaml GET /bundles/{bundleId}
         notes: A bundle the recommendation slot names (`kind` bundle), opened from its card; signed catalogue
           snapshots (`listCatalogueBundles`) are the tills', not the guest's (R269).
@@ -2182,9 +2261,9 @@ screens:
     contract: orders
     purpose: Add a suggested add-on or the offered bundle to the cart
     trigger: onAction
-  - operationId: getBundle
+  - operationId: getGuestBundle
     contract: promotions
-    purpose: A bundle offered as an upsell
+    purpose: A bundle offered as an upsell, in the guest shape (r8, ORDERS-MONEY-C32, CHG-R8INT-009)
     trigger: onAction
   - operationId: decideRecommendations
     contract: ai
@@ -2285,8 +2364,8 @@ screens:
       trigger: Date & Performance Selection
       carries:
       - performanceId
-      provenance: derived — WEB-006 declares entryState.params cartId, entryId, eventId, performanceId
-        and WEB-009 holds performanceId, so an edge into it carries them
+      provenance: derived — WEB-006 declares entryState.params cartId, entryId, eventId, performanceId,
+        productId and WEB-009 holds performanceId, so an edge into it carries them
   notes: 'Withdrawn products stay in the list marked unavailable. A guest who saved something and finds
     it silently gone assumes the feature is broken. Purpose derived from the screen name and its operations
     on 17 August, not from a requirement. Wishlist. **Device operations removed** — Sanket flagged that
@@ -2452,8 +2531,8 @@ screens:
       trigger: Login / Register
       carries:
       - subjectId
-      provenance: derived — WEB-016 declares entryState.params challengeId, subjectId and WEB-010 holds
-        subjectId, so an edge into it carries them
+      provenance: derived — WEB-016 declares entryState.params challengeId, returnParams, returnTo, subjectId
+        and WEB-010 holds subjectId, so an edge into it carries them
     - to: WEB-012
       trigger: 'Guest code proved or signed in: straight to payment (details skipped)'
       provenance: decided 29 September 2026, W1
@@ -2512,7 +2591,7 @@ screens:
         - CouponCode.validFrom
         - CouponCode.validTo
         - CouponCode.redeemedAt
-        operation: getCouponCode
+        operation: getGuestCouponCode
         provenance: contract promotions.yaml GET /coupon-codes/{code}
       - kind: textField
         label: Promo code
@@ -2649,11 +2728,11 @@ screens:
     contract: promotions
     purpose: Evaluate promotions against a cart
     trigger: onAction
-  - operationId: getCouponCode
+  - operationId: getGuestCouponCode
     contract: promotions
-    purpose: 'Look up a code With the guest session the device already holds: signed in, or the anonymous
-      cart session a visitor gets with the first line (ADR-0045) (decided 2 October 2026 by Chinmay, fix
-      before Block A starts (GFIX-6)).'
+    purpose: 'In the guest shape (r8, ORDERS-MONEY-C32, CHG-R8INT-009). Look up a code With the guest
+      session the device already holds: signed in, or the anonymous cart session a visitor gets with the
+      first line (ADR-0045) (decided 2 October 2026 by Chinmay, fix before Block A starts (GFIX-6)).'
     trigger: onLoad
   - operationId: createCart
     contract: orders
@@ -3111,7 +3190,19 @@ screens:
 
     **createOrder left 4 October 2026: the order is made from the cart by checkoutCart (the cart''s lines,
     holder names and opt-ins), then paid with createPayment; F01 step 7 and F02 step 5 say the same**
-    (CHG-FXS-003)'
+    (CHG-FXS-003)
+
+
+    Build note (r8 second round, GPS-C09): **build the no-access state as GFIX-4 says, not as the state
+    text above reads.** A guest holds no permission, so the state never names one (the text above still
+    names staff permissions); signed out, the guest is offered sign-in and brought back here; a record
+    that is not theirs says so without saying whose. The corrected wording waits for the client''s approval
+    of the visible text (pending entry GPS-C09).
+
+
+    Build note (r8 second round, IDENTITY-C28, from the core lane): the no-access state is the 404 of
+    the guest''s own order lookup (an order that is not theirs answers as one that does not exist); the
+    visible text is unchanged.'
   openQuestions:
   - Sandbox credentials for Stripe and Network International are outstanding. The recovery paths cannot
     be tested without them.
@@ -3345,7 +3436,21 @@ screens:
     **Create an account collects the email and the code its two calls send** (CHG-FXS-003)
 
 
-    **The code is collected by the verify form (formVerifyGuestEmail)** (CHG-FXS-003)'
+    **The code is collected by the verify form (formVerifyGuestEmail)** (CHG-FXS-003)
+
+
+    Build note (r8 second round, GPS-C09): **build the no-access state as GFIX-4 says, not as the state
+    text above reads.** A guest holds no permission, so the state never names one (the text above still
+    names staff permissions); signed out, the guest is offered sign-in and brought back here; a record
+    that is not theirs says so without saying whose. The corrected wording waits for the client''s approval
+    of the visible text (pending entry GPS-C09).
+
+
+    Build note (r8 second round, IDENTITY-C28, C29, C52, from the core lane): the no-access state is the
+    404 of the guest''s own order lookup; Add to wallet sends `reprintOrder` with delivery `wallet`; the
+    order access token from checkout is kept in navigation state and sent as `X-Order-Access-Token` by
+    a guest with no account. The drawn edge to WEB-014 carries nothing and should go; removing it changes
+    approved navigation and waits for the client (pending entry IDENTITY-C52).'
   density: compact
   pattern: statusTracker
   patternReason: '`getOrder` reads one record and nothing reads a population — the screen is about that
@@ -3378,6 +3483,10 @@ screens:
         provenance: carried from the previous definition
       - kind: secondaryButton
         label: Add to wallet
+        operation: reprintOrder
+        notes: 'r8 (IDENTITY-C29): sends `reprintOrder` with delivery `wallet`, which returns the phone
+          wallet passes of the order''s tickets; the guest who has no account sends the `X-Order-Access-Token`
+          kept in navigation state from checkout (IDENTITY-C52).'
         provenance: carried from the previous definition
       - kind: secondaryButton
         label: Send me a code
@@ -4148,6 +4257,16 @@ screens:
       from: navigation
     - name: subjectId
       from: navigation
+    - name: returnTo
+      from: navigation
+      optional: true
+      notes: 'r8 (WHITE-C13, screens/_patterns.yaml rule guestSignInReturn): the screen that sent a signed-out
+        guest here from its no-access state; after sign-in this screen opens it again. Ignored unless
+        it is a screen of this app.'
+    - name: returnParams
+      from: navigation
+      optional: true
+      notes: 'r8 (WHITE-C13): the entry parameters `returnTo` was opened with, handed back to it unchanged.'
     coldEntry: '**Needs nothing.** A guest arriving cold signs in and goes to My Account; one sent from
       the cart carries `cartId` and goes back to it. The SSO deep-link parameter (`providerId`) went with
       the operations that used it (audit R167); a second-factor challenge is created in place, never arrives
@@ -4195,8 +4314,8 @@ screens:
       carries:
       - challengeId
       - subjectId
-      provenance: derived — WEB-016 declares entryState.params challengeId, subjectId and WEB-017 holds
-        challengeId, subjectId, so an edge into it carries them
+      provenance: derived — WEB-016 declares entryState.params challengeId, returnParams, returnTo, subjectId
+        and WEB-017 holds challengeId, subjectId, so an edge into it carries them
     - to: WEB-018
       trigger: My Tickets
       carries:
@@ -4219,7 +4338,14 @@ screens:
     **The loyalty tile''s programmeId comes from listLoyaltyProgrammes (4 October 2026)** (CHG-FXS-003)
 
 
-    **The loyalty programme is picked from listLoyaltyProgrammes when there are several** (CHG-FXS-003)'
+    **The loyalty programme is picked from listLoyaltyProgrammes when there are several** (CHG-FXS-003)
+
+
+    Build note (r8 second round, GPS-C09): **build the no-access state as GFIX-4 says, not as the state
+    text above reads.** A guest holds no permission, so the state never names one (the text above still
+    names staff permissions); signed out, the guest is offered sign-in and brought back here; a record
+    that is not theirs says so without saying whose. The corrected wording waits for the client''s approval
+    of the visible text (pending entry GPS-C09).'
   density: compact
   boardFrames:
   - Dashboards Board.dc.html#web-017
@@ -4421,8 +4547,8 @@ screens:
       trigger: Login / Register
       carries:
       - subjectId
-      provenance: derived — WEB-016 declares entryState.params challengeId, subjectId and WEB-018 holds
-        subjectId, so an edge into it carries them
+      provenance: derived — WEB-016 declares entryState.params challengeId, returnParams, returnTo, subjectId
+        and WEB-018 holds subjectId, so an edge into it carries them
     - to: WEB-017
       trigger: My Account Dashboard
       provenance: 'derived — WEB-017 declares entryState.params token and WEB-018 holds none of them.
@@ -4716,8 +4842,8 @@ screens:
       trigger: Login / Register
       carries:
       - subjectId
-      provenance: derived — WEB-016 declares entryState.params challengeId, subjectId and WEB-019 holds
-        subjectId, so an edge into it carries them
+      provenance: derived — WEB-016 declares entryState.params challengeId, returnParams, returnTo, subjectId
+        and WEB-019 holds subjectId, so an edge into it carries them
     - to: WEB-017
       trigger: My Account Dashboard
       provenance: 'derived — WEB-017 declares entryState.params token and WEB-019 holds none of them.
@@ -4845,6 +4971,16 @@ screens:
       Anything that spends money, holds capacity or changes the account waits for the connection, and
       its button says so rather than failing.'
   apis:
+  - operationId: listOwnRefundRequests
+    contract: orders
+    purpose: 'The guest''s own refund requests and their status, shown on the rows of Your orders (the
+      prototype''s "refunded in full" and the request a guest has open on an order), matched by order;
+      no component of its own, since the approved screen draws none: the prototype''s Order history row
+      shows it (shownBy, r8 integration, CHG-R8INT-008). Read once when the screen opens and after Ask
+      for a refund.'
+    trigger: onLoad
+    shownBy: AED 675 · refunded in full
+    provenance: r8 walk, 20 October 2026 (ORDERS-MONEY-C26, CHG-R8SPN-012)
   - operationId: listMyOrders
     contract: orders
     purpose: The orders this guest placed
@@ -4983,8 +5119,8 @@ screens:
       trigger: Login / Register
       carries:
       - subjectId
-      provenance: derived — WEB-016 declares entryState.params challengeId, subjectId and WEB-020 holds
-        subjectId, so an edge into it carries them
+      provenance: derived — WEB-016 declares entryState.params challengeId, returnParams, returnTo, subjectId
+        and WEB-020 holds subjectId, so an edge into it carries them
     - to: WEB-017
       trigger: My Account Dashboard
       provenance: 'derived — WEB-017 declares entryState.params token and WEB-020 holds none of them.
@@ -5371,12 +5507,19 @@ screens:
     trigger: onLoad
   - operationId: getGiftCard
     contract: wallet
-    purpose: Check a gift card balance
-    trigger: onAction
+    purpose: 'The gift card a deep link names: called only when the screen is entered with `cardCode`
+      and `cardKind` giftCard (ADAM CR-143, 18 October 2026; CHG-CRA-008). Without such a link the panel
+      stays closed'
+    trigger: onLoad
+    provenance: ADAM CR-143, 18 October 2026 (CHG-CRA-008); was onAction with nothing on the screen naming
+      a card
   - operationId: getGameCard
     contract: games
-    purpose: Balance on a game card
-    trigger: onAction
+    purpose: 'The game card a deep link names: called only when the screen is entered with `cardCode`
+      and `cardKind` gameCard (ADAM CR-143; CHG-CRA-008). Without such a link the panel stays closed'
+    trigger: onLoad
+    provenance: ADAM CR-143, 18 October 2026 (CHG-CRA-008); was onAction with nothing on the screen naming
+      a card
   - operationId: listPaymentTokens
     contract: orders
     purpose: Saved cards on this account
@@ -5389,6 +5532,18 @@ screens:
     contract: wallet
     purpose: Move value between wallets
     trigger: onAction
+  - operationId: getPublishedTenantConfig
+    contract: white-label
+    purpose: 'The provider the web tokenises cards with and its hosted card form (`paymentTokenisation`):
+      storePaymentToken''s `providerId` (ADAM CR-142, 18 October 2026; CHG-CRA-008)'
+    trigger: background
+    provenance: ADAM CR-142, 18 October 2026 (CHG-CRA-008), as GST-071 (CHG-FXS-003); nothing shows
+  - operationId: listConsentPurposes
+    contract: marketing-crm
+    purpose: 'The stored-card consent purpose''s id: storePaymentToken''s `consentPurposeId` (ADAM CR-142;
+      CHG-CRA-008)'
+    trigger: background
+    provenance: ADAM CR-142, 18 October 2026 (CHG-CRA-008), as GST-071 (CHG-FXS-003); nothing shows
   entryState:
     params:
     - name: cardCode
@@ -5396,7 +5551,17 @@ screens:
       optional: true
       notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `getGiftCard`, `getGameCard`
         take the id from the record the user acts on, and an edge or link that holds one only pre-selects
-        it.'
+        it. **Carried with `cardKind`** (ADAM CR-143, 18 October 2026; CHG-CRA-008): the approved screen
+        has no input or list that yields a card code, so the gift card or game card panel opens only from
+        a deep link carrying both.'
+    - name: cardKind
+      from: deepLink
+      optional: true
+      notes: '`giftCard` or `gameCard` (ADAM CR-143; CHG-CRA-008): which panel `cardCode` opens, read
+        with `getGiftCard` or `getGameCard`, both limited to the guest''s own cards. Never shown. Without
+        it, or without `cardCode`, both panels stay closed and the empty state is as approved. How a guest
+        reaches these panels otherwise is the client''s decision (option 1, "Check a balance", put to
+        the client).'
     - name: subjectId
       from: session
     - name: walletId
@@ -5435,7 +5600,12 @@ screens:
     component: modal
     trigger: Add a card
     body: '**The gateway''s own card form**, hosted by the provider; it returns the token that `storePaymentToken`
-      saves with the guest''s consent. No token, provider or consent id is ever a field.'
+      saves with the guest''s consent. No token, provider or consent id is ever a field. **Where they
+      come from** (ADAM CR-142, 18 October 2026; CHG-CRA-008): `providerId` and the hosted form from `getPublishedTenantConfig`
+      (`paymentTokenisation`), `consentPurposeId` from `listConsentPurposes` (the stored-card purpose);
+      never a guessed provider or purpose. The guest gives the consent itself on WEB-024 (`recordConsent`),
+      already one of this screen''s approved links: Save card without it answers `409 consent-not-given`,
+      and the error says so and offers the link to WEB-024.'
     confirm:
       label: Save card
       operation: storePaymentToken
@@ -5503,9 +5673,9 @@ screens:
     transitions:
     - to: WEB-021
       trigger: Wallet & Gift Cards
-      provenance: 'derived — WEB-021 declares entryState.params cardCode, walletId and WEB-022 holds none
-        of them. The edge carries nothing: cardCode, walletId only pre-select (deep link or optional),
-        and WEB-021 opens on its own'
+      provenance: 'derived — WEB-021 declares entryState.params cardCode, cardKind, walletId and WEB-022
+        holds none of them. The edge carries nothing: cardCode, cardKind, walletId only pre-select (deep
+        link or optional), and WEB-021 opens on its own'
     - to: WEB-023
       trigger: Membership Management
       provenance: 'derived — WEB-023 declares entryState.params caseId, orderId, statementId and WEB-022
@@ -5658,9 +5828,9 @@ screens:
     transitions:
     - to: WEB-021
       trigger: Wallet & Gift Cards
-      provenance: 'derived — WEB-021 declares entryState.params cardCode, walletId and WEB-023 holds none
-        of them. The edge carries nothing: cardCode, walletId only pre-select (deep link or optional),
-        and WEB-021 opens on its own'
+      provenance: 'derived — WEB-021 declares entryState.params cardCode, cardKind, walletId and WEB-023
+        holds none of them. The edge carries nothing: cardCode, cardKind, walletId only pre-select (deep
+        link or optional), and WEB-021 opens on its own'
     - to: WEB-022
       trigger: Membership Plans
       carries:
@@ -5900,9 +6070,9 @@ screens:
     transitions:
     - to: WEB-021
       trigger: Wallet & Gift Cards
-      provenance: 'derived — WEB-021 declares entryState.params cardCode, walletId and WEB-024 holds none
-        of them. The edge carries nothing: cardCode, walletId only pre-select (deep link or optional),
-        and WEB-021 opens on its own'
+      provenance: 'derived — WEB-021 declares entryState.params cardCode, cardKind, walletId and WEB-024
+        holds none of them. The edge carries nothing: cardCode, cardKind, walletId only pre-select (deep
+        link or optional), and WEB-021 opens on its own'
     - to: WEB-022
       trigger: Membership Plans
       provenance: 'derived — WEB-022 declares entryState.params productId and WEB-024 holds none of them.
@@ -5932,7 +6102,14 @@ screens:
 
 
     **The Face Pass enrolmentId comes from the guest''s passes (listMyEntitlements, Entitlement.facePassEnrolmentId),
-    bound 4 October 2026** (CHG-FXS-003)'
+    bound 4 October 2026** (CHG-FXS-003)
+
+
+    Build note (r8 second round, GPS-C09): **build the no-access state as GFIX-4 says, not as the state
+    text above reads.** A guest holds no permission, so the state never names one (the text above still
+    names staff permissions); signed out, the guest is offered sign-in and brought back here; a record
+    that is not theirs says so without saying whose. The corrected wording waits for the client''s approval
+    of the visible text (pending entry GPS-C09).'
   density: compact
   pattern: listDetail
   patternReason: '`listGuestDevices` reads the population and `getWishlist` reads one of them — list,
@@ -7088,6 +7265,15 @@ screens:
     offline: '**The offline banner shows.** Sending, claiming and listing for resale need the connection
       — a transfer nobody received is a ticket nobody holds. Tickets already loaded stay visible.'
   apis:
+  - operationId: listOwnResaleListings
+    contract: orders
+    purpose: 'The guest''s own resale listings and their status, shown on the rows of Your orders with
+      tickets (the prototype''s "Listed for resale" row), matched by order; no component of its own, since
+      the approved screen draws none: the prototype''s Transfer & resale row shows it (shownBy, r8 integration,
+      CHG-R8INT-008). Read once when the screen opens and after Create resale listing.'
+    trigger: onLoad
+    shownBy: Listed for resale · AED 180
+    provenance: r8 walk, 20 October 2026 (ORDERS-MONEY-C26, CHG-R8SPN-012)
   - operationId: transferOrderTickets
     contract: orders
     purpose: Transfer tickets to another guest
@@ -7219,7 +7405,16 @@ screens:
 
     **Two jobs, one id (GAP-D3, DI-1078; CHG-SGU-020).** This is My Reservations and the web''s group-booking
     view. The group request form is a flow opened from here and from the booking listing, not a separate
-    screen; the prototype labels that dialog WEB-031.'
+    screen; the prototype labels that dialog WEB-031.
+
+
+    Build note (r8 second round, ORDERS-MONEY-C08, the lead 20 October 2026, option A): **Pay now on a
+    held reservation opens the payment of WEB-014 with the reservation''s id** (the payment component
+    exists there); the edge WEB-031 to WEB-014 is not drawn on this client-approved screen yet, so it
+    waits for the client to confirm that Pay now belongs in r8 (pending entry ORDERS-MONEY-C08). Until
+    then the row shows no Pay now. **The resource availability panel** reads `listProductStartTimes` (the
+    reserved product''s start times on a picked date), not `getResourceAvailability`: a guest never names
+    a resource, so `resourceId` on entry pre-selects nothing.'
   density: compact
   pattern: listDetail
   patternReason: '`listReservations` reads the population and `getReservation` reads one of them — list,
@@ -7327,7 +7522,11 @@ screens:
         - ResourceAvailability.resourceId
         - ResourceAvailability.freeWindows
         - ResourceAvailability.blockedWindows
-        operation: getResourceAvailability
+        operation: listProductStartTimes
+        notes: 'Build note (r8 second round, ORDERS-MONEY-C08, option A): drawn as approved, filled from
+          `listProductStartTimes` for the reserved line''s product and variant on the picked date: the
+          free windows are its start times (`startsAt` to `endsAt`, with `freeCount`); no resource is
+          named, so the resource column stays empty, and nothing is blocked that the guest needs to see.'
         provenance: contract resources.yaml GET /resources/{resourceId}/availability
       - kind: detailPanel
         label: The reservation
@@ -7423,6 +7622,16 @@ screens:
       changing and cancelling need the connection — a table held offline is a table two people think they
       have.'
   apis:
+  - operationId: listOwnGroupBookings
+    contract: orders
+    purpose: 'The school trips and parties this guest asked for, provisional ones included: they are rows
+      of Your reservations beside the reservations (the prototype''s "School group, 32 pupils · invoice
+      due" row), and a picked one opens The group booking (`getGroupBooking`). No component of its own,
+      since the approved screen draws none: the prototype''s Reservations row shows it (shownBy, r8 integration,
+      CHG-R8INT-008).'
+    trigger: onLoad
+    shownBy: Summit Peaks · School group, 32 pupils
+    provenance: r8 walk, 20 October 2026 (ORDERS-MONEY-C26, CHG-R8SPN-012)
   - operationId: listGroupPackages
     contract: catalogue
     purpose: School-trip formats and party packages
@@ -7453,10 +7662,14 @@ screens:
     contract: orders
     purpose: A group booking this guest belongs to
     trigger: onAction
-  - operationId: getResourceAvailability
+  - operationId: listProductStartTimes
     contract: resources
-    purpose: What is free and when
+    purpose: 'What is free and when, for Check another date (r8, ORDERS-MONEY-C08, the lead''s option
+      A): the start times the reserved product (its line''s `productId` and `variantId`) can be booked
+      at on the date the guest picks. A guest never names a resource, so `getResourceAvailability` is
+      not called here.'
     trigger: onAction
+    provenance: r8 second round, ORDERS-MONEY-C08 (ticket 28228)
   - operationId: updateTableReservation
     contract: fnb
     purpose: Change or cancel it
@@ -7539,7 +7752,13 @@ screens:
     **`evaluatePromotions` removed 27 September 2026 (audit root R292).** It evaluates promotions against
     a cart — `EvaluatePromotionsRequest` requires `venueId`, `channel` and at least one line with a variant,
     quantity and unit price — and this screen has no cart: it arrives with `promotionId` alone. Offers
-    apply where the cart is, on WEB-005 and WEB-010, which keep the call.'
+    apply where the cart is, on WEB-005 and WEB-010, which keep the call.
+
+
+    Build note (r8 second round, ORDERS-MONEY-C11): **Use this offer** on a promotion with a code applies
+    it to the guest''s cart with `applyCartPromoCode` and that code; an automatic promotion needs nothing
+    applied, so it goes back to the list. The button is not drawn on this client-approved screen''s definition
+    yet; adding it and its binding waits for the client (pending entry ORDERS-MONEY-C11).'
   density: compact
   pattern: listDetail
   patternReason: '`listPromotions` reads the population and `getPromotion` reads one of them — list, select,
@@ -7614,11 +7833,9 @@ screens:
       optional: true
       notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listPromotions`
         and the user picks one; an edge that holds one may still carry it to open on that record.'
-    coldEntry: '**A guest arriving cold on a link that no longer resolves is shown what happened and one
-      way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened
-      three weeks late all land here, and the person holding the link did nothing wrong. **The screen
-      names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.**
-      Arrives with `promotionId`.'
+    coldEntry: '**A dead promotion link says "This offer is no longer available" and shows the list it
+      came from** (the offers active now), with no name and no reason (r8, ORDERS-MONEY-C01; ADR-0030
+      as relaxed for promotions). Never a 404 page. Arrives with `promotionId`.'
     preloaded:
     - Promotion.code
     - Promotion.name
@@ -8786,7 +9003,15 @@ screens:
 
 
     **The map comes from listBookableVenueMaps?venueId (contracts, ledger: the venue -> map read exists),
-    so a normal visit has a map to load** (CHG-FXS-003)'
+    so a normal visit has a map to load** (CHG-FXS-003) Build note (r8, GPS-C08): send `onlyBookable=false`
+    on `listBookableVenueMaps`, so a venue map with no bookable resource still opens.
+
+
+    Build note (r8 second round, GPS-C09): **build the no-access state as GFIX-4 says, not as the state
+    text above reads.** A guest holds no permission, so the state never names one (the text above still
+    names staff permissions); signed out, the guest is offered sign-in and brought back here; a record
+    that is not theirs says so without saying whose. The corrected wording waits for the client''s approval
+    of the visible text (pending entry GPS-C09).'
   density: compact
   boardFrames:
   - Seat Board 3.dc.html#seat-3c
@@ -9129,7 +9354,14 @@ screens:
 
 
     **The car park''s parking product is ParkingFacility.productVariantId (agreed with contracts in the
-    ledger 4 October 2026): Add parking to my cart sends it as addCartLine''s variantId** (CHG-FXS-003)'
+    ledger 4 October 2026): Add parking to my cart sends it as addCartLine''s variantId** (CHG-FXS-003)
+
+
+    Build note (r8 second round, ORDERS-MONEY-C01, from the core lane): build the no-access state as two
+    cases, not signed in (401: offered sign-in and brought back) and otherwise one neutral message with
+    the list it came from; "a record that is not theirs" is not a case of its own, because another guest''s
+    record answers 404 like a missing one (Pattern 4). The wording waits for the client (pending entry
+    ORDERS-MONEY-C01).'
   density: compact
   pattern: listDetail
   patternReason: '`listParkingFacilities` reads a population and nothing reads one of them; the detail
@@ -9937,7 +10169,18 @@ screens:
 
 
     **Rev 3 (decided 29 September).** Shows *What''s new* (GAP-B2). One implementation with WEB-025, both
-    ids kept (GAP-D3).'
+    ids kept (GAP-D3).
+
+
+    Build note (r8 second round, WHITE-C12): **WEB-045 is not a page of its own.** It is WEB-025''s Help
+    centre page reached at its own route (`/help-centre-and-accessibility`, the header''s *Policies and
+    accessibility* and the footer''s *Accessibility*), opened scrolled to its policies and accessibility
+    pages; it is built once: this screen''s component is a thin route that renders WEB-025''s page, and
+    this id stays for its route and its tickets. The case actions (Ask for help, Reply) and their reads
+    stay WEB-025''s; the offline state''s *raising a case is disabled* is about that shared page. **No
+    results** is the page''s search box (*Search help articles* in the prototype): it filters the FAQs,
+    help pages and policies already loaded, by title, on the device; no operation takes a query, and nothing
+    is read again.'
   density: compact
   pattern: listDetail
   patternReason: '`listFaqs` reads a population and nothing reads one of them; the detail is the row until
@@ -10549,6 +10792,14 @@ screens:
     contract: orders
     purpose: Add the room type for the booked window, then the add-ons
     trigger: onAction
+  - operationId: createCart
+    contract: orders
+    purpose: 'Started by the runtime the first time a line is added, before the first addCartLine, against
+      the guest or the anonymous cart token (2.1.31); never a button or a form (GFIX-3). With the guest
+      session the device already holds: signed in, or the anonymous cart session a visitor gets with the
+      first line (ADR-0045; r8, GPS-C23), as on its app twin GST-075.'
+    trigger: background
+    provenance: r8 second round, GPS-C23 (the core lane's request)
   entryState:
     params:
     - name: productId
@@ -10982,7 +11233,7 @@ screens:
         provenance: decided 29 September 2026, MOB-6
       - kind: multiSelect
         label: What are you most interested in?
-        operation: listProducts
+        operation: getVisitPlannerOptions
         notes: Interest tags of the venue.
         provenance: decided 29 September 2026, MOB-6
       - kind: multiSelect
@@ -11109,6 +11360,13 @@ screens:
     purpose: The tenant's active venues, for the park-per-day choice in a multi-venue tenant
     trigger: onLoad
     provenance: decided 30 September 2026, client meeting MoM 4.7 (Allam)
+  - operationId: getVisitPlannerOptions
+    contract: venue-map
+    purpose: 'The planner''s choices from the venue''s data (r8, GPS-C21): the interest tags of its parks
+      fill What are you most interested in?, and the ready-made plans and Fast Track bundles come from
+      the same read.'
+    trigger: onLoad
+    provenance: r8 integration, GPS-C21 (CHG-R8INT-007)
   entryState:
     params:
     - name: venueId

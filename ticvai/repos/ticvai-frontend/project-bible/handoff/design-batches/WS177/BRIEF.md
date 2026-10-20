@@ -137,7 +137,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-1075` | Seat Event Catalog | B | 0 | 13 | 6 | 0 | 0 | 6 | — | notStarted (—) |
 | `BO-1076` | Concurrency, Idempotency & Limits | B | 0 | 15 | 6 | 15 | 0 | 4 | — | notStarted (—) |
 | `BO-1077` | Mapping & Transformation | B | 0 | 9 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-1078` | Monitoring, Retry & Reconciliation | B | 0 | 11 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-1078` | Monitoring, Retry & Reconciliation | B | 0 | 12 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-1079` | Immutable Seat Audit Logs | B | 1 | 26 | 6 | 0 | 0 | 6 | — | notStarted (—) |
 | `BO-1080` | Integration Approval & Compliance | B | 0 | 0 | 6 | 5 | 0 | 3 | — | notStarted (—) |
 

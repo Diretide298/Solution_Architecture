@@ -25,7 +25,7 @@ servicesCalled:
 - service: PlatformService
   operationCalls: 371
 - service: IdentityService
-  operationCalls: 262
+  operationCalls: 264
 - service: AiService
   operationCalls: 193
 - service: TenancyService
@@ -726,11 +726,13 @@ screens:
   wave: 1
   density: compact
   operations:
+  - createMfaChallenge
   - getTenantConfig
   - listOwnPlatformStaffGrants
   - listTenants
   - openPlatformStaffGrant
   - setLanguages
+  - verifyMfaChallenge
   states:
   - emptyFirstRun
   - emptyNoAccess

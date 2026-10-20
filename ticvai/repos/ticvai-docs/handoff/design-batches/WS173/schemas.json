@@ -108,6 +108,28 @@
     ],
     "description": "The mode the server actually used. With `mode=auto` this is how a client knows what it got: `list` means the map has no geometry (the seat map's `noGeometry` state), so the client sells from categories and best-available groups and does not draw a plan. `graphical` means every seat carries `position`.\n"
    },
+   "viewBox": {
+    "type": "object",
+    "nullable": true,
+    "description": "The coordinate space the seat positions are in, as `SeatMap.viewBox`, so the section view is drawn from this response alone (WEB-007, GST-049; r8 walk of ticket 28197). Null when `renderMode` is `list`.\n",
+    "properties": {
+     "width": {
+      "type": "number"
+     },
+     "height": {
+      "type": "number"
+     }
+    }
+   },
+   "stagePosition": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/Point"
+     }
+    ],
+    "nullable": true,
+    "description": "Where the stage sits in the same space, as `SeatMap.stagePosition`; the section view orients the seats towards it. Null when `renderMode` is `list`.\n"
+   },
    "totals": {
     "type": "object",
     "properties": {
@@ -148,6 +170,35 @@
       },
       "price": {
        "$ref": "../shared/common.yaml#/components/schemas/Money"
+      }
+     }
+    }
+   },
+   "zones": {
+    "type": "array",
+    "description": "**The standing zones and what is left in each** (r8, GPS-C38): a zone has no seats, so it is sold by quantity (`createSeatHold` `zoneId` and `quantity`). `keepTogether` says whether the venue keeps a party in one zone (a party larger than `remaining` is then refused rather than split).",
+    "items": {
+     "type": "object",
+     "required": [
+      "zoneId",
+      "name",
+      "remaining"
+     ],
+     "properties": {
+      "zoneId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "name": {
+       "type": "string"
+      },
+      "remaining": {
+       "type": "integer",
+       "minimum": 0
+      },
+      "keepTogether": {
+       "type": "boolean",
+       "default": true
       }
      }
     }

@@ -37,7 +37,7 @@
     "x-ticvai-references": "catalogue.inventory_reservation",
     "type": "string",
     "nullable": true,
-    "description": "Lease the units were drawn from — a `catalogue.InventoryHold.id`. Absent for uncontended products."
+    "description": "Lease the units were drawn from — a `catalogue.InventoryHold.id`. Absent for uncontended products. **A standing-zone line** (zone-priced general admission at POS-004 and WEB-007; decided 20 October 2026, Chinmay, R8 blocker cause GPS-C38, option A; CHG-R8SPN-040) carries no `seatIds`: it is `quantity` places in one zone, held by `seating.createSeatHold` with `zoneId` and `quantity`, and this names that hold's inventory hold; the zone, its price band and keep-the-party- together come from the hold, and a lapsed one is `409 hold-not-active` as for seats."
    },
    "seatIds": {
     "type": "array",
@@ -321,6 +321,11 @@
  },
  "Payment": {
   "x-ticvai-persistence": "orders.payment",
+  "x-ticvai-index": [
+   [
+    "providerReference"
+   ]
+  ],
   "type": "object",
   "required": [
    "id",
@@ -875,19 +880,17 @@
  "PaymentsCurrencyRule": {
   "type": "object",
   "x-ticvai-persistence": "payments.currency_rule",
+  "x-ticvai-retired-columns": [
+   "payment_policy_id"
+  ],
   "description": "**Taken from the backend workbook, 20 September.** NEW TABLE. Defines payment-level currency rules such as accepted/settlement currency, min/max payment amount and rounding.",
   "required": [
-   "paymentPolicyId",
    "code",
    "isActive",
    "createdAt"
   ],
   "properties": {
    "id": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "paymentPolicyId": {
     "type": "string",
     "format": "uuid"
    },
@@ -938,9 +941,11 @@
  "PaymentsEligibilityRule": {
   "type": "object",
   "x-ticvai-persistence": "payments.eligibility_rule",
+  "x-ticvai-retired-columns": [
+   "payment_policy_id"
+  ],
   "description": "**Taken from the backend workbook, 20 September.** NEW TABLE. Defines when a payment method is allowed or denied for a transaction.",
   "required": [
-   "paymentPolicyId",
    "paymentMethodId",
    "effect",
    "priority",
@@ -949,10 +954,6 @@
   ],
   "properties": {
    "id": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "paymentPolicyId": {
     "type": "string",
     "format": "uuid"
    },
@@ -1013,9 +1014,11 @@
   "x-ticvai-rls": "grant-holder-read",
   "type": "object",
   "x-ticvai-persistence": "payments.fee_rule",
+  "x-ticvai-retired-columns": [
+   "payment_policy_id"
+  ],
   "description": "**Taken from the backend workbook, 20 September.** NEW TABLE. Defines payment-related fees or surcharges that may be applied to an order.",
   "required": [
-   "paymentPolicyId",
    "name",
    "category",
    "calculationType",
@@ -1031,10 +1034,6 @@
     "description": "Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007)."
    },
    "id": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "paymentPolicyId": {
     "type": "string",
     "format": "uuid"
    },

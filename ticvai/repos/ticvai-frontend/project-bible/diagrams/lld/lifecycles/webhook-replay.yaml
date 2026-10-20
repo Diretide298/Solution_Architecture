@@ -1,0 +1,36 @@
+id: LLD-Webhook replay
+title: Webhook replay — 3 transitions
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/04-lifecycles.yaml
+source: states/webhook-replay.yaml
+entity: Webhook replay
+contract: public-api
+enum: WebhookReplayJob.status
+enumKind: inline
+enumSchema: WebhookReplayJob
+enumProperty: status
+owner: public-api
+initial:
+- queued
+terminal:
+- completed
+- failed
+transitions:
+- from: queued
+  to: running
+  trigger: job
+  guard: The replay dispatcher on the workers host takes the row (ADAM CR-140, 18 October 2026; CHG-CRA-004)
+- from: running
+  to: completed
+  trigger: job
+  guard: Every event of the window and types asked was re-delivered, each as a webhook delivery marked
+    as a replay with this replay's id
+- from: running
+  to: failed
+  trigger: job
+  guard: The dispatcher stopped, for example a tenant database it could not read; `completedAt` records
+    when
+notes: '**`replayEvents` only queues.** It validates the window, the event types and the caller''s tenant
+  and inserts the row; it reads no outbox. The dispatcher reads each tenant''s `platform.outbox` directly,
+  as the relay on the same host does (ADAM CR-140). A failed replay is not resumed in place: a new `replayEvents`
+  asks again.'

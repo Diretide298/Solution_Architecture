@@ -10,7 +10,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/general/platform-dashboard",
-   "component": "apps/ticvai-web/src/routes/general/PlatformDashboard.tsx",
+   "component": "src/routes/general/PlatformDashboard.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -348,7 +348,7 @@
      "carries": [
       "tenantId"
      ],
-     "provenance": "derived — ADM-018 declares entryState.params bannerId, pageId, policyKind, tenantId, version and ADM-002 holds tenantId, so an edge into it carries them"
+     "provenance": "derived — ADM-018 declares entryState.params bannerId, challengeId, pageId, policyKind, tenantId, version and ADM-002 holds tenantId, so an edge into it carries them"
     },
     {
      "to": "ADM-019",
@@ -830,7 +830,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/general/cross-tenant-health-dashboard",
-   "component": "apps/ticvai-web/src/routes/general/CrossTenantHealthDashboard.tsx",
+   "component": "src/routes/general/CrossTenantHealthDashboard.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1224,7 +1224,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/general/platform-audit-log",
-   "component": "apps/ticvai-web/src/routes/general/PlatformAuditLogList.tsx",
+   "component": "src/routes/general/PlatformAuditLogList.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1252,7 +1252,10 @@
     {
      "to": "ADM-003",
      "trigger": "Cross-Tenant Health Dashboard",
-     "provenance": "derived — ADM-003 declares entryState.params cellId and ADM-004 holds none of them. The edge carries nothing: cellId only pre-selects (deep link or optional), and ADM-003 opens on its own"
+     "carries": [
+      "cellId"
+     ],
+     "provenance": "derived — ADM-003 declares entryState.params cellId and ADM-004 holds cellId, so an edge into it carries them"
     },
     {
      "to": "BO-068",
@@ -1512,7 +1515,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/general/tenant-performance-monitor",
-   "component": "apps/ticvai-web/src/routes/general/TenantPerformanceMonitorDashboard.tsx",
+   "component": "src/routes/general/TenantPerformanceMonitorDashboard.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1776,7 +1779,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/general/deployment-monitor",
-   "component": "apps/ticvai-web/src/routes/general/DeploymentMonitorDashboard.tsx",
+   "component": "src/routes/general/DeploymentMonitorDashboard.tsx",
    "status": "notStarted"
   },
   "navigation": {

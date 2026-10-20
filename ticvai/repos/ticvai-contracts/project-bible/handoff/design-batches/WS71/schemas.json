@@ -14,6 +14,14 @@
  "AiInteraction": {
   "type": "object",
   "x-ticvai-persistence": "ai.activity",
+  "x-ticvai-required-when": {
+   "principalId": {
+    "audience": "staff"
+   },
+   "subjectId": {
+    "audience": "guest"
+   }
+  },
   "required": [
    "id",
    "principalId",
@@ -71,7 +79,9 @@
    },
    "principalId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "nullable": true,
+    "description": "The staff member who made the call. Null for a guest (`audience` `guest`), whose row names `subjectId` instead; a row always has one or the other."
    },
    "audience": {
     "type": "string",

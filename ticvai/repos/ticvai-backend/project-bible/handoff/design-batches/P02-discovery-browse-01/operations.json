@@ -48,19 +48,6 @@
   "requestBody": null,
   "responds": "PerformanceAvailabilityPage"
  },
- "getBundle": {
-  "method": "GET",
-  "path": "/bundles/{bundleId}",
-  "contract": "promotions",
-  "summary": "Read a bundle with components and allocation",
-  "permission": "PRODUCT_VIEW",
-  "offlineCapable": true,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "Bundle"
- },
  "getCookieConsentRuntime": {
   "method": "GET",
   "path": "/storefront/cookie-consent",
@@ -94,6 +81,19 @@
   ],
   "requestBody": null,
   "responds": "CookieConsentRuntime"
+ },
+ "getGuestBundle": {
+  "method": "GET",
+  "path": "/guest-bundles/{bundleId}",
+  "contract": "promotions",
+  "summary": "What a guest is shown of a bundle",
+  "permission": null,
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "GuestBundle"
  },
  "getMyProfile": {
   "method": "GET",
@@ -246,6 +246,35 @@
   "requestBody": null,
   "responds": "WaitTime"
  },
+ "listEvents": {
+  "method": "GET",
+  "path": "/events",
+  "contract": "catalogue",
+  "summary": "List events",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "listMyEntitlements": {
   "method": "GET",
   "path": "/guests/me/entitlements",
@@ -338,7 +367,18 @@
   "offlineCapable": true,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "kind",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": false
+   }
+  ],
   "requestBody": null,
   "responds": "ProductCategoryNode"
  },

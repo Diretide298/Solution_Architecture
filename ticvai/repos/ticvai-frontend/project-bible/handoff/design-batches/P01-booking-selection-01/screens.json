@@ -39,14 +39,18 @@
      "to": "WEB-007",
      "trigger": "Interactive Seat Selection",
      "carries": [
-      "eventId"
+      "eventId",
+      "productId"
      ],
-     "provenance": "derived — WEB-007 declares entryState.params eventId, holdId, performanceId and WEB-005 holds eventId, so an edge into it carries them"
+     "provenance": "derived — WEB-007 declares entryState.params eventId, holdId, performanceId, productId and WEB-005 holds eventId, productId, so an edge into it carries them"
     },
     {
      "to": "WEB-008",
      "trigger": "Add-ons & Upsell",
-     "provenance": "derived — WEB-008 declares entryState.params bundleId and WEB-005 holds none of them. The edge carries nothing: bundleId only pre-selects (deep link or optional), and WEB-008 opens on its own"
+     "carries": [
+      "bundleId"
+     ],
+     "provenance": "derived — WEB-008 declares entryState.params bundleId and WEB-005 holds bundleId, so an edge into it carries them"
     },
     {
      "to": "WEB-010",
@@ -377,7 +381,10 @@
     {
      "to": "WEB-008",
      "trigger": "Add-ons & Upsell",
-     "provenance": "derived — WEB-008 declares entryState.params bundleId and WEB-006 holds none of them. The edge carries nothing: bundleId only pre-selects (deep link or optional), and WEB-008 opens on its own"
+     "carries": [
+      "bundleId"
+     ],
+     "provenance": "derived — WEB-008 declares entryState.params bundleId and WEB-006 holds bundleId, so an edge into it carries them"
     },
     {
      "to": "WEB-010",
@@ -406,7 +413,8 @@
      "operation": "getAvailability",
      "carries": [
       "eventId",
-      "performanceId"
+      "performanceId",
+      "productId"
      ]
     }
    ]
@@ -601,6 +609,20 @@
     "purpose": "The published booking flow for this product: which steps it has and in what order (W12)",
     "trigger": "onLoad",
     "provenance": "decided 29 September 2026, W12"
+   },
+   {
+    "operationId": "getProduct",
+    "contract": "catalogue",
+    "purpose": "Resolves the event from the product (r8, GPS-C05): WEB-004 opens this screen with `productId` only, and `Product.eventId` is the event `listPerformances` and `getAvailability` need. Not called when the edge carried `eventId`. No component of its own: what it finds drives the date and time pickers.",
+    "trigger": "background",
+    "provenance": "r8 second round, GPS-C05 (ticket 28152)"
+   },
+   {
+    "operationId": "createCart",
+    "contract": "orders",
+    "purpose": "Started by the runtime the first time a line is added, before the first addCartLine, against the guest or the anonymous cart token (2.1.31); never a button or a form (GFIX-3). With the guest session the device already holds: signed in, or the anonymous cart session a visitor gets with the first line (ADR-0045; r8, GPS-C23).",
+    "trigger": "background",
+    "provenance": "r8 second round, GPS-C23 (the core lane's request)"
    }
   ],
   "wireframe": {
@@ -621,15 +643,24 @@
    "params": [
     {
      "name": "performanceId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "r8 (GPS-C05): picked on this screen; an edge that holds one opens on that time."
     },
     {
      "name": "cartId",
      "from": "navigation"
     },
     {
+     "name": "productId",
+     "from": "WEB-004",
+     "notes": "r8 (GPS-C05): what WEB-004's Book carries; `getPublishedBookingFlow` and `checkBookingEligibility` take it, and `getProduct` turns it into the event."
+    },
+    {
      "name": "eventId",
-     "from": "WEB-004"
+     "from": "WEB-004",
+     "optional": true,
+     "notes": "r8 (GPS-C05): read from `Product.eventId` (`getProduct`) when the edge carries only `productId`."
     },
     {
      "name": "venueId",
@@ -731,7 +762,8 @@
    "entryFrom": [
     "WEB-006",
     "WEB-004",
-    "WEB-049"
+    "WEB-049",
+    "WEB-005"
    ],
    "exitTo": [
     "WEB-001",
@@ -744,7 +776,10 @@
     {
      "to": "WEB-005",
      "trigger": "Ticket Type Selection",
-     "provenance": "derived — WEB-005 declares entryState.params cartId, productId and WEB-007 holds none of them. The edge carries nothing: cartId only pre-selects (deep link or optional); WEB-005 finds productId (listProducts) itself, and WEB-005 opens on its own"
+     "carries": [
+      "productId"
+     ],
+     "provenance": "derived — WEB-005 declares entryState.params cartId, productId and WEB-007 holds productId, so an edge into it carries them"
     },
     {
      "to": "WEB-008",
@@ -756,9 +791,10 @@
      "trigger": "Date & Performance Selection",
      "carries": [
       "eventId",
-      "performanceId"
+      "performanceId",
+      "productId"
      ],
-     "provenance": "derived — WEB-006 declares entryState.params cartId, entryId, eventId, performanceId and WEB-007 holds eventId, performanceId, so an edge into it carries them"
+     "provenance": "derived — WEB-006 declares entryState.params cartId, entryId, eventId, performanceId, productId and WEB-007 holds eventId, performanceId, productId, so an edge into it carries them"
     },
     {
      "to": "WEB-010",
@@ -771,7 +807,7 @@
     }
    ]
   },
-  "notes": "A map with no geometry falls back to category and best-available selection. Availability returns renderMode: list, and the screen renders groups rather than a plan. Never refuses the seated flow. **Drawn 26 August** — `Seat Board 3.dc.html` frame `seat-3b`. **The frame names this screen on its own face**, which is the first pack to do that: the earlier F&B, POS and Retail boards had to be hand-assigned by purpose after three derivation attempts produced nonsense. **A board that says what it draws removes the guess entirely.** **Renamed 31 August** from *Seat Map Selection*. **A guest surface is one product with two renderings** — a screen named differently on web and app is two screens to a developer and one journey to a guest. **Cross-surface parity, 31 August**: added recommendSeats. **A guest does not know which surface they are on** — the same named screen on web and app now calls the same guest-callable operations.\n\n**Rev 3 (decided 29 September).** Date and time on seated events: an inline step before this map, or a pop-up over it, per `BookingFlowConfig.seatEventDateMode` (REV3-4); a single-performance event opens straight here. Time bar with performance switcher (REV3-6, `seatTimeBar`). View-from-your-seat box placed per `seatViewPosition` (REV3-5) and fed by a section photo or the geometry (23SEP-14). Fixture strip and a direct WEB-004 → WEB-007 path (23SEP-16). With WEB-006 this may render as one step (REV3-7). Seat picker defaults to the bowl (`seatPicker` default `bowl`, CFG-6). **The cabana map is no longer this screen:** a cabana, lounger or other spot placed on a venue map is booked on WEB-047 (REV3-15, GAP-C2). Every booking-flow setting named here is read from `getPublishedTenantConfig` `bookingFlow`, resolved for the venue the guest picked (audit R267): the tenant's values with that venue's `venueOverrides` entry laid over field by field (decided 29 September, rev 3 CFG-11).\n\n**The step order comes from the published booking flow** (W12, 29 September): `getPublishedBookingFlow` returns the flow the product (or its category, else the venue default for its kind) uses, with its enabled steps in `sortOrder`; this screen renders when that flow has its step and in the order the flow gives. Flow-level settings (`performanceReveal`, `signInAt`, `seatEventDateMode`, `extrasStep`, `quickTour`, `consentQuestionIds`) are read from the flow; venue-wide settings stay on `getPublishedTenantConfig` `bookingFlow`.\n\n**29 September (W2).** Sections first, zoom into a section, scroll or pinch out (or *Whole map*) back to the full map; held seats are kept.",
+  "notes": "A map with no geometry falls back to category and best-available selection. Availability returns renderMode: list, and the screen renders groups rather than a plan. Never refuses the seated flow. **Drawn 26 August** — `Seat Board 3.dc.html` frame `seat-3b`. **The frame names this screen on its own face**, which is the first pack to do that: the earlier F&B, POS and Retail boards had to be hand-assigned by purpose after three derivation attempts produced nonsense. **A board that says what it draws removes the guess entirely.** **Renamed 31 August** from *Seat Map Selection*. **A guest surface is one product with two renderings** — a screen named differently on web and app is two screens to a developer and one journey to a guest. **Cross-surface parity, 31 August**: added recommendSeats. **A guest does not know which surface they are on** — the same named screen on web and app now calls the same guest-callable operations.\n\n**Rev 3 (decided 29 September).** Date and time on seated events: an inline step before this map, or a pop-up over it, per `BookingFlowConfig.seatEventDateMode` (REV3-4); a single-performance event opens straight here. Time bar with performance switcher (REV3-6, `seatTimeBar`). View-from-your-seat box placed per `seatViewPosition` (REV3-5) and fed by a section photo or the geometry (23SEP-14). Fixture strip and a direct WEB-004 → WEB-007 path (23SEP-16). With WEB-006 this may render as one step (REV3-7). Seat picker defaults to the bowl (`seatPicker` default `bowl`, CFG-6). **The cabana map is no longer this screen:** a cabana, lounger or other spot placed on a venue map is booked on WEB-047 (REV3-15, GAP-C2). Every booking-flow setting named here is read from `getPublishedTenantConfig` `bookingFlow`, resolved for the venue the guest picked (audit R267): the tenant's values with that venue's `venueOverrides` entry laid over field by field (decided 29 September, rev 3 CFG-11).\n\n**The step order comes from the published booking flow** (W12, 29 September): `getPublishedBookingFlow` returns the flow the product (or its category, else the venue default for its kind) uses, with its enabled steps in `sortOrder`; this screen renders when that flow has its step and in the order the flow gives. Flow-level settings (`performanceReveal`, `signInAt`, `seatEventDateMode`, `extrasStep`, `quickTour`, `consentQuestionIds`) are read from the flow; venue-wide settings stay on `getPublishedTenantConfig` `bookingFlow`.\n\n**29 September (W2).** Sections first, zoom into a section, scroll or pinch out (or *Whole map*) back to the full map; held seats are kept.\n\nBuild note (r8 second round, GPS-C38, from the core lane): a standing zone is sold by quantity: the zone and what is left come with `getSeatAvailability` (`zones`), the hold is `createSeatHold` with `zoneId` and `quantity`, and a 409 `zone-unavailable` shows the zone's state as unavailable with what is left, keeping the party together where the venue asks it (`keepTogether`). The cart line names its zone hold through `inventoryHoldId`.",
   "density": "compact",
   "boardFrames": [
    "Seat Board 3.dc.html#seat-3b"
@@ -910,6 +946,13 @@
     "purpose": "The published booking flow for this product: which steps it has and in what order (W12)",
     "trigger": "onLoad",
     "provenance": "decided 29 September 2026, W12"
+   },
+   {
+    "operationId": "getPerformance",
+    "contract": "catalogue",
+    "purpose": "Resolves a deep-linked performance (r8, GPS-C05): its `eventId` drives `listPerformances` (time bar, fixture strip) and its `startsAt` and `status` the cold entry (a performance that has happened offers the next one of the same event). No component of its own.",
+    "trigger": "background",
+    "provenance": "r8 second round, GPS-C05 (ticket 28197)"
    }
   ],
   "entryState": {
@@ -920,7 +963,15 @@
     },
     {
      "name": "eventId",
-     "from": "WEB-006"
+     "from": "WEB-006",
+     "optional": true,
+     "notes": "r8 (GPS-C05): read from `Performance.eventId` (`getPerformance`) when a deep link or the WEB-004 edge carries only `performanceId`."
+    },
+    {
+     "name": "productId",
+     "from": "WEB-004",
+     "optional": true,
+     "notes": "r8 (GPS-C05): carried by the WEB-004 edge and the deep link, for `getPublishedBookingFlow`. When it is absent the screen asks `getPublishedBookingFlow` by `flowTypeKey`: `seatedFixedPerformance`, or `seatedDateTimeSeatMap` when the venue's `seatEventDateMode` puts the date over the map."
     },
     {
      "name": "holdId",
@@ -958,7 +1009,7 @@
     "id": "formRecommendSeats",
     "component": "modal",
     "trigger": "Recommend seats",
-    "body": "**How many seats, and best available or together.** The party size is the tickets already chosen; the guest only picks the preference, then `recommendSeats` places them.",
+    "body": "**How many seats, and best available or together.** The guest sets the party size (a How many seats stepper, at most `maxSeatsPerGuestOrder`) and picks the preference, then `recommendSeats` places them. Tickets are chosen after seats, so there are none to count yet.",
     "bindsTo": "SeatRecommendationRequest",
     "confirm": {
      "label": "Recommend seats",
@@ -1070,18 +1121,17 @@
       "cartId",
       "performanceId"
      ],
-     "provenance": "derived — WEB-006 declares entryState.params cartId, entryId, eventId, performanceId and WEB-008 holds cartId, performanceId, so an edge into it carries them"
+     "provenance": "derived — WEB-006 declares entryState.params cartId, entryId, eventId, performanceId, productId and WEB-008 holds cartId, performanceId, so an edge into it carries them"
     },
     {
      "to": "WEB-010",
      "trigger": "Shopping Cart",
      "carries": [
       "cartId",
-      "code",
       "lineId",
       "performanceId"
      ],
-     "provenance": "derived — WEB-010 declares entryState.params cartId, code, holdId, lineId, performanceId and WEB-008 holds cartId, code, lineId, performanceId, so an edge into it carries them"
+     "provenance": "derived — WEB-010 declares entryState.params cartId, code, holdId, lineId, performanceId and WEB-008 holds cartId, lineId, performanceId, so an edge into it carries them"
     },
     {
      "to": "WEB-016",
@@ -1135,7 +1185,7 @@
         "Bundle.savingsPercentage",
         "Bundle.hasBeenSold"
        ],
-       "operation": "getBundle",
+       "operation": "getGuestBundle",
        "provenance": "contract promotions.yaml GET /bundles/{bundleId}",
        "notes": "A bundle the recommendation slot names (`kind` bundle), opened from its card; signed catalogue snapshots (`listCatalogueBundles`) are the tills', not the guest's (R269)."
       },
@@ -1181,9 +1231,9 @@
     "trigger": "onAction"
    },
    {
-    "operationId": "getBundle",
+    "operationId": "getGuestBundle",
     "contract": "promotions",
-    "purpose": "A bundle offered as an upsell",
+    "purpose": "A bundle offered as an upsell, in the guest shape (r8, ORDERS-MONEY-C32, CHG-R8INT-009)",
     "trigger": "onAction"
    },
    {
@@ -1335,7 +1385,7 @@
      "carries": [
       "performanceId"
      ],
-     "provenance": "derived — WEB-006 declares entryState.params cartId, entryId, eventId, performanceId and WEB-009 holds performanceId, so an edge into it carries them"
+     "provenance": "derived — WEB-006 declares entryState.params cartId, entryId, eventId, performanceId, productId and WEB-009 holds performanceId, so an edge into it carries them"
     }
    ]
   },
@@ -1963,6 +2013,13 @@
     "contract": "orders",
     "purpose": "Add the room type for the booked window, then the add-ons",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "createCart",
+    "contract": "orders",
+    "purpose": "Started by the runtime the first time a line is added, before the first addCartLine, against the guest or the anonymous cart token (2.1.31); never a button or a form (GFIX-3). With the guest session the device already holds: signed in, or the anonymous cart session a visitor gets with the first line (ADR-0045; r8, GPS-C23), as on its app twin GST-075.",
+    "trigger": "background",
+    "provenance": "r8 second round, GPS-C23 (the core lane's request)"
    }
   ],
   "entryState": {

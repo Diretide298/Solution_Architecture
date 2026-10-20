@@ -566,7 +566,12 @@
    "workshopBoard": "wireframes/WS124 Rental Management Board 9.dc.html#bo-576"
   },
   "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 111. 0 of 0 labels bound to a contract property; 7 of 20 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "entryState": {},
+  "entryState": {
+   "params": [],
+   "preloaded": [
+    "VenueSettings.calendarDayStartHour"
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",

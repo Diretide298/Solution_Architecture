@@ -95,7 +95,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `WEB-049` | Transport — Route & Schedule | A | 29 | 66 | 6 | 4 | 5 | 6 | guest | review (client-verified) |
+| `WEB-049` | Transport — Route & Schedule | A | 37 | 66 | 6 | 4 | 5 | 6 | guest | review (client-verified) |
 
 ## Design inputs from the client meetings
 

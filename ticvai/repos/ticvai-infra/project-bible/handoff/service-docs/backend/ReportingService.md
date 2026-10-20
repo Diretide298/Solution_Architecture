@@ -832,7 +832,7 @@ Scope is applied from the caller's resolved permissions. Parameters narrow; they
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `reporting.execution`, `reporting.report_definition`, `reporting.report_parameter` |
+| Reads | `cache:idempotency`, `reporting.execution`, `reporting.report_column`, `reporting.report_definition`, `reporting.report_filter`, `reporting.report_parameter` |
 | Writes | `cache:idempotency`, `reporting.execution` |
 | Called by | ANL-001, ANL-002, ANL-003, ANL-004, ANL-005, ANL-006, ANL-007, ANL-009, BO-010, BO-029, BO-058, BO-059, BO-060, BO-1059, BO-1082, BO-118, BO-133, BO-262, POS-008, POS-020, PTR-018, SUP-008 |
 
@@ -1096,8 +1096,8 @@ Turns a one-off question into something schedulable. The generated query becomes
 | Wave | 1 |
 | Offline | no |
 | Config scope | tenant |
-| Reads | `reporting.kpi_definition` |
-| Writes | `reporting.kpi_definition` |
+| Reads | `cache:idempotency`, `reporting.kpi_definition` |
+| Writes | `cache:idempotency`, `reporting.kpi_definition` |
 | Called by | ANL-025, ANL-062 |
 
 **Parameters**
@@ -1188,6 +1188,7 @@ The tiles go with it and come back with it. `reporting.dashboard_tile` carries `
 
 **The dashboard panel reads this.** Critical first, then unacknowledged, then by age — an alert list sorted by time puts a resolved info notice above an unacknowledged critical.
 **Venue scope is the rule; the filters below narrow inside it.** A till screen asks for its own workstation or shift, a replenishment screen for one item. Each alert carries its rule's name and metric, so a list can be read without a second call to `listAlertRules`.
+**A shift-variance alert goes only to those who may act on it** (r8, APPROVALS-TENANCY-C36; the rule is shift.yaml submitShiftCount's): one carrying `observedValue` and `threshold` for a till's count is listed only for a caller holding one of the rule's `recipientRoleIds` or `OVERSHORT_ACCEPT` at the venue; anyone else gets no such alert in the list (it is left out, not masked), so a cashier never sees the variance of their own count.
 
 |  |  |
 |---|---|
@@ -1224,8 +1225,8 @@ The tiles go with it and come back with it. `reporting.dashboard_tile` carries `
 **`PUT /alert-rules/{alertRuleId}`**: Watch a metric and tell somebody
 
 BL-152. **The metric comes from the closed set**, so a rule cannot watch something nothing produces.
-**PUT semantics — an upsert of one rule, keyed on the body's `id`.** The collection path carries no id, so the body names the rule: a client-generated `id` that does not exist creates the rule (`201`); an `id` that exists replaces that rule whole (`200`). **Replace means every field** — an optional field left out of the body returns to its default, it does not keep its stored value. Other rules are never touched; removing a rule is `isActive: false`.
-**The target is the body's `scopePath`**, which names the venue the rule watches and must lie inside the caller's scope (`403` otherwise). An `id` that exists at a scope the caller cannot reach is also `403`, never a silent second rule with the same id.
+**PUT semantics — an upsert of one rule, keyed on the path's `alertRuleId`** (the body's `id`, when sent, must equal it): an id that does not exist creates the rule (`201`); an id that exists replaces that rule whole (`200`). **Replace means every field** — an optional field left out of the body returns to its default, it does not keep its stored value. Other rules are never touched; removing a rule is `isActive: false`.
+**The target is the caller's session venue** (r8, APPROVALS-TENANCY-C07, option A): the rule watches that venue and the server sets `scopePath` (readOnly). An id that exists at a scope the caller cannot reach is `403`, never a silent second rule with the same id.
 
 |  |  |
 |---|---|
@@ -1305,8 +1306,8 @@ BL-152. **The metric comes from the closed set**, so a rule cannot watch somethi
 | Part of slice | setup, makes `reporting.semantic_model` non-empty |
 | Wave | 1 |
 | Offline | no |
-| Reads | `reporting.semantic_model` |
-| Writes | `reporting.semantic_model` |
+| Reads | `cache:idempotency`, `reporting.semantic_model` |
+| Writes | `cache:idempotency`, `reporting.semantic_model` |
 | Called by | ANL-066 |
 
 **Parameters**

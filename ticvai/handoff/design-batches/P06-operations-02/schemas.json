@@ -336,6 +336,12 @@
  "AiConversation": {
   "type": "object",
   "x-ticvai-persistence": "ai.conversation",
+  "x-ticvai-exactly-one-of": [
+   [
+    "principalId",
+    "subjectId"
+   ]
+  ],
   "required": [
    "id",
    "principalId",
@@ -349,7 +355,20 @@
    },
    "principalId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "nullable": true,
+    "description": "The staff member who opened the conversation; null when a guest opened it (`subjectId`)."
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The guest who opened the conversation (a guest is not a principal); null for staff. Exactly one of `principalId` and `subjectId` is set."
+   },
+   "profileKey": {
+    "type": "string",
+    "nullable": true,
+    "description": "The assistant profile the conversation runs under (`configureAssistantProfile`), as `createAiConversation` set it; null for the module's default profile (R8 blocker WHITE-C27)."
    },
    "scopePath": {
     "type": "string"
@@ -695,6 +714,21 @@
     "type": "string",
     "format": "uuid"
    },
+   "publishedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "When the bundle was published; `BundleSummary.publishedAt` (CHG-R8MIG-015)."
+   },
+   "publishedBy": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-references": "identity.principal",
+    "description": "Who published it; `BundleSummary.publishedBy` (CHG-R8MIG-015)."
+   },
    "isDelta": {
     "type": "boolean"
    },
@@ -705,7 +739,7 @@
    },
    "signature": {
     "type": "string",
-    "description": "Detached signature over `contentHash`. The terminal verifies before applying and rolls back on failure — a half-applied catalogue is never traded against.\n"
+    "description": "Detached signature over `contentHash`. The terminal verifies before applying and rolls back on failure — a half-applied catalogue is never traded against.\n\n**Ed25519**, with the key `signatureKeyId` names, whose public half `getBundleSigningKeys` returns (FOUNDATION-AI-C14, CHG-R8SPN-022).\n"
    },
    "signatureKeyId": {
     "type": "string"
@@ -1166,6 +1200,13 @@
     "type": "string",
     "format": "uuid",
     "description": "The client UUIDv7 from `CreateOrderRequest.id`."
+   },
+   "orderAccessToken": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "**What lets the device that just checked out read the order it paid for** (decided 20 October 2026, Chinmay, R8 blocker cause IDENTITY-C52, option A; CHG-R8SPN-025). Returned only in `checkoutCart`'s answer, null everywhere else: a signed token bound to this order and to the cart's device, valid 24 hours, never stored. `getOrder` accepts it in `X-Order-Access-Token` in place of a session, so a guest who checked out with no account, or whose session ended, still sees the confirmation (WEB-013 keeps it in its navigation state). It reads this order only and grants nothing else."
    },
    "orderNumber": {
     "x-ticvai-unique": "tenant",
@@ -1649,6 +1690,11 @@
  },
  "Payment": {
   "x-ticvai-persistence": "orders.payment",
+  "x-ticvai-index": [
+   [
+    "providerReference"
+   ]
+  ],
   "type": "object",
   "required": [
    "id",
@@ -1819,7 +1865,47 @@
     "format": "uuid",
     "nullable": true,
     "readOnly": true,
+    "x-ticvai-references": "ai.translation_job",
     "description": "The `proposeTranslations` job that drafted this proposal; `getTranslationProposals` reads a job's rows by it. Null on every other proposal (CHG-RFM-004)."
+   },
+   "targetKind": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "enum": [
+     "contentBlock",
+     "productName",
+     "emailTemplate",
+     "messageTemplate"
+    ],
+    "description": "For a translation draft, what kind of thing it sits on (`TranslationProposals.drafts[].targetKind`); null on every other proposal (R8 blocker FOUNDATION-AI-C40)."
+   },
+   "targetRef": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "maxLength": 200,
+    "description": "For a translation draft, the id of the block, product or template it sits on (the path id of the target's own write, e.g. a content block's `blockId`); null otherwise (R8 blocker FOUNDATION-AI-C40)."
+   },
+   "locale": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "maxLength": 20,
+    "description": "For a translation draft, the language it is in (the job's `targetLocale`); null otherwise."
+   },
+   "fieldPath": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "maxLength": 300,
+    "description": "For a translation draft, where it goes inside the target, as a dotted path in the target's own body (`TranslationProposals.drafts[].fieldPath`); null otherwise. Empty for a field that is not text."
+   },
+   "draftText": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "For a translation draft, the proposed text; null otherwise. `payload` stays the request body of the target's write, with this text at `fieldPath` (R8 blocker FOUNDATION-AI-C40)."
    },
    "kind": {
     "type": "string",
@@ -2602,8 +2688,10 @@
      "payment",
      "refund",
      "void",
-     "scan"
-    ]
+     "scan",
+     "cashMovement"
+    ],
+    "description": "What was refused. `cashMovement` (20 October 2026, R8 blocker cause FOUNDATION-AI-C13; CHG-R8SPN-021) is an offline lift or float replayed through `shift.createCashMovement` and refused `409 shift-not-open` or `lift-exceeds-float`; its `payload` is the `CreateCashMovementRequest` the till sent."
    },
    "recordedAt": {
     "type": "string",

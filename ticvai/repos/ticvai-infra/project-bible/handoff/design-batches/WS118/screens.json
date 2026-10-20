@@ -15,7 +15,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/platform/ai-configuration-readiness-center-adm-489",
-   "component": "apps/ticvai-web/src/routes/platform/AiConfigurationReadinessCenter.tsx",
+   "component": "src/routes/platform/AiConfigurationReadinessCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -419,7 +419,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/platform/configuration-validation-results-adm-490",
-   "component": "apps/ticvai-web/src/routes/platform/ConfigurationValidationResults.tsx",
+   "component": "src/routes/platform/ConfigurationValidationResults.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -651,7 +651,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/platform/ai-recommendations-best-practice-review-adm-491",
-   "component": "apps/ticvai-web/src/routes/platform/AiRecommendationsBestPracticeReview.tsx",
+   "component": "src/routes/platform/AiRecommendationsBestPracticeReview.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -906,7 +906,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/platform/configuration-approval-workflow-adm-492",
-   "component": "apps/ticvai-web/src/routes/platform/ConfigurationApprovalWorkflow.tsx",
+   "component": "src/routes/platform/ConfigurationApprovalWorkflow.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1115,7 +1115,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/platform/ai-configuration-execution-center-adm-493",
-   "component": "apps/ticvai-web/src/routes/platform/AiConfigurationExecutionCenter.tsx",
+   "component": "src/routes/platform/AiConfigurationExecutionCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1362,7 +1362,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/platform/execution-progress-dependency-monitor-adm-494",
-   "component": "apps/ticvai-web/src/routes/platform/ExecutionProgressDependencyMonitor.tsx",
+   "component": "src/routes/platform/ExecutionProgressDependencyMonitor.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1648,7 +1648,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/platform/configuration-results-object-mapping-adm-495",
-   "component": "apps/ticvai-web/src/routes/platform/ConfigurationResultsObjectMapping.tsx",
+   "component": "src/routes/platform/ConfigurationResultsObjectMapping.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1897,7 +1897,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/platform/configuration-change-modification-assistant-adm-496",
-   "component": "apps/ticvai-web/src/routes/platform/ConfigurationChangeModificationAssistant.tsx",
+   "component": "src/routes/platform/ConfigurationChangeModificationAssistant.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -2117,7 +2117,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/platform/configuration-history-versions-rollback-adm-497",
-   "component": "apps/ticvai-web/src/routes/platform/ConfigurationHistoryVersionsRollback.tsx",
+   "component": "src/routes/platform/ConfigurationHistoryVersionsRollback.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -2363,7 +2363,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/platform/ai-configuration-audit-governance-adm-498",
-   "component": "apps/ticvai-web/src/routes/platform/AiConfigurationAuditGovernance.tsx",
+   "component": "src/routes/platform/AiConfigurationAuditGovernance.tsx",
    "status": "notStarted"
   },
   "navigation": {

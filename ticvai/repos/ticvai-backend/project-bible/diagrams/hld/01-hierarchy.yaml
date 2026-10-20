@@ -34,7 +34,7 @@ levels:
 - level: tenant
   branch: root
   parent: null
-  operations: 606
+  operations: 610
   configurations: 113
   configuredBy:
   - claimCustomDomain
@@ -68,7 +68,7 @@ levels:
 - level: region
   branch: organisational
   parent: brand
-  operations: 65
+  operations: 62
   configurations: 11
   configuredBy:
   - createSeatMapTemplate
@@ -91,8 +91,8 @@ levels:
 - level: venue
   branch: organisational
   parent: region
-  operations: 2047
-  configurations: 190
+  operations: 2077
+  configurations: 193
   configuredBy:
   - cloneAccreditationProgramme
   - cloneReaderConfiguration
@@ -134,7 +134,7 @@ levels:
 - level: workstation
   branch: organisational
   parent: subDepartment
-  operations: 48
+  operations: 47
   configurations: 0
   configuredBy: null
   owns:

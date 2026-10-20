@@ -353,6 +353,9 @@
  "event:approval.rejected": [
   "ai:consumes"
  ],
+ "event:approval.withdrawn": [
+  "ai:consumes"
+ ],
  "event:assets.documentIndexed": [
   "ai:consumes"
  ],
@@ -360,6 +363,9 @@
   "ai:consumes"
  ],
  "event:catalogue.productPublished": [
+  "ai:consumes"
+ ],
+ "event:catalogue.productWithdrawn": [
   "ai:consumes"
  ],
  "event:conversation.handedOver": [
@@ -446,7 +452,13 @@
  "event:storefront.sessionEvent": [
   "ai:consumes"
  ],
+ "event:tenant.provisioned": [
+  "ai:consumes"
+ ],
  "event:tenant.suspended": [
+  "ai:consumes"
+ ],
+ "event:tenant.terminated": [
   "ai:consumes"
  ],
  "event:whitelabel.contentPublished": [
@@ -570,6 +582,9 @@
   "ai:seed"
  ],
  "operation:decideRiskAlert": [
+  "ai:seed"
+ ],
+ "operation:eraseSubject": [
   "ai:seed"
  ],
  "operation:evaluateAiGovernance": [
@@ -849,6 +864,9 @@
   "ai:seed"
  ],
  "operation:runForecast": [
+  "ai:seed"
+ ],
+ "operation:runGuidedChoiceSuggestionJob": [
   "ai:seed"
  ],
  "operation:saveNaturalLanguageQuery": [
@@ -1751,6 +1769,9 @@
  "table:ai.operational_requirement": [
   "ai:owned"
  ],
+ "table:ai.outbox": [
+  "ai:owned"
+ ],
  "table:ai.policy": [
   "ai:owned"
  ],
@@ -1814,6 +1835,9 @@
  "table:ai.training_run": [
   "ai:owned"
  ],
+ "table:ai.translation_job": [
+  "ai:owned"
+ ],
  "table:ai.venue_settings": [
   "ai:owned"
  ],
@@ -1875,9 +1899,6 @@
   "ai:read or written"
  ],
  "table:catalogue.variant_dimension": [
-  "ai:read or written"
- ],
- "table:control.content_block": [
   "ai:read or written"
  ],
  "table:fnb.menu_item": [

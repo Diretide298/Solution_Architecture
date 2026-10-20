@@ -55,8 +55,11 @@
    "profiling",
    "thirdPartySharing",
    "aiProcessing",
-   "transactional"
-  ]
+   "transactional",
+   "storedPaymentCredential",
+   "facePassEnrolment"
+  ],
+  "description": "`storedPaymentCredential` (a card saved for later, `storePaymentToken`) and `facePassEnrolment` (a face enrolled for entry, `enrolFacePass`) are purposes of their own (R8 blocker ORDERS-MONEY-C21, CHG-R8MIG-022), so a screen picks the row by its purpose instead of guessing: each tenant has one `marketing.consent_purpose` row of each, seeded with the tenant's other purposes."
  },
  "ConsentRecord": {
   "x-ticvai-rls": "grant-holder-read",
@@ -759,47 +762,57 @@
   ],
   "properties": {
    "id": {
+    "x-ticvai-data-class": "behavioural",
     "type": "string",
     "format": "uuid",
     "readOnly": true,
     "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
    },
    "subjectId": {
+    "x-ticvai-data-class": "behavioural",
     "type": "string",
     "format": "uuid",
     "description": "Opaque reference. Personal data lives in the separately erasable store, which is what makes erasure possible against an append-only ledger.\n"
    },
    "displayName": {
+    "x-ticvai-data-class": "personal",
     "type": "string",
     "nullable": true
    },
    "email": {
+    "x-ticvai-data-class": "personal",
     "type": "string",
     "nullable": true
    },
    "phone": {
+    "x-ticvai-data-class": "personal",
     "type": "string",
     "nullable": true
    },
    "preferredLanguage": {
+    "x-ticvai-data-class": "personal",
     "type": "string",
     "nullable": true
    },
    "preferredChannel": {
+    "x-ticvai-data-class": "personal",
     "$ref": "#/components/schemas/MessageChannel"
    },
    "guestLinkId": {
+    "x-ticvai-data-class": "personal",
     "type": "string",
     "nullable": true,
     "description": "Present where the guest is linked across cells. Marketing acts locally."
    },
    "tags": {
+    "x-ticvai-data-class": "behavioural",
     "type": "array",
     "items": {
      "type": "string"
     }
    },
    "engagementScore": {
+    "x-ticvai-data-class": "behavioural",
     "type": "integer",
     "nullable": true,
     "minimum": 0,
@@ -807,6 +820,7 @@
     "description": "22.2.20 and 22.2.21. **`lifetimeValue` and `visitCount` existed, so value was a stored figure and engagement was not.** They are different questions: a guest who spent a lot once and a guest who visits monthly have the same LTV and need opposite treatment.\n**Recency, frequency and breadth, not spend** — spend is already `lifetimeValue`, and folding it in here would make one number twice.\n"
    },
    "engagementTier": {
+    "x-ticvai-data-class": "behavioural",
     "type": "string",
     "nullable": true,
     "enum": [
@@ -820,20 +834,26 @@
     "description": "5.3.19. **Automatic classification, computed rather than assigned.** `lapsing` is the tier the whole field exists for — **a guest who has not been for a while and still might is the only one marketing can change**, and lumping them with `lapsed` wastes the window.\n"
    },
    "lifetimeValue": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
+    "x-ticvai-data-class": "behavioural",
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "**Left out of guest reads until a guest's lifetime value has a currency** (ADAM CR-141, 18 October 2026; CHG-CRA-007): an amount above a venue is in the currency recorded on its own row (CR-094's rule, which waits on the client), and this row records none yet."
    },
    "visitCount": {
+    "x-ticvai-data-class": "behavioural",
     "type": "integer"
    },
    "lastVisitAt": {
+    "x-ticvai-data-class": "behavioural",
     "type": "string",
     "format": "date-time",
     "nullable": true
    },
    "isActive": {
+    "x-ticvai-data-class": "behavioural",
     "type": "boolean"
    },
    "mergedIntoSubjectId": {
+    "x-ticvai-data-class": "behavioural",
     "type": "string",
     "format": "uuid",
     "nullable": true,
@@ -841,6 +861,7 @@
     "description": "**Set on the absorbed profile by `mergeGuestProfiles` and `mergeGuests`**, which retain it as a redirect rather than deleting it. A read that lands here follows it; a second merge of a profile that has one is refused as `alreadyMerged`.\n"
    },
    "mergedAt": {
+    "x-ticvai-data-class": "behavioural",
     "type": "string",
     "format": "date-time",
     "nullable": true,
@@ -1144,6 +1165,14 @@
     "nullable": true,
     "readOnly": true,
     "description": "When the scan (and any selfie) was deleted under the policy's retention."
+   },
+   "selfieUploadId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-references": "none",
+    "description": "**The selfie sent with the document** (R8 blocker IDENTITY-C66, CHG-R8MIG-027): the `assets.guest_upload` id of the request's `selfieAssetId`, kept for the reviewer and deleted with the scan (`documentImageDeletedAt`, then null). Null when none was sent."
    }
   }
  },

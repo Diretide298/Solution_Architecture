@@ -7,15 +7,15 @@
  "audience": "staff",
  "formFactor": "web",
  "offlineCapable": false,
- "generated": "2026-10-18",
+ "generated": "2026-10-20",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 104,
-  "operations": 209,
+  "operations": 210,
   "contracts": 8,
   "modules": 4,
   "undrawn": 0,
-  "operationsWithNoScreen": 94
+  "operationsWithNoScreen": 114
  },
  "waves": {
   "wave1": 26,
@@ -55,7 +55,7 @@
  "contracts": [
   {
    "contract": "white-label",
-   "operations": 95
+   "operations": 96
   },
   {
    "contract": "marketing-crm",
@@ -70,11 +70,11 @@
    "operations": 10
   },
   {
-   "contract": "identity",
+   "contract": "catalogue",
    "operations": 5
   },
   {
-   "contract": "catalogue",
+   "contract": "identity",
    "operations": 5
   },
   {
@@ -147,7 +147,7 @@
    "module": "White Label",
    "wave": 1,
    "route": "/white-label/page-builder",
-   "operations": 15,
+   "operations": 16,
    "drawn": true
   },
   {
@@ -984,7 +984,7 @@
    "module": "White Label",
    "wave": 1,
    "route": "/white-label/help-me-choose",
-   "operations": 12,
+   "operations": 13,
    "drawn": true
   },
   {
@@ -1002,7 +1002,7 @@
    "module": "White Label",
    "wave": 1,
    "route": "/white-label/booking-flows",
-   "operations": 14,
+   "operations": 15,
    "drawn": true
   },
   {
@@ -1078,7 +1078,25 @@
     "operation": "setSuggestionProvider",
     "contract": "ai",
     "verb": "PUT",
-    "summary": ""
+    "summary": "Point a question at a rule, a model, or both"
+   },
+   {
+    "operation": "acquireInventoryHold",
+    "contract": "catalogue",
+    "verb": "POST",
+    "summary": "Acquire an inventory hold"
+   },
+   {
+    "operation": "checkProductSalePermission",
+    "contract": "catalogue",
+    "verb": "POST",
+    "summary": "Would this seller, here, be allowed to sell these products"
+   },
+   {
+    "operation": "getBundleSigningKeys",
+    "contract": "catalogue",
+    "verb": "GET",
+    "summary": "The public keys a till verifies catalogue bundles with"
    },
    {
     "operation": "getEventChangeTreatmentPolicy",
@@ -1091,6 +1109,30 @@
     "contract": "catalogue",
     "verb": "GET",
     "summary": "Which benefits a plan grants, and how much of each"
+   },
+   {
+    "operation": "getProductChannelTexts",
+    "contract": "catalogue",
+    "verb": "GET",
+    "summary": "The product's texts per sales channel, in each of the tenant's languages"
+   },
+   {
+    "operation": "getProductDashboard",
+    "contract": "catalogue",
+    "verb": "GET",
+    "summary": "The products dashboard's counts"
+   },
+   {
+    "operation": "getProductOwnerForms",
+    "contract": "catalogue",
+    "verb": "GET",
+    "summary": "Which form a sale of this product asks the buyer, and which it asks each ticket owner"
+   },
+   {
+    "operation": "getProductSalePermissionRules",
+    "contract": "catalogue",
+    "verb": "GET",
+    "summary": "Who can sell this product"
    },
    {
     "operation": "getWaitingRoomStatus",
@@ -1117,22 +1159,46 @@
     "summary": "Membership schemes, the level above a plan"
    },
    {
+    "operation": "listOwnerFormCandidates",
+    "contract": "catalogue",
+    "verb": "GET",
+    "summary": "The forms a product can link for its reservation owner or ticket owner"
+   },
+   {
     "operation": "listProductApprovalWorkflows",
     "contract": "catalogue",
     "verb": "GET",
     "summary": "The product approval workflows `approveWorkflow` saved"
    },
    {
+    "operation": "listProductAttentionItems",
+    "contract": "catalogue",
+    "verb": "GET",
+    "summary": "The products that need someone to act, and why"
+   },
+   {
+    "operation": "listProductCategoryUsage",
+    "contract": "catalogue",
+    "verb": "GET",
+    "summary": "How many products each category holds"
+   },
+   {
+    "operation": "listProductTags",
+    "contract": "catalogue",
+    "verb": "GET",
+    "summary": "The venue's tags, the master list products and promotions pick from"
+   },
+   {
+    "operation": "listSalePermissionTargets",
+    "contract": "catalogue",
+    "verb": "GET",
+    "summary": "What a sale permission rule can name at one level, with names"
+   },
+   {
     "operation": "listSeatPricingRules",
     "contract": "catalogue",
     "verb": "GET",
     "summary": "Seat-level dynamic pricing rules"
-   },
-   {
-    "operation": "listTaxProfiles",
-    "contract": "catalogue",
-    "verb": "GET",
-    "summary": "The tax profiles"
    },
    {
     "operation": "relinquishInventoryHold",
@@ -1144,13 +1210,43 @@
     "operation": "renewInventoryHold",
     "contract": "catalogue",
     "verb": "POST",
-    "summary": "Extend a lease TTL"
+    "summary": "Extend an inventory hold's TTL"
    },
    {
     "operation": "setEventChangeTreatmentPolicy",
     "contract": "catalogue",
     "verb": "PUT",
     "summary": "Set the default treatment per kind of event change"
+   },
+   {
+    "operation": "setProductChannelTexts",
+    "contract": "catalogue",
+    "verb": "PUT",
+    "summary": "Set the product's texts per sales channel"
+   },
+   {
+    "operation": "setProductClassification",
+    "contract": "catalogue",
+    "verb": "PUT",
+    "summary": "File a product under a category and give it its tags, both from the master lists"
+   },
+   {
+    "operation": "setProductOwnerForms",
+    "contract": "catalogue",
+    "verb": "PUT",
+    "summary": "Link a product to the forms its sale asks"
+   },
+   {
+    "operation": "setProductSalePermissionRules",
+    "contract": "catalogue",
+    "verb": "PUT",
+    "summary": "Set who can sell this product"
+   },
+   {
+    "operation": "setProductTagDefinition",
+    "contract": "catalogue",
+    "verb": "PUT",
+    "summary": "Create or replace one tag of the venue's list"
    },
    {
     "operation": "setSeatPricingRule",
@@ -1195,6 +1291,12 @@
     "summary": "What this person may do, as ticks"
    },
    {
+    "operation": "getSessionVenue",
+    "contract": "identity",
+    "verb": "GET",
+    "summary": "Which venue this back-office session is working in, and which it may switch to"
+   },
+   {
     "operation": "listAccessDecisions",
     "contract": "identity",
     "verb": "GET",
@@ -1231,10 +1333,22 @@
     "summary": "Who already holds a conflicting pair"
    },
    {
+    "operation": "listStepUpSupervisors",
+    "contract": "identity",
+    "verb": "GET",
+    "summary": "Who may sign a supervisor step-up here"
+   },
+   {
     "operation": "setPrincipalModuleAccess",
     "contract": "identity",
     "verb": "PUT",
     "summary": "Tick what they may do"
+   },
+   {
+    "operation": "setSessionVenue",
+    "contract": "identity",
+    "verb": "PUT",
+    "summary": "Switch the back-office session to another venue it may act at"
    },
    {
     "operation": "updateRole",
@@ -1583,6 +1697,12 @@
     "contract": "tenancy",
     "verb": "POST",
     "summary": "A device reports interference"
+   },
+   {
+    "operation": "getPreview",
+    "contract": "white-label",
+    "verb": "GET",
+    "summary": "Read a preview while its link lives"
    },
    {
     "operation": "setFaqs",

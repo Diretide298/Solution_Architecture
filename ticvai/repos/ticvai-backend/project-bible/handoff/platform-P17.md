@@ -5,7 +5,7 @@
 | | |
 |---|---|
 | Screens | 24 |
-| Operations | 12 |
+| Operations | 11 |
 | Contracts | 3 |
 | Modules | 3 |
 | Undrawn | 0 |
@@ -46,10 +46,10 @@
 | `SGN-016` | Module Dependency & Compatibility Manager | Package Builder | 3 | 1 | yes |
 | `SGN-017` | Add-Ons, Capacity & Commercial Options | Package Builder | 3 | 1 | yes |
 | `SGN-018` | Purchase / Trial Journey Selection | Purchase & Activation | 3 | 0 | yes |
-| `SGN-019` | Contract & Billing Cycle Selection | Purchase & Activation | 3 | 1 | yes |
+| `SGN-019` | Contract & Billing Cycle Selection | Purchase & Activation | 3 | 0 | yes |
 | `SGN-020` | Billing & Legal Entity Information | Purchase & Activation | 3 | 1 | yes |
 | `SGN-021` | Payment Method & Settlement Setup | Purchase & Activation | 3 | 1 | yes |
 | `SGN-022` | Order & Commercial Pricing Review | Purchase & Activation | 3 | 1 | yes |
 | `SGN-023` | Commercial Agreement, Billable Definition & Customer Acceptance | Purchase & Activation | 3 | 1 | yes |
-| `SGN-024` | Subscription Confirmation & Commercial Activation | Purchase & Activation | 3 | 1 | yes |
+| `SGN-024` | Subscription Confirmation & Commercial Activation | Purchase & Activation | 3 | 0 | yes |
 

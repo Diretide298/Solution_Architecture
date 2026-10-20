@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI White Label Builder
   version: 0.1.0
-  x-ticvai-screen-count: 106
+  x-ticvai-screen-count: 107
   x-ticvai-tier: satellite
   x-ticvai-module: 19 — Guest Mobile App & Branding (builder)
   x-ticvai-requirements: 107
@@ -94,6 +94,26 @@ x-ticvai-queries:
   # **Data reads other modules ask this module for** (MOD audit, 14 October 2026, CHG-MOD-001): one query per
   # table, instead of a raw read of it (check-cross-module-reads XR-UNCOVERED; ADR-0055 rule 2, amended
   # 14 October).
+  contentBlockRecords:
+    module: white-label
+    table: whitelabel.content_block
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The whitelabel.content_block rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as WhiteLabel stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/ContentBlock'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). WhiteLabel answers with its whitelabel.content_block rows, as it stores them and as the caller's
+      scope lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
+      process within operations, through the C# query interface WhiteLabel implements, and asked from another
+      deployable through WhiteLabel's service route (serviceAuth). Moved from platform-ops with the table (R8 blocker
+      IDENTITY-C59): content blocks are tenant-authored content in the tenant database.
+    served: [in-process, service]
   bannerRecords:
     module: white-label
     table: whitelabel.banner
@@ -165,6 +185,22 @@ x-ticvai-queries:
       decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
       a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked
       from another deployable through WhiteLabel's service route (serviceAuth).
+    served: [service]
+  guidedChoiceRecords:
+    module: white-label
+    table: whitelabel.guided_choice
+    inputs:
+      where: {type: object, additionalProperties: true, description: 'The rows whose columns equal these values (venueId, status); status published is the usual ask.'}
+    returns:
+      type: array
+      description: 'The guided choices found, each with its questions and answers and their targets, as WhiteLabel stores them.'
+      items: {$ref: '#/components/schemas/GuidedChoice'}
+    rule: >-
+      A data read, not a rule question (r8, FOUNDATION-AI-C39; ADR-0055 rule 2 as amended 14 October). WhiteLabel
+      answers with its whitelabel.guided_choice rows and their answers' targets, as it stores them and as the
+      caller's scope lets it see them. The AI job that re-runs Help me choose after a product is withdrawn asks it
+      which published choices point at the product. It is asked from another deployable through WhiteLabel's
+      service route (serviceAuth).
     served: [service]
   guidedChoiceAnswerRecords:
     module: white-label
@@ -238,6 +274,42 @@ x-ticvai-queries:
       decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
       a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked
       from another deployable through WhiteLabel's service route (serviceAuth).
+    served: [service]
+  tenantLanguageRecords:
+    module: white-label
+    table: whitelabel.config_version
+    inputs:
+      where: {type: object, additionalProperties: true, description: 'The rows whose columns equal these values; with none, the current published version (isCurrent).'}
+    returns:
+      type: array
+      description: 'The tenant''s current published configuration version, as WhiteLabel stores it; its `snapshot` carries the published `LanguageConfig`, whose `languages` are the enabled languages a caller keys texts by. The working draft (whitelabel.tenant_config) is not read here (catalogue reads it through tenantConfigRecords before the first publish): a language added but not yet published is not enabled, and one removed in the draft stays enabled until published.'
+      items: {$ref: '#/components/schemas/ConfigVersion'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). WhiteLabel answers with its whitelabel.config_version rows, as it stores them and as the
+      caller's scope lets it see them (the table's row-level security, under the caller's connection and
+      transaction). It decides nothing: an asker that refuses or chooses on these rows states that rule in its
+      own operation, and a question with a rule of its own (open, live, sellable) is declared as a query of its
+      own. It is asked from another deployable through WhiteLabel's service route (serviceAuth). Added for the products
+      module, wave 1 (CHG-R8PRD-009).
+    served: [service]
+  tenantConfigRecords:
+    module: white-label
+    table: whitelabel.tenant_config
+    inputs:
+      where: {type: object, additionalProperties: true, description: 'The rows whose columns equal these values; the tenant''s one working configuration when empty.'}
+    returns:
+      type: array
+      description: 'The tenant''s working configuration (the draft), as WhiteLabel stores it; its languages are `LanguageConfig`.'
+      items: {$ref: '#/components/schemas/TenantConfig'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). WhiteLabel answers with its whitelabel.tenant_config rows, as it stores them and as the
+      caller's scope lets it see them (the table's row-level security, under the caller's connection and
+      transaction). It decides nothing: an asker that refuses or chooses on these rows states that rule in its
+      own operation, and a question with a rule of its own (open, live, sellable) is declared as a query of its
+      own. It is asked from another deployable through WhiteLabel's service route (serviceAuth). Added for the products
+      module, wave 1 (CHG-R8PRD-012).
     served: [service]
 paths:
   /tenant-domains:
@@ -376,6 +448,11 @@ paths:
       description: '**Verification and issuance are one act from the tenant''s point of view and two states
         in the model.** A tenant who has published the record wants a working domain, not a green tick.
 
+        **Connected means the edge resolves it** (r8, APPROVALS-TENANCY-C11): after the mapping is sent
+        (`setTenantDomainMapping`, which reaches the control plane as `tenantDomain.mapped`), the domain is shown
+        connected only once `resolveTenantHost` answers the hostname with this tenant; a `tenantDomain.rejected`
+        (hostname taken by another tenant) shows the refusal instead.
+
         **Retried by a job rather than by the tenant.** DNS propagation takes hours and a tenant clicking
         *verify* every ten minutes is a tenant who will give up before it resolves.
 
@@ -438,6 +515,10 @@ paths:
       description: '**Refused while it is the only active domain for a live app.** Releasing the hostname
         a tenant''s guests are using takes their storefront down, and the confirmation should say so rather
         than the request succeeding.
+
+        **One mapping call per host** (r8, APPROVALS-TENANCY-C11): the release is sent as one
+        `setTenantDomainMapping` for this hostname; when it was the primary custom domain, the control plane''s
+        consumer promotes the platform subdomain, so no second call is made here.
 
         **A live app is an app with a published configuration (decided 28 September, audit R096)**: the
         tenant has a current `ConfigVersion` (`TenantAppStatus.isPublished` true) for the app the domain
@@ -503,6 +584,9 @@ paths:
       description: '**One primary domain per kind; the others redirect to it** (CHG-CSA-043). The domain must be
         `active`, or 409 `domain-not-active`. The tenant''s platform subdomain redirects to the primary too, and is
         primary again when none is.
+
+        **One mapping call per host** (r8, APPROVALS-TENANCY-C11): this sends one `setTenantDomainMapping` for the
+        new primary; demoting the channel''s other primary is the control plane consumer''s, from the same event.
 
         '
       tags:
@@ -900,6 +984,9 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-016 White-Label Branding Management"
         - "P13 CMS-014 Publishing Workflow"
+      x-ticvai-reads:
+      - table: whitelabel.config_version
+        for: 'the published version''s snapshot the package is built from (r8 integration, CHG-R8INT-014; check-parameter-columns P-NAMED-TABLE)'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '2 October: Chinmay, workbook Q144 ("self-hosted: the venue generates a site package"); shape
@@ -909,6 +996,11 @@ paths:
         downloadable package of the published configuration: the storefront build, its configuration snapshot and the
         hosting instructions. A job: answers 202, followed with `getSitePackage`. Only from a published version; the
         working draft never leaves.
+
+        **The job** (R8 blocker IDENTITY-C63): it runs in the workers host, reads the version''s
+        `whitelabel.config_version` snapshot, builds the package and stores it in the assets store; the package moves
+        `building` -> `ready` (with its download link, which expires 24 hours after it is issued) or `failed` (with
+        the reason). Nothing else is stored.
 
         '
       tags:
@@ -992,6 +1084,7 @@ paths:
     get:
       operationId: getPublishReviewPolicy
       x-ticvai-consumed-by:
+        - "P13 CMS-007 Page Builder"
         - "P13 CMS-014 Publishing Workflow"
       x-ticvai-audience:
       - staff
@@ -1031,7 +1124,19 @@ paths:
         publishing, and the version or block goes live when approved; `requiresReviewerOtherThanAuthor` keeps the
         products'' rule. When off, a permission holder simulates (`createPreview`) and publishes in one step.
 
+        **Switching it on creates the tenant''s default approval matrix for `whiteLabelPublication`** (ADAM CR-154,
+        18 October 2026; CHG-CRA-004) through approvals'' `setApprovalMatrix` (`x-ticvai-write-via`), where the
+        tenant has none, so the policy and the matrix never disagree: a policy that is on always has a matrix to
+        route the approval request by.
+
+        **Switching it off** (r8 walk of ticket 27780; lead decision of 20 October 2026, option A): versions and
+        content blocks already `pending` review **stay pending** until a reviewer decides; the switch affects new
+        publishes only. The matrix is kept.
+
         '
+      x-ticvai-write-via:
+      - table: approvals.matrix
+        operation: setApprovalMatrix
       tags:
       - publishing
       x-ticvai-permission: TENANT_PUBLISH
@@ -1215,10 +1320,6 @@ paths:
       operationId: listContentBlocks
       x-ticvai-consumed-by:
         - "P13 CMS-007 Page Builder"
-      x-ticvai-read-via:
-      - query: platform-ops#contentBlockRecords
-        route: in-process
-        for: 'its read of control.content_block, Platform''s data (CHG-MOD-001)'
       summary: The content blocks of a page
       description: |-
         **Added 4 October 2026 (CHG-FXC-011; CMS-007: the builder could create and publish a block and not load one).** The blocks of one page (`pageKey`, a content page's id or a homepage section key), ordered by `position`, drafts and published alike.
@@ -1267,9 +1368,6 @@ paths:
       - query: marketing-crm#segmentRecords
         route: in-process
         for: 'its read of marketing.segment, Marketing''s data (CHG-MOD-001)'
-      - query: platform-ops#contentBlockRecords
-        route: in-process
-        for: 'its read of control.content_block, Platform''s data (CHG-MOD-001)'
       summary: Author a block of content
       description: 'BL-172. **The CMS modelled configuration and not authoring** — a marketer could choose
         between things a developer had built and could not write something new.
@@ -1322,9 +1420,9 @@ paths:
       - query: identity#principalRecords
         route: service
         for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
-      - query: platform-ops#contentBlockRecords
-        route: in-process
-        for: 'its read of control.content_block, Platform''s data (CHG-MOD-001)'
+      x-ticvai-write-via:
+      - table: approvals.request
+        operation: createApprovalRequest
       summary: Publish now, or schedule it
       description: '**A seasonal banner needing somebody awake at midnight is the same defect `Product.onSaleFrom`
         fixed**, and the answer is the same: a date on the object rather than a person with an alarm.
@@ -1336,6 +1434,16 @@ paths:
 
         **`expireAt` must follow `publishAt`** when both are sent (decided 28 September, audit R163), or
         400. A scheduled job makes the publish and the expiry at those times (audit R163).
+
+        **The review path, as `publishTenantConfig` has it** (r8 walk of ticket 27919; ADAM CR-154). With the
+        tenant''s publish-review policy off, the block is published or scheduled at once (200). With it on, this
+        calls approvals'' `createApprovalRequest` (`x-ticvai-write-via`; kind `configurationChange`, the same matrix
+        subject `whiteLabelPublication`, `subjectId` the block id; the request points at the block, and the block keeps no link back), leaves `status`
+        as it is and sets `reviewStatus` `pending`, and answers 202. White-label''s consumer of `approval.granted`
+        then publishes or schedules the block (`reviewStatus` `approved`); its consumer of `approval.rejected`
+        sets `reviewStatus` `rejected` and the block stays a draft. While `pending`, a second publish of the block
+        is refused with 409 `content-block-awaiting-review`. CMS-007 reads `getPublishReviewPolicy` to say whether
+        review applies and shows `reviewStatus` on the block.
 
         '
       tags:
@@ -1373,9 +1481,17 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ContentBlock'
+        '202':
+          description: Submitted for review; the tenant's publish-review policy is on. The block keeps its `status`,
+            carries `reviewStatus` `pending`, and is published or scheduled when the
+            request is approved.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContentBlock'
         '409':
-          description: 'The block is already `published` (`content-block-published`; a change goes through a new draft) or is `archived` (`content-block-archived`). Nothing changes.'
-          x-ticvai-problem-types: [content-block-published, content-block-archived]
+          description: 'The block is already `published` (`content-block-published`; a change goes through a new draft), is `archived` (`content-block-archived`), or is already waiting for review (`content-block-awaiting-review`). Nothing changes.'
+          x-ticvai-problem-types: [content-block-published, content-block-archived, content-block-awaiting-review]
           content:
             application/problem+json:
               schema:
@@ -1390,6 +1506,10 @@ paths:
         - "P09 ADM-018 Interface Languages"
         - "P13 CMS-009 Navigation & Menus"
         - "P13 CMS-011 Translations"
+      x-ticvai-read-via:
+      - query: tenancy#activeVenues
+        route: service
+        for: 'the venues whose overrides it returns: platform.scope, Tenancy''s data (CHG-RTE-001)'
       x-ticvai-audience:
       - staff
       - guest
@@ -1476,7 +1596,7 @@ paths:
 
         **Two views of one schema.** Called without a staff session, the response carries only `tenantId`,
         `isPublished`, `publishedVersion`, `publishedAt`, `isInMaintenance`, `maintenanceMessage`,
-        `expectedBackAt`, `minimumAppVersion`, `contact`, `availability`, `availabilityMessage`, `venues` and `whatsNew`. The draft and CMS fields (`draftVersion`, `hasUnpublishedChanges`, the module
+        `expectedBackAt`, `minimumAppVersion`, `contact`, `availability`, `availabilityMessage`, `venues`, `whatsNew` and `darkAppModules` (ADAM CR-164). The draft and CMS fields (`draftVersion`, `hasUnpublishedChanges`, the module
         and page counts, `recentChanges`) are returned only to a staff session holding `TENANT_CONFIGURE`
         — a public, cacheable response must not carry who changed what.
 
@@ -1484,6 +1604,13 @@ paths:
         minimum supported app version, so GST-047 can force an upgrade (`minimumAppVersion`); and the
         venue''s contact details with a sold-out or closed signal, for WEB-028 and WEB-029 (`contact`,
         `availability`). All of them are set with `setMaintenanceMode`.
+
+        **Per tenant, except each venue''s contact** (R8 blocker WHITE-C16, the lead''s answer of 20 October
+        2026). Maintenance, `availability` and the homepage layout are one per tenant in r8: a closure (a
+        weather closure, a private event) set for the site shows at every venue the guest may pick, which is a
+        known simplification, and the screens call it "the site", not "the venue". `contact` is the tenant''s
+        head-office contact. **The picked venue''s own address, phone and email** are `venues[].contact`, which
+        WEB-028 heads its page with; where a venue has none, the app shows `contact`.
 
         **And the tenant''s venues, for the guest''s venue picker (decided 28 September, audit R267)**: the
         guest picks a venue on first open of WEB-001 or GST-001, the choice is remembered on the device
@@ -1515,6 +1642,8 @@ paths:
                 $ref: '#/components/schemas/TenantAppStatus'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+        '503':
+          $ref: '../shared/common.yaml#/components/responses/ServiceUnavailable'
     put:
       operationId: setMaintenanceMode
       x-ticvai-consumed-by:
@@ -1630,7 +1759,7 @@ paths:
         for: 'showPoweredBy false: the tenant''s licence add-on keyed poweredByRemoval, else 403 powered-by-locked (ADAM CR-096)'
       - query: assets#mediaAssetRecords
         route: in-process
-        for: 'each asset''s type, size and dimensions: PNG or SVG, up to 2 MB (ADAM CR-096)'
+        for: 'each asset''s type, size and dimensions: image fields PNG or SVG up to 2 MB, the intro video as a video asset within the library''s limit (ADAM CR-096)'
       x-ticvai-singleton: true
       x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
@@ -1641,8 +1770,12 @@ paths:
         and a store submission. **On the guest web app a splash change is immediate (decided 28 September,
         audit R163)**: it reaches web guests with the publish, with no build.
 
-        **Each asset is PNG or SVG, up to 2 MB (decided 28 September, audit R270).** Anything else is
-        refused with 400 before it is stored against the brand.
+        **Each image asset (logo, dark logo, favicon, splash images) is PNG or SVG, up to 2 MB (decided 28
+        September, audit R270).** Anything else is refused with 400 before it is stored against the brand.
+        **`introVideoAssetRef` is a video asset and is not held to that rule** (r8 walk of ticket 27912; lead decision
+        of 20 October 2026): it takes the asset library''s own limit for kind `video` (`assets.createUpload`: mp4,
+        webm or quicktime, up to 500 MB), so there is one number; any other kind is refused with 400
+        `media-type-not-permitted`.
 
         **"Powered by TICVAI" is a toggle, on by default** (Chinmay, 2 October, workbook Q160; CHG-CSA-036):
         `showPoweredBy` false is accepted only where the tenant''s licence allows it, or 403 `powered-by-locked`.
@@ -1673,8 +1806,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/BrandIdentity'
         '400':
-          x-ticvai-problem-types: [media-too-large, media-type-not-permitted]
-          description: An asset is larger than 2 MB, or is not PNG or SVG (audit R270)
+          x-ticvai-problem-types: [media-too-large, media-type-not-permitted, asset-not-ready]
+          description: An image asset is larger than 2 MB, or is not PNG or SVG (audit R270); the intro video is not a video asset or is above the library limit; or an asset is not ready to
+            use, because it is still processing, was quarantined or failed (`asset-not-ready`; r8 walk of tickets
+            28682 and 27928, so the CMS-002 preview rule has a refusal to test). The problem names the field and
+            the asset status. Nothing is saved.
           content:
             application/problem+json:
               schema:
@@ -2095,7 +2231,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/Theme'
         '400':
-          description: A colour pair fails the contrast requirement. The response names the pairs
+          x-ticvai-problem-types: [contrast-insufficient]
+          description: A colour pair fails the contrast requirement (`contrast-insufficient`). The response names the pairs
           content:
             application/problem+json:
               schema:
@@ -3265,6 +3402,7 @@ paths:
       description: '**Policies are versioned and never overwritten.** A guest who consented to version
         3 consented to version 3, and a privacy notice that changes silently under a recorded consent
         is a compliance failure. Publishing creates a new version; prior versions remain readable.
+        **There is no title to send**: the heading a guest sees is derived from `kind` (`PolicyKind`).
 
         **English and Arabic are both required before a policy can be published (decided 28 September,
         audit R096)**: `body` must carry non-empty `en` and `ar` entries, or 400. Other enabled languages
@@ -3327,21 +3465,29 @@ paths:
         - "P13 CMS-001 Tenant Workspace"
         - "P13 CMS-007 Page Builder"
       x-ticvai-read-via:
+      - query: subscription#tenantRecords
+        route: in-process
+        for: 'the tenant''s cell address (Tenant.cellHost) a platform operator''s X-Tenant-Id resolves to, Platform''s data (r8 integration, CHG-R8INT-014)'
       - query: subscription#contractRecords
         route: in-process
-        for: 'its read of subscription.contract, Platform''s data (CHG-MOD-001)'
+        for: 'its read of control.contract, Platform''s data (CHG-MOD-001)'
       - query: subscription#licenceAddOnRecords
         route: in-process
         for: 'its read of control.licence_add_on, Platform''s data (CHG-MOD-001)'
       - query: subscription#planRecords
         route: in-process
-        for: 'its read of subscription.plan, Platform''s data (CHG-MOD-001)'
+        for: 'its read of control.plan, Platform''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
       summary: Read module enablement
       description: 'Shows which modules the tenant has licensed and which are enabled. A module that is
         not licensed cannot be enabled, so the two are returned together.
+
+        **`isLicensed` uses the map on `ModuleKey`** (common.yaml; R8 blocker fix, IDENTITY-C31): a feature here is
+        licensed when its `x-ticvai-licence-module` is in the tenant''s `LicencePosition.licensedModules`.
+        **A platform operator sends `X-Tenant-Id`** (`TenantId`; APPROVALS-TENANCY-C44) to read a tenant''s
+        enablement from the cell that holds many tenants; the cell address is `Tenant.cellHost`.
 
         '
       tags:
@@ -3350,6 +3496,8 @@ paths:
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/TenantId
       responses:
         '200':
           description: Modules
@@ -3369,22 +3517,36 @@ paths:
       x-ticvai-read-via:
       - query: subscription#contractRecords
         route: in-process
-        for: 'its read of subscription.contract, Platform''s data (CHG-MOD-001)'
+        for: 'its read of control.contract, Platform''s data (CHG-MOD-001)'
       - query: subscription#licenceAddOnRecords
         route: in-process
         for: 'its read of control.licence_add_on, Platform''s data (CHG-MOD-001)'
       - query: subscription#planRecords
         route: in-process
-        for: 'its read of subscription.plan, Platform''s data (CHG-MOD-001)'
+        for: 'its read of control.plan, Platform''s data (CHG-MOD-001)'
+      - query: subscription#moduleListingRecords
+        route: in-process
+        for: 'display name, requiresModules and incompatibleWithModules of each module listed (control.module_listing), Platform''s data (APPROVALS-TENANCY-C41; r8 integration, CHG-R8INT-016)'
       x-ticvai-singleton: true
       x-ticvai-singleton-note: 'One set per tenant, the caller''s tenant: a PUT replaces the whole set, and an entry the body leaves out is removed. There is no key in the path.'
       x-ticvai-audience:
       - staff
       x-ticvai-config-scope: tenant
       summary: Enable or disable modules
-      description: 'A disabled module is **hidden from the guest app entirely** — not shown and refused.
+      description: 'A disabled module is **hidden from the guest app entirely** — not shown and refused. **Enabling one whose
+        licence module (`x-ticvai-licence-module`, the map on `ModuleKey` in common.yaml) the tenant does not hold is
+        refused** as "not licensed". A platform operator sends `X-Tenant-Id` (`TenantId`).
+
         Disabling one that navigation or the homepage references is rejected, with the references named
         so the tenant can clear them first.
+
+
+        **The server checks the dependency graph** (R8 blocker APPROVALS-TENANCY-C41, option A; r8 integration,
+        CHG-R8INT-016): enabling a module whose `requiresModules` are not all enabled in the same set is refused 409
+        `module-dependency-unmet`, and enabling two modules one lists in `incompatibleWithModules` is refused 409
+        `module-incompatible`, both read from the module listing (`subscription#moduleListingRecords`); the screen''s
+        own check stays as a courtesy. The enablement hangs off the tenant''s current draft tenant configuration
+        (created when there is none), and each row''s display name is copied from the listing.
 
         '
       tags:
@@ -3395,6 +3557,7 @@ paths:
       x-ticvai-conflict-policy: serverWins
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      - $ref: ../shared/common.yaml#/components/parameters/TenantId
       requestBody:
         required: true
         content:
@@ -3430,6 +3593,14 @@ paths:
                   $ref: '#/components/schemas/ModuleEnablement'
         '400':
           description: Module not licensed, or still referenced by navigation or homepage
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ModuleReferenceProblem'
+        '409':
+          description: A module enabled without a module it requires, or with one it cannot run beside (the listing's
+            requiresModules and incompatibleWithModules; APPROVALS-TENANCY-C41).
+          x-ticvai-problem-types: [module-dependency-unmet, module-incompatible]
           content:
             application/problem+json:
               schema:
@@ -3477,6 +3648,10 @@ paths:
 
         Several are build-time on native apps and are flagged accordingly. A tenant enabling Apple Wallet
         should know it needs a release, not a publish.
+
+        **The caller sends only `featureKey` and `isEnabled`.** `displayName`, `changeScope` and
+        `requiresConfiguration` come from the feature catalogue on `FeatureKey`, and the server writes them into
+        each row it inserts, including every row of the whole-set replace.
 
         '
       tags:
@@ -3615,6 +3790,11 @@ paths:
         needs, DI-444) or a sample ticket otherwise. **Simulate, then publish** (workbook Q156, CHG-CSA-042): this is
         the simulate step.
 
+        **Where the preview is kept** (R8 blocker IDENTITY-C63): nothing is stored in a table. The rendered draft''s
+        reference is held in Redis under `cache:preview:{tenantId}:{previewId}` until `expiresAt` (its time to live),
+        and `url` is served from that entry; after it expires the link answers 404. The read that serves the link is
+        requested of the surface lane (`GET /tenant-config/preview/{previewId}`).
+
         '
       tags:
       - publishing
@@ -3679,6 +3859,41 @@ paths:
                 $ref: '#/components/schemas/Preview'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /tenant-config/preview/{previewId}:
+    parameters:
+    - name: previewId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    get:
+      operationId: getPreview
+      x-ticvai-audience:
+      - staff
+      summary: Read a preview while its link lives
+      description: '**A preview is read back by its id until it expires** (r8, IDENTITY-C63; the storage-sat lane''s
+        request). `createPreview` keeps it in Redis under `cache:preview:{tenantId}:{previewId}` until `expiresAt`,
+        not in a table; this answers it as created (its link and rendered outputs), so a reviewer who reloads the
+        page sees the same preview. After `expiresAt` it is gone: 404, and the screen offers to create a new one.'
+      tags:
+      - publishing
+      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-scope-level: tenant
+      x-ticvai-read-routing: primary
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: The preview, as created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Preview'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /tenant-config/validate:
     post:
       operationId: validateTenantConfig
@@ -3728,6 +3943,9 @@ paths:
       - query: tenancy#activeVenues
         route: service
         for: 'what its text calls "active venues": platform.scope, Tenancy''s data (CHG-RTE-001)'
+      x-ticvai-write-via:
+      - table: approvals.request
+        operation: createApprovalRequest
       x-ticvai-audience:
       - staff
       x-ticvai-config-scope: tenant
@@ -3753,8 +3971,24 @@ paths:
         author, where the policy says so) approves it.
 
         **Platform staff publish a hosted tenant''s site** (Chinmay, 2 October, workbook Q144; R098; CHG-CSA-038)
-        only under a platform-staff grant naming `TENANT_PUBLISH`, with step-up. A self-hosted tenant exports a site
-        package (`exportSitePackage`) instead.
+        only under a platform-staff grant naming `TENANT_PUBLISH`, with step-up. A self-hosted tenant publishes first and then
+        exports a site package (`exportSitePackage`, which needs a published version); both actions are always
+        offered on CMS-014 and there is no hosting flag (r8 walk of ticket 27906; lead decision of 20 October 2026).
+
+        **The server names the version** (ADAM CR-154, 18 October 2026; CHG-CRA-004). In the publish transaction it
+        takes the next integer for the tenant (`1`, `2`, ...), as kiosk versions are numbered; that is the
+        version''s `version`, and the draft''s `tenant_config.version` becomes the next label. `config_version` is
+        unique on (`scope_path`, `version`) and has one current row per tenant (a partial unique index on
+        `scope_path` where `is_current`), so a racing publish fails on the index and is retried with the next label.
+
+        **The review path** (CR-154; CHG-CRA-004). The tenant''s publish-review policy decides: off, the version is
+        current at once (201) and `whitelabel.contentPublished` goes out in the same transaction; on, this calls
+        approvals'' `createApprovalRequest` (`x-ticvai-write-via`; kind `configurationChange`, subject
+        `whiteLabelPublication`, `subjectId` the `config_version` id), records its `approvalRequestId` and answers
+        202 with `reviewStatus` `pending`. White-label''s consumer of `approval.granted` makes the version current
+        (`reviewStatus` `approved`) and then emits `contentPublished`; its consumer of `approval.rejected` sets
+        `reviewStatus` `rejected` and the version never becomes current. A scheduled publish emits it when the job
+        makes the version current. **The event goes out when a version becomes current, never before.**
 
         '
       tags:
@@ -3786,7 +4020,12 @@ paths:
                     activates it (decided 28 September, audit R163)**: the version is validated and
                     snapshotted now, recorded with `isCurrent` false, and the job makes it current at
                     `scheduledFor`. It is validated again then; a failure leaves the current version
-                    live and is reported on the version.
+                    live and is reported on the version (`activationFailedAt`, `activationFailure`).
+                    **The job** (R8 blocker IDENTITY-C63) runs in the workers host every minute: it takes the
+                    versions whose `scheduledFor` has passed and that are not current and not failed,
+                    validates each again and makes it current, which is when `contentPublished` is emitted
+                    (CR-154); a version that fails validation keeps `isCurrent` false and records the
+                    failure.
       responses:
         '201':
           headers:
@@ -4046,6 +4285,12 @@ paths:
         then review then publish, so a rollback is as deliberate as the change that caused it. **Not a
         one-click rollback (confirmed 28 September, audit R139)**: flow F22 is corrected to match.
 
+        **Unpublished changes** (r8 walk of ticket 27901; lead decision of 20 October 2026). A restore overwrites
+        the working draft, so it is refused with 409 `unpublished-changes` while the draft holds changes not yet
+        published, unless the request sends `discardDraftChanges` true, as `restoreKioskConfigVersion` does. The
+        CMS-015 dialog says the unpublished changes are replaced, and sends true after the user confirms. The
+        discarded draft is stored nowhere (the loss is intended, and the dialog is the only confirmation).
+
         '
       tags:
       - publishing
@@ -4055,6 +4300,17 @@ paths:
       x-ticvai-conflict-policy: serverWins
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                discardDraftChanges:
+                  type: boolean
+                  default: false
+                  description: True overwrites unpublished changes in the draft.
       responses:
         '200':
           headers:
@@ -4068,7 +4324,7 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
-          description: 'The working draft has unpublished changes that the restore would overwrite; publish or discard them first. Nothing changes.'
+          description: 'The working draft has unpublished changes that the restore would overwrite and `discardDraftChanges` is not true. Nothing changes.'
           x-ticvai-problem-types: [unpublished-changes]
           content:
             application/problem+json:
@@ -4089,12 +4345,24 @@ paths:
         - "P09 ADM-016 White-Label Branding Management"
         - "P13 CMS-014 Publishing Workflow"
         - "P13 CMS-015 Version History"
+        - "P13 CMS-103 Booking Flows"
+      x-ticvai-read-via:
+      - query: catalogue#productRecords
+        route: service
+        for: 'its read of catalogue.product, Catalogue''s data (ADR-0055), to name the products a changed flow reaches'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
       summary: Compare a version against the working draft
       description: 'What a review step actually needs. A publish note saying "updated homepage" is not
         a review; a field-level diff is.
+
+        **Changed booking flows and the products they reach** (r8 walk of ticket 28337). The publish gate on
+        CMS-103 says which flows changed and which products are affected, and it reads both here. `changes` has an
+        area `bookingFlows` with one entry per flow added, removed or modified (`path` is the flow key).
+        `affectedProducts` lists, for the flows that differ, each product the flow serves, found by the rule
+        `Product.bookingFlowId` already states: the product''s own flow, else its category''s, else the venue''s
+        default flow for the product''s kind. The server applies that rule on read; nothing is stored.
 
         '
       tags:
@@ -4390,6 +4658,63 @@ paths:
                 $ref: '#/components/schemas/GuidedChoice'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /venues/{venueId}/guided-choice-previews:
+    parameters:
+    - name: venueId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: previewGuidedChoice
+      x-ticvai-consumed-by:
+        - "P13 CMS-101 Help Me Choose"
+      x-ticvai-idempotency-exempt: A preview computed in process from the draft answers; it writes nothing, so a replay duplicates no row (r8 integration, CHG-R8INT-014).
+      x-ticvai-read-via:
+      - query: catalogue#productRecords
+        route: service
+        for: 'the products each combination of answers leaves, by the same answer filter listProducts applies for a
+          guest (r8, WHITE-C26)'
+      - query: catalogue#productEligibilityRuleRecords
+        route: service
+        for: 'the age and height limits an age or level answer filters on (r8, WHITE-C26)'
+      x-ticvai-audience:
+      - staff
+      summary: What a draft Help me choose leaves, combination by combination
+      description: '**The live preview of a draft set-up** (r8, WHITE-C26; the core lane made catalogue''s listProducts
+        say that drafts preview through this). The body is the draft''s questions and answers as CMS-101 holds them,
+        saved or not; the answer is, for every combination of answers a guest can give, how many of the venue''s
+        products it leaves and up to three of their ids, so the editor sees a combination that leaves nothing
+        before publishing. Nothing is stored and nothing is published; the guest filter is the one listProducts
+        applies, so the preview and the published behaviour cannot differ. A set-up with `behaviour` `recommend`
+        is answered with each last answer''s `target` instead of a count.'
+      tags:
+      - content
+      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: replica
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GuidedChoicePreviewRequest'
+      responses:
+        '200':
+          description: The products each combination leaves
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GuidedChoicePreview'
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /guided-choices/{guidedChoiceId}:
@@ -4707,7 +5032,8 @@ paths:
         CHG-GCF-005): the storefront and app tag loader reads `PublishedTenantConfig.analyticsProviders` from
         `getPublishedTenantConfig`, which needs no session, and GST-001 and WEB-001 no longer call this. This
         stays a staff read under `TENANT_CONFIGURE`; the guest audience and the optional credential stay only
-        so a client built against r1 is not broken, and a guest caller still gets the rows described above.
+        so a client built against r1 is not broken, and a guest caller still gets the rows described above,
+        carrying only the fields of `PublishedAnalyticsProvider` (the others are left out).
       tags:
       - overview
       x-ticvai-permission: TENANT_CONFIGURE
@@ -4762,11 +5088,17 @@ paths:
       x-ticvai-agreed: '29 September: matrix 22.10.29; Chinmay''s brief for the build (venue configuration: provider, measurement id, the consent category it waits on); BL-073 design §4a; shape follows setBookingFlowConfig'
       summary: Connect the storefront and app to an analytics platform
       description: >
-        **An upsert keyed on `venueId` + `provider`** (22.10.29). A null `venueId` is the tenant-wide
+        **One row per `venueId` + `provider`** (22.10.29; a database unique key, a null `venueId` counting
+        as one value). The path id is the row's identity: a PUT to an existing id replaces that row; a PUT
+        to a new id creates it, unless another row already holds the same `venueId` and `provider`, which
+        is 409 `analytics-provider-exists` (PUT to that row's id instead). A null `venueId` is the tenant-wide
         default; a venue's own row replaces it for that venue (ADR-0018, nearest wins). `measurementId`
-        is what the page tag or app SDK reports to (a GA4 `G-` id, a Tag Manager `GTM-` container, a
-        pixel id); it is public by nature, and the reporting credential is not: `reportingCredentialRef`
-        names a secret in the platform vault, is write-only and is never returned.
+        is what the page tag or app SDK reports to; it is public by nature, and the reporting credential is
+        not: `reportingCredentialRef` names a secret in the platform vault, is write-only and is never returned.
+        **`measurementId` must match its provider's format**, else 422 `measurement-id-invalid` (formats
+        proposed, client to confirm against each vendor): `googleAnalytics4` `^G-[A-Z0-9]{6,12}$`,
+        `googleTagManager` `^GTM-[A-Z0-9]{4,8}$`, `metaPixel` `^[0-9]{10,20}$`; `adobeAnalytics`, `matomo` and
+        `other` are checked for length only (1 to 100 characters).
 
         **Every provider waits on a consent category** (`consentCategory`, `analytics` unless set): it is
         not loaded, and no hit is sent, until the visitor's decision grants that category. `strictlyNecessary`
@@ -4806,6 +5138,13 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '409':
+          x-ticvai-problem-types: [analytics-provider-exists]
+          description: Another row already holds this `venueId` and `provider` (`analytics-provider-exists`). Nothing is written.
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
           x-ticvai-problem-types: [measurement-id-invalid, venue-not-active]
           description: A `measurementId` that does not match the provider's format, or a `venueId` not among the tenant's active venues
@@ -4976,12 +5315,17 @@ paths:
       operationId: getPublishedTenantConfig
       x-ticvai-consumed-by:
         - "P01 WEB-001 Home / Landing"
+        - "P01 WEB-021 Wallet & Gift Cards"
         - "P01 WEB-029 Error / Sold Out / Maintenance"
         - "P02 GST-001 Home"
         - "P02 GST-043 Arabic / RTL Experience"
         - "P02 GST-047 Maintenance / Upgrade Page"
         - "P02 GST-071 Payment Methods"
         - "P05 KSK-002 Language Select"
+      x-ticvai-read-via:
+      - query: payments#providerConnectionRecords
+        route: service
+        for: 'its read of payments.provider_connection, for `paymentTokenisation`, through the service route: White-label runs in operations, Payments in commerce (lineage request, r8; CHG-R8INT-005)'
       x-ticvai-audience:
       - anonymous
       - guest
@@ -5450,6 +5794,7 @@ paths:
     get:
       operationId: getPublishedBookingFlow
       x-ticvai-consumed-by:
+        - "P01 WEB-004 Attraction Details"
         - "P01 WEB-005 Ticket Type Selection"
         - "P01 WEB-006 Date & Performance Selection"
         - "P01 WEB-007 Interactive Seat Selection"
@@ -6194,10 +6539,6 @@ paths:
       operationId: updateContentBlock
       x-ticvai-consumed-by:
         - "P13 CMS-007 Page Builder"
-      x-ticvai-read-via:
-      - query: platform-ops#contentBlockRecords
-        route: in-process
-        for: 'its read of control.content_block, Platform''s data (CHG-MOD-001)'
       summary: Change a draft content block
       description: |-
         **Added 4 October 2026 (CHG-FXC-011; CMS-007).** Changes a block's `body`, `localeVariants`, `position`,
@@ -6377,8 +6718,13 @@ components:
     StorefrontAnalyticsProvider:
       type: object
       x-ticvai-persistence: whitelabel.analytics_provider
+      # One row per venue (or tenant-wide) and provider (R8 blocker IDENTITY-C09, CHG-R8STO-001).
+      x-ticvai-unique-together:
+      - [venueId, provider]
+      x-ticvai-unique-nulls: not-distinct
       description: '**One analytics platform the storefront or app reports to** (22.10.29, 29 September build). Venue
-        configuration: a null `venueId` is the tenant-wide default a venue''s own row replaces.'
+        configuration: a null `venueId` is the tenant-wide default a venue''s own row replaces. One row per `venueId`
+        and `provider`.'
       required:
       - provider
       - measurementId
@@ -6411,7 +6757,9 @@ components:
         measurementId:
           type: string
           maxLength: 100
-          description: What the tag or SDK reports to (GA4 `G-...`, Tag Manager `GTM-...`, a pixel id).
+          description: 'What the tag or SDK reports to. Format by provider (proposed, client to confirm): googleAnalytics4
+            `^G-[A-Z0-9]{6,12}$`, googleTagManager `^GTM-[A-Z0-9]{4,8}$`, metaPixel `^[0-9]{10,20}$`; adobeAnalytics,
+            matomo and other length only. A mismatch is 422 `measurement-id-invalid` on `setAnalyticsProvider`.'
         surfaces:
           type: array
           minItems: 1
@@ -6606,6 +6954,53 @@ components:
           nullable: true
           description: Required when `kind` is `bookingFlow` (decided 29 September, W12; BUILD-YOUR-EXPERIENCE
             "each answer points to one booking flow"). One of the venue's enabled `BookingFlow`s.
+    GuidedChoicePreviewRequest:
+      x-ticvai-persistence: none — request only
+      type: object
+      description: 'What `previewGuidedChoice` takes: a draft set-up''s behaviour and questions, in
+        `GuidedChoice`''s shape, saved or not (r8, WHITE-C26).'
+      required: [behaviour, questions]
+      properties:
+        behaviour:
+          type: string
+          enum: [filter, recommend]
+        questions:
+          type: array
+          minItems: 1
+          maxItems: 4
+          description: Same shape and bounds as `GuidedChoice.questions`.
+          items:
+            type: object
+    GuidedChoicePreview:
+      x-ticvai-persistence: none — computed on read
+      type: object
+      description: 'One row per combination of answers a guest can give (at most the product of the questions''
+        answer counts, four questions of a few answers each), in question order (r8, WHITE-C26).'
+      required: [combinations]
+      properties:
+        combinations:
+          type: array
+          items:
+            type: object
+            required: [answerKeys, productsLeft]
+            properties:
+              answerKeys:
+                type: array
+                items: { type: string }
+                description: The answer picked on each question, in order.
+              productsLeft:
+                type: integer
+                minimum: 0
+                description: The venue's products the combination leaves (filter behaviour); 0 is the case to fix.
+              sampleProductIds:
+                type: array
+                maxItems: 3
+                items: { type: string, format: uuid }
+              target:
+                type: object
+                nullable: true
+                additionalProperties: true
+                description: The result the combination ends on (recommend behaviour), as the last answer's `target`.
     GuidedChoice:
       x-ticvai-persistence: whitelabel.guided_choice + whitelabel.guided_choice_question + whitelabel.guided_choice_answer
       type: object
@@ -6884,8 +7279,9 @@ components:
     BookingFlowTypeKey:
       type: string
       description: '**The flow types the system catalogue offers (decided 29 September, W12; impact.md b).**
-        `seatedFixedPerformance` and `seatedDateTimeSeatMap` are the two seated flows; `cabanaMap` and `cabanaBySize`
-        are the two cabana flows (W6); `experienceWorkshop` puts the product before the date (W8); `multiLocation`
+        `seatedFixedPerformance` and `seatedDateTimeSeatMap` are the two seated flows; `cabanaMap` is the one cabana flow
+        (W6; `cabanaBySize` was removed in r8: a guest books a cabana from the map only, lead decision of 20
+        October 2026); `experienceWorkshop` puts the product before the date (W8); `multiLocation`
         opens on the location switcher.
 
         '
@@ -6899,7 +7295,6 @@ components:
       - surfSession
       - meetingRoomHourly
       - cabanaMap
-      - cabanaBySize
       - guidedTourByLanguage
       - transport
       - tableReservation
@@ -7092,16 +7487,19 @@ components:
           productKinds: [rental]
           steps:
           - {stepKey: location, requirement: conditional}
+          # r8 (GPS-C28): date, then the length, then the start time, because the start times a room type offers
+          # depend on the length (listProductStartTimes takes the length variant); the room type is the product the
+          # flow is for, chosen before it. partySize carries the attendees the room must hold.
           - {stepKey: date, requirement: required, settingsOwned: [dateStripDays]}
-          - {stepKey: time, requirement: required, settingsOwned: [timesPerPage, dayPartFilter, dayPartBoundaries]}
           - {stepKey: duration, requirement: required, stepSettings: [{name: minHours, type: integer, default: 1}, {name: maxHours, type: integer, default: 8}, {name: stepMinutes, type: integer, default: 60}]}
+          - {stepKey: time, requirement: required, settingsOwned: [timesPerPage, dayPartFilter, dayPartBoundaries]}
           - {stepKey: partySize, requirement: optional, stepSettings: [{name: minGuests, type: integer, default: 1}, {name: maxGuests, type: integer}]}
           - {stepKey: extras, requirement: optional, settingsOwned: [extrasStep, quantitiesOnAddOns]}
           - {stepKey: review, requirement: optional}
           - {stepKey: payment, requirement: required, settingsOwned: [signInAt]}
           orderConstraints:
-          - {kind: before, stepKey: date, otherStepKey: time}
-          - {kind: before, stepKey: time, otherStepKey: duration}
+          - {kind: before, stepKey: date, otherStepKey: duration}
+          - {kind: before, stepKey: duration, otherStepKey: time}
         - key: cabanaMap
           productKinds: [rental]
           steps:
@@ -7114,20 +7512,6 @@ components:
           - {stepKey: payment, requirement: required, settingsOwned: [signInAt]}
           orderConstraints:
           - {kind: before, stepKey: date, otherStepKey: resourceMap}
-        - key: cabanaBySize
-          productKinds: [rental]
-          steps:
-          - {stepKey: location, requirement: conditional}
-          - {stepKey: date, requirement: required, settingsOwned: [dateStripDays]}
-          - {stepKey: partySize, requirement: required, stepSettings: [{name: minGuests, type: integer, default: 1}, {name: maxGuests, type: integer}]}
-          - {stepKey: resourceSize, requirement: required, note: the server assigns a unit of the chosen size}
-          - {stepKey: consent, requirement: conditional, settingsOwned: [consentQuestionIds]}
-          - {stepKey: extras, requirement: optional, settingsOwned: [extrasStep, quantitiesOnAddOns]}
-          - {stepKey: review, requirement: optional}
-          - {stepKey: payment, requirement: required, settingsOwned: [signInAt]}
-          orderConstraints:
-          - {kind: before, stepKey: date, otherStepKey: resourceSize}
-          - {kind: before, stepKey: partySize, otherStepKey: resourceSize}
         - key: guidedTourByLanguage
           productKinds: [timedAdmission]
           steps:
@@ -7615,7 +7999,21 @@ components:
           - null
           description: 'The starting point. Each preset proposes the modules, the booking flow types (with
             their default step order), the homepage sections, the mobile tabs and a booking-flow `preset`;
-            nothing is written until the operator accepts a step.'
+            nothing is written until the operator accepts a step.
+
+
+            **What each preset proposes** (r8 walk of tickets 27908, 27899 and 27905; lead decision of 20 October
+            2026, option 2). `waterPark` is DEC-159: modules `ticketsAndBooking`, `diningAndFnb`, `shop`, `map`;
+            flows `datedDayPass` and `cabanaMap`; sections `heroBanner`, `tickets`, `attractions`, `dining`; tabs Home,
+            Explore, Map, Tickets. **Every other preset (`themePark`, `museum`, `theatreAndArena`,
+            `singleAttraction`, `playCentre`, `multiVenue`) proposes the same neutral default until the client
+            supplies its own values, which then arrive as data:** flow `datedDayPass`; theme primary `#1F4E79`,
+            secondary `#5B6770`, accent `#B85C00`, background `#FFFFFF`, text `#1A1A1A` (all pass the contrast
+            pairs of `Theme`); header layout `logoLeft` with logo, menu and notifications shown; footer with one
+            column, "Information", holding the policy links, and the copyright line; homepage sections and tabs from
+            `listLandingPageTemplates` for the preset. **These values are a placeholder, not a client decision**
+            (DI-885 awaits the client''s feedback): the CMS marks them "placeholder" and must not present them as
+            decided.'
         currentStep:
           allOf:
           - $ref: '#/components/schemas/SiteSetupStepKey'
@@ -7702,8 +8100,11 @@ components:
           type: string
           nullable: true
           writeOnly: true
-          description: App Store Connect API key or Play service-account key, sent once and kept in the secret
-            store; this is its reference. Needed only for `submitToStore`.
+          description: 'App Store Connect API key or Play service-account key. **What the browser sends** (r8
+            walk of ticket 27914): the request carries the secret itself once, as the key text (the .p8 text for
+            Apple, the service-account JSON for Google); the server puts it in the cell''s Key Vault and the row
+            keeps only the vault name. It is never returned: a read shows `hasApiCredential`, nothing else. Same
+            rule as `ai.setAiCredential`. Needed only for `submitToStore`.'
         hasApiCredential:
           type: boolean
           readOnly: true
@@ -7720,11 +8121,23 @@ components:
           type: string
           nullable: true
           writeOnly: true
-          description: '**The Pass Type ID certificate** (its .p12 and password), from the client''s Apple Developer
-            account, sent once and kept in Key Vault; this is its reference, as `apiCredentialSecretRef` is. It signs
+          description: '**The Pass Type ID certificate**, from the client''s Apple Developer account. **What the
+            browser sends** (r8 walk of ticket 27914): the request carries the .p12 file itself, base64 text, in this
+            field, and its password in `passCertificatePassword`; the server keeps both in Key Vault as one secret and
+            the row keeps only the vault name, as for `apiCredentialSecretRef`. A read shows `hasPassCertificate`
+            and `passCertificateExpiresAt`, never the certificate or the password. It signs
             every Apple pass the brand issues (orders `issueWalletPass`, `pushWalletPassUpdate`). On save the server
             reads the certificate''s Pass Type ID, team and expiry; a certificate whose Pass Type ID is not
             `passTypeIdentifier`, or whose team is not `developerAccountId`, is refused with 400 (CHG-R6-033).'
+        passCertificatePassword:
+          type: string
+          format: password
+          writeOnly: true
+          nullable: true
+          x-ticvai-persisted: false
+          description: 'The password of the .p12 sent in `passCertificateSecretRef`. Required with it, refused
+            without it (400). Kept with the certificate in Key Vault, never stored in the row, never returned, never
+            logged, masked in any audit record.'
         hasPassCertificate:
           type: boolean
           readOnly: true
@@ -8338,7 +8751,8 @@ components:
           description: |-
             **The patterns, fixed** (4 October 2026, CHG-FXC-009). One per target kind, under `baseUrl`:
             `product` `/p/{productId}`, `event` `/e/{eventId}`, `contentPage` `/c/{contentPageId}`, `module` `/m/{moduleKey}`,
-            `appSection` `/s/{appSection}`, `bookingFlow` `/book/{productId}` (optionally `?date=YYYY-MM-DD`). `externalUrl` and
+            `appSection` `/s/{appSection}`, `bookingFlow` `/book/{productId}` (optionally `?date=YYYY-MM-DD`),
+            `transferClaim` `/t/{transferId}?token={claimToken}` (opens `/general/ticket-transfer` in the app; ORDERS-MONEY-C12; to be confirmed before release, because a released pattern never changes). `externalUrl` and
             `none` have no pattern. Campaign tags are appended as `utm_*` query parameters. A released pattern never changes: a new
             target kind gets a new prefix, so a link a tenant printed keeps working. Where app links are enabled the same path opens
             the app (universal links and app links on the primary domain) and the storefront where the app is not installed;
@@ -8354,7 +8768,7 @@ components:
                 description: A `LinkTarget.kind`, or `bookingFlow`.
               pattern:
                 type: string
-                description: e.g. `/p/{productId}`, `/e/{eventId}`, `/book/{flowKey}`.
+                description: e.g. `/p/{productId}`, `/e/{eventId}`, `/book/{productId}`.
         appLinksEnabled:
           type: boolean
     SitePackage:
@@ -8460,6 +8874,11 @@ components:
         the tenant''s own database, not the control plane (decided 28 September, audit R163)**: it moved
         from `control.footer_config` (renamed `whitelabel.footer_config`) and its two child tables.
 
+        **Links and order** (R8 blocker WHITE-C24 and IDENTITY-C60): a column''s `links` are stored with the
+        column, as one jsonb value in their array order; each column and each social link keeps its
+        `sortOrder`, which `setFooter` writes from its position in the array (0 first), and every read returns
+        `columns` and `socialLinks` ordered by it.
+
         '
       required:
       - id
@@ -8480,8 +8899,16 @@ components:
             properties:
               heading:
                 type: string
+              sortOrder:
+                type: integer
+                readOnly: true
+                description: The column's position, written by `setFooter` from the array order (R8 blocker IDENTITY-C60).
               links:
                 type: array
+                x-ticvai-persistence-column: jsonb
+                x-ticvai-persistence-kind: valueObject
+                description: The column's links in display order, stored on the column row as one value (R8 blocker
+                  WHITE-C24).
                 items:
                   type: object
                   properties:
@@ -8520,6 +8947,10 @@ components:
                 type: string
               url:
                 type: string
+              sortOrder:
+                type: integer
+                readOnly: true
+                description: The link's position, written by `setFooter` from the array order (R8 blocker IDENTITY-C60).
     AccessibilitySettings:
       type: object
       description: 'BL-065, 2.1.27. **POS and kiosk accessibility, which is a legal obligation in most
@@ -8560,7 +8991,9 @@ components:
             '
     ContentBlock:
       type: object
-      x-ticvai-persistence: control.content_block
+      # Tenant-authored content lives in the tenant database, owned by WhiteLabel (R8 blocker IDENTITY-C59, the lead's
+      # answer of 20 October 2026; as the footer moved in R163). It was control.content_block.
+      x-ticvai-persistence: whitelabel.content_block
       description: 'BL-172. **`white-label` is excellent as a configuration model and is not an authoring
         surface.** `HomepageLayout` with ordered sections, `Banner`, `PromoBlock` and `ContentPage` describe
         what a venue has chosen; **none of them lets a marketer write something new without a developer.**
@@ -8601,7 +9034,13 @@ components:
         body:
           type: object
           additionalProperties: true
-          description: Typed by `kind`, and validated against the block's own schema at save.
+          description: 'Typed by `kind`, and validated against the block''s own schema at save. **The text a
+            translation may fill** (R8 blocker FOUNDATION-AI-C40; the keys a body of each kind uses for its words, and
+            the `fieldPath` a translation draft names, under `localeVariants.<locale>.`): richText `text`; image
+            `altText`, `caption`; video `title`, `caption`; gallery `items[].altText`, `items[].caption`; cta
+            `heading`, `text`, `label`; faq `items[].question`, `items[].answer`; form `title`, `fields[].label`,
+            `submitLabel`; embed `title`; productGrid `heading`; countdown `heading`, `endedText`; testimonial
+            `quote`, `author`. Every other key (links, ids, numbers, media references) is not translated.'
         localeVariants:
           type: object
           additionalProperties: true
@@ -8646,6 +9085,17 @@ components:
           format: uuid
           nullable: true
           readOnly: true
+        reviewStatus:
+          type: string
+          readOnly: true
+          enum:
+          - notRequired
+          - pending
+          - approved
+          - rejected
+          default: notRequired
+          description: The review step of `publishContentBlock`, where the tenant's publish-review policy is on (r8 walk
+            of ticket 27919). `pending` from the 202 until the approval is decided; `status` does not change meanwhile.
         scopePath:
           type: string
           readOnly: true
@@ -8784,6 +9234,18 @@ components:
           type: boolean
           x-ticvai-derived: onRead
           description: True once any version has been published.
+        darkAppModules:
+          type: array
+          readOnly: true
+          x-ticvai-derived: onRead
+          description: '**The app-modules switched off for this tenant** (ADAM CR-164, option A, 18 October 2026;
+            CHG-CRA-005): their keys (for example `AM-MARKETING-CRM-P01`), from the tenant''s release flags. Returned
+            to guests and staff alike; the apps leave those modules'' screens out of navigation (the map is
+            `handoff/release-flags.json`). An operation is dark for the tenant only when every app-module that binds
+            it is off, so an operation shared with a live module stays callable. A flag the configuration does not
+            declare counts as on. Additive: nothing new shows on screen.'
+          items:
+            type: string
         publishedVersion:
           type: string
           nullable: true
@@ -8855,6 +9317,13 @@ components:
                 type: string
                 maxLength: 200
                 description: The venue's name (`tenancy.OrgUnit.name`).
+              contact:
+                allOf:
+                - $ref: '#/components/schemas/VenueContact'
+                nullable: true
+                description: The venue's own contact (address, phone, email), from the venue's settings
+                  (`tenancy.VenueSettings`, read through `venueSettingsRecords`). Null when the venue has none set;
+                  the app then shows the tenant's `contact` (R8 blocker WHITE-C16).
               city:
                 type: string
                 maxLength: 120
@@ -8922,6 +9391,13 @@ components:
         (GST-047) and nothing else. Null, or a platform left null, forces nothing. Live at once through
         `setMaintenanceMode`, because an upgrade that must wait for a publish is not forced.
 
+
+        **`storeUrl`** (r8 walk of ticket 27893): the store page GST-047''s "Update" button opens, one per
+        platform, set with `setMaintenanceMode` beside the versions and live at once like them. Optional. A
+        store address cannot be derived from `StoreAccount.appIdentifier`, which is a bundle id. The forced-upgrade
+        screen opens the URL for the platform it runs on; where it is null the screen shows the message without
+        the button and the guest updates from the store by hand.
+
         '
       properties:
         ios:
@@ -8932,6 +9408,21 @@ components:
           type: string
           nullable: true
           pattern: ^\d+\.\d+\.\d+$
+        storeUrl:
+          type: object
+          nullable: true
+          description: The store page of the tenant's app for each platform. https only.
+          properties:
+            ios:
+              type: string
+              format: uri
+              pattern: ^https://
+              nullable: true
+            android:
+              type: string
+              format: uri
+              pattern: ^https://
+              nullable: true
     VenueContact:
       x-ticvai-persistence: none — embedded in tenant_config
       type: object
@@ -8979,7 +9470,8 @@ components:
       x-ticvai-persistence: none — embedded in tenant_config
       type: object
       description: 'Every `*AssetRef` here is a `MediaAsset` id from the `assets` library (`createUpload`
-        then `completeUpload`), PNG or SVG and at most 2 MB (decided 28 September, audit R270).
+        then `completeUpload`). The image fields are PNG or SVG and at most 2 MB (decided 28 September, audit R270);
+        `introVideoAssetRef` is a video asset within the library''s limit for kind `video` (`assets.createUpload`).
 
         '
       required:
@@ -9787,9 +10279,13 @@ components:
           - event
           - externalUrl
           - appSection
+          - bookingFlow
           - none
           description: '`appSection` points at a section of the guest mobile app (decided 29 September, MOB-1),
-            so the bottom navigation can hold Home, Explore, Plan and Tickets.'
+            so the bottom navigation can hold Home, Explore, Plan and Tickets. `bookingFlow` (r8 walk of ticket
+            27905) opens the booking flow of one product, optionally on a date: `productId` is required, `date`
+            optional; the link is `/book/{productId}?date=YYYY-MM-DD` (see `DeepLinkScheme`), and the flow shown is
+            the one that product resolves to.'
         moduleKey:
           $ref: '#/components/schemas/ModuleKey'
         appSection:
@@ -9813,6 +10309,12 @@ components:
         eventId:
           type: string
           format: uuid
+        date:
+          type: string
+          format: date
+          nullable: true
+          description: Used when `kind` is `bookingFlow`, the date the flow opens on. Absent opens it on today or the
+            first date with availability, as the product page does.
         url:
           type: string
     NavigationConfig:
@@ -9907,6 +10409,26 @@ components:
         `venueOverview` and `spacer` need no module. `venueOverview` (decided 29 September, MOB-3) is the
         mobile Home''s description, opening hours (from `getTenantAppStatus`) and type tiles. `setHomepageLayout` refuses a visible section whose module is not
         enabled, and `setModuleEnablement` refuses to disable a module a section still needs.
+
+
+        **Which catalogue slice a type tile shows, and whose card count applies** (r8 walk of tickets 28335 and
+        28682; lead decision of 20 October 2026, option 1, no schema change; DEC-152 and DEC-153 stand as they are).
+        A Home type tile is a product category, and its highlights are `listProducts(venueId, categoryId, pageSize)`
+        in `displayOrder`, the order `listProducts` documents. The card count (`maxItems`) is that of the section
+        whose kind matches the tile: `attractions`, `dining` or `shop`; **every other category uses the count of the
+        `whatsOn` section**. On GST-038 (At the Venue), Food is kind `fnb` (opens GST-024), Shop is kind `retail`
+        (GST-026), Services opens GST-029, Shows is `listPerformances` of the venue for today, and Map and Waits
+        show in place.
+
+
+        **Where the Home overview, its quick actions and "Book a trip" come from in r8** (R8 blocker WHITE-C07, the
+        lead''s answer of 20 October 2026: option 3, nothing new stored). The `venueOverview` description is the
+        published content page its section names (`contentPageId`, read with `listPublishedContentPages`); none
+        named, the line is left out. The `quickActions` tiles are a fixed list the app shows, one per enabled
+        module (`enabledModules` of the published configuration), in the order of the approved frame; a venue does
+        not configure them in r8. "Book a trip" shows when the venue has a published booking flow of type
+        `transport` (`getPublishedBookingFlow`). Configurable tiles (a section''s own actions) come later, when the
+        client asks for them.
 
         '
       enum:
@@ -10083,9 +10605,14 @@ components:
           - $ref: '#/components/schemas/ScheduleState'
           readOnly: true
           x-ticvai-derived: sweeper
-          description: Moved by `updateBanner` between `draft` and `scheduled`, and by the schedule timer
-            from `scheduled` to `active` and `active` to `expired` at `startsAt` and `endsAt`, in the tenant's
-            timezone (`states/schedule.yaml`).
+          description: 'Moved by `updateBanner` between `draft` and `scheduled`, and by the schedule timer
+            from `scheduled` to `active` and `active` to `expired` at `startsAt` and `endsAt`, in the tenant''s
+            timezone (`states/schedule.yaml`). **The rule, which no request field moves** (r8 walk of ticket
+            27920): a new banner is `draft`. The server sets `scheduled` when `updateBanner` leaves `startsAt`
+            set (`endsAt` null means no end, so the banner runs until switched off; when `endsAt` is set it must follow
+            `startsAt`), and sets `draft` again when a later update clears `startsAt`. Sending
+            `isActive` false on an `active` banner pulls it to `draft`. `state` is derived by the server on every
+            save and is never in a request.'
         sortOrder:
           type: integer
         isActive:
@@ -10134,8 +10661,10 @@ components:
           - $ref: '#/components/schemas/ScheduleState'
           readOnly: true
           x-ticvai-derived: sweeper
-          description: Moved by the schedule timer at `startsAt` and `endsAt`, in the tenant's timezone,
-            as for `Banner.state`. Once `active` or `expired` the block may only be withdrawn (audit R163).
+          description: 'Moved by the schedule timer at `startsAt` and `endsAt`, in the tenant''s timezone,
+            as for `Banner.state`. A new block is `draft` and moves to `scheduled` the same way as a banner: when
+            an update leaves `startsAt` set (a null `endsAt` means no end), and back to `draft` when `startsAt` is cleared. Once `active` or `expired`
+            the block may only be withdrawn (audit R163).'
         sortOrder:
           type: integer
         scopePath:
@@ -10421,6 +10950,12 @@ components:
             **Operations write it at `tenant` scope.**'
     KioskConfigVersion:
       x-ticvai-persistence: whitelabel.kiosk_config_version
+      # The same pair as ConfigVersion (ADAM CR-154, 18 October 2026; CHG-CRA-004): one number per kiosk
+      # configuration, and one current version of each.
+      x-ticvai-unique-together: [[kioskConfigId, versionNumber]]
+      x-ticvai-unique-when:
+      - columns: [kioskConfigId]
+        when: {isCurrent: true}
       type: object
       description: '**A published kiosk configuration: immutable**, like a `ConfigVersion` (decided 5 October 2026 by
         Chinmay, CHG-R4-001). Written once by `publishKioskConfigs` and never changed; the newest published one is
@@ -10480,6 +11015,26 @@ components:
           description: The partition key (ADR-0005). Written at `venue` scope.
     PolicyKind:
       type: string
+      description: 'The kinds of policy a tenant publishes. **Each kind has one fixed title in English and Arabic**
+        (r8 walk of ticket 27890), the only source of `PublishedPolicy.title`; `setPolicy` takes no title. The
+        Arabic labels are the standard names of each document and the client should approve them.
+
+
+        | kind | en | ar |
+
+        |---|---|---|
+
+        | privacy | Privacy policy | سياسة الخصوصية |
+
+        | termsAndConditions | Terms and conditions | الشروط والأحكام |
+
+        | refund | Refund policy | سياسة الاسترداد |
+
+        | cookie | Cookie policy | سياسة ملفات تعريف الارتباط |
+
+        | accessibility | Accessibility statement | بيان إمكانية الوصول |
+
+        '
       enum:
       - privacy
       - termsAndConditions
@@ -10500,7 +11055,10 @@ components:
           $ref: '#/components/schemas/PolicyKind'
         title:
           type: string
-          description: 'The heading a guest sees, and the field a refund question retrieves against.
+          nullable: true
+          readOnly: true
+          description: 'Not written by anyone: `setPolicy` takes no title and the column stays null. The heading a
+            guest sees is `PublishedPolicy.title`, derived from `kind` (see `PolicyKind`).
 
             '
         version:
@@ -10553,8 +11111,26 @@ components:
       - lostAndFound
       - map
       - visitPlanner
+      x-ticvai-licence-module:
+        ticketsAndBooking: ticketing
+        events: ticketing
+        attractions: ticketing
+        membership: membership
+        virtualQueue: queue
+        diningAndFnb: fnb
+        shop: retail
+        parking: access
+        gamification: games
+        loyalty: marketing
+        photoGallery: core
+        wallet: core
+        lostAndFound: core
+        map: core
+        visitPlanner: core
       description: '`visitPlanner` (decided 29 September, MOB-1 and the Plan tab in Block A) is the Plan tab
-        and WEB-050; off, the tab and the page are not shown.'
+        and WEB-050; off, the tab and the page are not shown. **`x-ticvai-licence-module` maps each feature to the
+        licence module (`ModuleKey` in common.yaml) that licenses it**, proposed from the screens'' `requiresModule`
+        and for the client to confirm; `core` is always licensed.'
     KioskAssignment:
       x-ticvai-persistence: whitelabel.kiosk_assignment
       type: object
@@ -10636,7 +11212,58 @@ components:
       description: 'The feature toggles a tenant can set — one list for `FeatureToggle` and the `setFeatureToggles`
         body, which took a free string where the response had this enum.
 
+
+        **The catalogue** (`x-ticvai-feature-catalogue`; r8 walk of ticket 27776): the table below is the one
+        source of each key''s `displayName`, `changeScope` and `requiresConfiguration`. `setFeatureToggles`
+        takes only `featureKey` and `isEnabled` from the caller; it fills the other three columns of the
+        `whitelabel.feature_toggle` row from this table when it inserts the row, and its whole-set replace does
+        the same for every row it writes, so no caller can set or change them. `buildTime` means a native app
+        needs a new release to take the change, a `runtime` one takes it on the next publish.
+        **Wallet and payment keys are `buildTime`** (stated before r8); the other values are proposals for the
+        owner to confirm and are marked below.
+
+        | featureKey | displayName | changeScope | requiresConfiguration |
+
+        |---|---|---|---|
+
+        | digitalCompanionMode | Digital companion mode | runtime | false (proposed) |
+
+        | aiConciergeChat | AI concierge chat | runtime | true: the platform must have set an AI provider (proposed) |
+
+        | lostAndFound | Lost and found | runtime | false (proposed) |
+
+        | pushNotifications | Push notifications | buildTime | true: push credentials in the app build (proposed) |
+
+        | socialSharing | Social sharing | runtime | false (proposed) |
+
+        | multiLanguage | Multiple languages | runtime | false (proposed) |
+
+        | appleWallet | Apple Wallet passes | buildTime | true: pass certificate on the store account |
+
+        | googlePay | Google Pay | buildTime | true: payment provider setup |
+
+        | applePay | Apple Pay | buildTime | true: payment provider setup |
+
+        | cashOnDelivery | Cash on delivery | runtime | false (proposed) |
+
+        | guestCheckout | Guest checkout | runtime | false |
+
+        | uaePassLogin | UAE PASS sign-in | buildTime | true: UAE PASS client credentials (proposed) |
+
         '
+      x-ticvai-feature-catalogue:
+        digitalCompanionMode: { displayName: Digital companion mode, changeScope: runtime, requiresConfiguration: false }
+        aiConciergeChat: { displayName: AI concierge chat, changeScope: runtime, requiresConfiguration: true }
+        lostAndFound: { displayName: Lost and found, changeScope: runtime, requiresConfiguration: false }
+        pushNotifications: { displayName: Push notifications, changeScope: buildTime, requiresConfiguration: true }
+        socialSharing: { displayName: Social sharing, changeScope: runtime, requiresConfiguration: false }
+        multiLanguage: { displayName: Multiple languages, changeScope: runtime, requiresConfiguration: false }
+        appleWallet: { displayName: Apple Wallet passes, changeScope: buildTime, requiresConfiguration: true }
+        googlePay: { displayName: Google Pay, changeScope: buildTime, requiresConfiguration: true }
+        applePay: { displayName: Apple Pay, changeScope: buildTime, requiresConfiguration: true }
+        cashOnDelivery: { displayName: Cash on delivery, changeScope: runtime, requiresConfiguration: false }
+        guestCheckout: { displayName: Guest checkout, changeScope: runtime, requiresConfiguration: false }
+        uaePassLogin: { displayName: UAE PASS sign-in, changeScope: buildTime, requiresConfiguration: true }
       enum:
       - digitalCompanionMode
       - aiConciergeChat
@@ -10839,6 +11466,38 @@ components:
           description: The slide, tile, flow, language or payment method the finding is about.
     ConfigFindingKind:
       type: string
+      description: 'The checks `validateTenantConfig` runs. **Severity** (r8 walk of ticket 27780; lead decision of 20
+        October 2026, option A): `missingTranslation` is a `warning` when the missing text has a fallback language
+        and an `error` when the default language is the one missing; every other kind is an `error`. A publish is
+        blocked when `errorCount` is above 0, and a warning never blocks.
+
+        | kind | severity |
+
+        |---|---|
+
+        | missingTranslation | warning with a fallback language, error when the default language is missing |
+
+        | navigationTargetsDisabledModule | error |
+
+        | homepageReferencesMissingContent | error |
+
+        | contrastFailure | error |
+
+        | missingRequiredAsset | error |
+
+        | policyVersionMissing | error |
+
+        | noVisibleNavigationItems | error |
+
+        | unlicensedModuleEnabled | error |
+
+        | arabicFontMissing | error |
+
+        | bookingFlowInvalid | error |
+
+        | bookingFlowMissing | error |
+
+        '
       enum:
       - missingTranslation
       - navigationTargetsDisabledModule
@@ -10926,6 +11585,12 @@ components:
     ConfigVersion:
       x-ticvai-rls: read-beneath   # MOD audit, CHG-MOD-008: read below the tenant by getKioskConfigValidation
       x-ticvai-persistence: whitelabel.config_version
+      # One label per tenant and one current version per tenant (ADAM CR-154, 18 October 2026; CHG-CRA-004):
+      # config_version_scope_path_version_uniq and the partial config_version_scope_path_uniq where is_current.
+      x-ticvai-unique-together: [[scopePath, version]]
+      x-ticvai-unique-when:
+      - columns: [scopePath]
+        when: {isCurrent: true}
       type: object
       required:
       - version
@@ -10936,6 +11601,9 @@ components:
       properties:
         version:
           type: string
+          readOnly: true
+          description: '**Named by the server** (ADAM CR-154; CHG-CRA-004): the next integer for the tenant, `1`, `2`,
+            ..., taken in the publish transaction. Unique per tenant; a racing publish fails on the index and retries.'
         publishedAt:
           type: string
           format: date-time
@@ -10967,6 +11635,19 @@ components:
           type: string
           format: date-time
           nullable: true
+        activationFailedAt:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+          description: When the scheduled activation of this version failed its validation again; null when it has
+            not failed (R8 blocker IDENTITY-C63). A failed version is not tried again; publish a new one.
+        activationFailure:
+          type: string
+          maxLength: 2000
+          nullable: true
+          readOnly: true
+          description: Why the scheduled activation failed, in the validation's words (R8 blocker IDENTITY-C63).
         contentHash:
           type: string
         pendingBuildTimeChanges:
@@ -11029,6 +11710,21 @@ components:
           type: string
         toVersion:
           type: string
+        affectedProducts:
+          type: array
+          readOnly: true
+          x-ticvai-persisted: false
+          x-ticvai-derived: onRead
+          description: 'The products served by a booking flow that differs between the two versions (area
+            `bookingFlows` in `changes`), by the product-to-flow rule of `Product.bookingFlowId`. Empty when no flow
+            differs. Bounded by the venue''s products; the screen shows the first page and the count.'
+          items:
+            type: object
+            required: [productId, name, flowKey]
+            properties:
+              productId: { type: string, format: uuid }
+              name: { type: string }
+              flowKey: { type: string, description: The changed flow that serves this product. }
         changes:
           type: array
           items:
@@ -11263,8 +11959,65 @@ components:
         publishedAt:
           type: string
           format: date-time
+        guestSignIn:
+          type: object
+          readOnly: true
+          additionalProperties: false
+          description: '**What the guest sign-in buttons need before anyone is signed in** (r8, IDENTITY-C21): the
+            public client ids of the tenant''s enabled social and UAE PASS providers, derived on read from Identity''s
+            provider rows (no stored column, nothing secret). A provider the tenant has not enabled is absent, and
+            its button is not drawn.'
+          properties:
+            apple:
+              type: object
+              additionalProperties: false
+              properties:
+                clientId: { type: string }
+            google:
+              type: object
+              additionalProperties: false
+              properties:
+                clientId: { type: string }
+            uaePass:
+              type: object
+              additionalProperties: false
+              properties:
+                authorizationUrl: { type: string, format: uri }
+                clientId: { type: string }
         brand:
           $ref: '#/components/schemas/BrandIdentity'
+        assetsBaseUrl:
+          type: string
+          format: uri
+          readOnly: true
+          x-ticvai-persisted: false
+          x-ticvai-derived: onRead
+          description: '**How any guest screen turns an asset id into a picture** (r8 walk of ticket 28156; lead
+            decision of 20 October 2026, option A). The address of a published asset is `assetsBaseUrl` + `/` +
+            the asset id + `/` + a rendition name, for example `{assetsBaseUrl}/{assetId}/card.webp`. The renditions are
+            `thumb`, `card`, `hero` and `original`. Every media object in every guest response carries an asset id and
+            nothing else, so no screen makes a media call per tile. Only public assets referenced by a published
+            version are served at it. `brandUrls` and the banner addresses below are this rule worked out for you.'
+        brandUrls:
+          type: object
+          nullable: true
+          readOnly: true
+          x-ticvai-persisted: false
+          x-ticvai-derived: onRead
+          description: '**The brand assets as addresses a guest can load** (r8 walk of ticket 28335). A guest cannot
+            read `assets`, so the `*AssetRef` ids in `brand` mean nothing to a client. The server turns each asset
+            the published version references into its stable CDN address (`assets.yaml`, `MediaAsset.url`: a public
+            asset has a stable CDN address) and returns it here, beside the ids. Only assets the published version
+            names are resolved; the address is that of the asset version the publish named. A field is null where its
+            ref is null.'
+          properties:
+            logoUrl: { type: string, format: uri, nullable: true }
+            logoDarkUrl: { type: string, format: uri, nullable: true }
+            faviconUrl: { type: string, format: uri, nullable: true }
+            splashImageUrls:
+              type: array
+              items: { type: string, format: uri }
+            introVideoUrl: { type: string, format: uri, nullable: true }
         appIcons:
           $ref: '#/components/schemas/AppIcons'
         theme:
@@ -11279,6 +12032,26 @@ components:
           $ref: '#/components/schemas/NavigationConfig'
         homepage:
           $ref: '#/components/schemas/HomepageLayout'
+        banners:
+          type: array
+          readOnly: true
+          x-ticvai-persisted: false
+          x-ticvai-derived: onRead
+          description: '**The hero and other banners a guest sees now** (r8 walk of ticket 28335): the banners in the
+            published version whose state is `active` at the time of the read, by `sortOrder`. Draft, scheduled and
+            expired banners are never returned. `imageUrl` is the resolved address of `imageAssetRef`. Staff read
+            all banners with `listBanners`, which is unchanged.'
+          items:
+            $ref: '#/components/schemas/PublishedBanner'
+        promoBlocks:
+          type: array
+          readOnly: true
+          x-ticvai-persisted: false
+          x-ticvai-derived: onRead
+          description: The promo blocks in the published version that are `active` at the time of the read, by
+            `sortOrder`, with the same rule as `banners`.
+          items:
+            $ref: '#/components/schemas/PublishedPromoBlock'
         bookingFlow:
           allOf:
           - $ref: '#/components/schemas/BookingFlowConfig'
@@ -11348,6 +12121,37 @@ components:
             publishableKey:
               type: string
               nullable: true
+    PublishedBanner:
+      x-ticvai-persistence: none — a public projection of whitelabel.banner (r8 walk of ticket 28335)
+      type: object
+      description: One active banner as a guest reads it inside `PublishedTenantConfig`. No state, no schedule
+        dates, no author.
+      required:
+      - id
+      - imageUrl
+      properties:
+        id: { type: string, format: uuid }
+        placement:
+          type: string
+          enum: [homepageHero, homepageBlock, explore, checkout]
+        title: { $ref: '#/components/schemas/LocalisedText' }
+        subtitle: { $ref: '#/components/schemas/LocalisedText' }
+        imageUrl: { type: string, format: uri, description: The stable address of the banner image. }
+        linkTarget: { $ref: '#/components/schemas/LinkTarget' }
+        sortOrder: { type: integer }
+    PublishedPromoBlock:
+      x-ticvai-persistence: none — a public projection of whitelabel.promo_block (r8 walk of ticket 28335)
+      type: object
+      description: One active promo block as a guest reads it inside `PublishedTenantConfig`.
+      required:
+      - id
+      properties:
+        id: { type: string, format: uuid }
+        title: { $ref: '#/components/schemas/LocalisedText' }
+        description: { $ref: '#/components/schemas/LocalisedText' }
+        iconUrl: { type: string, format: uri, nullable: true }
+        linkTarget: { $ref: '#/components/schemas/LinkTarget' }
+        sortOrder: { type: integer }
     PublishedKioskConfig:
       x-ticvai-persistence: none — computed from the current KioskConfigVersion snapshot and the live state on
         whitelabel.kiosk_config and whitelabel.kiosk_assignment
@@ -11482,7 +12286,16 @@ components:
         kind:
           $ref: '#/components/schemas/PolicyKind'
         title:
-          type: string
+          allOf:
+          - $ref: '#/components/schemas/LocalisedText'
+          readOnly: true
+          x-ticvai-persisted: false
+          x-ticvai-derived: onRead
+          description: 'The heading, with `en` and `ar`, derived on read from `kind` by the fixed label table on
+            `PolicyKind`. Nothing is stored (`whitelabel.policy.title` stays unused), so a tenant cannot retitle a
+            policy and the heading is the same in the app, on the web and in a consent record.
+
+            '
         version:
           type: string
           description: The version a consent records (a guest who consented to version 3 consented to version 3).

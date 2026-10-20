@@ -187,8 +187,11 @@
    "profiling",
    "thirdPartySharing",
    "aiProcessing",
-   "transactional"
-  ]
+   "transactional",
+   "storedPaymentCredential",
+   "facePassEnrolment"
+  ],
+  "description": "`storedPaymentCredential` (a card saved for later, `storePaymentToken`) and `facePassEnrolment` (a face enrolled for entry, `enrolFacePass`) are purposes of their own (R8 blocker ORDERS-MONEY-C21, CHG-R8MIG-022), so a screen picks the row by its purpose instead of guessing: each tenant has one `marketing.consent_purpose` row of each, seeded with the tenant's other purposes."
  },
  "ConsentSource": {
   "type": "string",

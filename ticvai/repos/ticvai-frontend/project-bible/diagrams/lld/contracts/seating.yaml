@@ -52,6 +52,7 @@ operations:
   permission: ORDER_CREATE
   audience:
   - staff
+  - guest
   offline: false
   reads:
   - cache:idempotency
@@ -102,6 +103,7 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - seating.seat_map
   - seating.section
   writes:
@@ -116,8 +118,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - seating.group_request
   writes:
+  - cache:idempotency
   - seating.group_request
 - operation: createSeatBlock
   verb: POST
@@ -176,8 +180,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - seating.hold_pool
   writes:
+  - cache:idempotency
   - seating.hold_pool
 - operation: createSeatMap
   verb: POST
@@ -245,6 +251,7 @@ operations:
   permission: ORDER_CREATE
   audience:
   - staff
+  - guest
   offline: false
   reads:
   - cache:idempotency
@@ -295,6 +302,7 @@ operations:
   permission: ORDER_VIEW
   audience:
   - staff
+  - guest
   offline: false
   reads:
   - seating.seat_reservation
@@ -427,6 +435,7 @@ operations:
   offline: false
   reads:
   - assets.media_asset
+  - cache:idempotency
   - seating.seat_map_template
   writes:
   - cache:idempotency
@@ -549,8 +558,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - seating.reassignment
   writes:
+  - cache:idempotency
   - seating.reassignment
 - operation: recommendSeats
   verb: POST
@@ -562,6 +573,7 @@ operations:
   - guest
   offline: false
   reads:
+  - cache:idempotency
   - catalogue.performance
   - seating.accessible
   - seating.recommendation_rule
@@ -571,7 +583,8 @@ operations:
   - seating.seat_price_band
   - seating.seat_reservation
   - seating.seat_reservation_item
-  writes: []
+  writes:
+  - cache:idempotency
 - operation: releaseSeatHoldPool
   verb: POST
   path: /seat-hold-pools/{poolId}/release
@@ -581,8 +594,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - seating.hold_pool
   writes:
+  - cache:idempotency
   - seating.hold_pool
 - operation: relinquishSeatBlock
   verb: DELETE
@@ -608,10 +623,13 @@ operations:
   permission: ORDER_CREATE
   audience:
   - staff
+  - guest
   offline: false
   reads:
+  - cache:idempotency
   - seating.seat_reservation
   writes:
+  - cache:idempotency
   - platform.outbox
   - seating.seat_reservation
 - operation: setAccessibleSeating
@@ -623,8 +641,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - seating.accessible
   writes:
+  - cache:idempotency
   - seating.accessible
 - operation: setGroupSeatRoster
   verb: PUT
@@ -667,8 +687,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - seating.hold_type
   writes:
+  - cache:idempotency
   - seating.hold_type
 - operation: setSeatRecommendationRules
   verb: PUT
@@ -679,8 +701,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - seating.recommendation_rule
   writes:
+  - cache:idempotency
   - seating.recommendation_rule
 - operation: setSeatRules
   verb: PUT
@@ -691,8 +715,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - seating.seat_rules
   writes:
+  - cache:idempotency
   - seating.seat_rules
 - operation: setSeatingRules
   verb: PUT
@@ -717,9 +743,11 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - seating.seat_category
   - seating.seat_price_band
   writes:
+  - cache:idempotency
   - seating.seat_price_band
 - operation: updateSeatMap
   verb: PATCH

@@ -1376,6 +1376,15 @@
   "x-ticvai-persistence": "platform.venue_settings",
   "description": "**Venue-level operational configuration that no other level can answer.**\nRegion owns currency, tax regime and fiscal year (ADR-0011). Venue owns the things that vary between two venues in one region — **opening hours, support hours, and what the local law requires of the gate.**\n**And the configured limits** (decided 28 September, audit R094): every limit the contracts call *configured* is a field here, from `displayCurrencies` and `cartLeaseSeconds` down to the grouped `catalogue`, `inventory`, `seating`, `promotions`, `fnb`, `queue`, `reporting`, `marketing` and `identity` settings. **Each has a tenant-level default**: the tenant sets it once with `setVenueSettingsDefaults`, a venue overrides it within the field's bounds, and a null field here inherits it. Each field's `default` is the proposed tenant default, marked proposed, client to correct (audit R094); `docs/active/configured-limits-proposal.md` is the sheet the client corrects, and where the two differ this contract is what runs.\n",
   "properties": {
+   "contact": {
+    "allOf": [
+     {
+      "$ref": "../satellite/white-label.yaml#/components/schemas/VenueContact"
+     }
+    ],
+    "nullable": true,
+    "description": "**How a guest reaches this venue** (R8 blocker WHITE-C16, the storage-sat lane's request 5; CHG-R8MIG-011): phone, email, WhatsApp, address and opening-hours prose, one jsonb column, written by the venue settings write and read by White-Label's getTenantAppStatus through tenancy#venueSettingsRecords. Null means the tenant's contact is shown."
+   },
    "id": {
     "type": "string",
     "format": "uuid",

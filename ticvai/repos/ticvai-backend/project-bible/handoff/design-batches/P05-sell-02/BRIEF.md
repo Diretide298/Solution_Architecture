@@ -157,7 +157,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `KSK-013` | Call staff | D | 3 | 1 | 4 | 4 | 0 | 0 | guest | notStarted (generated) |
 | `KSK-014` | Out of service | B | 0 | 23 | 4 | 0 | 0 | 0 | guest | notStarted (generated) |
 | `KSK-016` | Order Food | C | 23 | 27 | 6 | 2 | 0 | 0 | guest | notStarted (generated) |
-| `KSK-017` | Shop | C | 31 | 5 | 6 | 8 | 1 | 0 | guest | notStarted (generated) |
+| `KSK-017` | Shop | C | 39 | 5 | 6 | 8 | 1 | 0 | guest | notStarted (generated) |
 
 ## Thin screens in this batch
 

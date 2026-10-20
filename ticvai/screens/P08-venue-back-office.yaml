@@ -5783,10 +5783,10 @@ screens:
     trigger: onAction
   - operationId: listProductCategories
     contract: catalogue
-    purpose: 'The options of the calendar''s category filter (r8, GPS-C18), read once when the screen opens; the
-      chosen category is sent to `listPerformances` as `categoryId`. No component of its own: the filter is
-      part of the calendar. Not background (r8 integration, CHG-R8INT-008): the user sees the options, and the
-      approved screen has no element of its own for the filter.'
+    purpose: 'The options of the calendar''s category filter (r8, GPS-C18), read once when the screen
+      opens; the chosen category is sent to `listPerformances` as `categoryId`. No component of its own:
+      the filter is part of the calendar. Not background (r8 integration, CHG-R8INT-008): the user sees
+      the options, and the approved screen has no element of its own for the filter.'
     trigger: onLoad
     provenance: r8 second round, GPS-C18 (ticket 28195)
   - operationId: getPerformance
@@ -33996,6 +33996,7 @@ screens:
       trigger: The failing till is found, with its alerts
       provenance: flow F95 step 1→2
       carries:
+      - deviceId
       - workstationId
   notes: '**Added 20 August from the client design board.** The operations existed and no screen called
     them. **Owns POS board frame(s) POS-5B** (client pack, 24 August). **Assigned by board purpose rather
@@ -34148,6 +34149,7 @@ screens:
       provenance: flow F79 step 2→3
       operation: setConfigurationProfile
       carries:
+      - deviceId
       - profileId
   notes: '**Added 20 August from the client design board.** The operations existed and no screen called
     them. **Owns POS board frame(s) POS-5D** (client pack, 24 August). **Assigned by board purpose rather
@@ -56298,28 +56300,28 @@ screens:
     provenance: decided 29 September, VM close-out (venue management and configuration)
   - operationId: getChannelAvailability
     contract: catalogue
-    purpose: 'The membership product''s channels as published now (r8, GPS-C39): fills the channel fields, and the
-      publish sends that answer back whole with the guest''s changes (capacityLimited and fixedSalesWindow are left
-      to ADM-124).'
+    purpose: 'The membership product''s channels as published now (r8, GPS-C39): fills the channel fields,
+      and the publish sends that answer back whole with the guest''s changes (capacityLimited and fixedSalesWindow
+      are left to ADM-124).'
     trigger: onLoad
     provenance: r8 integration, GPS-C39 (CHG-R8INT-007)
   - operationId: publishChannelAvailability
     contract: catalogue
-    purpose: 'Choose the channels that sell the membership: the whole map `getChannelAvailability` read, with the
-      changes (r8, GPS-C39)'
+    purpose: 'Choose the channels that sell the membership: the whole map `getChannelAvailability` read,
+      with the changes (r8, GPS-C39)'
     trigger: onAction
     provenance: decided 29 September, VM close-out (venue management and configuration)
   - operationId: listPriceLists
     contract: catalogue
-    purpose: The price lists a membership is priced on, and the options of the save form's base pricing profile
-      picker (r8, GPS-C34)
+    purpose: The price lists a membership is priced on, and the options of the save form's base pricing
+      profile picker (r8, GPS-C34)
     trigger: onLoad
   - operationId: listTaxProfiles
     contract: catalogue
-    purpose: 'The options of the save form''s tax profile picker (r8, GPS-C34): `taxProfile` is a catalogue tax
-      profile''s id. Read once when the screen opens; no component of its own, the picker is in the form. Not
-      background (r8 integration, CHG-R8INT-008): the user sees the options, and the approved screen draws the
-      picker only in the form overlay''s body, not as a component.'
+    purpose: 'The options of the save form''s tax profile picker (r8, GPS-C34): `taxProfile` is a catalogue
+      tax profile''s id. Read once when the screen opens; no component of its own, the picker is in the
+      form. Not background (r8 integration, CHG-R8INT-008): the user sees the options, and the approved
+      screen draws the picker only in the form overlay''s body, not as a component.'
     trigger: onLoad
     provenance: r8 second round, GPS-C34 (ticket 29883)
   - operationId: setMembershipCommercialConfig
@@ -56353,8 +56355,8 @@ screens:
       `basePricingProfile`, `taxProfile`, `salesPeriod`. Optional: `feeProfile`, `upgradePricePolicy`,
       `promotionalPricingEligibility`, `paymentTerms`. Dismissing sends nothing; the screen behind is
       unchanged. **Pickers** (r8, GPS-C34): `basePricingProfile` is picked from the price lists (`listPriceLists`),
-      `taxProfile` from the tax profiles (`listTaxProfiles`); `feeProfile` and `upgradePricePolicy` are typed
-      codes, since no entity holds them yet.'
+      `taxProfile` from the tax profiles (`listTaxProfiles`); `feeProfile` and `upgradePricePolicy` are
+      typed codes, since no entity holds them yet.'
     bindsTo: MembershipCommercialConfigInput
     confirm:
       label: Save membership commercial config
@@ -56673,8 +56675,8 @@ screens:
 
     Build note (r8 second round, GPS-C33, the lead 20 October 2026, option A): the membership-product
     operations now need the venue permissions `MEMBERSHIP_VIEW` and `MEMBERSHIP_MANAGE`, not platform-staff
-    ones; build the no-access state naming `MEMBERSHIP_MANAGE`. The state text above still names
-    `PLATFORM_CELL_MANAGE` until the client approves the new wording (pending entry GPS-C33).'
+    ones; build the no-access state naming `MEMBERSHIP_MANAGE`. The state text above still names `PLATFORM_CELL_MANAGE`
+    until the client approves the new wording (pending entry GPS-C33).'
 - id: BO-294
   name: Member Operations Command Center
   module: Sell
@@ -117680,8 +117682,8 @@ screens:
       - kind: secondaryButton
         label: Award to this guest
         operation: awardBadge
-        notes: 'Shown only when the screen was opened from a guest (customerId); sends badgeId, awardedAt now and
-          sourceType `manager`, and no status: the server writes `awarded` (r8, ORDERS-MONEY-C14).'
+        notes: 'Shown only when the screen was opened from a guest (customerId); sends badgeId, awardedAt
+          now and sourceType `manager`, and no status: the server writes `awarded` (r8, ORDERS-MONEY-C14).'
         provenance: defined 4 October 2026 (CHG-FXS-001)
       - kind: secondaryButton
         label: Cancel
@@ -208046,8 +208048,8 @@ screens:
       - kind: selectField
         label: Customer/account
         operation: listB2bCreditAccounts
-        notes: 'The B2B credit accounts (`listB2bCreditAccounts`); the picked account''s id is the `accountId` the
-          terms are read and saved for (r8, ORDERS-MONEY-C28).'
+        notes: The B2B credit accounts (`listB2bCreditAccounts`); the picked account's id is the `accountId`
+          the terms are read and saved for (r8, ORDERS-MONEY-C28).
         provenance: pack Payment_Payment_Orchestration.pdf, page 95 §Define
       - kind: selectField
         label: Credit agreement

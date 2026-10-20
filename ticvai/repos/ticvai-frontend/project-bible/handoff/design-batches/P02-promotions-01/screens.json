@@ -93,7 +93,7 @@
         "CouponCode.discount",
         "CouponCode.validFrom"
        ],
-       "operation": "getCouponCode",
+       "operation": "getGuestCouponCode",
        "provenance": "contract promotions.yaml GET /coupon-codes/{code}"
       }
      ]
@@ -122,9 +122,9 @@
     "trigger": "onAction"
    },
    {
-    "operationId": "getCouponCode",
+    "operationId": "getGuestCouponCode",
     "contract": "promotions",
-    "purpose": "Resolve a code the guest typed",
+    "purpose": "Resolve a code the guest typed, in the guest shape (r8, ORDERS-MONEY-C32, CHG-R8INT-009): the staff read `getCouponCode` is the back office's",
     "trigger": "onAction"
    }
   ],

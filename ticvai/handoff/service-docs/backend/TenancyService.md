@@ -7,7 +7,7 @@
 | Tier | foundation: Read by everything, reads nothing above. Deploys first and alone. |
 | Contracts | `tenancy`, `workforce`, `approvals`, `accreditation` |
 | Schemas owned | `platform`, `workforce`, `approvals`, `accreditation`, `tenancy`, `kernel` |
-| Operations in the slice | 32 of 213 |
+| Operations in the slice | 34 of 214 |
 | Scale | Read-heavy and highly cacheable. Config changes are rare. |
 | If it is down | Same as identity — nothing runs without a scope. |
 
@@ -55,12 +55,14 @@
 | scope | [`listOrgUnits`](#listorgunits) | GET | `/org-units` | core | 1 | ADM-006, ADM-412, ADM-421, BO-055, BO-064, BO-068 … |
 | scope | [`updateOrgUnit`](#updateorgunit) | PATCH | `/org-units/{orgUnitId}` | setup | 1 | BO-064, BO-145 |
 | tenancy | [`getWorkstationHealth`](#getworkstationhealth) | GET | `/workstations/{workstationId}/health` | core | 1 | BO-036, BO-128, BO-129, POS-001, POS-025 |
+| tenancy | [`listAuditRecords`](#listauditrecords) | GET | `/audit-records` | core | 1 | ADM-004, ANL-070, BO-035, BO-068, BO-1079, BO-1162 … |
 | tenancy | [`setVenueSettings`](#setvenuesettings) | PUT | `/venues/{venueId}/settings` | setup | 1 | BO-065, BO-1063, BO-136, BO-187, BO-600 |
 | tenancy | [`setVenueSettingsDefaults`](#setvenuesettingsdefaults) | PUT | `/venue-settings-defaults` | setup | 1 | ADM-019, ADM-426, BO-1062 |
 | workstation | [`configureWorkstation`](#configureworkstation) | PUT | `/workstations/{workstationId}` | core | 1 | BO-036, BO-602, POS-016 |
 | workstation | [`createOutlet`](#createoutlet) | POST | `/outlets` | setup | 1 | BO-044 |
 | workstation | [`createSaleBoard`](#createsaleboard) | POST | `/sale-boards` | setup | 1 | BO-109, BO-124 |
 | workstation | [`getOutlet`](#getoutlet) | GET | `/outlets/{outletId}` | core | 1 | POS-021 |
+| workstation | [`getWorkstation`](#getworkstation) | GET | `/workstations/{workstationId}` | core | 1 | BO-036, POS-016 |
 | workstation | [`listDevices`](#listdevices) | GET | `/devices` | core | 1 | ADM-580, ANL-003, BO-036, BO-124, BO-405, BO-732 … |
 | workstation | [`listSaleBoards`](#listsaleboards) | GET | `/sale-boards` | core | 1 | BO-109, BO-116, BO-122, BO-123, BO-124, BO-126 … |
 | workstation | [`updateOutlet`](#updateoutlet) | PATCH | `/outlets/{outletId}` | setup | 1 | BO-044, BO-063, BO-731 |
@@ -86,16 +88,17 @@ in-flight requests keep theirs, R129):
 
 | Input | Stored as |
 |---|---|
-| `module` | the matrix: `approvals.matrix.kind`, an `ApprovalKind` value (400 when it is not one) |
-| `venue` | the matrix's scope (`scope_level` venue, its `scope_path`); absent, the tenant's matrix |
+| `module` | **required by the server** (`400 validation` without it; optional in the schema only so an r1 client still validates). The matrix: `approvals.matrix.kind`, an `ApprovalKind` value (400 when it is not one); it selects which matrix the rule goes into |
+| `venue` | the matrix's scope (`scope_level` venue, its `scope_path`). **Only the caller's own scope node (audit R183):** absent, it is the venue the caller acts at, never the tenant's matrix; a venue that is not that node is `400 validation` (`errors[]` names `venue`). Nobody writes another level's matrix through this call |
 | `code` | `approvals.rule.code`, the upsert key within the matrix |
 | `approvalMode` | `compositeMode`, and what the engine runs: `single` sequential with `levels` 1; `sequential` and `multiLevel` sequential with `levels` = `minimumApprovals`; `parallel` parallel; `anyOne` parallel with `minimumApprovals` 1; `allMustApprove` consensus; `conditional` sequential, applying only where `skipConditions` does not hold |
 | `amount`, `percentage` | `minAmount`, `minPercentage` |
 | `product`, `department`, `customerType`, `risk`, `exceptionType`, `legalEntity` | `matchAttributes` (with `module`) |
 | `minimumApprovals`, `rejectionBehavior` | the same-named rule fields |
 | `requestChanges`, `delegate`, `reassign` | `allowRequestChanges`, `allowDelegate`, `allowReassign` |
-| `skipConditions` | `condition`, negated: the rule is skipped where it holds |
-| `requiredApproverRole` | `requiredApproverRoleId`, and `approverRoleIds` = [it] when the rule is new |
+| `skipConditions` | `condition`, negated: the rule is skipped where it holds. **Refused `422 condition-not-supported` when not empty** until a condition language exists (APPROVALS-TENANCY-C06, CHG-R8SPN-016) |
+| `requiredApproverRole` | `requiredApproverRoleId`, and `approverRoleIds` = [it] when the rule is new. **Required when the rule is new** (`400 approver-role-required`), so `approver_role_ids` is never empty; an existing rule keeps the list it has |
+| (not sent) `sort_order` | a new rule gets **last + 1 in its matrix**, so it is the last rule tried; an existing rule keeps its place. `setApprovalMatrix` reorders |
 
 The view reads the same row back in the input's shape. `setApprovalMatrix` stays the operation of record for whole
 matrices; both write the same rows, so neither overwrites the other's rules.
@@ -104,7 +107,7 @@ matrices; both write the same rows, so neither overwrites the other's rules.
 |---|---|
 | Permission | `APPROVAL_CONFIGURE` |
 | Scope level | venue |
-| Part of slice | setup, changes rows of `approvals.matrix`, `approvals.rule` that another operation creates |
+| Part of slice | setup, changes rows of `approvals.rule` that another operation creates |
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
@@ -131,9 +134,9 @@ matrices; both write the same rows, so neither overwrites the other's rules.
 | amount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | amount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | percentage | number |  | Percentage |
-| module | string |  | Module |
+| module | string |  | Required by the server. |
 | product | string |  | Product |
-| venue | string |  | Venue |
+| venue | string |  | Venue. |
 | department | string |  | Department |
 | customerType | string |  | Customer Type |
 | risk | string |  | Risk |
@@ -178,7 +181,11 @@ matrices; both write the same rows, so neither overwrites the other's rules.
 
 | Code | Shape | Meaning |
 |---|---|---|
-| 200 |  | Approval Matrix & Multi-Level Approval Configuration |
+| 200 |  | Approval Matrix & Multi-Level Approval Configuration. |
+| 201 |  | Created. |
+| 400 |  | Validation failed: module missing or not an ApprovalKind; venue not the venue the caller acts at (audit R183); or a new rule with no requiredApproverRole (approver-role-required). |
+| 409 |  | Refused, and nothing is stored: the rule would loosen a rule set above (loosensParentRule) or can never match because an earlier rule always does (unreachableRule), as setApprovalMatrix refuses it. |
+| 422 |  | skipConditions is not empty, and no condition language exists yet (pull audit R104; APPROVALS-TENANCY-C06, CHG-R8SPN-016): it would be the rule's condition, negated, and a condition is refused, never… |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### approveRoleAuthorityDelegation
@@ -201,10 +208,10 @@ matrices; both write the same rows, so neither overwrites the other's rules.
 | `delegator`, `delegate` (principal ids; `user` is the delegator when `delegator` is absent) | `delegatorPrincipalId`, `delegatePrincipalId` |
 | `start`, `end`, `reason` | `from`, `to`, `reason` |
 | `requestKind` | `kinds` = [it] (an `ApprovalKind`; absent, every kind) |
-| `authorityAmount`, `authorityPercentage` | `maxAmount`, `maxPercentage`: the delegation's own cap, which never exceeds what the delegator may approve under the matrix (409 `exceedsDelegatorAuthority`) |
+| `authorityAmount`, `authorityPercentage` | `maxAmount`, `maxPercentage`: the delegation's own cap, which never exceeds what the delegator may approve under the matrix (`403 exceedsDelegatorAuthority`, as `createApprovalDelegation` refuses it) |
 | `scope`, `venue`, `region`, `businessUnit`, `legalEntity`, `department` | `scopePath`: the most specific scope node given |
 | `delegationType` | `delegationType` |
-| `requiredRole` (and `role`, `position`) | `requiredRoleId`: the delegate must hold it (409 otherwise); `role` and `position` are display only |
+| `requiredRole` (and `role`, `position`) | `requiredRoleId`: the delegate must hold it (`409 delegateLacksRequiredRole` otherwise); `role` and `position` are display only |
 
 Authority limits of a role stay in `setApprovalMatrix`; this sets the limit of one delegation.
 
@@ -287,6 +294,9 @@ Authority limits of a role stay in `setApprovalMatrix`; this sets the limit of o
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Roles, Authority, Delegation & Approval Limits |
+| 400 |  | The delegation is malformed: invalidWindow (end not after start) or delegateIsDelegator. |
+| 403 |  | The delegation would hand over authority that is not there: delegateLacksPermission or exceedsDelegatorAuthority, with the same status as createApprovalDelegation. |
+| 409 |  | The delegate does not hold the role the delegation names (delegateLacksRequiredRole). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
@@ -447,6 +457,7 @@ The delegate cannot exceed the delegator's own authority, and **cannot approve a
 | 201 |  | Delegated |
 | 400 |  | The delegation is malformed. |
 | 403 |  | The delegation would hand over authority that is not there. |
+| 409 |  | The delegate does not hold the role the delegation names in requiredRoleId (delegateLacksRequiredRole). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
@@ -469,8 +480,8 @@ The delegate cannot exceed the delegator's own authority, and **cannot approve a
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `tenancy.device_assignment` |
-| Writes | `tenancy.device_assignment` |
+| Reads | `cache:idempotency`, `platform.device`, `tenancy.device_assignment` |
+| Writes | `cache:idempotency`, `tenancy.device_assignment` |
 | Called by | ADM-582, BO-732, POS-016 |
 
 **Parameters**
@@ -484,7 +495,7 @@ The delegate cannot exceed the delegator's own authority, and **cannot approve a
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| deviceId | string (uuid) |  | From the path of setDeviceAssignment. (read-only) |
+| deviceId | string (uuid) | yes | From the path of setDeviceAssignment. (read-only) |
 | ownerOrgUnitId | string (uuid) |  | Who the device belongs to — the cost centre that replaces it when it breaks. (nullable) |
 | custodianPrincipalId | string (uuid) |  | Who is holding it right now. (nullable) |
 | assignedWorkstationId | string (uuid) |  | (nullable) |
@@ -500,7 +511,7 @@ The delegate cannot exceed the delegator's own authority, and **cannot approve a
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| deviceId | string (uuid) |  | From the path of setDeviceAssignment. (read-only) |
+| deviceId | string (uuid) | yes | From the path of setDeviceAssignment. (read-only) |
 | ownerOrgUnitId | string (uuid) |  | Who the device belongs to — the cost centre that replaces it when it breaks. (nullable) |
 | custodianPrincipalId | string (uuid) |  | Who is holding it right now. (nullable) |
 | assignedWorkstationId | string (uuid) |  | (nullable) |
@@ -552,7 +563,7 @@ The delegate cannot exceed the delegator's own authority, and **cannot approve a
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| deviceId | string (uuid) |  | From the path of setDeviceAssignment. (read-only) |
+| deviceId | string (uuid) | yes | From the path of setDeviceAssignment. (read-only) |
 | ownerOrgUnitId | string (uuid) |  | Who the device belongs to — the cost centre that replaces it when it breaks. (nullable) |
 | custodianPrincipalId | string (uuid) |  | Who is holding it right now. (nullable) |
 | assignedWorkstationId | string (uuid) |  | (nullable) |
@@ -742,7 +753,7 @@ Changing a matrix creates a version (11.1.80). Requests in flight keep the versi
 |---|---|
 | Permission | `APPROVAL_CONFIGURE` |
 | Scope level | venue |
-| Part of slice | setup, makes `approvals.matrix`, `approvals.rule` non-empty |
+| Part of slice | setup, makes `approvals.rule` non-empty |
 | Wave | 1 |
 | Offline | no |
 | Config scope | venue |
@@ -860,6 +871,7 @@ Changing a matrix creates a version (11.1.80). Requests in flight keep the versi
 | 201 |  | Created — no matrix existed for this kind and scope, so this is version 1 |
 | 400 |  | Validation failed. |
 | 409 |  | Refused, and nothing is stored. |
+| 422 |  | A rule carries a condition (not null), and no condition language exists yet (pull audit R104; APPROVALS-TENANCY-C06, CHG-R8SPN-016). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
@@ -1050,6 +1062,7 @@ Called by the contract that needs the authorisation, not by a person. `createRef
 **The subject is a reference, never a copy.** The request points at the order, the shift or the proposed action; it does not embed it. A copy goes stale between raising and deciding, and an approver reading a stale copy approves something that no longer exists.
 Draft is supported (11.1.51) for the case where a person raises it themselves and wants to gather detail first.
 **A draft is saved, not routed — decided 28 September, audit R129 (3).** `isDraft: true` stores the request at `draft`: nobody is asked, no SLA runs, and it does not count as an open request for the `409` below, so a person may keep a draft while a contract raises the real one. The draft is sent with `submitApprovalRequest`, which is when the matrix is read, the approvers are resolved and `matrixVersion` is fixed. A contract raising a request never drafts.
+**No route, no request** (lead's ruling on lane H review 3 N-1, 20 October 2026; CHG-R8SPN-015). A request that is not a draft and matches no active rule (no rule of its kind and subject type at its `scopePath`, or for subject type `tenant` no active platform rule) is refused `422 no-approval-route` and nothing is written: it is never approved automatically and never left `pending` with nobody to ask. The calling operation passes the refusal on to its own caller (`suspendTenant`, `reactivateTenant`). A rule that matches but whose roles have no holder is a different case (`rerouteOnNoApprover`, `noApproverAvailable`).
 
 |  |  |
 |---|---|
@@ -1109,6 +1122,7 @@ Draft is supported (11.1.51) for the case where a person raises it themselves an
 | amount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | amount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | amount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| attributes | object |  | The attributes the raising contract sent (CreateApprovalRequest.attributes), stored as given (ADAM CR-172, fix round 3; CHG-CRA-005). (read-only; nullable) |
 | justification | string |  | (nullable) |
 | requestedByPrincipalId | string (uuid) | yes |  |
 | matrixVersion | integer |  |  |
@@ -1122,11 +1136,13 @@ Draft is supported (11.1.51) for the case where a person raises it themselves an
 | decisions | array of ApprovalDecision |  | Every decision at every level, in order. |
 | decisions[].id | string (uuid) |  | Added 20 August. (read-only) |
 | decisions[].level | integer | yes |  |
-| decisions[].principalId | string (uuid) | yes |  |
+| decisions[].principalId | string (uuid) |  | The approver; null when an external workflow system decided (externalApproverRef set). (nullable) |
+| decisions[].externalApproverRef | string |  | Who decided in the external provider's system, as it named them (recordExternalApprovalDecision); null for an internal approver (CHG-R8MIG-009). (nullable) |
+| decisions[].externalApproverName | string |  | The external approver's display name, where the provider sent one (CHG-R8MIG-009). (max length 200; nullable) |
 | decisions[].displayName | string |  |  |
 | decisions[].isDelegate | boolean |  |  |
 | decisions[].delegatedFrom | string (uuid) |  | (nullable) |
-| decisions[].decision | enum (approve, reject) | yes |  |
+| decisions[].decision | enum (approve, reject, return, requestInformation) | yes | return and requestInformation are stored as decisions too, their comment in comment (decideApprovalRequest; CHG-R8MIG-009). |
 | decisions[].comment | string |  | (nullable) |
 | decisions[].reason | string |  | (nullable) |
 | decisions[].usedMfa | boolean |  |  |
@@ -1148,6 +1164,10 @@ Draft is supported (11.1.51) for the case where a person raises it themselves an
 | assignedToPrincipalId | string (uuid) |  | Who claimed or was assigned the request in a shared queue (assignApprovalRequest; DI-723; CHG-CSP-042). (read-only; nullable) |
 | assignedToDepartmentId | string (uuid) |  | The department queue it was assigned to, where it went to a department rather than a person (CHG-CSP-042). (read-only; nullable) |
 | assignedAt | string (date-time) |  | (read-only; nullable) |
+| assignmentNote | string |  | The note assignApprovalRequest was given, kept with the assignment (R8 blocker APPROVALS-TENANCY-C02, CHG-R8MIG-009). (max length 500; read-only; nullable) |
+| approvalMatrixId | string (uuid) |  | The matrix routing chose at submit (with matrixVersion), so a decision is checked against the matrix the request was routed by (CHG-R8MIG-009). (read-only; nullable) |
+| ruleId | string (uuid) |  | The matrix rule that matched on kind, scope, amount and attributes (CHG-R8MIG-009). (read-only; nullable) |
+| cancelReason | string |  | Why the request was cancelled, as cancelApprovalRequest was given it (CHG-R8MIG-009). (max length 500; read-only; nullable) |
 | requestedAt | string (date-time) | yes |  |
 | completedAt | string (date-time) |  | (nullable) |
 | aiAssessment | object |  | AI context for the reviewer, never an input to the decision (11.1.73 to 11.1.75; MoM 8 September; 29 September, build pass, group G2). (read-only; nullable) |
@@ -1171,6 +1191,7 @@ Draft is supported (11.1.51) for the case where a person raises it themselves an
 |---|---|---|
 | 201 |  | Raised, and routed |
 | 409 |  | An open request already exists for this subject. |
+| 422 |  | No approval route (no-approval-route; CHG-R8SPN-015): the request is not a draft and no active rule matches its kind and subject type at its scopePath (for subject type tenant, no active platform rul… |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### decideApprovalRequest
@@ -1180,7 +1201,7 @@ Draft is supported (11.1.51) for the case where a person raises it themselves an
 **Records an authorisation. Does not perform the action.** The requesting contract executes afterwards under the approver's permission.
 Refused where the approver is the requester (11.1.24), where they do not hold the permission the rule demands, or where the rule requires MFA and the step-up token is absent (11.1.60).
 A rejection requires a reason (11.1.21). An approval may carry a comment (11.1.20) and usually should — six months later the comment is the only record of why the exception was allowed.
-**Return and request information (decided 29 September, readiness close-out; MoM 10 Aug §5.5: Approve, Reject, Return, Request More Information).** `return` sends the request back to the requester to amend (`returned`); `requestInformation` asks the requester a question and pauses the SLA clock (`informationRequested`). Neither is a rejection and neither counts against the requester in the rejection rate. Both need a comment saying what is wanted. The requester answers with `submitApprovalRequest` on the same request, and routing resumes at the level that sent it back.
+**Return and request information (decided 29 September, readiness close-out; MoM 10 Aug §5.5: Approve, Reject, Return, Request More Information).** `return` sends the request back to the requester to amend (`returned`); `requestInformation` asks the requester a question and stops the SLA clock (`informationRequested`). Neither is a rejection and neither counts against the requester in the rejection rate. Both need a comment saying what is wanted. The requester answers with `submitApprovalRequest` on the same request, and routing resumes at the level that sent it back. **Both are stored as a decision row** (`approvals.decision.decision` `return` or `requestInformation`, the comment in `comment`; R8 blocker APPROVALS-TENANCY-C02, CHG-R8MIG-009), so the request's `decisions[]` shows them. **The SLA restarts, it does not resume**: the answering submit sets `sla_due_at` again to now plus the rule's `slaMinutes` (states/approval-request.yaml); no remaining time is kept.
 
 |  |  |
 |---|---|
@@ -1190,7 +1211,7 @@ A rejection requires a reason (11.1.21). An approval may carry a comment (11.1.2
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `approvals.decision`, `approvals.escalation`, `approvals.request`, `approvals.rule`, `cache:idempotency`, `identity.principal` |
+| Reads | `approvals.decision`, `approvals.delegation`, `approvals.escalation`, `approvals.matrix`, `approvals.request`, `approvals.rule`, `cache:idempotency`, `identity.principal` |
 | Writes | `approvals.decision`, `approvals.request`, `cache:idempotency`, `control.partner_agreement`, `control.partner_application`, `control.partner_change_request`, `marketing.privacy_notice_governance`, `platform.outbox` |
 | Called by | ADM-145, BO-084, BO-085, BO-243, BO-367, BO-374, BO-377, BO-378, BO-940, POS-020 |
 | State model | AccessConfigurationVersion ([states/access-configuration-version.yaml](../../../states/access-configuration-version.yaml)): moves `pendingApproval` -> `active`, `pendingApproval` -> `scheduled`, `pendingApproval` -> `draft`<br/>AccessDynamicPolicyVersion ([states/access-dynamic-policy-version.yaml](../../../states/access-dynamic-policy-version.yaml)): moves `pendingApproval` -> `active`, `pendingApproval` -> `rejected`<br/>AccessDynamicPolicy ([states/access-dynamic-policy.yaml](../../../states/access-dynamic-policy.yaml)): moves `pendingApproval` -> `active`, `pendingApproval` -> `draft`<br/>AccessMediaTemplateVersion ([states/access-media-template-version.yaml](../../../states/access-media-template-version.yaml)): moves `pendingApproval` -> `published`, `pendingApproval` -> `scheduled`, `pendingApproval` -> `rejected`<br/>AccessMediaTemplate ([states/access-media-template.yaml](../../../states/access-media-template.yaml)): moves `pendingApproval` -> `published`, `pendingApproval` -> `scheduled`, `pendingApproval` -> `draft`<br/>Approval request ([states/approval-request.yaml](../../../states/approval-request.yaml)): moves `escalated` -> `pending`, `pending` -> `approved`, `escalated` -> `approved`, `pending` -> `rejected`, `escalated` -> `rejected`, `pending` -> `returned`, `escalated` -> `returned`, `pending` -> `informationRequested`, `escalated` -> `informationRequested`<br/>Partner agreement ([states/partner-agreement.yaml](../../../states/partner-agreement.yaml)): moves `pendingApproval` -> `active`, `pendingApproval` -> `terminated`<br/>Partner application ([states/partner-application.yaml](../../../states/partner-application.yaml)): moves `inReview` -> `approved`, `inReview` -> `rejected`<br/>Partner change request ([states/partner-change-request.yaml](../../../states/partner-change-request.yaml)): moves `pendingApproval` -> `approved`, `pendingApproval` -> `rejected`<br/>Privacy notice governance ([states/privacy-notice-governance.yaml](../../../states/privacy-notice-governance.yaml)): moves `review` -> `approved`<br/>Refund ([states/refund.yaml](../../../states/refund.yaml)): moves `pendingApproval` -> `pendingGateway`, `pendingApproval` -> `declined`<br/>Shift swap ([states/shift-swap.yaml](../../../states/shift-swap.yaml)): moves `awaitingApproval` -> `approved`, `awaitingApproval` -> `rejected` |
@@ -1232,6 +1253,7 @@ A rejection requires a reason (11.1.21). An approval may carry a comment (11.1.2
 | amount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | amount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | amount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| attributes | object |  | The attributes the raising contract sent (CreateApprovalRequest.attributes), stored as given (ADAM CR-172, fix round 3; CHG-CRA-005). (read-only; nullable) |
 | justification | string |  | (nullable) |
 | requestedByPrincipalId | string (uuid) | yes |  |
 | matrixVersion | integer |  |  |
@@ -1245,11 +1267,13 @@ A rejection requires a reason (11.1.21). An approval may carry a comment (11.1.2
 | decisions | array of ApprovalDecision |  | Every decision at every level, in order. |
 | decisions[].id | string (uuid) |  | Added 20 August. (read-only) |
 | decisions[].level | integer | yes |  |
-| decisions[].principalId | string (uuid) | yes |  |
+| decisions[].principalId | string (uuid) |  | The approver; null when an external workflow system decided (externalApproverRef set). (nullable) |
+| decisions[].externalApproverRef | string |  | Who decided in the external provider's system, as it named them (recordExternalApprovalDecision); null for an internal approver (CHG-R8MIG-009). (nullable) |
+| decisions[].externalApproverName | string |  | The external approver's display name, where the provider sent one (CHG-R8MIG-009). (max length 200; nullable) |
 | decisions[].displayName | string |  |  |
 | decisions[].isDelegate | boolean |  |  |
 | decisions[].delegatedFrom | string (uuid) |  | (nullable) |
-| decisions[].decision | enum (approve, reject) | yes |  |
+| decisions[].decision | enum (approve, reject, return, requestInformation) | yes | return and requestInformation are stored as decisions too, their comment in comment (decideApprovalRequest; CHG-R8MIG-009). |
 | decisions[].comment | string |  | (nullable) |
 | decisions[].reason | string |  | (nullable) |
 | decisions[].usedMfa | boolean |  |  |
@@ -1271,6 +1295,10 @@ A rejection requires a reason (11.1.21). An approval may carry a comment (11.1.2
 | assignedToPrincipalId | string (uuid) |  | Who claimed or was assigned the request in a shared queue (assignApprovalRequest; DI-723; CHG-CSP-042). (read-only; nullable) |
 | assignedToDepartmentId | string (uuid) |  | The department queue it was assigned to, where it went to a department rather than a person (CHG-CSP-042). (read-only; nullable) |
 | assignedAt | string (date-time) |  | (read-only; nullable) |
+| assignmentNote | string |  | The note assignApprovalRequest was given, kept with the assignment (R8 blocker APPROVALS-TENANCY-C02, CHG-R8MIG-009). (max length 500; read-only; nullable) |
+| approvalMatrixId | string (uuid) |  | The matrix routing chose at submit (with matrixVersion), so a decision is checked against the matrix the request was routed by (CHG-R8MIG-009). (read-only; nullable) |
+| ruleId | string (uuid) |  | The matrix rule that matched on kind, scope, amount and attributes (CHG-R8MIG-009). (read-only; nullable) |
+| cancelReason | string |  | Why the request was cancelled, as cancelApprovalRequest was given it (CHG-R8MIG-009). (max length 500; read-only; nullable) |
 | requestedAt | string (date-time) | yes |  |
 | completedAt | string (date-time) |  | (nullable) |
 | aiAssessment | object |  | AI context for the reviewer, never an input to the decision (11.1.73 to 11.1.75; MoM 8 September; 29 September, build pass, group G2). (read-only; nullable) |
@@ -1304,6 +1332,7 @@ A rejection requires a reason (11.1.21). An approval may carry a comment (11.1.2
 **The operation every other contract calls.** It answers before the action, not after, so a cashier learns a discount needs a manager while the guest is still at the counter.
 Returns the matching rule and the resolved approver chain, so the caller can say *"this needs Sara, and she has four hours"* rather than *"this needs approval"*.
 Read-only and deliberately cheap. It runs on the hot path — every refund, every discount, every price override — and a slow answer here is a slow till.
+**Rules match without a condition** (APPROVALS-TENANCY-C06, CHG-R8SPN-016): no stored rule has one, because `setApprovalMatrix` and `approveMatrixMultiLevel` refuse a condition or skip condition `422 condition-not-supported` until a condition language exists (`ApprovalRule.condition`). `createApprovalRequest` and `submitApprovalRequest` route by the same match.
 
 |  |  |
 |---|---|
@@ -1410,7 +1439,7 @@ Sorted by SLA proximity rather than age. **A request breaching in ten minutes ma
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | primary |
-| Reads | `approvals.decision`, `approvals.escalation`, `approvals.request` |
+| Reads | `approvals.decision`, `approvals.delegation`, `approvals.escalation`, `approvals.matrix`, `approvals.request` |
 | Writes | - |
 | Called by | ADM-130, ADM-145, ADM-224, BO-084, BO-085, BO-1181, BO-364, BO-366, BO-367, BO-368, BO-369, BO-371, BO-374, BO-375, BO-393, BO-940, EMP-037, POS-020 |
 
@@ -1448,6 +1477,7 @@ Sorted by SLA proximity rather than age. **A request breaching in ten minutes ma
 | items[].amount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | items[].amount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | items[].amount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| items[].attributes | object |  | The attributes the raising contract sent (CreateApprovalRequest.attributes), stored as given (ADAM CR-172, fix round 3; CHG-CRA-005). (read-only; nullable) |
 | items[].justification | string |  | (nullable) |
 | items[].requestedByPrincipalId | string (uuid) | yes |  |
 | items[].matrixVersion | integer |  |  |
@@ -1461,11 +1491,13 @@ Sorted by SLA proximity rather than age. **A request breaching in ten minutes ma
 | items[].decisions | array of ApprovalDecision |  | Every decision at every level, in order. |
 | items[].decisions[].id | string (uuid) |  | Added 20 August. (read-only) |
 | items[].decisions[].level | integer | yes |  |
-| items[].decisions[].principalId | string (uuid) | yes |  |
+| items[].decisions[].principalId | string (uuid) |  | The approver; null when an external workflow system decided (externalApproverRef set). (nullable) |
+| items[].decisions[].externalApproverRef | string |  | Who decided in the external provider's system, as it named them (recordExternalApprovalDecision); null for an internal approver (CHG-R8MIG-009). (nullable) |
+| items[].decisions[].externalApproverName | string |  | The external approver's display name, where the provider sent one (CHG-R8MIG-009). (max length 200; nullable) |
 | items[].decisions[].displayName | string |  |  |
 | items[].decisions[].isDelegate | boolean |  |  |
 | items[].decisions[].delegatedFrom | string (uuid) |  | (nullable) |
-| items[].decisions[].decision | enum (approve, reject) | yes |  |
+| items[].decisions[].decision | enum (approve, reject, return, requestInformation) | yes | return and requestInformation are stored as decisions too, their comment in comment (decideApprovalRequest; CHG-R8MIG-009). |
 | items[].decisions[].comment | string |  | (nullable) |
 | items[].decisions[].reason | string |  | (nullable) |
 | items[].decisions[].usedMfa | boolean |  |  |
@@ -1487,6 +1519,10 @@ Sorted by SLA proximity rather than age. **A request breaching in ten minutes ma
 | items[].assignedToPrincipalId | string (uuid) |  | Who claimed or was assigned the request in a shared queue (assignApprovalRequest; DI-723; CHG-CSP-042). (read-only; nullable) |
 | items[].assignedToDepartmentId | string (uuid) |  | The department queue it was assigned to, where it went to a department rather than a person (CHG-CSP-042). (read-only; nullable) |
 | items[].assignedAt | string (date-time) |  | (read-only; nullable) |
+| items[].assignmentNote | string |  | The note assignApprovalRequest was given, kept with the assignment (R8 blocker APPROVALS-TENANCY-C02, CHG-R8MIG-009). (max length 500; read-only; nullable) |
+| items[].approvalMatrixId | string (uuid) |  | The matrix routing chose at submit (with matrixVersion), so a decision is checked against the matrix the request was routed by (CHG-R8MIG-009). (read-only; nullable) |
+| items[].ruleId | string (uuid) |  | The matrix rule that matched on kind, scope, amount and attributes (CHG-R8MIG-009). (read-only; nullable) |
+| items[].cancelReason | string |  | Why the request was cancelled, as cancelApprovalRequest was given it (CHG-R8MIG-009). (max length 500; read-only; nullable) |
 | items[].requestedAt | string (date-time) | yes |  |
 | items[].completedAt | string (date-time) |  | (nullable) |
 | items[].aiAssessment | object |  | AI context for the reviewer, never an input to the decision (11.1.73 to 11.1.75; MoM 8 September; 29 September, build pass, group G2). (read-only; nullable) |
@@ -1957,6 +1993,70 @@ Board 1 of the client's POS design set. **The package held `lastHeartbeatAt` and
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
+### listAuditRecords
+
+**`GET /audit-records`**: Who did what, where, and when
+
+POS board 1 and 4, 24 August. **`platform.audit_record` existed and nothing read it** — fifteen operations write an audit trail and no operation, screen or flow could show one. `BO-068 Audit Log` had zero operations declared.
+Found by mapping the POS pack: four separate frames wanted an audit view — station events, profile deployments, limit unlocks, override history — and **every one of them is this operation with a filter.**
+**Reading the audit log is itself audited.** `platform.audit_read` exists for that reason: a trail nobody can inspect is useless, and one anybody can inspect without trace is a different problem. Each call writes one `AuditRead` row (`target` `auditRecord`, the caller, the time, the filters and the number of rows returned; CHG-R8MIG-004).
+**Never deletes and never edits.** The only operations on an audit record are write and read — which is why there is no `updateAuditRecord` here and never will be.
+**Typed and paged** (pull audit R198, 26 September). The rows were free-form objects in a bare array, so no screen could name a column and BO-035's *cursor pagination, never offset* had nothing to page with. Each row is an `AuditRecord`, carrying exactly the fields this operation filters on, and the list is the shared `Page`. **Gated by `AUDIT_VIEW`, not `AI_AUDIT_VIEW`**: this is the platform trail of every principal's actions, and the AI key covers only what an assistant did.
+**Order.** Newest first, by `occurredAt` descending, then by `id`.
+
+|  |  |
+|---|---|
+| Permission | `AUDIT_VIEW` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | analytical |
+| Reads | `cache:idempotency`, `identity.principal`, `platform.audit_record`, `platform.scope` |
+| Writes | `platform.audit_read` |
+| Called by | ADM-004, ANL-070, BO-035, BO-068, BO-1079, BO-1162, BO-126, BO-133, BO-503 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| orgUnitId | query |  | string (uuid) |  |
+| principalId | query |  | string (uuid) |  |
+| workstationId | query |  | string (uuid) |  |
+| action | query |  | string |  |
+| subjectRef | query |  | string | The thing acted on. |
+| platformStaffGrantId | query |  | string (uuid) | Exact match on AuditRecord.platformStaffGrantId: what a platform operator did under one grant (audit R098). |
+| from | query |  | string (date-time) |  |
+| to | query |  | string (date-time) |  |
+| pageSize | query |  | integer |  |
+| cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
+
+**Response**: `object`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| items | array of AuditRecord | yes |  |
+| items[].id | string (uuid) | yes | (read-only) |
+| items[].principalId | string (uuid) |  | Who acted. |
+| items[].orgUnitId | string (uuid) |  | The scope node the action happened in. (nullable) |
+| items[].workstationId | string (uuid) |  | The workstation it was done from, where there was one. (nullable) |
+| items[].action | string | yes | What was done, as the writing operation names it. |
+| items[].subjectRef | string |  | The thing acted on — a profile, a shift, an order. (nullable) |
+| items[].occurredAt | string (date-time) | yes | When. |
+| items[].platformStaffGrantId | string (uuid) |  | Set when a TICVAI platform operator acted, naming the grant they acted under (identity.openPlatformStaffGrant; decided 28 September, audit R098). (nullable) |
+| nextCursor | string |  |  |
+| hasMore | boolean | yes |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Records, most recent first |
+| 401 | Unauthorized | Missing, expired or superseded session |
+| 403 | Forbidden | Authenticated but not permitted at the requested scope |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
 ### setVenueSettings
 
 **`PUT /venues/{venueId}/settings`**: Set support hours, quiet hours, segregated access and alerting
@@ -1992,6 +2092,12 @@ Support hours were an open conflict for eleven days and were never a design ques
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
+| contact | object |  | How a guest reaches this venue (R8 blocker WHITE-C16, the storage-sat lane's request 5; CHG-R8MIG-011): phone, email, WhatsApp, address and opening-hours prose, one jsonb column, written by the venue… (nullable) |
+| contact.phone | string |  | (nullable) |
+| contact.email | string (email) |  | (nullable) |
+| contact.whatsapp | string |  | (nullable) |
+| contact.address | object |  | (nullable) |
+| contact.openingHours | object |  | Prose, as the guest reads it. (nullable) |
 | id | string (uuid) |  | Added 20 August. (read-only) |
 | venueId | string (uuid) |  | From the path of setVenueSettings. (read-only) |
 | calendarDayStartHour | integer |  | Where the venue's calendar day starts (17 September minutes M17-03, added 30 September): the first hour row of every day and week calendar view (calendarView in screens/_components.yaml), so a venue… (min 0; max 23; default 6; nullable) |
@@ -2099,6 +2205,12 @@ Support hours were an open conflict for eleven days and were never a design ques
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
+| contact | object |  | How a guest reaches this venue (R8 blocker WHITE-C16, the storage-sat lane's request 5; CHG-R8MIG-011): phone, email, WhatsApp, address and opening-hours prose, one jsonb column, written by the venue… (nullable) |
+| contact.phone | string |  | (nullable) |
+| contact.email | string (email) |  | (nullable) |
+| contact.whatsapp | string |  | (nullable) |
+| contact.address | object |  | (nullable) |
+| contact.openingHours | object |  | Prose, as the guest reads it. (nullable) |
 | id | string (uuid) |  | Added 20 August. (read-only) |
 | venueId | string (uuid) |  | From the path of setVenueSettings. (read-only) |
 | calendarDayStartHour | integer |  | Where the venue's calendar day starts (17 September minutes M17-03, added 30 September): the first hour row of every day and week calendar view (calendarView in screens/_components.yaml), so a venue… (min 0; max 23; default 6; nullable) |
@@ -2228,8 +2340,8 @@ Support hours were an open conflict for eleven days and were never a design ques
 | Offline | no |
 | Config scope | tenant |
 | Conflict policy | serverWins |
-| Reads | `platform.venue_settings` |
-| Writes | `platform.venue_settings` |
+| Reads | `cache:idempotency`, `platform.venue_settings` |
+| Writes | `cache:idempotency`, `platform.venue_settings` |
 | Called by | ADM-019, ADM-426, BO-1062 |
 
 **Parameters**
@@ -2242,6 +2354,12 @@ Support hours were an open conflict for eleven days and were never a design ques
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
+| contact | object |  | How a guest reaches this venue (R8 blocker WHITE-C16, the storage-sat lane's request 5; CHG-R8MIG-011): phone, email, WhatsApp, address and opening-hours prose, one jsonb column, written by the venue… (nullable) |
+| contact.phone | string |  | (nullable) |
+| contact.email | string (email) |  | (nullable) |
+| contact.whatsapp | string |  | (nullable) |
+| contact.address | object |  | (nullable) |
+| contact.openingHours | object |  | Prose, as the guest reads it. (nullable) |
 | id | string (uuid) |  | Added 20 August. (read-only) |
 | venueId | string (uuid) |  | From the path of setVenueSettings. (read-only) |
 | calendarDayStartHour | integer |  | Where the venue's calendar day starts (17 September minutes M17-03, added 30 September): the first hour row of every day and week calendar view (calendarView in screens/_components.yaml), so a venue… (min 0; max 23; default 6; nullable) |
@@ -2349,6 +2467,12 @@ Support hours were an open conflict for eleven days and were never a design ques
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
+| contact | object |  | How a guest reaches this venue (R8 blocker WHITE-C16, the storage-sat lane's request 5; CHG-R8MIG-011): phone, email, WhatsApp, address and opening-hours prose, one jsonb column, written by the venue… (nullable) |
+| contact.phone | string |  | (nullable) |
+| contact.email | string (email) |  | (nullable) |
+| contact.whatsapp | string |  | (nullable) |
+| contact.address | object |  | (nullable) |
+| contact.openingHours | object |  | Prose, as the guest reads it. (nullable) |
 | id | string (uuid) |  | Added 20 August. (read-only) |
 | venueId | string (uuid) |  | From the path of setVenueSettings. (read-only) |
 | calendarDayStartHour | integer |  | Where the venue's calendar day starts (17 September minutes M17-03, added 30 September): the first hour row of every day and week calendar view (calendarView in screens/_components.yaml), so a venue… (min 0; max 23; default 6; nullable) |
@@ -2473,6 +2597,7 @@ Support hours were an open conflict for eleven days and were never a design ques
 **Refused while a shift is open on this workstation** (F73, pull audit R078). Changing the rules under an open shift means it closes against rules it did not open under, so the change waits for the shift to close.
 **How it knows: it asks Orders, which owns the shift** (decided 14 October 2026, Chinmay, ADAM CR-083; CHG-TEN-004; ADR-0055 rule 2). In one transaction Tenancy first locks the workstation row (`SELECT ... FOR UPDATE` on `platform.workstation`), then calls Orders' declared query `openShiftForWorkstation(workstationId)` in process (`x-ticvai-read-via`), then writes. The lock serialises the check against `openShift`, whose insert of a shift takes a key-share lock on the same row through its foreign key, so a shift cannot open between the question and the write. **Open means every state before `closed` or `autoClosed`** (`pendingApproval`, `open`, `suspended`, `pendingClosure`, `pendingVariance`; the query's rule in shift.yaml). A shift open is `409 shift-open`, naming the shift (`WorkstationShiftOpenProblem`).
 **The till layout is the outlet's unless this till overrides it** (decided 2 October 2026, Chinmay, BO-109; DEC-183; CHG-CSP-006). `saleBoardId` is optional since 2 October: absent or null, the workstation uses its outlet's `Outlet.saleBoardId`; set, it overrides it for this till alone. A workstation with neither an outlet board nor its own is refused `422 sale-board-required`, because a till must open on something. `cashDrawerLimit` overrides the venue's drawer limit for this till (DEC-179; CHG-CSP-016).
+**`devices` links and unlinks registered devices; it never creates or deletes one** (ADAM CR-155, option A, 18 October 2026; CHG-CRA-004). Each item names a registered device by `deviceId`. A device in the list is linked to this workstation (`platform.device.workstation_id`, with the item's `isRequired`); a device linked here and left out of the list is unlinked (`workstation_id` null). No `platform.device` row is ever inserted or deleted by this PUT. An unknown `deviceId` (or an item with none) is `422 unknown-device`; a device that cannot be bound to a till (retired, or not approved) is `422 device-not-bindable`; a device already linked to another workstation is `409 device-bound-elsewhere` (unlink it there first). The approved screens already pick from the registered devices, so nothing changes on screen. "Binding" (CR-095) is `platform.device.workstation_id`, set by `registerDevice` or this PUT; `tenancy.device_assignment` (CR-103) records custody and location, a different fact.
 
 |  |  |
 |---|---|
@@ -2483,7 +2608,7 @@ Support hours were an open conflict for eleven days and were never a design ques
 | Offline | no |
 | Config scope | venue |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `orders.pos_shift`, `platform.device`, `platform.workstation` |
+| Reads | `cache:idempotency`, `orders.pos_shift`, `platform.device`, `platform.outlet`, `platform.region_settings`, `platform.sale_board`, `platform.workstation` |
 | Writes | `cache:idempotency`, `platform.device`, `platform.workstation` |
 | Called by | BO-036, BO-602, POS-016 |
 
@@ -2509,6 +2634,7 @@ Support hours were an open conflict for eleven days and were never a design ques
 | departmentId | string (uuid) |  | (nullable) |
 | accessPointId | string (uuid) |  | (nullable) |
 | devices | array of DeviceBinding |  |  |
+| devices[].deviceId | string (uuid) |  | The registered device (CR-155): the platform.device row's own id. |
 | devices[].kind | DeviceKind: enum (receiptPrinter, ticketPrinter, labelPrinter, cashDrawer, barcodeScanner, rfidReader, nfcReader, cardReader, …) | yes | mobileHandset (18.1.5, added 29 September): a staff phone or tablet running the staff app, registered for push and bound to no workstation. |
 | devices[].driver | string | yes | Driver identifier. |
 | devices[].identifier | string |  | Serial |
@@ -2539,6 +2665,7 @@ Support hours were an open conflict for eleven days and were never a design ques
 | guestDisplayContent | array of enum (lineItems, total, loyaltyBalance, promotions, branding, upsell, queuePosition) |  | BL-061. (default ['lineItems']) |
 | accessPointId | string (uuid) |  | Inherited from the workstation, never selected by the operator. (nullable) |
 | devices | array of DeviceBinding |  |  |
+| devices[].deviceId | string (uuid) |  | The registered device (CR-155): the platform.device row's own id. |
 | devices[].kind | DeviceKind: enum (receiptPrinter, ticketPrinter, labelPrinter, cashDrawer, barcodeScanner, rfidReader, nfcReader, cardReader, …) | yes | mobileHandset (18.1.5, added 29 September): a staff phone or tablet running the staff app, registered for push and bound to no workstation. |
 | devices[].driver | string | yes | Driver identifier. |
 | devices[].identifier | string |  | Serial |
@@ -2550,6 +2677,7 @@ Support hours were an open conflict for eleven days and were never a design ques
 | edgeNodeId | string (uuid) |  | Present when deploymentProfile is venueEdge. (nullable) |
 | healthScore | integer |  | Board 1 of the client's POS set. (min 0; max 100; read-only; nullable) |
 | configurationProfileId | string (uuid) |  | Which profile this workstation runs, and at which version. (nullable) |
+| configurationProfileVersion | integer |  | The version of configurationProfileId this workstation runs, written when a deployment reaches it; null with no profile (R8 blocker APPROVALS-TENANCY-C08, CHG-R8MIG-019). (read-only; nullable) |
 | catalogueState | CatalogueState |  | The workstation's local catalogue position. |
 | catalogueState.appliedBundleVersion | string | yes |  |
 | catalogueState.appliedAt | string (date-time) | yes |  |
@@ -2583,7 +2711,7 @@ Support hours were an open conflict for eleven days and were never a design ques
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `platform.outlet`, `platform.outlet_opening_hour` |
+| Reads | `cache:idempotency`, `platform.outlet`, `platform.outlet_opening_hour`, `platform.region_settings` |
 | Writes | `cache:idempotency`, `platform.outlet`, `platform.outlet_opening_hour` |
 | Called by | BO-044 |
 
@@ -2800,6 +2928,86 @@ A board `code` already used in the venue is `409 duplicate-code` (audit R108; CH
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
+### getWorkstation
+
+**`GET /workstations/{workstationId}`**: Read a workstation
+
+Returns the sale board, connected devices, inherited access point and the region's currency settings. A client calls this at boot to know what surface to load and what hardware is attached.
+Workstation determines presentation, hardware binding, till identity, access point and reporting dimension. It is never a permission source.
+**Scope level `workstation` names where the permission must be held, not who calls.** The workstation is the one in the path, so a back-office caller with no workstation of its own is served when its grant sits at or above that workstation — a venue grant covers every workstation beneath it (downward inheritance, permission-resolution.md).
+
+|  |  |
+|---|---|
+| Permission | `SCOPE_VIEW` |
+| Scope level | workstation |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | yes |
+| Conflict policy | serverWins |
+| Read routing | replica |
+| Reads | `platform.device`, `platform.workstation` |
+| Writes | - |
+| Called by | BO-036, POS-016 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| workstationId | path | yes | string (uuid) |  |
+
+**Response**: `Workstation`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) | yes |  |
+| code | string | yes | (max length 64) |
+| name | string | yes | (max length 200) |
+| venueId | string (uuid) | yes |  |
+| regionId | string (uuid) | yes |  |
+| departmentId | string (uuid) |  | (nullable) |
+| outletId | string (uuid) |  | The outlet this till stands in (CHG-CSP-006). (nullable) |
+| scopePath | string | yes |  |
+| saleBoard | object | yes | Determines which front end loads. |
+| saleBoard.id | string (uuid) | yes |  |
+| saleBoard.kind | SaleBoardKind: enum (ticketing, fnb, retail, mixed) | yes |  |
+| saleBoard.name | string |  |  |
+| saleBoardSource | enum (outlet, workstation) |  | Where saleBoard came from (decided 2 October 2026, Chinmay, BO-109: "Per outlet, with a till override"; DEC-183; CHG-CSP-006): outlet when the till uses its outlet's layout, workstation when this til… (read-only) |
+| cashDrawerLimit | Money |  | This till's drawer limit, overriding the venue's (VenueSettings.cashDrawerLimit; DEC-179; CHG-CSP-016). (nullable) |
+| cashierInputMode | enum (keyboard, touch, scanner, hybrid) |  | BL-061. (default hybrid) |
+| guestDisplayContent | array of enum (lineItems, total, loyaltyBalance, promotions, branding, upsell, queuePosition) |  | BL-061. (default ['lineItems']) |
+| accessPointId | string (uuid) |  | Inherited from the workstation, never selected by the operator. (nullable) |
+| devices | array of DeviceBinding |  |  |
+| devices[].deviceId | string (uuid) |  | The registered device (CR-155): the platform.device row's own id. |
+| devices[].kind | DeviceKind: enum (receiptPrinter, ticketPrinter, labelPrinter, cashDrawer, barcodeScanner, rfidReader, nfcReader, cardReader, …) | yes | mobileHandset (18.1.5, added 29 September): a staff phone or tablet running the staff app, registered for push and bound to no workstation. |
+| devices[].driver | string | yes | Driver identifier. |
+| devices[].identifier | string |  | Serial |
+| devices[].isRequired | boolean |  | When true, the workstation refuses to open a shift if the device is absent. (default False) |
+| currency | string | yes | Resolved from the region, not stored (ADR-0018, 24 August). (pattern ^[A-Z]{3}$) |
+| currencyScale | integer | yes | Resolved from the region, not stored (ADR-0018, 24 August). (min 0; max 4) |
+| timeZone | string | yes |  |
+| deploymentProfile | DeploymentProfile: enum (terminalLocal, venueEdge, thin) |  | How this workstation obtains catalogue and inventory (ADR-0013). |
+| edgeNodeId | string (uuid) |  | Present when deploymentProfile is venueEdge. (nullable) |
+| healthScore | integer |  | Board 1 of the client's POS set. (min 0; max 100; read-only; nullable) |
+| configurationProfileId | string (uuid) |  | Which profile this workstation runs, and at which version. (nullable) |
+| configurationProfileVersion | integer |  | The version of configurationProfileId this workstation runs, written when a deployment reaches it; null with no profile (R8 blocker APPROVALS-TENANCY-C08, CHG-R8MIG-019). (read-only; nullable) |
+| catalogueState | CatalogueState |  | The workstation's local catalogue position. |
+| catalogueState.appliedBundleVersion | string | yes |  |
+| catalogueState.appliedAt | string (date-time) | yes |  |
+| catalogueState.staleAfter | string (date-time) | yes | Beyond this the terminal refuses to trade. |
+| catalogueState.isStale | boolean | yes |  |
+| catalogueState.pendingBundleVersion | string |  | Published but not yet applied. (nullable) |
+| offlineCapable | boolean |  | Derived from deploymentProfile. |
+| isActive | boolean |  |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Workstation |
+| 403 | Forbidden | Authenticated but not permitted at the requested scope |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
 ### listDevices
 
 **`GET /devices`**: List registered devices
@@ -2860,7 +3068,7 @@ Physical devices bound to workstations, and staff handsets (`mobileHandset`), wh
 | items[].offlineScope | enum (none, readOnly, sellAndScan, fullVenue) |  | BL-163. (nullable) |
 | items[].firmwareVersion | string |  | As the device last reported it on its heartbeat. (read-only; nullable) |
 | items[].isRequired | boolean |  | True blocks shift open when the device is unreachable. |
-| items[].status | enum (online, offline, error, consumableLow, needsAttention, localMode, unknown) |  | What the device last said on its heartbeat; unknown until it has. (read-only) |
+| items[].status | enum (online, offline, error, consumableLow, needsAttention, localMode, unknown) |  | What the device last said on its heartbeat; unknown until it has. (default unknown; read-only) |
 | items[].batteryPercent | integer |  | Board 1 of the client's POS design set, 20 August. (min 0; max 100; read-only; nullable) |
 | items[].lastCheckedAt | string (date-time) |  | Distinct from lastHeartbeatAt. (read-only; nullable) |
 | items[].health | enum (healthy, warning, degraded, offline, unknown) |  | Derived, not reported. (default unknown; read-only) |
@@ -2902,7 +3110,7 @@ The configured front ends a workstation may load. A board determines presentatio
 | Read routing | replica |
 | Reads | `platform.sale_board`, `platform.sale_board_page`, `platform.sale_board_tile` |
 | Writes | - |
-| Called by | BO-109, BO-116, BO-122, BO-123, BO-124, BO-126, POS-002, POS-025 |
+| Called by | BO-109, BO-116, BO-122, BO-123, BO-124, BO-126, POS-002, POS-016, POS-025 |
 
 **Parameters**
 
@@ -2930,7 +3138,7 @@ The configured front ends a workstation may load. A board determines presentatio
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `platform.outlet`, `platform.outlet_opening_hour` |
+| Reads | `cache:idempotency`, `platform.outlet`, `platform.outlet_opening_hour`, `platform.region_settings` |
 | Writes | `cache:idempotency`, `platform.outlet`, `platform.outlet_opening_hour` |
 | Called by | BO-044, BO-063, BO-731 |
 
@@ -3094,11 +3302,13 @@ Every table this service owns that the slice reads or writes, with its columns a
 |---|---|---|---|
 | id | uuid | yes | Added 20 August. |
 | level | integer | yes |  |
-| principal_id | uuid | yes |  |
+| principal_id | uuid | no | The approver; null when an external workflow system decided (externalApproverRef set). |
+| external_approver_ref | text | no | Who decided in the external provider's system, as it named them (recordExternalApprovalDecision); null for an internal approver (CHG-R8MIG-009). |
+| external_approver_name | text | no | The external approver's display name, where the provider sent one (CHG-R8MIG-009). |
 | display_name | text | no |  |
 | is_delegate | boolean | no |  |
 | delegated_from | uuid | no |  |
-| decision | text | yes |  |
+| decision | text | yes | return and requestInformation are stored as decisions too, their comment in comment (decideApprovalRequest; CHG-R8MIG-009). |
 | comment | text | no |  |
 | reason | text | no |  |
 | did_use_mfa | boolean | no |  |
@@ -3187,6 +3397,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | scope_path | text | no |  |
 | summary | text | no |  |
 | amount | numeric(18,4) | no |  |
+| attributes | jsonb | no | The attributes the raising contract sent (CreateApprovalRequest.attributes), stored as given (ADAM CR-172, fix round 3; CHG-CRA-005). |
 | justification | text | no |  |
 | requested_by_principal_id | uuid | yes |  |
 | matrix_version | integer | no |  |
@@ -3201,6 +3412,10 @@ Every table this service owns that the slice reads or writes, with its columns a
 | assigned_to_principal_id | uuid | no | Who claimed or was assigned the request in a shared queue (assignApprovalRequest; DI-723; CHG-CSP-042). |
 | assigned_to_department_id | uuid | no | The department queue it was assigned to, where it went to a department rather than a person (CHG-CSP-042). |
 | assigned_at | timestamptz | no |  |
+| assignment_note | text | no | The note assignApprovalRequest was given, kept with the assignment (R8 blocker APPROVALS-TENANCY-C02, CHG-R8MIG-009). |
+| approval_matrix_id | uuid | no | The matrix routing chose at submit (with matrixVersion), so a decision is checked against the matrix the request was routed by (CHG-R8MIG-009). |
+| rule_id | uuid | no | The matrix rule that matched on kind, scope, amount and attributes (CHG-R8MIG-009). |
+| cancel_reason | text | no | Why the request was cancelled, as cancelApprovalRequest was given it (CHG-R8MIG-009). |
 | requested_at | timestamptz | yes |  |
 | completed_at | timestamptz | no |  |
 | ai_assessment | jsonb | no | AI context for the reviewer, never an input to the decision (11.1.73 to 11.1.75; MoM 8 September; 29 September, build pass, group G2). |
@@ -3239,6 +3454,18 @@ Every table this service owns that the slice reads or writes, with its columns a
 | match_attributes | jsonb | no | The request attributes a rule matches on (CHG-FXC-005): keys module, product, department, customerType, risk, exceptionType, legalEntity, each an exact value the request's attributes must carry. |
 | composite_mode | text | no | The approvalMode the composite screen sent, kept so it reads back what it saved; mode, levels and minimumApprovals are what the engine runs (CHG-FXC-005). |
 | matrix_id | uuid | yes | Points at approvals.matrix. |
+
+### `platform.audit_read`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| principal_id | uuid | yes | Who read. |
+| subject_id | uuid | no | The guest whose PII was read; null for an audit-log read. |
+| read_at | timestamptz | yes | When the read happened. |
+| target | text | yes | What was read. |
+| filter | jsonb | no | The query parameters the read was made with (for auditRecord, the list''s filters and cursor). |
+| record_count | integer | no | How many rows the read returned. |
 
 ### `platform.audit_record`
 
@@ -3314,6 +3541,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | payload | jsonb | yes | The event as it happened, not a reference to a row that may have moved on. |
 | scope_path | text | no | The partition key (ADR-0005). |
 | sequence | integer | yes | Monotonic per aggregate (SD-030: was *per scope*), allocated in the writing transaction. |
+| occurred_at | timestamptz | yes | The envelope's occurredAt (ADAM CR-166; CHG-CRA-005): when the change happened, set in the writing transaction. |
 | trace_id | text | no | The W3C trace id of the request that made the change (envelope field, SD-030), so a consumer's work joins the producer's trace. |
 | published_at | timestamptz | no | Null until the relay publishes it. |
 | attempts | integer | no | Five, exponential from one second, jittered. |
@@ -3429,6 +3657,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
+| contact | jsonb | no | How a guest reaches this venue (R8 blocker WHITE-C16, the storage-sat lane's request 5; CHG-R8MIG-011): phone, email, WhatsApp, address and opening-hours prose, one jsonb column, written by the venue… |
 | id | uuid | yes | Added 20 August. |
 | venue_id | uuid | no | From the path of setVenueSettings. |
 | calendar_day_start_hour | integer | no | Where the venue's calendar day starts (17 September minutes M17-03, added 30 September): the first hour row of every day and week calendar view (calendarView in screens/_components.yaml), so a venue… |
@@ -3473,7 +3702,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | department_id | uuid | no |  |
 | outlet_id | uuid | no | The outlet this till stands in (CHG-CSP-006). |
 | scope_path | text | yes |  |
-| sale_board | jsonb | yes | Determines which front end loads. |
+| sale_board | jsonb | no | Determines which front end loads. |
 | sale_board_source | text | no | Where saleBoard came from (decided 2 October 2026, Chinmay, BO-109: "Per outlet, with a till override"; DEC-183; CHG-CSP-006): outlet when the till uses its outlet's layout, workstation when this til… |
 | deposit_box_limit_amount | numeric(18,4) | no | This till's drawer limit, overriding the venue's (VenueSettings.cashDrawerLimit; DEC-179; CHG-CSP-016). |
 | cashier_input_mode | text | no | BL-061. |
@@ -3484,6 +3713,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | edge_node_id | uuid | no | Present when deploymentProfile is venueEdge. |
 | health_score | integer | no | Board 1 of the client's POS set. |
 | configuration_profile_id | uuid | no | Which profile this workstation runs, and at which version. |
+| configuration_profile_version | integer | no | The version of configurationProfileId this workstation runs, written when a deployment reaches it; null with no profile (R8 blocker APPROVALS-TENANCY-C08, CHG-R8MIG-019). |
 | is_offline_capable | boolean | no | Derived from deploymentProfile. |
 | is_active | boolean | no |  |
 
@@ -3491,7 +3721,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| device_id | uuid | no | From the path of setDeviceAssignment. |
+| device_id | uuid | yes | From the path of setDeviceAssignment. |
 | owner_org_unit_id | uuid | no | Who the device belongs to — the cost centre that replaces it when it breaks. |
 | custodian_principal_id | uuid | no | Who is holding it right now. |
 | assigned_workstation_id | uuid | no |  |
@@ -3560,7 +3790,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-181 operations, added to this service in later releases without changing any of the above.
+180 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
@@ -3572,9 +3802,9 @@ Every table this service owns that the slice reads or writes, with its columns a
 | delegation | `listApprovalDelegations`, `revokeApprovalDelegation` |
 | devices | `approveDevice`, `createDeviceFirmware`, `enrolDevice`, `getDeviceFirmware`, `getDeviceTelemetry`, `issueDeviceCredential`, `listDeviceAuditRecords`, `listDeviceFirmware`, `listDeviceTamperEvents`, `recordDeviceTamperEvent`, `revokeDeviceCredential`, `rollbackDeviceFirmware`, `setDeviceFirmwareStatus`, `startDeviceFirmwareRollout` |
 | matrix | `listApprovalExternalProviders`, `listApprovalMatrices`, `listStepUpPolicies`, `setStepUpPolicy` |
-| request | `assignApprovalRequest`, `cancelApprovalRequest`, `escalateApprovalRequest`, `getApprovalRequest`, `listApprovalExternalDispatches`, `listApprovedActionExecutions`, `recordExternalApprovalDecision`, `reopenApprovalRequest`, `resolveApprovedActionExecution`, `resubmitApprovalRequest`, `submitApprovalRequest`, `withdrawApprovalRequest` |
+| request | `assignApprovalRequest`, `cancelApprovalRequest`, `escalateApprovalRequest`, `getApprovalRequest`, `listApprovalExternalDispatches`, `listApprovedActionExecutions`, `recordApprovedActionOutcome`, `recordExternalApprovalDecision`, `reopenApprovalRequest`, `resolveApprovedActionExecution`, `resubmitApprovalRequest`, `submitApprovalRequest`, `withdrawApprovalRequest` |
 | rota | `requestShiftSwap` |
 | scope | `getOrgUnit` |
-| tenancy | `deployConfigurationProfile`, `getConfigurationProfile`, `getConnectivityPolicy`, `getOfflinePolicy`, `getVenueSettings`, `getVenueSettingsDefaults`, `listAuditRecords`, `listCellEndpoints`, `listConfigurationProfiles`, `listDataRetentionSettings`, `listProfileDeployments`, `requeueDeadLetter`, `resolveTenantHost`, `setConfigurationProfile`, `setConnectivityThresholds`, `setDataRetentionSetting`, `setOfflinePolicy`, `setTenantDomainMapping` |
+| tenancy | `deployConfigurationProfile`, `getConfigurationProfile`, `getConnectivityPolicy`, `getOfflinePolicy`, `getVenueSettings`, `getVenueSettingsDefaults`, `listCellEndpoints`, `listConfigurationProfiles`, `listDataRetentionSettings`, `listProfileDeployments`, `requeueDeadLetter`, `resolveTenantHost`, `setConfigurationProfile`, `setConnectivityThresholds`, `setDataRetentionSetting`, `setOfflinePolicy`, `setTenantDomainMapping` |
 | workforce | `broadcastToGuests`, `claimOpenShift`, `getEmployee`, `getFieldOwnership`, `getLabourCost`, `getStaffingCoverage`, `listEmployees`, `listIntegrationSources`, `listJobTitles`, `listLabourBudgets`, `listLeaveBalances`, `listLeaveRequests`, `listLeaveTypes`, `listOpenShifts`, `listShiftPatterns`, `listShiftSwapRequests`, `listShiftTemplates`, `listSyncConflicts`, `listSyncRuns`, `listTrainingRecords`, `listWorkAssignments`, `requestLeave`, `resolveSyncConflict`, `setFieldOwnership`, `setIntegrationSource`, `setJobTitle`, `setLabourBudget`, `setLeaveType`, `setShiftPattern`, `setShiftTemplate`, `setStaffingRules`, `setWorkAssignment`, `startSync`, `validateWorkforceCompliance` |
-| workstation | `getDevice`, `getWorkstation`, `listOutlets`, `listWorkstations`, `recordDeviceHeartbeat`, `registerDevice` |
+| workstation | `getDevice`, `listOutlets`, `listWorkstations`, `recordDeviceHeartbeat`, `registerDevice` |

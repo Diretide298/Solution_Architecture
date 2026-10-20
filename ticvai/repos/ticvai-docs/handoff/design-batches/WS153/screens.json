@@ -1036,7 +1036,8 @@
     "Transaction period",
     "Expected settlement date",
     "Actual settlement date",
-    "Status"
+    "Status",
+    "VenueSettings.calendarDayStartHour"
    ],
    "params": [
     {

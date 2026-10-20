@@ -10,7 +10,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/white-label/site-builder",
-   "component": "apps/venue-management-web/src/routes/white-label/SiteBuilder.tsx",
+   "component": "src/routes/white-label/SiteBuilder.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -423,7 +423,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/white-label/booking-flows",
-   "component": "apps/venue-management-web/src/routes/white-label/BookingFlows.tsx",
+   "component": "src/routes/white-label/BookingFlows.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -613,7 +613,8 @@
        "kind": "publishGate",
        "label": "What publishing changes",
        "impliedBy": "publishTenantConfig",
-       "notes": "**Flows publish with the whole site**, never alone: the gate names every venue flow that changed since the last version and the products whose steps will change for guests, and says the rest of the draft (theme, pages, navigation) goes live with it. Refused while any enabled flow is invalid (`409`, `bookingFlowInvalid`). Needs `TENANT_PUBLISH`.",
+       "operation": "diffConfigVersion",
+       "notes": "**Read with `diffConfigVersion`** (r8, WHITE-C18): the draft against the published version, its `bookingFlows` area and `affectedProducts`. **Flows publish with the whole site**, never alone: the gate names every venue flow that changed since the last version and the products whose steps will change for guests, and says the rest of the draft (theme, pages, navigation) goes live with it. Refused while any enabled flow is invalid (`409`, `bookingFlowInvalid`). Needs `TENANT_PUBLISH`.",
        "provenance": "contract white-label.yaml POST /tenant-config/publish"
       }
      ]
@@ -777,6 +778,12 @@
     "invalidates": [
      "listProductCategories"
     ]
+   },
+   {
+    "operationId": "diffConfigVersion",
+    "contract": "white-label",
+    "purpose": "Compare two configuration versions, including the booking flows and the products they affect",
+    "trigger": "onLoad"
    }
   ],
   "entryState": {
@@ -788,6 +795,11 @@
     {
      "name": "bookingFlowId",
      "from": "CMS-102",
+     "optional": true
+    },
+    {
+     "name": "version",
+     "from": "CMS-015",
      "optional": true
     },
     {
@@ -891,7 +903,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/white-label/app-publishing",
-   "component": "apps/venue-management-web/src/routes/white-label/AppPublishing.tsx",
+   "component": "src/routes/white-label/AppPublishing.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1022,7 +1034,7 @@
        "kind": "assistantPanel",
        "label": "App publishing guide",
        "operation": "sendAiMessage",
-       "notes": "**The in-platform guide M24-08 asks for**: how to get a D-U-N-S number, open each account, fill the listing and answer store review. Grounded on a store-publishing knowledge source, no tenant data. `unavailable` until the ai \"app publishing guide\" assistant profile exists; the checklist guidance works without it.",
+       "notes": "**The in-platform guide M24-08 asks for**: how to get a D-U-N-S number, open each account, fill the listing and answer store review. Grounded on a store-publishing knowledge source, no tenant data. `unavailable` until the ai \"app publishing guide\" assistant profile exists; the checklist guidance works without it. The conversation is started with `createAiConversation` and `profileKey` `guide.appPublishing`; a 404 `assistant-profile-unavailable` shows the panel's unavailable state, not an error (r8, WHITE-C27).",
        "provenance": "authored 29 September, M24-08"
       },
       {

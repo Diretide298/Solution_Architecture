@@ -222,8 +222,8 @@
    },
    "placedResourceCount": {
     "type": "integer",
-    "minimum": 1,
-    "description": "Placed resources on the published version."
+    "minimum": 0,
+    "description": "Placed resources on the published version. 0 only when the caller sent `onlyBookable=false`."
    },
    "kinds": {
     "type": "array",
@@ -298,10 +298,31 @@
     "type": "string",
     "format": "uuid"
    },
+   "anonymousSessionToken": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "The `guestAuth` token of the anonymous session `createCart` opened for a visitor with no credential (GPS-C23, CHG-R8SPN-031); null on every other answer. Not stored on the cart."
+   },
    "token": {
     "type": "string",
     "readOnly": true,
     "description": "**How an anonymous guest returns to their cart**, including from a recovery email. Rotated on claim, so a link shared before signing in does not reach the account after.\n"
+   },
+   "sessionId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The staff or partner session that started the cart (a till's cart is its session's own); null for a guest's cart (R8 blocker IDENTITY-C49, CHG-R8MIG-021)."
+   },
+   "workstationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The workstation of that session; null for a guest's cart."
    },
    "venueId": {
     "type": "string",
@@ -876,6 +897,18 @@
    "zone": {
     "type": "string",
     "nullable": true
+   },
+   "opensAt": {
+    "type": "string",
+    "format": "time",
+    "nullable": true,
+    "description": "When a collection point opens, local to the venue (r8 walk of ticket 27820). Used by retail `createShopAndDrop` (`collectionPointClosed`). Null means no stated hours."
+   },
+   "closesAt": {
+    "type": "string",
+    "format": "time",
+    "nullable": true,
+    "description": "When a collection point closes, local to the venue; retail `collectBy` defaults to this on the day. Null means no stated hours."
    },
    "tableId": {
     "type": "string",
@@ -1715,10 +1748,88 @@
   "nullable": true,
   "additionalProperties": true,
   "x-ticvai-persistence": "none — embedded as attributes (jsonb) on orders.cart_line and orders.order_line",
-  "description": "Open attributes of a line, kept from the cart to the order line. **`transport` is the one with a defined shape** (decided 29 September, rev 3 REV3-21); other keys are free.\n",
+  "description": "Open attributes of a line, kept from the cart to the order line. **`transport` is the one with a defined shape** (decided 29 September, rev 3 REV3-21); other keys are free. **`attendees` is the second** (20 October 2026, R8 blocker cause GPS-C28; CHG-R8SPN-034), and **`parking` and `bundle` have a defined shape too** (R8 blockers ORDERS-MONEY-C22 and C43, CHG-R8MIG-023).\n",
   "properties": {
    "transport": {
     "$ref": "#/components/schemas/TransportLineAttributes"
+   },
+   "attendees": {
+    "type": "integer",
+    "minimum": 1,
+    "nullable": true,
+    "description": "**How many people a meeting-room booking is for** (GST-075; R8 blocker cause GPS-C28, CHG-R8SPN-034). Sent with `addCartLine` for a meeting-room product, kept from the cart line to the order line, and shown on the venue's reception list for the booking. It must not exceed the room type's capacity, which the guest step shows beside each room type: more is refused `422 attendees-over-capacity` by `addCartLine`, naming the capacity. The guest steps run in the order `listProductStartTimes` can answer (lead answer, option A): date, room type, length, then start time."
+   },
+   "parking": {
+    "type": "object",
+    "nullable": true,
+    "description": "**A parking line's plate and day** (R8 blocker ORDERS-MONEY-C22, CHG-R8MIG-023): carried from `addCartLine` to the order line and passed to `issueOrderEntitlements`, which writes the parking entitlement's plate, `validFrom` and `validTo` from it. A sold-out answer (`soldOutForDay`) means the facility's capacity on the `validFrom` day.",
+    "required": [
+     "plate",
+     "validFrom",
+     "validTo"
+    ],
+    "properties": {
+     "plate": {
+      "type": "object",
+      "required": [
+       "number"
+      ],
+      "properties": {
+       "number": {
+        "type": "string",
+        "maxLength": 16
+       },
+       "country": {
+        "type": "string",
+        "maxLength": 3,
+        "nullable": true,
+        "description": "ISO 3166 code of the plate's country; null for the venue's own."
+       }
+      }
+     },
+     "validFrom": {
+      "type": "string",
+      "format": "date-time"
+     },
+     "validTo": {
+      "type": "string",
+      "format": "date-time"
+     }
+    }
+   },
+   "bundle": {
+    "type": "object",
+    "nullable": true,
+    "description": "**A bundle line's picks** (R8 blocker ORDERS-MONEY-C43, the lead's answer B for r8; CHG-R8MIG-023): the bundle and the option the guest chose in each choice group. The line's `variantId` is the bundle's own (`Bundle.variantId`); the server prices it at the bundle's own price and freezes the allocation at `createOrder` (ADR-0019). In r8 a bundle's admission is open-dated, so no date or session is asked.",
+    "required": [
+     "bundleId"
+    ],
+    "properties": {
+     "bundleId": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "choices": {
+      "type": "array",
+      "items": {
+       "type": "object",
+       "required": [
+        "choiceGroupId",
+        "optionId"
+       ],
+       "properties": {
+        "choiceGroupId": {
+         "type": "string",
+         "format": "uuid"
+        },
+        "optionId": {
+         "type": "string",
+         "format": "uuid"
+        }
+       }
+      }
+     }
+    }
    }
   }
  },

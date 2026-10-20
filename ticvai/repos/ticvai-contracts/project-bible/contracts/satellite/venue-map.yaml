@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI — Venue map
   version: 1.0.0
-  x-ticvai-screen-count: 22
+  x-ticvai-screen-count: 24
   x-ticvai-tier: satellite
   x-ticvai-module: "21 — Seat Management & Venue Mapping"
   x-ticvai-platforms:
@@ -1473,6 +1473,12 @@ paths:
         A venue with one bookable map returns one entry and the screen skips the choice.
 
         A venue with no published bookable map is an empty `maps` list, not a 404.
+
+        **`onlyBookable`** (r8 walk of ticket 28690). The default `true` is the behaviour above, for the booking
+        screens (WEB-047, GST-058, GST-074). The map-viewing screens (WEB-039, GST-021) send `false`: they list
+        every **published** map of the venue whether or not it carries a placed resource, so a guest can open a
+        map of walkways and attractions that has no cabana on it. Published only, still; with `false`,
+        `placedResourceCount` may be 0, and `productId` and `kind` still narrow the list when sent.
       tags: [venueMap]
       x-ticvai-permission: VENUE_MAP_VIEW
       x-ticvai-guest-callable: true
@@ -1501,6 +1507,13 @@ paths:
           required: false
           schema: { type: string, enum: [cabana, lounger, table, pitch, other] }
           description: Only maps carrying at least one placed resource of this kind (`PlacedResource.kind`).
+        - name: onlyBookable
+          in: query
+          required: false
+          schema: { type: boolean, default: true }
+          description: >
+            `true` (default): only maps whose published version carries at least one placed resource. `false`: every
+            published map of the venue, with or without placed resources (WEB-039, GST-021).
       responses:
         '200':
           description: The venue's published bookable maps, park maps first, then by `name`.
@@ -1509,7 +1522,221 @@ paths:
               schema: { $ref: '#/components/schemas/BookableVenueMaps' }
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /venues/{venueId}/visit-planner-options:
+    parameters:
+      - name: venueId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: getVisitPlannerOptions
+      x-ticvai-consumed-by:
+        - "P01 WEB-050 Plan Your Visit"
+        - "P02 GST-051 Plan"
+        - "P02 GST-052 Suggested Itineraries"
+      x-ticvai-read-via:
+      - query: promotions#bundleRecords
+        route: service
+        for: 'the venue''s published Fast Track bundles, Promotions'' data (R8 blocker GPS-C21)'
+      # Public, with an optional token, as listBookableVenueMaps: a visitor plans before signing in.
+      security:
+      - {}
+      - guestAuth: []
+      - bearerAuth: []
+      summary: What a guest can choose from when planning a visit
+      description: >
+        **The planner's questions, answered from the venue's data** (R8 blocker GPS-C21, the lead's answer B of 20
+        October 2026; r8 integration, CHG-R8INT-007). GST-051 and WEB-050 ask the guest for a ready-made plan,
+        interests and Fast Track; GST-052 lists the ready-made plans. Each choice they show comes from here:
+
+        - `presets`: the venue's active `VisitPlanPreset` rows (`venuemap.visit_plan_preset`, `isActive` true),
+          ordered by `sortOrder` then `presetKey`, with the name and description in the caller's locale where the
+          row has one. A venue starts with the six built-in rows, so the list is never empty unless the venue
+          switched all of them off.
+        - `interestTags`: per published park map of the venue, the interest tags its published points carry
+          (`VenuePoint.interestTags`), each tag once.
+        - `fastTrackBundles`: the venue's published bundles that carry Fast Track, read from Promotions
+          (`promotions#bundleRecords`), as id and name only.
+
+        Published data only, whoever calls; a venue with no published map has an empty `interestTags`. Not a list
+        operation: one venue's options, a handful of each (bounded below).
+      tags: [visitPlan]
+      x-ticvai-permission: VENUE_MAP_VIEW
+      x-ticvai-guest-callable: true
+      x-ticvai-audience: [staff, guest]
+      x-ticvai-agreed: 'R8 blocker GPS-C21, the lead''s answer B of 20 October 2026: venue-defined presets in a table; the guest read of the planner options (the surface lane''s request, applied at the r8 integration)'
+      x-ticvai-bounded: 'one venue''s presets (a dozen), its parks'' interest tags (12 per point, a closed list) and its Fast Track bundles (a handful)'
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: The venue's planner options
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/VisitPlannerOptions' }
+        '404':
+          $ref: '../shared/common.yaml#/components/responses/NotFound'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /venues/{venueId}/visit-plan-presets:
+    parameters:
+      - name: venueId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: listVisitPlanPresets
+      summary: A venue's ready-made day plans, as staff edit them
+      description: >
+        **The venue's presets, switched-off ones included** (R8 blocker GPS-C21; r8 integration, CHG-R8INT-007).
+        Ordered by `sortOrder`, then `presetKey`; paged. `status` keeps the active (`isActive` true) or inactive
+        rows; absent, both. The six built-in rows are always present (they are seeded per venue and never
+        deleted). No screen binds it yet: the venue's preset editor is not in Block A, and the six seeded rows
+        serve until it is.
+      tags: [visitPlan]
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-audience: [staff]
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: status
+          in: query
+          required: false
+          schema: { type: string, enum: [active, inactive] }
+          description: Only active or only switched-off presets.
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: The venue's presets
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/VisitPlanPreset' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /venues/{venueId}/visit-plan-presets/{presetKey}:
+    parameters:
+      - name: venueId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+      - name: presetKey
+        in: path
+        required: true
+        schema: { type: string, maxLength: 64, pattern: '^[a-z][a-zA-Z0-9]*$' }
+    put:
+      operationId: setVisitPlanPreset
+      summary: Add or replace one of a venue's ready-made day plans
+      description: >
+        **Whole replace, keyed on the venue and `presetKey`** (R8 blocker GPS-C21; r8 integration, CHG-R8INT-007):
+        the body is the preset as it should be (name, description, pace, interest tags, must-include points,
+        `isActive`, `sortOrder`); a key the venue does not have yet adds a preset, an existing key replaces it. A
+        built-in row keeps its key and `isBuiltIn`; switching it off is `isActive` false, and there is no delete,
+        so a built-in row is never removed. `mustIncludePointIds` must be points of the venue's published maps,
+        else 422 `unknown-point`; an interest tag outside `VenuePoint.interestTags`' list is 400. A change reaches
+        `generateVisitPlan` and `getVisitPlannerOptions` at once; a plan already made keeps its own copy.
+      tags: [visitPlan]
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-audience: [staff]
+      x-ticvai-scope-level: venue
+      x-ticvai-config-scope: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/VisitPlanPreset' }
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: The preset as stored
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/VisitPlanPreset' }
+        '422':
+          description: A must-include point that is not a point of the venue's published maps
+          x-ticvai-problem-types: [unknown-point]
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /visit-plans:
+    get:
+      operationId: listMyVisitPlans
+      x-ticvai-consumed-by:
+        - "P02 GST-059 Plan in Progress"
+      x-ticvai-read-via:
+      - query: tenancy#activeVenues
+        route: service
+        for: 'what its plans call "active venues" (VisitPlan.availableAtVenueIds): platform.scope, Tenancy''s data (r8 integration, CHG-R8INT-014)'
+      security:
+      - guestAuth: []
+      x-ticvai-agreed: 'r8 walk of ticket 28694: GST-059 opened cold, from the home screen or a notification, had no planId; shape follows listVisitPlanAlternatives (paged) and getVisitPlan (owner rule)'
+      summary: The caller's own visit plans, by date or status
+      description: >
+        **How a screen finds today's plan without being handed a `planId`** (r8 walk of ticket 28694).
+        GST-059 (Plan in Progress), opened cold, calls this with `date` set to today and `status=draft`
+        or `booked`; it shows the plan it finds, or offers to make one when the list is empty.
+
+        **Only the caller's own plans**, by the same owner rule as `getVisitPlan`: a signed-in guest's
+        plans (`subjectId`), or the plans of the device session the anonymous guest holds (`sessionRef`).
+        Another guest's plan is never listed. Ordered by `updatedAt`, newest first, then by `id`; paged.
+
+        `date` keeps the plans whose current version has a day on that date (`VisitPlan.days[].date`).
+        `status` keeps one status. With neither, every plan of the caller. An empty page is a 200, not a 404.
+      tags: [visitPlan]
+      x-ticvai-permission: null
+      x-ticvai-guest-callable: true
+      x-ticvai-audience: [guest]
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: primary
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: date
+          in: query
+          required: false
+          schema: { type: string, format: date }
+          description: Only plans with a day on this date.
+        - name: status
+          in: query
+          required: false
+          schema: { type: string, enum: [draft, booked, archived] }
+          description: Only plans in this status.
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: The caller's plans, newest first
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/VisitPlan' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: generateVisitPlan
       x-ticvai-consumed-by:
@@ -1538,7 +1765,7 @@ paths:
       summary: Build a visit plan from the party, the dates and what they like
       description: >
         **The Plan tab's first answer, and it needs no AI** (29 September, MOB-6). The guest gives
-        party size, each person's height or age, the dates, the pace (packed or relaxed), interests
+        party size, each person's height or age, the dates, the pace (packed, balanced or relaxed), interests
         and cuisines; the planner returns one itinerary per day with timed items and add-ons such
         as Fast Track.
 
@@ -1569,7 +1796,9 @@ paths:
         unmatched cuisine recorded; a retail stop is placed when the party chose `shopping` or a
         `retailTags` value, at a retail point of the day's venue that matches, late in the day or
         on the way to the exit; `relaxed` leaves a 30-minute gap after every two items and stops
-        by 18:00, `packed` fills to closing. (5) Add-ons: where the expected wait on a planned ride
+        by 18:00, `packed` fills to closing, and `balanced` (DI-1098, agreed 30 September; r8 walk of tickets 28701
+        and 28200) sits between them: a 15-minute gap after every two items, filling to 85% of the venue's opening
+        hours. **The balanced numbers are the planner owner's proposal, to be confirmed by the lead.** (5) Add-ons: where the expected wait on a planned ride
         exceeds 30 minutes and the venue sells a Fast Track for it, the add-on is suggested on that
         item, never added.
 
@@ -1626,13 +1855,18 @@ paths:
             to lay out; or a date is outside its venue's opening calendar (`venue-closed-on-date`);
             or `presetKey` names no ready-made plan of the venue (`unknown-preset`); or a
             `dayVenues` entry names a venue that is not an active venue of the caller's tenant, or
-            a date that is not in `dates` (`venue-not-in-tenant`; 30 September, MoM 4.7). The
-            problem names which, and for which date.
+            a date that is not in `dates` (`venue-not-in-tenant`; 30 September, MoM 4.7); or every
+            candidate was excluded by the party's answers (`no-suitable-plan`; r8 walk of ticket 28200). The
+            problem names which, and for which date. For `no-suitable-plan` it carries `excludingAnswer`
+            (`height`, `age`, `interests`, `cuisines` or `pace`) and `excludedBy`, the answer that removed the
+            most candidates (for example the smallest child's height against every ride's minimum), so
+            WEB-050 and GST-052 can say which answer to change; the same plan is never shown empty.
           x-ticvai-problem-types:
             - venue-not-plannable
             - venue-closed-on-date
             - unknown-preset
             - venue-not-in-tenant
+            - no-suitable-plan
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
@@ -1734,9 +1968,17 @@ paths:
         e.g. Fast Track on a ride, a photo pass) on an item, whether or not the planner
         suggested it; `removeAddOn` takes one off. `acceptAddOn` and `declineAddOn` still answer
         the planner's own suggestion (`addOnSuggestion`). An add-on not sold for that stop's
-        product is refused 422 `add-on-not-offered`. **Nothing is priced on the plan**: the add-on
-        is priced when the plan is booked (`bookVisitPlan`, by `addCartLine`). Allowed in an
+        product is refused 422 `add-on-not-offered`. **No price is stored on the plan**: an estimate
+        is computed on read (`VisitPlan.estimate`), and the add-on is priced when the plan is booked (`bookVisitPlan`,
+        by `addCartLine`). Allowed in an
         anonymous session, like every change here.
+
+        **The waits-changed re-order on GST-059** (r8 walk of ticket 28694; lead decision of 20 October 2026,
+        option A). The server proposes nothing. A stop is **late** when its planned start has passed by more than 15
+        minutes (a proposal, owner to confirm) because the live wait (`getWaitTimes`) exceeds the item's
+        `expectedWaitMinutes`. The app works out the proposed new order from the live waits, shows it, and when the
+        guest taps "Re-order my day" sends the moves as `updateVisitPlan` operations (`move`), which the server lays
+        out and checks like any other change and saves as a new version, so undo works.
       tags: [visitPlan]
       x-ticvai-permission: null
       x-ticvai-guest-callable: true
@@ -1936,7 +2178,8 @@ paths:
         anonymous device session is refused `403 sign-in-required` and nothing is added; the app
         asks the guest to sign in, the plan moves to the account (`generateVisitPlan`), and the
         guest books it. Add-ons on the plan (`addOnProductIds`, `addOnAccepted`) are priced here, at
-        booking, by the lines `addCartLine` creates; the plan itself carries no price.
+        booking, by the lines `addCartLine` creates; the plan stores no price, shows only an estimate computed on read
+        (`VisitPlan.estimate`), and the price is fixed when booked.
       tags: [visitPlan]
       x-ticvai-permission: null
       x-ticvai-guest-callable: true
@@ -2096,7 +2339,7 @@ components:
               ageYears: { type: integer, minimum: 0, maximum: 120, nullable: true }
         pace:
           type: string
-          enum: [packed, relaxed]
+          enum: [packed, balanced, relaxed]
           default: relaxed
         interestTags:
           type: array
@@ -2153,6 +2396,111 @@ components:
           description: When the party arrives. Null means opening time.
         locale: { type: string, nullable: true }
 
+    VisitPlanPreset:
+      type: object
+      x-ticvai-persistence: venuemap.visit_plan_preset
+      # One preset per key at a venue (R8 blocker GPS-C21, the lead's answer B of 20 October 2026; CHG-R8STO-005).
+      x-ticvai-unique-together:
+      - [scopePath, presetKey]
+      description: '**A ready-made day plan a venue offers** (GST-052 Suggested Itineraries; R8 blocker GPS-C21, the
+        lead''s answer of 20 October 2026: venue-defined presets in a table, the six built-in ones as seed). Each venue
+        starts with six rows seeded from the built-in `preset` keys (`highlights`, `family`, `thrillSeeker`,
+        `waterDay`, `relaxed`, `showsAndDining`, `isBuiltIn` true, with TICVAI''s wording); the venue may change
+        their wording and contents, switch any off, and add its own. `generateVisitPlan` resolves `presetKey`
+        against the active rows of the plan''s venues (422 `unknown-preset` otherwise) and takes the interests,
+        pace and must-include points from the row. The guest read of the planner options and the venue''s write
+        are operations of this contract (requested of the surface lane with this cause).'
+      required: [id, presetKey, name, pace, isBuiltIn, isActive, sortOrder, scopePath]
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        presetKey:
+          type: string
+          maxLength: 64
+          pattern: '^[a-z][a-zA-Z0-9]*$'
+          description: The key `generateVisitPlan.presetKey` names. A built-in row keeps its built-in key.
+        name:
+          type: string
+          maxLength: 120
+        nameLocalised:
+          type: object
+          nullable: true
+          additionalProperties: { type: string }
+        description:
+          type: string
+          maxLength: 500
+          nullable: true
+        descriptionLocalised:
+          type: object
+          nullable: true
+          additionalProperties: { type: string }
+        pace:
+          type: string
+          enum: [packed, balanced, relaxed]
+        interestTags:
+          type: array
+          maxItems: 12
+          description: The same closed list as `VenuePoint.interestTags`.
+          items: { type: string }
+        mustIncludePointIds:
+          type: array
+          maxItems: 10
+          items: { type: string, format: uuid }
+        isBuiltIn:
+          type: boolean
+          readOnly: true
+          description: True for the six seeded rows; a built-in row can be changed or switched off, never deleted.
+        isActive:
+          type: boolean
+          default: true
+        sortOrder:
+          type: integer
+          minimum: 0
+          description: The order GST-052 lists the presets in.
+        scopePath:
+          type: string
+          readOnly: true
+          description: '**The partition key** (ADR-0005): the venue the preset belongs to.'
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+    VisitPlannerOptions:
+      type: object
+      x-ticvai-persistence: none — assembled on read from venuemap.visit_plan_preset, the published points and Promotions' bundles
+      description: '**What the visit planner offers at one venue** (`getVisitPlannerOptions`; R8 blocker GPS-C21).'
+      required: [venueId, presets, interestTags, fastTrackBundles]
+      properties:
+        venueId: { type: string, format: uuid }
+        presets:
+          type: array
+          maxItems: 50
+          items: { $ref: '#/components/schemas/VisitPlanPreset' }
+        interestTags:
+          type: array
+          maxItems: 50
+          description: Per published park map of the venue, the interest tags its points carry.
+          items:
+            type: object
+            required: [mapId, tags]
+            properties:
+              mapId: { type: string, format: uuid }
+              mapName: { type: string }
+              tags:
+                type: array
+                maxItems: 50
+                items: { type: string }
+        fastTrackBundles:
+          type: array
+          maxItems: 50
+          items:
+            type: object
+            required: [bundleId, name]
+            properties:
+              bundleId: { type: string, format: uuid }
+              name: { type: string }
     VisitPlan:
       type: object
       x-ticvai-persistence: venuemap.visit_plan
@@ -2233,12 +2581,46 @@ components:
             properties:
               pointId: { type: string, format: uuid }
               productId: { type: string, format: uuid, nullable: true }
+              name:
+                type: string
+                nullable: true
+                x-ticvai-persisted: false
+                x-ticvai-derived: onRead
+                description: The point's name, worked out on read for the left-out banner (r8 walk of ticket 28693).
+              limit:
+                type: object
+                nullable: true
+                x-ticvai-persisted: false
+                x-ticvai-derived: onRead
+                description: >
+                  The rule that left it out, worked out on read from the product's eligibility rule: for
+                  `heightRule` a minimum or maximum height in centimetres, for `ageRule` a minimum or maximum age in
+                  years. Null for the other reasons. The banner says "Min height 120 cm" from it.
+                properties:
+                  kind: { type: string, enum: [minHeightCm, maxHeightCm, minAge, maxAge] }
+                  value: { type: integer, minimum: 0 }
               reason:
                 type: string
                 enum: [heightRule, ageRule, closedOnDate, notInInterests, noTime, notAtVenue]
                 description: >
                   `notAtVenue` (30 September, MoM 4.7): a must-include point that is at none of the
                   plan's venues, so no day could hold it.
+        estimate:
+          type: object
+          nullable: true
+          readOnly: true
+          x-ticvai-persisted: false
+          x-ticvai-derived: onRead
+          description: >
+            **An estimated total, computed on read from current catalogue prices and stored nowhere** (r8 walk of
+            tickets 28693 and 28200; lead decision of 20 October 2026, option A; DI-1098, "with associated costing").
+            The 3 October rule stands: no price is stored on the plan and add-ons are priced when booked. This only
+            tells the guest roughly what the plan would cost today, for the group and the days; the price is fixed at
+            booking and may differ. Null when no product on the plan has a current price.
+          required: [total, currency]
+          properties:
+            total: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+            currency: { type: string }
         unmatchedPreferences:
           type: array
           readOnly: true
@@ -2335,6 +2717,24 @@ components:
           format: uuid
           nullable: true
           x-ticvai-references: venuemap.point
+        name:
+          type: string
+          nullable: true
+          readOnly: true
+          x-ticvai-persisted: false
+          x-ticvai-derived: onRead
+          description: 'What the stop is called on the timeline (GST-059, GST-053; r8 walk of ticket 28693): the
+            point''s name, or the performance''s title for a show, in the request language. Worked out on read from
+            `pointId` or `performanceId`, as `VisitPlanAlternative.name` is; nothing is stored. Null for a travel
+            stop.'
+        zoneName:
+          type: string
+          nullable: true
+          readOnly: true
+          x-ticvai-persisted: false
+          x-ticvai-derived: onRead
+          description: The name of the zone the stop is in, from the point's zone on the map the plan was laid out
+            on. Worked out on read; null when the point has no zone.
         productId:
           type: string
           format: uuid
@@ -2367,6 +2767,20 @@ components:
           properties:
             productId: { type: string, format: uuid }
             reason: { type: string }
+            pricePerGuest:
+              allOf:
+                - $ref: '../shared/common.yaml#/components/schemas/Money'
+              nullable: true
+              x-ticvai-persisted: false
+              x-ticvai-derived: onRead
+              description: The add-on's current price for one guest, computed on read and stored nowhere (the estimate rule of `VisitPlan.estimate`).
+            minutesSaved:
+              type: integer
+              minimum: 0
+              nullable: true
+              x-ticvai-persisted: false
+              x-ticvai-derived: onRead
+              description: The wait the add-on would save at this stop, worked out on read from the expected wait.
         addOnAccepted:
           type: boolean
           default: false
@@ -2498,8 +2912,8 @@ components:
           description: The `VenueMap.publishedVersion` a guest is served; send it to `getVenueMap` as `version`.
         placedResourceCount:
           type: integer
-          minimum: 1
-          description: Placed resources on the published version.
+          minimum: 0
+          description: Placed resources on the published version. 0 only when the caller sent `onlyBookable=false`.
         kinds:
           type: array
           description: The kinds of spot on this map, e.g. `[cabana, lounger]`, for the picker's chips.

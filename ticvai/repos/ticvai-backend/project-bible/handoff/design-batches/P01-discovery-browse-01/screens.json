@@ -160,7 +160,7 @@
     {
      "to": "WEB-021",
      "trigger": "Wallet & Gift Cards",
-     "provenance": "derived — WEB-021 declares entryState.params cardCode, walletId and WEB-001 holds none of them. The edge carries nothing: cardCode, walletId only pre-select (deep link or optional), and WEB-021 opens on its own"
+     "provenance": "derived — WEB-021 declares entryState.params cardCode, cardKind, walletId and WEB-001 holds none of them. The edge carries nothing: cardCode, cardKind, walletId only pre-select (deep link or optional), and WEB-021 opens on its own"
     },
     {
      "to": "WEB-022",
@@ -947,7 +947,9 @@
      "provenance": "flow F01 step 2→3",
      "carries": [
       "productId"
-     ]
+     ],
+     "operation": "getPublishedBookingFlow",
+     "precondition": "the product's published flow (`getPublishedBookingFlow` `flowTypeKey`) is none of the four below, or nothing resolves (404): the ticket counters open as the side panel"
     },
     {
      "to": "WEB-006",
@@ -955,15 +957,20 @@
      "carries": [
       "productId"
      ],
-     "provenance": "decided 29 September, rev 3 REV3-2: the dated flow runs date → time → ticket; flow F01 step 2→3"
+     "provenance": "decided 29 September, rev 3 REV3-2: the dated flow runs date → time → ticket; flow F01 step 2→3",
+     "operation": "getPublishedBookingFlow",
+     "precondition": "`flowTypeKey` is `datedDayPass`, `timedEntry` or `seatedDateTimeSeatMap`, or it is `seatedFixedPerformance` and the event has more than one on-sale performance (`listPerformances`)"
     },
     {
      "to": "WEB-007",
      "trigger": "Book (a fixture with one on-sale performance opens straight on the seat map)",
      "carries": [
-      "performanceId"
+      "performanceId",
+      "productId"
      ],
-     "provenance": "decided 29 September, rev 3 23SEP-16 and REV3-4: WEB-006 is skipped when the event has exactly one on-sale performance"
+     "provenance": "decided 29 September, rev 3 23SEP-16 and REV3-4: WEB-006 is skipped when the event has exactly one on-sale performance",
+     "operation": "getPublishedBookingFlow",
+     "precondition": "`flowTypeKey` is `seatedFixedPerformance` and `listPerformances` returns exactly one on-sale performance, whose id the edge carries"
     },
     {
      "to": "WEB-047",
@@ -971,7 +978,9 @@
      "carries": [
       "productId"
      ],
-     "provenance": "decided 29 September, rev 3 REV3-15 and GAP-C2"
+     "provenance": "decided 29 September, rev 3 REV3-15 and GAP-C2",
+     "operation": "getPublishedBookingFlow",
+     "precondition": "`flowTypeKey` is `cabanaMap` (placed on a map is the flow type the venue chose on CMS-103; the product needs no field of its own)"
     },
     {
      "to": "WEB-048",
@@ -979,7 +988,9 @@
      "carries": [
       "productId"
      ],
-     "provenance": "decided 29 September, rev 3 REV3-13"
+     "provenance": "decided 29 September, rev 3 REV3-13",
+     "operation": "getPublishedBookingFlow",
+     "precondition": "`flowTypeKey` is `meetingRoomHourly`"
     }
    ]
   },
@@ -1164,6 +1175,13 @@
     "contract": "queue",
     "purpose": "Wait times across a venue",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "getPublishedBookingFlow",
+    "contract": "white-label",
+    "purpose": "Which screen Book opens (r8, GPS-C06): the product's published flow (its own, then its category's, then the venue default for its kind), read with `productId`; its `flowTypeKey` chooses among the Book transitions (each names its condition). Public, so it runs before sign-in.",
+    "trigger": "onLoad",
+    "provenance": "r8 second round, GPS-C06 (ticket 28685)"
    }
   ],
   "entryState": {
@@ -1175,6 +1193,11 @@
     {
      "name": "productId",
      "from": "WEB-001"
+    },
+    {
+     "name": "venueId",
+     "from": "session",
+     "notes": "r8 (GPS-C06): the venue of the site the guest is on, for `getPublishedBookingFlow`."
     }
    ],
    "coldEntry": "Resolves from the session; a cold arrival is the ordinary case.",
@@ -1346,7 +1369,7 @@
       {
        "kind": "multiSelect",
        "label": "What are you most interested in?",
-       "operation": "listProducts",
+       "operation": "getVisitPlannerOptions",
        "notes": "Interest tags of the venue.",
        "provenance": "decided 29 September 2026, MOB-6"
       },
@@ -1500,6 +1523,13 @@
     "purpose": "The tenant's active venues, for the park-per-day choice in a multi-venue tenant",
     "trigger": "onLoad",
     "provenance": "decided 30 September 2026, client meeting MoM 4.7 (Allam)"
+   },
+   {
+    "operationId": "getVisitPlannerOptions",
+    "contract": "venue-map",
+    "purpose": "The planner's choices from the venue's data (r8, GPS-C21): the interest tags of its parks fill What are you most interested in?, and the ready-made plans and Fast Track bundles come from the same read.",
+    "trigger": "onLoad",
+    "provenance": "r8 integration, GPS-C21 (CHG-R8INT-007)"
    }
   ],
   "entryState": {

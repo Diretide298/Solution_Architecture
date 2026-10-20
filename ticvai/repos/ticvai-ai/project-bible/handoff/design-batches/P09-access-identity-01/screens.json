@@ -9,7 +9,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/general/platform-login-mfa",
-   "component": "apps/ticvai-web/src/routes/general/PlatformLoginMfaList.tsx",
+   "component": "src/routes/general/PlatformLoginMfaList.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -335,7 +335,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/general/platform-user-directory",
-   "component": "apps/ticvai-web/src/routes/general/PlatformUserDirectoryList.tsx",
+   "component": "src/routes/general/PlatformUserDirectoryList.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -671,7 +671,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/general/platform-role-management",
-   "component": "apps/ticvai-web/src/routes/general/PlatformRoleManagementForm.tsx",
+   "component": "src/routes/general/PlatformRoleManagementForm.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -977,7 +977,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/access-identity/my-account-security",
-   "component": "apps/ticvai-web/src/routes/access-identity/MyAccountSecurity.tsx",
+   "component": "src/routes/access-identity/MyAccountSecurity.tsx",
    "status": "notStarted"
   },
   "navigation": {

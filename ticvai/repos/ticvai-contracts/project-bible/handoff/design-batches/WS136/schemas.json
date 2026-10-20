@@ -166,8 +166,11 @@
    "profiling",
    "thirdPartySharing",
    "aiProcessing",
-   "transactional"
-  ]
+   "transactional",
+   "storedPaymentCredential",
+   "facePassEnrolment"
+  ],
+  "description": "`storedPaymentCredential` (a card saved for later, `storePaymentToken`) and `facePassEnrolment` (a face enrolled for entry, `enrolFacePass`) are purposes of their own (R8 blocker ORDERS-MONEY-C21, CHG-R8MIG-022), so a screen picks the row by its purpose instead of guessing: each tenant has one `marketing.consent_purpose` row of each, seeded with the tenant's other purposes."
  },
  "ConsentPurposeConfig": {
   "x-ticvai-rls": "grant-holder-read",
@@ -180,6 +183,12 @@
    "isRequiredForService"
   ],
   "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "The purpose row's id (`marketing.consent_purpose.id`), the value `consentPurposeId` and a consent's `purposeId` carry (R8 blocker ORDERS-MONEY-C21, CHG-R8MIG-022)."
+   },
    "purpose": {
     "$ref": "#/components/schemas/ConsentPurpose"
    },
@@ -1109,6 +1118,16 @@
       "type": "string"
      }
     }
+   },
+   "presentation": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "dropDown",
+     "radio",
+     "checkBoxes"
+    ],
+    "description": "**How a choice is drawn** (products module, 16 October 2026 minutes 4.13: the data mask's field types are text, drop-down, radio and check box; CHG-R8PRD-009). For `select`, `dropDown` (the default) or `radio`; for `multiSelect`, `checkBoxes`. A single check box is a `boolean`. Null for every other type. It changes how the field is drawn, never what is stored. On any other type, or a value that does not fit the type, the server stores null."
    }
   }
  },
@@ -1381,7 +1400,9 @@
    },
    "title": {
     "type": "string",
-    "description": "The heading a guest sees, and the field a refund question retrieves against.\n"
+    "nullable": true,
+    "readOnly": true,
+    "description": "Not written by anyone: `setPolicy` takes no title and the column stays null. The heading a guest sees is `PublishedPolicy.title`, derived from `kind` (see `PolicyKind`).\n"
    },
    "version": {
     "type": "string",
@@ -1414,6 +1435,7 @@
  },
  "PolicyKind": {
   "type": "string",
+  "description": "The kinds of policy a tenant publishes. **Each kind has one fixed title in English and Arabic** (r8 walk of ticket 27890), the only source of `PublishedPolicy.title`; `setPolicy` takes no title. The Arabic labels are the standard names of each document and the client should approve them.\n\n| kind | en | ar |\n|---|---|---|\n| privacy | Privacy policy | سياسة الخصوصية |\n| termsAndConditions | Terms and conditions | الشروط والأحكام |\n| refund | Refund policy | سياسة الاسترداد |\n| cookie | Cookie policy | سياسة ملفات تعريف الارتباط |\n| accessibility | Accessibility statement | بيان إمكانية الوصول |\n",
   "enum": [
    "privacy",
    "termsAndConditions",

@@ -64,7 +64,7 @@
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | append |
-| Reads | `ledger.fx_rate`, `platform.region_settings` |
+| Reads | `cache:idempotency`, `ledger.fx_rate`, `platform.region_settings` |
 | Writes | `cache:idempotency`, `ledger.fx_rate` |
 | Called by | BO-077 |
 
@@ -133,7 +133,7 @@
 | Offline | no |
 | Config scope | region |
 | Conflict policy | serverWins |
-| Reads | `ledger.fx_provider_assignment`, `platform.region_settings` |
+| Reads | `cache:idempotency`, `ledger.fx_provider_assignment`, `platform.region_settings` |
 | Writes | `cache:idempotency`, `ledger.fx_provider_assignment`, `platform.region_settings` |
 | Called by | **no screen**: no screen lists it in its apis, so it is reachable only by API or import until one does (README, Known gaps) |
 
@@ -802,7 +802,7 @@ An invoice is never edited or deleted: a correction is a credit memo (`issueCred
 | orderIds | array of string (uuid) | yes | One order for simplified and full; one or more for consolidated. (min items 1) |
 | recipient | FinTaxInvoiceRecipient |  | Who the invoice is addressed to. |
 | recipient.name | string | yes | (max length 300) |
-| recipient.address | string |  | (max length 1000; nullable) |
+| recipient.address | string |  | The recipient's postal address. (max length 1000; nullable) |
 | recipient.countryCode | string |  | (pattern ^[A-Z]{2}$; nullable) |
 | recipient.taxRegistrationNumber | string |  | The recipient's TRN where they are VAT-registered. (max length 30; nullable) |
 | recipient.customerAccountId | string (uuid) |  | The B2B credit account (payments B2bCreditAccount) where a company is invoiced. (nullable) |

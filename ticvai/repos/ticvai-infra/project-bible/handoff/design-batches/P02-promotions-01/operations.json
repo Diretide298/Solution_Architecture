@@ -1,16 +1,22 @@
 {
- "getCouponCode": {
+ "getGuestCouponCode": {
   "method": "GET",
-  "path": "/coupon-codes/{code}",
+  "path": "/guest-coupon-codes/{code}",
   "contract": "promotions",
-  "summary": "Look up a code",
-  "permission": "PRICE_VIEW",
-  "offlineCapable": true,
+  "summary": "What a guest is told about a coupon code",
+  "permission": null,
+  "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": false
+   }
+  ],
   "requestBody": null,
-  "responds": "CouponCode"
+  "responds": "GuestCouponCode"
  },
  "getPromotion": {
   "method": "GET",

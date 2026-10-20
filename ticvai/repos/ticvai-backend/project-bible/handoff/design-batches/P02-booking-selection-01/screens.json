@@ -599,6 +599,13 @@
     "purpose": "The published booking flow for this product: which steps it has and in what order (W12)",
     "trigger": "onLoad",
     "provenance": "decided 29 September 2026, W12"
+   },
+   {
+    "operationId": "createCart",
+    "contract": "orders",
+    "purpose": "Started by the runtime the first time a line is added, before the first addCartLine, against the guest or the anonymous cart token (2.1.31); never a button or a form (GFIX-3). With the guest session the device already holds: signed in, or the anonymous cart session a visitor gets with the first line (ADR-0045; r8, GPS-C23).",
+    "trigger": "background",
+    "provenance": "r8 second round, GPS-C23 (the core lane's request)"
    }
   ],
   "entryState": {
@@ -722,7 +729,7 @@
     }
    ]
   },
-  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement.",
+  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement.\n\nBuild note (r8 second round, ORDERS-MONEY-C05): this screen is reached from GST-053 (Your Plan) and leaves to the checkout entry GST-041 once the guest has added what they want; with no cart (`getCart` 404, or no `cartId` in the session) it shows no suggestions and offers to go back. Those edges and that state are not drawn on this client-approved screen yet; they wait for the client (pending entries ORDERS-MONEY-C05).",
   "density": "comfortable",
   "pattern": "statusTracker",
   "patternReason": "`getUpsellSuggestions` reads one record and nothing reads a population — the screen is about that one thing",
@@ -813,6 +820,13 @@
     "purpose": "Show the cart the suggestions are for, with the guest session the device already holds: signed in, or the anonymous cart session a visitor gets with the first line (ADR-0045)",
     "trigger": "onLoad",
     "provenance": "r1 gate, 3 October 2026 (CHG-R1S-004)"
+   },
+   {
+    "operationId": "listProductVariants",
+    "contract": "catalogue",
+    "purpose": "The variants of a suggested product that carries no `variantId` (r8, ORDERS-MONEY-C40, option B), read when the guest taps it, so the add-to-cart form lets them choose; no component of its own. Not background (r8 integration, CHG-R8INT-008): the guest sees and picks the variants, and the approved screen has no element of its own for them (the prototype has no view of this screen).",
+    "trigger": "onAction",
+    "provenance": "r8 second round, ORDERS-MONEY-C40"
    }
   ],
   "entryState": {
@@ -820,22 +834,28 @@
     {
      "name": "cartId",
      "from": "session"
+    },
+    {
+     "name": "productId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "r8 (ORDERS-MONEY-C40): the product of the suggestion the guest tapped, picked on this screen, for `listProductVariants` when the suggestion carries no `variantId`."
     }
    ],
    "coldEntry": "Resolves from the session; a cold arrival is the ordinary case."
   },
   "wireframe": {
-   "status": "notStarted",
-   "provenance": "designed",
+   "status": "approved",
+   "provenance": "client-verified",
    "board": "wireframes/P02 Guest App.dc.html#gst-048",
    "prototype": {
     "file": "sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html",
     "rev": "Mobile App v4, 29 September 2026",
     "match": "none",
-    "note": "Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the v4 look (the frame on this screen's board, wireframes/frames/gst-048.html, and #GST-048 in handoff/design-batches/apps/1-guest-app/return/TICVAI Guest App.dc.html). NOT client-verified: awaiting the client's design reviewer. Build the layout from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at: Account → All screens → Wave 2 → Upsell / cross-sell (exact)."
+    "note": "Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the v4 look (the frame on this screen's board, wireframes/frames/gst-048.html, and #GST-048 in handoff/design-batches/apps/1-guest-app/return/TICVAI Guest App.dc.html). Client-approved 19 October 2026 (confirmed by Chinmay Parab). Build the layout from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at: Account → All screens → Wave 2 → Upsell / cross-sell (exact)."
    },
-   "source": "Claude Code, 30 September 2026, drawn in the Mobile App v4 look",
-   "note": "**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified, awaiting the client's design reviewer.** `provenance: designed` because the accepted vocabulary has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md."
+   "source": "client approval, confirmed by Chinmay Parab 19 October 2026",
+   "note": "**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; client-approved 19 October 2026, confirmed by Chinmay Parab.** Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
@@ -843,7 +863,7 @@
     "id": "formAddCartLine",
     "component": "modal",
     "trigger": "Add cart line",
-    "body": "**Collects what `addCartLine` sends before it is called.** Required: `variantId`, `quantity`. Optional: `performanceId`, `seatIds`, `parentLineId`, `attributes`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Asks only what the guest decides** (r8, ORDERS-MONEY-C40): the quantity, and a date for a timed product. `variantId` (and `performanceId`) come from the suggestion (`AiRecommendationItem.variantId`); when the suggestion has none, the form lists the product's variants (`listProductVariants`) and the guest picks one. Never `seatIds`, `parentLineId` or `attributes`. The suggestion's `trackingId` is sent as `recommendationId`. An offer, reward or challenge suggestion has its own action and never opens this form. Dismissing sends nothing; the screen behind is unchanged.",
     "bindsTo": "AddCartLineRequest",
     "confirm": {
      "label": "Add cart line",
@@ -946,7 +966,7 @@
     }
    ]
   },
-  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Drawn 26 August** — `Seat Board 4.dc.html` frame `seat-4a`. **The frame names this screen on its own face**, which is the first pack to do that: the earlier F&B, POS and Retail boards had to be hand-assigned by purpose after three derivation attempts produced nonsense. **A board that says what it draws removes the guess entirely.**\n\n**Rev 3 (decided 29 September).** Date and time inline or as a pop-up (REV3-4); view box always below on mobile (REV3-5, 23SEP-14); time bar (REV3-6); at most `VenueSettings.seating.maxSeatsPerGuestOrder` seats per booking (default 10, bounds 1-50; `422 seat-limit-exceeded` reads *Up to {maxSeats} seats per booking*) and the basket lists each seat (REV3-7); may render with GST-007 as one step (REV3-7); fixture strip and a direct path from GST-004 (23SEP-16). A cabana map is GST-074, not this screen (REV3-15). Every booking-flow setting named here is read from `getPublishedTenantConfig` `bookingFlow`, resolved for the venue the guest picked (audit R267): the tenant's values with that venue's `venueOverrides` entry laid over field by field (decided 29 September, rev 3 CFG-11).\n\n**29 September (W2).** Sections first, zoom into a section for seats, pinch out or *Whole map* back to the full map; held seats are kept.",
+  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Drawn 26 August** — `Seat Board 4.dc.html` frame `seat-4a`. **The frame names this screen on its own face**, which is the first pack to do that: the earlier F&B, POS and Retail boards had to be hand-assigned by purpose after three derivation attempts produced nonsense. **A board that says what it draws removes the guess entirely.**\n\n**Rev 3 (decided 29 September).** Date and time inline or as a pop-up (REV3-4); view box always below on mobile (REV3-5, 23SEP-14); time bar (REV3-6); at most `VenueSettings.seating.maxSeatsPerGuestOrder` seats per booking (default 10, bounds 1-50; `422 seat-limit-exceeded` reads *Up to {maxSeats} seats per booking*) and the basket lists each seat (REV3-7); may render with GST-007 as one step (REV3-7); fixture strip and a direct path from GST-004 (23SEP-16). A cabana map is GST-074, not this screen (REV3-15). Every booking-flow setting named here is read from `getPublishedTenantConfig` `bookingFlow`, resolved for the venue the guest picked (audit R267): the tenant's values with that venue's `venueOverrides` entry laid over field by field (decided 29 September, rev 3 CFG-11).\n\n**29 September (W2).** Sections first, zoom into a section for seats, pinch out or *Whole map* back to the full map; held seats are kept. Build note (r8, GPS-C03, decided by the lead 20 October 2026): `recommendSeats` takes `partySize` from the guest in the Recommend seats overlay (a How many seats stepper, capped by maxSeatsPerGuestOrder) with the preference best available or together. Tickets are chosen after seats, so there is no ticket count to read. The stepper is new to an approved frame: raise it with the client; until then default the stepper to 2.",
   "density": "comfortable",
   "boardFrames": [
    "Seat Board 4.dc.html#seat-4a"
@@ -1056,17 +1076,28 @@
     "contract": "seating",
     "purpose": "Sent by the time bar when the guest switches time, not a control: releases the seats held for the old performance (decided 29 September), with the guest session the device already holds: signed in, or the anonymous cart session a visitor gets with the first line (ADR-0045)",
     "trigger": "background"
+   },
+   {
+    "operationId": "getPerformance",
+    "contract": "catalogue",
+    "purpose": "Resolves a performance given without its event (r8, GPS-C05): its `eventId` drives `listPerformances` (time bar, fixture strip, date pop-up), and its `startsAt` and `status` the cold entry (a performance that has happened offers the next one of the same event). No component of its own.",
+    "trigger": "background",
+    "provenance": "r8 second round, GPS-C05 (ticket 28202)"
    }
   ],
   "entryState": {
    "params": [
     {
      "name": "performanceId",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "r8 (GPS-C05): an edge that carries only `eventId` (from GST-001) opens on the event's first on-sale performance, the first `listPerformances` returns."
     },
     {
      "name": "eventId",
-     "from": "GST-007"
+     "from": "GST-007",
+     "optional": true,
+     "notes": "r8 (GPS-C05): read from `Performance.eventId` (`getPerformance`) when a deep link or the GST-077 edge carries only `performanceId`."
     },
     {
      "name": "holdId",
@@ -1101,7 +1132,7 @@
     "id": "formRecommendSeats",
     "component": "modal",
     "trigger": "Recommend seats",
-    "body": "**How many seats, and best available or together.** The party size is the tickets already chosen; the guest only picks the preference, then `recommendSeats` places them.",
+    "body": "**How many seats, and best available or together.** The guest sets the party size (a How many seats stepper, at most `maxSeatsPerGuestOrder`) and picks the preference, then `recommendSeats` places them. Tickets are chosen after seats, so there are none to count yet.",
     "bindsTo": "SeatRecommendationRequest",
     "confirm": {
      "label": "Recommend seats",
@@ -1286,6 +1317,13 @@
     "contract": "catalogue",
     "purpose": "Live remaining capacity",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "createCart",
+    "contract": "orders",
+    "purpose": "Started by the runtime the first time a line is added, before the first addCartLine, against the guest or the anonymous cart token (2.1.31); never a button or a form (GFIX-3). With the guest session the device already holds: signed in, or the anonymous cart session a visitor gets with the first line (ADR-0045; r8, GPS-C23).",
+    "trigger": "background",
+    "provenance": "r8 second round, GPS-C23 (the core lane's request)"
    }
   ],
   "entryState": {
@@ -1299,17 +1337,17 @@
    "preloaded": []
   },
   "wireframe": {
-   "status": "notStarted",
-   "provenance": "designed",
+   "status": "approved",
+   "provenance": "client-verified",
    "board": "wireframes/P02 Guest App.dc.html#gst-050",
    "prototype": {
     "file": "sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html",
     "rev": "Mobile App v4, 29 September 2026",
     "match": "none",
-    "note": "Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the v4 look (the frame on this screen's board, wireframes/frames/gst-050.html, and #GST-050 in handoff/design-batches/apps/1-guest-app/return/TICVAI Guest App.dc.html). NOT client-verified: awaiting the client's design reviewer. Build the layout from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at: Account → All screens → Wave 3 → Resource booking – cabana; Rev 3 feedback → Cabana map (partial). What v2 did differently: Rev 3 books from a map, with a hold countdown and sold-out cabanas; the YAML is a list with addCartLine and no hold. YAML GST-070 also says cabanas are booked by staff (R073c), which contradicts both this screen and the prototype."
+    "note": "Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the v4 look (the frame on this screen's board, wireframes/frames/gst-050.html, and #GST-050 in handoff/design-batches/apps/1-guest-app/return/TICVAI Guest App.dc.html). Client-approved 19 October 2026 (confirmed by Chinmay Parab). Build the layout from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at: Account → All screens → Wave 3 → Resource booking – cabana; Rev 3 feedback → Cabana map (partial). What v2 did differently: Rev 3 books from a map, with a hold countdown and sold-out cabanas; the YAML is a list with addCartLine and no hold. YAML GST-070 also says cabanas are booked by staff (R073c), which contradicts both this screen and the prototype."
    },
-   "source": "Claude Code, 30 September 2026, drawn in the Mobile App v4 look",
-   "note": "**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified, awaiting the client's design reviewer.** `provenance: designed` because the accepted vocabulary has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md."
+   "source": "client approval, confirmed by Chinmay Parab 19 October 2026",
+   "note": "**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; client-approved 19 October 2026, confirmed by Chinmay Parab.** Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
@@ -1432,7 +1470,7 @@
         "Bundle.price",
         "Bundle.savingsAmount"
        ],
-       "operation": "getBundle",
+       "operation": "getGuestBundle",
        "provenance": "contract promotions.yaml GET /bundles/{bundleId}"
       }
      ]
@@ -1461,9 +1499,9 @@
   },
   "apis": [
    {
-    "operationId": "getBundle",
+    "operationId": "getGuestBundle",
     "contract": "promotions",
-    "purpose": "Read a bundle with components and allocation",
+    "purpose": "Read a bundle with its components and choice groups, in the guest shape (r8, ORDERS-MONEY-C32, CHG-R8INT-009)",
     "trigger": "onLoad"
    },
    {
@@ -1494,17 +1532,17 @@
    ]
   },
   "wireframe": {
-   "status": "notStarted",
-   "provenance": "designed",
+   "status": "approved",
+   "provenance": "client-verified",
    "board": "wireframes/P02 Guest App.dc.html#gst-056",
    "prototype": {
     "file": "sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html",
     "rev": "Mobile App v4, 29 September 2026",
     "match": "none",
-    "note": "Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the v4 look (the frame on this screen's board, wireframes/frames/gst-056.html, and #GST-056 in handoff/design-batches/apps/1-guest-app/return/TICVAI Guest App.dc.html). NOT client-verified: awaiting the client's design reviewer. Build the layout from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at: Account → All screens → Wave 2 → Bundle package (exact)."
+    "note": "Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the v4 look (the frame on this screen's board, wireframes/frames/gst-056.html, and #GST-056 in handoff/design-batches/apps/1-guest-app/return/TICVAI Guest App.dc.html). Client-approved 19 October 2026 (confirmed by Chinmay Parab). Build the layout from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at: Account → All screens → Wave 2 → Bundle package (exact)."
    },
-   "source": "Claude Code, 30 September 2026, drawn in the Mobile App v4 look",
-   "note": "**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified, awaiting the client's design reviewer.** `provenance: designed` because the accepted vocabulary has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md."
+   "source": "client approval, confirmed by Chinmay Parab 19 October 2026",
+   "note": "**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; client-approved 19 October 2026, confirmed by Chinmay Parab.** Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
@@ -1616,7 +1654,7 @@
     }
    ]
   },
-  "notes": "**Deliberately separate from GST-050**, and checked on 18 August. Board 8 panel 8 is availability across areas with counts remaining; board 7 panel 10 is one cabana with a price and a Book Now. **A list and a detail, not a duplicate** — merging them would put a booking action on a browsing screen.\n\n**Rev 3 (decided 29 September).** Where the venue's spots are on an ingested map, availability is shown on the map (GST-074, REV3-15); this list stays for capacity-sold resources.\n\n**29 September (W6).** Map booking of cabanas stays **optional per flow**: the venue picks *Cabana: pick on map* (GST-074) or *Cabana: by size* (GST-050 / GST-058) as its booking flow (CMS-103), and the resource selection policy (`guestMayChoose`, REV3-15) decides whether the guest chooses the unit. Same venue-map back end as F&B and locations.\n\n**Availability is the map's (4 October 2026): listBookableVenueMaps gives the mapId and getMapResourceAvailability every cabana's status for the day, as GST-074 books them; getAvailability needs a performance, event or capacity id no cabana product has, and left the screen** (CHG-FXS-003)",
+  "notes": "**Deliberately separate from GST-050**, and checked on 18 August. Board 8 panel 8 is availability across areas with counts remaining; board 7 panel 10 is one cabana with a price and a Book Now. **A list and a detail, not a duplicate** — merging them would put a booking action on a browsing screen.\n\n**Rev 3 (decided 29 September).** Where the venue's spots are on an ingested map, availability is shown on the map (GST-074, REV3-15); this list stays for capacity-sold resources.\n\n**29 September (W6).** Map booking of cabanas stays **optional per flow**: the venue picks *Cabana: pick on map* (GST-074) or *Cabana: by size* (GST-050 / GST-058) as its booking flow (CMS-103), and the resource selection policy (`guestMayChoose`, REV3-15) decides whether the guest chooses the unit. Same venue-map back end as F&B and locations.\n\n**Availability is the map's (4 October 2026): listBookableVenueMaps gives the mapId and getMapResourceAvailability every cabana's status for the day, as GST-074 books them; getAvailability needs a performance, event or capacity id no cabana product has, and left the screen** (CHG-FXS-003)\n\nBuild note (r8 second round, GPS-C09): **build the no-access state as GFIX-4 says, not as the state text above reads.** A guest holds no permission, so the state never names one (the text above still names staff permissions); signed out, the guest is offered sign-in and brought back here; a record that is not theirs says so without saying whose. The corrected wording waits for the client's approval of the visible text (pending entry GPS-C09).",
   "density": "comfortable",
   "pattern": "listDetail",
   "patternReason": "`listProducts` reads the population and `getAvailability` reads one of them — list, select, act",
@@ -1691,17 +1729,17 @@
    "preloaded": []
   },
   "wireframe": {
-   "status": "notStarted",
-   "provenance": "designed",
+   "status": "approved",
+   "provenance": "client-verified",
    "board": "wireframes/P02 Guest App.dc.html#gst-058",
    "prototype": {
     "file": "sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html",
     "rev": "Mobile App v4, 29 September 2026",
     "match": "none",
-    "note": "Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the v4 look (the frame on this screen's board, wireframes/frames/gst-058.html, and #GST-058 in handoff/design-batches/apps/1-guest-app/return/TICVAI Guest App.dc.html). NOT client-verified: awaiting the client's design reviewer. Build the layout from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at: Account → All screens → Wave 3 → Resource availability (cabana); Rev 3 feedback → Cabana map (exact). What v2 did differently: The Rev 3 cabana map puts availability and booking on one screen."
+    "note": "Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the v4 look (the frame on this screen's board, wireframes/frames/gst-058.html, and #GST-058 in handoff/design-batches/apps/1-guest-app/return/TICVAI Guest App.dc.html). Client-approved 19 October 2026 (confirmed by Chinmay Parab). Build the layout from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at: Account → All screens → Wave 3 → Resource availability (cabana); Rev 3 feedback → Cabana map (exact). What v2 did differently: The Rev 3 cabana map puts availability and booking on one screen."
    },
-   "source": "Claude Code, 30 September 2026, drawn in the Mobile App v4 look",
-   "note": "**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified, awaiting the client's design reviewer.** `provenance: designed` because the accepted vocabulary has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md."
+   "source": "client approval, confirmed by Chinmay Parab 19 October 2026",
+   "note": "**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; client-approved 19 October 2026, confirmed by Chinmay Parab.** Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "_platform": {
@@ -2305,17 +2343,17 @@
    "coldEntry": "**A link to a map that is no longer published, or a day that has passed,** says which and offers today on the current map. Nothing is held on arrival."
   },
   "wireframe": {
-   "status": "notStarted",
-   "provenance": "designed",
+   "status": "approved",
+   "provenance": "client-verified",
    "board": "wireframes/P02 Guest App.dc.html#gst-074",
    "prototype": {
     "file": "sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html",
     "rev": "Mobile App v4, 29 September 2026",
     "match": "none",
-    "note": "Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the v4 look (the frame on this screen's board, wireframes/frames/gst-074.html, and #GST-074 in handoff/design-batches/apps/1-guest-app/return/TICVAI Guest App.dc.html). NOT client-verified: awaiting the client's design reviewer. Build the layout from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at: Account → All screens → Rev 3 feedback → Cabana map (r3cabmap) (exact)."
+    "note": "Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the v4 look (the frame on this screen's board, wireframes/frames/gst-074.html, and #GST-074 in handoff/design-batches/apps/1-guest-app/return/TICVAI Guest App.dc.html). Client-approved 19 October 2026 (confirmed by Chinmay Parab). Build the layout from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at: Account → All screens → Rev 3 feedback → Cabana map (r3cabmap) (exact)."
    },
-   "source": "Claude Code, 30 September 2026, drawn in the Mobile App v4 look",
-   "note": "**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified, awaiting the client's design reviewer.** `provenance: designed` because the accepted vocabulary has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md."
+   "source": "client approval, confirmed by Chinmay Parab 19 October 2026",
+   "note": "**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; client-approved 19 October 2026, confirmed by Chinmay Parab.** Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md."
   },
   "apisNote": "Authored 29 September 2026 from the rev 3 decisions and the client prototype view named in `wireframe.prototype`; every operation exists in the contracts (decided 29 September, rev 3).",
   "overlays": [
@@ -2454,7 +2492,7 @@
       {
        "kind": "numberField",
        "label": "Attendees",
-       "notes": "For the visitor list at reception; a room type smaller than the party is not offered.",
+       "notes": "For the visitor list at reception; a room type smaller than the party is not offered. Sent as `attributes.attendees` on `addCartLine` (r8, GPS-C28, `OrderLineAttributes.attendees`); a 422 `attendees-over-capacity` sends the guest back to How long and Start time.",
        "provenance": "decided 29 September, rev 3 REV3-13"
       },
       {
@@ -2512,8 +2550,15 @@
    {
     "operationId": "addCartLine",
     "contract": "orders",
-    "purpose": "Add the room type for the booked window, then the add-ons",
+    "purpose": "Add the room type for the booked window with the party as `attributes.attendees` (r8, GPS-C28), then the add-ons; 422 `attendees-over-capacity` sends the guest back to the length and start-time steps",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "createCart",
+    "contract": "orders",
+    "purpose": "Started by the runtime the first time a line is added, before the first addCartLine, against the guest or the anonymous cart token (2.1.31); never a button or a form (GFIX-3). With the guest session the device already holds: signed in, or the anonymous cart session a visitor gets with the first line (ADR-0045; r8, GPS-C23).",
+    "trigger": "background",
+    "provenance": "r8 second round, GPS-C23 (the core lane's request)"
    }
   ],
   "entryState": {
@@ -2531,17 +2576,17 @@
    "coldEntry": "Resolves the venue the app is in and lists its room types; nothing is booked on arrival."
   },
   "wireframe": {
-   "status": "notStarted",
-   "provenance": "designed",
+   "status": "approved",
+   "provenance": "client-verified",
    "board": "wireframes/P02 Guest App.dc.html#gst-075",
    "prototype": {
     "file": "sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html",
     "rev": "Mobile App v4, 29 September 2026",
     "match": "none",
-    "note": "Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the v4 look (the frame on this screen's board, wireframes/frames/gst-075.html, and #GST-075 in handoff/design-batches/apps/1-guest-app/return/TICVAI Guest App.dc.html). NOT client-verified: awaiting the client's design reviewer. Build the layout from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at: Account → All screens → Rev 3 feedback → Meeting room by the hour (r3room) (exact)."
+    "note": "Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the v4 look (the frame on this screen's board, wireframes/frames/gst-075.html, and #GST-075 in handoff/design-batches/apps/1-guest-app/return/TICVAI Guest App.dc.html). Client-approved 19 October 2026 (confirmed by Chinmay Parab). Build the layout from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at: Account → All screens → Rev 3 feedback → Meeting room by the hour (r3room) (exact)."
    },
-   "source": "Claude Code, 30 September 2026, drawn in the Mobile App v4 look",
-   "note": "**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified, awaiting the client's design reviewer.** `provenance: designed` because the accepted vocabulary has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md."
+   "source": "client approval, confirmed by Chinmay Parab 19 October 2026",
+   "note": "**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; client-approved 19 October 2026, confirmed by Chinmay Parab.** Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md."
   },
   "apisNote": "Authored 29 September 2026 from the rev 3 decisions and the client prototype view named in `wireframe.prototype`; every operation exists in the contracts (decided 29 September, rev 3).",
   "_platform": {

@@ -9,12 +9,12 @@
 | Contracts | 8 |
 | Modules | 5 |
 | Undrawn | 0 |
-| Operations with no screen | 83 |
+| Operations with no screen | 87 |
 | Waves | wave1 4 · wave3 24 |
 
 ## Gaps
 
-### 83 operations with no screen here
+### 87 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -28,7 +28,7 @@
 | `removeIndexEntry` | ai | DELETE | Remove one record from the index |
 | `setAiTool` | ai | PUT | Register or change a tool (platform) |
 | `setIndexSource` | ai | PUT | Declare a source indexed |
-| `setSuggestionProvider` | ai | PUT |  |
+| `setSuggestionProvider` | ai | PUT | Point a question at a rule, a model, or both |
 | `calculateTax` | finance | POST | Compute tax for a set of lines |
 | `disputeObligation` | finance | POST | One entity disagrees with the amount |
 | `getForeignTenderReport` | finance | GET | What was taken in which currency |
@@ -42,13 +42,16 @@
 | `getAuthorisationPolicyBundle` | identity | GET | The policies a device needs to decide for itself |
 | `getMembership` | identity | GET | A membership with its history, usage and renewals |
 | `getPrincipalModuleAccess` | identity | GET | What this person may do, as ticks |
+| `getSessionVenue` | identity | GET | Which venue this back-office session is working in, and which it may switch to |
 | `listAccessDecisions` | identity | GET | What was decided, for whom, where and why |
 | `listAuthorisationPolicyTemplates` | identity | GET | Reusable policy shapes |
 | `listCustomerMemberships` | identity | GET | Memberships a customer holds |
 | `listModuleCapabilities` | identity | GET | What a person can be allowed to do, per module |
 | `listModules` | identity | GET | The module tree permissions are grouped under |
 | `listSegregationViolations` | identity | GET | Who already holds a conflicting pair |
+| `listStepUpSupervisors` | identity | GET | Who may sign a supervisor step-up here |
 | `setPrincipalModuleAccess` | identity | PUT | Tick what they may do |
+| `setSessionVenue` | identity | PUT | Switch the back-office session to another venue it may act at |
 | `updateRole` | identity | PATCH | Rename a role or change its description |
 | `actOnWaiverRequirements` | marketing-crm | POST | Send, resend or correct participant waiver requirements, one or in bulk |
 | `createInvitationCampaign` | marketing-crm | POST | A quota-bounded, addressed invitation |
@@ -57,10 +60,7 @@
 | `getDigitalWaiverForm` | marketing-crm | GET | Load the layout of a waiver version |
 | `getGuestExtraValues` | marketing-crm | GET | What a guest answered |
 | `getSuppressionList` | marketing-crm | GET | Addresses suppressed from all sending |
-| `getWaiverTesting` | marketing-crm | GET | Checklist, rule simulation and approval record of a waiver version |
-| `issueReward` | marketing-crm | POST | Issue a reward to a guest |
-| `listGuestExtraFields` | marketing-crm | GET | Venue-defined guest fields and their options |
-| … | | | 43 more |
+| … | | | 47 more |
 
 ### 2 modules split across waves
 

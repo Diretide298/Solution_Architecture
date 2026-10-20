@@ -15,7 +15,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/analytics/forecasting-command-center-adm-499",
-   "component": "apps/ticvai-web/src/routes/analytics/ForecastingCommandCenter.tsx",
+   "component": "src/routes/analytics/ForecastingCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -373,7 +373,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/analytics/forecast-configuration-forecasting-strategy-adm-500",
-   "component": "apps/ticvai-web/src/routes/analytics/ForecastConfigurationForecastingStrategy.tsx",
+   "component": "src/routes/analytics/ForecastConfigurationForecastingStrategy.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -756,7 +756,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/analytics/forecast-data-signal-configuration-adm-501",
-   "component": "apps/ticvai-web/src/routes/analytics/ForecastDataSignalConfiguration.tsx",
+   "component": "src/routes/analytics/ForecastDataSignalConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1002,7 +1002,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/analytics/attendance-visitation-forecast-adm-502",
-   "component": "apps/ticvai-web/src/routes/analytics/AttendanceVisitationForecast.tsx",
+   "component": "src/routes/analytics/AttendanceVisitationForecast.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1236,7 +1236,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/analytics/ticket-product-timeslot-demand-forecast-adm-503",
-   "component": "apps/ticvai-web/src/routes/analytics/TicketProductTimeslotDemandForecast.tsx",
+   "component": "src/routes/analytics/TicketProductTimeslotDemandForecast.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1536,7 +1536,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/analytics/channel-booking-pace-forecast-adm-504",
-   "component": "apps/ticvai-web/src/routes/analytics/ChannelBookingPaceForecast.tsx",
+   "component": "src/routes/analytics/ChannelBookingPaceForecast.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1816,7 +1816,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/analytics/revenue-commercial-forecast-adm-505",
-   "component": "apps/ticvai-web/src/routes/analytics/RevenueCommercialForecast.tsx",
+   "component": "src/routes/analytics/RevenueCommercialForecast.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -2115,7 +2115,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/analytics/forecast-drivers-confidence-explainability-adm-506",
-   "component": "apps/ticvai-web/src/routes/analytics/ForecastDriversConfidenceExplainability.tsx",
+   "component": "src/routes/analytics/ForecastDriversConfidenceExplainability.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -2465,7 +2465,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/analytics/forecast-scenario-what-if-simulator-adm-507",
-   "component": "apps/ticvai-web/src/routes/analytics/ForecastScenarioWhatIfSimulator.tsx",
+   "component": "src/routes/analytics/ForecastScenarioWhatIfSimulator.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -2708,7 +2708,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/analytics/forecast-accuracy-review-publication-center-adm-508",
-   "component": "apps/ticvai-web/src/routes/analytics/ForecastAccuracyReviewPublicationCenter.tsx",
+   "component": "src/routes/analytics/ForecastAccuracyReviewPublicationCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {

@@ -9,7 +9,7 @@
   "implementation": {
    "app": "venue-scanner",
    "route": "/access/sign-in",
-   "component": "apps/venue-scanner/src/routes/access/SignInDetail.tsx",
+   "component": "src/routes/access/SignInDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -33,7 +33,7 @@
     }
    ]
   },
-  "notes": "**Rebuilt as a sign-in form on 2 October 2026 (CHG-DOOR-002/003; Chinmay, 2 October 2026: fix the Block A blockers now).** It was generated as a list over active sessions, MFA methods and SSO providers with Force logout and Revoke all sessions on the door, which a person who is not yet signed in can never use (platform-foundation process notes). The sequence is the same on every staff and partner door: credentials (or the organisation's SSO) -> the authentication code only when a permission demands it (R135) -> the role prompt when several roles are held (ADR-0003) -> the landing. Managing sessions moved to the staff directory (BO-053); managing MFA methods stays on each app's own security or profile screen. **resolvePermissions and getCurrentShift left the door**: simulating a principal's permissions is an administration tool (BO-068), and a scanner runs no cash shift, so a steward was shown a SHIFT_OPEN no-access state at sign-in.",
+  "notes": "**Rebuilt as a sign-in form on 2 October 2026 (CHG-DOOR-002/003; Chinmay, 2 October 2026: fix the Block A blockers now).** It was generated as a list over active sessions, MFA methods and SSO providers with Force logout and Revoke all sessions on the door, which a person who is not yet signed in can never use (platform-foundation process notes). The sequence is the same on every staff and partner door: credentials (or the organisation's SSO) -> the authentication code only when a permission demands it (R135) -> the role prompt when several roles are held (ADR-0003) -> the landing. Managing sessions moved to the staff directory (BO-053); managing MFA methods stays on each app's own security or profile screen. **resolvePermissions and getCurrentShift left the door**: simulating a principal's permissions is an administration tool (BO-068), and a scanner runs no cash shift, so a steward was shown a SHIFT_OPEN no-access state at sign-in.\n\nBuild note (r8 second round, IDENTITY-C01, from the core lane): login is online-only for tills and staff handhelds in r8 (identity login x-ticvai-offline-note); build the offline state as \"signing in needs a connection\", not the cached-list sign-in above. The wording waits for the client (pending entry IDENTITY-C01).",
   "density": "comfortable",
   "pattern": "form",
   "patternReason": "PIN or badge on a gate scanner, then the role - a form, not a list.",
@@ -231,7 +231,7 @@
   "implementation": {
    "app": "venue-scanner",
    "route": "/access/access-point-direction",
-   "component": "apps/venue-scanner/src/routes/access/AccessPointDirectionDetail.tsx",
+   "component": "src/routes/access/AccessPointDirectionDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -495,7 +495,7 @@
   "implementation": {
    "app": "venue-scanner",
    "route": "/access/ready-to-scan",
-   "component": "apps/venue-scanner/src/routes/access/ReadyToScanDetail.tsx",
+   "component": "src/routes/access/ReadyToScanDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -841,7 +841,7 @@
   "implementation": {
    "app": "venue-scanner",
    "route": "/access/group-admission",
-   "component": "apps/venue-scanner/src/routes/access/GroupAdmissionDetail.tsx",
+   "component": "src/routes/access/GroupAdmissionDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1078,7 +1078,7 @@
   "implementation": {
    "app": "venue-scanner",
    "route": "/access/manual-entry",
-   "component": "apps/venue-scanner/src/routes/access/ManualEntryDetail.tsx",
+   "component": "src/routes/access/ManualEntryDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1319,7 +1319,7 @@
   "implementation": {
    "app": "venue-scanner",
    "route": "/access/ticket-lookup",
-   "component": "apps/venue-scanner/src/routes/access/TicketLookupDetail.tsx",
+   "component": "src/routes/access/TicketLookupDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1589,7 +1589,7 @@
   "implementation": {
    "app": "venue-scanner",
    "route": "/access/delegated-right",
-   "component": "apps/venue-scanner/src/routes/access/DelegatedRightDetail.tsx",
+   "component": "src/routes/access/DelegatedRightDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1759,7 +1759,7 @@
   "implementation": {
    "app": "venue-scanner",
    "route": "/access/offline-journal",
-   "component": "apps/venue-scanner/src/routes/access/OfflineJournalDetail.tsx",
+   "component": "src/routes/access/OfflineJournalDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -2064,7 +2064,7 @@
   "implementation": {
    "app": "venue-scanner",
    "route": "/access/sync-reconciliation",
-   "component": "apps/venue-scanner/src/routes/access/SyncReconciliationDetail.tsx",
+   "component": "src/routes/access/SyncReconciliationDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -2460,7 +2460,7 @@
   "implementation": {
    "app": "venue-scanner",
    "route": "/access/offline-package",
-   "component": "apps/venue-scanner/src/routes/access/OfflinePackageDetail.tsx",
+   "component": "src/routes/access/OfflinePackageDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {

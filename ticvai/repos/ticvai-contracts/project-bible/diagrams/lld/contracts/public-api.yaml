@@ -136,9 +136,11 @@ operations:
   - service
   offline: false
   reads:
+  - cache:idempotency
   - control.api_client
   - control.api_licence
-  writes: []
+  writes:
+  - cache:idempotency
 - operation: listApiAnomalies
   verb: GET
   path: /api-anomalies
@@ -200,7 +202,7 @@ operations:
   verb: GET
   path: /api-scopes
   scope: tenant
-  permission: DEVELOPER_VIEW
+  permission: null
   audience:
   - public
   - staff
@@ -208,13 +210,15 @@ operations:
   offline: false
   reads:
   - control.api_licence
+  - release:api-scopes
   writes: []
 - operation: listApiVersions
   verb: GET
   path: /api-versions
   scope: tenant
-  permission: DEVELOPER_VIEW
+  permission: null
   audience:
+  - public
   - partner
   offline: false
   reads:
@@ -237,6 +241,7 @@ operations:
   scope: tenant
   permission: DEVELOPER_VIEW
   audience:
+  - public
   - staff
   - partner
   offline: false
@@ -308,7 +313,7 @@ operations:
   scope: tenant
   permission: DEVELOPER_VIEW
   audience:
-  - staff
+  - public
   offline: false
   reads:
   - cache:idempotency
@@ -327,11 +332,11 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - control.webhook_replay
   - control.webhook_subscription
-  - platform.outbox
   writes:
   - cache:idempotency
-  - control.webhook_delivery
+  - control.webhook_replay
 - operation: requestProductionAccess
   verb: POST
   path: /api-clients/{clientId}/production-access
@@ -377,6 +382,7 @@ operations:
   - cache:idempotency
   - control.api_client
   writes:
+  - cache:idempotency
   - control.api_client
 - operation: rotateApiCredential
   verb: POST
@@ -417,8 +423,10 @@ operations:
   - partner
   offline: false
   reads:
+  - cache:idempotency
   - control.api_client
   writes:
+  - cache:idempotency
   - control.api_client
 - operation: setApiLicensing
   verb: PUT
@@ -492,6 +500,8 @@ operations:
   - partner
   offline: false
   reads:
+  - cache:idempotency
   - control.webhook_delivery
   writes:
+  - cache:idempotency
   - control.webhook_delivery

@@ -27,6 +27,16 @@ from pathlib import Path
 
 import yaml
 
+
+def _yload(src):
+    """YAML with the C loader, the pure one where a file defeats it (20 October 2026, CHG-R8GEN-016): the screen files
+    are 25 MB and the pure loader took most of each refresh step's minute; the loaded data is the same."""
+    text = src.read() if hasattr(src, "read") else src
+    try:
+        return yaml.load(text, Loader=getattr(yaml, "CSafeLoader", yaml.SafeLoader))
+    except Exception:
+        return yaml.safe_load(text)
+
 ROOT = Path(__file__).resolve().parents[1]
 SCREENS = ROOT / "screens"
 
@@ -177,7 +187,7 @@ def main() -> int:
     touched = 0
 
     for f in sorted(SCREENS.glob("P*.yaml")):
-        doc = yaml.safe_load(f.read_text(encoding="utf-8"))
+        doc = _yload(f.read_text(encoding="utf-8"))
         code = (doc.get("platform") or {}).get("code", "")
         changed = False
         for s in doc.get("screens") or []:

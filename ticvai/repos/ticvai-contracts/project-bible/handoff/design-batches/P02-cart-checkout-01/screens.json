@@ -270,17 +270,17 @@
    ]
   },
   "wireframe": {
-   "status": "notStarted",
-   "provenance": "designed",
+   "status": "approved",
+   "provenance": "client-verified",
    "board": "wireframes/P02 Guest App.dc.html#gst-009",
    "prototype": {
     "file": "sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html",
     "rev": "Mobile App v4, 29 September 2026",
     "match": "none",
-    "note": "Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the v4 look (the frame on this screen's board, wireframes/frames/gst-009.html, and #GST-009 in handoff/design-batches/apps/1-guest-app/return/TICVAI Guest App.dc.html). NOT client-verified: awaiting the client's design reviewer. Build the layout from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at: Account → All screens → Wave 1 → Review & payment; also the \"Confirm and pay\" sheet in the booking flow (exact). What v2 did differently: Prototype offers Tabby and wallet credit as payment methods; the YAML does not name them."
+    "note": "Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the v4 look (the frame on this screen's board, wireframes/frames/gst-009.html, and #GST-009 in handoff/design-batches/apps/1-guest-app/return/TICVAI Guest App.dc.html). Client-approved 19 October 2026 (confirmed by Chinmay Parab). Build the layout from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at: Account → All screens → Wave 1 → Review & payment; also the \"Confirm and pay\" sheet in the booking flow (exact). What v2 did differently: Prototype offers Tabby and wallet credit as payment methods; the YAML does not name them."
    },
-   "source": "Claude Code, 30 September 2026, drawn in the Mobile App v4 look",
-   "note": "**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified, awaiting the client's design reviewer.** `provenance: designed` because the accepted vocabulary has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md."
+   "source": "client approval, confirmed by Chinmay Parab 19 October 2026",
+   "note": "**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; client-approved 19 October 2026, confirmed by Chinmay Parab.** Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "x-ticvai-make-or-break": "M18-15: may a guest-checkout customer be sent marketing on an opt-in taken at checkout (law and the client's marketing policy)? Until the client confirms, the opt-in is shown unticked and nothing is sent without it.",
@@ -366,7 +366,7 @@
     }
    ]
   },
-  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Wired 24 August from review**: getOrder. **The operations existed and this screen could not call them** — reviewers reported them as missing APIs, which is what an unreachable operation looks like from a wireframe. **Cross-surface parity, 31 August**: added reprintOrder. **A guest does not know which surface they are on** — the same named screen on web and app now calls the same guest-callable operations.\n\n**'Set a password' is 'Create an account' (4 October 2026), the same as its web twin WEB-013: registerGuest and verifyGuestEmail make and prove the account, then linkGuestCheckout** (CHG-FXS-003)\n\n**Create an account collects the email and the code its two calls send** (CHG-FXS-003)\n\n**The code is collected by the verify form (formVerifyGuestEmail)** (CHG-FXS-003)",
+  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Wired 24 August from review**: getOrder. **The operations existed and this screen could not call them** — reviewers reported them as missing APIs, which is what an unreachable operation looks like from a wireframe. **Cross-surface parity, 31 August**: added reprintOrder. **A guest does not know which surface they are on** — the same named screen on web and app now calls the same guest-callable operations.\n\n**'Set a password' is 'Create an account' (4 October 2026), the same as its web twin WEB-013: registerGuest and verifyGuestEmail make and prove the account, then linkGuestCheckout** (CHG-FXS-003)\n\n**Create an account collects the email and the code its two calls send** (CHG-FXS-003)\n\n**The code is collected by the verify form (formVerifyGuestEmail)** (CHG-FXS-003)\n\nBuild note (r8 second round, GPS-C09): **build the no-access state as GFIX-4 says, not as the state text above reads.** A guest holds no permission, so the state never names one (the text above still names staff permissions); signed out, the guest is offered sign-in and brought back here; a record that is not theirs says so without saying whose. The corrected wording waits for the client's approval of the visible text (pending entry GPS-C09).",
   "density": "comfortable",
   "pattern": "statusTracker",
   "patternReason": "`getOrder` reads one record and nothing reads a population — the screen is about that one thing",

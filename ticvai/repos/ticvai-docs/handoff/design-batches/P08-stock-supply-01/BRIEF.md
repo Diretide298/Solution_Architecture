@@ -104,8 +104,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-051` | Purchase Orders | D | 22 | 14 | 6 | 12 | 1 | 4 | — | notStarted (generated) |
 | `BO-052` | Goods Receipt | D | 19 | 19 | 6 | 12 | 1 | 0 | — | notStarted (generated) |
 | `BO-078` | Requisitions | D | 23 | 26 | 6 | 16 | 3 | 0 | — | notStarted (generated) |
-| `BO-079` | Stock Count | D | 28 | 18 | 6 | 8 | 0 | 4 | — | notStarted (generated) |
-| `BO-080` | Stock Transfers | D | 18 | 12 | 6 | 8 | 2 | 4 | — | notStarted (generated) |
+| `BO-079` | Stock Count | D | 29 | 18 | 6 | 8 | 0 | 4 | — | notStarted (generated) |
+| `BO-080` | Stock Transfers | D | 19 | 12 | 6 | 8 | 2 | 4 | — | notStarted (generated) |
 | `BO-081` | Inventory Items | A | 33 | 18 | 6 | 33 | 2 | 4 | — | notStarted (generated) |
 | `BO-082` | Stock Movements | D | 14 | 16 | 6 | 18 | 0 | 4 | — | notStarted (generated) |
 | `BO-083` | Suppliers | D | 35 | 13 | 6 | 7 | 1 | 4 | — | notStarted (generated) |

@@ -404,7 +404,7 @@
  },
  "BookingFlowTypeKey": {
   "type": "string",
-  "description": "**The flow types the system catalogue offers (decided 29 September, W12; impact.md b).** `seatedFixedPerformance` and `seatedDateTimeSeatMap` are the two seated flows; `cabanaMap` and `cabanaBySize` are the two cabana flows (W6); `experienceWorkshop` puts the product before the date (W8); `multiLocation` opens on the location switcher.\n",
+  "description": "**The flow types the system catalogue offers (decided 29 September, W12; impact.md b).** `seatedFixedPerformance` and `seatedDateTimeSeatMap` are the two seated flows; `cabanaMap` is the one cabana flow (W6; `cabanaBySize` was removed in r8: a guest books a cabana from the map only, lead decision of 20 October 2026); `experienceWorkshop` puts the product before the date (W8); `multiLocation` opens on the location switcher.\n",
   "enum": [
    "datedDayPass",
    "timedEntry",
@@ -415,7 +415,6 @@
    "surfSession",
    "meetingRoomHourly",
    "cabanaMap",
-   "cabanaBySize",
    "guidedTourByLanguage",
    "transport",
    "tableReservation",
@@ -439,10 +438,31 @@
     "type": "string",
     "format": "uuid"
    },
+   "anonymousSessionToken": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "The `guestAuth` token of the anonymous session `createCart` opened for a visitor with no credential (GPS-C23, CHG-R8SPN-031); null on every other answer. Not stored on the cart."
+   },
    "token": {
     "type": "string",
     "readOnly": true,
     "description": "**How an anonymous guest returns to their cart**, including from a recovery email. Rotated on claim, so a link shared before signing in does not reach the account after.\n"
+   },
+   "sessionId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The staff or partner session that started the cart (a till's cart is its session's own); null for a guest's cart (R8 blocker IDENTITY-C49, CHG-R8MIG-021)."
+   },
+   "workstationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The workstation of that session; null for a guest's cart."
    },
    "venueId": {
     "type": "string",
@@ -733,8 +753,11 @@
    "profiling",
    "thirdPartySharing",
    "aiProcessing",
-   "transactional"
-  ]
+   "transactional",
+   "storedPaymentCredential",
+   "facePassEnrolment"
+  ],
+  "description": "`storedPaymentCredential` (a card saved for later, `storePaymentToken`) and `facePassEnrolment` (a face enrolled for entry, `enrolFacePass`) are purposes of their own (R8 blocker ORDERS-MONEY-C21, CHG-R8MIG-022), so a screen picks the row by its purpose instead of guessing: each tenant has one `marketing.consent_purpose` row of each, seeded with the tenant's other purposes."
  },
  "ConsentPurposeConfig": {
   "x-ticvai-rls": "grant-holder-read",
@@ -747,6 +770,12 @@
    "isRequiredForService"
   ],
   "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "The purpose row's id (`marketing.consent_purpose.id`), the value `consentPurposeId` and a consent's `purposeId` carry (R8 blocker ORDERS-MONEY-C21, CHG-R8MIG-022)."
+   },
    "purpose": {
     "$ref": "#/components/schemas/ConsentPurpose"
    },
@@ -801,105 +830,6 @@
   ],
   "description": "`checkout` (30 September, M18-15): an opt-in ticked beside the terms at checkout, carried on orders `checkoutCart` `marketingConsents[]` and recorded by `recordCheckoutConsents`, bound to the order and the verified contact. `cookieBanner` (29 September, build; BL-073 §4b): a decision made on the cookie banner or preference centre and moved onto the guest by `claimDeviceConsent`. Kept apart from `website`, a form submission, because the audit trail (2.6.56) has to tell the two apart."
  },
- "CouponCode": {
-  "x-ticvai-persistence": "promotions.coupon_code",
-  "type": "object",
-  "required": [
-   "code",
-   "campaignId",
-   "status"
-  ],
-  "properties": {
-   "code": {
-    "type": "string"
-   },
-   "campaignId": {
-    "x-ticvai-references": "promotions.coupon_campaign",
-    "type": "string",
-    "format": "uuid"
-   },
-   "batchId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "The `generateCouponCodes` batch that issued this code. Null where no batch did."
-   },
-   "status": {
-    "$ref": "#/components/schemas/CouponStatus"
-   },
-   "assignedSubjectId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "redemptionCount": {
-    "type": "integer"
-   },
-   "maxRedemptions": {
-    "type": "integer"
-   },
-   "discount": {
-    "$ref": "#/components/schemas/Discount"
-   },
-   "invalidReason": {
-    "type": "string",
-    "nullable": true,
-    "description": "Why the code cannot be applied. A cashier reading `expired` to a guest is a very different conversation from reading `already used`.\n",
-    "enum": [
-     "expired",
-     "alreadyRedeemed",
-     "voided",
-     "notYetValid",
-     "wrongVenue",
-     "conditionsNotMet",
-     "notAssignedToGuest"
-    ]
-   },
-   "validFrom": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "validTo": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "redeemedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "redeemedOrderId": {
-    "type": "string",
-    "nullable": true
-   },
-   "scopePath": {
-    "type": "string",
-    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"
-   },
-   "assignmentId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "readOnly": true,
-    "description": "The `CouponCodeAssignment` that assigned this code (4 October 2026, CHG-FXC-005)."
-   },
-   "distributionStatus": {
-    "type": "string",
-    "nullable": true,
-    "readOnly": true,
-    "enum": [
-     "pending",
-     "sent",
-     "delivered",
-     "viewed",
-     "cancelled"
-    ],
-    "description": "**How far the code got to its holder** (4 October 2026, CHG-FXC-005). `pending` when assigned, `sent` when the channel accepted it, `delivered` on the channel's delivery receipt, `viewed` when the holder opened it, `cancelled` when the assignment was withdrawn. Null for a code never assigned. Kept apart from `status`, which is the code's redemption life (issued, assigned, redeemed, expired, voided)."
-   }
-  }
- },
  "CouponStatus": {
   "type": "string",
   "enum": [
@@ -948,7 +878,7 @@
     "x-ticvai-references": "catalogue.inventory_reservation",
     "type": "string",
     "nullable": true,
-    "description": "Lease the units were drawn from — a `catalogue.InventoryHold.id`. Absent for uncontended products."
+    "description": "Lease the units were drawn from — a `catalogue.InventoryHold.id`. Absent for uncontended products. **A standing-zone line** (zone-priced general admission at POS-004 and WEB-007; decided 20 October 2026, Chinmay, R8 blocker cause GPS-C38, option A; CHG-R8SPN-040) carries no `seatIds`: it is `quantity` places in one zone, held by `seating.createSeatHold` with `zoneId` and `quantity`, and this names that hold's inventory hold; the zone, its price band and keep-the-party- together come from the hold, and a lapsed one is `409 hold-not-active` as for seats."
    },
    "seatIds": {
     "type": "array",
@@ -1277,6 +1207,53 @@
   "description": "**An exchange rate: a decimal string, never a float**, for the reason `Money.amount` is one — a JavaScript client must not round a rate in transit. **Six decimal places**, the precision `finance.FxRate.rate` asks for, and stored at that precision.\n",
   "pattern": "^\\d+(\\.\\d{1,6})?$"
  },
+ "GuestCouponCode": {
+  "x-ticvai-persistence": "none — guest projection of promotions.coupon_code and its campaign",
+  "type": "object",
+  "description": "**What a guest may see of a coupon code** (R8 blocker ORDERS-MONEY-C32), as `GuestPromotion` is for a promotion: never the campaign, batch, assignee, assignment, redemption counts or the order it was redeemed on. `additionalProperties: false` is the point.",
+  "additionalProperties": false,
+  "required": [
+   "code",
+   "status"
+  ],
+  "properties": {
+   "code": {
+    "type": "string"
+   },
+   "status": {
+    "$ref": "#/components/schemas/CouponStatus"
+   },
+   "isValid": {
+    "type": "boolean",
+    "description": "True when the code can be applied now; else `invalidReason` says why."
+   },
+   "invalidReason": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "expired",
+     "notYetValid",
+     "voided",
+     "alreadyRedeemed",
+     "notAssignedToGuest",
+     "wrongVenue"
+    ]
+   },
+   "discount": {
+    "$ref": "#/components/schemas/Discount"
+   },
+   "validFrom": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "validTo": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
  "GuestPreferences": {
   "x-ticvai-rls": "grant-holder-read",
   "type": "object",
@@ -1343,47 +1320,57 @@
   ],
   "properties": {
    "id": {
+    "x-ticvai-data-class": "behavioural",
     "type": "string",
     "format": "uuid",
     "readOnly": true,
     "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
    },
    "subjectId": {
+    "x-ticvai-data-class": "behavioural",
     "type": "string",
     "format": "uuid",
     "description": "Opaque reference. Personal data lives in the separately erasable store, which is what makes erasure possible against an append-only ledger.\n"
    },
    "displayName": {
+    "x-ticvai-data-class": "personal",
     "type": "string",
     "nullable": true
    },
    "email": {
+    "x-ticvai-data-class": "personal",
     "type": "string",
     "nullable": true
    },
    "phone": {
+    "x-ticvai-data-class": "personal",
     "type": "string",
     "nullable": true
    },
    "preferredLanguage": {
+    "x-ticvai-data-class": "personal",
     "type": "string",
     "nullable": true
    },
    "preferredChannel": {
+    "x-ticvai-data-class": "personal",
     "$ref": "#/components/schemas/MessageChannel"
    },
    "guestLinkId": {
+    "x-ticvai-data-class": "personal",
     "type": "string",
     "nullable": true,
     "description": "Present where the guest is linked across cells. Marketing acts locally."
    },
    "tags": {
+    "x-ticvai-data-class": "behavioural",
     "type": "array",
     "items": {
      "type": "string"
     }
    },
    "engagementScore": {
+    "x-ticvai-data-class": "behavioural",
     "type": "integer",
     "nullable": true,
     "minimum": 0,
@@ -1391,6 +1378,7 @@
     "description": "22.2.20 and 22.2.21. **`lifetimeValue` and `visitCount` existed, so value was a stored figure and engagement was not.** They are different questions: a guest who spent a lot once and a guest who visits monthly have the same LTV and need opposite treatment.\n**Recency, frequency and breadth, not spend** — spend is already `lifetimeValue`, and folding it in here would make one number twice.\n"
    },
    "engagementTier": {
+    "x-ticvai-data-class": "behavioural",
     "type": "string",
     "nullable": true,
     "enum": [
@@ -1404,20 +1392,26 @@
     "description": "5.3.19. **Automatic classification, computed rather than assigned.** `lapsing` is the tier the whole field exists for — **a guest who has not been for a while and still might is the only one marketing can change**, and lumping them with `lapsed` wastes the window.\n"
    },
    "lifetimeValue": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
+    "x-ticvai-data-class": "behavioural",
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "**Left out of guest reads until a guest's lifetime value has a currency** (ADAM CR-141, 18 October 2026; CHG-CRA-007): an amount above a venue is in the currency recorded on its own row (CR-094's rule, which waits on the client), and this row records none yet."
    },
    "visitCount": {
+    "x-ticvai-data-class": "behavioural",
     "type": "integer"
    },
    "lastVisitAt": {
+    "x-ticvai-data-class": "behavioural",
     "type": "string",
     "format": "date-time",
     "nullable": true
    },
    "isActive": {
+    "x-ticvai-data-class": "behavioural",
     "type": "boolean"
    },
    "mergedIntoSubjectId": {
+    "x-ticvai-data-class": "behavioural",
     "type": "string",
     "format": "uuid",
     "nullable": true,
@@ -1425,6 +1419,7 @@
     "description": "**Set on the absorbed profile by `mergeGuestProfiles` and `mergeGuests`**, which retain it as a redirect rather than deleting it. A read that lands here follows it; a second merge of a profile that has one is refused as `alreadyMerged`.\n"
    },
    "mergedAt": {
+    "x-ticvai-data-class": "behavioural",
     "type": "string",
     "format": "date-time",
     "nullable": true,
@@ -1459,7 +1454,7 @@
    },
    "identityProviders": {
     "type": "array",
-    "description": "Linked providers. Several may resolve to one account.",
+    "description": "Linked providers. Several may resolve to one account. Read from `pii.subject_identity` (apple, google, uaePass), `identity.guest_credential` (password) and a verified contact (otp) (CHG-R8MIG-015).",
     "items": {
      "type": "string",
      "enum": [
@@ -1526,6 +1521,14 @@
  "MfaMethod": {
   "x-ticvai-persistence": "identity.mfa_method",
   "type": "object",
+  "description": "**A second factor a principal or a guest has enrolled** (R8 blockers IDENTITY-C12 and IDENTITY-C34, CHG-R8MIG-007). Exactly one of `principalId` and `subjectId` is set, so a guest's method is stored like a staff member's and `GuestSession.requiresMfa` and `mfaMethods` are answered from here; the row is its owner's alone (`x-ticvai-rls: own-row`). Three fields are storage only and never returned (`handoff/schema-storage-only.md`): `secret` (a `totp` shared secret, which `verifyMfaChallenge` computes the code from), `destination` (the full phone number or email an `smsOtp` or `emailOtp` code is sent to; `maskedTarget` is the only form returned) and `pendingExpiresAt` (set while an enrolment awaits `verifyMfaEnrolment`; an expired pending row is deleted by the next `enrolMfaMethod` of its owner).",
+  "x-ticvai-exactly-one-of": [
+   [
+    "principalId",
+    "subjectId"
+   ]
+  ],
+  "x-ticvai-rls": "own-row",
   "required": [
    "id",
    "kind",
@@ -1536,6 +1539,44 @@
    "id": {
     "type": "string",
     "format": "uuid"
+   },
+   "principalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-references": "identity.principal",
+    "x-ticvai-staff-only": "Omitted from the response when the caller is a guest (R164; r8 gate residue, CHG-R8RES-008). A guest's own method has it null, so a guest screen never shows it.",
+    "description": "The principal who enrolled it; null for a guest."
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-references": "pii.subject",
+    "description": "The guest who enrolled it; null for a principal."
+   },
+   "secret": {
+    "type": "string",
+    "nullable": true,
+    "writeOnly": true,
+    "x-ticvai-secret": "field-encrypted",
+    "description": "The `totp` shared secret, encrypted with the tenant's field key (ADR-0063); null for other kinds. Never returned after `MfaEnrolment.secret`."
+   },
+   "destination": {
+    "type": "string",
+    "nullable": true,
+    "writeOnly": true,
+    "x-ticvai-secret": "field-encrypted",
+    "description": "The full phone number (`smsOtp`) or email (`emailOtp`) the code goes to, encrypted with the tenant's field key (ADR-0063); null for other kinds. Only `maskedTarget` is ever returned."
+   },
+   "pendingExpiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "writeOnly": true,
+    "description": "While `isActive` is false, when the unconfirmed enrolment lapses; null once verified."
    },
    "kind": {
     "$ref": "#/components/schemas/MfaKind"
@@ -1618,6 +1659,13 @@
     "type": "string",
     "format": "uuid",
     "description": "The client UUIDv7 from `CreateOrderRequest.id`."
+   },
+   "orderAccessToken": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "**What lets the device that just checked out read the order it paid for** (decided 20 October 2026, Chinmay, R8 blocker cause IDENTITY-C52, option A; CHG-R8SPN-025). Returned only in `checkoutCart`'s answer, null everywhere else: a signed token bound to this order and to the cart's device, valid 24 hours, never stored. `getOrder` accepts it in `X-Order-Access-Token` in place of a session, so a guest who checked out with no account, or whose session ended, still sees the confirmation (WEB-013 keeps it in its navigation state). It reads this order only and grants nothing else."
    },
    "orderNumber": {
     "x-ticvai-unique": "tenant",
@@ -1914,10 +1962,88 @@
   "nullable": true,
   "additionalProperties": true,
   "x-ticvai-persistence": "none — embedded as attributes (jsonb) on orders.cart_line and orders.order_line",
-  "description": "Open attributes of a line, kept from the cart to the order line. **`transport` is the one with a defined shape** (decided 29 September, rev 3 REV3-21); other keys are free.\n",
+  "description": "Open attributes of a line, kept from the cart to the order line. **`transport` is the one with a defined shape** (decided 29 September, rev 3 REV3-21); other keys are free. **`attendees` is the second** (20 October 2026, R8 blocker cause GPS-C28; CHG-R8SPN-034), and **`parking` and `bundle` have a defined shape too** (R8 blockers ORDERS-MONEY-C22 and C43, CHG-R8MIG-023).\n",
   "properties": {
    "transport": {
     "$ref": "#/components/schemas/TransportLineAttributes"
+   },
+   "attendees": {
+    "type": "integer",
+    "minimum": 1,
+    "nullable": true,
+    "description": "**How many people a meeting-room booking is for** (GST-075; R8 blocker cause GPS-C28, CHG-R8SPN-034). Sent with `addCartLine` for a meeting-room product, kept from the cart line to the order line, and shown on the venue's reception list for the booking. It must not exceed the room type's capacity, which the guest step shows beside each room type: more is refused `422 attendees-over-capacity` by `addCartLine`, naming the capacity. The guest steps run in the order `listProductStartTimes` can answer (lead answer, option A): date, room type, length, then start time."
+   },
+   "parking": {
+    "type": "object",
+    "nullable": true,
+    "description": "**A parking line's plate and day** (R8 blocker ORDERS-MONEY-C22, CHG-R8MIG-023): carried from `addCartLine` to the order line and passed to `issueOrderEntitlements`, which writes the parking entitlement's plate, `validFrom` and `validTo` from it. A sold-out answer (`soldOutForDay`) means the facility's capacity on the `validFrom` day.",
+    "required": [
+     "plate",
+     "validFrom",
+     "validTo"
+    ],
+    "properties": {
+     "plate": {
+      "type": "object",
+      "required": [
+       "number"
+      ],
+      "properties": {
+       "number": {
+        "type": "string",
+        "maxLength": 16
+       },
+       "country": {
+        "type": "string",
+        "maxLength": 3,
+        "nullable": true,
+        "description": "ISO 3166 code of the plate's country; null for the venue's own."
+       }
+      }
+     },
+     "validFrom": {
+      "type": "string",
+      "format": "date-time"
+     },
+     "validTo": {
+      "type": "string",
+      "format": "date-time"
+     }
+    }
+   },
+   "bundle": {
+    "type": "object",
+    "nullable": true,
+    "description": "**A bundle line's picks** (R8 blocker ORDERS-MONEY-C43, the lead's answer B for r8; CHG-R8MIG-023): the bundle and the option the guest chose in each choice group. The line's `variantId` is the bundle's own (`Bundle.variantId`); the server prices it at the bundle's own price and freezes the allocation at `createOrder` (ADR-0019). In r8 a bundle's admission is open-dated, so no date or session is asked.",
+    "required": [
+     "bundleId"
+    ],
+    "properties": {
+     "bundleId": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "choices": {
+      "type": "array",
+      "items": {
+       "type": "object",
+       "required": [
+        "choiceGroupId",
+        "optionId"
+       ],
+       "properties": {
+        "choiceGroupId": {
+         "type": "string",
+         "format": "uuid"
+        },
+        "optionId": {
+         "type": "string",
+         "format": "uuid"
+        }
+       }
+      }
+     }
+    }
    }
   }
  },
@@ -1998,6 +2124,11 @@
  },
  "Payment": {
   "x-ticvai-persistence": "orders.payment",
+  "x-ticvai-index": [
+   [
+    "providerReference"
+   ]
+  ],
   "type": "object",
   "required": [
    "id",
@@ -2250,6 +2381,7 @@
  },
  "PolicyKind": {
   "type": "string",
+  "description": "The kinds of policy a tenant publishes. **Each kind has one fixed title in English and Arabic** (r8 walk of ticket 27890), the only source of `PublishedPolicy.title`; `setPolicy` takes no title. The Arabic labels are the standard names of each document and the client should approve them.\n\n| kind | en | ar |\n|---|---|---|\n| privacy | Privacy policy | سياسة الخصوصية |\n| termsAndConditions | Terms and conditions | الشروط والأحكام |\n| refund | Refund policy | سياسة الاسترداد |\n| cookie | Cookie policy | سياسة ملفات تعريف الارتباط |\n| accessibility | Accessibility statement | بيان إمكانية الوصول |\n",
   "enum": [
    "privacy",
    "termsAndConditions",
@@ -2388,7 +2520,15 @@
     "$ref": "#/components/schemas/PolicyKind"
    },
    "title": {
-    "type": "string"
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/white-label::LocalisedText"
+     }
+    ],
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "x-ticvai-derived": "onRead",
+    "description": "The heading, with `en` and `ar`, derived on read from `kind` by the fixed label table on `PolicyKind`. Nothing is stored (`whitelabel.policy.title` stays unused), so a tenant cannot retitle a policy and the heading is the same in the app, on the web and in a consent record.\n"
    },
    "version": {
     "type": "string",
@@ -2523,7 +2663,7 @@
    },
    "consents": {
     "type": "array",
-    "description": "Consent captured at registration, recorded with the notice version.",
+    "description": "Consent captured at registration, recorded with the notice version. **Recorded by Marketing, not stored here**: `registerGuest` carries the list on `identity.guestRegistered`, and Marketing's consumer records each item as a consent (IDENTITY-C55, CHG-R8SPN-029).",
     "items": {
      "type": "object",
      "properties": {
@@ -2685,8 +2825,17 @@
      "held",
      "converted",
      "released",
-     "expired"
-    ]
+     "expired",
+     "sold"
+    ],
+    "description": "`converted` when the order is created; `sold` when the order is paid and `catalogue.convertInventoryHold` sells the units (ADAM CR-169, 18 October 2026; CHG-CRA-007)."
+   },
+   "inventoryReservationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "x-ticvai-references": "catalogue.inventory_reservation",
+    "description": "**The inventory hold these seats sit under** (ADAM CR-169; CHG-CRA-007), so `convertInventoryHold` finds the order's seat reservations from the hold it converts."
    },
    "totalPrice": {
     "x-ticvai-column": "gross_amount",
@@ -2748,7 +2897,7 @@
    },
    "expiresIn": {
     "type": "integer",
-    "description": "Seconds"
+    "description": "Seconds until the access token expires: `PasswordPolicy.accessTokenMinutes` x 60, 900 by default (15 minutes; proposed, client to correct). The refresh token, its rotation and reuse detection, and the signing key are described once on `bearerAuth` in contracts/shared/common.yaml (IDENTITY-C25, FOUNDATION-AI-C27; CHG-R8SPN-014)."
    }
   }
  }

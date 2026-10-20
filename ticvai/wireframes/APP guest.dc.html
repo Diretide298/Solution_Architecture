@@ -207,10 +207,10 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
 
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getProductEligibilityRule · getProduct · listPerformances · getAvailability +1</div>
+          <div><b>OPERATIONS</b> &middot; getProductEligibilityRule · getProduct · listPerformances · getAvailability +2</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · videoBuffering · videoUnavailable · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          <div><b>ARRIVES WITH</b> &middot; eventId&larr;WEB-002, productId&larr;WEB-001</div>
-          <div><b>GOES TO</b> &middot; <a href="#web-001">WEB-001</a> <br><a href="#web-002">WEB-002</a>  &mdash; <i>Event &amp; Attraction Listing</i> <span class="car">eventId</span><br><a href="#web-003">WEB-003</a> <br><a href="#web-005">WEB-005</a>  &mdash; <i>Chooses ticket types and quantities</i> <span class="car">productId</span><br><a href="#web-006">WEB-006</a>  &mdash; <i>Book (a dated product: date first, then time</i> <span class="car">productId</span><br><a href="#web-007">WEB-007</a>  &mdash; <i>Book (a fixture with one on-sale performance</i> <span class="car">performanceId</span><br><a href="#web-047">WEB-047</a>  &mdash; <i>Book (a cabana, lounger or other spot placed</i> <span class="car">productId</span><br><a href="#web-048">WEB-048</a>  &mdash; <i>Book (a space sold by the hour, e.g. a meeti</i> <span class="car">productId</span></div>
+          <div><b>ARRIVES WITH</b> &middot; eventId&larr;WEB-002, productId&larr;WEB-001, venueId&larr;session</div>
+          <div><b>GOES TO</b> &middot; <a href="#web-001">WEB-001</a> <br><a href="#web-002">WEB-002</a>  &mdash; <i>Event &amp; Attraction Listing</i> <span class="car">eventId</span><br><a href="#web-003">WEB-003</a> <br><a href="#web-005">WEB-005</a>  &mdash; <i>Chooses ticket types and quantities</i> <span class="car">productId</span><br><a href="#web-006">WEB-006</a>  &mdash; <i>Book (a dated product: date first, then time</i> <span class="car">productId</span><br><a href="#web-007">WEB-007</a>  &mdash; <i>Book (a fixture with one on-sale performance</i> <span class="car">performanceId · productId</span><br><a href="#web-047">WEB-047</a>  &mdash; <i>Book (a cabana, lounger or other spot placed</i> <span class="car">productId</span><br><a href="#web-048">WEB-048</a>  &mdash; <i>Book (a space sold by the hour, e.g. a meeti</i> <span class="car">productId</span></div>
           
           
         </div>
@@ -226,7 +226,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
 
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listProducts · generateVisitPlan · getVisitPlan · updateVisitPlan +3</div>
+          <div><b>OPERATIONS</b> &middot; listProducts · generateVisitPlan · getVisitPlan · updateVisitPlan +4</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · preferenceNotAtVenue · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; venueId&larr;session, planId&larr;deepLink, itemId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#web-010">WEB-010</a>  &mdash; <i>Book this plan</i> <span class="car">cartId</span><br><a href="#web-001">WEB-001</a>  &mdash; <i>Back to tickets</i><br><a href="#web-004">WEB-004</a>  &mdash; <i>Opens an item on the plan</i> <span class="car">productId</span></div>
@@ -248,7 +248,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           <div><b>OPERATIONS</b> &middot; evaluatePromotions · listProductVariants · listProductCategories · listProducts +3</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; productId&larr;WEB-004, venueId&larr;session, cartId&larr;navigation</div>
-          <div><b>GOES TO</b> &middot; <a href="#web-001">WEB-001</a> <br><a href="#web-006">WEB-006</a>  &mdash; <i>Change date or time (the dated flow picks th</i> <span class="car">eventId</span><br><a href="#web-007">WEB-007</a>  &mdash; <i>Interactive Seat Selection</i> <span class="car">eventId</span><br><a href="#web-008">WEB-008</a>  &mdash; <i>Add-ons &amp; Upsell</i><br><a href="#web-010">WEB-010</a>  &mdash; <i>Shopping Cart</i> <span class="car">cartId · code · lineId · performanceId</span><br><a href="#web-016">WEB-016</a>  &mdash; <i>Continue, when sign-in is asked after add-on</i> <span class="car">cartId</span></div>
+          <div><b>GOES TO</b> &middot; <a href="#web-001">WEB-001</a> <br><a href="#web-006">WEB-006</a>  &mdash; <i>Change date or time (the dated flow picks th</i> <span class="car">eventId</span><br><a href="#web-007">WEB-007</a>  &mdash; <i>Interactive Seat Selection</i> <span class="car">eventId · productId</span><br><a href="#web-008">WEB-008</a>  &mdash; <i>Add-ons &amp; Upsell</i> <span class="car">bundleId</span><br><a href="#web-010">WEB-010</a>  &mdash; <i>Shopping Cart</i> <span class="car">cartId · code · lineId · performanceId</span><br><a href="#web-016">WEB-016</a>  &mdash; <i>Continue, when sign-in is asked after add-on</i> <span class="car">cartId</span></div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>modal</b> helpMeChoose &middot; <i>Help me choose (the button, the banner, or once on first arrival when the mode is popupOnArrival)</i> &middot; <b>Show me</b> &middot; Close <span class="dis">discards answers</span></div><div class="ov"><b>modal</b> quickTour &middot; <i>First booking visit on this device, or Quick tour</i> &middot; End tour</div></div>
         </div>
@@ -264,10 +264,10 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
 
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; checkBookingEligibility · getAvailability · addCartLine · getPerformance +6</div>
+          <div><b>OPERATIONS</b> &middot; checkBookingEligibility · getAvailability · addCartLine · getPerformance +8</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoAccess · offline · emptyNoResults</span></div>
-          <div><b>ARRIVES WITH</b> &middot; performanceId&larr;navigation, cartId&larr;navigation, eventId&larr;WEB-004</div>
-          <div><b>GOES TO</b> &middot; <a href="#web-001">WEB-001</a> <br><a href="#web-005">WEB-005</a>  &mdash; <i>Picks a time; the tickets for it appear</i> <span class="car">performanceId</span><br><a href="#web-007">WEB-007</a>  &mdash; <i>Selects seats on the map</i> <span class="car">eventId · performanceId</span><br><a href="#web-008">WEB-008</a>  &mdash; <i>Add-ons &amp; Upsell</i><br><a href="#web-010">WEB-010</a>  &mdash; <i>Reviews the cart and may enter a promotion c</i> <span class="car">cartId</span><br><a href="#web-015">WEB-015</a>  &mdash; <i>Adds tickets for a performance whose on-sale</i> <span class="car">performanceId</span></div>
+          <div><b>ARRIVES WITH</b> &middot; performanceId&larr;navigation, cartId&larr;navigation, productId&larr;WEB-004</div>
+          <div><b>GOES TO</b> &middot; <a href="#web-001">WEB-001</a> <br><a href="#web-005">WEB-005</a>  &mdash; <i>Picks a time; the tickets for it appear</i> <span class="car">performanceId</span><br><a href="#web-007">WEB-007</a>  &mdash; <i>Selects seats on the map</i> <span class="car">eventId · performanceId · productId</span><br><a href="#web-008">WEB-008</a>  &mdash; <i>Add-ons &amp; Upsell</i> <span class="car">bundleId</span><br><a href="#web-010">WEB-010</a>  &mdash; <i>Reviews the cart and may enter a promotion c</i> <span class="car">cartId</span><br><a href="#web-015">WEB-015</a>  &mdash; <i>Adds tickets for a performance whose on-sale</i> <span class="car">performanceId</span></div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>drawer</b> eligibilityDeclaration &middot; <i>Once, on leaving selection, when a chosen product has an eligibility rule</i> &middot; <b>Continue</b> &middot; Back <span class="dis">discards party</span></div><div class="ov"><b>modal</b> consentQuestions &middot; <i>Once, after the session or date is picked, when the cart has consent questions</i> &middot; <b>Next</b> &middot; Back <span class="dis">discards answers</span></div></div>
         </div>
@@ -283,10 +283,10 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
 
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; createSeatHold · getSeatAvailability · recommendSeats · listPerformances +2</div>
+          <div><b>OPERATIONS</b> &middot; createSeatHold · getSeatAvailability · recommendSeats · listPerformances +3</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoAccess · offline · emptyNoResults</span></div>
-          <div><b>ARRIVES WITH</b> &middot; performanceId&larr;deepLink, eventId&larr;WEB-006, holdId&larr;navigation</div>
-          <div><b>GOES TO</b> &middot; <a href="#web-001">WEB-001</a> <br><a href="#web-005">WEB-005</a>  &mdash; <i>Ticket Type Selection</i><br><a href="#web-006">WEB-006</a>  &mdash; <i>Date &amp; Performance Selection</i> <span class="car">eventId · performanceId</span><br><a href="#web-008">WEB-008</a>  &mdash; <i>Add-ons &amp; Upsell</i><br><a href="#web-010">WEB-010</a>  &mdash; <i>Reviews the cart</i> <span class="car">holdId · performanceId</span></div>
+          <div><b>ARRIVES WITH</b> &middot; performanceId&larr;deepLink, eventId&larr;WEB-006, productId&larr;WEB-004</div>
+          <div><b>GOES TO</b> &middot; <a href="#web-001">WEB-001</a> <br><a href="#web-005">WEB-005</a>  &mdash; <i>Ticket Type Selection</i> <span class="car">productId</span><br><a href="#web-006">WEB-006</a>  &mdash; <i>Date &amp; Performance Selection</i> <span class="car">eventId · performanceId · productId</span><br><a href="#web-008">WEB-008</a>  &mdash; <i>Add-ons &amp; Upsell</i><br><a href="#web-010">WEB-010</a>  &mdash; <i>Reviews the cart</i> <span class="car">holdId · performanceId</span></div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formRecommendSeats &middot; <i>Recommend seats</i> &middot; <b>Recommend seats</b> &middot; Cancel <span class="dis">discards partySize · strategy · categoryIds · maxPrice · accessibleCount · maxOptions</span></div><div class="ov"><b>modal</b> dateTimeOnSeatMap &middot; <i>The seat map opens for an event with several performances and `seatEventDateMode` is `popupOnSeatMap`</i> &middot; <b>Show seats</b> &rarr; <a href="#web-007">WEB-007</a> <span class="car">performanceId</span> &middot; Close</div></div>
         </div>
@@ -302,10 +302,10 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
 
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; addCartLine · getBundle · decideRecommendations · recordRecommendationEvents +1</div>
+          <div><b>OPERATIONS</b> &middot; addCartLine · getGuestBundle · decideRecommendations · recordRecommendationEvents +1</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; cartId&larr;session, bundleId&larr;navigation, venueId&larr;session</div>
-          <div><b>GOES TO</b> &middot; <a href="#web-001">WEB-001</a> <br><a href="#web-005">WEB-005</a>  &mdash; <i>Ticket Type Selection</i> <span class="car">cartId</span><br><a href="#web-006">WEB-006</a>  &mdash; <i>Date &amp; Performance Selection</i> <span class="car">cartId · performanceId</span><br><a href="#web-010">WEB-010</a>  &mdash; <i>Shopping Cart</i> <span class="car">cartId · code · lineId · performanceId</span><br><a href="#web-016">WEB-016</a>  &mdash; <i>Continue — sign in or use a guest code (when</i> <span class="car">cartId</span></div>
+          <div><b>GOES TO</b> &middot; <a href="#web-001">WEB-001</a> <br><a href="#web-005">WEB-005</a>  &mdash; <i>Ticket Type Selection</i> <span class="car">cartId</span><br><a href="#web-006">WEB-006</a>  &mdash; <i>Date &amp; Performance Selection</i> <span class="car">cartId · performanceId</span><br><a href="#web-010">WEB-010</a>  &mdash; <i>Shopping Cart</i> <span class="car">cartId · lineId · performanceId</span><br><a href="#web-016">WEB-016</a>  &mdash; <i>Continue — sign in or use a guest code (when</i> <span class="car">cartId</span></div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formAddCartLine &middot; <i>Add cart line</i> &middot; <b>Add cart line</b> &middot; Cancel <span class="dis">discards variantId · quantity · performanceId · seatIds · parentLineId · attributes</span></div></div>
         </div>
@@ -359,7 +359,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
 
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listProducts · listProductVariants · listProductStartTimes · addCartLine</div>
+          <div><b>OPERATIONS</b> &middot; listProducts · listProductVariants · listProductStartTimes · addCartLine +1</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; productId&larr;WEB-004, cartId&larr;session</div>
           <div><b>GOES TO</b> &middot; <a href="#web-004">WEB-004</a>  &mdash; <i>Back to the product</i> <span class="car">productId</span><br><a href="#web-010">WEB-010</a>  &mdash; <i>Add to basket, then review the cart</i> <span class="car">cartId</span></div>
@@ -641,7 +641,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
 
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listMyOrders · getOrder · createRefundRequest · listTaxInvoices +4</div>
+          <div><b>OPERATIONS</b> &middot; listOwnRefundRequests · listMyOrders · getOrder · createRefundRequest +5</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; subjectId&larr;session, orderId&larr;deepLink, documentId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#web-001">WEB-001</a> <br><a href="#web-016">WEB-016</a>  &mdash; <i>Login / Register</i> <span class="car">subjectId</span><br><a href="#web-017">WEB-017</a>  &mdash; <i>My Account Dashboard</i><br><a href="#web-018">WEB-018</a>  &mdash; <i>My Tickets</i> <span class="car">orderId</span></div>
@@ -679,9 +679,9 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
 
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getWallet · listWalletTransactions · getGiftCard · getGameCard +3</div>
+          <div><b>OPERATIONS</b> &middot; getWallet · listWalletTransactions · getGiftCard · getGameCard +5</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
-          <div><b>ARRIVES WITH</b> &middot; cardCode&larr;deepLink, subjectId&larr;session, walletId&larr;navigation</div>
+          <div><b>ARRIVES WITH</b> &middot; cardCode&larr;deepLink, cardKind&larr;deepLink, subjectId&larr;session</div>
           <div><b>GOES TO</b> &middot; <a href="#web-001">WEB-001</a> <br><a href="#web-022">WEB-022</a>  &mdash; <i>Membership Plans</i><br><a href="#web-023">WEB-023</a>  &mdash; <i>Membership Management</i> <span class="car">orderId</span><br><a href="#web-024">WEB-024</a>  &mdash; <i>Devices, Wishlist &amp; Consent</i></div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formStorePaymentToken &middot; <i>Add a card</i> &middot; <b>Save card</b> &middot; Cancel</div><div class="ov"><b>modal</b> formTransferWalletBalance &middot; <i>Transfer wallet balance</i> &middot; <b>Transfer wallet balance</b> &middot; Cancel <span class="dis">discards amount · toSubjectId · toWalletId · message</span></div></div>
@@ -907,7 +907,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
 
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; transferOrderTickets · listMyOrders · createResaleListing</div>
+          <div><b>OPERATIONS</b> &middot; listOwnResaleListings · transferOrderTickets · listMyOrders · createResaleListing</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; subjectId&larr;session, orderId&larr;deepLink, transferId&larr;deepLink</div>
           <div><b>GOES TO</b> &middot; <a href="#web-001">WEB-001</a> <br><a href="#web-031">WEB-031</a>  &mdash; <i>My Reservations</i><br><a href="#web-035">WEB-035</a> </div>
@@ -926,7 +926,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
 
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listGroupPackages · getGroupPackageDefinition · requestGroupBooking · listReservations +6</div>
+          <div><b>OPERATIONS</b> &middot; listOwnGroupBookings · listGroupPackages · getGroupPackageDefinition · requestGroupBooking +7</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; subjectId&larr;session, reservationId&larr;deepLink, groupBookingId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#web-001">WEB-001</a> <br><a href="#web-030">WEB-030</a>  &mdash; <i>Ticket Transfer</i> <span class="car">orderId</span><br><a href="#web-035">WEB-035</a> </div>
@@ -1195,7 +1195,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           <div><b>OPERATIONS</b> &middot; getTenantAppStatus · getMyProfile · listMyEntitlements · searchCatalogue +5</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline · introVideo</span></div>
           <div><b>ARRIVES WITH</b> &middot; subjectId&larr;session</div>
-          <div><b>GOES TO</b> &middot; entry point · <a href="#gst-002">GST-002</a>  &mdash; <i>Explore Categories</i><br><a href="#gst-003">GST-003</a>  &mdash; <i>Event &amp; Attraction Listing</i> <span class="car">eventId</span><br><a href="#gst-004">GST-004</a>  &mdash; <i>Attraction Details</i> <span class="car">productId</span><br><a href="#gst-005">GST-005</a>  &mdash; <i>What&#x27;s On</i> <span class="car">eventId</span><br><a href="#gst-006">GST-006</a>  &mdash; <i>Event / Exhibition Details</i> <span class="car">productId</span><br><a href="#gst-007">GST-007</a>  &mdash; <i>Select Date &amp; Time</i> <span class="car">eventId</span><br><a href="#gst-008">GST-008</a>  &mdash; <i>Tickets &amp; Add-ons</i> <span class="car">productId</span><br><a href="#gst-009">GST-009</a>  &mdash; <i>Review &amp; Payment</i> <span class="car">orderId</span><br><a href="#gst-010">GST-010</a>  &mdash; <i>Booking Confirmation</i> <span class="car">orderId</span><br><a href="#gst-011">GST-011</a>  &mdash; <i>Wallet Overview</i><br><a href="#gst-012">GST-012</a>  &mdash; <i>My Tickets</i> <span class="car">entitlementId · orderId</span><br><a href="#gst-013">GST-013</a>  &mdash; <i>Ticket Details</i> <span class="car">entitlementId · orderId</span><br><a href="#gst-014">GST-014</a>  &mdash; <i>Ticket Transfer</i> <span class="car">orderId</span><br><a href="#gst-015">GST-015</a>  &mdash; <i>Memberships</i><br><a href="#gst-016">GST-016</a>  &mdash; <i>My Reservations</i><br><a href="#gst-017">GST-017</a>  &mdash; <i>Reservation Details</i><br><a href="#gst-018">GST-018</a>  &mdash; <i>Add to Calendar / Reminders</i> <span class="car">orderId</span><br><a href="#gst-019">GST-019</a>  &mdash; <i>Order History</i> <span class="car">orderId</span><br><a href="#gst-020">GST-020</a>  &mdash; <i>Saved Items / Wishlist</i><br><a href="#gst-021">GST-021</a>  &mdash; <i>Interactive Map</i><br><a href="#gst-022">GST-022</a>  &mdash; <i>Attraction Wait Times</i><br><a href="#gst-023">GST-023</a>  &mdash; <i>Virtual Queue</i><br><a href="#gst-024">GST-024</a>  &mdash; <i>F&amp;B – Browse &amp; Order</i> <span class="car">orderId</span><br><a href="#gst-025">GST-025</a>  &mdash; <i>F&amp;B – Order Tracking</i> <span class="car">orderId</span><br><a href="#gst-026">GST-026</a>  &mdash; <i>Retail / Merchandise</i><br><a href="#gst-027">GST-027</a>  &mdash; <i>Parking – Reserve &amp; Pay</i> <span class="car">entitlementId</span><br><a href="#gst-028">GST-028</a>  &mdash; <i>Parking – Reservation Confirmed</i> <span class="car">orderId</span><br><a href="#gst-029">GST-029</a>  &mdash; <i>Venue Info &amp; Services</i><br><a href="#gst-030">GST-030</a>  &mdash; <i>In-Venue Notifications</i><br><a href="#gst-031">GST-031</a>  &mdash; <i>AI Concierge – Home</i><br><a href="#gst-032">GST-032</a>  &mdash; <i>AI Concierge – Chat</i> <span class="car">orderId</span><br><a href="#gst-033">GST-033</a>  &mdash; <i>AI Concierge – Contextual Help</i><br><a href="#gst-034">GST-034</a>  &mdash; <i>Lost &amp; Found</i><br><a href="#gst-035">GST-035</a>  &mdash; <i>Feedback &amp; Ratings</i><br><a href="#gst-036">GST-036</a>  &mdash; <i>Loyalty &amp; Rewards</i><br><a href="#gst-037">GST-037</a>  &mdash; <i>Offers &amp; Promotions</i><br><a href="#gst-038">GST-038</a>  &mdash; <i>Digital Companion Mode</i><br><a href="#gst-039">GST-039</a>  &mdash; <i>Profile</i><br><a href="#gst-040">GST-040</a>  &mdash; <i>Help &amp; Support</i><br><a href="#gst-041">GST-041</a>  &mdash; <i>Checkout Entry</i> <span class="car">productId</span><br><a href="#gst-042">GST-042</a>  &mdash; <i>Simple Registration &amp; OTP</i> <span class="car">subjectId</span><br><a href="#gst-043">GST-043</a>  &mdash; <i>Arabic / RTL Experience</i><br><a href="#gst-044">GST-044</a>  &mdash; <i>Multi-Currency &amp; Pricing</i><br><a href="#gst-045">GST-045</a>  &mdash; <i>Ticket Delivery &amp; Sharing</i> <span class="car">orderId</span><br><a href="#gst-047">GST-047</a>  &mdash; <i>Maintenance / Upgrade Page</i><br><a href="#gst-048">GST-048</a>  &mdash; <i>Upsell / Cross-Sell</i><br><a href="#gst-049">GST-049</a>  &mdash; <i>Interactive Seat Selection</i> <span class="car">eventId</span><br><a href="#gst-050">GST-050</a>  &mdash; <i>Resource Booking – Cabana</i><br><a href="#gst-051">GST-051</a>  &mdash; <i>Plan Your Adventure – Start</i><br><a href="#gst-052">GST-052</a>  &mdash; <i>Suggested Itineraries</i><br><a href="#gst-053">GST-053</a>  &mdash; <i>Build Your Own Itinerary</i><br><a href="#gst-054">GST-054</a>  &mdash; <i>AI Optimized Itinerary</i><br><a href="#gst-055">GST-055</a>  &mdash; <i>Dynamic QR Ticket</i> <span class="car">entitlementId · orderId</span><br><a href="#gst-056">GST-056</a>  &mdash; <i>Bundle Package</i><br><a href="#gst-057">GST-057</a>  &mdash; <i>Accessibility Information</i><br><a href="#gst-058">GST-058</a>  &mdash; <i>Resource Availability (Cabana)</i><br><a href="#gst-059">GST-059</a>  &mdash; <i>Plan My Day – In Progress</i><br><a href="#gst-061">GST-061</a>  &mdash; <i>Menu Item Detail</i><br><a href="#gst-062">GST-062</a>  &mdash; <i>Shop &amp; Drop Collection</i><br><a href="#gst-063">GST-063</a>  &mdash; <i>Search</i><br><a href="#gst-068">GST-068</a>  &mdash; <i>Help &amp; My Cases</i><br><a href="#gst-070">GST-070</a>  &mdash; <i>Reserve a Table</i><br><a href="#gst-076">GST-076</a>  &mdash; <i>Book a trip (a transport venue)</i></div>
+          <div><b>GOES TO</b> &middot; entry point · <a href="#gst-002">GST-002</a>  &mdash; <i>Explore Categories</i><br><a href="#gst-003">GST-003</a>  &mdash; <i>Event &amp; Attraction Listing</i> <span class="car">eventId</span><br><a href="#gst-004">GST-004</a>  &mdash; <i>Attraction Details</i> <span class="car">productId</span><br><a href="#gst-005">GST-005</a>  &mdash; <i>What&#x27;s On</i> <span class="car">eventId</span><br><a href="#gst-006">GST-006</a>  &mdash; <i>Event / Exhibition Details</i> <span class="car">productId</span><br><a href="#gst-007">GST-007</a>  &mdash; <i>Select Date &amp; Time</i> <span class="car">eventId</span><br><a href="#gst-008">GST-008</a>  &mdash; <i>Tickets &amp; Add-ons</i> <span class="car">productId</span><br><a href="#gst-009">GST-009</a>  &mdash; <i>Review &amp; Payment</i> <span class="car">orderId</span><br><a href="#gst-010">GST-010</a>  &mdash; <i>Booking Confirmation</i> <span class="car">orderId</span><br><a href="#gst-011">GST-011</a>  &mdash; <i>Wallet Overview</i><br><a href="#gst-012">GST-012</a>  &mdash; <i>My Tickets</i> <span class="car">entitlementId · orderId</span><br><a href="#gst-013">GST-013</a>  &mdash; <i>Ticket Details</i> <span class="car">entitlementId · orderId</span><br><a href="#gst-014">GST-014</a>  &mdash; <i>Ticket Transfer</i> <span class="car">orderId</span><br><a href="#gst-015">GST-015</a>  &mdash; <i>Memberships</i><br><a href="#gst-016">GST-016</a>  &mdash; <i>My Reservations</i><br><a href="#gst-017">GST-017</a>  &mdash; <i>Reservation Details</i><br><a href="#gst-018">GST-018</a>  &mdash; <i>Add to Calendar / Reminders</i> <span class="car">orderId</span><br><a href="#gst-019">GST-019</a>  &mdash; <i>Order History</i> <span class="car">orderId</span><br><a href="#gst-020">GST-020</a>  &mdash; <i>Saved Items / Wishlist</i><br><a href="#gst-021">GST-021</a>  &mdash; <i>Interactive Map</i><br><a href="#gst-022">GST-022</a>  &mdash; <i>Attraction Wait Times</i><br><a href="#gst-023">GST-023</a>  &mdash; <i>Virtual Queue</i><br><a href="#gst-024">GST-024</a>  &mdash; <i>F&amp;B – Browse &amp; Order</i> <span class="car">orderId</span><br><a href="#gst-025">GST-025</a>  &mdash; <i>F&amp;B – Order Tracking</i> <span class="car">orderId</span><br><a href="#gst-026">GST-026</a>  &mdash; <i>Retail / Merchandise</i><br><a href="#gst-027">GST-027</a>  &mdash; <i>Parking – Reserve &amp; Pay</i> <span class="car">entitlementId</span><br><a href="#gst-028">GST-028</a>  &mdash; <i>Parking – Reservation Confirmed</i> <span class="car">orderId</span><br><a href="#gst-029">GST-029</a>  &mdash; <i>Venue Info &amp; Services</i><br><a href="#gst-030">GST-030</a>  &mdash; <i>In-Venue Notifications</i><br><a href="#gst-031">GST-031</a>  &mdash; <i>AI Concierge – Home</i><br><a href="#gst-032">GST-032</a>  &mdash; <i>AI Concierge – Chat</i> <span class="car">orderId</span><br><a href="#gst-033">GST-033</a>  &mdash; <i>AI Concierge – Contextual Help</i><br><a href="#gst-034">GST-034</a>  &mdash; <i>Lost &amp; Found</i><br><a href="#gst-035">GST-035</a>  &mdash; <i>Feedback &amp; Ratings</i><br><a href="#gst-036">GST-036</a>  &mdash; <i>Loyalty &amp; Rewards</i><br><a href="#gst-037">GST-037</a>  &mdash; <i>Offers &amp; Promotions</i><br><a href="#gst-038">GST-038</a>  &mdash; <i>Digital Companion Mode</i><br><a href="#gst-039">GST-039</a>  &mdash; <i>Profile</i><br><a href="#gst-040">GST-040</a>  &mdash; <i>Help &amp; Support</i><br><a href="#gst-041">GST-041</a>  &mdash; <i>Checkout Entry</i> <span class="car">productId</span><br><a href="#gst-042">GST-042</a>  &mdash; <i>Simple Registration &amp; OTP</i> <span class="car">subjectId</span><br><a href="#gst-043">GST-043</a>  &mdash; <i>Arabic / RTL Experience</i><br><a href="#gst-044">GST-044</a>  &mdash; <i>Multi-Currency &amp; Pricing</i><br><a href="#gst-045">GST-045</a>  &mdash; <i>Ticket Delivery &amp; Sharing</i> <span class="car">orderId</span><br><a href="#gst-047">GST-047</a>  &mdash; <i>Maintenance / Upgrade Page</i><br><a href="#gst-048">GST-048</a>  &mdash; <i>Upsell / Cross-Sell</i> <span class="car">productId</span><br><a href="#gst-049">GST-049</a>  &mdash; <i>Interactive Seat Selection</i> <span class="car">eventId</span><br><a href="#gst-050">GST-050</a>  &mdash; <i>Resource Booking – Cabana</i><br><a href="#gst-051">GST-051</a>  &mdash; <i>Plan Your Adventure – Start</i><br><a href="#gst-052">GST-052</a>  &mdash; <i>Suggested Itineraries</i><br><a href="#gst-053">GST-053</a>  &mdash; <i>Build Your Own Itinerary</i><br><a href="#gst-054">GST-054</a>  &mdash; <i>AI Optimized Itinerary</i><br><a href="#gst-055">GST-055</a>  &mdash; <i>Dynamic QR Ticket</i> <span class="car">entitlementId · orderId</span><br><a href="#gst-056">GST-056</a>  &mdash; <i>Bundle Package</i><br><a href="#gst-057">GST-057</a>  &mdash; <i>Accessibility Information</i><br><a href="#gst-058">GST-058</a>  &mdash; <i>Resource Availability (Cabana)</i><br><a href="#gst-059">GST-059</a>  &mdash; <i>Plan My Day – In Progress</i><br><a href="#gst-061">GST-061</a>  &mdash; <i>Menu Item Detail</i><br><a href="#gst-062">GST-062</a>  &mdash; <i>Shop &amp; Drop Collection</i><br><a href="#gst-063">GST-063</a>  &mdash; <i>Search</i><br><a href="#gst-068">GST-068</a>  &mdash; <i>Help &amp; My Cases</i><br><a href="#gst-070">GST-070</a>  &mdash; <i>Reserve a Table</i><br><a href="#gst-076">GST-076</a>  &mdash; <i>Book a trip (a transport venue)</i></div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>modal</b> introVideo &middot; <i>App start, when `BrandIdentity.introVideoMode` is `firstLaunch` (first open on this device) or `everyLaunch`; never when it is `off` (the default)</i> &middot; Skip introduction <span class="dis">discards the rest of the video</span></div></div>
         </div>
@@ -1233,7 +1233,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           <div><b>OPERATIONS</b> &middot; listProducts · getWaitTimes · listPerformances · searchCatalogue +1</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; eventId&larr;deepLink, venueId&larr;session</div>
-          <div><b>GOES TO</b> &middot; <a href="#gst-001">GST-001</a>  &mdash; <i>Home – Default</i><br><a href="#gst-002">GST-002</a> <br><a href="#gst-004">GST-004</a>  &mdash; <i>Attraction Details</i> <span class="car">bundleId · eventId · productId</span><br><a href="#gst-007">GST-007</a>  &mdash; <i>Book (a dated product: date, then time, then</i> <span class="car">productId</span><br><a href="#gst-008">GST-008</a>  &mdash; <i>Book (an undated product, or a product-first</i> <span class="car">productId</span><br><a href="#gst-074">GST-074</a>  &mdash; <i>Book (a spot on the venue map, where the flo</i> <span class="car">productId</span><br><a href="#gst-075">GST-075</a>  &mdash; <i>Book (a space by the hour)</i> <span class="car">productId</span><br><a href="#gst-056">GST-056</a>  &mdash; <i>Book a bundle (e.g. meal combo with admissio</i></div>
+          <div><b>GOES TO</b> &middot; <a href="#gst-001">GST-001</a>  &mdash; <i>Home – Default</i><br><a href="#gst-002">GST-002</a> <br><a href="#gst-004">GST-004</a>  &mdash; <i>Attraction Details</i> <span class="car">bundleId · eventId · productId</span><br><a href="#gst-007">GST-007</a>  &mdash; <i>Book (a dated product: date, then time, then</i> <span class="car">productId</span><br><a href="#gst-008">GST-008</a>  &mdash; <i>Book (an undated product, or a product-first</i> <span class="car">productId</span><br><a href="#gst-074">GST-074</a>  &mdash; <i>Book (a spot on the venue map, where the flo</i> <span class="car">productId</span><br><a href="#gst-075">GST-075</a>  &mdash; <i>Book (a space by the hour)</i> <span class="car">productId</span><br><a href="#gst-056">GST-056</a>  &mdash; <i>Book a bundle (e.g. meal combo with admissio</i> <span class="car">bundleId</span></div>
           
           
         </div>
@@ -1268,7 +1268,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
 
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listPerformances · listProducts</div>
+          <div><b>OPERATIONS</b> &middot; listEvents · listPerformances · listProducts</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; eventId&larr;deepLink</div>
           <div><b>GOES TO</b> &middot; <a href="#gst-001">GST-001</a>  &mdash; <i>Home – Default</i><br><a href="#gst-002">GST-002</a> <br><a href="#gst-003">GST-003</a>  &mdash; <i>Event &amp; Attraction Listing</i> <span class="car">eventId</span><br><a href="#gst-006">GST-006</a>  &mdash; <i>Item Detail – Event / Exhibition</i> <span class="car">performanceId</span></div>
@@ -1344,7 +1344,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
 
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listProductVariants · listProductCategories · listProducts · getPublishedGuidedChoice +2</div>
+          <div><b>OPERATIONS</b> &middot; listProductVariants · listProductCategories · listProducts · getPublishedGuidedChoice +3</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoAccess · offline · emptyNoResults</span></div>
           <div><b>ARRIVES WITH</b> &middot; productId&larr;GST-004, performanceId&larr;GST-007, cartId&larr;session</div>
           <div><b>GOES TO</b> &middot; <a href="#gst-001">GST-001</a>  &mdash; <i>Home – Default</i><br><a href="#gst-007">GST-007</a>  &mdash; <i>Change date or time</i> <span class="car">eventId</span><br><a href="#gst-041">GST-041</a>  &mdash; <i>Continue to the basket</i> <span class="car">cartId</span><br><a href="#gst-042">GST-042</a>  &mdash; <i>Continue — sign in or use a guest code (when</i> <span class="car">cartId</span><br><a href="#gst-072">GST-072</a>  &mdash; <i>Booking for a group or a party</i> <span class="car">productId · token</span></div>
@@ -1488,9 +1488,9 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
 
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; addCartLine · decideRecommendations · recordRecommendationEvents · getCart</div>
+          <div><b>OPERATIONS</b> &middot; addCartLine · decideRecommendations · recordRecommendationEvents · getCart +1</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoAccess · offline</span></div>
-          <div><b>ARRIVES WITH</b> &middot; cartId&larr;session</div>
+          <div><b>ARRIVES WITH</b> &middot; cartId&larr;session, productId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#gst-001">GST-001</a>  &mdash; <i>Home – Default</i><br><a href="#gst-002">GST-002</a> </div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formAddCartLine &middot; <i>Add cart line</i> &middot; <b>Add cart line</b> &middot; Cancel <span class="dis">discards variantId · quantity · performanceId · seatIds · parentLineId · attributes</span></div></div>
@@ -1507,7 +1507,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
 
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getSeatAvailability · createSeatHold · recommendSeats · listPerformances +1</div>
+          <div><b>OPERATIONS</b> &middot; getSeatAvailability · createSeatHold · recommendSeats · listPerformances +2</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; performanceId&larr;deepLink, eventId&larr;GST-007, holdId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#gst-001">GST-001</a>  &mdash; <i>Home – Default</i><br><a href="#gst-002">GST-002</a> <br><a href="#gst-008">GST-008</a>  &mdash; <i>Continue to add-ons</i> <span class="car">performanceId</span><br><a href="#gst-041">GST-041</a>  &mdash; <i>Go to basket</i> <span class="car">holdId · performanceId</span></div>
@@ -1651,7 +1651,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
 
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; addCartLine · listProducts · getAvailability</div>
+          <div><b>OPERATIONS</b> &middot; addCartLine · listProducts · getAvailability · createCart</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; cartId&larr;session</div>
           <div><b>GOES TO</b> &middot; <a href="#gst-001">GST-001</a>  &mdash; <i>Home – Default</i><br><a href="#gst-002">GST-002</a> <br><a href="#gst-016">GST-016</a>  &mdash; <i>They see it in their reservations</i></div>
@@ -1795,7 +1795,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
 
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getBundle · addCartLine</div>
+          <div><b>OPERATIONS</b> &middot; getGuestBundle · addCartLine</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; bundleId&larr;deepLink, cartId&larr;session</div>
           <div><b>GOES TO</b> &middot; <a href="#gst-001">GST-001</a>  &mdash; <i>Home – Default</i><br><a href="#gst-002">GST-002</a> <br><a href="#gst-041">GST-041</a>  &mdash; <i>Add the meal combo (admission included) to t</i> <span class="car">cartId</span></div>
@@ -2246,7 +2246,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
 
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listProducts · listProductVariants · listProductStartTimes · addCartLine</div>
+          <div><b>OPERATIONS</b> &middot; listProducts · listProductVariants · listProductStartTimes · addCartLine +1</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; productId&larr;GST-004, cartId&larr;session</div>
           <div><b>GOES TO</b> &middot; <a href="#gst-004">GST-004</a>  &mdash; <i>Back to the product</i> <span class="car">productId</span><br><a href="#gst-041">GST-041</a>  &mdash; <i>Add to basket</i> <span class="car">cartId</span></div>
@@ -2440,7 +2440,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
         <div>
           <div class="hdr"><span class="code">GST-011</span>
             <span class="ttl">Wallet Overview</span><span class="pill off">offline</span><span class="drawnb" title="A designer drew this frame">drawn</span></div>
-          <div class="pur">My wallet: balance, activity and auto top-up, and what is due or refundable at exit.</div>
+          <div class="pur">My wallet: balance, activity and auto top-up.</div>
         </div>
         <div class="frame drawn">
           <section id="gst-011" class="v4f v4f-gst-011" data-skin="park" data-screen="GST-011"><style>.v4f-gst-011{--br:#6a3fd4;--bg:#f6f4fb;--sf:#ffffff;--ink:#171425;--ink2:#4b4661;--ink3:#6b6684;--ln:#e6e1f5;--ln2:#f1eefb;--deep:#1d1733;--rk:1;--fh:'Archivo',system-ui,sans-serif;--fb:'IBM Plex Sans',system-ui,sans-serif;--shd:0 14px 34px rgba(58,28,130,.12);display:block;padding:24px;background:#e9e6f3;font-family:var(--fb);-webkit-font-smoothing:antialiased;color:var(--ink);box-sizing:border-box;text-align:start}
@@ -2574,7 +2574,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
         <div class="foot">
           <div><b>OPERATIONS</b> &middot; getWallet · listWalletTransactions · getWalletAutoReloadSetting · setWalletAutoReloadSetting +2</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
-          <div><b>ARRIVES WITH</b> &middot; subjectId&larr;session, cardCode&larr;deepLink, walletId&larr;navigation</div>
+          <div><b>ARRIVES WITH</b> &middot; subjectId&larr;session, cardCode&larr;deepLink, cardKind&larr;deepLink</div>
           <div><b>GOES TO</b> &middot; <a href="#gst-001">GST-001</a>  &mdash; <i>Home – Default</i><br><a href="#gst-002">GST-002</a> <br><a href="#gst-020">GST-020</a>  &mdash; <i>Saved items carry across sessions</i></div>
           
           
@@ -3569,9 +3569,9 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
 
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; createRefundRequest · createResaleListing · getOrder</div>
+          <div><b>OPERATIONS</b> &middot; listOwnRefundRequests · listOwnResaleListings · getGuestRefundPolicy · createRefundRequest +2</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
-          <div><b>ARRIVES WITH</b> &middot; subjectId&larr;session, orderId&larr;navigation</div>
+          <div><b>ARRIVES WITH</b> &middot; subjectId&larr;session, orderId&larr;navigation, venueId&larr;session</div>
           <div><b>GOES TO</b> &middot; <a href="#gst-039">GST-039</a>  &mdash; <i>Profile</i></div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formCreateRefundRequest &middot; <i>Create refund request</i> &middot; <b>Create refund request</b> &middot; Cancel <span class="dis">discards orderId · reason · lineIds</span></div><div class="ov"><b>modal</b> formCreateResaleListing &middot; <i>Create resale listing</i> &middot; <b>Create resale listing</b> &middot; Cancel <span class="dis">discards entitlementId · askPrice · sellerSubjectId</span></div></div>
@@ -3607,7 +3607,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
 
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listPaymentTokens · storePaymentToken · transferWalletBalance · redeemLoyaltyPoints +4</div>
+          <div><b>OPERATIONS</b> &middot; listPaymentTokens · storePaymentToken · transferWalletBalance · redeemLoyaltyPoints +6</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; subjectId&larr;session, walletId&larr;deepLink, cardCode&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#gst-039">GST-039</a>  &mdash; <i>Profile</i></div>
@@ -4419,10 +4419,10 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
 
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listProducts · generateVisitPlan · getTenantAppStatus</div>
+          <div><b>OPERATIONS</b> &middot; listProducts · generateVisitPlan · getTenantAppStatus · getVisitPlannerOptions</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · preferenceNotAtVenue · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; venueId&larr;session</div>
-          <div><b>GOES TO</b> &middot; entry point · <a href="#gst-053">GST-053</a>  &mdash; <i>Make my plan</i> <span class="car">planId</span><br><a href="#gst-052">GST-052</a>  &mdash; <i>Take a ready-made plan</i><br><a href="#gst-001">GST-001</a>  &mdash; <i>Home tab</i></div>
+          <div><b>GOES TO</b> &middot; entry point · <a href="#gst-053">GST-053</a>  &mdash; <i>Make my plan</i> <span class="car">planId</span><br><a href="#gst-052">GST-052</a>  &mdash; <i>Take a ready-made plan</i> <span class="car">party · dates</span><br><a href="#gst-001">GST-001</a>  &mdash; <i>Home tab</i></div>
           
           
         </div>
@@ -4563,9 +4563,9 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
 
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listProducts · listCatalogueBundles · generateVisitPlan</div>
+          <div><b>OPERATIONS</b> &middot; getVisitPlannerOptions · generateVisitPlan</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
-          <div><b>ARRIVES WITH</b> &middot; venueId&larr;session</div>
+          <div><b>ARRIVES WITH</b> &middot; venueId&larr;session, party&larr;GST-051, dates&larr;GST-051</div>
           <div><b>GOES TO</b> &middot; <a href="#gst-053">GST-053</a>  &mdash; <i>Use this plan</i> <span class="car">planId</span><br><a href="#gst-051">GST-051</a>  &mdash; <i>Make my own</i><br><a href="#gst-001">GST-001</a>  &mdash; <i>Home tab</i></div>
           
           
@@ -4745,7 +4745,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
 
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getWaitTimes · getVisitPlan · updateVisitPlan · listVisitPlanAlternatives</div>
+          <div><b>OPERATIONS</b> &middot; getWaitTimes · getVisitPlan · updateVisitPlan · listVisitPlanAlternatives +1</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; planId&larr;GST-053, venueId&larr;session, itemId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#gst-053">GST-053</a>  &mdash; <i>See the whole plan</i> <span class="car">planId</span><br><a href="#gst-038">GST-038</a>  &mdash; <i>Directions (At the Venue, Map)</i><br><a href="#gst-001">GST-001</a>  &mdash; <i>Home tab</i></div>
@@ -4764,7 +4764,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
 
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listAiConversations · listMyCases · raiseMyCase · replyToMyCase</div>
+          <div><b>OPERATIONS</b> &middot; listAiConversations · listMyCases · raiseMyCase · replyToMyCase +1</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; subjectId&larr;session, caseId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#gst-039">GST-039</a>  &mdash; <i>Profile</i></div>
@@ -4802,7 +4802,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
 
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listPromotions · getPromotion · getCouponCode</div>
+          <div><b>OPERATIONS</b> &middot; listPromotions · getPromotion · getGuestCouponCode</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; promotionId&larr;deepLink, code&larr;deepLink</div>
           <div><b>GOES TO</b> &middot; <a href="#gst-001">GST-001</a>  &mdash; <i>Home – Default</i><br><a href="#gst-002">GST-002</a> <br><a href="#gst-011">GST-011</a>  &mdash; <i>Their wallet shows stored value</i></div>

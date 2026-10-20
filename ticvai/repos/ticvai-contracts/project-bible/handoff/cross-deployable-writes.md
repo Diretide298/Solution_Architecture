@@ -14,9 +14,9 @@
 
 | | writes |
 |---|---:|
-| Cross-deployable writes in the lineage (59 operations) | 68 |
-| by event | 29 |
-| by the owner's operation | 39 |
+| Cross-deployable writes in the lineage (63 operations) | 72 |
+| by event | 28 |
+| by the owner's operation | 44 |
 | on the exception list | 0 |
 
 ## The kernel tables every deployable is granted directly
@@ -27,6 +27,7 @@
 | `platform.scope` | SELECT | Every host resolves the caller's scope and its row-level security reads it (ADR-0005). Read only: a write to platform.scope from another deployable is not exempt. |
 | `platform.audit_record` | INSERT | Every operation that audits itself appends its audit row in its own transaction (CHG-R6-002). |
 | `platform.idempotency_record` | SELECT, INSERT, UPDATE | Every host claims, completes and replays an Idempotency-Key in the transaction of the write it guards. |
+| `platform.outbox_sequence` | SELECT, INSERT, UPDATE | Every host allocates the next sequence of the aggregate it changes, in the transaction that writes the outbox row (INSERT ... ON CONFLICT DO UPDATE ... RETURNING), so a sequence survives the outbox's monthly partitions leaving (ADAM CR-166, 18 October 2026; CHG-CRA-005; ADR-0057 and ADR-0058 as amended). DB-ROLES grants it to commerce, access, operations and workers. |
 
 Every other table in another deployable's schema is reached by one of the routes below.
 
@@ -49,12 +50,16 @@ Sorted by the owning deployable, then the table.
 | `suspendEntitlement` | commerce / CatalogueService | `access.entitlement` | access / AccessService | event `entitlement.statusChanged` |
 | `transferOrderTickets` | commerce / OrderService | `access.entitlement` | access / AccessService | event `entitlement.transferred` |
 | `voidEntitlement` | commerce / OrderService | `access.entitlement` | access / AccessService | event `entitlement.voided` |
+| `setPublishReviewPolicy` | operations / WhiteLabelService | `approvals.matrix` | commerce / TenancyService | operation `setApprovalMatrix` |
 | `actOnPartnerApplicationReview` | operations / PlatformService | `approvals.request` | commerce / TenancyService | operation `createApprovalRequest` |
 | `approveBookingLimitCommercial` | operations / PlatformService | `approvals.request` | commerce / TenancyService | operation `createApprovalRequest` |
 | `approveMembershipProductValidation` | operations / PlatformService | `approvals.request` | commerce / TenancyService | operation `createApprovalRequest` |
 | `approvePartnerStatuLifecycle` | operations / PlatformService | `approvals.request` | commerce / TenancyService | operation `createApprovalRequest` |
 | `createPartnerAgreement` | operations / PlatformService | `approvals.request` | commerce / TenancyService | operation `createApprovalRequest` |
 | `createPartnerChangeRequest` | operations / PlatformService | `approvals.request` | commerce / TenancyService | operation `createApprovalRequest` |
+| `publishContentBlock` | operations / WhiteLabelService | `approvals.request` | commerce / TenancyService | operation `createApprovalRequest` |
+| `publishTenantConfig` | operations / WhiteLabelService | `approvals.request` | commerce / TenancyService | operation `createApprovalRequest` |
+| `reactivateTenant` | operations / PlatformService | `approvals.request` | commerce / TenancyService | operation `createApprovalRequest` |
 | `registerPartner` | operations / PlatformService | `approvals.request` | commerce / TenancyService | operation `createApprovalRequest` |
 | `setAgreementContractTerm` | operations / PlatformService | `approvals.request` | commerce / TenancyService | operation `createApprovalRequest` |
 | `setPartnerAllocations` | operations / PlatformService | `approvals.request` | commerce / TenancyService | operation `createApprovalRequest` |
@@ -62,6 +67,7 @@ Sorted by the owning deployable, then the table.
 | `setPartnerCreditProfile` | operations / PlatformService | `approvals.request` | commerce / TenancyService | operation `createApprovalRequest` |
 | `setPartnerRateNet` | operations / PlatformService | `approvals.request` | commerce / TenancyService | operation `createApprovalRequest` |
 | `setPaymentTermBilling` | operations / PlatformService | `approvals.request` | commerce / TenancyService | operation `createApprovalRequest` |
+| `suspendTenant` | operations / PlatformService | `approvals.request` | commerce / TenancyService | operation `createApprovalRequest` |
 | `bookVisitPlan` | operations / VenueOpsService | `catalogue.inventory_reservation` | commerce / CatalogueService | operation `acquireInventoryHold` |
 | `bulkUpdateProducts` | operations / InventoryService | `catalogue.price` | commerce / CatalogueService | operation `bulkUpdateCatalogueProducts` |
 | `bulkUpdateProducts` | operations / InventoryService | `catalogue.product` | commerce / CatalogueService | operation `bulkUpdateCatalogueProducts` |
@@ -93,7 +99,6 @@ Sorted by the owning deployable, then the table.
 | `loadGameCredits` | commerce / WalletService | `games.card` | operations / VenueOpsService | event `wallet.credited` |
 | `checkoutCart` | commerce / OrderService | `marketing.consent_record` | operations / MarketingService | event `order.created` |
 | `enrolFacePass` | access / AccessService | `marketing.consent_record` | operations / MarketingService | event `biometric.enrolmentChanged` |
-| `storePaymentToken` | commerce / OrderService | `marketing.consent_record` | operations / MarketingService | event `paymentToken.stored` |
 | `broadcastToGuests` | commerce / TenancyService | `marketing.message_dispatch` | operations / MarketingService | operation `sendTransactionalMessage` |
 | `createPaymentLink` | commerce / OrderService | `marketing.message_dispatch` | operations / MarketingService | operation `sendTransactionalMessage` |
 | `resendPaymentLink` | commerce / OrderService | `marketing.message_dispatch` | operations / MarketingService | operation `sendTransactionalMessage` |

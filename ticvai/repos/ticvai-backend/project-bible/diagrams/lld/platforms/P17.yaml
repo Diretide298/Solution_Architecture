@@ -24,7 +24,7 @@ modulesUsed:
   screens: 24
 servicesCalled:
 - service: PlatformService
-  operationCalls: 23
+  operationCalls: 21
 - service: IdentityService
   operationCalls: 2
 - service: OrderService
@@ -440,8 +440,7 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations:
-  - setSubscription
+  operations: []
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -552,8 +551,7 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations:
-  - setSubscription
+  operations: []
   states:
   - emptyFirstRun
   - emptyNoAccess

@@ -1,0 +1,25 @@
+# tenant.terminated v1 — published by subscription
+# Added 20 October 2026 (r8 cause FOUNDATION-AI-C43): AI removes a terminated tenant's vectors.
+
+name: tenant.terminated
+version: 1
+publisher: subscription
+description: A terminated tenant's retention window has ended and its data is being removed.
+aggregate: tenant
+emittedWhen: 'The workers job that ends terminateTenant''s retention window writes it to control.outbox, in the
+  transaction that marks the tenant terminated for good; terminateTenant itself only starts the window, so it is
+  not an emitter'
+payload:
+- field: tenantId
+  type: uuid
+- field: terminatedAt
+  type: timestamp
+consumers:
+- context: ai
+  purpose: Delete the tenant's Qdrant collections and alias, revoke its token and mark ai.vector_store deleted
+  writes:
+  - ai.vector_store
+  idempotencyKey: tenantId
+  onFailure: retryThenDeadLetter
+  isCritical: true
+retention: 30 days after publication

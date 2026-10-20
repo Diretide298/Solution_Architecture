@@ -110,7 +110,13 @@
   "offlineCapable": null,
   "conflictPolicy": null,
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "walletTypeId",
+    "in": "query",
+    "required": false
+   }
+  ],
   "requestBody": null,
   "responds": "WalletFundingRules"
  },

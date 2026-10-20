@@ -89,6 +89,28 @@
     "type": "string",
     "format": "date-time"
    },
+   "cancelledByPrincipalId": {
+    "x-ticvai-references": "identity.principal",
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**Who cancelled the pending change** (ADAM CR-171, option B, 19 October 2026; CHG-CRA-010), set by `cancelGateModeChange` from the caller. `changedByPrincipalId`, `changedAt` and `reason` stay the scheduler's."
+   },
+   "cancelledAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "When `cancelGateModeChange` cancelled it (CR-171)."
+   },
+   "cancelReason": {
+    "type": "string",
+    "maxLength": 200,
+    "nullable": true,
+    "readOnly": true,
+    "description": "The `reason` sent to `cancelGateModeChange` (CR-171), kept apart from the scheduler's `reason`."
+   },
    "scopePath": {
     "type": "string",
     "description": "ltree of the owning scope node (ADR-0005)",
@@ -122,6 +144,13 @@
    "venueId": {
     "type": "string",
     "format": "uuid"
+   },
+   "accessAreaId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "x-ticvai-references": "access.access_area",
+    "description": "**The zone this access point admits to** (R8 blocker FOUNDATION-AI-C12, CHG-R8MIG-004): an `access.access_area` row whose `entityType` is `zone` (named for the table it keys, as every key is). `getOfflinePackage` and `validateAccess` filter accreditation credentials and dynamic policies by it (their `zoneIds` / `allowedZoneIds` must contain it, compared as text); null means the point is venue-wide and no zone filter applies."
    },
    "scopePath": {
     "type": "string"

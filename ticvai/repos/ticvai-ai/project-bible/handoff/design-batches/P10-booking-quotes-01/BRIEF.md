@@ -118,9 +118,9 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `PTR-008` | Booking Creation | C | 105 | 39 | 6 | 66 | 0 | 6 | — | notStarted (generated) |
+| `PTR-008` | Booking Creation | C | 114 | 39 | 6 | 66 | 0 | 6 | — | notStarted (generated) |
 | `PTR-009` | Group / Bulk Booking | C | 11 | 12 | 6 | 14 | 2 | 6 | — | notStarted (generated) |
-| `PTR-010` | Cart & Quote | C | 46 | 29 | 6 | 30 | 0 | 6 | — | notStarted (generated) |
+| `PTR-010` | Cart & Quote | C | 54 | 29 | 6 | 30 | 0 | 6 | — | notStarted (generated) |
 | `PTR-011` | Quote Management | B–D | 9 | 26 | 6 | 17 | 0 | 0 | — | notStarted (generated) |
 
 ## Design inputs from the client meetings

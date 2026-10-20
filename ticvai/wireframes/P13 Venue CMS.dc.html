@@ -193,7 +193,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>ARRIVES WITH</b> &middot; uploadId&larr;deepLink</div>
           <div><b>GOES TO</b> &middot; <a href="#cms-001">CMS-001</a>  &mdash; <i>Tenant Workspace</i><br><a href="#cms-003">CMS-003</a>  &mdash; <i>Typography</i><br><a href="#cms-004">CMS-004</a>  &mdash; <i>Logo &amp; Assets</i> <span class="car">uploadId</span><br><a href="#cms-005">CMS-005</a>  &mdash; <i>Sets the colour theme</i></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetBrandIdentity &middot; <i>Save brand identity</i> &middot; <b>Save brand identity</b> &middot; Cancel <span class="dis">discards logoAssetRef · logoDarkAssetRef · logoVariant · faviconAssetRef · splashImageAssetRefs · splashDurationSeconds · splashBackgroundColour · showLoadingIndicator</span></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetBrandIdentity &middot; <i>Save brand identity</i> &middot; <b>Save brand identity</b> &middot; Cancel <span class="dis">discards logoAssetRef · logoDarkAssetRef · logoVariant · faviconAssetRef</span></div></div>
         </div>
       </div>
       <div id="cms-003" class="scr">
@@ -253,7 +253,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>ARRIVES WITH</b> &middot; uploadId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#cms-001">CMS-001</a>  &mdash; <i>Tenant Workspace</i><br><a href="#cms-002">CMS-002</a>  &mdash; <i>Brand Kit</i> <span class="car">uploadId</span><br><a href="#cms-003">CMS-003</a>  &mdash; <i>Typography</i></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetAppIcons &middot; <i>Save app icons</i> &middot; <b>Save app icons</b> &middot; Cancel <span class="dis">discards sourceAssetRef</span></div><div class="ov"><b>modal</b> formSetBrandIdentity &middot; <i>Save brand identity</i> &middot; <b>Save brand identity</b> &middot; Cancel <span class="dis">discards logoAssetRef · logoDarkAssetRef · logoVariant · faviconAssetRef · splashImageAssetRefs · splashDurationSeconds · splashBackgroundColour · showLoadingIndicator · introVideoAssetRef · introVideoMode</span></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetAppIcons &middot; <i>Save app icons</i> &middot; <b>Save app icons</b> &middot; Cancel <span class="dis">discards sourceAssetRef</span></div><div class="ov"><b>modal</b> formSetBrandIdentity &middot; <i>Save brand identity</i> &middot; <b>Save brand identity</b> &middot; Cancel <span class="dis">discards splashImageAssetRefs · splashDurationSeconds · splashBackgroundColour · showLoadingIndicator · introVideoAssetRef · introVideoMode</span></div></div>
         </div>
       </div>
       <div id="cms-005" class="scr">
@@ -338,7 +338,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listContentPages · createContentPage · updateContentPage · getHomepageLayout +11</div>
+          <div><b>OPERATIONS</b> &middot; listContentPages · createContentPage · updateContentPage · getHomepageLayout +12</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; pageId&larr;navigation, actionId&larr;navigation, blockId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#cms-001">CMS-001</a>  &mdash; <i>Tenant Workspace</i><br><a href="#cms-002">CMS-002</a>  &mdash; <i>Brand Kit</i><br><a href="#cms-003">CMS-003</a>  &mdash; <i>Typography</i><br><a href="#cms-012">CMS-012</a>  &mdash; <i>Previews in both directions</i></div>
@@ -728,7 +728,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listGuidedChoices · createGuidedChoice · updateGuidedChoice · deleteGuidedChoice +8</div>
+          <div><b>OPERATIONS</b> &middot; listGuidedChoices · createGuidedChoice · updateGuidedChoice · deleteGuidedChoice +9</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; venueId&larr;session, guidedChoiceId&larr;navigation, suggestionId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#cms-016">CMS-016</a>  &mdash; <i>Back to Site Settings</i><br><a href="#cms-102">CMS-102</a>  &mdash; <i>Back to the Site Builder</i></div>
@@ -788,9 +788,9 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listBookingFlows · listBookingFlowTypes · getBookingFlow · getPublishedBookingFlow +10</div>
+          <div><b>OPERATIONS</b> &middot; listBookingFlows · listBookingFlowTypes · getBookingFlow · getPublishedBookingFlow +11</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          <div><b>ARRIVES WITH</b> &middot; venueId&larr;session, bookingFlowId&larr;CMS-102, productId&larr;navigation</div>
+          <div><b>ARRIVES WITH</b> &middot; venueId&larr;session, bookingFlowId&larr;CMS-102, version&larr;CMS-015</div>
           <div><b>GOES TO</b> &middot; <a href="#cms-102">CMS-102</a>  &mdash; <i>Back to the Site Builder</i><br><a href="#cms-016">CMS-016</a>  &mdash; <i>Venue-wide booking settings</i><br><a href="#cms-101">CMS-101</a>  &mdash; <i>Help me choose</i><br><a href="#cms-014">CMS-014</a>  &mdash; <i>Publish with the site</i> <span class="car">version</span></div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formCreateBookingFlowDefinition &middot; <i>Add a flow</i> &middot; <b>Add flow</b> &middot; Cancel <span class="dis">discards flowTypeKey · name · isDefaultForType · steps · settings</span></div><div class="ov"><b>confirmDialog</b> confirmDeleteBookingFlow &middot; <i>Remove flow</i> &middot; <b>Remove</b> &middot; Keep it</div><div class="ov"><b>confirmDialog</b> confirmPublishSite &middot; <i>Publish site</i> &middot; <b>Publish</b> &middot; Cancel</div></div>

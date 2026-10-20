@@ -236,6 +236,11 @@
     "name": null,
     "in": null,
     "required": null
+   },
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": false
    }
   ],
   "requestBody": null,
@@ -323,6 +328,11 @@
     "name": null,
     "in": null,
     "required": null
+   },
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": false
    }
   ],
   "requestBody": null,

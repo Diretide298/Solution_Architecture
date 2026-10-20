@@ -14,8 +14,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - platform.device
   writes:
+  - cache:idempotency
   - platform.device
   - tenancy.device_audit
 - operation: configureWorkstation
@@ -30,6 +32,9 @@ operations:
   - cache:idempotency
   - orders.pos_shift
   - platform.device
+  - platform.outlet
+  - platform.region_settings
+  - platform.sale_board
   - platform.workstation
   writes:
   - cache:idempotency
@@ -77,6 +82,7 @@ operations:
   - cache:idempotency
   - platform.outlet
   - platform.outlet_opening_hour
+  - platform.region_settings
   writes:
   - cache:idempotency
   - platform.outlet
@@ -148,7 +154,7 @@ operations:
   verb: GET
   path: /connectivity-policy
   scope: venue
-  permission: TENANT_CONFIGURE
+  permission: TENANT_VIEW
   audience:
   - staff
   offline: false
@@ -204,12 +210,13 @@ operations:
   verb: GET
   path: /offline-policy
   scope: venue
-  permission: TENANT_CONFIGURE
+  permission: TENANT_VIEW
   audience:
   - staff
   offline: false
   reads:
   - platform.offline_policy
+  - platform.scope
   writes: []
 - operation: getOrgUnit
   verb: GET
@@ -259,6 +266,7 @@ operations:
   offline: true
   reads:
   - cache:resolution
+  - platform.scope
   - platform.venue_settings
   writes: []
 - operation: getVenueSettingsDefaults
@@ -287,7 +295,7 @@ operations:
 - operation: getWorkstationHealth
   verb: GET
   path: /workstations/{workstationId}/health
-  scope: tenant
+  scope: venue
   permission: DEVICE_VIEW
   audience:
   - staff
@@ -305,14 +313,16 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - tenancy.device_credential
   writes:
+  - cache:idempotency
   - tenancy.device_credential
 - operation: listAuditRecords
   verb: GET
   path: /audit-records
   scope: venue
-  permission: AI_AUDIT_VIEW
+  permission: AUDIT_VIEW
   audience:
   - staff
   offline: false
@@ -332,7 +342,7 @@ operations:
   - staff
   offline: false
   reads:
-  - platform.cell_endpoint
+  - control.cell_endpoint
   writes: []
 - operation: listConfigurationProfiles
   verb: GET
@@ -365,6 +375,7 @@ operations:
   - staff
   offline: false
   reads:
+  - platform.device
   - tenancy.device_audit
   writes: []
 - operation: listDeviceFirmware
@@ -471,8 +482,11 @@ operations:
   - device
   offline: false
   reads:
+  - cache:idempotency
   - platform.device
+  - tenancy.device_credential
   writes:
+  - cache:idempotency
   - platform.device
   - platform.outbox
 - operation: recordDeviceTamperEvent
@@ -482,11 +496,14 @@ operations:
   permission: DEVICE_VIEW
   audience:
   - staff
+  - device
   offline: true
   reads:
+  - cache:idempotency
   - platform.device
   - tenancy.device_tamper_event
   writes:
+  - cache:idempotency
   - platform.outbox
   - tenancy.device_tamper_event
 - operation: registerDevice
@@ -512,8 +529,10 @@ operations:
   - service
   offline: false
   reads:
+  - cache:idempotency
   - platform.dead_letter
   writes:
+  - cache:idempotency
   - platform.dead_letter
   - platform.outbox
 - operation: resolveTenantHost
@@ -610,8 +629,11 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
+  - platform.device
   - tenancy.device_assignment
   writes:
+  - cache:idempotency
   - tenancy.device_assignment
 - operation: setDeviceFirmwareStatus
   verb: POST
@@ -673,9 +695,11 @@ operations:
   - service
   offline: false
   reads:
+  - cache:idempotency
   - control.tenant
   - control.tenant_domain
   writes:
+  - cache:idempotency
   - control.tenant_domain
   - platform.outbox
 - operation: setVenueSettings
@@ -703,8 +727,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - platform.venue_settings
   writes:
+  - cache:idempotency
   - platform.venue_settings
 - operation: startDeviceFirmwareRollout
   verb: POST
@@ -749,6 +775,7 @@ operations:
   - cache:idempotency
   - platform.outlet
   - platform.outlet_opening_hour
+  - platform.region_settings
   writes:
   - cache:idempotency
   - platform.outlet

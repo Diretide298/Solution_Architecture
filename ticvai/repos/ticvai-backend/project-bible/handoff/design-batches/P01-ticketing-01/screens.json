@@ -101,6 +101,14 @@
   },
   "apis": [
    {
+    "operationId": "listOwnResaleListings",
+    "contract": "orders",
+    "purpose": "The guest's own resale listings and their status, shown on the rows of Your orders with tickets (the prototype's \"Listed for resale\" row), matched by order; no component of its own, since the approved screen draws none: the prototype's Transfer & resale row shows it (shownBy, r8 integration, CHG-R8INT-008). Read once when the screen opens and after Create resale listing.",
+    "trigger": "onLoad",
+    "shownBy": "Listed for resale · AED 180",
+    "provenance": "r8 walk, 20 October 2026 (ORDERS-MONEY-C26, CHG-R8SPN-012)"
+   },
+   {
     "operationId": "transferOrderTickets",
     "contract": "orders",
     "purpose": "Transfer tickets to another guest",
@@ -280,7 +288,7 @@
     }
    ]
   },
-  "notes": "Added 17 August for parity with GST-016. **Not on the wireframe board** — needs drawing. CF-93.\n\n**Rev 3 (decided 29 September).** **Table deposit (REV3-8b):** a dining deposit is a venue option, off unless the venue enables it in Venue Management (`DepositPolicy.dining`; amount and basis are the venue's), superseding audit R077 (a). A reservation holding a deposit shows its amount, when it stops being refundable (`refundableUntil`) and the late-cancel and no-show terms. Group booking on the web is this screen (`requestGroupBooking`; GAP-D3, already); school and party requests are unchanged (DG-4).\n\n**Two jobs, one id (GAP-D3, DI-1078; CHG-SGU-020).** This is My Reservations and the web's group-booking view. The group request form is a flow opened from here and from the booking listing, not a separate screen; the prototype labels that dialog WEB-031.",
+  "notes": "Added 17 August for parity with GST-016. **Not on the wireframe board** — needs drawing. CF-93.\n\n**Rev 3 (decided 29 September).** **Table deposit (REV3-8b):** a dining deposit is a venue option, off unless the venue enables it in Venue Management (`DepositPolicy.dining`; amount and basis are the venue's), superseding audit R077 (a). A reservation holding a deposit shows its amount, when it stops being refundable (`refundableUntil`) and the late-cancel and no-show terms. Group booking on the web is this screen (`requestGroupBooking`; GAP-D3, already); school and party requests are unchanged (DG-4).\n\n**Two jobs, one id (GAP-D3, DI-1078; CHG-SGU-020).** This is My Reservations and the web's group-booking view. The group request form is a flow opened from here and from the booking listing, not a separate screen; the prototype labels that dialog WEB-031.\n\nBuild note (r8 second round, ORDERS-MONEY-C08, the lead 20 October 2026, option A): **Pay now on a held reservation opens the payment of WEB-014 with the reservation's id** (the payment component exists there); the edge WEB-031 to WEB-014 is not drawn on this client-approved screen yet, so it waits for the client to confirm that Pay now belongs in r8 (pending entry ORDERS-MONEY-C08). Until then the row shows no Pay now. **The resource availability panel** reads `listProductStartTimes` (the reserved product's start times on a picked date), not `getResourceAvailability`: a guest never names a resource, so `resourceId` on entry pre-selects nothing.",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listReservations` reads the population and `getReservation` reads one of them — list, select, act",
@@ -402,7 +410,8 @@
         "ResourceAvailability.freeWindows",
         "ResourceAvailability.blockedWindows"
        ],
-       "operation": "getResourceAvailability",
+       "operation": "listProductStartTimes",
+       "notes": "Build note (r8 second round, ORDERS-MONEY-C08, option A): drawn as approved, filled from `listProductStartTimes` for the reserved line's product and variant on the picked date: the free windows are its start times (`startsAt` to `endsAt`, with `freeCount`); no resource is named, so the resource column stays empty, and nothing is blocked that the guest needs to see.",
        "provenance": "contract resources.yaml GET /resources/{resourceId}/availability"
       },
       {
@@ -511,6 +520,14 @@
   },
   "apis": [
    {
+    "operationId": "listOwnGroupBookings",
+    "contract": "orders",
+    "purpose": "The school trips and parties this guest asked for, provisional ones included: they are rows of Your reservations beside the reservations (the prototype's \"School group, 32 pupils · invoice due\" row), and a picked one opens The group booking (`getGroupBooking`). No component of its own, since the approved screen draws none: the prototype's Reservations row shows it (shownBy, r8 integration, CHG-R8INT-008).",
+    "trigger": "onLoad",
+    "shownBy": "Summit Peaks · School group, 32 pupils",
+    "provenance": "r8 walk, 20 October 2026 (ORDERS-MONEY-C26, CHG-R8SPN-012)"
+   },
+   {
     "operationId": "listGroupPackages",
     "contract": "catalogue",
     "purpose": "School-trip formats and party packages",
@@ -556,10 +573,11 @@
     "trigger": "onAction"
    },
    {
-    "operationId": "getResourceAvailability",
+    "operationId": "listProductStartTimes",
     "contract": "resources",
-    "purpose": "What is free and when",
-    "trigger": "onAction"
+    "purpose": "What is free and when, for Check another date (r8, ORDERS-MONEY-C08, the lead's option A): the start times the reserved product (its line's `productId` and `variantId`) can be booked at on the date the guest picks. A guest never names a resource, so `getResourceAvailability` is not called here.",
+    "trigger": "onAction",
+    "provenance": "r8 second round, ORDERS-MONEY-C08 (ticket 28228)"
    },
    {
     "operationId": "updateTableReservation",

@@ -1,0 +1,223 @@
+group	ticket	plan_key	status	type	assignee	subject	links
+started	27686	TEST-AM-FOUNDATION-DATABASE	On hold	Task	Pranay Shinde	[Test] Module test: Foundation · Database migrations	table:identity.delegated_access, table:platform.device
+started	30794	SVC-TENANCY-WORKSTATION-1#configureWorkstation	In progress	Sub Task	Pranay Shinde	[BE] configureWorkstation: PUT /workstations/{workstationId}	table:platform.device
+finished	27657	MIG-IDENTITY	Ready for QA	Task	Hrushikant Patkar	[DB] Migration V0009__identity.sql: identity (18 tables)	table:identity.delegated_access
+finished	27665	MIG-PLATFORM	Ready for QA	Task	Hrushikant Patkar	[DB] Migration V0017__platform.sql: platform (17 tables)	table:platform.device
+finished	27683	MIG-FOREIGN-KEYS	Ready for QA	Task	Hrushikant Patkar	[DB] Migration V0034__cross_schema_foreign_keys.sql (35 keys)	table:identity.delegated_access
+finished	27991	MIG-CONTROL-6	Ready for QA	Task	Hrushikant Patkar	[DB] Forward migration V1004__control.sql: control for Platform Operations · TICVAI Consol	table:control.outbox_republish
+finished	30196	MIG-IDENTITY#identity.delegated_access	Ready for QA	Sub Task	Hrushikant Patkar	[DB] identity.delegated_access	table:identity.delegated_access
+finished	30329	MIG-PLATFORM#platform.device	Ready for QA	Sub Task	Hrushikant Patkar	[DB] platform.device	table:platform.device
+new	27645	AM-FOUNDATION-DATABASE	New	Feature	Hrushikant Patkar	Foundation · Database migrations	table:identity.delegated_access, table:platform.device
+new	27666	SETUP-AUTH	New	Task	Pranay Shinde	[DevOps] Sign-in working end to end against IdentityService	table:identity.delegated_access
+new	27684	SETUP-SEED	New	Task	Pranay Shinde	[DevOps] Seed data: the reference fixture (two brands, three regions, AED and OMR) every t	raised the CR
+new	27685	TEST-AM-FOUNDATION-SETUP	New	Task	Deep Khanvilkar	[Test] Module test: Foundation · Setup and environments	table:identity.delegated_access
+new	27687	AM-FOUNDATION-PLATFORM	New	Feature	Pranay Shinde	Foundation · Platform kernel	operation:platform-ops#getOutboxRepublish, operation:platform-ops#listOutboxRepublishes, operation:platform-ops#republishOutbox
+new	27700	PLATFORM-REPUBLISH	New	Task	Hrushikant Patkar	[BE] Republish from the outbox by tenant and time range	operation:platform-ops#getOutboxRepublish, operation:platform-ops#listOutboxRepublishes, operation:platform-ops#republishOutbox, table:control.outbox_republish
+new	27703	TEST-AM-FOUNDATION-PLATFORM	New	Task	Chinmay Patkar	[Test] Module test: Foundation · Platform kernel	operation:platform-ops#getOutboxRepublish, operation:platform-ops#listOutboxRepublishes, operation:platform-ops#republishOutbox, table:control.outbox_republish
+new	27732	SVC-IDENTITY-IDENTITY-2	New	Task	Hrushikant Patkar	[BE] IdentityService: grantDelegation, listDelegations, login, refreshToken	operation:identity#grantDelegation, operation:identity#listDelegations, table:identity.delegated_access
+new	27749	SVC-IDENTITY-IDENTITY-3	New	Task	Hrushikant Patkar	[BE] IdentityService: selectRole, setGuestVerificationPolicy, setPasswordPolicy, setSegreg	table:identity.delegated_access
+new	27750	SVC-IDENTITY-IDENTITY-1	New	Task	Deep Khanvilkar	[BE] IdentityService: changeOwnCredential, exportSubjectData, forceLogout, getCurrentSessi	table:identity.delegated_access
+new	27757	SVC-IDENTITY-SSO-1	New	Task	Deep Khanvilkar	[BE] IdentityService: completeSsoAuthorization, listSsoProviders, startSsoAuthorization	table:identity.delegated_access
+new	27759	TEST-AM-IDENTITY-SECURITY-P06-BLOCK-A	New	Task	Pallavi Sawant	[Test] Module test: Identity & Security · Staff App (Block A)	table:identity.delegated_access
+new	27764	SVC-IDENTITY-ADMINISTRATION-1	New	Task	Deep Khanvilkar	[BE] IdentityService: createRole, listOwnPlatformStaffGrants, listPrincipals, listRoles	table:identity.delegated_access
+new	27768	TEST-AM-IDENTITY-SECURITY-P04	New	Task	Chinmay Patkar	[Test] Module test: Identity & Security · POS	table:identity.delegated_access
+new	27770	TEST-AM-IDENTITY-SECURITY-P13	New	Task	Pranay Shinde	[Test] Module test: Identity & Security · CMS 1 of 2	table:identity.delegated_access
+new	27787	AM-TENANCY-VENUES-P04	New	Feature	Pranay Shinde	Tenancy & Venues · POS	operation:tenancy#listDevices
+new	27789	SVC-TENANCY-WORKSTATION-1	New	Task	Pranay Shinde	[BE] TenancyService: configureWorkstation, createOutlet, createSaleBoard, getOutlet	table:platform.device
+new	27790	SVC-TENANCY-WORKSTATION-2	New	Task	Sanket Keluskar	[BE] TenancyService: listDevices, listSaleBoards, updateOutlet, updateSaleBoard	operation:tenancy#listDevices, table:platform.device
+new	27793	APP-POS-POS-016	New	Task	Pradnya Yeram	[FE] POS-016 Till Configuration	operation:tenancy#listDevices
+new	27794	TEST-AM-TENANCY-VENUES-P04	New	Task	Deep Khanvilkar	[Test] Module test: Tenancy & Venues · POS	operation:tenancy#listDevices, table:platform.device
+new	27802	SVC-TENANCY-DEVICES-3	New	Task	Pranay Shinde	[BE] TenancyService: listDeviceAuditRecords, listDeviceTamperEvents, recordDeviceTamperEve	table:platform.device
+new	27803	SVC-TENANCY-WORKSTATION-3	New	Task	Deep Khanvilkar	[BE] TenancyService: recordDeviceHeartbeat	table:platform.device
+new	27812	SVC-TENANCY-APPROVALS-1	New	Task	Deep Khanvilkar	[BE] TenancyService: approveMatrixMultiLevel, approveRoleAuthorityDelegation	table:identity.delegated_access
+new	27813	SVC-TENANCY-REQUEST-1	New	Task	Pranay Shinde	[BE] TenancyService: createApprovalRequest, decideApprovalRequest, evaluateApprovalRequire	table:identity.delegated_access
+new	27864	SVC-ORDER-ORDERS-5	New	Task	Pranay Shinde	[BE] OrderService: setPaymentProvider, shareEntitlement, storePaymentToken, updateTicketTe	table:identity.delegated_access
+new	27932	SVC-TENANCY-DELEGATION-1	New	Task	Chinmay Patkar	[BE] TenancyService: createApprovalDelegation	table:identity.delegated_access
+new	27941	SVC-TENANCY-TENANCY-1	New	Task	Deep Khanvilkar	[BE] TenancyService: getWorkstationHealth, setVenueSettings, setVenueSettingsDefaults	table:platform.device
+new	27945	TEST-AM-SETUP-PLATFORM-FOUNDATION-P08	New	Task	Narayan Gaonkar	[Test] Module test: Platform Foundation · Venue Management (setup)	table:identity.delegated_access
+new	27949	VM-IDENTITY-ADMINISTRATION-1	New	Task	Hrushikant Patkar	[BE] IdentityService: createPrincipal, getPrincipal, listPlatformStaffGrants, resetPrincip	table:identity.delegated_access
+new	28230	AM-ORDERS-RESERVATIONS-P02	New	Feature	Narayan Gaonkar	Orders & Reservations · Guest App	operation:identity#grantDelegation, operation:identity#listDelegations
+new	28285	SVC-ORDER-ORDERS-14	New	Task	Surendra Loke	[BE] OrderService: revokeEntitlementShare	table:identity.delegated_access
+new	28286	VM-IDENTITY-ADMINISTRATION-2	New	Task	Chinmay Patkar	[BE] IdentityService: suggestRoleAssignment	table:identity.delegated_access
+new	28287	SVC-IDENTITY-ADMINISTRATION-10	New	Task	Deep Khanvilkar	[BE] IdentityService: resolvePermissions	table:identity.delegated_access
+new	28288	SVC-IDENTITY-ADMINISTRATION-9	New	Task	Surendra Loke	[BE] IdentityService: listAccessReviewCampaigns, listAccessReviewItems, listCapabilityTemp	table:identity.delegated_access
+new	28298	APP-MOB-GST-015	New	Task	Chitrangi Mestry	[FE] GST-015 Memberships	operation:identity#grantDelegation, operation:identity#listDelegations
+new	28300	AM-PAYMENTS-API-BLOCK-A	New	Feature	Hrushikant Patkar	Payments · API only (Block A)	operation:payments#setPaymentRules, table:payments.currency_rule, table:payments.eligibility_rule, table:payments.fee_rule, table:payments.method_config
+new	28301	MIG-PAYMENTS-10	New	Task	Hrushikant Patkar	[DB] Forward migration V1182__payments.sql: payments for Payments · API only (Block A) (1 	table:payments.method_config
+new	28302	MIG-PAYMENTS-7	New	Task	Hrushikant Patkar	[DB] Forward migration V1030__payments.sql: payments for Payments · Venue Management 1 of 	table:payments.currency_rule, table:payments.eligibility_rule, table:payments.fee_rule
+new	28304	SVC-ORDER-PAYMENTS-17	New	Task	Deep Khanvilkar	[BE] OrderService: listPaymentMethods, listPaymentProviderConnections, setPaymentRules, si	operation:payments#setPaymentRules, table:payments.currency_rule, table:payments.eligibility_rule, table:payments.fee_rule, table:payments.method_config
+new	28307	TEST-AM-PAYMENTS-API-BLOCK-A	New	Task	Narayan Gaonkar	[Test] Module test: Payments · API only (Block A)	operation:payments#setPaymentRules, table:payments.currency_rule, table:payments.eligibility_rule, table:payments.fee_rule, table:payments.method_config
+new	28328	SVC-ACCESS-ACCESS-2	New	Task	Narayan Gaonkar	[BE] AccessService: enrolFaceTag, getEntitlement, getEntitlementCredential, getEntitlement	table:identity.delegated_access
+new	28330	AM-ADMISSION-ACCESS-P02	New	Feature	Chinmay Patkar	Admission & Access · Guest App	operation:identity#listDelegations
+new	28332	SVC-ACCESS-ACCESS-3	New	Task	Pranay Shinde	[BE] AccessService: getFacePassEnrolment, listEntitlements, listMyEntitlements, listParkin	table:identity.delegated_access
+new	28334	TEST-AM-WHITE-LABEL-P01	New	Task	Narayan Gaonkar	[Test] Module test: White Label · Guest Web	table:identity.delegated_access
+new	28349	TEST-AM-ADMISSION-ACCESS-P01	New	Task	Deep Khanvilkar	[Test] Module test: Admission & Access · Guest Web	table:identity.delegated_access
+new	28355	APP-MOB-GST-069	New	Task	Chinmay Patkar	[FE] GST-069 Face Pass	operation:identity#listDelegations
+new	28385	TEST-AM-SUBSCRIPTION-LICENSING-P09	New	Task	Sanket Keluskar	[Test] Module test: Subscription & Licensing · TICVAI Console 1 of 6	table:control.outbox_republish, table:control.release
+new	28416	SVC-TENANCY-ROTA-1	New	Task	Pranay Shinde	[BE] TenancyService: createRotaAssignment, listRotaAssignments, updateRotaAssignment	table:identity.delegated_access
+new	28446	TEST-AM-SETUP-VENUE-OPERATIONS-P08	New	Task	Pallavi Sawant	[Test] Module test: Venue Operations · Venue Management (setup)	table:identity.delegated_access
+new	28526	AM-FOOD-BEVERAGE-P04	New	Feature	Pradnya Yeram	Food & Beverage · POS	operation:tenancy#listDevices
+new	28547	TEST-AM-SETUP-PLATFORM-FOUNDATION-P08-REST	New	Task	Deep Khanvilkar	[Test] Module test: Platform Foundation · Venue Management (setup, the rest of the screens	table:identity.delegated_access
+new	28592	VM-TENANCY-WORKSTATION-1	New	Task	Pranay Shinde	[BE] TenancyService: getWorkstation, listOutlets, listWorkstations, registerDevice	operation:tenancy#registerDevice, table:platform.device
+new	28630	VM-MIG-RENTAL	New	Task	Hrushikant Patkar	[DB] Forward migration V1014__rental.sql: rental for Venue Management (2 tables)	table:rental.booking
+new	28641	VM-VENUEOPS-RENTAL-1	New	Task	Chinmay Patkar	[BE] VenueOpsService: getRentalBooking	table:rental.booking
+new	28643	TEST-AM-RESOURCES-CAPACITY-P08-BLOCK-A	New	Task	Pranay Shinde	[Test] Module test: Resources & Capacity · Venue Management (Block A)	table:rental.booking
+new	28753	APP-POS-POS-025	New	Task	Pradnya Yeram	[FE] POS-025 Till Home	operation:tenancy#listDevices
+new	28797	AM-MARKETING-CRM-P01	New	Feature	Chitrangi Mestry	Marketing & CRM · Guest Web	operation:identity#listDelegations
+new	28812	APP-WEB-WEB-024	New	Task	Chitrangi Mestry	[FE] WEB-024 Devices, Wishlist & Consent	operation:identity#listDelegations
+new	28911	SVC-MARKETING-MARKETING-21	New	Task	Sanket Keluskar	[BE] MarketingService: setCallDisposition, startKioskAssist	table:platform.device
+new	28916	TEST-AM-SETUP-CUSTOMER-MARKETING-P08-REST	New	Task	Chinmay Patkar	[Test] Module test: Customer & Marketing · Venue Management (setup, the rest of the screen	table:platform.device
+new	29046	SVC-IDENTITY-ADMINISTRATION-3	New	Task	Surendra Loke	[BE] IdentityService: createAccessReviewCampaign, createAuthorisationPolicy, createEmergen	table:identity.delegated_access
+new	29049	SVC-IDENTITY-ADMINISTRATION-7	New	Task	Deep Khanvilkar	[BE] IdentityService: setPrincipalModuleAccess, simulateAuthorisationPolicy, updateAuthori	table:identity.delegated_access
+new	29093	AM-IDENTITY-SECURITY-P10	New	Feature	Pradnya Yeram	Identity & Security · Partner Portal	operation:identity#createDelegatedAccess, operation:identity#listDelegatedAccess
+new	29095	SVC-IDENTITY-ADMINISTRATION-8	New	Task	Sanket Keluskar	[BE] IdentityService: createDelegatedAccess, deleteDelegatedAccess, listDelegatedAccess	operation:identity#createDelegatedAccess, operation:identity#listDelegatedAccess, table:identity.delegated_access
+new	29096	SVC-IDENTITY-IDENTITY-7	New	Task	Sanket Keluskar	[BE] IdentityService: listModules, listSegregationRules, listSegregationViolations	table:identity.delegated_access
+new	29097	APP-PARTNER-PTR-020	New	Task	Pradnya Yeram	[FE] PTR-020 Sub-Agent Management	operation:identity#createDelegatedAccess, operation:identity#listDelegatedAccess
+new	29101	TEST-AM-IDENTITY-SECURITY-P10	New	Task	Chinmay Patkar	[Test] Module test: Identity & Security · Partner Portal	operation:identity#createDelegatedAccess, operation:identity#listDelegatedAccess, table:identity.delegated_access
+new	29102	AM-TENANCY-VENUES-P06	New	Feature	Chitrangi Mestry	Tenancy & Venues · Staff App	operation:tenancy#listDevices, operation:tenancy#registerDevice
+new	29103	APP-STAFF-EMP-043	New	Task	Chitrangi Mestry	[FE] EMP-043 Device settings	operation:tenancy#listDevices, operation:tenancy#registerDevice
+new	29105	AM-TENANCY-VENUES-P08	New	Feature	Sanket Keluskar	Tenancy & Venues · Venue Management 1 of 3	operation:tenancy#listDevices, operation:tenancy#registerDevice
+new	29108	VM-TENANCY-DEVICES-1	New	Task	Deep Khanvilkar	[BE] TenancyService: createDeviceFirmware, getDeviceFirmware, issueDeviceCredential, listD	table:platform.device
+new	29109	VM-TENANCY-DEVICES-2	New	Task	Pranay Shinde	[BE] TenancyService: revokeDeviceCredential, rollbackDeviceFirmware, setDeviceFirmwareStat	table:platform.device
+new	29113	VM-BO-124	New	Task	Surendra Loke	[FE] BO-124 Layout & Journey Builder	operation:tenancy#listDevices
+new	29119	VM-BO-036	New	Task	Sanket Keluskar	[FE] BO-036 Device Registry	operation:tenancy#listDevices, operation:tenancy#registerDevice
+new	29126	TEST-AM-TENANCY-VENUES-P08	New	Task	Chinmay Patkar	[Test] Module test: Tenancy & Venues · Venue Management 1 of 3	table:platform.device
+new	29147	SVC-TENANCY-DEVICES-4	New	Task	Sanket Keluskar	[BE] TenancyService: enrolDevice, getDeviceTelemetry	table:platform.device
+new	29157	TEST-AM-TENANCY-VENUES-P08-2	New	Task	Sanket Keluskar	[Test] Module test: Tenancy & Venues · Venue Management 2 of 3	table:platform.device
+new	29158	AM-TENANCY-VENUES-P08-3	New	Feature	Chitrangi Mestry	Tenancy & Venues · Venue Management 3 of 3	operation:tenancy#listDevices
+new	29171	VM-BO-732	New	Task	Pallavi Sawant	[FE] BO-732 POS & Device Assignment	operation:tenancy#listDevices
+new	29186	MIG-CONTROL-5	New	Task	Hrushikant Patkar	[DB] Forward migration V1085__control.sql: control for Platform Operations · Scanner (2 ta	raised the CR, table:control.release
+new	29197	AM-PLATFORM-OPERATIONS-P09	New	Feature	Sanket Keluskar	Platform Operations · TICVAI Console	operation:platform-ops#createRelease, operation:platform-ops#getOutboxRepublish, operation:platform-ops#getRelease, operation:platform-ops#listOutboxRepublishes, operation:platform-ops#listReleases, operation:platform-ops#republishOutbox
+new	29212	SVC-PLATFORM-PLATFORM-OPS-2	New	Task	Pranay Shinde	[BE] PlatformService: cancelOutboxRepublish, getOutboxRepublish, listDeadLetters, listOutb	operation:platform-ops#getOutboxRepublish, operation:platform-ops#listOutboxRepublishes, table:control.outbox_republish
+new	29213	SVC-PLATFORM-PLATFORM-OPS-3	New	Task	Sanket Keluskar	[BE] PlatformService: replayDeadLetter, republishOutbox	operation:platform-ops#republishOutbox, table:control.outbox_republish
+new	29214	APP-CONSOLE-ADM-318	New	Task	Pradnya Yeram	[FE] ADM-318 Dead Letters	operation:platform-ops#getOutboxRepublish, operation:platform-ops#listOutboxRepublishes, operation:platform-ops#republishOutbox
+new	29215	SVC-PLATFORM-RELEASE-1	New	Task	Surendra Loke	[BE] PlatformService: createRelease, getRelease, getReleaseReadiness, listReleases	operation:platform-ops#createRelease, operation:platform-ops#getRelease, operation:platform-ops#listReleases, table:control.release
+new	29216	SVC-PLATFORM-RELEASE-2	New	Task	Sanket Keluskar	[BE] PlatformService: promoteRelease, rejectRelease, withdrawRelease	table:control.release
+new	29217	APP-CONSOLE-ADM-022	New	Task	Chitrangi Mestry	[FE] ADM-022 Release & Version Management	operation:platform-ops#createRelease, operation:platform-ops#getRelease, operation:platform-ops#listReleases
+new	29218	APP-CONSOLE-ADM-023	New	Task	Pradnya Yeram	[FE] ADM-023 Staging Promotion & Approval	operation:platform-ops#getRelease, operation:platform-ops#listReleases
+new	29222	APP-CONSOLE-ADM-024	New	Task	Chinmay Patkar	[FE] ADM-024 Release Notification Composer	operation:platform-ops#listReleases
+new	29226	TEST-AM-PLATFORM-OPERATIONS-P09	New	Task	Chinmay Patkar	[Test] Module test: Platform Operations · TICVAI Console	operation:platform-ops#createRelease, operation:platform-ops#getOutboxRepublish, operation:platform-ops#getRelease, operation:platform-ops#listOutboxRepublishes, operation:platform-ops#listReleases, operation:platform-ops#republishOutbox, table:control.outbox_republish, table:control.release
+new	29855	TEST-AM-IDENTITY-SECURITY-P08	New	Task	Surendra Loke	[Test] Module test: Identity & Security · Venue Management	table:identity.delegated_access
+new	29970	AM-PRICING-PROMOTIONS-P08-2	New	Feature	Pranay Shinde	Pricing & Promotions · Venue Management 2 of 8	operation:promotions#listBundlePartnerProductMappings, operation:promotions#listPartnerExternalProduct, operation:promotions#setBundlePartnerProductMappings
+new	29971	MIG-PROMOTIONS-4	New	Task	Hrushikant Patkar	[DB] Forward migration V1131__promotions.sql: promotions for Pricing & Promotions · Venue 	table:promotions.partner_bundle_product
+new	29972	SVC-CATALOGUE-BUNDLE-4	New	Task	Hrushikant Patkar	[BE] CatalogueService: listBundlePartnerProductMappings, setBundlePartnerProductMappings	operation:promotions#listBundlePartnerProductMappings, operation:promotions#setBundlePartnerProductMappings, table:promotions.partner_bundle_product
+new	29979	SVC-CATALOGUE-DRAFTED-43	New	Task	Hrushikant Patkar	[BE] CatalogueService: listPartnerExternalProduct, listRedemption, listRedemptionCodeLooku	operation:promotions#listPartnerExternalProduct, table:promotions.partner_bundle_product
+new	30002	TEST-AM-PRICING-PROMOTIONS-P08-2	New	Task	Pranay Shinde	[Test] Module test: Pricing & Promotions · Venue Management 2 of 8	operation:promotions#listBundlePartnerProductMappings, operation:promotions#listPartnerExternalProduct, operation:promotions#setBundlePartnerProductMappings, table:promotions.partner_bundle_product
+new	30035	AM-PAYMENTS-P08	New	Feature	Surendra Loke	Payments · Venue Management 1 of 3	operation:payments#getPaymentRules, operation:payments#setPaymentRules
+new	30036	AM-PAYMENTS-P08-2	New	Feature	Hrushikant Patkar	Payments · Venue Management 2 of 3	operation:payments#getPaymentRules, operation:tenancy#listDevices
+new	30049	AM-ADMISSION-ACCESS-P08-3	New	Feature	Narayan Gaonkar	Admission & Access · Venue Management 3 of 8	operation:tenancy#registerDevice
+new	30065	AM-RENTALS-P06	New	Feature	Chitrangi Mestry	Rentals · Staff App 1 of 2	operation:rental#checkOutRental
+new	30070	AM-RENTALS-P08-3	New	Feature	Chinmay Patkar	Rentals · Venue Management 3 of 5	operation:rental#checkOutRental
+new	30071	AM-RENTALS-P08-4	New	Feature	Pallavi Sawant	Rentals · Venue Management 4 of 5	operation:rental#checkOutRental
+new	30092	AM-GAMES-RIDES-P08	New	Feature	Chinmay Patkar	Games & Rides · Venue Management 1 of 4	operation:tenancy#listDevices, operation:tenancy#registerDevice
+new	30135	AM-REPORTING-P16	New	Feature	Chitrangi Mestry	Reporting · Analytics 1 of 4	operation:tenancy#listDevices
+new	30672	SVC-IDENTITY-IDENTITY-2#grantDelegation	New	Sub Task	Hrushikant Patkar	[BE] grantDelegation: POST /guests/{subjectId}/delegations	operation:identity#grantDelegation, table:identity.delegated_access
+new	30673	SVC-IDENTITY-IDENTITY-2#listDelegations	New	Sub Task	Hrushikant Patkar	[BE] listDelegations: GET /guests/{subjectId}/delegations	operation:identity#listDelegations, table:identity.delegated_access
+new	30674	SVC-IDENTITY-IDENTITY-2#login	New	Sub Task	Hrushikant Patkar	[BE] login: POST /auth/login	table:identity.delegated_access
+new	30715	SVC-IDENTITY-IDENTITY-3#selectRole	New	Sub Task	Hrushikant Patkar	[BE] selectRole: POST /auth/select-role	table:identity.delegated_access
+new	30718	SVC-IDENTITY-IDENTITY-3#setSegregationRules	New	Sub Task	Hrushikant Patkar	[BE] setSegregationRules: PUT /segregation-rules	table:identity.delegated_access
+new	30721	SVC-IDENTITY-IDENTITY-1#forceLogout	New	Sub Task	Deep Khanvilkar	[BE] forceLogout: POST /auth/sessions/{sessionId}/force-logout	table:identity.delegated_access
+new	30722	SVC-IDENTITY-IDENTITY-1#getCurrentSession	New	Sub Task	Deep Khanvilkar	[BE] getCurrentSession: GET /auth/session	table:identity.delegated_access
+new	30729	SVC-IDENTITY-SSO-1#completeSsoAuthorization	New	Sub Task	Deep Khanvilkar	[BE] completeSsoAuthorization: POST /auth/sso/{providerId}/callback	table:identity.delegated_access
+new	30740	SVC-IDENTITY-ADMINISTRATION-1#listPrincipals	New	Sub Task	Deep Khanvilkar	[BE] listPrincipals: GET /principals	table:identity.delegated_access
+new	30741	SVC-IDENTITY-ADMINISTRATION-1#listRoles	New	Sub Task	Deep Khanvilkar	[BE] listRoles: GET /roles	table:identity.delegated_access
+new	30798	SVC-TENANCY-WORKSTATION-2#listDevices	New	Sub Task	Sanket Keluskar	[BE] listDevices: GET /devices	operation:tenancy#listDevices, table:platform.device
+new	30807	APP-POS-POS-016#build	New	Sub Task	Pradnya Yeram	[FE] POS-016 Till Configuration: build with all states	operation:tenancy#listDevices
+new	30808	APP-POS-POS-016#wire	New	Sub Task	Pradnya Yeram	[FE] POS-016 Till Configuration: connect to API	operation:tenancy#listDevices
+new	30809	APP-POS-POS-016#test	New	Sub Task	Pradnya Yeram	[FE] POS-016 Till Configuration: tests	operation:tenancy#listDevices
+new	30830	SVC-TENANCY-DEVICES-3#recordDeviceTamperEvent	New	Sub Task	Pranay Shinde	[BE] recordDeviceTamperEvent: POST /device-tamper-events	table:platform.device
+new	30831	SVC-TENANCY-WORKSTATION-3#recordDeviceHeartbeat	New	Sub Task	Deep Khanvilkar	[BE] recordDeviceHeartbeat: POST /devices/{deviceId}/heartbeat	table:platform.device
+new	30847	SVC-TENANCY-APPROVALS-1#approveRoleAuthorityDelegation	New	Sub Task	Deep Khanvilkar	[BE] approveRoleAuthorityDelegation: PUT /role-authority-delegation	table:identity.delegated_access
+new	30850	SVC-TENANCY-REQUEST-1#evaluateApprovalRequirement	New	Sub Task	Pranay Shinde	[BE] evaluateApprovalRequirement: POST /approval-requests/evaluate	table:identity.delegated_access
+new	30991	SVC-ORDER-ORDERS-5#shareEntitlement	New	Sub Task	Pranay Shinde	[BE] shareEntitlement: POST /entitlements/{entitlementId}/share	table:identity.delegated_access
+new	31182	SVC-TENANCY-DELEGATION-1#createApprovalDelegation	New	Sub Task	Chinmay Patkar	[BE] createApprovalDelegation: POST /delegations	table:identity.delegated_access
+new	31204	SVC-TENANCY-TENANCY-1#getWorkstationHealth	New	Sub Task	Deep Khanvilkar	[BE] getWorkstationHealth: GET /workstations/{workstationId}/health	table:platform.device
+new	31235	VM-IDENTITY-ADMINISTRATION-1#createPrincipal	New	Sub Task	Hrushikant Patkar	[BE] createPrincipal: POST /principals	table:identity.delegated_access
+new	31236	VM-IDENTITY-ADMINISTRATION-1#getPrincipal	New	Sub Task	Hrushikant Patkar	[BE] getPrincipal: GET /principals/{principalId}	table:identity.delegated_access
+new	31325	MIG-CONTROL-6#control.outbox_republish	New	Sub Task	Hrushikant Patkar	[DB] control.outbox_republish	table:control.outbox_republish
+new	32078	SVC-ORDER-ORDERS-14#revokeEntitlementShare	New	Sub Task	Surendra Loke	[BE] revokeEntitlementShare: POST /entitlements/{entitlementId}/share/{shareId}/revoke	table:identity.delegated_access
+new	32079	VM-IDENTITY-ADMINISTRATION-2#suggestRoleAssignment	New	Sub Task	Chinmay Patkar	[BE] suggestRoleAssignment: GET /role-suggestions	table:identity.delegated_access
+new	32080	SVC-IDENTITY-ADMINISTRATION-10#resolvePermissions	New	Sub Task	Deep Khanvilkar	[BE] resolvePermissions: POST /permissions/resolve	table:identity.delegated_access
+new	32084	SVC-IDENTITY-ADMINISTRATION-9#listPermissionFindings	New	Sub Task	Surendra Loke	[BE] listPermissionFindings: GET /permission-findings	table:identity.delegated_access
+new	32103	APP-MOB-GST-015#build	New	Sub Task	Chitrangi Mestry	[FE] GST-015 Memberships: build with all states	operation:identity#grantDelegation, operation:identity#listDelegations
+new	32104	APP-MOB-GST-015#wire	New	Sub Task	Chitrangi Mestry	[FE] GST-015 Memberships: connect to API	operation:identity#grantDelegation, operation:identity#listDelegations
+new	32105	APP-MOB-GST-015#test	New	Sub Task	Chitrangi Mestry	[FE] GST-015 Memberships: tests	operation:identity#grantDelegation, operation:identity#listDelegations
+new	32106	MIG-PAYMENTS-10#payments.method_config	New	Sub Task	Hrushikant Patkar	[DB] payments.method_config	table:payments.method_config
+new	32107	MIG-PAYMENTS-7#payments.currency_rule	New	Sub Task	Hrushikant Patkar	[DB] payments.currency_rule	table:payments.currency_rule
+new	32108	MIG-PAYMENTS-7#payments.eligibility_rule	New	Sub Task	Hrushikant Patkar	[DB] payments.eligibility_rule	table:payments.eligibility_rule
+new	32110	MIG-PAYMENTS-7#payments.fee_rule	New	Sub Task	Hrushikant Patkar	[DB] payments.fee_rule	table:payments.fee_rule
+new	32118	SVC-ORDER-PAYMENTS-17#setPaymentRules	New	Sub Task	Deep Khanvilkar	[BE] setPaymentRules: PUT /payments/rules	operation:payments#setPaymentRules, table:payments.currency_rule, table:payments.eligibility_rule, table:payments.fee_rule
+new	32119	SVC-ORDER-PAYMENTS-17#simulatePaymentConfiguration	New	Sub Task	Deep Khanvilkar	[BE] simulatePaymentConfiguration: POST /payment-configuration/simulate	table:payments.currency_rule, table:payments.eligibility_rule, table:payments.fee_rule, table:payments.method_config
+new	32160	SVC-ACCESS-ACCESS-2#getEntitlement	New	Sub Task	Narayan Gaonkar	[BE] getEntitlement: GET /entitlements/{entitlementId}	table:identity.delegated_access
+new	32170	SVC-ACCESS-ACCESS-3#listMyEntitlements	New	Sub Task	Pranay Shinde	[BE] listMyEntitlements: GET /guests/me/entitlements	table:identity.delegated_access
+new	32222	APP-MOB-GST-069#build	New	Sub Task	Chinmay Patkar	[FE] GST-069 Face Pass: build with all states	operation:identity#listDelegations
+new	32223	APP-MOB-GST-069#wire	New	Sub Task	Chinmay Patkar	[FE] GST-069 Face Pass: connect to API	operation:identity#listDelegations
+new	32224	APP-MOB-GST-069#test	New	Sub Task	Chinmay Patkar	[FE] GST-069 Face Pass: tests	operation:identity#listDelegations
+new	32338	SVC-TENANCY-ROTA-1#createRotaAssignment	New	Sub Task	Pranay Shinde	[BE] createRotaAssignment: POST /rota-assignments	table:identity.delegated_access
+new	32812	VM-TENANCY-WORKSTATION-1#getWorkstation	New	Sub Task	Pranay Shinde	[BE] getWorkstation: GET /workstations/{workstationId}	table:platform.device
+new	32814	VM-TENANCY-WORKSTATION-1#listWorkstations	New	Sub Task	Pranay Shinde	[BE] listWorkstations: GET /workstations	table:platform.device
+new	32815	VM-TENANCY-WORKSTATION-1#registerDevice	New	Sub Task	Pranay Shinde	[BE] registerDevice: POST /devices	operation:tenancy#registerDevice, table:platform.device
+new	32880	VM-MIG-RENTAL#rental.booking	New	Sub Task	Hrushikant Patkar	[DB] rental.booking	table:rental.booking
+new	32914	VM-VENUEOPS-RENTAL-1#getRentalBooking	New	Sub Task	Chinmay Patkar	[BE] getRentalBooking: GET /rental-bookings/{bookingId}	table:rental.booking
+new	33131	APP-POS-POS-025#build	New	Sub Task	Pradnya Yeram	[FE] POS-025 Till Home: build with all states	operation:tenancy#listDevices
+new	33132	APP-POS-POS-025#wire	New	Sub Task	Pradnya Yeram	[FE] POS-025 Till Home: connect to API	operation:tenancy#listDevices
+new	33133	APP-POS-POS-025#test	New	Sub Task	Pradnya Yeram	[FE] POS-025 Till Home: tests	operation:tenancy#listDevices
+new	33277	APP-WEB-WEB-024#build	New	Sub Task	Chitrangi Mestry	[FE] WEB-024 Devices, Wishlist & Consent: build with all states	operation:identity#listDelegations
+new	33278	APP-WEB-WEB-024#wire	New	Sub Task	Chitrangi Mestry	[FE] WEB-024 Devices, Wishlist & Consent: connect to API	operation:identity#listDelegations
+new	33279	APP-WEB-WEB-024#test	New	Sub Task	Chitrangi Mestry	[FE] WEB-024 Devices, Wishlist & Consent: tests	operation:identity#listDelegations
+new	33523	SVC-MARKETING-MARKETING-21#startKioskAssist	New	Sub Task	Sanket Keluskar	[BE] startKioskAssist: POST /kiosk-assists	table:platform.device
+new	33757	SVC-IDENTITY-ADMINISTRATION-3#createAccessReviewCampaign	New	Sub Task	Surendra Loke	[BE] createAccessReviewCampaign: POST /access-review-campaigns	table:identity.delegated_access
+new	33760	SVC-IDENTITY-ADMINISTRATION-3#decideAccessReviewItem	New	Sub Task	Surendra Loke	[BE] decideAccessReviewItem: POST /access-review-items/{itemId}/decision	table:identity.delegated_access
+new	33769	SVC-IDENTITY-ADMINISTRATION-7#setPrincipalModuleAccess	New	Sub Task	Deep Khanvilkar	[BE] setPrincipalModuleAccess: PUT /principals/{principalId}/module-access	table:identity.delegated_access
+new	33854	SVC-IDENTITY-ADMINISTRATION-8#createDelegatedAccess	New	Sub Task	Sanket Keluskar	[BE] createDelegatedAccess: POST /delegated-access	operation:identity#createDelegatedAccess, table:identity.delegated_access
+new	33855	SVC-IDENTITY-ADMINISTRATION-8#deleteDelegatedAccess	New	Sub Task	Sanket Keluskar	[BE] deleteDelegatedAccess: DELETE /delegated-access/{delegatedAccessId}	table:identity.delegated_access
+new	33856	SVC-IDENTITY-ADMINISTRATION-8#listDelegatedAccess	New	Sub Task	Sanket Keluskar	[BE] listDelegatedAccess: GET /delegated-access	operation:identity#listDelegatedAccess, table:identity.delegated_access
+new	33859	SVC-IDENTITY-IDENTITY-7#listSegregationViolations	New	Sub Task	Sanket Keluskar	[BE] listSegregationViolations: GET /segregation-violations	table:identity.delegated_access
+new	33860	APP-PARTNER-PTR-020#build	New	Sub Task	Pradnya Yeram	[FE] PTR-020 Sub-Agent Management: build with all states	operation:identity#createDelegatedAccess, operation:identity#listDelegatedAccess
+new	33861	APP-PARTNER-PTR-020#wire	New	Sub Task	Pradnya Yeram	[FE] PTR-020 Sub-Agent Management: connect to API	operation:identity#createDelegatedAccess, operation:identity#listDelegatedAccess
+new	33862	APP-PARTNER-PTR-020#test	New	Sub Task	Pradnya Yeram	[FE] PTR-020 Sub-Agent Management: tests	operation:identity#createDelegatedAccess, operation:identity#listDelegatedAccess
+new	33871	APP-STAFF-EMP-043#build	New	Sub Task	Chitrangi Mestry	[FE] EMP-043 Device settings: build with all states	operation:tenancy#listDevices, operation:tenancy#registerDevice
+new	33872	APP-STAFF-EMP-043#wire	New	Sub Task	Chitrangi Mestry	[FE] EMP-043 Device settings: connect to API	operation:tenancy#listDevices, operation:tenancy#registerDevice
+new	33873	APP-STAFF-EMP-043#test	New	Sub Task	Chitrangi Mestry	[FE] EMP-043 Device settings: tests	operation:tenancy#listDevices, operation:tenancy#registerDevice
+new	33879	VM-TENANCY-DEVICES-1#getDeviceFirmware	New	Sub Task	Deep Khanvilkar	[BE] getDeviceFirmware: GET /device-firmware/{firmwareId}	table:platform.device
+new	33881	VM-TENANCY-DEVICES-1#listDeviceFirmware	New	Sub Task	Deep Khanvilkar	[BE] listDeviceFirmware: GET /device-firmware	table:platform.device
+new	33885	VM-TENANCY-DEVICES-2#startDeviceFirmwareRollout	New	Sub Task	Pranay Shinde	[BE] startDeviceFirmwareRollout: POST /device-firmware/rollouts	table:platform.device
+new	33895	VM-BO-124#build	New	Sub Task	Surendra Loke	[FE] BO-124 Layout & Journey Builder: build with all states	operation:tenancy#listDevices
+new	33896	VM-BO-124#wire	New	Sub Task	Surendra Loke	[FE] BO-124 Layout & Journey Builder: connect to API	operation:tenancy#listDevices
+new	33897	VM-BO-124#test	New	Sub Task	Surendra Loke	[FE] BO-124 Layout & Journey Builder: tests	operation:tenancy#listDevices
+new	33913	VM-BO-036#build	New	Sub Task	Sanket Keluskar	[FE] BO-036 Device Registry: build with all states	operation:tenancy#listDevices, operation:tenancy#registerDevice
+new	33914	VM-BO-036#wire	New	Sub Task	Sanket Keluskar	[FE] BO-036 Device Registry: connect to API	operation:tenancy#listDevices, operation:tenancy#registerDevice
+new	33915	VM-BO-036#test	New	Sub Task	Sanket Keluskar	[FE] BO-036 Device Registry: tests	operation:tenancy#listDevices, operation:tenancy#registerDevice
+new	33989	SVC-TENANCY-DEVICES-4#enrolDevice	New	Sub Task	Sanket Keluskar	[BE] enrolDevice: POST /devices/{deviceId}/enrolment	table:platform.device
+new	34030	VM-BO-732#build	New	Sub Task	Pallavi Sawant	[FE] BO-732 POS & Device Assignment: build with all states	operation:tenancy#listDevices
+new	34031	VM-BO-732#wire	New	Sub Task	Pallavi Sawant	[FE] BO-732 POS & Device Assignment: connect to API	operation:tenancy#listDevices
+new	34032	VM-BO-732#test	New	Sub Task	Pallavi Sawant	[FE] BO-732 POS & Device Assignment: tests	operation:tenancy#listDevices
+new	34047	MIG-CONTROL-5#control.release	New	Sub Task	Hrushikant Patkar	[DB] control.release	table:control.release
+new	34112	SVC-PLATFORM-PLATFORM-OPS-2#cancelOutboxRepublish	New	Sub Task	Pranay Shinde	[BE] cancelOutboxRepublish: POST /outbox-republishes/{republishId}/cancel	table:control.outbox_republish
+new	34113	SVC-PLATFORM-PLATFORM-OPS-2#getOutboxRepublish	New	Sub Task	Pranay Shinde	[BE] getOutboxRepublish: GET /outbox-republishes/{republishId}	operation:platform-ops#getOutboxRepublish, table:control.outbox_republish
+new	34115	SVC-PLATFORM-PLATFORM-OPS-2#listOutboxRepublishes	New	Sub Task	Pranay Shinde	[BE] listOutboxRepublishes: GET /outbox-republishes	operation:platform-ops#listOutboxRepublishes, table:control.outbox_republish
+new	34117	SVC-PLATFORM-PLATFORM-OPS-3#republishOutbox	New	Sub Task	Sanket Keluskar	[BE] republishOutbox: POST /outbox-republishes	operation:platform-ops#republishOutbox, table:control.outbox_republish
+new	34118	APP-CONSOLE-ADM-318#build	New	Sub Task	Pradnya Yeram	[FE] ADM-318 Dead Letters: build with all states	operation:platform-ops#getOutboxRepublish, operation:platform-ops#listOutboxRepublishes, operation:platform-ops#republishOutbox
+new	34119	APP-CONSOLE-ADM-318#wire	New	Sub Task	Pradnya Yeram	[FE] ADM-318 Dead Letters: connect to API	operation:platform-ops#getOutboxRepublish, operation:platform-ops#listOutboxRepublishes, operation:platform-ops#republishOutbox
+new	34120	APP-CONSOLE-ADM-318#test	New	Sub Task	Pradnya Yeram	[FE] ADM-318 Dead Letters: tests	operation:platform-ops#getOutboxRepublish, operation:platform-ops#listOutboxRepublishes, operation:platform-ops#republishOutbox
+new	34121	SVC-PLATFORM-RELEASE-1#createRelease	New	Sub Task	Surendra Loke	[BE] createRelease: POST /releases	operation:platform-ops#createRelease, table:control.release
+new	34122	SVC-PLATFORM-RELEASE-1#getRelease	New	Sub Task	Surendra Loke	[BE] getRelease: GET /releases/{releaseId}	operation:platform-ops#getRelease
+new	34123	SVC-PLATFORM-RELEASE-1#getReleaseReadiness	New	Sub Task	Surendra Loke	[BE] getReleaseReadiness: GET /releases/{releaseId}/readiness	table:control.release
+new	34124	SVC-PLATFORM-RELEASE-1#listReleases	New	Sub Task	Surendra Loke	[BE] listReleases: GET /releases	operation:platform-ops#listReleases, table:control.release
+new	34126	SVC-PLATFORM-RELEASE-2#rejectRelease	New	Sub Task	Sanket Keluskar	[BE] rejectRelease: POST /releases/{releaseId}/reject	table:control.release
+new	34127	SVC-PLATFORM-RELEASE-2#withdrawRelease	New	Sub Task	Sanket Keluskar	[BE] withdrawRelease: POST /releases/{releaseId}/withdraw	table:control.release
+new	34128	APP-CONSOLE-ADM-022#build	New	Sub Task	Chitrangi Mestry	[FE] ADM-022 Release & Version Management: build with all states	operation:platform-ops#createRelease, operation:platform-ops#getRelease, operation:platform-ops#listReleases
+new	34129	APP-CONSOLE-ADM-022#wire	New	Sub Task	Chitrangi Mestry	[FE] ADM-022 Release & Version Management: connect to API	operation:platform-ops#createRelease, operation:platform-ops#getRelease, operation:platform-ops#listReleases
+new	34130	APP-CONSOLE-ADM-022#test	New	Sub Task	Chitrangi Mestry	[FE] ADM-022 Release & Version Management: tests	operation:platform-ops#createRelease, operation:platform-ops#getRelease, operation:platform-ops#listReleases
+new	34131	APP-CONSOLE-ADM-023#build	New	Sub Task	Pradnya Yeram	[FE] ADM-023 Staging Promotion & Approval: build with all states	operation:platform-ops#getRelease, operation:platform-ops#listReleases
+new	34132	APP-CONSOLE-ADM-023#wire	New	Sub Task	Pradnya Yeram	[FE] ADM-023 Staging Promotion & Approval: connect to API	operation:platform-ops#getRelease, operation:platform-ops#listReleases
+new	34133	APP-CONSOLE-ADM-023#test	New	Sub Task	Pradnya Yeram	[FE] ADM-023 Staging Promotion & Approval: tests	operation:platform-ops#getRelease, operation:platform-ops#listReleases
+new	34142	APP-CONSOLE-ADM-024#build	New	Sub Task	Chinmay Patkar	[FE] ADM-024 Release Notification Composer: build with all states	operation:platform-ops#listReleases
+new	34143	APP-CONSOLE-ADM-024#wire	New	Sub Task	Chinmay Patkar	[FE] ADM-024 Release Notification Composer: connect to API	operation:platform-ops#listReleases
+new	34144	APP-CONSOLE-ADM-024#test	New	Sub Task	Chinmay Patkar	[FE] ADM-024 Release Notification Composer: tests	operation:platform-ops#listReleases
+new	35565	MIG-PROMOTIONS-4#promotions.partner_bundle_product	New	Sub Task	Hrushikant Patkar	[DB] promotions.partner_bundle_product	table:promotions.partner_bundle_product
+new	35566	SVC-CATALOGUE-BUNDLE-4#listBundlePartnerProductMappings	New	Sub Task	Hrushikant Patkar	[BE] listBundlePartnerProductMappings: GET /bundles/{bundleId}/partner-products	operation:promotions#listBundlePartnerProductMappings, table:promotions.partner_bundle_product
+new	35567	SVC-CATALOGUE-BUNDLE-4#setBundlePartnerProductMappings	New	Sub Task	Hrushikant Patkar	[BE] setBundlePartnerProductMappings: PUT /bundles/{bundleId}/partner-products	operation:promotions#setBundlePartnerProductMappings, table:promotions.partner_bundle_product
+new	35572	SVC-CATALOGUE-DRAFTED-43#listPartnerExternalProduct	New	Sub Task	Hrushikant Patkar	[BE] listPartnerExternalProduct: GET /partner-external-product	operation:promotions#listPartnerExternalProduct, table:promotions.partner_bundle_product
+new	35730	SVC-IDENTITY-IDENTITY-15	New	Task	Narayan Gaonkar	[BE] IdentityService: verifySupervisorStepUp	table:identity.delegated_access
+new	35914	SVC-IDENTITY-IDENTITY-15#verifySupervisorStepUp	New	Sub Task	Narayan Gaonkar	[BE] verifySupervisorStepUp: POST /internal/step-up/verify	table:identity.delegated_access

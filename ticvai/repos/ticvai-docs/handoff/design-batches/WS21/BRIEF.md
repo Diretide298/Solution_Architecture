@@ -1,6 +1,6 @@
 # WS21 — B2B, Reseller & OTA Partner Management board 1
 
-**8 screens · 14 operations · 23 schemas · 3 permissions**
+**8 screens · 14 operations · 24 schemas · 3 permissions**
 
 Platform P10 Partner Web · ships as **ticvai-control** ·
 partner audience · web ·

@@ -15,7 +15,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/tenants-licensing/commercial-command-center-adm-369",
-   "component": "apps/ticvai-web/src/routes/tenants-licensing/CommercialCommandCenter.tsx",
+   "component": "src/routes/tenants-licensing/CommercialCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -245,7 +245,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/tenants-licensing/customer-subscription-commercial-portfolio-adm-370",
-   "component": "apps/ticvai-web/src/routes/tenants-licensing/CustomerSubscriptionCommercialPortfolio.tsx",
+   "component": "src/routes/tenants-licensing/CustomerSubscriptionCommercialPortfolio.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -448,7 +448,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/tenants-licensing/customer-commercial-360-adm-371",
-   "component": "apps/ticvai-web/src/routes/tenants-licensing/CustomerCommercial360.tsx",
+   "component": "src/routes/tenants-licensing/CustomerCommercial360.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -570,7 +570,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/tenants-licensing/operational-profile-vsi-commercial-model-intelligence-adm-372",
-   "component": "apps/ticvai-web/src/routes/tenants-licensing/OperationalProfileVsiCommercialModelIntelligence.tsx",
+   "component": "src/routes/tenants-licensing/OperationalProfileVsiCommercialModelIntelligence.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -731,7 +731,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/tenants-licensing/revenue-commercial-model-analytics-adm-373",
-   "component": "apps/ticvai-web/src/routes/tenants-licensing/RevenueCommercialModelAnalytics.tsx",
+   "component": "src/routes/tenants-licensing/RevenueCommercialModelAnalytics.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -946,7 +946,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/tenants-licensing/trial-conversion-monitor-adm-374",
-   "component": "apps/ticvai-web/src/routes/tenants-licensing/TrialConversionMonitor.tsx",
+   "component": "src/routes/tenants-licensing/TrialConversionMonitor.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1098,7 +1098,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/tenants-licensing/renewal-retention-center-adm-375",
-   "component": "apps/ticvai-web/src/routes/tenants-licensing/RenewalRetentionCenter.tsx",
+   "component": "src/routes/tenants-licensing/RenewalRetentionCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1318,7 +1318,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/tenants-licensing/commercial-optimization-expansion-opportunities-adm-376",
-   "component": "apps/ticvai-web/src/routes/tenants-licensing/CommercialOptimizationExpansionOpportunities.tsx",
+   "component": "src/routes/tenants-licensing/CommercialOptimizationExpansionOpportunities.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1520,7 +1520,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/tenants-licensing/subscription-exceptions-commercial-alerts-adm-377",
-   "component": "apps/ticvai-web/src/routes/tenants-licensing/SubscriptionExceptionsCommercialAlerts.tsx",
+   "component": "src/routes/tenants-licensing/SubscriptionExceptionsCommercialAlerts.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1655,7 +1655,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/tenants-licensing/executive-ai-commercial-intelligence-adm-378",
-   "component": "apps/ticvai-web/src/routes/tenants-licensing/ExecutiveAiCommercialIntelligence.tsx",
+   "component": "src/routes/tenants-licensing/ExecutiveAiCommercialIntelligence.tsx",
    "status": "notStarted"
   },
   "navigation": {

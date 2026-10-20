@@ -42,6 +42,25 @@
   "requestBody": "EligibilityCheckRequest",
   "responds": "EligibilityCheckResult"
  },
+ "createCart": {
+  "method": "POST",
+  "path": "/carts",
+  "contract": "orders",
+  "summary": "Start a cart",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Cart"
+ },
  "createResourceHold": {
   "method": "POST",
   "path": "/resource-holds",
@@ -167,19 +186,6 @@
   "requestBody": null,
   "responds": "PerformanceAvailabilityPage"
  },
- "getBundle": {
-  "method": "GET",
-  "path": "/bundles/{bundleId}",
-  "contract": "promotions",
-  "summary": "Read a bundle with components and allocation",
-  "permission": "PRODUCT_VIEW",
-  "offlineCapable": true,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "Bundle"
- },
  "getCart": {
   "method": "GET",
   "path": "/carts/{cartId}",
@@ -231,6 +237,19 @@
   "requestBody": null,
   "responds": "GroupPackageDefinition"
  },
+ "getGuestBundle": {
+  "method": "GET",
+  "path": "/guest-bundles/{bundleId}",
+  "contract": "promotions",
+  "summary": "What a guest is shown of a bundle",
+  "permission": null,
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "GuestBundle"
+ },
  "getMapResourceAvailability": {
   "method": "GET",
   "path": "/resource-availability",
@@ -260,10 +279,28 @@
     "name": "kind",
     "in": "query",
     "required": null
+   },
+   {
+    "name": "minCapacity",
+    "in": "query",
+    "required": false
    }
   ],
   "requestBody": null,
   "responds": "MapResourceAvailability"
+ },
+ "getPerformance": {
+  "method": "GET",
+  "path": "/performances/{performanceId}",
+  "contract": "catalogue",
+  "summary": "Read a performance",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "Performance"
  },
  "getPublishedBookingFlow": {
   "method": "GET",
@@ -440,6 +477,11 @@
     "name": "kind",
     "in": "query",
     "required": false
+   },
+   {
+    "name": "onlyBookable",
+    "in": "query",
+    "required": false
    }
   ],
   "requestBody": null,
@@ -455,6 +497,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": false
+   },
    {
     "name": "kind",
     "in": "query",
@@ -527,7 +574,18 @@
   "offlineCapable": true,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "kind",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": false
+   }
+  ],
   "requestBody": null,
   "responds": "ProductCategoryNode"
  },
@@ -585,6 +643,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
    {
     "name": null,
     "in": null,

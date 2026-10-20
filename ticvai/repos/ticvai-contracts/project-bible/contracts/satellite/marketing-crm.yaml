@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Marketing & CRM
   version: 0.1.0
-  x-ticvai-screen-count: 232
+  x-ticvai-screen-count: 233
   x-ticvai-tier: satellite
   x-ticvai-module: 22 — Marketing & CRM
   x-ticvai-requirements: 319
@@ -375,6 +375,25 @@ x-ticvai-queries:
       own operation, and a question with a rule of its own (open, live, sellable) is declared as a query of its
       own. It is asked from another deployable through Marketing's service route (serviceAuth).
     served: [service]
+  formDefinitionRecords:
+    module: marketing-crm
+    table: marketing.form_definition
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The marketing.form_definition rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Marketing stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/FormDefinition'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Marketing answers with its marketing.form_definition rows, as it stores them and as the
+      caller's scope lets it see them (the table's row-level security, under the caller's connection and
+      transaction). It decides nothing: an asker that refuses or chooses on these rows states that rule in its
+      own operation, and a question with a rule of its own (open, live, sellable) is declared as a query of its
+      own. It is asked from another deployable through Marketing's service route (serviceAuth). Added for the products
+      module, wave 1 (CHG-R8PRD-009).
+    served: [service]
 paths:
   /my/cases:
     get:
@@ -537,6 +556,59 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /my/cases/{caseId}:
+    parameters:
+    - name: caseId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    get:
+      operationId: getMyCase
+      x-ticvai-consumed-by:
+        - "P02 GST-068 Help & My Cases"
+      x-ticvai-read-via:
+      - query: identity#subjectRecords
+        route: service
+        for: 'the case''s guest as CaseDetail shows them (pii.subject), Identity''s data (r8 integration, CHG-R8INT-014)'
+      security:
+      - guestAuth: []
+      - bearerAuth: []
+      summary: One case the guest raised, with its thread
+      description: '**How a guest opens a case** (r8 walk of ticket 27891). `listMyCases` returns the cases without
+        their messages and `getCase` needs `CASE_VIEW`, so a guest had no way to read the thread they were having.
+        This returns the case as `CaseDetail`: the description, the resolution note, and the messages.
+
+        **Scoped to the caller, not filtered by it** (`x-ticvai-self-scoped: subject`): a case the caller did not
+        raise answers 404, exactly as one that does not exist, as `replyToMyCase` does. **A guest never receives a
+        message with `isInternal: true`**; those are staff notes and are left out of `messages`, oldest first.
+
+        Read from the primary, because a reply the guest has just sent must be in the thread they read next.
+
+        '
+      tags:
+      - marketing
+      x-ticvai-permission: null
+      x-ticvai-guest-callable: true
+      x-ticvai-self-scoped: subject
+      x-ticvai-audience:
+      - guest
+      x-ticvai-scope-level: tenant
+      x-ticvai-read-routing: primary
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: The case with its guest-visible thread
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CaseDetail'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /my/cases/{caseId}/messages:
@@ -3979,6 +4051,7 @@ paths:
         - "P01 WEB-017 My Account Dashboard"
         - "P01 WEB-043 Loyalty & Rewards"
         - "P02 GST-036 Loyalty & Rewards"
+        - "P02 GST-071 Payment Methods"
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -4197,6 +4270,9 @@ paths:
         - "P06 EMP-026 Incident report"
         - "P08 BO-734 CRM Command Center"
         - "P08 BO-735 Guest Directory"
+      x-ticvai-reads:
+      - table: marketing.consent_record
+        for: 'the hasConsentFor filter: the guest''s current consent record for the purpose (r8 integration, CHG-R8INT-014; check-parameter-columns P-NAMED-TABLE)'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -4207,7 +4283,17 @@ paths:
 
         
 
-        **Order.** Sorted by `displayName` ascending, then by `id`.'
+        **Order.** Sorted by `displayName` ascending, then by `id`.
+
+
+        **Decided 18 October 2026** (ADAM CR-141; CHG-CRA-007). **Without `GUEST_VIEW_PII`** the six personal fields
+        (`displayName`, `email`, `phone`, `preferredLanguage`, `preferredChannel`, `guestLinkId`; marked
+        `x-ticvai-data-class: personal` on `GuestProfile`, and Identity''s subject record already treats preferred language as
+        personal) are null, and the results are ordered by `id`, not by name, so the order discloses nothing.
+        **`hasConsentFor`**: a guest has consent for a purpose when their `marketing.consent_record` for that purpose
+        with `superseded_at` null has decision `granted`; it is Marketing''s own table, so no read route is needed.
+        **`lifetimeValue` is left out** until a guest''s lifetime value has a currency (CR-094''s rule, waiting on the
+        client).'
       tags:
       - guest
       x-ticvai-permission: GUEST_VIEW
@@ -4517,6 +4603,11 @@ paths:
 
         Every record captures the notice version, the channel, the purpose, the source and the timestamp.
 
+        **A third path, with the same rules** (r8, IDENTITY-C55): the consents a guest gives on the registration
+        form arrive as `identity.guestRegistered`, and Marketing''s consumer records each one through these
+        rules with source `registration` (idempotency: the event id and the purpose), so a registration never
+        leaves a consent unrecorded.
+
         **Two callers, two rules.** A guest recording their own consent uses a guest token and may only
         act on their own subject. An agent recording on a guest''s behalf uses a staff token, requires
         `GUEST_MANAGE`, and the resulting record names them in `recordedByPrincipalId` — consent captured
@@ -4822,6 +4913,7 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-011 Guest Details & Attendee Forms"
         - "P01 WEB-020 Profile & Preferences"
+        - "P01 WEB-021 Wallet & Gift Cards"
         - "P01 WEB-024 Devices, Wishlist & Consent"
         - "P01 WEB-027 Newsletter Subscription"
         - "P02 GST-039 Profile"
@@ -5474,6 +5566,13 @@ paths:
         signed in. Revoking the device the guest is using signs it out too, so the app returns to sign-in. If
         Identity does not answer, the device stays revoked and this answers `502`
         `device-sessions-not-ended`; the client calls again, which is a `204` revoke that asks Identity again.
+
+        **How the retry still reaches Identity** (R8 blocker IDENTITY-C23): the revoke clears `installationId` as
+        above but first copies it to `pendingSessionEndInstallationId`, which is kept until Identity answers.
+        On `204` from `endGuestDeviceSessions` it is cleared. On a revoked row where it is still set, a call
+        again (or a revoke of an already revoked device) asks Identity again with that value; where it is null,
+        a revoke of a revoked device is `204` with no call. A `502` is never stored as the Idempotency-Key
+        answer, so a retry with the same key runs again.
 
         '
       tags:
@@ -7008,6 +7107,13 @@ paths:
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      - name: venueId
+        in: query
+        required: false
+        description: 'Whose venue to read, for a caller with no venue (R8 blocker fix, as `listProductCategories`): a visitor with no credential, or an app before sign-in, must send it (missing is `400 venue-required`, an id that is not a venue of the tenant `400 unknown-venue`). A caller who already acts at a venue may leave it out; with a credential it must be that venue.'
+        schema:
+          type: string
+          format: uuid
       x-ticvai-permission: MARKETING_VIEW
       x-ticvai-guest-callable: true
       x-ticvai-scope-level: venue
@@ -16496,6 +16602,7 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-043 Loyalty & Rewards"
         - "P02 GST-036 Loyalty & Rewards"
+        - "P02 GST-071 Payment Methods"
         - "P08 BO-828 Milestones & Reward Rules"
       # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
       # or staff token is still accepted. `{}` makes the credential optional.
@@ -16702,6 +16809,13 @@ paths:
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      - name: venueId
+        in: query
+        required: false
+        description: 'Whose venue to read, for a caller with no venue (R8 blocker fix, as `listProductCategories`): a visitor with no credential, or an app before sign-in, must send it (missing is `400 venue-required`, an id that is not a venue of the tenant `400 unknown-venue`). A caller who already acts at a venue may leave it out; with a credential it must be that venue.'
+        schema:
+          type: string
+          format: uuid
       responses:
         '200':
           description: Badges
@@ -16862,7 +16976,8 @@ paths:
                 $ref: '#/components/schemas/MarketingCustomerBadge'
         '409':
           x-ticvai-problem-types: [badge-already-held]
-          description: Already held and not expired
+          description: The customer already holds this badge with status `awarded` and an `expiresAt` that is null or
+            in the future (`badge-already-held`). An expired or revoked award does not block a new one.
           content:
             application/problem+json:
               schema:
@@ -17885,6 +18000,10 @@ paths:
         as the row, without the IP address or user agent, so a CDP or CRM subscribed through the webhook
         catalogue receives the consent signal; Google Analytics and Tag Manager read it in the page
         (`getCookieConsentRuntime`).
+
+        **The identifier carries the row's scope** (R8 blocker fix, IDENTITY-C02): the call to `recordConsentIdentifier`
+        sends `scopePath`, the `marketing.device_consent.scope_path` of the row just written, in its
+        `ConsentIdentifierCapture` body, where it is now required.
       tags:
       - consent
       x-ticvai-permission: null
@@ -18874,6 +18993,111 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/NotFound'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /internal/sale-owner-answers:
+    post:
+      operationId: recordSaleOwnerAnswers
+      security:
+      - serviceAuth: []
+      x-ticvai-audience:
+      - service
+      x-ticvai-auth: service
+      x-ticvai-read-via:
+      - query: orders#salesOrderRecords
+        route: service
+        for: 'the order must exist, be of the sent venue, and a reservation owner must be its buyer: orders.sales_order, Orders'' data'
+      - query: orders#orderLineRecords
+        route: service
+        for: 'a ticket owner''s order line must be on the order and its unit within the line''s quantity: orders.order_line, Orders'' data'
+      - query: identity#subjectRecords
+        route: service
+        for: 'the owner''s subjectId must be a subject, as submitForm checks: pii.subject, Identity''s data'
+      summary: Keep one owner's answers to a product's owner form, for one sale
+      description: >-
+        **The only write of `FormSubmission.saleContext`** (products module, 16 October 2026 minutes 4.13;
+        CHG-R8PRD-010). The Orders service calls it, cell-internal over mTLS, when a sale records the answers of the
+        reservation owner (once per order) or of a ticket owner (once per credential: order line and unit) to the form
+        catalogue `getProductOwnerForms` links for that role. A guest or staff caller of `submitForm` cannot set a sale
+        context: there it is read-only.
+
+        **What Orders sends, and what is checked** (CHG-R8PRD-011): the order's venue (`venueId`) and the sale slot.
+        The order must exist and be of that venue (`422 unknown-order`, `422 order-not-of-venue`); a reservation
+        owner's `subjectId` must be the order's buyer (`422 not-order-buyer`), and an order with no buyer (an
+        anonymous walk-in till sale) takes no reservation-owner answer (`422 order-has-no-buyer`) while its ticket-owner
+        answers are accepted (CHG-R8PRD-012); a ticket owner's order line must be on
+        the order and its unit within the line's quantity (`422 unknown-order-line`); the form must be a published form
+        of that venue (`422 form-not-for-venue`) and the answers must fill its required fields (`422 answer-required`);
+        the `subjectId` must be a subject (`422 unknown-subject`). The link row's `scopePath` is that venue, so the
+        venue that sold the order reads its owners' answers.
+
+        **One submission per owner slot**: `(orderId, ownerRole, orderLineId, unitIndex)` is unique
+        (`marketing.form_submission_sale_link`), so a second answer for the same slot is refused
+        `409 owner-answers-already-recorded`. Orders retries a call that timed out with the same `Idempotency-Key`,
+        which answers the first result again; only a different key for an answered slot is the `409`. The answers are kept as any submission is: bound to the form version
+        answered, keyed by the form's field keys, the personal-data mark of each field deciding its retention.
+      tags:
+      - marketing
+      x-ticvai-permission: null
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: append
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SaleOwnerAnswers'
+      responses:
+        '201':
+          headers:
+            X-Consistency-Token:
+              $ref: ../shared/common.yaml#/components/headers/ConsistencyToken
+          description: Kept
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FormSubmission'
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '401':
+          description: The calling workload's token is missing or invalid (`unauthenticated`).
+          x-ticvai-problem-types:
+          - unauthenticated
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '409':
+          description: This owner slot of the sale already has its answers (`owner-answers-already-recorded`).
+          x-ticvai-problem-types:
+          - owner-answers-already-recorded
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '422':
+          description: The form or version is unknown (`unknown-form`) or not a published form of the order's venue
+            (`form-not-for-venue`), a required field has no answer (`answer-required`), the order is unknown
+            (`unknown-order`) or of another venue (`order-not-of-venue`), the buyer is not the order's
+            (`not-order-buyer`) or the order has no buyer for a reservation-owner answer (`order-has-no-buyer`), the line or unit is not on the order (`unknown-order-line`), or the subject is unknown
+            (`unknown-subject`).
+          x-ticvai-problem-types:
+          - unknown-form
+          - form-not-for-venue
+          - answer-required
+          - unknown-order
+          - order-not-of-venue
+          - not-order-buyer
+          - order-has-no-buyer
+          - unknown-order-line
+          - unknown-subject
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: ../shared/common.yaml#/components/responses/TooManyRequests
 components:
   schemas:
     CookieCategory:
@@ -20060,8 +20284,8 @@ components:
         **Not named `marketing.loyalty_tier`**: that name is recorded in `schema-history.json`
         as renamed to `marketing.points_earning_rule` on 20 September, and a rename record that
         contradicts the schema is worse than a longer name. Not named `marketing.tier` either,
-        because `subscription.tier_allowance` is a SaaS plan's tier and one bare `tier` in a
-        package with two tier concepts is how `plan_id` came to point at `subscription.plan`.
+        because the control database's tier allowance is a SaaS plan's tier and one bare `tier` in a
+        package with two tier concepts is how `plan_id` came to point at the SaaS plan catalogue.
 
         **The denormalised copy on the position stays.** A till rendering *Gold* beside a
         balance must not join, and must certainly not cross a cell boundary to print a word.
@@ -20331,7 +20555,7 @@ components:
           format: date-time
           nullable: true
     MarketingBadge:
-      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by listBadges, setBadge
+      x-ticvai-rls: signed-in-read   # MOD audit, CHG-MOD-007: read below the tenant by listBadges, setBadge; any signed-in guest too (CHG-R8MIG-011: badge definitions are not personal, ORDERS-MONEY-C33)
       type: object
       x-ticvai-persistence: marketing.badge
       description: '**Taken from the backend workbook, 20 September.** Defines a digital badge that can be awarded to a customer for challenge completion or other engagement achievement.'
@@ -20438,6 +20662,13 @@ components:
           type: string
           maxLength: 30
           nullable: true
+          enum:
+          - challenge
+          - purchase
+          - manager
+          description: 'Why the badge was awarded (R8 blocker ORDERS-MONEY-C14): `challenge` (a completed challenge,
+            `challengeId` set), `purchase` (`sourceReferenceId` the order), `manager` (awarded by hand, as BO-826
+            does).'
         sourceReferenceId:
           type: string
           format: uuid
@@ -20453,6 +20684,13 @@ components:
           readOnly: true
           type: string
           maxLength: 20
+          enum:
+          - awarded
+          - expired
+          - revoked
+          description: 'Written by the server, never sent (R8 blocker ORDERS-MONEY-C14). `awardBadge` stores
+            `awarded`. `expired` is worked out when the badge is read, from `expiresAt` in the past (no job
+            rewrites the row). `revoked` is reserved: no operation revokes a badge yet.'
     MarketingJourneyStep:
       type: object
       x-ticvai-persistence: marketing.journey_step
@@ -22254,6 +22492,19 @@ components:
               type: string
             equals:
               type: string
+        presentation:
+          type: string
+          nullable: true
+          enum:
+          - dropDown
+          - radio
+          - checkBoxes
+          description: >-
+            **How a choice is drawn** (products module, 16 October 2026 minutes 4.13: the data mask's field types are
+            text, drop-down, radio and check box; CHG-R8PRD-009). For `select`, `dropDown` (the default) or `radio`;
+            for `multiSelect`, `checkBoxes`. A single check box is a `boolean`. Null for every other type. It changes
+            how the field is drawn, never what is stored. On any other type, or a value that does not fit the type,
+            the server stores null.
     FormSubmission:
       x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by getGuestTimeline, getWaiverStatus, listComplianceEvidenceWaiver, listContact and others
       type: object
@@ -22337,6 +22588,20 @@ components:
         ipAddress:
           type: string
           nullable: true
+        saleContext:
+          allOf:
+          - $ref: '#/components/schemas/FormSubmissionSaleLink'
+          nullable: true
+          readOnly: true
+          x-ticvai-persisted: false
+          x-ticvai-derived: onRead
+          description: >-
+            **The sale a capture was made for** (products module, 16 October 2026 minutes 4.13; CHG-R8PRD-009,
+            CHG-R8PRD-010): a product's reservation-owner and ticket-owner forms (catalogue `getProductOwnerForms`) are
+            answered as submissions of this form, one for the buyer and one per credential for each ticket owner, so
+            each owner's answers are a record of their own and two owners' keys never collide. **Read-only here**: it
+            is written only by the Orders service through `recordSaleOwnerAnswers` (service-to-service), never by a
+            caller of `submitForm`. Null for a submission made outside a sale.
     GuestDocument:
       x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by listComplianceEvidenceWaiver, uploadGuestDocument
       type: object
@@ -23923,6 +24188,12 @@ components:
       - thirdPartySharing
       - aiProcessing
       - transactional
+      - storedPaymentCredential
+      - facePassEnrolment
+      description: '`storedPaymentCredential` (a card saved for later, `storePaymentToken`) and `facePassEnrolment` (a face
+        enrolled for entry, `enrolFacePass`) are purposes of their own (R8 blocker ORDERS-MONEY-C21, CHG-R8MIG-022), so a
+        screen picks the row by its purpose instead of guessing: each tenant has one `marketing.consent_purpose` row of
+        each, seeded with the tenant''s other purposes.'
     ConsentDecision:
       type: string
       enum:
@@ -24077,12 +24348,15 @@ components:
           description: '**The partition key** (ADR-0005). Operations write it at `venue` scope.'
     GuestProfile:
       x-ticvai-persistence: marketing.guest_profile
+      # Each property is personal or behavioural (x-ticvai-data-class; ADAM CR-141, 18 October 2026; CHG-CRA-007):
+      # a personal one is null to a caller without GUEST_VIEW_PII, in every guest read.
       type: object
       required:
       - subjectId
       - isActive
       properties:
         id:
+          x-ticvai-data-class: behavioural
           type: string
           format: uuid
           readOnly: true
@@ -24093,6 +24367,7 @@ components:
 
             '
         subjectId:
+          x-ticvai-data-class: behavioural
           type: string
           format: uuid
           description: 'Opaque reference. Personal data lives in the separately erasable store, which
@@ -24100,28 +24375,36 @@ components:
 
             '
         displayName:
+          x-ticvai-data-class: personal
           type: string
           nullable: true
         email:
+          x-ticvai-data-class: personal
           type: string
           nullable: true
         phone:
+          x-ticvai-data-class: personal
           type: string
           nullable: true
         preferredLanguage:
+          x-ticvai-data-class: personal
           type: string
           nullable: true
         preferredChannel:
+          x-ticvai-data-class: personal
           $ref: '#/components/schemas/MessageChannel'
         guestLinkId:
+          x-ticvai-data-class: personal
           type: string
           nullable: true
           description: Present where the guest is linked across cells. Marketing acts locally.
         tags:
+          x-ticvai-data-class: behavioural
           type: array
           items:
             type: string
         engagementScore:
+          x-ticvai-data-class: behavioural
           type: integer
           nullable: true
           minimum: 0
@@ -24135,6 +24418,7 @@ components:
 
             '
         engagementTier:
+          x-ticvai-data-class: behavioural
           type: string
           nullable: true
           enum:
@@ -24150,16 +24434,24 @@ components:
 
             '
         lifetimeValue:
+          x-ticvai-data-class: behavioural
           $ref: ../shared/common.yaml#/components/schemas/Money
+          description: '**Left out of guest reads until a guest''s lifetime value has a currency** (ADAM CR-141,
+            18 October 2026; CHG-CRA-007): an amount above a venue is in the currency recorded on its own row
+            (CR-094''s rule, which waits on the client), and this row records none yet.'
         visitCount:
+          x-ticvai-data-class: behavioural
           type: integer
         lastVisitAt:
+          x-ticvai-data-class: behavioural
           type: string
           format: date-time
           nullable: true
         isActive:
+          x-ticvai-data-class: behavioural
           type: boolean
         mergedIntoSubjectId:
+          x-ticvai-data-class: behavioural
           type: string
           format: uuid
           nullable: true
@@ -24170,6 +24462,7 @@ components:
 
             '
         mergedAt:
+          x-ticvai-data-class: behavioural
           type: string
           format: date-time
           nullable: true
@@ -24476,6 +24769,16 @@ components:
           type: string
           format: date-time
           nullable: true
+        pendingSessionEndInstallationId:
+          type: string
+          format: uuid
+          nullable: true
+          writeOnly: true
+          description: 'Set only by the server (a value a client sends is ignored) and never returned (R8 blocker
+            IDENTITY-C23). The install whose guest sessions a
+            revoke has not yet ended at Identity: set from `installationId` when the device is revoked, cleared
+            when `endGuestDeviceSessions` answers `204`. While it is set the revoke is retried against Identity.
+            Not part of any unique key, so a new registration of the same phone is never blocked by it.'
     ConsentPurposeConfig:
       x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by getGuestConsents, listCustomerPrivacyConsent, listPrivacyConsent
       x-ticvai-persistence: marketing.consent_purpose + marketing.consent_purpose_channel
@@ -24486,6 +24789,12 @@ components:
       - noticeVersion
       - isRequiredForService
       properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+          description: The purpose row's id (`marketing.consent_purpose.id`), the value `consentPurposeId` and a
+            consent's `purposeId` carry (R8 blocker ORDERS-MONEY-C21, CHG-R8MIG-022).
         purpose:
           $ref: '#/components/schemas/ConsentPurpose'
         displayName:
@@ -26081,6 +26390,9 @@ components:
           description: The case this message belongs to, from the path of `addCaseMessage` (the opening one, `createCase`).
     LoyaltyProgramme:
       x-ticvai-persistence: marketing.loyalty_programme + marketing.points_earning_rule + marketing.programme_tier
+      # A tenant-wide programme (no venue) is read at every venue; a venue's own at that venue (ORDERS-MONEY-C33 answer A;
+      # CHG-R8MIG-026). Positions follow it for staff, and a guest reads only its own.
+      x-ticvai-rls: read-beneath
       type: object
       required:
       - id
@@ -38556,6 +38868,95 @@ components:
           type: string
           readOnly: true
           description: '**The partition key** (ADR-0005), the requirement''s.'
+    SaleOwnerAnswers:
+      type: object
+      x-ticvai-persistence: none — request body of recordSaleOwnerAnswers, kept as marketing.form_submission and marketing.form_submission_sale_link
+      description: One owner's answers to an owner form, for one sale (CHG-R8PRD-010).
+      required:
+      - venueId
+      - formId
+      - formVersion
+      - subjectId
+      - answers
+      - sale
+      properties:
+        venueId:
+          type: string
+          format: uuid
+          description: The order's venue, sent by Orders; checked against the order and the form, and the link row's scope.
+        formId:
+          type: string
+          format: uuid
+        formVersion:
+          type: integer
+          description: The published version the sale asked.
+        subjectId:
+          type: string
+          format: uuid
+          description: The owner's profile (the buyer's, or the ticket owner's, which the sale creates when it has none).
+        answers:
+          type: object
+          description: As `FormSubmission.answers`, keyed by the form's field keys.
+          additionalProperties:
+            oneOf:
+            - type: string
+            - type: number
+            - type: boolean
+            - type: array
+              items:
+                type: string
+        capturedAtChannel:
+          $ref: ../shared/common.yaml#/components/schemas/SalesChannel
+        sale:
+          $ref: '#/components/schemas/FormSubmissionSaleLink'
+    FormSubmissionSaleLink:
+      type: object
+      x-ticvai-persistence: marketing.form_submission_sale_link
+      x-ticvai-unique-together:
+      - [orderId, ownerRole, orderLineId, unitIndex]
+      x-ticvai-unique-nulls: not-distinct
+      x-ticvai-required-when:
+        orderLineId:
+          ownerRole: ticketOwner
+        unitIndex:
+          ownerRole: ticketOwner
+      description: >-
+        **Which owner slot of which sale a submission answers** (CHG-R8PRD-010). One row per submission made for a
+        sale; the unique key allows one answer per slot: the buyer once per order (line and unit null), each ticket
+        owner once per order line and unit. A `reservationOwner` link with a line or unit set is refused
+        (`400 validation`), so the buyer's slot cannot be widened.
+      required:
+      - orderId
+      - ownerRole
+      properties:
+        submissionId:
+          type: string
+          format: uuid
+          readOnly: true
+          x-ticvai-references: marketing.form_submission
+        orderId:
+          type: string
+          format: uuid
+          description: The order (Orders' id; not a database reference).
+        ownerRole:
+          type: string
+          enum:
+          - reservationOwner
+          - ticketOwner
+        orderLineId:
+          type: string
+          format: uuid
+          nullable: true
+          description: For a ticket owner, the order line whose credential this owner holds; null for the buyer.
+        unitIndex:
+          type: integer
+          minimum: 1
+          nullable: true
+          description: For a ticket owner, which of the line's credentials (1 to the line's quantity); null for the buyer.
+        scopePath:
+          type: string
+          readOnly: true
+          description: '**The partition key** (ADR-0005). The order''s venue.'
   securitySchemes:
     apiKeyAuth:
       type: apiKey

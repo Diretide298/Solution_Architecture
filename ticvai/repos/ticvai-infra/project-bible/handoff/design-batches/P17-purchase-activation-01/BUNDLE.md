@@ -1,6 +1,6 @@
 # P17-purchase-activation-01 — P17 · Purchase & Activation
 
-**7 screens · 5 operations · 14 schemas · 4 permissions**
+**7 screens · 4 operations · 13 schemas · 3 permissions**
 
 Platform P17 TICVAI Sign-up · ships as **ticvai-control** ·
 public audience · web ·
@@ -48,8 +48,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 4 permissions apply here:
-  `PLATFORM_CELL_MANAGE, PLATFORM_TENANT_MANAGE, PLATFORM_TENANT_VIEW, TENANT_CONFIGURE`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 3 permissions apply here:
+  `PLATFORM_CELL_MANAGE, PLATFORM_TENANT_VIEW, TENANT_CONFIGURE`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -149,12 +149,12 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `SGN-018` | Purchase / Trial Journey Selection | B | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
-| `SGN-019` | Contract & Billing Cycle Selection | B | 0 | 0 | 6 | 2 | 1 | 0 | — | notStarted (—) |
+| `SGN-019` | Contract & Billing Cycle Selection | B | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `SGN-020` | Billing & Legal Entity Information | B | 27 | 2 | 5 | 0 | 1 | 0 | — | notStarted (—) |
 | `SGN-021` | Payment Method & Settlement Setup | C | 34 | 0 | 6 | 17 | 1 | 0 | — | notStarted (—) |
 | `SGN-022` | Order & Commercial Pricing Review | B | 0 | 10 | 6 | 2 | 1 | 0 | — | notStarted (—) |
 | `SGN-023` | Commercial Agreement, Billable Definition & Customer Acceptance | B | 0 | 16 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `SGN-024` | Subscription Confirmation & Commercial Activation | B | 0 | 0 | 6 | 2 | 0 | 0 | — | notStarted (—) |
+| `SGN-024` | Subscription Confirmation & Commercial Activation | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 
@@ -277,14 +277,14 @@ Also apply: 10 for all of P17, 29 for every app (section *Design inputs from the
 | App · platform | TICVAI Control · P17 TICVAI Sign-up (web) |
 | Module | Purchase & Activation · wave 3 · needs the `core` module |
 | Block | Block B · ticket #29391 (APP-SIGNUP-SGN-019) |
-| Who uses it | public staff holding `PLATFORM_TENANT_MANAGE` (1 configure) |
+| Who uses it | public |
 | Device and orientation | This is a public marketing and sign-up web flow, 1440 desktop and 390 phone widths, in TICVAI's own brand. · LTR and RTL · light theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
 | Opens with | `tenantId` (session) |
 | Route | `/purchase-activation/contract-billing-cycle-selection-sgn-019` |
 
-**What the spec says about it.** The self-service form of `ADM-410`, for a prospect with no account. Decided 11 September 2026; P09 keeps its screen for the operator-led path (BL-165). `tools/applied/apply-subscription-placement.py` keeps the two in step.
+**What the spec says about it.** The self-service form of `ADM-410`, for a prospect with no account. Decided 11 September 2026; P09 keeps its screen for the operator-led path (BL-165). `tools/applied/apply-subscription-placement.py` keeps the two in step. Build note (r8 second round, APPROVALS-TENANCY-C16, the lead 20 October 2026, option B): **a prospect does not call `setSubscription`**, which is staff-only (a prospect has no tenant and no permission). The plan and term chosen here are held by the sign-up and travel on the application as `requestedPlanId`, sent with `submitOnboardingApplication` on SGN-020. The first subscription is set by platform staff (ADM-417, `setSubscription`) when the application is approved and provisioned.
 
 **Known gaps.** **The pack names 1 actions on this screen and the screen declares 0 operations.** Unserved: Custom Term. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
@@ -322,7 +322,6 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the contract billing cycle are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | TODO — not decided. A prospect is signed out and holds no permission, so the operator wording on the P09 twin does not apply. The book offers *Continue Saved Setup* and *Sign In* on 2.1, which is where somebody without access to a saved setup would be sent; no minute has decided it. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 409 Downgrade conflicts with current usage. The response names every module and limit that would be violated. (DowngradeConflictProblem); 422 `effectiveFrom` was sent and is not the date the change must take effect: today for an upgrade, the next renewal for a downgrade (`effective-date-not-allowed` … |
 
 #### Edge cases to draw
 
@@ -340,20 +339,13 @@ billing: monthly
 
 #### Permissions
 
-- `setSubscription` → `PLATFORM_TENANT_MANAGE` (configure) · staff, prospect
-
 **A refused user sees:** TODO — not decided. A prospect is signed out and holds no permission, so the operator wording on the P09 twin does not apply. The book offers *Continue Saved Setup* and *Sign In* on 2.1, which is where somebody without access to a saved setup would be sent; no minute has decided it.
 
 Screen guard: `PLATFORM_TENANT_MANAGE`
 
 #### Requirements it meets
 
-2 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
-
-| Ref | Requirement (shortened) | Domain | Verdict | Via |
-|---|---|---|---|---|
-| 20.2.2 | Monthly Billing - System shall support monthly subscriptions. | Subscription & Licensing Management | CONTRACTED | `setSubscription` |
-| 20.2.3 | Annual Billing - System shall support annual subscriptions. | Subscription & Licensing Management | CONTRACTED | `setSubscription` |
+No matrix row traces to this screen's operations or data.
 
 #### Client meeting inputs
 
@@ -374,12 +366,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (409, 422).
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
 - [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#SGN-019?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Custom Term, Cancel.
 - [ ] Every transition is wired: `SGN-018`, `SGN-020`.
-- [ ] Every gated control is gated: `PLATFORM_TENANT_MANAGE`.
+- [ ] Sign-in is asked only where the spec asks for it.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] The 2 edge case(s) from the process notes are drawn.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
@@ -1037,14 +1029,14 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI Control · P17 TICVAI Sign-up (web) |
 | Module | Purchase & Activation · wave 3 · needs the `core` module |
 | Block | Block B · ticket #29398 (APP-SIGNUP-SGN-024) |
-| Who uses it | public staff holding `PLATFORM_TENANT_MANAGE` (1 configure) |
+| Who uses it | public |
 | Device and orientation | This is a public marketing and sign-up web flow, 1440 desktop and 390 phone widths, in TICVAI's own brand. · LTR and RTL · light theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
 | Opens with | `tenantId` (session) |
 | Route | `/purchase-activation/subscription-confirmation-commercial-activation-sgn-024` |
 
-**What the spec says about it.** The self-service form of `ADM-417`, for a prospect with no account. Decided 11 September 2026; P09 keeps its screen for the operator-led path (BL-165). `tools/applied/apply-subscription-placement.py` keeps the two in step.
+**What the spec says about it.** The self-service form of `ADM-417`, for a prospect with no account. Decided 11 September 2026; P09 keeps its screen for the operator-led path (BL-165). `tools/applied/apply-subscription-placement.py` keeps the two in step. Build note (r8 second round, APPROVALS-TENANCY-C16, the lead 20 October 2026, option B): **Save subscription calls nothing.** The prospect's choices are already on the application: the plan (`requestedPlanId`, picked on SGN-012 and SGN-019) and the billing entity were sent with `submitOnboardingApplication` on SGN-020. This screen confirms them and moves on; `setSubscription` is staff-only, and platform staff set the first subscription from `requestedPlanId` (ADM-417) once the application is verified. Nothing is provisioned before that.
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
@@ -1085,7 +1077,6 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the subscription confirmation commercial are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | TODO — not decided. A prospect is signed out and holds no permission, so the operator wording on the P09 twin does not apply. The book offers *Continue Saved Setup* and *Sign In* on 2.1, which is where somebody without access to a saved setup would be sent; no minute has decided it. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 409 Downgrade conflicts with current usage. The response names every module and limit that would be violated. (DowngradeConflictProblem); 422 `effectiveFrom` was sent and is not the date the change must take effect: today for an upgrade, the next renewal for a downgrade (`effective-date-not-allowed` … |
 
 #### Edge cases to draw
 
@@ -1105,20 +1096,13 @@ firstInvoice: 01/12/2026
 
 #### Permissions
 
-- `setSubscription` → `PLATFORM_TENANT_MANAGE` (configure) · staff, prospect
-
 **A refused user sees:** TODO — not decided. A prospect is signed out and holds no permission, so the operator wording on the P09 twin does not apply. The book offers *Continue Saved Setup* and *Sign In* on 2.1, which is where somebody without access to a saved setup would be sent; no minute has decided it.
 
 Screen guard: `PLATFORM_TENANT_MANAGE`
 
 #### Requirements it meets
 
-2 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
-
-| Ref | Requirement (shortened) | Domain | Verdict | Via |
-|---|---|---|---|---|
-| 20.2.2 | Monthly Billing - System shall support monthly subscriptions. | Subscription & Licensing Management | CONTRACTED | `setSubscription` |
-| 20.2.3 | Annual Billing - System shall support annual subscriptions. | Subscription & Licensing Management | CONTRACTED | `setSubscription` |
+No matrix row traces to this screen's operations or data.
 
 #### Client meeting inputs
 
@@ -1137,12 +1121,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (409, 422).
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
 - [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#SGN-024?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save subscription, Cancel.
 - [ ] Every transition is wired: `BO-594`.
-- [ ] Every gated control is gated: `PLATFORM_TENANT_MANAGE`.
+- [ ] Sign-in is asked only where the spec asks for it.
 - [ ] The module and platform inputs below are applied.
 - [ ] The 2 edge case(s) from the process notes are drawn.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
@@ -1225,7 +1209,6 @@ Method, path, parameters, request and response for every operation these screens
 "previewSubscriptionChange": {"method":"POST","path":"/tenants/{tenantId}/subscription/preview","contract":"subscription","summary":"Preview the effect of a plan change","permission":"PLATFORM_TENANT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"SetSubscriptionRequest","responds":"SubscriptionPreview"},
 "setAgreementContractTerm": {"method":"PUT","path":"/agreement-contract-term","contract":"subscription","summary":"Agreement & Contract Terms Builder","permission":"PLATFORM_CELL_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"AgreementContractTermsBuilderInput","responds":"AgreementContractTermsBuilderView"},
 "setPaymentProvider": {"method":"PUT","path":"/payment-providers/{providerId}","contract":"orders","summary":"Configure a gateway and its routing","permission":"TENANT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"providerId","in":"path","required":true},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":"SetPaymentProviderRequest","responds":"PaymentProvider"},
-"setSubscription": {"method":"PUT","path":"/tenants/{tenantId}/subscription","contract":"subscription","summary":"Assign or change a subscription","permission":"PLATFORM_TENANT_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"SetSubscriptionRequest","responds":"Subscription"},
 "submitOnboardingApplication": {"method":"POST","path":"/onboarding-applications","contract":"subscription","summary":"A prospect signs themselves up","permission":"TENANT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"OnboardingApplication","responds":"OnboardingApplication"}
 }
 ```
@@ -1248,7 +1231,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "PaymentRouting": {"type":"object","x-ticvai-persistence":"payments.routing_rule","description":"**Which provider takes a given payment, and why.** With two gateways the question is live from day one: a UAE card may cost less through one and an international card less through the other.\n**Ordered rules, first match wins, and a fallback that is not optional.** A gateway outage with no fallback is a venue that cannot sell.\n","required":["id","priority","providerId"],"properties":{"id":{"type":"string","format":"uuid"},"priority":{"type":"integer"},"providerId":{"x-ticvai-references":"payments.provider","type":"string","format":"uuid"},"conditions":{"type":"object","description":"**Match on what is known before the charge** — channel, currency, method, issuer country, amount band. Not on anything that requires asking the provider first.\n","properties":{"channel":{"$ref":"../shared/common.yaml#/components/schemas/SalesChannel"},"currency":{"type":"string","nullable":true,"x-ticvai-persisted":false,"description":"**Resolved from the region, not stored** (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and cannot be anything else — storing it per ro w is a copy of a fact that cannot differ. **Kept on the wire, removed from the table**: a cl ient reading a figure should not walk a hierarchy to know what it means, and the database sh ould not hold nine million copies of AED. Four tables genuinely differ from their region and\n keep a stored currency — `orders.payment.tender_currency`, `inventory.supplier`, `ledger.ac\ncount`, `control.partner_agreement`. **A guest paying USD at an AED venue is a real row; a w orkstation with its own currency is a misconfiguration.**\n"},"method":{"type":"string","nullable":true},"issuerCountry":{"type":"string","nullable":true},"minAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"maxAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"}}},"fallbackProviderId":{"x-ticvai-references":"payments.provider","type":"string","format":"uuid","nullable":true,"description":"**Where this provider declines or is unreachable.** A decline is not always a fallback case — an insufficient-funds decline should not be retried elsewhere, and a gateway timeout should.\n"},"scopePath":{"type":"string","description":"**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"}}},
 "SetPaymentProviderRequest": {"x-ticvai-persistence":"none — request only; the provider lands in payments.provider and its rules in payments.routing_rule","description":"Request only. **A provider and the rules that route to it**, because `setPaymentProvider` is *\"configure a gateway and its routing\"* and writes both tables — and the provider schema alone carried no routing field, so the routing half had nothing to arrive in.\n","allOf":[{"$ref":"#/components/schemas/PaymentProvider"},{"type":"object","properties":{"routing":{"type":"array","description":"The ordered rules that send payments to this provider. `providerId` on each is this provider's `id`.","items":{"$ref":"#/components/schemas/PaymentRouting"}}}}]},
 "SetSubscriptionRequest": {"x-ticvai-persistence":"none — request only","type":"object","required":["planId"],"properties":{"planId":{"type":"string","format":"uuid"},"planVersion":{"type":"string","description":"Defaults to the current version."},"effectiveFrom":{"type":"string","format":"date","description":"Optional, and set by the server if omitted. Today for an upgrade, `renewsAt` for a downgrade; any other date is refused (audit R214 (1))."},"prorate":{"type":"boolean","default":true,"description":"An upgrade is always prorated and a downgrade, which starts at renewal, never is (audit R214 (1)). Kept so a preview can show the unprorated figure; `setSubscription` applies the rule whatever is sent."},"note":{"type":"string","maxLength":500}}},
-"Subscription": {"x-ticvai-persistence":"subscription.contract","type":"object","required":["tenantId","planId","planVersion","status","startsAt"],"properties":{"tenantId":{"type":"string","format":"uuid"},"planId":{"type":"string","format":"uuid"},"planName":{"type":"string"},"planVersion":{"type":"string"},"status":{"type":"string","enum":["trial","active","pastDue","cancelled","expired"]},"startsAt":{"type":"string","format":"date"},"renewsAt":{"type":"string","format":"date","nullable":true},"cancelledAt":{"type":"string","format":"date","nullable":true},"scheduledChange":{"type":"object","nullable":true,"readOnly":true,"description":"A downgrade waiting for the next renewal (decided 28 September, audit R214 (1)). Null when none is scheduled.","properties":{"planId":{"type":"string","format":"uuid"},"planVersion":{"type":"string"},"effectiveFrom":{"type":"string","format":"date","description":"Always the `renewsAt` it was scheduled against."}}},"currentPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"billingPeriod":{"type":"string"}}},
 "SubscriptionPreview": {"x-ticvai-persistence":"none — computed","type":"object","required":["canApply","priceChange"],"properties":{"canApply":{"type":"boolean"},"priceChange":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"proratedAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"modulesGained":{"type":"array","items":{"type":"string"}},"modulesLost":{"type":"array","items":{"type":"string"}},"conflicts":{"$ref":"#/components/schemas/DowngradeConflictProblem"},"cellTierChange":{"type":"object","nullable":true,"properties":{"from":{"$ref":"#/components/schemas/CellTier"},"to":{"$ref":"#/components/schemas/CellTier"},"requiresMigration":{"type":"boolean"}}}}}
 }
 ```

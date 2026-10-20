@@ -1,10 +1,10 @@
 id: LLD-MarketingService
-title: MarketingService — 278 operations, 131 tables
+title: MarketingService — 280 operations, 132 tables
 generatedBy: tools/derive-diagrams.py
 tier: engagement
 deployable: operations
 index: diagrams/hld/02-services.yaml
-why: '**278 operations and 131 tables — the biggest thing in the package, and probably two services
+why: '**280 operations and 132 tables — the biggest thing in the package, and probably two services
   eventually.** CRM and campaigns have different write patterns: a guest profile is read constantly
   and written rarely; a campaign send is a burst of millions of rows nobody reads again.
 
@@ -13,20 +13,20 @@ why: '**278 operations and 131 tables — the biggest thing in the package, and 
 scale: Bursty on send, read-heavy otherwise. **The one to watch for a split.**
 ifDown: Down stops campaigns and guest lookup. Neither stops trading.
 coverage:
-  operations: 278
+  operations: 280
   inAFlow: 103
   percent: 37%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
 - schema: marketing
-  tables: 131
+  tables: 132
   stores:
   - postgres
   largestTable: marketing.waiver_requirement
 operationsByContract:
 - contract: marketing-crm
-  count: 278
+  count: 280
   operations:
   - operation: accrueLoyaltyPoints
     verb: POST
@@ -50,16 +50,16 @@ operationsByContract:
     scope: tenant
     permission: MARKETING_MANAGE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: activateChallenge
     verb: POST
     path: /challenges/{challengeId}/activate
     scope: venue
     permission: MARKETING_SEND
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: activateJourney
     verb: POST
     path: /journeys/{journeyId}/activate
@@ -95,7 +95,7 @@ operationsByContract:
   - operation: addToWishlist
     verb: POST
     path: /guests/{subjectId}/wishlist
-    scope: venue
+    scope: subject
     permission: null
     offline: false
     reads: 9
@@ -112,34 +112,34 @@ operationsByContract:
     verb: PUT
     path: /privacy-testing
     scope: venue
-    permission: MARKETING_MANAGE
+    permission: GUEST_MANAGE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: approveWaiverTesting
     verb: PUT
     path: /waiver-testing
     scope: venue
-    permission: MARKETING_MANAGE
+    permission: GUEST_MANAGE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: awardBadge
     verb: POST
     path: /customers/{customerId}/badges
     scope: venue
     permission: MARKETING_MANAGE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: checkGuestCheckoutMatch
     verb: POST
     path: /guest-checkout/profile-match
     scope: venue
     permission: null
     offline: false
-    reads: 3
-    writes: 0
+    reads: 4
+    writes: 1
   - operation: claimConversation
     verb: POST
     path: /conversations/{conversationId}/claim
@@ -184,7 +184,7 @@ operationsByContract:
     verb: POST
     path: /case-classification-intelligent
     scope: venue
-    permission: MARKETING_MANAGE
+    permission: CASE_MANAGE
     offline: false
     reads: 8
     writes: 2
@@ -202,8 +202,8 @@ operationsByContract:
     scope: venue
     permission: GUEST_MANAGE
     offline: false
-    reads: 2
-    writes: 2
+    reads: 3
+    writes: 3
   - operation: createForm
     verb: POST
     path: /forms
@@ -274,8 +274,8 @@ operationsByContract:
     scope: tenant
     permission: GUEST_MANAGE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: decideGuestCheckoutMatch
     verb: POST
     path: /guest-checkout/profile-match/decision
@@ -297,7 +297,7 @@ operationsByContract:
     path: /cases/{caseId}/escalate
     scope: venue
     permission: CASE_MANAGE
-    offline: false
+    offline: true
     reads: 2
     writes: 3
   - operation: getAudienceOverlap
@@ -548,6 +548,14 @@ operationsByContract:
     offline: false
     reads: 1
     writes: 0
+  - operation: getMyCase
+    verb: GET
+    path: /my/cases/{caseId}
+    scope: tenant
+    permission: null
+    offline: false
+    reads: 2
+    writes: 0
   - operation: getMyChallenges
     verb: GET
     path: /guests/me/challenges
@@ -607,7 +615,7 @@ operationsByContract:
   - operation: getWishlist
     verb: GET
     path: /guests/{subjectId}/wishlist
-    scope: venue
+    scope: subject
     permission: null
     offline: false
     reads: 8
@@ -626,24 +634,24 @@ operationsByContract:
     scope: venue
     permission: GUEST_VIEW
     offline: false
-    reads: 5
-    writes: 0
+    reads: 6
+    writes: 1
   - operation: importAudienceList
     verb: POST
     path: /audience-lists
     scope: tenant
     permission: MARKETING_MANAGE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: issueReward
     verb: POST
     path: /loyalty/reward-assignments
     scope: venue
     permission: LOYALTY_REDEEM
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: launchCampaign
     verb: POST
     path: /campaigns/{campaignId}/launch
@@ -656,7 +664,7 @@ operationsByContract:
     verb: GET
     path: /agent-workload-availability
     scope: venue
-    permission: MARKETING_VIEW
+    permission: CASE_VIEW
     offline: false
     reads: 5
     writes: 0
@@ -712,7 +720,7 @@ operationsByContract:
     verb: GET
     path: /case-resolution-closure
     scope: venue
-    permission: MARKETING_VIEW
+    permission: CASE_VIEW
     offline: false
     reads: 1
     writes: 0
@@ -744,7 +752,7 @@ operationsByContract:
     verb: GET
     path: /compliance-evidence-waiver
     scope: venue
-    permission: MARKETING_VIEW
+    permission: GUEST_VIEW_PII
     offline: false
     reads: 9
     writes: 0
@@ -760,7 +768,7 @@ operationsByContract:
     verb: GET
     path: /consent-evidence-withdrawal
     scope: venue
-    permission: MARKETING_VIEW
+    permission: GUEST_VIEW
     offline: false
     reads: 4
     writes: 0
@@ -768,7 +776,7 @@ operationsByContract:
     verb: GET
     path: /consent-preference-communication
     scope: venue
-    permission: MARKETING_VIEW
+    permission: GUEST_VIEW
     offline: false
     reads: 4
     writes: 0
@@ -792,7 +800,7 @@ operationsByContract:
     verb: GET
     path: /contact
     scope: venue
-    permission: MARKETING_VIEW
+    permission: CASE_VIEW
     offline: false
     reads: 6
     writes: 0
@@ -800,7 +808,7 @@ operationsByContract:
     verb: GET
     path: /contact-automation
     scope: venue
-    permission: MARKETING_VIEW
+    permission: CASE_VIEW
     offline: false
     reads: 1
     writes: 0
@@ -816,7 +824,7 @@ operationsByContract:
     verb: GET
     path: /cookie-banner-preference
     scope: venue
-    permission: MARKETING_VIEW
+    permission: GUEST_VIEW
     offline: false
     reads: 1
     writes: 0
@@ -848,7 +856,7 @@ operationsByContract:
     verb: GET
     path: /cookie-tracking-digital
     scope: venue
-    permission: MARKETING_VIEW
+    permission: GUEST_VIEW
     offline: false
     reads: 1
     writes: 0
@@ -864,7 +872,7 @@ operationsByContract:
     verb: GET
     path: /customer-privacy-consent
     scope: venue
-    permission: MARKETING_VIEW
+    permission: GUEST_VIEW_PII
     offline: false
     reads: 9
     writes: 0
@@ -872,7 +880,7 @@ operationsByContract:
     verb: GET
     path: /customer-satisfaction-feedback
     scope: venue
-    permission: MARKETING_VIEW
+    permission: CASE_VIEW
     offline: false
     reads: 5
     writes: 0
@@ -880,7 +888,7 @@ operationsByContract:
     verb: GET
     path: /customer-service
     scope: venue
-    permission: MARKETING_VIEW
+    permission: CASE_VIEW
     offline: false
     reads: 5
     writes: 0
@@ -888,7 +896,7 @@ operationsByContract:
     verb: GET
     path: /customer-service-profile
     scope: venue
-    permission: MARKETING_VIEW
+    permission: CASE_VIEW
     offline: false
     reads: 12
     writes: 0
@@ -896,7 +904,7 @@ operationsByContract:
     verb: GET
     path: /data-processing-purpose
     scope: venue
-    permission: MARKETING_VIEW
+    permission: GUEST_VIEW
     offline: false
     reads: 1
     writes: 0
@@ -904,7 +912,7 @@ operationsByContract:
     verb: GET
     path: /data-retention-expiry
     scope: venue
-    permission: MARKETING_VIEW
+    permission: GUEST_VIEW
     offline: false
     reads: 1
     writes: 0
@@ -912,7 +920,7 @@ operationsByContract:
     verb: GET
     path: /data-subject-customer
     scope: venue
-    permission: MARKETING_VIEW
+    permission: GUEST_VIEW
     offline: false
     reads: 1
     writes: 0
@@ -920,7 +928,7 @@ operationsByContract:
     verb: GET
     path: /deletion-anonymization-restriction
     scope: venue
-    permission: MARKETING_VIEW
+    permission: GUEST_VIEW
     offline: false
     reads: 1
     writes: 0
@@ -952,7 +960,7 @@ operationsByContract:
     verb: GET
     path: /digital-signing-collection
     scope: venue
-    permission: MARKETING_VIEW
+    permission: GUEST_VIEW
     offline: false
     reads: 4
     writes: 0
@@ -968,7 +976,7 @@ operationsByContract:
     verb: GET
     path: /dynamic-field-question
     scope: venue
-    permission: MARKETING_VIEW
+    permission: GUEST_VIEW
     offline: false
     reads: 2
     writes: 0
@@ -976,7 +984,7 @@ operationsByContract:
     verb: GET
     path: /escalation-collaboration-internal
     scope: venue
-    permission: MARKETING_VIEW
+    permission: CASE_VIEW
     offline: false
     reads: 1
     writes: 0
@@ -984,7 +992,7 @@ operationsByContract:
     verb: GET
     path: /escalation-critical-case
     scope: venue
-    permission: MARKETING_VIEW
+    permission: CASE_VIEW
     offline: false
     reads: 3
     writes: 0
@@ -999,7 +1007,7 @@ operationsByContract:
   - operation: listGuestDevices
     verb: GET
     path: /guests/{subjectId}/devices
-    scope: tenant
+    scope: subject
     permission: null
     offline: false
     reads: 1
@@ -1096,7 +1104,7 @@ operationsByContract:
     verb: GET
     path: /minor-guardian-group
     scope: venue
-    permission: MARKETING_VIEW
+    permission: GUEST_VIEW_PII
     offline: false
     reads: 7
     writes: 0
@@ -1104,7 +1112,7 @@ operationsByContract:
     verb: GET
     path: /missing-expired-invalid
     scope: venue
-    permission: MARKETING_VIEW
+    permission: GUEST_VIEW_PII
     offline: false
     reads: 10
     writes: 0
@@ -1128,7 +1136,7 @@ operationsByContract:
     verb: GET
     path: /participant-waiver-statu
     scope: venue
-    permission: MARKETING_VIEW
+    permission: GUEST_VIEW_PII
     offline: false
     reads: 9
     writes: 0
@@ -1136,7 +1144,7 @@ operationsByContract:
     verb: GET
     path: /privacy
     scope: venue
-    permission: MARKETING_VIEW
+    permission: GUEST_VIEW
     offline: false
     reads: 8
     writes: 0
@@ -1144,7 +1152,7 @@ operationsByContract:
     verb: GET
     path: /privacy-compliance
     scope: venue
-    permission: MARKETING_VIEW
+    permission: GUEST_VIEW
     offline: false
     reads: 10
     writes: 0
@@ -1160,7 +1168,7 @@ operationsByContract:
     verb: GET
     path: /privacy-consent
     scope: venue
-    permission: MARKETING_VIEW
+    permission: GUEST_VIEW
     offline: false
     reads: 4
     writes: 0
@@ -1168,7 +1176,7 @@ operationsByContract:
     verb: GET
     path: /privacy-evidence-compliance
     scope: venue
-    permission: MARKETING_VIEW
+    permission: AUDIT_VIEW
     offline: false
     reads: 1
     writes: 0
@@ -1176,7 +1184,7 @@ operationsByContract:
     verb: GET
     path: /privacy-notice-policy
     scope: venue
-    permission: MARKETING_VIEW
+    permission: GUEST_VIEW
     offline: false
     reads: 2
     writes: 0
@@ -1184,7 +1192,7 @@ operationsByContract:
     verb: GET
     path: /product-event-experience
     scope: venue
-    permission: MARKETING_VIEW
+    permission: GUEST_VIEW
     offline: false
     reads: 1
     writes: 0
@@ -1208,7 +1216,7 @@ operationsByContract:
     verb: GET
     path: /quality-agent-evaluation
     scope: venue
-    permission: MARKETING_VIEW
+    permission: CASE_VIEW
     offline: false
     reads: 1
     writes: 0
@@ -1272,7 +1280,7 @@ operationsByContract:
     verb: GET
     path: /service-root-cause
     scope: venue
-    permission: MARKETING_VIEW
+    permission: CASE_VIEW
     offline: false
     reads: 5
     writes: 0
@@ -1280,7 +1288,7 @@ operationsByContract:
     verb: GET
     path: /site-waiver-exception
     scope: venue
-    permission: MARKETING_VIEW
+    permission: GUEST_VIEW_PII
     offline: false
     reads: 2
     writes: 0
@@ -1296,7 +1304,7 @@ operationsByContract:
     verb: GET
     path: /sla-policy-service
     scope: venue
-    permission: MARKETING_VIEW
+    permission: CASE_VIEW
     offline: false
     reads: 2
     writes: 0
@@ -1320,7 +1328,7 @@ operationsByContract:
     verb: GET
     path: /unified-interaction-communication
     scope: venue
-    permission: MARKETING_VIEW
+    permission: CASE_VIEW
     offline: false
     reads: 6
     writes: 0
@@ -1328,7 +1336,7 @@ operationsByContract:
     verb: GET
     path: /versioning-effective-date
     scope: venue
-    permission: MARKETING_VIEW
+    permission: GUEST_VIEW
     offline: false
     reads: 4
     writes: 0
@@ -1336,7 +1344,7 @@ operationsByContract:
     verb: GET
     path: /waiver
     scope: venue
-    permission: MARKETING_VIEW
+    permission: GUEST_VIEW
     offline: false
     reads: 9
     writes: 0
@@ -1344,7 +1352,7 @@ operationsByContract:
     verb: GET
     path: /waiver-compliance-operational
     scope: venue
-    permission: MARKETING_VIEW
+    permission: GUEST_VIEW
     offline: false
     reads: 6
     writes: 0
@@ -1352,7 +1360,7 @@ operationsByContract:
     verb: GET
     path: /waiver-compliance-risk
     scope: venue
-    permission: MARKETING_VIEW
+    permission: GUEST_VIEW
     offline: false
     reads: 11
     writes: 0
@@ -1360,7 +1368,7 @@ operationsByContract:
     verb: GET
     path: /waiver-consent
     scope: venue
-    permission: MARKETING_VIEW
+    permission: GUEST_VIEW
     offline: false
     reads: 4
     writes: 0
@@ -1376,7 +1384,7 @@ operationsByContract:
     verb: GET
     path: /waiver-template-master
     scope: venue
-    permission: MARKETING_VIEW
+    permission: GUEST_VIEW
     offline: false
     reads: 1
     writes: 0
@@ -1384,7 +1392,7 @@ operationsByContract:
     verb: GET
     path: /waiver-trigger-eligibility
     scope: venue
-    permission: MARKETING_VIEW
+    permission: GUEST_VIEW
     offline: false
     reads: 1
     writes: 0
@@ -1410,8 +1418,8 @@ operationsByContract:
     scope: venue
     permission: GUEST_VIEW
     offline: false
-    reads: 2
-    writes: 0
+    reads: 3
+    writes: 1
   - operation: matchLostItem
     verb: POST
     path: /lost-items/{itemId}/match
@@ -1473,7 +1481,7 @@ operationsByContract:
     path: /my/cases
     scope: tenant
     permission: null
-    offline: true
+    offline: false
     reads: 2
     writes: 2
   - operation: recordCheckoutConsents
@@ -1482,12 +1490,12 @@ operationsByContract:
     scope: venue
     permission: null
     offline: false
-    reads: 5
-    writes: 3
+    reads: 6
+    writes: 4
   - operation: recordConsent
     verb: POST
     path: /guests/{subjectId}/consents
-    scope: venue
+    scope: subject
     permission: GUEST_MANAGE
     offline: false
     reads: 3
@@ -1498,8 +1506,8 @@ operationsByContract:
     scope: venue
     permission: ORDER_CREATE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: recordCookieScan
     verb: POST
     path: /cookie-tracking-digital/scans
@@ -1521,7 +1529,7 @@ operationsByContract:
     path: /lost-items
     scope: venue
     permission: CASE_MANAGE
-    offline: true
+    offline: false
     reads: 4
     writes: 2
   - operation: recordPrivacyIncident
@@ -1532,6 +1540,14 @@ operationsByContract:
     offline: false
     reads: 3
     writes: 2
+  - operation: recordSaleOwnerAnswers
+    verb: POST
+    path: /internal/sale-owner-answers
+    scope: venue
+    permission: null
+    offline: false
+    reads: 3
+    writes: 3
   - operation: recordTouchPoint
     verb: POST
     path: /attribution/touches
@@ -1551,7 +1567,7 @@ operationsByContract:
   - operation: registerGuestDevice
     verb: POST
     path: /guests/{subjectId}/devices
-    scope: tenant
+    scope: subject
     permission: null
     offline: false
     reads: 2
@@ -1559,7 +1575,7 @@ operationsByContract:
   - operation: removeFromWishlist
     verb: DELETE
     path: /guests/{subjectId}/wishlist/{itemId}
-    scope: venue
+    scope: subject
     permission: null
     offline: false
     reads: 2
@@ -1569,7 +1585,7 @@ operationsByContract:
     path: /cases/{caseId}/reopen
     scope: venue
     permission: CASE_MANAGE
-    offline: false
+    offline: true
     reads: 2
     writes: 2
   - operation: replyToMyCase
@@ -1607,7 +1623,7 @@ operationsByContract:
   - operation: revokeGuestDevice
     verb: DELETE
     path: /guests/{subjectId}/devices/{deviceId}
-    scope: tenant
+    scope: subject
     permission: null
     offline: false
     reads: 2
@@ -1626,7 +1642,7 @@ operationsByContract:
     scope: venue
     permission: GUEST_VIEW
     offline: false
-    reads: 1
+    reads: 2
     writes: 0
   - operation: sendConversationMessage
     verb: POST
@@ -1642,13 +1658,13 @@ operationsByContract:
     scope: tenant
     permission: null
     offline: false
-    reads: 0
-    writes: 1
+    reads: 1
+    writes: 2
   - operation: sendTransactionalMessage
     verb: POST
     path: /messages
     scope: venue
-    permission: null
+    permission: MARKETING_SEND
     offline: false
     reads: 2
     writes: 4
@@ -1666,16 +1682,16 @@ operationsByContract:
     scope: venue
     permission: CASE_MANAGE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setBadge
     verb: PUT
     path: /badges/{badgeId}
     scope: venue
     permission: MARKETING_MANAGE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setBusinessEventMapping
     verb: PUT
     path: /business-event-notification/{eventId}
@@ -1706,56 +1722,56 @@ operationsByContract:
     scope: venue
     permission: CASE_MANAGE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setCaseInvestigationResolution
     verb: PUT
     path: /case-investigation-resolution
     scope: venue
-    permission: MARKETING_MANAGE
+    permission: CASE_MANAGE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setCaseResolution
     verb: PUT
     path: /case-resolution-closure/{caseResolutionId}
     scope: venue
     permission: CASE_MANAGE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setChannelProvider
     verb: PUT
     path: /channel-provider/{communicationProviderId}
     scope: venue
     permission: MARKETING_MANAGE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setCommunicationPreferenceMarketing
     verb: PUT
     path: /communication-preference-marketing
     scope: venue
-    permission: MARKETING_MANAGE
+    permission: GUEST_MANAGE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setCommunicationRoutingRule
     verb: PUT
     path: /routing-priority-throttling/{routingRuleId}
     scope: venue
     permission: MARKETING_MANAGE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setConsentCapturePoint
     verb: PUT
     path: /consent-capture-point
     scope: venue
-    permission: MARKETING_MANAGE
+    permission: GUEST_MANAGE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setConsentPurposes
     verb: PUT
     path: /consent-purposes
@@ -1770,16 +1786,16 @@ operationsByContract:
     scope: venue
     permission: AI_CONFIGURE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setCookieBannerDesign
     verb: PUT
     path: /cookie-banner-preference/{bannerDesignId}
     scope: venue
     permission: GUEST_MANAGE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setCookieScanPolicy
     verb: PUT
     path: /cookie-scan-policy/{scanPolicyId}
@@ -1792,154 +1808,154 @@ operationsByContract:
     verb: PUT
     path: /customer-service-copilot
     scope: venue
-    permission: MARKETING_MANAGE
+    permission: AI_CONFIGURE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setDataDiscoveryAccess
     verb: PUT
     path: /data-discovery-access
     scope: venue
-    permission: MARKETING_MANAGE
+    permission: GUEST_VIEW_PII
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setDataProcessingPurpose
     verb: PUT
     path: /data-processing-purpose/{purposeId}
     scope: venue
     permission: GUEST_MANAGE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setDataRetentionPolicy
     verb: PUT
     path: /retention-policies/{retentionPolicyId}
     scope: tenant
     permission: GUEST_MANAGE
     offline: false
-    reads: 2
+    reads: 3
     writes: 2
   - operation: setDigitalWaiverForm
     verb: PUT
     path: /digital-waiver-form
     scope: venue
-    permission: MARKETING_MANAGE
+    permission: GUEST_MANAGE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setDynamicFieldQuestion
     verb: PUT
     path: /dynamic-field-question/{formId}/{key}
     scope: venue
     permission: GUEST_MANAGE
     offline: false
-    reads: 2
-    writes: 2
+    reads: 3
+    writes: 3
   - operation: setGuestAttributeModel
     verb: PUT
     path: /guest-attribute-model
     scope: tenant
     permission: GUEST_MANAGE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setGuestExtraFields
     verb: PUT
     path: /guest-extra-fields
     scope: venue
     permission: MARKETING_MANAGE
     offline: false
-    reads: 2
-    writes: 2
+    reads: 3
+    writes: 3
   - operation: setGuestExtraValues
     verb: PUT
     path: /guests/{guestId}/extra-values
     scope: venue
     permission: GUEST_VIEW_PII
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setGuestMatchPolicy
     verb: PUT
     path: /guest-match-policy
     scope: venue
     permission: MARKETING_MANAGE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setGuestRelationships
     verb: PUT
     path: /guests/{guestId}/relationships
     scope: venue
     permission: GUEST_MANAGE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setIdentityResolutionRules
     verb: PUT
     path: /identity-resolution-rules
     scope: tenant
     permission: GUEST_MANAGE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setIntelligentRoutingSkill
     verb: PUT
     path: /intelligent-routing-skill/{routingRuleId}
     scope: venue
-    permission: MARKETING_MANAGE
+    permission: CASE_MANAGE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setLeaderboardNickname
     verb: PUT
     path: /loyalty/leaderboard-nickname
-    scope: tenant
+    scope: subject
     permission: null
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setLegalHold
     verb: PUT
     path: /data-retention-expiry/{holdId}
     scope: venue
     permission: GUEST_MANAGE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setLocalizationBrandingCustomer
     verb: PUT
     path: /localization-branding-customer
     scope: venue
-    permission: MARKETING_MANAGE
+    permission: GUEST_MANAGE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setLoyaltyCampaign
     verb: PUT
     path: /loyalty/campaigns/{loyaltyCampaignId}
     scope: venue
     permission: MARKETING_MANAGE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setLoyaltyRules
     verb: PUT
     path: /loyalty/programmes/{programmeId}/rules
     scope: venue
     permission: MARKETING_MANAGE
     offline: false
-    reads: 3
-    writes: 3
+    reads: 4
+    writes: 4
   - operation: setMarketingSubscription
     verb: PUT
     path: /marketing-subscriptions
     scope: tenant
     permission: MARKETING_VIEW
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setMessageTrigger
     verb: POST
     path: /message-triggers
@@ -1952,34 +1968,34 @@ operationsByContract:
     verb: PUT
     path: /minor-guardian-age
     scope: venue
-    permission: MARKETING_MANAGE
+    permission: GUEST_MANAGE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setOrderBookingTicket
     verb: PUT
     path: /order-booking-ticket/{serviceActionId}
     scope: venue
-    permission: MARKETING_MANAGE
+    permission: CASE_MANAGE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setPrivacyAction
     verb: PUT
     path: /deletion-anonymization-restriction/{actionId}
     scope: venue
     permission: GUEST_MANAGE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setPrivacyComplianceException
     verb: PUT
     path: /privacy-compliance-exception/{exceptionId}
     scope: venue
-    permission: MARKETING_MANAGE
+    permission: GUEST_MANAGE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setPrivacyNoticePolicyGovernance
     verb: PUT
     path: /privacy-notice-policy/{governanceId}
@@ -1994,48 +2010,48 @@ operationsByContract:
     scope: venue
     permission: GUEST_MANAGE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setPrivacyRequestTypes
     verb: PUT
     path: /privacy/{requestTypeId}
     scope: venue
     permission: GUEST_MANAGE
     offline: false
-    reads: 2
-    writes: 2
+    reads: 3
+    writes: 3
   - operation: setQualityEvaluation
     verb: PUT
     path: /quality-agent-evaluation/{evaluationId}
     scope: venue
     permission: CASE_MANAGE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setRefundCompensationService
     verb: PUT
     path: /refund-compensation-service/{compensationRequestId}
     scope: venue
-    permission: MARKETING_MANAGE
+    permission: ORDER_REFUND
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setReward
     verb: PUT
     path: /loyalty/rewards/{rewardId}
     scope: venue
     permission: MARKETING_MANAGE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setSenderIdentityDomain
     verb: PUT
     path: /sender-identity-domain/{senderIdentityId}
     scope: venue
     permission: MARKETING_MANAGE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setSeoMetadata
     verb: PUT
     path: /seo-metadata
@@ -2056,74 +2072,74 @@ operationsByContract:
     verb: PUT
     path: /signatory-signature-guardian
     scope: venue
-    permission: MARKETING_MANAGE
+    permission: GUEST_MANAGE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setSlaPolicy
     verb: PUT
     path: /sla-policies/{slaPolicyId}
     scope: venue
     permission: CASE_MANAGE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setTrackingTechnology
     verb: PUT
     path: /cookie-tracking-digital/{technologyId}
     scope: venue
     permission: GUEST_MANAGE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setTrackingTechnologyCatalogueEntry
     verb: PUT
     path: /cookie-tracking-digital/platform-catalogue/{entryKey}
     scope: platform
     permission: PLATFORM_PLAN_MANAGE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setWaiverAssociation
     verb: PUT
     path: /product-event-experience/{associationId}
     scope: venue
     permission: GUEST_MANAGE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setWaiverException
     verb: PUT
     path: /site-waiver-exception/{waiverExceptionId}
     scope: venue
     permission: GUEST_MANAGE
     offline: false
-    reads: 2
-    writes: 2
+    reads: 3
+    writes: 3
   - operation: setWaiverTemplateMaster
     verb: PUT
     path: /waiver-template-master/{waiverId}
     scope: venue
     permission: GUEST_MANAGE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setWaiverTriggerRule
     verb: PUT
     path: /waiver-trigger-eligibility/{triggerRuleId}
     scope: venue
     permission: GUEST_MANAGE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setWaiverVerificationValidation
     verb: PUT
     path: /waiver-verification-validation/{verificationId}
     scope: venue
-    permission: MARKETING_MANAGE
+    permission: GUEST_MANAGE
     offline: false
-    reads: 3
-    writes: 3
+    reads: 4
+    writes: 4
   - operation: startKioskAssist
     verb: POST
     path: /kiosk-assists
@@ -2145,9 +2161,9 @@ operationsByContract:
     path: /form-submissions
     scope: venue
     permission: GUEST_VIEW
-    offline: true
-    reads: 6
-    writes: 5
+    offline: false
+    reads: 7
+    writes: 6
   - operation: submitReview
     verb: POST
     path: /reviews
@@ -2193,7 +2209,7 @@ operationsByContract:
     path: /cases/{caseId}
     scope: venue
     permission: CASE_MANAGE
-    offline: false
+    offline: true
     reads: 2
     writes: 2
   - operation: updateConsentQuestion
@@ -2202,12 +2218,12 @@ operationsByContract:
     scope: venue
     permission: GUEST_MANAGE
     offline: false
-    reads: 2
-    writes: 2
+    reads: 3
+    writes: 3
   - operation: updateGuestPreferences
     verb: PUT
     path: /guests/{subjectId}/preferences
-    scope: tenant
+    scope: subject
     permission: GUEST_MANAGE
     offline: false
     reads: 3
@@ -2239,7 +2255,7 @@ operationsByContract:
   - operation: updateMyProfile
     verb: PATCH
     path: /guests/me/profile
-    scope: venue
+    scope: subject
     permission: GUEST_VIEW
     offline: false
     reads: 2
@@ -2267,12 +2283,18 @@ tables:
   writtenBy:
   - accrueLoyaltyPoints
   - actOnWaiverRequirements
+  - activateAudience
+  - activateChallenge
   - activateJourney
   - addCaseMessage
   - addGuestNote
   - addSuppression
   - addToWishlist
   - adjustLoyaltyPoints
+  - approvePrivacyTesting
+  - approveWaiverTesting
+  - awardBadge
+  - checkGuestCheckoutMatch
   - claimConversation
   - claimDeviceConsent
   - closeConversation
@@ -2280,6 +2302,7 @@ tables:
   - createCase
   - createCaseClassificationIntelligent
   - createChallenge
+  - createConsentQuestion
   - createForm
   - createInvitationCampaign
   - createJourney
@@ -2288,12 +2311,17 @@ tables:
   - createReferral
   - createSegment
   - createUrlRedirect
+  - decideDuplicateCandidate
   - decideGuestCheckoutMatch
   - endKioskAssist
   - escalateCase
   - handoverToAgent
+  - identifyGuest
+  - importAudienceList
+  - issueReward
   - launchCampaign
   - markMyNotificationsRead
+  - matchGuest
   - matchLostItem
   - mergeGuestProfiles
   - mergeGuests
@@ -2301,11 +2329,14 @@ tables:
   - pauseCampaign
   - previewSegment
   - raiseMyCase
+  - recordCheckoutConsents
   - recordConsent
+  - recordConsentAnswers
   - recordCookieScan
   - recordDeviceConsent
   - recordLostItem
   - recordPrivacyIncident
+  - recordSaleOwnerAnswers
   - recordTouchPoint
   - redeemLoyaltyPoints
   - registerGuestDevice
@@ -2318,18 +2349,67 @@ tables:
   - revokeGuestDevice
   - runDataRetention
   - sendConversationMessage
+  - sendGuestConversationMessage
   - sendTransactionalMessage
   - setAgentAvailability
+  - setAgentServiceProfile
+  - setBadge
   - setBusinessEventMapping
   - setCallDisposition
   - setCaseCategoryDefinition
+  - setCaseInternalRequest
+  - setCaseInvestigationResolution
+  - setCaseResolution
+  - setChannelProvider
+  - setCommunicationPreferenceMarketing
+  - setCommunicationRoutingRule
+  - setConsentCapturePoint
   - setConsentPurposes
+  - setContactAutomation
+  - setCookieBannerDesign
   - setCookieScanPolicy
+  - setCustomerServiceCopilot
+  - setDataDiscoveryAccess
+  - setDataProcessingPurpose
   - setDataRetentionPolicy
+  - setDigitalWaiverForm
+  - setDynamicFieldQuestion
+  - setGuestAttributeModel
+  - setGuestExtraFields
+  - setGuestExtraValues
+  - setGuestMatchPolicy
+  - setGuestRelationships
+  - setIdentityResolutionRules
+  - setIntelligentRoutingSkill
+  - setLeaderboardNickname
+  - setLegalHold
+  - setLocalizationBrandingCustomer
+  - setLoyaltyCampaign
+  - setLoyaltyRules
+  - setMarketingSubscription
   - setMessageTrigger
+  - setMinorGuardianAge
+  - setOrderBookingTicket
+  - setPrivacyAction
+  - setPrivacyComplianceException
   - setPrivacyNoticePolicyGovernance
+  - setPrivacyRequest
+  - setPrivacyRequestTypes
+  - setQualityEvaluation
+  - setRefundCompensationService
+  - setReward
+  - setSenderIdentityDomain
   - setSeoMetadata
   - setServiceQueueDefinition
+  - setSignatorySignatureGuardian
+  - setSlaPolicy
+  - setTrackingTechnology
+  - setTrackingTechnologyCatalogueEntry
+  - setWaiverAssociation
+  - setWaiverException
+  - setWaiverTemplateMaster
+  - setWaiverTriggerRule
+  - setWaiverVerificationValidation
   - startKioskAssist
   - stopCampaign
   - submitForm
@@ -2339,6 +2419,7 @@ tables:
   - unscheduleCampaign
   - updateCampaign
   - updateCase
+  - updateConsentQuestion
   - updateGuestPreferences
   - updateGuestProfile
   - updateLoyaltyProgramme
@@ -2348,12 +2429,18 @@ tables:
   readBy:
   - accrueLoyaltyPoints
   - actOnWaiverRequirements
+  - activateAudience
+  - activateChallenge
   - activateJourney
   - addCaseMessage
   - addGuestNote
   - addSuppression
   - addToWishlist
   - adjustLoyaltyPoints
+  - approvePrivacyTesting
+  - approveWaiverTesting
+  - awardBadge
+  - checkGuestCheckoutMatch
   - claimConversation
   - claimDeviceConsent
   - closeConversation
@@ -2361,6 +2448,7 @@ tables:
   - createCase
   - createCaseClassificationIntelligent
   - createChallenge
+  - createConsentQuestion
   - createForm
   - createInvitationCampaign
   - createJourney
@@ -2369,12 +2457,17 @@ tables:
   - createReferral
   - createSegment
   - createUrlRedirect
+  - decideDuplicateCandidate
   - decideGuestCheckoutMatch
   - endKioskAssist
   - escalateCase
   - handoverToAgent
+  - identifyGuest
+  - importAudienceList
+  - issueReward
   - launchCampaign
   - markMyNotificationsRead
+  - matchGuest
   - matchLostItem
   - mergeGuestProfiles
   - mergeGuests
@@ -2382,11 +2475,14 @@ tables:
   - pauseCampaign
   - previewSegment
   - raiseMyCase
+  - recordCheckoutConsents
   - recordConsent
+  - recordConsentAnswers
   - recordCookieScan
   - recordDeviceConsent
   - recordLostItem
   - recordPrivacyIncident
+  - recordSaleOwnerAnswers
   - recordTouchPoint
   - redeemLoyaltyPoints
   - registerGuestDevice
@@ -2399,17 +2495,67 @@ tables:
   - revokeGuestDevice
   - runDataRetention
   - sendConversationMessage
+  - sendGuestConversationMessage
   - sendTransactionalMessage
   - setAgentAvailability
+  - setAgentServiceProfile
+  - setBadge
   - setBusinessEventMapping
   - setCallDisposition
   - setCaseCategoryDefinition
+  - setCaseInternalRequest
+  - setCaseInvestigationResolution
+  - setCaseResolution
+  - setChannelProvider
+  - setCommunicationPreferenceMarketing
+  - setCommunicationRoutingRule
+  - setConsentCapturePoint
   - setConsentPurposes
+  - setContactAutomation
+  - setCookieBannerDesign
   - setCookieScanPolicy
+  - setCustomerServiceCopilot
+  - setDataDiscoveryAccess
+  - setDataProcessingPurpose
+  - setDataRetentionPolicy
+  - setDigitalWaiverForm
+  - setDynamicFieldQuestion
+  - setGuestAttributeModel
+  - setGuestExtraFields
+  - setGuestExtraValues
+  - setGuestMatchPolicy
+  - setGuestRelationships
+  - setIdentityResolutionRules
+  - setIntelligentRoutingSkill
+  - setLeaderboardNickname
+  - setLegalHold
+  - setLocalizationBrandingCustomer
+  - setLoyaltyCampaign
+  - setLoyaltyRules
+  - setMarketingSubscription
   - setMessageTrigger
+  - setMinorGuardianAge
+  - setOrderBookingTicket
+  - setPrivacyAction
+  - setPrivacyComplianceException
   - setPrivacyNoticePolicyGovernance
+  - setPrivacyRequest
+  - setPrivacyRequestTypes
+  - setQualityEvaluation
+  - setRefundCompensationService
+  - setReward
+  - setSenderIdentityDomain
   - setSeoMetadata
   - setServiceQueueDefinition
+  - setSignatorySignatureGuardian
+  - setSlaPolicy
+  - setTrackingTechnology
+  - setTrackingTechnologyCatalogueEntry
+  - setWaiverAssociation
+  - setWaiverException
+  - setWaiverTemplateMaster
+  - setWaiverTriggerRule
+  - setWaiverVerificationValidation
   - startKioskAssist
   - stopCampaign
   - submitForm
@@ -2419,6 +2565,7 @@ tables:
   - unscheduleCampaign
   - updateCampaign
   - updateCase
+  - updateConsentQuestion
   - updateGuestPreferences
   - updateGuestProfile
   - updateLoyaltyProgramme
@@ -2841,7 +2988,7 @@ tables:
   - marketing-crm
   foreignWriters: null
 - table: marketing.form_definition_field
-  columns: 23
+  columns: 24
   store: postgres
   parent: marketing.form_definition
   writtenBy:
@@ -2854,6 +3001,13 @@ tables:
   writtenBy:
   - marketing-crm
   foreignWriters: null
+- table: marketing.form_submission_sale_link
+  columns: 7
+  store: postgres
+  parent: marketing.form_submission
+  writtenBy:
+  - marketing-crm
+  foreignWriters: null
 - table: marketing.guest_attribute_model
   columns: 7
   store: postgres
@@ -2862,7 +3016,7 @@ tables:
   - marketing-crm
   foreignWriters: null
 - table: marketing.guest_device
-  columns: 15
+  columns: 16
   store: postgres
   parent: null
   writtenBy:
@@ -3520,6 +3674,7 @@ screens:
 - P01:WEB-016 Login / Register
 - P01:WEB-017 My Account Dashboard
 - P01:WEB-020 Profile & Preferences
+- P01:WEB-021 Wallet & Gift Cards
 - P01:WEB-024 Devices, Wishlist & Consent
 - P01:WEB-025 Help Centre / FAQ
 - P01:WEB-026 Survey & Feedback

@@ -448,8 +448,9 @@ def state_facts(o: str, x: dict, models: dict, by_op: dict) -> tuple[list[str], 
 
 # ---- DDL to migrations --------------------------------------------------------------------------
 
-# A forward migration derive-ddl writes after r1 (`V0100__after_r1_20261002.sql`); the same pattern as derive-ddl's.
-FORWARD_FILE = re.compile(r"^V(\d{4})__[\w.-]+\.sql$")
+# A forward migration derive-ddl writes after r1 (`V0100__after_r1_20261002.sql`); the same pattern as derive-ddl's,
+# including a letter after the number for a file that runs between two frozen ones (`V0103a__`, CHG-R8MIG-003).
+FORWARD_FILE = re.compile(r"^V(\d{4})[a-z]?__[\w.-]+\.sql$")
 # The row-level policy each `platform.apply_<kind>_rls` gives a table (backend/<db>/920-row-level-security.sql), as the
 # documents name it (CHG-TBF-004). **`tenant` is not a missing tenant_id**: a tenant database holds one tenant
 # (ADR-0038), so the tenant-root policy is platform.tenant_root_in_scope() and needs no tenant column.
@@ -469,6 +470,10 @@ MACHINERY_TABLES = {
     "kernel.inbox": "kernel machinery: the inbox per tenant database (ADR-0058; PLATFORM-OUTBOX, MIG-PARTITIONS)",
     "ai.inbox": "kernel machinery: the AI consumers' inbox, since only AI writes AI tables (ADR-0058, ADR-0020)",
     "control.outbox_relay": "kernel machinery: the relay lease per tenant database (ADR-0058; PLATFORM-OUTBOX)",
+    # AI's own outbox (R8 blocker FOUNDATION-AI-C41, the storage-sat lane's request 10; CHG-R8MIG-011): AI writes no
+    # other module's table, so its events leave through ai.outbox, allocated from ai.outbox_sequence, like ai.inbox.
+    "ai.outbox": "kernel machinery: AI's own outbox, written in AI's transactions (ADR-0058, ADR-0020)",
+    "ai.outbox_sequence": "kernel machinery: the per-aggregate sequence of ai.outbox (ADR-0058)",
 }
 # **Forward migration file numbers** (CHG-TBF-002). V0001 is the baseline and V0002-V0099 the first release, in
 # schema order; V0100-V0999 belong to derive-ddl's frozen-mode files (backend/<db>/V01xx__after_r1_<date>.sql);
@@ -531,7 +536,7 @@ def read_ddl() -> dict[str, dict]:
         # access.hardware_certification ...) out of every migration ticket although operations read and write
         # them; their columns added after r1 were missing from the counts as well.
         fwd = sorted((p for p in (ROOT / "backend" / db).glob("V*.sql") if FORWARD_FILE.match(p.name)),
-                     key=lambda p: int(FORWARD_FILE.match(p.name).group(1)))
+                     key=lambda p: p.name)   # the order a database applies them: by name (V0103a after V0103)
         for f in sorted((ROOT / "backend" / db).glob("010-*.sql")) + fwd:
             name, cols_ = None, []
             for line in f.read_text(encoding="utf-8").splitlines():
@@ -560,8 +565,11 @@ def read_ddl() -> dict[str, dict]:
                 if name and m:
                     cols_.append((m.group(1), m.group(2).rstrip(",")))
         policy = {}
+        # **The names file is not part of the build order** (R8-MIG-001): its keys are added NOT VALID, guarded, and
+        # only when both tables are there, so they never make one migration wait for another. Read as edges they
+        # renumbered V0006-V0034, which developers have delivered.
         for f in [ROOT / "backend" / db / "900-foreign-keys.sql",
-                  ROOT / "backend" / db / "920-row-level-security.sql"] + fwd:
+                  ROOT / "backend" / db / "920-row-level-security.sql"] + [x for x in fwd if "__names_" not in x.name]:
             if not f.exists():
                 continue
             text = f.read_text(encoding="utf-8").replace('"', "")
@@ -1367,7 +1375,7 @@ def main() -> int:
               "AI": "[AI]", "Test": "[Test]"}
 
     def track_of(key, area):
-        if key.startswith(("MIG", "VM-MIG", "VM-DB")):
+        if key.startswith(("MIG", "VM-MIG", "VM-DB")) or area == "database":
             return "Database"
         if key == "SETUP":
             return "Setup"
@@ -1642,6 +1650,13 @@ def main() -> int:
             continue
         for x in sorted(items_):
             if x in ddl and x.split(".")[0] != ident_[1] and x in moved_.values():
+                if ident_[1] == "control" and ddl[x]["db"] != "control":
+                    # **A table that left the control database is a new table in the tenant one** (CHG-R8MIG-024; the
+                    # merged rehearsal of this lane: control.content_block -> whitelabel.content_block). Kept in
+                    # MIG-CONTROL's group it formed a tenant group keyed MIG-CONTROL beside the control database's own,
+                    # and the second task with the key took every control table off the ticket. It is planned with its
+                    # new schema; the control table's drop is its migration-review row.
+                    continue
                 grp_over[x] = ident_[1]
                 if x not in rel:
                     rel.add(x)
@@ -1827,7 +1842,18 @@ def main() -> int:
                 "Why"], [[r[0], f"`{r[1]}`", r[3], r[4], r[5], r[6], r[7], r[9]] for r in tables_rows])
     if not_tables:
         M += ["", "## Used by the release but not a table", ""]
-        M += [f"- `{t}`: " + (ref.get("storage") or {}).get(t, "").replace("**", "")[:160] for t in not_tables]
+        # **A published read view says what it is** (CHG-R8MIG-020; R8 blocker FOUNDATION-AI-C31): the three
+        # platform.sale_board*_for_catalogue names are views DB-READ-VIEWS generates over Tenancy's sale-board tables
+        # for Catalogue's reads, so they come after MIG-PLATFORM, and their line was empty.
+        def not_table_reason(t):
+            why = (ref.get("storage") or {}).get(t, "").replace("**", "")[:160]
+            if not why and t.endswith("_for_" + t.rsplit("_for_", 1)[-1]) and "_for_" in t:
+                base_ = t.rsplit("_for_", 1)[0]
+                why = (f"a published read view over {base_} for {t.rsplit('_for_', 1)[1]}'s reads, created by "
+                       f"DB-READ-VIEWS after the migration that creates {base_} (a regenerated view set ships as a new "
+                       "forward file of CREATE OR REPLACE VIEW)")
+            return why
+        M += [f"- `{t}`: " + not_table_reason(t) for t in not_tables]
     (OUT / "backend" / "MIGRATIONS.md").write_text("\n".join(M) + "\n", encoding="utf-8")
 
     def migs_for(olist):
@@ -1985,9 +2011,21 @@ def main() -> int:
         task("VM-DB", "VM", "Feature", "Venue Management: database migrations",
              "Tables the Venue Management backend needs that the first release does not create.", 2, area="VM")
         vm_mig = {}
+        pushed_map_ = (json.loads((OUT / "pms-map.json").read_text(encoding="utf-8"))
+                       if (OUT / "pms-map.json").exists() else {})
         for sch in sorted({t.split(".")[0] for t in new_tables}):
             ts = [t for t in new_tables if t.split(".")[0] == sch]
             k = f"VM-MIG-{sch.upper()}"
+            if k in by_key:
+                # **Its key already holds a pushed forward migration the first release kept whole** (CHG-R8MIG-024;
+                # the refresh rehearsal of 20 October: VM-MIG-APPROVALS, pushed for approvals.escalation, was formed
+                # again for approvals.sla_policy, and the second task with the key lost escalation from every ticket).
+                # This work takes a key nobody holds; the key reconciliation then writes it under the pushed ticket
+                # whose work it is (MIG-APPROVALS-4 for sla_policy).
+                n_ = 2
+                while f"MIG-{sch.upper()}-{n_}" in by_key or f"MIG-{sch.upper()}-{n_}" in pushed_map_:
+                    n_ += 1
+                k = f"MIG-{sch.upper()}-{n_}"
             prior = [m[1] for m in migrations if m[4] == sch]
             n_cols = sum(len(ddl[t]["columns"]) for t in ts)
             pts = points_of(1 + 0.5 * len(ts) + n_cols / 40)
@@ -2118,14 +2156,18 @@ def main() -> int:
             return ""
         lead = "Builds: " + ", ".join(f"`{b}`" for b in items) + ". "
         if served:
-            lead += (f"{', '.join(served)} {'is' if len(served) == 1 else 'are'} served by ticvai-ai behind the AI gateway, "
-                     "to their contracts at the release tag in ADAM; no back-end task builds them. ")
+            lead += ticket_done.claimed_ops_sentence(served, t_.get("epic") == "AI-ENGINE")
         return lead
 
     # **Tasks no screen or operation implies** (docs/active/block-a-extra-tasks.json, 30 September): the
     # platform kernel and offline machinery the system-design review found unticketed (SD-047, SD-063), and
     # the AI engine work the two AI engineers carry. Backend-pool tasks go to the least-loaded owner, as
     # services do; AI engine tasks carry no points, because the AI engineers' capacity is separate.
+    # **A hand-written task that builds tables is their migration** (CHG-R8MIG-016; the coordinator, 20 October 2026, for
+    # the products wave 1 task PRD-W1-DB): a task whose `builds` lists `table <schema.name>` and claims no operation is a
+    # [DB] task. Its tables count as created by it (no second migration is planned for them, and they are not "Tables no
+    # migration creates"), and it carries the migration ticket text below.
+    hand_db: dict[str, str] = {}
     if EXTRA.exists():
         ex = json.loads(EXTRA.read_text(encoding="utf-8"))
         backend_ = areas.get("backend") or []
@@ -2142,8 +2184,12 @@ def main() -> int:
             who = t_.get("assignee") or (min(backend_, key=lambda x: load[x]) if backend_ else "")
             if not is_ai and who:
                 load[who] += pts
+            db_tables_ = ticket_done.hand_db_tables(t_)
+            for x_ in db_tables_:
+                hand_db.setdefault(x_, t_["key"])
             task(t_["key"], t_["epic"], "Task", t_["subject"], t_["subject"] + ". " + extra_lead(t_) + t_["detail"], 1,
-                 pts=pts, area="ai" if is_ai else "backend", assignee=who, depends=t_.get("depends") or ())
+                 pts=pts, area="ai" if is_ai else ("database" if db_tables_ else "backend"), assignee=who,
+                 depends=t_.get("depends") or ())
 
     # ================================================================ the rest of the package (1 October)
     # **Every block is planned task by task now**, not only Block A: the PM's replan wants module-wise completion
@@ -2208,6 +2254,8 @@ def main() -> int:
         if ident and ident[0] == "screen":
             built_screen[ident[1]] = t_["key"]
     mig_of = dict(table_mig)
+    for t_h, k_h in hand_db.items():       # created by a hand-written [DB] task (CHG-R8MIG-016): never planned again
+        mig_of.setdefault(t_h, k_h)
     mig_of.update(vm_mig)
     later_op_task, later_mig, later_items = {}, {}, []      # later_items: (key, module, platform, kind) per screen
     later_ams = {}                                          # (module, platform) -> [(sid, key, pts, kind)]
@@ -3822,7 +3870,7 @@ def main() -> int:
     # contracts describe and no operation reads or writes yet; they are listed with that reason rather than
     # migrated (a table no code touches is a migration nobody can test), and the one an operation does reach is a
     # gap tools/check-migration-tickets.py fails on.
-    assigned = set(table_mig) | set(vm_mig) | set(later_mig)
+    assigned = set(table_mig) | set(vm_mig) | set(later_mig) | set(hand_db)
     reached = defaultdict(set)
     for o, x in lineage.items():
         for kk in ("reads", "writes"):
@@ -3847,8 +3895,11 @@ def main() -> int:
             storage_only.append((t, "GAP: read or written by " + ", ".join(sorted(reached[t])[:4])
                                  + " but in no migration"))
         else:
+            # an after-r1 change to it is cited here too, so the migration planned later applies it (CHG-R8MIG-024; the
+            # refresh rehearsal: V0109 keyed ai.translation_job, which V0108 creates and no operation reaches yet)
             storage_only.append((t, "storage only: no operation reads or writes it and no task names it; its "
-                                    "forward migration is planned when an operation first reaches it"))
+                                    "forward migration is planned when an operation first reaches it"
+                                 + "".join(f"; Source DDL after r1: {r_}" for r_ in sorted(held_ar1.get(t, ())))))
     M2 = ["", "## Forward migrations after the first release", "",
           f"**{len(fwd_rows)} forward migrations**, V{FORWARD_TICKET_FIRST:04d} upwards in build order (the Venue "
           "Management waves, then each later app-module). V0100-V0999 are derive-ddl's frozen-mode files in "
@@ -4230,17 +4281,53 @@ def main() -> int:
     # no ticket), and MIG-FOREIGN-KEYS and MIG-PARTITIONS name their Source DDL like every other migration.
     base_words_ = ticket_done.baseline_wording(ROOT)
     made_by_ = {}
+    hand_keys_ = set(hand_db.values())
     for t_ in tasks:
         if t_["type"] == "Task" and t_["track"] == "Database" and ticket_done.MIGRATION_KEY.match(t_["key"]):
             m_ = re.search(r"Tables: (.+?)\. Source", t_["description"] or "")
             for x_ in (m_.group(1).split(", ") if m_ else []):
                 made_by_.setdefault(x_.strip(), t_["key"])
+    for x_, k_ in hand_db.items():
+        made_by_.setdefault(x_, k_)
     after_r1_ = defaultdict(lambda: defaultdict(dict))
     for (rel_, tbl_), items_ in ticket_done.after_r1_changes(ROOT).items():
         if tbl_ in made_by_:
             after_r1_[made_by_[tbl_]][rel_][tbl_] = items_
         else:
             print(f"WARNING: {rel_} changes {tbl_}, which no migration ticket creates (CHG-R5-002)")
+    # **What a migration needs that the copied DDL does not give it** (CHG-R8MIG-008; ADAM faster-db-tickets report):
+    # the enum types the frozen 010-pii.sql names and no file creates (CR-001), and a parent-row policy whose parent a
+    # later migration creates (it moves there, as a cross-schema key does).
+    extra_ = defaultdict(list)
+    for tbl_, uses_ in sorted(ticket_done.undefined_types(ROOT).items()):
+        if tbl_ in made_by_:
+            extra_[made_by_[tbl_]].append(ticket_done.type_sentence(tbl_, uses_))
+        else:
+            print(f"WARNING: {tbl_} uses a type no file creates and no migration ticket creates the table (CR-001)")
+    mig_no_ = {}
+    for t_ in tasks:
+        m_ = re.search(r"\bV(\d{4})[a-z]?__", t_.get("subject") or "")
+        if m_ and ticket_done.MIGRATION_KEY.match(t_["key"]):
+            mig_no_[t_["key"]] = int(m_.group(1))
+    moved_, orphans_ = ticket_done.parent_policy_moves(ticket_done.parent_policies(ROOT), made_by_, mig_no_,
+                                                       ticket_done.declared_moves(ROOT))
+    for k_, ws_ in ticket_done.parent_policy_sentences(moved_, orphans_).items():
+        extra_[k_] += ws_
+    for k_, ws_ in ticket_done.key_move_sentences(ticket_done.key_moves(
+            ticket_done.foreign_keys(ROOT), made_by_, mig_no_, ticket_done.declared_moves(ROOT))).items():
+        extra_[k_] += ws_
+    for c_, p_ in sorted(orphans_.items()):
+        print(f"WARNING: {c_}'s row-level security reads {p_}, which no migration ticket creates (CHG-R8MIG-008)")
+    rows_by_ = defaultdict(list)
+    moves_ = ticket_done.declared_moves(ROOT)
+    for row_ in ticket_done.review_rows(ROOT):
+        tbl_ = moves_.get(row_[0], row_[0])
+        if tbl_ in made_by_:
+            rows_by_[made_by_[tbl_]].append(row_)
+        else:
+            print(f"WARNING: handoff/migration-review.md row on {tbl_} ({row_[1]}) is on no migration ticket (CHG-R8MIG-013)")
+    for k_, rs_ in rows_by_.items():
+        extra_[k_].append(ticket_done.review_sentence(rs_))
     own_src_ = {"MIG-FOREIGN-KEYS": "Source DDL: backend/tenant/900-foreign-keys.sql and backend/control/900-foreign-keys.sql "
                                     "(the constraints named here, nothing else from those files).",
                 "MIG-PARTITIONS": "Source DDL: backend/tenant/930-partitioning.sql (the monthly partitions and default "
@@ -4248,11 +4335,18 @@ def main() -> int:
                                   "platform.ensure_month_partition and platform.ensure_month_partitions are already in "
                                   "the baseline, MIG-BASELINE)."}
     for t_ in tasks:
-        if t_["type"] == "Task" and t_["track"] == "Database" and ticket_done.MIGRATION_KEY.match(t_["key"]):
+        if t_["type"] == "Task" and t_["track"] == "Database" and (ticket_done.MIGRATION_KEY.match(t_["key"])
+                                                                   or t_["key"] in hand_keys_):
             src_ = ([own_src_[t_["key"]]] if t_["key"] in own_src_ and "Source DDL:" not in (t_["description"] or "")
                     else [])
-            ar1_ = [ticket_done.after_r1_sentence(rel_, ch_) for rel_, ch_ in sorted(after_r1_[t_["key"]].items())]
-            add_ = [w_ for w_ in (src_ + ar1_ + [ticket_done.MIGRATION_WORDING]
+            if t_["key"] in hand_keys_:
+                dbs_ = sorted({ddl[x_]["db"] for x_, k_ in hand_db.items() if k_ == t_["key"] and x_ in ddl})
+                src_ = [f"{' and '.join(d_.capitalize() for d_ in dbs_) or 'Tenant'} database."] + src_
+            ar1_ = [(ticket_done.names_sentence if "__names_" in rel_ else ticket_done.after_r1_sentence)(rel_, ch_)
+                    for rel_, ch_ in sorted(after_r1_[t_["key"]].items())]
+            add_ = [w_ for w_ in (src_ + ar1_ + extra_.get(t_["key"], [])
+                                  + [ticket_done.MIGRATION_WORDING, ticket_done.GUARDED_KEYS,
+                                     ticket_done.SCHEMA_VERSION_LINE]
                                   + ([base_words_] if t_["key"] == "MIG-BASELINE" else []))
                     if w_ not in (t_["description"] or "")]
             if add_:

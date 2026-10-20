@@ -1,6 +1,6 @@
 # P02-booking-selection-01 — P02 · Booking & Selection
 
-**10 screens · 34 operations · 68 schemas · 8 permissions**
+**10 screens · 36 operations · 71 schemas · 8 permissions**
 
 Platform P02 Guest App · ships as **guest** ·
 guest audience · mobileApp ·
@@ -51,7 +51,7 @@ convincingly. It is never a caption.
 - **Every control that can be refused must be gated.** 8 permissions apply here:
   `AI_USE, GUEST_VIEW, ORDER_CREATE, ORDER_MODIFY, ORDER_VIEW, PRODUCT_VIEW, RESOURCE_VIEW, VENUE_MAP_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **9 of these operations work offline**: getBundle, getPublishedBookingFlow, getPublishedGuidedChoice, getVenueMap, listBookableVenueMaps, listPerformances, listProductCategories, listProductVariants
+- **10 of these operations work offline**: getGuestBundle, getPerformance, getPublishedBookingFlow, getPublishedGuidedChoice, getVenueMap, listBookableVenueMaps, listPerformances, listProductCategories
   — and the rest do not. A surface that looks the same online and off is lying.
 - **Offline, every screen shows one banner, the same on web and app:** *"You're offline. Connect to the internet to book, pay, order or join a queue."* The moment the connection drops, on every screen, above the screen's own content. By itself as soon as the connection is back, with a short "Back online" confirmation. **It never** Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing. Each screen's `states.offline` says what stays on screen and what waits.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -145,15 +145,15 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `GST-007` | Select Date & Time | A | 27 | 31 | 6 | 22 | 28 | 0 | guest | notStarted (client-verified) |
-| `GST-008` | Tickets & Add-ons | A | 19 | 66 | 6 | 26 | 25 | 0 | guest | notStarted (client-verified) |
-| `GST-048` | Upsell / Cross-Sell | A | 19 | 10 | 5 | 48 | 9 | 0 | guest | notStarted (designed) |
+| `GST-008` | Tickets & Add-ons | A | 27 | 66 | 6 | 30 | 25 | 0 | guest | notStarted (client-verified) |
+| `GST-048` | Upsell / Cross-Sell | A | 27 | 10 | 5 | 57 | 9 | 0 | guest | approved (client-verified) |
 | `GST-049` | Interactive Seat Selection | A | 8 | 39 | 5 | 29 | 21 | 6 | guest | notStarted (client-verified) |
-| `GST-050` | Resource Booking – Cabana | A | 19 | 18 | 6 | 21 | 4 | 6 | guest | notStarted (designed) |
-| `GST-056` | Bundle Package | A | 19 | 5 | 6 | 4 | 4 | 0 | guest | notStarted (designed) |
-| `GST-058` | Resource Availability (Cabana) | A | 3 | 20 | 6 | 0 | 4 | 0 | guest | notStarted (designed) |
-| `GST-072` | Share & Group Booking | A | 14 | 14 | 6 | 8 | 8 | 6 | guest | notStarted (client-verified) |
-| `GST-074` | Map Booking — Cabanas & Spots | A | 24 | 38 | 6 | 5 | 4 | 6 | guest | notStarted (designed) |
-| `GST-075` | Book a Space by the Hour | A | 23 | 40 | 6 | 25 | 7 | 0 | guest | notStarted (designed) |
+| `GST-050` | Resource Booking – Cabana | A | 27 | 18 | 6 | 25 | 4 | 6 | guest | approved (client-verified) |
+| `GST-056` | Bundle Package | A | 27 | 5 | 6 | 4 | 4 | 0 | guest | approved (client-verified) |
+| `GST-058` | Resource Availability (Cabana) | A | 3 | 20 | 6 | 0 | 4 | 0 | guest | approved (client-verified) |
+| `GST-072` | Share & Group Booking | A | 15 | 14 | 6 | 8 | 8 | 6 | guest | notStarted (client-verified) |
+| `GST-074` | Map Booking — Cabanas & Spots | A | 32 | 38 | 6 | 5 | 4 | 6 | guest | approved (client-verified) |
+| `GST-075` | Book a Space by the Hour | A | 31 | 40 | 6 | 29 | 7 | 0 | guest | approved (client-verified) |
 
 ## Thin screens in this batch
 

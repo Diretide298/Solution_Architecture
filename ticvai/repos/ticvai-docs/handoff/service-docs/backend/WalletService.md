@@ -7,7 +7,7 @@
 | Tier | commerce: The sale path. Highest availability, highest write rate. |
 | Contracts | `wallet` |
 | Schemas owned | `wallet` |
-| Operations in the slice | 11 of 70 |
+| Operations in the slice | 14 of 70 |
 | Scale | Read-heavy on the sale path — every till and reader resolves a balance — and write-heavy on top-up. Latency-critical in a way LedgerService is not, which is why the two are separate: the ledger is append-only and batch-tolerant, a balance check is neither. |
 | If it is down | It holds a liability owed to a customer. A wallet that double-spends is a financial loss, not a bug report. Deduction order across credit lots is FEFO and is decided here, once, rather than per caller. |
 
@@ -32,12 +32,15 @@
 | retail | [`getWalletAutoReloadSetting`](#getwalletautoreloadsetting) | GET | `/wallets/{walletId}/auto-reload` | core | 1 | BO-416, GST-011 |
 | retail | [`setWalletAutoReloadSetting`](#setwalletautoreloadsetting) | PUT | `/wallets/{walletId}/auto-reload` | core | 1 | BO-416, GST-011 |
 | retail | [`transferWalletBalance`](#transferwalletbalance) | POST | `/wallets/{walletId}/transfer` | core | 1 | BO-1116, BO-1121, GST-071, WEB-021 |
+| wallet | [`createCreditType`](#createcredittype) | POST | `/credit-types` | setup | 1 | BO-1088, BO-1104, BO-415 |
 | wallet | [`getWallet`](#getwallet) | GET | `/wallets/{subjectId}` | core | 1 | BO-1086, BO-1100, BO-1149, BO-1150, BO-414, BO-416 … |
 | wallet | [`listWalletTransactions`](#listwallettransactions) | GET | `/wallets/{subjectId}/transactions` | core | 1 | BO-1093, BO-1102, BO-1142, BO-1143, BO-1148, BO-414 … |
 | wallet | [`publishWalletConfiguration`](#publishwalletconfiguration) | POST | `/wallet-configuration/publish` | setup | 1 | BO-1092, BO-1112, BO-1132, BO-1162, BO-1173, BO-1180 … |
 | wallet | [`restoreWalletConfigurationVersion`](#restorewalletconfigurationversion) | POST | `/wallet-configuration/versions/{version}/restore` | setup | 1 | BO-1162 |
 | wallet | [`setWalletFundingRules`](#setwalletfundingrules) | PUT | `/wallet-funding-rules` | setup | 1 | BO-1094, BO-1095, BO-1096, BO-1097, BO-1098, BO-1099 … |
+| wallet | [`setWalletTransferRules`](#setwallettransferrules) | PUT | `/wallet-transfer-rules` | setup | 1 | BO-1144, BO-1145 |
 | wallet | [`topUpWallet`](#topupwallet) | POST | `/wallets/{subjectId}/top-ups` | core | 1 | BO-488, POS-027 |
+| wallet | [`updateCreditType`](#updatecredittype) | PUT | `/credit-types/{creditTypeId}` | setup | 1 | BO-1088, BO-1104, BO-1105, BO-1108, BO-420 |
 
 ## Group: card
 
@@ -49,18 +52,34 @@ Creates a liability, not revenue. Recognition happens as credits are played, or 
 **Posts a `gameCreditLoaded` ledger entry** (decided 28 September, audit R191): the amount paid to the liability account `finance.setAccountMappings` holds for that event type, in the fiscal period open for the load date. Until this date the load wrote no ledger row.
 Bonus credits from a promotion are tracked separately because they are typically non-refundable and are spent first.
 
-**Where the credits go and what comes back** (4 October 2026, CHG-FXC-006; the Sprint 1-2 judging found a Wallet
-response and a wallet lock for a card that has no wallet). The card is found by `cardCode` (`games.card.card_code`).
-* **A card with a `walletId`** (registered to a guest with a wallet): the movement is a wallet movement under the
-  one-balance-writer rule: `wallet.balance` locked for one guarded statement, a `wallet.wallet_transaction` (kind
-  `topUp`, `reason` `gameCard:{cardCode}`), and a `wallet.credit_lot` per kind of credit (`source_kind` `topUp` for
-  paid credits, `promotion` for bonus credits, `source_reference` `gameCard:{cardCode}`). Returns that Wallet.
-* **An anonymous card** (`walletId` null): the card row is the balance. `games.card.credits` and `bonus_credits`
-  change in one guarded update on the locked row. Returns the card as a Wallet view: `id` the card's `id`,
-  `subjectId` the nil UUID `00000000-0000-0000-0000-000000000000` (no guest), `balance` the paid credits,
-  `bonusBalance` the bonus credits, `currency` the venue's, `status` the card's status.
-Either way the movement emits `wallet.credited` (`kind` `gameCreditLoad`, `walletId` the wallet or the card's id)
-through `platform.outbox` in the same transaction, and the ledger posts `gameCreditLoaded` from it.
+**Where the credits go and what comes back** (4 October 2026, CHG-FXC-006; corrected by the lead's answer of
+20 October 2026, r8 cause APPROVALS-TENANCY-C30, option A). The card is read by `cardCode` through
+`games#cardRecords` (`games.card.card_code`) and must be `active` (409 otherwise). **This operation never
+writes `games.card`**: that table is VenueOps's, in another deployable (ADR-0055), and its only writer here is
+the games consumer of `wallet.credited` (`x-ticvai-write-via`).
+* **A card with a `walletId`** (registered to a guest with a wallet): **the wallet moves by the money paid**,
+  `amountPaid`, under the one-balance-writer rule: `wallet.balance` locked for one guarded statement, a
+  `wallet.wallet_transaction` (kind `topUp`, `reason` `gameCard:{cardCode}`) for `amountPaid`. **Credits are a
+  counted attribute of the lots, not money**: one `wallet.credit_lot` per kind of credit, of credit type
+  `gameCredit` for the paid credits (`issuedCredits` = `credits`, `issuedAmount` = `amountPaid`, `source_kind`
+  `topUp`) and `gameBonusCredit` for the bonus (`issuedCredits` = `bonusCredits`, `issuedAmount` zero,
+  `source_kind` `promotion`), `source_reference` `gameCard:{cardCode}`. No conversion between credits and money is
+  held anywhere: the credits a payment buys are what the till sold. Returns that Wallet.
+* **An anonymous card** (`walletId` null): no wallet row and no `wallet_transaction` is written. The load is
+  handed to the games consumer through `wallet.credited` (v2: `cardId`, `credits`, `bonusCredits`,
+  `amountPaid`, `loadId` = this request's `id`, the consumer's idempotency key), which adds the credits to
+  `games.card.credits` and `bonus_credits` on its locked row. The answer is the card as a Wallet view **as it
+  will stand once the consumer applies the load**: `id` the card's `id`, `subjectId` the nil UUID
+  `00000000-0000-0000-0000-000000000000` (no guest), `balance` the card's paid credits read now plus
+  `credits`, `bonusBalance` likewise with `bonusCredits`, `currency` the venue's, `status` the card's status.
+  A screen that reads the card again before the consumer has run may briefly see the old figures.
+Either way the load emits `wallet.credited` (`kind` `gameCreditLoad`, `walletId` the wallet or the card's id)
+through `platform.outbox` in the same transaction, and the ledger posts `gameCreditLoaded` from it for
+`amountPaid`.
+
+**Two credit types are seeded for every tenant** (loaded with the other seed data at provisioning,
+SETUP-SEED): `gameCredit` (category `ride`, `monetary` false) and `gameBonusCredit` (category
+`bonus`, `monetary` false). Proposed, client to confirm the two types and their names.
 
 |  |  |
 |---|---|
@@ -103,6 +122,13 @@ through `platform.outbox` in the same transaction, and the ledger posts `gameCre
 |---|---|---|---|
 | id | string (uuid) |  | Added 20 August. (read-only) |
 | subjectId | string (uuid) | yes |  |
+| transferRules | object |  | What the venue allows this guest to do with a transfer, read from the venue's WalletTransferRules so a guest screen can hide or limit the action (r8 walk of tickets 28310 and 28345). (read-only; nullable) |
+| transferRules.peerToPeerAllowed | boolean |  |  |
+| transferRules.withinSharedWalletOnly | boolean |  |  |
+| transferRules.maximumPerTransfer | object |  | (nullable) |
+| transferRules.maximumPerTransfer.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| transferRules.maximumPerTransfer.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| transferRules.maximumPerTransfer.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | balance | Money | yes | On the wire this is three fields; in the database it is one column. |
 | balance.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | balance.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
@@ -130,7 +156,7 @@ through `platform.outbox` in the same transaction, and the ledger posts `gameCre
 
 | Code | Shape | Meaning |
 |---|---|---|
-| 200 |  | Loaded |
+| 200 |  | Loaded (a registered card), or handed to the games consumer with the card as it will stand (an anonymous card) |
 | 409 |  | The card is not active. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
@@ -141,7 +167,7 @@ through `platform.outbox` in the same transaction, and the ledger posts `gameCre
 
 **`GET /gift-cards/{cardCode}`**: Check a gift card balance
 
-**A guest acts on their own only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-002; `x-ticvai-self-scoped: subject`): a guest caller needs no permission and is answered for a gift card held in their own wallet; any other card code is refused exactly as one that does not exist, never returned. `WALLET_VIEW` is what a staff caller must hold to act for any guest (ADR-0025).
+**A gift card is a bearer instrument, so any signed-in guest may check a card by its code** (R8 blocker ORDERS-MONEY-C27, the lead's answer of 20 October 2026, replacing the own-wallet-only rule of CHG-GCF-002; design input DI-533 "check balance by code (the 16 characters on the card)"). A guest caller needs no permission and gets the card's balance, status and expiry, with `subjectId` left out unless it is the caller's own. An unknown code is 404, exactly as a card the guest may not see would have been; the code is the secret (16 characters from a cryptographic generator) and the guest's requests are held to the existing `429` limits, so codes cannot be guessed by trying. `WALLET_VIEW` is what a staff caller must hold (ADR-0025).
 
 |  |  |
 |---|---|
@@ -152,6 +178,7 @@ through `platform.outbox` in the same transaction, and the ledger posts `gameCre
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | primary |
+| Guest callable | True |
 | Reads | `wallet.gift_card` |
 | Writes | - |
 | Called by | BO-1123, BO-1125, GST-071, WEB-021 |
@@ -178,6 +205,7 @@ through `platform.outbox` in the same transaction, and the ledger posts `gameCre
 | balance.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | status | enum (issued, active, partiallyRedeemed, redeemed, expired, blocked) | yes |  |
 | blockedReason | string |  | (nullable) |
+| subjectId | string (uuid) |  | The registered owner, if any (R8 blocker ORDERS-MONEY-C27): the guest named when the card was issued (the buyer, or the guest whose refund became store credit); null for a card sold to nobody in part… (read-only; nullable) |
 | issuedAt | string (date-time) | yes |  |
 | activatedAt | string (date-time) |  | (nullable) |
 | expiresAt | string (date-time) |  | (nullable) |
@@ -335,6 +363,7 @@ BL-121. **Peer-to-peer transfer was declared on the wallet and unreachable** —
 **Only `cash` credit transfers.** Bonus, redemption and goodwill credit stay put, because a promotion that can be moved between guests is a promotion that can be sold — **and a venue that gave 50 dirhams of bonus credit has just funded a secondary market.**
 Both wallets must belong to the same tenant. **A transfer across tenants is a payment**, and it belongs on the payment path with everything that implies. A recipient outside the tenant is therefore the shared 404, exactly as an unknown one is.
 **The recipient is named one way or the other, never both.** `toWalletId` names the receiving wallet outright — the only way to reach a shared wallet (BO-1121), because a subject can hold their own wallet and sit in a family or corporate one. `toSubjectId` is the guest-to-guest form and resolves to the same wallet `getWallet` returns for that subject: their own, never a shared wallet they belong to.
+**Who a guest can name** (r8 walk of tickets 28310 and 28345; lead decision of 20 October 2026, option A). A guest knows no subject id, so in r8 a guest screen offers **linked family members only**: the people from `identity.listDelegations` (`familyMember` or `primaryHolder`), whose `subjectId` it sends as `toSubjectId`. Peer-to-peer to another guest stays off (`WalletTransferRules.peerToPeerAllowed` false) until it is decided. A guest screen sends exactly one of `toSubjectId` and `toWalletId`. The screen reads `Wallet.transferRules` to hide or limit the action.
 
 |  |  |
 |---|---|
@@ -346,8 +375,8 @@ Both wallets must belong to the same tenant. **A transfer across tenants is a pa
 | Conflict policy | serverWins |
 | Lock | rowExclusive |
 | Guest callable | True |
-| Reads | `cache:idempotency`, `pii.subject`, `wallet.wallet`, `wallet.wallet_transaction` |
-| Writes | `cache:idempotency`, `wallet.wallet`, `wallet.wallet_transaction` |
+| Reads | `cache:idempotency`, `pii.subject`, `wallet.balance`, `wallet.credit_lot`, `wallet.credit_type`, `wallet.transfer_rule`, `wallet.wallet`, `wallet.wallet_transaction` |
+| Writes | `cache:idempotency`, `wallet.balance`, `wallet.credit_lot`, `wallet.wallet`, `wallet.wallet_transaction` |
 | Called by | BO-1116, BO-1121, GST-071, WEB-021 |
 
 **Parameters**
@@ -402,6 +431,77 @@ Both wallets must belong to the same tenant. **A transfer across tenants is a pa
 
 ## Group: wallet
 
+### createCreditType
+
+**`POST /credit-types`**: Define a kind of credit, without a release
+
+|  |  |
+|---|---|
+| Permission | `WALLET_CONFIGURE` |
+| Scope level | tenant |
+| Part of slice | setup, makes `wallet.credit_type` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Config scope | tenant |
+| Conflict policy | serverWins |
+| Reads | `cache:idempotency`, `wallet.credit_type` |
+| Writes | `cache:idempotency`, `wallet.credit_type` |
+| Called by | BO-1088, BO-1104, BO-415 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
+
+**Request body**: `CreditType`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) |  |  |
+| code | string | yes |  |
+| name | string | yes |  |
+| category | enum (cash, refund, bonus, promotional, giftCard, membership, loyalty, ride, …) |  |  |
+| monetary | boolean |  | Loyalty points are not money. (default True) |
+| conversionRate | number |  | (nullable) |
+| refundable | boolean |  | Promotional credit is not refundable and cash credit is. (default False) |
+| transferable | boolean |  | (default False) |
+| expires | boolean |  | (default False) |
+| validityDays | integer |  | (nullable) |
+| breakageEligible | boolean |  | (default False) |
+| ledgerAccountCode | string |  | (nullable) |
+| priority | integer |  | (default 0) |
+| scopePath | string |  |  |
+| isActive | boolean |  | (default True) |
+
+**Response**: `CreditType`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) |  |  |
+| code | string | yes |  |
+| name | string | yes |  |
+| category | enum (cash, refund, bonus, promotional, giftCard, membership, loyalty, ride, …) |  |  |
+| monetary | boolean |  | Loyalty points are not money. (default True) |
+| conversionRate | number |  | (nullable) |
+| refundable | boolean |  | Promotional credit is not refundable and cash credit is. (default False) |
+| transferable | boolean |  | (default False) |
+| expires | boolean |  | (default False) |
+| validityDays | integer |  | (nullable) |
+| breakageEligible | boolean |  | (default False) |
+| ledgerAccountCode | string |  | (nullable) |
+| priority | integer |  | (default 0) |
+| scopePath | string |  |  |
+| isActive | boolean |  | (default True) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 201 |  | Created |
+| 409 | DuplicateCode | A business code the request names is already used within its uniqueness scope (the scope the property's x-ticvai-unique names; decided 28 September, audit R108). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
 ### getWallet
 
 **`GET /wallets/{subjectId}`**: Read a guest wallet
@@ -435,6 +535,13 @@ Stored value belonging to a guest, distinct from a bearer gift card. Where the g
 |---|---|---|---|
 | id | string (uuid) |  | Added 20 August. (read-only) |
 | subjectId | string (uuid) | yes |  |
+| transferRules | object |  | What the venue allows this guest to do with a transfer, read from the venue's WalletTransferRules so a guest screen can hide or limit the action (r8 walk of tickets 28310 and 28345). (read-only; nullable) |
+| transferRules.peerToPeerAllowed | boolean |  |  |
+| transferRules.withinSharedWalletOnly | boolean |  |  |
+| transferRules.maximumPerTransfer | object |  | (nullable) |
+| transferRules.maximumPerTransfer.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| transferRules.maximumPerTransfer.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| transferRules.maximumPerTransfer.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | balance | Money | yes | On the wire this is three fields; in the database it is one column. |
 | balance.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | balance.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
@@ -535,6 +642,7 @@ Stored value belonging to a guest, distinct from a bearer gift card. Where the g
 
 Boards 1.10, 10.8 and 10.9. **Ten boards of configuration that interact**, and the failure mode is a credit type with no accounting mapping or a consumption policy naming a type that was retired. Validation names those before they reach a till.
 Published as a version, so a change can be rolled back and so `getApprovalRecord` can say what was in force. **`mode: publish` writes `wallet.configuration_version` and one `wallet.configuration_version_snapshot` row per configuration area**, read from the area tables at that moment; validation alone writes neither (decided 29 September, writers pass; DM6).
+**Publishing with a blocking finding is refused** (R8 blocker APPROVALS-TENANCY-C32): `mode: publish` validates first, and when any finding has `severity: blocking` it answers 409 `configuration-has-blocking-findings` with the findings and writes nothing; warnings do not stop it. **The version number** is the highest `version` at the scope plus one, under a database unique key on (scope, version), so two publishes at once cannot take the same number (the one that loses the race is retried by the server).
 
 |  |  |
 |---|---|
@@ -581,6 +689,7 @@ Published as a version, so a change can be rolled back and so `getApprovalRecord
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Findings, and the version if published |
+| 409 |  | mode: publish with at least one blocking finding (configuration-has-blocking-findings). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### restoreWalletConfigurationVersion
@@ -588,13 +697,13 @@ Published as a version, so a change can be rolled back and so `getApprovalRecord
 **`POST /wallet-configuration/versions/{version}/restore`**: Put a previous wallet configuration back as the working draft
 
 Board 8, p.98. Copies the chosen version's configuration into the working draft and returns it as a new unpublished version with its validation findings. **It does not publish**: restore, review with `diffWalletConfigurationVersion`, then `publishWalletConfiguration`, so a rollback is as deliberate as the change that caused it (same rule as `restoreConfigVersion`, audit R139). A credit type retired since that version is reported as a blocking finding rather than silently revived.
-**It reads the version's `wallet.configuration_version_snapshot` rows and writes their values back into the area tables** (wallet types, credit types, funding, consumption, transfer, refund, channel, risk, authentication, accounting, integration and reconciliation), which are the working draft (decided 29 September, writers pass; DM6).
+**It reads the version's `wallet.configuration_version_snapshot` rows and writes their values back into the area tables** (wallet types, credit types, funding, consumption, transfer, refund, channel, risk, authentication, accounting, integration and reconciliation), which are the working draft (decided 29 September, writers pass; DM6). **Rows the snapshot holds are upserted by their id; rows of an area that the snapshot does not hold (created after that version) are deactivated (`is_active` false: wallet and credit types), never deleted**; in an area with no `is_active` they are left as they are and named in a `warning` finding, so nothing that other records point at disappears (R8 blocker APPROVALS-TENANCY-C32).
 
 |  |  |
 |---|---|
 | Permission | `WALLET_CONFIGURE` |
 | Scope level | tenant |
-| Part of slice | setup, makes `wallet.funding_rule` non-empty |
+| Part of slice | setup, makes `wallet.credit_type`, `wallet.funding_rule`, `wallet.transfer_rule` non-empty |
 | Wave | 1 |
 | Offline | no |
 | Config scope | tenant |
@@ -656,8 +765,8 @@ Board 8, p.98. Copies the chosen version's configuration into the working draft 
 | Offline | no |
 | Config scope | venue |
 | Conflict policy | serverWins |
-| Reads | `wallet.funding_rule` |
-| Writes | `wallet.funding_rule` |
+| Reads | `cache:idempotency`, `wallet.funding_rule` |
+| Writes | `cache:idempotency`, `wallet.funding_rule` |
 | Called by | BO-1094, BO-1095, BO-1096, BO-1097, BO-1098, BO-1099, BO-1101, BO-417, BO-418 |
 
 **Parameters**
@@ -671,7 +780,7 @@ Board 8, p.98. Copies the chosen version's configuration into the working draft 
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| walletTypeId | string (uuid) |  | (nullable) |
+| walletTypeId | string (uuid) |  | The wallet type these rules are for; null for the venue default. (nullable) |
 | minimumTopUp | Money |  | On the wire this is three fields; in the database it is one column. |
 | minimumTopUp.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | minimumTopUp.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
@@ -740,7 +849,7 @@ Board 8, p.98. Copies the chosen version's configuration into the working draft 
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| walletTypeId | string (uuid) |  | (nullable) |
+| walletTypeId | string (uuid) |  | The wallet type these rules are for; null for the venue default. (nullable) |
 | minimumTopUp | Money |  | On the wire this is three fields; in the database it is one column. |
 | minimumTopUp.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | minimumTopUp.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
@@ -813,6 +922,85 @@ Board 8, p.98. Copies the chosen version's configuration into the working draft 
 | 200 |  | Set |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
+### setWalletTransferRules
+
+**`PUT /wallet-transfer-rules`**: Whether guests may move money to each other, and on what terms
+
+Boards 7.2 and 7.3. **Peer-to-peer transfer is a money-transmission question before it is a feature.** Limits, approval above a threshold, which credit types may move at all — promotional credit that can be transferred is promotional credit that can be sold — and whether both parties must be identified.
+`transferWalletBalance` performs the transfer; this decides whether it is allowed.
+
+|  |  |
+|---|---|
+| Permission | `WALLET_CONFIGURE` |
+| Scope level | tenant |
+| Part of slice | setup, makes `wallet.transfer_rule` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Config scope | tenant |
+| Conflict policy | serverWins |
+| Reads | `cache:idempotency`, `wallet.transfer_rule` |
+| Writes | `cache:idempotency`, `wallet.transfer_rule` |
+| Called by | BO-1144, BO-1145 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| If-Match | header |  | string | Optimistic concurrency for serverWins (system-design review SD-013, 29 September; ADR-0031). |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
+
+**Request body**: `WalletTransferRules`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| peerToPeerAllowed | boolean |  | (default False) |
+| transferableCreditTypeIds | array of string (uuid) |  |  |
+| maximumPerTransfer | Money |  | On the wire this is three fields; in the database it is one column. |
+| maximumPerTransfer.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| maximumPerTransfer.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| maximumPerTransfer.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| maximumPerDay | Money |  | On the wire this is three fields; in the database it is one column. |
+| maximumPerDay.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| maximumPerDay.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| maximumPerDay.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| approvalAboveAmount | Money |  | On the wire this is three fields; in the database it is one column. |
+| approvalAboveAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| approvalAboveAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| approvalAboveAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| bothPartiesIdentified | boolean |  | (default True) |
+| withinSharedWalletOnly | boolean |  | (default False) |
+| scopePath | string |  |  |
+
+**Response**: `WalletTransferRules`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| peerToPeerAllowed | boolean |  | (default False) |
+| transferableCreditTypeIds | array of string (uuid) |  |  |
+| maximumPerTransfer | Money |  | On the wire this is three fields; in the database it is one column. |
+| maximumPerTransfer.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| maximumPerTransfer.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| maximumPerTransfer.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| maximumPerDay | Money |  | On the wire this is three fields; in the database it is one column. |
+| maximumPerDay.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| maximumPerDay.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| maximumPerDay.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| approvalAboveAmount | Money |  | On the wire this is three fields; in the database it is one column. |
+| approvalAboveAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| approvalAboveAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| approvalAboveAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| bothPartiesIdentified | boolean |  | (default True) |
+| withinSharedWalletOnly | boolean |  | (default False) |
+| scopePath | string |  |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 412 | PreconditionFailed | The row changed since the If-Match version was read (SD-013). |
+| 200 |  | Set |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
 ### topUpWallet
 
 **`POST /wallets/{subjectId}/top-ups`**: Add value to a wallet
@@ -863,6 +1051,13 @@ Creates a liability, not revenue. Recognition happens when the value is spent, o
 |---|---|---|---|
 | id | string (uuid) |  | Added 20 August. (read-only) |
 | subjectId | string (uuid) | yes |  |
+| transferRules | object |  | What the venue allows this guest to do with a transfer, read from the venue's WalletTransferRules so a guest screen can hide or limit the action (r8 walk of tickets 28310 and 28345). (read-only; nullable) |
+| transferRules.peerToPeerAllowed | boolean |  |  |
+| transferRules.withinSharedWalletOnly | boolean |  |  |
+| transferRules.maximumPerTransfer | object |  | (nullable) |
+| transferRules.maximumPerTransfer.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| transferRules.maximumPerTransfer.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| transferRules.maximumPerTransfer.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | balance | Money | yes | On the wire this is three fields; in the database it is one column. |
 | balance.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | balance.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
@@ -892,6 +1087,82 @@ Creates a liability, not revenue. Recognition happens when the value is spent, o
 |---|---|---|
 | 201 |  | Topped up |
 | 402 |  | Payment declined |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
+### updateCreditType
+
+**`PUT /credit-types/{creditTypeId}`**: Change a kind of credit
+
+**Changing expiry or refundability does not reach credit already issued.** A lot carries the terms it was issued under, because retro-expiring somebody's gift card is the kind of change that ends up in a regulator's inbox.
+
+|  |  |
+|---|---|
+| Permission | `WALLET_CONFIGURE` |
+| Scope level | tenant |
+| Part of slice | setup, changes rows of `wallet.credit_type` that another operation creates |
+| Wave | 1 |
+| Offline | no |
+| Config scope | tenant |
+| Conflict policy | serverWins |
+| Reads | `cache:idempotency`, `wallet.credit_type` |
+| Writes | `cache:idempotency`, `wallet.credit_type` |
+| Called by | BO-1088, BO-1104, BO-1105, BO-1108, BO-420 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| creditTypeId | path | yes | string (uuid) |  |
+| If-Match | header |  | string | Optimistic concurrency for serverWins (system-design review SD-013, 29 September; ADR-0031). |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
+
+**Request body**: `CreditType`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) |  |  |
+| code | string | yes |  |
+| name | string | yes |  |
+| category | enum (cash, refund, bonus, promotional, giftCard, membership, loyalty, ride, …) |  |  |
+| monetary | boolean |  | Loyalty points are not money. (default True) |
+| conversionRate | number |  | (nullable) |
+| refundable | boolean |  | Promotional credit is not refundable and cash credit is. (default False) |
+| transferable | boolean |  | (default False) |
+| expires | boolean |  | (default False) |
+| validityDays | integer |  | (nullable) |
+| breakageEligible | boolean |  | (default False) |
+| ledgerAccountCode | string |  | (nullable) |
+| priority | integer |  | (default 0) |
+| scopePath | string |  |  |
+| isActive | boolean |  | (default True) |
+
+**Response**: `CreditType`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) |  |  |
+| code | string | yes |  |
+| name | string | yes |  |
+| category | enum (cash, refund, bonus, promotional, giftCard, membership, loyalty, ride, …) |  |  |
+| monetary | boolean |  | Loyalty points are not money. (default True) |
+| conversionRate | number |  | (nullable) |
+| refundable | boolean |  | Promotional credit is not refundable and cash credit is. (default False) |
+| transferable | boolean |  | (default False) |
+| expires | boolean |  | (default False) |
+| validityDays | integer |  | (nullable) |
+| breakageEligible | boolean |  | (default False) |
+| ledgerAccountCode | string |  | (nullable) |
+| priority | integer |  | (default 0) |
+| scopePath | string |  |  |
+| isActive | boolean |  | (default True) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 412 | PreconditionFailed | The row changed since the If-Match version was read (SD-013). |
+| 200 |  | Updated |
+| 409 | DuplicateCode | A business code the request names is already used within its uniqueness scope (the scope the property's x-ticvai-unique names; decided 28 September, audit R108). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ## Tables
@@ -1004,6 +1275,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | credit_type_id | uuid | yes |  |
 | issued_amount | numeric(18,4) | no |  |
 | remaining_amount | numeric(18,4) | no |  |
+| issued_credits | integer | no | Game credits are counted, not priced (the lead, 20 October 2026, r8 cause APPROVALS-TENANCY-C30, option A): the credits a game-card load put on this lot (credit types gameCredit and gameBonusCredit);… |
 | issued_at | timestamptz | no |  |
 | expires_at | timestamptz | no |  |
 | source_kind | text | no |  |
@@ -1036,7 +1308,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| wallet_type_id | uuid | no |  |
+| wallet_type_id | uuid | no | The wallet type these rules are for; null for the venue default. |
 | minimum_top_up | numeric(18,4) | no |  |
 | maximum_top_up | numeric(18,4) | no |  |
 | preset_amounts | numeric(18,4)[] | no |  |
@@ -1060,11 +1332,11 @@ Every table this service owns that the slice reads or writes, with its columns a
 | balance_amount | numeric(18,4) | yes |  |
 | status | text | yes |  |
 | blocked_reason | text | no |  |
+| subject_id | uuid | no | The registered owner, if any (R8 blocker ORDERS-MONEY-C27): the guest named when the card was issued (the buyer, or the guest whose refund became store credit); null for a card sold to nobody in part… |
 | issued_at | timestamptz | yes |  |
 | activated_at | timestamptz | no |  |
 | expires_at | timestamptz | no |  |
 | id | uuid | yes | Synthesised key. |
-| subject_id | uuid | yes | Points at pii.subject. |
 
 ### `wallet.integration_mapping`
 
@@ -1185,11 +1457,11 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-59 operations, added to this service in later releases without changing any of the above.
+56 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
 | card | `adjustGameCard` |
 | giftCard | `blockGiftCard`, `issueGiftCard` |
 | retail | `activateGiftCard`, `closeWallet`, `getWalletExitBalance`, `redeemGiftCard`, `reinstateWallet`, `settleWalletAtExit`, `suspendWallet` |
-| wallet | `adjustWallet`, `captureWalletHold`, `createCreditType`, `createSharedWallet`, `createVoucherType`, `createWalletType`, `diffWalletConfigurationVersion`, `expireCreditLots`, `getCreditConsumptionPolicy`, `getWalletBalance`, `getWalletFundingRules`, `getWalletLiability`, `getWalletMovementSummary`, `getWalletPreCloseChecks`, `getWalletReconciliation`, `getWalletRefundPolicy`, `getWalletRiskRules`, `holdWalletFunds`, `linkWalletCredential`, `listCreditLots`, `listCreditTypes`, `listSharedWallets`, `listVoucherTypes`, `listWalletConfigurationVersions`, `listWalletDisputes`, `listWalletHolds`, `listWalletTypes`, `raiseWalletDispute`, `releaseWalletHold`, `resolveWalletDispute`, `reverseWalletFunding`, `setCreditConsumptionPolicy`, `setCreditEligibilityRules`, `setGiftCardProduct`, `setSharedWalletMembers`, `setWalletAccountingMapping`, `setWalletAuthenticationPolicy`, `setWalletChannelRules`, `setWalletIntegrationMapping`, `setWalletReconciliationSources`, `setWalletRefundPolicy`, `setWalletRestriction`, `setWalletRiskRuleStatus`, `setWalletRiskRules`, `setWalletTransferRules`, `simulateCreditConsumption`, `updateCreditType`, `updateWalletType`, `withdrawWalletDispute` |
+| wallet | `adjustWallet`, `captureWalletHold`, `createSharedWallet`, `createVoucherType`, `createWalletType`, `diffWalletConfigurationVersion`, `expireCreditLots`, `getCreditConsumptionPolicy`, `getWalletBalance`, `getWalletFundingRules`, `getWalletLiability`, `getWalletMovementSummary`, `getWalletPreCloseChecks`, `getWalletReconciliation`, `getWalletRefundPolicy`, `getWalletRiskRules`, `holdWalletFunds`, `linkWalletCredential`, `listCreditLots`, `listCreditTypes`, `listSharedWallets`, `listVoucherTypes`, `listWalletConfigurationVersions`, `listWalletDisputes`, `listWalletHolds`, `listWalletTypes`, `raiseWalletDispute`, `releaseWalletHold`, `resolveWalletDispute`, `reverseWalletFunding`, `setCreditConsumptionPolicy`, `setCreditEligibilityRules`, `setGiftCardProduct`, `setSharedWalletMembers`, `setWalletAccountingMapping`, `setWalletAuthenticationPolicy`, `setWalletChannelRules`, `setWalletIntegrationMapping`, `setWalletReconciliationSources`, `setWalletRefundPolicy`, `setWalletRestriction`, `setWalletRiskRuleStatus`, `setWalletRiskRules`, `simulateCreditConsumption`, `updateWalletType`, `withdrawWalletDispute` |

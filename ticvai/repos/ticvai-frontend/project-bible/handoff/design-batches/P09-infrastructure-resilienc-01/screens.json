@@ -10,7 +10,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/general/auto-scaling-configuration",
-   "component": "apps/ticvai-web/src/routes/general/AutoScalingConfigurationForm.tsx",
+   "component": "src/routes/general/AutoScalingConfigurationForm.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -289,7 +289,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/general/infrastructure-sizing-and-scaling-policy",
-   "component": "apps/ticvai-web/src/routes/general/InfrastructureSizingAndScalingPolicyForm.tsx",
+   "component": "src/routes/general/InfrastructureSizingAndScalingPolicyForm.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -537,7 +537,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/general/backup-and-dr-status",
-   "component": "apps/ticvai-web/src/routes/general/BackupAndDrStatusDashboard.tsx",
+   "component": "src/routes/general/BackupAndDrStatusDashboard.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -764,7 +764,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/general/archival-job-monitor",
-   "component": "apps/ticvai-web/src/routes/general/ArchivalJobMonitorDashboard.tsx",
+   "component": "src/routes/general/ArchivalJobMonitorDashboard.tsx",
    "status": "notStarted"
   },
   "navigation": {

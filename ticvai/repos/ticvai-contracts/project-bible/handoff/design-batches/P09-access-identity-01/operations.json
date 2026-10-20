@@ -201,6 +201,11 @@
   "scopeLevel": "tenant",
   "parameters": [
    {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
     "name": "activeOnly",
     "in": "query",
     "required": null
@@ -401,6 +406,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": null,
     "in": null,

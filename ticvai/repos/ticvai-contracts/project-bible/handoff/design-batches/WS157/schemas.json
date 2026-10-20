@@ -118,7 +118,7 @@
  },
  "Principal": {
   "x-ticvai-persistence": "identity.principal",
-  "x-ticvai-rls": "grant-holder-read",
+  "x-ticvai-rls": "home-scope-write",
   "type": "object",
   "required": [
    "id",
@@ -1153,6 +1153,19 @@
    "isPrimary": {
     "type": "boolean",
     "description": "True for the role that is the principal's `primaryRoleId` (`identity.principal.primary_role_id`); false for the others (14 October 2026, ADAM CR-077; CHG-IDR-002)."
+   },
+   "grantId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "**The grant this card stands for** (`identity.delegated_access.id`; IDENTITY-C45, CHG-R8SPN-032). A role held at two venues is two grants and two cards; `selectRole` takes the chosen one."
+   },
+   "scope": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/ScopeRef"
+     }
+    ],
+    "description": "The scope node the grant is held at (`platform.scope`), with its name, so the card can say which venue (IDENTITY-C45)."
    }
   }
  },

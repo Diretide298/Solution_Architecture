@@ -71,7 +71,7 @@
  "AiMaturity": {
   "type": "object",
   "x-ticvai-persistence": "none — embedded as jsonb on ai.suggestion and ai.forecast_version",
-  "description": "**Where an answer stands, on every answer** (29 September, AI functions review; baseline then learn). The customer sees a stage badge and a \"Based on\" chip, never a bare percentage (design 5.6), and \"Limited historical data\" while the starting pattern carries more than half the weight.",
+  "description": "**Where an answer stands, on every answer** (29 September, AI functions review; baseline then learn). The customer sees a stage badge and a \"Based on\" chip, never a bare percentage (design 5.6), and \"Limited historical data\" while the starting pattern carries more than half the weight.\n\n**The stage rule per kind** (r8 walk of ticket 27723; lead decision of 20 October 2026, option A). The stage of an answer is decided by the days of the tenant's own data behind its kind, against that kind's `Minimum` in `SuggestionKind`: `starting` below the minimum, `learning` from the minimum, `established` from three times the minimum, `learned` only by promotion (AI-D16). For the Block A kinds that is:\n| kind | minimum | learning from | established from |\n|---|---|---|---|\n| queueBalancing | 14 days | day 14 | day 42 |\n| prepPlan | 28 days (4 weeks) | day 28 | day 84 |\n| upsell | 90 days | day 90 | day 270 |\nThe 28-day seeded run of AI-ENGINE-BASELINE therefore proves `learning` for `queueBalancing` and `prepPlan`. `upsell` cannot read `learning` at day 28 and is checked at day 90 with a seeded fixture of 90 days of orders. Other kinds follow the same rule with their own minimum.",
   "required": [
    "stage",
    "basedOn"
@@ -975,7 +975,7 @@
     "x-ticvai-references": "catalogue.inventory_reservation",
     "type": "string",
     "nullable": true,
-    "description": "Lease the units were drawn from — a `catalogue.InventoryHold.id`. Absent for uncontended products."
+    "description": "Lease the units were drawn from — a `catalogue.InventoryHold.id`. Absent for uncontended products. **A standing-zone line** (zone-priced general admission at POS-004 and WEB-007; decided 20 October 2026, Chinmay, R8 blocker cause GPS-C38, option A; CHG-R8SPN-040) carries no `seatIds`: it is `quantity` places in one zone, held by `seating.createSeatHold` with `zoneId` and `quantity`, and this names that hold's inventory hold; the zone, its price band and keep-the-party- together come from the hold, and a lapsed one is `409 hold-not-active` as for seats."
    },
    "seatIds": {
     "type": "array",
@@ -1406,47 +1406,57 @@
   ],
   "properties": {
    "id": {
+    "x-ticvai-data-class": "behavioural",
     "type": "string",
     "format": "uuid",
     "readOnly": true,
     "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
    },
    "subjectId": {
+    "x-ticvai-data-class": "behavioural",
     "type": "string",
     "format": "uuid",
     "description": "Opaque reference. Personal data lives in the separately erasable store, which is what makes erasure possible against an append-only ledger.\n"
    },
    "displayName": {
+    "x-ticvai-data-class": "personal",
     "type": "string",
     "nullable": true
    },
    "email": {
+    "x-ticvai-data-class": "personal",
     "type": "string",
     "nullable": true
    },
    "phone": {
+    "x-ticvai-data-class": "personal",
     "type": "string",
     "nullable": true
    },
    "preferredLanguage": {
+    "x-ticvai-data-class": "personal",
     "type": "string",
     "nullable": true
    },
    "preferredChannel": {
+    "x-ticvai-data-class": "personal",
     "$ref": "#/components/schemas/MessageChannel"
    },
    "guestLinkId": {
+    "x-ticvai-data-class": "personal",
     "type": "string",
     "nullable": true,
     "description": "Present where the guest is linked across cells. Marketing acts locally."
    },
    "tags": {
+    "x-ticvai-data-class": "behavioural",
     "type": "array",
     "items": {
      "type": "string"
     }
    },
    "engagementScore": {
+    "x-ticvai-data-class": "behavioural",
     "type": "integer",
     "nullable": true,
     "minimum": 0,
@@ -1454,6 +1464,7 @@
     "description": "22.2.20 and 22.2.21. **`lifetimeValue` and `visitCount` existed, so value was a stored figure and engagement was not.** They are different questions: a guest who spent a lot once and a guest who visits monthly have the same LTV and need opposite treatment.\n**Recency, frequency and breadth, not spend** — spend is already `lifetimeValue`, and folding it in here would make one number twice.\n"
    },
    "engagementTier": {
+    "x-ticvai-data-class": "behavioural",
     "type": "string",
     "nullable": true,
     "enum": [
@@ -1467,20 +1478,26 @@
     "description": "5.3.19. **Automatic classification, computed rather than assigned.** `lapsing` is the tier the whole field exists for — **a guest who has not been for a while and still might is the only one marketing can change**, and lumping them with `lapsed` wastes the window.\n"
    },
    "lifetimeValue": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
+    "x-ticvai-data-class": "behavioural",
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "**Left out of guest reads until a guest's lifetime value has a currency** (ADAM CR-141, 18 October 2026; CHG-CRA-007): an amount above a venue is in the currency recorded on its own row (CR-094's rule, which waits on the client), and this row records none yet."
    },
    "visitCount": {
+    "x-ticvai-data-class": "behavioural",
     "type": "integer"
    },
    "lastVisitAt": {
+    "x-ticvai-data-class": "behavioural",
     "type": "string",
     "format": "date-time",
     "nullable": true
    },
    "isActive": {
+    "x-ticvai-data-class": "behavioural",
     "type": "boolean"
    },
    "mergedIntoSubjectId": {
+    "x-ticvai-data-class": "behavioural",
     "type": "string",
     "format": "uuid",
     "nullable": true,
@@ -1488,6 +1505,7 @@
     "description": "**Set on the absorbed profile by `mergeGuestProfiles` and `mergeGuests`**, which retain it as a redirect rather than deleting it. A read that lands here follows it; a second merge of a profile that has one is refused as `alreadyMerged`.\n"
    },
    "mergedAt": {
+    "x-ticvai-data-class": "behavioural",
     "type": "string",
     "format": "date-time",
     "nullable": true,
@@ -2104,6 +2122,13 @@
     "type": "string",
     "format": "uuid",
     "description": "The client UUIDv7 from `CreateOrderRequest.id`."
+   },
+   "orderAccessToken": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "**What lets the device that just checked out read the order it paid for** (decided 20 October 2026, Chinmay, R8 blocker cause IDENTITY-C52, option A; CHG-R8SPN-025). Returned only in `checkoutCart`'s answer, null everywhere else: a signed token bound to this order and to the cart's device, valid 24 hours, never stored. `getOrder` accepts it in `X-Order-Access-Token` in place of a session, so a guest who checked out with no account, or whose session ended, still sees the confirmation (WEB-013 keeps it in its navigation state). It reads this order only and grants nothing else."
    },
    "orderNumber": {
     "x-ticvai-unique": "tenant",
@@ -2736,6 +2761,11 @@
  },
  "Payment": {
   "x-ticvai-persistence": "orders.payment",
+  "x-ticvai-index": [
+   [
+    "providerReference"
+   ]
+  ],
   "type": "object",
   "required": [
    "id",
@@ -3418,6 +3448,17 @@
    "id": {
     "type": "string",
     "format": "uuid"
+   },
+   "listPrice": {
+    "oneOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "**The list price on the caller's channel now**, resolved on read from the price lists (`listProductVariants`; R8 blocker cause GPS-C27, CHG-R8SPN-028). Not stored on the variant and ignored on input. Null where no price list prices it on that channel. The list price, not the total: promotions and bundles are applied at the basket."
    },
    "productId": {
     "type": "string",

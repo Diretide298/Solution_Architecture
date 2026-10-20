@@ -52,6 +52,7 @@
      "provenance": "flow F79 step 2→3",
      "operation": "setConfigurationProfile",
      "carries": [
+      "deviceId",
       "profileId"
      ]
     }

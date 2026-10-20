@@ -14,10 +14,12 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - resources.booking
   - resources.resource_dependency
   - resources.resource_requirement
   writes:
+  - cache:idempotency
   - resources.booking
   - resources.resource_requirement
 - operation: bookResource
@@ -27,7 +29,6 @@ operations:
   permission: RESOURCE_BOOK
   audience:
   - staff
-  - guest
   offline: false
   reads:
   - cache:idempotency
@@ -47,8 +48,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - resources.booking
   writes:
+  - cache:idempotency
   - resources.booking
 - operation: checkInResource
   verb: POST
@@ -94,8 +97,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - resources.resource
   writes:
+  - cache:idempotency
   - resources.resource
 - operation: createResource
   verb: POST
@@ -120,8 +125,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - resources.attribute_definition
   writes:
+  - cache:idempotency
   - resources.attribute_definition
 - operation: createResourceBlock
   verb: POST
@@ -132,8 +139,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - resources.resource_block
   writes:
+  - cache:idempotency
   - resources.resource_block
 - operation: createResourceCategory
   verb: POST
@@ -144,8 +153,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - resources.resource_category
   writes:
+  - cache:idempotency
   - resources.resource_category
 - operation: createResourceCost
   verb: POST
@@ -173,6 +184,7 @@ operations:
   - guest
   offline: false
   reads:
+  - cache:idempotency
   - resources.booking
   - resources.resource
   - resources.resource_block
@@ -180,6 +192,7 @@ operations:
   - venuemap.map
   - venuemap.placed_resource
   writes:
+  - cache:idempotency
   - resources.resource_reservation
 - operation: createResourcePackage
   verb: POST
@@ -190,9 +203,11 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - resources.resource_package
   - resources.resource_requirement
   writes:
+  - cache:idempotency
   - resources.resource_package
   - resources.resource_requirement
 - operation: createResourceType
@@ -204,8 +219,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - resources.resource_type
   writes:
+  - cache:idempotency
   - resources.resource_type
 - operation: deleteResourceCost
   verb: DELETE
@@ -232,8 +249,10 @@ operations:
   - guest
   offline: false
   reads:
+  - cache:idempotency
   - resources.resource_reservation
   writes:
+  - cache:idempotency
   - resources.resource_reservation
 - operation: getExperienceResourceRequirements
   verb: GET
@@ -561,8 +580,10 @@ operations:
   - staff
   offline: true
   reads:
+  - cache:idempotency
   - resources.resource_request
   writes:
+  - cache:idempotency
   - resources.resource_request
 - operation: releaseResourceBlock
   verb: DELETE
@@ -616,8 +637,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - resources.booking
   writes:
+  - cache:idempotency
   - resources.booking
 - operation: setExperienceResourceRequirements
   verb: PUT
@@ -628,8 +651,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - resources.resource_requirement
   writes:
+  - cache:idempotency
   - resources.resource_requirement
 - operation: setResourceAllocationPolicy
   verb: PUT
@@ -640,8 +665,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - resources.allocation_policy
   writes:
+  - cache:idempotency
   - resources.allocation_policy
 - operation: setResourceBookingProgress
   verb: POST
@@ -652,8 +679,10 @@ operations:
   - staff
   offline: true
   reads:
+  - cache:idempotency
   - resources.booking
   writes:
+  - cache:idempotency
   - resources.booking
 - operation: setResourceDependencies
   verb: PUT
@@ -664,8 +693,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - resources.resource_dependency
   writes:
+  - cache:idempotency
   - resources.resource_dependency
 - operation: setResourceHierarchy
   verb: PUT
@@ -676,8 +707,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - resources.resource_relation
   writes:
+  - cache:idempotency
   - resources.resource_relation
 - operation: setResourceLifecycleState
   verb: POST
@@ -688,8 +721,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - resources.resource
   writes:
+  - cache:idempotency
   - resources.resource
 - operation: setResourceQualifications
   verb: PUT
@@ -716,8 +751,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - resources.resource_schedule
   writes:
+  - cache:idempotency
   - resources.resource_schedule
 - operation: setResourceSelectionPolicy
   verb: PUT
@@ -743,8 +780,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - resources.venue_assignment
   writes:
+  - cache:idempotency
   - resources.venue_assignment
 - operation: suggestResources
   verb: GET
@@ -769,8 +808,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - resources.resource
   writes:
+  - cache:idempotency
   - resources.resource
 - operation: updateResourceBooking
   verb: PATCH
@@ -781,8 +822,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - resources.booking
   writes:
+  - cache:idempotency
   - resources.booking
 - operation: updateResourceCategory
   verb: PUT
@@ -793,8 +836,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - resources.resource_category
   writes:
+  - cache:idempotency
   - resources.resource_category
 - operation: updateResourcePackage
   verb: PUT
@@ -805,9 +850,11 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - resources.resource_package
   - resources.resource_requirement
   writes:
+  - cache:idempotency
   - resources.resource_package
   - resources.resource_requirement
 - operation: updateResourceType
@@ -819,6 +866,8 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - resources.resource_type
   writes:
+  - cache:idempotency
   - resources.resource_type

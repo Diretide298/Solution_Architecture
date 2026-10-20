@@ -6114,6 +6114,13 @@ paths:
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      - name: venueId
+        in: query
+        required: false
+        description: 'Whose venue to read, for a caller with no venue (R8 blocker fix, as `listProductCategories`): a visitor with no credential, or an app before sign-in, must send it (missing is `400 venue-required`, an id that is not a venue of the tenant `400 unknown-venue`). A caller who already acts at a venue may leave it out; with a credential it must be that venue.'
+        schema:
+          type: string
+          format: uuid
       x-ticvai-permission: PRODUCT_VIEW
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
@@ -6712,7 +6719,7 @@ paths:
                 tables:
                   type: array
                   items:
-                    $ref: '#/components/schemas/TableDefinition'
+                    $ref: '#/components/schemas/TableLayoutItem'
       responses:
         '412':
           $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
@@ -11010,6 +11017,18 @@ components:
         zone:
           type: string
           nullable: true
+        opensAt:
+          type: string
+          format: time
+          nullable: true
+          description: 'When a collection point opens, local to the venue (r8 walk of ticket 27820). Used by retail
+            `createShopAndDrop` (`collectionPointClosed`). Null means no stated hours.'
+        closesAt:
+          type: string
+          format: time
+          nullable: true
+          description: When a collection point closes, local to the venue; retail `collectBy` defaults to this on the
+            day. Null means no stated hours.
         tableId:
           type: string
           format: uuid
@@ -12006,6 +12025,22 @@ components:
       - needsClearing
       - reserved
       - outOfService
+    TableLayoutItem:
+      x-ticvai-persistence: none — request only; each item lands as its fnb.dining_table row (TableDefinition)
+      description: '**One table of `setTableLayout`''s whole layout, named by its id** (r8 integration, CHG-R8INT-013;
+        check-storage-promises SP-REPLACE-NO-KEY, CR-155). The operation matches each item on `id`: an id already on
+        the outlet updates that table, a new id adds one, so the client sends the id, which `TableDefinition` marks
+        read-only for every other write (createTable mints it). Everything else is the table as `TableDefinition`
+        states it.'
+      allOf:
+      - $ref: '#/components/schemas/TableDefinition'
+      - type: object
+        required: [id]
+        properties:
+          id:
+            type: string
+            format: uuid
+            description: The table this item updates, or the id of the table it adds (a UUIDv7 the client makes).
     TableDefinition:
       x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by clearTable, createDeliveryLocation, createTable, getTableMap and others
       x-ticvai-persistence: fnb.dining_table

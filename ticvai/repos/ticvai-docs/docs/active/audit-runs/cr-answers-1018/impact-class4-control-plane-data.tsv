@@ -1,0 +1,441 @@
+group	ticket	plan_key	status	type	assignee	subject	links
+started	27686	TEST-AM-FOUNDATION-DATABASE	On hold	Task	Pranay Shinde	[Test] Module test: Foundation · Database migrations	table:control.tenant, table:subscription.contract, table:subscription.module_listing, table:subscription.plan, table:subscription.plan_limit, table:subscription.plan_module
+finished	27647	MIG-CONTROL	Ready for QA	Task	Hrushikant Patkar	[DB] Migration V0002__control.sql: control (21 tables)	table:control.tenant
+finished	27651	MIG-SUBSCRIPTION	Ready for QA	Task	Hrushikant Patkar	[DB] Migration V0005__subscription.sql: subscription (5 tables)	table:subscription.contract, table:subscription.module_listing, table:subscription.plan, table:subscription.plan_limit, table:subscription.plan_module
+finished	27683	MIG-FOREIGN-KEYS	Ready for QA	Task	Hrushikant Patkar	[DB] Migration V0034__cross_schema_foreign_keys.sql (35 keys)	table:subscription.contract
+finished	30167	MIG-CONTROL#control.tenant	Ready for QA	Sub Task	Hrushikant Patkar	[DB] control.tenant	table:control.tenant
+finished	30175	MIG-SUBSCRIPTION#subscription.contract	Ready for QA	Sub Task	Hrushikant Patkar	[DB] subscription.contract	table:subscription.contract
+finished	30176	MIG-SUBSCRIPTION#subscription.module_listing	Ready for QA	Sub Task	Hrushikant Patkar	[DB] subscription.module_listing	table:subscription.module_listing
+finished	30177	MIG-SUBSCRIPTION#subscription.plan	Ready for QA	Sub Task	Hrushikant Patkar	[DB] subscription.plan	table:subscription.plan
+finished	30178	MIG-SUBSCRIPTION#subscription.plan_limit	Ready for QA	Sub Task	Hrushikant Patkar	[DB] subscription.plan_limit	table:subscription.plan_limit
+finished	30179	MIG-SUBSCRIPTION#subscription.plan_module	Ready for QA	Sub Task	Hrushikant Patkar	[DB] subscription.plan_module	table:subscription.plan_module
+new	27645	AM-FOUNDATION-DATABASE	New	Feature	Hrushikant Patkar	Foundation · Database migrations	table:control.tenant, table:subscription.contract, table:subscription.module_listing, table:subscription.plan, table:subscription.plan_limit, table:subscription.plan_module
+new	27687	AM-FOUNDATION-PLATFORM	New	Feature	Pranay Shinde	Foundation · Platform kernel	operation:subscription#getPlan
+new	27692	PLATFORM-KERNEL	New	Task	Pranay Shinde	[BE] Request kernel: hostname to tenant routing, per-transaction scope, error model and 42	table:control.tenant
+new	27693	KERNEL-TENANT-LIMITS	New	Task	Pranay Shinde	[BE] Per-tenant request budgets: a token bucket per tenant and audience, and a load-aware 	operation:subscription#getPlan, table:subscription.plan, table:subscription.plan_limit, table:subscription.plan_module
+new	27703	TEST-AM-FOUNDATION-PLATFORM	New	Task	Chinmay Patkar	[Test] Module test: Foundation · Platform kernel	operation:subscription#getPlan, table:control.tenant, table:subscription.plan, table:subscription.plan_limit, table:subscription.plan_module
+new	27775	SVC-PLATFORM-TENANT-1	New	Task	Narayan Gaonkar	[BE] PlatformService: createTenant, listTenants, reactivateTenant, suspendTenant	table:control.tenant
+new	27776	SVC-WHITELABEL-MODULES-1	New	Task	Sanket Keluskar	[BE] WhiteLabelService: getFeatureToggles, getModuleEnablement, setFeatureToggles, setLang	table:subscription.contract, table:subscription.plan
+new	27806	AM-SUBSCRIPTION-LICENSING-P09	New	Feature	Hrushikant Patkar	Subscription & Licensing · TICVAI Console 1 of 6	operation:subscription#getTenant, operation:subscription#listModuleCatalogue
+new	27807	SVC-PLATFORM-LICENSING-1	New	Task	Sanket Keluskar	[BE] PlatformService: addLicenceAddOn, getTenantLicences	table:subscription.contract, table:subscription.plan
+new	27808	SVC-PLATFORM-SUBSCRIPTION-1	New	Task	Sanket Keluskar	[BE] PlatformService: listModuleCatalogue, setModuleListing, setSubscription	operation:subscription#listModuleCatalogue, operation:subscription#setModuleListing, operation:subscription#setSubscription, table:subscription.contract, table:subscription.module_listing, table:subscription.plan
+new	27809	SVC-WHITELABEL-MODULES-2	New	Task	Chinmay Patkar	[BE] WhiteLabelService: setModuleEnablement	table:subscription.contract, table:subscription.plan
+new	27810	APP-WL-ADM-424	New	Task	Chitrangi Mestry	[FE] ADM-424 Module Activation & Dependency Validation	operation:subscription#listModuleCatalogue
+new	27887	TEST-AM-IDENTITY-SECURITY-P09	New	Task	Deep Khanvilkar	[Test] Module test: Identity & Security · TICVAI Console 1 of 5	table:control.tenant
+new	27894	SVC-WHITELABEL-WHITE-LABEL-1	New	Task	Deep Khanvilkar	[BE] WhiteLabelService: claimCustomDomain, getPlatformSubdomain, listCustomDomains, regene	table:control.tenant
+new	27961	AM-SETUP-PLATFORM-FOUNDATION-P09	New	Feature	Surendra Loke	Platform Foundation · TICVAI Console (setup)	operation:subscription#createPlan, operation:subscription#createPlanVersion, operation:subscription#setSubscription
+new	27962	SVC-PLATFORM-PLAN-1	New	Task	Deep Khanvilkar	[BE] PlatformService: createPlan, createPlanVersion	operation:subscription#createPlan, operation:subscription#createPlanVersion, table:control.tenant, table:subscription.plan, table:subscription.plan_limit, table:subscription.plan_module
+new	27963	SVC-PLATFORM-TENANT-2	New	Task	Sanket Keluskar	[BE] PlatformService: terminateTenant, updateTenant	table:control.tenant, table:subscription.contract
+new	27965	APP-SETUP-ADM-008	New	Task	Surendra Loke	[FE] ADM-008 Subscription & Plan Management (setup: 3 of its 15 operations)	operation:subscription#createPlan, operation:subscription#createPlanVersion, operation:subscription#setSubscription
+new	27967	TEST-AM-SETUP-PLATFORM-FOUNDATION-P09	New	Task	Narayan Gaonkar	[Test] Module test: Platform Foundation · TICVAI Console (setup)	operation:subscription#createPlan, operation:subscription#createPlanVersion, table:control.tenant, table:subscription.contract, table:subscription.plan, table:subscription.plan_limit, table:subscription.plan_module
+new	27968	AM-SETUP-PLATFORM-FOUNDATION-P09-REST	New	Feature	Pallavi Sawant	Platform Foundation · TICVAI Console (setup, the rest of the screens)	operation:subscription#getPlan, operation:subscription#getSubscription, operation:subscription#getTenant, operation:subscription#listPlans
+new	27970	SVC-PLATFORM-LICENSING-3	New	Task	Narayan Gaonkar	[BE] PlatformService: removeLicenceAddOn	table:subscription.contract
+new	27971	SVC-PLATFORM-PLAN-2	New	Task	Narayan Gaonkar	[BE] PlatformService: getPlan, listPlans	operation:subscription#getPlan, operation:subscription#listPlans, table:subscription.plan, table:subscription.plan_limit, table:subscription.plan_module
+new	27972	SVC-PLATFORM-SUBSCRIPTION-19	New	Task	Narayan Gaonkar	[BE] PlatformService: getSubscription, previewSubscriptionChange	operation:subscription#getSubscription, table:subscription.contract, table:subscription.plan
+new	27990	SVC-TENANCY-TENANCY-4	New	Task	Surendra Loke	[BE] TenancyService: resolveTenantHost, setTenantDomainMapping	table:control.tenant
+new	28000	SVC-PLATFORM-BILLING-6	New	Task	Surendra Loke	[BE] PlatformService: generateInvoice, listSubscriptionInvoices	table:subscription.contract, table:subscription.module_listing, table:subscription.plan, table:subscription.plan_module
+new	28004	SVC-PLATFORM-TENANT-3	New	Task	Pranay Shinde	[BE] PlatformService: getTenant	operation:subscription#getTenant, table:control.tenant, table:subscription.contract
+new	28005	SVC-PLATFORM-METERING-2	New	Task	Pranay Shinde	[BE] PlatformService: getUsageMetering	table:subscription.contract
+new	28338	TEST-AM-WHITE-LABEL-P13	New	Task	Pallavi Sawant	[Test] Module test: White Label · CMS	table:control.tenant
+new	28384	APP-CONSOLE-ADM-002	New	Task	Surendra Loke	[FE] ADM-002 Platform Dashboard	operation:subscription#getTenant
+new	28385	TEST-AM-SUBSCRIPTION-LICENSING-P09	New	Task	Sanket Keluskar	[Test] Module test: Subscription & Licensing · TICVAI Console 1 of 6	operation:subscription#getTenant, operation:subscription#listModuleCatalogue, table:control.tenant, table:subscription.contract, table:subscription.module_listing, table:subscription.plan
+new	28386	APP-SETUP-ADM-005-REST	New	Task	Pallavi Sawant	[FE] ADM-005 Tenant Directory (the rest of the screen: 11 of its 17 operations)	operation:subscription#getTenant
+new	28387	APP-SETUP-ADM-008-REST	New	Task	Pallavi Sawant	[FE] ADM-008 Subscription & Plan Management (the rest of the screen: 12 of its 15 operatio	operation:subscription#getPlan, operation:subscription#getSubscription, operation:subscription#getTenant, operation:subscription#listPlans
+new	28388	TEST-AM-SETUP-PLATFORM-FOUNDATION-P09-REST	New	Task	Narayan Gaonkar	[Test] Module test: Platform Foundation · TICVAI Console (setup, the rest of the screens)	operation:subscription#getPlan, operation:subscription#getSubscription, operation:subscription#listPlans, table:subscription.contract, table:subscription.module_listing, table:subscription.plan, table:subscription.plan_limit, table:subscription.plan_module
+new	28759	TEST-AM-SETUP-TICKETING-GUEST-COMMERCE-P08-REST	New	Task	Narayan Gaonkar	[Test] Module test: Ticketing & Guest Commerce · Venue Management (setup, the rest of the 	table:subscription.membership_renewal_policy, table:subscription.tier_allowance, table:subscription.tier_module
+new	29085	SVC-PLATFORM-SUBSCRIPTION-2	New	Task	Sanket Keluskar	[BE] PlatformService: submitOnboardingApplication	table:subscription.plan
+new	29179	AM-TENANCY-VENUES-P09	New	Feature	Pradnya Yeram	Tenancy & Venues · TICVAI Console	operation:subscription#runGoLiveValidation
+new	29180	MIG-SUBSCRIPTION-2	New	Task	Hrushikant Patkar	[DB] Forward migration V1057__subscription.sql: subscription for Tenancy & Venues · TICVAI	table:subscription.go_live_readiness
+new	29182	SVC-PLATFORM-SUBSCRIPTION-3	New	Task	Sanket Keluskar	[BE] PlatformService: runGoLiveValidation	operation:subscription#runGoLiveValidation, table:subscription.go_live_readiness
+new	29183	APP-CONSOLE-ADM-426	New	Task	Pradnya Yeram	[FE] ADM-426 Initial Configuration & Regional Defaults	operation:subscription#runGoLiveValidation
+new	29184	TEST-AM-TENANCY-VENUES-P09	New	Task	Chinmay Patkar	[Test] Module test: Tenancy & Venues · TICVAI Console	operation:subscription#runGoLiveValidation, table:subscription.go_live_readiness
+new	29231	MIG-SUBSCRIPTION-3	New	Task	Hrushikant Patkar	[DB] Forward migration V1084__subscription.sql: subscription for Subscription & Licensing 	table:subscription.membership_renewal_policy, table:subscription.tier_allowance, table:subscription.tier_module
+new	29237	SVC-PLATFORM-SUBSCRIPTION-4	New	Task	Surendra Loke	[BE] PlatformService: actOnPartnerCommissionLine, actOnPartnerReconciliationException, act	operation:subscription#cancelSubscription, table:control.tenant, table:subscription.contract
+new	29239	SVC-PLATFORM-SUBSCRIPTION-9	New	Task	Surendra Loke	[BE] PlatformService: setPartnerSecurity, setPlanTiers, updatePartnerAgreement	operation:subscription#setPlanTiers, table:subscription.tier_allowance, table:subscription.tier_module
+new	29244	SVC-PLATFORM-SUBSCRIPTION-6	New	Task	Narayan Gaonkar	[BE] PlatformService: getPlanTiers, listBurstEnvironments, listPartnerUsers, reconcileBurs	operation:subscription#getPlanTiers, table:subscription.tier_allowance, table:subscription.tier_module
+new	29246	SVC-PLATFORM-DRAFTED-2	New	Task	Surendra Loke	[BE] PlatformService: approveMembershipProductValidation, listCommercialAllocationQuota, l	table:subscription.membership_renewal_policy
+new	29253	AM-SUBSCRIPTION-LICENSING-P08-2	New	Feature	Pradnya Yeram	Subscription & Licensing · Venue Management 2 of 3	operation:subscription#getGoLiveReadiness, operation:subscription#runGoLiveValidation
+new	29255	SVC-PLATFORM-SUBSCRIPTION-10	New	Task	Narayan Gaonkar	[BE] PlatformService: getGoLiveReadiness	operation:subscription#getGoLiveReadiness, table:subscription.go_live_readiness
+new	29257	VM-BO-603	New	Task	Pradnya Yeram	[FE] BO-603 Configuration Health & AI Review	operation:subscription#getGoLiveReadiness, operation:subscription#runGoLiveValidation
+new	29258	VM-BO-606	New	Task	Pradnya Yeram	[FE] BO-606 Automated Validation Plan	operation:subscription#getGoLiveReadiness, operation:subscription#runGoLiveValidation
+new	29259	VM-BO-607	New	Task	Pradnya Yeram	[FE] BO-607 Ticketing & Product Validation	operation:subscription#getGoLiveReadiness, operation:subscription#runGoLiveValidation
+new	29260	VM-BO-595	New	Task	Pradnya Yeram	[FE] BO-595 AI Setup Command Center	operation:subscription#getGoLiveReadiness
+new	29261	VM-BO-596	New	Task	Chinmay Patkar	[FE] BO-596 Guided Setup Plan	operation:subscription#getGoLiveReadiness
+new	29262	VM-BO-604	New	Task	Sanket Keluskar	[FE] BO-604 Setup Completion & Handoff to Go-Live	operation:subscription#getGoLiveReadiness
+new	29263	VM-BO-605	New	Task	Pradnya Yeram	[FE] BO-605 Go-Live Readiness Command Center	operation:subscription#getGoLiveReadiness
+new	29264	SVC-PLATFORM-DRAFTED-8	New	Task	Deep Khanvilkar	[BE] PlatformService: setMemberMembershipAccount, setRenewalAutoMembership	table:subscription.membership_renewal_policy
+new	29268	AM-SUBSCRIPTION-LICENSING-P08-3	New	Feature	Sanket Keluskar	Subscription & Licensing · Venue Management 3 of 3	operation:subscription#getGoLiveReadiness, operation:subscription#runGoLiveValidation
+new	29269	VM-BO-608	New	Task	Sanket Keluskar	[FE] BO-608 End-to-End Sales Channel Testing	operation:subscription#getGoLiveReadiness, operation:subscription#runGoLiveValidation
+new	29270	VM-BO-609	New	Task	Pradnya Yeram	[FE] BO-609 Payment & Financial Validation	operation:subscription#getGoLiveReadiness, operation:subscription#runGoLiveValidation
+new	29271	VM-BO-610	New	Task	Sanket Keluskar	[FE] BO-610 Ticket, QR & Access Validation	operation:subscription#getGoLiveReadiness, operation:subscription#runGoLiveValidation
+new	29272	VM-BO-611	New	Task	Chitrangi Mestry	[FE] BO-611 User, Security & Integration Validation	operation:subscription#getGoLiveReadiness, operation:subscription#runGoLiveValidation
+new	29273	VM-BO-612	New	Task	Pradnya Yeram	[FE] BO-612 Communication & Customer Journey Validation	operation:subscription#getGoLiveReadiness, operation:subscription#runGoLiveValidation
+new	29274	VM-BO-613	New	Task	Sanket Keluskar	[FE] BO-613 Blocker, Warning & AI Resolution Center	operation:subscription#getGoLiveReadiness
+new	29275	VM-BO-614	New	Task	Chitrangi Mestry	[FE] BO-614 Final Go-Live Approval & Production Launch	operation:subscription#getGoLiveReadiness
+new	29277	AM-SUBSCRIPTION-LICENSING-P09-2	New	Feature	Sanket Keluskar	Subscription & Licensing · TICVAI Console 2 of 6	operation:subscription#getSubscription, operation:subscription#getTenant, operation:subscription#scoreVsiAssessment
+new	29278	MIG-SUBSCRIPTION-4	New	Task	Hrushikant Patkar	[DB] Forward migration V1089__subscription.sql: subscription for Subscription & Licensing 	table:subscription.licensing_model, table:subscription.vsi_assessment
+new	29279	APP-CONSOLE-ADM-006	New	Task	Pradnya Yeram	[FE] ADM-006 Tenant Hierarchy Explorer	operation:subscription#getTenant
+new	29280	APP-CONSOLE-ADM-007	New	Task	Sanket Keluskar	[FE] ADM-007 Module & Feature Entitlement	operation:subscription#getSubscription, operation:subscription#getTenant
+new	29281	APP-CONSOLE-ADM-012	New	Task	Chitrangi Mestry	[FE] ADM-012 Tenant Isolation & Resource Pool	operation:subscription#getTenant
+new	29283	APP-CONSOLE-ADM-010	New	Task	Pradnya Yeram	[FE] ADM-010 Usage Metering	operation:subscription#getTenant
+new	29284	APP-CONSOLE-ADM-011	New	Task	Sanket Keluskar	[FE] ADM-011 Licence & Seat Management	operation:subscription#getSubscription, operation:subscription#getTenant
+new	29285	SVC-PLATFORM-SUBSCRIPTION-11	New	Task	Sanket Keluskar	[BE] PlatformService: getBillingReconciliation, scoreVsiAssessment	operation:subscription#scoreVsiAssessment, table:subscription.contract, table:subscription.licensing_model, table:subscription.vsi_assessment
+new	29287	APP-CONSOLE-ADM-372	New	Task	Chitrangi Mestry	[FE] ADM-372 Operational Profile, VSI & Commercial Model Intelligence	operation:subscription#scoreVsiAssessment
+new	29290	APP-CONSOLE-ADM-371	New	Task	Chinmay Patkar	[FE] ADM-371 Customer Commercial 360°	operation:subscription#getSubscription
+new	29291	AM-SUBSCRIPTION-LICENSING-P09-3	New	Feature	Chinmay Patkar	Subscription & Licensing · TICVAI Console 3 of 6	operation:subscription#createPlan, operation:subscription#getVsiModel, operation:subscription#listLicensingModels, operation:subscription#listModuleCatalogue, operation:subscription#listPlans, operation:subscription#scoreVsiAssessment, operation:subscription#setLicensingModel, operation:subscription#setVsiModel
+new	29292	MIG-SUBSCRIPTION-5	New	Task	Hrushikant Patkar	[DB] Forward migration V1094__subscription.sql: subscription for Subscription & Licensing 	table:subscription.capacity_pack, table:subscription.enforcement_policy, table:subscription.vsi_model
+new	29293	SVC-PLATFORM-SUBSCRIPTION-13	New	Task	Pranay Shinde	[BE] PlatformService: setLicensingModel, setVsiModel, simulateCommercialPackage	operation:subscription#setLicensingModel, operation:subscription#setVsiModel, table:subscription.capacity_pack, table:subscription.licensing_model, table:subscription.module_listing, table:subscription.plan, table:subscription.tier_allowance, table:subscription.tier_module, table:subscription.vsi_model
+new	29295	APP-CONSOLE-ADM-381	New	Task	Chinmay Patkar	[FE] ADM-381 Venue Type & Business Profile	operation:subscription#scoreVsiAssessment
+new	29296	APP-CONSOLE-ADM-382	New	Task	Pradnya Yeram	[FE] ADM-382 Visitor, Capacity & Operational Scale	operation:subscription#scoreVsiAssessment
+new	29297	APP-CONSOLE-ADM-383	New	Task	Sanket Keluskar	[FE] ADM-383 Sales Channel Assessment	operation:subscription#scoreVsiAssessment
+new	29298	APP-CONSOLE-ADM-384	New	Task	Chitrangi Mestry	[FE] ADM-384 Ticketing & Product Requirements	operation:subscription#scoreVsiAssessment
+new	29299	APP-CONSOLE-ADM-385	New	Task	Chinmay Patkar	[FE] ADM-385 Access, Queue & Visitor Experience Assessment	operation:subscription#scoreVsiAssessment
+new	29300	APP-CONSOLE-ADM-386	New	Task	Pradnya Yeram	[FE] ADM-386 Additional Business Module Assessment	operation:subscription#listModuleCatalogue, operation:subscription#scoreVsiAssessment
+new	29301	APP-CONSOLE-ADM-387	New	Task	Chinmay Patkar	[FE] ADM-387 Integration, Payment & Technical Readiness	operation:subscription#scoreVsiAssessment
+new	29302	APP-CONSOLE-ADM-388	New	Task	Sanket Keluskar	[FE] ADM-388 AI Assessment Summary & Handoff	operation:subscription#scoreVsiAssessment
+new	29303	APP-CONSOLE-ADM-391	New	Task	Pradnya Yeram	[FE] ADM-391 VSI Scoring & Tier Threshold Configuration	operation:subscription#setVsiModel
+new	29304	APP-CONSOLE-ADM-393	New	Task	Chinmay Patkar	[FE] ADM-393 Tier Included Allowances	operation:subscription#setLicensingModel
+new	29305	APP-CONSOLE-ADM-394	New	Task	Sanket Keluskar	[FE] ADM-394 Commercial & Licensing Model Configuration	operation:subscription#setLicensingModel
+new	29306	APP-CONSOLE-ADM-395	New	Task	Pradnya Yeram	[FE] ADM-395 Billable Unit, Minimum Guarantee & Enforcement Rules	operation:subscription#setLicensingModel
+new	29307	APP-CONSOLE-ADM-392	New	Task	Chinmay Patkar	[FE] ADM-392 Subscription Tier Configuration	operation:subscription#createPlan, operation:subscription#listPlans
+new	29308	AM-SUBSCRIPTION-LICENSING-P09-4	New	Feature	Chinmay Patkar	Subscription & Licensing · TICVAI Console 4 of 6	operation:subscription#addCapacityPack, operation:subscription#createPlanVersion, operation:subscription#listModuleCatalogue, operation:subscription#listPlans, operation:subscription#setLicensingModel, operation:subscription#setSubscription, operation:subscription#setTrialConfiguration
+new	29309	MIG-SUBSCRIPTION-6	New	Task	Hrushikant Patkar	[DB] Forward migration V1095__subscription.sql: subscription for Subscription & Licensing 	table:subscription.trial_config
+new	29312	SVC-PLATFORM-SUBSCRIPTION-14	New	Task	Sanket Keluskar	[BE] PlatformService: addCapacityPack, setTrialConfiguration	operation:subscription#addCapacityPack, operation:subscription#setTrialConfiguration, table:subscription.capacity_pack, table:subscription.trial_config
+new	29313	APP-CONSOLE-ADM-396	New	Task	Pradnya Yeram	[FE] ADM-396 Overage Pricing & Capacity Packs	operation:subscription#addCapacityPack, operation:subscription#setLicensingModel
+new	29315	APP-CONSOLE-ADM-398	New	Task	Chinmay Patkar	[FE] ADM-398 Rule Versioning, Approval & Publication	operation:subscription#createPlanVersion
+new	29317	APP-CONSOLE-ADM-401	New	Task	Pradnya Yeram	[FE] ADM-401 Module Marketplace	operation:subscription#listModuleCatalogue
+new	29318	APP-CONSOLE-ADM-402	New	Task	Pallavi Sawant	[FE] ADM-402 AI Module & Package Recommendations	operation:subscription#listModuleCatalogue
+new	29319	APP-CONSOLE-ADM-403	New	Task	Pradnya Yeram	[FE] ADM-403 Module Detail & Commercial Treatment	operation:subscription#listModuleCatalogue
+new	29320	APP-CONSOLE-ADM-404	New	Task	Chitrangi Mestry	[FE] ADM-404 Module Dependency & Compatibility Manager	operation:subscription#listModuleCatalogue
+new	29321	APP-CONSOLE-ADM-405	New	Task	Chinmay Patkar	[FE] ADM-405 Add-Ons, Capacity & Commercial Options	operation:subscription#addCapacityPack
+new	29324	APP-CONSOLE-ADM-410	New	Task	Chinmay Patkar	[FE] ADM-410 Contract & Billing Cycle Selection	operation:subscription#setSubscription
+new	29326	APP-CONSOLE-ADM-413	New	Task	Chitrangi Mestry	[FE] ADM-413 Trial Configuration & Conversion Rules	operation:subscription#setTrialConfiguration
+new	29329	APP-CONSOLE-ADM-417	New	Task	Pradnya Yeram	[FE] ADM-417 Subscription Confirmation & Commercial Activation	operation:subscription#setSubscription
+new	29330	APP-CONSOLE-ADM-400	New	Task	Chinmay Patkar	[FE] ADM-400 Commercial Model & Tier Selection	operation:subscription#listPlans
+new	29332	APP-CONSOLE-ADM-418	New	Task	Sanket Keluskar	[FE] ADM-418 Subscription Lifecycle & Trial-to-Paid Handoff	operation:subscription#getSubscription
+new	29333	TEST-AM-SUBSCRIPTION-LICENSING-P09-4	New	Task	Chinmay Patkar	[Test] Module test: Subscription & Licensing · TICVAI Console 4 of 6	operation:subscription#addCapacityPack, operation:subscription#setTrialConfiguration, table:subscription.capacity_pack, table:subscription.trial_config
+new	29334	AM-SUBSCRIPTION-LICENSING-P09-5	New	Feature	Sanket Keluskar	Subscription & Licensing · TICVAI Console 5 of 6	operation:subscription#addCapacityPack, operation:subscription#getGoLiveReadiness, operation:subscription#getSubscription, operation:subscription#listModuleCatalogue, operation:subscription#setLicenceEnforcementPolicy, operation:subscription#setSubscription
+new	29337	APP-CONSOLE-ADM-009	New	Task	Pradnya Yeram	[FE] ADM-009 Tenant Billing & Invoicing	operation:subscription#getSubscription, operation:subscription#getTenant
+new	29338	TEST-AM-SUBSCRIPTION-LICENSING-P09-2	New	Task	Sanket Keluskar	[Test] Module test: Subscription & Licensing · TICVAI Console 2 of 6	operation:subscription#scoreVsiAssessment, table:subscription.contract, table:subscription.licensing_model, table:subscription.vsi_assessment
+new	29339	SVC-PLATFORM-SUBSCRIPTION-15	New	Task	Sanket Keluskar	[BE] PlatformService: listVenueTypeTemplates, setLicenceEnforcementPolicy, settleAiUsage	operation:subscription#setLicenceEnforcementPolicy, table:subscription.contract, table:subscription.enforcement_policy, table:subscription.plan
+new	29340	SVC-PLATFORM-SUBSCRIPTION-12	New	Task	Narayan Gaonkar	[BE] PlatformService: getLicenceEnforcement, getPlanRecommendations, getVsiModel, listLice	operation:subscription#getVsiModel, operation:subscription#listLicensingModels, table:subscription.capacity_pack, table:subscription.contract, table:subscription.enforcement_policy, table:subscription.licensing_model, table:subscription.module_listing, table:subscription.plan, table:subscription.plan_limit, table:subscription.plan_module, table:subscription.tier_allowance, table:subscription.tier_module, table:subscription.vsi_model
+new	29343	APP-CONSOLE-ADM-389	New	Task	Chinmay Patkar	[FE] ADM-389 Commercial Rules Engine Overview	operation:subscription#listLicensingModels
+new	29344	APP-CONSOLE-ADM-390	New	Task	Pradnya Yeram	[FE] ADM-390 VSI Model Builder	operation:subscription#getVsiModel, operation:subscription#setVsiModel
+new	29345	TEST-AM-SUBSCRIPTION-LICENSING-P09-3	New	Task	Pallavi Sawant	[Test] Module test: Subscription & Licensing · TICVAI Console 3 of 6	operation:subscription#getVsiModel, operation:subscription#listLicensingModels, operation:subscription#setLicensingModel, operation:subscription#setVsiModel, table:subscription.capacity_pack, table:subscription.contract, table:subscription.enforcement_policy, table:subscription.licensing_model, table:subscription.module_listing, table:subscription.plan, table:subscription.plan_limit, table:subscription.plan_module, table:subscription.tier_allowance, table:subscription.tier_module, table:subscription.vsi_model
+new	29347	APP-CONSOLE-ADM-423	New	Task	Chitrangi Mestry	[FE] ADM-423 License & Entitlement Activation	operation:subscription#listModuleCatalogue
+new	29350	APP-CONSOLE-ADM-453	New	Task	Pradnya Yeram	[FE] ADM-453 License Enforcement & Decision Engine	operation:subscription#setLicenceEnforcementPolicy
+new	29351	APP-CONSOLE-ADM-455	New	Task	Pradnya Yeram	[FE] ADM-455 Overage, Capacity & Temporary Exception Management	operation:subscription#addCapacityPack
+new	29357	APP-CONSOLE-ADM-427	New	Task	Chinmay Patkar	[FE] ADM-427 Provisioning Validation & Exception Management	operation:subscription#getGoLiveReadiness
+new	29365	TEST-AM-SUBSCRIPTION-LICENSING-P09-5	New	Task	Chinmay Patkar	[Test] Module test: Subscription & Licensing · TICVAI Console 5 of 6	operation:subscription#setLicenceEnforcementPolicy, table:subscription.enforcement_policy
+new	29374	AM-SUBSCRIPTION-LICENSING-P17	New	Feature	Sanket Keluskar	Subscription & Licensing · Sign-up 1 of 2	operation:subscription#addCapacityPack, operation:subscription#listModuleCatalogue, operation:subscription#listPlans, operation:subscription#scoreVsiAssessment, operation:subscription#setSubscription
+new	29377	APP-SIGNUP-SGN-003	New	Task	Chinmay Patkar	[FE] SGN-003 Venue Type & Business Profile	operation:subscription#scoreVsiAssessment
+new	29378	APP-SIGNUP-SGN-004	New	Task	Sanket Keluskar	[FE] SGN-004 Visitor, Capacity & Operational Scale	operation:subscription#scoreVsiAssessment
+new	29379	APP-SIGNUP-SGN-005	New	Task	Chitrangi Mestry	[FE] SGN-005 Sales Channel Assessment	operation:subscription#scoreVsiAssessment
+new	29380	APP-SIGNUP-SGN-006	New	Task	Pradnya Yeram	[FE] SGN-006 Ticketing & Product Requirements	operation:subscription#scoreVsiAssessment
+new	29381	APP-SIGNUP-SGN-007	New	Task	Chinmay Patkar	[FE] SGN-007 Access, Queue & Visitor Experience Assessment	operation:subscription#scoreVsiAssessment
+new	29382	APP-SIGNUP-SGN-008	New	Task	Sanket Keluskar	[FE] SGN-008 Additional Business Module Assessment	operation:subscription#listModuleCatalogue, operation:subscription#scoreVsiAssessment
+new	29383	APP-SIGNUP-SGN-009	New	Task	Chinmay Patkar	[FE] SGN-009 Integration, Payment & Technical Readiness	operation:subscription#scoreVsiAssessment
+new	29384	APP-SIGNUP-SGN-010	New	Task	Chitrangi Mestry	[FE] SGN-010 AI Assessment Summary & Handoff	operation:subscription#scoreVsiAssessment
+new	29386	APP-SIGNUP-SGN-013	New	Task	Sanket Keluskar	[FE] SGN-013 Module Marketplace	operation:subscription#listModuleCatalogue
+new	29387	APP-SIGNUP-SGN-014	New	Task	Chitrangi Mestry	[FE] SGN-014 AI Module & Package Recommendations	operation:subscription#listModuleCatalogue
+new	29388	APP-SIGNUP-SGN-015	New	Task	Sanket Keluskar	[FE] SGN-015 Module Detail & Commercial Treatment	operation:subscription#listModuleCatalogue
+new	29389	APP-SIGNUP-SGN-016	New	Task	Surendra Loke	[FE] SGN-016 Module Dependency & Compatibility Manager	operation:subscription#listModuleCatalogue
+new	29390	APP-SIGNUP-SGN-017	New	Task	Pradnya Yeram	[FE] SGN-017 Add-Ons, Capacity & Commercial Options	operation:subscription#addCapacityPack
+new	29391	APP-SIGNUP-SGN-019	New	Task	Chitrangi Mestry	[FE] SGN-019 Contract & Billing Cycle Selection	operation:subscription#setSubscription
+new	29394	APP-SIGNUP-SGN-012	New	Task	Chitrangi Mestry	[FE] SGN-012 Commercial Model & Tier Selection	operation:subscription#listPlans
+new	29397	AM-SUBSCRIPTION-LICENSING-P17-2	New	Feature	Pradnya Yeram	Subscription & Licensing · Sign-up 2 of 2	operation:subscription#setSubscription
+new	29398	APP-SIGNUP-SGN-024	New	Task	Pradnya Yeram	[FE] SGN-024 Subscription Confirmation & Commercial Activation	operation:subscription#setSubscription
+new	29574	AM-PUBLIC-API-P09	New	Feature	Pradnya Yeram	Public API · TICVAI Console	operation:subscription#getTenant
+new	29577	APP-CONSOLE-ADM-015	New	Task	Pradnya Yeram	[FE] ADM-015 API Rate Limit & Quota Management	operation:subscription#getTenant
+new	29856	SVC-PLATFORM-DRAFTED-3	New	Task		[BE] PlatformService: listCreditLimitExposure, listDepositGuaranteeFinancial, listMemberEx	table:subscription.membership_renewal_policy
+new	29861	TEST-AM-SUBSCRIPTION-LICENSING-P08	New	Task	Narayan Gaonkar	[Test] Module test: Subscription & Licensing · Venue Management 1 of 3	table:subscription.membership_renewal_policy
+new	29862	SVC-PLATFORM-DRAFTED-6	New	Task	Narayan Gaonkar	[BE] PlatformService: getMembershipProductValidation, listMember, listMemberLifecycleCase,	table:subscription.membership_renewal_policy
+new	29863	SVC-PLATFORM-DRAFTED-7	New	Task	Surendra Loke	[BE] PlatformService: listMembershipRenewalRetention, listMembershipUpgradeDowngrade, list	table:subscription.membership_renewal_policy
+new	29872	TEST-AM-SUBSCRIPTION-LICENSING-P08-2	New	Task	Chinmay Patkar	[Test] Module test: Subscription & Licensing · Venue Management 2 of 3	operation:subscription#getGoLiveReadiness, table:subscription.go_live_readiness, table:subscription.membership_renewal_policy
+new	30756	SVC-PLATFORM-TENANT-1#createTenant	New	Sub Task	Narayan Gaonkar	[BE] createTenant: POST /tenants	table:control.tenant
+new	30757	SVC-PLATFORM-TENANT-1#listTenants	New	Sub Task	Narayan Gaonkar	[BE] listTenants: GET /tenants	table:control.tenant
+new	30758	SVC-PLATFORM-TENANT-1#reactivateTenant	New	Sub Task	Narayan Gaonkar	[BE] reactivateTenant: POST /tenants/{tenantId}/reactivate	table:control.tenant
+new	30759	SVC-PLATFORM-TENANT-1#suspendTenant	New	Sub Task	Narayan Gaonkar	[BE] suspendTenant: POST /tenants/{tenantId}/suspend	table:control.tenant
+new	30761	SVC-WHITELABEL-MODULES-1#getModuleEnablement	New	Sub Task	Sanket Keluskar	[BE] getModuleEnablement: GET /tenant-config/modules	table:subscription.contract, table:subscription.plan
+new	30838	SVC-PLATFORM-LICENSING-1#getTenantLicences	New	Sub Task	Sanket Keluskar	[BE] getTenantLicences: GET /tenants/{tenantId}/licences	table:subscription.contract, table:subscription.plan
+new	30839	SVC-PLATFORM-SUBSCRIPTION-1#listModuleCatalogue	New	Sub Task	Sanket Keluskar	[BE] listModuleCatalogue: GET /module-catalogue	operation:subscription#listModuleCatalogue, table:subscription.module_listing
+new	30840	SVC-PLATFORM-SUBSCRIPTION-1#setModuleListing	New	Sub Task	Sanket Keluskar	[BE] setModuleListing: PUT /module-catalogue/{moduleCode}	operation:subscription#setModuleListing, table:subscription.module_listing
+new	30841	SVC-PLATFORM-SUBSCRIPTION-1#setSubscription	New	Sub Task	Sanket Keluskar	[BE] setSubscription: PUT /tenants/{tenantId}/subscription	operation:subscription#setSubscription, table:subscription.contract, table:subscription.plan
+new	30842	SVC-WHITELABEL-MODULES-2#setModuleEnablement	New	Sub Task	Chinmay Patkar	[BE] setModuleEnablement: PUT /tenant-config/modules	table:subscription.contract, table:subscription.plan
+new	30843	APP-WL-ADM-424#build	New	Sub Task	Chitrangi Mestry	[FE] ADM-424 Module Activation & Dependency Validation: build with all states	operation:subscription#listModuleCatalogue
+new	30844	APP-WL-ADM-424#wire	New	Sub Task	Chitrangi Mestry	[FE] ADM-424 Module Activation & Dependency Validation: connect to API	operation:subscription#listModuleCatalogue
+new	30845	APP-WL-ADM-424#test	New	Sub Task	Chitrangi Mestry	[FE] ADM-424 Module Activation & Dependency Validation: tests	operation:subscription#listModuleCatalogue
+new	31077	SVC-WHITELABEL-WHITE-LABEL-1#claimCustomDomain	New	Sub Task	Deep Khanvilkar	[BE] claimCustomDomain: POST /tenant-domains	table:control.tenant
+new	31262	SVC-PLATFORM-PLAN-1#createPlan	New	Sub Task	Deep Khanvilkar	[BE] createPlan: POST /plans	operation:subscription#createPlan, table:control.tenant, table:subscription.plan, table:subscription.plan_limit, table:subscription.plan_module
+new	31263	SVC-PLATFORM-PLAN-1#createPlanVersion	New	Sub Task	Deep Khanvilkar	[BE] createPlanVersion: POST /plans/{planId}	operation:subscription#createPlanVersion, table:control.tenant, table:subscription.plan, table:subscription.plan_limit, table:subscription.plan_module
+new	31264	SVC-PLATFORM-TENANT-2#terminateTenant	New	Sub Task	Sanket Keluskar	[BE] terminateTenant: POST /tenants/{tenantId}/terminate	table:control.tenant, table:subscription.contract
+new	31265	SVC-PLATFORM-TENANT-2#updateTenant	New	Sub Task	Sanket Keluskar	[BE] updateTenant: PATCH /tenants/{tenantId}	table:control.tenant
+new	31269	APP-SETUP-ADM-008#build	New	Sub Task	Surendra Loke	[FE] ADM-008 Subscription & Plan Management (setup: 3 of its 15 operations): build with al	operation:subscription#createPlan, operation:subscription#createPlanVersion, operation:subscription#setSubscription
+new	31270	APP-SETUP-ADM-008#wire	New	Sub Task	Surendra Loke	[FE] ADM-008 Subscription & Plan Management (setup: 3 of its 15 operations): connect to AP	operation:subscription#createPlan, operation:subscription#createPlanVersion, operation:subscription#setSubscription
+new	31271	APP-SETUP-ADM-008#test	New	Sub Task	Surendra Loke	[FE] ADM-008 Subscription & Plan Management (setup: 3 of its 15 operations): tests	operation:subscription#createPlan, operation:subscription#createPlanVersion, operation:subscription#setSubscription
+new	31277	SVC-PLATFORM-LICENSING-3#removeLicenceAddOn	New	Sub Task	Narayan Gaonkar	[BE] removeLicenceAddOn: DELETE /tenants/{tenantId}/licences/add-ons	table:subscription.contract
+new	31278	SVC-PLATFORM-PLAN-2#getPlan	New	Sub Task	Narayan Gaonkar	[BE] getPlan: GET /plans/{planId}	operation:subscription#getPlan, table:subscription.plan, table:subscription.plan_limit, table:subscription.plan_module
+new	31279	SVC-PLATFORM-PLAN-2#listPlans	New	Sub Task	Narayan Gaonkar	[BE] listPlans: GET /plans	operation:subscription#listPlans, table:subscription.plan, table:subscription.plan_limit, table:subscription.plan_module
+new	31280	SVC-PLATFORM-SUBSCRIPTION-19#getSubscription	New	Sub Task	Narayan Gaonkar	[BE] getSubscription: GET /tenants/{tenantId}/subscription	operation:subscription#getSubscription, table:subscription.contract
+new	31281	SVC-PLATFORM-SUBSCRIPTION-19#previewSubscriptionChange	New	Sub Task	Narayan Gaonkar	[BE] previewSubscriptionChange: POST /tenants/{tenantId}/subscription/preview	table:subscription.contract, table:subscription.plan
+new	31313	SVC-TENANCY-TENANCY-4#setTenantDomainMapping	New	Sub Task	Surendra Loke	[BE] setTenantDomainMapping: PUT /tenant-domains/{hostname}	table:control.tenant
+new	31361	SVC-PLATFORM-BILLING-6#generateInvoice	New	Sub Task	Surendra Loke	[BE] generateInvoice: POST /tenants/{tenantId}/invoices	table:subscription.contract, table:subscription.module_listing, table:subscription.plan, table:subscription.plan_module
+new	31371	SVC-PLATFORM-TENANT-3#getTenant	New	Sub Task	Pranay Shinde	[BE] getTenant: GET /tenants/{tenantId}	operation:subscription#getTenant, table:control.tenant, table:subscription.contract
+new	31372	SVC-PLATFORM-METERING-2#getUsageMetering	New	Sub Task	Pranay Shinde	[BE] getUsageMetering: GET /tenants/{tenantId}/usage	table:subscription.contract
+new	32284	APP-CONSOLE-ADM-002#build	New	Sub Task	Surendra Loke	[FE] ADM-002 Platform Dashboard: build with all states	operation:subscription#getTenant
+new	32285	APP-CONSOLE-ADM-002#wire	New	Sub Task	Surendra Loke	[FE] ADM-002 Platform Dashboard: connect to API	operation:subscription#getTenant
+new	32286	APP-CONSOLE-ADM-002#test	New	Sub Task	Surendra Loke	[FE] ADM-002 Platform Dashboard: tests	operation:subscription#getTenant
+new	32287	APP-SETUP-ADM-005-REST#build	New	Sub Task	Pallavi Sawant	[FE] ADM-005 Tenant Directory (the rest of the screen: 11 of its 17 operations): build wit	operation:subscription#getTenant
+new	32288	APP-SETUP-ADM-005-REST#wire	New	Sub Task	Pallavi Sawant	[FE] ADM-005 Tenant Directory (the rest of the screen: 11 of its 17 operations): connect t	operation:subscription#getTenant
+new	32289	APP-SETUP-ADM-005-REST#test	New	Sub Task	Pallavi Sawant	[FE] ADM-005 Tenant Directory (the rest of the screen: 11 of its 17 operations): tests	operation:subscription#getTenant
+new	32290	APP-SETUP-ADM-008-REST#build	New	Sub Task	Pallavi Sawant	[FE] ADM-008 Subscription & Plan Management (the rest of the screen: 12 of its 15 operatio	operation:subscription#getPlan, operation:subscription#getSubscription, operation:subscription#getTenant, operation:subscription#listPlans
+new	32291	APP-SETUP-ADM-008-REST#wire	New	Sub Task	Pallavi Sawant	[FE] ADM-008 Subscription & Plan Management (the rest of the screen: 12 of its 15 operatio	operation:subscription#getPlan, operation:subscription#getSubscription, operation:subscription#getTenant, operation:subscription#listPlans
+new	32292	APP-SETUP-ADM-008-REST#test	New	Sub Task	Pallavi Sawant	[FE] ADM-008 Subscription & Plan Management (the rest of the screen: 12 of its 15 operatio	operation:subscription#getPlan, operation:subscription#getSubscription, operation:subscription#getTenant, operation:subscription#listPlans
+new	33838	SVC-PLATFORM-SUBSCRIPTION-2#submitOnboardingApplication	New	Sub Task	Sanket Keluskar	[BE] submitOnboardingApplication: POST /onboarding-applications	table:subscription.plan
+new	34039	MIG-SUBSCRIPTION-2#subscription.go_live_readiness	New	Sub Task	Hrushikant Patkar	[DB] subscription.go_live_readiness	table:subscription.go_live_readiness
+new	34043	SVC-PLATFORM-SUBSCRIPTION-3#runGoLiveValidation	New	Sub Task	Sanket Keluskar	[BE] runGoLiveValidation: POST /go-live-readiness/run	operation:subscription#runGoLiveValidation, table:subscription.go_live_readiness
+new	34044	APP-CONSOLE-ADM-426#build	New	Sub Task	Pradnya Yeram	[FE] ADM-426 Initial Configuration & Regional Defaults: build with all states	operation:subscription#runGoLiveValidation
+new	34045	APP-CONSOLE-ADM-426#wire	New	Sub Task	Pradnya Yeram	[FE] ADM-426 Initial Configuration & Regional Defaults: connect to API	operation:subscription#runGoLiveValidation
+new	34046	APP-CONSOLE-ADM-426#test	New	Sub Task	Pradnya Yeram	[FE] ADM-426 Initial Configuration & Regional Defaults: tests	operation:subscription#runGoLiveValidation
+new	34163	MIG-SUBSCRIPTION-3#subscription.membership_renewal_policy	New	Sub Task	Hrushikant Patkar	[DB] subscription.membership_renewal_policy	table:subscription.membership_renewal_policy
+new	34165	MIG-SUBSCRIPTION-3#subscription.tier_allowance	New	Sub Task	Hrushikant Patkar	[DB] subscription.tier_allowance	table:subscription.tier_allowance
+new	34166	MIG-SUBSCRIPTION-3#subscription.tier_module	New	Sub Task	Hrushikant Patkar	[DB] subscription.tier_module	table:subscription.tier_module
+new	34182	SVC-PLATFORM-SUBSCRIPTION-4#cancelSubscription	New	Sub Task	Surendra Loke	[BE] cancelSubscription: POST /subscriptions/{subscriptionId}/cancel	operation:subscription#cancelSubscription, table:control.tenant, table:subscription.contract
+new	34188	SVC-PLATFORM-SUBSCRIPTION-9#setPlanTiers	New	Sub Task	Surendra Loke	[BE] setPlanTiers: PUT /plans/{planId}/tiers	operation:subscription#setPlanTiers, table:subscription.tier_allowance, table:subscription.tier_module
+new	34203	SVC-PLATFORM-SUBSCRIPTION-6#getPlanTiers	New	Sub Task	Narayan Gaonkar	[BE] getPlanTiers: GET /plans/{planId}/tiers	operation:subscription#getPlanTiers, table:subscription.tier_allowance, table:subscription.tier_module
+new	34211	SVC-PLATFORM-DRAFTED-2#approveMembershipProductValidation	New	Sub Task	Surendra Loke	[BE] approveMembershipProductValidation: PUT /membership-product-validation	table:subscription.membership_renewal_policy
+new	34225	SVC-PLATFORM-SUBSCRIPTION-10#getGoLiveReadiness	New	Sub Task	Narayan Gaonkar	[BE] getGoLiveReadiness: GET /go-live-readiness	operation:subscription#getGoLiveReadiness, table:subscription.go_live_readiness
+new	34229	VM-BO-603#build	New	Sub Task	Pradnya Yeram	[FE] BO-603 Configuration Health & AI Review: build with all states	operation:subscription#getGoLiveReadiness, operation:subscription#runGoLiveValidation
+new	34230	VM-BO-603#wire	New	Sub Task	Pradnya Yeram	[FE] BO-603 Configuration Health & AI Review: connect to API	operation:subscription#getGoLiveReadiness, operation:subscription#runGoLiveValidation
+new	34231	VM-BO-603#test	New	Sub Task	Pradnya Yeram	[FE] BO-603 Configuration Health & AI Review: tests	operation:subscription#getGoLiveReadiness, operation:subscription#runGoLiveValidation
+new	34232	VM-BO-606#build	New	Sub Task	Pradnya Yeram	[FE] BO-606 Automated Validation Plan: build with all states	operation:subscription#getGoLiveReadiness, operation:subscription#runGoLiveValidation
+new	34233	VM-BO-606#wire	New	Sub Task	Pradnya Yeram	[FE] BO-606 Automated Validation Plan: connect to API	operation:subscription#getGoLiveReadiness, operation:subscription#runGoLiveValidation
+new	34234	VM-BO-606#test	New	Sub Task	Pradnya Yeram	[FE] BO-606 Automated Validation Plan: tests	operation:subscription#getGoLiveReadiness, operation:subscription#runGoLiveValidation
+new	34235	VM-BO-607#build	New	Sub Task	Pradnya Yeram	[FE] BO-607 Ticketing & Product Validation: build with all states	operation:subscription#getGoLiveReadiness, operation:subscription#runGoLiveValidation
+new	34236	VM-BO-607#wire	New	Sub Task	Pradnya Yeram	[FE] BO-607 Ticketing & Product Validation: connect to API	operation:subscription#getGoLiveReadiness, operation:subscription#runGoLiveValidation
+new	34237	VM-BO-607#test	New	Sub Task	Pradnya Yeram	[FE] BO-607 Ticketing & Product Validation: tests	operation:subscription#getGoLiveReadiness, operation:subscription#runGoLiveValidation
+new	34238	VM-BO-595#build	New	Sub Task	Pradnya Yeram	[FE] BO-595 AI Setup Command Center: build with all states	operation:subscription#getGoLiveReadiness
+new	34239	VM-BO-595#wire	New	Sub Task	Pradnya Yeram	[FE] BO-595 AI Setup Command Center: connect to API	operation:subscription#getGoLiveReadiness
+new	34240	VM-BO-595#test	New	Sub Task	Pradnya Yeram	[FE] BO-595 AI Setup Command Center: tests	operation:subscription#getGoLiveReadiness
+new	34241	VM-BO-596#build	New	Sub Task	Chinmay Patkar	[FE] BO-596 Guided Setup Plan: build with all states	operation:subscription#getGoLiveReadiness
+new	34242	VM-BO-596#wire	New	Sub Task	Chinmay Patkar	[FE] BO-596 Guided Setup Plan: connect to API	operation:subscription#getGoLiveReadiness
+new	34243	VM-BO-596#test	New	Sub Task	Chinmay Patkar	[FE] BO-596 Guided Setup Plan: tests	operation:subscription#getGoLiveReadiness
+new	34244	VM-BO-604#build	New	Sub Task	Sanket Keluskar	[FE] BO-604 Setup Completion & Handoff to Go-Live: build with all states	operation:subscription#getGoLiveReadiness
+new	34245	VM-BO-604#wire	New	Sub Task	Sanket Keluskar	[FE] BO-604 Setup Completion & Handoff to Go-Live: connect to API	operation:subscription#getGoLiveReadiness
+new	34246	VM-BO-604#test	New	Sub Task	Sanket Keluskar	[FE] BO-604 Setup Completion & Handoff to Go-Live: tests	operation:subscription#getGoLiveReadiness
+new	34247	VM-BO-605#build	New	Sub Task	Pradnya Yeram	[FE] BO-605 Go-Live Readiness Command Center: build with all states	operation:subscription#getGoLiveReadiness
+new	34248	VM-BO-605#wire	New	Sub Task	Pradnya Yeram	[FE] BO-605 Go-Live Readiness Command Center: connect to API	operation:subscription#getGoLiveReadiness
+new	34249	VM-BO-605#test	New	Sub Task	Pradnya Yeram	[FE] BO-605 Go-Live Readiness Command Center: tests	operation:subscription#getGoLiveReadiness
+new	34251	SVC-PLATFORM-DRAFTED-8#setRenewalAutoMembership	New	Sub Task	Deep Khanvilkar	[BE] setRenewalAutoMembership: PUT /renewal-auto-membership	table:subscription.membership_renewal_policy
+new	34261	VM-BO-608#build	New	Sub Task	Sanket Keluskar	[FE] BO-608 End-to-End Sales Channel Testing: build with all states	operation:subscription#getGoLiveReadiness, operation:subscription#runGoLiveValidation
+new	34262	VM-BO-608#wire	New	Sub Task	Sanket Keluskar	[FE] BO-608 End-to-End Sales Channel Testing: connect to API	operation:subscription#getGoLiveReadiness, operation:subscription#runGoLiveValidation
+new	34263	VM-BO-608#test	New	Sub Task	Sanket Keluskar	[FE] BO-608 End-to-End Sales Channel Testing: tests	operation:subscription#getGoLiveReadiness, operation:subscription#runGoLiveValidation
+new	34264	VM-BO-609#build	New	Sub Task	Pradnya Yeram	[FE] BO-609 Payment & Financial Validation: build with all states	operation:subscription#getGoLiveReadiness, operation:subscription#runGoLiveValidation
+new	34265	VM-BO-609#wire	New	Sub Task	Pradnya Yeram	[FE] BO-609 Payment & Financial Validation: connect to API	operation:subscription#getGoLiveReadiness, operation:subscription#runGoLiveValidation
+new	34266	VM-BO-609#test	New	Sub Task	Pradnya Yeram	[FE] BO-609 Payment & Financial Validation: tests	operation:subscription#getGoLiveReadiness, operation:subscription#runGoLiveValidation
+new	34267	VM-BO-610#build	New	Sub Task	Sanket Keluskar	[FE] BO-610 Ticket, QR & Access Validation: build with all states	operation:subscription#getGoLiveReadiness, operation:subscription#runGoLiveValidation
+new	34268	VM-BO-610#wire	New	Sub Task	Sanket Keluskar	[FE] BO-610 Ticket, QR & Access Validation: connect to API	operation:subscription#getGoLiveReadiness, operation:subscription#runGoLiveValidation
+new	34269	VM-BO-610#test	New	Sub Task	Sanket Keluskar	[FE] BO-610 Ticket, QR & Access Validation: tests	operation:subscription#getGoLiveReadiness, operation:subscription#runGoLiveValidation
+new	34270	VM-BO-611#build	New	Sub Task	Chitrangi Mestry	[FE] BO-611 User, Security & Integration Validation: build with all states	operation:subscription#getGoLiveReadiness, operation:subscription#runGoLiveValidation
+new	34271	VM-BO-611#wire	New	Sub Task	Chitrangi Mestry	[FE] BO-611 User, Security & Integration Validation: connect to API	operation:subscription#getGoLiveReadiness, operation:subscription#runGoLiveValidation
+new	34272	VM-BO-611#test	New	Sub Task	Chitrangi Mestry	[FE] BO-611 User, Security & Integration Validation: tests	operation:subscription#getGoLiveReadiness, operation:subscription#runGoLiveValidation
+new	34273	VM-BO-612#build	New	Sub Task	Pradnya Yeram	[FE] BO-612 Communication & Customer Journey Validation: build with all states	operation:subscription#getGoLiveReadiness, operation:subscription#runGoLiveValidation
+new	34274	VM-BO-612#wire	New	Sub Task	Pradnya Yeram	[FE] BO-612 Communication & Customer Journey Validation: connect to API	operation:subscription#getGoLiveReadiness, operation:subscription#runGoLiveValidation
+new	34275	VM-BO-612#test	New	Sub Task	Pradnya Yeram	[FE] BO-612 Communication & Customer Journey Validation: tests	operation:subscription#getGoLiveReadiness, operation:subscription#runGoLiveValidation
+new	34276	VM-BO-613#build	New	Sub Task	Sanket Keluskar	[FE] BO-613 Blocker, Warning & AI Resolution Center: build with all states	operation:subscription#getGoLiveReadiness
+new	34277	VM-BO-613#wire	New	Sub Task	Sanket Keluskar	[FE] BO-613 Blocker, Warning & AI Resolution Center: connect to API	operation:subscription#getGoLiveReadiness
+new	34278	VM-BO-613#test	New	Sub Task	Sanket Keluskar	[FE] BO-613 Blocker, Warning & AI Resolution Center: tests	operation:subscription#getGoLiveReadiness
+new	34279	VM-BO-614#build	New	Sub Task	Chitrangi Mestry	[FE] BO-614 Final Go-Live Approval & Production Launch: build with all states	operation:subscription#getGoLiveReadiness
+new	34280	VM-BO-614#wire	New	Sub Task	Chitrangi Mestry	[FE] BO-614 Final Go-Live Approval & Production Launch: connect to API	operation:subscription#getGoLiveReadiness
+new	34281	VM-BO-614#test	New	Sub Task	Chitrangi Mestry	[FE] BO-614 Final Go-Live Approval & Production Launch: tests	operation:subscription#getGoLiveReadiness
+new	34282	MIG-SUBSCRIPTION-4#subscription.licensing_model	New	Sub Task	Hrushikant Patkar	[DB] subscription.licensing_model	table:subscription.licensing_model
+new	34283	MIG-SUBSCRIPTION-4#subscription.vsi_assessment	New	Sub Task	Hrushikant Patkar	[DB] subscription.vsi_assessment	table:subscription.vsi_assessment
+new	34284	APP-CONSOLE-ADM-006#build	New	Sub Task	Pradnya Yeram	[FE] ADM-006 Tenant Hierarchy Explorer: build with all states	operation:subscription#getTenant
+new	34285	APP-CONSOLE-ADM-006#wire	New	Sub Task	Pradnya Yeram	[FE] ADM-006 Tenant Hierarchy Explorer: connect to API	operation:subscription#getTenant
+new	34286	APP-CONSOLE-ADM-006#test	New	Sub Task	Pradnya Yeram	[FE] ADM-006 Tenant Hierarchy Explorer: tests	operation:subscription#getTenant
+new	34287	APP-CONSOLE-ADM-007#build	New	Sub Task	Sanket Keluskar	[FE] ADM-007 Module & Feature Entitlement: build with all states	operation:subscription#getSubscription, operation:subscription#getTenant
+new	34288	APP-CONSOLE-ADM-007#wire	New	Sub Task	Sanket Keluskar	[FE] ADM-007 Module & Feature Entitlement: connect to API	operation:subscription#getSubscription, operation:subscription#getTenant
+new	34289	APP-CONSOLE-ADM-007#test	New	Sub Task	Sanket Keluskar	[FE] ADM-007 Module & Feature Entitlement: tests	operation:subscription#getSubscription, operation:subscription#getTenant
+new	34290	APP-CONSOLE-ADM-012#build	New	Sub Task	Chitrangi Mestry	[FE] ADM-012 Tenant Isolation & Resource Pool: build with all states	operation:subscription#getTenant
+new	34291	APP-CONSOLE-ADM-012#wire	New	Sub Task	Chitrangi Mestry	[FE] ADM-012 Tenant Isolation & Resource Pool: connect to API	operation:subscription#getTenant
+new	34292	APP-CONSOLE-ADM-012#test	New	Sub Task	Chitrangi Mestry	[FE] ADM-012 Tenant Isolation & Resource Pool: tests	operation:subscription#getTenant
+new	34296	APP-CONSOLE-ADM-010#build	New	Sub Task	Pradnya Yeram	[FE] ADM-010 Usage Metering: build with all states	operation:subscription#getTenant
+new	34297	APP-CONSOLE-ADM-010#wire	New	Sub Task	Pradnya Yeram	[FE] ADM-010 Usage Metering: connect to API	operation:subscription#getTenant
+new	34298	APP-CONSOLE-ADM-010#test	New	Sub Task	Pradnya Yeram	[FE] ADM-010 Usage Metering: tests	operation:subscription#getTenant
+new	34299	APP-CONSOLE-ADM-011#build	New	Sub Task	Sanket Keluskar	[FE] ADM-011 Licence & Seat Management: build with all states	operation:subscription#getSubscription, operation:subscription#getTenant
+new	34300	APP-CONSOLE-ADM-011#wire	New	Sub Task	Sanket Keluskar	[FE] ADM-011 Licence & Seat Management: connect to API	operation:subscription#getSubscription, operation:subscription#getTenant
+new	34301	APP-CONSOLE-ADM-011#test	New	Sub Task	Sanket Keluskar	[FE] ADM-011 Licence & Seat Management: tests	operation:subscription#getSubscription, operation:subscription#getTenant
+new	34302	SVC-PLATFORM-SUBSCRIPTION-11#getBillingReconciliation	New	Sub Task	Sanket Keluskar	[BE] getBillingReconciliation: GET /billing-reconciliation	table:subscription.contract, table:subscription.licensing_model
+new	34303	SVC-PLATFORM-SUBSCRIPTION-11#scoreVsiAssessment	New	Sub Task	Sanket Keluskar	[BE] scoreVsiAssessment: POST /vsi-assessments	operation:subscription#scoreVsiAssessment, table:subscription.vsi_assessment
+new	34307	APP-CONSOLE-ADM-372#build	New	Sub Task	Chitrangi Mestry	[FE] ADM-372 Operational Profile, VSI & Commercial Model Intelligence: build with all stat	operation:subscription#scoreVsiAssessment
+new	34308	APP-CONSOLE-ADM-372#wire	New	Sub Task	Chitrangi Mestry	[FE] ADM-372 Operational Profile, VSI & Commercial Model Intelligence: connect to API	operation:subscription#scoreVsiAssessment
+new	34309	APP-CONSOLE-ADM-372#test	New	Sub Task	Chitrangi Mestry	[FE] ADM-372 Operational Profile, VSI & Commercial Model Intelligence: tests	operation:subscription#scoreVsiAssessment
+new	34316	APP-CONSOLE-ADM-371#build	New	Sub Task	Chinmay Patkar	[FE] ADM-371 Customer Commercial 360°: build with all states	operation:subscription#getSubscription
+new	34317	APP-CONSOLE-ADM-371#wire	New	Sub Task	Chinmay Patkar	[FE] ADM-371 Customer Commercial 360°: connect to API	operation:subscription#getSubscription
+new	34318	APP-CONSOLE-ADM-371#test	New	Sub Task	Chinmay Patkar	[FE] ADM-371 Customer Commercial 360°: tests	operation:subscription#getSubscription
+new	34319	MIG-SUBSCRIPTION-5#subscription.capacity_pack	New	Sub Task	Hrushikant Patkar	[DB] subscription.capacity_pack	table:subscription.capacity_pack
+new	34320	MIG-SUBSCRIPTION-5#subscription.enforcement_policy	New	Sub Task	Hrushikant Patkar	[DB] subscription.enforcement_policy	table:subscription.enforcement_policy
+new	34321	MIG-SUBSCRIPTION-5#subscription.vsi_model	New	Sub Task	Hrushikant Patkar	[DB] subscription.vsi_model	table:subscription.vsi_model
+new	34322	SVC-PLATFORM-SUBSCRIPTION-13#setLicensingModel	New	Sub Task	Pranay Shinde	[BE] setLicensingModel: PUT /licensing-models/{licensingModelId}	operation:subscription#setLicensingModel, table:subscription.licensing_model
+new	34323	SVC-PLATFORM-SUBSCRIPTION-13#setVsiModel	New	Sub Task	Pranay Shinde	[BE] setVsiModel: PUT /vsi-models	operation:subscription#setVsiModel, table:subscription.vsi_model
+new	34324	SVC-PLATFORM-SUBSCRIPTION-13#simulateCommercialPackage	New	Sub Task	Pranay Shinde	[BE] simulateCommercialPackage: POST /package-simulations	table:subscription.capacity_pack, table:subscription.licensing_model, table:subscription.module_listing, table:subscription.plan, table:subscription.tier_allowance, table:subscription.tier_module
+new	34328	APP-CONSOLE-ADM-381#build	New	Sub Task	Chinmay Patkar	[FE] ADM-381 Venue Type & Business Profile: build with all states	operation:subscription#scoreVsiAssessment
+new	34329	APP-CONSOLE-ADM-381#wire	New	Sub Task	Chinmay Patkar	[FE] ADM-381 Venue Type & Business Profile: connect to API	operation:subscription#scoreVsiAssessment
+new	34330	APP-CONSOLE-ADM-381#test	New	Sub Task	Chinmay Patkar	[FE] ADM-381 Venue Type & Business Profile: tests	operation:subscription#scoreVsiAssessment
+new	34331	APP-CONSOLE-ADM-382#build	New	Sub Task	Pradnya Yeram	[FE] ADM-382 Visitor, Capacity & Operational Scale: build with all states	operation:subscription#scoreVsiAssessment
+new	34332	APP-CONSOLE-ADM-382#wire	New	Sub Task	Pradnya Yeram	[FE] ADM-382 Visitor, Capacity & Operational Scale: connect to API	operation:subscription#scoreVsiAssessment
+new	34333	APP-CONSOLE-ADM-382#test	New	Sub Task	Pradnya Yeram	[FE] ADM-382 Visitor, Capacity & Operational Scale: tests	operation:subscription#scoreVsiAssessment
+new	34334	APP-CONSOLE-ADM-383#build	New	Sub Task	Sanket Keluskar	[FE] ADM-383 Sales Channel Assessment: build with all states	operation:subscription#scoreVsiAssessment
+new	34335	APP-CONSOLE-ADM-383#wire	New	Sub Task	Sanket Keluskar	[FE] ADM-383 Sales Channel Assessment: connect to API	operation:subscription#scoreVsiAssessment
+new	34336	APP-CONSOLE-ADM-383#test	New	Sub Task	Sanket Keluskar	[FE] ADM-383 Sales Channel Assessment: tests	operation:subscription#scoreVsiAssessment
+new	34337	APP-CONSOLE-ADM-384#build	New	Sub Task	Chitrangi Mestry	[FE] ADM-384 Ticketing & Product Requirements: build with all states	operation:subscription#scoreVsiAssessment
+new	34338	APP-CONSOLE-ADM-384#wire	New	Sub Task	Chitrangi Mestry	[FE] ADM-384 Ticketing & Product Requirements: connect to API	operation:subscription#scoreVsiAssessment
+new	34339	APP-CONSOLE-ADM-384#test	New	Sub Task	Chitrangi Mestry	[FE] ADM-384 Ticketing & Product Requirements: tests	operation:subscription#scoreVsiAssessment
+new	34340	APP-CONSOLE-ADM-385#build	New	Sub Task	Chinmay Patkar	[FE] ADM-385 Access, Queue & Visitor Experience Assessment: build with all states	operation:subscription#scoreVsiAssessment
+new	34341	APP-CONSOLE-ADM-385#wire	New	Sub Task	Chinmay Patkar	[FE] ADM-385 Access, Queue & Visitor Experience Assessment: connect to API	operation:subscription#scoreVsiAssessment
+new	34342	APP-CONSOLE-ADM-385#test	New	Sub Task	Chinmay Patkar	[FE] ADM-385 Access, Queue & Visitor Experience Assessment: tests	operation:subscription#scoreVsiAssessment
+new	34343	APP-CONSOLE-ADM-386#build	New	Sub Task	Pradnya Yeram	[FE] ADM-386 Additional Business Module Assessment: build with all states	operation:subscription#listModuleCatalogue, operation:subscription#scoreVsiAssessment
+new	34344	APP-CONSOLE-ADM-386#wire	New	Sub Task	Pradnya Yeram	[FE] ADM-386 Additional Business Module Assessment: connect to API	operation:subscription#listModuleCatalogue, operation:subscription#scoreVsiAssessment
+new	34345	APP-CONSOLE-ADM-386#test	New	Sub Task	Pradnya Yeram	[FE] ADM-386 Additional Business Module Assessment: tests	operation:subscription#listModuleCatalogue, operation:subscription#scoreVsiAssessment
+new	34346	APP-CONSOLE-ADM-387#build	New	Sub Task	Chinmay Patkar	[FE] ADM-387 Integration, Payment & Technical Readiness: build with all states	operation:subscription#scoreVsiAssessment
+new	34347	APP-CONSOLE-ADM-387#wire	New	Sub Task	Chinmay Patkar	[FE] ADM-387 Integration, Payment & Technical Readiness: connect to API	operation:subscription#scoreVsiAssessment
+new	34348	APP-CONSOLE-ADM-387#test	New	Sub Task	Chinmay Patkar	[FE] ADM-387 Integration, Payment & Technical Readiness: tests	operation:subscription#scoreVsiAssessment
+new	34349	APP-CONSOLE-ADM-388#build	New	Sub Task	Sanket Keluskar	[FE] ADM-388 AI Assessment Summary & Handoff: build with all states	operation:subscription#scoreVsiAssessment
+new	34350	APP-CONSOLE-ADM-388#wire	New	Sub Task	Sanket Keluskar	[FE] ADM-388 AI Assessment Summary & Handoff: connect to API	operation:subscription#scoreVsiAssessment
+new	34351	APP-CONSOLE-ADM-388#test	New	Sub Task	Sanket Keluskar	[FE] ADM-388 AI Assessment Summary & Handoff: tests	operation:subscription#scoreVsiAssessment
+new	34352	APP-CONSOLE-ADM-391#build	New	Sub Task	Pradnya Yeram	[FE] ADM-391 VSI Scoring & Tier Threshold Configuration: build with all states	operation:subscription#setVsiModel
+new	34353	APP-CONSOLE-ADM-391#wire	New	Sub Task	Pradnya Yeram	[FE] ADM-391 VSI Scoring & Tier Threshold Configuration: connect to API	operation:subscription#setVsiModel
+new	34354	APP-CONSOLE-ADM-391#test	New	Sub Task	Pradnya Yeram	[FE] ADM-391 VSI Scoring & Tier Threshold Configuration: tests	operation:subscription#setVsiModel
+new	34355	APP-CONSOLE-ADM-393#build	New	Sub Task	Chinmay Patkar	[FE] ADM-393 Tier Included Allowances: build with all states	operation:subscription#setLicensingModel
+new	34356	APP-CONSOLE-ADM-393#wire	New	Sub Task	Chinmay Patkar	[FE] ADM-393 Tier Included Allowances: connect to API	operation:subscription#setLicensingModel
+new	34357	APP-CONSOLE-ADM-393#test	New	Sub Task	Chinmay Patkar	[FE] ADM-393 Tier Included Allowances: tests	operation:subscription#setLicensingModel
+new	34358	APP-CONSOLE-ADM-394#build	New	Sub Task	Sanket Keluskar	[FE] ADM-394 Commercial & Licensing Model Configuration: build with all states	operation:subscription#setLicensingModel
+new	34359	APP-CONSOLE-ADM-394#wire	New	Sub Task	Sanket Keluskar	[FE] ADM-394 Commercial & Licensing Model Configuration: connect to API	operation:subscription#setLicensingModel
+new	34360	APP-CONSOLE-ADM-394#test	New	Sub Task	Sanket Keluskar	[FE] ADM-394 Commercial & Licensing Model Configuration: tests	operation:subscription#setLicensingModel
+new	34361	APP-CONSOLE-ADM-395#build	New	Sub Task	Pradnya Yeram	[FE] ADM-395 Billable Unit, Minimum Guarantee & Enforcement Rules: build with all states	operation:subscription#setLicensingModel
+new	34362	APP-CONSOLE-ADM-395#wire	New	Sub Task	Pradnya Yeram	[FE] ADM-395 Billable Unit, Minimum Guarantee & Enforcement Rules: connect to API	operation:subscription#setLicensingModel
+new	34363	APP-CONSOLE-ADM-395#test	New	Sub Task	Pradnya Yeram	[FE] ADM-395 Billable Unit, Minimum Guarantee & Enforcement Rules: tests	operation:subscription#setLicensingModel
+new	34364	APP-CONSOLE-ADM-392#build	New	Sub Task	Chinmay Patkar	[FE] ADM-392 Subscription Tier Configuration: build with all states	operation:subscription#createPlan, operation:subscription#listPlans
+new	34365	APP-CONSOLE-ADM-392#wire	New	Sub Task	Chinmay Patkar	[FE] ADM-392 Subscription Tier Configuration: connect to API	operation:subscription#createPlan, operation:subscription#listPlans
+new	34366	APP-CONSOLE-ADM-392#test	New	Sub Task	Chinmay Patkar	[FE] ADM-392 Subscription Tier Configuration: tests	operation:subscription#createPlan, operation:subscription#listPlans
+new	34367	MIG-SUBSCRIPTION-6#subscription.trial_config	New	Sub Task	Hrushikant Patkar	[DB] subscription.trial_config	table:subscription.trial_config
+new	34371	SVC-PLATFORM-SUBSCRIPTION-14#addCapacityPack	New	Sub Task	Sanket Keluskar	[BE] addCapacityPack: POST /capacity-packs	operation:subscription#addCapacityPack, table:subscription.capacity_pack
+new	34372	SVC-PLATFORM-SUBSCRIPTION-14#setTrialConfiguration	New	Sub Task	Sanket Keluskar	[BE] setTrialConfiguration: PUT /trial-configurations/{trialConfigurationId}	operation:subscription#setTrialConfiguration, table:subscription.trial_config
+new	34373	APP-CONSOLE-ADM-396#build	New	Sub Task	Pradnya Yeram	[FE] ADM-396 Overage Pricing & Capacity Packs: build with all states	operation:subscription#addCapacityPack, operation:subscription#setLicensingModel
+new	34374	APP-CONSOLE-ADM-396#wire	New	Sub Task	Pradnya Yeram	[FE] ADM-396 Overage Pricing & Capacity Packs: connect to API	operation:subscription#addCapacityPack, operation:subscription#setLicensingModel
+new	34375	APP-CONSOLE-ADM-396#test	New	Sub Task	Pradnya Yeram	[FE] ADM-396 Overage Pricing & Capacity Packs: tests	operation:subscription#addCapacityPack, operation:subscription#setLicensingModel
+new	34379	APP-CONSOLE-ADM-398#build	New	Sub Task	Chinmay Patkar	[FE] ADM-398 Rule Versioning, Approval & Publication: build with all states	operation:subscription#createPlanVersion
+new	34380	APP-CONSOLE-ADM-398#wire	New	Sub Task	Chinmay Patkar	[FE] ADM-398 Rule Versioning, Approval & Publication: connect to API	operation:subscription#createPlanVersion
+new	34381	APP-CONSOLE-ADM-398#test	New	Sub Task	Chinmay Patkar	[FE] ADM-398 Rule Versioning, Approval & Publication: tests	operation:subscription#createPlanVersion
+new	34385	APP-CONSOLE-ADM-401#build	New	Sub Task	Pradnya Yeram	[FE] ADM-401 Module Marketplace: build with all states	operation:subscription#listModuleCatalogue
+new	34386	APP-CONSOLE-ADM-401#wire	New	Sub Task	Pradnya Yeram	[FE] ADM-401 Module Marketplace: connect to API	operation:subscription#listModuleCatalogue
+new	34387	APP-CONSOLE-ADM-401#test	New	Sub Task	Pradnya Yeram	[FE] ADM-401 Module Marketplace: tests	operation:subscription#listModuleCatalogue
+new	34388	APP-CONSOLE-ADM-402#build	New	Sub Task	Pallavi Sawant	[FE] ADM-402 AI Module & Package Recommendations: build with all states	operation:subscription#listModuleCatalogue
+new	34389	APP-CONSOLE-ADM-402#wire	New	Sub Task	Pallavi Sawant	[FE] ADM-402 AI Module & Package Recommendations: connect to API	operation:subscription#listModuleCatalogue
+new	34390	APP-CONSOLE-ADM-402#test	New	Sub Task	Pallavi Sawant	[FE] ADM-402 AI Module & Package Recommendations: tests	operation:subscription#listModuleCatalogue
+new	34391	APP-CONSOLE-ADM-403#build	New	Sub Task	Pradnya Yeram	[FE] ADM-403 Module Detail & Commercial Treatment: build with all states	operation:subscription#listModuleCatalogue
+new	34392	APP-CONSOLE-ADM-403#wire	New	Sub Task	Pradnya Yeram	[FE] ADM-403 Module Detail & Commercial Treatment: connect to API	operation:subscription#listModuleCatalogue
+new	34393	APP-CONSOLE-ADM-403#test	New	Sub Task	Pradnya Yeram	[FE] ADM-403 Module Detail & Commercial Treatment: tests	operation:subscription#listModuleCatalogue
+new	34394	APP-CONSOLE-ADM-404#build	New	Sub Task	Chitrangi Mestry	[FE] ADM-404 Module Dependency & Compatibility Manager: build with all states	operation:subscription#listModuleCatalogue
+new	34395	APP-CONSOLE-ADM-404#wire	New	Sub Task	Chitrangi Mestry	[FE] ADM-404 Module Dependency & Compatibility Manager: connect to API	operation:subscription#listModuleCatalogue
+new	34396	APP-CONSOLE-ADM-404#test	New	Sub Task	Chitrangi Mestry	[FE] ADM-404 Module Dependency & Compatibility Manager: tests	operation:subscription#listModuleCatalogue
+new	34397	APP-CONSOLE-ADM-405#build	New	Sub Task	Chinmay Patkar	[FE] ADM-405 Add-Ons, Capacity & Commercial Options: build with all states	operation:subscription#addCapacityPack
+new	34398	APP-CONSOLE-ADM-405#wire	New	Sub Task	Chinmay Patkar	[FE] ADM-405 Add-Ons, Capacity & Commercial Options: connect to API	operation:subscription#addCapacityPack
+new	34399	APP-CONSOLE-ADM-405#test	New	Sub Task	Chinmay Patkar	[FE] ADM-405 Add-Ons, Capacity & Commercial Options: tests	operation:subscription#addCapacityPack
+new	34406	APP-CONSOLE-ADM-410#build	New	Sub Task	Chinmay Patkar	[FE] ADM-410 Contract & Billing Cycle Selection: build with all states	operation:subscription#setSubscription
+new	34407	APP-CONSOLE-ADM-410#wire	New	Sub Task	Chinmay Patkar	[FE] ADM-410 Contract & Billing Cycle Selection: connect to API	operation:subscription#setSubscription
+new	34408	APP-CONSOLE-ADM-410#test	New	Sub Task	Chinmay Patkar	[FE] ADM-410 Contract & Billing Cycle Selection: tests	operation:subscription#setSubscription
+new	34412	APP-CONSOLE-ADM-413#build	New	Sub Task	Chitrangi Mestry	[FE] ADM-413 Trial Configuration & Conversion Rules: build with all states	operation:subscription#setTrialConfiguration
+new	34413	APP-CONSOLE-ADM-413#wire	New	Sub Task	Chitrangi Mestry	[FE] ADM-413 Trial Configuration & Conversion Rules: connect to API	operation:subscription#setTrialConfiguration
+new	34414	APP-CONSOLE-ADM-413#test	New	Sub Task	Chitrangi Mestry	[FE] ADM-413 Trial Configuration & Conversion Rules: tests	operation:subscription#setTrialConfiguration
+new	34421	APP-CONSOLE-ADM-417#build	New	Sub Task	Pradnya Yeram	[FE] ADM-417 Subscription Confirmation & Commercial Activation: build with all states	operation:subscription#setSubscription
+new	34422	APP-CONSOLE-ADM-417#wire	New	Sub Task	Pradnya Yeram	[FE] ADM-417 Subscription Confirmation & Commercial Activation: connect to API	operation:subscription#setSubscription
+new	34423	APP-CONSOLE-ADM-417#test	New	Sub Task	Pradnya Yeram	[FE] ADM-417 Subscription Confirmation & Commercial Activation: tests	operation:subscription#setSubscription
+new	34424	APP-CONSOLE-ADM-400#build	New	Sub Task	Chinmay Patkar	[FE] ADM-400 Commercial Model & Tier Selection: build with all states	operation:subscription#listPlans
+new	34425	APP-CONSOLE-ADM-400#wire	New	Sub Task	Chinmay Patkar	[FE] ADM-400 Commercial Model & Tier Selection: connect to API	operation:subscription#listPlans
+new	34426	APP-CONSOLE-ADM-400#test	New	Sub Task	Chinmay Patkar	[FE] ADM-400 Commercial Model & Tier Selection: tests	operation:subscription#listPlans
+new	34430	APP-CONSOLE-ADM-418#build	New	Sub Task	Sanket Keluskar	[FE] ADM-418 Subscription Lifecycle & Trial-to-Paid Handoff: build with all states	operation:subscription#getSubscription
+new	34431	APP-CONSOLE-ADM-418#wire	New	Sub Task	Sanket Keluskar	[FE] ADM-418 Subscription Lifecycle & Trial-to-Paid Handoff: connect to API	operation:subscription#getSubscription
+new	34432	APP-CONSOLE-ADM-418#test	New	Sub Task	Sanket Keluskar	[FE] ADM-418 Subscription Lifecycle & Trial-to-Paid Handoff: tests	operation:subscription#getSubscription
+new	34436	APP-CONSOLE-ADM-009#build	New	Sub Task	Pradnya Yeram	[FE] ADM-009 Tenant Billing & Invoicing: build with all states	operation:subscription#getSubscription, operation:subscription#getTenant
+new	34437	APP-CONSOLE-ADM-009#wire	New	Sub Task	Pradnya Yeram	[FE] ADM-009 Tenant Billing & Invoicing: connect to API	operation:subscription#getSubscription, operation:subscription#getTenant
+new	34438	APP-CONSOLE-ADM-009#test	New	Sub Task	Pradnya Yeram	[FE] ADM-009 Tenant Billing & Invoicing: tests	operation:subscription#getSubscription, operation:subscription#getTenant
+new	34440	SVC-PLATFORM-SUBSCRIPTION-15#setLicenceEnforcementPolicy	New	Sub Task	Sanket Keluskar	[BE] setLicenceEnforcementPolicy: PUT /licence-enforcement	operation:subscription#setLicenceEnforcementPolicy, table:subscription.enforcement_policy
+new	34441	SVC-PLATFORM-SUBSCRIPTION-15#settleAiUsage	New	Sub Task	Sanket Keluskar	[BE] settleAiUsage: POST /ai-usage/settle	table:subscription.contract, table:subscription.plan
+new	34442	SVC-PLATFORM-SUBSCRIPTION-12#getLicenceEnforcement	New	Sub Task	Narayan Gaonkar	[BE] getLicenceEnforcement: GET /licence-enforcement	table:subscription.capacity_pack, table:subscription.contract, table:subscription.enforcement_policy, table:subscription.plan_limit, table:subscription.tier_allowance
+new	34443	SVC-PLATFORM-SUBSCRIPTION-12#getPlanRecommendations	New	Sub Task	Narayan Gaonkar	[BE] getPlanRecommendations: GET /plan-recommendations	table:subscription.capacity_pack, table:subscription.contract, table:subscription.enforcement_policy, table:subscription.licensing_model, table:subscription.module_listing, table:subscription.plan, table:subscription.plan_limit, table:subscription.plan_module, table:subscription.tier_allowance, table:subscription.tier_module
+new	34444	SVC-PLATFORM-SUBSCRIPTION-12#getVsiModel	New	Sub Task	Narayan Gaonkar	[BE] getVsiModel: GET /vsi-models	operation:subscription#getVsiModel, table:subscription.vsi_model
+new	34445	SVC-PLATFORM-SUBSCRIPTION-12#listLicensingModels	New	Sub Task	Narayan Gaonkar	[BE] listLicensingModels: GET /licensing-models	operation:subscription#listLicensingModels, table:subscription.licensing_model
+new	34452	APP-CONSOLE-ADM-389#build	New	Sub Task	Chinmay Patkar	[FE] ADM-389 Commercial Rules Engine Overview: build with all states	operation:subscription#listLicensingModels
+new	34453	APP-CONSOLE-ADM-389#wire	New	Sub Task	Chinmay Patkar	[FE] ADM-389 Commercial Rules Engine Overview: connect to API	operation:subscription#listLicensingModels
+new	34454	APP-CONSOLE-ADM-389#test	New	Sub Task	Chinmay Patkar	[FE] ADM-389 Commercial Rules Engine Overview: tests	operation:subscription#listLicensingModels
+new	34455	APP-CONSOLE-ADM-390#build	New	Sub Task	Pradnya Yeram	[FE] ADM-390 VSI Model Builder: build with all states	operation:subscription#getVsiModel, operation:subscription#setVsiModel
+new	34456	APP-CONSOLE-ADM-390#wire	New	Sub Task	Pradnya Yeram	[FE] ADM-390 VSI Model Builder: connect to API	operation:subscription#getVsiModel, operation:subscription#setVsiModel
+new	34457	APP-CONSOLE-ADM-390#test	New	Sub Task	Pradnya Yeram	[FE] ADM-390 VSI Model Builder: tests	operation:subscription#getVsiModel, operation:subscription#setVsiModel
+new	34461	APP-CONSOLE-ADM-423#build	New	Sub Task	Chitrangi Mestry	[FE] ADM-423 License & Entitlement Activation: build with all states	operation:subscription#listModuleCatalogue
+new	34462	APP-CONSOLE-ADM-423#wire	New	Sub Task	Chitrangi Mestry	[FE] ADM-423 License & Entitlement Activation: connect to API	operation:subscription#listModuleCatalogue
+new	34463	APP-CONSOLE-ADM-423#test	New	Sub Task	Chitrangi Mestry	[FE] ADM-423 License & Entitlement Activation: tests	operation:subscription#listModuleCatalogue
+new	34470	APP-CONSOLE-ADM-453#build	New	Sub Task	Pradnya Yeram	[FE] ADM-453 License Enforcement & Decision Engine: build with all states	operation:subscription#setLicenceEnforcementPolicy
+new	34471	APP-CONSOLE-ADM-453#wire	New	Sub Task	Pradnya Yeram	[FE] ADM-453 License Enforcement & Decision Engine: connect to API	operation:subscription#setLicenceEnforcementPolicy
+new	34472	APP-CONSOLE-ADM-453#test	New	Sub Task	Pradnya Yeram	[FE] ADM-453 License Enforcement & Decision Engine: tests	operation:subscription#setLicenceEnforcementPolicy
+new	34473	APP-CONSOLE-ADM-455#build	New	Sub Task	Pradnya Yeram	[FE] ADM-455 Overage, Capacity & Temporary Exception Management: build with all states	operation:subscription#addCapacityPack
+new	34474	APP-CONSOLE-ADM-455#wire	New	Sub Task	Pradnya Yeram	[FE] ADM-455 Overage, Capacity & Temporary Exception Management: connect to API	operation:subscription#addCapacityPack
+new	34475	APP-CONSOLE-ADM-455#test	New	Sub Task	Pradnya Yeram	[FE] ADM-455 Overage, Capacity & Temporary Exception Management: tests	operation:subscription#addCapacityPack
+new	34491	APP-CONSOLE-ADM-427#build	New	Sub Task	Chinmay Patkar	[FE] ADM-427 Provisioning Validation & Exception Management: build with all states	operation:subscription#getGoLiveReadiness
+new	34492	APP-CONSOLE-ADM-427#wire	New	Sub Task	Chinmay Patkar	[FE] ADM-427 Provisioning Validation & Exception Management: connect to API	operation:subscription#getGoLiveReadiness
+new	34493	APP-CONSOLE-ADM-427#test	New	Sub Task	Chinmay Patkar	[FE] ADM-427 Provisioning Validation & Exception Management: tests	operation:subscription#getGoLiveReadiness
+new	34538	APP-SIGNUP-SGN-003#build	New	Sub Task	Chinmay Patkar	[FE] SGN-003 Venue Type & Business Profile: build with all states	operation:subscription#scoreVsiAssessment
+new	34539	APP-SIGNUP-SGN-003#wire	New	Sub Task	Chinmay Patkar	[FE] SGN-003 Venue Type & Business Profile: connect to API	operation:subscription#scoreVsiAssessment
+new	34540	APP-SIGNUP-SGN-003#test	New	Sub Task	Chinmay Patkar	[FE] SGN-003 Venue Type & Business Profile: tests	operation:subscription#scoreVsiAssessment
+new	34541	APP-SIGNUP-SGN-004#build	New	Sub Task	Sanket Keluskar	[FE] SGN-004 Visitor, Capacity & Operational Scale: build with all states	operation:subscription#scoreVsiAssessment
+new	34542	APP-SIGNUP-SGN-004#wire	New	Sub Task	Sanket Keluskar	[FE] SGN-004 Visitor, Capacity & Operational Scale: connect to API	operation:subscription#scoreVsiAssessment
+new	34543	APP-SIGNUP-SGN-004#test	New	Sub Task	Sanket Keluskar	[FE] SGN-004 Visitor, Capacity & Operational Scale: tests	operation:subscription#scoreVsiAssessment
+new	34544	APP-SIGNUP-SGN-005#build	New	Sub Task	Chitrangi Mestry	[FE] SGN-005 Sales Channel Assessment: build with all states	operation:subscription#scoreVsiAssessment
+new	34545	APP-SIGNUP-SGN-005#wire	New	Sub Task	Chitrangi Mestry	[FE] SGN-005 Sales Channel Assessment: connect to API	operation:subscription#scoreVsiAssessment
+new	34546	APP-SIGNUP-SGN-005#test	New	Sub Task	Chitrangi Mestry	[FE] SGN-005 Sales Channel Assessment: tests	operation:subscription#scoreVsiAssessment
+new	34547	APP-SIGNUP-SGN-006#build	New	Sub Task	Pradnya Yeram	[FE] SGN-006 Ticketing & Product Requirements: build with all states	operation:subscription#scoreVsiAssessment
+new	34548	APP-SIGNUP-SGN-006#wire	New	Sub Task	Pradnya Yeram	[FE] SGN-006 Ticketing & Product Requirements: connect to API	operation:subscription#scoreVsiAssessment
+new	34549	APP-SIGNUP-SGN-006#test	New	Sub Task	Pradnya Yeram	[FE] SGN-006 Ticketing & Product Requirements: tests	operation:subscription#scoreVsiAssessment
+new	34550	APP-SIGNUP-SGN-007#build	New	Sub Task	Chinmay Patkar	[FE] SGN-007 Access, Queue & Visitor Experience Assessment: build with all states	operation:subscription#scoreVsiAssessment
+new	34551	APP-SIGNUP-SGN-007#wire	New	Sub Task	Chinmay Patkar	[FE] SGN-007 Access, Queue & Visitor Experience Assessment: connect to API	operation:subscription#scoreVsiAssessment
+new	34552	APP-SIGNUP-SGN-007#test	New	Sub Task	Chinmay Patkar	[FE] SGN-007 Access, Queue & Visitor Experience Assessment: tests	operation:subscription#scoreVsiAssessment
+new	34553	APP-SIGNUP-SGN-008#build	New	Sub Task	Sanket Keluskar	[FE] SGN-008 Additional Business Module Assessment: build with all states	operation:subscription#listModuleCatalogue, operation:subscription#scoreVsiAssessment
+new	34554	APP-SIGNUP-SGN-008#wire	New	Sub Task	Sanket Keluskar	[FE] SGN-008 Additional Business Module Assessment: connect to API	operation:subscription#listModuleCatalogue, operation:subscription#scoreVsiAssessment
+new	34555	APP-SIGNUP-SGN-008#test	New	Sub Task	Sanket Keluskar	[FE] SGN-008 Additional Business Module Assessment: tests	operation:subscription#listModuleCatalogue, operation:subscription#scoreVsiAssessment
+new	34556	APP-SIGNUP-SGN-009#build	New	Sub Task	Chinmay Patkar	[FE] SGN-009 Integration, Payment & Technical Readiness: build with all states	operation:subscription#scoreVsiAssessment
+new	34557	APP-SIGNUP-SGN-009#wire	New	Sub Task	Chinmay Patkar	[FE] SGN-009 Integration, Payment & Technical Readiness: connect to API	operation:subscription#scoreVsiAssessment
+new	34558	APP-SIGNUP-SGN-009#test	New	Sub Task	Chinmay Patkar	[FE] SGN-009 Integration, Payment & Technical Readiness: tests	operation:subscription#scoreVsiAssessment
+new	34559	APP-SIGNUP-SGN-010#build	New	Sub Task	Chitrangi Mestry	[FE] SGN-010 AI Assessment Summary & Handoff: build with all states	operation:subscription#scoreVsiAssessment
+new	34560	APP-SIGNUP-SGN-010#wire	New	Sub Task	Chitrangi Mestry	[FE] SGN-010 AI Assessment Summary & Handoff: connect to API	operation:subscription#scoreVsiAssessment
+new	34561	APP-SIGNUP-SGN-010#test	New	Sub Task	Chitrangi Mestry	[FE] SGN-010 AI Assessment Summary & Handoff: tests	operation:subscription#scoreVsiAssessment
+new	34565	APP-SIGNUP-SGN-013#build	New	Sub Task	Sanket Keluskar	[FE] SGN-013 Module Marketplace: build with all states	operation:subscription#listModuleCatalogue
+new	34566	APP-SIGNUP-SGN-013#wire	New	Sub Task	Sanket Keluskar	[FE] SGN-013 Module Marketplace: connect to API	operation:subscription#listModuleCatalogue
+new	34567	APP-SIGNUP-SGN-013#test	New	Sub Task	Sanket Keluskar	[FE] SGN-013 Module Marketplace: tests	operation:subscription#listModuleCatalogue
+new	34568	APP-SIGNUP-SGN-014#build	New	Sub Task	Chitrangi Mestry	[FE] SGN-014 AI Module & Package Recommendations: build with all states	operation:subscription#listModuleCatalogue
+new	34569	APP-SIGNUP-SGN-014#wire	New	Sub Task	Chitrangi Mestry	[FE] SGN-014 AI Module & Package Recommendations: connect to API	operation:subscription#listModuleCatalogue
+new	34570	APP-SIGNUP-SGN-014#test	New	Sub Task	Chitrangi Mestry	[FE] SGN-014 AI Module & Package Recommendations: tests	operation:subscription#listModuleCatalogue
+new	34571	APP-SIGNUP-SGN-015#build	New	Sub Task	Sanket Keluskar	[FE] SGN-015 Module Detail & Commercial Treatment: build with all states	operation:subscription#listModuleCatalogue
+new	34572	APP-SIGNUP-SGN-015#wire	New	Sub Task	Sanket Keluskar	[FE] SGN-015 Module Detail & Commercial Treatment: connect to API	operation:subscription#listModuleCatalogue
+new	34573	APP-SIGNUP-SGN-015#test	New	Sub Task	Sanket Keluskar	[FE] SGN-015 Module Detail & Commercial Treatment: tests	operation:subscription#listModuleCatalogue
+new	34574	APP-SIGNUP-SGN-016#build	New	Sub Task	Surendra Loke	[FE] SGN-016 Module Dependency & Compatibility Manager: build with all states	operation:subscription#listModuleCatalogue
+new	34575	APP-SIGNUP-SGN-016#wire	New	Sub Task	Surendra Loke	[FE] SGN-016 Module Dependency & Compatibility Manager: connect to API	operation:subscription#listModuleCatalogue
+new	34576	APP-SIGNUP-SGN-016#test	New	Sub Task	Surendra Loke	[FE] SGN-016 Module Dependency & Compatibility Manager: tests	operation:subscription#listModuleCatalogue
+new	34577	APP-SIGNUP-SGN-017#build	New	Sub Task	Pradnya Yeram	[FE] SGN-017 Add-Ons, Capacity & Commercial Options: build with all states	operation:subscription#addCapacityPack
+new	34578	APP-SIGNUP-SGN-017#wire	New	Sub Task	Pradnya Yeram	[FE] SGN-017 Add-Ons, Capacity & Commercial Options: connect to API	operation:subscription#addCapacityPack
+new	34579	APP-SIGNUP-SGN-017#test	New	Sub Task	Pradnya Yeram	[FE] SGN-017 Add-Ons, Capacity & Commercial Options: tests	operation:subscription#addCapacityPack
+new	34580	APP-SIGNUP-SGN-019#build	New	Sub Task	Chitrangi Mestry	[FE] SGN-019 Contract & Billing Cycle Selection: build with all states	operation:subscription#setSubscription
+new	34581	APP-SIGNUP-SGN-019#wire	New	Sub Task	Chitrangi Mestry	[FE] SGN-019 Contract & Billing Cycle Selection: connect to API	operation:subscription#setSubscription
+new	34582	APP-SIGNUP-SGN-019#test	New	Sub Task	Chitrangi Mestry	[FE] SGN-019 Contract & Billing Cycle Selection: tests	operation:subscription#setSubscription
+new	34589	APP-SIGNUP-SGN-012#build	New	Sub Task	Chitrangi Mestry	[FE] SGN-012 Commercial Model & Tier Selection: build with all states	operation:subscription#listPlans
+new	34590	APP-SIGNUP-SGN-012#wire	New	Sub Task	Chitrangi Mestry	[FE] SGN-012 Commercial Model & Tier Selection: connect to API	operation:subscription#listPlans
+new	34591	APP-SIGNUP-SGN-012#test	New	Sub Task	Chitrangi Mestry	[FE] SGN-012 Commercial Model & Tier Selection: tests	operation:subscription#listPlans
+new	34595	APP-SIGNUP-SGN-024#build	New	Sub Task	Pradnya Yeram	[FE] SGN-024 Subscription Confirmation & Commercial Activation: build with all states	operation:subscription#setSubscription
+new	34596	APP-SIGNUP-SGN-024#wire	New	Sub Task	Pradnya Yeram	[FE] SGN-024 Subscription Confirmation & Commercial Activation: connect to API	operation:subscription#setSubscription
+new	34597	APP-SIGNUP-SGN-024#test	New	Sub Task	Pradnya Yeram	[FE] SGN-024 Subscription Confirmation & Commercial Activation: tests	operation:subscription#setSubscription
+new	34885	APP-CONSOLE-ADM-015#build	New	Sub Task	Pradnya Yeram	[FE] ADM-015 API Rate Limit & Quota Management: build with all states	operation:subscription#getTenant
+new	34886	APP-CONSOLE-ADM-015#wire	New	Sub Task	Pradnya Yeram	[FE] ADM-015 API Rate Limit & Quota Management: connect to API	operation:subscription#getTenant
+new	34887	APP-CONSOLE-ADM-015#test	New	Sub Task	Pradnya Yeram	[FE] ADM-015 API Rate Limit & Quota Management: tests	operation:subscription#getTenant
+new	35346	SVC-PLATFORM-DRAFTED-3#listMembershipAnnualPass	New	Sub Task		[BE] listMembershipAnnualPass: GET /membership-annual-pass	table:subscription.membership_renewal_policy
+new	35353	SVC-PLATFORM-DRAFTED-6#getMembershipProductValidation	New	Sub Task	Narayan Gaonkar	[BE] getMembershipProductValidation: GET /membership-product-validation	table:subscription.membership_renewal_policy
+new	35359	SVC-PLATFORM-DRAFTED-7#listRenewalAuto	New	Sub Task	Surendra Loke	[BE] listRenewalAuto: GET /renewal-auto	table:subscription.membership_renewal_policy
+new	35771	TEST-AM-IDENTITY-SECURITY-P09-5	New	Task	Chinmay Patkar	[Test] Module test: Identity & Security · TICVAI Console 5 of 5	table:subscription.plan

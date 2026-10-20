@@ -11,7 +11,7 @@ enumSchema: RegisteredDevice
 enumProperty: status
 owner: tenancy
 initial:
-- offline
+- unknown
 terminal: []
 transitions:
 - from: offline

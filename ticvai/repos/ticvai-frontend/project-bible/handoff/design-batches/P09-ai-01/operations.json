@@ -83,6 +83,11 @@
   "scopeLevel": "tenant",
   "parameters": [
    {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
     "name": "activeOnly",
     "in": "query",
     "required": null
@@ -188,6 +193,11 @@
     "name": null,
     "in": null,
     "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
@@ -236,7 +246,7 @@
   "path": "/ai-providers/{providerId}/credential",
   "contract": "ai",
   "summary": "Store or rotate a provider key",
-  "permission": "AI_CONFIGURE",
+  "permission": "PLATFORM_TENANT_MANAGE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",

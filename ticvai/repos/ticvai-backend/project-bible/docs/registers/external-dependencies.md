@@ -172,9 +172,9 @@ Chinmay adopted the recommended default for every question the Block A pull audi
 | Choice | Decision | Why |
 |---|---|---|
 | Cloud provider and region | **Azure, in a UAE region** | The existing Terraform scaffold already targets `azurerm` |
-| CI | **GitHub Actions** | Every repository already ships `.github/workflows` |
+| CI | **GitLab CI** (since 20 October 2026; was GitHub Actions) | The code lives in GitLab (CHG-R6-058); `@ticvai/api-client` is published to the group's GitLab npm registry and pinned by exact version (ADR-0007 amendment, r8 cause FOUNDATION-AI-C37) |
 
-The setup bible carries it where developers read it: `setup/backend-patterns.md` (Terraform provider), `setup/config-and-secrets.md` (Azure Key Vault), `setup/git-and-mrs.md` (pull requests on GitHub), `setup/dependencies.md` (infra and CI list).
+The setup bible carries it where developers read it: `setup/backend-patterns.md` (Terraform provider), `setup/config-and-secrets.md` (Azure Key Vault), `setup/git-and-mrs.md` (merge requests on GitLab), `setup/dependencies.md` (infra and CI list).
 
 #### Integration vendors (audit R117)
 

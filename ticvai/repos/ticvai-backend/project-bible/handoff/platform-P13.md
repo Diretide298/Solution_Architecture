@@ -5,16 +5,16 @@
 | | |
 |---|---|
 | Screens | 104 |
-| Operations | 209 |
+| Operations | 210 |
 | Contracts | 8 |
 | Modules | 4 |
 | Undrawn | 0 |
-| Operations with no screen | 94 |
+| Operations with no screen | 114 |
 | Waves | wave1 26 · wave3 78 |
 
 ## Gaps
 
-### 94 operations with no screen here
+### 114 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -28,39 +28,39 @@
 | `removeIndexEntry` | ai | DELETE | Remove one record from the index |
 | `setAiTool` | ai | PUT | Register or change a tool (platform) |
 | `setIndexSource` | ai | PUT | Declare a source indexed |
-| `setSuggestionProvider` | ai | PUT |  |
+| `setSuggestionProvider` | ai | PUT | Point a question at a rule, a model, or both |
+| `acquireInventoryHold` | catalogue | POST | Acquire an inventory hold |
+| `checkProductSalePermission` | catalogue | POST | Would this seller, here, be allowed to sell these products |
+| `getBundleSigningKeys` | catalogue | GET | The public keys a till verifies catalogue bundles with |
 | `getEventChangeTreatmentPolicy` | catalogue | GET | What happens to tickets, reservations and guests when an event changes, by default |
 | `getPlanBenefits` | catalogue | GET | Which benefits a plan grants, and how much of each |
+| `getProductChannelTexts` | catalogue | GET | The product's texts per sales channel, in each of the tenant's languages |
+| `getProductDashboard` | catalogue | GET | The products dashboard's counts |
+| `getProductOwnerForms` | catalogue | GET | Which form a sale of this product asks the buyer, and which it asks each ticket owner |
+| `getProductSalePermissionRules` | catalogue | GET | Who can sell this product |
 | `getWaitingRoomStatus` | catalogue | GET | A performance's waiting room, its setting and how it is moving |
 | `listGuestMemberships` | catalogue | GET | A guest's memberships, benefits and history |
 | `listMembershipBenefits` | catalogue | GET | Benefits a plan can grant |
 | `listMembershipProgrammes` | catalogue | GET | Membership schemes, the level above a plan |
+| `listOwnerFormCandidates` | catalogue | GET | The forms a product can link for its reservation owner or ticket owner |
 | `listProductApprovalWorkflows` | catalogue | GET | The product approval workflows `approveWorkflow` saved |
+| `listProductAttentionItems` | catalogue | GET | The products that need someone to act, and why |
+| `listProductCategoryUsage` | catalogue | GET | How many products each category holds |
+| `listProductTags` | catalogue | GET | The venue's tags, the master list products and promotions pick from |
+| `listSalePermissionTargets` | catalogue | GET | What a sale permission rule can name at one level, with names |
 | `listSeatPricingRules` | catalogue | GET | Seat-level dynamic pricing rules |
-| `listTaxProfiles` | catalogue | GET | The tax profiles |
 | `relinquishInventoryHold` | catalogue | DELETE | Return unsold units |
-| `renewInventoryHold` | catalogue | POST | Extend a lease TTL |
+| `renewInventoryHold` | catalogue | POST | Extend an inventory hold's TTL |
 | `setEventChangeTreatmentPolicy` | catalogue | PUT | Set the default treatment per kind of event change |
+| `setProductChannelTexts` | catalogue | PUT | Set the product's texts per sales channel |
+| `setProductClassification` | catalogue | PUT | File a product under a category and give it its tags, both from the master lists |
+| `setProductOwnerForms` | catalogue | PUT | Link a product to the forms its sale asks |
+| `setProductSalePermissionRules` | catalogue | PUT | Set who can sell this product |
+| `setProductTagDefinition` | catalogue | PUT | Create or replace one tag of the venue's list |
 | `setSeatPricingRule` | catalogue | PUT | Create or replace a seat-level dynamic pricing rule |
 | `setWaitingRoomSetting` | catalogue | PUT | Switch a performance's waiting room on or off, and set how fast it releases |
 | `evaluateAccess` | identity | POST | Decide, now, and say why |
-| `getAuthorisationPolicy` | identity | GET | One policy, at a version |
-| `getAuthorisationPolicyBundle` | identity | GET | The policies a device needs to decide for itself |
-| `getMembership` | identity | GET | A membership with its history, usage and renewals |
-| `getPrincipalModuleAccess` | identity | GET | What this person may do, as ticks |
-| `listAccessDecisions` | identity | GET | What was decided, for whom, where and why |
-| `listAuthorisationPolicyTemplates` | identity | GET | Reusable policy shapes |
-| `listCustomerMemberships` | identity | GET | Memberships a customer holds |
-| `listModuleCapabilities` | identity | GET | What a person can be allowed to do, per module |
-| `listModules` | identity | GET | The module tree permissions are grouped under |
-| `listSegregationViolations` | identity | GET | Who already holds a conflicting pair |
-| `setPrincipalModuleAccess` | identity | PUT | Tick what they may do |
-| `updateRole` | identity | PATCH | Rename a role or change its description |
-| `actOnWaiverRequirements` | marketing-crm | POST | Send, resend or correct participant waiver requirements, one or in bulk |
-| `createInvitationCampaign` | marketing-crm | POST | A quota-bounded, addressed invitation |
-| `createLoyaltyProgramme` | marketing-crm | POST | Create a loyalty programme |
-| `getCaseInvestigationResolution` | marketing-crm | GET | Read the case workspace |
-| … | | | 54 more |
+| … | | | 74 more |
 
 ### 1 modules split across waves
 
@@ -87,7 +87,7 @@
 | `CMS-004` | Logo & Assets | White Label | 1 | 7 | yes |
 | `CMS-005` | Theme Editor | White Label | 1 | 2 | yes |
 | `CMS-006` | Component Preview | White Label | 1 | 6 | yes |
-| `CMS-007` | Page Builder | White Label | 1 | 15 | yes |
+| `CMS-007` | Page Builder | White Label | 1 | 16 | yes |
 | `CMS-008` | Content Blocks | White Label | 1 | 11 | yes |
 | `CMS-009` | Navigation & Menus | White Label | 1 | 7 | yes |
 | `CMS-010` | Media Library | White Label | 1 | 11 | yes |
@@ -180,9 +180,9 @@
 | `CMS-098` | Delivery Monitoring & Integration Health | Media Library | 3 | 1 | yes |
 | `CMS-099` | Asset Usage & Performance Analytics | Media Library | 3 | 1 | yes |
 | `CMS-100` | Distribution Intelligence, AI Insights & Optimization | Media Library | 3 | 1 | yes |
-| `CMS-101` | Help Me Choose | White Label | 1 | 12 | yes |
+| `CMS-101` | Help Me Choose | White Label | 1 | 13 | yes |
 | `CMS-102` | Site Builder | White Label | 1 | 7 | yes |
-| `CMS-103` | Booking Flows | White Label | 1 | 14 | yes |
+| `CMS-103` | Booking Flows | White Label | 1 | 15 | yes |
 | `CMS-104` | App Build & Store Publishing | White Label | 1 | 9 | yes |
 | `CMS-105` | Kiosk Builder | Kiosk | 1 | 10 | yes |
 

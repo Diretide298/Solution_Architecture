@@ -741,7 +741,13 @@
   "offlineCapable": true,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": false
+   }
+  ],
   "requestBody": null,
   "responds": "BundleSummary"
  },
@@ -984,6 +990,11 @@
   "scopeLevel": "venue",
   "parameters": [
    {
+    "name": "venueId",
+    "in": "query",
+    "required": false
+   },
+   {
     "name": null,
     "in": null,
     "required": null
@@ -1185,6 +1196,30 @@
   "requestBody": null,
   "responds": "Page"
  },
+ "listProductCategories": {
+  "method": "GET",
+  "path": "/product-categories",
+  "contract": "catalogue",
+  "summary": "The merchandise hierarchy — categories, brands, collections",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "kind",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "ProductCategoryNode"
+ },
  "listProductVariants": {
   "method": "GET",
   "path": "/products/{productId}/variants",
@@ -1195,6 +1230,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
    {
     "name": null,
     "in": null,

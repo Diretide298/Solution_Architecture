@@ -82,6 +82,30 @@
   },
   "apis": [
    {
+    "operationId": "listOwnRefundRequests",
+    "contract": "orders",
+    "purpose": "The guest's own refund requests and their status",
+    "trigger": "onLoad",
+    "provenance": "r8 walk, 20 October 2026 (ORDERS-MONEY-C26, CHG-R8SPN-012)",
+    "shownBy": "Tickets you can act on"
+   },
+   {
+    "operationId": "listOwnResaleListings",
+    "contract": "orders",
+    "purpose": "The guest's own resale listings and their status",
+    "trigger": "onLoad",
+    "provenance": "r8 walk, 20 October 2026 (ORDERS-MONEY-C26, CHG-R8SPN-012)",
+    "shownBy": "Tickets you can act on"
+   },
+   {
+    "operationId": "getGuestRefundPolicy",
+    "contract": "orders",
+    "purpose": "How much comes back and until when, before any request",
+    "trigger": "onLoad",
+    "provenance": "r8 walk, 20 October 2026 (ORDERS-MONEY-C26, CHG-R8SPN-012)",
+    "shownBy": "Rules"
+   },
+   {
     "operationId": "createRefundRequest",
     "contract": "orders",
     "purpose": "Guest-initiated refund request",
@@ -110,6 +134,10 @@
     {
      "name": "orderId",
      "from": "navigation"
+    },
+    {
+     "name": "venueId",
+     "from": "session"
     }
    ],
    "coldEntry": "**Resolves from the session.** A guest arriving cold is asked to sign in and returned here afterwards — never a 404, and never a screen that silently shows somebody else's data (ADR-0030)."
@@ -229,7 +257,7 @@
     }
    ]
   },
-  "notes": "🔴 **Biometric enrolment had no guest-facing consent step.** `enrolFacePass` was callable by a guest and reachable from nowhere, which means enrolment was happening at a desk with somebody else operating the screen.\n\n**`pii.subject_biometric` is separate from contact and document precisely so consent and erasure differ per kind.** Revocation sits beside enrolment for the same reason — a face a guest cannot withdraw is a face they did not really consent to.\n\n**Who is this for** (decided 28 September, audit R205): the signed-in adult enrols themselves or a linked child, and is recorded as guardian by the server. The age below which a subject is a minor is an open value client counsel sets.\n\n**The passes come from listMyEntitlements (4 October 2026): entitlementId for enrolFacePass, facePassEnrolmentId for getFacePassEnrolment. The template comes from the facial-reader vendor's SDK, a client choice still open (ADR-0063); the build uses a stub until it is named** (CHG-FXS-003)\n\n**The face is captured inside the enrol form (formEnrolFacePass) by the vendor SDK** (CHG-FXS-003)",
+  "notes": "🔴 **Biometric enrolment had no guest-facing consent step.** `enrolFacePass` was callable by a guest and reachable from nowhere, which means enrolment was happening at a desk with somebody else operating the screen.\n\n**`pii.subject_biometric` is separate from contact and document precisely so consent and erasure differ per kind.** Revocation sits beside enrolment for the same reason — a face a guest cannot withdraw is a face they did not really consent to.\n\n**Who is this for** (decided 28 September, audit R205): the signed-in adult enrols themselves or a linked child, and is recorded as guardian by the server. The age below which a subject is a minor is an open value client counsel sets.\n\n**The passes come from listMyEntitlements (4 October 2026): entitlementId for enrolFacePass, facePassEnrolmentId for getFacePassEnrolment. The template comes from the facial-reader vendor's SDK, a client choice still open (ADR-0063); the build uses a stub until it is named** (CHG-FXS-003)\n\n**The face is captured inside the enrol form (formEnrolFacePass) by the vendor SDK** (CHG-FXS-003)\n\nBuild note (r8 second round, GPS-C09): **build the no-access state as GFIX-4 says, not as the state text above reads.** A guest holds no permission, so the state never names one (the text above still names staff permissions); signed out, the guest is offered sign-in and brought back here; a record that is not theirs says so without saying whose. The corrected wording waits for the client's approval of the visible text (pending entry GPS-C09).",
   "density": "comfortable",
   "offline": false,
   "pattern": "statusTracker",
@@ -466,7 +494,7 @@
     }
    ]
   },
-  "notes": "**A stored card a guest cannot see is a stored card they cannot remove.** `listPaymentTokens` and `storePaymentToken` were guest-callable with no guest screen.\n\n**Wallet transfer and loyalty redemption sit here** because to a guest they are all *how I pay*, whatever the contracts call them.\n\n**storePaymentToken's providerId comes from the published tenant config (paymentTokenisation, agreed with contracts in the ledger) and its consentPurposeId from listConsentPurposes; the transfer's walletId is the guest's wallet id from getWallet (Wallet.id, agreed). Bound 4 October 2026** (CHG-FXS-003)\n\n**The card is entered in the provider's secure fields, named by the published config** (CHG-FXS-003)",
+  "notes": "**A stored card a guest cannot see is a stored card they cannot remove.** `listPaymentTokens` and `storePaymentToken` were guest-callable with no guest screen.\n\n**Wallet transfer and loyalty redemption sit here** because to a guest they are all *how I pay*, whatever the contracts call them.\n\n**storePaymentToken's providerId comes from the published tenant config (paymentTokenisation, agreed with contracts in the ledger) and its consentPurposeId from listConsentPurposes; the transfer's walletId is the guest's wallet id from getWallet (Wallet.id, agreed). Bound 4 October 2026** (CHG-FXS-003)\n\n**The card is entered in the provider's secure fields, named by the published config** (CHG-FXS-003)\n\nBuild note (r8 second round, GPS-C09): **build the no-access state as GFIX-4 says, not as the state text above reads.** A guest holds no permission, so the state never names one (the text above still names staff permissions); signed out, the guest is offered sign-in and brought back here; a record that is not theirs says so without saying whose. The corrected wording waits for the client's approval of the visible text (pending entry GPS-C09).",
   "density": "comfortable",
   "offline": false,
   "pattern": "listDetail",
@@ -639,6 +667,20 @@
     "purpose": "The guest's wallet and its id, for a balance transfer",
     "trigger": "onLoad",
     "provenance": "defined 4 October 2026 (CHG-FXS-003)"
+   },
+   {
+    "operationId": "getLoyaltyPosition",
+    "contract": "marketing-crm",
+    "purpose": "The guest's loyalty position",
+    "trigger": "onLoad",
+    "shownBy": "Balances"
+   },
+   {
+    "operationId": "listRewards",
+    "contract": "marketing-crm",
+    "purpose": "The rewards the guest can redeem",
+    "trigger": "onLoad",
+    "shownBy": "Spend points"
    }
   ],
   "entryState": {
@@ -974,17 +1016,17 @@
    "coldEntry": "**Resolves from the session.** A guest arriving cold is asked to sign in and returned here afterwards — never a 404, and never a screen that silently shows somebody else's data (ADR-0030)."
   },
   "wireframe": {
-   "status": "notStarted",
-   "provenance": "designed",
+   "status": "approved",
+   "provenance": "client-verified",
    "board": "wireframes/P02 Guest App.dc.html#gst-073",
    "prototype": {
     "file": "sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html",
     "rev": "Mobile App v4, 29 September 2026",
     "match": "none",
-    "note": "Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the v4 look (the frame on this screen's board, wireframes/frames/gst-073.html, and #GST-073 in handoff/design-batches/apps/1-guest-app/return/TICVAI Guest App.dc.html). NOT client-verified: awaiting the client's design reviewer. Build the layout from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at: Account → All screens → Wave 2 → Security & sign-in (partial). What v2 did differently: Prototype offers two-step verification and a trusted-device skip, but the YAML says guests have no second factor (R167). Either remove the toggle from the prototype or reopen the decision."
+    "note": "Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the v4 look (the frame on this screen's board, wireframes/frames/gst-073.html, and #GST-073 in handoff/design-batches/apps/1-guest-app/return/TICVAI Guest App.dc.html). Client-approved 19 October 2026 (confirmed by Chinmay Parab). Build the layout from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at: Account → All screens → Wave 2 → Security & sign-in (partial). What v2 did differently: Prototype offers two-step verification and a trusted-device skip, but the YAML says guests have no second factor (R167). Either remove the toggle from the prototype or reopen the decision."
    },
-   "source": "Claude Code, 30 September 2026, drawn in the Mobile App v4 look",
-   "note": "**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified, awaiting the client's design reviewer.** `provenance: designed` because the accepted vocabulary has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md."
+   "source": "client approval, confirmed by Chinmay Parab 19 October 2026",
+   "note": "**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; client-approved 19 October 2026, confirmed by Chinmay Parab.** Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [

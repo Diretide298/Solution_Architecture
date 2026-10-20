@@ -17,7 +17,8 @@ The kernel tables every host needs, and the writes that cannot route yet, are in
 `docs/active/cross-deployable-writes.yaml`.
 
     X-KERNEL     the kernel grants are exactly platform.outbox INSERT, platform.scope SELECT,
-                 platform.audit_record INSERT and platform.idempotency_record SELECT/INSERT/UPDATE
+                 platform.audit_record INSERT, platform.idempotency_record SELECT/INSERT/UPDATE and
+                 platform.outbox_sequence SELECT/INSERT/UPDATE (CR-166)
     X-UNROUTED   a write into another deployable's table (a kernel table only where the kernel grants a write)
                  has neither a route nor an exception
     X-EVENT      an event route names an event that is not catalogued, that the operation does not emit
@@ -58,6 +59,9 @@ KERNEL = {
     "platform.scope": ("SELECT",),
     "platform.audit_record": ("INSERT",),
     "platform.idempotency_record": ("SELECT", "INSERT", "UPDATE"),
+    # ADAM CR-166, 18 October 2026 (CHG-CRA-005): every host allocates its outbox sequence from the counter in the
+    # transaction that writes the outbox row, so access and operations allocate like commerce.
+    "platform.outbox_sequence": ("SELECT", "INSERT", "UPDATE"),
 }
 WRITE_PRIVS = {"INSERT", "UPDATE", "DELETE"}
 EXC_FIELDS = ("id", "operation", "table", "kind", "reason", "added", "removal_release")
@@ -131,7 +135,7 @@ def analyse():
     want = {t: tuple(sorted(p)) for t, p in KERNEL.items()}
     for t in sorted(set(kern) | set(want)):
         if t not in want:
-            bad.append(("X-KERNEL", t, "is granted to every deployable in the kernel list, and only the four agreed "
+            bad.append(("X-KERNEL", t, "is granted to every deployable in the kernel list, and only the five agreed "
                                        "tables may be (ADAM CR-002)"))
         elif t not in kern:
             bad.append(("X-KERNEL", t, "is missing from the kernel list"))
@@ -308,7 +312,7 @@ def main() -> int:
         print("FAIL %d finding(s): %s" % (len(bad), ", ".join("%s %d" % kv for kv in sorted(by.items()))))
         return 1
     print("ok: every cross-deployable write is routed by event or by the owner's operation, or is a dated "
-          "exception; the kernel grants are the four agreed")
+          "exception; the kernel grants are the five agreed")
     return 0
 
 

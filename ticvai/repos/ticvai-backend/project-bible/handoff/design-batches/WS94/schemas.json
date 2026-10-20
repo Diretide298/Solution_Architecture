@@ -154,11 +154,11 @@
     "nullable": true
    },
    "depositAuthorisationId": {
-    "x-ticvai-references": "orders.stored_value_authorisation",
+    "x-ticvai-references": "orders.payment",
     "type": "string",
     "format": "uuid",
     "nullable": true,
-    "description": "The card deposit's terminal pre-authorisation, written by `checkOutRental` (workbook Q304; CHG-CSA-029). The hold is kept whole until every unit is back (workbook Q306)."
+    "description": "The card deposit's terminal pre-authorisation, written by `checkOutRental` (workbook Q304; CHG-CSA-029). The hold is kept whole until every unit is back (workbook Q306). **It is an `orders.payment`** (ADAM CR-146, option A, 18 October 2026; CHG-CRA-002): a card payment with `tender` card, `status` authorised and its `terminalId`, captured in part or voided when the rental comes back, which is that payment's own life. Orders' stored-value authorisation holds wallet and stored-value holds and has no card kind, so no card deposit could satisfy the key it used to name. The deposit payment belongs to the rental's order (`orderId`; the lead confirms, since `order_id` is nullable)."
    },
    "accruedLateFee": {
     "$ref": "../shared/common.yaml#/components/schemas/Money"

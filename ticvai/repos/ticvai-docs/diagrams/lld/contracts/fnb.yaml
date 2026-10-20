@@ -203,7 +203,7 @@ operations:
   permission: ORDER_CREATE
   audience:
   - staff
-  offline: false
+  offline: true
   reads:
   - cache:idempotency
   - fnb.kitchen_ticket
@@ -238,7 +238,7 @@ operations:
   verb: POST
   path: /production-runs/{runId}/complete
   scope: venue
-  permission: FNB_MANAGE
+  permission: PRODUCT_CONFIGURE
   audience:
   - staff
   offline: true
@@ -296,6 +296,7 @@ operations:
   - staff
   offline: true
   reads:
+  - cache:idempotency
   - fnb.kitchen_station
   - fnb.kitchen_ticket
   - fnb.kitchen_ticket_line
@@ -303,6 +304,7 @@ operations:
   - fnb.service_order
   - fnb.service_order_line
   writes:
+  - cache:idempotency
   - fnb.kitchen_ticket
   - fnb.kitchen_ticket_line
   - fnb.service_order
@@ -405,9 +407,11 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - fnb.reservation_table
   - fnb.table_reservation
   writes:
+  - cache:idempotency
   - fnb.reservation_table
   - fnb.table_reservation
 - operation: enterCountLine
@@ -559,7 +563,7 @@ operations:
   audience:
   - guest
   - staff
-  offline: true
+  offline: false
   reads:
   - fnb.modifier_group
   - fnb.modifier_option
@@ -706,7 +710,7 @@ operations:
   verb: POST
   path: /waitlist
   scope: venue
-  permission: FNB_SERVE
+  permission: ORDER_MODIFY
   audience:
   - staff
   - guest
@@ -729,8 +733,10 @@ operations:
   - guest
   offline: false
   reads:
+  - cache:idempotency
   - fnb.waitlist_entry
   writes:
+  - cache:idempotency
   - fnb.waitlist_entry
 - operation: list86Events
   verb: GET
@@ -785,7 +791,8 @@ operations:
   permission: null
   audience:
   - guest
-  offline: true
+  - staff
+  offline: false
   reads:
   - fnb.delivery_location
   - fnb.delivery_location_outlet
@@ -906,7 +913,7 @@ operations:
   permission: PRODUCT_VIEW
   audience:
   - staff
-  offline: true
+  offline: false
   reads:
   - fnb.menu
   - fnb.menu_item
@@ -920,7 +927,7 @@ operations:
   audience:
   - staff
   - guest
-  offline: true
+  offline: false
   reads:
   - fnb.modifier_group
   - fnb.modifier_option
@@ -1012,7 +1019,7 @@ operations:
   verb: GET
   path: /table-reservations
   scope: venue
-  permission: FNB_OPERATE
+  permission: ORDER_MODIFY
   audience:
   - staff
   offline: true
@@ -1144,7 +1151,7 @@ operations:
   permission: ORDER_MODIFY
   audience:
   - staff
-  offline: false
+  offline: true
   reads:
   - cache:idempotency
   - fnb.table_visit
@@ -1190,7 +1197,7 @@ operations:
   verb: POST
   path: /production-runs
   scope: venue
-  permission: FNB_MANAGE
+  permission: PRODUCT_CONFIGURE
   audience:
   - staff
   offline: false
@@ -1212,8 +1219,10 @@ operations:
   - staff
   offline: true
   reads:
+  - cache:idempotency
   - fnb.kitchen_ticket
-  writes: []
+  writes:
+  - cache:idempotency
 - operation: printPrepSheet
   verb: POST
   path: /production-plans/{planId}/prep-sheet
@@ -1222,8 +1231,10 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - cache:idempotency
+  writes:
+  - cache:idempotency
 - operation: prioritiseKitchenTicket
   verb: POST
   path: /kitchen/tickets/{ticketId}/prioritise
@@ -1231,7 +1242,7 @@ operations:
   permission: ORDER_MODIFY
   audience:
   - staff
-  offline: false
+  offline: true
   reads:
   - cache:idempotency
   - fnb.kitchen_ticket
@@ -1483,7 +1494,7 @@ operations:
   verb: POST
   path: /table-reservations/{reservationId}/seat
   scope: venue
-  permission: FNB_OPERATE
+  permission: ORDER_MODIFY
   audience:
   - staff
   offline: true
@@ -1587,8 +1598,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - fnb.delivery_policy
   writes:
+  - cache:idempotency
   - fnb.delivery_policy
 - operation: setFnbReservationPolicy
   verb: PUT
@@ -1599,8 +1612,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - fnb.reservation_policy
   writes:
+  - cache:idempotency
   - fnb.reservation_policy
 - operation: setFnbServiceChargePolicy
   verb: PUT
@@ -1611,8 +1626,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - fnb.service_charge_policy
   writes:
+  - cache:idempotency
   - fnb.service_charge_policy
 - operation: setIngredientSubstitutes
   verb: PUT
@@ -1623,9 +1640,11 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - fnb.ingredient_substitute
   - fnb.recipe
   writes:
+  - cache:idempotency
   - fnb.ingredient_substitute
 - operation: setItemAvailability
   verb: PUT
@@ -1650,8 +1669,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - fnb.kitchen_routing_rule
   writes:
+  - cache:idempotency
   - fnb.kitchen_routing_rule
 - operation: setKitchenSla
   verb: PUT
@@ -1707,8 +1728,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - fnb.menu_item
   writes:
+  - cache:idempotency
   - fnb.menu_item
 - operation: setMenuSections
   verb: PUT
@@ -1737,8 +1760,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - fnb.outlet_template
   writes:
+  - cache:idempotency
   - fnb.outlet_template
 - operation: setPrepSheetTemplate
   verb: PUT
@@ -1749,8 +1774,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - fnb.prep_sheet_template
   writes:
+  - cache:idempotency
   - fnb.prep_sheet_template
 - operation: setRecipe
   verb: PUT
@@ -1863,8 +1890,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - fnb.temperature_checkpoint
   writes:
+  - cache:idempotency
   - fnb.temperature_checkpoint
 - operation: setWasteApprovalPolicy
   verb: PUT
@@ -1875,8 +1904,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - fnb.waste_approval_policy
   writes:
+  - cache:idempotency
   - fnb.waste_approval_policy
 - operation: signCorrectiveAction
   verb: POST
@@ -1933,7 +1964,7 @@ operations:
   verb: POST
   path: /table-visits/{visitId}/transfer
   scope: venue
-  permission: FNB_SERVE
+  permission: ORDER_MODIFY
   audience:
   - staff
   offline: true
@@ -2040,6 +2071,7 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - fnb.allergen_verdict
   - fnb.ingredient_substitute
   - fnb.menu_item
@@ -2051,4 +2083,5 @@ operations:
   - fnb.substitution_rule
   - inventory.inventory_item
   writes:
+  - cache:idempotency
   - fnb.allergen_verdict

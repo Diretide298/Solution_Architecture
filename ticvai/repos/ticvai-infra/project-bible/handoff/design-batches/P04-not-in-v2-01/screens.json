@@ -207,8 +207,8 @@
    ]
   },
   "wireframe": {
-   "status": "notStarted",
-   "provenance": "designed",
+   "status": "approved",
+   "provenance": "client-verified",
    "board": "wireframes/P04 Venue POS.dc.html#pos-009",
    "prototype": {
     "file": "sources/designs/TICVAI_POS_Terminal_client_approved.html",
@@ -217,7 +217,7 @@
     "note": "The prototype has no view for this screen. It was drawn in Claude Design on 29 September in the prototype's style and accepted as its design the same day (the frame on this screen's board): build the layout from that frame."
    },
    "derivedFrom": "wireframes/reference/POS Board 3.dc.html",
-   "source": "Claude Design POS pack, 24 August",
+   "source": "client approval, confirmed by Chinmay Parab 19 October 2026",
    "note": "**Drawn by Claude Design on `POS Board 3.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 16 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
@@ -377,7 +377,7 @@
      "carries": [
       "performanceId"
      ],
-     "provenance": "derived — POS-004 declares entryState.params holdId, performanceId and POS-010 holds performanceId, so an edge into it carries them"
+     "provenance": "derived — POS-004 declares entryState.params eventId, holdId, performanceId and POS-010 holds performanceId, so an edge into it carries them"
     },
     {
      "to": "POS-005",
@@ -544,15 +544,16 @@
    "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `mediaCode`, `orderId`."
   },
   "wireframe": {
-   "status": "notStarted",
-   "provenance": "designed",
+   "status": "approved",
+   "provenance": "client-verified",
    "board": "wireframes/P04 Venue POS.dc.html#pos-010",
    "prototype": {
     "file": "sources/designs/TICVAI_POS_Terminal_client_approved.html",
     "rev": "TICVAI OS 4.2.1, build 2026.08.14",
     "match": "none",
     "note": "The prototype has no view for this screen. It was drawn in Claude Design on 29 September in the prototype's style and accepted as its design the same day (the frame on this screen's board): build the layout from that frame."
-   }
+   },
+   "source": "client approval, confirmed by Chinmay Parab 19 October 2026"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
@@ -805,15 +806,16 @@
    ]
   },
   "wireframe": {
-   "status": "notStarted",
-   "provenance": "designed",
+   "status": "approved",
+   "provenance": "client-verified",
    "board": "wireframes/P04 Venue POS.dc.html#pos-015",
    "prototype": {
     "file": "sources/designs/TICVAI_POS_Terminal_client_approved.html",
     "rev": "TICVAI OS 4.2.1, build 2026.08.14",
     "match": "none",
     "note": "The prototype has no view for this screen. It was drawn in Claude Design on 29 September in the prototype's style and accepted as its design the same day (the frame on this screen's board): build the layout from that frame."
-   }
+   },
+   "source": "client approval, confirmed by Chinmay Parab 19 October 2026"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "purposeNote": "Purpose rewritten 2 October 2026 (CHG-WIR-010): The purpose read \"Cash Operations Dashboard — from the client design board, 20 August\"; the client asked for live cash status per till with expected cash and card totals for supervisors (DI-273, DI-308; design-notes correction fnb-retail POS-015).",
@@ -985,8 +987,8 @@
    "coldEntry": "**Resolves from the session, which carries the workstation** — a till is signed into, not navigated to."
   },
   "wireframe": {
-   "status": "notStarted",
-   "provenance": "designed",
+   "status": "approved",
+   "provenance": "client-verified",
    "board": "wireframes/P04 Venue POS.dc.html#pos-017",
    "prototype": {
     "file": "sources/designs/TICVAI_POS_Terminal_client_approved.html",
@@ -995,7 +997,8 @@
     "note": "The prototype has no view for this screen. It was drawn in Claude Design on 29 September in the prototype's style and accepted as its design the same day (the frame on this screen's board): build the layout from that frame."
    },
    "derivedFrom": "wireframes/reference/POS Frontline Board 2.dc.html",
-   "note": "**Drawn by Claude Design on `POS Frontline Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
+   "note": "**Drawn by Claude Design on `POS Frontline Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing.",
+   "source": "client approval, confirmed by Chinmay Parab 19 October 2026"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "_platform": {
@@ -1218,8 +1221,8 @@
    ]
   },
   "wireframe": {
-   "status": "notStarted",
-   "provenance": "designed",
+   "status": "approved",
+   "provenance": "client-verified",
    "board": "wireframes/P04 Venue POS.dc.html#pos-018",
    "prototype": {
     "file": "sources/designs/TICVAI_POS_Terminal_client_approved.html",
@@ -1228,7 +1231,7 @@
     "note": "The prototype has no view for this screen. It was drawn in Claude Design on 29 September in the prototype's style and accepted as its design the same day (the frame on this screen's board): build the layout from that frame."
    },
    "derivedFrom": "wireframes/reference/POS Board 3.dc.html",
-   "source": "Claude Design POS pack, 24 August",
+   "source": "client approval, confirmed by Chinmay Parab 19 October 2026",
    "note": "**Drawn by Claude Design on `POS Board 3.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
@@ -1470,8 +1473,8 @@
    ]
   },
   "wireframe": {
-   "status": "notStarted",
-   "provenance": "designed",
+   "status": "approved",
+   "provenance": "client-verified",
    "board": "wireframes/P04 Venue POS.dc.html#pos-019",
    "prototype": {
     "file": "sources/designs/TICVAI_POS_Terminal_client_approved.html",
@@ -1480,7 +1483,7 @@
     "note": "The prototype has no view for this screen. It was drawn in Claude Design on 29 September in the prototype's style and accepted as its design the same day (the frame on this screen's board): build the layout from that frame."
    },
    "derivedFrom": "wireframes/reference/POS Board 3.dc.html",
-   "source": "Claude Design POS pack, 24 August",
+   "source": "client approval, confirmed by Chinmay Parab 19 October 2026",
    "note": "**Drawn by Claude Design on `POS Board 3.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
@@ -1733,15 +1736,16 @@
    ]
   },
   "wireframe": {
-   "status": "notStarted",
-   "provenance": "designed",
+   "status": "approved",
+   "provenance": "client-verified",
    "board": "wireframes/P04 Venue POS.dc.html#pos-024",
    "prototype": {
     "file": "sources/designs/TICVAI_POS_Terminal_client_approved.html",
     "rev": "TICVAI OS 4.2.1, build 2026.08.14",
     "match": "none",
     "note": "The prototype has no view for this screen. It was drawn in Claude Design on 29 September in the prototype's style and accepted as its design the same day (the frame on this screen's board): build the layout from that frame."
-   }
+   },
+   "source": "client approval, confirmed by Chinmay Parab 19 October 2026"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [

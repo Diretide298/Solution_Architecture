@@ -29,6 +29,7 @@ Tested by searching every contract for each named system. A "no trace" result me
 | 17 | Google ID | `identity` | Covered — guest-app social login |
 | 18 | **NI Payment Gateway** | — | 🔴 **No trace.** Network International |
 | 19 | **NI Payment Device** | — | 🔴 **No trace** |
+| 20 | Breached-password check (added 20 October 2026, not in the matrix; R117) | `identity` | Covered — no outside service: a local corpus of breached-password SHA-1 hashes shipped with each release, behind the adapter `checkPasswordBreached(passwordSha1Prefix)` (R8 blocker cause IDENTITY-C06, CHG-R8SPN-019). The client may still name a vendor under R117 |
 
 ## Hardware — 16
 

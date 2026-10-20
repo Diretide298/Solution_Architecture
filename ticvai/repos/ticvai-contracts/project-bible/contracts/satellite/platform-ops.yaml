@@ -52,25 +52,6 @@ x-ticvai-queries:
   # **Data reads other modules ask this module for** (MOD audit, 14 October 2026, CHG-MOD-001): one query per
   # table, instead of a raw read of it (check-cross-module-reads XR-UNCOVERED; ADR-0055 rule 2, amended
   # 14 October).
-  contentBlockRecords:
-    module: platform-ops
-    table: control.content_block
-    inputs:
-      ids: {type: array, items: {type: string, format: uuid}, description: 'The control.content_block rows asked for, by id.'}
-      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
-    returns:
-      type: array
-      description: 'The rows found, each as Platform stores it; an id with no visible row is absent.'
-      items: {type: object, description: 'A control.content_block row: the columns handoff/schema-reference.json lists for it.'}
-    rule: >-
-      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
-      October). Platform answers with its control.content_block rows, as it stores them and as the caller's
-      scope lets it see them (the table's row-level security, under the caller's connection and transaction). It
-      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
-      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
-      process within operations, through the C# query interface Platform implements, and asked from another
-      deployable through Platform's service route (serviceAuth).
-    served: [in-process, service]
   seoMetadataRecords:
     module: platform-ops
     table: control.seo_metadata
@@ -1010,6 +991,12 @@ paths:
         **Fans out per region** (ADR-0014). Cells advance in waves with a canary first, and a failure
         halts the wave rather than continuing into it.
 
+        **A failed run is resumed, not restarted** (ADAM CR-160, 18 October 2026; CHG-CRA-006; PLATFORM-MIGRATE''s
+        spec of 4 October). Applying the plan of a run that is `failed`, once the cause is fixed, moves that run back
+        to `running` (states/migration-run.yaml): tenants already `complete` stay complete, and the failed tenant is
+        retried from its `control.migration_run_tenant` row before the wave goes on. Only a run already rolled back
+        cannot be resumed (`409 migration-run-rolled-back`); its plan is planned again.
+
         '
       tags:
       - migration
@@ -1064,9 +1051,10 @@ paths:
               schema:
                 $ref: '#/components/schemas/MigrationRun'
         '409':
-          x-ticvai-problem-types: [migration-plan-stale]
+          x-ticvai-problem-types: [migration-plan-stale, migration-run-rolled-back]
           description: 'The plan is stale — cell state changed since it was computed. Re-plan and review
-            before applying.
+            before applying. Or the plan''s run was rolled back and cannot be resumed
+            (`migration-run-rolled-back`; ADAM CR-160, CHG-CRA-006).
 
             '
           content:
@@ -2442,6 +2430,11 @@ components:
         - status
         - createdAt
         x-ticvai-persistence: control.release + control.release_component
+        # `plan_id` was a relationship-graph column pointing at `control.subscription_plan`, renamed to
+        # `subscription.plan` on 20 September. No operation writes or reads it, and a release is a manifest, not a
+        # plan (ADAM CR-145, option B, 18 October 2026; CHG-CRA-002): retired, so the generator stops rebuilding it;
+        # the review gives its drop, and until then its NOT NULL is dropped so an insert never supplies a plan.
+        x-ticvai-retired-columns: [plan_id]
         properties:
           id:
             type: string
@@ -3269,6 +3262,35 @@ components:
           type: string
           format: uuid
           description: The row that would not deliver.
+        eventId:
+          x-ticvai-references: none
+          type: string
+          format: uuid
+          nullable: true
+          description: '**The outbox envelope''s event id, copied when the dead letter is written** (R8 blocker
+            APPROVALS-TENANCY-C29, CHG-R8MIG-004). `requeueDeadLetter` writes a new outbox row with this same event
+            id and `sequence`: consumers dedupe on (consumer, event id), so only the consumer that failed handles it
+            again. Null only on a row written before the column existed.'
+        tenantId:
+          x-ticvai-references: none
+          type: string
+          format: uuid
+          nullable: true
+          description: The envelope's tenant, copied from the outbox row, so the requeued row carries it again.
+        aggregateType:
+          type: string
+          nullable: true
+          description: The envelope's aggregate type, copied from the outbox row.
+        aggregateId:
+          x-ticvai-references: none
+          type: string
+          format: uuid
+          nullable: true
+          description: The envelope's aggregate id (the broker ordering key), copied from the outbox row.
+        sequence:
+          type: integer
+          nullable: true
+          description: The envelope's per-aggregate sequence, copied from the outbox row and reused on requeue.
         eventName:
           type: string
         consumer:
@@ -3302,6 +3324,8 @@ components:
       x-ticvai-append-only: createdAt
       type: object
       x-ticvai-persistence: platform.outbox
+      # One aggregate's events in order (ADAM CR-166, 18 October 2026; CHG-CRA-005): outbox_aggregate_id_sequence_idx.
+      x-ticvai-index: [[aggregateId, sequence]]
       description: '**Written in the same transaction as the state change** (ADR-0033). That is what makes
         it exactly-once — the row and the change commit together or neither does.
 
@@ -3322,6 +3346,7 @@ components:
       - aggregateId
       - sequence
       - payload
+      - occurredAt
       - createdAt
       properties:
         id:
@@ -3333,7 +3358,8 @@ components:
           format: uuid
           description: '**The envelope''s event id, which is this row''s `id`** (ADR-0058; UUIDv7, ADR-0056). The
             consumer inbox key, so a redelivery is recognised as the same event. `events/_schema.yaml` defines
-            the envelope.'
+            the envelope. The one exception is a row `requeueDeadLetter` writes: a new `id`, and the dead letter''s
+            event id here, so it is the same event to every consumer (CHG-R8MIG-004).'
         eventName:
           type: string
           description: The `name` of an event in `events/` (`aggregate.pastTenseFact`).
@@ -3366,7 +3392,16 @@ components:
           type: integer
           description: '**Monotonic per aggregate** (SD-030: was *per scope*), allocated in the writing
             transaction. A consumer that missed one knows it missed one — ordering is the difference between
-            at-least-once and unusable — and ordering is only ever promised within one aggregate.'
+            at-least-once and unusable — and ordering is only ever promised within one aggregate. **Allocated from
+            `platform.outbox_sequence`** (ADAM CR-166, 18 October 2026; CHG-CRA-005): `INSERT ... ON CONFLICT
+            (aggregate_id) DO UPDATE SET last_sequence = last_sequence + 1 RETURNING last_sequence` in the writing
+            transaction, never `max(sequence) + 1`, which restarts when a monthly partition leaves (ADR-0058).'
+        occurredAt:
+          type: string
+          format: date-time
+          description: '**The envelope''s `occurredAt`** (ADAM CR-166; CHG-CRA-005): when the change happened, set in
+            the writing transaction. `createdAt` is when the row was written and partitions the table; a consumer
+            reads `occurredAt`.'
         traceId:
           type: string
           maxLength: 64
@@ -3383,6 +3418,109 @@ components:
           type: integer
           default: 0
           description: '**Five, exponential from one second, jittered.** Then `platform.dead_letter`.'
+        lastError:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+    OutboxSequence:
+      type: object
+      x-ticvai-persistence: platform.outbox_sequence
+      x-ticvai-primary-key: [aggregateId]
+      description: '**The last outbox sequence given to each aggregate** (ADAM CR-166, 18 October 2026; CHG-CRA-005).
+        One row per aggregate, updated with `INSERT ... ON CONFLICT (aggregate_id) DO UPDATE ... RETURNING` in the
+        transaction that writes the outbox row, so two writers of one aggregate queue on the row lock and a sequence
+        survives the monthly partitions of `platform.outbox` leaving (ADR-0058). **Every host role holds SELECT,
+        INSERT and UPDATE on it** (a kernel grant in docs/active/cross-deployable-writes.yaml, which DB-ROLES
+        creates), because access and operations allocate like commerce.'
+      required:
+      - aggregateId
+      - lastSequence
+      - scopePath
+      properties:
+        aggregateId:
+          x-ticvai-references: none
+          type: string
+          format: uuid
+          description: The aggregate (any table's row id; ADR-0056), as `OutboxEntry.aggregateId`.
+        lastSequence:
+          type: integer
+          format: int64
+          description: The last sequence given; the next writer gets this plus one.
+        scopePath:
+          type: string
+          readOnly: true
+          description: '**The aggregate''s own scope path**, the one its outbox rows carry, set on the first insert
+            and never changed. Row-level security reads it like any scoped row, so every principal allowed to change
+            the aggregate can allocate its next sequence, from any host, and no other can (CHG-CRA-005).'
+    ControlOutboxEntry:
+      type: object
+      x-ticvai-persistence: control.outbox
+      description: '**The control database''s outbox** (ADAM CR-152, option 1a, 18 October 2026; CHG-CRA-005). The
+        tenant outbox''s columns without `scopePath` and with no row security (the control database has no scope
+        tree, ADR-0039), drained by the workers host''s relay like each tenant''s. A control-plane state change that
+        must reach anything outside its transaction writes its event here in the same transaction (ADR-0033):
+        `tenant.suspended` by Subscription''s `approval.granted` consumer applying the suspension `suspendTenant` asked
+        for (CR-172) or by the suspension job, with `tenantId` the suspended tenant and
+        the event''s scope path its root (`control.cell_tenant.root_scope_path`).'
+      required:
+      - id
+      - eventId
+      - eventName
+      - tenantId
+      - aggregateType
+      - aggregateId
+      - sequence
+      - payload
+      - occurredAt
+      - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        eventId:
+          x-ticvai-references: none
+          type: string
+          format: uuid
+          description: The envelope's event id (ADR-0058; UUIDv7, ADR-0056), the consumer inbox key.
+        eventName:
+          type: string
+          description: The `name` of an event in `events/`.
+        eventVersion:
+          type: integer
+          minimum: 1
+        tenantId:
+          x-ticvai-references: none
+          type: string
+          format: uuid
+          description: The tenant the change is about (`control.tenant`).
+        aggregateType:
+          type: string
+        aggregateId:
+          type: string
+          format: uuid
+        payload:
+          type: object
+          description: The event as it happened.
+        sequence:
+          type: integer
+          description: Monotonic per aggregate, allocated in the writing transaction.
+        traceId:
+          type: string
+          maxLength: 64
+          nullable: true
+        occurredAt:
+          type: string
+          format: date-time
+        publishedAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: Null until the relay publishes it; unpublished rows in sequence order are the work.
+        attempts:
+          type: integer
+          default: 0
         lastError:
           type: string
           nullable: true
@@ -3476,6 +3614,7 @@ components:
         status:
           type: string
           readOnly: true
+          default: queued
           enum:
           - queued
           - running

@@ -9,8 +9,10 @@ enumKind: inline
 enumSchema: RegisteredDevice
 enumProperty: status
 owner: tenancy
+# A registered device starts `unknown` (r8, APPROVALS-TENANCY-C27): nothing has been heard from it yet, so its
+# first heartbeat moves it unknown -> online, and `offline` is reached only from the heartbeat timer.
 initial:
-- offline
+- unknown
 terminal: []
 transitions:
 - from: offline

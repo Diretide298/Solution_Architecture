@@ -2,6 +2,12 @@
  "AiConversation": {
   "type": "object",
   "x-ticvai-persistence": "ai.conversation",
+  "x-ticvai-exactly-one-of": [
+   [
+    "principalId",
+    "subjectId"
+   ]
+  ],
   "required": [
    "id",
    "principalId",
@@ -15,7 +21,20 @@
    },
    "principalId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "nullable": true,
+    "description": "The staff member who opened the conversation; null when a guest opened it (`subjectId`)."
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The guest who opened the conversation (a guest is not a principal); null for staff. Exactly one of `principalId` and `subjectId` is set."
+   },
+   "profileKey": {
+    "type": "string",
+    "nullable": true,
+    "description": "The assistant profile the conversation runs under (`configureAssistantProfile`), as `createAiConversation` set it; null for the module's default profile (R8 blocker WHITE-C27)."
    },
    "scopePath": {
     "type": "string"
@@ -1051,15 +1070,6 @@
        ]
       },
       {
-       "stepKey": "time",
-       "requirement": "required",
-       "settingsOwned": [
-        "timesPerPage",
-        "dayPartFilter",
-        "dayPartBoundaries"
-       ]
-      },
-      {
        "stepKey": "duration",
        "requirement": "required",
        "stepSettings": [
@@ -1078,6 +1088,15 @@
          "type": "integer",
          "default": 60
         }
+       ]
+      },
+      {
+       "stepKey": "time",
+       "requirement": "required",
+       "settingsOwned": [
+        "timesPerPage",
+        "dayPartFilter",
+        "dayPartBoundaries"
        ]
       },
       {
@@ -1119,12 +1138,12 @@
       {
        "kind": "before",
        "stepKey": "date",
-       "otherStepKey": "time"
+       "otherStepKey": "duration"
       },
       {
        "kind": "before",
-       "stepKey": "time",
-       "otherStepKey": "duration"
+       "stepKey": "duration",
+       "otherStepKey": "time"
       }
      ]
     },
@@ -1185,83 +1204,6 @@
        "kind": "before",
        "stepKey": "date",
        "otherStepKey": "resourceMap"
-      }
-     ]
-    },
-    {
-     "key": "cabanaBySize",
-     "productKinds": [
-      "rental"
-     ],
-     "steps": [
-      {
-       "stepKey": "location",
-       "requirement": "conditional"
-      },
-      {
-       "stepKey": "date",
-       "requirement": "required",
-       "settingsOwned": [
-        "dateStripDays"
-       ]
-      },
-      {
-       "stepKey": "partySize",
-       "requirement": "required",
-       "stepSettings": [
-        {
-         "name": "minGuests",
-         "type": "integer",
-         "default": 1
-        },
-        {
-         "name": "maxGuests",
-         "type": "integer"
-        }
-       ]
-      },
-      {
-       "stepKey": "resourceSize",
-       "requirement": "required",
-       "note": "the server assigns a unit of the chosen size"
-      },
-      {
-       "stepKey": "consent",
-       "requirement": "conditional",
-       "settingsOwned": [
-        "consentQuestionIds"
-       ]
-      },
-      {
-       "stepKey": "extras",
-       "requirement": "optional",
-       "settingsOwned": [
-        "extrasStep",
-        "quantitiesOnAddOns"
-       ]
-      },
-      {
-       "stepKey": "review",
-       "requirement": "optional"
-      },
-      {
-       "stepKey": "payment",
-       "requirement": "required",
-       "settingsOwned": [
-        "signInAt"
-       ]
-      }
-     ],
-     "orderConstraints": [
-      {
-       "kind": "before",
-       "stepKey": "date",
-       "otherStepKey": "resourceSize"
-      },
-      {
-       "kind": "before",
-       "stepKey": "partySize",
-       "otherStepKey": "resourceSize"
       }
      ]
     },
@@ -1782,7 +1724,7 @@
  },
  "BookingFlowTypeKey": {
   "type": "string",
-  "description": "**The flow types the system catalogue offers (decided 29 September, W12; impact.md b).** `seatedFixedPerformance` and `seatedDateTimeSeatMap` are the two seated flows; `cabanaMap` and `cabanaBySize` are the two cabana flows (W6); `experienceWorkshop` puts the product before the date (W8); `multiLocation` opens on the location switcher.\n",
+  "description": "**The flow types the system catalogue offers (decided 29 September, W12; impact.md b).** `seatedFixedPerformance` and `seatedDateTimeSeatMap` are the two seated flows; `cabanaMap` is the one cabana flow (W6; `cabanaBySize` was removed in r8: a guest books a cabana from the map only, lead decision of 20 October 2026); `experienceWorkshop` puts the product before the date (W8); `multiLocation` opens on the location switcher.\n",
   "enum": [
    "datedDayPass",
    "timedEntry",
@@ -1793,7 +1735,6 @@
    "surfSession",
    "meetingRoomHourly",
    "cabanaMap",
-   "cabanaBySize",
    "guidedTourByLanguage",
    "transport",
    "tableReservation",
@@ -1857,7 +1798,7 @@
  "BrandIdentity": {
   "x-ticvai-persistence": "none — embedded in tenant_config",
   "type": "object",
-  "description": "Every `*AssetRef` here is a `MediaAsset` id from the `assets` library (`createUpload` then `completeUpload`), PNG or SVG and at most 2 MB (decided 28 September, audit R270).\n",
+  "description": "Every `*AssetRef` here is a `MediaAsset` id from the `assets` library (`createUpload` then `completeUpload`). The image fields are PNG or SVG and at most 2 MB (decided 28 September, audit R270); `introVideoAssetRef` is a video asset within the library's limit for kind `video` (`assets.createUpload`).\n",
   "required": [
    "logoAssetRef"
   ],
@@ -1963,8 +1904,92 @@
    "callCentre"
   ]
  },
+ "ConfigDiff": {
+  "x-ticvai-persistence": "none — computed",
+  "type": "object",
+  "required": [
+   "fromVersion",
+   "toVersion",
+   "changes"
+  ],
+  "properties": {
+   "fromVersion": {
+    "type": "string"
+   },
+   "toVersion": {
+    "type": "string"
+   },
+   "affectedProducts": {
+    "type": "array",
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "x-ticvai-derived": "onRead",
+    "description": "The products served by a booking flow that differs between the two versions (area `bookingFlows` in `changes`), by the product-to-flow rule of `Product.bookingFlowId`. Empty when no flow differs. Bounded by the venue's products; the screen shows the first page and the count.",
+    "items": {
+     "type": "object",
+     "required": [
+      "productId",
+      "name",
+      "flowKey"
+     ],
+     "properties": {
+      "productId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "name": {
+       "type": "string"
+      },
+      "flowKey": {
+       "type": "string",
+       "description": "The changed flow that serves this product."
+      }
+     }
+    }
+   },
+   "changes": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "area",
+      "path",
+      "changeKind"
+     ],
+     "properties": {
+      "area": {
+       "type": "string"
+      },
+      "path": {
+       "type": "string"
+      },
+      "changeKind": {
+       "type": "string",
+       "enum": [
+        "added",
+        "removed",
+        "modified"
+       ]
+      },
+      "before": {
+       "type": "string",
+       "nullable": true
+      },
+      "after": {
+       "type": "string",
+       "nullable": true
+      },
+      "changeScope": {
+       "$ref": "#/components/schemas/ChangeScope"
+      }
+     }
+    }
+   }
+  }
+ },
  "ConfigFindingKind": {
   "type": "string",
+  "description": "The checks `validateTenantConfig` runs. **Severity** (r8 walk of ticket 27780; lead decision of 20 October 2026, option A): `missingTranslation` is a `warning` when the missing text has a fallback language and an `error` when the default language is the one missing; every other kind is an `error`. A publish is blocked when `errorCount` is above 0, and a warning never blocks.\n| kind | severity |\n|---|---|\n| missingTranslation | warning with a fallback language, error when the default language is missing |\n| navigationTargetsDisabledModule | error |\n| homepageReferencesMissingContent | error |\n| contrastFailure | error |\n| missingRequiredAsset | error |\n| policyVersionMissing | error |\n| noVisibleNavigationItems | error |\n| unlicensedModuleEnabled | error |\n| arabicFontMissing | error |\n| bookingFlowInvalid | error |\n| bookingFlowMissing | error |\n",
   "enum": [
    "missingTranslation",
    "navigationTargetsDisabledModule",
@@ -2036,6 +2061,22 @@
  "ConfigVersion": {
   "x-ticvai-rls": "read-beneath",
   "x-ticvai-persistence": "whitelabel.config_version",
+  "x-ticvai-unique-together": [
+   [
+    "scopePath",
+    "version"
+   ]
+  ],
+  "x-ticvai-unique-when": [
+   {
+    "columns": [
+     "scopePath"
+    ],
+    "when": {
+     "isCurrent": true
+    }
+   }
+  ],
   "type": "object",
   "required": [
    "version",
@@ -2046,7 +2087,9 @@
   ],
   "properties": {
    "version": {
-    "type": "string"
+    "type": "string",
+    "readOnly": true,
+    "description": "**Named by the server** (ADAM CR-154; CHG-CRA-004): the next integer for the tenant, `1`, `2`, ..., taken in the publish transaction. Unique per tenant; a racing publish fails on the index and retries."
    },
    "publishedAt": {
     "type": "string",
@@ -2087,6 +2130,20 @@
     "type": "string",
     "format": "date-time",
     "nullable": true
+   },
+   "activationFailedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "When the scheduled activation of this version failed its validation again; null when it has not failed (R8 blocker IDENTITY-C63). A failed version is not tried again; publish a new one."
+   },
+   "activationFailure": {
+    "type": "string",
+    "maxLength": 2000,
+    "nullable": true,
+    "readOnly": true,
+    "description": "Why the scheduled activation failed, in the validation's words (R8 blocker IDENTITY-C63)."
    },
    "contentHash": {
     "type": "string"
@@ -2245,7 +2302,7 @@
   "x-ticvai-persistence": "none — embedded in tenant_config",
   "type": "object",
   "nullable": true,
-  "description": "**The oldest guest app build still allowed to run (decided 28 September, audit R073).** A guest app whose own version is below the one for its platform shows the forced-upgrade screen (GST-047) and nothing else. Null, or a platform left null, forces nothing. Live at once through `setMaintenanceMode`, because an upgrade that must wait for a publish is not forced.\n",
+  "description": "**The oldest guest app build still allowed to run (decided 28 September, audit R073).** A guest app whose own version is below the one for its platform shows the forced-upgrade screen (GST-047) and nothing else. Null, or a platform left null, forces nothing. Live at once through `setMaintenanceMode`, because an upgrade that must wait for a publish is not forced.\n\n**`storeUrl`** (r8 walk of ticket 27893): the store page GST-047's \"Update\" button opens, one per platform, set with `setMaintenanceMode` beside the versions and live at once like them. Optional. A store address cannot be derived from `StoreAccount.appIdentifier`, which is a bundle id. The forced-upgrade screen opens the URL for the platform it runs on; where it is null the screen shows the message without the button and the guest updates from the store by hand.\n",
   "properties": {
    "ios": {
     "type": "string",
@@ -2256,6 +2313,25 @@
     "type": "string",
     "nullable": true,
     "pattern": "^\\d+\\.\\d+\\.\\d+$"
+   },
+   "storeUrl": {
+    "type": "object",
+    "nullable": true,
+    "description": "The store page of the tenant's app for each platform. https only.",
+    "properties": {
+     "ios": {
+      "type": "string",
+      "format": "uri",
+      "pattern": "^https://",
+      "nullable": true
+     },
+     "android": {
+      "type": "string",
+      "format": "uri",
+      "pattern": "^https://",
+      "nullable": true
+     }
+    }
    }
   }
  },
@@ -2826,7 +2902,47 @@
     "format": "uuid",
     "nullable": true,
     "readOnly": true,
+    "x-ticvai-references": "ai.translation_job",
     "description": "The `proposeTranslations` job that drafted this proposal; `getTranslationProposals` reads a job's rows by it. Null on every other proposal (CHG-RFM-004)."
+   },
+   "targetKind": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "enum": [
+     "contentBlock",
+     "productName",
+     "emailTemplate",
+     "messageTemplate"
+    ],
+    "description": "For a translation draft, what kind of thing it sits on (`TranslationProposals.drafts[].targetKind`); null on every other proposal (R8 blocker FOUNDATION-AI-C40)."
+   },
+   "targetRef": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "maxLength": 200,
+    "description": "For a translation draft, the id of the block, product or template it sits on (the path id of the target's own write, e.g. a content block's `blockId`); null otherwise (R8 blocker FOUNDATION-AI-C40)."
+   },
+   "locale": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "maxLength": 20,
+    "description": "For a translation draft, the language it is in (the job's `targetLocale`); null otherwise."
+   },
+   "fieldPath": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "maxLength": 300,
+    "description": "For a translation draft, where it goes inside the target, as a dotted path in the target's own body (`TranslationProposals.drafts[].fieldPath`); null otherwise. Empty for a field that is not text."
+   },
+   "draftText": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "For a translation draft, the proposed text; null otherwise. `payload` stays the request body of the target's write, with this text at `fieldPath` (R8 blocker FOUNDATION-AI-C40)."
    },
    "kind": {
     "type": "string",
@@ -2951,7 +3067,7 @@
      "multiVenue",
      null
     ],
-    "description": "The starting point. Each preset proposes the modules, the booking flow types (with their default step order), the homepage sections, the mobile tabs and a booking-flow `preset`; nothing is written until the operator accepts a step."
+    "description": "The starting point. Each preset proposes the modules, the booking flow types (with their default step order), the homepage sections, the mobile tabs and a booking-flow `preset`; nothing is written until the operator accepts a step.\n\n**What each preset proposes** (r8 walk of tickets 27908, 27899 and 27905; lead decision of 20 October 2026, option 2). `waterPark` is DEC-159: modules `ticketsAndBooking`, `diningAndFnb`, `shop`, `map`; flows `datedDayPass` and `cabanaMap`; sections `heroBanner`, `tickets`, `attractions`, `dining`; tabs Home, Explore, Map, Tickets. **Every other preset (`themePark`, `museum`, `theatreAndArena`, `singleAttraction`, `playCentre`, `multiVenue`) proposes the same neutral default until the client supplies its own values, which then arrive as data:** flow `datedDayPass`; theme primary `#1F4E79`, secondary `#5B6770`, accent `#B85C00`, background `#FFFFFF`, text `#1A1A1A` (all pass the contrast pairs of `Theme`); header layout `logoLeft` with logo, menu and notifications shown; footer with one column, \"Information\", holding the policy links, and the copyright line; homepage sections and tabs from `listLandingPageTemplates` for the preset. **These values are a placeholder, not a client decision** (DI-885 awaits the client's feedback): the CMS marks them \"placeholder\" and must not present them as decided."
    },
    "currentStep": {
     "allOf": [
@@ -3073,7 +3189,7 @@
     "type": "string",
     "nullable": true,
     "writeOnly": true,
-    "description": "App Store Connect API key or Play service-account key, sent once and kept in the secret store; this is its reference. Needed only for `submitToStore`."
+    "description": "App Store Connect API key or Play service-account key. **What the browser sends** (r8 walk of ticket 27914): the request carries the secret itself once, as the key text (the .p8 text for Apple, the service-account JSON for Google); the server puts it in the cell's Key Vault and the row keeps only the vault name. It is never returned: a read shows `hasApiCredential`, nothing else. Same rule as `ai.setAiCredential`. Needed only for `submitToStore`."
    },
    "hasApiCredential": {
     "type": "boolean",
@@ -3091,7 +3207,15 @@
     "type": "string",
     "nullable": true,
     "writeOnly": true,
-    "description": "**The Pass Type ID certificate** (its .p12 and password), from the client's Apple Developer account, sent once and kept in Key Vault; this is its reference, as `apiCredentialSecretRef` is. It signs every Apple pass the brand issues (orders `issueWalletPass`, `pushWalletPassUpdate`). On save the server reads the certificate's Pass Type ID, team and expiry; a certificate whose Pass Type ID is not `passTypeIdentifier`, or whose team is not `developerAccountId`, is refused with 400 (CHG-R6-033)."
+    "description": "**The Pass Type ID certificate**, from the client's Apple Developer account. **What the browser sends** (r8 walk of ticket 27914): the request carries the .p12 file itself, base64 text, in this field, and its password in `passCertificatePassword`; the server keeps both in Key Vault as one secret and the row keeps only the vault name, as for `apiCredentialSecretRef`. A read shows `hasPassCertificate` and `passCertificateExpiresAt`, never the certificate or the password. It signs every Apple pass the brand issues (orders `issueWalletPass`, `pushWalletPassUpdate`). On save the server reads the certificate's Pass Type ID, team and expiry; a certificate whose Pass Type ID is not `passTypeIdentifier`, or whose team is not `developerAccountId`, is refused with 400 (CHG-R6-033)."
+   },
+   "passCertificatePassword": {
+    "type": "string",
+    "format": "password",
+    "writeOnly": true,
+    "nullable": true,
+    "x-ticvai-persisted": false,
+    "description": "The password of the .p12 sent in `passCertificateSecretRef`. Required with it, refused without it (400). Kept with the certificate in Key Vault, never stored in the row, never returned, never logged, masked in any audit record."
    },
    "hasPassCertificate": {
     "type": "boolean",
@@ -3222,6 +3346,15 @@
     "x-ticvai-derived": "onRead",
     "description": "True once any version has been published."
    },
+   "darkAppModules": {
+    "type": "array",
+    "readOnly": true,
+    "x-ticvai-derived": "onRead",
+    "description": "**The app-modules switched off for this tenant** (ADAM CR-164, option A, 18 October 2026; CHG-CRA-005): their keys (for example `AM-MARKETING-CRM-P01`), from the tenant's release flags. Returned to guests and staff alike; the apps leave those modules' screens out of navigation (the map is `handoff/release-flags.json`). An operation is dark for the tenant only when every app-module that binds it is off, so an operation shared with a live module stays callable. A flag the configuration does not declare counts as on. Additive: nothing new shows on screen.",
+    "items": {
+     "type": "string"
+    }
+   },
    "publishedVersion": {
     "type": "string",
     "nullable": true
@@ -3305,6 +3438,15 @@
        "type": "string",
        "maxLength": 200,
        "description": "The venue's name (`tenancy.OrgUnit.name`)."
+      },
+      "contact": {
+       "allOf": [
+        {
+         "$ref": "#/components/schemas/VenueContact"
+        }
+       ],
+       "nullable": true,
+       "description": "The venue's own contact (address, phone, email), from the venue's settings (`tenancy.VenueSettings`, read through `venueSettingsRecords`). Null when the venue has none set; the app then shows the tenant's `contact` (R8 blocker WHITE-C16)."
       },
       "city": {
        "type": "string",

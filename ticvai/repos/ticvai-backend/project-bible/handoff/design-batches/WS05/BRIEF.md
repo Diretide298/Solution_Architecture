@@ -100,7 +100,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-184` | Biometric Access Command Center | C | 0 | 240 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
 | `BO-185` | Biometric Verification Profile Builder | A | 16 | 4 | 5 | 0 | 0 | 6 | — | notStarted (generated) |
 | `BO-186` | Face Pass Enrollment Configuration | A | 19 | 8 | 5 | 0 | 1 | 6 | — | notStarted (generated) |
-| `BO-187` | Biometric Consent & Guardian Management | B–D | 85 | 20 | 5 | 17 | 1 | 6 | — | notStarted (generated) |
+| `BO-187` | Biometric Consent & Guardian Management | B–D | 91 | 20 | 5 | 17 | 1 | 6 | — | notStarted (generated) |
 | `BO-188` | Face Tag Temporary Enrollment | A | 10 | 17 | 5 | 0 | 1 | 6 | — | notStarted (generated) |
 | `BO-189` | Face Matching & Verification Thresholds | A | 21 | 0 | 5 | 0 | 0 | 6 | — | notStarted (generated) |
 | `BO-190` | Face Change, Re-enrollment & Identity Protection | C | 2 | 16 | 6 | 0 | 1 | 6 | — | notStarted (generated) |

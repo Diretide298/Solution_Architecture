@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Promotions & Bundles
   version: 0.1.0
-  x-ticvai-screen-count: 134
+  x-ticvai-screen-count: 135
   x-ticvai-tier: satellite
   x-ticvai-module: 4 — Bundles and Promotions
   x-ticvai-requirements: 229
@@ -1410,9 +1410,6 @@ paths:
         type: string
     get:
       operationId: getCouponCode
-      x-ticvai-consumed-by:
-        - "P01 WEB-010 Shopping Cart"
-        - "P02 GST-037 Offers & Promotions"
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -1458,6 +1455,9 @@ paths:
         type: string
     get:
       operationId: getGuestCouponCode
+      x-ticvai-consumed-by:
+        - "P01 WEB-010 Shopping Cart"
+        - "P02 GST-037 Offers & Promotions"
       x-ticvai-audience:
       - guest
       security:
@@ -1510,6 +1510,10 @@ paths:
         format: uuid
     get:
       operationId: getGuestBundle
+      x-ticvai-consumed-by:
+        - "P01 WEB-008 Add-ons & Upsell"
+        - "P02 GST-004 Item Detail"
+        - "P02 GST-056 Bundle Package"
       x-ticvai-audience:
       - guest
       # Public, with an optional token, as getBundle: a visitor browses before signing in.
@@ -1918,9 +1922,6 @@ paths:
     get:
       operationId: getBundle
       x-ticvai-consumed-by:
-        - "P01 WEB-008 Add-ons & Upsell"
-        - "P02 GST-004 Item Detail"
-        - "P02 GST-056 Bundle Package"
         - "P08 ADM-180 Bundle Component Builder"
         - "P08 ADM-181 Guest Choice & Build-Your-Own Bundle Designer"
         - "P08 ADM-187 Bundle Preview, Simulation & AI Recommendation"

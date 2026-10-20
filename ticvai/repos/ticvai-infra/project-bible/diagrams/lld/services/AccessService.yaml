@@ -37,7 +37,7 @@ operationsByContract:
     verb: PUT
     path: /manual-override-supervisor
     scope: venue
-    permission: ACCESS_POINT_CONFIGURE
+    permission: ACCESS_OVERRIDE
     offline: false
     reads: 4
     writes: 2
@@ -293,7 +293,7 @@ operationsByContract:
     verb: GET
     path: /pdf-printable-pos
     scope: venue
-    permission: ACCESS_POINT_CONFIGURE
+    permission: PRODUCT_VIEW
     offline: false
     reads: 1
     writes: 0
@@ -311,8 +311,8 @@ operationsByContract:
     scope: venue
     permission: null
     offline: false
-    reads: 5
-    writes: 4
+    reads: 6
+    writes: 5
   - operation: listAccess
     verb: GET
     path: /access
@@ -341,7 +341,7 @@ operationsByContract:
     verb: GET
     path: /access-executive-insight
     scope: venue
-    permission: SCOPE_VIEW
+    permission: REPORT_VIEW_VENUE
     offline: false
     reads: 3
     writes: 0
@@ -357,7 +357,7 @@ operationsByContract:
     verb: GET
     path: /access-monitoring
     scope: venue
-    permission: SCOPE_VIEW
+    permission: REPORT_VIEW_VENUE
     offline: false
     reads: 4
     writes: 0
@@ -373,7 +373,7 @@ operationsByContract:
     verb: GET
     path: /access-report-scheduled
     scope: venue
-    permission: SCOPE_VIEW
+    permission: REPORT_VIEW_VENUE
     offline: false
     reads: 0
     writes: 0
@@ -429,7 +429,7 @@ operationsByContract:
     verb: GET
     path: /attendance-admission
     scope: venue
-    permission: SCOPE_VIEW
+    permission: REPORT_VIEW_VENUE
     offline: false
     reads: 5
     writes: 0
@@ -445,7 +445,7 @@ operationsByContract:
     verb: GET
     path: /biometric
     scope: venue
-    permission: SCOPE_VIEW
+    permission: AUDIT_VIEW
     offline: false
     reads: 1
     writes: 0
@@ -581,7 +581,7 @@ operationsByContract:
     verb: GET
     path: /credential-security
     scope: venue
-    permission: SCOPE_VIEW
+    permission: AUDIT_VIEW
     offline: false
     reads: 5
     writes: 0
@@ -589,7 +589,7 @@ operationsByContract:
     verb: GET
     path: /credential-security-operational
     scope: venue
-    permission: SCOPE_VIEW
+    permission: AUDIT_VIEW
     offline: false
     reads: 6
     writes: 0
@@ -613,7 +613,7 @@ operationsByContract:
     verb: GET
     path: /credential-usage-cross
     scope: venue
-    permission: SCOPE_VIEW
+    permission: TICKET_LOOKUP
     offline: false
     reads: 6
     writes: 0
@@ -629,7 +629,7 @@ operationsByContract:
     verb: GET
     path: /device-gate
     scope: venue
-    permission: SCOPE_VIEW
+    permission: DEVICE_VIEW
     offline: false
     reads: 3
     writes: 0
@@ -637,7 +637,7 @@ operationsByContract:
     verb: GET
     path: /device-type-hardware
     scope: venue
-    permission: SCOPE_VIEW
+    permission: DEVICE_VIEW
     offline: false
     reads: 1
     writes: 0
@@ -709,7 +709,7 @@ operationsByContract:
     verb: GET
     path: /entry-exit-crossover
     scope: venue
-    permission: SCOPE_VIEW
+    permission: REPORT_VIEW_VENUE
     offline: false
     reads: 5
     writes: 0
@@ -853,7 +853,7 @@ operationsByContract:
     verb: GET
     path: /guest-dwell-time
     scope: venue
-    permission: SCOPE_VIEW
+    permission: REPORT_VIEW_VENUE
     offline: false
     reads: 5
     writes: 0
@@ -869,7 +869,7 @@ operationsByContract:
     verb: GET
     path: /hardware-compatibility-health
     scope: venue
-    permission: SCOPE_VIEW
+    permission: DEVICE_VIEW
     offline: false
     reads: 3
     writes: 0
@@ -1053,7 +1053,7 @@ operationsByContract:
     verb: GET
     path: /parking-facilities
     scope: venue
-    permission: ACCESS_POINT_CONFIGURE
+    permission: PARKING_CONFIGURE
     offline: true
     reads: 1
     writes: 0
@@ -1061,7 +1061,7 @@ operationsByContract:
     verb: GET
     path: /physical-device-registration
     scope: venue
-    permission: SCOPE_VIEW
+    permission: DEVICE_VIEW
     offline: false
     reads: 5
     writes: 0
@@ -1125,7 +1125,7 @@ operationsByContract:
     verb: GET
     path: /security-detection-governance
     scope: venue
-    permission: SCOPE_VIEW
+    permission: REPORT_VIEW_VENUE
     offline: false
     reads: 7
     writes: 0
@@ -1133,7 +1133,7 @@ operationsByContract:
     verb: GET
     path: /shift-handover-summary
     scope: venue
-    permission: SCOPE_VIEW
+    permission: AUDIT_VIEW
     offline: false
     reads: 6
     writes: 0
@@ -1149,7 +1149,7 @@ operationsByContract:
     verb: GET
     path: /throughput-queue-validation
     scope: venue
-    permission: SCOPE_VIEW
+    permission: REPORT_VIEW_VENUE
     offline: false
     reads: 2
     writes: 0
@@ -1157,7 +1157,7 @@ operationsByContract:
     verb: GET
     path: /ticket-credential-investigation
     scope: venue
-    permission: SCOPE_VIEW
+    permission: TICKET_LOOKUP
     offline: false
     reads: 6
     writes: 0
@@ -1165,7 +1165,7 @@ operationsByContract:
     verb: GET
     path: /ticket-media
     scope: venue
-    permission: SCOPE_VIEW
+    permission: REPORT_VIEW_VENUE
     offline: false
     reads: 9
     writes: 0
@@ -1189,7 +1189,7 @@ operationsByContract:
     verb: GET
     path: /validation-outcome-rejection
     scope: venue
-    permission: SCOPE_VIEW
+    permission: REPORT_VIEW_VENUE
     offline: false
     reads: 5
     writes: 0
@@ -1229,7 +1229,7 @@ operationsByContract:
     verb: GET
     path: /virtual-ticket-architecture
     scope: venue
-    permission: SCOPE_VIEW
+    permission: AUDIT_VIEW
     offline: false
     reads: 2
     writes: 0
@@ -1287,8 +1287,8 @@ operationsByContract:
     scope: venue
     permission: ACCESS_POINT_CONFIGURE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: publishMediaCompatibilityTesting
     verb: PUT
     path: /media-compatibility-testing
@@ -1431,8 +1431,8 @@ operationsByContract:
     scope: venue
     permission: ACCESS_DIRECTION_SET
     offline: false
-    reads: 2
-    writes: 3
+    reads: 3
+    writes: 4
   - operation: setAccessPointGeofence
     verb: PUT
     path: /access-points/{accessPointId}/geofence
@@ -1453,7 +1453,7 @@ operationsByContract:
     verb: PUT
     path: /apple-wallet-pass
     scope: venue
-    permission: ACCESS_POINT_CONFIGURE
+    permission: PRODUCT_CONFIGURE
     offline: false
     reads: 2
     writes: 3
@@ -1471,8 +1471,8 @@ operationsByContract:
     scope: venue
     permission: ACCESS_POINT_CONFIGURE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setBiometricVerificationProfile
     verb: PUT
     path: /biometric-verification-profile
@@ -1527,8 +1527,8 @@ operationsByContract:
     scope: venue
     permission: ACCESS_POINT_CONFIGURE
     offline: false
-    reads: 1
-    writes: 2
+    reads: 2
+    writes: 3
   - operation: setDeviceBindingPolicy
     verb: PUT
     path: /device-binding-policy
@@ -1541,7 +1541,7 @@ operationsByContract:
     verb: PUT
     path: /device-software-content
     scope: venue
-    permission: ACCESS_POINT_CONFIGURE
+    permission: DEVICE_CONFIGURE
     offline: false
     reads: 2
     writes: 3
@@ -1607,8 +1607,8 @@ operationsByContract:
     scope: venue
     permission: ACCESS_POINT_CONFIGURE
     offline: false
-    reads: 1
-    writes: 2
+    reads: 2
+    writes: 3
   - operation: setFaceMatchingVerification
     verb: PUT
     path: /face-matching-verification/{profileId}
@@ -1677,7 +1677,7 @@ operationsByContract:
     verb: PUT
     path: /google-wallet-pass
     scope: venue
-    permission: ACCESS_POINT_CONFIGURE
+    permission: PRODUCT_CONFIGURE
     offline: false
     reads: 2
     writes: 3
@@ -1701,7 +1701,7 @@ operationsByContract:
     verb: PUT
     path: /handheld-mobile-access
     scope: venue
-    permission: ACCESS_POINT_CONFIGURE
+    permission: DEVICE_CONFIGURE
     offline: false
     reads: 2
     writes: 3
@@ -1719,8 +1719,8 @@ operationsByContract:
     scope: tenant
     permission: DEVICE_MANAGE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 3
   - operation: setHotelWalletExternal
     verb: PUT
     path: /hotel-wallet-external/{integrationId}
@@ -1797,7 +1797,7 @@ operationsByContract:
     verb: PUT
     path: /operational-incident-exception
     scope: venue
-    permission: ACCESS_POINT_CONFIGURE
+    permission: INCIDENT_MANAGE
     offline: false
     reads: 3
     writes: 2
@@ -1813,7 +1813,7 @@ operationsByContract:
     verb: PUT
     path: /pdf-printable-pos
     scope: venue
-    permission: ACCESS_POINT_CONFIGURE
+    permission: PRODUCT_CONFIGURE
     offline: false
     reads: 2
     writes: 3
@@ -1845,7 +1845,7 @@ operationsByContract:
     verb: PUT
     path: /reader-scanner-peripheral
     scope: venue
-    permission: ACCESS_POINT_CONFIGURE
+    permission: DEVICE_CONFIGURE
     offline: false
     reads: 5
     writes: 3
@@ -2023,8 +2023,8 @@ operationsByContract:
     scope: workstation
     permission: ACCESS_VALIDATE
     offline: false
-    reads: 1
-    writes: 3
+    reads: 2
+    writes: 4
   - operation: updateAccessDevicePlacement
     verb: PUT
     path: /device-placements/{placementId}
@@ -2121,9 +2121,11 @@ tables:
   - endPodiumShift
   - enrolFacePass
   - enrolFaceTag
+  - issueOrderEntitlements
   - lockIdentity
   - overrideAccess
   - placeAccessDevice
+  - publishHardwareDeployment
   - publishMediaCompatibilityTesting
   - publishRuleConflictCheck
   - publishTopologyValidation
@@ -2141,16 +2143,19 @@ tables:
   - setAccessAreaZone
   - setAccessAttributeCatalog
   - setAccessGraphicalMap
+  - setAccessPointDirection
   - setAccessPointGeofence
   - setAccessPointGroup
   - setAppleWalletPass
   - setAttractionAccess
+  - setBiometricLifecycleRetention
   - setBiometricVerificationProfile
   - setBleBeaconGeofence
   - setBrandingLocalizationTemplate
   - setContextTimeEvent
   - setCredentialActivationDisplay
   - setCredentialEventPropagationRule
+  - setCredentialIssuanceRetryPolicy
   - setDeviceBindingPolicy
   - setDeviceSoftwareContent
   - setDigitalBarcodeTicket
@@ -2160,6 +2165,7 @@ tables:
   - setEdgeNodeLocal
   - setEmbeddedEntitlementPayload
   - setEntitlementConsumption
+  - setEntryRulePoints
   - setFaceMatchingVerification
   - setFacePassEnrollment
   - setFaceTagTemporaryEnrollment
@@ -2173,6 +2179,7 @@ tables:
   - setGuestCompanionEligibility
   - setHandheldMobileAccess
   - setHardwareModel
+  - setHardwareModelCertification
   - setHotelWalletExternal
   - setJourneyProfile
   - setJourneySequenceRule
@@ -2210,6 +2217,7 @@ tables:
   - simulateOfflineResilienceTesting
   - simulatePolicyConflictImpact
   - startPodiumShift
+  - syncScans
   - updateAccessDevicePlacement
   - updateAccessPoint
   - updateAdmissionRules
@@ -2238,9 +2246,11 @@ tables:
   - endPodiumShift
   - enrolFacePass
   - enrolFaceTag
+  - issueOrderEntitlements
   - lockIdentity
   - overrideAccess
   - placeAccessDevice
+  - publishHardwareDeployment
   - publishMediaCompatibilityTesting
   - publishRuleConflictCheck
   - publishTopologyValidation
@@ -2258,16 +2268,19 @@ tables:
   - setAccessAreaZone
   - setAccessAttributeCatalog
   - setAccessGraphicalMap
+  - setAccessPointDirection
   - setAccessPointGeofence
   - setAccessPointGroup
   - setAppleWalletPass
   - setAttractionAccess
+  - setBiometricLifecycleRetention
   - setBiometricVerificationProfile
   - setBleBeaconGeofence
   - setBrandingLocalizationTemplate
   - setContextTimeEvent
   - setCredentialActivationDisplay
   - setCredentialEventPropagationRule
+  - setCredentialIssuanceRetryPolicy
   - setDeviceBindingPolicy
   - setDeviceSoftwareContent
   - setDigitalBarcodeTicket
@@ -2277,6 +2290,7 @@ tables:
   - setEdgeNodeLocal
   - setEmbeddedEntitlementPayload
   - setEntitlementConsumption
+  - setEntryRulePoints
   - setFaceMatchingVerification
   - setFacePassEnrollment
   - setFaceTagTemporaryEnrollment
@@ -2290,6 +2304,7 @@ tables:
   - setGuestCompanionEligibility
   - setHandheldMobileAccess
   - setHardwareModel
+  - setHardwareModelCertification
   - setHotelWalletExternal
   - setJourneyProfile
   - setJourneySequenceRule
@@ -2327,6 +2342,7 @@ tables:
   - simulateOfflineResilienceTesting
   - simulatePolicyConflictImpact
   - startPodiumShift
+  - syncScans
   - updateAccessDevicePlacement
   - updateAccessPoint
   - updateAdmissionRules
@@ -2371,7 +2387,7 @@ tables:
   - access
   foreignWriters: null
 - table: access.access_point
-  columns: 20
+  columns: 21
   store: postgres
   parent: null
   writtenBy:
@@ -2645,7 +2661,7 @@ tables:
   - access
   foreignWriters: null
 - table: access.gate_mode_change
-  columns: 13
+  columns: 16
   store: postgres
   parent: null
   writtenBy:

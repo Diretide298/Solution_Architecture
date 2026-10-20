@@ -10,7 +10,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/white-label/tenant-workspace",
-   "component": "apps/venue-management-web/src/routes/white-label/TenantWorkspaceDetail.tsx",
+   "component": "src/routes/white-label/TenantWorkspaceDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -401,7 +401,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/white-label/brand-kit",
-   "component": "apps/venue-management-web/src/routes/white-label/BrandKitDetail.tsx",
+   "component": "src/routes/white-label/BrandKitDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -547,7 +547,7 @@
     "id": "formSetBrandIdentity",
     "component": "modal",
     "trigger": "Save brand identity",
-    "body": "**Collects what `setBrandIdentity` sends before it is called.** Required: `logoAssetRef`. Optional: `logoVariant` (light, dark or duotone: which lockup sits in the nav bar and which colour reading of it drives the theme, decided 29 September, rev 3 CFG-4), `logoDarkAssetRef`, `faviconAssetRef`, `splashImageAssetRefs`, `splashDurationSeconds`, `splashBackgroundColour`, `showLoadingIndicator`. **`showPoweredBy` is not asked here**: it is sent as read, and changed only on CMS-104 (CHG-R1S-012). Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setBrandIdentity` sends before it is called.** Required: `logoAssetRef`. Optional: `logoVariant` (light, dark or duotone: which lockup sits in the nav bar and which colour reading of it drives the theme, decided 29 September, rev 3 CFG-4), `logoDarkAssetRef`, `faviconAssetRef`. The splash, intro video and `showPoweredBy` are not asked here: they are sent as read (CMS-004 owns the splash and intro video, CMS-104 the credit; CHG-SGU-022, CHG-R1S-012). Reads `getBrandIdentity` first and sends the whole record back with the fields owned by CMS-004 as read (the PUT replaces the whole record; `setBrandIdentity` takes no If-Match, so if two people save at once the last write wins). Dismissing sends nothing; the screen behind is unchanged.",
     "bindsTo": "BrandIdentity",
     "confirm": {
      "label": "Save brand identity",
@@ -559,11 +559,7 @@
       "logoAssetRef",
       "logoDarkAssetRef",
       "logoVariant",
-      "faviconAssetRef",
-      "splashImageAssetRefs",
-      "splashDurationSeconds",
-      "splashBackgroundColour",
-      "showLoadingIndicator"
+      "faviconAssetRef"
      ]
     },
     "provenance": "contract white-label.yaml PUT /tenant-config/brand"
@@ -603,7 +599,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/white-label/typography",
-   "component": "apps/venue-management-web/src/routes/white-label/TypographyDetail.tsx",
+   "component": "src/routes/white-label/TypographyDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -637,7 +633,7 @@
     }
    ]
   },
-  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. **37 operations removed 24 August.** Every white-label screen across P09, P12 and P13 declared the **identical 41 operations** — a Typography screen that could create banners and a Component Preview that could set FAQs. **The worst instance of the 18 August bulk attach found so far**, and only walking the white-label journey surfaced it.",
+  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. **37 operations removed 24 August.** Every white-label screen across P09, P12 and P13 declared the **identical 41 operations** — a Typography screen that could create banners and a Component Preview that could set FAQs. **The worst instance of the 18 August bulk attach found so far**, and only walking the white-label journey surfaced it. Build note (r8, WHITE-C03): the generated first-run text \"Offers no create action\" is wrong. `setFonts` creates the part on first save: build the form empty with Save fonts when `getFonts` answers 404 not-configured.",
   "density": "compact",
   "pattern": "statusTracker",
   "patternReason": "`getFonts` reads one record and nothing reads a population — the screen is about that one thing",
@@ -781,7 +777,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/white-label/logo-assets",
-   "component": "apps/venue-management-web/src/routes/white-label/LogoAssetsDetail.tsx",
+   "component": "src/routes/white-label/LogoAssetsDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -812,7 +808,7 @@
     }
    ]
   },
-  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.\n\n**Rewired 23 September (L7).** The screen called the maintenance equipment register, guest CRM or subscription billing where its purpose names White Labelling. Its operations now match its purpose.\n\n**This screen owns the app icons, the splash and the intro video**; the marks and the logo variant are CMS-002's (CHG-SGU-022).\n\n**Asset ids (the logo, icon source, splash and video) come from the media library (searchMedia) or an upload (createUpload, completeUpload), bound 4 October 2026** (CHG-FXS-003)",
+  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.\n\n**Rewired 23 September (L7).** The screen called the maintenance equipment register, guest CRM or subscription billing where its purpose names White Labelling. Its operations now match its purpose.\n\n**This screen owns the app icons, the splash and the intro video**; the marks and the logo variant are CMS-002's (CHG-SGU-022).\n\n**Asset ids (the logo, icon source, splash and video) come from the media library (searchMedia) or an upload (createUpload, completeUpload), bound 4 October 2026** (CHG-FXS-003) Build note (r8, WHITE-C23): the first-run text \"Offers no create action\" is wrong. With no logo yet (`getBrandIdentity` returns none) show \"Set the logo on CMS-002 first\" and keep Save off; the form's Required `logoAssetRef` is gone because the logo is CMS-002's. The detail panel above still shows the marks read-only.",
   "density": "compact",
   "pattern": "statusTracker",
   "patternReason": "`getBrandIdentity` reads one record and nothing reads a population — the screen is about that one thing",
@@ -983,7 +979,7 @@
     "id": "formSetBrandIdentity",
     "component": "modal",
     "trigger": "Save brand identity",
-    "body": "**Collects what `setBrandIdentity` sends before it is called.** Required: `logoAssetRef`. Optional: `logoVariant` (light, dark or duotone: which lockup sits in the nav bar and which colour reading of it drives the theme, decided 29 September, rev 3 CFG-4), `logoDarkAssetRef`, `faviconAssetRef`, `splashImageAssetRefs`, `splashDurationSeconds`, `splashBackgroundColour`, `showLoadingIndicator`, `introVideoAssetRef` and `introVideoMode` (off, first launch or every launch; MOB-5). Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setBrandIdentity` sends before it is called.** Optional: `splashImageAssetRefs`, `splashDurationSeconds`, `splashBackgroundColour`, `showLoadingIndicator`, `introVideoAssetRef` and `introVideoMode` (off, first launch or every launch; MOB-5). `logoAssetRef`, `logoVariant`, `logoDarkAssetRef`, `faviconAssetRef` and `showPoweredBy` are not asked here: they are sent as read (CMS-002 owns the marks, CMS-104 the credit; CHG-SGU-022). Reads `getBrandIdentity` first and sends the whole record back with the fields owned by CMS-002 as read (the PUT replaces the whole record; `setBrandIdentity` takes no If-Match, so if two people save at once the last write wins). `logoAssetRef` is required by the record, so before anything is saved here the logo must exist: when `getBrandIdentity` returns none, this form shows \"Set the logo on CMS-002 first\" and Save is off. Dismissing sends nothing; the screen behind is unchanged.",
     "bindsTo": "BrandIdentity",
     "confirm": {
      "label": "Save brand identity",
@@ -992,10 +988,6 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "logoAssetRef",
-      "logoDarkAssetRef",
-      "logoVariant",
-      "faviconAssetRef",
       "splashImageAssetRefs",
       "splashDurationSeconds",
       "splashBackgroundColour",
@@ -1051,7 +1043,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/white-label/theme-editor",
-   "component": "apps/venue-management-web/src/routes/white-label/ThemeEditorDetail.tsx",
+   "component": "src/routes/white-label/ThemeEditorDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1238,7 +1230,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/white-label/component-preview",
-   "component": "apps/venue-management-web/src/routes/white-label/ComponentPreviewDetail.tsx",
+   "component": "src/routes/white-label/ComponentPreviewDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1515,7 +1507,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/white-label/page-builder",
-   "component": "apps/venue-management-web/src/routes/white-label/PageBuilderDetail.tsx",
+   "component": "src/routes/white-label/PageBuilderDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1665,7 +1657,8 @@
       {
        "kind": "publishGate",
        "label": "What publishing a block changes",
-       "notes": "Names the page and section the block shows in, from when, and for whom; says whether the venue's review step applies. Blocks go live on their own schedule, not with the site Publish.",
+       "operation": "getPublishReviewPolicy",
+       "notes": "Names the page and section the block shows in, from when, and for whom; says whether the venue's review step applies. Blocks go live on their own schedule, not with the site Publish. Whether review applies is read with `getPublishReviewPolicy` (r8, WHITE-C19); a block sent for review shows its `reviewStatus` (pending) in Blocks on this page until it is decided.",
        "provenance": "corrected 2 October 2026 (CHG-SGU-022, design-notes correction)"
       }
      ]
@@ -1785,6 +1778,12 @@
     "purpose": "Follows decideProposedAction (202) until what it started settles: What the assistant has proposed and nobody has decided",
     "trigger": "onInterval",
     "provenance": "Block A audit, 14 October 2026: the read that follows a 202 (CHG-SCR-011)"
+   },
+   {
+    "operationId": "getPublishReviewPolicy",
+    "contract": "white-label",
+    "purpose": "Whether publishing a content block needs review; the screen shows each block's reviewStatus",
+    "trigger": "onLoad"
    }
   ],
   "wireframe": {
@@ -1969,7 +1968,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/white-label/content-blocks",
-   "component": "apps/venue-management-web/src/routes/white-label/ContentBlocksDetail.tsx",
+   "component": "src/routes/white-label/ContentBlocksDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -2410,7 +2409,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/white-label/navigation-menus",
-   "component": "apps/venue-management-web/src/routes/white-label/NavigationMenusDetail.tsx",
+   "component": "src/routes/white-label/NavigationMenusDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -2754,7 +2753,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/white-label/media-library",
-   "component": "apps/venue-management-web/src/routes/white-label/MediaLibraryDetail.tsx",
+   "component": "src/routes/white-label/MediaLibraryDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {

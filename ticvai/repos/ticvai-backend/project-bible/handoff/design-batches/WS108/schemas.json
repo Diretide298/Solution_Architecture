@@ -1002,6 +1002,16 @@
       "type": "string"
      }
     }
+   },
+   "presentation": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "dropDown",
+     "radio",
+     "checkBoxes"
+    ],
+    "description": "**How a choice is drawn** (products module, 16 October 2026 minutes 4.13: the data mask's field types are text, drop-down, radio and check box; CHG-R8PRD-009). For `select`, `dropDown` (the default) or `radio`; for `multiSelect`, `checkBoxes`. A single check box is a `boolean`. Null for every other type. It changes how the field is drawn, never what is stored. On any other type, or a value that does not fit the type, the server stores null."
    }
   }
  },

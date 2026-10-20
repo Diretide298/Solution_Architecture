@@ -379,6 +379,11 @@
   "scopeLevel": "tenant",
   "parameters": [
    {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
     "name": "activeOnly",
     "in": "query",
     "required": null
@@ -540,6 +545,11 @@
     "name": null,
     "in": null,
     "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
@@ -600,7 +610,7 @@
    }
   ],
   "requestBody": null,
-  "responds": "Tenant"
+  "responds": null
  },
  "removeLicenceAddOn": {
   "method": "DELETE",
@@ -724,7 +734,7 @@
    }
   ],
   "requestBody": null,
-  "responds": "Tenant"
+  "responds": null
  },
  "terminateTenant": {
   "method": "POST",

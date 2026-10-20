@@ -121,8 +121,11 @@
    "profiling",
    "thirdPartySharing",
    "aiProcessing",
-   "transactional"
-  ]
+   "transactional",
+   "storedPaymentCredential",
+   "facePassEnrolment"
+  ],
+  "description": "`storedPaymentCredential` (a card saved for later, `storePaymentToken`) and `facePassEnrolment` (a face enrolled for entry, `enrolFacePass`) are purposes of their own (R8 blocker ORDERS-MONEY-C21, CHG-R8MIG-022), so a screen picks the row by its purpose instead of guessing: each tenant has one `marketing.consent_purpose` row of each, seeded with the tenant's other purposes."
  },
  "ConsentPurposeConfig": {
   "x-ticvai-rls": "grant-holder-read",
@@ -135,6 +138,12 @@
    "isRequiredForService"
   ],
   "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "The purpose row's id (`marketing.consent_purpose.id`), the value `consentPurposeId` and a consent's `purposeId` carry (R8 blocker ORDERS-MONEY-C21, CHG-R8MIG-022)."
+   },
    "purpose": {
     "$ref": "#/components/schemas/ConsentPurpose"
    },
@@ -296,6 +305,33 @@
     "type": "string",
     "format": "uuid"
    },
+   "productName": {
+    "type": "string",
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "**Read with the entitlement, not stored on it** (R8 blocker ORDERS-MONEY-C20, CHG-R8MIG-009), as `TicketStatus.productName`: the product's name from `catalogue.product` (catalogue#productRecords), in the caller's language. The ticket card shows it."
+   },
+   "venueName": {
+    "type": "string",
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "The venue's name, read from `platform.scope` by `venueId`; not stored."
+   },
+   "imageUrl": {
+    "type": "string",
+    "format": "uri",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "The product's primary image (`catalogue.product_media`), read with the entitlement; null when the product has none. Not stored."
+   },
+   "guestCategory": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "The guest category of the order line it was issued for (adult, child, ...), from the line's variant (catalogue#productRecords); null for an entitlement no order line issued. Not stored."
+   },
    "orderId": {
     "type": "string",
     "format": "uuid",
@@ -304,7 +340,8 @@
    },
    "orderLineId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "description": "The order line it was issued for; the ticket list groups cards by it (CHG-R8MIG-009)."
    },
    "subjectId": {
     "type": "string",
@@ -786,7 +823,7 @@
     "type": "string",
     "format": "uuid",
     "nullable": true,
-    "description": "A simplified invoice this full invoice replaces for the same supply. Refused unless the law allows it (make-or-break on issueTaxInvoice)."
+    "description": "A simplified invoice this full invoice replaces for the same supply. Refused unless the law allows it (make-or-break on issueTaxInvoice). **Not sent in r8** (decided 20 October 2026, Chinmay, R8 blocker cause ORDERS-MONEY-C06, option C; CHG-R8SPN-026): until the client's written answer to CF-133, the server refuses any value `422 supersede-not-allowed`, and \"Get a tax invoice\" is not offered for an order already on an invoice: that order answers `409 order-already-invoiced` and the screen shows the invoice it has."
    },
    "deliverToEmail": {
     "type": "string",
@@ -1189,7 +1226,8 @@
    "address": {
     "type": "string",
     "maxLength": 1000,
-    "nullable": true
+    "nullable": true,
+    "description": "The recipient's postal address. **Required, not null and not empty, on a `full` or `consolidated` invoice** (Executive Regulation Article 59; R8 blocker cause ORDERS-MONEY-C06, CHG-R8SPN-026): without it `issueTaxInvoice` refuses `422 recipient-required`, so the guest form that asks for a full invoice (GST-019) collects it. Null on a `simplified` invoice."
    },
    "countryCode": {
     "type": "string",
@@ -1313,47 +1351,57 @@
   ],
   "properties": {
    "id": {
+    "x-ticvai-data-class": "behavioural",
     "type": "string",
     "format": "uuid",
     "readOnly": true,
     "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
    },
    "subjectId": {
+    "x-ticvai-data-class": "behavioural",
     "type": "string",
     "format": "uuid",
     "description": "Opaque reference. Personal data lives in the separately erasable store, which is what makes erasure possible against an append-only ledger.\n"
    },
    "displayName": {
+    "x-ticvai-data-class": "personal",
     "type": "string",
     "nullable": true
    },
    "email": {
+    "x-ticvai-data-class": "personal",
     "type": "string",
     "nullable": true
    },
    "phone": {
+    "x-ticvai-data-class": "personal",
     "type": "string",
     "nullable": true
    },
    "preferredLanguage": {
+    "x-ticvai-data-class": "personal",
     "type": "string",
     "nullable": true
    },
    "preferredChannel": {
+    "x-ticvai-data-class": "personal",
     "$ref": "#/components/schemas/MessageChannel"
    },
    "guestLinkId": {
+    "x-ticvai-data-class": "personal",
     "type": "string",
     "nullable": true,
     "description": "Present where the guest is linked across cells. Marketing acts locally."
    },
    "tags": {
+    "x-ticvai-data-class": "behavioural",
     "type": "array",
     "items": {
      "type": "string"
     }
    },
    "engagementScore": {
+    "x-ticvai-data-class": "behavioural",
     "type": "integer",
     "nullable": true,
     "minimum": 0,
@@ -1361,6 +1409,7 @@
     "description": "22.2.20 and 22.2.21. **`lifetimeValue` and `visitCount` existed, so value was a stored figure and engagement was not.** They are different questions: a guest who spent a lot once and a guest who visits monthly have the same LTV and need opposite treatment.\n**Recency, frequency and breadth, not spend** — spend is already `lifetimeValue`, and folding it in here would make one number twice.\n"
    },
    "engagementTier": {
+    "x-ticvai-data-class": "behavioural",
     "type": "string",
     "nullable": true,
     "enum": [
@@ -1374,20 +1423,26 @@
     "description": "5.3.19. **Automatic classification, computed rather than assigned.** `lapsing` is the tier the whole field exists for — **a guest who has not been for a while and still might is the only one marketing can change**, and lumping them with `lapsed` wastes the window.\n"
    },
    "lifetimeValue": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
+    "x-ticvai-data-class": "behavioural",
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "**Left out of guest reads until a guest's lifetime value has a currency** (ADAM CR-141, 18 October 2026; CHG-CRA-007): an amount above a venue is in the currency recorded on its own row (CR-094's rule, which waits on the client), and this row records none yet."
    },
    "visitCount": {
+    "x-ticvai-data-class": "behavioural",
     "type": "integer"
    },
    "lastVisitAt": {
+    "x-ticvai-data-class": "behavioural",
     "type": "string",
     "format": "date-time",
     "nullable": true
    },
    "isActive": {
+    "x-ticvai-data-class": "behavioural",
     "type": "boolean"
    },
    "mergedIntoSubjectId": {
+    "x-ticvai-data-class": "behavioural",
     "type": "string",
     "format": "uuid",
     "nullable": true,
@@ -1395,6 +1450,7 @@
     "description": "**Set on the absorbed profile by `mergeGuestProfiles` and `mergeGuests`**, which retain it as a redirect rather than deleting it. A read that lands here follows it; a second merge of a profile that has one is refused as `alreadyMerged`.\n"
    },
    "mergedAt": {
+    "x-ticvai-data-class": "behavioural",
     "type": "string",
     "format": "date-time",
     "nullable": true,
@@ -1429,7 +1485,7 @@
    },
    "identityProviders": {
     "type": "array",
-    "description": "Linked providers. Several may resolve to one account.",
+    "description": "Linked providers. Several may resolve to one account. Read from `pii.subject_identity` (apple, google, uaePass), `identity.guest_credential` (password) and a verified contact (otp) (CHG-R8MIG-015).",
     "items": {
      "type": "string",
      "enum": [
@@ -1488,6 +1544,14 @@
  "MfaMethod": {
   "x-ticvai-persistence": "identity.mfa_method",
   "type": "object",
+  "description": "**A second factor a principal or a guest has enrolled** (R8 blockers IDENTITY-C12 and IDENTITY-C34, CHG-R8MIG-007). Exactly one of `principalId` and `subjectId` is set, so a guest's method is stored like a staff member's and `GuestSession.requiresMfa` and `mfaMethods` are answered from here; the row is its owner's alone (`x-ticvai-rls: own-row`). Three fields are storage only and never returned (`handoff/schema-storage-only.md`): `secret` (a `totp` shared secret, which `verifyMfaChallenge` computes the code from), `destination` (the full phone number or email an `smsOtp` or `emailOtp` code is sent to; `maskedTarget` is the only form returned) and `pendingExpiresAt` (set while an enrolment awaits `verifyMfaEnrolment`; an expired pending row is deleted by the next `enrolMfaMethod` of its owner).",
+  "x-ticvai-exactly-one-of": [
+   [
+    "principalId",
+    "subjectId"
+   ]
+  ],
+  "x-ticvai-rls": "own-row",
   "required": [
    "id",
    "kind",
@@ -1498,6 +1562,44 @@
    "id": {
     "type": "string",
     "format": "uuid"
+   },
+   "principalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-references": "identity.principal",
+    "x-ticvai-staff-only": "Omitted from the response when the caller is a guest (R164; r8 gate residue, CHG-R8RES-008). A guest's own method has it null, so a guest screen never shows it.",
+    "description": "The principal who enrolled it; null for a guest."
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-references": "pii.subject",
+    "description": "The guest who enrolled it; null for a principal."
+   },
+   "secret": {
+    "type": "string",
+    "nullable": true,
+    "writeOnly": true,
+    "x-ticvai-secret": "field-encrypted",
+    "description": "The `totp` shared secret, encrypted with the tenant's field key (ADR-0063); null for other kinds. Never returned after `MfaEnrolment.secret`."
+   },
+   "destination": {
+    "type": "string",
+    "nullable": true,
+    "writeOnly": true,
+    "x-ticvai-secret": "field-encrypted",
+    "description": "The full phone number (`smsOtp`) or email (`emailOtp`) the code goes to, encrypted with the tenant's field key (ADR-0063); null for other kinds. Only `maskedTarget` is ever returned."
+   },
+   "pendingExpiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "writeOnly": true,
+    "description": "While `isActive` is false, when the unconfirmed enrolment lapses; null once verified."
    },
    "kind": {
     "$ref": "#/components/schemas/MfaKind"
@@ -1551,6 +1653,13 @@
     "type": "string",
     "format": "uuid",
     "description": "The client UUIDv7 from `CreateOrderRequest.id`."
+   },
+   "orderAccessToken": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "**What lets the device that just checked out read the order it paid for** (decided 20 October 2026, Chinmay, R8 blocker cause IDENTITY-C52, option A; CHG-R8SPN-025). Returned only in `checkoutCart`'s answer, null everywhere else: a signed token bound to this order and to the cart's device, valid 24 hours, never stored. `getOrder` accepts it in `X-Order-Access-Token` in place of a session, so a guest who checked out with no account, or whose session ended, still sees the confirmation (WEB-013 keeps it in its navigation state). It reads this order only and grants nothing else."
    },
    "orderNumber": {
     "x-ticvai-unique": "tenant",
@@ -1878,6 +1987,11 @@
  },
  "Payment": {
   "x-ticvai-persistence": "orders.payment",
+  "x-ticvai-index": [
+   [
+    "providerReference"
+   ]
+  ],
   "type": "object",
   "required": [
    "id",
@@ -2092,7 +2206,7 @@
    },
    "consents": {
     "type": "array",
-    "description": "Consent captured at registration, recorded with the notice version.",
+    "description": "Consent captured at registration, recorded with the notice version. **Recorded by Marketing, not stored here**: `registerGuest` carries the list on `identity.guestRegistered`, and Marketing's consumer records each item as a consent (IDENTITY-C55, CHG-R8SPN-029).",
     "items": {
      "type": "object",
      "properties": {
@@ -2107,6 +2221,44 @@
       }
      }
     }
+   }
+  }
+ },
+ "RoleSummary": {
+  "x-ticvai-persistence": "none — projection over role",
+  "type": "object",
+  "required": [
+   "id",
+   "code",
+   "name"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "isPrimary": {
+    "type": "boolean",
+    "description": "True for the role that is the principal's `primaryRoleId` (`identity.principal.primary_role_id`); false for the others (14 October 2026, ADAM CR-077; CHG-IDR-002)."
+   },
+   "grantId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "**The grant this card stands for** (`identity.delegated_access.id`; IDENTITY-C45, CHG-R8SPN-032). A role held at two venues is two grants and two cards; `selectRole` takes the chosen one."
+   },
+   "scope": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/ScopeRef"
+     }
+    ],
+    "description": "The scope node the grant is held at (`platform.scope`), with its name, so the card can say which venue (IDENTITY-C45)."
    }
   }
  },
@@ -2165,13 +2317,23 @@
    "workstation": {
     "$ref": "#/components/schemas/WorkstationContext"
    },
+   "availableRoles": {
+    "type": "array",
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "**The roles the principal may choose, one per grant** (IDENTITY-C45, CHG-R8SPN-032), resolved on read as `LoginResponse.availableRoles` is, so EMP-002 can list them on a cold open or after a relaunch (`getCurrentSession`) without signing in again.",
+    "items": {
+     "$ref": "#/components/schemas/RoleSummary"
+    }
+   },
    "openedAt": {
     "type": "string",
     "format": "date-time"
    },
    "expiresAt": {
     "type": "string",
-    "format": "date-time"
+    "format": "date-time",
+    "description": "When the session ends at the latest: `openedAt` plus `PasswordPolicy.sessionMaxHours` (12 hours by default; proposed, client to correct). A till session ends earlier, when the shift on its workstation closes; any session ends at `logout` or a revocation. Refreshing the access token never moves this time (IDENTITY-C25, FOUNDATION-AI-C27; CHG-R8SPN-014)."
    }
   }
  },
@@ -2236,7 +2398,8 @@
    },
    "claimUrl": {
     "type": "string",
-    "nullable": true
+    "nullable": true,
+    "description": "**The link the recipient is sent** (R8 blocker fix, ORDERS-MONEY-C12). Built from the tenant's deep-link table (`white-label.DeepLinkScheme`), pattern `transferClaim`: the tenant's `baseUrl` plus `/t/{transferId}?token={claimToken}`. It opens the app on `/general/ticket-transfer` (GST-014) where the app is installed, and the storefront claim page otherwise. Once released the pattern never changes, so a link already sent keeps working. **Never returned to the sender** in `listTicketTransfers` (null on the rows the caller sent; IDENTITY-C26, CHG-R8SPN-025)."
    },
    "claimToken": {
     "x-ticvai-secret": "blind-index",
@@ -2279,7 +2442,7 @@
    },
    "expiresIn": {
     "type": "integer",
-    "description": "Seconds"
+    "description": "Seconds until the access token expires: `PasswordPolicy.accessTokenMinutes` x 60, 900 by default (15 minutes; proposed, client to correct). The refresh token, its rotation and reuse detection, and the signing key are described once on `bearerAuth` in contracts/shared/common.yaml (IDENTITY-C25, FOUNDATION-AI-C27; CHG-R8SPN-014)."
    }
   }
  },
@@ -2367,6 +2530,13 @@
    },
    "serialNumber": {
     "type": "string"
+   },
+   "passUrl": {
+    "type": "string",
+    "format": "uri",
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "**What the app adds to the wallet** (R8 blocker ORDERS-MONEY-C39, CHG-R8MIG-017): for `apple` a short-lived signed link to the `.pkpass` file (signed with the brand's Pass Type ID certificate), for `google` the \"Save to Google Wallet\" link (a signed JWT). Made when the pass is issued or read, never stored; valid for 15 minutes (proposed, client to confirm), after which a read of the pass gives a new one."
    },
    "authenticationToken": {
     "x-ticvai-secret": "blind-index",

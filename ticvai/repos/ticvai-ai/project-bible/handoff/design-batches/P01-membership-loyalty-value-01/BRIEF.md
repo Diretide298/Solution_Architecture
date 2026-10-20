@@ -1,6 +1,6 @@
 # P01-membership-loyalty-value-01 — P01 · Membership, Loyalty & Value
 
-**5 screens · 37 operations · 55 schemas · 12 permissions**
+**5 screens · 38 operations · 73 schemas · 12 permissions**
 
 Platform P01 Guest Web · ships as **guest** ·
 guest audience · web ·
@@ -129,7 +129,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `WEB-021` | Wallet & Gift Cards | A | 4 | 36 | 6 | 37 | 13 | 6 | guest | review (client-verified) |
 | `WEB-022` | Membership Plans | A | 0 | 17 | 6 | 16 | 4 | 0 | guest | review (client-verified) |
 | `WEB-023` | Membership Management | A | 3 | 28 | 6 | 5 | 5 | 0 | guest | review (client-verified) |
-| `WEB-024` | Devices, Wishlist & Consent | A | 4 | 78 | 6 | 52 | 2 | 4 | guest | review (client-verified) |
+| `WEB-024` | Devices, Wishlist & Consent | A | 4 | 85 | 6 | 52 | 2 | 4 | guest | review (client-verified) |
 | `WEB-043` | Loyalty & Rewards | A | 9 | 51 | 6 | 12 | 2 | 2 | guest | review (client-verified) |
 
 ## Thin screens in this batch

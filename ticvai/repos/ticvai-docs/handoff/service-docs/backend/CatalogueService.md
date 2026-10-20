@@ -7,7 +7,7 @@
 | Tier | commerce: The sale path. Highest availability, highest write rate. |
 | Contracts | `catalogue`, `promotions`, `seating` |
 | Schemas owned | `catalogue`, `pricing`, `promotions`, `seating` |
-| Operations in the slice | 95 of 451 |
+| Operations in the slice | 92 of 470 |
 | Scale | Read-heavy, bundle-published to tills. The catalogue bundle is this service's output (ADR-0013). |
 | If it is down | A bad publish reaches every workstation. Versioned and rollback-able for that reason. |
 
@@ -23,7 +23,7 @@
 | [FnbService](FnbService.md) | `fnb.menu_item` |
 | [MarketingService](MarketingService.md) | `marketing.loyalty_position` |
 | [OrderService](OrderService.md) | `orders.sales_order` |
-| [TenancyService](TenancyService.md) | `platform.sale_board_for_catalogue`, `platform.sale_board_page_for_catalogue`, `platform.sale_board_tile_for_catalogue`, `platform.workstation` |
+| [TenancyService](TenancyService.md) | `platform.sale_board_for_catalogue`, `platform.sale_board_page_for_catalogue`, `platform.sale_board_tile_for_catalogue` |
 | [WhiteLabelService](WhiteLabelService.md) | `whitelabel.booking_flow`, `whitelabel.guided_choice_answer` |
 
 ## Operations in the first release
@@ -32,9 +32,8 @@
 |---|---|---|---|---|---|---|
 | availability | [`getSeatAvailability`](#getseatavailability) | GET | `/performances/{performanceId}/seat-availability` | core | 1 | BO-015, BO-019, BO-1000, BO-1001, BO-1002, BO-1039 … |
 | bundle | [`createBundle`](#createbundle) | POST | `/bundles` | setup | 1 | BO-011 |
-| bundle | [`getBundle`](#getbundle) | GET | `/bundles/{bundleId}` | core | 1 | ADM-180, ADM-181, ADM-187, BO-011, GST-004, GST-056 … |
+| bundle | [`getGuestBundle`](#getguestbundle) | GET | `/guest-bundles/{bundleId}` | core | 1 | GST-004, GST-056, WEB-008 |
 | bundle | [`getLatestBundle`](#getlatestbundle) | GET | `/catalogue/bundles/latest` | core | 1 | BO-011, BO-037, EMP-018, POS-002 |
-| bundle | [`listCatalogueBundles`](#listcataloguebundles) | GET | `/catalogue/bundles` | core | 1 | BO-011, BO-037, BO-094, EMP-018, GST-052 |
 | bundle | [`publishBundle`](#publishbundle) | POST | `/catalogue/bundles` | setup | 1 | BO-013, BO-014, BO-037 |
 | bundle | [`updateBundle`](#updatebundle) | PATCH | `/bundles/{bundleId}` | setup | 1 | BO-011 |
 | capacity | [`getAvailability`](#getavailability) | GET | `/availability` | core | 1 | GST-004, GST-007, GST-050, KSK-004, KSK-005, KSK-015 … |
@@ -44,7 +43,7 @@
 | catalogue | [`getMyMemberships`](#getmymemberships) | GET | `/guests/me/memberships` | core | 1 | GST-015, WEB-022, WEB-023 |
 | catalogue | [`joinWaitlist`](#joinwaitlist) | POST | `/waitlist-entries` | core | 1 | GST-007, WEB-006 |
 | catalogue | [`leaveWaitlist`](#leavewaitlist) | DELETE | `/waitlist-entries/{entryId}` | core | 1 | GST-007, WEB-006 |
-| catalogue | [`listProductCategories`](#listproductcategories) | GET | `/product-categories` | core | 1 | BO-048, BO-115, CMS-101, CMS-103, GST-001, GST-002 … |
+| catalogue | [`listProductCategories`](#listproductcategories) | GET | `/product-categories` | core | 1 | BO-015, BO-048, BO-115, CMS-101, CMS-103, GST-001 … |
 | catalogue | [`searchCatalogue`](#searchcatalogue) | GET | `/search` | core | 1 | GST-001, GST-002, GST-003, GST-063, WEB-001, WEB-002 … |
 | catalogue | [`setChannelConnectionConfiguration`](#setchannelconnectionconfiguration) | PUT | `/channel-connections/{connectionId}` | setup | 1 | ADM-269 |
 | catalogue | [`setChannelSalesRule`](#setchannelsalesrule) | PUT | `/channel-sales-rules/{ruleId}` | setup | 1 | ADM-263, ADM-264, ADM-265 |
@@ -58,7 +57,7 @@
 | category | [`updateSeatCategory`](#updateseatcategory) | PATCH | `/seat-categories/{seatCategoryId}` | setup | 1 | BO-1045 |
 | coupon | [`createCouponCampaign`](#createcouponcampaign) | POST | `/coupon-campaigns` | setup | 1 | BO-010 |
 | coupon | [`generateCouponCodes`](#generatecouponcodes) | POST | `/coupon-campaigns/{campaignId}/codes` | setup | 1 | ADM-160, BO-010 |
-| coupon | [`getCouponCode`](#getcouponcode) | GET | `/coupon-codes/{code}` | core | 1 | GST-037, WEB-010 |
+| coupon | [`getGuestCouponCode`](#getguestcouponcode) | GET | `/guest-coupon-codes/{code}` | core | 1 | GST-037, WEB-010 |
 | drafted | [`createChannelProfile`](#createchannelprofile) | POST | `/channel-profile` | setup | 1 | ADM-259 |
 | drafted | [`createLiveDynamicPrice`](#createlivedynamicprice) | POST | `/live-dynamic-price` | setup | 1 | ADM-115 |
 | drafted | [`decidePricingRecommendation`](#decidepricingrecommendation) | POST | `/recommendation-review-decision/{recommendationId}/decision` | setup | 1 | ADM-106, ADM-113 |
@@ -80,9 +79,9 @@
 | event | [`createEvent`](#createevent) | POST | `/events` | setup | 1 | BO-015, BO-019 |
 | event | [`createPerformances`](#createperformances) | POST | `/events/{eventId}/performances` | setup | 1 | BO-015, BO-019 |
 | event | [`enterWaitingRoom`](#enterwaitingroom) | POST | `/performances/{performanceId}/waiting-room/entries` | core | 1 | GST-046, WEB-015 |
-| event | [`getPerformance`](#getperformance) | GET | `/performances/{performanceId}` | core | 1 | BO-015, BO-019, BO-726, GST-006, GST-041, POS-004 … |
+| event | [`getPerformance`](#getperformance) | GET | `/performances/{performanceId}` | core | 1 | BO-015, BO-019, BO-726, GST-006, GST-041, GST-049 … |
 | event | [`getWaitingRoomPosition`](#getwaitingroomposition) | GET | `/performances/{performanceId}/waiting-room/entries/{waitingEntryId}` | core | 1 | GST-046, WEB-015 |
-| event | [`listEvents`](#listevents) | GET | `/events` | core | 1 | BO-015, BO-019, BO-694, CMS-101 |
+| event | [`listEvents`](#listevents) | GET | `/events` | core | 1 | BO-015, BO-019, BO-694, CMS-101, GST-005 |
 | event | [`listPerformances`](#listperformances) | GET | `/events/{eventId}/performances` | core | 1 | BO-015, BO-019, BO-725, GST-003, GST-004, GST-005 … |
 | event | [`updateEvent`](#updateevent) | PATCH | `/events/{eventId}` | setup | 1 | BO-015, BO-019 |
 | event | [`updatePerformance`](#updateperformance) | PATCH | `/performances/{performanceId}` | setup | 1 | BO-015, BO-019, BO-978 |
@@ -92,9 +91,7 @@
 | hold | [`extendSeatHold`](#extendseathold) | POST | `/seat-holds/{holdId}/extend` | core | 1 | WEB-011 |
 | hold | [`getSeatHold`](#getseathold) | GET | `/seat-holds/{holdId}` | core | 1 | BO-987, BO-999, POS-004 |
 | hold | [`relinquishSeatHold`](#relinquishseathold) | DELETE | `/seat-holds/{holdId}` | core | 1 | BO-999, GST-049, POS-004, WEB-007 |
-| lease | [`acquireInventoryHold`](#acquireinventoryhold) | POST | `/inventory-holds` | core | 1 | POS-003 |
 | lease | [`convertInventoryHold`](#convertinventoryhold) | POST | `/inventory-holds/{inventoryHoldId}/convert` | setup | 1 |  |
-| lease | [`listInventoryHolds`](#listinventoryholds) | GET | `/inventory-holds` | core | 1 | BO-018, POS-003 |
 | pricing | [`copyPriceList`](#copypricelist) | POST | `/price-lists/{priceListId}/copy` | setup | 1 | BO-009 |
 | pricing | [`createPriceList`](#createpricelist) | POST | `/price-lists` | setup | 1 | BO-009 |
 | pricing | [`setPrices`](#setprices) | PUT | `/price-lists/{priceListId}/prices` | setup | 1 | BO-009, BO-291, BO-601 |
@@ -167,6 +164,12 @@ Every seat with its current state — available, held, sold, blocked or buffered
 | performanceId | string (uuid) | yes |  |
 | seatMapId | string (uuid) | yes |  |
 | renderMode | enum (graphical, list) | yes | The mode the server actually used. |
+| viewBox | object |  | The coordinate space the seat positions are in, as SeatMap.viewBox, so the section view is drawn from this response alone (WEB-007, GST-049; r8 walk of ticket 28197). (nullable) |
+| viewBox.width | number |  |  |
+| viewBox.height | number |  |  |
+| stagePosition | object |  | Where the stage sits in the same space, as SeatMap.stagePosition; the section view orients the seats towards it. (nullable) |
+| stagePosition.x | number | yes |  |
+| stagePosition.y | number | yes |  |
 | totals | object | yes |  |
 | totals.total | integer |  |  |
 | totals.available | integer |  |  |
@@ -182,6 +185,11 @@ Every seat with its current state — available, held, sold, blocked or buffered
 | byCategory[].price.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | byCategory[].price.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | byCategory[].price.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| zones | array of object |  | The standing zones and what is left in each (r8, GPS-C38): a zone has no seats, so it is sold by quantity (createSeatHold zoneId and quantity). |
+| zones[].zoneId | string (uuid) | yes |  |
+| zones[].name | string | yes |  |
+| zones[].remaining | integer | yes | (min 0) |
+| zones[].keepTogether | boolean |  | (default True) |
 | sections | array of object |  | The map's sections with what a guest screen needs to show the view from each (decided 29 September, rev 3 23SEP-14): the photo where the venue supplied one, otherwise null and the client renders the… |
 | sections[].code | string | yes |  |
 | sections[].name | string | yes |  |
@@ -222,7 +230,7 @@ A bundle is a product whose price differs from the sum of its parts. **The alloc
 |---|---|
 | Permission | `PRODUCT_CONFIGURE` |
 | Scope level | venue |
-| Part of slice | setup, makes `promotions.allocation_component`, `promotions.bundle`, `promotions.bundle_choice_group`, `promotions.bundle_choice_option`, `promotions.bundle_component` non-empty |
+| Part of slice | setup, makes `promotions.bundle`, `promotions.bundle_choice_group`, `promotions.bundle_choice_option`, `promotions.bundle_component` non-empty |
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
@@ -350,6 +358,7 @@ A bundle is a product whose price differs from the sum of its parts. **The alloc
 | isRecommendedAtCheckout | boolean |  | Whether checkout recommends the bundle. (default False) |
 | requiredVariantIds | array of string (uuid) |  | Products that must already be in the basket for the bundle to be sold (the setup screen's "requires another product"). (nullable) |
 | id | string (uuid) | yes |  |
+| variantId | string (uuid) |  | The catalogue variant a cart line of this bundle names (R8 blocker ORDERS-MONEY-C43, CHG-R8MIG-023): each sold bundle has a catalogue product of kind bundle with one variant, made when the bundle is… (read-only; nullable) |
 | savingsAmount | object | yes | Sum of component list prices less the bundle price. |
 | savingsAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | savingsAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
@@ -368,26 +377,24 @@ A bundle is a product whose price differs from the sum of its parts. **The alloc
 | 409 | DuplicateCode | A business code the request names is already used within its uniqueness scope (the scope the property's x-ticvai-unique names; decided 28 September, audit R108). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
-### getBundle
+### getGuestBundle
 
-**`GET /bundles/{bundleId}`**: Read a bundle with components and allocation
+**`GET /guest-bundles/{bundleId}`**: What a guest is shown of a bundle
 
-**A guest calls this without a permission and sees published data only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-001; `x-ticvai-guest-callable`): a guest or a visitor gets a published bundle, and nothing in draft, unpublished or withdrawn; asked for by id, such a record answers as not found. `PRODUCT_VIEW` is what a staff caller must hold, and staff also see drafts (ADR-0025).
+A published bundle as a guest or a visitor sees it (R8 blocker ORDERS-MONEY-C32, the lead's answer A of 20 October 2026; GST-004, GST-056, WEB-008). Answers `GuestBundle`: name, description, kind, price and savings, components and choice groups, and validity, never the allocation, owner, campaign, code or whether it has been sold. A bundle in draft, unpublished or withdrawn answers 404. `getBundle` stays the staff read and is unchanged. Published catalogue data, so no permission is needed.
 
 |  |  |
 |---|---|
-| Permission | `PRODUCT_VIEW` |
+| Permission | `None` |
 | Scope level | venue |
 | Part of slice | core |
 | Wave | 1 |
 | Offline | yes |
 | Conflict policy | serverWins |
 | Read routing | replica |
-| Guest callable | True |
-| Offline note | 24 August: servable from a local cache. |
-| Reads | `promotions.allocation_component`, `promotions.bundle`, `promotions.bundle_choice_group`, `promotions.bundle_choice_option`, `promotions.bundle_component` |
+| Reads | `promotions.bundle_choice_group`, `promotions.bundle_choice_option`, `promotions.bundle_component` |
 | Writes | - |
-| Called by | ADM-180, ADM-181, ADM-187, BO-011, GST-004, GST-056, WEB-008 |
+| Called by | GST-004, GST-056, WEB-008 |
 
 **Parameters**
 
@@ -395,20 +402,24 @@ A bundle is a product whose price differs from the sum of its parts. **The alloc
 |---|---|---|---|---|
 | bundleId | path | yes | string (uuid) |  |
 
-**Response**: `Bundle`
+**Response**: `GuestBundle`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| code | string | yes | (max length 64) |
-| name | string | yes | (max length 200) |
-| description | string |  | (max length 1000) |
-| venueId | string (uuid) | yes |  |
-| kind | BundleKind: enum (fixed, dynamic, mandatory, optional, promotional) | yes |  |
+| id | string (uuid) | yes |  |
+| name | string | yes |  |
+| description | string |  | (nullable) |
+| kind | BundleKind: enum (fixed, dynamic, mandatory, optional, promotional) |  |  |
 | price | Money | yes | On the wire this is three fields; in the database it is one column. |
 | price.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | price.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | price.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| components | array of BundleComponent | yes | (min items 0) |
+| savingsAmount | Money |  | On the wire this is three fields; in the database it is one column. |
+| savingsAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| savingsAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| savingsAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| savingsPercentage | number |  | (nullable) |
+| components | array of BundleComponent |  |  |
 | components[].id | string (uuid) |  | Added 20 August. (read-only) |
 | components[].variantId | string (uuid) | yes |  |
 | components[].componentKind | BundleComponentKind: enum (admission, fnbMenuItem, retail, addOn, other) |  | What a bundle component entitles the guest to (decided 29 September, MOB-4). (default admission) |
@@ -421,7 +432,7 @@ A bundle is a product whose price differs from the sum of its parts. **The alloc
 | components[].substitutionPriceEffect | enum (samePrice, surcharge, reducedPrice) |  | What a substitution does to the bundle price. (default samePrice) |
 | components[].substitutionApproval | enum (none, customer, operator) |  | Who must accept a substitution before it stands. (default customer) |
 | components[].venueId | string (uuid) |  | Where this component is redeemed. (nullable) |
-| choiceGroups | array of BundleChoiceGroup |  | Dynamic bundles (3.5.10). |
+| choiceGroups | array of BundleChoiceGroup |  |  |
 | choiceGroups[].id | string (uuid) |  | (read-only) |
 | choiceGroups[].label | string | yes | What the guest is asked. |
 | choiceGroups[].choose | integer | yes | How many options the guest picks. (min 1) |
@@ -432,39 +443,14 @@ A bundle is a product whose price differs from the sum of its parts. **The alloc
 | choiceGroups[].options[].quantity | integer |  | (default 1) |
 | choiceGroups[].options[].isDefault | boolean |  | (default False) |
 | choiceGroups[].unavailableBehaviour | enum (hideOption, hideBundle) |  | An option that has sold out for the chosen date is not offered. (default hideOption) |
-| allocation | object | yes |  |
-| allocation.method | object | yes | Proportional to list price by default. (default proRataListPrice) |
-| allocation.components | array of AllocationComponent | yes |  |
-| allocation.components[].id | string (uuid) |  | Added 20 August. (read-only) |
-| allocation.components[].variantId | string (uuid) | yes |  |
-| allocation.components[].percentage | number |  | (min 0; max 100) |
-| allocation.components[].fixedAmount | Money |  | On the wire this is three fields; in the database it is one column. |
-| allocation.components[].listPrice | object |  | For proRataListPrice — weights derived from list prices. |
-| allocation.components[].revenueAccountId | string (uuid) |  |  |
-| allocation.components[].legalEntityId | string (uuid) |  | Set where the component is earned by a different legal entity. (nullable) |
-| allocation.components[].venueId | string (uuid) |  | (nullable) |
-| validFrom | string (date-time) |  |  |
-| validTo | string (date-time) |  |  |
-| campaignId | string (uuid) |  | The commercial campaign (promotions.campaign) the bundle is sold under. (nullable) |
-| ownerPrincipalId | string (uuid) |  | The bundle owner (Bundle Definition & Setup). (nullable) |
-| category | string |  | The bundle category the setup screen files it under. (max length 100; nullable) |
-| isStandaloneProduct | boolean |  | Whether the bundle appears as a product in its own right, or only as an offer on another product. (default True) |
-| isRecommendedAtCheckout | boolean |  | Whether checkout recommends the bundle. (default False) |
-| requiredVariantIds | array of string (uuid) |  | Products that must already be in the basket for the bundle to be sold (the setup screen's "requires another product"). (nullable) |
-| id | string (uuid) | yes |  |
-| savingsAmount | object | yes | Sum of component list prices less the bundle price. |
-| savingsAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
-| savingsAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
-| savingsAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| savingsPercentage | number |  |  |
-| hasBeenSold | boolean | yes | True locks components and allocation against amendment. |
-| isActive | boolean | yes |  |
+| validFrom | string (date-time) |  | (nullable) |
+| validTo | string (date-time) |  | (nullable) |
 
 **Responses**
 
 | Code | Shape | Meaning |
 |---|---|---|
-| 200 |  | Bundle |
+| 200 |  | The guest's view of the bundle. |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
@@ -501,6 +487,8 @@ Use `since` to request a delta instead of a full bundle — a terminal on a slow
 |---|---|---|---|
 | version | string | yes |  |
 | venueId | string (uuid) | yes |  |
+| publishedAt | string (date-time) |  | When the bundle was published; BundleSummary.publishedAt (CHG-R8MIG-015). (read-only; nullable) |
+| publishedBy | string (uuid) |  | Who published it; BundleSummary.publishedBy (CHG-R8MIG-015). (read-only; nullable) |
 | isDelta | boolean | yes |  |
 | baseVersion | string |  | Present when isDelta. (nullable) |
 | signature | string | yes | Detached signature over contentHash. |
@@ -517,35 +505,6 @@ Use `since` to request a delta instead of a full bundle — a terminal on a slow
 | 200 |  | Full bundle or delta |
 | 304 |  | Unchanged |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
-| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
-
-### listCatalogueBundles
-
-**`GET /catalogue/bundles`**: List published catalogue bundles
-
-**A catalogue bundle is the signed snapshot of a venue's catalogue that terminals pull** (ADR-0013) — not `promotions.Bundle`, the sellable product whose price differs from the sum of its parts. `promotions.listBundles` lists those.
-**A guest calls this without a permission and sees published data only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-001; `x-ticvai-guest-callable`): a guest or a visitor gets published bundles, and nothing in draft, unpublished or withdrawn; asked for by id, such a record answers as not found. `PRODUCT_VIEW` is what a staff caller must hold, and staff also see drafts (ADR-0025).
-
-|  |  |
-|---|---|
-| Permission | `PRODUCT_VIEW` |
-| Scope level | venue |
-| Part of slice | core |
-| Wave | 1 |
-| Offline | yes |
-| Conflict policy | serverWins |
-| Read routing | replica |
-| Guest callable | True |
-| Offline note | 24 August: servable from a local cache. |
-| Reads | `catalogue.product`, `catalogue.published_bundle` |
-| Writes | - |
-| Called by | BO-011, BO-037, BO-094, EMP-018, GST-052 |
-
-**Responses**
-
-| Code | Shape | Meaning |
-|---|---|---|
-| 200 |  | Bundles, newest first |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### publishBundle
@@ -619,7 +578,7 @@ Components and allocation are immutable once the bundle has been sold. Historic 
 |---|---|
 | Permission | `PRODUCT_CONFIGURE` |
 | Scope level | venue |
-| Part of slice | setup, changes rows of `promotions.allocation_component`, `promotions.bundle`, `promotions.bundle_component` that another operation creates |
+| Part of slice | setup, changes rows of `promotions.bundle`, `promotions.bundle_component` that another operation creates |
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
@@ -703,6 +662,7 @@ Components and allocation are immutable once the bundle has been sold. Historic 
 | isRecommendedAtCheckout | boolean |  | Whether checkout recommends the bundle. (default False) |
 | requiredVariantIds | array of string (uuid) |  | Products that must already be in the basket for the bundle to be sold (the setup screen's "requires another product"). (nullable) |
 | id | string (uuid) | yes |  |
+| variantId | string (uuid) |  | The catalogue variant a cart line of this bundle names (R8 blocker ORDERS-MONEY-C43, CHG-R8MIG-023): each sold bundle has a catalogue product of kind bundle with one variant, made when the bundle is… (read-only; nullable) |
 | savingsAmount | object | yes | Sum of component list prices less the bundle price. |
 | savingsAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | savingsAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
@@ -863,7 +823,7 @@ The clone starts as a draft with a new code. **Variants come with it; orders do 
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `catalogue.product`, `catalogue.product_media`, `catalogue.variant` |
+| Reads | `cache:idempotency`, `catalogue.product`, `catalogue.product_media`, `catalogue.variant` |
 | Writes | `cache:idempotency`, `catalogue.product`, `catalogue.product_media`, `catalogue.variant` |
 | Called by | BO-008 |
 | State model | Product ([states/product.yaml](../../../states/product.yaml)): created as `draft` |
@@ -1161,6 +1121,7 @@ Includes lapsed terms. **A guest deciding whether to renew is comparing against 
 
 Retail Board 2. **`listSeatCategories` existed and a product category did not** — a seat category prices a seat; this groups a catalogue.
 **Returned as a tree, not a flat list with parent ids.** A merchandiser reading a hierarchy five levels deep should not have to reassemble it, and every caller that does will reassemble it differently.
+**Whose tree, and what a guest sees** (R8 blocker fix, GPS-C01 and WHITE-C05). The tree is the venue's: `venueId` names it for a caller with no venue (a visitor, an app before sign-in), as `listProducts` does, and is left out by a caller who acts at one. **A guest or visitor gets only active categories of `kind` `category`** (not `brand`, `collection`, `season` or `department`), at every depth, unless the screen asks for a kind: `kind` narrows the tree to that kind. Staff see every kind and the inactive ones, as before.
 
 |  |  |
 |---|---|
@@ -1174,13 +1135,21 @@ Retail Board 2. **`listSeatCategories` existed and a product category did not** 
 | Guest callable | True |
 | Reads | `catalogue.product`, `catalogue.product_category` |
 | Writes | - |
-| Called by | BO-048, BO-115, CMS-101, CMS-103, GST-001, GST-002, GST-007, GST-008, WEB-002, WEB-005 |
+| Called by | BO-015, BO-048, BO-115, CMS-101, CMS-103, GST-001, GST-002, GST-007, GST-008, WEB-002, WEB-005 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| kind | query |  | enum (category, brand, collection, season, department) | Only categories of this kind (category, brand, collection, season or department). |
+| venueId | query |  | string (uuid) | Whose venue to read, for a caller with no venue (R8 blocker fix, GPS-C01 and WHITE-C05). |
 
 **Responses**
 
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | The tree. |
+| 400 |  | No venueId from a caller with no venue (venue-required), or one that is not a venue of the tenant (unknown-venue). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### searchCatalogue
@@ -1476,8 +1445,8 @@ Rules: `effectiveTo` before `effectiveFrom`, or `minimumQuantity` above `maximum
 | Wave | 1 |
 | Offline | no |
 | Config scope | venue |
-| Reads | `pricing.dynamic_price_action`, `pricing.dynamic_price_condition`, `pricing.dynamic_price_rule` |
-| Writes | `pricing.dynamic_price_action`, `pricing.dynamic_price_condition`, `pricing.dynamic_price_rule` |
+| Reads | `cache:idempotency`, `pricing.dynamic_price_action`, `pricing.dynamic_price_condition`, `pricing.dynamic_price_rule` |
+| Writes | `cache:idempotency`, `pricing.dynamic_price_action`, `pricing.dynamic_price_condition`, `pricing.dynamic_price_rule` |
 | Called by | BO-009, BO-443 |
 
 **Parameters**
@@ -1843,7 +1812,13 @@ Rules: bands must ascend and include `baseBandCode` (`422` `invalidBands`); a ba
 | dynamicPricingStrategyId | string (uuid) | yes |  |
 | basePriceSource | string |  | (max length 100; nullable) |
 | adjustmentModel | enum (fixedPriceBands, percentageBands, fixedAmountSteps, derivedBands, continuousRange) | yes |  |
-| bands | object |  | [{code, price, percent}], ascending. |
+| bands | array of object |  | The bands, lowest first (typed 20 October 2026, R8 blocker cause GPS-C32; CHG-R8SPN-028: it was declared an object while every reader and writer used a list, so no valid body could carry it). |
+| bands[].code | string | yes | Band code, e.g. (max length 40) |
+| bands[].price | object |  | Band price (fixed and derived bands) (nullable) |
+| bands[].price.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| bands[].price.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| bands[].price.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| bands[].percent | number |  | Band offset from base in percent (percentage bands) (nullable) |
 | baseBandCode | string |  | (max length 40; nullable) |
 | stepAmount | object |  | (nullable) |
 | stepAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
@@ -1869,7 +1844,7 @@ Rules: bands must ascend and include `baseBandCode` (`422` `invalidBands`); a ba
 | minimumMinutesBetweenMovements | integer |  | (min 0; nullable) |
 | cooldownMinutes | integer |  | (min 0; nullable) |
 | reversalRule | enum (allowed, afterCooldown, notAllowed) |  | (default afterCooldown) |
-| allowedEndpoints | array of string |  | Psychological price endings, e.g. |
+| allowedEndpoints | array of string |  | The governed price endpoints a price may land on, as decimal strings in the venue's currency (e.g. |
 | createdAt | string (date-time) |  | (read-only) |
 | updatedAt | string (date-time) |  | (read-only) |
 
@@ -1882,7 +1857,13 @@ Rules: bands must ascend and include `baseBandCode` (`422` `invalidBands`); a ba
 | dynamicPricingStrategyId | string (uuid) | yes |  |
 | basePriceSource | string |  | (max length 100; nullable) |
 | adjustmentModel | enum (fixedPriceBands, percentageBands, fixedAmountSteps, derivedBands, continuousRange) | yes |  |
-| bands | object |  | [{code, price, percent}], ascending. |
+| bands | array of object |  | The bands, lowest first (typed 20 October 2026, R8 blocker cause GPS-C32; CHG-R8SPN-028: it was declared an object while every reader and writer used a list, so no valid body could carry it). |
+| bands[].code | string | yes | Band code, e.g. (max length 40) |
+| bands[].price | object |  | Band price (fixed and derived bands) (nullable) |
+| bands[].price.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| bands[].price.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| bands[].price.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| bands[].percent | number |  | Band offset from base in percent (percentage bands) (nullable) |
 | baseBandCode | string |  | (max length 40; nullable) |
 | stepAmount | object |  | (nullable) |
 | stepAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
@@ -1908,7 +1889,7 @@ Rules: bands must ascend and include `baseBandCode` (`422` `invalidBands`); a ba
 | minimumMinutesBetweenMovements | integer |  | (min 0; nullable) |
 | cooldownMinutes | integer |  | (min 0; nullable) |
 | reversalRule | enum (allowed, afterCooldown, notAllowed) |  | (default afterCooldown) |
-| allowedEndpoints | array of string |  | Psychological price endings, e.g. |
+| allowedEndpoints | array of string |  | The governed price endpoints a price may land on, as decimal strings in the venue's currency (e.g. |
 | createdAt | string (date-time) |  | (read-only) |
 | updatedAt | string (date-time) |  | (read-only) |
 
@@ -2156,8 +2137,8 @@ Added with `SeatCategory.priceBands` (decided 28 September, audit R275 (d)), so 
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `seating.seat_category`, `seating.seat_price_band` |
-| Writes | `seating.seat_price_band` |
+| Reads | `cache:idempotency`, `seating.seat_category`, `seating.seat_price_band` |
+| Writes | `cache:idempotency`, `seating.seat_price_band` |
 | Called by | BO-1045 |
 
 **Parameters**
@@ -2439,24 +2420,23 @@ Up to fifty thousand at a time. Generation is asynchronous and the batch is expo
 | 202 |  | Generation queued |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
-### getCouponCode
+### getGuestCouponCode
 
-**`GET /coupon-codes/{code}`**: Look up a code
+**`GET /guest-coupon-codes/{code}`**: What a guest is told about a coupon code
 
-Called at point of sale before applying. Returns whether the code is valid, why not when it is not, and what it would give.
-**A guest calls this without a permission and sees published data only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-001; `x-ticvai-guest-callable`): a guest or a visitor gets whether a code of a live, published promotion is valid and what it gives, and nothing in draft, unpublished or withdrawn; asked for by id, such a record answers as not found. `PRICE_VIEW` is what a staff caller must hold, and staff also see drafts (ADR-0025).
+A guest's check of a code before applying it (R8 blocker ORDERS-MONEY-C32, the lead's answer A of 20 October 2026; GST-037). Answers `GuestCouponCode`: the code, its status, whether it can be applied now and why not, the discount and the validity window, never its campaign, batch, assignee, assignment, counts or the order it was redeemed on. `getCouponCode` stays the staff read and is unchanged.
+**The rule, on what is stored** (a coupon campaign has `is_active`, `valid_from` and `valid_to` and no link to a promotion): an unknown code is 404. A known code is 200, and when it cannot be applied `invalidReason` is `expired`, `notYetValid`, `voided` (also when the campaign is not active), `alreadyRedeemed` (the guest's own redemption), `notAssignedToGuest` (assigned to someone else, without saying to whom) or `wrongVenue` (only when `venueId` is sent and the code is not valid there). A guest needs no permission; the code is what the guest holds, and the existing `429` limits stop guessing.
 
 |  |  |
 |---|---|
-| Permission | `PRICE_VIEW` |
+| Permission | `None` |
 | Scope level | venue |
 | Part of slice | core |
 | Wave | 1 |
-| Offline | yes |
+| Offline | no |
 | Conflict policy | serverWins |
 | Read routing | primary |
-| Guest callable | True |
-| Reads | `promotions.coupon_code` |
+| Reads | - |
 | Writes | - |
 | Called by | GST-037, WEB-010 |
 
@@ -2465,18 +2445,16 @@ Called at point of sale before applying. Returns whether the code is valid, why 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | code | path | yes | string |  |
+| venueId | query |  | string (uuid) | The venue the guest is buying at, so wrongVenue can be answered; a guest session carries no venue. |
 
-**Response**: `CouponCode`
+**Response**: `GuestCouponCode`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | code | string | yes |  |
-| campaignId | string (uuid) | yes |  |
-| batchId | string (uuid) |  | The generateCouponCodes batch that issued this code. (nullable) |
 | status | CouponStatus: enum (issued, assigned, redeemed, expired, voided) | yes |  |
-| assignedSubjectId | string (uuid) |  | (nullable) |
-| redemptionCount | integer |  |  |
-| maxRedemptions | integer |  |  |
+| isValid | boolean |  | True when the code can be applied now; else invalidReason says why. |
+| invalidReason | enum (expired, notYetValid, voided, alreadyRedeemed, notAssignedToGuest, wrongVenue) |  | (nullable) |
 | discount | Discount |  |  |
 | discount.kind | DiscountKind: enum (percentage, fixedAmount, fixedPrice, buyXGetY, freeItem, tieredPercentage) | yes |  |
 | discount.percentage | number |  | (min 0; max 100) |
@@ -2500,20 +2478,14 @@ Called at point of sale before applying. Returns whether the code is valid, why 
 | discount.maxDiscountAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | discount.rewardVariantIds | array of string (uuid) |  | The reward products, where the reward is not the qualifying product: the free gift of freeItem, the "different product" of a buyXGetY (createPromotion; the builders setGiftFreeProduct and setBuyGetBo… (nullable) |
 | discount.maxApplicationsPerBasket | integer |  | How many times the offer repeats in one basket: the "maximum repetitions" of an N-for-X offer (createPromotion; setFixedPriceOffer was retired in r2, CHG-CLN-001). (min 1; nullable) |
-| invalidReason | enum (expired, alreadyRedeemed, voided, notYetValid, wrongVenue, conditionsNotMet, notAssignedToGuest) |  | Why the code cannot be applied. (nullable) |
 | validFrom | string (date-time) |  | (nullable) |
 | validTo | string (date-time) |  | (nullable) |
-| redeemedAt | string (date-time) |  | (nullable) |
-| redeemedOrderId | string |  | (nullable) |
-| scopePath | string |  | The partition key (ADR-0005). |
-| assignmentId | string (uuid) |  | The CouponCodeAssignment that assigned this code (4 October 2026, CHG-FXC-005). (read-only; nullable) |
-| distributionStatus | enum (pending, sent, delivered, viewed, cancelled) |  | How far the code got to its holder (4 October 2026, CHG-FXC-005). (read-only; nullable) |
 
 **Responses**
 
 | Code | Shape | Meaning |
 |---|---|---|
-| 200 |  | Code state |
+| 200 |  | The guest's view of the code. |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
@@ -2793,6 +2765,10 @@ Rules: `reject` needs `rejectionReason`; `modify` needs `humanSelectedPrice`, wh
 
 **Agreed (decided 29 September, readiness close-out).** enable/disable became a typed per-channel list ($ref Channel) with sites, POS groups, venues and effective dates; preview and missing dependencies are response-only (publicationPreview, validationIssues); productId and the count of issued entitlements that stay valid added. Removing a channel stops future sale only; previously issued tickets stay valid, and the response shows issuedEntitlementsUnaffected so ADM-124 can say so. Only approved or live products can be exposed; channel configuration itself belongs to Sales Channel Management.
 
+**A PUT replaces the product's publication whole, so a caller reads it first** (20 October 2026, R8 blocker cause GPS-C39; CHG-R8SPN-038). Every screen that changes one part (BO-291 its channels, ADM-124 everything) reads the current publication with `getChannelAvailability`, changes what it shows, and sends the rest back as read: `siteIds`, `posGroupIds`, `venueIds` and the dates it does not show are kept only because they are sent. A body that leaves them out clears them.
+
+**Membership channels map onto catalogue channels** (GPS-C39): the channel values BO-291's membership view carries (subscription) map `guestWeb` -> `web`, `guestApp` -> `mobile`, `Reseller` (or `partner`) -> `b2b`, and the rest by the same name where one exists; `api` has no catalogue channel (public API sale is governed by the API licensing, not by this list) and is not sent.
+
 |  |  |
 |---|---|
 | Permission | `PRODUCT_CONFIGURE` |
@@ -2873,7 +2849,7 @@ Rules: `reject` needs `rejectionReason`; `modify` needs `humanSelectedPrice`, wh
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | primary |
-| Reads | `cache:idempotency`, `catalogue.channel_envelope`, `catalogue.channel_capacity`, `catalogue.channel_connection`, `catalogue.channel_sales_rule`, `catalogue.price_assignment`, `catalogue.price_list`, `catalogue.product`, `catalogue.product_channel_assignment`, `catalogue.sales_channel` |
+| Reads | `cache:idempotency`, `catalogue.channel_capacity`, `catalogue.channel_connection`, `catalogue.channel_envelope`, `catalogue.channel_sales_rule`, `catalogue.price_assignment`, `catalogue.price_list`, `catalogue.product`, `catalogue.product_channel_assignment`, `catalogue.sales_channel` |
 | Writes | `cache:idempotency`, `catalogue.audit_entry`, `catalogue.sales_channel` |
 | Called by | ADM-267 |
 | State model | Sales channel ([states/sales-channel.yaml](../../../states/sales-channel.yaml)): moves `draft` -> `pendingApproval`, `pendingApproval` -> `draft`, `pendingApproval` -> `scheduled`, `pendingApproval` -> `active`, `active` -> `suspended`, `suspended` -> `active` |
@@ -3939,8 +3915,8 @@ The resolution method defaults to `highestPriorityWins`; lowest-price-wins is ne
 | Offline | no |
 | Config scope | venue |
 | Conflict policy | serverWins |
-| Reads | `catalogue.entitlement_template` |
-| Writes | `catalogue.audit_entry`, `catalogue.entitlement_template` |
+| Reads | `cache:idempotency`, `catalogue.entitlement_template` |
+| Writes | `cache:idempotency`, `catalogue.audit_entry`, `catalogue.entitlement_template` |
 | Called by | **no screen**: no screen lists it in its apis, so it is reachable only by API or import until one does (README, Known gaps) |
 
 **Parameters**
@@ -4268,8 +4244,8 @@ When the performance's room is off, the answer is `state: notRequired` and the g
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | - |
-| Writes | - |
+| Reads | `cache:idempotency` |
+| Writes | `cache:idempotency` |
 | Called by | GST-046, WEB-015 |
 
 **Parameters**
@@ -4323,7 +4299,7 @@ When the performance's room is off, the answer is `state: notRequired` and the g
 | Offline note | 24 August: servable from a local cache. |
 | Reads | `catalogue.performance` |
 | Writes | - |
-| Called by | BO-015, BO-019, BO-726, GST-006, GST-041, POS-004, WEB-006, WEB-010 |
+| Called by | BO-015, BO-019, BO-726, GST-006, GST-041, GST-049, POS-004, WEB-006, WEB-007, WEB-010 |
 
 **Parameters**
 
@@ -4412,7 +4388,9 @@ When the performance's room is off, the answer is `state: notRequired` and the g
 
 **`GET /events`**: List events
 
-**Order.** Sorted by `name` ascending, then by `id`.
+**The venue's programme, for a guest too** (decided 20 October 2026, Chinmay, R8 blocker cause GPS-C30, option A; CHG-R8SPN-034). GST-005 What's On lists the venue's events from here and then each event's performances (`listPerformances`). **A guest or a visitor calls this without a permission and sees published data only** (Pattern 4; CHG-GCF-001; `x-ticvai-guest-callable`): events in `onSale` or `live` that are active (`isActive`), and nothing in `draft`, `planned`, `closed`, `cancelled` or `archived`. A visitor with no credential sends `venueId`. `PRODUCT_VIEW` is what a staff caller must hold, and staff see every state.
+
+**Order.** Sorted by `name` ascending, then by `id`. **Statuses.** For staff every `lifecycleState`; for a guest only `onSale` and `live`, as above.
 
 |  |  |
 |---|---|
@@ -4423,14 +4401,16 @@ When the performance's room is off, the answer is `state: notRequired` and the g
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | replica |
+| Guest callable | True |
 | Reads | `catalogue.event` |
 | Writes | - |
-| Called by | BO-015, BO-019, BO-694, CMS-101 |
+| Called by | BO-015, BO-019, BO-694, CMS-101, GST-005 |
 
 **Parameters**
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
+| venueId | query |  | string (uuid) | Whose venue to read, for a caller with no venue (as listProductCategories; GPS-C30). |
 | pageSize | query |  | integer |  |
 | cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
 
@@ -4456,6 +4436,7 @@ When the performance's room is off, the answer is `state: notRequired` and the g
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 400 |  | No venueId from a caller with no venue (venue-required), or one that is not a venue of the tenant (unknown-venue). |
 | 200 |  | Events |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
@@ -4480,7 +4461,7 @@ When the performance's room is off, the answer is `state: notRequired` and the g
 | Offline note | 24 August: servable from a local cache. |
 | Reads | `catalogue.performance`, `catalogue.product`, `catalogue.product_category` |
 | Writes | - |
-| Called by | BO-015, BO-019, BO-725, GST-003, GST-004, GST-005, GST-007, GST-049, WEB-002, WEB-004, WEB-006, WEB-007 |
+| Called by | BO-015, BO-019, BO-725, GST-003, GST-004, GST-005, GST-007, GST-049, POS-004, WEB-002, WEB-004, WEB-006, WEB-007 |
 
 **Parameters**
 
@@ -4743,6 +4724,8 @@ Where seating rules apply, holding a seat may implicitly buffer its neighbours �
 **Seats per guest booking is a venue setting** (decided 29 September, rev 3 REV3-7). On a guest channel (Guest Web, Guest App), the seats in this request plus the seats the same guest already holds on the same performance may not exceed `VenueSettings.seating.maxSeatsPerGuestOrder` (default 10, bounds 1 to 50); above it the hold is refused with `422` `seat-limit-exceeded` and nothing is held. Staff and POS sales keep at most 10 seats per sale (audit R080 (c)), refused the same way.
 **A guest does this within their own session** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-003; `x-ticvai-guest-callable`): a guest needs no permission and acts only for themselves, on their own cart, hold, order or payment in their own session. `ORDER_CREATE` is what a staff caller must hold to do it for a guest at a till or in the back office (ADR-0025).
 
+**The hold model on a guest screen: one hold per tap** (r8 walk of tickets 28202 and 28197). Each tap on a free seat is one `createSeatHold` with that seat, and the screen keeps the `holdId` of each. A deselect is `relinquishSeatHold` of that seat's hold. The seats a guest holds on a performance are therefore several holds, which is what the `seat-limit-exceeded` rule above already counts. **Switching the time** relinquishes the guest's holds on the performance being left, then holds the seats still wanted on the new one, one hold each; a seat the new time does not have free is dropped and the screen says so. The way on to the basket (the edge from WEB-007 or GST-049) carries the list of `holdIds`. A screen opened again with a `holdId` reads it with `getSeatHold`.
+
 |  |  |
 |---|---|
 | Permission | `ORDER_CREATE` |
@@ -4770,7 +4753,9 @@ Where seating rules apply, holding a seat may implicitly buffer its neighbours �
 |---|---|---|---|
 | id | string (uuid) | yes |  |
 | performanceId | string (uuid) | yes |  |
-| seatIds | array of string | yes | 50 is the ceiling of the venue setting, not the limit a caller gets. (min items 1; max items 50) |
+| zoneId | string (uuid) |  | A standing zone of the performance's map (SeatAvailability.zones), with quantity (r8, GPS-C38). |
+| quantity | integer |  | The places held in zoneId; the same per-booking limits as seatIds (r8, GPS-C38). (min 1; max 50) |
+| seatIds | array of string |  | 50 is the ceiling of the venue setting, not the limit a caller gets. (min items 1; max items 50) |
 | ttlSeconds | integer |  | 8 minutes by default, extendable to 30 in all (decided 28 September, audit R169). (min 60; max 1800; default 480) |
 | subjectId | string (uuid) |  |  |
 
@@ -4782,7 +4767,8 @@ Where seating rules apply, holding a seat may implicitly buffer its neighbours �
 | performanceId | string (uuid) | yes |  |
 | seatIds | array of string | yes |  |
 | bufferedSeatIds | array of string |  | Neighbours implicitly held by a seating rule. |
-| status | enum (held, converted, released, expired) | yes |  |
+| status | enum (held, converted, released, expired, sold) | yes | converted when the order is created; sold when the order is paid and catalogue.convertInventoryHold sells the units (ADAM CR-169, 18 October 2026; CHG-CRA-007). |
+| inventoryReservationId | string (uuid) |  | The inventory hold these seats sit under (ADAM CR-169; CHG-CRA-007), so convertInventoryHold finds the order's seat reservations from the hold it converts. (nullable) |
 | totalPrice | Money |  | On the wire this is three fields; in the database it is one column. |
 | totalPrice.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | totalPrice.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
@@ -4839,7 +4825,8 @@ For a guest still completing payment. Bounded by the venue's maximum, so a hold 
 | performanceId | string (uuid) | yes |  |
 | seatIds | array of string | yes |  |
 | bufferedSeatIds | array of string |  | Neighbours implicitly held by a seating rule. |
-| status | enum (held, converted, released, expired) | yes |  |
+| status | enum (held, converted, released, expired, sold) | yes | converted when the order is created; sold when the order is paid and catalogue.convertInventoryHold sells the units (ADAM CR-169, 18 October 2026; CHG-CRA-007). |
+| inventoryReservationId | string (uuid) |  | The inventory hold these seats sit under (ADAM CR-169; CHG-CRA-007), so convertInventoryHold finds the order's seat reservations from the hold it converts. (nullable) |
 | totalPrice | Money |  | On the wire this is three fields; in the database it is one column. |
 | totalPrice.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | totalPrice.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
@@ -4862,6 +4849,8 @@ For a guest still completing payment. Bounded by the venue's maximum, so a hold 
 
 **`GET /seat-holds/{holdId}`**: Read a hold
 
+**A guest may read their own hold** (r8 walk of ticket 28202), so WEB-007 and GST-049, opened again with a `holdId`, show the seats and the time left. On a guest channel only a hold the same guest session or subject placed with `createSeatHold` can be read; any other hold answers `404`, exactly as `relinquishSeatHold` does, so hold ids cannot be probed. Staff keep reading any hold at their venue under `ORDER_VIEW`.
+
 |  |  |
 |---|---|
 | Permission | `ORDER_VIEW` |
@@ -4871,6 +4860,7 @@ For a guest still completing payment. Bounded by the venue's maximum, so a hold 
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | primary |
+| Guest callable | True |
 | Reads | `seating.seat_reservation` |
 | Writes | - |
 | Called by | BO-987, BO-999, POS-004 |
@@ -4889,7 +4879,8 @@ For a guest still completing payment. Bounded by the venue's maximum, so a hold 
 | performanceId | string (uuid) | yes |  |
 | seatIds | array of string | yes |  |
 | bufferedSeatIds | array of string |  | Neighbours implicitly held by a seating rule. |
-| status | enum (held, converted, released, expired) | yes |  |
+| status | enum (held, converted, released, expired, sold) | yes | converted when the order is created; sold when the order is paid and catalogue.convertInventoryHold sells the units (ADAM CR-169, 18 October 2026; CHG-CRA-007). |
+| inventoryReservationId | string (uuid) |  | The inventory hold these seats sit under (ADAM CR-169; CHG-CRA-007), so convertInventoryHold finds the order's seat reservations from the hold it converts. (nullable) |
 | totalPrice | Money |  | On the wire this is three fields; in the database it is one column. |
 | totalPrice.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | totalPrice.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
@@ -4925,8 +4916,8 @@ Releases buffered neighbours alongside the held seats.
 | Offline | no |
 | Conflict policy | serverWins |
 | Guest callable | True |
-| Reads | `seating.seat_reservation` |
-| Writes | `platform.outbox`, `seating.seat_reservation` |
+| Reads | `cache:idempotency`, `seating.seat_reservation` |
+| Writes | `cache:idempotency`, `platform.outbox`, `seating.seat_reservation` |
 | Called by | BO-999, GST-049, POS-004, WEB-007 |
 | State model | Seat hold ([states/seat-hold.yaml](../../../states/seat-hold.yaml)): moves `held` -> `released`<br/>Seat ([states/seat.yaml](../../../states/seat.yaml)): moves `held` -> `available` |
 
@@ -4949,81 +4940,6 @@ Releases buffered neighbours alongside the held seats.
 
 ## Group: lease
 
-### acquireInventoryHold
-
-**`POST /inventory-holds`**: Acquire an inventory hold
-
-Grants the caller N units of a capacity envelope for a TTL. The holder may sell against them without further server contact, including offline.
-**Not a guest call.** A guest session never calls this (`guestAuth`). A guest's cart takes its hold through `orders.addCartLine`, which calls this as the order service with `holderKind: cart` and the cart's id (decided 29 September, SD-023): **a hold belongs to a workstation or to a cart**, and a browser has no workstation, so `holderWorkstationId` is null on a cart hold.
-**The capacity model** (decided 29 September, SD-023, closing what ADR-0037 left open). One guarded statement moves the units: `UPDATE catalogue.channel_capacity SET remaining = remaining - n, leased = leased + n WHERE id = ? AND remaining >= n`, with `n` cut to what remains for a partial grant, under the row lock declared here. **Units leave `remaining` at the hold, not at the sale.** They go to `sold` when the hold converts (`convertInventoryHold`, in the order transaction when the order is paid) or when a workstation reports them consumed (`renewInventoryHold`, `relinquishInventoryHold`); they go back to `remaining` when the hold is released, force-released or expires. The expiry sweeper (`states/lease.yaml` timer) runs the same statement in reverse for each `active` hold past `expiresAt`, so an expired hold never strands units and **a converted hold is never swept**.
-Unsold units return automatically on expiry. Requesting more than remains returns a partial grant — the caller decides whether that is enough.
-A `venueEdge` workstation acquires through its edge node, which holds the venue lease and sub-leases to terminals.
-
-|  |  |
-|---|---|
-| Permission | `ORDER_CREATE` |
-| Scope level | workstation |
-| Part of slice | core |
-| Wave | 1 |
-| Offline | no |
-| Conflict policy | serverWins |
-| Lock | rowExclusiveSkipLocked |
-| Reads | `cache:idempotency`, `catalogue.channel_envelope`, `catalogue.channel_capacity`, `catalogue.inventory_reservation`, `platform.workstation` |
-| Writes | `cache:idempotency`, `catalogue.channel_envelope`, `catalogue.channel_capacity`, `catalogue.inventory_reservation` |
-| Called by | POS-003 |
-| State model | Inventory lease ([states/lease.yaml](../../../states/lease.yaml)): created as `active` |
-
-**Parameters**
-
-| Name | In | Required | Type | Notes |
-|---|---|---|---|---|
-| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
-| X-Admission-Token | header |  | string | The on-sale waiting room's admission token (ADR-0066, accepted 1 October). |
-
-**Request body**: `AcquireLeaseRequest`
-
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| holderKind | InventoryHoldHolderKind: enum (workstation, cart) |  | Who holds the units (decided 29 September, SD-023). (default workstation) |
-| cartId | string (uuid) |  | Required when holderKind is cart, else 400. (nullable) |
-| channel | object |  | Which channel's allocation to draw from. |
-| id | string (uuid) | yes | Client-generated UUIDv7. |
-| channelCapacityId | string (uuid) | yes |  |
-| requestedUnits | integer | yes | (min 1) |
-| ttlSeconds | integer | yes | Short TTLs limit stranding when a terminal dies; long TTLs survive longer outages. (min 30; max 3600; default 900) |
-
-**Response**: `InventoryHold`
-
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| id | string | yes |  |
-| channelCapacityId | string (uuid) | yes |  |
-| holderKind | InventoryHoldHolderKind: enum (workstation, cart) | yes | Who holds the units (decided 29 September, SD-023). (default workstation) |
-| holderWorkstationId | string (uuid) |  | The holding workstation when holderKind is workstation; null on a cart hold, because a browser has none (SD-023, 29 September). (nullable) |
-| holderCartId | string (uuid) |  | The holding cart (orders.cart) when holderKind is cart (SD-023, 29 September). (nullable) |
-| convertedOrderId | string (uuid) |  | The paid order the hold was converted for, set by convertInventoryHold. (read-only; nullable) |
-| convertedAt | string (date-time) |  | (read-only; nullable) |
-| parentLeaseId | string |  | Present when sub-leased from a venue edge node. (nullable) |
-| requestedUnits | integer |  |  |
-| channel | object |  | Allocation this lease draws from. |
-| grantedUnits | integer | yes | May be less than requested — a partial grant is not an error. |
-| consumedUnits | integer | yes |  |
-| status | LeaseStatus: enum (active, expired, released, forceReleased, converted) | yes | states/lease.yaml. |
-| acquiredAt | string (date-time) | yes |  |
-| expiresAt | string (date-time) | yes |  |
-| releasedAt | string (date-time) |  | (nullable) |
-| forceReleasedByPrincipalId | string (uuid) |  | (nullable) |
-| forceReleaseReason | string |  | (nullable) |
-
-**Responses**
-
-| Code | Shape | Meaning |
-|---|---|---|
-| 201 |  | Granted, wholly or partially. |
-| 403 |  | Not permitted at the requested scope (forbidden), or a cart hold for a performance whose waiting room is on without a valid admission token (admission-required, ADR-0066). |
-| 409 |  | No units remain, or the envelope is seated — seated inventory cannot be leased because a seat map is not a count. |
-| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
-
 ### convertInventoryHold
 
 **`POST /inventory-holds/{inventoryHoldId}/convert`**: Turn a paid hold into sold units
@@ -5032,6 +4948,8 @@ A `venueEdge` workstation acquires through its edge node, which holds the venue 
 **A hold that is no longer `active` is refused `409`** (`hold-not-active`): it expired, was released or force-released, or was converted for another order, so its units may already be sold to someone else. The order service then re-acquires with `acquireInventoryHold` before taking the payment; it never sells against a hold it does not hold. No screen calls this operation.
 
 **The order's seat holds convert in the same call** (3 October 2026, CHG-R1S-010): each held seat of the order moves to `sold` (`seating.seat_reservation`, `seating.seat_reservation_item`) and `seat.sold` is written to the outbox once per seat. Seating belongs to this service, so the seat event is published here and not by the order service that called it.
+
+**Decided 18 October 2026** (ADAM CR-169, option A; CHG-CRA-007). **Seats**: the order's seat reservations are the ones whose `inventoryReservationId` is this hold; they move to `sold` and `seat.sold` is written once per seat. **Envelopes**: where the capacity has channel allocations, the same units move from `leased` to `sold` on the hold's `catalogue.channel_envelope`. **A hold that lapsed after the capture**: the capture stands and the order is paid. The units are taken again if they are still free; otherwise the order is flagged for the reconciler with `refusedReason` `unitsGone`. **Nothing is ever refunded automatically**, PLATFORM-SAGA-PAID's own rule for a dead-lettered issuance. Until the seat reservation's key lands, a seated line is refused with `409 hold-not-active` naming this request.
 
 |  |  |
 |---|---|
@@ -5042,10 +4960,10 @@ A `venueEdge` workstation acquires through its edge node, which holds the venue 
 | Offline | no |
 | Conflict policy | serverWins |
 | Lock | rowExclusive |
-| Reads | `cache:idempotency`, `catalogue.channel_envelope`, `catalogue.channel_capacity`, `catalogue.inventory_reservation` |
-| Writes | `cache:idempotency`, `catalogue.channel_envelope`, `catalogue.channel_capacity`, `catalogue.inventory_reservation`, `platform.outbox`, `seating.seat_reservation`, `seating.seat_reservation_item` |
+| Reads | `cache:idempotency`, `catalogue.channel_capacity`, `catalogue.channel_envelope`, `catalogue.inventory_reservation` |
+| Writes | `cache:idempotency`, `catalogue.channel_capacity`, `catalogue.channel_envelope`, `catalogue.inventory_reservation`, `platform.outbox`, `seating.seat_reservation`, `seating.seat_reservation_item` |
 | Called by | **no screen**: no screen lists it in its apis, so it is reachable only by API or import until one does (README, Known gaps) |
-| State model | Inventory lease ([states/lease.yaml](../../../states/lease.yaml)): moves `active` -> `converted`<br/>Seat ([states/seat.yaml](../../../states/seat.yaml)): moves `held` -> `sold` |
+| State model | Inventory lease ([states/lease.yaml](../../../states/lease.yaml)): moves `active` -> `converted`<br/>Seat hold ([states/seat-hold.yaml](../../../states/seat-hold.yaml)): moves `converted` -> `sold`<br/>Seat ([states/seat.yaml](../../../states/seat.yaml)): moves `held` -> `sold` |
 
 **Parameters**
 
@@ -5092,71 +5010,6 @@ A `venueEdge` workstation acquires through its edge node, which holds the venue 
 | 400 |  | units is more than the hold grants. |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 409 |  | The hold is not active (expired, released, force-released or converted for another order). |
-| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
-
-### listInventoryHolds
-
-**`GET /inventory-holds`**: List inventory holds
-
-Back-office monitoring. Surfaces stranded leases — capacity held by a terminal that died and will not return it until TTL expiry. At a gate during peak that is visible to a queue.
-
-
-**Order.** Soonest first, by `expiresAt` ascending, then by `id`.
-
-|  |  |
-|---|---|
-| Permission | `PRODUCT_VIEW` |
-| Scope level | venue |
-| Part of slice | core |
-| Wave | 1 |
-| Offline | no |
-| Conflict policy | serverWins |
-| Read routing | primary |
-| Reads | `catalogue.inventory_reservation` |
-| Writes | - |
-| Called by | BO-018, POS-003 |
-
-**Parameters**
-
-| Name | In | Required | Type | Notes |
-|---|---|---|---|---|
-| channelCapacityId | query |  | string (uuid) |  |
-| holderWorkstationId | query |  | string (uuid) |  |
-| status | query |  | LeaseStatus: enum (active, expired, released, forceReleased, converted) |  |
-| pageSize | query |  | integer |  |
-| cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
-
-**Response**: `object`
-
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| items | array of InventoryHold | yes |  |
-| items[].id | string | yes |  |
-| items[].channelCapacityId | string (uuid) | yes |  |
-| items[].holderKind | InventoryHoldHolderKind: enum (workstation, cart) | yes | Who holds the units (decided 29 September, SD-023). (default workstation) |
-| items[].holderWorkstationId | string (uuid) |  | The holding workstation when holderKind is workstation; null on a cart hold, because a browser has none (SD-023, 29 September). (nullable) |
-| items[].holderCartId | string (uuid) |  | The holding cart (orders.cart) when holderKind is cart (SD-023, 29 September). (nullable) |
-| items[].convertedOrderId | string (uuid) |  | The paid order the hold was converted for, set by convertInventoryHold. (read-only; nullable) |
-| items[].convertedAt | string (date-time) |  | (read-only; nullable) |
-| items[].parentLeaseId | string |  | Present when sub-leased from a venue edge node. (nullable) |
-| items[].requestedUnits | integer |  |  |
-| items[].channel | object |  | Allocation this lease draws from. |
-| items[].grantedUnits | integer | yes | May be less than requested — a partial grant is not an error. |
-| items[].consumedUnits | integer | yes |  |
-| items[].status | LeaseStatus: enum (active, expired, released, forceReleased, converted) | yes | states/lease.yaml. |
-| items[].acquiredAt | string (date-time) | yes |  |
-| items[].expiresAt | string (date-time) | yes |  |
-| items[].releasedAt | string (date-time) |  | (nullable) |
-| items[].forceReleasedByPrincipalId | string (uuid) |  | (nullable) |
-| items[].forceReleaseReason | string |  | (nullable) |
-| nextCursor | string |  |  |
-| hasMore | boolean | yes |  |
-
-**Responses**
-
-| Code | Shape | Meaning |
-|---|---|---|
-| 200 |  | Inventory holds |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
@@ -5506,8 +5359,8 @@ Checks a party's declared ages and heights against every product in the booking 
 | Offline | no |
 | Conflict policy | serverWins |
 | Guest callable | True |
-| Reads | `catalogue.product`, `catalogue.product_eligibility_rule` |
-| Writes | - |
+| Reads | `cache:idempotency`, `catalogue.product`, `catalogue.product_eligibility_rule` |
+| Writes | `cache:idempotency` |
 | Called by | GST-007, WEB-006 |
 
 **Parameters**
@@ -5576,7 +5429,13 @@ Checks a party's declared ages and heights against every product in the booking 
 |---|---|---|---|
 | id | string (uuid) |  | (read-only) |
 | productId | string |  | (read-only) |
-| kind | enum (school, party) | yes |  |
+| name | string |  | Read from the package's product, not stored here (R8 blocker ORDERS-MONEY-C20, CHG-R8MIG-009): catalogue.product.name, in the caller's language. (read-only) |
+| unitPrice | object |  | The product's price per participant (pricingBasis perParticipant) or per package, read from the product's current price; not stored here. (read-only) |
+| unitPrice.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| unitPrice.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| unitPrice.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| minimumSize | integer |  | The smallest group the package is sold to; null means one participant. (min 1; nullable) |
+| kind | enum (school, party, corporate, tourOperator, community) | yes | corporate, tourOperator and community are the group types the approved group-booking screens draw beside school and party (CHG-SGU-024; R8 blocker ORDERS-MONEY-C20, CHG-R8MIG-009). |
 | maxParticipants | integer | yes | Pupils or children, e.g. (min 1) |
 | durationMinutes | integer | yes | (min 15) |
 | hostCount | integer |  | Party hosts included. (min 0; default 1) |
@@ -5598,7 +5457,8 @@ Checks a party's declared ages and heights against every product in the booking 
 
 **`GET /products/{productId}`**: Read a product
 
-**A guest calls this without a permission and sees published data only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-001; `x-ticvai-guest-callable`): a guest or a visitor gets a product that is published, and nothing in draft, unpublished or withdrawn; asked for by id, such a record answers as not found. `PRODUCT_VIEW` is what a staff caller must hold, and staff also see drafts (ADR-0025).
+**A guest calls this without a permission and sees published data only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-001; `x-ticvai-guest-callable`): a guest or a visitor gets a product that is published, and nothing in draft or unpublished; asked for by id, such a record answers as not found. `PRODUCT_VIEW` is what a staff caller must hold, and staff also see drafts (ADR-0025).
+**One exception: a withdrawn product is returned to a guest or visitor** (decided 20 October 2026, Chinmay, R8 blocker cause GPS-C07, option A; CHG-R8SPN-023), so WEB-004's approved withdrawn banner can show. It comes in the same guest projection, with `lifecycleState` `withdrawn` and `isSellable` false, and only when it was once published; a draft or unpublished product is still not found. Nothing else widens: `listProducts` and the other lists leave withdrawn products out for a guest, and `addCartLine` still refuses one.
 
 |  |  |
 |---|---|
@@ -5613,7 +5473,7 @@ Checks a party's declared ages and heights against every product in the booking 
 | Offline note | 24 August: servable from a local cache. |
 | Reads | `catalogue.product`, `catalogue.product_media` |
 | Writes | - |
-| Called by | BO-007, BO-008, BO-012, BO-014, EMP-034, GST-004, GST-006, POS-002, POS-003, PTR-006, WEB-004, WEB-022 |
+| Called by | BO-007, BO-008, BO-012, BO-014, EMP-034, GST-004, GST-006, POS-002, POS-003, PTR-006, WEB-004, WEB-006, WEB-022 |
 
 **Parameters**
 
@@ -5802,6 +5662,7 @@ Partners and distributors use their own SKUs. Mapping them here means an inbound
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
+| venueId | query |  | string (uuid) | Whose venue to read, for a caller with no venue (R8 blocker fix, GPS-C01 and WHITE-C05). |
 | kind | query |  | enum (school, party) |  |
 | pageSize | query |  | integer |  |
 | cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
@@ -5813,7 +5674,13 @@ Partners and distributors use their own SKUs. Mapping them here means an inbound
 | items | array of GroupPackageDefinition | yes |  |
 | items[].id | string (uuid) |  | (read-only) |
 | items[].productId | string |  | (read-only) |
-| items[].kind | enum (school, party) | yes |  |
+| items[].name | string |  | Read from the package's product, not stored here (R8 blocker ORDERS-MONEY-C20, CHG-R8MIG-009): catalogue.product.name, in the caller's language. (read-only) |
+| items[].unitPrice | object |  | The product's price per participant (pricingBasis perParticipant) or per package, read from the product's current price; not stored here. (read-only) |
+| items[].unitPrice.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| items[].unitPrice.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| items[].unitPrice.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| items[].minimumSize | integer |  | The smallest group the package is sold to; null means one participant. (min 1; nullable) |
+| items[].kind | enum (school, party, corporate, tourOperator, community) | yes | corporate, tourOperator and community are the group types the approved group-booking screens draw beside school and party (CHG-SGU-024; R8 blocker ORDERS-MONEY-C20, CHG-R8MIG-009). |
 | items[].maxParticipants | integer | yes | Pupils or children, e.g. (min 1) |
 | items[].durationMinutes | integer | yes | (min 15) |
 | items[].hostCount | integer |  | Party hosts included. (min 0; default 1) |
@@ -5830,6 +5697,7 @@ Partners and distributors use their own SKUs. Mapping them here means an inbound
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Packages |
+| 400 |  | No venueId from a caller with no venue (venue-required), or one that is not a venue of the tenant (unknown-venue). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listProductVariants
@@ -5837,6 +5705,7 @@ Partners and distributors use their own SKUs. Mapping them here means an inbound
 **`GET /products/{productId}/variants`**: List generated variants
 
 **A guest calls this without a permission and sees published data only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-001; `x-ticvai-guest-callable`): a guest or a visitor gets the published variants of a published product, and nothing in draft, unpublished or withdrawn; asked for by id, such a record answers as not found. `PRODUCT_VIEW` is what a staff caller must hold, and staff also see drafts (ADR-0025).
+**Each variant carries its list price** (20 October 2026, R8 blocker cause GPS-C27; CHG-R8SPN-028): `listPrice` is the price the guest listing shows for the variant on the caller's channel at this moment, in the venue's currency, resolved by the same price-list rule as `searchCatalogue`'s `fromPrice` and the `variantListingFacts` query's `listPrice`. It is what GST-008's stepper, GST-050, GST-075's price per length and WEB-005 show. It is the list price only: the total a guest pays is still decided at the basket by `promotions.evaluatePromotions` (offers, bundles) and tax is shown as the listing shows it. The channel is the caller's (`web` for the storefront, `mobile` for the guest app, from the credential or, for a visitor, the `channel` parameter); null where no price list prices the variant on that channel.
 **Order.** Sorted by `name` ascending, then by `id`.
 
 |  |  |
@@ -5852,13 +5721,14 @@ Partners and distributors use their own SKUs. Mapping them here means an inbound
 | Offline note | 24 August: servable from a local cache. |
 | Reads | `catalogue.variant` |
 | Writes | - |
-| Called by | BO-007, BO-008, BO-012, BO-048, EMP-034, GST-008, GST-041, GST-075, KSK-004, POS-002, POS-003, PTR-006, WEB-005, WEB-048 |
+| Called by | BO-007, BO-008, BO-012, BO-048, EMP-034, GST-008, GST-041, GST-048, GST-075, KSK-004, POS-002, POS-003, PTR-006, WEB-005, WEB-048 |
 
 **Parameters**
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | productId | path | yes | string (uuid) |  |
+| channel | query |  | Channel: enum (pos, kiosk, web, mobile, b2b, ota, callCentre) | The channel listPrice is priced for (GPS-C27, CHG-R8SPN-028). |
 | pageSize | query |  | integer |  |
 | cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
 
@@ -5868,6 +5738,7 @@ Partners and distributors use their own SKUs. Mapping them here means an inbound
 |---|---|---|---|
 | items | array of ProductVariant | yes |  |
 | items[].id | string (uuid) | yes |  |
+| items[].listPrice | Money |  | The list price on the caller's channel now, resolved on read from the price lists (listProductVariants; R8 blocker cause GPS-C27, CHG-R8SPN-028). (read-only; nullable) |
 | items[].productId | string (uuid) | yes |  |
 | items[].sku | string | yes |  |
 | items[].axisValues | object | yes |  |
@@ -5894,6 +5765,7 @@ For guest, partner and back-office callers. **A point-of-sale terminal does not 
 **What a guest caller gets** (decided 29 September, rev 3 REV3-14). Products with `guestListing: bookable` that are on sale at the caller's channel, plus products with `guestListing: infoOnly` whose lifecycle is live, whether or not they are on sale, each carrying its `guestListing` and `notBookableLabel` so the screen shows the label and opens details instead of adding to the basket. `hidden` products are never returned to a guest, and `infoOnly` ones are left out when the venue's `BookingFlowConfig.showInfoOnly` is off. Staff and partner callers see every product, whatever its `guestListing`.
 **Category and tag filters** (decided 29 September, rev 3 REV3-16 and REV3-19). `categoryId` narrows to one category of the `listProductCategories` tree, so a guest can go from a category tile to that category's tickets; `segmentTag` narrows by tag, e.g. a surf level.
 **Help me choose filters the list** (decided 29 September, W4). `guidedAnswerIds` applies the filter of each chosen answer on the server; the guest screen offers *Show everything*, which is the same call without it. **A partner caller reads here** what is assigned to its channel (M17-04): partners never write products, prices or performances.
+**Only published answers filter here; a draft is previewed elsewhere** (decided 20 October 2026, Chinmay, R8 blocker cause WHITE-C26, server option; CHG-R8SPN-036). CMS-101's live preview of a draft guided choice calls white-label's `previewGuidedChoice` with the draft answers, which runs this operation's own answer filter (the same code: age ranges, certification, swimmer, segment tags) over the venue's published products and returns what is left for each combination; the browser never re-implements the filter.
 **A guest calls this without a permission and sees published data only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-001; `x-ticvai-guest-callable`): a guest or a visitor gets products that are published and on sale, and nothing in draft, unpublished or withdrawn; asked for by id, such a record answers as not found. `PRODUCT_VIEW` is what a staff caller must hold, and staff also see drafts (ADR-0025).
 
 
@@ -5912,7 +5784,7 @@ For guest, partner and back-office callers. **A point-of-sale terminal does not 
 | Offline note | 24 August: servable from a local cache. |
 | Reads | `catalogue.product`, `catalogue.product_category`, `catalogue.product_eligibility_rule`, `catalogue.product_media`, `whitelabel.guided_choice_answer` |
 | Writes | - |
-| Called by | ANL-004, BO-007, BO-012, BO-013, BO-014, BO-048, BO-094, BO-125, BO-877, CMS-101, CMS-103, EMP-034, GST-001, GST-002, GST-003, GST-005, GST-007, GST-008, GST-015, GST-021, GST-038, GST-044, GST-050, GST-051, GST-052, GST-075, KSK-001, KSK-003, KSK-015, POS-002, POS-003, PTR-006, WEB-001, WEB-002, WEB-003, WEB-005, WEB-022, WEB-035, WEB-048, WEB-050 |
+| Called by | ANL-004, BO-007, BO-012, BO-013, BO-014, BO-048, BO-094, BO-125, BO-877, CMS-101, CMS-103, EMP-034, GST-001, GST-002, GST-003, GST-005, GST-007, GST-008, GST-015, GST-021, GST-038, GST-044, GST-050, GST-051, GST-075, KSK-001, KSK-003, KSK-015, POS-002, POS-003, PTR-006, WEB-001, WEB-002, WEB-003, WEB-005, WEB-022, WEB-035, WEB-048, WEB-050 |
 
 **Parameters**
 
@@ -6033,6 +5905,7 @@ Called on inbound distribution orders. Accepts a partner's own SKU and returns t
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | id | string (uuid) | yes |  |
+| listPrice | Money |  | The list price on the caller's channel now, resolved on read from the price lists (listProductVariants; R8 blocker cause GPS-C27, CHG-R8SPN-028). (read-only; nullable) |
 | productId | string (uuid) | yes |  |
 | sku | string | yes |  |
 | axisValues | object | yes |  |
@@ -6111,8 +5984,8 @@ Called on inbound distribution orders. Accepts a partner's own SKU and returns t
 | Offline | no |
 | Config scope | venue |
 | Conflict policy | serverWins |
-| Reads | `catalogue.group_package` |
-| Writes | `catalogue.group_package` |
+| Reads | `cache:idempotency`, `catalogue.group_package` |
+| Writes | `cache:idempotency`, `catalogue.group_package` |
 | Called by | BO-011 |
 
 **Parameters**
@@ -6128,7 +6001,13 @@ Called on inbound distribution orders. Accepts a partner's own SKU and returns t
 |---|---|---|---|
 | id | string (uuid) |  | (read-only) |
 | productId | string |  | (read-only) |
-| kind | enum (school, party) | yes |  |
+| name | string |  | Read from the package's product, not stored here (R8 blocker ORDERS-MONEY-C20, CHG-R8MIG-009): catalogue.product.name, in the caller's language. (read-only) |
+| unitPrice | object |  | The product's price per participant (pricingBasis perParticipant) or per package, read from the product's current price; not stored here. (read-only) |
+| unitPrice.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| unitPrice.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| unitPrice.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| minimumSize | integer |  | The smallest group the package is sold to; null means one participant. (min 1; nullable) |
+| kind | enum (school, party, corporate, tourOperator, community) | yes | corporate, tourOperator and community are the group types the approved group-booking screens draw beside school and party (CHG-SGU-024; R8 blocker ORDERS-MONEY-C20, CHG-R8MIG-009). |
 | maxParticipants | integer | yes | Pupils or children, e.g. (min 1) |
 | durationMinutes | integer | yes | (min 15) |
 | hostCount | integer |  | Party hosts included. (min 0; default 1) |
@@ -6144,7 +6023,13 @@ Called on inbound distribution orders. Accepts a partner's own SKU and returns t
 |---|---|---|---|
 | id | string (uuid) |  | (read-only) |
 | productId | string |  | (read-only) |
-| kind | enum (school, party) | yes |  |
+| name | string |  | Read from the package's product, not stored here (R8 blocker ORDERS-MONEY-C20, CHG-R8MIG-009): catalogue.product.name, in the caller's language. (read-only) |
+| unitPrice | object |  | The product's price per participant (pricingBasis perParticipant) or per package, read from the product's current price; not stored here. (read-only) |
+| unitPrice.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| unitPrice.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| unitPrice.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| minimumSize | integer |  | The smallest group the package is sold to; null means one participant. (min 1; nullable) |
+| kind | enum (school, party, corporate, tourOperator, community) | yes | corporate, tourOperator and community are the group types the approved group-booking screens draw beside school and party (CHG-SGU-024; R8 blocker ORDERS-MONEY-C20, CHG-R8MIG-009). |
 | maxParticipants | integer | yes | Pupils or children, e.g. (min 1) |
 | durationMinutes | integer | yes | (min 15) |
 | hostCount | integer |  | Party hosts included. (min 0; default 1) |
@@ -6181,8 +6066,8 @@ Called on inbound distribution orders. Accepts a partner's own SKU and returns t
 | Offline | no |
 | Config scope | venue |
 | Conflict policy | serverWins |
-| Reads | `catalogue.product_eligibility_rule` |
-| Writes | `catalogue.product_eligibility_rule` |
+| Reads | `cache:idempotency`, `catalogue.product_eligibility_rule` |
+| Writes | `cache:idempotency`, `catalogue.product_eligibility_rule` |
 | Called by | BO-161 |
 
 **Parameters**
@@ -6388,8 +6273,8 @@ Setting `isDefault` true clears it on the product's other variants. A retired va
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `catalogue.variant` |
-| Writes | `catalogue.variant` |
+| Reads | `cache:idempotency`, `catalogue.variant` |
+| Writes | `cache:idempotency`, `catalogue.variant` |
 | Called by | BO-008 |
 
 **Parameters**
@@ -6414,6 +6299,7 @@ Setting `isDefault` true clears it on the product's other variants. A retired va
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | id | string (uuid) | yes |  |
+| listPrice | Money |  | The list price on the caller's channel now, resolved on read from the price lists (listProductVariants; R8 blocker cause GPS-C27, CHG-R8SPN-028). (read-only; nullable) |
 | productId | string (uuid) | yes |  |
 | sku | string | yes |  |
 | axisValues | object | yes |  |
@@ -7181,8 +7067,8 @@ Returns contiguous groups where the party requires them — a family of four spl
 | Offline | no |
 | Conflict policy | serverWins |
 | Guest callable | True |
-| Reads | `catalogue.performance`, `seating.accessible`, `seating.recommendation_rule`, `seating.seat`, `seating.seat_block_item`, `seating.seat_category`, `seating.seat_reservation`, `seating.seat_reservation_item`, `seating.seat_price_band` |
-| Writes | - |
+| Reads | `cache:idempotency`, `catalogue.performance`, `seating.accessible`, `seating.recommendation_rule`, `seating.seat`, `seating.seat_block_item`, `seating.seat_category`, `seating.seat_price_band`, `seating.seat_reservation`, `seating.seat_reservation_item` |
+| Writes | `cache:idempotency` |
 | Called by | BO-015, BO-019, BO-1001, BO-1002, BO-1039, GST-049, WEB-007 |
 
 **Parameters**
@@ -7250,7 +7136,7 @@ Returns contiguous groups where the party requires them — a family of four spl
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `seating.seat_map` |
-| Writes | `cache:idempotency`, `seating.seat_map`, `seating.section`, `seating.seat` |
+| Writes | `cache:idempotency`, `seating.seat`, `seating.seat_map`, `seating.section` |
 | Called by | BO-954, BO-956 |
 
 **Parameters**
@@ -7332,8 +7218,8 @@ Returns contiguous groups where the party requires them — a family of four spl
 | Part of slice | setup, makes `seating.accessible` non-empty |
 | Wave | 1 |
 | Offline | no |
-| Reads | `seating.accessible` |
-| Writes | `seating.accessible` |
+| Reads | `cache:idempotency`, `seating.accessible` |
+| Writes | `cache:idempotency`, `seating.accessible` |
 | Called by | BO-1018, BO-1019, BO-1020 |
 
 **Parameters**
@@ -7395,8 +7281,8 @@ Board 9, and it is the 21 August minute made configurable: *"best-seat ranking (
 | Wave | 1 |
 | Offline | no |
 | Config scope | venue |
-| Reads | `seating.recommendation_rule` |
-| Writes | `seating.recommendation_rule` |
+| Reads | `cache:idempotency`, `seating.recommendation_rule` |
+| Writes | `cache:idempotency`, `seating.recommendation_rule` |
 | Called by | BO-1034, BO-1035, BO-1036, BO-1037, BO-1038, BO-1041 |
 
 **Parameters**
@@ -7861,7 +7747,8 @@ Every table this service owns that the slice reads or writes, with its columns a
 |---|---|---|---|
 | id | uuid | yes |  |
 | product_id | uuid | yes |  |
-| kind | text | yes |  |
+| minimum_size | integer | no | The smallest group the package is sold to; null means one participant. |
+| kind | text | yes | corporate, tourOperator and community are the group types the approved group-booking screens draw beside school and party (CHG-SGU-024; R8 blocker ORDERS-MONEY-C20, CHG-R8MIG-009). |
 | max_participants | integer | yes | Pupils or children, e.g. |
 | duration_minutes | integer | yes |  |
 | host_count | integer | no | Party hosts included. |
@@ -8017,7 +7904,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | dynamic_pricing_strategy_id | uuid | yes |  |
 | base_price_source | text | no |  |
 | adjustment_model | text | yes |  |
-| bands | jsonb | no | [{code, price, percent}], ascending. |
+| bands | jsonb | no | The bands, lowest first (typed 20 October 2026, R8 blocker cause GPS-C32; CHG-R8SPN-028: it was declared an object while every reader and writer used a list, so no valid body could carry it). |
 | base_band_code | text | no |  |
 | step_amount | numeric(18,4) | no |  |
 | minimum_price | numeric(18,4) | no |  |
@@ -8031,7 +7918,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | minimum_minutes_between_movements | integer | no |  |
 | cooldown_minutes | integer | no |  |
 | reversal_rule | text | no |  |
-| allowed_endpoints | text[] | no | Psychological price endings, e.g. |
+| allowed_endpoints | text[] | no | The governed price endpoints a price may land on, as decimal strings in the venue's currency (e.g. |
 | created_at | timestamptz | no |  |
 | updated_at | timestamptz | no |  |
 
@@ -8341,6 +8228,8 @@ Every table this service owns that the slice reads or writes, with its columns a
 |---|---|---|---|
 | version | text | yes |  |
 | venue_id | uuid | yes |  |
+| published_at | timestamptz | no | When the bundle was published; BundleSummary.publishedAt (CHG-R8MIG-015). |
+| published_by | uuid | no | Who published it; BundleSummary.publishedBy (CHG-R8MIG-015). |
 | is_delta | boolean | yes |  |
 | base_version | text | no | Present when isDelta. |
 | signature | text | yes | Detached signature over contentHash. |
@@ -8538,6 +8427,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | is_recommended_at_checkout | boolean | no | Whether checkout recommends the bundle. |
 | required_variant_ids | text[] | no | Products that must already be in the basket for the bundle to be sold (the setup screen's "requires another product"). |
 | id | uuid | yes |  |
+| variant_id | uuid | no | The catalogue variant a cart line of this bundle names (R8 blocker ORDERS-MONEY-C43, CHG-R8MIG-023): each sold bundle has a catalogue product of kind bundle with one variant, made when the bundle is… |
 | savings_amount | numeric(18,4) | yes | Sum of component list prices less the bundle price. |
 | savings_percentage | numeric | no |  |
 | has_been_sold | boolean | yes | True locks components and allocation against amendment. |
@@ -8860,7 +8750,8 @@ Every table this service owns that the slice reads or writes, with its columns a
 | performance_id | uuid | yes |  |
 | seat_ids | text[] | yes |  |
 | buffered_seat_ids | text[] | no | Neighbours implicitly held by a seating rule. |
-| status | text | yes |  |
+| status | text | yes | converted when the order is created; sold when the order is paid and catalogue.convertInventoryHold sells the units (ADAM CR-169, 18 October 2026; CHG-CRA-007). |
+| inventory_reservation_id | text | no | The inventory hold these seats sit under (ADAM CR-169; CHG-CRA-007), so convertInventoryHold finds the order's seat reservations from the hold it converts. |
 | gross_amount | numeric(18,4) | no |  |
 | held_by_principal_id | uuid | no |  |
 | subject_id | uuid | no |  |
@@ -8894,26 +8785,26 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-356 operations, added to this service in later releases without changing any of the above.
+378 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
 | allocation | `listAllocationSplits`, `previewAllocationSplit` |
 | block | `allocateBlockedSeats`, `createSeatBlock`, `listSeatBlocks`, `relinquishSeatBlock` |
-| bundle | `listBundleCapacityPolicies`, `listBundlePartnerProductMappings`, `listBundles`, `reportBundleApplied`, `setBundleCapacityPolicy`, `setBundlePartnerProductMappings` |
+| bundle | `getBundle`, `getBundleSigningKeys`, `listBundleCapacityPolicies`, `listBundlePartnerProductMappings`, `listBundles`, `listCatalogueBundles`, `reportBundleApplied`, `setBundleCapacityPolicy`, `setBundlePartnerProductMappings` |
 | capacity | `createChannelCapacity`, `getChannelAllocations`, `listChannelCapacities`, `relinquishChannelAllocation`, `setChannelAllocations`, `updateChannelCapacity` |
-| catalogue | `assessProductChange`, `bulkUpdateCatalogueProducts`, `cancelPricingRollback`, `createDonationCampaign`, `decideCatalogueAiFinding`, `freezeEntitlement`, `getCatalogueImportJob`, `getDynamicPriceRule`, `getPlanBenefits`, `importProductCatalogue`, `listDonationCampaigns`, `listDynamicPriceRules`, `listGuestMemberships`, `listMembershipBenefits`, `listMembershipProgrammes`, `listProductVersions`, `listWaitlistEntries`, `offerWaitlistCapacity`, `reinstateEntitlement`, `requestPricingRollback`, `restoreProductVersion`, `retryChannelIncident`, `setChannelSyncSetting`, `setConfigurationTemplate`, `setCurrencyRoundingRule`, `setDemandSignalConfiguration`, `setMarketPricingConfiguration`, `setMembershipBenefit`, `setMembershipProgramme`, `setPackagePricingDefinition`, `setPlanBenefits`, `setPriceCalculationPolicy`, `setPriceCategoryRateType`, `setProductLinks`, `setSignalRegistryPolicy`, `testChannelConnection`, `updateChannelIncident`, `updateDonationCampaign` |
+| catalogue | `assessProductChange`, `bulkUpdateCatalogueProducts`, `cancelPricingRollback`, `createDonationCampaign`, `decideCatalogueAiFinding`, `freezeEntitlement`, `getCatalogueImportJob`, `getDynamicPriceRule`, `getPlanBenefits`, `importProductCatalogue`, `listDonationCampaigns`, `listDynamicPriceRules`, `listGuestMemberships`, `listMembershipBenefits`, `listMembershipProgrammes`, `listProductCategoryUsage`, `listProductTags`, `listProductVersions`, `listWaitlistEntries`, `offerWaitlistCapacity`, `reinstateEntitlement`, `requestPricingRollback`, `restoreProductVersion`, `retryChannelIncident`, `setChannelSyncSetting`, `setConfigurationTemplate`, `setCurrencyRoundingRule`, `setDemandSignalConfiguration`, `setMarketPricingConfiguration`, `setMembershipBenefit`, `setMembershipProgramme`, `setPackagePricingDefinition`, `setPlanBenefits`, `setPriceCalculationPolicy`, `setPriceCategoryRateType`, `setProductLinks`, `setProductTagDefinition`, `setSignalRegistryPolicy`, `testChannelConnection`, `updateChannelIncident`, `updateDonationCampaign` |
 | category | `listSeatCategories` |
-| coupon | `assignCoupon`, `getCouponCodeBatch`, `listCouponCampaigns`, `listCouponCodes`, `voidCouponCode` |
-| drafted | `approveCampaignWorkflow`, `approveDecision`, `approvePricingWorkflowAuthority`, `approveReviewDecision`, `approveWorkflow`, `decidePricingChangeRequest`, `listAdvancedOffer`, `listAdvancedOfferGuardrail`, `listAudienceDiscoveryTargeting`, `listAudiencePreviewReach`, `listAutomationPolicyAutonomous`, `listBehavioralTransactionTargeting`, `listBestOfferCustomer`, `listBudgetConsumptionForecast`, `listBulkPricingUpdate`, `listBundleAvailabilityCapacity`, `listBundleAvailabilityChannel`, `listBundleAvailabilityForecast`, `listBundleBogoAdvanced`, `listBundleCombo`, `listBundlePricingCommercial`, `listBundleSellabilityDependency`, `listBundleValidityScheduling`, `listCalculationValidationReconciliation`, `listCampaignCalendarTimeline`, `listCampaignExperimentTest`, `listCampaignFinancialCommercial`, `listCampaignGovernanceBudget`, `listCampaignPromotionPerformance`, `listCapacityPoolReservation`, `listCartTransactionThreshold`, `listChangeImpactAnalysis`, `listChangePropagationDependency`, `listChannel`, `listChannel2`, `listChannelAllocationRebalancing`, `listChannelBasedPricing`, `listChannelConnectionIntegration`, `listChannelCustomerSegment`, `listChannelExceptionIncident`, `listChannelGovernanceSla`, `listChannelLogTransaction`, `listChannelPerformanceCommercial`, `listChannelSaleRule`, `listChannelSaleSchedule`, `listCheapestLowestValue`, `listCodeEligibilityRestriction`, `listCodeSecurityFraud`, `listCommercialPricing`, `listCommercialPricingStructure`, `listCompetitorPricingMarket`, `listComponentInventoryAvailability`, `listConflict`, `listConflictDetectionResolution`, `listContextLocationChannel`, `listCrmCustomerSegment`, `listCurrencyPrecisionRounding`, `listCustomerEligibilityRule`, `listCustomerMembershipSegment`, `listCustomerSegmentChannel`, `listCustomerSegmentProfile`, `listDemandBookingCurve`, `listDiscountCalculationApplication`, `listDiscountCapMaximum`, `listDiscountLimitGuardrail`, `listDiscountMarginProfitability`, `listDynamicBundle`, `listDynamicBundle2`, `listDynamicBundleRule`, `listDynamicComponentSubstitution`, `listDynamicPriceBand`, `listDynamicPricingAutomation`, `listDynamicPricingGuardrail`, `listDynamicPricingPerformance`, `listDynamicPricingStrategy`, `listEffectiveDateSeason`, `listExecutivePromotionReporting`, `listFeeSurcharge`, `listFeeWaiverTax`, `listGovernanceRiskLaunch`, `listGovernanceRiskMonitoring`, `listIncrementalityAttributionCannibalization`, `listInternalDemandBooking`, `listInventoryCapacityChannel`, `listLearningModelPerformance`, `listLocationVenueEvent`, `listMarketTourismHoliday`, `listMarketVenueCurrency`, `listMembershipLoyaltyGuest`, `listMembershipLoyaltyPricing`, `listMultiBuyQuantity`, `listNearbyEventExhibition`, `listNextBestAction`, `listOfferBasketTrace`, `listPackageBundleAdd`, `listPartnerExternalProduct`, `listPartnerPaymentEligibility`, `listPaymentMethodBank`, `listPercentageFixedDiscount`, `listPriceCalculationSequence`, `listPriceCategoryRate`, `listPriceElasticityRevenue`, `listPriceListTemplate`, `listPricing`, `listPricingChangeImpact`, `listPricingCompliance`, `listPricingDistributionSynchronization`, `listPricingGovernance`, `listPricingRecommendationExplainability`, `listPricingRollbackEmergency`, `listPricingRule`, `listPricingRulePriority`, `listPricingVersionBaseline`, `listProductApprovalWorkflows`, `listProductDuplicationTemplate`, `listProductGovernance`, `listProductImportExport`, `listProductLifecycle`, `listProductPriceAvailability`, `listProductRetirementSuspension`, `listProductTrailChange`, `listPromotionActivityVersion`, `listPromotionAlertException`, `listPromotionCampaign`, `listPromotionChannel`, `listPromotionDecisionTrace`, `listPromotionExclusionCompatibility`, `listPromotionHealthPerformance`, `listPromotionLifecycleStatus`, `listPromotionPerformance`, `listPromotionPriorityHierarchy`, `listQuantityGroupVolume`, `listRealTimeAvailability`, `listRealTimeChannel`, `listRecommendationReviewDecision`, `listRedemption`, `listRedemptionCodeLookup`, `listRedemptionConversionFunnel`, `listRedemptionDiscountExposure`, `listResidencyNationalityMarket`, `listRevenue`, `listRevenueAllocationCost`, `listRevenueDemandImpact`, `listRewardSelectionSubstitution`, `listRollbackRecovery`, `listRulePriorityConflict`, `listSaleChannel`, `listScenarioModelingWhat`, `listScheduledLifecycleActions`, `listSeasonalCalendarDay`, `listSeatPricingRules`, `listSignalDataQuality`, `listSpecialPriceGuest`, `listStackingConflict`, `listTargetingConflictFrequency`, `listTargetingEligibility`, `listTaxFeeCalculation`, `listTaxProfiles`, `listThresholdActionAutomatic`, `listTimeBasedSeasonal`, `listTimeslotPerformanceTime`, `listUniqueCodeGeneration`, `listUpsellCrossSell`, `listUsageCapacityFrequency`, `listValidityDateTime`, `listVolumeBulkTier`, `listWeatherDemandImpact`, `publishActivationScheduler`, `publishPricingEffectiveDate`, `setCampaignBudgetFinancial`, `setCatalogueReview`, `setFeeApplicabilityCharging`, `setLifecycleStatuWorkflow`, `setPriceHierarchyInheritance`, `setPricingChangeRequest`, `setPricingExperiment`, `setProductContextOwnership`, `setPromotionStackingRule`, `setRuleTestRecommendation`, `setSeatPricingRule`, `setTaxProfileJurisdiction`, `setTaxRuleTreatment`, `simulateBundlePreviewRecommendation`, `simulatePriceBreakdownCalculation`, `submitPricingChangeRequest`, `testPricingRule` |
+| coupon | `assignCoupon`, `getCouponCode`, `getCouponCodeBatch`, `listCouponCampaigns`, `listCouponCodes`, `voidCouponCode` |
+| drafted | `approveCampaignWorkflow`, `approveDecision`, `approvePricingWorkflowAuthority`, `approveReviewDecision`, `approveWorkflow`, `decidePricingChangeRequest`, `getChannelAvailability`, `listAdvancedOffer`, `listAdvancedOfferGuardrail`, `listAudienceDiscoveryTargeting`, `listAudiencePreviewReach`, `listAutomationPolicyAutonomous`, `listBehavioralTransactionTargeting`, `listBestOfferCustomer`, `listBudgetConsumptionForecast`, `listBulkPricingUpdate`, `listBundleAvailabilityCapacity`, `listBundleAvailabilityChannel`, `listBundleAvailabilityForecast`, `listBundleBogoAdvanced`, `listBundleCombo`, `listBundlePricingCommercial`, `listBundleSellabilityDependency`, `listBundleValidityScheduling`, `listCalculationValidationReconciliation`, `listCampaignCalendarTimeline`, `listCampaignExperimentTest`, `listCampaignFinancialCommercial`, `listCampaignGovernanceBudget`, `listCampaignPromotionPerformance`, `listCapacityPoolReservation`, `listCartTransactionThreshold`, `listChangeImpactAnalysis`, `listChangePropagationDependency`, `listChannel`, `listChannel2`, `listChannelAllocationRebalancing`, `listChannelBasedPricing`, `listChannelConnectionIntegration`, `listChannelCustomerSegment`, `listChannelExceptionIncident`, `listChannelGovernanceSla`, `listChannelLogTransaction`, `listChannelPerformanceCommercial`, `listChannelSaleRule`, `listChannelSaleSchedule`, `listCheapestLowestValue`, `listCodeEligibilityRestriction`, `listCodeSecurityFraud`, `listCommercialPricing`, `listCommercialPricingStructure`, `listCompetitorPricingMarket`, `listComponentInventoryAvailability`, `listConflict`, `listConflictDetectionResolution`, `listContextLocationChannel`, `listCrmCustomerSegment`, `listCurrencyPrecisionRounding`, `listCustomerEligibilityRule`, `listCustomerMembershipSegment`, `listCustomerSegmentChannel`, `listCustomerSegmentProfile`, `listDemandBookingCurve`, `listDiscountCalculationApplication`, `listDiscountCapMaximum`, `listDiscountLimitGuardrail`, `listDiscountMarginProfitability`, `listDynamicBundle`, `listDynamicBundle2`, `listDynamicBundleRule`, `listDynamicComponentSubstitution`, `listDynamicPriceBand`, `listDynamicPricingAutomation`, `listDynamicPricingGuardrail`, `listDynamicPricingPerformance`, `listDynamicPricingStrategy`, `listEffectiveDateSeason`, `listExecutivePromotionReporting`, `listFeeSurcharge`, `listFeeWaiverTax`, `listGovernanceRiskLaunch`, `listGovernanceRiskMonitoring`, `listIncrementalityAttributionCannibalization`, `listInternalDemandBooking`, `listInventoryCapacityChannel`, `listLearningModelPerformance`, `listLocationVenueEvent`, `listMarketTourismHoliday`, `listMarketVenueCurrency`, `listMembershipLoyaltyGuest`, `listMembershipLoyaltyPricing`, `listMultiBuyQuantity`, `listNearbyEventExhibition`, `listNextBestAction`, `listOfferBasketTrace`, `listPackageBundleAdd`, `listPartnerExternalProduct`, `listPartnerPaymentEligibility`, `listPaymentMethodBank`, `listPercentageFixedDiscount`, `listPriceCalculationSequence`, `listPriceCategoryRate`, `listPriceElasticityRevenue`, `listPriceListTemplate`, `listPricing`, `listPricingChangeImpact`, `listPricingCompliance`, `listPricingDistributionSynchronization`, `listPricingGovernance`, `listPricingRecommendationExplainability`, `listPricingRollbackEmergency`, `listPricingRule`, `listPricingRulePriority`, `listPricingVersionBaseline`, `listProductApprovalWorkflows`, `listProductDuplicationTemplate`, `listProductGovernance`, `listProductImportExport`, `listProductLifecycle`, `listProductPriceAvailability`, `listProductRetirementSuspension`, `listProductTrailChange`, `listPromotionActivityVersion`, `listPromotionAlertException`, `listPromotionCampaign`, `listPromotionChannel`, `listPromotionDecisionTrace`, `listPromotionExclusionCompatibility`, `listPromotionHealthPerformance`, `listPromotionLifecycleStatus`, `listPromotionPerformance`, `listPromotionPriorityHierarchy`, `listQuantityGroupVolume`, `listRealTimeAvailability`, `listRealTimeChannel`, `listRecommendationReviewDecision`, `listRedemption`, `listRedemptionCodeLookup`, `listRedemptionConversionFunnel`, `listRedemptionDiscountExposure`, `listResidencyNationalityMarket`, `listRevenue`, `listRevenueAllocationCost`, `listRevenueDemandImpact`, `listRewardSelectionSubstitution`, `listRollbackRecovery`, `listRulePriorityConflict`, `listSaleChannel`, `listScenarioModelingWhat`, `listScheduledLifecycleActions`, `listSeasonalCalendarDay`, `listSeatPricingRules`, `listSignalDataQuality`, `listSpecialPriceGuest`, `listStackingConflict`, `listTargetingConflictFrequency`, `listTargetingEligibility`, `listTaxFeeCalculation`, `listTaxProfiles`, `listThresholdActionAutomatic`, `listTimeBasedSeasonal`, `listTimeslotPerformanceTime`, `listUniqueCodeGeneration`, `listUpsellCrossSell`, `listUsageCapacityFrequency`, `listValidityDateTime`, `listVolumeBulkTier`, `listWeatherDemandImpact`, `publishActivationScheduler`, `publishPricingEffectiveDate`, `setCampaignBudgetFinancial`, `setCatalogueReview`, `setFeeApplicabilityCharging`, `setLifecycleStatuWorkflow`, `setPriceHierarchyInheritance`, `setPricingChangeRequest`, `setPricingExperiment`, `setProductContextOwnership`, `setPromotionStackingRule`, `setRuleTestRecommendation`, `setSeatPricingRule`, `setTaxProfileJurisdiction`, `setTaxRuleTreatment`, `simulateBundlePreviewRecommendation`, `simulatePriceBreakdownCalculation`, `submitPricingChangeRequest`, `testPricingRule` |
 | entitlement | `archiveEntitlementTemplate`, `getEntitlementTemplate`, `listEntitlementTemplates`, `suspendEntitlement`, `updateEntitlementTemplate` |
 | event | `cancelPerformance`, `getEvent`, `getWaitingRoomStatus`, `setWaitingRoomSetting` |
 | events | `assignPerformanceMedia`, `estimateEventResourceCost`, `getEventChangeTreatmentPolicy`, `getEventResourcePlan`, `listEventTypes`, `listPerformanceTemplates`, `listSpaces`, `rescheduleEvent`, `setEventCapacityProfile`, `setEventChangeTreatmentPolicy`, `setEventRegistration`, `setEventResourcePlan`, `setEventSchedule`, `setEventType`, `setPerformanceTemplate`, `setPrepaidMinutePackage`, `setSpace` |
 | general | `getPackagePricingDefinition`, `getProductAttributes`, `getTaxProfileJurisdiction` |
 | import | `commitImportJob`, `getImportJob`, `importSeatGeometry`, `importSeatManifest` |
-| lease | `forceReleaseInventoryHold`, `relinquishInventoryHold`, `renewInventoryHold` |
+| lease | `acquireInventoryHold`, `forceReleaseInventoryHold`, `listInventoryHolds`, `relinquishInventoryHold`, `renewInventoryHold` |
 | pricing | `getPriceList`, `listPriceLists`, `listPrices` |
-| product | `createProduct`, `setProductAttributes`, `transitionProductLifecycle` |
+| product | `checkProductSalePermission`, `createProduct`, `getProductChannelTexts`, `getProductDashboard`, `getProductOwnerForms`, `getProductSalePermissionRules`, `listOwnerFormCandidates`, `listProductAttentionItems`, `listSalePermissionTargets`, `setProductAttributes`, `setProductChannelTexts`, `setProductClassification`, `setProductOwnerForms`, `setProductSalePermissionRules`, `transitionProductLifecycle` |
 | promotion | `createCommercialCampaign`, `endPromotion`, `listCommercialCampaigns`, `pausePromotion`, `unschedulePromotion`, `updateCommercialCampaign` |
 | promotions | `getRecommendations`, `simulatePromotion`, `voidVoucher` |
 | recommendations | `concludeRecommendationExperiment`, `createRecommendationExperiment`, `createRecommendationStrategy`, `explainRecommendation`, `getProductAffinity`, `getRecommendationPerformance`, `listProductRelationships`, `listRecommendationExperiments`, `listRecommendationStrategies`, `recordRecommendationOutcome`, `setProductRelationships`, `setRecommendationSuppression`, `simulateRecommendationStrategy`, `updateRecommendationStrategy` |

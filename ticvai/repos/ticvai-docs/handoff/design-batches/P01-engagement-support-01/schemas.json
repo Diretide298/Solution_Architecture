@@ -85,6 +85,12 @@
  "AiConversation": {
   "type": "object",
   "x-ticvai-persistence": "ai.conversation",
+  "x-ticvai-exactly-one-of": [
+   [
+    "principalId",
+    "subjectId"
+   ]
+  ],
   "required": [
    "id",
    "principalId",
@@ -98,7 +104,20 @@
    },
    "principalId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "nullable": true,
+    "description": "The staff member who opened the conversation; null when a guest opened it (`subjectId`)."
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The guest who opened the conversation (a guest is not a principal); null for staff. Exactly one of `principalId` and `subjectId` is set."
+   },
+   "profileKey": {
+    "type": "string",
+    "nullable": true,
+    "description": "The assistant profile the conversation runs under (`configureAssistantProfile`), as `createAiConversation` set it; null for the module's default profile (R8 blocker WHITE-C27)."
    },
    "scopePath": {
     "type": "string"
@@ -125,7 +144,7 @@
  "AiMaturity": {
   "type": "object",
   "x-ticvai-persistence": "none — embedded as jsonb on ai.suggestion and ai.forecast_version",
-  "description": "**Where an answer stands, on every answer** (29 September, AI functions review; baseline then learn). The customer sees a stage badge and a \"Based on\" chip, never a bare percentage (design 5.6), and \"Limited historical data\" while the starting pattern carries more than half the weight.",
+  "description": "**Where an answer stands, on every answer** (29 September, AI functions review; baseline then learn). The customer sees a stage badge and a \"Based on\" chip, never a bare percentage (design 5.6), and \"Limited historical data\" while the starting pattern carries more than half the weight.\n\n**The stage rule per kind** (r8 walk of ticket 27723; lead decision of 20 October 2026, option A). The stage of an answer is decided by the days of the tenant's own data behind its kind, against that kind's `Minimum` in `SuggestionKind`: `starting` below the minimum, `learning` from the minimum, `established` from three times the minimum, `learned` only by promotion (AI-D16). For the Block A kinds that is:\n| kind | minimum | learning from | established from |\n|---|---|---|---|\n| queueBalancing | 14 days | day 14 | day 42 |\n| prepPlan | 28 days (4 weeks) | day 28 | day 84 |\n| upsell | 90 days | day 90 | day 270 |\nThe 28-day seeded run of AI-ENGINE-BASELINE therefore proves `learning` for `queueBalancing` and `prepPlan`. `upsell` cannot read `learning` at day 28 and is checked at day 90 with a seeded fixture of 90 days of orders. Other kinds follow the same rule with their own minimum.",
   "required": [
    "stage",
    "basedOn"
@@ -658,8 +677,11 @@
    "profiling",
    "thirdPartySharing",
    "aiProcessing",
-   "transactional"
-  ]
+   "transactional",
+   "storedPaymentCredential",
+   "facePassEnrolment"
+  ],
+  "description": "`storedPaymentCredential` (a card saved for later, `storePaymentToken`) and `facePassEnrolment` (a face enrolled for entry, `enrolFacePass`) are purposes of their own (R8 blocker ORDERS-MONEY-C21, CHG-R8MIG-022), so a screen picks the row by its purpose instead of guessing: each tenant has one `marketing.consent_purpose` row of each, seeded with the tenant's other purposes."
  },
  "ConsentPurposeConfig": {
   "x-ticvai-rls": "grant-holder-read",
@@ -672,6 +694,12 @@
    "isRequiredForService"
   ],
   "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "The purpose row's id (`marketing.consent_purpose.id`), the value `consentPurposeId` and a consent's `purposeId` carry (R8 blocker ORDERS-MONEY-C21, CHG-R8MIG-022)."
+   },
    "purpose": {
     "$ref": "#/components/schemas/ConsentPurpose"
    },
@@ -1253,6 +1281,16 @@
       "type": "string"
      }
     }
+   },
+   "presentation": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "dropDown",
+     "radio",
+     "checkBoxes"
+    ],
+    "description": "**How a choice is drawn** (products module, 16 October 2026 minutes 4.13: the data mask's field types are text, drop-down, radio and check box; CHG-R8PRD-009). For `select`, `dropDown` (the default) or `radio`; for `multiSelect`, `checkBoxes`. A single check box is a `boolean`. Null for every other type. It changes how the field is drawn, never what is stored. On any other type, or a value that does not fit the type, the server stores null."
    }
   }
  },
@@ -1344,6 +1382,81 @@
    "ipAddress": {
     "type": "string",
     "nullable": true
+   },
+   "saleContext": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/FormSubmissionSaleLink"
+     }
+    ],
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "x-ticvai-derived": "onRead",
+    "description": "**The sale a capture was made for** (products module, 16 October 2026 minutes 4.13; CHG-R8PRD-009, CHG-R8PRD-010): a product's reservation-owner and ticket-owner forms (catalogue `getProductOwnerForms`) are answered as submissions of this form, one for the buyer and one per credential for each ticket owner, so each owner's answers are a record of their own and two owners' keys never collide. **Read-only here**: it is written only by the Orders service through `recordSaleOwnerAnswers` (service-to-service), never by a caller of `submitForm`. Null for a submission made outside a sale."
+   }
+  }
+ },
+ "FormSubmissionSaleLink": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.form_submission_sale_link",
+  "x-ticvai-unique-together": [
+   [
+    "orderId",
+    "ownerRole",
+    "orderLineId",
+    "unitIndex"
+   ]
+  ],
+  "x-ticvai-unique-nulls": "not-distinct",
+  "x-ticvai-required-when": {
+   "orderLineId": {
+    "ownerRole": "ticketOwner"
+   },
+   "unitIndex": {
+    "ownerRole": "ticketOwner"
+   }
+  },
+  "description": "**Which owner slot of which sale a submission answers** (CHG-R8PRD-010). One row per submission made for a sale; the unique key allows one answer per slot: the buyer once per order (line and unit null), each ticket owner once per order line and unit. A `reservationOwner` link with a line or unit set is refused (`400 validation`), so the buyer's slot cannot be widened.",
+  "required": [
+   "orderId",
+   "ownerRole"
+  ],
+  "properties": {
+   "submissionId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "x-ticvai-references": "marketing.form_submission"
+   },
+   "orderId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The order (Orders' id; not a database reference)."
+   },
+   "ownerRole": {
+    "type": "string",
+    "enum": [
+     "reservationOwner",
+     "ticketOwner"
+    ]
+   },
+   "orderLineId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "For a ticket owner, the order line whose credential this owner holds; null for the buyer."
+   },
+   "unitIndex": {
+    "type": "integer",
+    "minimum": 1,
+    "nullable": true,
+    "description": "For a ticket owner, which of the line's credentials (1 to the line's quantity); null for the buyer."
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). The order's venue."
    }
   }
  },
@@ -1692,7 +1805,7 @@
   "x-ticvai-persistence": "none — embedded in tenant_config",
   "type": "object",
   "nullable": true,
-  "description": "**The oldest guest app build still allowed to run (decided 28 September, audit R073).** A guest app whose own version is below the one for its platform shows the forced-upgrade screen (GST-047) and nothing else. Null, or a platform left null, forces nothing. Live at once through `setMaintenanceMode`, because an upgrade that must wait for a publish is not forced.\n",
+  "description": "**The oldest guest app build still allowed to run (decided 28 September, audit R073).** A guest app whose own version is below the one for its platform shows the forced-upgrade screen (GST-047) and nothing else. Null, or a platform left null, forces nothing. Live at once through `setMaintenanceMode`, because an upgrade that must wait for a publish is not forced.\n\n**`storeUrl`** (r8 walk of ticket 27893): the store page GST-047's \"Update\" button opens, one per platform, set with `setMaintenanceMode` beside the versions and live at once like them. Optional. A store address cannot be derived from `StoreAccount.appIdentifier`, which is a bundle id. The forced-upgrade screen opens the URL for the platform it runs on; where it is null the screen shows the message without the button and the guest updates from the store by hand.\n",
   "properties": {
    "ios": {
     "type": "string",
@@ -1703,6 +1816,25 @@
     "type": "string",
     "nullable": true,
     "pattern": "^\\d+\\.\\d+\\.\\d+$"
+   },
+   "storeUrl": {
+    "type": "object",
+    "nullable": true,
+    "description": "The store page of the tenant's app for each platform. https only.",
+    "properties": {
+     "ios": {
+      "type": "string",
+      "format": "uri",
+      "pattern": "^https://",
+      "nullable": true
+     },
+     "android": {
+      "type": "string",
+      "format": "uri",
+      "pattern": "^https://",
+      "nullable": true
+     }
+    }
    }
   }
  },
@@ -1806,6 +1938,13 @@
     "type": "string",
     "format": "uuid",
     "description": "The client UUIDv7 from `CreateOrderRequest.id`."
+   },
+   "orderAccessToken": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "**What lets the device that just checked out read the order it paid for** (decided 20 October 2026, Chinmay, R8 blocker cause IDENTITY-C52, option A; CHG-R8SPN-025). Returned only in `checkoutCart`'s answer, null everywhere else: a signed token bound to this order and to the cart's device, valid 24 hours, never stored. `getOrder` accepts it in `X-Order-Access-Token` in place of a session, so a guest who checked out with no account, or whose session ended, still sees the confirmation (WEB-013 keeps it in its navigation state). It reads this order only and grants nothing else."
    },
    "orderNumber": {
     "x-ticvai-unique": "tenant",
@@ -2133,6 +2272,11 @@
  },
  "Payment": {
   "x-ticvai-persistence": "orders.payment",
+  "x-ticvai-index": [
+   [
+    "providerReference"
+   ]
+  ],
   "type": "object",
   "required": [
    "id",
@@ -2303,7 +2447,47 @@
     "format": "uuid",
     "nullable": true,
     "readOnly": true,
+    "x-ticvai-references": "ai.translation_job",
     "description": "The `proposeTranslations` job that drafted this proposal; `getTranslationProposals` reads a job's rows by it. Null on every other proposal (CHG-RFM-004)."
+   },
+   "targetKind": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "enum": [
+     "contentBlock",
+     "productName",
+     "emailTemplate",
+     "messageTemplate"
+    ],
+    "description": "For a translation draft, what kind of thing it sits on (`TranslationProposals.drafts[].targetKind`); null on every other proposal (R8 blocker FOUNDATION-AI-C40)."
+   },
+   "targetRef": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "maxLength": 200,
+    "description": "For a translation draft, the id of the block, product or template it sits on (the path id of the target's own write, e.g. a content block's `blockId`); null otherwise (R8 blocker FOUNDATION-AI-C40)."
+   },
+   "locale": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "maxLength": 20,
+    "description": "For a translation draft, the language it is in (the job's `targetLocale`); null otherwise."
+   },
+   "fieldPath": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "maxLength": 300,
+    "description": "For a translation draft, where it goes inside the target, as a dotted path in the target's own body (`TranslationProposals.drafts[].fieldPath`); null otherwise. Empty for a field that is not text."
+   },
+   "draftText": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "For a translation draft, the proposed text; null otherwise. `payload` stays the request body of the target's write, with this text at `fieldPath` (R8 blocker FOUNDATION-AI-C40)."
    },
    "kind": {
     "type": "string",
@@ -2709,6 +2893,15 @@
     "x-ticvai-derived": "onRead",
     "description": "True once any version has been published."
    },
+   "darkAppModules": {
+    "type": "array",
+    "readOnly": true,
+    "x-ticvai-derived": "onRead",
+    "description": "**The app-modules switched off for this tenant** (ADAM CR-164, option A, 18 October 2026; CHG-CRA-005): their keys (for example `AM-MARKETING-CRM-P01`), from the tenant's release flags. Returned to guests and staff alike; the apps leave those modules' screens out of navigation (the map is `handoff/release-flags.json`). An operation is dark for the tenant only when every app-module that binds it is off, so an operation shared with a live module stays callable. A flag the configuration does not declare counts as on. Additive: nothing new shows on screen.",
+    "items": {
+     "type": "string"
+    }
+   },
    "publishedVersion": {
     "type": "string",
     "nullable": true
@@ -2792,6 +2985,15 @@
        "type": "string",
        "maxLength": 200,
        "description": "The venue's name (`tenancy.OrgUnit.name`)."
+      },
+      "contact": {
+       "allOf": [
+        {
+         "$ref": "#/components/schemas/VenueContact"
+        }
+       ],
+       "nullable": true,
+       "description": "The venue's own contact (address, phone, email), from the venue's settings (`tenancy.VenueSettings`, read through `venueSettingsRecords`). Null when the venue has none set; the app then shows the tenant's `contact` (R8 blocker WHITE-C16)."
       },
       "city": {
        "type": "string",

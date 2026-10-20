@@ -821,10 +821,8 @@ paths:
         - "P08 BO-1173 Wallet Integration Command Center"
         - "P08 BO-1179 Integration Monitoring & Exception Workbench"
         - "P14 DEV-005 Webhooks"
-      x-ticvai-read-via:
-      - query: tenancy#outboxRecords
-        route: service
-        for: 'its read of platform.outbox, Tenancy''s data (CHG-MOD-001)'
+      # The deliveries are written by the workers host's replay job, not by this request (r8 integration, CHG-R8INT-014; check-parameter-columns P-NAMED-TABLE).
+      x-ticvai-names-for-context: [control.webhook_delivery]
       summary: Re-deliver events from a point in time
       description: >
         13.3.19. **Recovery, synchronisation and troubleshooting** — an integrator whose server was
@@ -835,6 +833,26 @@ paths:
 
         **Marked as a replay in the payload.** A consumer that cannot tell a replay from a live
         event will double-count.
+
+        **This validates and queues; it reads no outbox** (ADAM CR-140, option 1, 18 October 2026;
+        CHG-CRA-004). It inserts one `control.webhook_replay` row (`WebhookReplayJob`, status `queued`) and
+        answers 202. **A dispatcher on the workers host drains it** (its own ticket): it reads each tenant
+        database's outbox directly, as the relay on the same host does, re-delivers the events in the window and
+        of the types asked, and writes each delivery as a `control.webhook_delivery` with `isReplay` true and the
+        replay's `replayId`; the row goes `running`, then `completed` or `failed`.
+
+        **The window** (CR-140): `to` before `from` is 400 `replay-window-invalid`. The retention bound is the
+        outbox itself: published rows leave with their monthly partition (ADR-0058), so a `from` older than the
+        oldest attached partition is 400 `replay-window-beyond-retention`. An event type the subscription does not
+        hold is 400 `replay-event-type-not-subscribed`. **The caller's tenant** must be one of the subscription's
+        API client's `allowedTenantIds`, else 404, as for an unknown subscription.
+
+        **What the window measures, what it filters, how large it may be** (r8 walk of ticket 27997). The window
+        is on the outbox row's `created_at`, the moment the event was written, not the moment it was first
+        delivered. The subscription's own filters (event types, venues) are applied by the dispatcher to every
+        replayed event exactly as for a live delivery, so an event of another venue is never sent. One replay
+        covers at most 7 days (`to` minus `from`, `to` defaulting to now) and at most 10,000 events; a larger
+        ask is 400 `replay-window-too-large` and nothing is queued, so the integrator replays in steps.
       tags: [publicApi]
       x-ticvai-permission: DEVELOPER_MANAGE
       x-ticvai-audience: [staff, partner]
@@ -864,6 +882,25 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/WebhookReplayJob'
+        '400':
+          description: 'The window or the event types cannot be replayed (ADAM CR-140; CHG-CRA-004): `to` before `from`
+            (`replay-window-invalid`); `from` older than the oldest outbox partition still attached
+            (`replay-window-beyond-retention`); an event type the subscription does not hold
+            (`replay-event-type-not-subscribed`); a window longer than 7 days or holding more than 10,000 events
+            (`replay-window-too-large`). Nothing is queued.'
+          x-ticvai-problem-types: [replay-window-invalid, replay-window-beyond-retention, replay-event-type-not-subscribed, replay-window-too-large]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
+        '404':
+          description: 'No such subscription, or the caller''s tenant is not one of its API client''s `allowedTenantIds`
+            (ADAM CR-140); the two are not told apart. Nothing is queued.'
+          x-ticvai-problem-types: [not-found]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '409':
           description: 'The subscription is `pendingVerification` (`webhook-subscription-not-verified`) or `disabled` (`webhook-subscription-disabled`); events are replayed only to a verified, enabled endpoint. Nothing is queued.'
           x-ticvai-problem-types: [webhook-subscription-not-verified, webhook-subscription-disabled]
@@ -1011,8 +1048,14 @@ paths:
         breaking change with no deprecation window breaks somebody else's business.**
 
         ADR-0026 records the versioning rule. This exposes it.
+
+        **Open to an anonymous caller, so it holds no permission** (r8 walk of ticket 27983; lead decision of 20
+        October 2026, option A): the reference is public, a developer arrives with no account (F27). The permission
+        a staff caller must hold (`DEVELOPER_VIEW`, ADR-0025) is not enforced here, and a signed-in staff caller
+        without it is not refused. Nobody is refused on this read, so the screen's no-access state cannot be reached
+        through it.
       tags: [publicApi]
-      x-ticvai-permission: DEVELOPER_VIEW
+      x-ticvai-permission: null
       x-ticvai-audience: [public, partner]
       x-ticvai-scope-level: tenant
       x-ticvai-read-routing: replica
@@ -1469,8 +1512,12 @@ paths:
         (`ModuleKey`). Each scope lists the operations it opens, so a CRM integration partner granted
         `marketing.read` and `marketing.write` reaches the CRM operations and nothing else. The
         catalogue is generated at release from `x-ticvai-api-scope` on every partner-callable
-        operation; it is not edited by hand. `licensed` says whether the caller's tenant licenses the
-        module (`setApiLicensing`), since an unlicensed scope yields no token.
+        operation; it is not edited by hand: it is handoff/api-scopes.json, written by
+        tools/derive-api-scopes.py and loaded at startup (FOUNDATION-AI-C47). `licensed` is true when any
+        of the caller's tenant's api_licence rows effective today (`effective_from` on or before today, and
+        `effective_to` null or on or after it) lists the module (`setApiLicensing`), since an unlicensed scope
+        yields no token; it is omitted for a caller with no tenant (anonymous, a developer account), and a
+        client spanning tenants is answered for the tenant of the request (proposed, client to confirm).
 
         **How the operations carry it** (30 September): every operation whose `x-ticvai-audience`
         includes `partner` names its scope, `x-ticvai-api-scope: '{module}.read'` for a GET and
@@ -1481,9 +1528,13 @@ paths:
         portal's own client management (this contract) are not module data and carry no scope: a
         client reaches them by its credential, not by a grant.
 
-        **Order.** Sorted by `operationId` descending (a UUIDv7, so newest first).
+        **Order.** By module, then access (read before write), the scope string as the tiebreak, which is
+        the cursor key (FOUNDATION-AI-C47; r8 integration, CHG-R8INT-016). Scopes, grouped by module.
+
+        **Open to an anonymous caller, so it holds no permission**, as `listApiVersions` (r8 walk of ticket 27983;
+        lead decision of 20 October 2026, option A); `DEVELOPER_VIEW` is not enforced here.
       tags: [publicApi]
-      x-ticvai-permission: DEVELOPER_VIEW
+      x-ticvai-permission: null
       x-ticvai-audience: [public, staff, partner]
       x-ticvai-scope-level: tenant
       x-ticvai-read-routing: replica
@@ -2177,7 +2228,7 @@ components:
       description: >
         **The webhook event catalogue: every event a subscription may name** (29 September, build
         pass). Each value is the `name` of an event in `events/` — `aggregate.pastTenseFact`,
-        published through `platform.outbox` by exactly one context. A name is added here in the same
+        published through the outbox of the tenant database by exactly one context. A name is added here in the same
         change that adds its event file, and never before.
 
         **Added 29 September**, each closing a requirement that had the webhook mechanism and nothing
@@ -2355,6 +2406,12 @@ components:
             **Truncated, and it is what makes the log useful** — a 500 with the receiver's own error
             message in it answers the question without a conversation.
         isReplay: { type: boolean, default: false }
+        replayId:
+          type: string
+          format: uuid
+          nullable: true
+          x-ticvai-references: control.webhook_replay
+          description: The replay that re-delivered it (`replayEvents`; ADAM CR-140, CHG-CRA-004); null for a live delivery.
         isTest:
           type: boolean
           default: false
@@ -2553,13 +2610,31 @@ components:
         effectiveTo: { type: string, format: date, nullable: true }
     WebhookReplayJob:
       type: object
-      x-ticvai-persistence: none — response only; the replayed deliveries are written as webhook deliveries marked as replays
-      description: '**A queued replay** (`replayEvents`): the window and event types it re-delivers. Each delivery it makes is marked as a replay in its payload.'
-      required: [replayId, subscriptionId, from, queuedAt]
+      x-ticvai-persistence: control.webhook_replay
+      description: '**A queued replay** (`replayEvents`): the window and event types it re-delivers. Each delivery it
+        makes is marked as a replay in its payload. **Stored** (ADAM CR-140, option 1, 18 October 2026; CHG-CRA-004):
+        one `control.webhook_replay` row per request, which the workers host''s replay dispatcher drains; each
+        delivery it writes is a `control.webhook_delivery` with `isReplay` true and this `replayId`.'
+      required: [replayId, subscriptionId, from, status, queuedAt]
       properties:
-        replayId: { type: string, format: uuid }
-        subscriptionId: { type: string, format: uuid }
-        from: { type: string, format: date-time }
-        to: { type: string, format: date-time, nullable: true }
+        replayId: { type: string, format: uuid, x-ticvai-column: id }
+        subscriptionId: { type: string, format: uuid, x-ticvai-references: control.webhook_subscription }
+        from: { type: string, format: date-time, x-ticvai-column: window_from }
+        to: { type: string, format: date-time, nullable: true, x-ticvai-column: window_to }
         eventTypes: { type: array, items: { $ref: '#/components/schemas/WebhookEventType' } }
+        status:
+          type: string
+          readOnly: true
+          enum: [queued, running, completed, failed]
+          default: queued
+          description: '`queued` until the dispatcher takes it; `running` while it re-delivers; `completed` or
+            `failed` when it stops (CR-140).'
         queuedAt: { type: string, format: date-time }
+        completedAt: { type: string, format: date-time, nullable: true, readOnly: true }
+        requestedByPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          x-ticvai-references: none
+          description: Who asked for the replay, a staff or partner principal; set by the server.

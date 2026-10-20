@@ -30,7 +30,7 @@ operationsByContract:
     verb: POST
     path: /purchase-orders/{purchaseOrderId}/acknowledge
     scope: venue
-    permission: PRODUCT_CONFIGURE
+    permission: PROCUREMENT_MANAGE
     offline: false
     reads: 3
     writes: 2
@@ -54,7 +54,7 @@ operationsByContract:
     verb: POST
     path: /purchase-orders/{purchaseOrderId}/cancel
     scope: venue
-    permission: ORDER_CANCEL
+    permission: PROCUREMENT_MANAGE
     offline: false
     reads: 3
     writes: 2
@@ -62,7 +62,7 @@ operationsByContract:
     verb: POST
     path: /requisitions/{requisitionId}/cancel
     scope: venue
-    permission: PRODUCT_CONFIGURE
+    permission: PROCUREMENT_REQUEST
     offline: false
     reads: 3
     writes: 2
@@ -78,7 +78,7 @@ operationsByContract:
     verb: POST
     path: /purchase-orders/{purchaseOrderId}/close-short
     scope: venue
-    permission: LEDGER_APPROVE
+    permission: PROCUREMENT_MANAGE
     offline: false
     reads: 3
     writes: 2
@@ -94,7 +94,7 @@ operationsByContract:
     verb: GET
     path: /requisitions/{requisitionId}/quotations
     scope: venue
-    permission: PRODUCT_VIEW
+    permission: PROCUREMENT_VIEW
     offline: false
     reads: 2
     writes: 0
@@ -102,7 +102,7 @@ operationsByContract:
     verb: POST
     path: /goods-receipts
     scope: venue
-    permission: PRODUCT_CONFIGURE
+    permission: PROCUREMENT_RECEIVE
     offline: true
     reads: 3
     writes: 4
@@ -118,7 +118,7 @@ operationsByContract:
     verb: POST
     path: /purchase-orders
     scope: venue
-    permission: ORDER_CREATE
+    permission: PROCUREMENT_MANAGE
     offline: false
     reads: 3
     writes: 3
@@ -126,7 +126,7 @@ operationsByContract:
     verb: POST
     path: /requisitions
     scope: venue
-    permission: ORDER_CREATE
+    permission: PROCUREMENT_REQUEST
     offline: true
     reads: 3
     writes: 3
@@ -159,14 +159,14 @@ operationsByContract:
     path: /stock-transfers
     scope: venue
     permission: PRODUCT_CONFIGURE
-    offline: false
+    offline: true
     reads: 3
     writes: 3
   - operation: createSupplier
     verb: POST
     path: /suppliers
-    scope: region
-    permission: PRODUCT_CONFIGURE
+    scope: tenant
+    permission: PROCUREMENT_MANAGE
     offline: false
     reads: 2
     writes: 2
@@ -206,7 +206,7 @@ operationsByContract:
     verb: GET
     path: /purchase-orders/{purchaseOrderId}
     scope: venue
-    permission: PRODUCT_VIEW
+    permission: PROCUREMENT_VIEW
     offline: false
     reads: 2
     writes: 0
@@ -238,7 +238,7 @@ operationsByContract:
     verb: GET
     path: /requisitions/suggested
     scope: venue
-    permission: PRODUCT_VIEW
+    permission: PROCUREMENT_VIEW
     offline: false
     reads: 2
     writes: 0
@@ -246,7 +246,7 @@ operationsByContract:
     verb: GET
     path: /stock-batches/expiring
     scope: venue
-    permission: INVENTORY_VIEW
+    permission: PRODUCT_VIEW
     offline: true
     reads: 2
     writes: 0
@@ -254,7 +254,7 @@ operationsByContract:
     verb: GET
     path: /goods-receipts
     scope: venue
-    permission: PRODUCT_VIEW
+    permission: PROCUREMENT_VIEW
     offline: false
     reads: 2
     writes: 0
@@ -270,7 +270,7 @@ operationsByContract:
     verb: GET
     path: /purchase-orders
     scope: venue
-    permission: PRODUCT_VIEW
+    permission: PROCUREMENT_VIEW
     offline: false
     reads: 2
     writes: 0
@@ -278,7 +278,7 @@ operationsByContract:
     verb: GET
     path: /requisitions
     scope: venue
-    permission: PRODUCT_VIEW
+    permission: PROCUREMENT_VIEW
     offline: true
     reads: 2
     writes: 0
@@ -349,8 +349,8 @@ operationsByContract:
   - operation: listSuppliers
     verb: GET
     path: /suppliers
-    scope: region
-    permission: PRODUCT_VIEW
+    scope: venue
+    permission: PROCUREMENT_VIEW
     offline: false
     reads: 2
     writes: 0
@@ -375,14 +375,14 @@ operationsByContract:
     path: /stock-transfers/{transferId}/receive
     scope: venue
     permission: PRODUCT_CONFIGURE
-    offline: false
+    offline: true
     reads: 3
     writes: 3
   - operation: recordQuotation
     verb: POST
     path: /suppliers/{supplierId}/quotations
     scope: venue
-    permission: PRODUCT_CONFIGURE
+    permission: PROCUREMENT_MANAGE
     offline: false
     reads: 3
     writes: 3
@@ -398,7 +398,7 @@ operationsByContract:
     verb: POST
     path: /goods-receipts/{receiptId}/reject
     scope: venue
-    permission: PRODUCT_CONFIGURE
+    permission: PROCUREMENT_RECEIVE
     offline: false
     reads: 3
     writes: 3
@@ -406,7 +406,7 @@ operationsByContract:
     verb: POST
     path: /requisitions/{requisitionId}/reject
     scope: venue
-    permission: LEDGER_APPROVE
+    permission: APPROVAL_ACT
     offline: false
     reads: 3
     writes: 2
@@ -422,7 +422,7 @@ operationsByContract:
     verb: POST
     path: /requisitions/{requisitionId}/return
     scope: venue
-    permission: LEDGER_APPROVE
+    permission: APPROVAL_ACT
     offline: false
     reads: 3
     writes: 2
@@ -430,7 +430,7 @@ operationsByContract:
     verb: POST
     path: /purchase-orders/{purchaseOrderId}/send
     scope: venue
-    permission: PRODUCT_CONFIGURE
+    permission: PROCUREMENT_MANAGE
     offline: false
     reads: 3
     writes: 2
@@ -478,7 +478,7 @@ operationsByContract:
     verb: PUT
     path: /requisitions/{requisitionId}/lines
     scope: venue
-    permission: PRODUCT_CONFIGURE
+    permission: PROCUREMENT_REQUEST
     offline: true
     reads: 4
     writes: 3
@@ -486,7 +486,7 @@ operationsByContract:
     verb: PUT
     path: /suppliers/{supplierId}
     scope: tenant
-    permission: PRODUCT_CONFIGURE
+    permission: PROCUREMENT_MANAGE
     offline: false
     reads: 2
     writes: 5

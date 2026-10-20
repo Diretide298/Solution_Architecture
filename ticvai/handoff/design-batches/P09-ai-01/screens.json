@@ -10,7 +10,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/ai/providers",
-   "component": "apps/ticvai-web/src/routes/AiProviderCredentials.tsx",
+   "component": "src/routes/AiProviderCredentials.tsx",
    "status": "notStarted"
   },
   "navigation": {

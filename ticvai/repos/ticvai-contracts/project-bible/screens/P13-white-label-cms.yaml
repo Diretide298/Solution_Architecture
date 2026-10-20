@@ -72,7 +72,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /white-label/tenant-workspace
-    component: apps/venue-management-web/src/routes/white-label/TenantWorkspaceDetail.tsx
+    component: src/routes/white-label/TenantWorkspaceDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -378,7 +378,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /white-label/brand-kit
-    component: apps/venue-management-web/src/routes/white-label/BrandKitDetail.tsx
+    component: src/routes/white-label/BrandKitDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -502,10 +502,12 @@ screens:
     trigger: Save brand identity
     body: '**Collects what `setBrandIdentity` sends before it is called.** Required: `logoAssetRef`. Optional:
       `logoVariant` (light, dark or duotone: which lockup sits in the nav bar and which colour reading
-      of it drives the theme, decided 29 September, rev 3 CFG-4), `logoDarkAssetRef`, `faviconAssetRef`,
-      `splashImageAssetRefs`, `splashDurationSeconds`, `splashBackgroundColour`, `showLoadingIndicator`.
-      **`showPoweredBy` is not asked here**: it is sent as read, and changed only on CMS-104 (CHG-R1S-012).
-      Dismissing sends nothing; the screen behind is unchanged.'
+      of it drives the theme, decided 29 September, rev 3 CFG-4), `logoDarkAssetRef`, `faviconAssetRef`.
+      The splash, intro video and `showPoweredBy` are not asked here: they are sent as read (CMS-004 owns
+      the splash and intro video, CMS-104 the credit; CHG-SGU-022, CHG-R1S-012). Reads `getBrandIdentity`
+      first and sends the whole record back with the fields owned by CMS-004 as read (the PUT replaces
+      the whole record; `setBrandIdentity` takes no If-Match, so if two people save at once the last write
+      wins). Dismissing sends nothing; the screen behind is unchanged.'
     bindsTo: BrandIdentity
     confirm:
       label: Save brand identity
@@ -517,10 +519,6 @@ screens:
       - logoDarkAssetRef
       - logoVariant
       - faviconAssetRef
-      - splashImageAssetRefs
-      - splashDurationSeconds
-      - splashBackgroundColour
-      - showLoadingIndicator
     provenance: contract white-label.yaml PUT /tenant-config/brand
 - id: CMS-003
   name: Typography
@@ -532,7 +530,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /white-label/typography
-    component: apps/venue-management-web/src/routes/white-label/TypographyDetail.tsx
+    component: src/routes/white-label/TypographyDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -559,13 +557,15 @@ screens:
     - to: CMS-006
       trigger: Component Preview
       provenance: flow F102 step 2→3
-  notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
-    to be written. States derived from the screen pattern on 17 August, not individually considered —
-    sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. **37
+  notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written. States derived from the screen pattern on 17 August, not individually considered
+    — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. **37
     operations removed 24 August.** Every white-label screen across P09, P12 and P13 declared the **identical
     41 operations** — a Typography screen that could create banners and a Component Preview that could
     set FAQs. **The worst instance of the 18 August bulk attach found so far**, and only walking the white-label
-    journey surfaced it.
+    journey surfaced it. Build note (r8, WHITE-C03): the generated first-run text "Offers no create action"
+    is wrong. `setFonts` creates the part on first save: build the form empty with Save fonts when `getFonts`
+    answers 404 not-configured.'
   density: compact
   pattern: statusTracker
   patternReason: '`getFonts` reads one record and nothing reads a population — the screen is about that
@@ -667,7 +667,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /white-label/logo-assets
-    component: apps/venue-management-web/src/routes/white-label/LogoAssetsDetail.tsx
+    component: src/routes/white-label/LogoAssetsDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -704,7 +704,10 @@ screens:
 
 
     **Asset ids (the logo, icon source, splash and video) come from the media library (searchMedia) or
-    an upload (createUpload, completeUpload), bound 4 October 2026** (CHG-FXS-003)'
+    an upload (createUpload, completeUpload), bound 4 October 2026** (CHG-FXS-003) Build note (r8, WHITE-C23):
+    the first-run text "Offers no create action" is wrong. With no logo yet (`getBrandIdentity` returns
+    none) show "Set the logo on CMS-002 first" and keep Save off; the form''s Required `logoAssetRef`
+    is gone because the logo is CMS-002''s. The detail panel above still shows the marks read-only.'
   density: compact
   pattern: statusTracker
   patternReason: '`getBrandIdentity` reads one record and nothing reads a population — the screen is about
@@ -840,12 +843,16 @@ screens:
   - id: formSetBrandIdentity
     component: modal
     trigger: Save brand identity
-    body: '**Collects what `setBrandIdentity` sends before it is called.** Required: `logoAssetRef`. Optional:
-      `logoVariant` (light, dark or duotone: which lockup sits in the nav bar and which colour reading
-      of it drives the theme, decided 29 September, rev 3 CFG-4), `logoDarkAssetRef`, `faviconAssetRef`,
-      `splashImageAssetRefs`, `splashDurationSeconds`, `splashBackgroundColour`, `showLoadingIndicator`,
-      `introVideoAssetRef` and `introVideoMode` (off, first launch or every launch; MOB-5). Dismissing
-      sends nothing; the screen behind is unchanged.'
+    body: '**Collects what `setBrandIdentity` sends before it is called.** Optional: `splashImageAssetRefs`,
+      `splashDurationSeconds`, `splashBackgroundColour`, `showLoadingIndicator`, `introVideoAssetRef`
+      and `introVideoMode` (off, first launch or every launch; MOB-5). `logoAssetRef`, `logoVariant`,
+      `logoDarkAssetRef`, `faviconAssetRef` and `showPoweredBy` are not asked here: they are sent as read
+      (CMS-002 owns the marks, CMS-104 the credit; CHG-SGU-022). Reads `getBrandIdentity` first and sends
+      the whole record back with the fields owned by CMS-002 as read (the PUT replaces the whole record;
+      `setBrandIdentity` takes no If-Match, so if two people save at once the last write wins). `logoAssetRef`
+      is required by the record, so before anything is saved here the logo must exist: when `getBrandIdentity`
+      returns none, this form shows "Set the logo on CMS-002 first" and Save is off. Dismissing sends
+      nothing; the screen behind is unchanged.'
     bindsTo: BrandIdentity
     confirm:
       label: Save brand identity
@@ -853,10 +860,6 @@ screens:
     dismiss:
       label: Cancel
       discards:
-      - logoAssetRef
-      - logoDarkAssetRef
-      - logoVariant
-      - faviconAssetRef
       - splashImageAssetRefs
       - splashDurationSeconds
       - splashBackgroundColour
@@ -880,7 +883,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /white-label/theme-editor
-    component: apps/venue-management-web/src/routes/white-label/ThemeEditorDetail.tsx
+    component: src/routes/white-label/ThemeEditorDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -1033,7 +1036,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /white-label/component-preview
-    component: apps/venue-management-web/src/routes/white-label/ComponentPreviewDetail.tsx
+    component: src/routes/white-label/ComponentPreviewDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -1253,7 +1256,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /white-label/page-builder
-    component: apps/venue-management-web/src/routes/white-label/PageBuilderDetail.tsx
+    component: src/routes/white-label/PageBuilderDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -1398,8 +1401,11 @@ screens:
         provenance: corrected 2 October 2026 (CHG-SGU-022, design-notes correction)
       - kind: publishGate
         label: What publishing a block changes
+        operation: getPublishReviewPolicy
         notes: Names the page and section the block shows in, from when, and for whom; says whether the
           venue's review step applies. Blocks go live on their own schedule, not with the site Publish.
+          Whether review applies is read with `getPublishReviewPolicy` (r8, WHITE-C19); a block sent for
+          review shows its `reviewStatus` (pending) in Blocks on this page until it is decided.
         provenance: corrected 2 October 2026 (CHG-SGU-022, design-notes correction)
   states:
     loading: The record, read by `getHomepageLayout`.
@@ -1490,6 +1496,10 @@ screens:
       proposed and nobody has decided'
     trigger: onInterval
     provenance: 'Block A audit, 14 October 2026: the read that follows a 202 (CHG-SCR-011)'
+  - operationId: getPublishReviewPolicy
+    contract: white-label
+    purpose: Whether publishing a content block needs review; the screen shows each block's reviewStatus
+    trigger: onLoad
   wireframe:
     status: notStarted
     provenance: generated
@@ -1629,7 +1639,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /white-label/content-blocks
-    component: apps/venue-management-web/src/routes/white-label/ContentBlocksDetail.tsx
+    component: src/routes/white-label/ContentBlocksDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -1967,7 +1977,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /white-label/navigation-menus
-    component: apps/venue-management-web/src/routes/white-label/NavigationMenusDetail.tsx
+    component: src/routes/white-label/NavigationMenusDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -2240,7 +2250,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /white-label/media-library
-    component: apps/venue-management-web/src/routes/white-label/MediaLibraryDetail.tsx
+    component: src/routes/white-label/MediaLibraryDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -2685,7 +2695,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /white-label/seo-metadata
-    component: apps/venue-management-web/src/routes/white-label/SeoMetadataDetail.tsx
+    component: src/routes/white-label/SeoMetadataDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -2837,7 +2847,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /white-label/translations
-    component: apps/venue-management-web/src/routes/white-label/TranslationsDetail.tsx
+    component: src/routes/white-label/TranslationsDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -2973,7 +2983,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /white-label/rtl-preview
-    component: apps/venue-management-web/src/routes/white-label/RtlPreviewDetail.tsx
+    component: src/routes/white-label/RtlPreviewDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -3000,13 +3010,17 @@ screens:
       trigger: Typography
       provenance: 'derived — CMS-003 declares entryState.params  and CMS-012 holds none of them. The edge
         carries nothing: CMS-003 needs nothing to open'
-  notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
-    to be written. States derived from the screen pattern on 17 August, not individually considered —
-    sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
+  notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written. States derived from the screen pattern on 17 August, not individually considered
+    — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. Build
+    note (r8, WHITE-C03): nothing is read on entry. The preview is made by `createPreview` when the person
+    presses the action and is empty until then (not a 404); Validate calls `validateTenantConfig`; the
+    no-access state names `TENANT_CONFIGURE` for those two operations. Ignore the generated first-run
+    text "Offers no create action" and the `getTenantConfig` wording in the no-access state.'
   density: compact
   pattern: statusTracker
-  patternReason: '`getTenantConfig` reads one record and nothing reads a population — the screen is about
-    that one thing'
+  patternReason: 'authored: the preview is made by `createPreview` when the person asks and the draft
+    is checked by `validateTenantConfig`; nothing on this screen reads a record on entry.'
   purpose: See the site as an Arabic reader sees it.
   layout:
     template: detail
@@ -3061,7 +3075,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /white-label/publishing-workflow
-    component: apps/venue-management-web/src/routes/white-label/PublishingWorkflowDetail.tsx
+    component: src/routes/white-label/PublishingWorkflowDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -3330,7 +3344,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /white-label/version-history
-    component: apps/venue-management-web/src/routes/white-label/VersionHistoryDetail.tsx
+    component: src/routes/white-label/VersionHistoryDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -3505,7 +3519,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /white-label/site-settings
-    component: apps/venue-management-web/src/routes/white-label/SiteSettingsDetail.tsx
+    component: src/routes/white-label/SiteSettingsDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -3746,7 +3760,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /white-label/domain-certificate
-    component: apps/venue-management-web/src/routes/white-label/DomainCertificateDetail.tsx
+    component: src/routes/white-label/DomainCertificateDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -3969,7 +3983,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /white-label/consent-legal
-    component: apps/venue-management-web/src/routes/white-label/ConsentLegalDetail.tsx
+    component: src/routes/white-label/ConsentLegalDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -4311,7 +4325,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /white-label/user-access
-    component: apps/venue-management-web/src/routes/white-label/UserAccessDetail.tsx
+    component: src/routes/white-label/UserAccessDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -4482,7 +4496,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /policy/privacy-consent-configuration-command-center-cms-021
-    component: apps/venue-management-web/src/routes/policy/PrivacyConsentConfigurationCommandCenter.tsx
+    component: src/routes/policy/PrivacyConsentConfigurationCommandCenter.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -4698,7 +4712,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /policy/data-processing-purpose-lawful-basis-registry-cms-022
-    component: apps/venue-management-web/src/routes/policy/DataProcessingPurposeLawfulBasisRegistry.tsx
+    component: src/routes/policy/DataProcessingPurposeLawfulBasisRegistry.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -4818,7 +4832,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /policy/consent-purpose-consent-type-builder-cms-023
-    component: apps/venue-management-web/src/routes/policy/ConsentPurposeConsentTypeBuilder.tsx
+    component: src/routes/policy/ConsentPurposeConsentTypeBuilder.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -4963,7 +4977,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /policy/communication-preference-marketing-permission-configurat-cms-024
-    component: apps/venue-management-web/src/routes/policy/CommunicationPreferenceMarketingPermissionConfig.tsx
+    component: src/routes/policy/CommunicationPreferenceMarketingPermissionConfig.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -5099,7 +5113,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /policy/cookie-tracking-digital-technology-registry-cms-025
-    component: apps/venue-management-web/src/routes/policy/CookieTrackingDigitalTechnologyRegistry.tsx
+    component: src/routes/policy/CookieTrackingDigitalTechnologyRegistry.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -5340,7 +5354,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /policy/cookie-banner-preference-center-designer-cms-026
-    component: apps/venue-management-web/src/routes/policy/CookieBannerPreferenceCenterDesigner.tsx
+    component: src/routes/policy/CookieBannerPreferenceCenterDesigner.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -5536,7 +5550,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /policy/consent-capture-point-customer-journey-configuration-cms-027
-    component: apps/venue-management-web/src/routes/policy/ConsentCapturePointCustomerJourneyConfiguration.tsx
+    component: src/routes/policy/ConsentCapturePointCustomerJourneyConfiguration.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -5717,7 +5731,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /policy/privacy-notice-policy-terms-version-management-cms-028
-    component: apps/venue-management-web/src/routes/policy/PrivacyNoticePolicyTermsVersionManagement.tsx
+    component: src/routes/policy/PrivacyNoticePolicyTermsVersionManagement.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -5852,7 +5866,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /policy/minor-guardian-age-based-privacy-configuration-cms-029
-    component: apps/venue-management-web/src/routes/policy/MinorGuardianAgeBasedPrivacyConfiguration.tsx
+    component: src/routes/policy/MinorGuardianAgeBasedPrivacyConfiguration.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -5951,7 +5965,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /policy/privacy-configuration-testing-approval-publication-cms-030
-    component: apps/venue-management-web/src/routes/policy/PrivacyConfigurationTestingApprovalPublication.tsx
+    component: src/routes/policy/PrivacyConfigurationTestingApprovalPublication.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -6217,7 +6231,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /policy/privacy-operations-command-center-cms-031
-    component: apps/venue-management-web/src/routes/policy/PrivacyOperationsCommandCenter.tsx
+    component: src/routes/policy/PrivacyOperationsCommandCenter.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -6413,7 +6427,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /policy/customer-privacy-consent-preference-360-cms-032
-    component: apps/venue-management-web/src/routes/policy/CustomerPrivacyConsentPreference360.tsx
+    component: src/routes/policy/CustomerPrivacyConsentPreference360.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -6504,7 +6518,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /policy/consent-evidence-history-withdrawal-management-cms-033
-    component: apps/venue-management-web/src/routes/policy/ConsentEvidenceHistoryWithdrawalManagement.tsx
+    component: src/routes/policy/ConsentEvidenceHistoryWithdrawalManagement.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -6597,7 +6611,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /policy/data-subject-customer-privacy-request-management-cms-034
-    component: apps/venue-management-web/src/routes/policy/DataSubjectCustomerPrivacyRequestManagement.tsx
+    component: src/routes/policy/DataSubjectCustomerPrivacyRequestManagement.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -6723,7 +6737,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /policy/data-discovery-access-export-correction-workspace-cms-035
-    component: apps/venue-management-web/src/routes/policy/DataDiscoveryAccessExportCorrectionWorkspace.tsx
+    component: src/routes/policy/DataDiscoveryAccessExportCorrectionWorkspace.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -6816,7 +6830,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /policy/deletion-anonymization-restriction-operations-cms-036
-    component: apps/venue-management-web/src/routes/policy/DeletionAnonymizationRestrictionOperations.tsx
+    component: src/routes/policy/DeletionAnonymizationRestrictionOperations.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -6936,7 +6950,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /policy/data-retention-expiry-legal-hold-operations-cms-037
-    component: apps/venue-management-web/src/routes/policy/DataRetentionExpiryLegalHoldOperations.tsx
+    component: src/routes/policy/DataRetentionExpiryLegalHoldOperations.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -7123,7 +7137,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /policy/privacy-compliance-exception-investigation-workspace-cms-038
-    component: apps/venue-management-web/src/routes/policy/PrivacyComplianceExceptionInvestigationWorkspace.tsx
+    component: src/routes/policy/PrivacyComplianceExceptionInvestigationWorkspace.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -7265,7 +7279,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /policy/privacy-audit-evidence-compliance-reporting-cms-039
-    component: apps/venue-management-web/src/routes/policy/PrivacyAuditEvidenceComplianceReporting.tsx
+    component: src/routes/policy/PrivacyAuditEvidenceComplianceReporting.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -7388,7 +7402,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /policy/privacy-analytics-ai-compliance-intelligence-cms-040
-    component: apps/venue-management-web/src/routes/policy/PrivacyAnalyticsAiComplianceIntelligence.tsx
+    component: src/routes/policy/PrivacyAnalyticsAiComplianceIntelligence.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -7538,7 +7552,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /policy/waiver-consent-command-center-cms-041
-    component: apps/venue-management-web/src/routes/policy/WaiverConsentCommandCenter.tsx
+    component: src/routes/policy/WaiverConsentCommandCenter.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -7822,7 +7836,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /policy/waiver-template-library-master-setup-cms-042
-    component: apps/venue-management-web/src/routes/policy/WaiverTemplateLibraryMasterSetup.tsx
+    component: src/routes/policy/WaiverTemplateLibraryMasterSetup.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -7967,7 +7981,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /policy/digital-waiver-form-builder-cms-043
-    component: apps/venue-management-web/src/routes/policy/DigitalWaiverFormBuilder.tsx
+    component: src/routes/policy/DigitalWaiverFormBuilder.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -8105,7 +8119,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /policy/dynamic-fields-questions-conditional-logic-cms-044
-    component: apps/venue-management-web/src/routes/policy/DynamicFieldsQuestionsConditionalLogic.tsx
+    component: src/routes/policy/DynamicFieldsQuestionsConditionalLogic.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -8254,7 +8268,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /policy/signatory-signature-guardian-rule-configuration-cms-045
-    component: apps/venue-management-web/src/routes/policy/SignatorySignatureGuardianRuleConfiguration.tsx
+    component: src/routes/policy/SignatorySignatureGuardianRuleConfiguration.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -8395,7 +8409,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /policy/product-event-experience-association-cms-046
-    component: apps/venue-management-web/src/routes/policy/ProductEventExperienceAssociation.tsx
+    component: src/routes/policy/ProductEventExperienceAssociation.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -8519,7 +8533,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /policy/waiver-trigger-eligibility-completion-rules-cms-047
-    component: apps/venue-management-web/src/routes/policy/WaiverTriggerEligibilityCompletionRules.tsx
+    component: src/routes/policy/WaiverTriggerEligibilityCompletionRules.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -8641,7 +8655,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /policy/versioning-effective-dates-legal-change-control-cms-048
-    component: apps/venue-management-web/src/routes/policy/VersioningEffectiveDatesLegalChangeControl.tsx
+    component: src/routes/policy/VersioningEffectiveDatesLegalChangeControl.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -8742,7 +8756,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /policy/localization-branding-customer-experience-configuration-cms-049
-    component: apps/venue-management-web/src/routes/policy/LocalizationBrandingCustomerExperienceConfigurat.tsx
+    component: src/routes/policy/LocalizationBrandingCustomerExperienceConfigurat.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -8865,7 +8879,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /policy/waiver-approval-testing-publication-workspace-cms-050
-    component: apps/venue-management-web/src/routes/policy/WaiverApprovalTestingPublicationWorkspace.tsx
+    component: src/routes/policy/WaiverApprovalTestingPublicationWorkspace.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -8968,7 +8982,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /policy/waiver-operations-command-center-cms-051
-    component: apps/venue-management-web/src/routes/policy/WaiverOperationsCommandCenter.tsx
+    component: src/routes/policy/WaiverOperationsCommandCenter.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -9190,7 +9204,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /policy/participant-waiver-status-tracking-cms-052
-    component: apps/venue-management-web/src/routes/policy/ParticipantWaiverStatusTracking.tsx
+    component: src/routes/policy/ParticipantWaiverStatusTracking.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -9319,7 +9333,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /policy/digital-signing-collection-operations-cms-053
-    component: apps/venue-management-web/src/routes/policy/DigitalSigningCollectionOperations.tsx
+    component: src/routes/policy/DigitalSigningCollectionOperations.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -9449,7 +9463,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /policy/minor-guardian-group-consent-management-cms-054
-    component: apps/venue-management-web/src/routes/policy/MinorGuardianGroupConsentManagement.tsx
+    component: src/routes/policy/MinorGuardianGroupConsentManagement.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -9566,7 +9580,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /policy/waiver-verification-validation-workspace-cms-055
-    component: apps/venue-management-web/src/routes/policy/WaiverVerificationValidationWorkspace.tsx
+    component: src/routes/policy/WaiverVerificationValidationWorkspace.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -9696,7 +9710,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /policy/missing-expired-invalid-waiver-management-cms-056
-    component: apps/venue-management-web/src/routes/policy/MissingExpiredInvalidWaiverManagement.tsx
+    component: src/routes/policy/MissingExpiredInvalidWaiverManagement.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -9804,7 +9818,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /policy/on-site-waiver-exception-handling-cms-057
-    component: apps/venue-management-web/src/routes/policy/OnSiteWaiverExceptionHandling.tsx
+    component: src/routes/policy/OnSiteWaiverExceptionHandling.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -9900,7 +9914,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /policy/compliance-evidence-audit-waiver-repository-cms-058
-    component: apps/venue-management-web/src/routes/policy/ComplianceEvidenceAuditWaiverRepository.tsx
+    component: src/routes/policy/ComplianceEvidenceAuditWaiverRepository.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -9989,7 +10003,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /policy/waiver-analytics-compliance-operational-insights-cms-059
-    component: apps/venue-management-web/src/routes/policy/WaiverAnalyticsComplianceOperationalInsights.tsx
+    component: src/routes/policy/WaiverAnalyticsComplianceOperationalInsights.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -10124,7 +10138,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /policy/ai-waiver-compliance-risk-intelligence-center-cms-060
-    component: apps/venue-management-web/src/routes/policy/AiWaiverComplianceRiskIntelligenceCenter.tsx
+    component: src/routes/policy/AiWaiverComplianceRiskIntelligenceCenter.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -10219,7 +10233,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /media-library/digital-asset-management-command-center-cms-061
-    component: apps/venue-management-web/src/routes/media-library/DigitalAssetManagementCommandCenter.tsx
+    component: src/routes/media-library/DigitalAssetManagementCommandCenter.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -10389,7 +10403,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /media-library/central-digital-asset-library-cms-062
-    component: apps/venue-management-web/src/routes/media-library/CentralDigitalAssetLibrary.tsx
+    component: src/routes/media-library/CentralDigitalAssetLibrary.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -10558,7 +10572,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /media-library/upload-asset-ingestion-workspace-cms-063
-    component: apps/venue-management-web/src/routes/media-library/UploadAssetIngestionWorkspace.tsx
+    component: src/routes/media-library/UploadAssetIngestionWorkspace.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -10676,7 +10690,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /media-library/folder-collection-workspace-management-cms-064
-    component: apps/venue-management-web/src/routes/media-library/FolderCollectionWorkspaceManagement.tsx
+    component: src/routes/media-library/FolderCollectionWorkspaceManagement.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -10787,7 +10801,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /media-library/metadata-taxonomy-management-cms-065
-    component: apps/venue-management-web/src/routes/media-library/MetadataTaxonomyManagement.tsx
+    component: src/routes/media-library/MetadataTaxonomyManagement.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -10893,7 +10907,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /media-library/tags-keywords-classification-cms-066
-    component: apps/venue-management-web/src/routes/media-library/TagsKeywordsClassification.tsx
+    component: src/routes/media-library/TagsKeywordsClassification.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -10993,7 +11007,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /media-library/advanced-search-discovery-cms-067
-    component: apps/venue-management-web/src/routes/media-library/AdvancedSearchDiscovery.tsx
+    component: src/routes/media-library/AdvancedSearchDiscovery.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -11089,7 +11103,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /media-library/digital-asset-360-profile-cms-068
-    component: apps/venue-management-web/src/routes/media-library/DigitalAsset360Profile.tsx
+    component: src/routes/media-library/DigitalAsset360Profile.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -11236,7 +11250,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /media-library/bulk-asset-management-workspace-cms-069
-    component: apps/venue-management-web/src/routes/media-library/BulkAssetManagementWorkspace.tsx
+    component: src/routes/media-library/BulkAssetManagementWorkspace.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -11328,7 +11342,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /media-library/asset-activity-recent-assets-library-health-cms-070
-    component: apps/venue-management-web/src/routes/media-library/AssetActivityRecentAssetsLibraryHealth.tsx
+    component: src/routes/media-library/AssetActivityRecentAssetsLibraryHealth.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -11468,7 +11482,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /media-library/ai-asset-intelligence-command-center-cms-071
-    component: apps/venue-management-web/src/routes/media-library/AiAssetIntelligenceCommandCenter.tsx
+    component: src/routes/media-library/AiAssetIntelligenceCommandCenter.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -11686,7 +11700,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /media-library/ai-auto-tagging-content-understanding-cms-072
-    component: apps/venue-management-web/src/routes/media-library/AiAutoTaggingContentUnderstanding.tsx
+    component: src/routes/media-library/AiAutoTaggingContentUnderstanding.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -11804,7 +11818,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /media-library/semantic-natural-language-asset-search-cms-073
-    component: apps/venue-management-web/src/routes/media-library/SemanticNaturalLanguageAssetSearch.tsx
+    component: src/routes/media-library/SemanticNaturalLanguageAssetSearch.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -11910,7 +11924,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /media-library/visual-similarity-related-asset-discovery-cms-074
-    component: apps/venue-management-web/src/routes/media-library/VisualSimilarityRelatedAssetDiscovery.tsx
+    component: src/routes/media-library/VisualSimilarityRelatedAssetDiscovery.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -12021,7 +12035,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /media-library/duplicate-near-duplicate-management-cms-075
-    component: apps/venue-management-web/src/routes/media-library/DuplicateNearDuplicateManagement.tsx
+    component: src/routes/media-library/DuplicateNearDuplicateManagement.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -12184,7 +12198,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /media-library/asset-version-control-revision-history-cms-076
-    component: apps/venue-management-web/src/routes/media-library/AssetVersionControlRevisionHistory.tsx
+    component: src/routes/media-library/AssetVersionControlRevisionHistory.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -12293,7 +12307,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /media-library/version-comparison-replacement-impact-cms-077
-    component: apps/venue-management-web/src/routes/media-library/VersionComparisonReplacementImpact.tsx
+    component: src/routes/media-library/VersionComparisonReplacementImpact.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -12378,7 +12392,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /media-library/transformation-rendition-management-cms-078
-    component: apps/venue-management-web/src/routes/media-library/TransformationRenditionManagement.tsx
+    component: src/routes/media-library/TransformationRenditionManagement.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -12473,7 +12487,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /media-library/rendition-processing-delivery-readiness-cms-079
-    component: apps/venue-management-web/src/routes/media-library/RenditionProcessingDeliveryReadiness.tsx
+    component: src/routes/media-library/RenditionProcessingDeliveryReadiness.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -12580,7 +12594,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /media-library/ai-quality-intelligence-review-recommendations-cms-080
-    component: apps/venue-management-web/src/routes/media-library/AiQualityIntelligenceReviewRecommendations.tsx
+    component: src/routes/media-library/AiQualityIntelligenceReviewRecommendations.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -12731,7 +12745,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /media-library/dam-governance-rights-command-center-cms-081
-    component: apps/venue-management-web/src/routes/media-library/DamGovernanceRightsCommandCenter.tsx
+    component: src/routes/media-library/DamGovernanceRightsCommandCenter.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -12907,7 +12921,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /media-library/asset-ownership-responsibility-management-cms-082
-    component: apps/venue-management-web/src/routes/media-library/AssetOwnershipResponsibilityManagement.tsx
+    component: src/routes/media-library/AssetOwnershipResponsibilityManagement.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -13008,7 +13022,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /media-library/rights-license-usage-policy-management-cms-083
-    component: apps/venue-management-web/src/routes/media-library/RightsLicenseUsagePolicyManagement.tsx
+    component: src/routes/media-library/RightsLicenseUsagePolicyManagement.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -13100,7 +13114,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /media-library/asset-approval-workflow-management-cms-084
-    component: apps/venue-management-web/src/routes/media-library/AssetApprovalWorkflowManagement.tsx
+    component: src/routes/media-library/AssetApprovalWorkflowManagement.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -13207,7 +13221,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /media-library/publication-eligibility-governance-validation-cms-085
-    component: apps/venue-management-web/src/routes/media-library/PublicationEligibilityGovernanceValidation.tsx
+    component: src/routes/media-library/PublicationEligibilityGovernanceValidation.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -13304,7 +13318,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /media-library/role-based-asset-access-permission-management-cms-086
-    component: apps/venue-management-web/src/routes/media-library/RoleBasedAssetAccessPermissionManagement.tsx
+    component: src/routes/media-library/RoleBasedAssetAccessPermissionManagement.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -13437,7 +13451,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /media-library/secure-internal-external-sharing-cms-087
-    component: apps/venue-management-web/src/routes/media-library/SecureInternalExternalSharing.tsx
+    component: src/routes/media-library/SecureInternalExternalSharing.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -13549,7 +13563,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /media-library/rights-expiry-renewal-usage-impact-cms-088
-    component: apps/venue-management-web/src/routes/media-library/RightsExpiryRenewalUsageImpact.tsx
+    component: src/routes/media-library/RightsExpiryRenewalUsageImpact.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -13677,7 +13691,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /media-library/governance-audit-trail-compliance-evidence-cms-089
-    component: apps/venue-management-web/src/routes/media-library/GovernanceAuditTrailComplianceEvidence.tsx
+    component: src/routes/media-library/GovernanceAuditTrailComplianceEvidence.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -13756,7 +13770,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /media-library/governance-risk-compliance-ai-recommendations-cms-090
-    component: apps/venue-management-web/src/routes/media-library/GovernanceRiskComplianceAiRecommendations.tsx
+    component: src/routes/media-library/GovernanceRiskComplianceAiRecommendations.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -13875,7 +13889,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /media-library/asset-distribution-delivery-command-center-cms-091
-    component: apps/venue-management-web/src/routes/media-library/AssetDistributionDeliveryCommandCenter.tsx
+    component: src/routes/media-library/AssetDistributionDeliveryCommandCenter.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -14079,7 +14093,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /media-library/asset-usage-distribution-map-cms-092
-    component: apps/venue-management-web/src/routes/media-library/AssetUsageDistributionMap.tsx
+    component: src/routes/media-library/AssetUsageDistributionMap.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -14186,7 +14200,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /media-library/channel-distribution-configuration-cms-093
-    component: apps/venue-management-web/src/routes/media-library/ChannelDistributionConfiguration.tsx
+    component: src/routes/media-library/ChannelDistributionConfiguration.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -14306,7 +14320,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /media-library/secure-delivery-url-cdn-rendition-delivery-cms-094
-    component: apps/venue-management-web/src/routes/media-library/SecureDeliveryUrlCdnRenditionDelivery.tsx
+    component: src/routes/media-library/SecureDeliveryUrlCdnRenditionDelivery.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -14407,7 +14421,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /media-library/asset-replacement-propagation-management-cms-095
-    component: apps/venue-management-web/src/routes/media-library/AssetReplacementPropagationManagement.tsx
+    component: src/routes/media-library/AssetReplacementPropagationManagement.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -14511,7 +14525,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /media-library/fallback-expiry-distribution-continuity-cms-096
-    component: apps/venue-management-web/src/routes/media-library/FallbackExpiryDistributionContinuity.tsx
+    component: src/routes/media-library/FallbackExpiryDistributionContinuity.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -14621,7 +14635,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /media-library/dam-api-integration-hub-cms-097
-    component: apps/venue-management-web/src/routes/media-library/DamApiIntegrationHub.tsx
+    component: src/routes/media-library/DamApiIntegrationHub.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -14707,7 +14721,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /media-library/delivery-monitoring-integration-health-cms-098
-    component: apps/venue-management-web/src/routes/media-library/DeliveryMonitoringIntegrationHealth.tsx
+    component: src/routes/media-library/DeliveryMonitoringIntegrationHealth.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -14822,7 +14836,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /media-library/asset-usage-performance-analytics-cms-099
-    component: apps/venue-management-web/src/routes/media-library/AssetUsagePerformanceAnalytics.tsx
+    component: src/routes/media-library/AssetUsagePerformanceAnalytics.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -14941,7 +14955,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /media-library/distribution-intelligence-ai-insights-optimization-cms-100
-    component: apps/venue-management-web/src/routes/media-library/DistributionIntelligenceAiInsightsOptimization.tsx
+    component: src/routes/media-library/DistributionIntelligenceAiInsightsOptimization.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -15000,7 +15014,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /white-label/help-me-choose
-    component: apps/venue-management-web/src/routes/white-label/HelpMeChoose.tsx
+    component: src/routes/white-label/HelpMeChoose.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -15111,12 +15125,15 @@ screens:
         provenance: contract white-label.yaml GET /venues/{venueId}/guided-choices
       - kind: livePreview
         label: Preview
-        notes: '**Renders the draft as a guest would meet it**: the button or pop-up, the banner, each
-          question and the result card, in each language and in both directions. Drawn from the record
-          in hand; it calls nothing and publishes nothing, and guests keep seeing the published set-up
-          until Publish. **Preview the filtered list**: for each combination of answers, the products
-          left (read with `listProducts` and the answer''s filter), so an answer that leaves nothing bookable
-          shows before it is published (W4).'
+        operation: previewGuidedChoice
+        notes: '**What each combination of answers leaves comes from `previewGuidedChoice`** (r8, WHITE-C26),
+          the same filter guests meet, so a combination that leaves nothing shows before publishing. **Renders
+          the draft as a guest would meet it**: the button or pop-up, the banner, each question and the
+          result card, in each language and in both directions. Drawn from the record in hand; it calls
+          nothing and publishes nothing, and guests keep seeing the published set-up until Publish. **Preview
+          the filtered list**: for each combination of answers, the products left (read with `listProducts`
+          and the answer''s filter), so an answer that leaves nothing bookable shows before it is published
+          (W4).'
         provenance: authored 29 September, rev 3 REV3-11
       - kind: publishGate
         label: What publishing changes
@@ -15228,6 +15245,12 @@ screens:
     purpose: The reasons behind a Help me choose suggestion
     trigger: onAction
     provenance: build, 29 September 2026
+  - operationId: previewGuidedChoice
+    contract: white-label
+    purpose: The products each combination of the draft's answers leaves, for the preview (r8, WHITE-C26);
+      called when the draft changes, nothing stored
+    trigger: onAction
+    provenance: r8 second round, WHITE-C26 (the core lane's request)
   entryState:
     params:
     - name: venueId
@@ -15302,7 +15325,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /white-label/site-builder
-    component: apps/venue-management-web/src/routes/white-label/SiteBuilder.tsx
+    component: src/routes/white-label/SiteBuilder.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -15604,7 +15627,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /white-label/booking-flows
-    component: apps/venue-management-web/src/routes/white-label/BookingFlows.tsx
+    component: src/routes/white-label/BookingFlows.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -15776,10 +15799,13 @@ screens:
       - kind: publishGate
         label: What publishing changes
         impliedBy: publishTenantConfig
-        notes: '**Flows publish with the whole site**, never alone: the gate names every venue flow that
-          changed since the last version and the products whose steps will change for guests, and says
-          the rest of the draft (theme, pages, navigation) goes live with it. Refused while any enabled
-          flow is invalid (`409`, `bookingFlowInvalid`). Needs `TENANT_PUBLISH`.'
+        operation: diffConfigVersion
+        notes: '**Read with `diffConfigVersion`** (r8, WHITE-C18): the draft against the published version,
+          its `bookingFlows` area and `affectedProducts`. **Flows publish with the whole site**, never
+          alone: the gate names every venue flow that changed since the last version and the products
+          whose steps will change for guests, and says the rest of the draft (theme, pages, navigation)
+          goes live with it. Refused while any enabled flow is invalid (`409`, `bookingFlowInvalid`).
+          Needs `TENANT_PUBLISH`.'
         provenance: contract white-label.yaml POST /tenant-config/publish
     - name: actionBar
       slot: rowActions
@@ -15898,12 +15924,19 @@ screens:
     trigger: onAction
     invalidates:
     - listProductCategories
+  - operationId: diffConfigVersion
+    contract: white-label
+    purpose: Compare two configuration versions, including the booking flows and the products they affect
+    trigger: onLoad
   entryState:
     params:
     - name: venueId
       from: session
     - name: bookingFlowId
       from: CMS-102
+      optional: true
+    - name: version
+      from: CMS-015
       optional: true
     - name: productId
       from: navigation
@@ -15969,7 +16002,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /white-label/app-publishing
-    component: apps/venue-management-web/src/routes/white-label/AppPublishing.tsx
+    component: src/routes/white-label/AppPublishing.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -16085,7 +16118,9 @@ screens:
         notes: '**The in-platform guide M24-08 asks for**: how to get a D-U-N-S number, open each account,
           fill the listing and answer store review. Grounded on a store-publishing knowledge source, no
           tenant data. `unavailable` until the ai "app publishing guide" assistant profile exists; the
-          checklist guidance works without it.'
+          checklist guidance works without it. The conversation is started with `createAiConversation`
+          and `profileKey` `guide.appPublishing`; a 404 `assistant-profile-unavailable` shows the panel''s
+          unavailable state, not an error (r8, WHITE-C27).'
         provenance: authored 29 September, M24-08
       - kind: publishGate
         label: What a build and a submission do
@@ -16217,7 +16252,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /white-label/kiosk
-    component: apps/venue-management-web/src/routes/white-label/KioskBuilder.tsx
+    component: src/routes/white-label/KioskBuilder.tsx
     status: notStarted
   navigation:
     entryFrom:

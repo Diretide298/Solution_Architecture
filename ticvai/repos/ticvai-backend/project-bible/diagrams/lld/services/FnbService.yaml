@@ -118,7 +118,7 @@ operationsByContract:
     path: /table-visits/{visitId}/close
     scope: workstation
     permission: ORDER_CREATE
-    offline: false
+    offline: true
     reads: 6
     writes: 3
   - operation: compItem
@@ -133,7 +133,7 @@ operationsByContract:
     verb: POST
     path: /production-runs/{runId}/complete
     scope: venue
-    permission: FNB_MANAGE
+    permission: PRODUCT_CONFIGURE
     offline: true
     reads: 3
     writes: 3
@@ -159,8 +159,8 @@ operationsByContract:
     scope: workstation
     permission: ORDER_CREATE
     offline: true
-    reads: 6
-    writes: 6
+    reads: 7
+    writes: 7
   - operation: createGuestFnbOrder
     verb: POST
     path: /guest-orders
@@ -207,8 +207,8 @@ operationsByContract:
     scope: venue
     permission: ORDER_CREATE
     offline: false
-    reads: 2
-    writes: 2
+    reads: 3
+    writes: 3
   - operation: enterCountLine
     verb: POST
     path: /fnb-stock-counts/{countId}/lines
@@ -302,7 +302,7 @@ operationsByContract:
     path: /outlets/{outletId}/guest-menu
     scope: venue
     permission: null
-    offline: true
+    offline: false
     reads: 2
     writes: 0
   - operation: getGuestOrderStatus
@@ -397,7 +397,7 @@ operationsByContract:
     verb: POST
     path: /waitlist
     scope: venue
-    permission: FNB_SERVE
+    permission: ORDER_MODIFY
     offline: true
     reads: 4
     writes: 2
@@ -407,8 +407,8 @@ operationsByContract:
     scope: venue
     permission: ORDER_MODIFY
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: list86Events
     verb: GET
     path: /outlets/{outletId}/86-events
@@ -446,7 +446,7 @@ operationsByContract:
     path: /venues/{venueId}/delivery-locations
     scope: venue
     permission: null
-    offline: true
+    offline: false
     reads: 2
     writes: 0
   - operation: listDiningOutlets
@@ -526,7 +526,7 @@ operationsByContract:
     path: /menus
     scope: venue
     permission: PRODUCT_VIEW
-    offline: true
+    offline: false
     reads: 3
     writes: 0
   - operation: listModifierGroups
@@ -534,7 +534,7 @@ operationsByContract:
     path: /modifier-groups
     scope: venue
     permission: PRODUCT_VIEW
-    offline: true
+    offline: false
     reads: 2
     writes: 0
   - operation: listMyTableReservations
@@ -597,7 +597,7 @@ operationsByContract:
     verb: GET
     path: /table-reservations
     scope: venue
-    permission: FNB_OPERATE
+    permission: ORDER_MODIFY
     offline: true
     reads: 3
     writes: 0
@@ -662,7 +662,7 @@ operationsByContract:
     path: /table-visits/{visitId}/notify-server
     scope: venue
     permission: ORDER_MODIFY
-    offline: false
+    offline: true
     reads: 3
     writes: 2
   - operation: notifyWaitlistParty
@@ -685,7 +685,7 @@ operationsByContract:
     verb: POST
     path: /production-runs
     scope: venue
-    permission: FNB_MANAGE
+    permission: PRODUCT_CONFIGURE
     offline: false
     reads: 5
     writes: 2
@@ -695,22 +695,22 @@ operationsByContract:
     scope: venue
     permission: ORDER_VIEW
     offline: true
-    reads: 1
-    writes: 0
+    reads: 2
+    writes: 1
   - operation: printPrepSheet
     verb: POST
     path: /production-plans/{planId}/prep-sheet
     scope: venue
     permission: PRODUCT_VIEW
     offline: false
-    reads: 0
-    writes: 0
+    reads: 1
+    writes: 1
   - operation: prioritiseKitchenTicket
     verb: POST
     path: /kitchen/tickets/{ticketId}/prioritise
     scope: venue
     permission: ORDER_MODIFY
-    offline: false
+    offline: true
     reads: 3
     writes: 2
   - operation: publishMenu
@@ -837,7 +837,7 @@ operationsByContract:
     verb: POST
     path: /table-reservations/{reservationId}/seat
     scope: venue
-    permission: FNB_OPERATE
+    permission: ORDER_MODIFY
     offline: true
     reads: 4
     writes: 5
@@ -887,32 +887,32 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_CONFIGURE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setFnbReservationPolicy
     verb: PUT
     path: /reservation-policy
     scope: venue
     permission: PRODUCT_CONFIGURE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setFnbServiceChargePolicy
     verb: PUT
     path: /service-charge-policy
     scope: venue
     permission: PRODUCT_CONFIGURE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setIngredientSubstitutes
     verb: PUT
     path: /recipes/{recipeId}/substitutes
     scope: venue
     permission: PRODUCT_CONFIGURE
     offline: false
-    reads: 2
-    writes: 1
+    reads: 3
+    writes: 2
   - operation: setItemAvailability
     verb: PUT
     path: /menu-items/{itemId}/availability
@@ -927,8 +927,8 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_CONFIGURE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setKitchenSla
     verb: PUT
     path: /outlets/{outletId}/kitchen-sla
@@ -959,8 +959,8 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_CONFIGURE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setMenuSections
     verb: PUT
     path: /menus/{menuId}/sections
@@ -975,16 +975,16 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_CONFIGURE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setPrepSheetTemplate
     verb: PUT
     path: /prep-sheet-template
     scope: venue
     permission: PRODUCT_CONFIGURE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setRecipe
     verb: PUT
     path: /recipes/{recipeId}
@@ -1039,16 +1039,16 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_CONFIGURE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setWasteApprovalPolicy
     verb: PUT
     path: /waste-approval-policy
     scope: venue
     permission: PRODUCT_CONFIGURE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: signCorrectiveAction
     verb: POST
     path: /food-safety/corrective-actions/{actionId}/sign
@@ -1077,7 +1077,7 @@ operationsByContract:
     verb: POST
     path: /table-visits/{visitId}/transfer
     scope: venue
-    permission: FNB_SERVE
+    permission: ORDER_MODIFY
     offline: true
     reads: 7
     writes: 2
@@ -1127,8 +1127,8 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_VIEW
     offline: false
-    reads: 10
-    writes: 1
+    reads: 11
+    writes: 2
 tables:
 - store: cache:idempotency
   kind: cache
@@ -1158,16 +1158,19 @@ tables:
   - completeProductionRun
   - createCombo
   - createDeliveryLocation
+  - createFnbOrder
   - createGuestFnbOrder
   - createMenu
   - createModifierGroup
   - createTable
   - createTableReservation
+  - createTableReservationForGuest
   - enterCountLine
   - escalateCorrectiveAction
   - fireCourse
   - holdCourse
   - joinRestaurantWaitlist
+  - leaveRestaurantWaitlist
   - logColdChain
   - logKitchenException
   - logTemperature
@@ -1178,6 +1181,8 @@ tables:
   - notifyWaitlistParty
   - openTableVisit
   - planProductionRun
+  - printOrderLabel
+  - printPrepSheet
   - prioritiseKitchenTicket
   - publishMenu
   - quoteWaitTime
@@ -1199,17 +1204,27 @@ tables:
   - setComboSlots
   - setCourseRules
   - setDeliveryLocationOutletMapping
+  - setFnbDeliveryPolicy
+  - setFnbReservationPolicy
+  - setFnbServiceChargePolicy
+  - setIngredientSubstitutes
   - setItemAvailability
+  - setKitchenRoutingRules
   - setKitchenSla
   - setKitchenStations
   - setKitchenTicketStatus
+  - setMenuItemDailyCount
   - setMenuSections
+  - setOutletTemplate
+  - setPrepSheetTemplate
   - setRecipe
   - setSectionLayout
   - setServiceStage
   - setSubstitutionRules
   - setTableCombinations
   - setTableLayout
+  - setTemperatureCheckpoint
+  - setWasteApprovalPolicy
   - signCorrectiveAction
   - splitBill
   - transferOrderItems
@@ -1219,6 +1234,7 @@ tables:
   - updateTable
   - updateTableReservation
   - updateTableVisit
+  - verifyAllergens
   readBy:
   - acceptFnbOrder
   - amendFnbOrder
@@ -1236,16 +1252,19 @@ tables:
   - completeProductionRun
   - createCombo
   - createDeliveryLocation
+  - createFnbOrder
   - createGuestFnbOrder
   - createMenu
   - createModifierGroup
   - createTable
   - createTableReservation
+  - createTableReservationForGuest
   - enterCountLine
   - escalateCorrectiveAction
   - fireCourse
   - holdCourse
   - joinRestaurantWaitlist
+  - leaveRestaurantWaitlist
   - logColdChain
   - logKitchenException
   - logTemperature
@@ -1256,6 +1275,8 @@ tables:
   - notifyWaitlistParty
   - openTableVisit
   - planProductionRun
+  - printOrderLabel
+  - printPrepSheet
   - prioritiseKitchenTicket
   - publishMenu
   - quoteWaitTime
@@ -1277,17 +1298,27 @@ tables:
   - setComboSlots
   - setCourseRules
   - setDeliveryLocationOutletMapping
+  - setFnbDeliveryPolicy
+  - setFnbReservationPolicy
+  - setFnbServiceChargePolicy
+  - setIngredientSubstitutes
   - setItemAvailability
+  - setKitchenRoutingRules
   - setKitchenSla
   - setKitchenStations
   - setKitchenTicketStatus
+  - setMenuItemDailyCount
   - setMenuSections
+  - setOutletTemplate
+  - setPrepSheetTemplate
   - setRecipe
   - setSectionLayout
   - setServiceStage
   - setSubstitutionRules
   - setTableCombinations
   - setTableLayout
+  - setTemperatureCheckpoint
+  - setWasteApprovalPolicy
   - signCorrectiveAction
   - splitBill
   - transferOrderItems
@@ -1297,6 +1328,7 @@ tables:
   - updateTable
   - updateTableReservation
   - updateTableVisit
+  - verifyAllergens
   keys:
     applyMenuActions:
       role: evicts
@@ -1592,7 +1624,7 @@ tables:
   - fnb
   foreignWriters: null
 - table: fnb.delivery_location
-  columns: 12
+  columns: 14
   store: postgres
   parent: null
   writtenBy:

@@ -1060,7 +1060,8 @@
     "description": "The outlet whose price and stock this is: the asking workstation's outlet, or `outletId` for a caller with none (decided 28 September, audit R215).\n"
    },
    "sku": {
-    "type": "string"
+    "type": "string",
+    "x-ticvai-staff-only": "Omitted from the response when the caller is a guest or a visitor (r8 walk of ticket 27820)."
    },
    "name": {
     "type": "string"
@@ -1088,6 +1089,7 @@
    },
    "siblingOutlets": {
     "type": "array",
+    "x-ticvai-staff-only": "Omitted from the response when the caller is a guest or a visitor (r8 walk of ticket 27820).",
     "description": "Stock elsewhere in the venue, so a colleague can be sent.",
     "items": {
      "type": "object",

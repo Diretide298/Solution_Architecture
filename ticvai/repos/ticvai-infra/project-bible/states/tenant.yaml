@@ -20,18 +20,30 @@ transitions:
   guard: Cell provisioned and licence issued
 - from: active
   to: suspended
-  operation: suspendTenant
-  trigger: operation
+  trigger: externalEvent
   guard: Commercial or compliance. **Access validation continues under every mode** — a dispute must
-    not strand guests at a gate
+    not strand guests at a gate. **Moved by Subscription's approval.granted consumer, not by suspendTenant**
+    (ADAM CR-172, option (a), 19 October 2026; CHG-CRA-005, fix round 3). suspendTenant only raises the approval
+    request (its one write) and answers 202; when the grant arrives the consumer re-checks that the tenant is
+    still `active`, applies the suspension and writes tenant.suspended to control.outbox in the same transaction.
+    Only with no `effectiveAt`, or one not in the future; a future one is pending and the timer below applies it
   requiresApproval: true
+  emits:
+  - tenant.suspended
+- from: active
+  to: suspended
+  trigger: timer
+  guard: '**A pending suspension falls due** (ADAM CR-152, 18 October 2026; CHG-CRA-005): a workers job moves
+    the tenant at `control.tenant.suspension_effective_at` and writes `tenant.suspended` to `control.outbox`
+    in the same transaction. `reactivateTenant` before then cancels it'
   emits:
   - tenant.suspended
 - from: suspended
   to: active
-  operation: reactivateTenant
-  trigger: operation
-  guard: Resolved
+  trigger: externalEvent
+  guard: Resolved. **Moved by Subscription's approval.granted consumer, not by reactivateTenant** (ADAM CR-172,
+    option (a), 19 October 2026; CHG-CRA-005, fix round 3). reactivateTenant only raises the approval request and
+    answers 202; the consumer re-checks the tenant when the grant arrives and applies the change
   isReversal: true
   requiresApproval: true
 - from: active
@@ -48,9 +60,10 @@ transitions:
   requiresApproval: true
 - from: terminating
   to: active
-  operation: reactivateTenant
-  trigger: operation
-  guard: Cancelled within the notice period
+  trigger: externalEvent
+  guard: Cancelled within the notice period. **Moved by Subscription's approval.granted consumer** for the
+    request reactivateTenant raised (ADAM CR-172, fix round 3); the consumer re-checks that the notice period
+    still runs (a tenant `terminated` by then is not reactivated, `tenant-terminated`)
   isReversal: true
   requiresApproval: true
 - from: terminating

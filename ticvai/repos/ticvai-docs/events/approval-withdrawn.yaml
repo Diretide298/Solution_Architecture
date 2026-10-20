@@ -1,0 +1,43 @@
+# approval.withdrawn v1 — published by approvals
+# Added 20 October 2026 (R8 blocker cause APPROVALS-TENANCY-C38, option A; the generators lane's request, applied at
+# the r8 integration, CHG-R8INT-016): a withdrawn request held an action somewhere, and nothing told its holder.
+# Checked by tools/check-states.py.
+
+name: approval.withdrawn
+version: 1
+publisher: approvals
+description: The requester took an approval request back before anyone decided it.
+aggregate: approvalRequest
+emittedWhen: ApprovalStatus pending or escalated to withdrawn
+emittedBy:
+- withdrawApprovalRequest
+payload:
+- field: requestId
+  type: uuid
+- field: kind
+  type: string
+- field: subjectContract
+  type: string
+- field: subjectId
+  type: uuid
+- field: withdrawnByPrincipalId
+  type: uuid
+- field: withdrawnAt
+  type: timestamp
+consumers:
+- context: orders
+  purpose: Void the held action, as for approval.rejected; nobody refused it, so the requester is not told it was refused
+  idempotencyKey: requestId
+  onFailure: retryThenDeadLetter
+  isCritical: true
+- context: reporting
+  purpose: Withdrawal analytics, kept apart from rejections (11.1.22)
+  idempotencyKey: requestId
+  onFailure: retry
+  isCritical: false
+- context: ai
+  purpose: Close the action plan waiting on this approval, as withdrawn (AI system design section 3.2)
+  idempotencyKey: requestId
+  onFailure: retry
+  isCritical: false
+retention: 30 days after publication

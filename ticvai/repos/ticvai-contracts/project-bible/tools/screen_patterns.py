@@ -277,6 +277,42 @@ def planned_sprints(root: str = ROOT) -> dict | None:
     return out
 
 
+_EF_FILTER = re.compile(r"filter on ([^.]*?) and the ")
+
+
+def op_parameter_names(pk, oid: str) -> set:
+    """The names of an operation's parameters (path, query, header), `$ref`s followed."""
+    o = pk.ops.get(oid) or {}
+    item = ((pk.contracts.get(o.get("_contract")) or {}).get("paths") or {}).get(o.get("_path")) or {}
+    out = set()
+    for prm in list(o.get("parameters") or []) + list(item.get("parameters") or []):
+        _c, node = pk.deref(o.get("_contract"), prm) if isinstance(prm, dict) else (None, None)
+        if isinstance(node, dict) and node.get("name"):
+            out.add(str(node["name"]))
+    return out
+
+
+def p_empty_filter(pk, sid: str, s: dict) -> list:
+    """EF: an `emptyNoResults` text that names the filters a list was searched on may name only parameters of an
+    operation the screen binds (20 October 2026, r8 cause ORDERS-MONEY-C04, CHG-R8GEN-010). The pattern template of
+    17 August wrote "Nothing matches the filter on venueId, principalId, shiftId, status, createdFrom, createdTo" into
+    screens whose reads take none of them, and a developer built filters the API does not have."""
+    text = str((s.get("states") or {}).get("emptyNoResults") or "")
+    m = _EF_FILTER.search(text)
+    if not m:
+        return []
+    named = [x.strip() for x in re.split(r",|\band\b", m.group(1)) if x.strip()]
+    have = set()
+    for a in s.get("apis") or []:
+        if isinstance(a, dict) and a.get("operationId"):
+            have |= op_parameter_names(pk, a["operationId"])
+    miss = [n for n in named if n not in have]
+    if not miss:
+        return []
+    return [("EF", sid, "emptyNoResults names %s, which no operation the screen binds takes as a parameter"
+             % ", ".join(miss))]
+
+
 def p_np(pk: Package, sid: str, s: dict) -> list:
     out = []
     for g in s.get("gaps") or []:

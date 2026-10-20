@@ -186,6 +186,22 @@ x-ticvai-queries:
       a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked
       from another deployable through Catalogue's service route (serviceAuth).
     served: [service]
+  seatHoldRecords:
+    module: seating
+    table: seating.seat_reservation
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The seat holds asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (performanceId, a hold''s status); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The holds found, each as Seating stores it (with its expiry); an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/SeatHold'}
+    rule: >-
+      A data read, not a rule question (r8, ORDERS-MONEY-C19; ADR-0055 rule 2 as amended 14 October). Seating answers
+      with its seat holds, as it stores them and as the caller's scope lets it see them; Orders' holdOrder reads a
+      held seat's expiry through it rather than reading seating.seat_reservation. It decides nothing. It is asked
+      from another deployable through the service route (serviceAuth).
+    served: [service]
   zoneRecords:
     module: seating
     table: seating.zone
@@ -1654,6 +1670,16 @@ paths:
         cart, hold, order or payment in their own session. `ORDER_CREATE` is what a staff caller must hold to
         do it for a guest at a till or in the back office (ADR-0025).
 
+
+        **The hold model on a guest screen: one hold per tap** (r8 walk of tickets 28202 and 28197). Each tap
+        on a free seat is one `createSeatHold` with that seat, and the screen keeps the `holdId` of each. A
+        deselect is `relinquishSeatHold` of that seat''s hold. The seats a guest holds on a performance are
+        therefore several holds, which is what the `seat-limit-exceeded` rule above already counts. **Switching
+        the time** relinquishes the guest''s holds on the performance being left, then holds the seats still
+        wanted on the new one, one hold each; a seat the new time does not have free is dropped and the screen
+        says so. The way on to the basket (the edge from WEB-007 or GST-049) carries the list of `holdIds`. A
+        screen opened again with a `holdId` reads it with `getSeatHold`.
+
         '
       tags:
       - hold
@@ -1694,7 +1720,8 @@ paths:
                 $ref: '#/components/schemas/SeatHold'
         '409':
           description: 'One or more seats are no longer available, or the selection breaks a seating rule.
-            The response names the offending seats.
+            The response names the offending seats. For a standing zone, `zone-unavailable`: fewer places left
+            than `quantity`, with the zone''s `remaining` (r8, GPS-C38).
 
             '
           content:
@@ -1729,13 +1756,26 @@ paths:
         - "P04 POS-004 Sell — Seat Map"
         - "P08 BO-987 Hold Tracker"
         - "P08 BO-999 Cart & Multi-Seat Management"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-audience:
       - staff
+      - guest
       x-ticvai-read-routing: primary
       summary: Read a hold
+      description: '**A guest may read their own hold** (r8 walk of ticket 28202), so WEB-007 and GST-049, opened
+        again with a `holdId`, show the seats and the time left. On a guest channel only a hold the same guest
+        session or subject placed with `createSeatHold` can be read; any other hold answers `404`, exactly as
+        `relinquishSeatHold` does, so hold ids cannot be probed. Staff keep reading any hold at their venue under
+        `ORDER_VIEW`.
+
+        '
       tags:
       - hold
       x-ticvai-permission: ORDER_VIEW
+      x-ticvai-guest-callable: true
+      x-ticvai-agreed: 'r8 walk of ticket 28202: guest audience added with the own-hold rule of relinquishSeatHold; shape unchanged'
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -4861,6 +4901,27 @@ components:
             `graphical` means every seat carries `position`.
 
             '
+        viewBox:
+          type: object
+          nullable: true
+          description: 'The coordinate space the seat positions are in, as `SeatMap.viewBox`, so the section view
+            is drawn from this response alone (WEB-007, GST-049; r8 walk of ticket 28197). Null when `renderMode`
+            is `list`.
+
+            '
+          properties:
+            width:
+              type: number
+            height:
+              type: number
+        stagePosition:
+          allOf:
+          - $ref: '#/components/schemas/Point'
+          nullable: true
+          description: 'Where the stage sits in the same space, as `SeatMap.stagePosition`; the section view orients
+            the seats towards it. Null when `renderMode` is `list`.
+
+            '
         totals:
           type: object
           properties:
@@ -4890,6 +4951,26 @@ components:
                 type: integer
               price:
                 $ref: ../shared/common.yaml#/components/schemas/Money
+        zones:
+          type: array
+          description: '**The standing zones and what is left in each** (r8, GPS-C38): a zone has no seats, so it is
+            sold by quantity (`createSeatHold` `zoneId` and `quantity`). `keepTogether` says whether the venue keeps a
+            party in one zone (a party larger than `remaining` is then refused rather than split).'
+          items:
+            type: object
+            required: [zoneId, name, remaining]
+            properties:
+              zoneId:
+                type: string
+                format: uuid
+              name:
+                type: string
+              remaining:
+                type: integer
+                minimum: 0
+              keepTogether:
+                type: boolean
+                default: true
         sections:
           type: array
           description: 'The map''s sections with what a guest screen needs to show the view from each
@@ -4950,7 +5031,9 @@ components:
       required:
       - id
       - performanceId
-      - seatIds
+      description: '**Seats or a standing zone, exactly one** (r8, GPS-C38): `seatIds` holds named seats; `zoneId` with
+        `quantity` holds places in a standing zone (a zone has no seats), refused `409` `zone-unavailable` when the
+        zone has fewer left. Both, or neither, is `400`.'
       properties:
         id:
           type: string
@@ -4958,6 +5041,15 @@ components:
         performanceId:
           type: string
           format: uuid
+        zoneId:
+          type: string
+          format: uuid
+          description: A standing zone of the performance's map (`SeatAvailability.zones`), with `quantity` (r8, GPS-C38).
+        quantity:
+          type: integer
+          minimum: 1
+          maximum: 50
+          description: The places held in `zoneId`; the same per-booking limits as `seatIds` (r8, GPS-C38).
         seatIds:
           type: array
           minItems: 1
@@ -5015,6 +5107,16 @@ components:
           - converted
           - released
           - expired
+          - sold
+          description: '`converted` when the order is created; `sold` when the order is paid and
+            `catalogue.convertInventoryHold` sells the units (ADAM CR-169, 18 October 2026; CHG-CRA-007).'
+        inventoryReservationId:
+          type: string
+          format: uuid
+          nullable: true
+          x-ticvai-references: catalogue.inventory_reservation
+          description: '**The inventory hold these seats sit under** (ADAM CR-169; CHG-CRA-007), so
+            `convertInventoryHold` finds the order''s seat reservations from the hold it converts.'
         totalPrice:
           x-ticvai-column: gross_amount
           $ref: ../shared/common.yaml#/components/schemas/Money

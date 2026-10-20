@@ -9,12 +9,12 @@
 | Contracts | 15 |
 | Modules | 13 |
 | Undrawn | 0 |
-| Operations with no screen | 101 |
+| Operations with no screen | 120 |
 | Waves | wave1 28 · wave2 13 · wave3 170 |
 
 ## Gaps
 
-### 101 operations with no screen here
+### 120 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -28,7 +28,7 @@
 | `removeIndexEntry` | ai | DELETE | Remove one record from the index |
 | `setAiTool` | ai | PUT | Register or change a tool (platform) |
 | `setIndexSource` | ai | PUT | Declare a source indexed |
-| `setSuggestionProvider` | ai | PUT |  |
+| `setSuggestionProvider` | ai | PUT | Point a question at a rule, a model, or both |
 | `approveMatrixMultiLevel` | approvals | PUT | Approval Matrix & Multi-Level Approval Configuration |
 | `approveRoleAuthorityDelegation` | approvals | PUT | Roles, Authority, Delegation & Approval Limits |
 | `approveUnifiedDecision` | approvals | PUT | Unified Approval Inbox & Decision Workspace |
@@ -38,29 +38,29 @@
 | `listAccreditationBadges` | approvals | GET | Badges issued and their state |
 | `listAutomationExecutions` | approvals | GET | What automations ran, when, on whose rule, and the outcome |
 | `reopenApprovalRequest` | approvals | POST | Reopen an expired or cancelled request as a new one |
-| `submitApprovalRequest` | approvals | POST | Send a saved draft for approval |
+| `submitApprovalRequest` | approvals | POST | Send a saved draft, or a returned request, for approval |
+| `acquireInventoryHold` | catalogue | POST | Acquire an inventory hold |
+| `checkProductSalePermission` | catalogue | POST | Would this seller, here, be allowed to sell these products |
+| `getBundleSigningKeys` | catalogue | GET | The public keys a till verifies catalogue bundles with |
 | `getEventChangeTreatmentPolicy` | catalogue | GET | What happens to tickets, reservations and guests when an event changes, by default |
 | `getPlanBenefits` | catalogue | GET | Which benefits a plan grants, and how much of each |
+| `getProductChannelTexts` | catalogue | GET | The product's texts per sales channel, in each of the tenant's languages |
+| `getProductDashboard` | catalogue | GET | The products dashboard's counts |
+| `getProductOwnerForms` | catalogue | GET | Which form a sale of this product asks the buyer, and which it asks each ticket owner |
+| `getProductSalePermissionRules` | catalogue | GET | Who can sell this product |
 | `getWaitingRoomStatus` | catalogue | GET | A performance's waiting room, its setting and how it is moving |
 | `listGuestMemberships` | catalogue | GET | A guest's memberships, benefits and history |
 | `listMembershipBenefits` | catalogue | GET | Benefits a plan can grant |
 | `listMembershipProgrammes` | catalogue | GET | Membership schemes, the level above a plan |
+| `listOwnerFormCandidates` | catalogue | GET | The forms a product can link for its reservation owner or ticket owner |
 | `listProductApprovalWorkflows` | catalogue | GET | The product approval workflows `approveWorkflow` saved |
+| `listProductAttentionItems` | catalogue | GET | The products that need someone to act, and why |
+| `listProductCategoryUsage` | catalogue | GET | How many products each category holds |
+| `listProductTags` | catalogue | GET | The venue's tags, the master list products and promotions pick from |
+| `listSalePermissionTargets` | catalogue | GET | What a sale permission rule can name at one level, with names |
 | `listSeatPricingRules` | catalogue | GET | Seat-level dynamic pricing rules |
-| `listTaxProfiles` | catalogue | GET | The tax profiles |
 | `relinquishInventoryHold` | catalogue | DELETE | Return unsold units |
-| `renewInventoryHold` | catalogue | POST | Extend a lease TTL |
-| `setEventChangeTreatmentPolicy` | catalogue | PUT | Set the default treatment per kind of event change |
-| `setSeatPricingRule` | catalogue | PUT | Create or replace a seat-level dynamic pricing rule |
-| `setWaitingRoomSetting` | catalogue | PUT | Switch a performance's waiting room on or off, and set how fast it releases |
-| `calculateTax` | finance | POST | Compute tax for a set of lines |
-| `disputeObligation` | finance | POST | One entity disagrees with the amount |
-| `getForeignTenderReport` | finance | GET | What was taken in which currency |
-| `listInterEntityObligations` | finance | GET | What one entity owes another |
-| `recordWriteOff` | finance | POST | Write off an uncollectable balance |
-| `resolveObligationDispute` | finance | POST | Agree what is actually owed |
-| `runFxRevaluation` | finance | POST | Revalue monetary balances at close |
-| … | | | 61 more |
+| … | | | 80 more |
 
 ### 8 modules split across waves
 
@@ -114,7 +114,7 @@
 | `ADM-015` | API Rate Limit & Quota Management | Tenants & Licensing | 3 | 13 | yes |
 | `ADM-016` | White-Label Branding Management | Branding & Localisation | 1 | 19 | yes |
 | `ADM-017` | Domain & Certificate Management | Branding & Localisation | 1 | 10 | yes |
-| `ADM-018` | Interface Languages | Branding & Localisation | 1 | 5 | yes |
+| `ADM-018` | Interface Languages | Branding & Localisation | 1 | 7 | yes |
 | `ADM-019` | Global Configuration & Defaults | Branding & Localisation | 2 | 5 | yes |
 | `ADM-020` | Platform User Directory | Access & Identity | 1 | 7 | yes |
 | `ADM-021` | Platform Role Management | Access & Identity | 1 | 7 | yes |

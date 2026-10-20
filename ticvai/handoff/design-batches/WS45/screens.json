@@ -1316,7 +1316,8 @@
   ],
   "entryState": {
    "preloaded": [
-    "CampaignCalendarTimelineView.calendarState"
+    "CampaignCalendarTimelineView.calendarState",
+    "VenueSettings.calendarDayStartHour"
    ]
   },
   "wireframe": {

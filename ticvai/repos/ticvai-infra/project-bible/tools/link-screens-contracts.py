@@ -34,6 +34,16 @@ if not CONTRACTS.exists():
 CHECK = "--check" in sys.argv
 
 
+def _load(text: str):
+    """**The C loader where it parses, the pure one where it does not** (20 October 2026, CHG-R8GEN-016): this step
+    took eleven minutes a run, and check-regenerate-twice runs it. A file the C loader refuses (surrogate escapes, as
+    audit_guard found in subscription.yaml) is read with the pure loader, so the result is the same."""
+    try:
+        return yaml.load(text, Loader=yaml.CSafeLoader)
+    except Exception:
+        return yaml.safe_load(text)
+
+
 def contract_files() -> list[Path]:
     return sorted(list((CONTRACTS / "spine").glob("*.yaml")) +
                   list((CONTRACTS / "satellite").glob("*.yaml")))
@@ -43,7 +53,7 @@ def main() -> int:
     # --- operationId -> contract, from the contracts
     op_contract: dict[str, str] = {}
     for f in contract_files():
-        doc = yaml.safe_load(f.read_text(encoding="utf-8"))
+        doc = _load(f.read_text(encoding="utf-8"))
         for item in (doc.get("paths") or {}).values():
             if not isinstance(item, dict):
                 continue
@@ -56,7 +66,7 @@ def main() -> int:
     op_screens: dict[str, list[str]] = defaultdict(list)
     screen_files = sorted(SCREENS.glob("P*.yaml"))
     for f in screen_files:
-        doc = yaml.safe_load(f.read_text(encoding="utf-8"))
+        doc = _load(f.read_text(encoding="utf-8"))
         code = doc["platform"]["code"]
         for s in doc["screens"]:
             for api in s.get("apis", []) or []:
@@ -76,7 +86,7 @@ def main() -> int:
 
     # --- write `contract` back into the screens
     for f in screen_files:
-        doc = yaml.safe_load(f.read_text(encoding="utf-8"))
+        doc = _load(f.read_text(encoding="utf-8"))
         changed = False
         for s in doc["screens"]:
             for api in s.get("apis", []) or []:
@@ -127,18 +137,25 @@ def main() -> int:
         # four operations). This tool owns the key, whatever form an author left it in.
         text = _re.sub(r"^ +x-ticvai-consumed-by: *\[[^\n]*\] *\r?\n", "", text, flags=_re.M)
         n = 0
+        # A whole line at the operation's own indent. A substring match also hit an OpenAPI
+        # response `links:` entry (`operationId: X` at a deeper indent) and wrote the block
+        # inside the link, which no longer parsed.
+        # **Every operation line found once, the blocks inserted from the end** (20 October 2026, CHG-R8GEN-016). It
+        # compiled and ran one search over the whole file per operation the screens call (about 2,000 per contract),
+        # which was most of its eleven minutes; the first match of each line is the same one that search found.
+        at = {}
+        for hit in _re.finditer(r"^      operationId: (\S+)\r?\n", text, _re.M):
+            at.setdefault(hit.group(1), hit.end())
+        inserts = []
         for oid, screens in sorted(op_screens.items()):
-            # A whole line at the operation's own indent. A substring match also hit an OpenAPI
-            # response `links:` entry (`operationId: X` at a deeper indent) and wrote the block
-            # inside the link, which no longer parsed.
-            marker = _re.compile(rf"^      operationId: {_re.escape(oid)}\r?\n", _re.M)
-            hit = marker.search(text)
-            if not hit:
+            if oid not in at:
                 continue
             block = "      x-ticvai-consumed-by:\n" + "".join(
                 f"        - \"{s}\"\n" for s in sorted(set(screens)))
-            text = text[:hit.end()] + block + text[hit.end():]
+            inserts.append((at[oid], block))
             n += 1
+        for end, block in sorted(inserts, reverse=True):
+            text = text[:end] + block + text[end:]
         total_ops = len(_re.findall(r"^      operationId: ", text, _re.M))
         consumed += n
         uncovered += total_ops - n
@@ -149,7 +166,7 @@ def main() -> int:
             text = _re.sub(r"(\n  version: [^\n]+\n)", rf"\1  x-ticvai-screen-count: {n}\n",
                            text, count=1)
         f.write_text(text, encoding="utf-8")
-        yaml.safe_load(f.read_text(encoding="utf-8"))  # fail loudly rather than leave a broken contract
+        _load(f.read_text(encoding="utf-8"))  # fail loudly rather than leave a broken contract
 
     print(f"linked {consumed} operations to screens")
     print(f"{uncovered} operations have no screen consuming them")

@@ -415,7 +415,7 @@
   "ai": {
    "title": "8 — Unified Operations Dashboard (AI)",
    "capabilityCount": 12,
-   "unguardedOperations": 4,
+   "unguardedOperations": 6,
    "capabilities": [
     {
      "key": "AI_APPROVE",
@@ -453,7 +453,7 @@
      "key": "AI_CONFIGURE",
      "label": null,
      "group": "Operations",
-     "operationCount": 35,
+     "operationCount": 34,
      "operations": [
       "backtestRiskStrategy",
       "configureAiCapability",
@@ -521,8 +521,9 @@
      "key": "PLATFORM_TENANT_MANAGE",
      "label": null,
      "group": "Control Plane",
-     "operationCount": 1,
+     "operationCount": 2,
      "operations": [
+      "setAiCredential",
       "setAiProvider"
      ],
      "elevated": false,
@@ -586,7 +587,7 @@
   "approvals": {
    "title": "11 — Approval Workflows and Governance",
    "capabilityCount": 6,
-   "unguardedOperations": 0,
+   "unguardedOperations": 1,
    "capabilities": [
     {
      "key": "APPROVAL_ACT",
@@ -682,7 +683,7 @@
   "assets": {
    "title": "23 — Digital Asset Management",
    "capabilityCount": 4,
-   "unguardedOperations": 0,
+   "unguardedOperations": 2,
    "capabilities": [
     {
      "key": "ASSET_LIBRARY_APPROVE",
@@ -887,7 +888,7 @@
      "key": "PRODUCT_CONFIGURE",
      "label": null,
      "group": "Catalogue",
-     "operationCount": 66,
+     "operationCount": 74,
      "operations": [
       "approvePricingWorkflowAuthority",
       "approveReviewDecision",
@@ -903,14 +904,14 @@
      "key": "PRODUCT_VIEW",
      "label": null,
      "group": "Catalogue",
-     "operationCount": 118,
+     "operationCount": 127,
      "operations": [
       "checkBookingEligibility",
       "getAvailability",
+      "getBundleSigningKeys",
       "getCatalogueImportJob",
       "getChannelAllocations",
-      "getEntitlementTemplate",
-      "getEvent"
+      "getChannelAvailability"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -1375,7 +1376,7 @@
   "identity": {
    "title": "19 — Guest Mobile App & Branding (auth) + cross-cutting staff auth",
    "capabilityCount": 12,
-   "unguardedOperations": 35,
+   "unguardedOperations": 39,
    "capabilities": [
     {
      "key": "AUDIT_VIEW",
@@ -1405,12 +1406,11 @@
      "key": "GUEST_VIEW",
      "label": "profiles, behavioural attributes, consent state",
      "group": "Guest engagement",
-     "operationCount": 4,
+     "operationCount": 3,
      "operations": [
       "getMembership",
       "listCustomerMemberships",
-      "listDelegations",
-      "verifyGuestEmail"
+      "listDelegations"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -1871,7 +1871,7 @@
   "marketing-crm": {
    "title": "22 — Marketing & CRM",
    "capabilityCount": 16,
-   "unguardedOperations": 28,
+   "unguardedOperations": 30,
    "capabilities": [
     {
      "key": "AI_CONFIGURE",
@@ -2098,7 +2098,7 @@
   "orders": {
    "title": "2 — Ticketing Sales",
    "capabilityCount": 21,
-   "unguardedOperations": 16,
+   "unguardedOperations": 21,
    "capabilities": [
     {
      "key": "CREDIT_MANAGE",
@@ -2568,7 +2568,7 @@
   "promotions": {
    "title": "4 — Bundles and Promotions",
    "capabilityCount": 6,
-   "unguardedOperations": 0,
+   "unguardedOperations": 2,
    "capabilities": [
     {
      "key": "LEDGER_VIEW",
@@ -2662,7 +2662,7 @@
   "public-api": {
    "title": "13 — Developer & API Management",
    "capabilityCount": 3,
-   "unguardedOperations": 0,
+   "unguardedOperations": 2,
    "capabilities": [
     {
      "key": "DEVELOPER_ADMIN",
@@ -2700,14 +2700,14 @@
      "key": "DEVELOPER_VIEW",
      "label": null,
      "group": "Guest engagement",
-     "operationCount": 15,
+     "operationCount": 13,
      "operations": [
       "getApiUsage",
       "getDeveloperAccount",
       "issueApiToken",
       "listApiAnomalies",
       "listApiClients",
-      "listApiScopes"
+      "listDeveloperMembers"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -3465,7 +3465,7 @@
   },
   "subscription": {
    "title": "20 — Subscription & Licensing Management",
-   "capabilityCount": 16,
+   "capabilityCount": 18,
    "unguardedOperations": 2,
    "capabilities": [
     {
@@ -3499,6 +3499,38 @@
      "operationCount": 1,
      "operations": [
       "exportPartnerInvoice"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "MEMBERSHIP_MANAGE",
+     "label": "build and change them, approve a product's validation, a member's account",
+     "group": "Guest engagement",
+     "operationCount": 8,
+     "operations": [
+      "approveMembershipProductValidation",
+      "setMemberMembershipAccount",
+      "setMembershipCommercialConfig",
+      "setMembershipEligibilityQualification",
+      "setMembershipEntitlementAdmission",
+      "setMembershipProductTier"
+     ],
+     "elevated": true,
+     "segregationConstrained": false
+    },
+    {
+     "key": "MEMBERSHIP_VIEW",
+     "label": "membership products, tiers, passes, usage and renewals",
+     "group": "Guest engagement",
+     "operationCount": 8,
+     "operations": [
+      "getMembershipProductValidation",
+      "listMembershipActivationCredential",
+      "listMembershipAnnualPass",
+      "listMembershipCommercialPricing",
+      "listMembershipFreezeSuspension",
+      "listMembershipRenewalRetention"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -3582,14 +3614,14 @@
      "key": "PLATFORM_CELL_MANAGE",
      "label": null,
      "group": "Control Plane",
-     "operationCount": 29,
+     "operationCount": 20,
      "operations": [
       "approveBookingLimitCommercial",
-      "approveMembershipProductValidation",
       "approvePartnerStatuLifecycle",
       "cancelDecommission",
       "decommissionBurstEnvironment",
-      "decommissionCell"
+      "decommissionCell",
+      "drainBurstEnvironment"
      ],
      "elevated": true,
      "segregationConstrained": false
@@ -3657,7 +3689,7 @@
      "key": "PLATFORM_TENANT_VIEW",
      "label": null,
      "group": "Control Plane",
-     "operationCount": 36,
+     "operationCount": 29,
      "operations": [
       "getEntitlementUsage",
       "getPlan",
@@ -3905,9 +3937,31 @@
   },
   "venue-map": {
    "title": "21 — Seat Management & Venue Mapping",
-   "capabilityCount": 3,
-   "unguardedOperations": 5,
+   "capabilityCount": 5,
+   "unguardedOperations": 6,
    "capabilities": [
+    {
+     "key": "PRODUCT_CONFIGURE",
+     "label": null,
+     "group": "Catalogue",
+     "operationCount": 1,
+     "operations": [
+      "setVisitPlanPreset"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "PRODUCT_VIEW",
+     "label": null,
+     "group": "Catalogue",
+     "operationCount": 1,
+     "operations": [
+      "listVisitPlanPresets"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
     {
      "key": "VENUE_MAP_MANAGE",
      "label": "place points, import geometry, accept proposals",
@@ -3939,14 +3993,14 @@
      "key": "VENUE_MAP_VIEW",
      "label": null,
      "group": "Guest engagement",
-     "operationCount": 7,
+     "operationCount": 8,
      "operations": [
       "getVenueMap",
       "getVenueMapGraph",
       "getVenueMapImportJob",
       "getVenueMapLive",
       "getVenueNavigationFile",
-      "listBookableVenueMaps"
+      "getVisitPlannerOptions"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -4050,7 +4104,7 @@
      "key": "TENANT_CONFIGURE",
      "label": "edit branding, content, navigation, modules",
      "group": "Tenant experience",
-     "operationCount": 84,
+     "operationCount": 86,
      "operations": [
       "buildDeepLink",
       "claimCustomDomain",
@@ -4373,9 +4427,9 @@
    ],
    "PLATFORM_CELL_MANAGE": [
     "approveBookingLimitCommercial",
-    "approveMembershipProductValidation",
     "approvePartnerStatuLifecycle",
-    "cancelDecommission"
+    "cancelDecommission",
+    "cancelOutboxRepublish"
    ],
    "PLATFORM_CELL_VIEW": [
     "getCell",

@@ -325,10 +325,18 @@ paths:
         maxLength: 253
     get:
       operationId: resolveTenantHost
+      # The placement is read through subscription#cellTenantRecords (x-ticvai-read-via), never raw (r8 integration, CHG-R8INT-014; check-parameter-columns P-NAMED-TABLE).
+      x-ticvai-names-for-context: [control.cell_tenant]
       x-ticvai-read-via:
       - query: platform-ops#tenantDomainRecords
         route: service
         for: 'its read of control.tenant_domain, Platform''s data (CHG-MOD-001)'
+      - query: subscription#cellTenantRecords
+        route: service
+        for: 'the tenant''s placement: its cell, instance and database name (control.cell_tenant), Platform''s data (r8 integration, CHG-R8INT-014)'
+      - query: subscription#cellRecords
+        route: service
+        for: 'its cell''s stem and Front Door endpoint (control.cell), Platform''s data (r8 integration, CHG-R8INT-014)'
       security:
       - serviceAuth: []
       x-ticvai-audience:
@@ -353,7 +361,24 @@ paths:
         is answered with a redirect to `redirectToHostname` by the edge. A custom domain whose CNAME stopped
         resolving to us stays routed while white-label''s `CustomDomain` is `pendingRevalidation`, and is
         `detached` here when that times out, so a released hostname cannot be served for somebody else
-        (the takeover warning on CMS-017).
+        (the takeover warning on CMS-017). **A `detached` host answers 404**, and at most one active row holds a
+        hostname, so the answer is never ambiguous (APPROVALS-TENANCY-C11, CHG-R8SPN-039).
+
+
+        **The routing outcomes, decided 18 October 2026** (ADAM CR-162, option A: what the resolver does today
+        becomes the rule; CHG-CRA-007). A request on a host that is not the tenant''s primary is answered **308
+        Permanent Redirect** to `redirectToHostname`. A **`terminated`** tenant answers 404; every other tenant
+        status is routed, and its operations apply the suspension mode. The address is the tenant''s
+        `control.cell_tenant` row: its cell, instance and database name, of a database that is `live`,
+        `suspended` or `draining` (`provisioning` and `dropped` are not opened), and none or more than one such
+        row answers 404. `tenant_domain.cell_id` narrows the cell; `tenant_domain.database_name` is
+        informational. A platform subdomain is written with `verifiedAt` set at provisioning, so one rule
+        serves both kinds of host.
+
+
+        **Installed staff apps resolve the same way** (R8 blocker FOUNDATION-AI-C26, CHG-R8MIG-004): a handheld,
+        POS, scanner or kiosk is provisioned with its tenant''s platform subdomain as its API host (a `staffApp`
+        channel row), so its login and token refresh name the tenant by host; there is no tenant header.
 
         '
       tags:
@@ -406,6 +431,30 @@ paths:
         `lastValidatedAt` and, on `timedOut`, sets `status: detached`. A platform subdomain is never
         detached while the tenant exists, so a tenant always has a host that works.
 
+
+        **Accepted, then written by Platform: the answer is 202** (decided 20 October 2026, Chinmay, R8 blocker
+        cause APPROVALS-TENANCY-C11, option A; CHG-R8SPN-039; the route CR-002 already decided: Tenancy has no
+        grant on the control database, and Platform writes `control.tenant_domain` from the event). The call
+        mints the row''s id (UUIDv7), writes `tenantDomain.mapped` **version 2** to the outbox with that id as the
+        event''s `aggregateId` and the whole row as its payload (id, hostname, tenantId, kind, status, cellId,
+        databaseName, channel, isPrimary, redirectToHostname, verifiedAt, lastValidatedAt), and answers `202` with
+        that row as it will be written (`TenantDomain`, its `id` the minted one). **The host is live only once
+        Platform''s consumer has written the row**, whatever the answer''s `status` says: white-label shows a domain as connected when
+        `verifyCustomDomain`, polling, finds it routed (`resolveTenantHost` on the host), never on this answer. **Whose host**:
+        `tenantId` is sent in the body (no longer server-owned: the service token names only the calling cell),
+        and is refused `403` unless the tenant is one of that cell''s tenants, as the tenant records it already reads say
+        (`subscription#tenantRecords`).
+
+
+        **`hostname-taken` is decided twice**: here, as a quick refusal (`409`) when the host is already active for
+        another tenant as Platform''s query reads it now; and finally in Platform''s consumer, under the unique
+        index on active hosts, which refuses a host another tenant took in between by writing
+        `tenantDomain.rejected` (id, hostname, tenantId, reason `hostname-taken`) for white-label to consume, so a
+        race never leaves two tenants on one host. **One host at a time**: `setPrimaryDomain` calls this once per
+        host it changes, and the consumer, writing a new primary, demotes the channel''s other primary in the same
+        transaction; when a primary custom domain is detached, the platform subdomain becomes primary in that
+        transaction. `resolveTenantHost` answers `404` for a `detached` host.
+
         '
       tags:
       - tenancy
@@ -422,15 +471,18 @@ paths:
             schema:
               $ref: '#/components/schemas/TenantDomain'
       responses:
-        '200':
+        '202':
           headers:
             X-Consistency-Token:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
-          description: Routed
+          description: 'Accepted (APPROVALS-TENANCY-C11): `tenantDomain.mapped` v2 is in the outbox, and Platform''s
+            consumer writes this row. Not yet routed: the answer is the row as it will be written.'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/TenantDomain'
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
         '409':
           description: The hostname is routed to another tenant (`hostname-taken`).
           x-ticvai-problem-types:
@@ -560,7 +612,8 @@ paths:
 
         **Reading the audit log is itself audited.** `platform.audit_read` exists for that reason:
         a trail nobody can inspect is useless, and one anybody can inspect without trace is a
-        different problem.
+        different problem. Each call writes one `AuditRead` row (`target` `auditRecord`, the
+        caller, the time, the filters and the number of rows returned; CHG-R8MIG-004).
 
         **Never deletes and never edits.** The only operations on an audit record are write and
         read — which is why there is no `updateAuditRecord` here and never will be.
@@ -886,10 +939,12 @@ paths:
         **Publishing makes the version immutable.** A workstation still running v2.3 must be able to
         say what v2.3 was, and a profile edited underneath its deployments cannot.
 
-        **PUT semantics — an upsert keyed on the body's `id`** (pull audit R103). There is no id in
-        the path, so the body names its target:
+        **PUT semantics — an upsert keyed on the path's `profileId`** (pull audit R103; corrected 20 October
+        2026, R8 blocker cause APPROVALS-TENANCY-C07, CHG-R8SPN-017: the path carries the id, and the body's `id`
+        is server-owned). A body that sends `id` must send the path's value, else `400` `validation`:
 
-        - **No profile has that `id`:** the profile is created at version 1 and the answer is `201`.
+        - **No profile has that `profileId`:** the profile is created at version 1 with it as its id, and the
+          answer is `201`.
         - **Its latest version is `draft`:** the body replaces that draft whole, the version number
           stays, and the answer is `200`.
         - **Its latest version is `published` or later:** that version is left exactly as it is and
@@ -925,7 +980,7 @@ paths:
           headers:
             X-Consistency-Token: { $ref: '../shared/common.yaml#/components/headers/ConsistencyToken' }
         '201':
-          description: Created — no profile had this `id`
+          description: Created — no profile had this `profileId`
           content:
             application/json:
               schema: { $ref: '#/components/schemas/ConfigurationProfile' }
@@ -1009,8 +1064,9 @@ paths:
         forty rows is forty.
 
         **The client names the version, the target and the strategy; the server owns the rest.**
-        `profileId` comes from the path, and `id`, `status`, the counts, `failureReasons`,
-        `startedAt` and `completedAt` are `readOnly` and ignored on input. **Only a published
+        The body is `DeployConfigurationProfileRequest` (since 20 October 2026, APPROVALS-TENANCY-C07,
+        CHG-R8SPN-017); `profileId` comes from the path, and the answer's `id`, `status`, the counts,
+        `failureReasons`, `startedAt` and `completedAt` are the server's. **Only a published
         version deploys** — a draft is still editable, and a version edited underneath its
         deployments is what publishing exists to prevent.
       tags: [tenancy]
@@ -1025,7 +1081,7 @@ paths:
         required: true
         content:
           application/json:
-            schema: { $ref: '#/components/schemas/ProfileDeployment' }
+            schema: { $ref: '#/components/schemas/DeployConfigurationProfileRequest' }
       responses:
         '202':
           description: Queued
@@ -1104,9 +1160,11 @@ paths:
         which is what `maxOfflineHours` prevents — after it, the workstation refuses to sell rather
         than keep journalling.
 
-        **PUT semantics — one policy per scope node, upserted on the body's `scopePath`** (pull
-        audit R103, R162). There is no id in the path; `scopePath` names the target, and the
-        caller must hold the permission at or above it. Where no policy is saved at that path
+        **PUT semantics — one policy per venue, the caller's** (pull audit R103, R162; corrected 20
+        October 2026, R8 blocker cause APPROVALS-TENANCY-C07, CHG-R8SPN-017). There is no id in the path, and
+        `scopePath` is server-owned (`readOnly`, ignored on input): the target is the scope node of the venue
+        the caller's session acts at, as the singleton note says, and the server writes that node's path into
+        `scopePath`. The caller must hold the permission there. Where no policy is saved at that node
         one is created (`201`); where one is, the body replaces it whole (`200`). `id` is
         server-owned and ignored on input. **An omitted field returns to its default** —
         `maxOfflineHours` to 24, `onCeilingBreach` to `blockNewSales`, `requiresManagerToExtend`
@@ -1196,9 +1254,11 @@ paths:
         `minimumStableSeconds` is what stops it, and **it is the field a venue with poor wifi will
         actually tune.**
 
-        **PUT semantics — one set of thresholds per scope node, upserted on the body's
-        `scopePath`** (pull audit R103). There is no id in the path; `scopePath` names the target.
-        Where nothing is saved at that path a row is created (`201`); where one is, the body
+        **PUT semantics — one set of thresholds per venue, the caller's** (pull audit R103; corrected
+        20 October 2026, R8 blocker cause APPROVALS-TENANCY-C07, CHG-R8SPN-017). There is no id in the path, and
+        `scopePath` is server-owned (`readOnly`, ignored on input): the target is the scope node of the venue
+        the caller's session acts at, and the server writes that node's path into `scopePath`.
+        Where nothing is saved at that node a row is created (`201`); where one is, the body
         replaces it whole (`200`). `id` is server-owned and ignored on input, and **an omitted
         field returns to its default.**
       tags: [tenancy]
@@ -1641,6 +1701,15 @@ paths:
         - "P08 BO-129 Software, Configuration & Version Management"
         - "P08 BO-133 Offline Alerts, Limits & Audit"
       description: '**Order.** Sorted by `name` ascending, then by `id`.'
+      x-ticvai-read-via:
+      - query: catalogue#bundleApplicationRecords
+        route: in-process
+        for: 'each workstation''s catalogueState, from catalogue.bundle_application, Catalogue''s data (R8 blocker
+          FOUNDATION-AI-C44) (r8 gate, CHG-R8GT2-007; check-cross-module-reads XR-FACT)'
+      - query: catalogue#publishedBundleRecords
+        route: in-process
+        for: 'catalogueState.staleAfter and pendingBundleVersion, from catalogue.published_bundle, Catalogue''s data (r8
+          gate, CHG-R8GT2-007)'
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: List workstations
@@ -1684,7 +1753,16 @@ paths:
     get:
       operationId: getWorkstation
       x-ticvai-consumed-by:
+        - "P04 POS-016 Till Configuration"
         - "P08 BO-036 Device Registry"
+      x-ticvai-read-via:
+      - query: catalogue#bundleApplicationRecords
+        route: in-process
+        for: 'catalogueState, from catalogue.bundle_application, Catalogue''s data (R8 blocker FOUNDATION-AI-C44, CHG-R8MIG-015)'
+      - query: catalogue#publishedBundleRecords
+        route: in-process
+        for: 'catalogueState.staleAfter and pendingBundleVersion, from catalogue.published_bundle, Catalogue''s data (r8
+          gate, CHG-R8GT2-007; check-cross-module-reads XR-FACT)'
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: Read a workstation
@@ -1721,6 +1799,8 @@ paths:
         - "P04 POS-016 Till Configuration"
         - "P08 BO-036 Device Registry"
         - "P08 BO-602 POS, Payment & Access Setup"
+      # Named to say custody is a different fact from binding; this PUT neither reads nor writes it (r8 integration, CHG-R8INT-014; check-parameter-columns P-NAMED-TABLE).
+      x-ticvai-names-for-context: [tenancy.device_assignment]
       x-ticvai-audience: [staff]
       x-ticvai-config-scope: venue
       summary: Configure a workstation
@@ -1761,6 +1841,17 @@ paths:
         till alone. A workstation with neither an outlet board nor its own is refused `422
         sale-board-required`, because a till must open on something. `cashDrawerLimit` overrides the
         venue's drawer limit for this till (DEC-179; CHG-CSP-016).
+
+        **`devices` links and unlinks registered devices; it never creates or deletes one** (ADAM CR-155,
+        option A, 18 October 2026; CHG-CRA-004). Each item names a registered device by `deviceId`. A device in
+        the list is linked to this workstation (`platform.device.workstation_id`, with the item's `isRequired`); a
+        device linked here and left out of the list is unlinked (`workstation_id` null). No `platform.device` row
+        is ever inserted or deleted by this PUT. An unknown `deviceId` (or an item with none) is `422
+        unknown-device`; a device that cannot be bound to a till (retired, or not approved) is `422
+        device-not-bindable`; a device already linked to another workstation is `409 device-bound-elsewhere`
+        (unlink it there first). The approved screens already pick from the registered devices, so nothing changes
+        on screen. "Binding" (CR-095) is `platform.device.workstation_id`, set by `registerDevice` or this PUT;
+        `tenancy.device_assignment` (CR-103) records custody and location, a different fact.
       tags: [workstation]
       x-ticvai-permission: WORKSTATION_CONFIGURE
       x-ticvai-scope-level: venue
@@ -1770,6 +1861,12 @@ paths:
         - query: shift#openShiftForWorkstation
           route: in-process
           for: "the open-shift refusal (409 shift-open), asked after locking the workstation row"
+        - query: catalogue#bundleApplicationRecords
+          route: in-process
+          for: "the returned workstation's catalogueState, from catalogue.bundle_application, Catalogue's data (R8 blocker FOUNDATION-AI-C44) (r8 gate, CHG-R8GT2-007; check-cross-module-reads XR-FACT)"
+        - query: catalogue#publishedBundleRecords
+          route: in-process
+          for: "catalogueState.staleAfter and pendingBundleVersion, from catalogue.published_bundle, Catalogue's data (r8 gate, CHG-R8GT2-007)"
       parameters:
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
@@ -1793,16 +1890,20 @@ paths:
             **A shift is open on this workstation** (`shift-open`: Orders' `openShiftForWorkstation`
             found one in `pendingApproval`, `open`, `suspended`, `pendingClosure` or `pendingVariance`;
             ADAM CR-083, CHG-TEN-004). The change is not applied; it can be made once the shift has
-            closed. Names the open shift (`shiftId`, `shiftStatus`).
-          x-ticvai-problem-types: [shift-open]
+            closed. Names the open shift (`shiftId`, `shiftStatus`). Or a device in `devices` is linked to
+            another workstation (`device-bound-elsewhere`, naming it; ADAM CR-155, CHG-CRA-004): unlink it there
+            first.
+          x-ticvai-problem-types: [shift-open, device-bound-elsewhere]
           content:
             application/problem+json:
               schema: { $ref: '#/components/schemas/WorkstationShiftOpenProblem' }
         '422':
           description: >
             No board would apply: the request sends no `saleBoardId` and the workstation's outlet has
-            none (`sale-board-required`; CHG-CSP-006).
-          x-ticvai-problem-types: [sale-board-required]
+            none (`sale-board-required`; CHG-CSP-006). Or an item of `devices` names no registered device
+            (`unknown-device`) or one that cannot be bound to a till, retired or not approved
+            (`device-not-bindable`; ADAM CR-155, CHG-CRA-004).
+          x-ticvai-problem-types: [sale-board-required, unknown-device, device-not-bindable]
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
@@ -2003,6 +2104,7 @@ paths:
       operationId: listSaleBoards
       x-ticvai-consumed-by:
         - "P04 POS-002 Sell — Ticket Catalogue"
+        - "P04 POS-016 Till Configuration"
         - "P04 POS-025 Till Home"
         - "P08 BO-109 Menu Builder & POS Layout Designer"
         - "P08 BO-116 Merchandising & Product Presentation"
@@ -2360,7 +2462,11 @@ paths:
         schema: { type: string, format: uuid }
     post:
       operationId: recordDeviceHeartbeat
+      x-ticvai-reads:
+      - table: tenancy.device_credential
+        for: 'the deviceAuth credential the heartbeat is signed with (APPROVALS-TENANCY-C27) (r8 integration, CHG-R8INT-014; check-parameter-columns P-NAMED-TABLE)'
       security:
+      - deviceAuth: []
       - apiKeyAuth: []
       - serviceAuth: []
       x-ticvai-audience: [device]
@@ -2375,6 +2481,19 @@ paths:
         is bound to — there is no other workstation to resolve, and a back-office session has
         none. A screen that shows device state reads it through `listDevices`, `getDevice` or
         `getWorkstationHealth`; it does not call this.
+
+        **How the device proves it is the device** (decided 20 October 2026, Chinmay, R8 blocker cause
+        APPROVALS-TENANCY-C27, option A; CHG-R8SPN-030): `deviceAuth`, the credential enrolment issued
+        (`tenancy.device_credential`). `apiKeyAuth` and `serviceAuth` stay listed for clients built on r1 and
+        are not issued to devices.
+
+        **What a heartbeat changes.** The reported `status` is stored on the device as sent, with one exception:
+        **`offline` is never accepted from a heartbeat** (a device that can call is not offline), and a body
+        with `status` `offline` is refused `400` `validation`. Only the timer sets `offline`: a device with no
+        heartbeat for 15 minutes moves to `offline` (and `health` `offline`). `device.statusChanged` is written
+        when the stored status changes, with `previousStatus` the value stored before this heartbeat (`unknown`
+        for a device's first). `lastHeartbeatAt` is set on every heartbeat; `health` is recomputed (see
+        `RegisteredDevice.health`).
       tags: [workstation]
       x-ticvai-permission: null   # a registered device, authenticated by its enrolment rather than a person
       x-ticvai-scope-level: workstation
@@ -2412,6 +2531,8 @@ paths:
           description: Recorded
           headers:
             X-Consistency-Token: { $ref: '../shared/common.yaml#/components/headers/ConsistencyToken' }
+        '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
+        '401': { $ref: '../shared/common.yaml#/components/responses/Unauthorized' }
         '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
@@ -3178,6 +3299,10 @@ paths:
         format: uuid
     get:
       operationId: listDeviceAuditRecords
+      x-ticvai-read-via:
+      - query: access#scanEventRecords
+        route: service
+        for: 'its read of access.scan_event, Access''s data: Access is its own deployable (CHG-MOD-001; R8 lineage request)'
       summary: What was done to this device, and what it did
       description: '16.7.38 and 16.7.39. **Two logs, one read.** The device audit is what administrators
         did to it — enrolled, reconfigured, re-keyed, retired. The access log is what it did — who signed
@@ -3262,11 +3387,22 @@ paths:
       operationId: recordDeviceTamperEvent
       x-ticvai-conflict-policy: append
       summary: A device reports interference
+      description: '**Reported by the device about itself** (decided 20 October 2026, Chinmay, R8 blocker cause
+        APPROVALS-TENANCY-C27, option A; CHG-R8SPN-030). A device calls with `deviceAuth` and needs no
+        permission; `deviceId` must be its own (another device''s is `404`). `DEVICE_VIEW` is what a staff caller
+        must hold to record one by hand. **The reporter never sets the trust**: the server stores `deviceTrusted`
+        false on every new event, whatever the body says, and ignores `resolvedAt`, `resolvedBy` and
+        `resolution` on input; they are set only when a person clears the device. The device is untrusted from
+        this moment.'
+      security:
+      - bearerAuth: []
+      - deviceAuth: []
       tags:
       - devices
       x-ticvai-permission: DEVICE_VIEW
       x-ticvai-audience:
       - staff
+      - device
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: true
       parameters:
@@ -3438,12 +3574,21 @@ paths:
   /cells/{cellId}/endpoints:
     get:
       operationId: listCellEndpoints
+      x-ticvai-read-via:
+      - query: subscription#cellEndpointRecords
+        route: service
+        for: 'its read of control.cell_endpoint, Platform''s data (CHG-R8MIG-018)'
       summary: Where each service answers inside a cell
       description: >
         **A cross-cell call needs an address and the addresses were not readable.**
         `contract_version` is on the row because two cells can run different versions of the same
         contract during a rollout, and a caller that assumes otherwise fails in the least debuggable
         way.
+
+        **Read from the control plane** (R8 blocker APPROVALS-TENANCY-C10, CHG-R8MIG-018): the rows are
+        `control.cell_endpoint`, which Platform keeps for each cell it provisions and serves through
+        `subscription#cellEndpointRecords`; the control plane writes a cell's rows at provisioning, so no rows means a
+        cell it does not know, `404`.
       tags:
       - tenancy
       x-ticvai-permission: SCOPE_VIEW
@@ -3491,7 +3636,11 @@ paths:
         `platform` is TenancyService''s schema in `commerce`, beside `platform.outbox`, which the dead letters drain
         from (ADR-0033); the operator''s `platform-ops.replayDeadLetter` runs in `operations` and calls this,
         cell-internal over mTLS. In one transaction it writes the dead letter''s event back to `platform.outbox`
-        as a new row and adds one to `replay_count` (**a new attempt, never a reset**, ADR-0033). The caller''s
+        as a new row and adds one to `replay_count` (**a new attempt, never a reset**, ADR-0033). **A new row, the
+        same event id**: the new outbox row takes the dead letter''s `event_id`, `tenant_id`, `aggregate_type`,
+        `aggregate_id`, `sequence`, `event_name` and `payload` as they were written (R8 blocker
+        APPROVALS-TENANCY-C29, CHG-R8MIG-004), so consumers that already handled it find their inbox row and skip
+        it, and only the consumer that failed handles it again. The caller''s
         `Idempotency-Key` makes a retried call one replay, not two.
 
         '
@@ -3735,6 +3884,55 @@ components:
           type: string
           readOnly: true
           description: The tenant. Retention is set at tenant scope only.
+    AuditRead:
+      type: object
+      x-ticvai-persistence: platform.audit_read
+      description: '**Who read audited data, when, and what they asked for** (R8 blocker APPROVALS-TENANCY-C09,
+        CHG-R8MIG-004; the lead''s answer, option A). One row per audited read, never edited: a read of a guest''s
+        PII (`target` `subject`, `subjectId` set) and every `listAuditRecords` call (`target` `auditRecord`, the
+        filter it was called with and how many rows it returned; `subjectId` null). Written by the reading
+        operation in its own transaction; storage only, no operation returns it. Any principal holding a grant
+        appends a row and only the tenant root reads one, as `platform.audit_record` (CHG-R6-002).'
+      required:
+      - id
+      - principalId
+      - readAt
+      - target
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        principalId:
+          type: string
+          format: uuid
+          x-ticvai-references: identity.principal
+          description: Who read.
+        subjectId:
+          type: string
+          format: uuid
+          nullable: true
+          x-ticvai-references: pii.subject
+          description: The guest whose PII was read; null for an audit-log read.
+        readAt:
+          type: string
+          format: date-time
+          description: When the read happened.
+        target:
+          type: string
+          enum:
+          - auditRecord
+          - subject
+          description: What was read. `auditRecord` is a `listAuditRecords` call; `subject` is a guest''s PII.
+        filter:
+          type: object
+          nullable: true
+          additionalProperties: true
+          description: The query parameters the read was made with (for `auditRecord`, the list''s filters and cursor).
+        recordCount:
+          type: integer
+          nullable: true
+          description: How many rows the read returned.
     AuditRecord:
       x-ticvai-append-only: occurredAt
       type: object
@@ -3822,6 +4020,12 @@ components:
       type: object
       x-ticvai-persistence: control.tenant_domain
       x-ticvai-agreed: '29 September: system-design review SD-021'
+      # **One active row per hostname across every tenant** (R8 blocker APPROVALS-TENANCY-C12, CHG-R8MIG-004): a
+      # partial unique index on lower(hostname) where status is active, so addCustomDomain's 409 hostname-taken holds
+      # across tenants, and a detached row stays for the audit trail without blocking the host's next owner.
+      x-ticvai-unique-when:
+      - columns: [hostname]
+        when: {status: active}
       description: '**Hostname to tenant, outside every tenant database** (SD-021, 29 September). In the control
         database, because the edge must answer it before it knows which tenant database to open.
         `whitelabel.custom_domain` stays the tenant''s own record of its domain and its verification.'
@@ -3838,12 +4042,14 @@ components:
         hostname:
           type: string
           maxLength: 253
-          x-ticvai-unique: tenant
+          description: Unique across every tenant among active rows (`x-ticvai-unique-when` on the schema).
         tenantId:
-          readOnly: true
           type: string
           format: uuid
           x-ticvai-references: control.tenant
+          description: 'The tenant the host routes to. **Sent by the caller of `setTenantDomainMapping`** since 20
+            October 2026 (APPROVALS-TENANCY-C11, CHG-R8SPN-039): the service token names only the calling cell, so
+            the body names the tenant, and it must be one of that cell''s tenants.'
         cellId:
           type: string
           format: uuid
@@ -3870,6 +4076,12 @@ components:
           - backOffice
           - partnerPortal
           - developerPortal
+          - staffApp
+          description: '`staffApp` (R8 blocker FOUNDATION-AI-C26, CHG-R8MIG-004; the lead''s answer, option A): **an
+            installed staff app (handheld, POS, scanner, kiosk) names its tenant by host**, like every other caller.
+            The device is provisioned with the tenant''s platform subdomain as its API host, and login, refresh and
+            every later call resolve the tenant from that host through `resolveTenantHost`; no tenant header or
+            body field is read.'
         status:
           type: string
           enum:
@@ -3954,10 +4166,104 @@ components:
         scopePath:
           type: string
           description: The partition key (ADR-0005).
+    ControlAuditRecord:
+      type: object
+      x-ticvai-persistence: control.audit_record
+      description: '**The control plane''s audit trail** (R8 blocker FOUNDATION-AI-C50, CHG-R8MIG-018). The control
+        database (ADR-0039) has no platform.audit_record and no scope tree, so an operation that runs on the control
+        connection (tenant, plan, subscription, cell, licence, webhook and API-client operations, `platform-ops` and
+        `subscription`) writes its audit row here, in the same transaction as its change: the tenant table''s fields
+        less `scopePath`, with the tenant it concerns and the operator from the Control Plane token. Append-only, never
+        returned by an operation in r8 (the Platform Audit Log reads it when its read is planned).'
+      required: [id, action, occurredAt]
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        operatorPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+          x-ticvai-references: none
+          description: The platform operator (the Control Plane token's subject); null for a system job.
+        tenantId:
+          type: string
+          format: uuid
+          nullable: true
+          x-ticvai-references: control.tenant
+          description: The tenant the change concerns; null for a platform-wide change (a plan, a cell).
+        action:
+          type: string
+          maxLength: 100
+          description: The operation, as `AuditRecord.action`.
+        subjectRef:
+          type: string
+          maxLength: 200
+          nullable: true
+          description: What it acted on, as `AuditRecord.subjectRef`.
+        details:
+          type: object
+          nullable: true
+          additionalProperties: true
+          description: The before and after of the change, where the operation records them.
+        occurredAt:
+          type: string
+          format: date-time
+    ControlIdempotencyRecord:
+      type: object
+      x-ticvai-persistence: control.idempotency_record
+      x-ticvai-unique-together: [[idempotencyKey, operationId]]
+      description: '**The durable idempotency record of the control database** (R8 blocker FOUNDATION-AI-C50,
+        CHG-R8MIG-018): `PlatformIdempotencyRecord` for the operations that run on the control connection, less
+        `scopePath` (no scope tree there), written in the same transaction as the keyed write and unique on
+        (`idempotencyKey`, `operationId`).'
+      required: [id, idempotencyKey, operationId, requestHash, status, createdAt, expiresAt]
+      properties:
+        id:
+          type: string
+          format: uuid
+        idempotencyKey:
+          type: string
+          format: uuid
+        operationId:
+          type: string
+          maxLength: 100
+        requestHash:
+          type: string
+          maxLength: 64
+          description: SHA-256 of the canonical request, so the same key with a different body is a `409`.
+        status:
+          type: string
+          enum:
+          - inProgress
+          - completed
+        responseStatus:
+          type: integer
+          nullable: true
+        responseBody:
+          type: object
+          nullable: true
+          additionalProperties: true
+        operatorPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+          x-ticvai-references: none
+        createdAt:
+          type: string
+          format: date-time
+        expiresAt:
+          type: string
+          format: date-time
     PlatformCellEndpoint:
       type: object
-      x-ticvai-persistence: platform.cell_endpoint
-      description: '**Taken from the backend workbook, 20 September.** Stores how another Cell/service can securely reach a particular Cell, especially its CrossCell service endpoint.'
+      x-ticvai-persistence: control.cell_endpoint
+      description: '**Taken from the backend workbook, 20 September.** Stores how another Cell/service can securely reach a particular Cell, especially its CrossCell service endpoint.
+        **A control-plane fact, kept in the control database** (R8 blocker APPROVALS-TENANCY-C10, the lead''s answer A,
+        as CR-150 moved the plan catalogue; CHG-R8MIG-018): `control.cell_endpoint`, keyed to the cell it serves (`cellId`). The control
+        plane writes a cell''s rows when it provisions the cell and when its CrossCell service moves; no tenant database
+        holds a copy.'
       required:
       - cellId
       - serviceName
@@ -3971,6 +4277,7 @@ components:
         cellId:
           type: string
           format: uuid
+          x-ticvai-references: control.cell
         serviceName:
           type: string
           maxLength: 100
@@ -4006,12 +4313,19 @@ components:
     DeviceAssignment:
       type: object
       x-ticvai-persistence: tenancy.device_assignment
-      description: '16.2.9 to 16.2.11. **Ownership, custody and location are three facts, not one.**'
+      # **One assignment per device** (R8 blocker APPROVALS-TENANCY-C26, CHG-R8MIG-004): setDeviceAssignment upserts
+      # ON CONFLICT (device_id), so device_id is required and unique.
+      x-ticvai-unique-together: [[deviceId]]
+      description: '16.2.9 to 16.2.11. **Ownership, custody and location are three facts, not one.** One row per
+        device: `setDeviceAssignment` replaces the device''s row (insert, or update on the device''s key).'
+      required:
+      - deviceId
       properties:
         deviceId:
           type: string
           format: uuid
           readOnly: true
+          x-ticvai-references: platform.device
           description: From the path of `setDeviceAssignment`.
         ownerOrgUnitId:
           type: string
@@ -4375,17 +4689,21 @@ components:
         deviceTrusted:
           type: boolean
           default: false
+          description: Set by the server, false on every new event; ignored on input (APPROVALS-TENANCY-C27).
         resolvedAt:
           type: string
           format: date-time
           nullable: true
+          description: Set when a person clears the device; ignored on `recordDeviceTamperEvent` (APPROVALS-TENANCY-C27).
         resolvedBy:
           type: string
           format: uuid
           nullable: true
+          description: Who cleared the device; ignored on `recordDeviceTamperEvent` (APPROVALS-TENANCY-C27).
         resolution:
           type: string
           nullable: true
+          description: How the device was cleared; ignored on `recordDeviceTamperEvent` (APPROVALS-TENANCY-C27).
         scopePath:
           type: string
           readOnly: true
@@ -4452,6 +4770,8 @@ components:
     ConfigurationProfile:
       type: object
       x-ticvai-persistence: "platform.configuration_profile"
+      # Each version is its own row, so an earlier one stays readable (R8 blocker APPROVALS-TENANCY-C08, CHG-R8MIG-019).
+      x-ticvai-primary-key: [id, version]
       description: >
         Board 1 of the client's POS design set, 20 August. **The board shows 1,248 workstations
         across four versions and the package modelled none of it** — a firmware version field on the
@@ -4470,7 +4790,9 @@ components:
           description: >
             Which workstation types it applies to. **A ticketing counter and a kitchen display do
             not share a profile**, and a profile that claims to is a profile somebody deploys to the
-            wrong fleet.
+            wrong fleet. **A workstation's type is the kind of its effective sale board**
+            (`SaleBoardKind`: ticketing, fnb, retail, mixed; R8 blocker APPROVALS-TENANCY-C08, the lead's
+            answer A, values proposed, client to confirm), so no column of its own is kept.
           items: { type: string }
         version:
           type: integer
@@ -4479,7 +4801,10 @@ components:
             **Immutable once deployed anywhere.** A change makes a new version, and the old one
             stays readable — a workstation still running v2.3 must be able to say what v2.3 was.
             Assigned by the server: 1 on create, and one more each time a change lands on a
-            published version (see `setConfigurationProfile`).
+            published version (see `setConfigurationProfile`). **Each version is its own row,
+            keyed (`id`, `version`)** (CHG-R8MIG-019): a new version is a new row, and
+            `setConfigurationProfile` sets the older published row's `status` to `superseded`, its
+            settings left exactly as they were.
         settings:
           type: object
           additionalProperties: true
@@ -4506,14 +4831,17 @@ components:
         id: { type: string, format: uuid, readOnly: true }
         profileId:
           x-ticvai-references: platform.configuration_profile
+          x-ticvai-references-version: version
           type: string
           format: uuid
           readOnly: true
-          description: Taken from the path of `deployConfigurationProfile`.
+          description: Taken from the path of `deployConfigurationProfile`. Keyed with `version` to the profile row
+            deployed (CHG-R8MIG-019).
         version:
           readOnly: true
           type: integer
-          description: The published version to deploy.
+          description: 'The published version deployed, as `DeployConfigurationProfileRequest.version` named it (R8
+            blocker cause APPROVALS-TENANCY-C07, CHG-R8SPN-017).'
         targetWorkstationIds: { type: array, items: { type: string, format: uuid } }
         targetFilter:
           type: object
@@ -4541,6 +4869,45 @@ components:
         startedAt: { type: string, format: date-time, readOnly: true }
         completedAt: { type: string, format: date-time, nullable: true, readOnly: true }
 
+    DeployConfigurationProfileRequest:
+      type: object
+      x-ticvai-persistence: none — request only
+      description: '**What `deployConfigurationProfile` is asked to do** (20 October 2026, R8 blocker cause
+        APPROVALS-TENANCY-C07, CHG-R8SPN-017). Until then the body was `ProfileDeployment`, whose `version` is
+        `readOnly`, so nothing named the version to deploy and the 409 `profile-version-draft` and
+        `profile-version-not-found` could never happen. The client names the version, the target and the strategy;
+        the answer is the `ProfileDeployment` the server records.'
+      required: [version]
+      properties:
+        version:
+          type: integer
+          minimum: 1
+          description: The published version of the path's profile to deploy.
+        targetWorkstationIds: { type: array, items: { type: string, format: uuid } }
+        targetFilter:
+          type: object
+          nullable: true
+          description: >
+            By department, type or venue, where the target is a set rather than a list.
+          properties:
+            venueIds: { type: array, items: { type: string, format: uuid } }
+            departmentIds: { type: array, items: { type: string, format: uuid } }
+            workstationTypes:
+              type: array
+              description: The same workstation-type values `ConfigurationProfile.venueKindScope` holds.
+              items: { type: string }
+        strategy: { type: string, enum: [immediate, staged, onNextIdle], default: onNextIdle }
+        # The answer's fields, kept readOnly (ignored on input) so a client built on r1, which sent the whole
+        # ProfileDeployment, still sends a valid body (check-contract-compat). Not `profileId`: the path names the
+        # profile, and the glossary keeps 'profile' for Role (r8 integration, CHG-R8INT-011; BC-402).
+        id: { type: string, format: uuid, readOnly: true }
+        status: { type: string, enum: [queued, inProgress, completed, partiallyFailed, rolledBack], readOnly: true }
+        succeededCount: { type: integer, readOnly: true }
+        failedCount: { type: integer, readOnly: true }
+        failureReasons: { type: object, readOnly: true, additionalProperties: { type: integer } }
+        startedAt: { type: string, format: date-time, readOnly: true }
+        completedAt: { type: string, format: date-time, nullable: true, readOnly: true }
+
     OfflinePolicy:
       type: object
       x-ticvai-persistence: "platform.offline_policy"
@@ -4565,8 +4932,9 @@ components:
           type: string
           pattern: '^[a-z0-9_]+(\.[a-z0-9_]+)*$'
           description: >
-            **The node this policy is for, and the key `setOfflinePolicy` upserts on.** The body
-            names its target here, because the path does not.
+            **The node this policy is for, and the key `setOfflinePolicy` upserts on.** Written by the
+            server from the venue the caller's session acts at; a value sent in a body is ignored
+            (APPROVALS-TENANCY-C07, CHG-R8SPN-017).
         maxOfflineHours:
           type: integer
           default: 24
@@ -4630,7 +4998,8 @@ components:
           pattern: '^[a-z0-9_]+(\.[a-z0-9_]+)*$'
           description: >
             **The node these thresholds are for, and the key `setConnectivityThresholds` upserts
-            on.** The body names its target here, because the path does not.
+            on.** Written by the server from the venue the caller's session acts at; a value sent in a
+            body is ignored (APPROVALS-TENANCY-C07, CHG-R8SPN-017).
         failuresBeforeOffline:
           type: integer
           default: 3
@@ -5028,6 +5397,7 @@ components:
           type: string
           readOnly: true
           enum: [online, offline, error, consumableLow, needsAttention, localMode, unknown]
+          default: unknown
           description: >
             What the device last said on its heartbeat; `unknown` until it has. `localMode` is an
             access-control device validating from its offline package with its link down (ADR-0067).
@@ -5061,6 +5431,15 @@ components:
             **Derived, not reported.** Computed from heartbeat age, battery, firmware currency and
             error rate — a device does not know whether it is healthy, and asking it produces a
             fleet that is 100% healthy and 12% broken.
+
+            **The formula, proposed, client to correct** (decided 20 October 2026, R8 blocker cause
+            APPROVALS-TENANCY-C27; CHG-R8SPN-030), the weights of `Workstation.healthScore` applied to one
+            device: score = 40 if its last reported `status` is `online` or `localMode` (0 otherwise) + 25
+            heartbeat freshness (25 at one minute old or less, 0 at 15 minutes or more, linear between) + 20
+            firmware currency (20 on the latest, 10 one version behind, 0 older) + 15 errors in the last hour
+            (15 at none, 0 at 10 or more, linear between). `healthy` at 80 or more, `warning` at 60 or more,
+            `degraded` below 60; `offline` after 15 minutes with no heartbeat, whatever the score; `unknown`
+            until the first heartbeat. A battery under 15% caps the device at `warning`.
         lastHeartbeatAt: { type: string, format: date-time, nullable: true, readOnly: true }
         capabilities:
           type: array
@@ -5336,6 +5715,14 @@ components:
         proposed, client to correct (audit R094); `docs/active/configured-limits-proposal.md` is the
         sheet the client corrects, and where the two differ this contract is what runs.
       properties:
+        contact:
+          allOf:
+          - $ref: ../satellite/white-label.yaml#/components/schemas/VenueContact
+          nullable: true
+          description: '**How a guest reaches this venue** (R8 blocker WHITE-C16, the storage-sat lane''s request 5;
+            CHG-R8MIG-011): phone, email, WhatsApp, address and opening-hours prose, one jsonb column, written by the
+            venue settings write and read by White-Label''s getTenantAppStatus through tenancy#venueSettingsRecords.
+            Null means the tenant''s contact is shown.'
         id:
           type: string
           format: uuid
@@ -6216,11 +6603,15 @@ components:
       enum: [terminalLocal, venueEdge, thin]
 
     CatalogueState:
-      x-ticvai-persistence: "none — computed from workstation bundle_version"
+      x-ticvai-persistence: "none — computed from catalogue.bundle_application, the workstation's latest applied report (CHG-R8MIG-015)"
       type: object
       description: >
         The workstation's local catalogue position. A terminal beyond `staleAfter` must
-        refuse to trade rather than transact against stale prices.
+        refuse to trade rather than transact against stale prices. **Read from Catalogue**
+        (R8 blocker FOUNDATION-AI-C44, CHG-R8MIG-015): the workstation's latest `applied` row in
+        `catalogue.bundle_application` (catalogue#bundleApplicationRecords) gives `appliedBundleVersion`
+        and `appliedAt`, that bundle's `catalogue.published_bundle.stale_after` gives `staleAfter`, and the
+        venue's newest published bundle, when newer, is `pendingBundleVersion`.
       required: [appliedBundleVersion, appliedAt, staleAfter, isStale]
       properties:
         appliedBundleVersion: { type: string }
@@ -6277,13 +6668,25 @@ components:
 
     DeviceBinding:
       x-ticvai-persistence: "platform.device"
-      description: >
-        A device as its workstation is configured with it. **Binding a device here moves its row to the
-        workstation's scope**: `platform.device.scope_path` becomes the workstation's path, so the device's own
-        session, scoped to that workstation, can write its heartbeat (ADAM CR-095, CHG-RSF-001).
       type: object
+      description: 'A device as its workstation is configured with it. **Binding a device here moves its row to the
+        workstation''s scope**: `platform.device.scope_path` becomes the workstation''s path, so the device''s own
+        session, scoped to that workstation, can write its heartbeat (ADAM CR-095, CHG-RSF-001).
+
+
+        **A registered device linked to the workstation** (ADAM CR-155, option A, 18 October 2026;
+        CHG-CRA-004). `deviceId` names an existing `platform.device` (registered by `registerDevice`); in
+        `configureWorkstation` it is what links the device (`platform.device.workstation_id`, `isRequired`). `kind`,
+        `driver` and `identifier` are the device''s own record, returned on `Workstation.devices`; a request''s values
+        for them are not written.'
       required: [kind, driver]
       properties:
+        deviceId:
+          type: string
+          format: uuid
+          x-ticvai-column: id
+          description: '**The registered device** (CR-155): the `platform.device` row''s own id. Every item `configureWorkstation` is sent names one; an
+            item without one, or naming no registered device of this tenant, is `422 unknown-device`.'
         kind: { $ref: '#/components/schemas/DeviceKind' }
         driver:
           type: string
@@ -6320,6 +6723,9 @@ components:
         scopePath: { type: string }
         saleBoard:
           type: object
+          # Stored only when the till overrides its outlet; the response resolves the effective board on read
+          # (R8 blocker APPROVALS-TENANCY-C39, core lane; CHG-R8MIG-014): platform.workstation.sale_board is nullable.
+          x-ticvai-column-nullable: true
           description: >
             Determines which front end loads. Bound to the workstation, not the role — the
             F&B terminal opens the F&B board. What the operator may then DO within it is
@@ -6327,6 +6733,14 @@ components:
 
             **The effective board** since 2 October 2026 (DEC-183; CHG-CSP-006): the till's own when it
             overrides the outlet, otherwise the outlet's (`saleBoardSource`).
+
+            **Resolved on read, never copied** (decided 20 October 2026, Chinmay, R8 blocker cause
+            APPROVALS-TENANCY-C39, option A; CHG-R8SPN-013). `platform.workstation.sale_board` holds only this
+            till's own override and is null when `saleBoardSource` is `outlet`. `getWorkstation`, `listWorkstations`
+            and `configureWorkstation`'s answer build `saleBoard` from the override when there is one, otherwise from
+            the outlet's `platform.outlet.sale_board_id` and that `platform.sale_board` row (its id, kind and name).
+            So `updateOutlet` and `updateSaleBoard` change what every inheriting till shows with no write to
+            `platform.workstation`, and no stored copy can go stale.
           required: [id, kind]
           properties:
             id: { type: string, format: uuid }
@@ -6436,6 +6850,8 @@ components:
           type: string
           format: uuid
           nullable: true
+          x-ticvai-references: platform.configuration_profile
+          x-ticvai-references-version: configurationProfileVersion
           description: >
             Which profile this workstation runs, and at which version. **The client's board shows a
             fleet split four ways — 72% latest, 18.8% one behind, 6.1% outdated** — and the package
@@ -6443,6 +6859,12 @@ components:
 
             **A profile is what a venue changes; a version is what it deploys.** Conflating them
             means a venue cannot say *roll the ticketing counters back and leave the kiosks*.
+        configurationProfileVersion:
+          type: integer
+          nullable: true
+          readOnly: true
+          description: The version of `configurationProfileId` this workstation runs, written when a deployment reaches
+            it; null with no profile (R8 blocker APPROVALS-TENANCY-C08, CHG-R8MIG-019).
         catalogueState:
           $ref: '#/components/schemas/CatalogueState'
         offlineCapable:

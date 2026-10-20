@@ -17,6 +17,13 @@ the decision and passes after it. Two rules are general, because the same gap ca
 
 And one rule per decision:
 
+  BR-APPROVAL-ROUTE  (r8, CHG-R8SPN-016, CHG-R8GEN-013) setApprovalMatrix and approveMatrixMultiLevel refuse a
+                   condition the engine cannot evaluate (422 condition-not-supported); submitApprovalRequest's 409
+                   lists approval-no-longer-required and approval-no-approver-available.
+  BR-GUEST-SELF-403  (r8, CHG-R8SPN-018) a guest operation scoped to the caller's subject answers another subject's
+                   record 404, not 403: a ratchet (GUEST_SELF_403_CEILING). BR-ALERT-RECIPIENT (CHG-R8SPN-020) is a
+                   warning until reporting's listAlerts states its recipient filter.
+
   BR-SPLIT         (CHG-RUL-001) Five split methods; `closeTableVisit` takes a payment without `subBillId` (an
                    unsplit bill is one sub-bill); `splitBill` and `closeTableVisit` state the outlet's payment
                    timing (`paymentTiming`, send first or pay first).
@@ -48,6 +55,29 @@ And one rule per decision:
                    default (GST-055).
   BR-NEW-OPS       (CHG-RUL-013) `listMyTableReservations` (self-scoped, paged), `listBookableOutlets` (public,
                    published, paged), `uploadIncidentMedia` and `addIncidentPerson` exist.
+
+And one rule per decision for the CRs of 18 October 2026 (class 9, "rules nobody has decided yet"; CHG-CRA-007):
+
+  BR-GUEST-PII     (ADAM CR-141) every GuestProfile property is marked personal or behavioural
+                   (`x-ticvai-data-class`), the six personal fields among them; `searchGuests` states the consent rule,
+                   the id order without GUEST_VIEW_PII and leaves out lifetimeValue until it has a currency.
+  BR-HOST-ROUTING  (CR-162) `resolveTenantHost` states 308, terminated is 404, which databases are opened, a
+                   platform subdomain verified at provisioning, and `database_name` informational.
+  BR-CASH-RECEIPT  (CR-168) a `payment` journal source, a region's account mapping by scope path, entry numbers unique
+                   per legal entity, the next open period, and createPayment's two settings reads.
+  BR-HOLD-LAPSE    (CR-169) a seat reservation names its hold and can be `sold`; `convertInventoryHold` moves the
+                   envelope's units and states the lapsed-hold rule (unitsGone, nothing refunded automatically).
+  BR-LOGIN-ATTEMPTS (CR-170, 19 October 2026; CHG-CRA-009) every wrong-credentials 401 of login carries
+                   attemptsRemaining, counted per submitted username known or not and per sign-in method, and
+                   sso-sign-in-required does not; verifyMfaChallenge carries it on its wrong-code 422 and not on its
+                   401, a missing or expired challenge session (narrowed, 20 October 2026, CHG-R8DEC-001); login's 409
+                   says since when and on what.
+  BR-GATE-CANCEL   (CR-171, 19 October 2026; CHG-CRA-010) a cancelled gate mode change records who, when and why in
+                   its own columns, leaving the scheduler's untouched.
+  BR-APPROVED-OUTCOME (20 October 2026, option A; CHG-R8DEC-002) an approved action's outcome has a writer:
+                   approvals' recordApprovedActionOutcome, service-only, takes applied, notApplied or noOp and returns
+                   the execution; the lineage has it write approvals.approved_action_execution; suspendTenant's and
+                   reactivateTenant's grant consumers call it.
 
 The step-up rule of `rejectShiftVariance` (CHG-RUL-014), and of `closeShift`, `acceptShiftVariance`,
 `withdrawFromDepositBox` and the 20 MFA step-ups (CHG-RUL-019, CHG-RUL-020), is held by `check-step-up.py`
@@ -139,6 +169,11 @@ def props(doc, node):
 
 def body_schema(op):
     return (((op.get("requestBody") or {}).get("content") or {}).get("application/json") or {}).get("schema") or {}
+
+
+# BR-GUEST-SELF-403: guest operations scoped to the caller's subject that declared 403 on 20 October 2026 (13 on the
+# generators branch before the core lane's CHG-R8SPN-018 merged). Lower it as they are fixed; never raise it.
+GUEST_SELF_403_CEILING = 13
 
 
 def problem_types(op):
@@ -330,11 +365,182 @@ def main() -> int:
         need("BR-NEW-OPS", "consent" in text(ops["addIncidentPerson"][3]).lower(),
              "addIncidentPerson does not apply the consent rules")
 
+    # ============================================== the rules decided for the CRs of 18 October 2026 (CHG-CRA-007)
+    # Class 9 of the 18 October triage, "rules nobody has decided yet": each operation depended on a rule the package
+    # never stated, so a developer could not build it. The lead decided each; the contract now states it, with any
+    # proposed default marked for the client to correct. One rule per decision, as above.
+
+    # -------------------------------------------------------------- BR-GUEST-PII (ADAM CR-141)
+    f, _, _, sg, doc = op("searchGuests")
+    gp = ((doc.get("components") or {}).get("schemas") or {}).get("GuestProfile") or {}
+    personal = {"displayName", "email", "phone", "preferredLanguage", "preferredChannel", "guestLinkId"}
+    for p, ps in (gp.get("properties") or {}).items():
+        cls = (ps or {}).get("x-ticvai-data-class")
+        need("BR-GUEST-PII", cls in ("personal", "behavioural"),
+             f"GuestProfile.{p} is not marked personal or behavioural (x-ticvai-data-class)")
+        if p in personal:
+            need("BR-GUEST-PII", cls == "personal", f"GuestProfile.{p} is personal data (CR-141) and not marked so")
+    st = text(sg)
+    need("BR-GUEST-PII", "superseded_at" in st and "granted" in st,
+         "searchGuests does not state hasConsentFor's rule (the current consent record, decision granted)")
+    need("BR-GUEST-PII", "ordered by `id`" in st or "ordered by id" in st,
+         "searchGuests does not order by id for a caller without GUEST_VIEW_PII")
+    need("BR-GUEST-PII", "lifetimeValue" in st and "currency" in st,
+         "searchGuests does not say lifetimeValue is left out until it has a currency (CR-094's rule)")
+
+    # -------------------------------------------------------------- BR-HOST-ROUTING (ADAM CR-162)
+    rt = text(op("resolveTenantHost")[3])
+    for frag, why in (("308", "the redirect status"), ("terminated", "a terminated tenant answers 404"),
+                      ("draining", "which cell_tenant databases are opened"),
+                      ("verifiedAt", "a platform subdomain is written verified at provisioning"),
+                      ("informational", "tenant_domain.database_name is informational")):
+        need("BR-HOST-ROUTING", frag in rt, f"resolveTenantHost does not state {why} ({frag!r})")
+
+    # -------------------------------------------------------------- BR-CASH-RECEIPT (ADAM CR-168)
+    fin = load("contracts/spine/finance.yaml")
+    fs = (fin.get("components") or {}).get("schemas") or {}
+    need("BR-CASH-RECEIPT", "payment" in ((fs.get("JournalSource") or {}).get("enum") or []),
+         "JournalSource has no `payment`: a cash receipt would read as revenue")
+    need("BR-CASH-RECEIPT", "scopePath" in ((fs.get("AccountMapping") or {}).get("properties") or {}),
+         "AccountMapping has no scopePath: a region's mapping cannot be found")
+    je = fs.get("JournalEntry") or {}
+    need("BR-CASH-RECEIPT", ["legalEntityId", "entryNumber"] in (je.get("x-ticvai-unique-together") or [])
+         and not (((je.get("properties") or {}).get("entryNumber") or {}).get("x-ticvai-unique")),
+         "JournalEntry.entryNumber is not unique per legal entity (x-ticvai-unique-together legalEntityId, entryNumber)")
+    cp = op("createPayment")[3]
+    need("BR-CASH-RECEIPT", "next open period" in text(cp),
+         "createPayment does not post a capture to the legal entity's next open period")
+    vias = {str(v.get("query")) for v in cp.get("x-ticvai-read-via") or [] if isinstance(v, dict)}
+    need("BR-CASH-RECEIPT", {"tenancy#venueSettingsRecords", "tenancy#regionSettingsRecords"} <= vias,
+         "createPayment does not declare its reads of venue and region settings")
+
+    # -------------------------------------------------------------- BR-HOLD-LAPSE (ADAM CR-169)
+    seat = load("contracts/satellite/seating.yaml")
+    sh = ((seat.get("components") or {}).get("schemas") or {}).get("SeatHold") or {}
+    shp = sh.get("properties") or {}
+    need("BR-HOLD-LAPSE", "sold" in ((shp.get("status") or {}).get("enum") or []),
+         "SeatHold.status has no `sold`")
+    need("BR-HOLD-LAPSE", "inventoryReservationId" in shp, "SeatHold names no inventory reservation")
+    ct = text(op("convertInventoryHold")[3])
+    need("BR-HOLD-LAPSE", "unitsGone" in ct and "refunded automatically" in ct,
+         "convertInventoryHold does not state the lapsed-hold rule (units retaken, else unitsGone; no automatic refund)")
+    need("BR-HOLD-LAPSE", "channel_envelope" in ct, "convertInventoryHold does not move the envelope's leased units")
+
+    # -------------------------------------------------------------- BR-LOGIN-ATTEMPTS (ADAM CR-170; CHG-CRA-009)
+    # Decided by Chinmay Parab on 19 October 2026, option D: the door says how many attempts are left on every 401,
+    # counted per submitted username so nothing reveals which usernames exist; the 409 says since when and on what.
+    idoc = load("contracts/spine/identity.yaml")
+    ids = (idoc.get("components") or {}).get("schemas") or {}
+
+    def ext(name, field):
+        sch = ids.get(name) or {}
+        return any(field in ((part or {}).get("properties") or {}) for part in sch.get("allOf") or [])
+
+    lg = op("login")[3]
+    r401 = text((lg.get("responses") or {}).get("401") or {})
+    need("BR-LOGIN-ATTEMPTS", "LoginDeniedProblem" in r401 and ext("LoginDeniedProblem", "attemptsRemaining"),
+         "login's 401 does not carry attemptsRemaining (LoginDeniedProblem)")
+    need("BR-LOGIN-ATTEMPTS", "whether or not a principal has it" in r401,
+         "login's 401 does not count attempts per submitted username, known or not")
+    # Fix round 3 (lane-H review 2 M-5): "every 401" is every 401 login and verifyMfaChallenge return, and the
+    # unknown username's counter is per sign-in method as a known one's lock is.
+    # Narrowed by the lead on 20 October 2026 (CHG-R8DEC-001): every wrong-credentials 401, never sso-sign-in-required,
+    # which checks no credential. LoginDeniedProblem serves both problem types, so the field is not `required` there and
+    # the contract says where it is present and where it is not.
+    ldp = text(ids.get("LoginDeniedProblem") or {})
+    need("BR-LOGIN-ATTEMPTS", "`unauthenticated`" in ldp and "Not on `sso-sign-in-required`" in ldp,
+         "LoginDeniedProblem does not say attemptsRemaining is on every unauthenticated 401 and not on "
+         "sso-sign-in-required (CHG-R8DEC-001)")
+    need("BR-LOGIN-ATTEMPTS", "does not carry `attemptsRemaining`" in r401 and "carries the count as it stands" not in r401,
+         "login's 401 does not say sso-sign-in-required leaves attemptsRemaining out (CHG-R8DEC-001)")
+    need("BR-LOGIN-ATTEMPTS", "per sign-in method" in r401,
+         "login's 401 does not count attempts per sign-in method as well as per username")
+    need("BR-LOGIN-ATTEMPTS", "SessionHeldProblem" in text((lg.get("responses") or {}).get("409") or {})
+         and ext("SessionHeldProblem", "openedAt") and ext("SessionHeldProblem", "deviceLabel"),
+         "login's 409 does not say since when and on what (SessionHeldProblem openedAt, deviceLabel)")
+    need("BR-LOGIN-ATTEMPTS", "credential-locked" in text((lg.get("responses") or {}).get("429") or {}),
+         "login's lock is not 429 credential-locked")
+    vm = op("verifyMfaChallenge")[3]
+    need("BR-LOGIN-ATTEMPTS", "MfaCodeInvalidProblem" in text((vm.get("responses") or {}).get("422") or {})
+         and ext("MfaCodeInvalidProblem", "attemptsRemaining"),
+         "verifyMfaChallenge's 422 does not carry attemptsRemaining")
+    # Narrowed on 20 October 2026 (CHG-R8DEC-001): a missing or expired challenge session is not a wrong credential.
+    vm401 = text((vm.get("responses") or {}).get("401") or {})
+    need("BR-LOGIN-ATTEMPTS", "MfaCodeInvalidProblem" not in vm401 and "does not carry `attemptsRemaining`" in vm401,
+         "verifyMfaChallenge's 401 carries attemptsRemaining or does not say it does not (a missing or expired challenge "
+         "session is not a wrong credential, CHG-R8DEC-001)")
+
+    # -------------------------------------------------------------- BR-GATE-CANCEL (ADAM CR-171; CHG-CRA-010)
+    # Decided by Chinmay Parab on 19 October 2026, option B: a cancelled gate mode change records who, when and why
+    # in its own columns, and the scheduler's changedBy, changedAt and reason are left untouched.
+    adoc = load("contracts/spine/access.yaml")
+    gm = (((adoc.get("components") or {}).get("schemas") or {}).get("AccessGateModeChange") or {}).get("properties") or {}
+    for fld in ("cancelledByPrincipalId", "cancelledAt", "cancelReason"):
+        need("BR-GATE-CANCEL", fld in gm, f"AccessGateModeChange has no {fld}")
+    need("BR-GATE-CANCEL", (gm.get("cancelReason") or {}).get("maxLength") == 200,
+         "AccessGateModeChange.cancelReason is not at most 200 characters")
+    need("BR-GATE-CANCEL", "left as they were" in text(op("cancelGateModeChange")[3]),
+         "cancelGateModeChange does not leave the scheduler's columns untouched")
+
+    # -------------------------------------------------------------- BR-APPROVED-OUTCOME (CHG-R8DEC-002)
+    # Decided by Chinmay Parab on 20 October 2026, option A: approvals.approved_action_execution was "updated by the
+    # requesting contract as it executes" with no operation or event able to write it. One internal operation is that
+    # writer, and the contracts that apply a grant say they call it.
+    ro = op("recordApprovedActionOutcome")
+    need("BR-APPROVED-OUTCOME", ro[0] is not None and ro[0].stem == "approvals",
+         "approvals has no recordApprovedActionOutcome (the writer of an approved action's outcome)")
+    if ro[0] is not None:
+        o = ro[3]
+        need("BR-APPROVED-OUTCOME", o.get("x-ticvai-audience") == ["service"] and o.get("x-ticvai-auth") == "service"
+             and {"serviceAuth": []} in (o.get("security") or []),
+             "recordApprovedActionOutcome is not service-only (audience service, x-ticvai-auth service, serviceAuth)")
+        oc = props(ro[4], body_schema(o)).get("outcome") or {}
+        need("BR-APPROVED-OUTCOME", set(oc.get("enum") or []) == {"applied", "notApplied", "noOp"},
+             "recordApprovedActionOutcome's outcome is not applied, notApplied or noOp")
+        need("BR-APPROVED-OUTCOME", "ApprovedActionExecutionView" in text((o.get("responses") or {}).get("200") or {}),
+             "recordApprovedActionOutcome does not return the execution (ApprovedActionExecutionView)")
+    lin_ = json.loads((ROOT / "handoff" / "api-data-lineage.json").read_text(encoding="utf-8"))
+    need("BR-APPROVED-OUTCOME", "approvals.approved_action_execution"
+         in ((lin_.get("recordApprovedActionOutcome") or {}).get("writes") or []),
+         "the lineage does not have recordApprovedActionOutcome write approvals.approved_action_execution")
+    for oid in ("suspendTenant", "reactivateTenant"):
+        need("BR-APPROVED-OUTCOME", "recordApprovedActionOutcome" in text(op(oid)[3]),
+             f"{oid}'s grant consumer does not record its outcome through recordApprovedActionOutcome")
+
+    # -------------------------------------------------------------- r8 second round (core lane's requests, CHG-R8GEN-013)
+    # BR-APPROVAL-ROUTE (CHG-R8SPN-016): a matrix condition the engine cannot evaluate is refused when it is saved, and a
+    # submission that no longer needs approval, or finds no approver, says so with its own problem type.
+    for oid in ("setApprovalMatrix", "approveMatrixMultiLevel"):
+        need("BR-APPROVAL-ROUTE", "condition-not-supported" in problem_types(op(oid)[3]),
+             f"{oid} does not refuse a condition the engine cannot evaluate (422 condition-not-supported)")
+    sub409 = text(((op("submitApprovalRequest")[3].get("responses") or {}).get("409")) or {})
+    for pt in ("approval-no-longer-required", "approval-no-approver-available"):
+        need("BR-APPROVAL-ROUTE", pt in sub409, f"submitApprovalRequest's 409 does not list {pt}")
+    # BR-ALERT-RECIPIENT (CHG-R8SPN-020): reporting's listAlerts says whose alerts come back (the recipient role; an
+    # over/short alert only to a holder of OVERSHORT_ACCEPT).
+    la = next((o for oid, (f, _p, _m, o, _d) in ops.items() if oid == "listAlerts" and f.stem == "reporting"),
+              op("listAlerts")[3])
+    # Printed, not failed, until the surface lane's listAlerts text lands (r8 cause APPROVALS-TENANCY-C36): then move
+    # it into `need` so the filter cannot be dropped again.
+    if not ("OVERSHORT_ACCEPT" in text(la) and "recipient" in text(la).lower()):
+        print("  WARN  BR-ALERT-RECIPIENT listAlerts does not yet state the recipient-role filter (OVERSHORT_ACCEPT for "
+              "over/short alerts); surface lane, r8 cause APPROVALS-TENANCY-C36")
+    # BR-GUEST-SELF-403 (CHG-R8SPN-018): a guest operation scoped to the caller's own subject answers someone else's
+    # record with 404, never 403 (which would confirm it exists). A ratchet over the operations found on 20 October.
+    self403 = sorted(oid for oid, (_f, _p, _m, o, _d) in ops.items()
+                     if o.get("x-ticvai-self-scoped") == "subject" and "guest" in (o.get("x-ticvai-audience") or [])
+                     and "403" in {str(k) for k in (o.get("responses") or {})})
+    if len(self403) > GUEST_SELF_403_CEILING:
+        need("BR-GUEST-SELF-403", False, f"{len(self403)} guest self-scoped operations declare 403, above the ceiling "
+             f"of {GUEST_SELF_403_CEILING}: answer another subject's record 404 ({', '.join(self403[:8])})")
+
     errors["BR-PARSE"].extend(PARSE_ERRORS)
     total = sum(len(v) for v in errors.values())
     rules = ["BR-PARSE", "BR-STREAM", "BR-PAIR-REFUSAL", "BR-SPLIT", "BR-VISIT-PLAN", "BR-PO", "BR-PAY-LINK", "BR-REPORT-RUNS",
              "BR-CONTRAST", "BR-WO-CANCEL", "BR-INCIDENT", "BR-FARE", "BR-SESSIONS-DOOR", "BR-ATTENDANCE",
-             "BR-AI-CURRENCY", "BR-QR", "BR-NEW-OPS"]
+             "BR-AI-CURRENCY", "BR-QR", "BR-NEW-OPS", "BR-GUEST-PII", "BR-HOST-ROUTING", "BR-CASH-RECEIPT",
+             "BR-HOLD-LAPSE", "BR-LOGIN-ATTEMPTS", "BR-GATE-CANCEL", "BR-APPROVAL-ROUTE", "BR-GUEST-SELF-403",
+             "BR-APPROVED-OUTCOME"]
     for r in rules:
         print(f"  {r:18} {len(errors.get(r, [])):3d}")
         for m in errors.get(r, [])[:12]:

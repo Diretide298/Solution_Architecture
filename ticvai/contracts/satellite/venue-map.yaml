@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI — Venue map
   version: 1.0.0
-  x-ticvai-screen-count: 22
+  x-ticvai-screen-count: 24
   x-ticvai-tier: satellite
   x-ticvai-module: "21 — Seat Management & Venue Mapping"
   x-ticvai-platforms:
@@ -1588,7 +1588,6 @@ paths:
         schema: { type: string, format: uuid }
     get:
       operationId: listVisitPlanPresets
-      x-ticvai-consumed-by: []
       summary: A venue's ready-made day plans, as staff edit them
       description: >
         **The venue's presets, switched-off ones included** (R8 blocker GPS-C21; r8 integration, CHG-R8INT-007).
@@ -1638,7 +1637,6 @@ paths:
         schema: { type: string, maxLength: 64, pattern: '^[a-z][a-zA-Z0-9]*$' }
     put:
       operationId: setVisitPlanPreset
-      x-ticvai-consumed-by: []
       summary: Add or replace one of a venue's ready-made day plans
       description: >
         **Whole replace, keyed on the venue and `presetKey`** (R8 blocker GPS-C21; r8 integration, CHG-R8INT-007):
@@ -1682,12 +1680,12 @@ paths:
   /visit-plans:
     get:
       operationId: listMyVisitPlans
+      x-ticvai-consumed-by:
+        - "P02 GST-059 Plan in Progress"
       x-ticvai-read-via:
       - query: tenancy#activeVenues
         route: service
         for: 'what its plans call "active venues" (VisitPlan.availableAtVenueIds): platform.scope, Tenancy''s data (r8 integration, CHG-R8INT-014)'
-      x-ticvai-consumed-by:
-        - "P02 GST-059 Plan in Progress"
       security:
       - guestAuth: []
       x-ticvai-agreed: 'r8 walk of ticket 28694: GST-059 opened cold, from the home screen or a notification, had no planId; shape follows listVisitPlanAlternatives (paged) and getVisitPlan (owner rule)'

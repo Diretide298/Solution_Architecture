@@ -29,10 +29,10 @@
 | [WEB-001](#web-001-home-landing) | Home / Landing | Discovery & Browse | 1 | 7 |
 | [WEB-002](#web-002-event-attraction-listing) | Event & Attraction Listing | Discovery & Browse | 1 | 6 |
 | [WEB-003](#web-003-search-results) | Search Results | Discovery & Browse | 1 | 2 |
-| [WEB-004](#web-004-attraction-details) | Attraction Details | Discovery & Browse | 1 | 5 |
+| [WEB-004](#web-004-attraction-details) | Attraction Details | Discovery & Browse | 1 | 6 |
 | [WEB-005](#web-005-ticket-type-selection) | Ticket Type Selection | Booking & Selection | 1 | 7 |
-| [WEB-006](#web-006-date-performance-selection) | Date & Performance Selection | Booking & Selection | 1 | 10 |
-| [WEB-007](#web-007-interactive-seat-selection) | Interactive Seat Selection | Booking & Selection | 1 | 6 |
+| [WEB-006](#web-006-date-performance-selection) | Date & Performance Selection | Booking & Selection | 1 | 12 |
+| [WEB-007](#web-007-interactive-seat-selection) | Interactive Seat Selection | Booking & Selection | 1 | 7 |
 | [WEB-008](#web-008-add-ons-upsell) | Add-ons & Upsell | Booking & Selection | 1 | 5 |
 | [WEB-009](#web-009-wishlist) | Wishlist | Booking & Selection | 1 | 3 |
 | [WEB-010](#web-010-shopping-cart) | Shopping Cart | Cart & Checkout | 1 | 14 |
@@ -44,9 +44,9 @@
 | [WEB-016](#web-016-login-register) | Login / Register | Account & Self-Service | 1 | 14 |
 | [WEB-017](#web-017-my-account-dashboard) | My Account Dashboard | Account & Self-Service | 1 | 8 |
 | [WEB-018](#web-018-my-tickets) | My Tickets | Account & Self-Service | 1 | 9 |
-| [WEB-019](#web-019-order-history) | Order History | Account & Self-Service | 1 | 8 |
+| [WEB-019](#web-019-order-history) | Order History | Account & Self-Service | 1 | 9 |
 | [WEB-020](#web-020-profile-preferences) | Profile & Preferences | Account & Self-Service | 1 | 7 |
-| [WEB-021](#web-021-wallet-gift-cards) | Wallet & Gift Cards | Membership, Loyalty & Value | 1 | 7 |
+| [WEB-021](#web-021-wallet-gift-cards) | Wallet & Gift Cards | Membership, Loyalty & Value | 1 | 9 |
 | [WEB-022](#web-022-membership-plans) | Membership Plans | Membership, Loyalty & Value | 1 | 3 |
 | [WEB-023](#web-023-membership-management) | Membership Management | Membership, Loyalty & Value | 1 | 5 |
 | [WEB-024](#web-024-devices-wishlist-consent) | Devices, Wishlist & Consent | Membership, Loyalty & Value | 1 | 14 |
@@ -55,8 +55,8 @@
 | [WEB-027](#web-027-newsletter-subscription) | Newsletter Subscription | Engagement & Support | 1 | 5 |
 | [WEB-028](#web-028-contact-venue-information) | Contact & Venue Information | Engagement & Support | 1 | 1 |
 | [WEB-029](#web-029-error-sold-out-maintenance) | Error / Sold Out / Maintenance | System States | 1 | 2 |
-| [WEB-030](#web-030-ticket-transfer) | Ticket Transfer | Ticketing | 1 | 3 |
-| [WEB-031](#web-031-my-reservations) | My Reservations | Ticketing | 1 | 10 |
+| [WEB-030](#web-030-ticket-transfer) | Ticket Transfer | Ticketing | 1 | 4 |
+| [WEB-031](#web-031-my-reservations) | My Reservations | Ticketing | 1 | 11 |
 | [WEB-032](#web-032-offers-promotions) | Offers & Promotions | Promotions | 1 | 2 |
 | [WEB-033](#web-033-shop) | Shop | Retail | 1 | 5 |
 | [WEB-034](#web-034-lost-found) | Lost & Found | Support | 1 | 4 |
@@ -73,9 +73,9 @@
 | [WEB-045](#web-045-help-centre-accessibility) | Help Centre & Accessibility | Support | 1 | 4 |
 | [WEB-046](#web-046-in-venue-notifications) | In-Venue Notifications | Engagement & Support | 1 | 2 |
 | [WEB-047](#web-047-map-booking-cabanas-spots) | Map Booking — Cabanas & Spots | Booking & Selection | 1 | 8 |
-| [WEB-048](#web-048-book-a-space-by-the-hour) | Book a Space by the Hour | Booking & Selection | 1 | 4 |
+| [WEB-048](#web-048-book-a-space-by-the-hour) | Book a Space by the Hour | Booking & Selection | 1 | 5 |
 | [WEB-049](#web-049-transport-route-schedule) | Transport — Route & Schedule | Transport | 1 | 12 |
-| [WEB-050](#web-050-plan-your-visit) | Plan Your Visit | Discovery & Browse | 1 | 7 |
+| [WEB-050](#web-050-plan-your-visit) | Plan Your Visit | Discovery & Browse | 1 | 8 |
 
 ## WEB-001 Home / Landing
 
@@ -267,6 +267,7 @@
 |---|---|
 | eventId | WEB-002 |
 | productId | WEB-001 |
+| venueId | session |
 
 **Operations**
 
@@ -277,6 +278,7 @@
 | `listPerformances` | [CatalogueService](../backend/CatalogueService.md#listperformances) | onLoad | List performances of an event | `PRODUCT_VIEW` |
 | `getAvailability` | [CatalogueService](../backend/CatalogueService.md#getavailability) | onLoad | Live remaining capacity | `PRODUCT_VIEW` |
 | `getWaitTimes` | [VenueOpsService](../backend/VenueOpsService.md#getwaittimes) | onLoad | Wait times across a venue | `None` |
+| `getPublishedBookingFlow` | [WhiteLabelService](../backend/WhiteLabelService.md#getpublishedbookingflow) | onLoad | Which screen Book opens (r8, GPS-C06): the product's published flow (its own, then its category's, then the venue default for its kind), read with `productId`; its `flowTypeKey` chooses among the Book transitions (each names its condition). Public, so it runs before sign-in. | `None` |
 
 **States**
 
@@ -296,11 +298,11 @@
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | WEB-002 | Event & Attraction Listing | eventId |  |
-| WEB-005 | Chooses ticket types and quantities | productId |  |
-| WEB-006 | Book (a dated product: date first, then time, then tickets) | productId |  |
-| WEB-007 | Book (a fixture with one on-sale performance opens straight on the seat map) | performanceId |  |
-| WEB-047 | Book (a cabana, lounger or other spot placed on the venue map) | productId |  |
-| WEB-048 | Book (a space sold by the hour, e.g. a meeting room) | productId |  |
+| WEB-005 | Chooses ticket types and quantities | productId | the product's published flow (`getPublishedBookingFlow` `flowTypeKey`) is none of the four below, or nothing resolves (404): the ticket counters open as the side panel |
+| WEB-006 | Book (a dated product: date first, then time, then tickets) | productId | `flowTypeKey` is `datedDayPass`, `timedEntry` or `seatedDateTimeSeatMap`, or it is `seatedFixedPerformance` and the event has more than one on-sale performance (`listPerformances`) |
+| WEB-007 | Book (a fixture with one on-sale performance opens straight on the seat map) | performanceId, productId | `flowTypeKey` is `seatedFixedPerformance` and `listPerformances` returns exactly one on-sale performance, whose id the edge carries |
+| WEB-047 | Book (a cabana, lounger or other spot placed on the venue map) | productId | `flowTypeKey` is `cabanaMap` (placed on a map is the flow type the venue chose on CMS-103; the product needs no field of its own) |
+| WEB-048 | Book (a space sold by the hour, e.g. a meeting room) | productId | `flowTypeKey` is `meetingRoomHourly` |
 
 ## WEB-005 Ticket Type Selection
 
@@ -353,8 +355,8 @@
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | WEB-006 | Change date or time (the dated flow picks them first) | eventId |  |
-| WEB-007 | Interactive Seat Selection | eventId |  |
-| WEB-008 | Add-ons & Upsell |  |  |
+| WEB-007 | Interactive Seat Selection | eventId, productId |  |
+| WEB-008 | Add-ons & Upsell | bundleId |  |
 | WEB-010 | Shopping Cart | cartId, code, lineId, performanceId |  |
 | WEB-016 | Continue, when sign-in is asked after add-ons and this booking has no add-ons step | cartId |  |
 | WEB-006 | Workshop chosen, then date and time (product-first flow) | productId |  |
@@ -380,6 +382,7 @@
 |---|---|
 | performanceId | navigation |
 | cartId | navigation |
+| productId | WEB-004 |
 | eventId | WEB-004 |
 | venueId | session |
 | entryId | navigation |
@@ -398,6 +401,8 @@
 | `joinWaitlist` | [CatalogueService](../backend/CatalogueService.md#joinwaitlist) | onAction | Join the waitlist of a sold-out time (CHG-R6-037) | `None` |
 | `leaveWaitlist` | [CatalogueService](../backend/CatalogueService.md#leavewaitlist) | onAction | Leave it (CHG-R6-037) | `None` |
 | `getPublishedBookingFlow` | [WhiteLabelService](../backend/WhiteLabelService.md#getpublishedbookingflow) | onLoad | The published booking flow for this product: which steps it has and in what order (W12) | `None` |
+| `getProduct` | [CatalogueService](../backend/CatalogueService.md#getproduct) | background | Resolves the event from the product (r8, GPS-C05): WEB-004 opens this screen with `productId` only, and `Product.eventId` is the event `listPerformances` and `getAvailability` need. Not called when the edge carried `eventId`. No component of its own: what it finds drives the date and time pickers. | `PRODUCT_VIEW` |
+| `createCart` | [OrderService](../backend/OrderService.md#createcart) | background | Started by the runtime the first time a line is added, before the first addCartLine, against the guest or the anonymous cart token (2.1.31); never a button or a form (GFIX-3). With the guest session the device already holds: signed in, or the anonymous cart session a visitor gets with the first line (ADR-0045; r8, GPS-C23). | `None` |
 
 **States**
 
@@ -415,10 +420,10 @@
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | WEB-005 | Picks a time; the tickets for it appear | performanceId |  |
-| WEB-008 | Add-ons & Upsell |  |  |
+| WEB-008 | Add-ons & Upsell | bundleId |  |
 | WEB-010 | Reviews the cart and may enter a promotion code | cartId |  |
 | WEB-015 | Adds tickets for a performance whose on-sale waiting room is on | performanceId | `addCartLine` refused `403 admission-required`: this performance's room is on and the page holds no admission token for it |
-| WEB-007 | Selects seats on the map | eventId, performanceId |  |
+| WEB-007 | Selects seats on the map | eventId, performanceId, productId |  |
 
 ## WEB-007 Interactive Seat Selection
 
@@ -441,6 +446,7 @@
 |---|---|
 | performanceId | deepLink |
 | eventId | WEB-006 |
+| productId | WEB-004 |
 | holdId | navigation |
 | venueId | session |
 
@@ -454,6 +460,7 @@
 | `listPerformances` | [CatalogueService](../backend/CatalogueService.md#listperformances) | onLoad | The event's other times, for the time bar and the date and time pop-up | `PRODUCT_VIEW` |
 | `relinquishSeatHold` | [CatalogueService](../backend/CatalogueService.md#relinquishseathold) | background | Sent by the time bar when the guest switches time, not a control: releases the seats held for the old performance (decided 29 September), with the guest session the device already holds: signed in, or the anonymous cart session a visitor gets with the first line (ADR-0045) | `ORDER_CREATE` |
 | `getPublishedBookingFlow` | [WhiteLabelService](../backend/WhiteLabelService.md#getpublishedbookingflow) | onLoad | The published booking flow for this product: which steps it has and in what order (W12) | `None` |
+| `getPerformance` | [CatalogueService](../backend/CatalogueService.md#getperformance) | background | Resolves a deep-linked performance (r8, GPS-C05): its `eventId` drives `listPerformances` (time bar, fixture strip) and its `startsAt` and `status` the cold entry (a performance that has happened offers the next one of the same event). No component of its own. | `PRODUCT_VIEW` |
 
 **States**
 
@@ -470,9 +477,9 @@
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| WEB-005 | Ticket Type Selection |  |  |
+| WEB-005 | Ticket Type Selection | productId |  |
 | WEB-008 | Add-ons & Upsell |  |  |
-| WEB-006 | Date & Performance Selection | eventId, performanceId |  |
+| WEB-006 | Date & Performance Selection | eventId, performanceId, productId |  |
 | WEB-010 | Reviews the cart | holdId, performanceId |  |
 
 ## WEB-008 Add-ons & Upsell
@@ -503,7 +510,7 @@
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
 | `addCartLine` | [OrderService](../backend/OrderService.md#addcartline) | onAction | Add a suggested add-on or the offered bundle to the cart | `None` |
-| `getBundle` | [CatalogueService](../backend/CatalogueService.md#getbundle) | onAction | A bundle offered as an upsell | `PRODUCT_VIEW` |
+| `getGuestBundle` | [CatalogueService](../backend/CatalogueService.md#getguestbundle) | onAction | A bundle offered as an upsell, in the guest shape (r8, ORDERS-MONEY-C32, CHG-R8INT-009) | `None` |
 | `decideRecommendations` | [AiService](../backend/AiService.md#deciderecommendations) | onLoad | Fill the cart slot, maxItems 3 (DI-959) | `AI_USE` |
 | `recordRecommendationEvents` | [AiService](../backend/AiService.md#recordrecommendationevents) | background | Sent by the Suggested for you list, not a control: impressions, clicks, add-to-cart and declines of the recommended items, batched | `AI_USE` |
 | `getPublishedBookingFlow` | [WhiteLabelService](../backend/WhiteLabelService.md#getpublishedbookingflow) | onLoad | The published booking flow for this product: which steps it has and in what order (W12) | `None` |
@@ -524,7 +531,7 @@
 |---|---|---|---|
 | WEB-005 | Ticket Type Selection | cartId |  |
 | WEB-006 | Date & Performance Selection | cartId, performanceId |  |
-| WEB-010 | Shopping Cart | cartId, code, lineId, performanceId |  |
+| WEB-010 | Shopping Cart | cartId, lineId, performanceId |  |
 | WEB-016 | Continue — sign in or use a guest code (when sign-in is asked after add-ons) | cartId | the guest is not signed in |
 
 ## WEB-009 Wishlist
@@ -613,7 +620,7 @@
 | `checkoutCart` | [OrderService](../backend/OrderService.md#checkoutcart) | onAction | Turn the cart into an order | `None` |
 | `abandonCart` | [OrderService](../backend/OrderService.md#abandoncart) | onAction | Empty it deliberately | `None` |
 | `evaluatePromotions` | [CatalogueService](../backend/CatalogueService.md#evaluatepromotions) | onAction | Evaluate promotions against a cart | `PRICE_VIEW` |
-| `getCouponCode` | [CatalogueService](../backend/CatalogueService.md#getcouponcode) | onLoad | Look up a code With the guest session the device already holds: signed in, or the anonymous cart session a visitor gets with the first line (ADR-0045) (decided 2 October 2026 by Chinmay, fix before Block A starts (GFIX-6)). | `PRICE_VIEW` |
+| `getGuestCouponCode` | [CatalogueService](../backend/CatalogueService.md#getguestcouponcode) | onLoad | In the guest shape (r8, ORDERS-MONEY-C32, CHG-R8INT-009). Look up a code With the guest session the device already holds: signed in, or the anonymous cart session a visitor gets with the first line (ADR-0045) (decided 2 October 2026 by Chinmay, fix before Block A starts (GFIX-6)). | `None` |
 | `createCart` | [OrderService](../backend/OrderService.md#createcart) | background | Started by the runtime the first time a line is added, against the guest or the anonymous cart token (2.1.31); never a button or a form (GFIX-3). With the guest session the device already holds: signed in, or the anonymous cart session a visitor gets with the first line (ADR-0045) (decided 2 October 2026 by Chinmay, fix before Block A starts (GFIX-6)). | `None` |
 | `getPerformance` | [CatalogueService](../backend/CatalogueService.md#getperformance) | onLoad | The visit date and time of each line (`Performance.startsAt`) | `PRODUCT_VIEW` |
 | `getResourceHold` | [VenueOpsService](../backend/VenueOpsService.md#getresourcehold) | onInterval | The countdown of a cabana or spot held on the venue map (`expiresAt`) With the guest session the device already holds: signed in, or the anonymous cart session a visitor gets with the first line (ADR-0045) (decided 2 October 2026 by Chinmay, fix before Block A starts (GFIX-6)). | `ORDER_VIEW` |
@@ -779,7 +786,7 @@
 | `reprintOrder` | [OrderService](../backend/OrderService.md#reprintorder) | onAction | Reprint or resend tickets | `ORDER_REPRINT` |
 | `linkGuestCheckout` | [IdentityService](../backend/IdentityService.md#linkguestcheckout) | onAction | Create an account: once verifyGuestEmail proves the code, move the guest-checkout order to the new account (parity with GST-010; CHG-R11-002) | `None` |
 | `registerGuest` | [IdentityService](../backend/IdentityService.md#registerguest) | onAction | Create an account for the order's email: sends a code | `None` |
-| `verifyGuestEmail` | [IdentityService](../backend/IdentityService.md#verifyguestemail) | onAction | Prove the code; then linkGuestCheckout moves the order to the account | `GUEST_VIEW` |
+| `verifyGuestEmail` | [IdentityService](../backend/IdentityService.md#verifyguestemail) | onAction | Prove the code; then linkGuestCheckout moves the order to the account | `None` |
 
 **States**
 
@@ -912,6 +919,8 @@
 | cartId | session |
 | challengeId | navigation |
 | subjectId | navigation |
+| returnTo | navigation |
+| returnParams | navigation |
 
 **Operations**
 
@@ -1093,6 +1102,7 @@
 
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
+| `listOwnRefundRequests` | [OrderService](../backend/OrderService.md#listownrefundrequests) | onLoad | The guest's own refund requests and their status, shown on the rows of Your orders (the prototype's "refunded in full" and the request a guest has open on an order), matched by order; no component of its own, since the approved screen draws none: the prototype's Order history row shows it (shownBy, r8 integration, CHG-R8INT-008). Read once when the screen opens and after Ask for a refund. | `None` |
 | `listMyOrders` | [OrderService](../backend/OrderService.md#listmyorders) | onLoad | The orders this guest placed | `None` |
 | `getOrder` | [OrderService](../backend/OrderService.md#getorder) | onAction | Read an order | `ORDER_VIEW` |
 | `createRefundRequest` | [OrderService](../backend/OrderService.md#createrefundrequest) | onAction | Ask for a refund | `None` |
@@ -1149,7 +1159,7 @@
 | `updateMyProfile` | [MarketingService](../backend/MarketingService.md#updatemyprofile) | onAction | A guest correcting their own details | `GUEST_VIEW` |
 | `recordConsent` | [MarketingService](../backend/MarketingService.md#recordconsent) | onAction | Record a consent decision | `GUEST_MANAGE` |
 | `listConsentPurposes` | [MarketingService](../backend/MarketingService.md#listconsentpurposes) | onLoad | The purposes the consent rows show | `GUEST_VIEW` |
-| `verifyGuestEmail` | [IdentityService](../backend/IdentityService.md#verifyguestemail) | onAction | Send a verification link, or consume one | `GUEST_VIEW` |
+| `verifyGuestEmail` | [IdentityService](../backend/IdentityService.md#verifyguestemail) | onAction | Send a verification link, or consume one | `None` |
 | `updateGuestPreferences` | [MarketingService](../backend/MarketingService.md#updateguestpreferences) | onAction | Change contact and consent preferences | `GUEST_MANAGE` |
 | `getMyProfile` | [MarketingService](../backend/MarketingService.md#getmyprofile) | onLoad | The guest's own details, read by session | `GUEST_VIEW` |
 | `getGuestConsents` | [MarketingService](../backend/MarketingService.md#getguestconsents) | onLoad | The current consent position the toggles change | `GUEST_VIEW` |
@@ -1193,6 +1203,7 @@
 | Parameter | From |
 |---|---|
 | cardCode | deepLink |
+| cardKind | deepLink |
 | subjectId | session |
 | walletId | navigation |
 
@@ -1202,11 +1213,13 @@
 |---|---|---|---|---|
 | `getWallet` | [WalletService](../backend/WalletService.md#getwallet) | onLoad | Read a guest wallet | `WALLET_VIEW` |
 | `listWalletTransactions` | [WalletService](../backend/WalletService.md#listwallettransactions) | onLoad | Wallet transaction history | `WALLET_VIEW` |
-| `getGiftCard` | [WalletService](../backend/WalletService.md#getgiftcard) | onAction | Check a gift card balance | `WALLET_VIEW` |
-| `getGameCard` | [VenueOpsService](../backend/VenueOpsService.md#getgamecard) | onAction | Balance on a game card | `WALLET_VIEW` |
+| `getGiftCard` | [WalletService](../backend/WalletService.md#getgiftcard) | onLoad | The gift card a deep link names: called only when the screen is entered with `cardCode` and `cardKind` giftCard (ADAM CR-143, 18 October 2026; CHG-CRA-008). Without such a link the panel stays closed | `WALLET_VIEW` |
+| `getGameCard` | [VenueOpsService](../backend/VenueOpsService.md#getgamecard) | onLoad | The game card a deep link names: called only when the screen is entered with `cardCode` and `cardKind` gameCard (ADAM CR-143; CHG-CRA-008). Without such a link the panel stays closed | `WALLET_VIEW` |
 | `listPaymentTokens` | [OrderService](../backend/OrderService.md#listpaymenttokens) | onLoad | Saved cards on this account | `ORDER_VIEW` |
 | `storePaymentToken` | [OrderService](../backend/OrderService.md#storepaymenttoken) | onAction | Save a card for next time | `ORDER_CREATE` |
 | `transferWalletBalance` | [WalletService](../backend/WalletService.md#transferwalletbalance) | onAction | Move value between wallets | `WALLET_OPERATE` |
+| `getPublishedTenantConfig` | [WhiteLabelService](../backend/WhiteLabelService.md#getpublishedtenantconfig) | background | The provider the web tokenises cards with and its hosted card form (`paymentTokenisation`): storePaymentToken's `providerId` (ADAM CR-142, 18 October 2026; CHG-CRA-008) | `None` |
+| `listConsentPurposes` | [MarketingService](../backend/MarketingService.md#listconsentpurposes) | background | The stored-card consent purpose's id: storePaymentToken's `consentPurposeId` (ADAM CR-142; CHG-CRA-008) | `GUEST_VIEW` |
 
 **States**
 
@@ -1639,6 +1652,7 @@
 
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
+| `listOwnResaleListings` | [OrderService](../backend/OrderService.md#listownresalelistings) | onLoad | The guest's own resale listings and their status, shown on the rows of Your orders with tickets (the prototype's "Listed for resale" row), matched by order; no component of its own, since the approved screen draws none: the prototype's Transfer & resale row shows it (shownBy, r8 integration, CHG-R8INT-008). Read once when the screen opens and after Create resale listing. | `None` |
 | `transferOrderTickets` | [OrderService](../backend/OrderService.md#transferordertickets) | onAction | Transfer tickets to another guest | `None` |
 | `listMyOrders` | [OrderService](../backend/OrderService.md#listmyorders) | onLoad | The orders this guest placed | `None` |
 | `createResaleListing` | [OrderService](../backend/OrderService.md#createresalelisting) | onAction | List a ticket for resale | `ORDER_CREATE` |
@@ -1690,6 +1704,7 @@
 
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
+| `listOwnGroupBookings` | [OrderService](../backend/OrderService.md#listowngroupbookings) | onLoad | The school trips and parties this guest asked for, provisional ones included: they are rows of Your reservations beside the reservations (the prototype's "School group, 32 pupils · invoice due" row), and a picked one opens The group booking (`getGroupBooking`). No component of its own, since the approved screen draws none: the prototype's Reservations row shows it (shownBy, r8 integration, CHG-R8INT-008). | `None` |
 | `listGroupPackages` | [CatalogueService](../backend/CatalogueService.md#listgrouppackages) | onLoad | School-trip formats and party packages | `PRODUCT_VIEW` |
 | `getGroupPackageDefinition` | [CatalogueService](../backend/CatalogueService.md#getgrouppackagedefinition) | onAction | What a package includes | `PRODUCT_VIEW` |
 | `requestGroupBooking` | [OrderService](../backend/OrderService.md#requestgroupbooking) | onAction | Ask for a school trip or a birthday party | `None` |
@@ -1697,7 +1712,7 @@
 | `getReservation` | [OrderService](../backend/OrderService.md#getreservation) | onAction | Read a reservation | `ORDER_VIEW` |
 | `cancelReservation` | [OrderService](../backend/OrderService.md#cancelreservation) | onAction | Cancel a reservation | `ORDER_CANCEL` |
 | `getGroupBooking` | [OrderService](../backend/OrderService.md#getgroupbooking) | onAction | A group booking this guest belongs to | `ORDER_VIEW` |
-| `getResourceAvailability` | [VenueOpsService](../backend/VenueOpsService.md#getresourceavailability) | onAction | What is free and when | `RESOURCE_VIEW` |
+| `listProductStartTimes` | [VenueOpsService](../backend/VenueOpsService.md#listproductstarttimes) | onAction | What is free and when, for Check another date (r8, ORDERS-MONEY-C08, the lead's option A): the start times the reserved product (its line's `productId` and `variantId`) can be booked at on the date the guest picks. A guest never names a resource, so `getResourceAvailability` is not called here. | `RESOURCE_VIEW` |
 | `updateTableReservation` | [FnbService](../backend/FnbService.md#updatetablereservation) | onAction | Change or cancel it | `None` |
 | `listMyTableReservations` | [FnbService](../backend/FnbService.md#listmytablereservations) | onLoad | Show the guest's own reservations, the one being changed among them | `None` |
 
@@ -2468,6 +2483,7 @@
 | `listProductVariants` | [CatalogueService](../backend/CatalogueService.md#listproductvariants) | onLoad | The lengths of a room type, each with its price | `PRODUCT_VIEW` |
 | `listProductStartTimes` | [VenueOpsService](../backend/VenueOpsService.md#listproductstarttimes) | onAction | Start times free for the room type and length on the date | `RESOURCE_VIEW` |
 | `addCartLine` | [OrderService](../backend/OrderService.md#addcartline) | onAction | Add the room type for the booked window, then the add-ons | `None` |
+| `createCart` | [OrderService](../backend/OrderService.md#createcart) | background | Started by the runtime the first time a line is added, before the first addCartLine, against the guest or the anonymous cart token (2.1.31); never a button or a form (GFIX-3). With the guest session the device already holds: signed in, or the anonymous cart session a visitor gets with the first line (ADR-0045; r8, GPS-C23), as on its app twin GST-075. | `None` |
 
 **States**
 
@@ -2581,6 +2597,7 @@
 | `listVisitPlanAlternatives` | [VenueOpsService](../backend/VenueOpsService.md#listvisitplanalternatives) | onAction | Swap candidates for one item that suit everyone in the party | `None` |
 | `bookVisitPlan` | [VenueOpsService](../backend/VenueOpsService.md#bookvisitplan) | onAction | Book this plan: turns the plan (and chosen add-ons) into cart lines and returns the cart | `None` |
 | `getTenantAppStatus` | [WhiteLabelService](../backend/WhiteLabelService.md#gettenantappstatus) | onLoad | The tenant's active venues, for the park-per-day choice in a multi-venue tenant | `None` |
+| `getVisitPlannerOptions` | [VenueOpsService](../backend/VenueOpsService.md#getvisitplanneroptions) | onLoad | The planner's choices from the venue's data (r8, GPS-C21): the interest tags of its parks fill What are you most interested in?, and the ready-made plans and Fast Track bundles come from the same read. | `VENUE_MAP_VIEW` |
 
 **States**
 

@@ -5294,6 +5294,7 @@
      "trigger": "The failing till is found, with its alerts",
      "provenance": "flow F95 step 1→2",
      "carries": [
+      "deviceId",
       "workstationId"
      ]
     }

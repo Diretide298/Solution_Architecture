@@ -191,14 +191,16 @@
    {
     "operationId": "getGiftCard",
     "contract": "wallet",
-    "purpose": "Check a gift card balance",
-    "trigger": "onAction"
+    "purpose": "The gift card a deep link names: called only when the screen is entered with `cardCode` and `cardKind` giftCard (ADAM CR-143, 18 October 2026; CHG-CRA-008). Without such a link the panel stays closed",
+    "trigger": "onLoad",
+    "provenance": "ADAM CR-143, 18 October 2026 (CHG-CRA-008); was onAction with nothing on the screen naming a card"
    },
    {
     "operationId": "getGameCard",
     "contract": "games",
-    "purpose": "Balance on a game card",
-    "trigger": "onAction"
+    "purpose": "The game card a deep link names: called only when the screen is entered with `cardCode` and `cardKind` gameCard (ADAM CR-143; CHG-CRA-008). Without such a link the panel stays closed",
+    "trigger": "onLoad",
+    "provenance": "ADAM CR-143, 18 October 2026 (CHG-CRA-008); was onAction with nothing on the screen naming a card"
    },
    {
     "operationId": "listPaymentTokens",
@@ -217,6 +219,20 @@
     "contract": "wallet",
     "purpose": "Move value between wallets",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "getPublishedTenantConfig",
+    "contract": "white-label",
+    "purpose": "The provider the web tokenises cards with and its hosted card form (`paymentTokenisation`): storePaymentToken's `providerId` (ADAM CR-142, 18 October 2026; CHG-CRA-008)",
+    "trigger": "background",
+    "provenance": "ADAM CR-142, 18 October 2026 (CHG-CRA-008), as GST-071 (CHG-FXS-003); nothing shows"
+   },
+   {
+    "operationId": "listConsentPurposes",
+    "contract": "marketing-crm",
+    "purpose": "The stored-card consent purpose's id: storePaymentToken's `consentPurposeId` (ADAM CR-142; CHG-CRA-008)",
+    "trigger": "background",
+    "provenance": "ADAM CR-142, 18 October 2026 (CHG-CRA-008), as GST-071 (CHG-FXS-003); nothing shows"
    }
   ],
   "entryState": {
@@ -225,7 +241,13 @@
      "name": "cardCode",
      "from": "deepLink",
      "optional": true,
-     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `getGiftCard`, `getGameCard` take the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `getGiftCard`, `getGameCard` take the id from the record the user acts on, and an edge or link that holds one only pre-selects it. **Carried with `cardKind`** (ADAM CR-143, 18 October 2026; CHG-CRA-008): the approved screen has no input or list that yields a card code, so the gift card or game card panel opens only from a deep link carrying both."
+    },
+    {
+     "name": "cardKind",
+     "from": "deepLink",
+     "optional": true,
+     "notes": "`giftCard` or `gameCard` (ADAM CR-143; CHG-CRA-008): which panel `cardCode` opens, read with `getGiftCard` or `getGameCard`, both limited to the guest's own cards. Never shown. Without it, or without `cardCode`, both panels stay closed and the empty state is as approved. How a guest reaches these panels otherwise is the client's decision (option 1, \"Check a balance\", put to the client)."
     },
     {
      "name": "subjectId",
@@ -266,7 +288,7 @@
     "id": "formStorePaymentToken",
     "component": "modal",
     "trigger": "Add a card",
-    "body": "**The gateway's own card form**, hosted by the provider; it returns the token that `storePaymentToken` saves with the guest's consent. No token, provider or consent id is ever a field.",
+    "body": "**The gateway's own card form**, hosted by the provider; it returns the token that `storePaymentToken` saves with the guest's consent. No token, provider or consent id is ever a field. **Where they come from** (ADAM CR-142, 18 October 2026; CHG-CRA-008): `providerId` and the hosted form from `getPublishedTenantConfig` (`paymentTokenisation`), `consentPurposeId` from `listConsentPurposes` (the stored-card purpose); never a guessed provider or purpose. The guest gives the consent itself on WEB-024 (`recordConsent`), already one of this screen's approved links: Save card without it answers `409 consent-not-given`, and the error says so and offers the link to WEB-024.",
     "confirm": {
      "label": "Save card",
      "operation": "storePaymentToken"
@@ -383,7 +405,7 @@
     {
      "to": "WEB-021",
      "trigger": "Wallet & Gift Cards",
-     "provenance": "derived — WEB-021 declares entryState.params cardCode, walletId and WEB-022 holds none of them. The edge carries nothing: cardCode, walletId only pre-select (deep link or optional), and WEB-021 opens on its own"
+     "provenance": "derived — WEB-021 declares entryState.params cardCode, cardKind, walletId and WEB-022 holds none of them. The edge carries nothing: cardCode, cardKind, walletId only pre-select (deep link or optional), and WEB-021 opens on its own"
     },
     {
      "to": "WEB-023",
@@ -589,7 +611,7 @@
     {
      "to": "WEB-021",
      "trigger": "Wallet & Gift Cards",
-     "provenance": "derived — WEB-021 declares entryState.params cardCode, walletId and WEB-023 holds none of them. The edge carries nothing: cardCode, walletId only pre-select (deep link or optional), and WEB-021 opens on its own"
+     "provenance": "derived — WEB-021 declares entryState.params cardCode, cardKind, walletId and WEB-023 holds none of them. The edge carries nothing: cardCode, cardKind, walletId only pre-select (deep link or optional), and WEB-021 opens on its own"
     },
     {
      "to": "WEB-022",
@@ -911,7 +933,7 @@
     {
      "to": "WEB-021",
      "trigger": "Wallet & Gift Cards",
-     "provenance": "derived — WEB-021 declares entryState.params cardCode, walletId and WEB-024 holds none of them. The edge carries nothing: cardCode, walletId only pre-select (deep link or optional), and WEB-021 opens on its own"
+     "provenance": "derived — WEB-021 declares entryState.params cardCode, cardKind, walletId and WEB-024 holds none of them. The edge carries nothing: cardCode, cardKind, walletId only pre-select (deep link or optional), and WEB-021 opens on its own"
     },
     {
      "to": "WEB-022",
@@ -932,7 +954,7 @@
     }
    ]
   },
-  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Renamed 31 August** from *Loyalty & Rewards*. **A guest surface is one product with two renderings** — a screen named differently on web and app is two screens to a developer and one journey to a guest.\n\n**Rev 3 (decided 29 September).** **Security (GAP-D1):** the devices list and signing out a lost device are here (`listGuestDevices`, `revokeGuestDevice`, already declared). **Face Pass stays mobile-only** (GST-069) until the facial-reader vendor SDK is named and supports web capture; viewing and withdrawing an enrolment stay here. **Two-step verification (GAP-B1, per venue):** enrolment appears only when a venue of the tenant enabled it. **One implementation, several ids (GAP-D3):** WEB-009 and WEB-024 are built as one account area; both ids are kept.\n\n**The Face Pass enrolmentId comes from the guest's passes (listMyEntitlements, Entitlement.facePassEnrolmentId), bound 4 October 2026** (CHG-FXS-003)",
+  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Renamed 31 August** from *Loyalty & Rewards*. **A guest surface is one product with two renderings** — a screen named differently on web and app is two screens to a developer and one journey to a guest.\n\n**Rev 3 (decided 29 September).** **Security (GAP-D1):** the devices list and signing out a lost device are here (`listGuestDevices`, `revokeGuestDevice`, already declared). **Face Pass stays mobile-only** (GST-069) until the facial-reader vendor SDK is named and supports web capture; viewing and withdrawing an enrolment stay here. **Two-step verification (GAP-B1, per venue):** enrolment appears only when a venue of the tenant enabled it. **One implementation, several ids (GAP-D3):** WEB-009 and WEB-024 are built as one account area; both ids are kept.\n\n**The Face Pass enrolmentId comes from the guest's passes (listMyEntitlements, Entitlement.facePassEnrolmentId), bound 4 October 2026** (CHG-FXS-003)\n\nBuild note (r8 second round, GPS-C09): **build the no-access state as GFIX-4 says, not as the state text above reads.** A guest holds no permission, so the state never names one (the text above still names staff permissions); signed out, the guest is offered sign-in and brought back here; a record that is not theirs says so without saying whose. The corrected wording waits for the client's approval of the visible text (pending entry GPS-C09).",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listGuestDevices` reads the population and `getWishlist` reads one of them — list, select, act",

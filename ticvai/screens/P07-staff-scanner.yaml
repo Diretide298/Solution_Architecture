@@ -89,10 +89,10 @@ screens:
     shown a SHIFT_OPEN no-access state at sign-in.
 
 
-    Build note (r8 second round, IDENTITY-C01, from the core lane): login is online-only for tills and staff
-    handhelds in r8 (identity login x-ticvai-offline-note); build the offline state as "signing in needs a
-    connection", not the cached-list sign-in above. The wording waits for the client (pending entry
-    IDENTITY-C01).'
+    Build note (r8 second round, IDENTITY-C01, from the core lane): login is online-only for tills and
+    staff handhelds in r8 (identity login x-ticvai-offline-note); build the offline state as "signing
+    in needs a connection", not the cached-list sign-in above. The wording waits for the client (pending
+    entry IDENTITY-C01).'
   density: comfortable
   pattern: form
   patternReason: PIN or badge on a gate scanner, then the role - a form, not a list.

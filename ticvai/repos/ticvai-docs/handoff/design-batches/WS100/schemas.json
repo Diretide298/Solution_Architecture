@@ -1,7 +1,7 @@
 {
  "CapacityPack": {
   "type": "object",
-  "x-ticvai-persistence": "subscription.capacity_pack",
+  "x-ticvai-persistence": "control.capacity_pack",
   "description": "Board 3.8. **A good season should not require renegotiating a contract in August.**\n",
   "required": [
    "tenantId",
@@ -14,7 +14,7 @@
     "format": "uuid"
    },
    "tenantId": {
-    "x-ticvai-references": "none",
+    "x-ticvai-references": "control.tenant",
     "type": "string",
     "format": "uuid"
    },
@@ -218,6 +218,7 @@
     "description": "**Three standard packages, and custom ones allowed** (decided 29 September, Chinmay)."
    },
    "offeredToTenantId": {
+    "x-ticvai-references": "control.tenant",
     "type": "string",
     "format": "uuid",
     "nullable": true,
@@ -239,7 +240,7 @@
     "type": "integer",
     "nullable": true,
     "x-ticvai-column": "limit_value",
-    "description": "Null means unlimited. Stored as `limit_value` — `limit` is a reserved word, and `subscription.tier_allowance` already names the same figure `limit_value`."
+    "description": "Null means unlimited. Stored as `limit_value` — `limit` is a reserved word, and `control.tier_allowance` already names the same figure `limit_value`."
    },
    "overageAllowed": {
     "type": "boolean",
@@ -252,7 +253,7 @@
  },
  "LicensingModel": {
   "type": "object",
-  "x-ticvai-persistence": "subscription.licensing_model",
+  "x-ticvai-persistence": "control.licensing_model",
   "description": "Boards 3.6 and 3.7. **The single most consequential commercial decision in the product.**\n",
   "required": [
    "code",
@@ -468,8 +469,13 @@
   }
  },
  "Plan": {
-  "x-ticvai-persistence": "subscription.plan + subscription.plan_module + subscription.plan_limit",
-  "description": "**A plan's modules and limits are rows, keyed on `plan_id`.** `licensedModules` and `limits` are required on every plan, and `subscription.plan` alone had no column for either — so the licence position, the downgrade check and every module gate had nothing to read. `plan_module` holds one row per licensed `ModuleKey`; `plan_limit` one row per `EntitlementLimit`. Both belong to the plan version the row is, so a subscriber on an earlier version keeps the modules and limits they were sold.",
+  "x-ticvai-persistence": "control.plan + control.plan_module + control.plan_limit",
+  "x-ticvai-version-key": "version",
+  "x-ticvai-primary-key": [
+   "id",
+   "version"
+  ],
+  "description": "**A plan's modules and limits are rows, keyed on `plan_id`.** `licensedModules` and `limits` are required on every plan, and `control.plan` alone had no column for either — so the licence position, the downgrade check and every module gate had nothing to read. `plan_module` holds one row per licensed `ModuleKey`; `plan_limit` one row per `EntitlementLimit`. Both belong to the plan version the row is, so a subscriber on an earlier version keeps the modules and limits they were sold.",
   "allOf": [
    {
     "$ref": "#/components/schemas/CreatePlanRequest"
@@ -508,7 +514,7 @@
  "PlanRequestLimits": {
   "type": "object",
   "nullable": true,
-  "x-ticvai-persistence": "none — embedded in subscription.plan as its request_limits jsonb column",
+  "x-ticvai-persistence": "none — embedded in control.plan as its request_limits jsonb column",
   "description": "**The limits section of a plan: every tenant has a request budget** (ADR-0064, accepted 1 October; it decides the per-tenant limit ADR-0032 deferred). A token bucket per tenant and audience in the kernel middleware of `commerce`, `access` and `operations`, counted in Azure Managed Redis so every replica agrees; a guest browse never spends a till's budget. Over budget, the call is refused `429` with `Retry-After` and the `RateLimit-*` headers (every operation declares it).\n\n**Null takes the platform default**, which starts at twice the tenant's expected peak from its sizing tier (`handoff/sizing.json` venue tiers) and is recalibrated after the benchmark and after four weeks of production. **A tenant may use the whole platform when others are quiet**: the per-replica share (`replicaSharePercent`) is enforced only above `shareEnforcedAbovePercent` of the replica's limit. If Redis is unavailable each replica falls back to its own buckets (the limit divided by the replica count); the request path never fails because the limiter's store did.",
   "properties": {
    "guest": {
@@ -541,7 +547,7 @@
  },
  "VsiModel": {
   "type": "object",
-  "x-ticvai-persistence": "subscription.vsi_model",
+  "x-ticvai-persistence": "control.vsi_model",
   "description": "Board 3.2. **The number the whole commercial model hangs on**, and configurable so a prospect reaches a package without a sales call.\n",
   "properties": {
    "version": {

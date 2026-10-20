@@ -81,6 +81,9 @@ IS_CONFIG = re.compile(
     # **Widened 29 September** for Help me choose (rev 3 REV3-11): a venue's guided choice is the
     # configuration a guest's questions resolve against, drafted and published like a template.
     r"GuidedChoice|"
+    # and the r8 integration (20 October 2026, GPS-C21, CHG-R8INT-020): a visit plan preset is a plan a venue sets up
+    # once for guests to start from, the same shape as a guided choice; a guest's own plan is the record.
+    r"VisitPlanPreset|"
     # and for the VM close-out (29 September): which systems a wallet reconciles against is set up
     # once and read by every reconciliation run.
     r"ReconciliationSource|"

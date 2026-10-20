@@ -7,7 +7,7 @@
 | Tier | engagement: Guests and intelligence. Nothing that takes money depends on these. |
 | Contracts | `ai` |
 | Schemas owned | `ai`, `qdrant` |
-| Operations in the slice | 66 of 144 |
+| Operations in the slice | 66 of 146 |
 | Scale | Latency-tolerant, cost-sensitive, token-metered. Different hardware from everything else. |
 | If it is down | Down degrades suggestions and the concierge. Nothing that takes money depends on it. |
 
@@ -23,7 +23,6 @@
 | [FnbService](FnbService.md) | `fnb.menu_item`, `fnb.production_plan` |
 | [InventoryService](InventoryService.md) | `inventory.movement`, `inventory.stock_batch` |
 | [MarketingService](MarketingService.md) | `marketing.attribution_touch`, `marketing.campaign`, `marketing.case`, `marketing.message_template`, `marketing.message_template_version`, `marketing.segment` |
-| [PlatformService](PlatformService.md) | `control.content_block` |
 | [ReportingService](ReportingService.md) | `reporting.report_definition` |
 | [RetailService](RetailService.md) | `retail.merchandise` |
 | [VenueOpsService](VenueOpsService.md) | `assets.media_asset`, `maintenance.inspection_template`, `queue.queue`, `queue.reading`, `venuemap.import_job`, `venuemap.point`, `venuemap.visit_plan`, `venuemap.visit_plan_item` |
@@ -108,7 +107,7 @@ The action pipeline and human oversight (design C3)
 
 **`POST /decision-records/{decisionRecordId}/override`**: Override an AI decision
 
-**Human override is always possible** (AIC-187, ADM-536): the original decision and the human one are kept side by side as an intervention and an annotation on the decision record. It changes what AI does next; it does not reach into an owning module (a correction there is that module's own operation).
+**Human override is always possible** (AIC-187, ADM-536): the original decision and the human one are kept side by side as an intervention and an annotation on the decision record. It changes what AI does next; it does not reach into an owning module (a correction there is that module's own operation). It writes the `ai.intervention` row and appends one annotation of `kind` `override` with its `interventionId` to the decision record; `humanDecision` stays as it was written when the record was created (R8 blocker FOUNDATION-AI-C33).
 
 |  |  |
 |---|---|
@@ -203,6 +202,8 @@ content; `getTranslationProposals` reads the rows back by job.
 | translationJobId | string (uuid) |  | The job to follow with getTranslationProposals (contract gap CHG-WIR-017, CMS-011; CHG-CSA-045). (read-only) |
 | status | enum (running, completed, failed) |  | running while drafts are still being written; drafts then holds those done so far. (read-only) |
 | drafts | array of object | yes |  |
+| drafts[].proposalId | string (uuid) | yes | The ai.proposed_action id of this draft (r8 walk of ticket 27926). |
+| drafts[].fieldPath | string | yes | Where the draft goes inside the target, as a dotted path in the target's own body, for example localeVariants.ar.title on a content block or name.ar on a product. |
 | drafts[].targetKind | enum (contentBlock, productName, emailTemplate, messageTemplate) | yes |  |
 | drafts[].targetRef | string | yes | The id of the block, product or template the draft sits on. |
 | drafts[].draftText | string | yes | The first-pass translation, as saved on the draft. |
@@ -225,8 +226,10 @@ BL-071, 2.6.34. **`setLanguages` already measures the gap** — `translationGaps
 
 **Where a draft is stored** (4 October 2026, CHG-FXC-004; the Sprint 1-2 judging found "a draft on the block" and a
 lineage that never writes the block, which ADR-0020 forbids anyway). Each proposal is an `ai.proposed_action` row:
-the block or template it is for (`control.content_block`, `marketing.message_template`), its job (`translationJobId`), the language, the proposed
-text. Nothing outside the AI schema is written. The CMS shows the proposal beside the block's field as an AI draft; an
+the block or template it is for (`whitelabel.content_block`, `marketing.message_template`), its job (`translationJobId`), the language, the proposed
+text (its `targetKind`, `targetRef`, `locale`, `fieldPath` and `draftText` columns). The run itself is one
+`ai.translation_job` row, `running` until it ends `completed` or `failed` (R8 blocker FOUNDATION-AI-C40). Nothing
+outside the AI schema is written. The CMS shows the proposal beside the block's field as an AI draft; an
 operator's save goes through the block's own operation (`white-label` or `marketing-crm`), which is when it becomes
 content; `getTranslationProposals` reads the rows back by job.
 
@@ -238,8 +241,8 @@ content; `getTranslationProposals` reads the rows back by job.
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `ai.policy`, `ai.provider`, `cache:idempotency`, `control.content_block`, `marketing.message_template`, `marketing.message_template_version` |
-| Writes | `ai.activity`, `ai.proposed_action`, `cache:idempotency` |
+| Reads | `ai.policy`, `ai.provider`, `cache:idempotency`, `marketing.message_template`, `marketing.message_template_version` |
+| Writes | `ai.activity`, `ai.proposed_action`, `ai.translation_job`, `cache:idempotency` |
 | Called by | BO-785, BO-793, CMS-011 |
 
 **Parameters**
@@ -264,6 +267,8 @@ content; `getTranslationProposals` reads the rows back by job.
 | translationJobId | string (uuid) |  | The job to follow with getTranslationProposals (contract gap CHG-WIR-017, CMS-011; CHG-CSA-045). (read-only) |
 | status | enum (running, completed, failed) |  | running while drafts are still being written; drafts then holds those done so far. (read-only) |
 | drafts | array of object | yes |  |
+| drafts[].proposalId | string (uuid) | yes | The ai.proposed_action id of this draft (r8 walk of ticket 27926). |
+| drafts[].fieldPath | string | yes | Where the draft goes inside the target, as a dotted path in the target's own body, for example localeVariants.ar.title on a content block or name.ar on a product. |
 | drafts[].targetKind | enum (contentBlock, productName, emailTemplate, messageTemplate) | yes |  |
 | drafts[].targetRef | string | yes | The id of the block, product or template the draft sits on. |
 | drafts[].draftText | string | yes | The first-pass translation, as saved on the draft. |
@@ -404,8 +409,9 @@ Proposes and stops. `venue-map.acceptVenueLabelProposals` is the human half.
 **Shadow mode is why this exists rather than a feature flag.** A new model runs alongside the rule, its answers are recorded and never shown, and **the venue compares six weeks of both before anything changes on a screen.** A model promoted without that is a model nobody can defend when it is wrong.
 **A guard rail is not optional for a `model` basis.** A price suggestion outside a stated band is refused and falls back to the rule — **an unbounded model in a pricing path is one bad inference from a free lunch for a thousand guests.**
 **Where it is kept.** The assignments are stored on the tenant's `ai.policy` row, in `AiPolicy.suggestionProviders`, which is what `requestSuggestion` reads to route a kind to its producer. `setAiPolicy` does not change them; this operation is the only writer.
-**What the PUT does.** Each assignment is matched on `kind`. An assignment in the body replaces the stored one for that kind, or adds it where the kind had none; **a kind left out of the body keeps its current assignment** — a partial body never leaves a question with nobody to answer it. The response is the full set after the write.
+**What the PUT does** (r8 walk of ticket 27715; lead decision of 20 October 2026, option A). **It replaces the whole routing table**, as the singleton note says: the body is the set in force afterwards, and **a kind left out of the body is removed** from `AiPolicy.suggestionProviders`. A removed kind is answered by its rule, as a kind with no assignment always is, so no question is left with nobody to answer it. The response is the full set after the write.
 **Also written by `promoteAiRelease`** (AI design 2.3, 3.5). Shadow mode here is the release pipeline's shadow stage: a `shadowProducerRef` is a release in `shadow`, and when it passes its gate a `promotionReady` governance alert is raised. **A person promotes it; nothing switches by itself** (decided 29 September). Setting a `model` basis here directly remains possible for a producer that has already been promoted.
+**Refusals.** 422 `guard-rails-required`: an assignment with basis `model` and no `guardRails`. 422 `shadow-release-not-in-shadow`: a `shadowProducerRef` that does not name an `ai.release` in stage `shadow` (matched on `ai.release.candidate_ref` = the `producerRef` and `suggestion_kind` = the `kind`). 409 `model-basis-needs-promotion`: basis `model` set directly for a producer not yet promoted. Nothing is written in any of the three.
 
 |  |  |
 |---|---|
@@ -453,6 +459,8 @@ Proposes and stops. `venue-map.acceptVenueLabelProposals` is the human half.
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Set. |
+| 409 |  | Basis model was set directly for a producer that has not been promoted (model-basis-needs-promotion). |
+| 422 |  | A model assignment has no guard rails (guard-rails-required), or a shadowProducerRef is not a release in stage shadow for that kind (shadow-release-not-in-shadow). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### testAiProvider
@@ -472,7 +480,7 @@ Costs a handful of tokens and **is billed to the tenant like any other call**, b
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `ai.provider`, `cache:idempotency` |
+| Reads | `ai.byok_enablement`, `ai.model`, `ai.provider`, `cache:idempotency` |
 | Writes | `ai.activity`, `ai.provider`, `cache:idempotency` |
 | Called by | ADM-037 |
 
@@ -552,13 +560,16 @@ Scoped to a module and a role, because the same question means different things 
 |---|---|---|---|
 | module | object | yes | Which part of the platform the conversation is about (8.4.1). |
 | locale | string |  | 8.4.3. |
+| profileKey | string |  | The assistant profile to run the conversation under (configureAssistantProfile), e.g. |
 
 **Response**: `AiConversation`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | id | string (uuid) | yes |  |
-| principalId | string (uuid) | yes |  |
+| principalId | string (uuid) | yes | The staff member who opened the conversation; null when a guest opened it (subjectId). (nullable) |
+| subjectId | string (uuid) |  | The guest who opened the conversation (a guest is not a principal); null for staff. (nullable) |
+| profileKey | string |  | The assistant profile the conversation runs under (configureAssistantProfile), as createAiConversation set it; null for the module's default profile (R8 blocker WHITE-C27). (nullable) |
 | scopePath | string |  |  |
 | module | ModuleKey: enum (core, ticketing, access, fnb, retail, inventory, seating, membership, …) | yes | What a tenant buys, and what a screen belongs to. |
 | locale | string |  |  |
@@ -571,6 +582,7 @@ Scoped to a module and a role, because the same question means different things 
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Opened |
+| 404 |  | profileKey names no active assistant profile of the tenant for the caller's audience (assistant-profile-unavailable): unknown, isActive false, or a staff profile asked for by a guest. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listAiConversations
@@ -609,7 +621,9 @@ Scoped to a module and a role, because the same question means different things 
 |---|---|---|---|
 | items | array of AiConversation | yes |  |
 | items[].id | string (uuid) | yes |  |
-| items[].principalId | string (uuid) | yes |  |
+| items[].principalId | string (uuid) | yes | The staff member who opened the conversation; null when a guest opened it (subjectId). (nullable) |
+| items[].subjectId | string (uuid) |  | The guest who opened the conversation (a guest is not a principal); null for staff. (nullable) |
+| items[].profileKey | string |  | The assistant profile the conversation runs under (configureAssistantProfile), as createAiConversation set it; null for the module's default profile (R8 blocker WHITE-C27). (nullable) |
 | items[].scopePath | string |  |  |
 | items[].module | ModuleKey: enum (core, ticketing, access, fnb, retail, inventory, seating, membership, …) | yes | What a tenant buys, and what a screen belongs to. |
 | items[].locale | string |  |  |
@@ -685,6 +699,11 @@ Every response carries a trace id, the model and provider that produced it, toke
 | proposedAction.id | string (uuid) | yes |  |
 | proposedAction.interactionId | string (uuid) |  |  |
 | proposedAction.translationJobId | string (uuid) |  | The proposeTranslations job that drafted this proposal; getTranslationProposals reads a job's rows by it. (read-only; nullable) |
+| proposedAction.targetKind | enum (contentBlock, productName, emailTemplate, messageTemplate) |  | For a translation draft, what kind of thing it sits on (TranslationProposals.drafts[].targetKind); null on every other proposal (R8 blocker FOUNDATION-AI-C40). (read-only; nullable) |
+| proposedAction.targetRef | string |  | For a translation draft, the id of the block, product or template it sits on (the path id of the target's own write, e.g. (max length 200; read-only; nullable) |
+| proposedAction.locale | string |  | For a translation draft, the language it is in (the job's targetLocale); null otherwise. (max length 20; read-only; nullable) |
+| proposedAction.fieldPath | string |  | For a translation draft, where it goes inside the target, as a dotted path in the target's own body (TranslationProposals.drafts[].fieldPath); null otherwise. (max length 300; read-only; nullable) |
+| proposedAction.draftText | string |  | For a translation draft, the proposed text; null otherwise. (read-only; nullable) |
 | proposedAction.kind | enum (pricing, promotion, operational, financial, configuration, content, audience) | yes | content (a marketing or storefront draft from proposeMarketingContent) and audience (a lookalike segment from proposeLookalikeSegment) added 29 September (build); both are applied by a person in the… |
 | proposedAction.targetContract | string | yes | Which contract would perform it. |
 | proposedAction.targetOperation | string | yes |  |
@@ -860,6 +879,10 @@ Read by ADM-037 beside the tenant's providers, and by the tenant's own staff wit
 | streamsByCapability | array of string |  | Time to first token and total latency are separate targets. |
 | fallbackProviderId | string (uuid) |  | BL-151: a provider outage with no fallback is every AI surface going dark at once. (nullable) |
 | guardrailShortCircuit | boolean |  | A refusal a rule can decide never reaches a model. (default True) |
+| glossaryTerms | array of object |  | The tenant's translation glossary (R8 blocker FOUNDATION-AI-C05, the lead's answer of 20 October 2026): terms proposeTranslations and proposeContent keep as they are (keep) or always translate one wa… (max items 500; nullable) |
+| glossaryTerms[].term | string | yes | (max length 200) |
+| glossaryTerms[].rule | enum (keep, translateAs) | yes |  |
+| glossaryTerms[].translations | object |  | For translateAs, the translation per locale (ar, fr, ...). (nullable) |
 | suggestionProviders | object |  | Which producer answers each SuggestionKind, and what requestSuggestion routes by. (read-only) |
 
 **Responses**
@@ -1059,6 +1082,10 @@ Masking is the part to get right. `maskedFields` names what is redacted before a
 | streamsByCapability | array of string |  | Time to first token and total latency are separate targets. |
 | fallbackProviderId | string (uuid) |  | BL-151: a provider outage with no fallback is every AI surface going dark at once. (nullable) |
 | guardrailShortCircuit | boolean |  | A refusal a rule can decide never reaches a model. (default True) |
+| glossaryTerms | array of object |  | The tenant's translation glossary (R8 blocker FOUNDATION-AI-C05, the lead's answer of 20 October 2026): terms proposeTranslations and proposeContent keep as they are (keep) or always translate one wa… (max items 500; nullable) |
+| glossaryTerms[].term | string | yes | (max length 200) |
+| glossaryTerms[].rule | enum (keep, translateAs) | yes |  |
+| glossaryTerms[].translations | object |  | For translateAs, the translation per locale (ar, fr, ...). (nullable) |
 | suggestionProviders | object |  | Which producer answers each SuggestionKind, and what requestSuggestion routes by. (read-only) |
 
 **Response**: `AiPolicy`
@@ -1117,6 +1144,10 @@ Masking is the part to get right. `maskedFields` names what is redacted before a
 | streamsByCapability | array of string |  | Time to first token and total latency are separate targets. |
 | fallbackProviderId | string (uuid) |  | BL-151: a provider outage with no fallback is every AI surface going dark at once. (nullable) |
 | guardrailShortCircuit | boolean |  | A refusal a rule can decide never reaches a model. (default True) |
+| glossaryTerms | array of object |  | The tenant's translation glossary (R8 blocker FOUNDATION-AI-C05, the lead's answer of 20 October 2026): terms proposeTranslations and proposeContent keep as they are (keep) or always translate one wa… (max items 500; nullable) |
+| glossaryTerms[].term | string | yes | (max length 200) |
+| glossaryTerms[].rule | enum (keep, translateAs) | yes |  |
+| glossaryTerms[].translations | object |  | For translateAs, the translation per locale (ar, fr, ...). (nullable) |
 | suggestionProviders | object |  | Which producer answers each SuggestionKind, and what requestSuggestion routes by. (read-only) |
 
 **Responses**
@@ -1442,7 +1473,7 @@ Forecasting and operational requirements (design C8)
 | averageSpend.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | fnbAttachRate | number |  | (min 0; max 1; nullable) |
 | staffProductivity | object |  | Per role, units per staff hour, e.g. |
-| startingPatternKey | string |  | The pattern and version in use, e.g. (read-only) |
+| startingPatternKey | string |  | The starting pattern and version in use, e.g. (read-only) |
 | updatedAt | string (date-time) |  | (read-only) |
 | scopePath | string |  | The partition key (ADR-0005). (read-only) |
 
@@ -1557,7 +1588,7 @@ Forecasting and operational requirements (design C8)
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | analytical |
-| Reads | `ai.forecast_accuracy` |
+| Reads | `ai.forecast_accuracy`, `ai.forecast_definition` |
 | Writes | - |
 | Called by | ADM-503, ADM-506, ADM-508 |
 
@@ -1675,7 +1706,7 @@ The job's status, rows read, loaded and rejected, and each finding (a bad date, 
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `ai.history_import`, `assets.media_asset`, `cache:idempotency` |
-| Writes | `ai.history_import`, `ai.history_observation`, `cache:idempotency` |
+| Writes | `ai.capability_maturity`, `ai.history_import`, `ai.history_observation`, `cache:idempotency` |
 | Called by | ANL-071 |
 
 **Parameters**
@@ -1750,7 +1781,7 @@ Immutable versions (AIP-032) with basis, producer, data cut-off, quality checks 
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | replica |
-| Reads | `ai.forecast_version` |
+| Reads | `ai.forecast_definition`, `ai.forecast_version` |
 | Writes | - |
 | Called by | ADM-506, ADM-508 |
 
@@ -2131,7 +2162,7 @@ Outside the nightly run (design 2.2 C): snapshot, produce, reconcile, score. Ret
 | averageSpend.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | fnbAttachRate | number |  | (min 0; max 1; nullable) |
 | staffProductivity | object |  | Per role, units per staff hour, e.g. |
-| startingPatternKey | string |  | The pattern and version in use, e.g. (read-only) |
+| startingPatternKey | string |  | The starting pattern and version in use, e.g. (read-only) |
 | updatedAt | string (date-time) |  | (read-only) |
 | scopePath | string |  | The partition key (ADR-0005). (read-only) |
 
@@ -2157,7 +2188,7 @@ Outside the nightly run (design 2.2 C): snapshot, produce, reconcile, score. Ret
 | averageSpend.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | fnbAttachRate | number |  | (min 0; max 1; nullable) |
 | staffProductivity | object |  | Per role, units per staff hour, e.g. |
-| startingPatternKey | string |  | The pattern and version in use, e.g. (read-only) |
+| startingPatternKey | string |  | The starting pattern and version in use, e.g. (read-only) |
 | updatedAt | string (date-time) |  | (read-only) |
 | scopePath | string |  | The partition key (ADR-0005). (read-only) |
 
@@ -2289,7 +2320,7 @@ Draft a configuration a person then reviews
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `ai.capability`, `ai.governance_policy_version`, `ai.policy`, `ai.prompt_template`, `ai.provider`, `cache:idempotency`, `catalogue.event`, `catalogue.product`, `control.content_block`, `marketing.campaign`, `marketing.message_template`, `promotions.promotion`, `whitelabel.banner`, `whitelabel.content_page`, `whitelabel.homepage_section`, `whitelabel.promo_block` |
+| Reads | `ai.capability`, `ai.governance_policy_version`, `ai.policy`, `ai.prompt_template`, `ai.provider`, `cache:idempotency`, `catalogue.event`, `catalogue.product`, `marketing.campaign`, `marketing.message_template`, `promotions.promotion`, `whitelabel.banner`, `whitelabel.content_page`, `whitelabel.homepage_section`, `whitelabel.promo_block` |
 | Writes | `ai.activity`, `ai.decision_record`, `ai.proposed_action`, `cache:idempotency` |
 | Called by | BO-766, BO-772, BO-785, BO-786, BO-787, BO-789, BO-793, CMS-007, CMS-008 |
 
@@ -2476,6 +2507,11 @@ A rejection carries a reason. It is the only signal that the assistant is propos
 | id | string (uuid) | yes |  |
 | interactionId | string (uuid) |  |  |
 | translationJobId | string (uuid) |  | The proposeTranslations job that drafted this proposal; getTranslationProposals reads a job's rows by it. (read-only; nullable) |
+| targetKind | enum (contentBlock, productName, emailTemplate, messageTemplate) |  | For a translation draft, what kind of thing it sits on (TranslationProposals.drafts[].targetKind); null on every other proposal (R8 blocker FOUNDATION-AI-C40). (read-only; nullable) |
+| targetRef | string |  | For a translation draft, the id of the block, product or template it sits on (the path id of the target's own write, e.g. (max length 200; read-only; nullable) |
+| locale | string |  | For a translation draft, the language it is in (the job's targetLocale); null otherwise. (max length 20; read-only; nullable) |
+| fieldPath | string |  | For a translation draft, where it goes inside the target, as a dotted path in the target's own body (TranslationProposals.drafts[].fieldPath); null otherwise. (max length 300; read-only; nullable) |
+| draftText | string |  | For a translation draft, the proposed text; null otherwise. (read-only; nullable) |
 | kind | enum (pricing, promotion, operational, financial, configuration, content, audience) | yes | content (a marketing or storefront draft from proposeMarketingContent) and audience (a lookalike segment from proposeLookalikeSegment) added 29 September (build); both are applied by a person in the… |
 | targetContract | string | yes | Which contract would perform it. |
 | targetOperation | string | yes |  |
@@ -2880,7 +2916,7 @@ Every version of every governance policy at the scope, newest first (ADM-523, AD
 
 **`POST /governance/capabilities/{capabilityKey}/pause`**: Stop a capability now
 
-**The kill switch** (AIC-189, ADM-519, ADM-536, ADM-556). The capability answers from its declared degradation mode until resumed: recommendations leave the slot empty, fraud scoring falls back to the owners' rules, the concierge offers a person (design 3.7). In-flight plans of the capability pause at their next checkpoint. Emits `ai.capabilityPaused`.
+**The kill switch** (AIC-189, ADM-519, ADM-536, ADM-556). The capability answers from its declared degradation mode until resumed: recommendations leave the slot empty, fraud scoring falls back to the owners' rules, the concierge offers a person (design 3.7). In-flight plans of the capability pause at their next checkpoint. Emits `ai.capabilityPaused`, written to `ai.outbox` in the same transaction as the capability, intervention and plan writes; the decision record in the log database follows after commit, retried (R8 blocker FOUNDATION-AI-C41).
 
 |  |  |
 |---|---|
@@ -2890,8 +2926,8 @@ Every version of every governance policy at the scope, newest first (ADM-523, AD
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `ai.capability`, `cache:idempotency` |
-| Writes | `ai.action_plan`, `ai.capability`, `ai.decision_record`, `ai.intervention`, `cache:idempotency` |
+| Reads | `ai.action_plan`, `ai.capability`, `cache:idempotency` |
+| Writes | `ai.action_plan`, `ai.capability`, `ai.decision_record`, `ai.intervention`, `ai.outbox`, `cache:idempotency` |
 | Called by | ADM-536, ADM-556, ADM-696 |
 | State model | AI capability ([states/ai-capability.yaml](../../../states/ai-capability.yaml)): moves `active` -> `paused` |
 
@@ -4256,6 +4292,8 @@ The recommendation and upsell engine (design C11)
 | items | array of AiRecommendationItem | yes |  |
 | items[].trackingId | string (uuid) | yes | Echoed on every recordRecommendationEvents event and as orders.addCartLine.recommendationId, so attribution never guesses. |
 | items[].productId | string (uuid) |  | The product recommended. (nullable) |
+| items[].variantId | string (uuid) |  | What the guest adds to the cart, when there is nothing to choose (r8, ORDERS-MONEY-C40, the lead's option A): for a product item whose product has one default variant, that variant, resolved from the… (nullable) |
+| items[].performanceId | string (uuid) |  | For a timed product with exactly one bookable performance in the context the engine was given (the cart's date), that performance (r8, ORDERS-MONEY-C40); otherwise null and the screen asks for the da… (nullable) |
 | items[].promotionId | string (uuid) |  | For offer, a published promotion the guest is eligible for. (nullable) |
 | items[].couponRef | string |  | For offer, a coupon campaign; a code is assigned only when the guest takes it (promotions.assignCoupon). (nullable) |
 | items[].rewardId | string (uuid) |  | For reward, a marketing-crm loyalty reward the guest can redeem. (nullable) |
@@ -4357,7 +4395,7 @@ Approved enterprise knowledge sources (8.4.38) — operating procedures, policie
 | name | string | yes |  |
 | description | string |  |  |
 | scopeLevel | enum (tenant, region, venue) | yes |  |
-| scopePath | string |  | (read-only) |
+| scopePath | string |  | The node the collection belongs to (R8 blocker ORDERS-MONEY-C36). |
 | documentCount | integer |  | (read-only) |
 | shardKey | string |  | The tenant boundary on shared placement (ADR-0021). (read-only) |
 | retrieval | enum (dense, hybrid) |  | Set at creation and not changeable. (default hybrid) |
@@ -4374,7 +4412,7 @@ Approved enterprise knowledge sources (8.4.38) — operating procedures, policie
 | name | string | yes |  |
 | description | string |  |  |
 | scopeLevel | enum (tenant, region, venue) | yes |  |
-| scopePath | string |  | (read-only) |
+| scopePath | string |  | The node the collection belongs to (R8 blocker ORDERS-MONEY-C36). |
 | documentCount | integer |  | (read-only) |
 | shardKey | string |  | The tenant boundary on shared placement (ADR-0021). (read-only) |
 | retrieval | enum (dense, hybrid) |  | Set at creation and not changeable. (default hybrid) |
@@ -4400,6 +4438,7 @@ Documents carry the scope they may be retrieved at. A venue operating procedure 
 - `reingestDocumentId` names an `indexed` or `failed` document to process again from the `sourceAssetId` in the body. **The same document** moves back to `processing` and keeps its id; no new document is created.
 - `supersedesDocumentId` names an `indexed` document that this new one replaces. A new document is created, and the named one moves to `superseded` when the new one reaches `indexed` — so search is never left with neither version.
 Sending both, or naming a document in another collection or in a state the transition does not start from, is refused as a validation failure.
+**The text comes from the asset** (R8 blocker ORDERS-MONEY-C19): the job reads `sourceAssetId`'s `status` and `extractedText` through Assets' `mediaAssetRecords` (service route) and chunks that text. An asset that does not exist or the caller cannot see is 404 `asset-not-found`; one that is `processing`, `quarantined` or `failed`, or has no extracted text, is 409 `asset-not-ready`, and nothing is written.
 
 |  |  |
 |---|---|
@@ -4430,6 +4469,7 @@ Sending both, or naming a document in another collection or in a state the trans
 | title | string | yes |  |
 | sourceAssetId | string (uuid) | yes |  |
 | mimeType | string |  |  |
+| venueId | string (uuid) |  | A venue to narrow the document to (R8 blocker ORDERS-MONEY-C36): the document's scopePath becomes that venue's path, which must be at or below the collection's node (else 400). (nullable) |
 | reingestDocumentId | string (uuid) |  | An indexed or failed document in this collection to process again from sourceAssetId. (nullable) |
 | supersedesDocumentId | string (uuid) |  | The indexed document in this collection that this one replaces. (nullable) |
 | status | enum (processing, indexed, failed, superseded) |  | (read-only) |
@@ -4447,6 +4487,7 @@ Sending both, or naming a document in another collection or in a state the trans
 | title | string | yes |  |
 | sourceAssetId | string (uuid) | yes |  |
 | mimeType | string |  |  |
+| venueId | string (uuid) |  | A venue to narrow the document to (R8 blocker ORDERS-MONEY-C36): the document's scopePath becomes that venue's path, which must be at or below the collection's node (else 400). (nullable) |
 | reingestDocumentId | string (uuid) |  | An indexed or failed document in this collection to process again from sourceAssetId. (nullable) |
 | supersedesDocumentId | string (uuid) |  | The indexed document in this collection that this one replaces. (nullable) |
 | status | enum (processing, indexed, failed, superseded) |  | (read-only) |
@@ -4460,6 +4501,8 @@ Sending both, or naming a document in another collection or in a state the trans
 | Code | Shape | Meaning |
 |---|---|---|
 | 202 |  | Accepted for indexing |
+| 404 |  | sourceAssetId names no asset the caller can see (asset-not-found). |
+| 409 |  | The source asset is processing, quarantined or failed, or has no extracted text yet (asset-not-ready). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### reindexSource
@@ -4467,7 +4510,7 @@ Sending both, or naming a document in another collection or in a state the trans
 **`POST /index-sources/{sourceId}/reindex`**: Rebuild a source
 
 Needed for three reasons and worth naming them: the embedding model changed, the `textFields` changed, or incremental indexing drifted and nobody knows why.
-**Builds into a shadow collection and swaps on completion.** Reindexing in place leaves the assistant answering from a half-built index, which is worse than answering from a stale one — a stale answer is wrong in a knowable way.
+**Builds without exposing a half-built index** (r8 walk of ticket 27841; lead decision of 20 October 2026, option A, to be confirmed with the AI lead). A tenant has one collection per embedding model holding every source and every document (ADR-0049), so rebuilding one source cannot swap a whole collection. **A rebuild of one source uses no shadow collection.** The new points are written into the same collection carrying a new index epoch in their payload; retrieval keeps filtering on the old epoch until the rebuild is verified, then the filter flips to the new epoch in one step, and the old-epoch points of that source are deleted. The reader sees either the old index or the new one, never a mix. **The shadow collection and alias swap are for a change of embedding model only**, which rebuilds every source. `IndexJob.shadowCollection` is therefore null for a single-source rebuild. `IndexJob.shardKey` names the tenant, which ADR-0049 makes the owner of the collection.
 
 |  |  |
 |---|---|
@@ -4508,7 +4551,7 @@ Needed for three reasons and worth naming them: the embedding model changed, the
 | recordsEmbedded | integer |  |  |
 | recordsFailed | integer |  | The number to watch. |
 | failureSample | array of string |  |  |
-| shadowCollection | string |  | A full rebuild writes here and swaps on completion. (nullable) |
+| shadowCollection | string |  | Set only for a change of embedding model: the rebuild writes here and the alias swaps on completion. (nullable) |
 | shardKey | string |  | The tenant boundary on shared placement (ADR-0021). (read-only) |
 | embeddingModel | string |  |  |
 | startedAt | string (date-time) | yes |  |
@@ -4531,6 +4574,8 @@ Separate from the conversational path because most of the time a person wants a 
 Results are scoped to the principal, and each carries the collection it came from so a wrong answer can be traced to a wrong document rather than blamed on the model.
 
 **Media added 29 September (build; 23.1.6).** Kind `media` searches the media library in plain language ("sunset over the lazy river with families"): an index source over `assets.media_asset` embeds each asset's title, description, tags and the AI description `assets.analyseMediaAsset` writes, one chunk per asset, re-embedded on `assets.documentIndexed` and by the nightly incremental reindex. Results carry `assetId` and `mediaType` and are scoped to the caller like every other kind: an asset the caller could not open through `assets.searchMedia` is never returned.
+
+**Which sources a kind searches** (R8 blocker ORDERS-MONEY-C37, the lead's answer of 20 October 2026): each index source declares the one search kind it feeds (`IndexSource.kind`), and a search over a kind reads the entries of the active sources of that kind only; a result's `kind` is its source's. Six kinds: `product` (products, membership products included), `entitlement`, `knowledge` (knowledge collections and every document a tenant uploads), `faq`, `report` and `media`. A kind no active source feeds returns no results, not an error. `membership` and `document` are no longer kinds.
 
 |  |  |
 |---|---|
@@ -4556,7 +4601,7 @@ Results are scoped to the principal, and each carries the collection it came fro
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | query | string | yes | (min length 2; max length 500) |
-| kinds | array of enum (product, entitlement, membership, document, knowledge, faq, report, media) |  |  |
+| kinds | array of enum (product, entitlement, knowledge, faq, report, media) |  |  |
 | limit | integer |  | (max 100; default 20) |
 
 **Responses**
@@ -4572,7 +4617,7 @@ Results are scoped to the principal, and each carries the collection it came fro
 
 Names the table, the fields that carry retrievable text, the collection it lands in and the event that invalidates it.
 **`textFields` is the important one.** Indexing an entire row embeds ids, timestamps and foreign keys as though they were meaning, and a search for "annual pass" then matches a UUID. Only the fields a person would read are embedded; the rest becomes payload used for filtering.
-**What the PUT does.** One declaration per indexed table, so the match key is `table`. A body naming a table already declared replaces that declaration in full — a field left out takes its default, not its old value — and returns 200; a table not yet declared is created and returns 201. Other declarations are never touched. A change to `textFields` or `chunkStrategy` does not re-embed anything by itself; `reindexSource` does.
+**What the PUT does.** The path `{sourceId}` is the declaration's identity, and a table has at most one declaration (`table` is unique). A PUT to an existing id replaces that declaration in full — a field left out takes its default, not its old value — and returns 200; a PUT to a new id creates it and returns 201. A PUT whose id exists but names a different table is 409 `index-source-table-immutable` (a declaration never moves to another table; declare the new table under a new id); a PUT to a new id naming a table another declaration already holds is 409 `index-source-table-taken`. `collectionId` names the knowledge collection the entries land in; an unknown `collectionId` is 422 `collection-unknown`. Other declarations are never touched. A change to `textFields` or `chunkStrategy` does not re-embed anything by itself; `reindexSource` does.
 
 |  |  |
 |---|---|
@@ -4603,8 +4648,10 @@ Names the table, the fields that carry retrievable text, the collection it lands
 | contract | string |  | Which contract owns it, for tracing back. |
 | textFields | array of string | yes | The fields a person would read. (min items 1) |
 | payloadFields | array of string |  | Carried alongside the vector for filtering, not embedded. |
-| collection | string | yes | Which embedding table it lands in (ai.chunk_embedding for the default model; one table per embedding model, AI design 5.8). |
+| collectionId | string (uuid) | yes | The knowledge collection the source's entries land in. |
+| collection | string | yes | The name of the collection's Qdrant alias, set by the server from collectionId and never sent. (read-only) |
 | scopeLevel | enum (tenant, region, venue) | yes |  |
+| kind | enum (product, entitlement, knowledge, faq, report, media) |  | The semanticSearch kind this source feeds (R8 blocker ORDERS-MONEY-C37). (nullable) |
 | invalidatedBy | array of string |  | Domain events that make an entry stale. |
 | chunkStrategy | enum (wholeRecord, paragraph, fixedTokens, section, semanticSection, parentChild) |  | Changes what is stored, so it cannot be altered without a reindex. |
 | parentField | string |  | Which field carries the parent context, where chunkStrategy is parentChild. (nullable) |
@@ -4622,8 +4669,10 @@ Names the table, the fields that carry retrievable text, the collection it lands
 | contract | string |  | Which contract owns it, for tracing back. |
 | textFields | array of string | yes | The fields a person would read. (min items 1) |
 | payloadFields | array of string |  | Carried alongside the vector for filtering, not embedded. |
-| collection | string | yes | Which embedding table it lands in (ai.chunk_embedding for the default model; one table per embedding model, AI design 5.8). |
+| collectionId | string (uuid) | yes | The knowledge collection the source's entries land in. |
+| collection | string | yes | The name of the collection's Qdrant alias, set by the server from collectionId and never sent. (read-only) |
 | scopeLevel | enum (tenant, region, venue) | yes |  |
+| kind | enum (product, entitlement, knowledge, faq, report, media) |  | The semanticSearch kind this source feeds (R8 blocker ORDERS-MONEY-C37). (nullable) |
 | invalidatedBy | array of string |  | Domain events that make an entry stale. |
 | chunkStrategy | enum (wholeRecord, paragraph, fixedTokens, section, semanticSection, parentChild) |  | Changes what is stored, so it cannot be altered without a reindex. |
 | parentField | string |  | Which field carries the parent context, where chunkStrategy is parentChild. (nullable) |
@@ -4636,8 +4685,10 @@ Names the table, the fields that carry retrievable text, the collection it lands
 
 | Code | Shape | Meaning |
 |---|---|---|
-| 200 |  | Declared — the table's existing declaration replaced |
-| 201 |  | Declared — the table had no declaration |
+| 200 |  | Declared — the declaration with this id replaced |
+| 201 |  | Declared — no declaration had this id |
+| 409 |  | The id exists and names a different table (index-source-table-immutable), or the id is new and another declaration already holds the table (index-source-table-taken). |
+| 422 |  | collectionId names no knowledge collection of the tenant (collection-unknown). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ## Tables
@@ -4675,7 +4726,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | scrub_audit | jsonb | no | The audit of one call's scrubbing and routing (3 October 2026, CHG-R1S-016; the legal research docs/active/research/openai-key-uae-3-october.md, item 9). |
 | id | uuid | yes |  |
 | conversation_id | uuid | no |  |
-| principal_id | uuid | yes |  |
+| principal_id | uuid | no | The staff member who made the call. |
 | audience | text | no | Billing divides on this. |
 | subject_id | uuid | no | The guest, where the audience is guest. |
 | billable_to_tenant_id | uuid | no | Resolved from scopePath at write time, not derived later. |
@@ -4813,6 +4864,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | document_id | uuid | yes |  |
 | chunk_index | integer | yes |  |
 | parent_chunk_id | uuid | no | The parent section's own row, where the source uses parentChild chunking. |
+| subject_id | uuid | no | The guest the chunk is about, where there is one (ADR-0049; R8 blocker FOUNDATION-AI-C42, CHG-R8MIG-025), copied from its index entry, so eraseSubject finds every chunk of a subject without reading t… |
 | content | text | no | The chunk text. |
 | embedding_model | text | yes | The model that produced the point; a model change re-embeds into a new collection. |
 | collection_alias | text | yes | The Qdrant collection alias the point is in: tenant_<tenantId> for the current model. |
@@ -4827,7 +4879,9 @@ Every table this service owns that the slice reads or writes, with its columns a
 | Column | Type | Required | Notes |
 |---|---|---|---|
 | id | uuid | yes |  |
-| principal_id | uuid | yes |  |
+| principal_id | uuid | no | The staff member who opened the conversation; null when a guest opened it (subjectId). |
+| subject_id | uuid | no | The guest who opened the conversation (a guest is not a principal); null for staff. |
+| profile_key | text | no | The assistant profile the conversation runs under (configureAssistantProfile), as createAiConversation set it; null for the module's default profile (R8 blocker WHITE-C27). |
 | scope_path | text | no |  |
 | module | text | yes |  |
 | locale | text | no |  |
@@ -4860,9 +4914,10 @@ Every table this service owns that the slice reads or writes, with its columns a
 | execution_result | jsonb | no |  |
 | outcome_ref | text | no | The business outcome it links to (an order, a published version, a closed case). |
 | outcome | text | yes | approvedThenFailed is kept distinct from executed (design 1.2 Audit). |
-| annotations | jsonb | no | Corrections, appended; the original fields are never edited. |
+| annotations | jsonb | no | Corrections, appended; the original fields are never edited and annotations are not part of the hash. |
 | previous_hash | text | no |  |
 | record_hash | text | yes |  |
+| hash_version | integer | no | Which list of hashed fields recordHash covers; 1 is the list in this schema's description (R8 blocker FOUNDATION-AI-C33). |
 | created_at | timestamptz | no |  |
 | scope_path | text | no | The partition key (ADR-0005). |
 
@@ -5156,7 +5211,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | records_embedded | integer | no |  |
 | records_failed | integer | no | The number to watch. |
 | failure_sample | text[] | no |  |
-| shadow_collection | text | no | A full rebuild writes here and swaps on completion. |
+| shadow_collection | text | no | Set only for a change of embedding model: the rebuild writes here and the alias swaps on completion. |
 | shard_key | text | no | The tenant boundary on shared placement (ADR-0021). |
 | embedding_model | text | no |  |
 | started_at | timestamptz | yes |  |
@@ -5171,8 +5226,10 @@ Every table this service owns that the slice reads or writes, with its columns a
 | contract | text | no | Which contract owns it, for tracing back. |
 | text_fields | text[] | yes | The fields a person would read. |
 | payload_fields | text[] | no | Carried alongside the vector for filtering, not embedded. |
-| collection | text | yes | Which embedding table it lands in (ai.chunk_embedding for the default model; one table per embedding model, AI design 5.8). |
+| collection_id | uuid | yes | The knowledge collection the source's entries land in. |
+| collection | text | yes | The name of the collection's Qdrant alias, set by the server from collectionId and never sent. |
 | scope_level | text | yes |  |
+| kind | text | no | The semanticSearch kind this source feeds (R8 blocker ORDERS-MONEY-C37). |
 | invalidated_by | text[] | no | Domain events that make an entry stale. |
 | chunk_strategy | text | no | Changes what is stored, so it cannot be altered without a reindex. |
 | parent_field | text | no | Which field carries the parent context, where chunkStrategy is parentChild. |
@@ -5180,7 +5237,6 @@ Every table this service owns that the slice reads or writes, with its columns a
 | entry_count | integer | no |  |
 | last_indexed_at | timestamptz | no |  |
 | stale_count | integer | no | Records changed since their last embedding. |
-| collection_id | uuid | yes | Points at ai.knowledge_collection. |
 
 ### `ai.insight`
 
@@ -5233,7 +5289,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | name | text | yes |  |
 | description | text | no |  |
 | scope_level | text | yes |  |
-| scope_path | text | no |  |
+| scope_path | text | no | The node the collection belongs to (R8 blocker ORDERS-MONEY-C36). |
 | document_count | integer | no |  |
 | shard_key | text | no | The tenant boundary on shared placement (ADR-0021). |
 | retrieval | text | no | Set at creation and not changeable. |
@@ -5343,6 +5399,27 @@ Every table this service owns that the slice reads or writes, with its columns a
 | handover_ref | text | no | The owning module's record once handed over. |
 | scope_path | text | no | The partition key (ADR-0005). |
 
+### `ai.outbox`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| event_id | uuid | yes | The envelope's event id, which is this row's id (ADR-0058; UUIDv7, ADR-0056). |
+| event_name | text | yes | The name of an event in events/ published by ai. |
+| event_version | integer | no |  |
+| tenant_id | uuid | yes | The tenant the change belongs to (envelope field, SD-030). |
+| aggregate_type | text | yes | The AI table the change happened in. |
+| aggregate_id | uuid | yes | Which row changed; also the broker ordering key (ADR-0058). |
+| payload | jsonb | yes | The event as it happened. |
+| scope_path | text | no | The partition key (ADR-0005). |
+| sequence | integer | yes | Monotonic per aggregate, allocated in the writing transaction from ai.outbox_sequence (INSERT ... |
+| occurred_at | timestamptz | yes | When the change happened, set in the writing transaction; a consumer reads this. |
+| trace_id | text | no |  |
+| published_at | timestamptz | no | Null until the relay publishes it; unpublished rows in sequence order are the work. |
+| attempts | integer | no | Five, exponential from one second, jittered; then the relay's dead letter, as for platform.outbox. |
+| last_error | text | no |  |
+| created_at | timestamptz | yes |  |
+
 ### `ai.policy`
 
 | Column | Type | Required | Notes |
@@ -5377,6 +5454,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | streams_by_capability | text[] | no | Time to first token and total latency are separate targets. |
 | fallback_provider_id | uuid | no | BL-151: a provider outage with no fallback is every AI surface going dark at once. |
 | has_guardrail_short_circuit | boolean | no | A refusal a rule can decide never reaches a model. |
+| glossary_terms | jsonb | no | The tenant's translation glossary (R8 blocker FOUNDATION-AI-C05, the lead's answer of 20 October 2026): terms proposeTranslations and proposeContent keep as they are (keep) or always translate one wa… |
 | suggestion_providers | jsonb | no | Which producer answers each SuggestionKind, and what requestSuggestion routes by. |
 | tenant_id | uuid | yes | Points at platform.tenant. |
 
@@ -5423,6 +5501,11 @@ Every table this service owns that the slice reads or writes, with its columns a
 | id | uuid | yes |  |
 | activity_id | uuid | no |  |
 | translation_job_id | uuid | no | The proposeTranslations job that drafted this proposal; getTranslationProposals reads a job's rows by it. |
+| target_kind | text | no | For a translation draft, what kind of thing it sits on (TranslationProposals.drafts[].targetKind); null on every other proposal (R8 blocker FOUNDATION-AI-C40). |
+| target_ref | text | no | For a translation draft, the id of the block, product or template it sits on (the path id of the target's own write, e.g. |
+| locale | text | no | For a translation draft, the language it is in (the job's targetLocale); null otherwise. |
+| field_path | text | no | For a translation draft, where it goes inside the target, as a dotted path in the target's own body (TranslationProposals.drafts[].fieldPath); null otherwise. |
+| draft_text | text | no | For a translation draft, the proposed text; null otherwise. |
 | kind | text | yes | content (a marketing or storefront draft from proposeMarketingContent) and audience (a lookalike segment from proposeLookalikeSegment) added 29 September (build); both are applied by a person in the… |
 | target_contract | text | yes | Which contract would perform it. |
 | target_operation | text | yes |  |
@@ -5591,6 +5674,21 @@ Every table this service owns that the slice reads or writes, with its columns a
 | completed_at | timestamptz | no |  |
 | scope_path | text | no | The partition key (ADR-0005). |
 
+### `ai.translation_job`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| scope_path | text | yes | The partition key (ADR-0005): the tenant the job ran for. |
+| target_locale | text | yes |  |
+| source_locale | text | no | The language translated from; null means the tenant's default language. |
+| scope | text | yes |  |
+| status | text | yes |  |
+| failure_reason | text | no |  |
+| created_by_principal_id | uuid | no |  |
+| created_at | timestamptz | yes |  |
+| completed_at | timestamptz | no |  |
+
 ### `ai.venue_settings`
 
 | Column | Type | Required | Notes |
@@ -5607,13 +5705,13 @@ Every table this service owns that the slice reads or writes, with its columns a
 | average_spend | numeric(18,4) | no |  |
 | fnb_attach_rate | numeric | no |  |
 | staff_productivity | jsonb | no | Per role, units per staff hour, e.g. |
-| starting_pattern_key | text | no | The pattern and version in use, e.g. |
+| starting_pattern_key | text | no | The starting pattern and version in use, e.g. |
 | updated_at | timestamptz | no |  |
 | scope_path | text | no | The partition key (ADR-0005). |
 
 ## Not in the first release
 
-78 operations, added to this service in later releases without changing any of the above.
+80 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
@@ -5621,7 +5719,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | ai | `proposeWalkways`, `recordSuggestionOutcome`, `setAiCredential` |
 | audit | `exportAiEvidencePackage`, `getAiDecisionTrace`, `replayAiDecision`, `searchAiDecisions` |
 | config | `getAiSpendCeiling`, `setAiProvider`, `setAiSpendCeiling` |
-| configure | `answerConfigurationQuestion`, `attachConfigurationSource`, `buildConfigurationPlan`, `decideBlueprintRecommendation`, `getConfigurationBlueprint`, `listConfigurationSessions`, `listConfigurationSources`, `proposeSeatMapChanges`, `startConfigurationSession` |
+| configure | `answerConfigurationQuestion`, `attachConfigurationSource`, `buildConfigurationPlan`, `decideBlueprintRecommendation`, `getConfigurationBlueprint`, `listConfigurationSessions`, `listConfigurationSources`, `proposeSeatMapChanges`, `runGuidedChoiceSuggestionJob`, `startConfigurationSession` |
 | forecast | `compareForecastScenarios`, `configureForecastSignalSource`, `exportForecastVersion`, `listForecastDefinitions`, `listForecastSignals` |
 | generate | `generateConfiguration`, `generateVenueLayout`, `proposeLookalikeSegment` |
 | governance | `configureAiCapability`, `createAiPolicyException`, `listAiInteractions`, `resumeAiCapability` |
@@ -5630,5 +5728,5 @@ Every table this service owns that the slice reads or writes, with its columns a
 | models | `listAiModels`, `listPromptTemplates` |
 | monitoring | `closeAiIncident`, `decideAiGovernanceAlert`, `listAiCapabilityHealth`, `listAiCapabilityMaturity`, `listAiControls`, `listAiRiskRegister`, `runAiControlTest`, `setAiRiskRegisterEntry` |
 | recommend | `explainRecommendationDecision`, `getCustomerRecommendationProfile`, `simulateRecommendationDecision` |
-| retrieval | `listIndexFailures`, `listIndexJobs`, `listIndexSources`, `listKnowledgeCollections`, `removeIndexEntry` |
+| retrieval | `eraseSubject`, `listIndexFailures`, `listIndexJobs`, `listIndexSources`, `listKnowledgeCollections`, `removeIndexEntry` |
 | risk | `addRiskCaseEvidence`, `backtestRiskStrategy`, `closeRiskCase`, `configureRiskStrategy`, `createRiskCase`, `decideRiskAlert`, `expandRiskNetwork`, `getApprovalRequestScore`, `getEntityRisk`, `getRiskCase`, `listRiskAlerts`, `proposeRiskAction`, `scoreApprovalRequest`, `scoreTransactionRisk` |

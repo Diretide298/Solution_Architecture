@@ -1,6 +1,6 @@
 # P09-infrastructure-resilienc-01 — P09 · Infrastructure & Resilience
 
-**4 screens · 8 operations · 10 schemas · 2 permissions**
+**4 screens · 8 operations · 11 schemas · 2 permissions**
 
 Platform P09 TICVAI Web · ships as **ticvai-control** ·
 platformAdmin audience · web ·

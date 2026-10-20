@@ -1,6 +1,6 @@
 # P02-discovery-browse-01 — P02 · Discovery & Browse
 
-**7 screens · 19 operations · 59 schemas · 4 permissions**
+**7 screens · 20 operations · 64 schemas · 4 permissions**
 
 Platform P02 Guest App · ships as **guest** ·
 guest audience · mobileApp ·
@@ -51,7 +51,7 @@ convincingly. It is never a caption.
 - **Every control that can be refused must be gated.** 4 permissions apply here:
   `GUEST_VIEW, ORDER_VIEW, PRODUCT_VIEW, VENUE_MAP_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **14 of these operations work offline**: getBundle, getPerformance, getProduct, getPublishedGuidedChoice, getPublishedTenantConfig, getTenantAppStatus, getVenueMap, getWaitTimes
+- **14 of these operations work offline**: getGuestBundle, getPerformance, getProduct, getPublishedGuidedChoice, getPublishedTenantConfig, getTenantAppStatus, getVenueMap, getWaitTimes
   — and the rest do not. A surface that looks the same online and off is lying.
 - **Offline, every screen shows one banner, the same on web and app:** *"You're offline. Connect to the internet to book, pay, order or join a queue."* The moment the connection drops, on every screen, above the screen's own content. By itself as soon as the connection is back, with a short "Back online" confirmation. **It never** Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing. Each screen's `states.offline` says what stays on screen and what waits.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that

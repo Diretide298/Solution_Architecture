@@ -152,7 +152,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `WEB-038` | F&B – Order Tracking | A | 0 | 14 | 5 | 0 | 0 | 0 | guest | review (client-verified) |
 | `WEB-039` | Venue Map & Wait Times | A | 1 | 18 | 6 | 5 | 4 | 6 | guest | review (client-verified) |
 | `WEB-040` | Virtual Queue | A | 8 | 35 | 6 | 11 | 3 | 6 | guest | review (client-verified) |
-| `WEB-041` | Parking – Reserve & Pay | A | 22 | 12 | 7 | 7 | 2 | 2 | guest | review (client-verified) |
+| `WEB-041` | Parking – Reserve & Pay | A | 30 | 12 | 7 | 7 | 2 | 2 | guest | review (client-verified) |
 
 ## Thin screens in this batch
 

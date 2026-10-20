@@ -235,7 +235,7 @@
     }
    ]
   },
-  "notes": "4.4.7. Claimed by the entitlement the guest is already carrying, not a paper slip.\n\n**The guest's drops are found by their own tickets (listMyEntitlements, then lookupShopAndDrop per entitlementId), bound 4 October 2026** (CHG-FXS-003)",
+  "notes": "4.4.7. Claimed by the entitlement the guest is already carrying, not a paper slip.\n\n**The guest's drops are found by their own tickets (listMyEntitlements, then lookupShopAndDrop per entitlementId), bound 4 October 2026** (CHG-FXS-003)\n\nBuild note (r8 second round, GPS-C09): **build the no-access state as GFIX-4 says, not as the state text above reads.** A guest holds no permission, so the state never names one (the text above still names staff permissions); signed out, the guest is offered sign-in and brought back here; a record that is not theirs says so without saying whose. The corrected wording waits for the client's approval of the visible text (pending entry GPS-C09).",
   "density": "comfortable",
   "pattern": "statusTracker",
   "patternReason": "A status list of every shop-and-drop waiting for the guest, read by `lookupShopAndDrop` (a GET with query identifiers, so no request body) (CHG-SGU-018)",

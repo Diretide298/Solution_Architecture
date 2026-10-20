@@ -91,6 +91,13 @@ by what is available for the chosen date before the guest sees them.
 "which options do people actually pick" is answerable — and it is the question that tells a
 venue whether the bundle is priced correctly.
 
+**How a bundle reaches the cart in r8** (R8 blocker ORDERS-MONEY-C43, the lead's answer B; CHG-R8MIG-023; r8
+integration, CHG-R8INT-024). A published bundle has a catalogue product of kind bundle with one variant
+(`Bundle.variantId`); `addCartLine` sends that variant with the picks in `OrderLineAttributes.bundle` (the bundle and
+the option chosen in each choice group), the server prices the line at `Bundle.price`, and `createOrder` freezes the
+allocation as above. In r8 a bundle's admission is open-dated, so no date or session is asked; the per-date option
+filter above applies once dated bundles are sold.
+
 ## Alternatives considered
 
 **Computed price with a bundle discount percentage.** Rejected above: unforecastable and a

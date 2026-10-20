@@ -103,6 +103,73 @@
    }
   }
  },
+ "BookingFlow": {
+  "x-ticvai-persistence": "whitelabel.booking_flow",
+  "type": "object",
+  "description": "**A venue's booking flow (decided 29 September, W12: operators pick their flows, see which steps are required, set their own order).** Made from a `BookingFlowType`; lives in the working draft and reaches guests with `publishTenantConfig`, which copies the venue's flows into the version's snapshot. A product or category names its flow (catalogue `bookingFlowId`); otherwise the venue's default for the type serving its kind applies.\n",
+  "required": [
+   "flowTypeKey",
+   "name"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "From the path of `createBookingFlowDefinition`."
+   },
+   "flowTypeKey": {
+    "$ref": "#/components/schemas/BookingFlowTypeKey"
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 80,
+    "description": "Staff-facing, e.g. \"Day pass, date first\". Not shown to guests."
+   },
+   "isDefaultForType": {
+    "type": "boolean",
+    "default": false,
+    "description": "At most one per venue and type; setting it takes it from the previous default."
+   },
+   "isEnabled": {
+    "type": "boolean",
+    "default": true,
+    "description": "A disabled flow is kept and not published; products naming it fall back to the default."
+   },
+   "steps": {
+    "type": "array",
+    "maxItems": 30,
+    "description": "Every step of the type, in the venue's order. Filled from the type when left out on create.",
+    "items": {
+     "$ref": "#/components/schemas/BookingFlowStep"
+    }
+   },
+   "settings": {
+    "$ref": "#/components/schemas/BookingFlowLevelSettings"
+   },
+   "isValid": {
+    "type": "boolean",
+    "readOnly": true,
+    "x-ticvai-derived": "onWrite",
+    "description": "Whether the flow passes `validateBookingFlow`; worked out in the same transaction as each write. `publishTenantConfig` refuses a draft holding an invalid enabled flow."
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "The partition key (ADR-0005). Written at `venue` scope."
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
  "BookingFlowConfig": {
   "x-ticvai-persistence": "none — embedded in tenant_config",
   "description": "**Set per tenant, with a per-venue override (decided 29 September, rev 3 CFG-11).** One tenant with several venues (the Kids Club branches, Coastal Aqua beside Union Arena) needs them to differ. The settings in force at a venue are the tenant's, with that venue's entry in `venueOverrides` laid over them field by field. The guest app resolves them for the venue the guest picked (audit R267); `effectiveForVenueId` on `getBookingFlowConfig` returns them resolved.\n",
@@ -126,10 +193,148 @@
    }
   ]
  },
+ "BookingFlowLevelSettings": {
+  "x-ticvai-persistence": "none — jsonb column on whitelabel.booking_flow",
+  "type": "object",
+  "description": "**The settings that belong to one flow, not to the venue (decided 29 September, W12).** Moved here from `BookingFlowSettings`, which keeps the venue-wide ones. Each keeps its rev 3 meaning and default. A field left out takes its default.\n",
+  "properties": {
+   "performanceReveal": {
+    "type": "string",
+    "enum": [
+     "dateTimeTicket",
+     "allAtOnce"
+    ],
+    "default": "dateTimeTicket",
+    "description": "**Performance reveal (rev 3 REV3-2).** `dateTimeTicket` shows the times only once a date is picked and the tickets only once a time is picked; `allAtOnce` shows them together. Product-first (W8) is the step order of `experienceWorkshop`, not a value here.\n"
+   },
+   "signInAt": {
+    "type": "string",
+    "enum": [
+     "afterAddOns",
+     "atPayment"
+    ],
+    "default": "afterAddOns",
+    "description": "**Where the guest is asked to sign in, or for a guest-checkout code (rev 3 REV3-3).** `afterAddOns` asks as the guest leaves the extras step; `atPayment` asks at payment. The basket is kept either way.\n"
+   },
+   "seatEventDateMode": {
+    "type": "string",
+    "enum": [
+     "inlineStep",
+     "popupOnSeatMap"
+    ],
+    "default": "inlineStep",
+    "description": "**Date and time on a seated event (rev 3 REV3-4).** `inlineStep` asks for them before the seat map; `popupOnSeatMap` opens the seat map with a date and time pop-up. Read only by the seated flow types.\n"
+   },
+   "extrasStep": {
+    "type": "string",
+    "enum": [
+     "auto",
+     "always",
+     "never"
+    ],
+    "default": "auto",
+    "description": "`auto` shows the extras step only when the cart's products have add-ons; `never` is the same as turning the optional `extras` step off."
+   },
+   "quickTour": {
+    "type": "boolean",
+    "default": false,
+    "description": "**Quick tour (rev 3 REV3-20).** A first visit gets a coach-mark tour of this flow's steps, replayable from a Quick tour button. Seen-state kept on the device only.\n"
+   },
+   "consentQuestionIds": {
+    "type": "array",
+    "maxItems": 10,
+    "uniqueItems": true,
+    "default": [],
+    "description": "**The flow's own consent questions (rev 3 REV3-26).** Asked on every booking through this flow, together with those of each product in the cart, each question once. Each id names an active `ConsentQuestion` of the tenant in marketing-crm, or 400. A Help me choose answer may pre-fill one (`GuidedChoice` `consentPrefill`); the guest still confirms it.\n",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   }
+  }
+ },
+ "BookingFlowStep": {
+  "x-ticvai-rls": "grant-holder-read",
+  "x-ticvai-persistence": "whitelabel.booking_flow_step",
+  "type": "object",
+  "description": "One step of a venue's flow, in the venue's order (decided 29 September, W12).",
+  "required": [
+   "stepKey",
+   "enabled",
+   "sortOrder",
+   "scopePath"
+  ],
+  "properties": {
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007)."
+   },
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "bookingFlowId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "stepKey": {
+    "$ref": "#/components/schemas/BookingFlowStepKey"
+   },
+   "enabled": {
+    "type": "boolean",
+    "description": "A `required` step cannot be off; the flow saves and `isValid` turns false."
+   },
+   "sortOrder": {
+    "type": "integer",
+    "minimum": 0
+   },
+   "requirement": {
+    "type": "string",
+    "enum": [
+     "required",
+     "optional",
+     "conditional"
+    ],
+    "readOnly": true,
+    "x-ticvai-derived": "onRead",
+    "description": "From the flow type, so the CMS can mark the step without a second read."
+   },
+   "settings": {
+    "type": "object",
+    "additionalProperties": true,
+    "default": {},
+    "description": "The step's own settings, by the names the type's `stepSettings` gives for this step (e.g. `languages` on `language`, `minHours` on `duration`). A name the type does not give is refused with 400."
+   }
+  }
+ },
+ "BookingFlowTypeKey": {
+  "type": "string",
+  "description": "**The flow types the system catalogue offers (decided 29 September, W12; impact.md b).** `seatedFixedPerformance` and `seatedDateTimeSeatMap` are the two seated flows; `cabanaMap` is the one cabana flow (W6; `cabanaBySize` was removed in r8: a guest books a cabana from the map only, lead decision of 20 October 2026); `experienceWorkshop` puts the product before the date (W8); `multiLocation` opens on the location switcher.\n",
+  "enum": [
+   "datedDayPass",
+   "timedEntry",
+   "openDated",
+   "seatedFixedPerformance",
+   "seatedDateTimeSeatMap",
+   "experienceWorkshop",
+   "surfSession",
+   "meetingRoomHourly",
+   "cabanaMap",
+   "guidedTourByLanguage",
+   "transport",
+   "tableReservation",
+   "membership",
+   "giftCard",
+   "multiLocation"
+  ]
+ },
  "BrandIdentity": {
   "x-ticvai-persistence": "none — embedded in tenant_config",
   "type": "object",
-  "description": "Every `*AssetRef` here is a `MediaAsset` id from the `assets` library (`createUpload` then `completeUpload`), PNG or SVG and at most 2 MB (decided 28 September, audit R270).\n",
+  "description": "Every `*AssetRef` here is a `MediaAsset` id from the `assets` library (`createUpload` then `completeUpload`). The image fields are PNG or SVG and at most 2 MB (decided 28 September, audit R270); `introVideoAssetRef` is a video asset within the library's limit for kind `video` (`assets.createUpload`).\n",
   "required": [
    "logoAssetRef"
   ],
@@ -728,6 +933,33 @@
     "type": "string",
     "format": "uuid"
    },
+   "productName": {
+    "type": "string",
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "**Read with the entitlement, not stored on it** (R8 blocker ORDERS-MONEY-C20, CHG-R8MIG-009), as `TicketStatus.productName`: the product's name from `catalogue.product` (catalogue#productRecords), in the caller's language. The ticket card shows it."
+   },
+   "venueName": {
+    "type": "string",
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "The venue's name, read from `platform.scope` by `venueId`; not stored."
+   },
+   "imageUrl": {
+    "type": "string",
+    "format": "uri",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "The product's primary image (`catalogue.product_media`), read with the entitlement; null when the product has none. Not stored."
+   },
+   "guestCategory": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "The guest category of the order line it was issued for (adult, child, ...), from the line's variant (catalogue#productRecords); null for an entitlement no order line issued. Not stored."
+   },
    "orderId": {
     "type": "string",
     "format": "uuid",
@@ -736,7 +968,8 @@
    },
    "orderLineId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "description": "The order line it was issued for; the ticket list groups cards by it (CHG-R8MIG-009)."
    },
    "subjectId": {
     "type": "string",
@@ -985,7 +1218,7 @@
  "FooterConfig": {
   "type": "object",
   "x-ticvai-persistence": "whitelabel.footer_config + whitelabel.footer_config_column + whitelabel.footer_config_social_link",
-  "description": "BL-002. **`setHeader` and `HeaderConfig` exist and the footer does not**, which looked like symmetry until you notice it is not: **a header is chrome and a footer is a link surface.**\nA footer carries the legal links — terms, privacy, accessibility statement, cookie preferences — and **those are the ones a regulator checks.** Treating it as a mirror of the header would have given it a logo and no way to reach a privacy notice.\n**Where it is stored.** `legalLinks` and `copyrightText` are columns of `whitelabel.footer_config`; each entry of `columns` is a `whitelabel.footer_config_column` row and each entry of `socialLinks` a `whitelabel.footer_config_social_link` row. Part of the working draft (see the header). **In the tenant's own database, not the control plane (decided 28 September, audit R163)**: it moved from `control.footer_config` (renamed `whitelabel.footer_config`) and its two child tables.\n",
+  "description": "BL-002. **`setHeader` and `HeaderConfig` exist and the footer does not**, which looked like symmetry until you notice it is not: **a header is chrome and a footer is a link surface.**\nA footer carries the legal links — terms, privacy, accessibility statement, cookie preferences — and **those are the ones a regulator checks.** Treating it as a mirror of the header would have given it a logo and no way to reach a privacy notice.\n**Where it is stored.** `legalLinks` and `copyrightText` are columns of `whitelabel.footer_config`; each entry of `columns` is a `whitelabel.footer_config_column` row and each entry of `socialLinks` a `whitelabel.footer_config_social_link` row. Part of the working draft (see the header). **In the tenant's own database, not the control plane (decided 28 September, audit R163)**: it moved from `control.footer_config` (renamed `whitelabel.footer_config`) and its two child tables.\n**Links and order** (R8 blocker WHITE-C24 and IDENTITY-C60): a column's `links` are stored with the column, as one jsonb value in their array order; each column and each social link keeps its `sortOrder`, which `setFooter` writes from its position in the array (0 first), and every read returns `columns` and `socialLinks` ordered by it.\n",
   "required": [
    "id",
    "scopePath"
@@ -1009,8 +1242,16 @@
       "heading": {
        "type": "string"
       },
+      "sortOrder": {
+       "type": "integer",
+       "readOnly": true,
+       "description": "The column's position, written by `setFooter` from the array order (R8 blocker IDENTITY-C60)."
+      },
       "links": {
        "type": "array",
+       "x-ticvai-persistence-column": "jsonb",
+       "x-ticvai-persistence-kind": "valueObject",
+       "description": "The column's links in display order, stored on the column row as one value (R8 blocker WHITE-C24).",
        "items": {
         "type": "object",
         "properties": {
@@ -1063,6 +1304,11 @@
       },
       "url": {
        "type": "string"
+      },
+      "sortOrder": {
+       "type": "integer",
+       "readOnly": true,
+       "description": "The link's position, written by `setFooter` from the array order (R8 blocker IDENTITY-C60)."
       }
      }
     }
@@ -1651,7 +1897,7 @@
   "x-ticvai-persistence": "none — embedded in tenant_config",
   "type": "object",
   "nullable": true,
-  "description": "**The oldest guest app build still allowed to run (decided 28 September, audit R073).** A guest app whose own version is below the one for its platform shows the forced-upgrade screen (GST-047) and nothing else. Null, or a platform left null, forces nothing. Live at once through `setMaintenanceMode`, because an upgrade that must wait for a publish is not forced.\n",
+  "description": "**The oldest guest app build still allowed to run (decided 28 September, audit R073).** A guest app whose own version is below the one for its platform shows the forced-upgrade screen (GST-047) and nothing else. Null, or a platform left null, forces nothing. Live at once through `setMaintenanceMode`, because an upgrade that must wait for a publish is not forced.\n\n**`storeUrl`** (r8 walk of ticket 27893): the store page GST-047's \"Update\" button opens, one per platform, set with `setMaintenanceMode` beside the versions and live at once like them. Optional. A store address cannot be derived from `StoreAccount.appIdentifier`, which is a bundle id. The forced-upgrade screen opens the URL for the platform it runs on; where it is null the screen shows the message without the button and the guest updates from the store by hand.\n",
   "properties": {
    "ios": {
     "type": "string",
@@ -1662,6 +1908,25 @@
     "type": "string",
     "nullable": true,
     "pattern": "^\\d+\\.\\d+\\.\\d+$"
+   },
+   "storeUrl": {
+    "type": "object",
+    "nullable": true,
+    "description": "The store page of the tenant's app for each platform. https only.",
+    "properties": {
+     "ios": {
+      "type": "string",
+      "format": "uri",
+      "pattern": "^https://",
+      "nullable": true
+     },
+     "android": {
+      "type": "string",
+      "format": "uri",
+      "pattern": "^https://",
+      "nullable": true
+     }
+    }
    }
   }
  },
@@ -2631,6 +2896,78 @@
    }
   }
  },
+ "PublishedBanner": {
+  "x-ticvai-persistence": "none — a public projection of whitelabel.banner (r8 walk of ticket 28335)",
+  "type": "object",
+  "description": "One active banner as a guest reads it inside `PublishedTenantConfig`. No state, no schedule dates, no author.",
+  "required": [
+   "id",
+   "imageUrl"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "placement": {
+    "type": "string",
+    "enum": [
+     "homepageHero",
+     "homepageBlock",
+     "explore",
+     "checkout"
+    ]
+   },
+   "title": {
+    "$ref": "#/components/schemas/white-label::LocalisedText"
+   },
+   "subtitle": {
+    "$ref": "#/components/schemas/white-label::LocalisedText"
+   },
+   "imageUrl": {
+    "type": "string",
+    "format": "uri",
+    "description": "The stable address of the banner image."
+   },
+   "linkTarget": {
+    "$ref": "#/components/schemas/LinkTarget"
+   },
+   "sortOrder": {
+    "type": "integer"
+   }
+  }
+ },
+ "PublishedPromoBlock": {
+  "x-ticvai-persistence": "none — a public projection of whitelabel.promo_block (r8 walk of ticket 28335)",
+  "type": "object",
+  "description": "One active promo block as a guest reads it inside `PublishedTenantConfig`.",
+  "required": [
+   "id"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "title": {
+    "$ref": "#/components/schemas/white-label::LocalisedText"
+   },
+   "description": {
+    "$ref": "#/components/schemas/white-label::LocalisedText"
+   },
+   "iconUrl": {
+    "type": "string",
+    "format": "uri",
+    "nullable": true
+   },
+   "linkTarget": {
+    "$ref": "#/components/schemas/LinkTarget"
+   },
+   "sortOrder": {
+    "type": "integer"
+   }
+  }
+ },
  "PublishedTenantConfig": {
   "x-ticvai-persistence": "none — computed from the current ConfigVersion snapshot and the live status on whitelabel.tenant_config",
   "type": "object",
@@ -2655,8 +2992,92 @@
     "type": "string",
     "format": "date-time"
    },
+   "guestSignIn": {
+    "type": "object",
+    "readOnly": true,
+    "additionalProperties": false,
+    "description": "**What the guest sign-in buttons need before anyone is signed in** (r8, IDENTITY-C21): the public client ids of the tenant's enabled social and UAE PASS providers, derived on read from Identity's provider rows (no stored column, nothing secret). A provider the tenant has not enabled is absent, and its button is not drawn.",
+    "properties": {
+     "apple": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+       "clientId": {
+        "type": "string"
+       }
+      }
+     },
+     "google": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+       "clientId": {
+        "type": "string"
+       }
+      }
+     },
+     "uaePass": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+       "authorizationUrl": {
+        "type": "string",
+        "format": "uri"
+       },
+       "clientId": {
+        "type": "string"
+       }
+      }
+     }
+    }
+   },
    "brand": {
     "$ref": "#/components/schemas/BrandIdentity"
+   },
+   "assetsBaseUrl": {
+    "type": "string",
+    "format": "uri",
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "x-ticvai-derived": "onRead",
+    "description": "**How any guest screen turns an asset id into a picture** (r8 walk of ticket 28156; lead decision of 20 October 2026, option A). The address of a published asset is `assetsBaseUrl` + `/` + the asset id + `/` + a rendition name, for example `{assetsBaseUrl}/{assetId}/card.webp`. The renditions are `thumb`, `card`, `hero` and `original`. Every media object in every guest response carries an asset id and nothing else, so no screen makes a media call per tile. Only public assets referenced by a published version are served at it. `brandUrls` and the banner addresses below are this rule worked out for you."
+   },
+   "brandUrls": {
+    "type": "object",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "x-ticvai-derived": "onRead",
+    "description": "**The brand assets as addresses a guest can load** (r8 walk of ticket 28335). A guest cannot read `assets`, so the `*AssetRef` ids in `brand` mean nothing to a client. The server turns each asset the published version references into its stable CDN address (`assets.yaml`, `MediaAsset.url`: a public asset has a stable CDN address) and returns it here, beside the ids. Only assets the published version names are resolved; the address is that of the asset version the publish named. A field is null where its ref is null.",
+    "properties": {
+     "logoUrl": {
+      "type": "string",
+      "format": "uri",
+      "nullable": true
+     },
+     "logoDarkUrl": {
+      "type": "string",
+      "format": "uri",
+      "nullable": true
+     },
+     "faviconUrl": {
+      "type": "string",
+      "format": "uri",
+      "nullable": true
+     },
+     "splashImageUrls": {
+      "type": "array",
+      "items": {
+       "type": "string",
+       "format": "uri"
+      }
+     },
+     "introVideoUrl": {
+      "type": "string",
+      "format": "uri",
+      "nullable": true
+     }
+    }
    },
    "appIcons": {
     "$ref": "#/components/schemas/AppIcons"
@@ -2678,6 +3099,26 @@
    },
    "homepage": {
     "$ref": "#/components/schemas/HomepageLayout"
+   },
+   "banners": {
+    "type": "array",
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "x-ticvai-derived": "onRead",
+    "description": "**The hero and other banners a guest sees now** (r8 walk of ticket 28335): the banners in the published version whose state is `active` at the time of the read, by `sortOrder`. Draft, scheduled and expired banners are never returned. `imageUrl` is the resolved address of `imageAssetRef`. Staff read all banners with `listBanners`, which is unchanged.",
+    "items": {
+     "$ref": "#/components/schemas/PublishedBanner"
+    }
+   },
+   "promoBlocks": {
+    "type": "array",
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "x-ticvai-derived": "onRead",
+    "description": "The promo blocks in the published version that are `active` at the time of the read, by `sortOrder`, with the same rule as `banners`.",
+    "items": {
+     "$ref": "#/components/schemas/PublishedPromoBlock"
+    }
    },
    "bookingFlow": {
     "allOf": [
@@ -2800,6 +3241,15 @@
     "x-ticvai-derived": "onRead",
     "description": "True once any version has been published."
    },
+   "darkAppModules": {
+    "type": "array",
+    "readOnly": true,
+    "x-ticvai-derived": "onRead",
+    "description": "**The app-modules switched off for this tenant** (ADAM CR-164, option A, 18 October 2026; CHG-CRA-005): their keys (for example `AM-MARKETING-CRM-P01`), from the tenant's release flags. Returned to guests and staff alike; the apps leave those modules' screens out of navigation (the map is `handoff/release-flags.json`). An operation is dark for the tenant only when every app-module that binds it is off, so an operation shared with a live module stays callable. A flag the configuration does not declare counts as on. Additive: nothing new shows on screen.",
+    "items": {
+     "type": "string"
+    }
+   },
    "publishedVersion": {
     "type": "string",
     "nullable": true
@@ -2883,6 +3333,15 @@
        "type": "string",
        "maxLength": 200,
        "description": "The venue's name (`tenancy.OrgUnit.name`)."
+      },
+      "contact": {
+       "allOf": [
+        {
+         "$ref": "#/components/schemas/VenueContact"
+        }
+       ],
+       "nullable": true,
+       "description": "The venue's own contact (address, phone, email), from the venue's settings (`tenancy.VenueSettings`, read through `venueSettingsRecords`). Null when the venue has none set; the app then shows the tenant's `contact` (R8 blocker WHITE-C16)."
       },
       "city": {
        "type": "string",
@@ -3263,6 +3722,35 @@
        "format": "uuid",
        "nullable": true
       },
+      "name": {
+       "type": "string",
+       "nullable": true,
+       "x-ticvai-persisted": false,
+       "x-ticvai-derived": "onRead",
+       "description": "The point's name, worked out on read for the left-out banner (r8 walk of ticket 28693)."
+      },
+      "limit": {
+       "type": "object",
+       "nullable": true,
+       "x-ticvai-persisted": false,
+       "x-ticvai-derived": "onRead",
+       "description": "The rule that left it out, worked out on read from the product's eligibility rule: for `heightRule` a minimum or maximum height in centimetres, for `ageRule` a minimum or maximum age in years. Null for the other reasons. The banner says \"Min height 120 cm\" from it.\n",
+       "properties": {
+        "kind": {
+         "type": "string",
+         "enum": [
+          "minHeightCm",
+          "maxHeightCm",
+          "minAge",
+          "maxAge"
+         ]
+        },
+        "value": {
+         "type": "integer",
+         "minimum": 0
+        }
+       }
+      },
       "reason": {
        "type": "string",
        "enum": [
@@ -3275,6 +3763,26 @@
        ],
        "description": "`notAtVenue` (30 September, MoM 4.7): a must-include point that is at none of the plan's venues, so no day could hold it.\n"
       }
+     }
+    }
+   },
+   "estimate": {
+    "type": "object",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "x-ticvai-derived": "onRead",
+    "description": "**An estimated total, computed on read from current catalogue prices and stored nowhere** (r8 walk of tickets 28693 and 28200; lead decision of 20 October 2026, option A; DI-1098, \"with associated costing\"). The 3 October rule stands: no price is stored on the plan and add-ons are priced when booked. This only tells the guest roughly what the plan would cost today, for the group and the days; the price is fixed at booking and may differ. Null when no product on the plan has a current price.\n",
+    "required": [
+     "total",
+     "currency"
+    ],
+    "properties": {
+     "total": {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     },
+     "currency": {
+      "type": "string"
      }
     }
    },
@@ -3575,6 +4083,22 @@
     "nullable": true,
     "x-ticvai-references": "venuemap.point"
    },
+   "name": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "x-ticvai-derived": "onRead",
+    "description": "What the stop is called on the timeline (GST-059, GST-053; r8 walk of ticket 28693): the point's name, or the performance's title for a show, in the request language. Worked out on read from `pointId` or `performanceId`, as `VisitPlanAlternative.name` is; nothing is stored. Null for a travel stop."
+   },
+   "zoneName": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "x-ticvai-derived": "onRead",
+    "description": "The name of the zone the stop is in, from the point's zone on the map the plan was laid out on. Worked out on read; null when the point has no zone."
+   },
    "productId": {
     "type": "string",
     "format": "uuid",
@@ -3625,6 +4149,25 @@
      },
      "reason": {
       "type": "string"
+     },
+     "pricePerGuest": {
+      "allOf": [
+       {
+        "$ref": "../shared/common.yaml#/components/schemas/Money"
+       }
+      ],
+      "nullable": true,
+      "x-ticvai-persisted": false,
+      "x-ticvai-derived": "onRead",
+      "description": "The add-on's current price for one guest, computed on read and stored nowhere (the estimate rule of `VisitPlan.estimate`)."
+     },
+     "minutesSaved": {
+      "type": "integer",
+      "minimum": 0,
+      "nullable": true,
+      "x-ticvai-persisted": false,
+      "x-ticvai-derived": "onRead",
+      "description": "The wait the add-on would save at this stop, worked out on read from the expected wait."
      }
     }
    },
@@ -3650,6 +4193,111 @@
     "type": "string",
     "nullable": true,
     "maxLength": 200
+   }
+  }
+ },
+ "VisitPlanPreset": {
+  "type": "object",
+  "x-ticvai-persistence": "venuemap.visit_plan_preset",
+  "x-ticvai-unique-together": [
+   [
+    "scopePath",
+    "presetKey"
+   ]
+  ],
+  "description": "**A ready-made day plan a venue offers** (GST-052 Suggested Itineraries; R8 blocker GPS-C21, the lead's answer of 20 October 2026: venue-defined presets in a table, the six built-in ones as seed). Each venue starts with six rows seeded from the built-in `preset` keys (`highlights`, `family`, `thrillSeeker`, `waterDay`, `relaxed`, `showsAndDining`, `isBuiltIn` true, with TICVAI's wording); the venue may change their wording and contents, switch any off, and add its own. `generateVisitPlan` resolves `presetKey` against the active rows of the plan's venues (422 `unknown-preset` otherwise) and takes the interests, pace and must-include points from the row. The guest read of the planner options and the venue's write are operations of this contract (requested of the surface lane with this cause).",
+  "required": [
+   "id",
+   "presetKey",
+   "name",
+   "pace",
+   "isBuiltIn",
+   "isActive",
+   "sortOrder",
+   "scopePath"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "presetKey": {
+    "type": "string",
+    "maxLength": 64,
+    "pattern": "^[a-z][a-zA-Z0-9]*$",
+    "description": "The key `generateVisitPlan.presetKey` names. A built-in row keeps its built-in key."
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 120
+   },
+   "nameLocalised": {
+    "type": "object",
+    "nullable": true,
+    "additionalProperties": {
+     "type": "string"
+    }
+   },
+   "description": {
+    "type": "string",
+    "maxLength": 500,
+    "nullable": true
+   },
+   "descriptionLocalised": {
+    "type": "object",
+    "nullable": true,
+    "additionalProperties": {
+     "type": "string"
+    }
+   },
+   "pace": {
+    "type": "string",
+    "enum": [
+     "packed",
+     "balanced",
+     "relaxed"
+    ]
+   },
+   "interestTags": {
+    "type": "array",
+    "maxItems": 12,
+    "description": "The same closed list as `VenuePoint.interestTags`.",
+    "items": {
+     "type": "string"
+    }
+   },
+   "mustIncludePointIds": {
+    "type": "array",
+    "maxItems": 10,
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "isBuiltIn": {
+    "type": "boolean",
+    "readOnly": true,
+    "description": "True for the six seeded rows; a built-in row can be changed or switched off, never deleted."
+   },
+   "isActive": {
+    "type": "boolean",
+    "default": true
+   },
+   "sortOrder": {
+    "type": "integer",
+    "minimum": 0,
+    "description": "The order GST-052 lists the presets in."
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005): the venue the preset belongs to."
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
    }
   }
  },
@@ -3726,6 +4374,7 @@
     "type": "string",
     "enum": [
      "packed",
+     "balanced",
      "relaxed"
     ],
     "default": "relaxed"
@@ -3869,6 +4518,78 @@
        "type": "integer",
        "nullable": true,
        "description": "For `revertTo`, the earlier version to restore (undo)."
+      }
+     }
+    }
+   }
+  }
+ },
+ "VisitPlannerOptions": {
+  "type": "object",
+  "x-ticvai-persistence": "none — assembled on read from venuemap.visit_plan_preset, the published points and Promotions' bundles",
+  "description": "**What the visit planner offers at one venue** (`getVisitPlannerOptions`; R8 blocker GPS-C21).",
+  "required": [
+   "venueId",
+   "presets",
+   "interestTags",
+   "fastTrackBundles"
+  ],
+  "properties": {
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "presets": {
+    "type": "array",
+    "maxItems": 50,
+    "items": {
+     "$ref": "#/components/schemas/VisitPlanPreset"
+    }
+   },
+   "interestTags": {
+    "type": "array",
+    "maxItems": 50,
+    "description": "Per published park map of the venue, the interest tags its points carry.",
+    "items": {
+     "type": "object",
+     "required": [
+      "mapId",
+      "tags"
+     ],
+     "properties": {
+      "mapId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "mapName": {
+       "type": "string"
+      },
+      "tags": {
+       "type": "array",
+       "maxItems": 50,
+       "items": {
+        "type": "string"
+       }
+      }
+     }
+    }
+   },
+   "fastTrackBundles": {
+    "type": "array",
+    "maxItems": 50,
+    "items": {
+     "type": "object",
+     "required": [
+      "bundleId",
+      "name"
+     ],
+     "properties": {
+      "bundleId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "name": {
+       "type": "string"
       }
      }
     }

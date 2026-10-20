@@ -223,6 +223,11 @@
     "name": null,
     "in": null,
     "required": null
+   },
+   {
+    "name": "X-Order-Access-Token",
+    "in": "header",
+    "required": false
    }
   ],
   "requestBody": null,
@@ -609,6 +614,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
    {
     "name": null,
     "in": null,

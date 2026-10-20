@@ -322,6 +322,10 @@ a load balancer, PostgreSQL Multi-AZ, about $1,053 plus the GPU; Stage 2 the sha
 | Stage 2, the full cell (production) | 5,327.27 without zone HA, 8,295.04 with it | workbook |
 | Stage 0, reference only: 1 x D16s v5 + the GPU node | 1,161.43 | Retail API |
 
+**Pre-production is one environment** (the lead, 20 October 2026, r8 cause FOUNDATION-AI-C52, option B): one
+shared `staging` of the minimal pre-production shape above, in the Softlabs subscription; dev runs on laptops with
+docker compose and costs nothing here. So "Stage 1 in all" carries one pre-production line, not two.
+
 Chinmay's ~$1.9k was the servers, PostgreSQL and the GPU node alone ($1,885.77 above). ADR-0061's floors apply from
 Stage 2 (one replica per deployable at Stage 1); PostgreSQL stays zone-redundant at every stage (ADR-0060). The move
 to Stage 2: a paying venue needing ADR-0060's targets, traffic beyond Stage 1 sustained, a large on-sale booked, or

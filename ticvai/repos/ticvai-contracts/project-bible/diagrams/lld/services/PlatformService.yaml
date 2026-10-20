@@ -1,10 +1,10 @@
 id: LLD-PlatformService
-title: PlatformService — 229 operations, 109 tables
+title: PlatformService — 229 operations, 113 tables
 generatedBy: tools/derive-diagrams.py
 tier: platform
 deployable: operations
 index: diagrams/hld/02-services.yaml
-why: '**Three contracts, two schemas, 109 tables.** Subscription, platform operations and the public
+why: '**Three contracts, two schemas, 113 tables.** Subscription, platform operations and the public
   API all write `control.*` — **they are one bounded context that was split into three contracts for
   API-surface reasons, not for data reasons.**
 
@@ -21,12 +21,12 @@ coverage:
     unwalked rather than under-documented.'
 schemas:
 - schema: control
-  tables: 86
+  tables: 104
   stores:
   - postgres
   largestTable: control.partner_agreement
 - schema: subscription
-  tables: 23
+  tables: 9
   stores:
   - postgres
   largestTable: subscription.membership_product
@@ -80,15 +80,15 @@ operationsByContract:
     scope: platform
     permission: PLATFORM_BILLING_MANAGE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: addLicenceAddOn
     verb: POST
     path: /tenants/{tenantId}/licences/add-ons
     scope: tenant
     permission: PLATFORM_TENANT_MANAGE
     offline: false
-    reads: 2
+    reads: 4
     writes: 3
   - operation: approveBookingLimitCommercial
     verb: PUT
@@ -102,7 +102,7 @@ operationsByContract:
     verb: PUT
     path: /membership-product-validation
     scope: tenant
-    permission: PLATFORM_CELL_MANAGE
+    permission: MEMBERSHIP_MANAGE
     offline: false
     reads: 10
     writes: 4
@@ -168,8 +168,8 @@ operationsByContract:
     scope: tenant
     permission: PARTNER_MANAGE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: createPartnerUser
     verb: POST
     path: /partners/{partnerId}/users
@@ -208,7 +208,7 @@ operationsByContract:
     scope: tenant
     permission: PLATFORM_CELL_MANAGE
     offline: false
-    reads: 1
+    reads: 2
     writes: 2
   - operation: decommissionCell
     verb: POST
@@ -232,7 +232,7 @@ operationsByContract:
     scope: tenant
     permission: PLATFORM_CELL_MANAGE
     offline: false
-    reads: 1
+    reads: 2
     writes: 2
   - operation: executeTenantMigration
     verb: POST
@@ -320,7 +320,7 @@ operationsByContract:
     scope: tenant
     permission: PLATFORM_TENANT_VIEW
     offline: false
-    reads: 3
+    reads: 4
     writes: 0
   - operation: getGoLiveReadiness
     verb: GET
@@ -342,7 +342,7 @@ operationsByContract:
     verb: GET
     path: /membership-product-validation
     scope: tenant
-    permission: PLATFORM_CELL_MANAGE
+    permission: MEMBERSHIP_VIEW
     offline: false
     reads: 9
     writes: 0
@@ -392,7 +392,7 @@ operationsByContract:
     scope: tenant
     permission: PLATFORM_TENANT_VIEW
     offline: true
-    reads: 3
+    reads: 5
     writes: 0
   - operation: getUsageMetering
     verb: GET
@@ -486,7 +486,7 @@ operationsByContract:
     verb: GET
     path: /commercial-allocation-quota
     scope: tenant
-    permission: PLATFORM_TENANT_VIEW
+    permission: PARTNER_VIEW
     offline: false
     reads: 8
     writes: 0
@@ -494,7 +494,7 @@ operationsByContract:
     verb: GET
     path: /commission-calculation-settlement
     scope: tenant
-    permission: PLATFORM_TENANT_VIEW
+    permission: PARTNER_VIEW
     offline: false
     reads: 10
     writes: 0
@@ -502,7 +502,7 @@ operationsByContract:
     verb: GET
     path: /commission-margin-incentive
     scope: tenant
-    permission: PLATFORM_TENANT_VIEW
+    permission: PARTNER_VIEW
     offline: false
     reads: 6
     writes: 0
@@ -510,7 +510,7 @@ operationsByContract:
     verb: GET
     path: /credit-limit-exposure
     scope: tenant
-    permission: PLATFORM_TENANT_VIEW
+    permission: PARTNER_VIEW
     offline: false
     reads: 7
     writes: 0
@@ -526,7 +526,7 @@ operationsByContract:
     verb: GET
     path: /deposit-guarantee-financial
     scope: tenant
-    permission: PLATFORM_TENANT_VIEW
+    permission: PARTNER_VIEW
     offline: false
     reads: 4
     writes: 0
@@ -566,7 +566,7 @@ operationsByContract:
     verb: GET
     path: /membership-activation-credential
     scope: tenant
-    permission: PLATFORM_TENANT_VIEW
+    permission: MEMBERSHIP_VIEW
     offline: false
     reads: 5
     writes: 0
@@ -574,7 +574,7 @@ operationsByContract:
     verb: GET
     path: /membership-annual-pass
     scope: tenant
-    permission: PLATFORM_TENANT_VIEW
+    permission: MEMBERSHIP_VIEW
     offline: false
     reads: 8
     writes: 0
@@ -582,7 +582,7 @@ operationsByContract:
     verb: GET
     path: /membership-commercial-pricing
     scope: tenant
-    permission: PLATFORM_TENANT_VIEW
+    permission: MEMBERSHIP_VIEW
     offline: false
     reads: 4
     writes: 0
@@ -590,7 +590,7 @@ operationsByContract:
     verb: GET
     path: /membership-freeze-suspension
     scope: tenant
-    permission: PLATFORM_TENANT_VIEW
+    permission: MEMBERSHIP_VIEW
     offline: false
     reads: 3
     writes: 0
@@ -598,7 +598,7 @@ operationsByContract:
     verb: GET
     path: /membership-renewal-retention
     scope: tenant
-    permission: PLATFORM_TENANT_VIEW
+    permission: MEMBERSHIP_VIEW
     offline: false
     reads: 6
     writes: 0
@@ -606,7 +606,7 @@ operationsByContract:
     verb: GET
     path: /membership-upgrade-downgrade
     scope: tenant
-    permission: PLATFORM_TENANT_VIEW
+    permission: MEMBERSHIP_VIEW
     offline: false
     reads: 5
     writes: 0
@@ -614,7 +614,7 @@ operationsByContract:
     verb: GET
     path: /membership-usage-visit
     scope: tenant
-    permission: PLATFORM_TENANT_VIEW
+    permission: MEMBERSHIP_VIEW
     offline: false
     reads: 3
     writes: 0
@@ -646,7 +646,7 @@ operationsByContract:
     verb: GET
     path: /partner-access-role
     scope: tenant
-    permission: PLATFORM_TENANT_VIEW
+    permission: PARTNER_VIEW
     offline: false
     reads: 3
     writes: 0
@@ -734,7 +734,7 @@ operationsByContract:
     verb: GET
     path: /partner-reconciliation-exception
     scope: tenant
-    permission: PLATFORM_TENANT_VIEW
+    permission: PARTNER_VIEW
     offline: false
     reads: 10
     writes: 0
@@ -822,7 +822,7 @@ operationsByContract:
     verb: GET
     path: /territory-market-distribution
     scope: tenant
-    permission: PLATFORM_TENANT_VIEW
+    permission: PARTNER_VIEW
     offline: false
     reads: 3
     writes: 0
@@ -830,7 +830,7 @@ operationsByContract:
     verb: GET
     path: /venue-type-templates
     scope: tenant
-    permission: TENANT_VIEW
+    permission: TENANT_CONFIGURE
     offline: false
     reads: 1
     writes: 0
@@ -880,7 +880,7 @@ operationsByContract:
     scope: tenant
     permission: PLATFORM_CELL_MANAGE
     offline: false
-    reads: 1
+    reads: 2
     writes: 6
   - operation: recordInvoicePayment
     verb: POST
@@ -920,7 +920,7 @@ operationsByContract:
     scope: tenant
     permission: PLATFORM_CELL_MANAGE
     offline: false
-    reads: 3
+    reads: 4
     writes: 2
   - operation: resolveInvoiceDispute
     verb: POST
@@ -944,16 +944,16 @@ operationsByContract:
     scope: platform
     permission: PLATFORM_TENANT_MANAGE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: scoreVsiAssessment
     verb: POST
     path: /vsi-assessments
     scope: platform
     permission: PLATFORM_PLAN_MANAGE
     offline: false
-    reads: 0
-    writes: 1
+    reads: 1
+    writes: 2
   - operation: setAgreementContractTerm
     verb: PUT
     path: /agreement-contract-term
@@ -968,8 +968,8 @@ operationsByContract:
     scope: tenant
     permission: PLATFORM_BILLING_MANAGE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setChannelListing
     verb: PUT
     path: /channel-listings/{listingId}
@@ -992,21 +992,21 @@ operationsByContract:
     scope: platform
     permission: PLATFORM_PLAN_MANAGE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setLicensingModel
     verb: PUT
     path: /licensing-models/{licensingModelId}
     scope: platform
     permission: PLATFORM_PLAN_MANAGE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setMemberMembershipAccount
     verb: PUT
     path: /member-membership-account
     scope: tenant
-    permission: PLATFORM_CELL_MANAGE
+    permission: MEMBERSHIP_MANAGE
     offline: false
     reads: 6
     writes: 1
@@ -1014,7 +1014,7 @@ operationsByContract:
     verb: PUT
     path: /membership-commercial-config
     scope: tenant
-    permission: PLATFORM_CELL_MANAGE
+    permission: MEMBERSHIP_MANAGE
     offline: false
     reads: 4
     writes: 3
@@ -1022,7 +1022,7 @@ operationsByContract:
     verb: PUT
     path: /membership-eligibility-qualification
     scope: tenant
-    permission: PLATFORM_CELL_MANAGE
+    permission: MEMBERSHIP_MANAGE
     offline: false
     reads: 4
     writes: 3
@@ -1030,7 +1030,7 @@ operationsByContract:
     verb: PUT
     path: /membership-entitlement-admission
     scope: tenant
-    permission: PLATFORM_CELL_MANAGE
+    permission: MEMBERSHIP_MANAGE
     offline: false
     reads: 5
     writes: 2
@@ -1038,7 +1038,7 @@ operationsByContract:
     verb: PUT
     path: /membership-product-tier
     scope: tenant
-    permission: PLATFORM_CELL_MANAGE
+    permission: MEMBERSHIP_MANAGE
     offline: false
     reads: 3
     writes: 3
@@ -1046,7 +1046,7 @@ operationsByContract:
     verb: PUT
     path: /membership-usage-policy
     scope: tenant
-    permission: PLATFORM_CELL_MANAGE
+    permission: MEMBERSHIP_MANAGE
     offline: false
     reads: 3
     writes: 4
@@ -1056,8 +1056,8 @@ operationsByContract:
     scope: platform
     permission: PLATFORM_PLAN_MANAGE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setPartnerAllocations
     verb: PUT
     path: /partner-agreements/{agreementId}/allocations
@@ -1152,13 +1152,13 @@ operationsByContract:
     scope: tenant
     permission: PLATFORM_PLAN_MANAGE
     offline: false
-    reads: 2
-    writes: 2
+    reads: 3
+    writes: 3
   - operation: setRenewalAutoMembership
     verb: PUT
     path: /renewal-auto-membership
     scope: tenant
-    permission: PLATFORM_CELL_MANAGE
+    permission: MEMBERSHIP_MANAGE
     offline: false
     reads: 4
     writes: 2
@@ -1169,15 +1169,15 @@ operationsByContract:
     permission: PLATFORM_TENANT_MANAGE
     offline: false
     reads: 3
-    writes: 2
+    writes: 3
   - operation: setTrialConfiguration
     verb: PUT
     path: /trial-configurations/{trialConfigurationId}
     scope: platform
     permission: PLATFORM_PLAN_MANAGE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setValidityActivationExpiry
     verb: PUT
     path: /validity-activation-expiry
@@ -1192,8 +1192,8 @@ operationsByContract:
     scope: platform
     permission: PLATFORM_PLAN_MANAGE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: settleAiUsage
     verb: POST
     path: /ai-usage/settle
@@ -1214,7 +1214,7 @@ operationsByContract:
     verb: POST
     path: /onboarding-applications
     scope: tenant
-    permission: TENANT_VIEW
+    permission: TENANT_CONFIGURE
     offline: false
     reads: 5
     writes: 3
@@ -1240,7 +1240,7 @@ operationsByContract:
     scope: tenant
     permission: PLATFORM_CELL_MANAGE
     offline: false
-    reads: 2
+    reads: 3
     writes: 2
   - operation: updatePartnerAgreement
     verb: PATCH
@@ -1267,8 +1267,8 @@ operationsByContract:
     scope: tenant
     permission: PLATFORM_MIGRATION_APPLY
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: applyMigration
     verb: POST
     path: /migrations/apply
@@ -1283,7 +1283,7 @@ operationsByContract:
     scope: platform
     permission: PLATFORM_CELL_MANAGE
     offline: false
-    reads: 1
+    reads: 2
     writes: 3
   - operation: createRelease
     verb: POST
@@ -1299,16 +1299,16 @@ operationsByContract:
     scope: tenant
     permission: PLATFORM_RELEASE_VIEW
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: exportConfigPackage
     verb: POST
     path: /config-packages
     scope: tenant
     permission: PLATFORM_RELEASE_MANAGE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: getMigrationRun
     verb: GET
     path: /migrations/runs/{runId}
@@ -1507,7 +1507,7 @@ operationsByContract:
     scope: platform
     permission: PLATFORM_CELL_MANAGE
     offline: false
-    reads: 1
+    reads: 2
     writes: 2
   - operation: republishOutbox
     verb: POST
@@ -1515,7 +1515,7 @@ operationsByContract:
     scope: platform
     permission: PLATFORM_CELL_MANAGE
     offline: false
-    reads: 2
+    reads: 3
     writes: 3
   - operation: rollbackMigrationRun
     verb: POST
@@ -1547,16 +1547,16 @@ operationsByContract:
     scope: region
     permission: PLATFORM_CELL_MANAGE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setWafPolicy
     verb: PUT
     path: /waf-policies/{wafRuleId}
     scope: region
     permission: PLATFORM_CELL_MANAGE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: skipRolloutCell
     verb: POST
     path: /rollouts/{rolloutId}/cells/{cellId}/skip
@@ -1654,8 +1654,8 @@ operationsByContract:
     scope: tenant
     permission: DEVELOPER_VIEW
     offline: false
-    reads: 2
-    writes: 0
+    reads: 3
+    writes: 1
   - operation: listApiAnomalies
     verb: GET
     path: /api-anomalies
@@ -1700,15 +1700,15 @@ operationsByContract:
     verb: GET
     path: /api-scopes
     scope: tenant
-    permission: DEVELOPER_VIEW
+    permission: null
     offline: false
-    reads: 1
+    reads: 2
     writes: 0
   - operation: listApiVersions
     verb: GET
     path: /api-versions
     scope: tenant
-    permission: DEVELOPER_VIEW
+    permission: null
     offline: false
     reads: 1
     writes: 0
@@ -1807,7 +1807,7 @@ operationsByContract:
     permission: DEVELOPER_MANAGE
     offline: false
     reads: 2
-    writes: 1
+    writes: 2
   - operation: rotateApiCredential
     verb: POST
     path: /api-clients/{clientId}/credentials
@@ -1830,8 +1830,8 @@ operationsByContract:
     scope: tenant
     permission: DEVELOPER_MANAGE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setApiLicensing
     verb: PUT
     path: /api-licensing/{licenceId}
@@ -1870,8 +1870,8 @@ operationsByContract:
     scope: tenant
     permission: DEVELOPER_MANAGE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
 tables:
 - store: cache:idempotency
   kind: cache
@@ -1890,7 +1890,9 @@ tables:
   - actOnPartnerCommissionLine
   - actOnPartnerReconciliationException
   - actOnPartnerSettlementBatch
+  - addCapacityPack
   - addLicenceAddOn
+  - applyConfigPackage
   - applyMigration
   - approveBookingLimitCommercial
   - approveMembershipProductValidation
@@ -1904,6 +1906,7 @@ tables:
   - createPartnerAgreement
   - createPartnerCase
   - createPartnerChangeRequest
+  - createPartnerQuote
   - createPartnerUser
   - createPlan
   - createPlanVersion
@@ -1915,11 +1918,14 @@ tables:
   - decommissionBurstEnvironment
   - decommissionCell
   - deprecateApiVersion
+  - diffConfigPackage
   - disputeInvoice
   - drainBurstEnvironment
   - executeTenantMigration
+  - exportConfigPackage
   - exportPartnerInvoice
   - generateInvoice
+  - issueApiToken
   - issueCreditNote
   - launchCellCluster
   - pauseRollout
@@ -1945,24 +1951,32 @@ tables:
   - requestProductionAccess
   - resetSandbox
   - resolveInvoiceDispute
+  - revokeApiCredential
   - rollbackMigrationRun
   - rollbackRollout
   - rollbackTenantMigration
   - rotateApiCredential
+  - runGoLiveValidation
   - scheduleTenantUpgrade
+  - scoreVsiAssessment
   - setAgreementContractTerm
   - setApiAnomalyRule
+  - setApiClientStatus
   - setApiLicensing
   - setApiQuota
+  - setBillingEntity
   - setChannelListing
   - setDeveloperMembers
   - setFamilyHouseholdDependent
+  - setLicenceEnforcementPolicy
+  - setLicensingModel
   - setMemberMembershipAccount
   - setMembershipCommercialConfig
   - setMembershipEligibilityQualification
   - setMembershipEntitlementAdmission
   - setMembershipProductTier
   - setMembershipUsagePolicy
+  - setModuleListing
   - setPartnerAllocations
   - setPartnerBrandVenue
   - setPartnerCapabilityGrants
@@ -1974,9 +1988,14 @@ tables:
   - setPartnerRateNet
   - setPartnerSecurity
   - setPaymentTermBilling
+  - setPlanTiers
   - setRenewalAutoMembership
+  - setScalingPolicy
   - setSubscription
+  - setTrialConfiguration
   - setValidityActivationExpiry
+  - setVsiModel
+  - setWafPolicy
   - settleAiUsage
   - simulateCommercialPackage
   - skipRolloutCell
@@ -1985,6 +2004,7 @@ tables:
   - submitOnboardingApplication
   - suspendTenant
   - terminateTenant
+  - testWebhookSubscription
   - updateCellTier
   - updatePartnerAgreement
   - updateTenant
@@ -1995,19 +2015,23 @@ tables:
   - actOnPartnerCommissionLine
   - actOnPartnerReconciliationException
   - actOnPartnerSettlementBatch
+  - addCapacityPack
   - addLicenceAddOn
+  - applyConfigPackage
   - applyMigration
   - approveBookingLimitCommercial
   - approveMembershipProductValidation
   - approvePartnerStatuLifecycle
   - cancelDecommission
   - cancelInvoice
+  - cancelOutboxRepublish
   - cancelSubscription
   - certifyIntegration
   - createApiClient
   - createPartnerAgreement
   - createPartnerCase
   - createPartnerChangeRequest
+  - createPartnerQuote
   - createPartnerUser
   - createPlan
   - createPlanVersion
@@ -2016,12 +2040,17 @@ tables:
   - createTenant
   - createWebhookSubscription
   - decideProductionAccess
+  - decommissionBurstEnvironment
   - decommissionCell
   - deprecateApiVersion
+  - diffConfigPackage
   - disputeInvoice
+  - drainBurstEnvironment
   - executeTenantMigration
+  - exportConfigPackage
   - exportPartnerInvoice
   - generateInvoice
+  - issueApiToken
   - issueCreditNote
   - launchCellCluster
   - pauseRollout
@@ -2032,6 +2061,7 @@ tables:
   - provisionCell
   - publishSupportNotice
   - reactivateTenant
+  - reconcileBurstEnvironment
   - recordInvoicePayment
   - recordUsage
   - registerDeveloper
@@ -2039,7 +2069,10 @@ tables:
   - registerPartner
   - rejectRelease
   - removeLicenceAddOn
+  - replayDeadLetter
   - replayEvents
+  - republishOutbox
+  - requestBurstEnvironment
   - requestProductionAccess
   - resetSandbox
   - resolveInvoiceDispute
@@ -2048,20 +2081,27 @@ tables:
   - rollbackRollout
   - rollbackTenantMigration
   - rotateApiCredential
+  - runGoLiveValidation
   - scheduleTenantUpgrade
+  - scoreVsiAssessment
   - setAgreementContractTerm
   - setApiAnomalyRule
+  - setApiClientStatus
   - setApiLicensing
   - setApiQuota
+  - setBillingEntity
   - setChannelListing
   - setDeveloperMembers
   - setFamilyHouseholdDependent
+  - setLicenceEnforcementPolicy
+  - setLicensingModel
   - setMemberMembershipAccount
   - setMembershipCommercialConfig
   - setMembershipEligibilityQualification
   - setMembershipEntitlementAdmission
   - setMembershipProductTier
   - setMembershipUsagePolicy
+  - setModuleListing
   - setPartnerAllocations
   - setPartnerBrandVenue
   - setPartnerCapabilityGrants
@@ -2073,9 +2113,14 @@ tables:
   - setPartnerRateNet
   - setPartnerSecurity
   - setPaymentTermBilling
+  - setPlanTiers
   - setRenewalAutoMembership
+  - setScalingPolicy
   - setSubscription
+  - setTrialConfiguration
   - setValidityActivationExpiry
+  - setVsiModel
+  - setWafPolicy
   - settleAiUsage
   - simulateCommercialPackage
   - skipRolloutCell
@@ -2084,6 +2129,7 @@ tables:
   - submitOnboardingApplication
   - suspendTenant
   - terminateTenant
+  - testWebhookSubscription
   - updateCellTier
   - updatePartnerAgreement
   - updateTenant
@@ -2134,6 +2180,18 @@ tables:
       bump: INCR resver:{tenantId}:{resolver}
       affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
         its ancestors and every descendant that inherits from it re-resolve on their next read'
+- store: release:api-scopes
+  kind: vector
+  columns: 0
+  backing: redis
+  owned: false
+  why: '**Not a table and not owned by a service.** Derived from something already read, losable without
+    consequence — no migration, no backup, no owner.'
+  key: null
+  eviction: null
+  writtenBy: null
+  readBy:
+  - listApiScopes
 - table: control.api_anomaly
   columns: 9
   store: postgres
@@ -2181,6 +2239,12 @@ tables:
   parent: null
   writtenBy: []
   foreignWriters: null
+- table: control.audit_record
+  columns: 7
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
 - table: control.backup_run
   columns: 9
   store: postgres
@@ -2201,6 +2265,13 @@ tables:
   writtenBy:
   - subscription
   foreignWriters: null
+- table: control.capacity_pack
+  columns: 10
+  store: postgres
+  parent: null
+  writtenBy:
+  - subscription
+  foreignWriters: null
 - table: control.cell
   columns: 20
   store: postgres
@@ -2215,6 +2286,12 @@ tables:
   writtenBy:
   - subscription
   foreignWriters: null
+- table: control.cell_endpoint
+  columns: 11
+  store: postgres
+  parent: control.cell
+  writtenBy: []
+  foreignWriters: null
 - table: control.cell_instance
   columns: 9
   store: postgres
@@ -2223,14 +2300,14 @@ tables:
   - subscription
   foreignWriters: null
 - table: control.cell_job
-  columns: 10
+  columns: 11
   store: postgres
   parent: control.cell
   writtenBy:
   - subscription
   foreignWriters: null
 - table: control.cell_tenant
-  columns: 10
+  columns: 11
   store: postgres
   parent: control.cell
   writtenBy:
@@ -2264,14 +2341,13 @@ tables:
   writtenBy:
   - platform-ops
   foreignWriters: null
-- table: control.content_block
+- table: control.contract
   columns: 12
   store: postgres
   parent: null
   writtenBy:
-  - white-label
-  foreignWriters:
-  - white-label
+  - subscription
+  foreignWriters: null
 - table: control.credit_note
   columns: 13
   store: postgres
@@ -2300,12 +2376,32 @@ tables:
   writtenBy:
   - public-api
   foreignWriters: null
+- table: control.enforcement_policy
+  columns: 4
+  store: postgres
+  parent: null
+  writtenBy:
+  - subscription
+  foreignWriters: null
 - table: control.environment
   columns: 9
   store: postgres
   parent: null
   writtenBy:
   - platform-ops
+  foreignWriters: null
+- table: control.go_live_readiness
+  columns: 9
+  store: postgres
+  parent: null
+  writtenBy:
+  - subscription
+  foreignWriters: null
+- table: control.idempotency_record
+  columns: 10
+  store: postgres
+  parent: null
+  writtenBy: []
   foreignWriters: null
 - table: control.integration_listing
   columns: 12
@@ -2339,6 +2435,13 @@ tables:
   columns: 6
   store: postgres
   parent: control.licence_add_on
+  writtenBy:
+  - subscription
+  foreignWriters: null
+- table: control.licensing_model
+  columns: 13
+  store: postgres
+  parent: null
   writtenBy:
   - subscription
   foreignWriters: null
@@ -2381,8 +2484,22 @@ tables:
   parent: control.migration_run
   writtenBy: []
   foreignWriters: null
+- table: control.module_listing
+  columns: 15
+  store: postgres
+  parent: null
+  writtenBy:
+  - subscription
+  foreignWriters: null
 - table: control.onboarding_application
   columns: 12
+  store: postgres
+  parent: null
+  writtenBy:
+  - subscription
+  foreignWriters: null
+- table: control.outbox
+  columns: 15
   store: postgres
   parent: null
   writtenBy:
@@ -2589,6 +2706,27 @@ tables:
   writtenBy:
   - subscription
   foreignWriters: null
+- table: control.plan
+  columns: 16
+  store: postgres
+  parent: null
+  writtenBy:
+  - subscription
+  foreignWriters: null
+- table: control.plan_limit
+  columns: 7
+  store: postgres
+  parent: control.plan
+  writtenBy:
+  - subscription
+  foreignWriters: null
+- table: control.plan_module
+  columns: 4
+  store: postgres
+  parent: control.plan
+  writtenBy:
+  - subscription
+  foreignWriters: null
 - table: control.production_access_request
   columns: 14
   store: postgres
@@ -2597,7 +2735,7 @@ tables:
   - public-api
   foreignWriters: null
 - table: control.release
-  columns: 12
+  columns: 11
   store: postgres
   parent: null
   writtenBy:
@@ -2660,7 +2798,7 @@ tables:
   - platform-ops
   foreignWriters: null
 - table: control.tenant
-  columns: 23
+  columns: 24
   store: postgres
   parent: null
   writtenBy:
@@ -2685,6 +2823,27 @@ tables:
   columns: 14
   store: postgres
   parent: control.tenant
+  writtenBy:
+  - subscription
+  foreignWriters: null
+- table: control.tier_allowance
+  columns: 11
+  store: postgres
+  parent: null
+  writtenBy:
+  - subscription
+  foreignWriters: null
+- table: control.tier_module
+  columns: 9
+  store: postgres
+  parent: null
+  writtenBy:
+  - subscription
+  foreignWriters: null
+- table: control.trial_config
+  columns: 10
+  store: postgres
+  parent: null
   writtenBy:
   - subscription
   foreignWriters: null
@@ -2716,6 +2875,20 @@ tables:
   parent: null
   writtenBy: []
   foreignWriters: null
+- table: control.vsi_assessment
+  columns: 7
+  store: postgres
+  parent: null
+  writtenBy:
+  - subscription
+  foreignWriters: null
+- table: control.vsi_model
+  columns: 5
+  store: postgres
+  parent: null
+  writtenBy:
+  - subscription
+  foreignWriters: null
 - table: control.waf_rule
   columns: 9
   store: postgres
@@ -2724,7 +2897,14 @@ tables:
   - platform-ops
   foreignWriters: null
 - table: control.webhook_delivery
-  columns: 11
+  columns: 12
+  store: postgres
+  parent: null
+  writtenBy:
+  - public-api
+  foreignWriters: null
+- table: control.webhook_replay
+  columns: 9
   store: postgres
   parent: null
   writtenBy:
@@ -2736,41 +2916,6 @@ tables:
   parent: null
   writtenBy:
   - public-api
-  foreignWriters: null
-- table: subscription.capacity_pack
-  columns: 10
-  store: postgres
-  parent: null
-  writtenBy:
-  - subscription
-  foreignWriters: null
-- table: subscription.contract
-  columns: 12
-  store: postgres
-  parent: platform.tenant
-  writtenBy:
-  - subscription
-  foreignWriters: null
-- table: subscription.enforcement_policy
-  columns: 4
-  store: postgres
-  parent: null
-  writtenBy:
-  - subscription
-  foreignWriters: null
-- table: subscription.go_live_readiness
-  columns: 9
-  store: postgres
-  parent: platform.tenant
-  writtenBy:
-  - subscription
-  foreignWriters: null
-- table: subscription.licensing_model
-  columns: 13
-  store: postgres
-  parent: null
-  writtenBy:
-  - subscription
   foreignWriters: null
 - table: subscription.membership_eligibility_rule
   columns: 8
@@ -2828,71 +2973,8 @@ tables:
   writtenBy:
   - subscription
   foreignWriters: null
-- table: subscription.module_listing
-  columns: 15
-  store: postgres
-  parent: null
-  writtenBy:
-  - subscription
-  foreignWriters: null
 - table: subscription.partner_quote
   columns: 7
-  store: postgres
-  parent: null
-  writtenBy:
-  - subscription
-  foreignWriters: null
-- table: subscription.plan
-  columns: 16
-  store: postgres
-  parent: null
-  writtenBy:
-  - subscription
-  foreignWriters: null
-- table: subscription.plan_limit
-  columns: 6
-  store: postgres
-  parent: subscription.plan
-  writtenBy:
-  - subscription
-  foreignWriters: null
-- table: subscription.plan_module
-  columns: 3
-  store: postgres
-  parent: subscription.plan
-  writtenBy:
-  - subscription
-  foreignWriters: null
-- table: subscription.tier_allowance
-  columns: 10
-  store: postgres
-  parent: null
-  writtenBy:
-  - subscription
-  foreignWriters: null
-- table: subscription.tier_module
-  columns: 8
-  store: postgres
-  parent: null
-  writtenBy:
-  - subscription
-  foreignWriters: null
-- table: subscription.trial_config
-  columns: 10
-  store: postgres
-  parent: null
-  writtenBy:
-  - subscription
-  foreignWriters: null
-- table: subscription.vsi_assessment
-  columns: 7
-  store: postgres
-  parent: null
-  writtenBy:
-  - subscription
-  foreignWriters: null
-- table: subscription.vsi_model
-  columns: 5
   store: postgres
   parent: null
   writtenBy:
@@ -2904,18 +2986,18 @@ readsFrom:
 - service: OrderService
   operations: 32
 - service: TenancyService
-  operations: 25
+  operations: 24
 - service: LedgerService
   operations: 14
 - service: AccessService
-  operations: 13
+  operations: 12
 - service: IdentityService
   operations: 12
 - service: AiService
   operations: 2
 writesOutside:
 - service: TenancyService
-  operations: 19
+  operations: 20
   rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
     published.'
   why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
@@ -2946,6 +3028,9 @@ writesOutside:
   - operation: decommissionBurstEnvironment
     tables:
     - platform.outbox
+  - operation: reactivateTenant
+    tables:
+    - approvals.request
   - operation: reconcileBurstEnvironment
     tables:
     - platform.outbox
@@ -2978,7 +3063,7 @@ writesOutside:
     - approvals.request
   - operation: suspendTenant
     tables:
-    - platform.outbox
+    - approvals.request
 - service: CrossRegionService
   operations: 1
   rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
@@ -3332,11 +3417,9 @@ screens:
 - P17:SGN-015 Module Detail & Commercial Treatment
 - P17:SGN-016 Module Dependency & Compatibility Manager
 - P17:SGN-017 Add-Ons, Capacity & Commercial Options
-- P17:SGN-019 Contract & Billing Cycle Selection
 - P17:SGN-020 Billing & Legal Entity Information
 - P17:SGN-022 Order & Commercial Pricing Review
 - P17:SGN-023 Commercial Agreement, Billable Definition & Customer Acceptance
-- P17:SGN-024 Subscription Confirmation & Commercial Activation
 flows:
 - F04 Platform admin ships a release
 - F105 A rate limit is set and a developer hits it

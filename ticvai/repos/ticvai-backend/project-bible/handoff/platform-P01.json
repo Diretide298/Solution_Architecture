@@ -7,15 +7,15 @@
  "audience": "guest",
  "formFactor": "web",
  "offlineCapable": false,
- "generated": "2026-10-18",
+ "generated": "2026-10-20",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 50,
-  "operations": 201,
+  "operations": 204,
   "contracts": 19,
   "modules": 14,
   "undrawn": 0,
-  "operationsWithNoScreen": 19
+  "operationsWithNoScreen": 22
  },
  "waves": {
   "wave1": 50
@@ -127,7 +127,7 @@
   },
   {
    "contract": "orders",
-   "operations": 32
+   "operations": 35
   },
   {
    "contract": "identity",
@@ -150,16 +150,12 @@
    "operations": 10
   },
   {
+   "contract": "venue-map",
+   "operations": 9
+  },
+  {
    "contract": "white-label",
    "operations": 8
-  },
-  {
-   "contract": "venue-map",
-   "operations": 8
-  },
-  {
-   "contract": "resources",
-   "operations": 7
   },
   {
    "contract": "ai",
@@ -167,6 +163,10 @@
   },
   {
    "contract": "finance",
+   "operations": 6
+  },
+  {
+   "contract": "resources",
    "operations": 6
   },
   {
@@ -232,7 +232,7 @@
    "module": "Discovery & Browse",
    "wave": 1,
    "route": "/discovery-and-browse/event-attraction-detail",
-   "operations": 5,
+   "operations": 6,
    "drawn": true
   },
   {
@@ -250,7 +250,7 @@
    "module": "Booking & Selection",
    "wave": 1,
    "route": "/booking-and-selection/date-and-session-selection",
-   "operations": 10,
+   "operations": 12,
    "drawn": true
   },
   {
@@ -259,7 +259,7 @@
    "module": "Booking & Selection",
    "wave": 1,
    "route": "/booking-and-selection/seat-map-selection",
-   "operations": 6,
+   "operations": 7,
    "drawn": true
   },
   {
@@ -367,7 +367,7 @@
    "module": "Account & Self-Service",
    "wave": 1,
    "route": "/account-and-self-service/order-history",
-   "operations": 8,
+   "operations": 9,
    "drawn": true
   },
   {
@@ -385,7 +385,7 @@
    "module": "Membership, Loyalty & Value",
    "wave": 1,
    "route": "/membership-loyalty-and-value/wallet-and-gift-cards",
-   "operations": 7,
+   "operations": 9,
    "drawn": true
   },
   {
@@ -466,7 +466,7 @@
    "module": "Ticketing",
    "wave": 1,
    "route": "/ticket-transfer",
-   "operations": 3,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -475,7 +475,7 @@
    "module": "Ticketing",
    "wave": 1,
    "route": "/my-reservations",
-   "operations": 10,
+   "operations": 11,
    "drawn": true
   },
   {
@@ -628,7 +628,7 @@
    "module": "Booking & Selection",
    "wave": 1,
    "route": "/booking-and-selection/space-by-the-hour",
-   "operations": 4,
+   "operations": 5,
    "drawn": true
   },
   {
@@ -646,18 +646,12 @@
    "module": "Discovery & Browse",
    "wave": 1,
    "route": "/plan-your-visit",
-   "operations": 7,
+   "operations": 8,
    "drawn": true
   }
  ],
  "gaps": {
   "operationsWithNoScreen": [
-   {
-    "operation": "createParkingEntitlement",
-    "contract": "access",
-    "verb": "POST",
-    "summary": "A guest bought parking"
-   },
    {
     "operation": "getPlanBenefits",
     "contract": "catalogue",
@@ -743,10 +737,34 @@
     "summary": "Store a guest photo, ID or signed document"
    },
    {
+    "operation": "convertToTermProduct",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "Turn a visit into a membership or season pass"
+   },
+   {
     "operation": "revokeEntitlementShare",
     "contract": "orders",
     "verb": "POST",
     "summary": "Take back a share"
+   },
+   {
+    "operation": "revokePaymentToken",
+    "contract": "orders",
+    "verb": "DELETE",
+    "summary": "Remove a saved payment method"
+   },
+   {
+    "operation": "getCouponCode",
+    "contract": "promotions",
+    "verb": "GET",
+    "summary": "Look up a code"
+   },
+   {
+    "operation": "getRecommendations",
+    "contract": "promotions",
+    "verb": "POST",
+    "summary": "What else this guest might want"
    },
    {
     "operation": "getUpsellSuggestions",

@@ -40,6 +40,16 @@ import sys
 
 import yaml
 
+
+def _yload(src):
+    """YAML with the C loader, the pure one where a file defeats it (20 October 2026, CHG-R8GEN-016): the screen files
+    are 25 MB and the pure loader took most of each refresh step's minute; the loaded data is the same."""
+    text = src.read() if hasattr(src, "read") else src
+    try:
+        return yaml.load(text, Loader=getattr(yaml, "CSafeLoader", yaml.SafeLoader))
+    except Exception:
+        return yaml.safe_load(text)
+
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 FLOWS = ROOT / "flows"
 
@@ -85,7 +95,7 @@ def slug(text: str) -> str:
 def load():
     screens, board, plat_of = {}, {}, {}
     for f in sorted((ROOT / "screens").glob("P*.yaml")):
-        doc = yaml.safe_load(f.read_text(encoding="utf-8")) or {}
+        doc = _yload(f.read_text(encoding="utf-8")) or {}
         code = f.name.split("-")[0]
         pl = doc.get("platform") or {}
         for sc in (doc.get("screens") or []):
@@ -239,7 +249,7 @@ def main() -> int:
         if m:
             used.add(int(m.group(1)))
         text = f.read_text(encoding="utf-8")
-        doc = yaml.safe_load(text) or {}
+        doc = _yload(text) or {}
         # A board an authored flow already reaches is left alone.
         if not str(doc.get("provenance", "")).startswith("derived"):
             # Four digits since 19 September — P08 passed 999 screens.

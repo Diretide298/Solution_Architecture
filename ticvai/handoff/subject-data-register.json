@@ -25,6 +25,8 @@
    "tables": [
     "ai.activity",
     "ai.answer_feedback",
+    "ai.chunk_embedding",
+    "ai.conversation",
     "ai.index_entry",
     "ai.rec_decision",
     "ai.rec_decline",
@@ -69,11 +71,15 @@
     "identity.guest_credential",
     "identity.guest_identity_verification",
     "identity.guest_session",
+    "identity.mfa_challenge",
+    "identity.mfa_method",
+    "identity.mfa_recovery_code",
     "identity.otp_challenge",
     "identity.subject_holding",
     "pii.subject_biometric",
     "pii.subject_contact",
-    "pii.subject_document"
+    "pii.subject_document",
+    "pii.subject_identity"
    ],
    "query": null,
    "asked": true
@@ -180,6 +186,7 @@
     "transport"
    ],
    "tables": [
+    "assets.guest_upload",
     "games.card",
     "maintenance.incident_involved_party",
     "queue.entry",

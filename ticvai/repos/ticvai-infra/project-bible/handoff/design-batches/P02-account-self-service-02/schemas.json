@@ -147,7 +147,7 @@
  "BrandIdentity": {
   "x-ticvai-persistence": "none — embedded in tenant_config",
   "type": "object",
-  "description": "Every `*AssetRef` here is a `MediaAsset` id from the `assets` library (`createUpload` then `completeUpload`), PNG or SVG and at most 2 MB (decided 28 September, audit R270).\n",
+  "description": "Every `*AssetRef` here is a `MediaAsset` id from the `assets` library (`createUpload` then `completeUpload`). The image fields are PNG or SVG and at most 2 MB (decided 28 September, audit R270); `introVideoAssetRef` is a video asset within the library's limit for kind `video` (`assets.createUpload`).\n",
   "required": [
    "logoAssetRef"
   ],
@@ -241,8 +241,11 @@
    "profiling",
    "thirdPartySharing",
    "aiProcessing",
-   "transactional"
-  ]
+   "transactional",
+   "storedPaymentCredential",
+   "facePassEnrolment"
+  ],
+  "description": "`storedPaymentCredential` (a card saved for later, `storePaymentToken`) and `facePassEnrolment` (a face enrolled for entry, `enrolFacePass`) are purposes of their own (R8 blocker ORDERS-MONEY-C21, CHG-R8MIG-022), so a screen picks the row by its purpose instead of guessing: each tenant has one `marketing.consent_purpose` row of each, seeded with the tenant's other purposes."
  },
  "ConsentPurposeConfig": {
   "x-ticvai-rls": "grant-holder-read",
@@ -255,6 +258,12 @@
    "isRequiredForService"
   ],
   "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "The purpose row's id (`marketing.consent_purpose.id`), the value `consentPurposeId` and a consent's `purposeId` carry (R8 blocker ORDERS-MONEY-C21, CHG-R8MIG-022)."
+   },
    "purpose": {
     "$ref": "#/components/schemas/ConsentPurpose"
    },
@@ -310,6 +319,21 @@
  },
  "DelegatedAccess": {
   "x-ticvai-persistence": "identity.delegated_access",
+  "x-ticvai-exactly-one-of": [
+   [
+    "permission",
+    "roleId"
+   ]
+  ],
+  "x-ticvai-rls": "scope-or-subject",
+  "x-ticvai-required-when": {
+   "grantedByPrincipalId": {
+    "grantedByKind": "principal"
+   },
+   "grantedBySubjectId": {
+    "grantedByKind": "subject"
+   }
+  },
   "type": "object",
   "required": [
    "id",
@@ -318,6 +342,33 @@
    "effect"
   ],
   "properties": {
+   "grantedByKind": {
+    "type": "string",
+    "enum": [
+     "principal",
+     "subject",
+     "system"
+    ],
+    "default": "principal",
+    "readOnly": true,
+    "description": "Who made the grant (CHG-R8MIG-021). `system` is the SSO callback's group-to-role grant."
+   },
+   "grantedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-references": "identity.principal",
+    "description": "The staff member who made the grant; set when `grantedByKind` is `principal`."
+   },
+   "grantedBySubjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-references": "pii.subject",
+    "description": "The guest who made the grant (the account holder); set when `grantedByKind` is `subject`."
+   },
    "id": {
     "type": "string",
     "format": "uuid"
@@ -330,11 +381,13 @@
    "roleId": {
     "type": "string",
     "format": "uuid",
-    "nullable": true
+    "nullable": true,
+    "description": "The role this grant gives, with its own and inherited permissions. **Exactly one of `roleId` and `permission` is set** (ADAM CR-158; CHG-CRA-002): a role grant carries no permission."
    },
    "permission": {
     "type": "string",
-    "description": "From the permission enum. `*` permitted on DENY only."
+    "nullable": true,
+    "description": "From the permission enum. `*` permitted on DENY only. **Null on a role grant** (ADAM CR-158, 18 October 2026; CHG-CRA-002): a grant names exactly one of a permission or a role (`roleId`), so a role grant stores `role_id` and no permission. Nullable in responses since then, a breaking change approved by the lead (BC-370)."
    },
    "subjectId": {
     "type": "string",
@@ -347,6 +400,20 @@
     "format": "uuid",
     "nullable": true,
     "description": "Whose behalf. **Null for a staff grant, which is the existing behaviour** — every grant written before 18 August means exactly what it meant before.\n"
+   },
+   "overSubjectName": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "The display name of the guest acted for (`pii.subject.display_name`), read with the grant; null for a staff grant. Not stored (R8 blocker ORDERS-MONEY-C20, CHG-R8MIG-009)."
+   },
+   "overSubjectIsMinor": {
+    "type": "boolean",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "Whether the guest acted for is under the region's `RegionSettings.minorAgeThreshold` today, computed from their date of birth, which is never returned; null when no date of birth is held. Not stored (CHG-R8MIG-009)."
    },
    "overObjectRef": {
     "type": "string",
@@ -450,6 +517,33 @@
     "type": "string",
     "format": "uuid"
    },
+   "productName": {
+    "type": "string",
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "**Read with the entitlement, not stored on it** (R8 blocker ORDERS-MONEY-C20, CHG-R8MIG-009), as `TicketStatus.productName`: the product's name from `catalogue.product` (catalogue#productRecords), in the caller's language. The ticket card shows it."
+   },
+   "venueName": {
+    "type": "string",
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "The venue's name, read from `platform.scope` by `venueId`; not stored."
+   },
+   "imageUrl": {
+    "type": "string",
+    "format": "uri",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "The product's primary image (`catalogue.product_media`), read with the entitlement; null when the product has none. Not stored."
+   },
+   "guestCategory": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "The guest category of the order line it was issued for (adult, child, ...), from the line's variant (catalogue#productRecords); null for an entitlement no order line issued. Not stored."
+   },
    "orderId": {
     "type": "string",
     "format": "uuid",
@@ -458,7 +552,8 @@
    },
    "orderLineId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "description": "The order line it was issued for; the ticket list groups cards by it (CHG-R8MIG-009)."
    },
    "subjectId": {
     "type": "string",
@@ -817,7 +912,7 @@
  "FooterConfig": {
   "type": "object",
   "x-ticvai-persistence": "whitelabel.footer_config + whitelabel.footer_config_column + whitelabel.footer_config_social_link",
-  "description": "BL-002. **`setHeader` and `HeaderConfig` exist and the footer does not**, which looked like symmetry until you notice it is not: **a header is chrome and a footer is a link surface.**\nA footer carries the legal links — terms, privacy, accessibility statement, cookie preferences — and **those are the ones a regulator checks.** Treating it as a mirror of the header would have given it a logo and no way to reach a privacy notice.\n**Where it is stored.** `legalLinks` and `copyrightText` are columns of `whitelabel.footer_config`; each entry of `columns` is a `whitelabel.footer_config_column` row and each entry of `socialLinks` a `whitelabel.footer_config_social_link` row. Part of the working draft (see the header). **In the tenant's own database, not the control plane (decided 28 September, audit R163)**: it moved from `control.footer_config` (renamed `whitelabel.footer_config`) and its two child tables.\n",
+  "description": "BL-002. **`setHeader` and `HeaderConfig` exist and the footer does not**, which looked like symmetry until you notice it is not: **a header is chrome and a footer is a link surface.**\nA footer carries the legal links — terms, privacy, accessibility statement, cookie preferences — and **those are the ones a regulator checks.** Treating it as a mirror of the header would have given it a logo and no way to reach a privacy notice.\n**Where it is stored.** `legalLinks` and `copyrightText` are columns of `whitelabel.footer_config`; each entry of `columns` is a `whitelabel.footer_config_column` row and each entry of `socialLinks` a `whitelabel.footer_config_social_link` row. Part of the working draft (see the header). **In the tenant's own database, not the control plane (decided 28 September, audit R163)**: it moved from `control.footer_config` (renamed `whitelabel.footer_config`) and its two child tables.\n**Links and order** (R8 blocker WHITE-C24 and IDENTITY-C60): a column's `links` are stored with the column, as one jsonb value in their array order; each column and each social link keeps its `sortOrder`, which `setFooter` writes from its position in the array (0 first), and every read returns `columns` and `socialLinks` ordered by it.\n",
   "required": [
    "id",
    "scopePath"
@@ -841,8 +936,16 @@
       "heading": {
        "type": "string"
       },
+      "sortOrder": {
+       "type": "integer",
+       "readOnly": true,
+       "description": "The column's position, written by `setFooter` from the array order (R8 blocker IDENTITY-C60)."
+      },
       "links": {
        "type": "array",
+       "x-ticvai-persistence-column": "jsonb",
+       "x-ticvai-persistence-kind": "valueObject",
+       "description": "The column's links in display order, stored on the column row as one value (R8 blocker WHITE-C24).",
        "items": {
         "type": "object",
         "properties": {
@@ -895,6 +998,11 @@
       },
       "url": {
        "type": "string"
+      },
+      "sortOrder": {
+       "type": "integer",
+       "readOnly": true,
+       "description": "The link's position, written by `setFooter` from the array order (R8 blocker IDENTITY-C60)."
       }
      }
     }
@@ -902,7 +1010,7 @@
   }
  },
  "GiftCard": {
-  "x-ticvai-rls": "grant-holder-read",
+  "x-ticvai-rls": "signed-in-read",
   "x-ticvai-persistence": "wallet.gift_card",
   "type": "object",
   "required": [
@@ -941,6 +1049,14 @@
    "blockedReason": {
     "type": "string",
     "nullable": true
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-references": "pii.subject",
+    "description": "**The registered owner, if any** (R8 blocker ORDERS-MONEY-C27): the guest named when the card was issued (the buyer, or the guest whose refund became store credit); null for a card sold to nobody in particular. It does not limit who may read or spend the card. Left out of a guest's response unless it is the caller."
    },
    "issuedAt": {
     "type": "string",
@@ -1060,6 +1176,62 @@
     "type": "string",
     "format": "date-time",
     "nullable": true
+   },
+   "pendingSessionEndInstallationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "writeOnly": true,
+    "description": "Set only by the server (a value a client sends is ignored) and never returned (R8 blocker IDENTITY-C23). The install whose guest sessions a revoke has not yet ended at Identity: set from `installationId` when the device is revoked, cleared when `endGuestDeviceSessions` answers `204`. While it is set the revoke is retried against Identity. Not part of any unique key, so a new registration of the same phone is never blocked by it."
+   }
+  }
+ },
+ "GuestRefundPolicy": {
+  "x-ticvai-persistence": "none — guest projection of RefundPolicy",
+  "type": "object",
+  "description": "**What `getGuestRefundPolicy` returns** (R8 blocker ORDERS-MONEY-C26): how much of a ticket comes back and until when, and nothing about who authorises a refund. `additionalProperties: false` is the guarantee: a staff field added to `RefundPolicy` does not reach a guest by default.\n",
+  "additionalProperties": false,
+  "required": [
+   "venueId",
+   "timeBands",
+   "allowPartial",
+   "refundWindowDays"
+  ],
+  "properties": {
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "timeBands": {
+    "type": "array",
+    "description": "Refundable percentage by time before the performance, as on `RefundPolicy`.",
+    "items": {
+     "type": "object",
+     "required": [
+      "hoursBefore",
+      "percentage"
+     ],
+     "properties": {
+      "hoursBefore": {
+       "type": "integer",
+       "minimum": 0
+      },
+      "percentage": {
+       "type": "number",
+       "minimum": 0,
+       "maximum": 100
+      }
+     }
+    }
+   },
+   "allowPartial": {
+    "type": "boolean"
+   },
+   "refundWindowDays": {
+    "type": "integer",
+    "minimum": 0,
+    "nullable": true,
+    "description": "As on `RefundPolicy`; null means no window."
    }
   }
  },
@@ -1090,7 +1262,7 @@
    },
    "identityProviders": {
     "type": "array",
-    "description": "Linked providers. Several may resolve to one account.",
+    "description": "Linked providers. Several may resolve to one account. Read from `pii.subject_identity` (apple, google, uaePass), `identity.guest_credential` (password) and a verified contact (otp) (CHG-R8MIG-015).",
     "items": {
      "type": "string",
      "enum": [
@@ -1402,6 +1574,67 @@
    }
   }
  },
+ "MarketingReward": {
+  "x-ticvai-rls": "grant-holder-read",
+  "type": "object",
+  "x-ticvai-persistence": "marketing.reward",
+  "description": "**Taken from the backend workbook, 20 September.** Defines a loyalty reward that can be issued to eligible customers.",
+  "required": [
+   "loyaltyProgramId",
+   "code",
+   "name",
+   "type",
+   "isActive",
+   "scopePath"
+  ],
+  "properties": {
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007)."
+   },
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "loyaltyProgramId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string",
+    "maxLength": 100
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "type": {
+    "type": "string",
+    "maxLength": 30
+   },
+   "productId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "pointsCost": {
+    "type": "number",
+    "nullable": true
+   },
+   "discountValue": {
+    "type": "number",
+    "nullable": true
+   },
+   "validityDays": {
+    "type": "integer",
+    "nullable": true
+   },
+   "isActive": {
+    "type": "boolean"
+   }
+  }
+ },
  "MessageChannel": {
   "x-ticvai-rls": "grant-holder-read",
   "type": "string",
@@ -1470,6 +1703,14 @@
  "MfaMethod": {
   "x-ticvai-persistence": "identity.mfa_method",
   "type": "object",
+  "description": "**A second factor a principal or a guest has enrolled** (R8 blockers IDENTITY-C12 and IDENTITY-C34, CHG-R8MIG-007). Exactly one of `principalId` and `subjectId` is set, so a guest's method is stored like a staff member's and `GuestSession.requiresMfa` and `mfaMethods` are answered from here; the row is its owner's alone (`x-ticvai-rls: own-row`). Three fields are storage only and never returned (`handoff/schema-storage-only.md`): `secret` (a `totp` shared secret, which `verifyMfaChallenge` computes the code from), `destination` (the full phone number or email an `smsOtp` or `emailOtp` code is sent to; `maskedTarget` is the only form returned) and `pendingExpiresAt` (set while an enrolment awaits `verifyMfaEnrolment`; an expired pending row is deleted by the next `enrolMfaMethod` of its owner).",
+  "x-ticvai-exactly-one-of": [
+   [
+    "principalId",
+    "subjectId"
+   ]
+  ],
+  "x-ticvai-rls": "own-row",
   "required": [
    "id",
    "kind",
@@ -1480,6 +1721,44 @@
    "id": {
     "type": "string",
     "format": "uuid"
+   },
+   "principalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-references": "identity.principal",
+    "x-ticvai-staff-only": "Omitted from the response when the caller is a guest (R164; r8 gate residue, CHG-R8RES-008). A guest's own method has it null, so a guest screen never shows it.",
+    "description": "The principal who enrolled it; null for a guest."
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-references": "pii.subject",
+    "description": "The guest who enrolled it; null for a principal."
+   },
+   "secret": {
+    "type": "string",
+    "nullable": true,
+    "writeOnly": true,
+    "x-ticvai-secret": "field-encrypted",
+    "description": "The `totp` shared secret, encrypted with the tenant's field key (ADR-0063); null for other kinds. Never returned after `MfaEnrolment.secret`."
+   },
+   "destination": {
+    "type": "string",
+    "nullable": true,
+    "writeOnly": true,
+    "x-ticvai-secret": "field-encrypted",
+    "description": "The full phone number (`smsOtp`) or email (`emailOtp`) the code goes to, encrypted with the tenant's field key (ADR-0063); null for other kinds. Only `maskedTarget` is ever returned."
+   },
+   "pendingExpiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "writeOnly": true,
+    "description": "While `isActive` is false, when the unconfirmed enrolment lapses; null once verified."
    },
    "kind": {
     "$ref": "#/components/schemas/MfaKind"
@@ -1514,7 +1793,7 @@
   "x-ticvai-persistence": "none — embedded in tenant_config",
   "type": "object",
   "nullable": true,
-  "description": "**The oldest guest app build still allowed to run (decided 28 September, audit R073).** A guest app whose own version is below the one for its platform shows the forced-upgrade screen (GST-047) and nothing else. Null, or a platform left null, forces nothing. Live at once through `setMaintenanceMode`, because an upgrade that must wait for a publish is not forced.\n",
+  "description": "**The oldest guest app build still allowed to run (decided 28 September, audit R073).** A guest app whose own version is below the one for its platform shows the forced-upgrade screen (GST-047) and nothing else. Null, or a platform left null, forces nothing. Live at once through `setMaintenanceMode`, because an upgrade that must wait for a publish is not forced.\n\n**`storeUrl`** (r8 walk of ticket 27893): the store page GST-047's \"Update\" button opens, one per platform, set with `setMaintenanceMode` beside the versions and live at once like them. Optional. A store address cannot be derived from `StoreAccount.appIdentifier`, which is a bundle id. The forced-upgrade screen opens the URL for the platform it runs on; where it is null the screen shows the message without the button and the guest updates from the store by hand.\n",
   "properties": {
    "ios": {
     "type": "string",
@@ -1525,6 +1804,25 @@
     "type": "string",
     "nullable": true,
     "pattern": "^\\d+\\.\\d+\\.\\d+$"
+   },
+   "storeUrl": {
+    "type": "object",
+    "nullable": true,
+    "description": "The store page of the tenant's app for each platform. https only.",
+    "properties": {
+     "ios": {
+      "type": "string",
+      "format": "uri",
+      "pattern": "^https://",
+      "nullable": true
+     },
+     "android": {
+      "type": "string",
+      "format": "uri",
+      "pattern": "^https://",
+      "nullable": true
+     }
+    }
    }
   }
  },
@@ -1666,6 +1964,13 @@
     "type": "string",
     "format": "uuid",
     "description": "The client UUIDv7 from `CreateOrderRequest.id`."
+   },
+   "orderAccessToken": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "**What lets the device that just checked out read the order it paid for** (decided 20 October 2026, Chinmay, R8 blocker cause IDENTITY-C52, option A; CHG-R8SPN-025). Returned only in `checkoutCart`'s answer, null everywhere else: a signed token bound to this order and to the cart's device, valid 24 hours, never stored. `getOrder` accepts it in `X-Order-Access-Token` in place of a session, so a guest who checked out with no account, or whose session ended, still sees the confirmation (WEB-013 keeps it in its navigation state). It reads this order only and grants nothing else."
    },
    "orderNumber": {
     "x-ticvai-unique": "tenant",
@@ -1993,6 +2298,11 @@
  },
  "Payment": {
   "x-ticvai-persistence": "orders.payment",
+  "x-ticvai-index": [
+   [
+    "providerReference"
+   ]
+  ],
   "type": "object",
   "required": [
    "id",
@@ -2178,6 +2488,13 @@
     "format": "date",
     "nullable": true
    },
+   "revokedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "When the guest removed it (`revokePaymentToken`); a removed token is never returned or charged (CHG-R8MIG-022)."
+   },
    "isDefault": {
     "type": "boolean"
    },
@@ -2245,6 +2562,78 @@
    }
   }
  },
+ "PublishedBanner": {
+  "x-ticvai-persistence": "none — a public projection of whitelabel.banner (r8 walk of ticket 28335)",
+  "type": "object",
+  "description": "One active banner as a guest reads it inside `PublishedTenantConfig`. No state, no schedule dates, no author.",
+  "required": [
+   "id",
+   "imageUrl"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "placement": {
+    "type": "string",
+    "enum": [
+     "homepageHero",
+     "homepageBlock",
+     "explore",
+     "checkout"
+    ]
+   },
+   "title": {
+    "$ref": "#/components/schemas/white-label::LocalisedText"
+   },
+   "subtitle": {
+    "$ref": "#/components/schemas/white-label::LocalisedText"
+   },
+   "imageUrl": {
+    "type": "string",
+    "format": "uri",
+    "description": "The stable address of the banner image."
+   },
+   "linkTarget": {
+    "$ref": "#/components/schemas/LinkTarget"
+   },
+   "sortOrder": {
+    "type": "integer"
+   }
+  }
+ },
+ "PublishedPromoBlock": {
+  "x-ticvai-persistence": "none — a public projection of whitelabel.promo_block (r8 walk of ticket 28335)",
+  "type": "object",
+  "description": "One active promo block as a guest reads it inside `PublishedTenantConfig`.",
+  "required": [
+   "id"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "title": {
+    "$ref": "#/components/schemas/white-label::LocalisedText"
+   },
+   "description": {
+    "$ref": "#/components/schemas/white-label::LocalisedText"
+   },
+   "iconUrl": {
+    "type": "string",
+    "format": "uri",
+    "nullable": true
+   },
+   "linkTarget": {
+    "$ref": "#/components/schemas/LinkTarget"
+   },
+   "sortOrder": {
+    "type": "integer"
+   }
+  }
+ },
  "PublishedTenantConfig": {
   "x-ticvai-persistence": "none — computed from the current ConfigVersion snapshot and the live status on whitelabel.tenant_config",
   "type": "object",
@@ -2269,8 +2658,92 @@
     "type": "string",
     "format": "date-time"
    },
+   "guestSignIn": {
+    "type": "object",
+    "readOnly": true,
+    "additionalProperties": false,
+    "description": "**What the guest sign-in buttons need before anyone is signed in** (r8, IDENTITY-C21): the public client ids of the tenant's enabled social and UAE PASS providers, derived on read from Identity's provider rows (no stored column, nothing secret). A provider the tenant has not enabled is absent, and its button is not drawn.",
+    "properties": {
+     "apple": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+       "clientId": {
+        "type": "string"
+       }
+      }
+     },
+     "google": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+       "clientId": {
+        "type": "string"
+       }
+      }
+     },
+     "uaePass": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+       "authorizationUrl": {
+        "type": "string",
+        "format": "uri"
+       },
+       "clientId": {
+        "type": "string"
+       }
+      }
+     }
+    }
+   },
    "brand": {
     "$ref": "#/components/schemas/BrandIdentity"
+   },
+   "assetsBaseUrl": {
+    "type": "string",
+    "format": "uri",
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "x-ticvai-derived": "onRead",
+    "description": "**How any guest screen turns an asset id into a picture** (r8 walk of ticket 28156; lead decision of 20 October 2026, option A). The address of a published asset is `assetsBaseUrl` + `/` + the asset id + `/` + a rendition name, for example `{assetsBaseUrl}/{assetId}/card.webp`. The renditions are `thumb`, `card`, `hero` and `original`. Every media object in every guest response carries an asset id and nothing else, so no screen makes a media call per tile. Only public assets referenced by a published version are served at it. `brandUrls` and the banner addresses below are this rule worked out for you."
+   },
+   "brandUrls": {
+    "type": "object",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "x-ticvai-derived": "onRead",
+    "description": "**The brand assets as addresses a guest can load** (r8 walk of ticket 28335). A guest cannot read `assets`, so the `*AssetRef` ids in `brand` mean nothing to a client. The server turns each asset the published version references into its stable CDN address (`assets.yaml`, `MediaAsset.url`: a public asset has a stable CDN address) and returns it here, beside the ids. Only assets the published version names are resolved; the address is that of the asset version the publish named. A field is null where its ref is null.",
+    "properties": {
+     "logoUrl": {
+      "type": "string",
+      "format": "uri",
+      "nullable": true
+     },
+     "logoDarkUrl": {
+      "type": "string",
+      "format": "uri",
+      "nullable": true
+     },
+     "faviconUrl": {
+      "type": "string",
+      "format": "uri",
+      "nullable": true
+     },
+     "splashImageUrls": {
+      "type": "array",
+      "items": {
+       "type": "string",
+       "format": "uri"
+      }
+     },
+     "introVideoUrl": {
+      "type": "string",
+      "format": "uri",
+      "nullable": true
+     }
+    }
    },
    "appIcons": {
     "$ref": "#/components/schemas/AppIcons"
@@ -2292,6 +2765,26 @@
    },
    "homepage": {
     "$ref": "#/components/schemas/HomepageLayout"
+   },
+   "banners": {
+    "type": "array",
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "x-ticvai-derived": "onRead",
+    "description": "**The hero and other banners a guest sees now** (r8 walk of ticket 28335): the banners in the published version whose state is `active` at the time of the read, by `sortOrder`. Draft, scheduled and expired banners are never returned. `imageUrl` is the resolved address of `imageAssetRef`. Staff read all banners with `listBanners`, which is unchanged.",
+    "items": {
+     "$ref": "#/components/schemas/PublishedBanner"
+    }
+   },
+   "promoBlocks": {
+    "type": "array",
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "x-ticvai-derived": "onRead",
+    "description": "The promo blocks in the published version that are `active` at the time of the read, by `sortOrder`, with the same rule as `banners`.",
+    "items": {
+     "$ref": "#/components/schemas/PublishedPromoBlock"
+    }
    },
    "bookingFlow": {
     "allOf": [
@@ -2383,6 +2876,141 @@
       "nullable": true
      }
     }
+   }
+  }
+ },
+ "Refund": {
+  "x-ticvai-persistence": "orders.refund",
+  "type": "object",
+  "required": [
+   "id",
+   "orderId",
+   "amount",
+   "status",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "orderId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "batchId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The `RefundBatch` that raised this refund, where `createBulkRefund` did. Null for a refund raised on its own."
+   },
+   "fxRate": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/ExchangeRateDecimal"
+     }
+    ],
+    "nullable": true,
+    "readOnly": true,
+    "description": "**The rate on the original payment, not today's** (BL-087, CF-118).\n`Payment` records `tenderCurrency`, `fxRate` and `fxRateSource` at the moment of sale, so the sale rate is always retrievable. **Refunding at today's rate repays a different amount of money than was taken** — a guest who paid 100 USD at 3.67 and is refunded at 3.72 gets back more AED than they gave, and the venue carries the difference on every refund.\nThe exposure runs both ways and neither direction is defensible: a guest short-changed by a moving rate has a complaint the venue cannot answer, because **the guest did nothing but wait.**\n"
+   },
+   "taxReversalEntryId": {
+    "x-ticvai-references": "ledger.journal_entry",
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**A refund reverses the tax entry it created, and this is where that is stated rather than implied.** `reverseJournalEntry` and `calculateTax` both exist, so both halves were present and the obligation was assumed — **an implied obligation is one a developer can miss without failing anything.**\nNull only where the original sale carried no tax.\n"
+   },
+   "settleTo": {
+    "type": "string",
+    "enum": [
+     "originalTender",
+     "advanceBalance",
+     "wireTransfer",
+     "storeCredit"
+    ],
+    "default": "originalTender",
+    "description": "BL-086. **A refund could only go back the way it came.** A guest whose card has expired, a partner settling by wire, a guest who would rather have the credit — three real cases with one answer.\n**`originalTender` stays the default** because refunding elsewhere is how money laundering works, and anything else needs a reason.\n\n**`storeCredit` is a gift card issued for the refund amount** (decided 2 October 2026, Chinmay, batch 1, POS-011; DEC-061; CHG-CSP-037; DI-796), never a voucher or a wallet top-up.\n"
+   },
+   "fxVariance": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "Where the sale rate and the current rate differ, **the difference is booked as an FX variance rather than hidden in the refund**. `runFxRevaluation` already handles this class of movement and this is the same act at a smaller scale.\n"
+   },
+   "tenderCurrency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**A refund goes back in the currency the guest paid** (decided 2 October 2026, Chinmay; CHG-FIN-001). For a card or wallet payment taken in a guest-selected currency, the refund request to the provider is in that currency, and `tenderAmount` is the refunded share of the original `Payment.tenderAmount` at the sale rate (`fxRate`), so a full refund returns exactly what was charged. `amount` stays in base currency for the ledger. Null for a refund in the base currency. Foreign cash refunded at a till is paid in base currency (DI-282)."
+   },
+   "tenderAmount": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "readOnly": true,
+    "description": "The refund in `tenderCurrency`, at that currency's own scale (CHG-FIN-001)."
+   },
+   "amount": {
+    "x-ticvai-column": "refunded_amount",
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "appliedPercentage": {
+    "type": "number",
+    "description": "From the venue's time bands, or an approver override."
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "pendingApproval",
+     "pendingGateway",
+     "completed",
+     "declined",
+     "failed"
+    ]
+   },
+   "reason": {
+    "type": "string"
+   },
+   "requestedByPrincipalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "secondaryPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "approvedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "ledgerEntryId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Written before the gateway is called."
+   },
+   "gatewayReference": {
+    "type": "string",
+    "nullable": true
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "completedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
    }
   }
  },
@@ -2685,7 +3313,7 @@
    },
    "expiresIn": {
     "type": "integer",
-    "description": "Seconds"
+    "description": "Seconds until the access token expires: `PasswordPolicy.accessTokenMinutes` x 60, 900 by default (15 minutes; proposed, client to correct). The refresh token, its rotation and reuse detection, and the signing key are described once on `bearerAuth` in contracts/shared/common.yaml (IDENTITY-C25, FOUNDATION-AI-C27; CHG-R8SPN-014)."
    }
   }
  },
@@ -2748,6 +3376,30 @@
     "type": "string",
     "format": "uuid"
    },
+   "transferRules": {
+    "type": "object",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "x-ticvai-derived": "onRead",
+    "description": "What the venue allows this guest to do with a transfer, read from the venue's `WalletTransferRules` so a guest screen can hide or limit the action (r8 walk of tickets 28310 and 28345). Worked out on read.",
+    "properties": {
+     "peerToPeerAllowed": {
+      "type": "boolean"
+     },
+     "withinSharedWalletOnly": {
+      "type": "boolean"
+     },
+     "maximumPerTransfer": {
+      "allOf": [
+       {
+        "$ref": "../shared/common.yaml#/components/schemas/Money"
+       }
+      ],
+      "nullable": true
+     }
+    }
+   },
    "balance": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
     "x-ticvai-column": "balance_amount"
@@ -2771,7 +3423,7 @@
         "refund",
         "goodwill"
        ],
-       "description": "**`cash` is money the guest paid and the others are not.** That distinction decides what is refundable, what expires, and what shows as a liability.\n",
+       "description": "**`cash` is money the guest paid and the others are not.** That distinction decides what is refundable, what expires, and what shows as a liability. Worked out from the lot's credit type `category` (proposed, client to correct): `cash` -> cash; `bonus`, `promotional`, `loyalty`, `membership`, `giftCard` -> bonus; `redemption`, `ride`, `attraction`, `fnb`, `retail`, `parking`, `event` -> redemption; `refund` -> refund; `other` -> bonus. `goodwill` comes only from a lot whose `sourceKind` is `adjustment` and whose adjustment (`sourceReference`) is of kind `goodwill`, whatever the category (R8 blocker APPROVALS-TENANCY-C32).\n",
        "x-ticvai-persisted": false
       },
       "amount": {

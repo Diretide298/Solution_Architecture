@@ -33,19 +33,19 @@
   }
  ],
  "stores": {
-  "postgres": 123,
+  "postgres": 124,
   "postgres-analytical": 5,
   "redis": 9,
   "qdrant": 1
  },
- "generated": "2026-10-18",
+ "generated": "2026-10-20",
  "note": "Derived by closure from the contract, not listed. See handoff/README.md \u2014 the hand-maintained version of this drifted four times in one day.",
  "counts": {
-  "operations": 146,
+  "operations": 148,
   "schemas": 125,
   "states": 42,
-  "events": 48,
-  "tables": 138,
+  "events": 52,
+  "tables": 139,
   "screens": 183,
   "flows": 11,
   "documents": 68,
@@ -55,29 +55,29 @@
   "design": [
    {
     "name": "Operations in the contract",
-    "done": 144,
-    "total": 144,
+    "done": 146,
+    "total": 146,
     "percent": 100,
     "note": "The seed of the closure."
    },
    {
     "name": "Lifecycles modelled",
     "done": 19,
-    "total": 36,
-    "percent": 53,
+    "total": 38,
+    "percent": 50,
     "note": "Status enums in the domain contract with a state model."
    },
    {
     "name": "Operations reaching a screen",
     "done": 131,
-    "total": 144,
-    "percent": 91,
+    "total": 146,
+    "percent": 90,
     "note": "This domain's own operations that a screen calls. Jobs and internal operations legitimately reach none."
    },
    {
     "name": "Events with a critical consumer",
-    "done": 32,
-    "total": 48,
+    "done": 35,
+    "total": 52,
     "percent": 67,
     "note": "An event whose loss breaks something must say which consumer."
    }
@@ -93,7 +93,7 @@
   ]
  },
  "headline": {
-  "design": 88,
+  "design": 87,
   "build": 0
  },
  "waves": {
@@ -278,7 +278,7 @@
   "operations": []
  },
  "storage": {
-  "postgres": 123,
+  "postgres": 124,
   "postgres-analytical": 5,
   "redis": 9,
   "qdrant": 1
@@ -292,6 +292,7 @@
   ]
  },
  "unmodelledLifecycles": [
+  "AiVectorStore.status",
   "AiHistoryImport.status",
   "AiTrainingRun.status",
   "AiPromptTemplate.status",
@@ -308,6 +309,7 @@
   "AiMarketingRecommendation.status",
   "AiForecastExport.status",
   "AiProviderCompatibility.status",
+  "TranslationJob.status",
   "TranslationProposals.status"
  ],
  "documents": [

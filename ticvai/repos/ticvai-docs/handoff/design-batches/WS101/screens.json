@@ -15,7 +15,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/tenants-licensing/recommended-package-overview-adm-399",
-   "component": "apps/ticvai-web/src/routes/tenants-licensing/RecommendedPackageOverview.tsx",
+   "component": "src/routes/tenants-licensing/RecommendedPackageOverview.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -190,7 +190,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/tenants-licensing/commercial-model-tier-selection-adm-400",
-   "component": "apps/ticvai-web/src/routes/tenants-licensing/CommercialModelTierSelection.tsx",
+   "component": "src/routes/tenants-licensing/CommercialModelTierSelection.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -324,7 +324,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/tenants-licensing/module-marketplace-adm-401",
-   "component": "apps/ticvai-web/src/routes/tenants-licensing/ModuleMarketplace.tsx",
+   "component": "src/routes/tenants-licensing/ModuleMarketplace.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -480,7 +480,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/tenants-licensing/ai-module-package-recommendations-adm-402",
-   "component": "apps/ticvai-web/src/routes/tenants-licensing/AiModulePackageRecommendations.tsx",
+   "component": "src/routes/tenants-licensing/AiModulePackageRecommendations.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -632,7 +632,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/tenants-licensing/module-detail-commercial-treatment-adm-403",
-   "component": "apps/ticvai-web/src/routes/tenants-licensing/ModuleDetailCommercialTreatment.tsx",
+   "component": "src/routes/tenants-licensing/ModuleDetailCommercialTreatment.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -746,7 +746,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/tenants-licensing/module-dependency-compatibility-manager-adm-404",
-   "component": "apps/ticvai-web/src/routes/tenants-licensing/ModuleDependencyCompatibilityManager.tsx",
+   "component": "src/routes/tenants-licensing/ModuleDependencyCompatibilityManager.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -871,7 +871,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/tenants-licensing/add-ons-capacity-commercial-options-adm-405",
-   "component": "apps/ticvai-web/src/routes/tenants-licensing/AddOnsCapacityCommercialOptions.tsx",
+   "component": "src/routes/tenants-licensing/AddOnsCapacityCommercialOptions.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -996,7 +996,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/tenants-licensing/commercial-package-simulator-adm-406",
-   "component": "apps/ticvai-web/src/routes/tenants-licensing/CommercialPackageSimulator.tsx",
+   "component": "src/routes/tenants-licensing/CommercialPackageSimulator.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1153,7 +1153,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/tenants-licensing/package-review-commercial-summary-adm-407",
-   "component": "apps/ticvai-web/src/routes/tenants-licensing/PackageReviewCommercialSummary.tsx",
+   "component": "src/routes/tenants-licensing/PackageReviewCommercialSummary.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1302,7 +1302,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/tenants-licensing/final-package-approval-handoff-adm-408",
-   "component": "apps/ticvai-web/src/routes/tenants-licensing/FinalPackageApprovalHandoff.tsx",
+   "component": "src/routes/tenants-licensing/FinalPackageApprovalHandoff.tsx",
    "status": "notStarted"
   },
   "navigation": {

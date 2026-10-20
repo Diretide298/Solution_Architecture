@@ -1,5 +1,5 @@
 id: LLD-catalogue
-title: catalogue — 252 operations
+title: catalogue — 269 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: spine
@@ -12,7 +12,7 @@ operations:
   permission: ORDER_CREATE
   audience:
   - staff
-  - guest
+  - service
   offline: false
   reads:
   - cache:idempotency
@@ -86,8 +86,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - catalogue.entitlement_template
   writes:
+  - cache:idempotency
   - catalogue.entitlement_template
 - operation: assessProductChange
   verb: POST
@@ -99,10 +101,12 @@ operations:
   offline: false
   reads:
   - access.entitlement
+  - cache:idempotency
   - catalogue.product
   - orders.cart
   - orders.sales_order
   writes:
+  - cache:idempotency
   - catalogue.product_media
 - operation: assignPerformanceMedia
   verb: POST
@@ -143,8 +147,10 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - cache:idempotency
   writes:
+  - cache:idempotency
   - catalogue.product
 - operation: cancelPerformance
   verb: POST
@@ -187,8 +193,20 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - catalogue.product
   - catalogue.product_eligibility_rule
+  writes:
+  - cache:idempotency
+- operation: checkProductSalePermission
+  verb: POST
+  path: /sale-permission-checks
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
   writes: []
 - operation: cloneEvent
   verb: POST
@@ -223,6 +241,7 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - catalogue.product
   - catalogue.product_media
   - catalogue.variant
@@ -275,7 +294,6 @@ operations:
   permission: PRICE_CONFIGURE
   audience:
   - staff
-  - partner
   offline: false
   reads:
   - cache:idempotency
@@ -290,7 +308,6 @@ operations:
   permission: CAPACITY_CONFIGURE
   audience:
   - staff
-  - partner
   offline: false
   reads:
   - cache:idempotency
@@ -401,7 +418,6 @@ operations:
   permission: PRICE_CONFIGURE
   audience:
   - staff
-  - partner
   offline: false
   reads:
   - cache:idempotency
@@ -416,7 +432,6 @@ operations:
   permission: PRODUCT_CONFIGURE
   audience:
   - staff
-  - partner
   offline: false
   reads:
   - cache:idempotency
@@ -487,8 +502,10 @@ operations:
   - anonymous
   - guest
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - cache:idempotency
+  writes:
+  - cache:idempotency
 - operation: estimateEventResourceCost
   verb: GET
   path: /events/{eventId}/resource-cost
@@ -524,9 +541,11 @@ operations:
   permission: PRODUCT_CONFIGURE
   audience:
   - staff
+  - guest
   offline: false
   reads:
   - access.entitlement
+  - cache:idempotency
   writes:
   - access.entitlement
   - cache:idempotency
@@ -545,6 +564,16 @@ operations:
   - catalogue.channel_capacity
   - catalogue.inventory_reservation
   - catalogue.performance
+  writes: []
+- operation: getBundleSigningKeys
+  verb: GET
+  path: /catalogue/bundle-signing-keys
+  scope: workstation
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
   writes: []
 - operation: getCatalogueImportJob
   verb: GET
@@ -568,6 +597,16 @@ operations:
   offline: false
   reads:
   - catalogue.channel_envelope
+  writes: []
+- operation: getChannelAvailability
+  verb: GET
+  path: /channel-availability
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
   writes: []
 - operation: getDynamicPriceRule
   verb: GET
@@ -690,7 +729,7 @@ operations:
   verb: GET
   path: /entitlement-templates/{templateId}/benefits
   scope: venue
-  permission: CATALOGUE_VIEW
+  permission: PRODUCT_VIEW
   audience:
   - staff
   - guest
@@ -735,6 +774,27 @@ operations:
   reads:
   - catalogue.variant_dimension
   writes: []
+- operation: getProductChannelTexts
+  verb: GET
+  path: /products/{productId}/channel-texts
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - catalogue.product_channel_text
+  writes: []
+- operation: getProductDashboard
+  verb: GET
+  path: /product-dashboard
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: getProductEligibilityRule
   verb: GET
   path: /products/{productId}/eligibility-rule
@@ -746,6 +806,28 @@ operations:
   offline: false
   reads:
   - catalogue.product_eligibility_rule
+  writes: []
+- operation: getProductOwnerForms
+  verb: GET
+  path: /products/{productId}/owner-forms
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - catalogue.product_owner_form
+  writes: []
+- operation: getProductSalePermissionRules
+  verb: GET
+  path: /products/{productId}/sale-permission-rules
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - catalogue.product_sale_permission
   writes: []
 - operation: getTaxProfileJurisdiction
   verb: GET
@@ -1340,6 +1422,8 @@ operations:
   permission: PRODUCT_VIEW
   audience:
   - staff
+  - guest
+  - anonymous
   offline: false
   reads:
   - catalogue.event
@@ -1505,7 +1589,7 @@ operations:
   verb: GET
   path: /membership-benefits
   scope: venue
-  permission: CATALOGUE_VIEW
+  permission: PRODUCT_VIEW
   audience:
   - staff
   - guest
@@ -1532,7 +1616,7 @@ operations:
   verb: GET
   path: /membership-programmes
   scope: venue
-  permission: CATALOGUE_VIEW
+  permission: PRODUCT_VIEW
   audience:
   - staff
   - guest
@@ -1550,6 +1634,16 @@ operations:
   offline: false
   reads:
   - catalogue.demand_signal
+  writes: []
+- operation: listOwnerFormCandidates
+  verb: GET
+  path: /owner-form-candidates
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
   writes: []
 - operation: listPackageBundleAdd
   verb: GET
@@ -1831,6 +1925,16 @@ operations:
   offline: false
   reads: []
   writes: []
+- operation: listProductAttentionItems
+  verb: GET
+  path: /product-dashboard/attention
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: listProductCategories
   verb: GET
   path: /product-categories
@@ -1838,10 +1942,21 @@ operations:
   permission: PRODUCT_VIEW
   audience:
   - staff
+  - guest
   offline: true
   reads:
   - catalogue.product
   - catalogue.product_category
+  writes: []
+- operation: listProductCategoryUsage
+  verb: GET
+  path: /product-categories/usage
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
   writes: []
 - operation: listProductDuplicationTemplate
   verb: GET
@@ -1928,6 +2043,17 @@ operations:
   - catalogue.product
   - catalogue.product_channel_assignment
   - orders.sales_order
+  writes: []
+- operation: listProductTags
+  verb: GET
+  path: /product-tags
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - catalogue.product_tag
   writes: []
 - operation: listProductTrailChange
   verb: GET
@@ -2123,6 +2249,16 @@ operations:
   - catalogue.product
   - catalogue.product_channel_assignment
   - catalogue.sales_channel
+  writes: []
+- operation: listSalePermissionTargets
+  verb: GET
+  path: /sale-permission-targets
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
   writes: []
 - operation: listScenarioModelingWhat
   verb: GET
@@ -2393,6 +2529,7 @@ operations:
   offline: false
   reads:
   - access.entitlement
+  - cache:idempotency
   writes:
   - access.entitlement
   - cache:idempotency
@@ -2407,8 +2544,10 @@ operations:
   - partner
   offline: false
   reads:
+  - cache:idempotency
   - catalogue.channel_envelope
   writes:
+  - cache:idempotency
   - catalogue.channel_envelope
 - operation: relinquishInventoryHold
   verb: DELETE
@@ -2419,9 +2558,11 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - catalogue.channel_capacity
   - catalogue.inventory_reservation
   writes:
+  - cache:idempotency
   - catalogue.channel_capacity
   - catalogue.inventory_reservation
 - operation: renewInventoryHold
@@ -2453,6 +2594,7 @@ operations:
   - catalogue.published_bundle
   writes:
   - cache:idempotency
+  - catalogue.bundle_application
   - catalogue.published_bundle
 - operation: requestPricingRollback
   verb: POST
@@ -2483,8 +2625,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - catalogue.event_reschedule
   writes:
+  - cache:idempotency
   - catalogue.event_reschedule
 - operation: resolveProductByCode
   verb: GET
@@ -2557,7 +2701,6 @@ operations:
   permission: PRODUCT_CONFIGURE
   audience:
   - staff
-  - partner
   offline: false
   reads:
   - cache:idempotency
@@ -2609,7 +2752,6 @@ operations:
   permission: CAPACITY_CONFIGURE
   audience:
   - staff
-  - partner
   offline: false
   reads:
   - cache:idempotency
@@ -2776,10 +2918,12 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - pricing.dynamic_price_action
   - pricing.dynamic_price_condition
   - pricing.dynamic_price_rule
   writes:
+  - cache:idempotency
   - pricing.dynamic_price_action
   - pricing.dynamic_price_condition
   - pricing.dynamic_price_rule
@@ -2827,8 +2971,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - catalogue.entitlement_template
   writes:
+  - cache:idempotency
   - catalogue.audit_entry
   - catalogue.entitlement_template
 - operation: setEventCapacityProfile
@@ -2840,8 +2986,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - catalogue.event_capacity_profile
   writes:
+  - cache:idempotency
   - catalogue.event_capacity_profile
 - operation: setEventChangeTreatmentPolicy
   verb: PUT
@@ -2852,8 +3000,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - catalogue.event_change_treatment_policy
   writes:
+  - cache:idempotency
   - catalogue.event_change_treatment_policy
 - operation: setEventLifecycleState
   verb: POST
@@ -2886,8 +3036,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - catalogue.event_registration
   writes:
+  - cache:idempotency
   - catalogue.event_registration
 - operation: setEventResourcePlan
   verb: PUT
@@ -2898,8 +3050,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - catalogue.event_resource_plan
   writes:
+  - cache:idempotency
   - catalogue.event_resource_plan
 - operation: setEventSchedule
   verb: PUT
@@ -2910,8 +3064,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - catalogue.event_schedule
   writes:
+  - cache:idempotency
   - catalogue.event_schedule
 - operation: setEventType
   verb: PUT
@@ -2922,8 +3078,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - catalogue.event_type
   writes:
+  - cache:idempotency
   - catalogue.event_type
 - operation: setFeeApplicabilityCharging
   verb: PUT
@@ -2965,8 +3123,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - catalogue.group_package
   writes:
+  - cache:idempotency
   - catalogue.group_package
 - operation: setLifecycleStatuWorkflow
   verb: PUT
@@ -3004,25 +3164,29 @@ operations:
   verb: PUT
   path: /membership-benefits/{benefitId}
   scope: venue
-  permission: CATALOGUE_MANAGE
+  permission: PRODUCT_CONFIGURE
   audience:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - catalogue.membership_benefit
   writes:
+  - cache:idempotency
   - catalogue.membership_benefit
 - operation: setMembershipProgramme
   verb: PUT
   path: /membership-programmes/{programId}
   scope: venue
-  permission: CATALOGUE_MANAGE
+  permission: PRODUCT_CONFIGURE
   audience:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - catalogue.membership_programme
   writes:
+  - cache:idempotency
   - catalogue.membership_programme
 - operation: setPackagePricingDefinition
   verb: PUT
@@ -3051,20 +3215,24 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - catalogue.performance_template
   writes:
+  - cache:idempotency
   - catalogue.performance_template
 - operation: setPlanBenefits
   verb: PUT
   path: /entitlement-templates/{templateId}/benefits
   scope: venue
-  permission: CATALOGUE_MANAGE
+  permission: PRODUCT_CONFIGURE
   audience:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - catalogue.plan_benefit
   writes:
+  - cache:idempotency
   - catalogue.plan_benefit
 - operation: setPrepaidMinutePackage
   verb: PUT
@@ -3075,8 +3243,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - catalogue.prepaid_minutes
   writes:
+  - cache:idempotency
   - catalogue.prepaid_minutes
 - operation: setPriceCalculationPolicy
   verb: PUT
@@ -3152,7 +3322,6 @@ operations:
   permission: PRICE_CONFIGURE
   audience:
   - staff
-  - partner
   offline: false
   reads:
   - cache:idempotency
@@ -3229,7 +3398,6 @@ operations:
   permission: PRODUCT_CONFIGURE
   audience:
   - staff
-  - partner
   offline: false
   reads:
   - cache:idempotency
@@ -3272,6 +3440,35 @@ operations:
   writes:
   - cache:idempotency
   - catalogue.product_category
+- operation: setProductChannelTexts
+  verb: PUT
+  path: /products/{productId}/channel-texts
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - catalogue.product_channel_text
+  writes:
+  - cache:idempotency
+  - catalogue.audit_entry
+  - catalogue.product_channel_text
+- operation: setProductClassification
+  verb: PUT
+  path: /products/{productId}/classification
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  writes:
+  - cache:idempotency
+  - catalogue.audit_entry
+  - catalogue.product
 - operation: setProductContextOwnership
   verb: PUT
   path: /product-context-ownership
@@ -3296,8 +3493,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - catalogue.product_eligibility_rule
   writes:
+  - cache:idempotency
   - catalogue.product_eligibility_rule
 - operation: setProductLinks
   verb: PUT
@@ -3315,6 +3514,36 @@ operations:
   - cache:idempotency
   - catalogue.audit_entry
   - catalogue.product_link
+- operation: setProductOwnerForms
+  verb: PUT
+  path: /products/{productId}/owner-forms
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - catalogue.product_owner_form
+  writes:
+  - cache:idempotency
+  - catalogue.audit_entry
+  - catalogue.product_owner_form
+- operation: setProductSalePermissionRules
+  verb: PUT
+  path: /products/{productId}/sale-permission-rules
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - catalogue.product_sale_permission
+  writes:
+  - cache:idempotency
+  - catalogue.audit_entry
+  - catalogue.product_sale_permission
 - operation: setProductServicePrice
   verb: PUT
   path: /product-service-price
@@ -3334,6 +3563,21 @@ operations:
   - cache:idempotency
   - catalogue.audit_entry
   - catalogue.price_assignment
+- operation: setProductTagDefinition
+  verb: PUT
+  path: /product-tags/{productTagId}
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - catalogue.product_tag
+  writes:
+  - cache:idempotency
+  - catalogue.audit_entry
+  - catalogue.product_tag
 - operation: setRulePriorityConflict
   verb: PUT
   path: /rule-priority-conflict
@@ -3365,8 +3609,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - catalogue.seat_pricing_rule
   writes:
+  - cache:idempotency
   - catalogue.seat_pricing_rule
 - operation: setSignalRegistryPolicy
   verb: PUT
@@ -3392,8 +3638,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - catalogue.space
   writes:
+  - cache:idempotency
   - catalogue.space
 - operation: setTaxProfileJurisdiction
   verb: PUT
@@ -3439,8 +3687,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - catalogue.waiting_room_setting
   writes:
+  - cache:idempotency
   - catalogue.waiting_room_setting
 - operation: simulatePriceBreakdownCalculation
   verb: PUT
@@ -3568,7 +3818,6 @@ operations:
   permission: PRODUCT_CONFIGURE
   audience:
   - staff
-  - partner
   offline: false
   reads:
   - access.entitlement
@@ -3587,7 +3836,6 @@ operations:
   permission: CAPACITY_CONFIGURE
   audience:
   - staff
-  - partner
   offline: false
   reads:
   - cache:idempotency
@@ -3633,8 +3881,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - catalogue.entitlement_template
   writes:
+  - cache:idempotency
   - catalogue.entitlement_template
 - operation: updateEvent
   verb: PATCH
@@ -3671,7 +3921,6 @@ operations:
   permission: PRICE_CONFIGURE
   audience:
   - staff
-  - partner
   offline: false
   reads:
   - cache:idempotency
@@ -3686,7 +3935,6 @@ operations:
   permission: PRODUCT_CONFIGURE
   audience:
   - staff
-  - partner
   offline: false
   reads:
   - cache:idempotency
@@ -3706,6 +3954,8 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - catalogue.variant
   writes:
+  - cache:idempotency
   - catalogue.variant

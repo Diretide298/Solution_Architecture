@@ -1,6 +1,6 @@
 # WS22 — B2B, Reseller & OTA Partner Management board 2
 
-**6 screens · 8 operations · 16 schemas · 2 permissions**
+**6 screens · 8 operations · 17 schemas · 2 permissions**
 
 Platform P10 Partner Web · ships as **ticvai-control** ·
 partner audience · web ·

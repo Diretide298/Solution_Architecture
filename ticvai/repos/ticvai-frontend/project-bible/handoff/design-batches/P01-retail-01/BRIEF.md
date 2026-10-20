@@ -122,8 +122,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `WEB-033` | Shop | A | 45 | 5 | 6 | 24 | 3 | 0 | guest | review (client-verified) |
-| `WEB-042` | Retail & Shop and Drop | A | 23 | 5 | 6 | 6 | 4 | 0 | guest | review (client-verified) |
+| `WEB-033` | Shop | A | 53 | 5 | 6 | 24 | 3 | 0 | guest | review (client-verified) |
+| `WEB-042` | Retail & Shop and Drop | A | 31 | 5 | 6 | 6 | 4 | 0 | guest | review (client-verified) |
 
 ## Design inputs from the client meetings
 

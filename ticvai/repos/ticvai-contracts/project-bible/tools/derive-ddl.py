@@ -116,8 +116,9 @@ OUT = ROOT / "backend"
 REVIEW = ROOT / "handoff" / "migration-review.md"
 # **A forward migration: written after r1, never regenerated.** `V` sorts after every digit, so
 # provision-tenant.sh and the initdb pass, which apply `<area>/*.sql` in name order, run these after the
-# baseline's 930 file.
-FORWARD_FILE = re.compile(r"^V(\d+)__[\w.-]+\.sql$")
+# baseline's 930 file. A letter after the number (`V0103a`) is a file that has to run between two frozen ones: it
+# sorts after `V0103__` (`_` < `a`) and before `V0104` by name, the order SqlMigrationRunner applies (R8-MIG-001).
+FORWARD_FILE = re.compile(r"^V(\d+)[a-z]?__[\w.-]+\.sql$")
 FORWARD_FIRST = 100
 
 # **The one schema that is a database.** ADR-0039 took `control` out of the tenant template,
@@ -210,14 +211,31 @@ for f in "$HERE"/tenant/*.sql; do
   psql -v ON_ERROR_STOP=1 -d "$SLUG" -f "$f" >/dev/null
 done
 
+# 2b. The root of the scope tree (ADAM CR-163, 18 October 2026; CHG-CRA-005). The cell creates the
+#     tenant's `level` tenant node here, and its path is recorded in control.cell_tenant below and
+#     never changes: the migrator and the fan-out read it there. The label is the slug made a valid
+#     ltree label (lower case, every other character an underscore), written once; nothing derives it
+#     again from control.tenant.code, whose pattern allows hyphens a scope label does not.
+#     platform.scope forces row security, so the insert runs in a transaction that grants the session the root
+#     path first (SET LOCAL ticvai.scope_paths); without it only a superuser could write the row, and on a
+#     managed server provisioning would stop after createdb.
+ROOT_PATH="t_$(printf '%s' "$SLUG" | tr '[:upper:]' '[:lower:]' | tr -c 'a-z0-9_' '_')"
+psql -v ON_ERROR_STOP=1 -d "$SLUG" <<SQL >/dev/null
+  BEGIN;
+  SET LOCAL ticvai.scope_paths = '$ROOT_PATH';
+  INSERT INTO platform.scope (id, level, parent_id, path, code, name, is_active)
+  VALUES (gen_random_uuid(), 'tenant', NULL, '$ROOT_PATH', '${ROOT_PATH#t_}', '$SLUG', true);
+  COMMIT;
+SQL
+
 # 3. The row. **A database with no row in control.cell_tenant is a database nothing knows
 #    about** - it will not be migrated, backed up or billed, and it will be found by somebody
 #    reading pg_database rather than by the control plane.
 if [ -n "$TENANT_ID" ]; then
   psql -v ON_ERROR_STOP=1 -d "$CONTROL_DB" <<SQL >/dev/null
     INSERT INTO control.cell_tenant (id, cell_id, tenant_id, database_name, status,
-                                     provisioned_at)
-    SELECT gen_random_uuid(), c.id, '$TENANT_ID', '$SLUG', 'live', now()
+                                     provisioned_at, root_scope_path)
+    SELECT gen_random_uuid(), c.id, '$TENANT_ID', '$SLUG', 'live', now(), '$ROOT_PATH'
       FROM control.cell c
      WHERE c.status = 'active'
      LIMIT 1;
@@ -597,8 +615,12 @@ $$;
 # `identity.authz_audit` (CHG-R6-014, 12 October 2026) is the second: every authorisation decision a
 # principal's request takes is appended there, venue-scoped principals included, and it sat at the tenant
 # root under `apply_tenant_rls` for the same reason `platform.audit_record` did.
+# `platform.audit_read` (CHG-R8MIG-004, R8 blocker APPROVALS-TENANCY-C09) is the third: every `listAuditRecords` call,
+# a venue's included, appends who read the trail; under the subject rule a row with no subject took the tenant-root
+# WITH CHECK and refused every venue reader.
 APPEND_AUDIT = {
     "platform.audit_record",   # CHG-R6-002 (CR-005)
+    "platform.audit_read",     # CHG-R8MIG-004
     "identity.authz_audit",    # CHG-R6-014
 }
 
@@ -677,7 +699,28 @@ $$;
 # a parent's SELECT would open its children's writes, since the parent rule's WITH CHECK is "the parent is
 # visible"). A tenant-root table is not a parent of anything, so marking one does not make tables that reference
 # it follow it, except where SPLIT_CHILDREN says so.
-RLS_MARKS = ("read-beneath", "grant-holder-read")
+#   * `x-ticvai-rls: own-row` (CHG-R8MIG-007; R8 blocker causes IDENTITY-C12, IDENTITY-C37, IDENTITY-C48): a row is read
+#     and written by the principal or the guest it belongs to (`principal_id` = the session's `ticvai.principal_id`,
+#     `subject_id` = its `ticvai.subject_id`), and by the tenant root, for a credential or second factor that is its
+#     owner's alone: changeOwnCredential, the MFA tables a guest enrols in too. Not split: one check for both.
+#   * `x-ticvai-rls: home-scope-write` (CHG-R8MIG-007; R8 blocker IDENTITY-C37, the lead's option A): any staff grant
+#     reads, as grant-holder-read; a row is written by the tenant root or by a grant over the row's `home_scope_id`, so
+#     a venue manager creates and updates the principals homed in their venue and nobody else's (CR-076's tenant-root
+#     writers keep their reach).
+#   * `x-ticvai-rls: subject-self` (CHG-R8MIG-007; IDENTITY-C48 option A): the guest record itself (`pii.subject`, whose
+#     `id` is the subject): any staff grant reads, the guest reads and writes its own row, and the tenant root writes.
+#   * `x-ticvai-rls: own-or-home-scope` (CHG-R8MIG-007; IDENTITY-C37): a principal's credential rows, read and written
+#     by that principal (`ticvai.principal_id`), by a grant over the principal's home scope (createPrincipal and
+#     resetPrincipalCredential at a venue) and by the tenant root.
+#   * `x-ticvai-rls: signed-in-read` (CHG-R8MIG-011; the storage-sat lane's request 6, ORDERS-MONEY-C27 and C33): any
+#     signed-in caller of the tenant, staff or guest, reads every row; writes keep the base rule. For rows that are not
+#     personal or whose secret is the key itself: badge definitions, a gift card read by its code.
+#   * `x-ticvai-rls: scope-or-subject` (CHG-R8MIG-021; R8 blocker IDENTITY-C42 and C48): a scoped row a guest is party
+#     to. Staff read and write by `scope_path`, as the scope rule; a guest reads a row naming its subject in
+#     `subject_id`, `over_subject_id` or `granted_by_subject_id`, and writes one whose `over_subject_id` (else
+#     `subject_id`) is its own: the account holder grants and revokes. identity.delegated_access, guest to guest.
+RLS_MARKS = ("read-beneath", "grant-holder-read", "own-row", "home-scope-write", "subject-self", "own-or-home-scope",
+             "signed-in-read", "scope-or-subject")
 
 # **A child that follows a split parent which the parent rule would not otherwise pick** (the parent sits at the tenant
 # root, so it is no owner). `identity.role_permission` is the rows of a role's permission set (CR-076 decision:
@@ -685,6 +728,8 @@ RLS_MARKS = ("read-beneath", "grant-holder-read")
 # only where the role may be written.
 SPLIT_CHILDREN = {
     "identity.role_permission": "role_id",   # CHG-GEN-005 (CR-076)
+    # a replaced hash is moved by the call that replaces the credential, at the principal's own or home scope
+    "identity.principal_credential_history": "principal_credential_id",   # CHG-R8MIG-007 (IDENTITY-C37)
 }
 
 # **The same marks for a table no contract schema describes** (MOD audit, 14 October 2026, CHG-MOD-007). `pii.subject`
@@ -692,7 +737,8 @@ SPLIT_CHILDREN = {
 # relationship rather than a schema of their own, so `x-ticvai-rls` has nowhere to be written. Every one is read by
 # staff operations below the tenant (check-rls-scope-fit RF-TENANT-ROOT): a venue's guest lookup read no guest at all.
 TABLE_RLS = {
-    "pii.subject": "grant-holder-read",
+    # a guest reads and updates its own record (CHG-R8MIG-007, IDENTITY-C48): grant-holder-read alone shut it out
+    "pii.subject": "subject-self",
     "pii.subject_contact": "grant-holder-read",
     "fnb.delivery_location_outlet": "grant-holder-read",
     "whitelabel.homepage_section": "grant-holder-read",
@@ -780,6 +826,46 @@ BEGIN
         'platform.grant_holder() OR platform.subject_in_scope(subject_id)',
         'platform.subject_in_scope(subject_id)');
 END
+$$;
+
+-- `x-ticvai-rls: own-row` (CHG-R8MIG-007): the row's own principal (`ticvai.principal_id`, set with the session at
+-- sign-in) or guest (`ticvai.subject_id`), or the tenant root. A credential or a second factor is its owner's alone.
+CREATE OR REPLACE FUNCTION platform.own_row(row_principal_id uuid, row_subject_id uuid)
+    RETURNS boolean
+    LANGUAGE sql
+    STABLE
+    PARALLEL SAFE
+AS $$
+    SELECT (row_principal_id IS NOT NULL
+            AND row_principal_id::text = NULLIF(current_setting('ticvai.principal_id', true), ''))
+        OR (row_subject_id IS NOT NULL
+            AND row_subject_id::text = NULLIF(current_setting('ticvai.subject_id', true), ''))
+        OR platform.tenant_root_in_scope();
+$$;
+
+CREATE OR REPLACE FUNCTION platform.apply_own_row_rls(target regclass, principal_column text, subject_column text)
+    RETURNS void
+    LANGUAGE plpgsql
+AS $$
+DECLARE
+    chk text := format('platform.own_row(%s, %s)',
+                       CASE WHEN principal_column IS NULL THEN 'NULL::uuid' ELSE quote_ident(principal_column) END,
+                       CASE WHEN subject_column IS NULL THEN 'NULL::uuid' ELSE quote_ident(subject_column) END);
+BEGIN
+    PERFORM platform.apply_split_rls(target, chk, chk);
+END
+$$;
+
+-- `x-ticvai-rls: signed-in-read` (CHG-R8MIG-011): any signed-in caller of the tenant, staff (a scope path set) or a
+-- guest (its subject set), reads; nobody unconfigured does.
+CREATE OR REPLACE FUNCTION platform.signed_in()
+    RETURNS boolean
+    LANGUAGE sql
+    STABLE
+    PARALLEL SAFE
+AS $$
+    SELECT cardinality(platform.current_scope_paths()) > 0
+        OR NULLIF(current_setting('ticvai.subject_id', true), '') IS NOT NULL;
 $$;
 
 -- A child of a split row: read where the parent is visible, written only where the parent may be written
@@ -1275,7 +1361,11 @@ def rls_file(db: str, scoped: list, by_venue: list, by_parent: list, unscoped: l
         for t, col, par, key, *rest in by_parent:
             # a parent in another deployable is asked through platform.visible_parent_ids (CHG-RSF-001, decision D9)
             how = "across_" if t in across else ""
-            if rest:
+            if len(rest) >= 3:
+                # under a parent a guest may read: staff read through it, a guest only its own rows (CHG-R8MIG-026)
+                body.append(f"SELECT platform.apply_split_rls('{qual(t)}'::regclass, {sql_literal(rest[1])}, "
+                            f"{sql_literal(rest[2])});")
+            elif rest:
                 # follows a split parent for reading; written where the parent may be written (CHG-GEN-005)
                 body.append(f"SELECT platform.apply_parent_split_{how}rls('{qual(t)}'::regclass, '{col}', "
                             f"'{qual(par)}'::regclass, '{key}', {sql_literal(rest[0])});")
@@ -1360,6 +1450,36 @@ def obj_name(*parts: str, suffix: str) -> str:
 
 def sql_literal(v) -> str:
     return "'" + str(v).replace("'", "''") + "'"
+
+
+def exactly_one_sql(short: str, group: list) -> str:
+    """`x-ticvai-exactly-one-of` (ADAM CR-158, CHG-CRA-002): the table CHECK line that exactly one column is set."""
+    return (f"    CONSTRAINT {obj_name(short, *group, 'one', suffix='chk')} CHECK ("
+            f"num_nonnulls({', '.join(q(k) for k in group)}) = 1)")
+
+
+def index_sql(schema: str, short: str, table: str, group: list) -> str:
+    """`x-ticvai-index` (ADAM CR-165, CR-166; CHG-CRA-004): a plain index over the columns the contract names."""
+    return (f"-- declared index (x-ticvai-index): {table} ({', '.join(group)})\n"
+            f"CREATE INDEX IF NOT EXISTS {obj_name(short, *group, suffix='idx')} ON {q(schema)}.{q(short)} "
+            f"({', '.join(q(k) for k in group)});")
+
+
+def unique_when_sql(schema: str, short: str, table: str, keycols: list, cond: dict, keys: list) -> str:
+    """`x-ticvai-unique-when` (ADAM CR-154; CHG-CRA-004): a partial unique index. `keys` are the index's
+    expressions (a text key as `lower(...)`); `cond` maps a column to the value that selects the rows."""
+    preds = []
+    for k, v in sorted(cond.items()):
+        if v is True:
+            preds.append(q(k))
+        elif v is False:
+            preds.append(f"NOT {q(k)}")
+        else:
+            preds.append(f"{q(k)} = {sql_literal(v)}")
+    where = " AND ".join(preds)
+    return (f"-- unique when (x-ticvai-unique-when): {table} ({', '.join(keycols)}) where {where}\n"
+            f"CREATE UNIQUE INDEX IF NOT EXISTS {obj_name(short, *keycols, suffix='uniq')} "
+            f"ON {q(schema)}.{q(short)} ({', '.join(keys)}) WHERE {where};")
 
 
 def load_contract_props(docs: dict | None = None) -> dict:
@@ -1604,6 +1724,32 @@ def table_marks(cols: dict, tables) -> dict:
                 (column_of(str(p)) or f"?{p}",
                  {(column_of(str(k)) or f"?{k}"): v for k, v in (cond or {}).items()})
                 for p, cond in rw.items() if isinstance(cond, dict) and cond]
+        # **A row names exactly one of two things** (ADAM CR-158, 18 October 2026; CHG-CRA-002):
+        # `x-ticvai-exactly-one-of: [[permission, roleId]]` on the schema is a table CHECK that exactly one column of
+        # each set is set, `num_nonnulls(a, b) = 1`. A grant names a permission or a role, never both and never neither.
+        eo = marks.get("x-ticvai-exactly-one-of")
+        if isinstance(eo, list) and eo:
+            entry["exactly_one_of"] = [
+                [column_of(str(p)) or (str(p) if str(p) in names else f"?{p}") for p in group]
+                for group in eo if isinstance(group, list) and len(group) > 1]
+        # **A plain index over several columns the contract asks for** (ADAM CR-165, CR-166; CHG-CRA-004):
+        # `x-ticvai-index: [[aggregateId, sequence]]` on the schema, for a lookup no key or unique index serves
+        # (a provider's reference, an aggregate's next sequence). Named `<table>_<columns>_idx`.
+        ix = marks.get("x-ticvai-index")
+        if isinstance(ix, list) and ix:
+            entry["index"] = [
+                [column_of(str(p)) or (str(p) if str(p) in names else f"?{p}") for p in group]
+                for group in ix if isinstance(group, list) and group]
+        # **Unique among the rows of one kind only** (ADAM CR-154; CHG-CRA-004): `x-ticvai-unique-when:
+        # [{columns: [scopePath], when: {isCurrent: true}}]` is a partial unique index, so one tenant has one
+        # current version however many it keeps. Named `<table>_<columns>_<when column>_uniq`.
+        uw = marks.get("x-ticvai-unique-when")
+        if isinstance(uw, list) and uw:
+            entry["unique_when"] = [
+                ([column_of(str(p)) or (str(p) if str(p) in names else f"?{p}") for p in (u.get("columns") or [])],
+                 {(column_of(str(k)) or (str(k) if str(k) in names else f"?{k}")): v
+                  for k, v in (u.get("when") or {}).items()})
+                for u in uw if isinstance(u, dict) and u.get("columns") and u.get("when")]
         if len(entry) > 1:
             out[t] = entry
     return out
@@ -1789,8 +1935,7 @@ def frozen_mode(files: dict, tag: str, commit: str, apply: bool) -> None:
             name = path.rsplit("/", 1)[-1]
             if path.endswith(".sql") and not FORWARD_FILE.match(name):
                 old.add_file((show(commit, path) or b"").decode("utf-8"))
-        for fwd in sorted((OUT / area_dir).glob("V*.sql"), key=lambda p: int(FORWARD_FILE.match(p.name).group(1))
-                          if FORWARD_FILE.match(p.name) else 0):
+        for fwd in sorted((OUT / area_dir).glob("V*.sql"), key=lambda p: p.name):   # the order a database applies them: by name
             if FORWARD_FILE.match(fwd.name):
                 text = fwd.read_text(encoding="utf-8")
                 old.apply_forward(re.split(r"^-- =+\n-- ROLLBACK\b", text, maxsplit=1, flags=re.M)[0])
@@ -1821,6 +1966,42 @@ def frozen_mode(files: dict, tag: str, commit: str, apply: bool) -> None:
         written.append((dest, p))
         if apply:
             dest.write_text(ddl_forward.render(p, version, baseline, stamp), encoding="utf-8")
+    # **The second file: the names** (R8-MIG-001). It takes the next number after the additive file, or the same
+    # number when nothing additive is due, and is one number for both databases like the first.
+    recon_n = version_n + (1 if any(p.statements for p in plans) else 0)
+    recon_version = f"V{recon_n:04d}"
+    for p in plans:
+        if not p.recon:
+            continue
+        # **The renames a frozen file already needs go in a file that sorts before it** (R8-MIG-001, CHG-R8MIG-003):
+        # V0104 applies row-level security on four columns by their new names, so a fresh database stopped there.
+        # The file takes the number before the first frozen file that needs one and the next free letter (V0103a
+        # for V0104), which sorts between the two by name; a number of its own would be a number already taken
+        # (V01035 reads as 1035, the plan's V1035__fnb.sql). This run's own additive file counts as frozen too.
+        frozen = {x.name: x.read_text(encoding="utf-8") for x in (OUT / p.area).glob("V*.sql")
+                  if FORWARD_FILE.match(x.name) and "__names_" not in x.name}
+        frozen.update({f"{version}__after_{safe_tag}_{stamp}.sql": ddl_forward.render(q, version, baseline, stamp)
+                       for q in plans if q.area == p.area and q.statements})
+        early, rest, first = ddl_forward.split_early(p, frozen)
+        if early[0]:
+            import dataclasses as _dc
+            taken = {x.name.split("__", 1)[0] for x in (OUT / p.area).glob("V*.sql")}
+            ev = ddl_forward.early_version(first, taken)
+            ep = _dc.replace(p, recon=early[0], recon_rollback=early[1],
+                             recon_counts={"renames": len(early[0]), "keys": 0, "indexes": 0})
+            edest = OUT / p.area / f"{ev}__names_early_after_{safe_tag}_{stamp}.sql"
+            written.append((edest, ep))
+            if apply:
+                edest.write_text(ddl_forward.render_recon(ep, ev, baseline, stamp, before=first, rest=recon_version),
+                                 encoding="utf-8")
+            p.recon, p.recon_rollback = rest
+            p.recon_counts["renames"] -= len(early[0])
+            if not p.recon:
+                continue
+        dest = OUT / p.area / f"{recon_version}__names_after_{safe_tag}_{stamp}.sql"
+        written.append((dest, p))
+        if apply:
+            dest.write_text(ddl_forward.render_recon(p, recon_version, baseline, stamp), encoding="utf-8")
     review = ddl_forward.render_review(plans, baseline, stamp, extra)
     if apply:
         for name, text in files.items():
@@ -1834,6 +2015,11 @@ def frozen_mode(files: dict, tag: str, commit: str, apply: bool) -> None:
     print(f"  FROZEN at {baseline}: the baseline files under backend/ are not rewritten")
     for dest, p in written:
         c = p.counts
+        if "__names_" in dest.name:
+            r = p.recon_counts
+            print(f"  forward migration {dest.relative_to(ROOT).as_posix()}: {r['renames']} column rename(s), "
+                  f"{r['keys']} key(s), {r['indexes']} index(es)" + ("" if apply else " (not written, pass --apply)"))
+            continue
         print(f"  forward migration {dest.relative_to(ROOT).as_posix()}: {c['tables']} table(s), "
               f"{c['columns']} column(s), {c['indexes']} index(es), {c['other']} other"
               + (f", {c['policies']} row-level security polic(ies) re-applied" if c.get("policies") else "")
@@ -2150,7 +2336,29 @@ def main() -> int:
                 if ref and ref in real:
                     tgt_s, tgt_t = ref.split(".", 1)
                     tgt_key = key_of(ref, cols)
-                    if c.get("enforced") == "yes" and tgt_key:
+                    # **A key into a versioned row names its version too** (CHG-R8MIG-019; R8 blocker
+                    # APPROVALS-TENANCY-C08): `x-ticvai-references-version: <sibling property>` on a reference whose
+                    # parent's declared key is (id, version) makes the key (col, version col) -> parent (id, version).
+                    vprop = (contract_props.get(str(c.get("source") or "")) or {}).get("x-ticvai-references-version")
+                    vcol = next((x["column"] for x in cols[t]
+                                 if str(x.get("source") or "").rsplit(".", 1)[-1] == str(vprop)), None) if vprop else None
+                    # A derived child of a versioned parent names its version column itself (derive-schema,
+                    # CHG-R8INT-023): `plan_module.plan_id` with `plan_version`.
+                    vcol = vcol or c.get("referencesVersionColumn")
+                    ppk = DECLARED_PK.get(ref) or []
+                    if (c.get("enforced") == "yes" and vcol and len(ppk) == 2
+                            and area(schema) == area(tgt_s)):
+                        fk_lines.append((schema,
+                            f"ALTER TABLE {q(schema)}.{q(short)} ADD CONSTRAINT "
+                            f"{obj_name(short, col, suffix='fkey')} FOREIGN KEY ({q(col)}, {q(vcol)}) "
+                            f"REFERENCES {q(tgt_s)}.{q(tgt_t)}({q(ppk[0])}, {q(ppk[1])});"))
+                        n_fk += 1
+                        idx_lines.append((schema,
+                            f"-- declared, with its version: {t}.({col}, {vcol}) -> {ref}\n"
+                            f"CREATE INDEX IF NOT EXISTS {obj_name(short, col, vcol, suffix='idx')} "
+                            f"ON {q(schema)}.{q(short)} ({q(col)}, {q(vcol)});"))
+                        n_idx += 1
+                    elif c.get("enforced") == "yes" and tgt_key:
                         stmt = (f"ALTER TABLE {q(schema)}.{q(short)} ADD CONSTRAINT "
                                 f"{obj_name(short, col, suffix='fkey')} FOREIGN KEY ({q(col)}) "
                                 f"REFERENCES {q(tgt_s)}.{q(tgt_t)}({q(tgt_key)});")
@@ -2337,6 +2545,30 @@ def main() -> int:
                     f"({', '.join(unique_key(k, col_type, src_of) for k in keycols)}){nnd};"))
                 n_uniq += 1
 
+            # `x-ticvai-unique-when` (ADAM CR-154, CHG-CRA-004): unique among the rows the condition selects only,
+            # a partial unique index named like any other, `<table>_<columns>_uniq` (the name the published answer
+            # gave developers for their own migration).
+            for group, cond in (marks.get(t) or {}).get("unique_when") or []:
+                bad = [k[1:] for k in [*group, *cond] if k.startswith("?")]
+                if bad:
+                    no_unique.append(f"{t} (x-ticvai-unique-when {group}): {', '.join(bad)} is not a column")
+                    continue
+                keycols = list(group)
+                if part_col and part_col not in keycols:
+                    keycols.append(part_col)
+                idx_lines.append((schema, unique_when_sql(schema, short, t, keycols, cond,
+                                                          [unique_key(k, col_type, src_of) for k in keycols])))
+                n_uniq += 1
+
+            # `x-ticvai-index` (ADAM CR-165, CR-166; CHG-CRA-004): a plain index over the columns the contract names.
+            for group in (marks.get(t) or {}).get("index") or []:
+                missing = [k for k in group if k.startswith("?")]
+                if missing:
+                    no_unique.append(f"{t} (x-ticvai-index {group}): {', '.join(k[1:] for k in missing)} is not a column")
+                    continue
+                idx_lines.append((schema, index_sql(schema, short, t, group)))
+                n_idx += 1
+
             if not inline_pk and pk_cols:
                 body.append(f"    CONSTRAINT {obj_name(short, suffix='pkey')} PRIMARY KEY "
                             f"({', '.join(q(k) for k in pk_cols)})")
@@ -2348,12 +2580,30 @@ def main() -> int:
                     continue
                 exempt = []
                 for k, v in sorted(cond.items()):
+                    if v is None:
+                        # `{reservationId: {orderId: null}}`: required where the other column is null (CHG-R8MIG-017,
+                        # ORDERS-MONEY-C35), so a row names at least one of the two
+                        exempt.append(f"{q(k)} IS NOT NULL")
+                        continue
+                    if isinstance(v, dict) and list(v) == ["not"] and v["not"] is None:
+                        # `{planVersion: {planId: {not: null}}}`: required wherever the other column is set (r8 gate
+                        # residue, CHG-R8RES-006). Written both ways, two columns are both set or both null: a
+                        # two-column key with one null column is never checked by its foreign key (MATCH SIMPLE).
+                        exempt.append(f"{q(k)} IS NULL")
+                        continue
                     vals = v if isinstance(v, list) else [v]
                     lits = ", ".join(sql_literal(x) for x in vals)
                     exempt.append(f"{q(k)} IS DISTINCT FROM {lits}" if len(vals) == 1
                                   else f"{q(k)} IS NULL OR {q(k)} NOT IN ({lits})")
                 body.append(f"    CONSTRAINT {obj_name(short, rcol, 'when', suffix='chk')} CHECK ("
                             f"{' OR '.join(exempt)} OR {q(rcol)} IS NOT NULL)")
+            # `x-ticvai-exactly-one-of` (ADAM CR-158, CHG-CRA-002): exactly one column of the set is set.
+            for group in (marks.get(t) or {}).get("exactly_one_of") or []:
+                bad = [k[1:] for k in group if k.startswith("?")]
+                if bad:
+                    no_unique.append(f"{t} (x-ticvai-exactly-one-of {group}): {', '.join(bad)} is not a column")
+                    continue
+                body.append(exactly_one_sql(short, group))
             out.append(",\n".join(body))
             # ADR-0056: range-partitioned by month; the partitions are in 930-partitioning.sql.
             out.append(f") PARTITION BY RANGE ({q(part_col)});" if part_col else ");")
@@ -2514,6 +2764,7 @@ def main() -> int:
         return f"{q(sch)}.{q(n)}"
 
     split_calls: dict = {}    # table -> (call, why)
+    split_mark: dict = {}     # table -> (its x-ticvai-rls mark, its base rule)
     split_write: dict = {}    # table -> its write check, `{a}` standing for the row's alias
     split_depth: dict = {}
     parent_of = {p[0]: p for p in by_parent}
@@ -2540,7 +2791,72 @@ def main() -> int:
             base, write = "subject", "platform.subject_in_scope({a}subject_id)"
         else:
             base, write = "tenant root", "platform.tenant_root_in_scope()"
-        if mark == "read-beneath":
+        if mark == "home-scope-write":
+            if "home_scope_id" not in has or base in ("scope_path", "venue_id"):
+                print(f"  ! {t}: x-ticvai-rls home-scope-write needs home_scope_id and no scope_path or venue_id; "
+                      "the base rule stands")
+                continue
+            write = ("(platform.tenant_root_in_scope() OR EXISTS (SELECT 1 FROM platform.scope hs WHERE hs.id = "
+                     "{a}home_scope_id AND platform.in_scope(hs.path)))")
+            call = (f"SELECT platform.apply_grant_holder_read_rls('{tq(t)}'::regclass, "
+                    f"{sql_literal(write.format(a=''))});")
+            base = "the tenant root or a grant over its home scope"
+        elif mark == "scope-or-subject":
+            subs = [x for x in ("subject_id", "over_subject_id", "granted_by_subject_id") if x in has]
+            holder = "over_subject_id" if "over_subject_id" in has else ("subject_id" if "subject_id" in has else None)
+            if base != "scope_path" or not holder:
+                print(f"  ! {t}: x-ticvai-rls scope-or-subject needs a scope_path and a subject column; the base rule "
+                      "stands")
+                continue
+            read = " OR ".join(["platform.in_scope(scope_path)"]
+                               + [f"platform.own_row(NULL::uuid, {x})" for x in subs])
+            write = "(platform.in_scope({a}scope_path) OR platform.own_row(NULL::uuid, {a}" + holder + "))"
+            call = (f"SELECT platform.apply_split_rls('{tq(t)}'::regclass, {sql_literal(read)}, "
+                    f"{sql_literal(write.format(a=''))});")
+            base = "its scope, or the guest account it is about"
+        elif mark == "signed-in-read":
+            call = (f"SELECT platform.apply_split_rls('{tq(t)}'::regclass, 'platform.signed_in()', "
+                    f"{sql_literal(write.format(a=''))});")
+        elif mark == "own-or-home-scope":
+            if "principal_id" not in has or base in ("scope_path", "venue_id"):
+                print(f"  ! {t}: x-ticvai-rls own-or-home-scope needs principal_id and no scope_path or venue_id; "
+                      "the base rule stands")
+                continue
+            write = ("(platform.own_row({a}principal_id, NULL::uuid) OR EXISTS (SELECT 1 FROM identity.principal hp "
+                     "JOIN platform.scope hs ON hs.id = hp.home_scope_id WHERE hp.id = {a}principal_id "
+                     "AND platform.in_scope(hs.path)))")
+            call = (f"SELECT platform.apply_split_rls('{tq(t)}'::regclass, {sql_literal(write.format(a=''))}, "
+                    f"{sql_literal(write.format(a=''))});")
+            base = "its principal, a grant over the principal's home scope, or the tenant root"
+        elif mark == "subject-self":
+            if "subject_id" in has or base in ("scope_path", "venue_id"):
+                print(f"  ! {t}: x-ticvai-rls subject-self is for the subject record itself (its id is the subject); "
+                      "the base rule stands")
+                continue
+            write = "platform.own_row(NULL::uuid, {a}id)"
+            call = (f"SELECT platform.apply_split_rls('{tq(t)}'::regclass, "
+                    f"{sql_literal('platform.grant_holder() OR platform.own_row(NULL::uuid, id)')}, "
+                    f"{sql_literal(write.format(a=''))});")
+            base = "the guest itself or the tenant root"
+        elif mark == "own-row":
+            pc = "principal_id" if "principal_id" in has else None
+            sc = "subject_id" if "subject_id" in has else None
+            if not (pc or sc) or base in ("scope_path", "venue_id"):
+                print(f"  ! {t}: x-ticvai-rls own-row needs principal_id or subject_id and no scope_path or venue_id; "
+                      "the base rule stands")
+                continue
+            lit = lambda c: sql_literal(c) if c else "NULL"
+            call = f"SELECT platform.apply_own_row_rls('{tq(t)}'::regclass, {lit(pc)}, {lit(sc)});"
+            write = ("platform.own_row(" + ("{a}principal_id" if pc else "NULL::uuid") + ", "
+                     + ("{a}subject_id" if sc else "NULL::uuid") + ")")
+            base = "its own principal or guest"
+        elif mark == "read-beneath" and base == "venue_id":
+            # **Owned above, read below, for a venue_id table** (CHG-R8MIG-026; the storage-sat lane's request 7,
+            # ORDERS-MONEY-C33 answer A): a row with no venue is the tenant's and is read at every venue; a venue's row
+            # is read and written at that venue, as apply_venue_rls.
+            call = (f"SELECT platform.apply_split_rls('{tq(t)}'::regclass, "
+                    f"'venue_id IS NULL OR platform.venue_in_scope(venue_id)', 'platform.venue_in_scope(venue_id)');")
+        elif mark == "read-beneath":
             if base != "scope_path":
                 print(f"  ! {t}: x-ticvai-rls read-beneath needs a scope_path (its rows are owned by {base}); "
                       "use grant-holder-read, or give the schema a scopePath. The base rule stands")
@@ -2554,6 +2870,7 @@ def main() -> int:
         else:
             call = (f"SELECT platform.apply_grant_holder_read_rls('{tq(t)}'::regclass, "
                     f"{sql_literal(write.format(a=''))});")
+        split_mark[t] = (mark, base)
         split_calls[t] = (call, f"x-ticvai-rls: {mark}, written by {base} "
                                 f"({(marks.get(t) or {}).get('schema') or 'TABLE_RLS'})")
         split_write[t] = write.format(a="{a}.")
@@ -2575,6 +2892,21 @@ def main() -> int:
             continue
         d = split_depth[par] + 1
         by_parent[i] = (t, col, par, key, split_write[par].format(a="parent_row"))
+        # **A parent a guest may read does not open its children to every guest** (CHG-R8MIG-026; the storage-sat lane's
+        # request 7): marketing.badge is signed-in-read, and marketing.customer_badge followed it for reading, so any
+        # guest would have read every customer's awards. Under such a parent (signed-in-read, or read-beneath on
+        # venue_id) a child is read by staff where the parent is visible, by a guest only for its own subject
+        # (customer_id or subject_id), and written where the parent may be written.
+        pm = split_mark.get(par)
+        if pm and (pm[0] == "signed-in-read" or (pm[0] == "read-beneath" and pm[1] == "venue_id")):
+            ccols = {c_["column"] for c_ in cols.get(t, [])}
+            subj = "customer_id" if "customer_id" in ccols else ("subject_id" if "subject_id" in ccols else None)
+            link = f"pr.{q(key)} = {tq(t)}.{q(col)}"
+            wr = f"EXISTS (SELECT 1 FROM {tq(par)} pr WHERE {link} AND ({split_write[par].format(a='pr')}))"
+            rd = f"(platform.grant_holder() AND EXISTS (SELECT 1 FROM {tq(par)} pr WHERE {link}))"
+            if subj:
+                rd += f" OR platform.own_row(NULL::uuid, {q(subj)})"
+            by_parent[i] = (t, col, par, key, split_write[par].format(a="parent_row"), rd, wr)
         alias = f"p{d}"
         split_write[t] = (f"EXISTS (SELECT 1 FROM {tq(par)} {alias} WHERE {alias}.{q(key)} = {{a}}.{q(col)} AND ("
                           + split_write[par].format(a=alias) + "))")

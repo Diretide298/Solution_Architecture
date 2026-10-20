@@ -23,7 +23,7 @@ modulesUsed:
   screens: 104
 servicesCalled:
 - service: WhiteLabelService
-  operationCalls: 119
+  operationCalls: 122
 - service: MarketingService
   operationCalls: 73
 - service: VenueOpsService
@@ -245,6 +245,7 @@ screens:
   - deleteContentPage
   - getHomepageLayout
   - getModuleEnablement
+  - getPublishReviewPolicy
   - listContentBlocks
   - listContentPages
   - listLandingPageTemplates
@@ -2551,6 +2552,7 @@ screens:
   - listGuidedChoices
   - listProductCategories
   - listProducts
+  - previewGuidedChoice
   - publishGuidedChoice
   - suggestGuidedChoice
   - unpublishGuidedChoice
@@ -2624,6 +2626,7 @@ screens:
   operations:
   - createBookingFlowDefinition
   - deleteBookingFlow
+  - diffConfigVersion
   - getBookingFlow
   - getPublishedBookingFlow
   - listBookingFlowTypes
@@ -2646,6 +2649,7 @@ screens:
   entryParams:
   - venueId<-session
   - bookingFlowId<-CMS-102
+  - version<-CMS-015
   - productId<-navigation
   goesTo:
   - CMS-014

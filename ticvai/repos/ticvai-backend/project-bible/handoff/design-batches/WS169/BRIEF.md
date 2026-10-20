@@ -112,7 +112,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-996` | Filters & Interactive Legend | C | 0 | 20 | 6 | 8 | 0 | 0 | — | notStarted (—) |
 | `BO-997` | Real-Time Availability & Locking | C | 0 | 17 | 6 | 1 | 0 | 0 | — | notStarted (—) |
 | `BO-998` | Lock Timeout & Concurrency | B | 0 | 0 | 6 | 0 | 1 | 4 | — | notStarted (—) |
-| `BO-999` | Cart & Multi-Seat Management | C | 0 | 10 | 6 | 0 | 0 | 6 | — | notStarted (—) |
+| `BO-999` | Cart & Multi-Seat Management | C | 0 | 11 | 6 | 0 | 0 | 6 | — | notStarted (—) |
 | `BO-1000` | Mobile & Accessible Selection | C | 0 | 20 | 6 | 8 | 0 | 0 | — | notStarted (—) |
 | `BO-1001` | View Preview, Compare & Heat Map | C | 0 | 20 | 6 | 20 | 0 | 0 | — | notStarted (—) |
 | `BO-1002` | AI Conversational Seat Assistant | C | 0 | 20 | 6 | 20 | 0 | 6 | — | notStarted (—) |

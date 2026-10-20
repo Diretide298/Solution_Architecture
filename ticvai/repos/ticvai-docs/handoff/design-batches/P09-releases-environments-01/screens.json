@@ -10,7 +10,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/general/release-and-version-management",
-   "component": "apps/ticvai-web/src/routes/general/ReleaseAndVersionManagementForm.tsx",
+   "component": "src/routes/general/ReleaseAndVersionManagementForm.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -365,7 +365,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/general/staging-promotion-and-approval",
-   "component": "apps/ticvai-web/src/routes/general/StagingPromotionAndApprovalWizard.tsx",
+   "component": "src/routes/general/StagingPromotionAndApprovalWizard.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -675,7 +675,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/general/release-notification-composer",
-   "component": "apps/ticvai-web/src/routes/general/ReleaseNotificationComposerForm.tsx",
+   "component": "src/routes/general/ReleaseNotificationComposerForm.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -908,7 +908,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/general/tenant-upgrade-scheduler",
-   "component": "apps/ticvai-web/src/routes/general/TenantUpgradeSchedulerForm.tsx",
+   "component": "src/routes/general/TenantUpgradeSchedulerForm.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1100,7 +1100,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/general/end-of-support-notice-management",
-   "component": "apps/ticvai-web/src/routes/general/EndOfSupportNoticeManagementForm.tsx",
+   "component": "src/routes/general/EndOfSupportNoticeManagementForm.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1426,7 +1426,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/general/database-migration-console",
-   "component": "apps/ticvai-web/src/routes/general/DatabaseMigrationConsoleDetail.tsx",
+   "component": "src/routes/general/DatabaseMigrationConsoleDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1751,7 +1751,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/general/environment-registry",
-   "component": "apps/ticvai-web/src/routes/general/EnvironmentRegistryDetail.tsx",
+   "component": "src/routes/general/EnvironmentRegistryDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1949,7 +1949,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/releases-environments/configuration-promotion",
-   "component": "apps/ticvai-web/src/routes/releases-environments/ConfigurationPromotion.tsx",
+   "component": "src/routes/releases-environments/ConfigurationPromotion.tsx",
    "status": "notStarted"
   },
   "navigation": {

@@ -224,7 +224,7 @@ operationsByContract:
     scope: region
     permission: LEDGER_APPROVE
     offline: false
-    reads: 2
+    reads: 3
     writes: 2
   - operation: ingestSettlementFile
     verb: POST
@@ -416,8 +416,8 @@ operationsByContract:
     scope: venue
     permission: null
     offline: false
-    reads: 6
-    writes: 4
+    reads: 7
+    writes: 5
   - operation: recordDeposit
     verb: POST
     path: /deposits
@@ -536,7 +536,7 @@ operationsByContract:
     scope: region
     permission: LEDGER_APPROVE
     offline: false
-    reads: 2
+    reads: 3
     writes: 3
   - operation: setFxRate
     verb: PUT
@@ -592,16 +592,16 @@ operationsByContract:
     scope: tenant
     permission: LEDGER_VIEW
     offline: false
-    reads: 2
-    writes: 0
+    reads: 3
+    writes: 1
   - operation: verifyTaxExemption
     verb: POST
     path: /tax-exemptions/{exemptionId}/verify
     scope: region
     permission: TAX_CONFIGURE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
 tables:
 - store: cache:idempotency
   kind: cache
@@ -632,6 +632,7 @@ tables:
   - ingestSettlementFile
   - issueCreditMemo
   - issueTaxInvoice
+  - postOrderRevenue
   - recordDeposit
   - recordEInvoiceTransmissionStatus
   - recordSettlement
@@ -653,6 +654,8 @@ tables:
   - transmitEInvoices
   - updateAccount
   - updateTaxCode
+  - validateRecognitionSchedules
+  - verifyTaxExemption
   readBy:
   - abandonPeriodClose
   - approveJournalEntry
@@ -667,9 +670,11 @@ tables:
   - createTaxCode
   - createTaxExemption
   - disputeObligation
+  - ingestFxRates
   - ingestSettlementFile
   - issueCreditMemo
   - issueTaxInvoice
+  - postOrderRevenue
   - recordDeposit
   - recordEInvoiceTransmissionStatus
   - recordSettlement
@@ -684,12 +689,15 @@ tables:
   - runRecognition
   - setAccountMappings
   - setEInvoicingProvider
+  - setFxProvider
   - setFxRate
   - setTaxInvoiceTemplate
   - settleDeposit
   - transmitEInvoices
   - updateAccount
   - updateTaxCode
+  - validateRecognitionSchedules
+  - verifyTaxExemption
   keys:
     setEInvoicingProvider:
       role: evicts
@@ -744,7 +752,7 @@ tables:
   - finance
   foreignWriters: null
 - table: ledger.account_mapping
-  columns: 5
+  columns: 6
   store: postgres
   parent: ledger.account
   writtenBy:
@@ -834,18 +842,16 @@ tables:
   - finance
   foreignWriters: null
 - table: ledger.journal_entry
-  columns: 21
+  columns: 22
   store: postgres
   parent: null
   writtenBy:
   - finance
   - orders
   - payments
-  - shift
   foreignWriters:
   - orders
   - payments
-  - shift
 - table: ledger.journal_line
   columns: 9
   store: postgres

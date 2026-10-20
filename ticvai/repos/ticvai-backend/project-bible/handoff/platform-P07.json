@@ -7,7 +7,7 @@
  "audience": "staff",
  "formFactor": "handheld",
  "offlineCapable": true,
- "generated": "2026-10-18",
+ "generated": "2026-10-20",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 11,
@@ -15,7 +15,7 @@
   "contracts": 5,
   "modules": 1,
   "undrawn": 0,
-  "operationsWithNoScreen": 42
+  "operationsWithNoScreen": 45
  },
  "waves": {
   "wave1": 11
@@ -275,6 +275,12 @@
     "summary": "What this person may do, as ticks"
    },
    {
+    "operation": "getSessionVenue",
+    "contract": "identity",
+    "verb": "GET",
+    "summary": "Which venue this back-office session is working in, and which it may switch to"
+   },
+   {
     "operation": "listAccessDecisions",
     "contract": "identity",
     "verb": "GET",
@@ -311,10 +317,22 @@
     "summary": "Who already holds a conflicting pair"
    },
    {
+    "operation": "listStepUpSupervisors",
+    "contract": "identity",
+    "verb": "GET",
+    "summary": "Who may sign a supervisor step-up here"
+   },
+   {
     "operation": "setPrincipalModuleAccess",
     "contract": "identity",
     "verb": "PUT",
     "summary": "Tick what they may do"
+   },
+   {
+    "operation": "setSessionVenue",
+    "contract": "identity",
+    "verb": "PUT",
+    "summary": "Switch the back-office session to another venue it may act at"
    },
    {
     "operation": "updateRole",

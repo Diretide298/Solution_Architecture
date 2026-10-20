@@ -16,7 +16,10 @@
 #                 epic). Writes /tmp/op-created.json {key: id}, the versions as VERSION-S<n> (CREATED_OUT).
 #   guard again   with the new ids
 #   priority      Priority_No. (the build order) on every plan ticket, started and closed ones too
-#   assign        a plan ticket On hold (deferred earlier, planned again) goes back to New with one comment; then
+#   assign        a plan ticket On hold (deferred earlier, planned again) goes back to New with one comment, unless the
+#                 lead holds it (the bundle's `hold`, docs/active/held-tasks.yaml, CHG-R8DEC-004): a held New ticket
+#                 goes On hold with that one comment and leaves the board (no assignee, no sprint, as op-retire's
+#                 Deferred), a held On hold one stays so, a started one is listed and left alone; then
 #                 assignee, accountable and sprint version on New tickets (names through the bundle's aliases); a
 #                 started ticket gets one comment per release naming the plan's person (ASSIGN_COMMENT=0: none) and
 #                 keeps its owner and sprint (stable owners, plan item L2)
@@ -148,6 +151,8 @@ B["ids"].each { |k, v| ids[k] = v.to_i }
 tickets = B["tickets"]
 by_key = {}
 tickets.each { |t| by_key[t["key"]] = t }
+# Plan tickets the lead holds (CHG-R8DEC-004): never reopened, never assigned, set On hold when New.
+held_keys = tickets.select { |t| t["hold"] }.map { |t| t["key"] }.to_set
 left_ids = (B["retire"].map { |e| e["id"] } + B["unexplained"].map { |e| e["id"] }).compact.map(&:to_i).to_set
 
 rel_say "OpenProject #{OpenProject::VERSION}: release #{RELEASE} bundle, built from #{B['built_from']} at #{B['built_at']}"
@@ -393,7 +398,8 @@ if rel_run?("assign")
   # **Back in the plan** (1 October): a ticket op-retire deferred (On hold) whose work the plan has again goes back
   # to New, with one comment, so it is assigned and versioned like any New ticket below.
   reopen_marker = B["reopen_marker"] || "Back in the plan"
-  reopen = tickets.map { |t| [t, all_ids[t["key"]]] }.select { |t, id| id && wps[id] && wps[id].status_id == status_hold.id }
+  # A ticket the lead holds is never reopened (CHG-R8DEC-004; op-release.py hold_problems() refuses a bundle without this).
+  reopen = tickets.map { |t| [t, all_ids[t["key"]]] }.select { |t, id| id && wps[id] && wps[id].status_id == status_hold.id && !held_keys.include?(t["key"]) }
   rel_say "On hold tickets the plan has again (back to New): #{reopen.size}"
   rel_list(reopen.map { |t, id| "reopen ##{id} #{t['key']}" })
   if APPLY && reopen.any?
@@ -404,6 +410,50 @@ if rel_run?("assign")
           w.status_id = NEW_ID
           where = t["sprint"] ? "Sprint #{t['sprint']}" : "the plan"
           w.add_journal(author, "**#{reopen_marker}** (release #{RELEASE}): this work is planned again, in #{where}; it was on hold.")
+          w.save!(validate: false)
+        end
+      end
+    end
+    wps = load_wps.call
+  end
+  # **Held in the plan** (the lead, 20 October 2026; CHG-R8DEC-004). A held ticket keeps its key and its place in the
+  # plan, but leaves the board: a New one goes On hold with the bundle's one comment (the reason) and loses its
+  # assignee and sprint, as op-retire's Deferred does; one already On hold stays so; a started or closed one is listed
+  # and left alone (work in progress is a conversation, not a script).
+  hold_marker = B["hold_marker"] || "On hold in the plan"
+  to_hold, held_already, held_left = [], [], []
+  held_later = 0
+  tickets.each do |t|
+    next unless t["hold"]
+    id = all_ids[t["key"]]
+    w = id && wps[id]
+    unless w
+      held_later += 1
+      next
+    end
+    if w.status_id == NEW_ID
+      to_hold << [t, id]
+    elsif w.status_id == status_hold.id
+      held_already << id
+    else
+      held_left << "##{id} #{t['key']}: #{w.status.name}, #{w.status.is_closed ? 'closed' : 'started'} - left alone"
+    end
+  end
+  held_noted = Journal.where(journable_type: "WorkPackage", journable_id: to_hold.map { |_, i| i })
+                      .where("notes LIKE ?", "%#{hold_marker}%").pluck(:journable_id).to_set
+  rel_say "held in the plan (#{held_keys.size} tickets): #{to_hold.size} New to set On hold, #{held_already.size} " \
+      "already On hold (kept), #{held_left.size} started or closed (left alone)" +
+      (held_later > 0 ? ", #{held_later} made in this run (held once they exist)" : "")
+  rel_list(to_hold.map { |t, id| "hold ##{id} #{t['key']}" } + held_left)
+  if APPLY && to_hold.any?
+    rel_quietly do
+      WorkPackage.transaction do
+        to_hold.each do |t, id|
+          w = WorkPackage.find(id)
+          w.status_id = status_hold.id
+          w.assigned_to = nil
+          w.send("#{version_col}=", nil)
+          w.add_journal(author, t["hold"]) unless held_noted.include?(id)
           w.save!(validate: false)
         end
       end
@@ -432,6 +482,7 @@ if rel_run?("assign")
   end
   change, notes, moves = {}, [], Hash.new(0)
   tickets.each do |t|
+    next if held_keys.include?(t["key"])          # held: no person, no sprint, no plan-update comment (above)
     id = all_ids[t["key"]]
     w = id && wps[id]
     next unless w
@@ -498,7 +549,8 @@ if rel_run?("assign")
     end
     rel_say "done: #{change.size} tickets changed, #{notes.size} comments"
   end
-  results << "assign: #{change.size} changed, #{notes.size} commented"
+  results << "assign: #{change.size} changed, #{notes.size} commented; held: #{to_hold.size} #{APPLY ? 'set' : 'to set'} " \
+             "On hold, #{held_already.size} kept, #{held_left.size} started left alone"
 end
 
 # ---------------------------------------------------------------------------------------------------------- links
@@ -647,9 +699,15 @@ if rel_run?("descriptions")
   commented = Journal.where(journable_type: "WorkPackage", journable_id: wps.keys)
                      .where("notes LIKE ?", "%#{COMMENT_MARKER}%").pluck(:journable_id).to_set
   rewrite, comment, retitle, kept_titles = [], [], [], []
-  same = already_pointer = already_commented = closed = 0
+  same = already_pointer = already_commented = closed = held_skipped = 0
   ordered = tickets.sort_by { |t| [t["sequence"] || 999_999, t["key"]] }
   ordered.each do |t|
+    # A held ticket keeps its text and title while it is held: its hold comment says why; the pointer comes with the
+    # release that puts it back to New (CHG-R8DEC-004).
+    if held_keys.include?(t["key"])
+      held_skipped += 1
+      next
+    end
     id = all_ids[t["key"]]
     w = id && wps[id]
     next unless w
@@ -685,6 +743,7 @@ if rel_run?("descriptions")
       "#{already_pointer} already carry a pointer, #{closed} closed (no comment)" +
       (BATCH ? " (BATCH=#{BATCH}: #{cm.size} this run)" : "")
   rel_say "titles: #{retitle.size} to retitle, #{kept_titles.size} on started tickets kept (RETITLE=all changes them too)"
+  rel_say "held in the plan: #{held_skipped} tickets keep their text and title while held" if held_skipped > 0
   rel_list(rw.map { |i, k, _, was| "rewrite ##{i} #{k} (#{was} -> pointer)" } +
             cm.map { |i, k, s, _| "comment ##{i} #{k} (#{s})" } +
             retitle.map { |i, k, was, now| "retitle ##{i} #{k}: '#{was[0, 50]}' -> '#{now[0, 50]}'" } + kept_titles)

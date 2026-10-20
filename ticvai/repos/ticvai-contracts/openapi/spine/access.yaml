@@ -232,8 +232,9 @@ paths:
         `accreditation.credentialIssued` (a replacement stops the credential it replaces) and
         `accreditation.holderStatusChanged` (a holder suspended, revoked, expired or archived stops admitting).
         It admits only where the credential `admits`, today is within its validity and this access point''s zone
-        is among its `zoneIds`; the same rows travel in the offline package, so a gate without a network decides
-        the same way.
+        (`access.access_point.access_area_id`) is among its `zoneIds`, compared as text; a point with no zone is venue-wide
+        and applies no zone filter (CHG-R8MIG-004). The same rows travel in the offline package, so a gate without a
+        network decides the same way.
 
         '
       tags:
@@ -466,6 +467,9 @@ paths:
       - query: identity#delegatedAccessRecords
         route: service
         for: 'its read of identity.delegated_access, Identity''s data (CHG-MOD-001)'
+      - query: catalogue#productRecords
+        route: service
+        for: 'productName, imageUrl and guestCategory of each entitlement, Catalogue''s data (R8 blocker ORDERS-MONEY-C20, CHG-R8MIG-009)'
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -1516,6 +1520,10 @@ paths:
     post:
       operationId: issueOrderEntitlements
       x-ticvai-read-via:
+      - query: catalogue#productRecords
+        route: service
+        for: 'the issued entitlements'' productName and imageUrl, from catalogue.product and its catalogue.product_media,
+          Catalogue''s data (CHG-R8MIG-009) (r8 gate, CHG-R8GT2-007; check-cross-module-reads XR-FACT)'
       - query: catalogue#entitlementTemplateRecords
         route: service
         for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001)'
@@ -1600,6 +1608,9 @@ paths:
                     properties:
                       lineId:
                         type: string
+                        description: The order line's id (orders.order_line.id, a uuid as text; `format` is not added because
+                          that is a breaking change against r1), from `order.paid` lines[].lineId. With orderId it is this
+                          consumer's per-line idempotency key (FOUNDATION-AI-C04).
                       variantId:
                         type: string
                         format: uuid
@@ -1610,6 +1621,12 @@ paths:
                         type: string
                         format: uuid
                         nullable: true
+                      attributes:
+                        allOf:
+                        - $ref: ../spine/orders.yaml#/components/schemas/OrderLineAttributes
+                        description: 'The line''s attributes as the order line keeps them (R8 blocker ORDERS-MONEY-C22,
+                          CHG-R8MIG-023). A parking line''s `attributes.parking` gives the parking entitlement its plate
+                          (`plate_number`), `validFrom` and `validTo`.'
       responses:
         '200':
           headers:
@@ -1717,6 +1734,17 @@ paths:
         WEB-041 and GST-027 change a parking entitlement with `updateParkingEntitlement` and never read it,
         so the plate and the dates they edit came from nowhere. Self-scoped, as the update is. Returns what
         the write stores, in the write's own shape.
+
+        **Another guest's entitlement is `404`, exactly as one that does not exist** (Pattern 4; Chinmay,
+        3 October 2026, CHG-GCF-002): there is no `403` here, so a guest cannot learn that an id belongs to
+        someone else (R8 blocker cause ORDERS-MONEY-C01, CHG-R8SPN-018).
+
+        **A guest's read only** (R8 blocker ORDERS-MONEY-C22, CHG-R8MIG-023): the audience is guest, so a staff
+        session's token is refused 403.
+
+        **The two refusals do not meet** (r8 integration, CHG-R8INT-021): a guest never gets `403` (another
+        guest's entitlement answers `404`, Pattern 4); a staff or partner token is refused `403` because the
+        operation is guest-only, before any entitlement is looked up.
       x-ticvai-permission: null
       x-ticvai-self-scoped: subject
       x-ticvai-scope-level: venue
@@ -1729,7 +1757,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ParkingEntitlement'
-        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
         '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
@@ -1757,6 +1784,11 @@ paths:
         or `status: revoked` — through `UpdateParkingEntitlementRequest`. Facility, order and validity
         window are fixed at purchase and are not resent.
 
+
+        **When the plate may change** (R8 blocker ORDERS-MONEY-C22, CHG-R8MIG-023): while the entitlement is
+        `pending`, `active`, `pushFailed` or `pushed` (a pushed one is pushed again: back to `pending`); a `used`,
+        `expired` or `revoked` one is `409 plate-change-not-allowed`.
+
         '
       tags:
       - access
@@ -1782,6 +1814,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ParkingEntitlement'
+        '409':
+          description: The plate cannot change in the entitlement's state (`used`, `expired`, `revoked`).
+          x-ticvai-problem-types: [plate-change-not-allowed]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '400':
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '429':
@@ -2132,7 +2171,9 @@ paths:
         **Accreditation credentials travel in the package** (29 September, build; BL-181):
         `accreditationCredentials` carries the admitting `access.accreditation_credential` rows whose zones include
         this access point''s, so an accredited person is admitted, and a suspended or revoked one refused, with
-        no network. A holder status change or a replacement changes the `etag`, so the next conditional refresh
+        no network. **The point''s zone is `access.access_point.access_area_id`** (CHG-R8MIG-004): credentials whose
+        `zoneIds`, and dynamic policies whose `allowedZoneIds`, contain it (compared as text); a point with no zone
+        is venue-wide and gets them unfiltered. A holder status change or a replacement changes the `etag`, so the next conditional refresh
         takes it.
 
         '
@@ -2923,6 +2964,10 @@ paths:
       - query: catalogue#entitlementTemplateRecords
         route: service
         for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#productRecords
+        route: service
+        for: 'the group entitlement''s productName and imageUrl, from catalogue.product and its catalogue.product_media,
+          Catalogue''s data (CHG-R8MIG-009) (r8 gate, CHG-R8GT2-007; check-cross-module-reads XR-FACT)'
       x-ticvai-audience:
       - staff
       summary: Admit a group on one read
@@ -25523,6 +25568,33 @@ components:
         productId:
           type: string
           format: uuid
+        productName:
+          type: string
+          readOnly: true
+          x-ticvai-persisted: false
+          description: '**Read with the entitlement, not stored on it** (R8 blocker ORDERS-MONEY-C20, CHG-R8MIG-009),
+            as `TicketStatus.productName`: the product''s name from `catalogue.product` (catalogue#productRecords), in
+            the caller''s language. The ticket card shows it.'
+        venueName:
+          type: string
+          readOnly: true
+          x-ticvai-persisted: false
+          description: The venue's name, read from `platform.scope` by `venueId`; not stored.
+        imageUrl:
+          type: string
+          format: uri
+          nullable: true
+          readOnly: true
+          x-ticvai-persisted: false
+          description: The product's primary image (`catalogue.product_media`), read with the entitlement; null when
+            the product has none. Not stored.
+        guestCategory:
+          type: string
+          nullable: true
+          readOnly: true
+          x-ticvai-persisted: false
+          description: The guest category of the order line it was issued for (adult, child, ...), from the line's
+            variant (catalogue#productRecords); null for an entitlement no order line issued. Not stored.
         orderId:
           type: string
           format: uuid
@@ -25532,6 +25604,7 @@ components:
         orderLineId:
           type: string
           format: uuid
+          description: The order line it was issued for; the ticket list groups cards by it (CHG-R8MIG-009).
         subjectId:
           type: string
           format: uuid
@@ -27092,6 +27165,15 @@ components:
         venueId:
           type: string
           format: uuid
+        accessAreaId:
+          type: string
+          format: uuid
+          nullable: true
+          x-ticvai-references: access.access_area
+          description: '**The zone this access point admits to** (R8 blocker FOUNDATION-AI-C12, CHG-R8MIG-004): an
+            `access.access_area` row whose `entityType` is `zone` (named for the table it keys, as every key is). `getOfflinePackage` and `validateAccess` filter
+            accreditation credentials and dynamic policies by it (their `zoneIds` / `allowedZoneIds` must contain
+            it, compared as text); null means the point is venue-wide and no zone filter applies.'
         scopePath:
           type: string
         externalCredentialSources:

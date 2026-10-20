@@ -107,7 +107,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-795` | Unified Inbox | D | 0 | 20 | 6 | 4 | 0 | 0 | — | notStarted (—) |
 | `BO-796` | Guest Conversation 360 | D | 0 | 20 | 6 | 3 | 1 | 0 | — | notStarted (—) |
 | `BO-797` | AI Chatbot Configuration | B | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-798` | Intent & Knowledge Management | A | 28 | 29 | 6 | 2 | 0 | 0 | — | notStarted (—) |
+| `BO-798` | Intent & Knowledge Management | A | 29 | 29 | 6 | 2 | 0 | 0 | — | notStarted (—) |
 | `BO-799` | Agent Workspace | A | 16 | 33 | 6 | 19 | 0 | 0 | — | notStarted (—) |
 | `BO-800` | Routing & Queue Management | D | 33 | 33 | 6 | 0 | 2 | 6 | — | notStarted (—) |
 | `BO-801` | Sales & Service Actions | D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |

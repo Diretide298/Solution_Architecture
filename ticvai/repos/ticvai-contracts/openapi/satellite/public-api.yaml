@@ -821,6 +821,8 @@ paths:
         - "P08 BO-1173 Wallet Integration Command Center"
         - "P08 BO-1179 Integration Monitoring & Exception Workbench"
         - "P14 DEV-005 Webhooks"
+      # The deliveries are written by the workers host's replay job, not by this request (r8 integration, CHG-R8INT-014; check-parameter-columns P-NAMED-TABLE).
+      x-ticvai-names-for-context: [control.webhook_delivery]
       summary: Re-deliver events from a point in time
       description: >
         13.3.19. **Recovery, synchronisation and troubleshooting** — an integrator whose server was
@@ -1510,8 +1512,12 @@ paths:
         (`ModuleKey`). Each scope lists the operations it opens, so a CRM integration partner granted
         `marketing.read` and `marketing.write` reaches the CRM operations and nothing else. The
         catalogue is generated at release from `x-ticvai-api-scope` on every partner-callable
-        operation; it is not edited by hand. `licensed` says whether the caller's tenant licenses the
-        module (`setApiLicensing`), since an unlicensed scope yields no token.
+        operation; it is not edited by hand: it is handoff/api-scopes.json, written by
+        tools/derive-api-scopes.py and loaded at startup (FOUNDATION-AI-C47). `licensed` is true when any
+        of the caller's tenant's api_licence rows effective today (`effective_from` on or before today, and
+        `effective_to` null or on or after it) lists the module (`setApiLicensing`), since an unlicensed scope
+        yields no token; it is omitted for a caller with no tenant (anonymous, a developer account), and a
+        client spanning tenants is answered for the tenant of the request (proposed, client to confirm).
 
         **How the operations carry it** (30 September): every operation whose `x-ticvai-audience`
         includes `partner` names its scope, `x-ticvai-api-scope: '{module}.read'` for a GET and
@@ -1522,7 +1528,8 @@ paths:
         portal's own client management (this contract) are not module data and carry no scope: a
         client reaches them by its credential, not by a grant.
 
-        **Order.** Sorted by `operationId` descending (a UUIDv7, so newest first).
+        **Order.** By module, then access (read before write), the scope string as the tiebreak, which is
+        the cursor key (FOUNDATION-AI-C47; r8 integration, CHG-R8INT-016). Scopes, grouped by module.
 
         **Open to an anonymous caller, so it holds no permission**, as `listApiVersions` (r8 walk of ticket 27983;
         lead decision of 20 October 2026, option A); `DEVELOPER_VIEW` is not enforced here.

@@ -74,8 +74,10 @@ x-ticvai-queries:
       scope lets it see them (the table's row-level security, under the caller's connection and transaction). It
       decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
       a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
-      process within commerce, through the C# query interface Orders implements.
-    served: [in-process]
+      process within commerce, through the C# query interface Orders implements, and from another deployable
+      (white-label's getPublishedTenantConfig, for paymentTokenisation) through the service route (serviceAuth; r8
+      integration, CHG-R8INT-005).
+    served: [in-process, service]
   storedForwardRecords:
     module: payments
     table: payments.stored_forward
@@ -1284,7 +1286,6 @@ paths:
         - "P08 ADM-599 Mixed Tender & Credit Command Center"
         - "P08 ADM-600 Mixed Tender Rule & Combination Builder"
         - "P08 ADM-605 Advanced Payment Eligibility, Sequence & Restriction Rules"
-        - "P08 ADM-606 Partial Payment, Failure & Recovery Manager"
       summary: Which tenders may be combined, and in what order
       tags:
       - payments
@@ -1358,6 +1359,7 @@ paths:
       operationId: listB2bCreditAccounts
       x-ticvai-consumed-by:
         - "P08 ADM-602 B2B Credit Account & Limit Manager"
+        - "P08 ADM-603 B2B Invoice, On-Account & Payment Terms Configuration"
         - "P08 ADM-608 Mixed Tender Simulator, Credit Exposure & AI Advisor"
       summary: On-account customers, their limits and their exposure
       description: 'Boards 5.4 and 5.5. **`CREDIT_MANAGE` and `CREDIT_OVERRIDE` existed as permissions
@@ -2212,10 +2214,6 @@ paths:
       operationId: setInstalmentPolicy
       x-ticvai-consumed-by:
         - "P08 ADM-603 B2B Invoice, On-Account & Payment Terms Configuration"
-      x-ticvai-read-via:
-      - query: catalogue#productRecords
-        route: in-process
-        for: 'the product''s term (422 too-many-instalments) (CHG-MOD-003)'
       x-ticvai-singleton: true
       x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
@@ -2229,6 +2227,11 @@ paths:
         whether a card on file is required. A failed instalment is chased by the dunning policy, never by
         a second schedule. What the guest is charged in total never changes with the plan: no interest
         and no fee unless `instalmentFee` is set.
+
+        **The policy names no product, so it is not checked against a product's term here** (the lead,
+        20 October 2026, r8 cause ORDERS-MONEY-C16, option A): `createInstalmentPlan` checks the count and the
+        frequency against the real product's term when a plan is made (422 `too-many-instalments`). A
+        `dueAtPurchasePercent` outside 0-100 is the shared `400` (the schema's bounds).
       tags:
       - payments
       x-ticvai-permission: PAYMENT_CONFIGURE
@@ -2257,14 +2260,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PayInstalmentPolicy'
-        '422':
-          x-ticvai-problem-types: [share-out-of-range, too-many-instalments]
-          description: A share due at purchase outside 0-100, or more instalments than the frequency allows
-            within the product's term.
-          content:
-            application/problem+json:
-              schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /instalment-plans:
@@ -2418,9 +2415,12 @@ paths:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
           description: The order or product does not qualify under the instalment policy, or the count or
-            frequency is outside it, or the first instalment was declined.
+            frequency is outside it, or more instalments than the frequency allows within the product's term
+            (`too-many-instalments`, checked here against the real product; r8, ORDERS-MONEY-C16), or the first
+            instalment was declined.
           x-ticvai-problem-types:
           - not-eligible-for-instalments
+          - too-many-instalments
           - first-instalment-declined
           content:
             application/problem+json:
@@ -2536,6 +2536,12 @@ components:
           default: false
         eligibleProductKinds:
           type: array
+          description: '**How these map to the catalogue''s ProductKind** (r8, ORDERS-MONEY-C16; proposed, client to
+            confirm): `membership` is ProductKind `membership`; `annualPass` and `seasonPass` are `membership` or
+            `openDated`, as the venue sells them; `event` is `timedAdmission`, `datedAdmission` or `seated`.
+            `groupBooking` is not a product kind: it makes the policy apply to group bookings (orders
+            GroupBooking), whatever their products'' kinds. `createInstalmentPlan` reads the product''s kind
+            (catalogue#productRecords) and applies this map.'
           items:
             type: string
             enum:
@@ -4173,7 +4179,17 @@ components:
     B2bPaymentTerms:
       type: object
       x-ticvai-persistence: payments.payment_terms
-      description: 'Board 5.5. **What happens at the limit is the decision.**'
+      description: 'Board 5.5. **What happens at the limit is the decision.**
+
+
+        **ADM-603 in r8** (R8 blocker ORDERS-MONEY-C28, the lead''s answer C of 20 October 2026). The approved
+        layout is built with the labels these fields carry: Payment term (`paymentTermDays`), Billing cycle
+        (`billingCycle`), Purchase order requirement (`purchaseOrderRequired`), Outstanding balance limit
+        (`creditLimit`) and Approval requirement (`overrideApprovalRole`). Credit agreement, Currency, Invoice
+        requirement and Transaction maximum have no field in r8 and are shown empty and read-only; proposed to the
+        client (not built): Currency resolved from the region and shown read-only, Transaction maximum, Credit
+        agreement and Invoice requirement as new fields. **The terms belong to the tenant**: a B2B credit account
+        and its terms are tenant-level records, edited by tenant-level staff, as their row security already holds.'
       properties:
         accountId:
           type: string

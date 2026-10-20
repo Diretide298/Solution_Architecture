@@ -158,10 +158,10 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-017` | Capacity Management | B | 24 | 20 | 6 | 14 | 7 | 0 | — | notStarted (generated) |
 | `BO-018` | Allocation & Holds | B | 4 | 14 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
-| `BO-019` | Closures & Blackouts | B | 49 | 31 | 6 | 38 | 1 | 0 | — | notStarted (generated) |
+| `BO-019` | Closures & Blackouts | B | 50 | 31 | 6 | 38 | 1 | 0 | — | notStarted (generated) |
 | `BO-037` | Offline Package Status | B | 51 | 32 | 6 | 3 | 0 | 0 | — | notStarted (generated) |
 | `BO-063` | Opening Hours & Calendar | B | 16 | 9 | 6 | 17 | 2 | 0 | — | notStarted (generated) |
-| `BO-102` | Sell | A | 2 | 37 | 6 | 57 | 0 | 0 | — | notStarted (generated) |
+| `BO-102` | Sell | A | 2 | 39 | 6 | 57 | 0 | 0 | — | notStarted (generated) |
 | `BO-109` | Menu Builder & POS Layout Designer | A | 53 | 7 | 6 | 8 | 2 | 2 | — | notStarted (generated) |
 | `BO-110` | Recipe & BOM Management | B–D | 0 | 0 | 6 | 0 | 2 | 2 | — | notStarted (generated) |
 | `BO-111` | Ingredient Substitution, Allergen & Nutrition | A | 21 | 39 | 5 | 6 | 1 | 0 | — | notStarted (generated) |

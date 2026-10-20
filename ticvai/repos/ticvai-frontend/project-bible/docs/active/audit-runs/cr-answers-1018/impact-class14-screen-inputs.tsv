@@ -1,0 +1,20 @@
+group	ticket	plan_key	status	type	assignee	subject	links
+new	27815	SVC-WALLET-RETAIL-2	New	Task	Sanket Keluskar	[BE] WalletService: transferWalletBalance	screen:WEB-021
+new	27816	SVC-WALLET-WALLET-1	New	Task	Pranay Shinde	[BE] WalletService: getWallet, listWalletTransactions, publishWalletConfiguration, restore	screen:WEB-021
+new	27863	SVC-ORDER-ORDERS-3	New	Task	Deep Khanvilkar	[BE] OrderService: listBillingStatements, listMyOrders, listPaymentTokens, payByLink	screen:WEB-021
+new	27864	SVC-ORDER-ORDERS-5	New	Task	Pranay Shinde	[BE] OrderService: setPaymentProvider, shareEntitlement, storePaymentToken, updateTicketTe	screen:WEB-021
+new	28261	SVC-VENUEOPS-CARD-1	New	Task	Sanket Keluskar	[BE] VenueOpsService: getGameCard, issueGameCard	screen:WEB-021
+new	28308	AM-WALLET-CASHLESS-P01	New	Feature	Chitrangi Mestry	Wallet & Cashless · Guest Web	raised the CR, screen:WEB-021
+new	28309	SVC-WALLET-GIFTCARD-1	New	Task	Chinmay Patkar	[BE] WalletService: getGiftCard	screen:WEB-021
+new	28310	APP-WEB-WEB-021	New	Task	Chitrangi Mestry	[FE] WEB-021 Wallet & Gift Cards	screen:WEB-021
+new	28311	TEST-AM-WALLET-CASHLESS-P01	New	Task	Sanket Keluskar	[Test] Module test: Wallet & Cashless · Guest Web	screen:WEB-021
+new	30853	SVC-WALLET-RETAIL-2#transferWalletBalance	New	Sub Task	Sanket Keluskar	[BE] transferWalletBalance: POST /wallets/{walletId}/transfer	screen:WEB-021
+new	30854	SVC-WALLET-WALLET-1#getWallet	New	Sub Task	Pranay Shinde	[BE] getWallet: GET /wallets/{subjectId}	screen:WEB-021
+new	30855	SVC-WALLET-WALLET-1#listWalletTransactions	New	Sub Task	Pranay Shinde	[BE] listWalletTransactions: GET /wallets/{subjectId}/transactions	screen:WEB-021
+new	30988	SVC-ORDER-ORDERS-3#listPaymentTokens	New	Sub Task	Deep Khanvilkar	[BE] listPaymentTokens: GET /payment-tokens	screen:WEB-021
+new	30992	SVC-ORDER-ORDERS-5#storePaymentToken	New	Sub Task	Pranay Shinde	[BE] storePaymentToken: POST /payment-tokens	screen:WEB-021
+new	32008	SVC-VENUEOPS-CARD-1#getGameCard	New	Sub Task	Sanket Keluskar	[BE] getGameCard: GET /game-cards/{cardCode}	screen:WEB-021
+new	32124	SVC-WALLET-GIFTCARD-1#getGiftCard	New	Sub Task	Chinmay Patkar	[BE] getGiftCard: GET /gift-cards/{cardCode}	screen:WEB-021
+new	32125	APP-WEB-WEB-021#build	New	Sub Task	Chitrangi Mestry	[FE] WEB-021 Wallet & Gift Cards: build with all states	screen:WEB-021
+new	32126	APP-WEB-WEB-021#wire	New	Sub Task	Chitrangi Mestry	[FE] WEB-021 Wallet & Gift Cards: connect to API	screen:WEB-021
+new	32127	APP-WEB-WEB-021#test	New	Sub Task	Chitrangi Mestry	[FE] WEB-021 Wallet & Gift Cards: tests	screen:WEB-021

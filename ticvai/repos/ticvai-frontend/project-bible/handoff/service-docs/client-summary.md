@@ -37,10 +37,10 @@ The four parts share 16 back-end services. Each looks after one area of the busi
 | Organisation and settings | Your organisation, regions, venues, outlets and tills, and the settings each one uses. | Nothing can find its venue or settings, so everything stops. |
 | Sign-in and people | Staff and guest accounts, sign-in, roles and permissions, and personal-data requests. | Nobody can sign in, so everything stops. |
 | Sales and payments | Baskets, orders, payments, refunds, and opening and closing cashier shifts. | No new sales can be taken. This service has the highest availability target. |
-| Products and pricing | What is sold, at what price and when: products, events and sessions, price lists, promotions, bundles and seating. | Tills keep selling from their last published catalogue; changes wait. |
 | Entry and admission | Tickets and passes at the gate, admission rules and entry validation. | Gates fall back to their local copy of what is valid. |
-| Finance | The financial record of every sale, refund and payment, and currency rates. | Finance postings wait until it returns; trading is not affected. |
+| Products and pricing | What is sold, at what price and when: products, events and sessions, price lists, promotions, bundles and seating. | Tills keep selling from their last published catalogue; changes wait. |
 | Wallets and credit | Guest wallets, stored credit, gift cards and membership credit. | Wallet balances cannot be spent until it returns. |
+| Finance | The financial record of every sale, refund and payment, and currency rates. | Finance postings wait until it returns; trading is not affected. |
 | Food and beverage | Menus, table service, kitchen screens and food orders. | Kitchens fall back to printed tickets. |
 | Venue operations | Queues and wait times, maintenance, bookable resources, the venue map and media. | Venue operations degrade; selling and entry continue. |
 | Stock | Stock levels, counting and purchasing. | Receiving and counting pause; selling continues. |

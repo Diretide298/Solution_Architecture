@@ -157,6 +157,9 @@ NOT_READ: tuple = tuple(re.compile(p, re.I | re.S) for p in (
     r"rather than a venue setting",             # listDiningOutlets: says what is not a venue setting
     r"introduced later as a venue setting",     # createJournalEntry: a setting that does not exist yet
     r"appears on tax codes, FX rates",          # listProducts, cloneProduct and the product family: a comparison
+    # r8 integration (20 October 2026, CHG-R8INT-017): two sentences that name a table to say Identity does not read it
+    r"never reads\s+`orders\.pos_shift`",      # Session.hasOpenShift (forceLogout, listSessions): fed by events
+    r"`marketing\.device_consent\.scope_path`;\s+Identity\s+may\s+not\s+read\s+that\s+table",  # recordConsentIdentifier
 ))
 TABLE_IN_TEXT = re.compile(r"(?<![\w.])([a-z][a-z0-9_]*)\.([a-z][a-z0-9_]+)\b")
 FIELD_IN_TEXT = re.compile(r"(?<![\w.])(?:([a-z][a-z-]+)\.)?([A-Z][A-Za-z0-9]+)\.([a-z][A-Za-z0-9]+)\b")
@@ -433,6 +436,13 @@ def main() -> int:
                     guard.add("XR-VIEW-ACROSS", f"{o}:{t}", f"{o} ({rdep}) reads the view {t} of {owner} "
                               f"({dep_of.get(owner)}): across deployables use the owner's service or a projection",
                               strict=strict)
+                # **A view named for Identity is still a read above it** (20 October 2026, r8 cause FOUNDATION-AI-C48,
+                # CHG-R8GEN-005). This branch skipped the tier rule, so an `orders.sales_order_for_identity` view
+                # would have passed although ADR-0028 lets Identity read nothing above it but a projection.
+                if reader in FOUNDATION_STRICT and tier_of.get(owner) != "foundation":
+                    guard.add("XR-FOUNDATION", f"{o}:{t}", f"{o} ({reader}, foundation) reads the view {t} of {owner} "
+                              f"({tier_of.get(owner)}): Identity reads nothing above it but a projection, and a view "
+                              "is not one", strict=strict)
                 continue
             if is_covered(t, owner, cov_t, cov_o):
                 continue

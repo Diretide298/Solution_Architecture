@@ -1,5 +1,5 @@
 id: LLD-orders
-title: orders — 222 operations
+title: orders — 227 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: spine
@@ -31,6 +31,7 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - catalogue.channel_capacity
   - catalogue.performance
   - catalogue.product
@@ -40,6 +41,7 @@ operations:
   - orders.cart
   - orders.cart_line
   writes:
+  - cache:idempotency
   - orders.cart
   - orders.cart_line
   - platform.idempotency_record
@@ -91,6 +93,7 @@ operations:
   - partner
   offline: false
   reads:
+  - cache:idempotency
   - marketing.consent_question
   - marketing.consent_question_version
   - orders.cart
@@ -98,6 +101,7 @@ operations:
   - promotions.coupon_campaign
   - promotions.coupon_code
   writes:
+  - cache:idempotency
   - orders.cart
   - orders.cart_line
 - operation: applyManualDiscount
@@ -212,9 +216,11 @@ operations:
   permission: ORDER_CREATE
   audience:
   - staff
+  - guest
   - device
   offline: false
   reads:
+  - cache:idempotency
   - orders.stored_value_authorisation
   - promotions.voucher
   - wallet.gift_card
@@ -231,8 +237,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - orders.payment_link
   writes:
+  - cache:idempotency
   - orders.payment_link
 - operation: cancelReservation
   verb: DELETE
@@ -260,6 +268,7 @@ operations:
   - partner
   offline: false
   reads:
+  - cache:idempotency
   - ledger.fx_rate
   - orders.payment
   - payments.provider_connection
@@ -284,6 +293,7 @@ operations:
   - device
   offline: false
   reads:
+  - cache:idempotency
   - orders.stored_value_authorisation
   writes:
   - cache:idempotency
@@ -299,6 +309,7 @@ operations:
   - partner
   offline: false
   reads:
+  - cache:idempotency
   - catalogue.inventory_reservation
   - marketing.consent_question
   - orders.cart
@@ -310,6 +321,7 @@ operations:
   - orders.payment
   - orders.sales_order
   writes:
+  - cache:idempotency
   - marketing.consent_record
   - orders.cart
   - orders.deposit
@@ -364,8 +376,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - orders.payment
   writes:
+  - cache:idempotency
   - orders.payment
 - operation: cloneTicketTemplate
   verb: POST
@@ -376,9 +390,11 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - orders.ticket_template
   - orders.ticket_template_channel
   writes:
+  - cache:idempotency
   - orders.ticket_template
   - orders.ticket_template_channel
 - operation: convertReservation
@@ -410,6 +426,7 @@ operations:
   permission: ORDER_MODIFY
   audience:
   - staff
+  - guest
   offline: false
   reads:
   - cache:idempotency
@@ -444,7 +461,10 @@ operations:
   scope: venue
   permission: null
   audience:
+  - guest
+  - anonymous
   - staff
+  - partner
   offline: false
   reads:
   - cache:idempotency
@@ -484,8 +504,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - orders.group_enquiry
   writes:
+  - cache:idempotency
   - orders.group_enquiry
 - operation: createListingSeller
   verb: POST
@@ -517,8 +539,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - orders.member_exception
   writes:
+  - cache:idempotency
   - orders.member_exception
 - operation: createOrder
   verb: POST
@@ -570,6 +594,7 @@ operations:
   - partner
   offline: true
   reads:
+  - cache:idempotency
   - catalogue.inventory_reservation
   - ledger.fx_rate
   - orders.order_line
@@ -727,6 +752,9 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - orders.order_line
+  - orders.refund
+  - orders.refund_policy
   - orders.sales_order
   writes:
   - cache:idempotency
@@ -806,6 +834,7 @@ operations:
   - guest
   - partner
   - staff
+  - device
   offline: false
   reads:
   - catalogue.channel_capacity
@@ -857,6 +886,16 @@ operations:
   - orders.sales_order
   - pii.subject
   writes: []
+- operation: getGuestRefundPolicy
+  verb: GET
+  path: /venues/{venueId}/guest-refund-policy
+  scope: venue
+  permission: null
+  audience:
+  - guest
+  offline: false
+  reads: []
+  writes: []
 - operation: getMediaEntitlements
   verb: GET
   path: /media/{mediaCode}/entitlements
@@ -899,6 +938,7 @@ operations:
   - staff
   offline: false
   reads:
+  - orders.order_event
   - orders.order_line
   - orders.sales_order
   - platform.scope
@@ -914,6 +954,9 @@ operations:
   offline: false
   reads:
   - ledger.posting
+  - orders.chargeback
+  - orders.order_event
+  - orders.order_fee
   - orders.payment
   - orders.refund
   - orders.sales_order
@@ -994,6 +1037,7 @@ operations:
   - guest
   offline: false
   reads:
+  - orders.sales_order
   - orders.visit_reminder
   writes: []
 - operation: holdOrder
@@ -1027,8 +1071,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - orders.resale_settlement
   writes:
+  - cache:idempotency
   - orders.resale_settlement
   - platform.outbox
 - operation: importTicketTemplate
@@ -1040,9 +1086,11 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - orders.ticket_template
   - orders.ticket_template_channel
   writes:
+  - cache:idempotency
   - orders.ticket_template
   - orders.ticket_template_channel
 - operation: inquirePaymentStatus
@@ -1781,7 +1829,41 @@ operations:
   offline: true
   reads:
   - orders.order_line
+  - orders.payment
   - orders.sales_order
+  writes: []
+- operation: listOwnGroupBookings
+  verb: GET
+  path: /group-booking-requests
+  scope: venue
+  permission: null
+  audience:
+  - guest
+  offline: false
+  reads:
+  - orders.group_booking
+  writes: []
+- operation: listOwnRefundRequests
+  verb: GET
+  path: /refund-requests
+  scope: venue
+  permission: null
+  audience:
+  - guest
+  offline: false
+  reads:
+  - orders.refund
+  writes: []
+- operation: listOwnResaleListings
+  verb: GET
+  path: /resale-listings
+  scope: venue
+  permission: null
+  audience:
+  - guest
+  offline: false
+  reads:
+  - orders.resale_listing
   writes: []
 - operation: listParticipantGuestList
   verb: GET
@@ -2364,12 +2446,14 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - orders.order_line
   - orders.order_line_discount
   - orders.order_line_eligibility
   - orders.payment
   - orders.sales_order
   writes:
+  - cache:idempotency
   - ledger.journal_entry
   - ledger.posting
   - orders.order_event
@@ -2387,8 +2471,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - orders.membership_migration
   writes:
+  - cache:idempotency
   - orders.membership_migration
 - operation: modifyOrder
   verb: POST
@@ -2405,6 +2491,8 @@ operations:
   - orders.order_line_discount
   - orders.order_line_eligibility
   - orders.payment
+  - orders.refund
+  - orders.refund_policy
   - orders.sales_order
   writes:
   - cache:idempotency
@@ -2514,13 +2602,16 @@ operations:
   permission: ORDER_MODIFY
   audience:
   - staff
+  - guest
   offline: false
   reads:
   - access.entitlement
+  - cache:idempotency
   - catalogue.price
   - catalogue.product
   - orders.sales_order
-  writes: []
+  writes:
+  - cache:idempotency
 - operation: recordChargeback
   verb: POST
   path: /chargebacks/intake
@@ -2581,11 +2672,13 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - orders.external_reference_mapping
   - orders.payment
   - orders.refund
   - orders.sales_order
   writes:
+  - cache:idempotency
   - orders.external_reference_mapping
 - operation: recordGroupCheckIn
   verb: POST
@@ -2596,9 +2689,11 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - orders.group_booking
   - orders.group_visit_plan
   writes:
+  - cache:idempotency
   - orders.group_visit_plan
   - orders.order_event
 - operation: reissueEntitlement
@@ -2626,9 +2721,11 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - orders.resale_marketplace_config
   - orders.resale_settlement
   writes:
+  - cache:idempotency
   - orders.resale_settlement
   - platform.outbox
 - operation: relinquishStoredValue
@@ -2641,8 +2738,10 @@ operations:
   - device
   offline: false
   reads:
+  - cache:idempotency
   - orders.stored_value_authorisation
   writes:
+  - cache:idempotency
   - orders.stored_value_authorisation
 - operation: removeCartLine
   verb: DELETE
@@ -2667,14 +2766,16 @@ operations:
   verb: POST
   path: /memberships/{membershipId}/renewals
   scope: venue
-  permission: ORDER_MANAGE
+  permission: ORDER_MODIFY
   audience:
   - staff
   - service
   offline: false
   reads:
+  - cache:idempotency
   - orders.membership_renewal
   writes:
+  - cache:idempotency
   - orders.membership_renewal
 - operation: reprintOrder
   verb: POST
@@ -2685,12 +2786,16 @@ operations:
   - staff
   - guest
   - partner
+  - device
   offline: true
   reads:
   - cache:idempotency
+  - orders.order_line
   - orders.sales_order
   writes:
   - cache:idempotency
+  - orders.order_event
+  - orders.order_line
   - orders.sales_order
 - operation: requestGroupBooking
   verb: POST
@@ -2720,6 +2825,9 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - orders.order_line
+  - orders.refund
+  - orders.refund_policy
   - orders.sales_order
   writes:
   - cache:idempotency
@@ -2750,8 +2858,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - orders.membership_activation_action
   writes:
+  - cache:idempotency
   - orders.membership_activation_action
 - operation: resolveSyncRejection
   verb: POST
@@ -2762,8 +2872,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - sync.rejection
   writes:
+  - cache:idempotency
   - sync.rejection
 - operation: respondToChargeback
   verb: POST
@@ -2827,6 +2939,19 @@ operations:
   - cache:idempotency
   - identity.delegated_access
   - platform.outbox
+- operation: revokePaymentToken
+  verb: DELETE
+  path: /payment-tokens/{tokenId}
+  scope: venue
+  permission: null
+  audience:
+  - guest
+  offline: false
+  reads:
+  - cache:idempotency
+  writes:
+  - cache:idempotency
+  - payments.token
 - operation: setAfterSaleFinancial
   verb: PUT
   path: /after-sale-financial
@@ -2921,8 +3046,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - orders.deposit_policy
   writes:
+  - cache:idempotency
   - orders.deposit_policy
 - operation: setFraudRules
   verb: PUT
@@ -2969,9 +3096,11 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - orders.group_customer_organisation
   - orders.group_customer_organisation_contact
   writes:
+  - cache:idempotency
   - orders.group_customer_organisation_contact
 - operation: setGroupOperationalPlanning
   verb: PUT
@@ -3017,9 +3146,11 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - orders.group_payment_milestone
   - orders.group_payment_schedule
   writes:
+  - cache:idempotency
   - orders.group_payment_milestone
 - operation: setGroupQuotationProposal
   verb: PUT
@@ -3049,9 +3180,11 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - orders.group_ticket_allocation
   - orders.group_ticket_allocation_line
   writes:
+  - cache:idempotency
   - orders.group_ticket_allocation
 - operation: setGroupTicketFulfillment
   verb: PUT
@@ -3062,8 +3195,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - orders.group_ticket_fulfillment
   writes:
+  - cache:idempotency
   - orders.group_ticket_fulfillment
 - operation: setMultiPaymentSplit
   verb: PUT
@@ -3150,9 +3285,11 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - orders.group_participant
   - orders.group_participant_list
   writes:
+  - cache:idempotency
   - orders.group_participant
 - operation: setPaymentProvider
   verb: PUT
@@ -3161,6 +3298,7 @@ operations:
   permission: TENANT_CONFIGURE
   audience:
   - staff
+  - prospect
   offline: false
   reads:
   - cache:idempotency
@@ -3192,8 +3330,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - orders.refund_calculation_policy
   writes:
+  - cache:idempotency
   - orders.refund_calculation_policy
 - operation: setRefundPolicy
   verb: PUT
@@ -3230,13 +3370,15 @@ operations:
   verb: PUT
   path: /resale-fee-policy
   scope: venue
-  permission: ORDER_CONFIGURE
+  permission: PRODUCT_CONFIGURE
   audience:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - orders.resale_fee_policy
   writes:
+  - cache:idempotency
   - orders.resale_fee_policy
 - operation: setResaleMarketplaceConfig
   verb: PUT
@@ -3247,8 +3389,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - orders.resale_marketplace_config
   writes:
+  - cache:idempotency
   - orders.resale_marketplace_config
 - operation: setResaleMarketplaceRecommendation
   verb: PUT
@@ -3304,8 +3448,10 @@ operations:
   - guest
   offline: false
   reads:
+  - cache:idempotency
   - orders.visit_reminder
   writes:
+  - cache:idempotency
   - orders.visit_reminder
 - operation: shareEntitlement
   verb: POST
@@ -3371,7 +3517,6 @@ operations:
   - payments.token
   writes:
   - cache:idempotency
-  - marketing.consent_record
   - payments.token
   - platform.outbox
 - operation: syncOrders
@@ -3383,11 +3528,13 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - catalogue.inventory_reservation
   - catalogue.price_list
   - catalogue.variant
   - orders.sales_order
   writes:
+  - cache:idempotency
   - catalogue.channel_capacity
   - catalogue.inventory_reservation
   - ledger.price_variance
@@ -3475,8 +3622,10 @@ operations:
   offline: false
   reads:
   - access.entitlement
+  - cache:idempotency
   writes:
   - access.entitlement
+  - cache:idempotency
   - platform.outbox
 - operation: voidOrder
   verb: POST

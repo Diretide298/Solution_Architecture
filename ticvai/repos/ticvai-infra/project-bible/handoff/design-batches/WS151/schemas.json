@@ -51,7 +51,7 @@
  "B2bPaymentTerms": {
   "type": "object",
   "x-ticvai-persistence": "payments.payment_terms",
-  "description": "Board 5.5. **What happens at the limit is the decision.**",
+  "description": "Board 5.5. **What happens at the limit is the decision.**\n\n**ADM-603 in r8** (R8 blocker ORDERS-MONEY-C28, the lead's answer C of 20 October 2026). The approved layout is built with the labels these fields carry: Payment term (`paymentTermDays`), Billing cycle (`billingCycle`), Purchase order requirement (`purchaseOrderRequired`), Outstanding balance limit (`creditLimit`) and Approval requirement (`overrideApprovalRole`). Credit agreement, Currency, Invoice requirement and Transaction maximum have no field in r8 and are shown empty and read-only; proposed to the client (not built): Currency resolved from the region and shown read-only, Transaction maximum, Credit agreement and Invoice requirement as new fields. **The terms belong to the tenant**: a B2B credit account and its terms are tenant-level records, edited by tenant-level staff, as their row security already holds.",
   "properties": {
    "accountId": {
     "type": "string",
@@ -632,6 +632,7 @@
    },
    "eligibleProductKinds": {
     "type": "array",
+    "description": "**How these map to the catalogue's ProductKind** (r8, ORDERS-MONEY-C16; proposed, client to confirm): `membership` is ProductKind `membership`; `annualPass` and `seasonPass` are `membership` or `openDated`, as the venue sells them; `event` is `timedAdmission`, `datedAdmission` or `seated`. `groupBooking` is not a product kind: it makes the policy apply to group bookings (orders GroupBooking), whatever their products' kinds. `createInstalmentPlan` reads the product's kind (catalogue#productRecords) and applies this map.",
     "items": {
      "type": "string",
      "enum": [

@@ -57,6 +57,11 @@ groups:
   web: [WEB-002]
   app: [GST-002, GST-003, GST-005]
   note: The app splits categories, the listing and what's on into three screens; the web filters one.
+  sanctioned:
+    operations: 'r8 integration (GPS-C30, CHG-R8INT-017): the app''s What''s On (GST-005) lists the venue''s
+      events with `listEvents`, because the prototype''s rows name the event and its run; the web''s one listing
+      (WEB-002) shows the same events as products with their performances (`listProducts`,
+      `listPerformances`), so it has no events list of its own to call it for.'
 - key: search
   kind: paired
   web: [WEB-003]

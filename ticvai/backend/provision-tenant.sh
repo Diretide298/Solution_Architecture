@@ -40,14 +40,31 @@ for f in "$HERE"/tenant/*.sql; do
   psql -v ON_ERROR_STOP=1 -d "$SLUG" -f "$f" >/dev/null
 done
 
+# 2b. The root of the scope tree (ADAM CR-163, 18 October 2026; CHG-CRA-005). The cell creates the
+#     tenant's `level` tenant node here, and its path is recorded in control.cell_tenant below and
+#     never changes: the migrator and the fan-out read it there. The label is the slug made a valid
+#     ltree label (lower case, every other character an underscore), written once; nothing derives it
+#     again from control.tenant.code, whose pattern allows hyphens a scope label does not.
+#     platform.scope forces row security, so the insert runs in a transaction that grants the session the root
+#     path first (SET LOCAL ticvai.scope_paths); without it only a superuser could write the row, and on a
+#     managed server provisioning would stop after createdb.
+ROOT_PATH="t_$(printf '%s' "$SLUG" | tr '[:upper:]' '[:lower:]' | tr -c 'a-z0-9_' '_')"
+psql -v ON_ERROR_STOP=1 -d "$SLUG" <<SQL >/dev/null
+  BEGIN;
+  SET LOCAL ticvai.scope_paths = '$ROOT_PATH';
+  INSERT INTO platform.scope (id, level, parent_id, path, code, name, is_active)
+  VALUES (gen_random_uuid(), 'tenant', NULL, '$ROOT_PATH', '${ROOT_PATH#t_}', '$SLUG', true);
+  COMMIT;
+SQL
+
 # 3. The row. **A database with no row in control.cell_tenant is a database nothing knows
 #    about** - it will not be migrated, backed up or billed, and it will be found by somebody
 #    reading pg_database rather than by the control plane.
 if [ -n "$TENANT_ID" ]; then
   psql -v ON_ERROR_STOP=1 -d "$CONTROL_DB" <<SQL >/dev/null
     INSERT INTO control.cell_tenant (id, cell_id, tenant_id, database_name, status,
-                                     provisioned_at)
-    SELECT gen_random_uuid(), c.id, '$TENANT_ID', '$SLUG', 'live', now()
+                                     provisioned_at, root_scope_path)
+    SELECT gen_random_uuid(), c.id, '$TENANT_ID', '$SLUG', 'live', now(), '$ROOT_PATH'
       FROM control.cell c
      WHERE c.status = 'active'
      LIMIT 1;

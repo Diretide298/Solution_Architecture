@@ -7,7 +7,7 @@
 | Tier | commerce: The sale path. Highest availability, highest write rate. |
 | Contracts | `orders`, `shift`, `payments` |
 | Schemas owned | `orders`, `payments` |
-| Operations in the slice | 95 of 299 |
+| Operations in the slice | 99 of 304 |
 | Scale | Write-heavy, spiky, latency-critical. The one that autoscales. |
 | If it is down | Down means no sales. Highest availability target in the platform. |
 
@@ -42,7 +42,7 @@
 | cart | [`applyCartPromoCode`](#applycartpromocode) | POST | `/carts/{cartId}/promo-codes` | core | 1 | GST-041, WEB-010 |
 | cart | [`checkoutCart`](#checkoutcart) | POST | `/carts/{cartId}/checkout` | core | 1 | GST-009, GST-032, GST-041, KSK-006, PTR-010, WEB-010 … |
 | cart | [`claimCart`](#claimcart) | POST | `/carts/{cartId}/claim` | core | 1 | GST-041, WEB-016 |
-| cart | [`createCart`](#createcart) | POST | `/carts` | core | 1 | GST-041, WEB-010 |
+| cart | [`createCart`](#createcart) | POST | `/carts` | core | 1 | GST-008, GST-041, GST-050, GST-075, WEB-006, WEB-010 … |
 | cart | [`extendCart`](#extendcart) | POST | `/carts/{cartId}/extend` | core | 1 | GST-041, WEB-010 |
 | cart | [`getCart`](#getcart) | GET | `/carts/{cartId}` | core | 1 | GST-007, GST-009, GST-032, GST-041, GST-048, KSK-006 … |
 | cart | [`removeCartLine`](#removecartline) | DELETE | `/carts/{cartId}/lines/{lineId}` | core | 1 | GST-041, PTR-010, WEB-010 |
@@ -82,6 +82,8 @@
 | orders | [`issueWalletPass`](#issuewalletpass) | POST | `/wallet-passes` | core | 1 | GST-018, WEB-018 |
 | orders | [`listBillingStatements`](#listbillingstatements) | GET | `/billing-statements` | core | 1 | GST-015, WEB-023 |
 | orders | [`listMyOrders`](#listmyorders) | GET | `/my/orders` | core | 1 | GST-014, GST-019, GST-035, WEB-017, WEB-019, WEB-026 … |
+| orders | [`listOwnGroupBookings`](#listowngroupbookings) | GET | `/group-booking-requests` | core | 1 | WEB-031 |
+| orders | [`listOwnResaleListings`](#listownresalelistings) | GET | `/resale-listings` | core | 1 | GST-067, WEB-030 |
 | orders | [`listPaymentTokens`](#listpaymenttokens) | GET | `/payment-tokens` | core | 1 | GST-011, GST-071, WEB-021 |
 | orders | [`payByLink`](#paybylink) | POST | `/payment-links/{token}/pay` | core | 1 | GST-009, WEB-014 |
 | orders | [`previewProductTickets`](#previewproducttickets) | GET | `/products/{productId}/ticket-previews` | core | 1 | BO-008, CMS-006 |
@@ -98,10 +100,12 @@
 | payment | [`inquirePaymentStatus`](#inquirepaymentstatus) | POST | `/payments/{paymentId}/inquiry` | core | 1 | ADM-595, ADM-597, ADM-615, BO-024, EMP-035, GST-009 … |
 | payments | [`createPaymentProviderConnection`](#createpaymentproviderconnection) | POST | `/payment-providers` | setup | 1 | ADM-570, ADM-571 |
 | payments | [`setDunningPolicy`](#setdunningpolicy) | PUT | `/dunning-policy` | setup | 1 | ADM-606 |
+| policy | [`getGuestRefundPolicy`](#getguestrefundpolicy) | GET | `/venues/{venueId}/guest-refund-policy` | core | 1 | GST-067 |
 | policy | [`setRefundPolicy`](#setrefundpolicy) | PUT | `/venues/{venueId}/refund-policy` | setup | 1 | BO-062, BO-065, BO-1146, BO-318 |
 | refund | [`createRefund`](#createrefund) | POST | `/orders/{orderId}/refunds` | core | 1 | ADM-610, ADM-616, BO-022, BO-023, BO-026, BO-047 … |
 | refund | [`createRefundRequest`](#createrefundrequest) | POST | `/refund-requests` | core | 1 | GST-067, WEB-019 |
 | refund | [`listOrderRefunds`](#listorderrefunds) | GET | `/orders/{orderId}/refunds` | core | 1 | ADM-609, ADM-616, BO-022, BO-023, BO-026, BO-047 … |
+| refund | [`listOwnRefundRequests`](#listownrefundrequests) | GET | `/refund-requests` | core | 1 | GST-067, WEB-019 |
 | reservation | [`cancelReservation`](#cancelreservation) | DELETE | `/reservations/{reservationId}` | core | 1 | GST-016, GST-017, POS-031, WEB-031 |
 | reservation | [`convertReservation`](#convertreservation) | POST | `/reservations/{reservationId}/convert` | core | 1 | POS-031 |
 | reservation | [`createReservation`](#createreservation) | POST | `/reservations` | core | 1 | POS-031 |
@@ -117,7 +121,7 @@
 | shift | [`getTillShiftPolicy`](#gettillshiftpolicy) | GET | `/venues/{venueId}/till-shift-policy` | core | 1 | BO-065, POS-019 |
 | shift | [`getWorkstationShift`](#getworkstationshift) | GET | `/shifts/current/overview` | core | 1 | EMP-003, POS-025 |
 | shift | [`giveShiftVarianceReason`](#giveshiftvariancereason) | POST | `/shifts/{shiftId}/variance-reason` | core | 1 | BO-040, EMP-009, POS-007 |
-| shift | [`listDenominations`](#listdenominations) | GET | `/denominations` | core | 1 | BO-1065, POS-001, POS-007 |
+| shift | [`listDenominations`](#listdenominations) | GET | `/denominations` | core | 1 | BO-1065, POS-001, POS-007, POS-016 |
 | shift | [`listDepositBoxes`](#listdepositboxes) | GET | `/deposit-boxes` | core | 1 | BO-042, POS-015, POS-018 |
 | shift | [`listShifts`](#listshifts) | GET | `/shifts` | core | 1 | BO-039, BO-040, BO-041, BO-043, BO-053, BO-100 … |
 | shift | [`openShift`](#openshift) | POST | `/shifts` | core | 1 | POS-001 |
@@ -199,8 +203,8 @@ Returns the cart with any conflicts the addition created (2.9.5) — golf at 13:
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `catalogue.channel_capacity`, `catalogue.performance`, `catalogue.product`, `catalogue.variant`, `marketing.consent_question`, `marketing.consent_question_version`, `orders.cart`, `orders.cart_line` |
-| Writes | `orders.cart`, `orders.cart_line`, `platform.idempotency_record` |
+| Reads | `cache:idempotency`, `catalogue.channel_capacity`, `catalogue.performance`, `catalogue.product`, `catalogue.variant`, `marketing.consent_question`, `marketing.consent_question_version`, `orders.cart`, `orders.cart_line` |
+| Writes | `cache:idempotency`, `orders.cart`, `orders.cart_line`, `platform.idempotency_record` |
 | Called by | GST-007, GST-008, GST-026, GST-027, GST-032, GST-048, GST-050, GST-056, GST-070, GST-074, GST-075, GST-077, GST-078, KSK-005, KSK-015, KSK-017, POS-002, POS-021, POS-023, POS-030, PTR-010, WEB-005, WEB-006, WEB-008, WEB-010, WEB-033, WEB-036, WEB-041, WEB-042, WEB-047, WEB-048, WEB-049 |
 | State model | Cart ([states/cart.yaml](../../../states/cart.yaml)): moves `expiring` -> `active`, `expired` -> `active` |
 
@@ -235,13 +239,24 @@ Returns the cart with any conflicts the addition created (2.9.5) — golf at 13:
 | attributes.transport.passengerTypeCode | string |  | The fare table's passenger type (adult, child, ...). (pattern ^[a-z][a-zA-Z0-9]{0,31}$; nullable) |
 | attributes.transport.passTypeId | string (uuid) |  | Pass purchase only. (nullable) |
 | attributes.transport.passEntitlementId | string (uuid) |  | A seat reserved with a pass already owned. (nullable) |
+| attributes.attendees | integer |  | How many people a meeting-room booking is for (GST-075; R8 blocker cause GPS-C28, CHG-R8SPN-034). (min 1; nullable) |
+| attributes.parking | object |  | A parking line's plate and day (R8 blocker ORDERS-MONEY-C22, CHG-R8MIG-023): carried from addCartLine to the order line and passed to issueOrderEntitlements, which writes the parking entitlement's pl… (nullable) |
+| attributes.parking.plate | object | yes |  |
+| attributes.parking.validFrom | string (date-time) | yes |  |
+| attributes.parking.validTo | string (date-time) | yes |  |
+| attributes.bundle | object |  | A bundle line's picks (R8 blocker ORDERS-MONEY-C43, the lead's answer B for r8; CHG-R8MIG-023): the bundle and the option the guest chose in each choice group. (nullable) |
+| attributes.bundle.bundleId | string (uuid) | yes |  |
+| attributes.bundle.choices | array of object |  |  |
 
 **Response**: `Cart`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | id | string (uuid) | yes |  |
+| anonymousSessionToken | string |  | The guestAuth token of the anonymous session createCart opened for a visitor with no credential (GPS-C23, CHG-R8SPN-031); null on every other answer. (read-only; nullable) |
 | token | string |  | How an anonymous guest returns to their cart, including from a recovery email. (read-only) |
+| sessionId | string (uuid) |  | The staff or partner session that started the cart (a till's cart is its session's own); null for a guest's cart (R8 blocker IDENTITY-C49, CHG-R8MIG-021). (read-only; nullable) |
+| workstationId | string (uuid) |  | The workstation of that session; null for a guest's cart. (read-only; nullable) |
 | venueId | string (uuid) | yes |  |
 | channel | SalesChannel: enum (pos, kiosk, guestApp, guestWeb, callCentre, partner, api, backOffice, …) | yes | Where a sale came from. |
 | subjectId | string (uuid) |  | Null while anonymous. (nullable) |
@@ -261,6 +276,9 @@ Returns the cart with any conflicts the addition created (2.9.5) — golf at 13:
 | lines[].resourceHoldId | string (uuid) |  | The resources.ResourceHold this line buys (decided 29 September, rev 3 REV3-15). (nullable) |
 | lines[].attributes | OrderLineAttributes |  | Open attributes of a line, kept from the cart to the order line. (nullable) |
 | lines[].attributes.transport | TransportLineAttributes |  | What a transport line is for (decided 29 September, rev 3 REV3-21). (nullable) |
+| lines[].attributes.attendees | integer |  | How many people a meeting-room booking is for (GST-075; R8 blocker cause GPS-C28, CHG-R8SPN-034). (min 1; nullable) |
+| lines[].attributes.parking | object |  | A parking line's plate and day (R8 blocker ORDERS-MONEY-C22, CHG-R8MIG-023): carried from addCartLine to the order line and passed to issueOrderEntitlements, which writes the parking entitlement's pl… (nullable) |
+| lines[].attributes.bundle | object |  | A bundle line's picks (R8 blocker ORDERS-MONEY-C43, the lead's answer B for r8; CHG-R8MIG-023): the bundle and the option the guest chose in each choice group. (nullable) |
 | lines[].parentLineId | string (uuid) |  | The line this add-on is attached to, from AddCartLineRequest.parentLineId. (nullable) |
 | lines[].overridePrice | Money |  | On the wire this is three fields; in the database it is one column. |
 | lines[].overridePrice.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
@@ -340,6 +358,7 @@ Returns the cart with any conflicts the addition created (2.9.5) — golf at 13:
 **Decided 28 September, audit R073 (e): WEB-010 promised a promo code field and the cart had no way to take one.**
 The code is evaluated the way the cart already evaluates promotions: the cart's lines, venue, channel and subject are sent to `promotions.evaluatePromotions` with the cart's `couponCodes` plus this one. **A code that unlocks nothing is refused, not stored**, so the guest learns at once rather than at checkout. An accepted code is kept on `Cart.couponCodes` and re-evaluated on every read, like `appliedPromotionIds`.
 Applying a code the cart already holds returns the cart unchanged.
+**A promotion's own code is accepted as well as a coupon campaign's** (decided 20 October 2026, Chinmay, R8 blocker cause ORDERS-MONEY-C11: option A for automatic promotions, B for code promotions; CHG-R8SPN-026). The code is looked up first among the venue's live promotions that need a code (`promotions.Promotion` with a code), then among coupon campaign codes; either way it is kept on `Cart.couponCodes` and evaluated as above. This is what WEB-032's "Use this offer" does for a promotion that needs a code: it carries the code to the cart through this call, so the offer shows on the price before the guest pays. An automatic promotion needs no call: `evaluatePromotions` already applies it at the basket, and the button only returns to the list. No new cart field.
 
 |  |  |
 |---|---|
@@ -349,8 +368,8 @@ Applying a code the cart already holds returns the cart unchanged.
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `marketing.consent_question`, `marketing.consent_question_version`, `orders.cart`, `orders.cart_line`, `promotions.coupon_campaign`, `promotions.coupon_code` |
-| Writes | `orders.cart`, `orders.cart_line` |
+| Reads | `cache:idempotency`, `marketing.consent_question`, `marketing.consent_question_version`, `orders.cart`, `orders.cart_line`, `promotions.coupon_campaign`, `promotions.coupon_code` |
+| Writes | `cache:idempotency`, `orders.cart`, `orders.cart_line` |
 | Called by | GST-041, WEB-010 |
 
 **Parameters**
@@ -371,7 +390,10 @@ Applying a code the cart already holds returns the cart unchanged.
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | id | string (uuid) | yes |  |
+| anonymousSessionToken | string |  | The guestAuth token of the anonymous session createCart opened for a visitor with no credential (GPS-C23, CHG-R8SPN-031); null on every other answer. (read-only; nullable) |
 | token | string |  | How an anonymous guest returns to their cart, including from a recovery email. (read-only) |
+| sessionId | string (uuid) |  | The staff or partner session that started the cart (a till's cart is its session's own); null for a guest's cart (R8 blocker IDENTITY-C49, CHG-R8MIG-021). (read-only; nullable) |
+| workstationId | string (uuid) |  | The workstation of that session; null for a guest's cart. (read-only; nullable) |
 | venueId | string (uuid) | yes |  |
 | channel | SalesChannel: enum (pos, kiosk, guestApp, guestWeb, callCentre, partner, api, backOffice, …) | yes | Where a sale came from. |
 | subjectId | string (uuid) |  | Null while anonymous. (nullable) |
@@ -391,6 +413,9 @@ Applying a code the cart already holds returns the cart unchanged.
 | lines[].resourceHoldId | string (uuid) |  | The resources.ResourceHold this line buys (decided 29 September, rev 3 REV3-15). (nullable) |
 | lines[].attributes | OrderLineAttributes |  | Open attributes of a line, kept from the cart to the order line. (nullable) |
 | lines[].attributes.transport | TransportLineAttributes |  | What a transport line is for (decided 29 September, rev 3 REV3-21). (nullable) |
+| lines[].attributes.attendees | integer |  | How many people a meeting-room booking is for (GST-075; R8 blocker cause GPS-C28, CHG-R8SPN-034). (min 1; nullable) |
+| lines[].attributes.parking | object |  | A parking line's plate and day (R8 blocker ORDERS-MONEY-C22, CHG-R8MIG-023): carried from addCartLine to the order line and passed to issueOrderEntitlements, which writes the parking entitlement's pl… (nullable) |
+| lines[].attributes.bundle | object |  | A bundle line's picks (R8 blocker ORDERS-MONEY-C43, the lead's answer B for r8; CHG-R8MIG-023): the bundle and the option the guest chose in each choice group. (nullable) |
 | lines[].parentLineId | string (uuid) |  | The line this add-on is attached to, from AddCartLineRequest.parentLineId. (nullable) |
 | lines[].overridePrice | Money |  | On the wire this is three fields; in the database it is one column. |
 | lines[].overridePrice.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
@@ -489,8 +514,8 @@ The cart is retained, not deleted — a checkout that fails at payment must be r
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `catalogue.inventory_reservation`, `marketing.consent_question`, `orders.cart`, `orders.cart_line`, `orders.fraud_rule`, `orders.order_line`, `orders.order_line_discount`, `orders.order_line_eligibility`, `orders.payment`, `orders.sales_order` |
-| Writes | `marketing.consent_record`, `orders.cart`, `orders.deposit`, `orders.order_line`, `orders.order_line_discount`, `orders.order_line_eligibility`, `orders.sales_order`, `platform.idempotency_record`, `platform.outbox` |
+| Reads | `cache:idempotency`, `catalogue.inventory_reservation`, `marketing.consent_question`, `orders.cart`, `orders.cart_line`, `orders.fraud_rule`, `orders.order_line`, `orders.order_line_discount`, `orders.order_line_eligibility`, `orders.payment`, `orders.sales_order` |
+| Writes | `cache:idempotency`, `marketing.consent_record`, `orders.cart`, `orders.deposit`, `orders.order_line`, `orders.order_line_discount`, `orders.order_line_eligibility`, `orders.sales_order`, `platform.idempotency_record`, `platform.outbox` |
 | Called by | GST-009, GST-032, GST-041, KSK-006, PTR-010, WEB-010, WEB-012, WEB-033 |
 | State model | Cart ([states/cart.yaml](../../../states/cart.yaml)): moves `active` -> `checkedOut`, `expiring` -> `checkedOut`<br/>Order ([states/order.yaml](../../../states/order.yaml)): created as `pending` |
 
@@ -521,6 +546,7 @@ The cart is retained, not deleted — a checkout that fails at payment must be r
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | id | string (uuid) | yes | The client UUIDv7 from CreateOrderRequest.id. |
+| orderAccessToken | string |  | What lets the device that just checked out read the order it paid for (decided 20 October 2026, Chinmay, R8 blocker cause IDENTITY-C52, option A; CHG-R8SPN-025). (read-only; nullable) |
 | orderNumber | string |  | The number a guest reads and a cashier types. (read-only) |
 | channel | object | yes | Where it came from. |
 | channelProfileId | string (uuid) |  | The named sales channel the order came through (catalogue SalesChannelProfile.id), set by the server from the caller: a partner user's or reseller's channel, an API key's channel. (read-only; nullable) |
@@ -574,6 +600,9 @@ The cart is retained, not deleted — a checkout that fails at payment must be r
 | lines[].resourceHoldId | string (uuid) |  | A resources.ResourceHold on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); variantId is the placed resource's price-band variant. (nullable) |
 | lines[].attributes | OrderLineAttributes |  | Open attributes of a line, kept from the cart to the order line. (nullable) |
 | lines[].attributes.transport | TransportLineAttributes |  | What a transport line is for (decided 29 September, rev 3 REV3-21). (nullable) |
+| lines[].attributes.attendees | integer |  | How many people a meeting-room booking is for (GST-075; R8 blocker cause GPS-C28, CHG-R8SPN-034). (min 1; nullable) |
+| lines[].attributes.parking | object |  | A parking line's plate and day (R8 blocker ORDERS-MONEY-C22, CHG-R8MIG-023): carried from addCartLine to the order line and passed to issueOrderEntitlements, which writes the parking entitlement's pl… (nullable) |
+| lines[].attributes.bundle | object |  | A bundle line's picks (R8 blocker ORDERS-MONEY-C43, the lead's answer B for r8; CHG-R8MIG-023): the bundle and the option the guest chose in each choice group. (nullable) |
 | lines[].quantity | integer | yes | (min 1) |
 | lines[].eligibilityDeclaration | array of object |  | What was declared for each guest on this line, kept as the record staff check at the gate. (nullable) |
 | lines[].eligibilityDeclaration[].ageBand | enum (infant, child, junior, adult, senior) |  | Infant under 3, child 3–12, junior 13–17, adult 18–59, senior 60+. |
@@ -677,6 +706,8 @@ The cart is retained, not deleted — a checkout that fails at payment must be r
 2.1.31. **The operation that makes cross-channel work.** A guest who built a cart anonymously and then signs in keeps it; a guest who signs in on a laptop finds the cart they started on their phone.
 Where the guest already has a cart, the two **merge rather than one replacing the other** — losing a cart at the moment of signing in is the worst possible time to lose one. Lines that cannot be re-leased are reported rather than dropped silently.
 
+**The anonymous cart's `token` proves it** (R8 blocker IDENTITY-C49, the lead's answer A; CHG-R8MIG-021): the body's `cartToken` must equal the cart's `token` (403 otherwise), and the claim rotates the token, so a link shared before signing in does not reach the account after.
+
 |  |  |
 |---|---|
 | Permission | `None` |
@@ -696,13 +727,22 @@ Where the guest already has a cart, the two **merge rather than one replacing th
 | cartId | path | yes | string (uuid) |  |
 | Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| cartToken | string |  | The anonymous cart's token, as the device that built it holds it (CHG-R8MIG-021). |
+
 **Response**: `CartMergeResult`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | cart | Cart | yes |  |
 | cart.id | string (uuid) | yes |  |
+| cart.anonymousSessionToken | string |  | The guestAuth token of the anonymous session createCart opened for a visitor with no credential (GPS-C23, CHG-R8SPN-031); null on every other answer. (read-only; nullable) |
 | cart.token | string |  | How an anonymous guest returns to their cart, including from a recovery email. (read-only) |
+| cart.sessionId | string (uuid) |  | The staff or partner session that started the cart (a till's cart is its session's own); null for a guest's cart (R8 blocker IDENTITY-C49, CHG-R8MIG-021). (read-only; nullable) |
+| cart.workstationId | string (uuid) |  | The workstation of that session; null for a guest's cart. (read-only; nullable) |
 | cart.venueId | string (uuid) | yes |  |
 | cart.channel | SalesChannel: enum (pos, kiosk, guestApp, guestWeb, callCentre, partner, api, backOffice, …) | yes | Where a sale came from. |
 | cart.subjectId | string (uuid) |  | Null while anonymous. (nullable) |
@@ -781,6 +821,7 @@ Where the guest already has a cart, the two **merge rather than one replacing th
 | Code | Shape | Meaning |
 |---|---|---|
 | 409 |  | The cart is checkedOut or abandoned (cart-not-open), or already belongs to another guest (cart-already-claimed). |
+| 403 |  | The cart's token was not sent, or does not match (R8 blocker IDENTITY-C49, the lead's answer A; CHG-R8MIG-021): only the device that built the anonymous cart holds its token, so it is the proof. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 | 200 |  | Claimed, and merged where the guest already had one |
 
@@ -790,7 +831,10 @@ Where the guest already has a cart, the two **merge rather than one replacing th
 
 **A cart holds leases; an order holds money.** Different lifetimes, different failure modes, and merging them is why this contract did not exist until 17 August — `createOrder` takes a whole basket at once, which is correct for a till and cannot be resumed on another device.
 Created against a guest subject where one is known, or an anonymous token where it is not. **The token is what lets a guest browse before signing in** and keep their cart when they do (2.1.31).
+**A visitor with no credential gets the token here** (decided 20 October 2026, Chinmay, R8 blocker cause GPS-C23, option A; CHG-R8SPN-031). Called with no credential, this creates the cart and an anonymous guest session for it, and returns the session's token in `Cart.anonymousSessionToken` (a `guestAuth` token with no subject, bound to this cart and the device, sliding like any guest token). The app calls this on the first Continue or Add (trigger background) and then `addCartLine` with that token; `checkBookingEligibility`, `joinWaitlist` and `leaveWaitlist` run under it too. On sign-in `claimCart` moves the cart to the account and the anonymous session ends. Nothing about the visitor is stored but the cart (ADR-0045: the contact is proven at checkout, not here). Called with a guest token, the token is the caller's and `anonymousSessionToken` is null.
 **POS does not use this.** A till builds its sale locally and submits atomically, because it works offline and does not need a resumable cart. Same order contract, different channel.
+
+**Who may start one** (R8 blocker IDENTITY-C49, CHG-R8MIG-021): a signed-in guest (the cart is theirs), an anonymous guest token (`guestAuth` with no subject: the cart is anonymous and its `token` brings the guest back), or a staff or partner session, whose cart records the session and its workstation (`orders.cart.session_id`, `workstation_id`) and is that session's own. A till's cart is also created implicitly by its first `addCartLine`.
 
 |  |  |
 |---|---|
@@ -802,7 +846,7 @@ Created against a guest subject where one is known, or an anonymous token where 
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `marketing.consent_question`, `marketing.consent_question_version`, `orders.cart`, `orders.cart_line`, `pii.subject`, `platform.scope` |
 | Writes | `cache:idempotency`, `orders.cart` |
-| Called by | GST-041, WEB-010 |
+| Called by | GST-008, GST-041, GST-050, GST-075, WEB-006, WEB-010, WEB-048 |
 | State model | Cart ([states/cart.yaml](../../../states/cart.yaml)): created as `active` |
 
 **Parameters**
@@ -825,7 +869,10 @@ Created against a guest subject where one is known, or an anonymous token where 
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | id | string (uuid) | yes |  |
+| anonymousSessionToken | string |  | The guestAuth token of the anonymous session createCart opened for a visitor with no credential (GPS-C23, CHG-R8SPN-031); null on every other answer. (read-only; nullable) |
 | token | string |  | How an anonymous guest returns to their cart, including from a recovery email. (read-only) |
+| sessionId | string (uuid) |  | The staff or partner session that started the cart (a till's cart is its session's own); null for a guest's cart (R8 blocker IDENTITY-C49, CHG-R8MIG-021). (read-only; nullable) |
+| workstationId | string (uuid) |  | The workstation of that session; null for a guest's cart. (read-only; nullable) |
 | venueId | string (uuid) | yes |  |
 | channel | SalesChannel: enum (pos, kiosk, guestApp, guestWeb, callCentre, partner, api, backOffice, …) | yes | Where a sale came from. |
 | subjectId | string (uuid) |  | Null while anonymous. (nullable) |
@@ -845,6 +892,9 @@ Created against a guest subject where one is known, or an anonymous token where 
 | lines[].resourceHoldId | string (uuid) |  | The resources.ResourceHold this line buys (decided 29 September, rev 3 REV3-15). (nullable) |
 | lines[].attributes | OrderLineAttributes |  | Open attributes of a line, kept from the cart to the order line. (nullable) |
 | lines[].attributes.transport | TransportLineAttributes |  | What a transport line is for (decided 29 September, rev 3 REV3-21). (nullable) |
+| lines[].attributes.attendees | integer |  | How many people a meeting-room booking is for (GST-075; R8 blocker cause GPS-C28, CHG-R8SPN-034). (min 1; nullable) |
+| lines[].attributes.parking | object |  | A parking line's plate and day (R8 blocker ORDERS-MONEY-C22, CHG-R8MIG-023): carried from addCartLine to the order line and passed to issueOrderEntitlements, which writes the parking entitlement's pl… (nullable) |
+| lines[].attributes.bundle | object |  | A bundle line's picks (R8 blocker ORDERS-MONEY-C43, the lead's answer B for r8; CHG-R8MIG-023): the bundle and the option the guest chose in each choice group. (nullable) |
 | lines[].parentLineId | string (uuid) |  | The line this add-on is attached to, from AddCartLineRequest.parentLineId. (nullable) |
 | lines[].overridePrice | Money |  | On the wire this is three fields; in the database it is one column. |
 | lines[].overridePrice.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
@@ -947,7 +997,10 @@ Offered once, typically, and the interface should say it is the last extension r
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | id | string (uuid) | yes |  |
+| anonymousSessionToken | string |  | The guestAuth token of the anonymous session createCart opened for a visitor with no credential (GPS-C23, CHG-R8SPN-031); null on every other answer. (read-only; nullable) |
 | token | string |  | How an anonymous guest returns to their cart, including from a recovery email. (read-only) |
+| sessionId | string (uuid) |  | The staff or partner session that started the cart (a till's cart is its session's own); null for a guest's cart (R8 blocker IDENTITY-C49, CHG-R8MIG-021). (read-only; nullable) |
+| workstationId | string (uuid) |  | The workstation of that session; null for a guest's cart. (read-only; nullable) |
 | venueId | string (uuid) | yes |  |
 | channel | SalesChannel: enum (pos, kiosk, guestApp, guestWeb, callCentre, partner, api, backOffice, …) | yes | Where a sale came from. |
 | subjectId | string (uuid) |  | Null while anonymous. (nullable) |
@@ -967,6 +1020,9 @@ Offered once, typically, and the interface should say it is the last extension r
 | lines[].resourceHoldId | string (uuid) |  | The resources.ResourceHold this line buys (decided 29 September, rev 3 REV3-15). (nullable) |
 | lines[].attributes | OrderLineAttributes |  | Open attributes of a line, kept from the cart to the order line. (nullable) |
 | lines[].attributes.transport | TransportLineAttributes |  | What a transport line is for (decided 29 September, rev 3 REV3-21). (nullable) |
+| lines[].attributes.attendees | integer |  | How many people a meeting-room booking is for (GST-075; R8 blocker cause GPS-C28, CHG-R8SPN-034). (min 1; nullable) |
+| lines[].attributes.parking | object |  | A parking line's plate and day (R8 blocker ORDERS-MONEY-C22, CHG-R8MIG-023): carried from addCartLine to the order line and passed to issueOrderEntitlements, which writes the parking entitlement's pl… (nullable) |
+| lines[].attributes.bundle | object |  | A bundle line's picks (R8 blocker ORDERS-MONEY-C43, the lead's answer B for r8; CHG-R8MIG-023): the bundle and the option the guest chose in each choice group. (nullable) |
 | lines[].parentLineId | string (uuid) |  | The line this add-on is attached to, from AddCartLineRequest.parentLineId. (nullable) |
 | lines[].overridePrice | Money |  | On the wire this is three fields; in the database it is one column. |
 | lines[].overridePrice.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
@@ -1071,7 +1127,10 @@ Returns the conflicts (2.9.5) and the leases with their remaining time, so the i
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | id | string (uuid) | yes |  |
+| anonymousSessionToken | string |  | The guestAuth token of the anonymous session createCart opened for a visitor with no credential (GPS-C23, CHG-R8SPN-031); null on every other answer. (read-only; nullable) |
 | token | string |  | How an anonymous guest returns to their cart, including from a recovery email. (read-only) |
+| sessionId | string (uuid) |  | The staff or partner session that started the cart (a till's cart is its session's own); null for a guest's cart (R8 blocker IDENTITY-C49, CHG-R8MIG-021). (read-only; nullable) |
+| workstationId | string (uuid) |  | The workstation of that session; null for a guest's cart. (read-only; nullable) |
 | venueId | string (uuid) | yes |  |
 | channel | SalesChannel: enum (pos, kiosk, guestApp, guestWeb, callCentre, partner, api, backOffice, …) | yes | Where a sale came from. |
 | subjectId | string (uuid) |  | Null while anonymous. (nullable) |
@@ -1091,6 +1150,9 @@ Returns the conflicts (2.9.5) and the leases with their remaining time, so the i
 | lines[].resourceHoldId | string (uuid) |  | The resources.ResourceHold this line buys (decided 29 September, rev 3 REV3-15). (nullable) |
 | lines[].attributes | OrderLineAttributes |  | Open attributes of a line, kept from the cart to the order line. (nullable) |
 | lines[].attributes.transport | TransportLineAttributes |  | What a transport line is for (decided 29 September, rev 3 REV3-21). (nullable) |
+| lines[].attributes.attendees | integer |  | How many people a meeting-room booking is for (GST-075; R8 blocker cause GPS-C28, CHG-R8SPN-034). (min 1; nullable) |
+| lines[].attributes.parking | object |  | A parking line's plate and day (R8 blocker ORDERS-MONEY-C22, CHG-R8MIG-023): carried from addCartLine to the order line and passed to issueOrderEntitlements, which writes the parking entitlement's pl… (nullable) |
+| lines[].attributes.bundle | object |  | A bundle line's picks (R8 blocker ORDERS-MONEY-C43, the lead's answer B for r8; CHG-R8MIG-023): the bundle and the option the guest chose in each choice group. (nullable) |
 | lines[].parentLineId | string (uuid) |  | The line this add-on is attached to, from AddCartLineRequest.parentLineId. (nullable) |
 | lines[].overridePrice | Money |  | On the wire this is three fields; in the database it is one column. |
 | lines[].overridePrice.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
@@ -1192,7 +1254,10 @@ Releases its lease immediately.
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | id | string (uuid) | yes |  |
+| anonymousSessionToken | string |  | The guestAuth token of the anonymous session createCart opened for a visitor with no credential (GPS-C23, CHG-R8SPN-031); null on every other answer. (read-only; nullable) |
 | token | string |  | How an anonymous guest returns to their cart, including from a recovery email. (read-only) |
+| sessionId | string (uuid) |  | The staff or partner session that started the cart (a till's cart is its session's own); null for a guest's cart (R8 blocker IDENTITY-C49, CHG-R8MIG-021). (read-only; nullable) |
+| workstationId | string (uuid) |  | The workstation of that session; null for a guest's cart. (read-only; nullable) |
 | venueId | string (uuid) | yes |  |
 | channel | SalesChannel: enum (pos, kiosk, guestApp, guestWeb, callCentre, partner, api, backOffice, …) | yes | Where a sale came from. |
 | subjectId | string (uuid) |  | Null while anonymous. (nullable) |
@@ -1212,6 +1277,9 @@ Releases its lease immediately.
 | lines[].resourceHoldId | string (uuid) |  | The resources.ResourceHold this line buys (decided 29 September, rev 3 REV3-15). (nullable) |
 | lines[].attributes | OrderLineAttributes |  | Open attributes of a line, kept from the cart to the order line. (nullable) |
 | lines[].attributes.transport | TransportLineAttributes |  | What a transport line is for (decided 29 September, rev 3 REV3-21). (nullable) |
+| lines[].attributes.attendees | integer |  | How many people a meeting-room booking is for (GST-075; R8 blocker cause GPS-C28, CHG-R8SPN-034). (min 1; nullable) |
+| lines[].attributes.parking | object |  | A parking line's plate and day (R8 blocker ORDERS-MONEY-C22, CHG-R8MIG-023): carried from addCartLine to the order line and passed to issueOrderEntitlements, which writes the parking entitlement's pl… (nullable) |
+| lines[].attributes.bundle | object |  | A bundle line's picks (R8 blocker ORDERS-MONEY-C43, the lead's answer B for r8; CHG-R8MIG-023): the bundle and the option the guest chose in each choice group. (nullable) |
 | lines[].parentLineId | string (uuid) |  | The line this add-on is attached to, from AddCartLineRequest.parentLineId. (nullable) |
 | lines[].overridePrice | Money |  | On the wire this is three fields; in the database it is one column. |
 | lines[].overridePrice.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
@@ -1320,7 +1388,10 @@ Increasing extends the lease and may fail on capacity; decreasing releases part 
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | id | string (uuid) | yes |  |
+| anonymousSessionToken | string |  | The guestAuth token of the anonymous session createCart opened for a visitor with no credential (GPS-C23, CHG-R8SPN-031); null on every other answer. (read-only; nullable) |
 | token | string |  | How an anonymous guest returns to their cart, including from a recovery email. (read-only) |
+| sessionId | string (uuid) |  | The staff or partner session that started the cart (a till's cart is its session's own); null for a guest's cart (R8 blocker IDENTITY-C49, CHG-R8MIG-021). (read-only; nullable) |
+| workstationId | string (uuid) |  | The workstation of that session; null for a guest's cart. (read-only; nullable) |
 | venueId | string (uuid) | yes |  |
 | channel | SalesChannel: enum (pos, kiosk, guestApp, guestWeb, callCentre, partner, api, backOffice, …) | yes | Where a sale came from. |
 | subjectId | string (uuid) |  | Null while anonymous. (nullable) |
@@ -1340,6 +1411,9 @@ Increasing extends the lease and may fail on capacity; decreasing releases part 
 | lines[].resourceHoldId | string (uuid) |  | The resources.ResourceHold this line buys (decided 29 September, rev 3 REV3-15). (nullable) |
 | lines[].attributes | OrderLineAttributes |  | Open attributes of a line, kept from the cart to the order line. (nullable) |
 | lines[].attributes.transport | TransportLineAttributes |  | What a transport line is for (decided 29 September, rev 3 REV3-21). (nullable) |
+| lines[].attributes.attendees | integer |  | How many people a meeting-room booking is for (GST-075; R8 blocker cause GPS-C28, CHG-R8SPN-034). (min 1; nullable) |
+| lines[].attributes.parking | object |  | A parking line's plate and day (R8 blocker ORDERS-MONEY-C22, CHG-R8MIG-023): carried from addCartLine to the order line and passed to issueOrderEntitlements, which writes the parking entitlement's pl… (nullable) |
+| lines[].attributes.bundle | object |  | A bundle line's picks (R8 blocker ORDERS-MONEY-C43, the lead's answer B for r8; CHG-R8MIG-023): the bundle and the option the guest chose in each choice group. (nullable) |
 | lines[].parentLineId | string (uuid) |  | The line this add-on is attached to, from AddCartLineRequest.parentLineId. (nullable) |
 | lines[].overridePrice | Money |  | On the wire this is three fields; in the database it is one column. |
 | lines[].overridePrice.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
@@ -1421,6 +1495,7 @@ Increasing extends the lease and may fail on capacity; decreasing releases part 
 A lift removes cash from an open float mid-shift without closing it — the supervisor takes the excess to the safe and the cashier keeps trading. Both directions are traced, both record the authorising principal, and both adjust the expected figure used at close.
 **What "exceeds the counted float" means** (decided 28 September, audit R123 (2)): the cash available to lift is the float counted at the shift's last count (the opening float, or the last `movement` count if one is later), less every lift recorded since, plus every add. A lift larger than that is refused with `lift-exceeds-float`. Cash taken in sales since the last count does not count towards it, because nobody has counted it.
 **The drawer limit offers the lift** (decided 2 October 2026, Chinmay, batch 6 #179, BO-042: "Add drawer limit setting (warn + offer cash lift)"; DEC-179; CHG-CSP-016; DI-274). When the cash a till has taken since its last count puts the drawer over the till's limit (`tenancy.Workstation.cashDrawerLimit`, else `tenancy.VenueSettings.cashDrawerLimit`), the till warns and offers a lift recorded here; `DepositBox.overDrawerLimit` flags the box on BO-042. The warning never blocks a sale, and the cashier is told only that the drawer is over its limit, not what it holds (CHG-FIN-003). A supervisor recording the lift counts what they take, which makes it counted cash.
+**Offline, the till journals the movement and replays this same call** (decided 20 October 2026, Chinmay, R8 blocker cause FOUNDATION-AI-C13, option A; CHG-R8SPN-021). On reconnect the journal calls `createCashMovement` itself, with the `Idempotency-Key` the movement was taken with and its `recordedAt` (when it happened at the till), so a replay sent twice records it once. It is not part of `syncOrders`. A replay refused `409 shift-not-open` or `lift-exceeds-float` is not retried: the till quarantines it through `recordSyncRejection` with `kind` `cashMovement` and the request body as the `payload`, and a supervisor resolves it on the sync rejections list like any other.
 
 |  |  |
 |---|---|
@@ -1802,6 +1877,7 @@ The media is the join, not the order. That is why this operation is keyed on `me
 |---|---|---|---|
 | order | object | yes | A new order. |
 | order.id | string (uuid) | yes | The client UUIDv7 from CreateOrderRequest.id. |
+| order.orderAccessToken | string |  | What lets the device that just checked out read the order it paid for (decided 20 October 2026, Chinmay, R8 blocker cause IDENTITY-C52, option A; CHG-R8SPN-025). (read-only; nullable) |
 | order.orderNumber | string |  | The number a guest reads and a cashier types. (read-only) |
 | order.channel | object | yes | Where it came from. |
 | order.channelProfileId | string (uuid) |  | The named sales channel the order came through (catalogue SalesChannelProfile.id), set by the server from the caller: a partner user's or reseller's channel, an API key's channel. (read-only; nullable) |
@@ -1974,6 +2050,7 @@ Posts to a discount account, never as a price change. A line sold at a reduced p
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | id | string (uuid) | yes | The client UUIDv7 from CreateOrderRequest.id. |
+| orderAccessToken | string |  | What lets the device that just checked out read the order it paid for (decided 20 October 2026, Chinmay, R8 blocker cause IDENTITY-C52, option A; CHG-R8SPN-025). (read-only; nullable) |
 | orderNumber | string |  | The number a guest reads and a cashier types. (read-only) |
 | channel | object | yes | Where it came from. |
 | channelProfileId | string (uuid) |  | The named sales channel the order came through (catalogue SalesChannelProfile.id), set by the server from the caller: a partner user's or reseller's channel, an API key's channel. (read-only; nullable) |
@@ -2027,6 +2104,9 @@ Posts to a discount account, never as a price change. A line sold at a reduced p
 | lines[].resourceHoldId | string (uuid) |  | A resources.ResourceHold on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); variantId is the placed resource's price-band variant. (nullable) |
 | lines[].attributes | OrderLineAttributes |  | Open attributes of a line, kept from the cart to the order line. (nullable) |
 | lines[].attributes.transport | TransportLineAttributes |  | What a transport line is for (decided 29 September, rev 3 REV3-21). (nullable) |
+| lines[].attributes.attendees | integer |  | How many people a meeting-room booking is for (GST-075; R8 blocker cause GPS-C28, CHG-R8SPN-034). (min 1; nullable) |
+| lines[].attributes.parking | object |  | A parking line's plate and day (R8 blocker ORDERS-MONEY-C22, CHG-R8MIG-023): carried from addCartLine to the order line and passed to issueOrderEntitlements, which writes the parking entitlement's pl… (nullable) |
+| lines[].attributes.bundle | object |  | A bundle line's picks (R8 blocker ORDERS-MONEY-C43, the lead's answer B for r8; CHG-R8MIG-023): the bundle and the option the guest chose in each choice group. (nullable) |
 | lines[].quantity | integer | yes | (min 1) |
 | lines[].eligibilityDeclaration | array of object |  | What was declared for each guest on this line, kept as the record staff check at the gate. (nullable) |
 | lines[].eligibilityDeclaration[].ageBand | enum (infant, child, junior, adult, senior) |  | Infant under 3, child 3–12, junior 13–17, adult 18–59, senior 60+. |
@@ -2161,7 +2241,7 @@ Posts to a discount account, never as a price change. A line sold at a reduced p
 | toSubjectId | string (uuid) |  | Set only on claim. (nullable) |
 | recipientAddressMasked | string |  |  |
 | status | enum (offered, claimed, expired, cancelled) | yes |  |
-| claimUrl | string |  | (nullable) |
+| claimUrl | string |  | The link the recipient is sent (R8 blocker fix, ORDERS-MONEY-C12). (nullable) |
 | claimToken | string (password) |  | What claimTicketTransfer checks the presented claimToken against. |
 | offeredAt | string (date-time) | yes |  |
 | claimedAt | string (date-time) |  | (nullable) |
@@ -2232,6 +2312,9 @@ Offline-capable. The client writes to its local journal, acknowledges the cashie
 | lines[].resourceHoldId | string (uuid) |  | A resources.ResourceHold on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); variantId is the placed resource's price-band variant. (nullable) |
 | lines[].attributes | OrderLineAttributes |  | Open attributes of a line, kept from the cart to the order line. (nullable) |
 | lines[].attributes.transport | TransportLineAttributes |  | What a transport line is for (decided 29 September, rev 3 REV3-21). (nullable) |
+| lines[].attributes.attendees | integer |  | How many people a meeting-room booking is for (GST-075; R8 blocker cause GPS-C28, CHG-R8SPN-034). (min 1; nullable) |
+| lines[].attributes.parking | object |  | A parking line's plate and day (R8 blocker ORDERS-MONEY-C22, CHG-R8MIG-023): carried from addCartLine to the order line and passed to issueOrderEntitlements, which writes the parking entitlement's pl… (nullable) |
+| lines[].attributes.bundle | object |  | A bundle line's picks (R8 blocker ORDERS-MONEY-C43, the lead's answer B for r8; CHG-R8MIG-023): the bundle and the option the guest chose in each choice group. (nullable) |
 | lines[].quantity | integer | yes | (min 1) |
 | lines[].eligibilityDeclaration | array of object |  | What was declared for each guest on this line, kept as the record staff check at the gate. (nullable) |
 | lines[].eligibilityDeclaration[].ageBand | enum (infant, child, junior, adult, senior) |  | Infant under 3, child 3–12, junior 13–17, adult 18–59, senior 60+. |
@@ -2252,6 +2335,7 @@ Offline-capable. The client writes to its local journal, acknowledges the cashie
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | id | string (uuid) | yes | The client UUIDv7 from CreateOrderRequest.id. |
+| orderAccessToken | string |  | What lets the device that just checked out read the order it paid for (decided 20 October 2026, Chinmay, R8 blocker cause IDENTITY-C52, option A; CHG-R8SPN-025). (read-only; nullable) |
 | orderNumber | string |  | The number a guest reads and a cashier types. (read-only) |
 | channel | object | yes | Where it came from. |
 | channelProfileId | string (uuid) |  | The named sales channel the order came through (catalogue SalesChannelProfile.id), set by the server from the caller: a partner user's or reseller's channel, an API key's channel. (read-only; nullable) |
@@ -2305,6 +2389,9 @@ Offline-capable. The client writes to its local journal, acknowledges the cashie
 | lines[].resourceHoldId | string (uuid) |  | A resources.ResourceHold on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); variantId is the placed resource's price-band variant. (nullable) |
 | lines[].attributes | OrderLineAttributes |  | Open attributes of a line, kept from the cart to the order line. (nullable) |
 | lines[].attributes.transport | TransportLineAttributes |  | What a transport line is for (decided 29 September, rev 3 REV3-21). (nullable) |
+| lines[].attributes.attendees | integer |  | How many people a meeting-room booking is for (GST-075; R8 blocker cause GPS-C28, CHG-R8SPN-034). (min 1; nullable) |
+| lines[].attributes.parking | object |  | A parking line's plate and day (R8 blocker ORDERS-MONEY-C22, CHG-R8MIG-023): carried from addCartLine to the order line and passed to issueOrderEntitlements, which writes the parking entitlement's pl… (nullable) |
+| lines[].attributes.bundle | object |  | A bundle line's picks (R8 blocker ORDERS-MONEY-C43, the lead's answer B for r8; CHG-R8MIG-023): the bundle and the option the guest chose in each choice group. (nullable) |
 | lines[].quantity | integer | yes | (min 1) |
 | lines[].eligibilityDeclaration | array of object |  | What was declared for each guest on this line, kept as the record staff check at the gate. (nullable) |
 | lines[].eligibilityDeclaration[].ageBand | enum (infant, child, junior, adult, senior) |  | Infant under 3, child 3–12, junior 13–17, adult 18–59, senior 60+. |
@@ -2418,7 +2505,7 @@ The replacement is held before the original is released, never the other way rou
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `orders.sales_order` |
+| Reads | `cache:idempotency`, `orders.order_line`, `orders.refund`, `orders.refund_policy`, `orders.sales_order` |
 | Writes | `cache:idempotency`, `orders.order_event`, `orders.order_line`, `orders.sales_order`, `platform.outbox` |
 | Called by | BO-022, BO-023, BO-026, BO-047, BO-315, EMP-034, POS-006, POS-010, POS-011, PTR-002, PTR-008, PTR-015 |
 
@@ -2448,6 +2535,9 @@ The replacement is held before the original is released, never the other way rou
 | incomingLines[].resourceHoldId | string (uuid) |  | A resources.ResourceHold on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); variantId is the placed resource's price-band variant. (nullable) |
 | incomingLines[].attributes | OrderLineAttributes |  | Open attributes of a line, kept from the cart to the order line. (nullable) |
 | incomingLines[].attributes.transport | TransportLineAttributes |  | What a transport line is for (decided 29 September, rev 3 REV3-21). (nullable) |
+| incomingLines[].attributes.attendees | integer |  | How many people a meeting-room booking is for (GST-075; R8 blocker cause GPS-C28, CHG-R8SPN-034). (min 1; nullable) |
+| incomingLines[].attributes.parking | object |  | A parking line's plate and day (R8 blocker ORDERS-MONEY-C22, CHG-R8MIG-023): carried from addCartLine to the order line and passed to issueOrderEntitlements, which writes the parking entitlement's pl… (nullable) |
+| incomingLines[].attributes.bundle | object |  | A bundle line's picks (R8 blocker ORDERS-MONEY-C43, the lead's answer B for r8; CHG-R8MIG-023): the bundle and the option the guest chose in each choice group. (nullable) |
 | incomingLines[].quantity | integer | yes | (min 1) |
 | incomingLines[].eligibilityDeclaration | array of object |  | What was declared for each guest on this line, kept as the record staff check at the gate. (nullable) |
 | incomingLines[].eligibilityDeclaration[].ageBand | enum (infant, child, junior, adult, senior) |  | Infant under 3, child 3–12, junior 13–17, adult 18–59, senior 60+. |
@@ -2561,6 +2651,7 @@ Scanned at a counter before adding something. Shows what the guest holds so a ca
 **`GET /orders/{orderId}`**: Read an order
 
 **A guest acts on their own only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-002; `x-ticvai-self-scoped: subject`): a guest caller needs no permission and is answered for an order they placed; another guest's order is refused exactly as one that does not exist, never returned. `ORDER_VIEW` is what a staff caller must hold to act for any guest (ADR-0025).
+**Or with the order's access token and no session** (decided 20 October 2026, Chinmay, R8 blocker cause IDENTITY-C52, option A; CHG-R8SPN-025): the device that checked out, or a payer with no session, sends `X-Order-Access-Token` (`Order.orderAccessToken`, from `checkoutCart`) and reads this one order for 24 hours. With neither a session nor a valid token for this order the answer is `404`. For a signed-in guest a `404` is also what WEB-013 and WEB-012 show as their no-access state: the guest's own order lookup found nothing they may see (IDENTITY-C28); no permission is involved.
 
 |  |  |
 |---|---|
@@ -2581,12 +2672,14 @@ Scanned at a counter before adding something. Shows what the guest holds so a ca
 |---|---|---|---|---|
 | orderId | path | yes | string (uuid) |  |
 | X-Consistency-Token | header |  | string | Opaque token returned by a prior write: the database instance and its WAL LSN (SD-025, 29 September; ADR-0040 allows several instances per region, so an LSN alone is ambiguous). |
+| X-Order-Access-Token | header |  | string | Order.orderAccessToken from checkoutCart's answer, in place of a session (IDENTITY-C52, CHG-R8SPN-025). |
 
 **Response**: `Order`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | id | string (uuid) | yes | The client UUIDv7 from CreateOrderRequest.id. |
+| orderAccessToken | string |  | What lets the device that just checked out read the order it paid for (decided 20 October 2026, Chinmay, R8 blocker cause IDENTITY-C52, option A; CHG-R8SPN-025). (read-only; nullable) |
 | orderNumber | string |  | The number a guest reads and a cashier types. (read-only) |
 | channel | object | yes | Where it came from. |
 | channelProfileId | string (uuid) |  | The named sales channel the order came through (catalogue SalesChannelProfile.id), set by the server from the caller: a partner user's or reseller's channel, an API key's channel. (read-only; nullable) |
@@ -2640,6 +2733,9 @@ Scanned at a counter before adding something. Shows what the guest holds so a ca
 | lines[].resourceHoldId | string (uuid) |  | A resources.ResourceHold on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); variantId is the placed resource's price-band variant. (nullable) |
 | lines[].attributes | OrderLineAttributes |  | Open attributes of a line, kept from the cart to the order line. (nullable) |
 | lines[].attributes.transport | TransportLineAttributes |  | What a transport line is for (decided 29 September, rev 3 REV3-21). (nullable) |
+| lines[].attributes.attendees | integer |  | How many people a meeting-room booking is for (GST-075; R8 blocker cause GPS-C28, CHG-R8SPN-034). (min 1; nullable) |
+| lines[].attributes.parking | object |  | A parking line's plate and day (R8 blocker ORDERS-MONEY-C22, CHG-R8MIG-023): carried from addCartLine to the order line and passed to issueOrderEntitlements, which writes the parking entitlement's pl… (nullable) |
+| lines[].attributes.bundle | object |  | A bundle line's picks (R8 blocker ORDERS-MONEY-C43, the lead's answer B for r8; CHG-R8MIG-023): the bundle and the option the guest chose in each choice group. (nullable) |
 | lines[].quantity | integer | yes | (min 1) |
 | lines[].eligibilityDeclaration | array of object |  | What was declared for each guest on this line, kept as the record staff check at the gate. (nullable) |
 | lines[].eligibilityDeclaration[].ageBand | enum (infant, child, junior, adult, senior) |  | Infant under 3, child 3–12, junior 13–17, adult 18–59, senior 60+. |
@@ -2750,7 +2846,7 @@ Returns an iCalendar (RFC 5545) event per dated line: the venue, the session sta
 | Conflict policy | serverWins |
 | Read routing | replica |
 | Guest callable | True |
-| Reads | `orders.order_line`, `orders.sales_order`, `platform.scope` |
+| Reads | `orders.order_event`, `orders.order_line`, `orders.sales_order`, `platform.scope` |
 | Writes | - |
 | Called by | GST-018 |
 
@@ -2784,7 +2880,7 @@ Every payment, refund, void, modification and exchange in sequence, with the run
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | primary |
-| Reads | `ledger.posting`, `orders.payment`, `orders.refund`, `orders.sales_order` |
+| Reads | `ledger.posting`, `orders.chargeback`, `orders.order_event`, `orders.order_fee`, `orders.payment`, `orders.refund`, `orders.sales_order` |
 | Writes | - |
 | Called by | BO-022, BO-023, BO-026, BO-047, BO-305, EMP-014, EMP-034, POS-006, PTR-002, PTR-005, PTR-008, PTR-015, PTR-016 |
 
@@ -2853,7 +2949,7 @@ Returns the reminder, or one with `enabled` false when the guest has never set o
 | Conflict policy | serverWins |
 | Read routing | replica |
 | Guest callable | True |
-| Reads | `orders.visit_reminder` |
+| Reads | `orders.sales_order`, `orders.visit_reminder` |
 | Writes | - |
 | Called by | GST-018 |
 
@@ -2925,6 +3021,7 @@ Held orders expire. A till that accumulates parked sales across a shift cannot b
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | id | string (uuid) | yes | The client UUIDv7 from CreateOrderRequest.id. |
+| orderAccessToken | string |  | What lets the device that just checked out read the order it paid for (decided 20 October 2026, Chinmay, R8 blocker cause IDENTITY-C52, option A; CHG-R8SPN-025). (read-only; nullable) |
 | orderNumber | string |  | The number a guest reads and a cashier types. (read-only) |
 | channel | object | yes | Where it came from. |
 | channelProfileId | string (uuid) |  | The named sales channel the order came through (catalogue SalesChannelProfile.id), set by the server from the caller: a partner user's or reseller's channel, an API key's channel. (read-only; nullable) |
@@ -2978,6 +3075,9 @@ Held orders expire. A till that accumulates parked sales across a shift cannot b
 | lines[].resourceHoldId | string (uuid) |  | A resources.ResourceHold on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); variantId is the placed resource's price-band variant. (nullable) |
 | lines[].attributes | OrderLineAttributes |  | Open attributes of a line, kept from the cart to the order line. (nullable) |
 | lines[].attributes.transport | TransportLineAttributes |  | What a transport line is for (decided 29 September, rev 3 REV3-21). (nullable) |
+| lines[].attributes.attendees | integer |  | How many people a meeting-room booking is for (GST-075; R8 blocker cause GPS-C28, CHG-R8SPN-034). (min 1; nullable) |
+| lines[].attributes.parking | object |  | A parking line's plate and day (R8 blocker ORDERS-MONEY-C22, CHG-R8MIG-023): carried from addCartLine to the order line and passed to issueOrderEntitlements, which writes the parking entitlement's pl… (nullable) |
+| lines[].attributes.bundle | object |  | A bundle line's picks (R8 blocker ORDERS-MONEY-C43, the lead's answer B for r8; CHG-R8MIG-023): the bundle and the option the guest chose in each choice group. (nullable) |
 | lines[].quantity | integer | yes | (min 1) |
 | lines[].eligibilityDeclaration | array of object |  | What was declared for each guest on this line, kept as the record staff check at the gate. (nullable) |
 | lines[].eligibilityDeclaration[].ageBand | enum (infant, child, junior, adult, senior) |  | Infant under 3, child 3–12, junior 13–17, adult 18–59, senior 60+. |
@@ -3089,7 +3189,7 @@ Held orders expire. A till that accumulates parked sales across a shift cannot b
 | Offline | yes |
 | Conflict policy | serverWins |
 | Read routing | replica |
-| Reads | `orders.order_line`, `orders.sales_order` |
+| Reads | `orders.order_line`, `orders.payment`, `orders.sales_order` |
 | Writes | - |
 | Called by | ANL-009, BO-022, BO-023, BO-026, BO-047, BO-101, EMP-014, EMP-034, EMP-057, POS-002, POS-006, POS-012, POS-030, PTR-002, PTR-005, PTR-008, PTR-015, PTR-016, SUP-014 |
 
@@ -3148,8 +3248,7 @@ Held orders expire. A till that accumulates parked sales across a shift cannot b
 
 **`TicketTransfer` was only ever the answer to a POST.** A guest who sent tickets had no way to see them again — whether the recipient claimed, whether the offer lapsed and the tickets came back — and `WEB-030` and `GST-014` bound their *every ticket transfer* table to the order list, which carries no transfer at all.
 **Scoped to the caller, not filtered by them** — the same shape as `listMyOrders`. A transfer appears where the caller is its sender (`fromSubjectId`) or, once claimed, its recipient (`toSubjectId`).
-
-
+**`claimUrl` is null on a transfer the caller sent** (decided 20 October 2026, Chinmay, R8 blocker cause IDENTITY-C26, option A; CHG-R8SPN-025): it carries the claim token, and the sender must not be able to claim on the recipient's behalf. It is returned only on the recipient's own rows.
 **Order.** Soonest first, by `expiresAt` ascending, then by `id`.
 
 |  |  |
@@ -3186,7 +3285,7 @@ Held orders expire. A till that accumulates parked sales across a shift cannot b
 | items[].toSubjectId | string (uuid) |  | Set only on claim. (nullable) |
 | items[].recipientAddressMasked | string |  |  |
 | items[].status | enum (offered, claimed, expired, cancelled) | yes |  |
-| items[].claimUrl | string |  | (nullable) |
+| items[].claimUrl | string |  | The link the recipient is sent (R8 blocker fix, ORDERS-MONEY-C12). (nullable) |
 | items[].claimToken | string (password) |  | What claimTicketTransfer checks the presented claimToken against. |
 | items[].offeredAt | string (date-time) | yes |  |
 | items[].claimedAt | string (date-time) |  | (nullable) |
@@ -3198,7 +3297,7 @@ Held orders expire. A till that accumulates parked sales across a shift cannot b
 
 | Code | Shape | Meaning |
 |---|---|---|
-| 200 |  | Transfers, newest offer first — offeredAt descending, id as the tiebreak. |
+| 200 |  | Transfers, soonest to lapse first — expiresAt ascending, id as the tiebreak (the order the description and the cursor use; IDENTITY-C26). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### modifyOrder
@@ -3217,7 +3316,7 @@ Lines whose entitlement has been redeemed cannot be removed. The guest has used 
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `orders.order_line`, `orders.order_line_discount`, `orders.order_line_eligibility`, `orders.payment`, `orders.sales_order` |
+| Reads | `cache:idempotency`, `orders.order_line`, `orders.order_line_discount`, `orders.order_line_eligibility`, `orders.payment`, `orders.refund`, `orders.refund_policy`, `orders.sales_order` |
 | Writes | `cache:idempotency`, `orders.order_event`, `orders.order_line`, `orders.payment`, `orders.sales_order` |
 | Called by | BO-022, BO-023, BO-026, BO-047, BO-281, BO-315, EMP-034, POS-006, PTR-002, PTR-008, PTR-015 |
 
@@ -3246,6 +3345,9 @@ Lines whose entitlement has been redeemed cannot be removed. The guest has used 
 | addLines[].resourceHoldId | string (uuid) |  | A resources.ResourceHold on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); variantId is the placed resource's price-band variant. (nullable) |
 | addLines[].attributes | OrderLineAttributes |  | Open attributes of a line, kept from the cart to the order line. (nullable) |
 | addLines[].attributes.transport | TransportLineAttributes |  | What a transport line is for (decided 29 September, rev 3 REV3-21). (nullable) |
+| addLines[].attributes.attendees | integer |  | How many people a meeting-room booking is for (GST-075; R8 blocker cause GPS-C28, CHG-R8SPN-034). (min 1; nullable) |
+| addLines[].attributes.parking | object |  | A parking line's plate and day (R8 blocker ORDERS-MONEY-C22, CHG-R8MIG-023): carried from addCartLine to the order line and passed to issueOrderEntitlements, which writes the parking entitlement's pl… (nullable) |
+| addLines[].attributes.bundle | object |  | A bundle line's picks (R8 blocker ORDERS-MONEY-C43, the lead's answer B for r8; CHG-R8MIG-023): the bundle and the option the guest chose in each choice group. (nullable) |
 | addLines[].quantity | integer | yes | (min 1) |
 | addLines[].eligibilityDeclaration | array of object |  | What was declared for each guest on this line, kept as the record staff check at the gate. (nullable) |
 | addLines[].eligibilityDeclaration[].ageBand | enum (infant, child, junior, adult, senior) |  | Infant under 3, child 3–12, junior 13–17, adult 18–59, senior 60+. |
@@ -3269,6 +3371,7 @@ Lines whose entitlement has been redeemed cannot be removed. The guest has used 
 |---|---|---|---|
 | order | Order | yes |  |
 | order.id | string (uuid) | yes | The client UUIDv7 from CreateOrderRequest.id. |
+| order.orderAccessToken | string |  | What lets the device that just checked out read the order it paid for (decided 20 October 2026, Chinmay, R8 blocker cause IDENTITY-C52, option A; CHG-R8SPN-025). (read-only; nullable) |
 | order.orderNumber | string |  | The number a guest reads and a cashier types. (read-only) |
 | order.channel | object | yes | Where it came from. |
 | order.channelProfileId | string (uuid) |  | The named sales channel the order came through (catalogue SalesChannelProfile.id), set by the server from the caller: a partner user's or reseller's channel, an API key's channel. (read-only; nullable) |
@@ -3395,6 +3498,7 @@ Reprint count is recorded per line (`OrderLine.reprintCount`). Repeated reprints
 Offline-capable, so it carries `recordedAt`: the moment the till reprinted, kept apart from when the server heard about it.
 **A guest acts on their own only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-004; `x-ticvai-self-scoped: subject`): a guest caller needs no permission and is answered for an order they placed (resend or reprint); another guest's order is refused exactly as one that does not exist, never returned. `ORDER_REPRINT` is what a staff caller must hold to act for any guest (ADR-0025).
 **A kiosk reprints as a registered device** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-004): the kiosk (P05) calls this with its device credential (`apiKeyAuth`, audience `device`) and holds no permission; it reprints only an order the guest at it has identified (KSK-012 booking found, KSK-009 ticket issued, KSK-010 print failure), and each reprint is recorded against the device.
+**`delivery` `wallet` is "Add to wallet"** (decided 20 October 2026, Chinmay, R8 blocker cause IDENTITY-C29, option A; CHG-R8SPN-025): one call adds every ticket of the order (or the lines named) to the guest's phone wallet, which is what WEB-013's approved button does; no other operation is needed.
 
 |  |  |
 |---|---|
@@ -3404,8 +3508,8 @@ Offline-capable, so it carries `recordedAt`: the moment the till reprinted, kept
 | Wave | 1 |
 | Offline | yes |
 | Conflict policy | append |
-| Reads | `cache:idempotency`, `orders.sales_order` |
-| Writes | `cache:idempotency`, `orders.sales_order` |
+| Reads | `cache:idempotency`, `orders.order_line`, `orders.sales_order` |
+| Writes | `cache:idempotency`, `orders.order_event`, `orders.order_line`, `orders.sales_order` |
 | Called by | BO-022, BO-023, BO-026, BO-047, EMP-014, EMP-034, GST-010, KSK-009, KSK-010, KSK-012, POS-002, POS-006, POS-026, POS-030, PTR-002, PTR-005, PTR-008, PTR-015, PTR-016, WEB-013 |
 
 **Parameters**
@@ -3460,7 +3564,7 @@ Where the new performance is priced differently, the balance settles as for an e
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `orders.sales_order` |
+| Reads | `cache:idempotency`, `orders.order_line`, `orders.refund`, `orders.refund_policy`, `orders.sales_order` |
 | Writes | `cache:idempotency`, `orders.order_event`, `orders.sales_order` |
 | Called by | BO-022, BO-023, BO-026, BO-047, BO-281, BO-315, EMP-034, POS-006, PTR-002, PTR-008, PTR-015 |
 
@@ -3549,6 +3653,7 @@ Prices are re-evaluated. Where a price, a promotion or an availability has moved
 |---|---|---|---|
 | order | Order | yes |  |
 | order.id | string (uuid) | yes | The client UUIDv7 from CreateOrderRequest.id. |
+| order.orderAccessToken | string |  | What lets the device that just checked out read the order it paid for (decided 20 October 2026, Chinmay, R8 blocker cause IDENTITY-C52, option A; CHG-R8SPN-025). (read-only; nullable) |
 | order.orderNumber | string |  | The number a guest reads and a cashier types. (read-only) |
 | order.channel | object | yes | Where it came from. |
 | order.channelProfileId | string (uuid) |  | The named sales channel the order came through (catalogue SalesChannelProfile.id), set by the server from the caller: a partner user's or reseller's channel, an API key's channel. (read-only; nullable) |
@@ -3681,8 +3786,8 @@ Prices are re-evaluated. Where a price, a promotion or an availability has moved
 | Offline | no |
 | Conflict policy | serverWins |
 | Guest callable | True |
-| Reads | `orders.visit_reminder` |
-| Writes | `orders.visit_reminder` |
+| Reads | `cache:idempotency`, `orders.visit_reminder` |
+| Writes | `cache:idempotency`, `orders.visit_reminder` |
 | Called by | GST-018 |
 
 **Parameters**
@@ -3775,7 +3880,7 @@ The recipient receives a claim link. **Ownership moves only when they claim it**
 | toSubjectId | string (uuid) |  | Set only on claim. (nullable) |
 | recipientAddressMasked | string |  |  |
 | status | enum (offered, claimed, expired, cancelled) | yes |  |
-| claimUrl | string |  | (nullable) |
+| claimUrl | string |  | The link the recipient is sent (R8 blocker fix, ORDERS-MONEY-C12). (nullable) |
 | claimToken | string (password) |  | What claimTicketTransfer checks the presented claimToken against. |
 | offeredAt | string (date-time) | yes |  |
 | claimedAt | string (date-time) |  | (nullable) |
@@ -3832,6 +3937,7 @@ Only before settlement and only within the same shift. After that it is a refund
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | id | string (uuid) | yes | The client UUIDv7 from CreateOrderRequest.id. |
+| orderAccessToken | string |  | What lets the device that just checked out read the order it paid for (decided 20 October 2026, Chinmay, R8 blocker cause IDENTITY-C52, option A; CHG-R8SPN-025). (read-only; nullable) |
 | orderNumber | string |  | The number a guest reads and a cashier types. (read-only) |
 | channel | object | yes | Where it came from. |
 | channelProfileId | string (uuid) |  | The named sales channel the order came through (catalogue SalesChannelProfile.id), set by the server from the caller: a partner user's or reseller's channel, an API key's channel. (read-only; nullable) |
@@ -3885,6 +3991,9 @@ Only before settlement and only within the same shift. After that it is a refund
 | lines[].resourceHoldId | string (uuid) |  | A resources.ResourceHold on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); variantId is the placed resource's price-band variant. (nullable) |
 | lines[].attributes | OrderLineAttributes |  | Open attributes of a line, kept from the cart to the order line. (nullable) |
 | lines[].attributes.transport | TransportLineAttributes |  | What a transport line is for (decided 29 September, rev 3 REV3-21). (nullable) |
+| lines[].attributes.attendees | integer |  | How many people a meeting-room booking is for (GST-075; R8 blocker cause GPS-C28, CHG-R8SPN-034). (min 1; nullable) |
+| lines[].attributes.parking | object |  | A parking line's plate and day (R8 blocker ORDERS-MONEY-C22, CHG-R8MIG-023): carried from addCartLine to the order line and passed to issueOrderEntitlements, which writes the parking entitlement's pl… (nullable) |
+| lines[].attributes.bundle | object |  | A bundle line's picks (R8 blocker ORDERS-MONEY-C43, the lead's answer B for r8; CHG-R8MIG-023): the bundle and the option the guest chose in each choice group. (nullable) |
 | lines[].quantity | integer | yes | (min 1) |
 | lines[].eligibilityDeclaration | array of object |  | What was declared for each guest on this line, kept as the record staff check at the gate. (nullable) |
 | lines[].eligibilityDeclaration[].ageBand | enum (infant, child, junior, adult, senior) |  | Infant under 3, child 3–12, junior 13–17, adult 18–59, senior 60+. |
@@ -3997,8 +4106,8 @@ Only before settlement and only within the same shift. After that it is a refund
 | Offline | no |
 | Config scope | venue |
 | Conflict policy | serverWins |
-| Reads | `orders.ticket_template`, `orders.ticket_template_channel` |
-| Writes | `orders.ticket_template`, `orders.ticket_template_channel` |
+| Reads | `cache:idempotency`, `orders.ticket_template`, `orders.ticket_template_channel` |
+| Writes | `cache:idempotency`, `orders.ticket_template`, `orders.ticket_template_channel` |
 | Called by | BO-344 |
 
 **Parameters**
@@ -4307,6 +4416,7 @@ BL-028. **`orders.group_booking` had ten columns and nothing read it** — a tab
 | quoteSentAt | string (date-time) |  | (read-only; nullable) |
 | riskAssessmentSentAt | string (date-time) |  | (read-only; nullable) |
 | preferredDate | string (date) |  | The date the guest asked for on requestGroupBooking — what its 409 dateUnavailable is checked against. (nullable) |
+| performanceId | string (uuid) |  | The session, for a timed or session package (DEC-121, Chinmay, 2 October 2026: a date and, for session products, a session; R8 blocker ORDERS-MONEY-C41, CHG-R8MIG-017): a catalogue.performance on pre… (nullable) |
 | orderId | string (uuid) | yes |  |
 | leaderSubjectId | string (uuid) | yes |  |
 | organisationName | string |  | (nullable) |
@@ -4373,6 +4483,9 @@ Returns the lines, the total and the deadline. **Never the guest's other orders*
 | lines[].resourceHoldId | string (uuid) |  | A resources.ResourceHold on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); variantId is the placed resource's price-band variant. (nullable) |
 | lines[].attributes | OrderLineAttributes |  | Open attributes of a line, kept from the cart to the order line. (nullable) |
 | lines[].attributes.transport | TransportLineAttributes |  | What a transport line is for (decided 29 September, rev 3 REV3-21). (nullable) |
+| lines[].attributes.attendees | integer |  | How many people a meeting-room booking is for (GST-075; R8 blocker cause GPS-C28, CHG-R8SPN-034). (min 1; nullable) |
+| lines[].attributes.parking | object |  | A parking line's plate and day (R8 blocker ORDERS-MONEY-C22, CHG-R8MIG-023): carried from addCartLine to the order line and passed to issueOrderEntitlements, which writes the parking entitlement's pl… (nullable) |
+| lines[].attributes.bundle | object |  | A bundle line's picks (R8 blocker ORDERS-MONEY-C43, the lead's answer B for r8; CHG-R8MIG-023): the bundle and the option the guest chose in each choice group. (nullable) |
 | lines[].quantity | integer | yes | (min 1) |
 | lines[].eligibilityDeclaration | array of object |  | What was declared for each guest on this line, kept as the record staff check at the gate. (nullable) |
 | lines[].eligibilityDeclaration[].ageBand | enum (infant, child, junior, adult, senior) |  | Infant under 3, child 3–12, junior 13–17, adult 18–59, senior 60+. |
@@ -4446,8 +4559,8 @@ Returns the lines, the total and the deadline. **Never the guest's other orders*
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `orders.ticket_template`, `orders.ticket_template_channel` |
-| Writes | `orders.ticket_template`, `orders.ticket_template_channel` |
+| Reads | `cache:idempotency`, `orders.ticket_template`, `orders.ticket_template_channel` |
+| Writes | `cache:idempotency`, `orders.ticket_template`, `orders.ticket_template_channel` |
 | Called by | BO-344 |
 
 **Parameters**
@@ -4533,6 +4646,7 @@ BL-029. **A wallet pass is a live object, not a download.** Its value over a PDF
 | entitlementId | string (uuid) | yes |  |
 | platform | enum (apple, google) | yes |  |
 | serialNumber | string | yes |  |
+| passUrl | string (uri) |  | What the app adds to the wallet (R8 blocker ORDERS-MONEY-C39, CHG-R8MIG-017): for apple a short-lived signed link to the .pkpass file (signed with the brand's Pass Type ID certificate), for google th… (read-only) |
 | authenticationToken | string (password) |  | Write-only. |
 | status | enum (issued, updated, voided, expired) | yes |  |
 | lastPushedAt | string (date-time) |  | (nullable) |
@@ -4663,6 +4777,7 @@ BL-029. **A wallet pass is a live object, not a download.** Its value over a PDF
 |---|---|---|---|
 | items | array of Order | yes |  |
 | items[].id | string (uuid) | yes | The client UUIDv7 from CreateOrderRequest.id. |
+| items[].orderAccessToken | string |  | What lets the device that just checked out read the order it paid for (decided 20 October 2026, Chinmay, R8 blocker cause IDENTITY-C52, option A; CHG-R8SPN-025). (read-only; nullable) |
 | items[].orderNumber | string |  | The number a guest reads and a cashier types. (read-only) |
 | items[].channel | object | yes | Where it came from. |
 | items[].channelProfileId | string (uuid) |  | The named sales channel the order came through (catalogue SalesChannelProfile.id), set by the server from the caller: a partner user's or reseller's channel, an API key's channel. (read-only; nullable) |
@@ -4767,11 +4882,142 @@ BL-029. **A wallet pass is a live object, not a download.** Its value over a PDF
 | 200 |  | Orders, newest first — createdAt descending, id as the tiebreak. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
+### listOwnGroupBookings
+
+**`GET /group-booking-requests`**: The group bookings the caller asked for
+
+Added for My Reservations (R8 blocker ORDERS-MONEY-C26): after `requestGroupBooking` answered 201 a guest could never see the request again, because `getGroupBooking` needs an id no screen carries and `listGroupBooking` is the staff command centre. Each item is a `GroupBooking` whose `leaderSubjectId` is the caller, provisional ones included. **Every status is returned, `cancelled` too**, so a guest sees a request the venue turned down; `status` narrows the list.
+**A guest acts on their own only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-002; `x-ticvai-self-scoped: subject`): a guest sees only the groups they lead; another guest's group is not in the list and, by id, is refused as one that does not exist.
+**Order.** Soonest `preferredDate` first, then by `id`.
+
+|  |  |
+|---|---|
+| Permission | `None` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | replica |
+| Reads | `orders.group_booking` |
+| Writes | - |
+| Called by | WEB-031 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| status | query |  | enum (provisional, confirmed, namesPending, complete, cancelled) | Exact match. |
+| pageSize | query |  | integer |  |
+| cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
+
+**Response**: `object`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| items | array of GroupBooking | yes |  |
+| items[].id | string (uuid) | yes |  |
+| items[].kind | enum (general, school, corporate, party) |  | (default general) |
+| items[].packageProductId | string |  | The school-trip format or party package. (nullable) |
+| items[].yearGroup | string |  | (max length 40; nullable) |
+| items[].accessAndDietaryNeeds | string |  | (max length 1000; nullable) |
+| items[].celebrantName | string |  | The birthday child. (max length 120; nullable) |
+| items[].celebrantTurningAge | integer |  | (min 1; max 18; nullable) |
+| items[].allergiesAndRequests | string |  | (max length 1000; nullable) |
+| items[].finalHeadcountDueBy | string (date-time) |  | (nullable) |
+| items[].quoteSentAt | string (date-time) |  | (read-only; nullable) |
+| items[].riskAssessmentSentAt | string (date-time) |  | (read-only; nullable) |
+| items[].preferredDate | string (date) |  | The date the guest asked for on requestGroupBooking — what its 409 dateUnavailable is checked against. (nullable) |
+| items[].performanceId | string (uuid) |  | The session, for a timed or session package (DEC-121, Chinmay, 2 October 2026: a date and, for session products, a session; R8 blocker ORDERS-MONEY-C41, CHG-R8MIG-017): a catalogue.performance on pre… (nullable) |
+| items[].orderId | string (uuid) | yes |  |
+| items[].leaderSubjectId | string (uuid) | yes |  |
+| items[].organisationName | string |  | (nullable) |
+| items[].expectedSize | integer | yes |  |
+| items[].confirmedSize | integer |  | (nullable) |
+| items[].minimumSize | integer |  | Below which the group rate does not apply. (nullable) |
+| items[].attendeeCaptureRequired | boolean |  | Whether names are needed before admission. (default False) |
+| items[].attendeeCaptureDueBy | string (date-time) |  | (nullable) |
+| items[].status | enum (provisional, confirmed, namesPending, complete, cancelled) | yes |  |
+| nextCursor | string |  |  |
+| hasMore | boolean | yes |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | The caller's group bookings. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
+### listOwnResaleListings
+
+**`GET /resale-listings`**: The caller's own resale listings
+
+Added for the Refunds & Resale tracker (R8 blocker ORDERS-MONEY-C26): a listing made with `createResaleListing` was never readable again by the seller. Each item is a `ResaleListing` whose `sellerSubjectId` is the caller, with its `status`.
+**A guest acts on their own only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-002; `x-ticvai-self-scoped: subject`): another guest's listing, named by `entitlementId`, is refused exactly as one that does not exist (404).
+**Order.** Newest first, by `listedAt` descending, then by `id`.
+
+|  |  |
+|---|---|
+| Permission | `None` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | replica |
+| Reads | `orders.resale_listing` |
+| Writes | - |
+| Called by | GST-067, WEB-030 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| entitlementId | query |  | string (uuid) | Only the listings of this entitlement. |
+| status | query |  | enum (pendingReview, listed, reserved, sold, withdrawn, expired, rejected) | Exact match. |
+| pageSize | query |  | integer |  |
+| cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
+
+**Response**: `object`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| items | array of ResaleListing | yes |  |
+| items[].id | string (uuid) | yes | (read-only) |
+| items[].entitlementId | string (uuid) | yes |  |
+| items[].sellerSubjectId | string (uuid) | yes |  |
+| items[].askPrice | Money | yes | On the wire this is three fields; in the database it is one column. |
+| items[].askPrice.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| items[].askPrice.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| items[].askPrice.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| items[].priceCapPercent | number |  | A ceiling as a percentage of face value, because uncapped resale is a venue watching its own tickets sold at four times the price with its name on them. (read-only; nullable) |
+| items[].sellerFeePercent | number |  | Snapshotted from ResaleFeePolicy at listing. (read-only) |
+| items[].buyerFeePercent | number |  | Snapshotted from ResaleFeePolicy at listing. (read-only) |
+| items[].status | enum (pendingReview, listed, reserved, sold, withdrawn, expired, rejected) | yes | pendingReview and rejected added 29 September (DM5): a listing the marketplace's moderationMode sends to review waits there until approveListingModeration lists or rejects it. (read-only) |
+| items[].listedAt | string (date-time) |  | (read-only) |
+| items[].soldToSubjectId | string (uuid) |  | (read-only; nullable) |
+| items[].reviewReasons | array of enum (highResalePrice, unusualDiscount, highValueTicket, vipTicket, sellerRisk, newSeller, multipleListings, identityIssue, …) |  | Why the listing was sent to review (DM5, 29 September). (read-only) |
+| items[].moderatedByPrincipalId | string (uuid) |  | (read-only; nullable) |
+| items[].moderatedAt | string (date-time) |  | (read-only; nullable) |
+| items[].moderationReason | string |  | (max length 1000; read-only; nullable) |
+| items[].payoutStatus | enum (pending, held, paid, failed) |  | The seller is paid after the buyer is admitted, not after they pay. (read-only) |
+| items[].scopePath | string |  | The partition key (ADR-0005). (read-only) |
+| nextCursor | string |  |  |
+| hasMore | boolean | yes |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | The caller's listings, newest first. |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
 ### listPaymentTokens
 
 **`GET /payment-tokens`**: A guest's saved payment methods
 
-**Masked, always.** The last four digits and the brand — enough to choose between two saved cards and not enough to use one.
+**Masked, always.** The last four digits and the brand — enough to choose between two saved cards and not enough to use one. A removed token (`revokedAt` set) is not returned (CHG-R8MIG-022).
 
 
 **Order.** Soonest first, by `expiresAt` ascending, then by `id`.
@@ -4809,6 +5055,7 @@ BL-029. **A wallet pass is a live object, not a download.** Its value over a PDF
 | items[].method | string |  |  |
 | items[].maskedIdentifier | string |  | What a guest sees — the last four digits, the card brand. |
 | items[].expiresAt | string (date) |  | (nullable) |
+| items[].revokedAt | string (date-time) |  | When the guest removed it (revokePaymentToken); a removed token is never returned or charged (CHG-R8MIG-022). (read-only; nullable) |
 | items[].isDefault | boolean | yes |  |
 | items[].consentPurposeId | string (uuid) |  | Storing a card for future use is a purpose a guest consents to, separate from the payment they are making now. (nullable) |
 | nextCursor | string |  |  |
@@ -4920,8 +5167,8 @@ BL-072. **Payment against the link, by somebody with no account.**
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `orders.group_booking`, `orders.group_visit_plan` |
-| Writes | `orders.group_visit_plan`, `orders.order_event` |
+| Reads | `cache:idempotency`, `orders.group_booking`, `orders.group_visit_plan` |
+| Writes | `cache:idempotency`, `orders.group_visit_plan`, `orders.order_event` |
 | Called by | BO-280, POS-031 |
 
 **Parameters**
@@ -5072,6 +5319,7 @@ Voids the old, issues the new. **The reason is recorded and the original is trac
 | kind | enum (general, school, corporate, party) | yes |  |
 | packageProductId | string | yes |  |
 | preferredDate | string (date) | yes |  |
+| performanceId | string (uuid) |  | The session, for a timed or session package (DEC-121, Chinmay, 2 October 2026: a date and, for session products, a session; R8 blocker ORDERS-MONEY-C41, CHG-R8MIG-017): a catalogue.performance on pre… (nullable) |
 | expectedSize | integer | yes | (min 2) |
 | organisationName | string |  | The school. (max length 200; nullable) |
 | yearGroup | string |  | (max length 40; nullable) |
@@ -5096,6 +5344,7 @@ Voids the old, issues the new. **The reason is recorded and the original is trac
 | quoteSentAt | string (date-time) |  | (read-only; nullable) |
 | riskAssessmentSentAt | string (date-time) |  | (read-only; nullable) |
 | preferredDate | string (date) |  | The date the guest asked for on requestGroupBooking — what its 409 dateUnavailable is checked against. (nullable) |
+| performanceId | string (uuid) |  | The session, for a timed or session package (DEC-121, Chinmay, 2 October 2026: a date and, for session products, a session; R8 blocker ORDERS-MONEY-C41, CHG-R8MIG-017): a catalogue.performance on pre… (nullable) |
 | orderId | string (uuid) | yes |  |
 | leaderSubjectId | string (uuid) | yes |  |
 | organisationName | string |  | (nullable) |
@@ -5284,6 +5533,8 @@ BL-116. **The keystone.** Recurring membership billing, wallet auto-reload, one-
 **The card never reaches the platform.** The provider tokenises and returns a reference, which is what keeps PCI scope where it belongs.
 **Requires its own consent purpose.** Storing a card for future use is not the same act as paying now, and a token taken without it is a card kept on a guest's behalf that they never agreed to.
 
+**The consent comes first, by `recordConsent`** (R8 blocker ORDERS-MONEY-C21, the lead's answer A, as CR-142 decided for the web wallet; CHG-R8MIG-022): Save card on GST-071 and WEB-021 records the guest's consent to the `storedPaymentCredential` purpose (`ConsentPurposeConfig.id`) with `recordConsent`, then calls this, which reads the granted record and refuses `409 consent-not-given` without it (the error offers the consent step). The `paymentToken.stored` event no longer creates a consent record.
+
 |  |  |
 |---|---|
 | Permission | `ORDER_CREATE` |
@@ -5294,7 +5545,7 @@ BL-116. **The keystone.** Recurring membership billing, wallet auto-reload, one-
 | Conflict policy | serverWins |
 | Guest callable | True |
 | Reads | `cache:idempotency`, `marketing.consent_record`, `payments.provider`, `payments.token` |
-| Writes | `cache:idempotency`, `marketing.consent_record`, `payments.token`, `platform.outbox` |
+| Writes | `cache:idempotency`, `payments.token`, `platform.outbox` |
 | Called by | GST-071, WEB-021 |
 
 **Parameters**
@@ -5323,6 +5574,7 @@ BL-116. **The keystone.** Recurring membership billing, wallet auto-reload, one-
 | method | string |  |  |
 | maskedIdentifier | string |  | What a guest sees — the last four digits, the card brand. |
 | expiresAt | string (date) |  | (nullable) |
+| revokedAt | string (date-time) |  | When the guest removed it (revokePaymentToken); a removed token is never returned or charged (CHG-R8MIG-022). (read-only; nullable) |
 | isDefault | boolean | yes |  |
 | consentPurposeId | string (uuid) |  | Storing a card for future use is a purpose a guest consents to, separate from the payment they are making now. (nullable) |
 
@@ -5503,7 +5755,7 @@ Captures an authorised payment. **Writes one `payments.payment_attempt` row for 
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `ledger.fx_rate`, `orders.payment`, `payments.provider_connection` |
+| Reads | `cache:idempotency`, `ledger.fx_rate`, `orders.payment`, `payments.provider_connection` |
 | Writes | `cache:idempotency`, `catalogue.channel_capacity`, `catalogue.inventory_reservation`, `ledger.journal_entry`, `ledger.journal_line`, `orders.order_event`, `orders.payment`, `payments.payment_attempt`, `platform.idempotency_record`, `platform.outbox` |
 | Called by | BO-024, EMP-035, POS-005, PTR-012 |
 | State model | Payment ([states/payment.yaml](../../../states/payment.yaml)): moves `authorised` -> `captured` |
@@ -5577,6 +5829,7 @@ Cash is offline-capable. Card, wallet and voucher are not — they need the gate
 A card payment returns `pendingConfirmation` when the terminal has been instructed but no result has arrived. **Do not assume failure.** Poll `/payments/{id}/inquiry`.
 **Which tenders each channel takes** (decided 28 September, audit R080 (a) and (d)). **In the guest app and on the guest web, card or wallet** (`card`, `wallet`): any other `tender` from a guest caller is refused with 409 `tenderNotAllowedOnChannel`. **At the till, all five the payment screen offers**: card, cash, digital wallet (`wallet`), gift card or voucher (`giftCard`, `voucher`), and online payment, which is a payment link the guest pays on their own device (`createPaymentLink`) rather than a tender on this call.
 **Posts to the ledger through the account mappings** (decided 28 September, audit R191): a captured `cash` payment posts `cashReceived`, `card` posts `cardReceived` and `wallet` posts `walletReceived`, each to the accounts `finance.setAccountMappings` holds for the venue, and to the fiscal period that is open for the payment date. An offline cash payment replayed through `syncOrders` posts the same event, dated by its `recordedAt`.
+**The cash receipt, decided 18 October 2026** (ADAM CR-168, option A; CHG-CRA-007). The mapping is the venue's own row for the event, else the row for the venue's region, else the posting is refused. The entry's `source` is `payment`, its `sourceId` the payment id and its `reference` the order id, so `postOrderRevenue` never mistakes a cash receipt for revenue. Where the payment date's period is closed or missing, the entry posts to the legal entity's **next open period**: a capture the provider has taken is never refused. "One ledger posting" (PLATFORM-SAGA-PAID) means one cash-receipt entry per payment, never one more from a replay; revenue is `postOrderRevenue`'s own.
 **Writes one `payments.payment_attempt` row per provider call**, including a declined, errored or abandoned attempt that never becomes a payment: `orders.payment` records what was taken, the attempt records what was tried, and the provider health and payment performance reads count them. Also appends to `orders.order_event` when the order's payment state changes (decided 29 September, writers pass; DM6).
 **A guest-selected currency is what the provider is asked for** (decided 2 October 2026, Chinmay; CHG-FIN-001). Where the order has a `chargeCurrency`, a card or wallet payment from the guest web, app or kiosk is sent to the provider in that currency for `Order.chargeTotal`; the server sets `tenderCurrency`, `tenderAmount` and `fxRate` from the order's locked quote and ignores different values from the client. `amount` stays the base-currency amount, and that is what the ledger posts. Foreign cash handed over at a till is unchanged: recorded at its base equivalent, change in base.
 
@@ -5592,7 +5845,7 @@ A card payment returns `pendingConfirmation` when the terminal has been instruct
 | Offline | yes |
 | Conflict policy | append |
 | Guest callable | True |
-| Reads | `catalogue.inventory_reservation`, `ledger.fx_rate`, `orders.order_line`, `orders.payment`, `orders.sales_order`, `payments.provider_connection` |
+| Reads | `cache:idempotency`, `catalogue.inventory_reservation`, `ledger.fx_rate`, `orders.order_line`, `orders.payment`, `orders.sales_order`, `payments.provider_connection` |
 | Writes | `cache:idempotency`, `catalogue.channel_capacity`, `catalogue.inventory_reservation`, `ledger.journal_entry`, `ledger.journal_line`, `orders.order_event`, `orders.payment`, `payments.payment_attempt`, `platform.idempotency_record`, `platform.outbox` |
 | Called by | EMP-035, EMP-059, GST-009, KSK-007, POS-002, POS-004, POS-005, PTR-012, WEB-012, WEB-033 |
 | State model | Order ([states/order.yaml](../../../states/order.yaml)): moves `pending` -> `paid`, `pending` -> `partiallyPaid`, `partiallyPaid` -> `paid`, `pending` -> `failed`<br/>PaymentLink ([states/payment-link.yaml](../../../states/payment-link.yaml)): moves `issued` -> `paid`, `viewed` -> `paid`<br/>Payment ([states/payment.yaml](../../../states/payment.yaml)): created as `authorised` or `pendingConfirmation`<br/>SubBill ([states/sub-bill.yaml](../../../states/sub-bill.yaml)): moves `open` -> `paid`<br/>Table ([states/table.yaml](../../../states/table.yaml)): moves `billRequested` -> `needsClearing` |
@@ -5677,7 +5930,7 @@ A card payment returns `pendingConfirmation` when the terminal has been instruct
 
 The recovery path (12 Aug §12). A terminal charged the card and the response never arrived — the guest has been charged and the order shows unpaid.
 This queries the provider directly and reconciles. A background reconciler runs the same operation for payments left unconfirmed past a threshold, so recovery does not depend on an operator noticing.
-**The reconciler threshold is the provider's own recommended status-poll interval** (Stripe and Network International each publish one), held per provider in the adapter configuration and never shorter than that interval. Proposed, client to correct (decided 28 September, audit R065).
+**The reconciler threshold is the provider's own recommended status-poll interval** (Stripe and Network International each publish one), held per provider in the adapter configuration and never shorter than that interval. Proposed, client to correct (decided 28 September, audit R065). **For Network International this poll is how a payment is confirmed** (ADAM CR-165, 18 October 2026; CHG-CRA-004): the provider never redelivers its webhook, so the scheduled job polls every Network International payment still `pendingConfirmation`, and the webhook is only the faster path.
 **A guest does this within their own session** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-003; `x-ticvai-guest-callable`): a guest needs no permission and acts only for themselves, on their own cart, hold, order or payment in their own session. `ORDER_CREATE` is what a staff caller must hold to do it for a guest at a till or in the back office (ADR-0025).
 
 |  |  |
@@ -5765,8 +6018,8 @@ This queries the provider directly and reconciles. A background reconciler runs 
 | Offline | no |
 | Config scope | tenant |
 | Conflict policy | serverWins |
-| Reads | `payments.provider_connection` |
-| Writes | `payments.provider_connection` |
+| Reads | `cache:idempotency`, `payments.provider_connection` |
+| Writes | `cache:idempotency`, `payments.provider_connection` |
 | Called by | ADM-570, ADM-571 |
 
 **Parameters**
@@ -5780,6 +6033,7 @@ This queries the provider directly and reconciles. A background reconciler runs 
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | id | string (uuid) |  |  |
+| providerId | string (uuid) |  | Which provider this connection is to (ADAM CR-165, 18 October 2026; CHG-CRA-004): a key to payments.provider, whose kind already says stripe or networkInternational. (nullable) |
 | code | string | yes |  |
 | name | string |  |  |
 | providerKind | enum (gateway, psp, acquirer, walletProvider, bnplProvider) | yes |  |
@@ -5805,6 +6059,7 @@ This queries the provider directly and reconciles. A background reconciler runs 
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | id | string (uuid) |  |  |
+| providerId | string (uuid) |  | Which provider this connection is to (ADAM CR-165, 18 October 2026; CHG-CRA-004): a key to payments.provider, whose kind already says stripe or networkInternational. (nullable) |
 | code | string | yes |  |
 | name | string |  |  |
 | providerKind | enum (gateway, psp, acquirer, walletProvider, bnplProvider) | yes |  |
@@ -5850,8 +6105,8 @@ This queries the provider directly and reconciles. A background reconciler runs 
 | Offline | no |
 | Config scope | tenant |
 | Conflict policy | serverWins |
-| Reads | `payments.dunning_policy` |
-| Writes | `payments.dunning_policy` |
+| Reads | `cache:idempotency`, `payments.dunning_policy` |
+| Writes | `cache:idempotency`, `payments.dunning_policy` |
 | Called by | ADM-606 |
 
 **Parameters**
@@ -5898,6 +6153,51 @@ This queries the provider directly and reconciles. A background reconciler runs 
 
 
 ## Group: policy
+
+### getGuestRefundPolicy
+
+**`GET /venues/{venueId}/guest-refund-policy`**: What a guest is told about refunds at a venue
+
+The part of the venue's refund policy a guest is told before asking for a refund (R8 blocker ORDERS-MONEY-C26; GST-067 shows it before any request exists): the time bands, whether a part of an order can be refunded, and the refund window, read from the same `orders.refund_policy` row `getRefundPolicy` returns to staff. Who may authorise a refund (`selfAuthoriseLimit`, `requiresSecondUserAbove`, `requiresApprovalAbove`) and `varianceThreshold` are staff matters and are not in `GuestRefundPolicy`.
+A venue with no refund policy answers `404`.
+
+|  |  |
+|---|---|
+| Permission | `None` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | replica |
+| Reads | - |
+| Writes | - |
+| Called by | GST-067 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| venueId | path | yes | string (uuid) |  |
+
+**Response**: `GuestRefundPolicy`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| venueId | string (uuid) | yes |  |
+| timeBands | array of object | yes | Refundable percentage by time before the performance, as on RefundPolicy. |
+| timeBands[].hoursBefore | integer | yes | (min 0) |
+| timeBands[].percentage | number | yes | (min 0; max 100) |
+| allowPartial | boolean | yes |  |
+| refundWindowDays | integer | yes | As on RefundPolicy; null means no window. (min 0; nullable) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | The guest's view of the policy. |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setRefundPolicy
 
@@ -6208,6 +6508,80 @@ An unknown order, or one outside the caller's scope, is the shared 404; an order
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
+### listOwnRefundRequests
+
+**`GET /refund-requests`**: The caller's own refund requests
+
+Added for the Refunds & Resale tracker (R8 blocker ORDERS-MONEY-C26): a request made with `createRefundRequest` was never readable again, so the screen showed nothing after a reload. Each item is the `Refund` row the request made (`requestId` in the 202 is its `id`), with its `status`.
+**A guest acts on their own only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-002; `x-ticvai-self-scoped: subject`): the list holds the refunds on orders that belong to the caller, and another guest's order, named in `orderId`, is refused exactly as one that does not exist (404), never returned and never an empty list that hints it is there.
+**Order.** Newest first, by `createdAt` descending, then by `id`.
+
+|  |  |
+|---|---|
+| Permission | `None` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | replica |
+| Reads | `orders.refund` |
+| Writes | - |
+| Called by | GST-067, WEB-019 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| orderId | query |  | string (uuid) | Only the refunds on this order. |
+| pageSize | query |  | integer |  |
+| cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
+
+**Response**: `object`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| items | array of Refund | yes |  |
+| items[].id | string (uuid) | yes |  |
+| items[].orderId | string (uuid) | yes |  |
+| items[].batchId | string (uuid) |  | The RefundBatch that raised this refund, where createBulkRefund did. (read-only; nullable) |
+| items[].fxRate | object |  | The rate on the original payment, not today's (BL-087, CF-118). (read-only; nullable) |
+| items[].taxReversalEntryId | string (uuid) |  | A refund reverses the tax entry it created, and this is where that is stated rather than implied. (read-only; nullable) |
+| items[].settleTo | enum (originalTender, advanceBalance, wireTransfer, storeCredit) |  | BL-086. (default originalTender) |
+| items[].fxVariance | object |  | Where the sale rate and the current rate differ, the difference is booked as an FX variance rather than hidden in the refund. |
+| items[].fxVariance.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| items[].fxVariance.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| items[].fxVariance.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| items[].tenderCurrency | string |  | A refund goes back in the currency the guest paid (decided 2 October 2026, Chinmay; CHG-FIN-001). (pattern ^[A-Z]{3}$; read-only; nullable) |
+| items[].tenderAmount | object |  | The refund in tenderCurrency, at that currency's own scale (CHG-FIN-001). (read-only) |
+| items[].tenderAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| items[].tenderAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| items[].tenderAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| items[].amount | Money | yes | On the wire this is three fields; in the database it is one column. |
+| items[].amount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| items[].amount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| items[].amount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| items[].appliedPercentage | number |  | From the venue's time bands, or an approver override. |
+| items[].status | enum (pendingApproval, pendingGateway, completed, declined, failed) | yes |  |
+| items[].reason | string |  |  |
+| items[].requestedByPrincipalId | string (uuid) |  |  |
+| items[].secondaryPrincipalId | string (uuid) |  | (nullable) |
+| items[].approvedByPrincipalId | string (uuid) |  | (nullable) |
+| items[].ledgerEntryId | string (uuid) |  | Written before the gateway is called. (nullable) |
+| items[].gatewayReference | string |  | (nullable) |
+| items[].createdAt | string (date-time) | yes |  |
+| items[].completedAt | string (date-time) |  | (nullable) |
+| nextCursor | string |  |  |
+| hasMore | boolean | yes |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | The caller's refund requests, newest first. |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
 
 ## Group: reservation
 
@@ -6278,6 +6652,7 @@ Releases held capacity immediately rather than waiting for expiry. A guest cance
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | id | string (uuid) | yes | The client UUIDv7 from CreateOrderRequest.id. |
+| orderAccessToken | string |  | What lets the device that just checked out read the order it paid for (decided 20 October 2026, Chinmay, R8 blocker cause IDENTITY-C52, option A; CHG-R8SPN-025). (read-only; nullable) |
 | orderNumber | string |  | The number a guest reads and a cashier types. (read-only) |
 | channel | object | yes | Where it came from. |
 | channelProfileId | string (uuid) |  | The named sales channel the order came through (catalogue SalesChannelProfile.id), set by the server from the caller: a partner user's or reseller's channel, an API key's channel. (read-only; nullable) |
@@ -6331,6 +6706,9 @@ Releases held capacity immediately rather than waiting for expiry. A guest cance
 | lines[].resourceHoldId | string (uuid) |  | A resources.ResourceHold on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); variantId is the placed resource's price-band variant. (nullable) |
 | lines[].attributes | OrderLineAttributes |  | Open attributes of a line, kept from the cart to the order line. (nullable) |
 | lines[].attributes.transport | TransportLineAttributes |  | What a transport line is for (decided 29 September, rev 3 REV3-21). (nullable) |
+| lines[].attributes.attendees | integer |  | How many people a meeting-room booking is for (GST-075; R8 blocker cause GPS-C28, CHG-R8SPN-034). (min 1; nullable) |
+| lines[].attributes.parking | object |  | A parking line's plate and day (R8 blocker ORDERS-MONEY-C22, CHG-R8MIG-023): carried from addCartLine to the order line and passed to issueOrderEntitlements, which writes the parking entitlement's pl… (nullable) |
+| lines[].attributes.bundle | object |  | A bundle line's picks (R8 blocker ORDERS-MONEY-C43, the lead's answer B for r8; CHG-R8MIG-023): the bundle and the option the guest chose in each choice group. (nullable) |
 | lines[].quantity | integer | yes | (min 1) |
 | lines[].eligibilityDeclaration | array of object |  | What was declared for each guest on this line, kept as the record staff check at the gate. (nullable) |
 | lines[].eligibilityDeclaration[].ageBand | enum (infant, child, junior, adult, senior) |  | Infant under 3, child 3–12, junior 13–17, adult 18–59, senior 60+. |
@@ -6470,6 +6848,9 @@ A reservation is not an order. It holds capacity, expires, creates no entitlemen
 | lines[].resourceHoldId | string (uuid) |  | A resources.ResourceHold on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); variantId is the placed resource's price-band variant. (nullable) |
 | lines[].attributes | OrderLineAttributes |  | Open attributes of a line, kept from the cart to the order line. (nullable) |
 | lines[].attributes.transport | TransportLineAttributes |  | What a transport line is for (decided 29 September, rev 3 REV3-21). (nullable) |
+| lines[].attributes.attendees | integer |  | How many people a meeting-room booking is for (GST-075; R8 blocker cause GPS-C28, CHG-R8SPN-034). (min 1; nullable) |
+| lines[].attributes.parking | object |  | A parking line's plate and day (R8 blocker ORDERS-MONEY-C22, CHG-R8MIG-023): carried from addCartLine to the order line and passed to issueOrderEntitlements, which writes the parking entitlement's pl… (nullable) |
+| lines[].attributes.bundle | object |  | A bundle line's picks (R8 blocker ORDERS-MONEY-C43, the lead's answer B for r8; CHG-R8MIG-023): the bundle and the option the guest chose in each choice group. (nullable) |
 | lines[].quantity | integer | yes | (min 1) |
 | lines[].eligibilityDeclaration | array of object |  | What was declared for each guest on this line, kept as the record staff check at the gate. (nullable) |
 | lines[].eligibilityDeclaration[].ageBand | enum (infant, child, junior, adult, senior) |  | Infant under 3, child 3–12, junior 13–17, adult 18–59, senior 60+. |
@@ -6506,6 +6887,9 @@ A reservation is not an order. It holds capacity, expires, creates no entitlemen
 | lines[].resourceHoldId | string (uuid) |  | A resources.ResourceHold on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); variantId is the placed resource's price-band variant. (nullable) |
 | lines[].attributes | OrderLineAttributes |  | Open attributes of a line, kept from the cart to the order line. (nullable) |
 | lines[].attributes.transport | TransportLineAttributes |  | What a transport line is for (decided 29 September, rev 3 REV3-21). (nullable) |
+| lines[].attributes.attendees | integer |  | How many people a meeting-room booking is for (GST-075; R8 blocker cause GPS-C28, CHG-R8SPN-034). (min 1; nullable) |
+| lines[].attributes.parking | object |  | A parking line's plate and day (R8 blocker ORDERS-MONEY-C22, CHG-R8MIG-023): carried from addCartLine to the order line and passed to issueOrderEntitlements, which writes the parking entitlement's pl… (nullable) |
+| lines[].attributes.bundle | object |  | A bundle line's picks (R8 blocker ORDERS-MONEY-C43, the lead's answer B for r8; CHG-R8MIG-023): the bundle and the option the guest chose in each choice group. (nullable) |
 | lines[].quantity | integer | yes | (min 1) |
 | lines[].eligibilityDeclaration | array of object |  | What was declared for each guest on this line, kept as the record staff check at the gate. (nullable) |
 | lines[].eligibilityDeclaration[].ageBand | enum (infant, child, junior, adult, senior) |  | Infant under 3, child 3–12, junior 13–17, adult 18–59, senior 60+. |
@@ -6579,6 +6963,9 @@ Bounded by the venue's maximum, so a reservation cannot be renewed indefinitely 
 | lines[].resourceHoldId | string (uuid) |  | A resources.ResourceHold on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); variantId is the placed resource's price-band variant. (nullable) |
 | lines[].attributes | OrderLineAttributes |  | Open attributes of a line, kept from the cart to the order line. (nullable) |
 | lines[].attributes.transport | TransportLineAttributes |  | What a transport line is for (decided 29 September, rev 3 REV3-21). (nullable) |
+| lines[].attributes.attendees | integer |  | How many people a meeting-room booking is for (GST-075; R8 blocker cause GPS-C28, CHG-R8SPN-034). (min 1; nullable) |
+| lines[].attributes.parking | object |  | A parking line's plate and day (R8 blocker ORDERS-MONEY-C22, CHG-R8MIG-023): carried from addCartLine to the order line and passed to issueOrderEntitlements, which writes the parking entitlement's pl… (nullable) |
+| lines[].attributes.bundle | object |  | A bundle line's picks (R8 blocker ORDERS-MONEY-C43, the lead's answer B for r8; CHG-R8MIG-023): the bundle and the option the guest chose in each choice group. (nullable) |
 | lines[].quantity | integer | yes | (min 1) |
 | lines[].eligibilityDeclaration | array of object |  | What was declared for each guest on this line, kept as the record staff check at the gate. (nullable) |
 | lines[].eligibilityDeclaration[].ageBand | enum (infant, child, junior, adult, senior) |  | Infant under 3, child 3–12, junior 13–17, adult 18–59, senior 60+. |
@@ -6651,6 +7038,9 @@ A guest reads only a reservation held for them; another guest's is the shared 40
 | lines[].resourceHoldId | string (uuid) |  | A resources.ResourceHold on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); variantId is the placed resource's price-band variant. (nullable) |
 | lines[].attributes | OrderLineAttributes |  | Open attributes of a line, kept from the cart to the order line. (nullable) |
 | lines[].attributes.transport | TransportLineAttributes |  | What a transport line is for (decided 29 September, rev 3 REV3-21). (nullable) |
+| lines[].attributes.attendees | integer |  | How many people a meeting-room booking is for (GST-075; R8 blocker cause GPS-C28, CHG-R8SPN-034). (min 1; nullable) |
+| lines[].attributes.parking | object |  | A parking line's plate and day (R8 blocker ORDERS-MONEY-C22, CHG-R8MIG-023): carried from addCartLine to the order line and passed to issueOrderEntitlements, which writes the parking entitlement's pl… (nullable) |
+| lines[].attributes.bundle | object |  | A bundle line's picks (R8 blocker ORDERS-MONEY-C43, the lead's answer B for r8; CHG-R8MIG-023): the bundle and the option the guest chose in each choice group. (nullable) |
 | lines[].quantity | integer | yes | (min 1) |
 | lines[].eligibilityDeclaration | array of object |  | What was declared for each guest on this line, kept as the record staff check at the gate. (nullable) |
 | lines[].eligibilityDeclaration[].ageBand | enum (infant, child, junior, adult, senior) |  | Infant under 3, child 3–12, junior 13–17, adult 18–59, senior 60+. |
@@ -6682,8 +7072,7 @@ A guest reads only a reservation held for them; another guest's is the shared 40
 
 **Who sees what.** Staff see the reservations of every venue their grants reach. **A guest sees only reservations held for them** (`Reservation.subjectId` equal to the caller): a guest token never widens to another subject (`guestAuth`), so the venue scope narrows further to the caller for a guest session, and no parameter can widen it.
 **A guest acts on their own only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-002; `x-ticvai-self-scoped: subject`): a guest caller needs no permission and is answered for their own reservations; another guest's reservation is refused exactly as one that does not exist, never returned. `ORDER_VIEW` is what a staff caller must hold to act for any guest (ADR-0025).
-
-
+**Upcoming and Past, as GST-016 splits them** (decided 20 October 2026, Chinmay, R8 blocker cause ORDERS-MONEY-C13, option A; CHG-R8SPN-026): by status and hold expiry, from fields every row carries. **Upcoming** is `status` `held` with `expiresAt` in the future; **Past** is every other row (`converted`, `expired` or `cancelled`, and a `held` row whose `expiresAt` has passed but the sweeper has not yet expired). The screen asks once with no `status` and splits the page itself; the card already shows when the hold expires.
 **Order.** Newest first, by `createdAt` descending, then by `id`.
 
 |  |  |
@@ -6742,7 +7131,7 @@ A guest reads only a reservation held for them; another guest's is the shared 40
 
 | Code | Shape | Meaning |
 |---|---|---|
-| 200 |  | Reservations, soonest expiresAt first, id as the tiebreak. |
+| 200 |  | Reservations, newest first (createdAt descending, id as the tiebreak), the order the operation states and the cursor follows (R8 blocker ORDERS-MONEY-C35, CHG-R8MIG-017). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
@@ -6767,7 +7156,7 @@ Moves the shift to `closed` and each of its deposit boxes from `closed` to `reco
 | Conflict policy | append |
 | Step-up auth | pin |
 | Reads | `cache:idempotency`, `orders.deposit_box`, `orders.pos_shift`, `orders.pos_shift_approval`, `orders.pos_shift_incident` |
-| Writes | `cache:idempotency`, `orders.deposit_box`, `orders.pos_shift`, `platform.outbox` |
+| Writes | `cache:idempotency`, `orders.deposit_box`, `orders.pos_shift`, `orders.pos_shift_approval`, `platform.outbox` |
 | Called by | BO-040, BO-043, EMP-009, POS-007 |
 | State model | Deposit box ([states/deposit-box.yaml](../../../states/deposit-box.yaml)): moves `closed` -> `reconciled`<br/>Shift ([states/shift.yaml](../../../states/shift.yaml)): moves `pendingVariance` -> `closed`<br/>Shift variance review ([states/variance-review.yaml](../../../states/variance-review.yaml)): moves `pendingReview` -> `reviewed` |
 
@@ -6784,7 +7173,8 @@ Moves the shift to `closed` and each of its deposit boxes from `closed` to `reco
 |---|---|---|---|
 | reason | string | yes | Retained for audit. (min length 3; max length 500) |
 | supervisorStepUp | object |  | The supervisor accepting, signing on this device (CHG-RUL-019). |
-| supervisorStepUp.principalId | string (uuid) | yes | The supervisor signing. |
+| supervisorStepUp.principalId | string (uuid) |  | The supervisor signing. |
+| supervisorStepUp.supervisorUsername | string |  | The supervisor's employee number, which is what the step-up prompt asks for (R8 blocker fix, IDENTITY-C44). (max length 200) |
 | supervisorStepUp.credential | string | yes | The supervisor's staff PIN, as they sign in at a till with it. (max length 512) |
 
 **Response**: `Shift`
@@ -6852,7 +7242,7 @@ Moves the shift to `closed` and each of its deposit boxes from `closed` to `reco
 | countNumber | integer |  | How many close counts the shift has had: 0 before the first, 1 after it, 2 after a recount (CHG-CSP-013). (min 0; read-only) |
 | syncedAt | string (date-time) |  | Null while the shift has unsynced operations. (nullable) |
 | approvals | array of object |  |  |
-| approvals[].kind | enum (open, close, variance) | yes | open from approveShiftOpen, close from approveShiftClose, variance from acceptShiftVariance. |
+| approvals[].kind | enum (open, close, variance, reopen) | yes | open from approveShiftOpen, close from approveShiftClose, variance from acceptShiftVariance, reopen from reopenShift (the supervisor who signed it, the time and the reason). |
 | approvals[].principalId | string (uuid) | yes |  |
 | approvals[].at | string (date-time) | yes |  |
 | approvals[].reason | string |  |  |
@@ -6893,7 +7283,7 @@ Moves the shift to `closed` and each of its deposit boxes from `closed` to `reco
 |---|---|---|---|---|
 | Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
-**Request body**: `DepositBox`
+**Request body**: `CreateDepositBoxRequest`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
@@ -6904,14 +7294,14 @@ Moves the shift to `closed` and each of its deposit boxes from `closed` to `reco
 | workstationId | string (uuid) |  | Where it is being used now. (nullable) |
 | shiftId | string (uuid) |  | The shift trading from this box. (nullable) |
 | status | DepositBoxStatus: enum (allocated, open, suspended, closing, closed, reconciled) |  |  |
-| openingFloat | Money | yes | On the wire this is three fields; in the database it is one column. |
+| openingFloat | Money |  | On the wire this is three fields; in the database it is one column. |
 | openingFloat.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | openingFloat.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | openingFloat.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | openingDenominations | array of object |  | 5.8.3. |
 | openingDenominations[].denominationId | string (uuid) | yes | References platform.denomination, as CashCountLine.denominationId does. |
 | openingDenominations[].count | integer | yes | (min 0) |
-| withdrawnTotal | object |  | Reduces the expected close figure. (read-only) |
+| withdrawnTotal | withdrawnTotal |  | Reduces the expected close figure. (read-only) |
 | withdrawnTotal.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | withdrawnTotal.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | withdrawnTotal.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
@@ -7032,7 +7422,7 @@ A float that does not match the venue's expected amount holds the shift in `pend
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `orders.pos_shift`, `orders.pos_shift_approval`, `orders.pos_shift_incident` |
-| Writes | `cache:idempotency`, `orders.pos_shift` |
+| Writes | `cache:idempotency`, `orders.pos_shift`, `orders.pos_shift_approval` |
 | Called by | POS-001 |
 | State model | Shift ([states/shift.yaml](../../../states/shift.yaml)): moves `pendingApproval` -> `open` |
 
@@ -7114,7 +7504,7 @@ A float that does not match the venue's expected amount holds the shift in `pend
 | countNumber | integer |  | How many close counts the shift has had: 0 before the first, 1 after it, 2 after a recount (CHG-CSP-013). (min 0; read-only) |
 | syncedAt | string (date-time) |  | Null while the shift has unsynced operations. (nullable) |
 | approvals | array of object |  |  |
-| approvals[].kind | enum (open, close, variance) | yes | open from approveShiftOpen, close from approveShiftClose, variance from acceptShiftVariance. |
+| approvals[].kind | enum (open, close, variance, reopen) | yes | open from approveShiftOpen, close from approveShiftClose, variance from acceptShiftVariance, reopen from reopenShift (the supervisor who signed it, the time and the reason). |
 | approvals[].principalId | string (uuid) | yes |  |
 | approvals[].at | string (date-time) | yes |  |
 | approvals[].reason | string |  |  |
@@ -7153,8 +7543,8 @@ Where the venue requires approval on close, the shift waits in `pendingClosure` 
 | Offline | no |
 | Conflict policy | append |
 | Step-up auth | pin |
-| Reads | `cache:idempotency`, `ledger.fx_rate`, `orders.cash_count_line`, `orders.cash_movement`, `orders.payment`, `orders.pos_shift`, `orders.pos_shift_approval`, `orders.pos_shift_incident`, `platform.venue_settings` |
-| Writes | `cache:idempotency`, `ledger.journal_entry`, `orders.cash_count_line`, `orders.pos_shift`, `platform.outbox` |
+| Reads | `cache:idempotency`, `ledger.fx_rate`, `orders.cash_count_line`, `orders.cash_movement`, `orders.payment`, `orders.pos_shift`, `orders.pos_shift_approval`, `orders.pos_shift_incident`, `orders.sales_order`, `orders.till_shift_policy`, `platform.venue_settings` |
+| Writes | `cache:idempotency`, `orders.cash_count_line`, `orders.pos_shift`, `platform.outbox` |
 | Called by | BO-040, BO-043, POS-007 |
 | State model | Shift ([states/shift.yaml](../../../states/shift.yaml)): moves `open` -> `pendingClosure` |
 
@@ -7187,7 +7577,8 @@ Where the venue requires approval on close, the shift waits in `pendingClosure` 
 | releaseHeldLeases | boolean |  | Return unsold inventory leases held by this workstation (ADR-0013 C103). (default True) |
 | recordedAt | string (date-time) | yes |  |
 | supervisorStepUp | object |  | The supervisor closing the shift, signing on this device (CHG-RUL-019). |
-| supervisorStepUp.principalId | string (uuid) | yes | The supervisor signing. |
+| supervisorStepUp.principalId | string (uuid) |  | The supervisor signing. |
+| supervisorStepUp.supervisorUsername | string |  | The supervisor's employee number, which is what the step-up prompt asks for (R8 blocker fix, IDENTITY-C44). (max length 200) |
 | supervisorStepUp.credential | string | yes | The supervisor's staff PIN, as they sign in at a till with it. (max length 512) |
 
 **Response**: `ShiftCloseResult`
@@ -7256,7 +7647,7 @@ Where the venue requires approval on close, the shift waits in `pendingClosure` 
 | shift.countNumber | integer |  | How many close counts the shift has had: 0 before the first, 1 after it, 2 after a recount (CHG-CSP-013). (min 0; read-only) |
 | shift.syncedAt | string (date-time) |  | Null while the shift has unsynced operations. (nullable) |
 | shift.approvals | array of object |  |  |
-| shift.approvals[].kind | enum (open, close, variance) | yes | open from approveShiftOpen, close from approveShiftClose, variance from acceptShiftVariance. |
+| shift.approvals[].kind | enum (open, close, variance, reopen) | yes | open from approveShiftOpen, close from approveShiftClose, variance from acceptShiftVariance, reopen from reopenShift (the supervisor who signed it, the time and the reason). |
 | shift.approvals[].principalId | string (uuid) | yes |  |
 | shift.approvals[].at | string (date-time) | yes |  |
 | shift.approvals[].reason | string |  |  |
@@ -7382,7 +7773,7 @@ Where the venue requires approval on close, the shift waits in `pendingClosure` 
 | countNumber | integer |  | How many close counts the shift has had: 0 before the first, 1 after it, 2 after a recount (CHG-CSP-013). (min 0; read-only) |
 | syncedAt | string (date-time) |  | Null while the shift has unsynced operations. (nullable) |
 | approvals | array of object |  |  |
-| approvals[].kind | enum (open, close, variance) | yes | open from approveShiftOpen, close from approveShiftClose, variance from acceptShiftVariance. |
+| approvals[].kind | enum (open, close, variance, reopen) | yes | open from approveShiftOpen, close from approveShiftClose, variance from acceptShiftVariance, reopen from reopenShift (the supervisor who signed it, the time and the reason). |
 | approvals[].principalId | string (uuid) | yes |  |
 | approvals[].at | string (date-time) | yes |  |
 | approvals[].reason | string |  |  |
@@ -7591,7 +7982,7 @@ Where the venue requires approval on close, the shift waits in `pendingClosure` 
 | countNumber | integer |  | How many close counts the shift has had: 0 before the first, 1 after it, 2 after a recount (CHG-CSP-013). (min 0; read-only) |
 | syncedAt | string (date-time) |  | Null while the shift has unsynced operations. (nullable) |
 | approvals | array of object |  |  |
-| approvals[].kind | enum (open, close, variance) | yes | open from approveShiftOpen, close from approveShiftClose, variance from acceptShiftVariance. |
+| approvals[].kind | enum (open, close, variance, reopen) | yes | open from approveShiftOpen, close from approveShiftClose, variance from acceptShiftVariance, reopen from reopenShift (the supervisor who signed it, the time and the reason). |
 | approvals[].principalId | string (uuid) | yes |  |
 | approvals[].at | string (date-time) | yes |  |
 | approvals[].reason | string |  |  |
@@ -7622,8 +8013,8 @@ Where the venue requires approval on close, the shift waits in `pendingClosure` 
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | append |
-| Reads | - |
-| Writes | `orders.pos_shift`, `platform.outbox` |
+| Reads | `cache:idempotency` |
+| Writes | `cache:idempotency`, `orders.pos_shift`, `platform.outbox` |
 | Called by | BO-040, EMP-009, POS-007 |
 | State model | Shift ([states/shift.yaml](../../../states/shift.yaml)): moves `pendingClosure` -> `closed` |
 
@@ -7683,7 +8074,7 @@ Raised by Tanmay in the 20 August review, and **the table was built and nothing 
 | Read routing | replica |
 | Reads | `platform.denomination`, `platform.region_settings` |
 | Writes | - |
-| Called by | BO-1065, POS-001, POS-007 |
+| Called by | BO-1065, POS-001, POS-007, POS-016 |
 
 **Parameters**
 
@@ -7801,7 +8192,7 @@ That separation is what makes a variance attributable to a person rather than to
 | Read routing | primary |
 | Reads | `orders.pos_shift`, `orders.pos_shift_approval`, `orders.pos_shift_incident` |
 | Writes | - |
-| Called by | BO-039, BO-040, BO-041, BO-043, BO-053, BO-100, EMP-008, EMP-009, POS-007, POS-009, POS-019, POS-025 |
+| Called by | BO-039, BO-040, BO-041, BO-043, BO-053, BO-100, EMP-008, EMP-009, POS-007, POS-009, POS-016, POS-019, POS-025 |
 
 **Parameters**
 
@@ -7881,7 +8272,7 @@ That separation is what makes a variance attributable to a person rather than to
 | items[].countNumber | integer |  | How many close counts the shift has had: 0 before the first, 1 after it, 2 after a recount (CHG-CSP-013). (min 0; read-only) |
 | items[].syncedAt | string (date-time) |  | Null while the shift has unsynced operations. (nullable) |
 | items[].approvals | array of object |  |  |
-| items[].approvals[].kind | enum (open, close, variance) | yes | open from approveShiftOpen, close from approveShiftClose, variance from acceptShiftVariance. |
+| items[].approvals[].kind | enum (open, close, variance, reopen) | yes | open from approveShiftOpen, close from approveShiftClose, variance from acceptShiftVariance, reopen from reopenShift (the supervisor who signed it, the time and the reason). |
 | items[].approvals[].principalId | string (uuid) | yes |  |
 | items[].approvals[].at | string (date-time) | yes |  |
 | items[].approvals[].reason | string |  |  |
@@ -7912,8 +8303,8 @@ Fails if another shift is already open on this workstation. Where the venue is c
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | append |
-| Reads | `cache:idempotency`, `identity.principal`, `orders.cash_count_line`, `orders.pos_shift`, `orders.pos_shift_approval`, `orders.pos_shift_incident`, `platform.venue_settings`, `platform.workstation` |
-| Writes | `cache:idempotency`, `orders.cash_count_line`, `orders.pos_shift`, `orders.pos_shift_approval`, `orders.pos_shift_incident` |
+| Reads | `cache:idempotency`, `identity.principal`, `orders.cash_count_line`, `orders.cash_movement`, `orders.deposit_box`, `orders.pos_shift`, `orders.pos_shift_approval`, `orders.pos_shift_incident`, `orders.till_shift_policy`, `platform.venue_settings`, `platform.workstation` |
+| Writes | `cache:idempotency`, `orders.cash_count_line`, `orders.pos_shift`, `orders.pos_shift_approval`, `orders.pos_shift_incident`, `platform.outbox` |
 | Called by | POS-001 |
 | State model | Deposit box ([states/deposit-box.yaml](../../../states/deposit-box.yaml)): moves `allocated` -> `open`<br/>Shift ([states/shift.yaml](../../../states/shift.yaml)): created as `pendingApproval` or `open` |
 
@@ -8012,7 +8403,7 @@ Fails if another shift is already open on this workstation. Where the venue is c
 | countNumber | integer |  | How many close counts the shift has had: 0 before the first, 1 after it, 2 after a recount (CHG-CSP-013). (min 0; read-only) |
 | syncedAt | string (date-time) |  | Null while the shift has unsynced operations. (nullable) |
 | approvals | array of object |  |  |
-| approvals[].kind | enum (open, close, variance) | yes | open from approveShiftOpen, close from approveShiftClose, variance from acceptShiftVariance. |
+| approvals[].kind | enum (open, close, variance, reopen) | yes | open from approveShiftOpen, close from approveShiftClose, variance from acceptShiftVariance, reopen from reopenShift (the supervisor who signed it, the time and the reason). |
 | approvals[].principalId | string (uuid) | yes |  |
 | approvals[].at | string (date-time) | yes |  |
 | approvals[].reason | string |  |  |
@@ -8100,8 +8491,8 @@ From `pendingVariance` only. The shift **stays `pendingVariance`** with `recount
 | Offline | no |
 | Conflict policy | append |
 | Step-up auth | pin |
-| Reads | `orders.pos_shift`, `orders.pos_shift_approval`, `orders.pos_shift_incident` |
-| Writes | `orders.pos_shift`, `orders.pos_shift_incident` |
+| Reads | `cache:idempotency`, `orders.pos_shift`, `orders.pos_shift_approval`, `orders.pos_shift_incident` |
+| Writes | `cache:idempotency`, `orders.pos_shift`, `orders.pos_shift_incident` |
 | Called by | BO-040, BO-043, POS-007 |
 
 **Parameters**
@@ -8117,7 +8508,8 @@ From `pendingVariance` only. The shift **stays `pendingVariance`** with `recount
 |---|---|---|---|
 | reason | string | yes | Why a recount is needed, shown to the cashier. (min length 3; max length 500) |
 | supervisorStepUp | object |  | The supervisor sending the shift back, signing on this device (CHG-RUL-014, as reopenShift). |
-| supervisorStepUp.principalId | string (uuid) | yes | The supervisor signing. |
+| supervisorStepUp.principalId | string (uuid) |  | The supervisor signing. |
+| supervisorStepUp.supervisorUsername | string |  | The supervisor's employee number, which is what the step-up prompt asks for (R8 blocker fix, IDENTITY-C44). (max length 200) |
 | supervisorStepUp.credential | string | yes | The supervisor's staff PIN, as they sign in at a till with it. (max length 512) |
 
 **Response**: `Shift`
@@ -8185,7 +8577,7 @@ From `pendingVariance` only. The shift **stays `pendingVariance`** with `recount
 | countNumber | integer |  | How many close counts the shift has had: 0 before the first, 1 after it, 2 after a recount (CHG-CSP-013). (min 0; read-only) |
 | syncedAt | string (date-time) |  | Null while the shift has unsynced operations. (nullable) |
 | approvals | array of object |  |  |
-| approvals[].kind | enum (open, close, variance) | yes | open from approveShiftOpen, close from approveShiftClose, variance from acceptShiftVariance. |
+| approvals[].kind | enum (open, close, variance, reopen) | yes | open from approveShiftOpen, close from approveShiftClose, variance from acceptShiftVariance, reopen from reopenShift (the supervisor who signed it, the time and the reason). |
 | approvals[].principalId | string (uuid) | yes |  |
 | approvals[].at | string (date-time) | yes |  |
 | approvals[].reason | string |  |  |
@@ -8206,6 +8598,7 @@ From `pendingVariance` only. The shift **stays `pendingVariance`** with `recount
 A cashier who closed the wrong till, or a count submitted before the drawer was finished.
 **A reversal, and treated as one.** Requires an approver who is not the person who closed it, and the original close is retained — reopening does not erase the first count, because the difference between the two counts is the thing worth looking at.
 **The approver is a supervisor giving a step-up on the same device** (decided 28 September, audit R144): `supervisorStepUp` carries the supervisor's principal and PIN, entered on the till or browser making this call. The rule is `SupervisorStepUp` in `common.yaml`: the PIN is verified against the principal, who must hold `SHIFT_REOPEN` at this venue and must not be the principal who closed the shift; otherwise a `403` and nothing is written. It does not go through the approvals engine.
+**Where the reopen is kept, and what "retained" means** (R8 blocker fix, APPROVALS-TENANCY-C49). The reason, the supervisor and the time go in one `orders.pos_shift_approval` row of kind `reopen` (`reason`, `principal_id` the supervisor, `at`). The shift's `closed_at`, `closed_by_principal_id`, `counted_cash_amount` and `variance_amount` are left as the first close wrote them until the next close overwrites them, and the first count stays in `orders.cash_count_line` under its `count_number`; the next close adds the next count number. The first close is therefore always readable, from the shift and from its count lines.
 
 |  |  |
 |---|---|
@@ -8234,7 +8627,8 @@ A cashier who closed the wrong till, or a count submitted before the drawer was 
 |---|---|---|---|
 | reason | string | yes | (min length 3; max length 500) |
 | supervisorStepUp | object | yes | The supervisor signing the reopen on this device (audit R144). |
-| supervisorStepUp.principalId | string (uuid) | yes | The supervisor signing. |
+| supervisorStepUp.principalId | string (uuid) |  | The supervisor signing. |
+| supervisorStepUp.supervisorUsername | string |  | The supervisor's employee number, which is what the step-up prompt asks for (R8 blocker fix, IDENTITY-C44). (max length 200) |
 | supervisorStepUp.credential | string | yes | The supervisor's staff PIN, as they sign in at a till with it. (max length 512) |
 
 **Response**: `Shift`
@@ -8302,7 +8696,7 @@ A cashier who closed the wrong till, or a count submitted before the drawer was 
 | countNumber | integer |  | How many close counts the shift has had: 0 before the first, 1 after it, 2 after a recount (CHG-CSP-013). (min 0; read-only) |
 | syncedAt | string (date-time) |  | Null while the shift has unsynced operations. (nullable) |
 | approvals | array of object |  |  |
-| approvals[].kind | enum (open, close, variance) | yes | open from approveShiftOpen, close from approveShiftClose, variance from acceptShiftVariance. |
+| approvals[].kind | enum (open, close, variance, reopen) | yes | open from approveShiftOpen, close from approveShiftClose, variance from acceptShiftVariance, reopen from reopenShift (the supervisor who signed it, the time and the reason). |
 | approvals[].principalId | string (uuid) | yes |  |
 | approvals[].at | string (date-time) | yes |  |
 | approvals[].reason | string |  |  |
@@ -8313,7 +8707,7 @@ A cashier who closed the wrong till, or a count submitted before the drawer was 
 |---|---|---|
 | 200 |  | Reopened |
 | 403 |  | The supervisor is the closing principal (problem type approver-is-closer), or the step-up failed: the PIN did not verify, or the principal does not hold SHIFT_REOPEN at this venue (supervisor-step-up… |
-| 409 |  | Shift is not closed (problem type shift-not-closed), or the fiscal period has closed over it (fiscal-period-closed) |
+| 409 |  | Shift is not closed (problem type shift-not-closed), the fiscal period has closed over it (fiscal-period-closed), or another shift is now open or suspended on the same till (shift-already-open: the c… |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### resumeShift
@@ -8413,7 +8807,7 @@ A cashier who closed the wrong till, or a count submitted before the drawer was 
 | countNumber | integer |  | How many close counts the shift has had: 0 before the first, 1 after it, 2 after a recount (CHG-CSP-013). (min 0; read-only) |
 | syncedAt | string (date-time) |  | Null while the shift has unsynced operations. (nullable) |
 | approvals | array of object |  |  |
-| approvals[].kind | enum (open, close, variance) | yes | open from approveShiftOpen, close from approveShiftClose, variance from acceptShiftVariance. |
+| approvals[].kind | enum (open, close, variance, reopen) | yes | open from approveShiftOpen, close from approveShiftClose, variance from acceptShiftVariance, reopen from reopenShift (the supervisor who signed it, the time and the reason). |
 | approvals[].principalId | string (uuid) | yes |  |
 | approvals[].at | string (date-time) | yes |  |
 | approvals[].reason | string |  |  |
@@ -8498,8 +8892,8 @@ A cashier who closed the wrong till, or a count submitted before the drawer was 
 | Offline | no |
 | Config scope | venue |
 | Conflict policy | serverWins |
-| Reads | `orders.till_shift_policy` |
-| Writes | `orders.till_shift_policy` |
+| Reads | `cache:idempotency`, `orders.till_shift_policy` |
+| Writes | `cache:idempotency`, `orders.till_shift_policy` |
 | Called by | BO-065, POS-019 |
 
 **Parameters**
@@ -8562,7 +8956,7 @@ A cashier who closed the wrong till, or a count submitted before the drawer was 
 **`POST /shifts/{shiftId}/count`**: The cashier's blind count, closing their own shift
 
 **Blind close: the cashier never sees the expected cash** (decided 2 October 2026, Chinmay; CHG-FIN-003; MoM 12 Aug 2026 section 19, DI-271; MoM 9 Sep 2026 4.18, DI-803 to DI-806). The cashier counts the drawer by denomination and submits it. The server measures the count against the expected figure (opening float + cash takings − cash refunds paid out + float entries − lifts and withdrawals, `Shift.liftsTotal`) and records the variance, **and returns neither the expected figure nor the variance, nor whether the drawer is over or short**. The receipt says only what happens next: `closed` (within the venue's `shiftVarianceThreshold`), `referredToSupervisor` (beyond it: the shift is `pendingVariance`) or `awaitingCloseApproval` (the venue supervises every close: `pendingClosure`).
-**The variance goes to the supervisor, not the cashier.** Beyond the threshold an alert is raised to the supervisors holding OVERSHORT_ACCEPT at the venue, on the venue's alerting channel (`tenancy.VenueSettings.alerting`); the shift appears on BO-040 and on the till's exceptions list (POS-020) for a supervisor, and the supervisor sees counted, expected and variance there (`getShift`, `closeShift`, `acceptShiftVariance`). The cashier may give a reason and a note with the count (`cashierReason`, `notes`; DI-803) without being told the amount. **A recount the supervisor asks for** (DI-804) is submitted the same way from `pendingVariance`; every count is kept (`CashCountLine`, `countKind` close) and the latest is the one measured.
+**The variance goes to the supervisor, not the cashier.** Beyond the threshold an alert is raised to the supervisors holding OVERSHORT_ACCEPT at the venue, on the venue's alerting channel (`tenancy.VenueSettings.alerting`); the shift appears on BO-040 and on the till's exceptions list (POS-020) for a supervisor, and the supervisor sees counted, expected and variance there (`getShift`, `closeShift`, `acceptShiftVariance`). **The alert itself is read only by those it is for** (decided 20 October 2026, Chinmay, R8 blocker cause APPROVALS-TENANCY-C36, option A; CHG-R8SPN-020): reporting's `listAlerts` returns a shift-variance alert, with its observed value and threshold, only to a caller holding one of the alert rule's recipient roles or OVERSHORT_ACCEPT at the venue; any other caller, the shift's own cashier among them, gets no such alert at all (POS-025's banner simply shows fewer). The cashier may give a reason and a note with the count (`cashierReason`, `notes`; DI-803) without being told the amount. **A recount the supervisor asks for** (DI-804) is submitted the same way from `pendingVariance`; every count is kept (`CashCountLine`, `countKind` close) and the latest is the one measured.
 **The recount after a rejection** (decided 2 October 2026, Chinmay; DEC-175; CHG-CSP-013): once `rejectShiftVariance` has set `Shift.recountRequestedAt`, the cashier submits the recount here, at any till of the venue, because the till the shift was counted on may be the next cashier's by then (DEC-059). The receipt's `countNumber` rises and the request flags clear.
 `Shift.expectedCash` and `Shift.variance` stay null to the shift's own cashier on every read; they are returned to a caller holding OVERSHORT_ACCEPT or SHIFT_CLOSE_OTHER at the venue.
 **A difference within the threshold closes only with a reason** (the client's policy, tracker answer T10.1 of 6 October 2026, `sources/client/2026-10-06-tracker-answers.md`: "Variances within the permitted threshold may be closed with mandatory reason capture"; CHG-R4-019). Where the count differs from the expected figure at all, by no more than `shiftVarianceThreshold`, and no `cashierReason` came with the count, the shift does not close: it is held in `pendingClosure`, the receipt's outcome is `awaitingCloseApproval` with `varianceReasonRequired: true`, and the till asks for a reason, which `giveShiftVarianceReason` records and which closes the shift. **The count is locked before the reason is asked**, so the close stays blind: the cashier learns only that a difference was found, never its amount or whether the drawer is over or short. A count that matches exactly closes with no reason; one beyond the threshold goes to the supervisor as before.
@@ -8577,7 +8971,7 @@ Online only, as `closeShift`: the expected figure is the server's.
 | Offline | no |
 | Conflict policy | append |
 | Reads | `cache:idempotency`, `ledger.fx_rate`, `orders.cash_count_line`, `orders.cash_movement`, `orders.payment`, `orders.pos_shift`, `orders.pos_shift_approval`, `orders.pos_shift_incident`, `platform.venue_settings` |
-| Writes | `cache:idempotency`, `ledger.journal_entry`, `orders.cash_count_line`, `orders.pos_shift`, `platform.outbox` |
+| Writes | `cache:idempotency`, `orders.cash_count_line`, `orders.pos_shift`, `platform.outbox` |
 | Called by | EMP-009, POS-007 |
 | State model | Shift ([states/shift.yaml](../../../states/shift.yaml)): moves `pendingVariance` -> `closed`, `open` -> `pendingClosure`, `suspended` -> `pendingClosure` |
 
@@ -8729,7 +9123,7 @@ The break mechanism. The float and the shift stay intact; the workstation become
 | countNumber | integer |  | How many close counts the shift has had: 0 before the first, 1 after it, 2 after a recount (CHG-CSP-013). (min 0; read-only) |
 | syncedAt | string (date-time) |  | Null while the shift has unsynced operations. (nullable) |
 | approvals | array of object |  |  |
-| approvals[].kind | enum (open, close, variance) | yes | open from approveShiftOpen, close from approveShiftClose, variance from acceptShiftVariance. |
+| approvals[].kind | enum (open, close, variance, reopen) | yes | open from approveShiftOpen, close from approveShiftClose, variance from acceptShiftVariance, reopen from reopenShift (the supervisor who signed it, the time and the reason). |
 | approvals[].principalId | string (uuid) | yes |  |
 | approvals[].at | string (date-time) | yes |  |
 | approvals[].reason | string |  |  |
@@ -8789,7 +9183,8 @@ Two people sign: the supervisor taking it and the cashier it came from.
 | note | string |  | (max length 300) |
 | recordedAt | string (date-time) | yes |  |
 | witnessStepUp | object |  | The witnessing cashier's countersignature on this device (CHG-RUL-019): principalId is witnessPrincipalId, credential their PIN. |
-| witnessStepUp.principalId | string (uuid) | yes | The supervisor signing. |
+| witnessStepUp.principalId | string (uuid) |  | The supervisor signing. |
+| witnessStepUp.supervisorUsername | string |  | The supervisor's employee number, which is what the step-up prompt asks for (R8 blocker fix, IDENTITY-C44). (max length 200) |
 | witnessStepUp.credential | string | yes | The supervisor's staff PIN, as they sign in at a till with it. (max length 512) |
 
 **Response**: `DepositBox`
@@ -8903,7 +9298,7 @@ A rejection leaves this list's unresolved view when `resolveSyncRejection` recor
 | items | array of SyncRejection | yes |  |
 | items[].id | string (uuid) | yes |  |
 | items[].workstationId | string (uuid) | yes |  |
-| items[].kind | enum (order, payment, refund, void, scan) | yes |  |
+| items[].kind | enum (order, payment, refund, void, scan, cashMovement) | yes | What was refused. |
 | items[].recordedAt | string (date-time) |  |  |
 | items[].rejectedAt | string (date-time) | yes |  |
 | items[].problem | Problem | yes | RFC 9457 problem details. |
@@ -8944,8 +9339,8 @@ Every line is re-priced on ingest. Variances are returned per order and posted t
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | append |
-| Reads | `catalogue.inventory_reservation`, `catalogue.price_list`, `catalogue.variant`, `orders.sales_order` |
-| Writes | `catalogue.channel_capacity`, `catalogue.inventory_reservation`, `ledger.price_variance`, `orders.order_line`, `orders.order_line_discount`, `orders.payment`, `orders.sales_order`, `platform.idempotency_record`, `platform.outbox`, `sync.rejection` |
+| Reads | `cache:idempotency`, `catalogue.inventory_reservation`, `catalogue.price_list`, `catalogue.variant`, `orders.sales_order` |
+| Writes | `cache:idempotency`, `catalogue.channel_capacity`, `catalogue.inventory_reservation`, `ledger.price_variance`, `orders.order_line`, `orders.order_line_discount`, `orders.payment`, `orders.sales_order`, `platform.idempotency_record`, `platform.outbox`, `sync.rejection` |
 | Called by | BO-037, BO-132, POS-013 |
 
 **Parameters**
@@ -9015,6 +9410,7 @@ Every line is re-priced on ingest. Variances are returned per order and posted t
 | results[].priceVariance.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | results[].varianceExceedsThreshold | boolean |  | True when review is required per the venue's variance threshold. |
 | results[].rejectionId | string |  | For a rejected or blockedByRejection entry, the sync.rejection row it was quarantined into (SD-028). (nullable) |
+| results[].reconcilerFlag | string |  | unitsGone on an accepted entry whose hold had expired before the sync and whose units were no longer free: the sale stands and the order is on the reconciliation queue, nothing refunded (FOUNDATION-A… (nullable) |
 | results[].error | Problem |  | RFC 9457 problem details. |
 | results[].error.type | string (uri) | yes | The problem type URI, https://api.ticvai.com/problems/<slug>. |
 | results[].error.title | string | yes |  |
@@ -9041,6 +9437,8 @@ Every table this service owns that the slice reads or writes, with its columns a
 |---|---|---|---|
 | id | uuid | yes |  |
 | token | text | no | How an anonymous guest returns to their cart, including from a recovery email. |
+| session_id | uuid | no | The staff or partner session that started the cart (a till's cart is its session's own); null for a guest's cart (R8 blocker IDENTITY-C49, CHG-R8MIG-021). |
+| workstation_id | uuid | no | The workstation of that session; null for a guest's cart. |
 | venue_id | uuid | yes |  |
 | channel | text | yes |  |
 | subject_id | uuid | no | Null while anonymous. |
@@ -9117,6 +9515,27 @@ Every table this service owns that the slice reads or writes, with its columns a
 | authorised_by_principal_id | uuid | yes | The principal who authorised the movement, recorded for audit. |
 | sequence | integer | yes | Monotonic within the shift. |
 | synced_at | timestamptz | no |  |
+
+### `orders.chargeback`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| payment_id | uuid | yes |  |
+| provider_id | uuid | no |  |
+| provider_case_reference | text | no |  |
+| amount | numeric(18,4) | yes |  |
+| fee_amount | numeric(18,4) | no |  |
+| reason | text | yes | The scheme's reason code, mapped. |
+| status | text | yes |  |
+| evidence_due_by | timestamptz | yes | The field the whole record exists for. |
+| evidence_submitted_at | timestamptz | no |  |
+| outcome_at | timestamptz | no |  |
+| scheme_reason_code | text | no | The card scheme's own reason code as notified, beside the mapped reason (5.7.92). |
+| notified_at | timestamptz | no | When the provider notified the case; the date its debit posts to (recordChargeback). |
+| assignee_principal_id | uuid | no | Who is investigating (assignChargeback). |
+| debit_journal_entry_id | uuid | no | The chargebackDebit (and chargebackFee) entry posted at intake. |
+| outcome_journal_entry_id | uuid | no | The chargebackReversal entry posted when the case is won, or the additional fee when lost. |
 
 ### `orders.deposit`
 
@@ -9214,6 +9633,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | quote_sent_at | timestamptz | no |  |
 | risk_assessment_sent_at | timestamptz | no |  |
 | preferred_date | date | no | The date the guest asked for on requestGroupBooking — what its 409 dateUnavailable is checked against. |
+| performance_id | uuid | no | The session, for a timed or session package (DEC-121, Chinmay, 2 October 2026: a date and, for session products, a session; R8 blocker ORDERS-MONEY-C41, CHG-R8MIG-017): a catalogue.performance on pre… |
 | order_id | uuid | yes |  |
 | leader_subject_id | uuid | yes |  |
 | organisation_name | text | no |  |
@@ -9286,7 +9706,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | Column | Type | Required | Notes |
 |---|---|---|---|
 | id | uuid | yes |  |
-| order_id | uuid | yes |  |
+| order_id | uuid | no | The order; null on a reservation's own events before it is converted. |
 | reservation_id | uuid | no |  |
 | event_type | text | yes |  |
 | previous_state | text | no |  |
@@ -9301,6 +9721,22 @@ Every table this service owns that the slice reads or writes, with its columns a
 | exception_type | text | no |  |
 | scope_path | text | no | The partition key (ADR-0005). |
 | occurred_at | timestamptz | yes |  |
+
+### `orders.order_fee`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| order_id | uuid | yes |  |
+| rule_id | uuid | no |  |
+| payment_method_id | uuid | no |  |
+| name | text | yes |  |
+| category | text | yes |  |
+| calculation_type | text | no |  |
+| rate_value | numeric | no |  |
+| amount | numeric(18,4) | yes |  |
+| tax_amount | numeric(18,4) | yes |  |
+| created_at | timestamptz | yes |  |
 
 ### `orders.order_line`
 
@@ -9436,7 +9872,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | Column | Type | Required | Notes |
 |---|---|---|---|
 | pos_shift_id | uuid | yes | The parent row. |
-| kind | text | yes | open from approveShiftOpen, close from approveShiftClose, variance from acceptShiftVariance. |
+| kind | text | yes | open from approveShiftOpen, close from approveShiftClose, variance from acceptShiftVariance, reopen from reopenShift (the supervisor who signed it, the time and the reason). |
 | principal_id | uuid | yes |  |
 | at | timestamptz | yes |  |
 | reason | text | no |  |
@@ -9618,7 +10054,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | to_subject_id | uuid | no | Set only on claim. |
 | recipient_address_masked | text | no |  |
 | status | text | yes |  |
-| claim_url | text | no |  |
+| claim_url | text | no | The link the recipient is sent (R8 blocker fix, ORDERS-MONEY-C12). |
 | claim_token | text | no | What claimTicketTransfer checks the presented claimToken against. |
 | offered_at | timestamptz | yes |  |
 | claimed_at | timestamptz | no |  |
@@ -9747,6 +10183,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | Column | Type | Required | Notes |
 |---|---|---|---|
 | id | uuid | yes |  |
+| provider_id | uuid | no | Which provider this connection is to (ADAM CR-165, 18 October 2026; CHG-CRA-004): a key to payments.provider, whose kind already says stripe or networkInternational. |
 | code | text | yes |  |
 | name | text | no |  |
 | provider_kind | text | yes |  |
@@ -9785,12 +10222,13 @@ Every table this service owns that the slice reads or writes, with its columns a
 | method | text | no |  |
 | masked_identifier | text | no | What a guest sees — the last four digits, the card brand. |
 | expires_at | date | no |  |
+| revoked_at | timestamptz | no | When the guest removed it (revokePaymentToken); a removed token is never returned or charged (CHG-R8MIG-022). |
 | is_default | boolean | yes |  |
 | consent_purpose_id | uuid | no | Storing a card for future use is a purpose a guest consents to, separate from the payment they are making now. |
 
 ## Not in the first release
 
-204 operations, added to this service in later releases without changing any of the above.
+205 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
@@ -9798,7 +10236,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | cart | `listAbandonedCarts` |
 | drafted | `approveExceptionServiceRecovery`, `approveGroupDiscountException`, `approveListingModeration`, `createListingSeller`, `createOrderSourceChannel`, `createUpgradeCredentialRegeneration`, `listAmendmentAfterSale`, `listAmendmentAfterSale2`, `listBulkGroupAssisted`, `listBuyerCheckoutInventory`, `listBuyerPurchaseResale`, `listCapacityInventoryReconciliation`, `listCapacityReservationInventory`, `listCreateListingResale`, `listCredentialRevocationRegeneration`, `listDepositPartialPayment`, `listExternalPaymentPartner`, `listFeeSellerProceed`, `listFinancialTraceability`, `listGroupAmendmentCancellation`, `listGroupBooking`, `listGroupBookingReconciliation`, `listGroupCustomerOrganization`, `listGroupEnquiryOpportunity`, `listGroupPaymentDeposit`, `listGroupRequirementAvailability`, `listGroupSale`, `listGroupSale2`, `listGroupTicketFulfillment`, `listGroupTicketSeat`, `listListingLifecycleExpiry`, `listOfficialResaleMarketplace`, `listOrderFinancialReconciliation`, `listOrderLifecycleTimeline`, `listOrderLineProduct`, `listOrderPaymentDetail`, `listOrderReservation`, `listOrderSplitMerge`, `listParticipantGuestList`, `listPaymentOrderFinancial`, `listPaymentReconciliationException`, `listPersonTypeProduct`, `listQuoteBookingConversion`, `listQuoteRevisionNegotiation`, `listRefundDisputeResale`, `listRelatedOrderTransaction`, `listResale`, `listResale2`, `listResaleConfirmationOwnership`, `listResaleEligibilityTicket`, `listResaleFeeCommission`, `listResaleFraudDuplicate`, `listResaleInventoryAvailability`, `listResaleListingSeller`, `listResaleMarketplace`, `listResaleOwnership`, `listResalePolicyMarketplace`, `listResalePricingPrice`, `listResaleTicketDetail`, `listReservationConfirmationExpiry`, `listSellerSettlementPayout`, `listTicketOwnershipTransfer`, `listTicketReissueFulfillment`, `listTicketResaleMarketplace`, `listUpgradeConversion`, `listUpgradeEligibilityQualification`, `listUpgradeException`, `listUpgradeFinancialTreatment`, `listUpgradeTimingUsage`, `listVoidReversalSame`, `listWhiteLabelMarketplace`, `setAfterSaleFinancial`, `setAmendmentEligibilityPolicy`, `setCancellationPartialPolicy`, `setCustomerGuestAccount`, `setGroupBookingHandover`, `setGroupOperationalPlanning`, `setGroupPackageExperience`, `setGroupQuotationProposal`, `setMultiPaymentSplit`, `setOrderAmendment`, `setOrderDetailTransaction`, `setOrderReservationStatus`, `setProRataResidual`, `setResaleEligibilityRule`, `setResaleMarketplaceRecommendation`, `setReservationHoldPolicy`, `setUpgradeConversionPath` |
 | order | `getDepositPolicy`, `setDepositPolicy` |
-| orders | `assignChargeback`, `authoriseStoredValue`, `cancelPaymentLink`, `captureStoredValue`, `cleanupFailedPayment`, `convertToTermProduct`, `createGroupBooking`, `createGroupEnquiry`, `createMemberException`, `createPaymentLink`, `getChargebackAnalytics`, `getResaleFeePolicy`, `getResaleMarketplaceConfig`, `holdResaleSettlement`, `issueInvitation`, `listChargebacks`, `listDeposits`, `listExternalReferenceMappings`, `listFraudRules`, `listInvitationAllowances`, `listMembershipRenewals`, `listOrderDiscounts`, `listOrderFees`, `listPaymentAllocationRules`, `listPaymentProviders`, `listTicketTemplates`, `listUpgrades`, `mergeOrders`, `migrateMembership`, `openGuestCreditAccount`, `printTicketProof`, `pushWalletPassUpdate`, `quoteUpgrade`, `recordChargeback`, `recordChargebackOutcome`, `recordExternalReference`, `releaseResaleSettlementHold`, `relinquishStoredValue`, `renewMembership`, `resendPaymentLink`, `resolveMembershipActivation`, `respondToChargeback`, `revokeEntitlementShare`, `setFraudRules`, `setGroupCustomerOrganization`, `setGroupPaymentSchedule`, `setGroupTicketAllocation`, `setGroupTicketFulfillment`, `setParticipantGuestList`, `setResaleFeePolicy`, `setResaleMarketplaceConfig`, `splitOrder`, `updateGroupBooking`, `voidEntitlement`, `voidPayment` |
+| orders | `assignChargeback`, `authoriseStoredValue`, `cancelPaymentLink`, `captureStoredValue`, `cleanupFailedPayment`, `convertToTermProduct`, `createGroupBooking`, `createGroupEnquiry`, `createMemberException`, `createPaymentLink`, `getChargebackAnalytics`, `getResaleFeePolicy`, `getResaleMarketplaceConfig`, `holdResaleSettlement`, `issueInvitation`, `listChargebacks`, `listDeposits`, `listExternalReferenceMappings`, `listFraudRules`, `listInvitationAllowances`, `listMembershipRenewals`, `listOrderDiscounts`, `listOrderFees`, `listPaymentAllocationRules`, `listPaymentProviders`, `listTicketTemplates`, `listUpgrades`, `mergeOrders`, `migrateMembership`, `openGuestCreditAccount`, `printTicketProof`, `pushWalletPassUpdate`, `quoteUpgrade`, `recordChargeback`, `recordChargebackOutcome`, `recordExternalReference`, `releaseResaleSettlementHold`, `relinquishStoredValue`, `renewMembership`, `resendPaymentLink`, `resolveMembershipActivation`, `respondToChargeback`, `revokeEntitlementShare`, `revokePaymentToken`, `setFraudRules`, `setGroupCustomerOrganization`, `setGroupPaymentSchedule`, `setGroupTicketAllocation`, `setGroupTicketFulfillment`, `setParticipantGuestList`, `setResaleFeePolicy`, `setResaleMarketplaceConfig`, `splitOrder`, `updateGroupBooking`, `voidEntitlement`, `voidPayment` |
 | payments | `createB2bCreditAccount`, `createInstalmentPlan`, `createPaymentMethod`, `getB2bPaymentTerms`, `getDunningPolicy`, `getInstalmentPolicy`, `getMixedTenderRules`, `getPaymentPerformance`, `getPaymentProviderEconomics`, `getPaymentProviderHealth`, `getPaymentRules`, `listB2bCreditAccounts`, `listDepositActivity`, `listDunningCases`, `listInstalmentPlans`, `listMerchantAccounts`, `listPaymentMethods`, `listPaymentProviderConnections`, `listPaymentRoutingRules`, `listPaymentTerminalCertifications`, `listPaymentTerminals`, `listReconciliationSources`, `listStoredForwardTransactions`, `receivePaymentProviderWebhook`, `recordDepositActivity`, `recordPaymentTerminalCertification`, `resolveDunningCase`, `setB2bPaymentTerms`, `setHostedCheckoutConfiguration`, `setInstalmentPolicy`, `setMerchantAccount`, `setMixedTenderRules`, `setPaymentAuthenticationPolicy`, `setPaymentFailoverPolicy`, `setPaymentRiskRules`, `setPaymentRoutingRules`, `setPaymentRules`, `setPaymentTerminalConfiguration`, `setReconciliationMatchingRules`, `setReconciliationSource`, `simulatePaymentConfiguration`, `simulatePaymentRouting`, `submitChargebackEvidence`, `testPaymentProviderConnection`, `updatePaymentMethod` |
 | policy | `getRefundPolicy`, `setRefundCalculationPolicy` |
 | refund | `approveRefund`, `createBulkRefund`, `simulateRefund` |

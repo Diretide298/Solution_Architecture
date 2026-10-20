@@ -430,6 +430,18 @@
     {
      "name": "subjectId",
      "from": "navigation"
+    },
+    {
+     "name": "returnTo",
+     "from": "navigation",
+     "optional": true,
+     "notes": "r8 (WHITE-C13, screens/_patterns.yaml rule guestSignInReturn): the screen that sent a signed-out guest here from its no-access state; after sign-in this screen opens it again. Ignored unless it is a screen of this app."
+    },
+    {
+     "name": "returnParams",
+     "from": "navigation",
+     "optional": true,
+     "notes": "r8 (WHITE-C13): the entry parameters `returnTo` was opened with, handed back to it unchanged."
     }
    ],
    "coldEntry": "**Needs nothing.** A guest arriving cold signs in and goes to My Account; one sent from the cart carries `cartId` and goes back to it. The SSO deep-link parameter (`providerId`) went with the operations that used it (audit R167); a second-factor challenge is created in place, never arrives by link."
@@ -511,7 +523,7 @@
       "challengeId",
       "subjectId"
      ],
-     "provenance": "derived — WEB-016 declares entryState.params challengeId, subjectId and WEB-017 holds challengeId, subjectId, so an edge into it carries them"
+     "provenance": "derived — WEB-016 declares entryState.params challengeId, returnParams, returnTo, subjectId and WEB-017 holds challengeId, subjectId, so an edge into it carries them"
     },
     {
      "to": "WEB-018",
@@ -532,7 +544,7 @@
     }
    ]
   },
-  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Drawn 26 August** — `Dashboards Board` frame `web-017`. **One board draws five dashboards across five platforms** — platform admin, partner, support, guest web and cross-tenant health. A dashboard is a shape rather than a domain, and the pack recognised that before the package did.\n\n**The loyalty tile's programmeId comes from listLoyaltyProgrammes (4 October 2026)** (CHG-FXS-003)\n\n**The loyalty programme is picked from listLoyaltyProgrammes when there are several** (CHG-FXS-003)",
+  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Drawn 26 August** — `Dashboards Board` frame `web-017`. **One board draws five dashboards across five platforms** — platform admin, partner, support, guest web and cross-tenant health. A dashboard is a shape rather than a domain, and the pack recognised that before the package did.\n\n**The loyalty tile's programmeId comes from listLoyaltyProgrammes (4 October 2026)** (CHG-FXS-003)\n\n**The loyalty programme is picked from listLoyaltyProgrammes when there are several** (CHG-FXS-003)\n\nBuild note (r8 second round, GPS-C09): **build the no-access state as GFIX-4 says, not as the state text above reads.** A guest holds no permission, so the state never names one (the text above still names staff permissions); signed out, the guest is offered sign-in and brought back here; a record that is not theirs says so without saying whose. The corrected wording waits for the client's approval of the visible text (pending entry GPS-C09).",
   "density": "compact",
   "boardFrames": [
    "Dashboards Board.dc.html#web-017"
@@ -813,7 +825,7 @@
      "carries": [
       "subjectId"
      ],
-     "provenance": "derived — WEB-016 declares entryState.params challengeId, subjectId and WEB-018 holds subjectId, so an edge into it carries them"
+     "provenance": "derived — WEB-016 declares entryState.params challengeId, returnParams, returnTo, subjectId and WEB-018 holds subjectId, so an edge into it carries them"
     },
     {
      "to": "WEB-017",
@@ -1192,7 +1204,7 @@
      "carries": [
       "subjectId"
      ],
-     "provenance": "derived — WEB-016 declares entryState.params challengeId, subjectId and WEB-019 holds subjectId, so an edge into it carries them"
+     "provenance": "derived — WEB-016 declares entryState.params challengeId, returnParams, returnTo, subjectId and WEB-019 holds subjectId, so an edge into it carries them"
     },
     {
      "to": "WEB-017",
@@ -1327,6 +1339,14 @@
    "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "apis": [
+   {
+    "operationId": "listOwnRefundRequests",
+    "contract": "orders",
+    "purpose": "The guest's own refund requests and their status, shown on the rows of Your orders (the prototype's \"refunded in full\" and the request a guest has open on an order), matched by order; no component of its own, since the approved screen draws none: the prototype's Order history row shows it (shownBy, r8 integration, CHG-R8INT-008). Read once when the screen opens and after Ask for a refund.",
+    "trigger": "onLoad",
+    "shownBy": "AED 675 · refunded in full",
+    "provenance": "r8 walk, 20 October 2026 (ORDERS-MONEY-C26, CHG-R8SPN-012)"
+   },
    {
     "operationId": "listMyOrders",
     "contract": "orders",
@@ -1537,7 +1557,7 @@
      "carries": [
       "subjectId"
      ],
-     "provenance": "derived — WEB-016 declares entryState.params challengeId, subjectId and WEB-020 holds subjectId, so an edge into it carries them"
+     "provenance": "derived — WEB-016 declares entryState.params challengeId, returnParams, returnTo, subjectId and WEB-020 holds subjectId, so an edge into it carries them"
     },
     {
      "to": "WEB-017",

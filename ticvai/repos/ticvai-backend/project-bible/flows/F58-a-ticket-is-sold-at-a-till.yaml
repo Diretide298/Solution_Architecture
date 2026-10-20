@@ -37,11 +37,12 @@ steps:
 
   - step: 2
     screen: POS-003
-    action: The ticket is timed entry, so a slot is taken.
-    operations: [getAvailability, acquireInventoryHold]
+    action: The ticket is timed entry, so a slot is picked from what is left.
+    operations: [getAvailability]
     outcome: >
-      A lease on the slot. **Contended inventory is leased, not reserved** (CF-115): a slot held
-      without a lease is a slot two tills can sell, and the lease expires if the sale stalls.
+      A slot picked. **Contended inventory is leased, not reserved** (CF-115): the lease on the slot is
+      the cart's hold, taken by `addCartLine` when the line is added on POS-002's quantity step, and it
+      expires if the sale stalls. POS-003 takes no hold of its own (r8, GPS-C11).
 
   - step: 3
     screen: POS-002
@@ -97,10 +98,11 @@ branches:
   - at: 2
     condition: The slot sells out while the guest is deciding.
     behaviour: >
-      `acquireInventoryHold` fails and the alternatives are offered. **A lease that cannot be acquired is a
-      slot genuinely gone**, which is the difference between leasing and optimistic reservation.
+      `addCartLine` is refused because the cart's hold cannot be taken, and the other slots are offered
+      from `getAvailability`. **A lease that cannot be acquired is a slot genuinely gone**, which is the
+      difference between leasing and optimistic reservation.
     severity: medium
-    resolvedBy: acquireInventoryHold
+    resolvedBy: getAvailability
 
   - at: 5
     condition: The till is offline when the override is needed.

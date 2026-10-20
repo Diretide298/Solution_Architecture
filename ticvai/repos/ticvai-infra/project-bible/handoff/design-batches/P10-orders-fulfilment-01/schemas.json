@@ -49,7 +49,7 @@
     "x-ticvai-references": "catalogue.inventory_reservation",
     "type": "string",
     "nullable": true,
-    "description": "Lease the units were drawn from — a `catalogue.InventoryHold.id`. Absent for uncontended products."
+    "description": "Lease the units were drawn from — a `catalogue.InventoryHold.id`. Absent for uncontended products. **A standing-zone line** (zone-priced general admission at POS-004 and WEB-007; decided 20 October 2026, Chinmay, R8 blocker cause GPS-C38, option A; CHG-R8SPN-040) carries no `seatIds`: it is `quantity` places in one zone, held by `seating.createSeatHold` with `zoneId` and `quantity`, and this names that hold's inventory hold; the zone, its price band and keep-the-party- together come from the hold, and a lapsed one is `409 hold-not-active` as for seats."
    },
    "seatIds": {
     "type": "array",
@@ -295,6 +295,13 @@
     "type": "string",
     "format": "uuid",
     "description": "The client UUIDv7 from `CreateOrderRequest.id`."
+   },
+   "orderAccessToken": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "**What lets the device that just checked out read the order it paid for** (decided 20 October 2026, Chinmay, R8 blocker cause IDENTITY-C52, option A; CHG-R8SPN-025). Returned only in `checkoutCart`'s answer, null everywhere else: a signed token bound to this order and to the cart's device, valid 24 hours, never stored. `getOrder` accepts it in `X-Order-Access-Token` in place of a session, so a guest who checked out with no account, or whose session ended, still sees the confirmation (WEB-013 keeps it in its navigation state). It reads this order only and grants nothing else."
    },
    "orderNumber": {
     "x-ticvai-unique": "tenant",
@@ -927,6 +934,11 @@
  },
  "Payment": {
   "x-ticvai-persistence": "orders.payment",
+  "x-ticvai-index": [
+   [
+    "providerReference"
+   ]
+  ],
   "type": "object",
   "required": [
    "id",

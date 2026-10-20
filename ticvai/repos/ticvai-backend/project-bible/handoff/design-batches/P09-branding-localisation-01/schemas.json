@@ -196,7 +196,7 @@
  "BrandIdentity": {
   "x-ticvai-persistence": "none — embedded in tenant_config",
   "type": "object",
-  "description": "Every `*AssetRef` here is a `MediaAsset` id from the `assets` library (`createUpload` then `completeUpload`), PNG or SVG and at most 2 MB (decided 28 September, audit R270).\n",
+  "description": "Every `*AssetRef` here is a `MediaAsset` id from the `assets` library (`createUpload` then `completeUpload`). The image fields are PNG or SVG and at most 2 MB (decided 28 September, audit R270); `introVideoAssetRef` is a video asset within the library's limit for kind `video` (`assets.createUpload`).\n",
   "required": [
    "logoAssetRef"
   ],
@@ -305,6 +305,34 @@
    "toVersion": {
     "type": "string"
    },
+   "affectedProducts": {
+    "type": "array",
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "x-ticvai-derived": "onRead",
+    "description": "The products served by a booking flow that differs between the two versions (area `bookingFlows` in `changes`), by the product-to-flow rule of `Product.bookingFlowId`. Empty when no flow differs. Bounded by the venue's products; the screen shows the first page and the count.",
+    "items": {
+     "type": "object",
+     "required": [
+      "productId",
+      "name",
+      "flowKey"
+     ],
+     "properties": {
+      "productId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "name": {
+       "type": "string"
+      },
+      "flowKey": {
+       "type": "string",
+       "description": "The changed flow that serves this product."
+      }
+     }
+    }
+   },
    "changes": {
     "type": "array",
     "items": {
@@ -348,6 +376,22 @@
  "ConfigVersion": {
   "x-ticvai-rls": "read-beneath",
   "x-ticvai-persistence": "whitelabel.config_version",
+  "x-ticvai-unique-together": [
+   [
+    "scopePath",
+    "version"
+   ]
+  ],
+  "x-ticvai-unique-when": [
+   {
+    "columns": [
+     "scopePath"
+    ],
+    "when": {
+     "isCurrent": true
+    }
+   }
+  ],
   "type": "object",
   "required": [
    "version",
@@ -358,7 +402,9 @@
   ],
   "properties": {
    "version": {
-    "type": "string"
+    "type": "string",
+    "readOnly": true,
+    "description": "**Named by the server** (ADAM CR-154; CHG-CRA-004): the next integer for the tenant, `1`, `2`, ..., taken in the publish transaction. Unique per tenant; a racing publish fails on the index and retries."
    },
    "publishedAt": {
     "type": "string",
@@ -399,6 +445,20 @@
     "type": "string",
     "format": "date-time",
     "nullable": true
+   },
+   "activationFailedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "When the scheduled activation of this version failed its validation again; null when it has not failed (R8 blocker IDENTITY-C63). A failed version is not tried again; publish a new one."
+   },
+   "activationFailure": {
+    "type": "string",
+    "maxLength": 2000,
+    "nullable": true,
+    "readOnly": true,
+    "description": "Why the scheduled activation failed, in the validation's words (R8 blocker IDENTITY-C63)."
    },
    "contentHash": {
     "type": "string"
@@ -738,7 +798,7 @@
  "FooterConfig": {
   "type": "object",
   "x-ticvai-persistence": "whitelabel.footer_config + whitelabel.footer_config_column + whitelabel.footer_config_social_link",
-  "description": "BL-002. **`setHeader` and `HeaderConfig` exist and the footer does not**, which looked like symmetry until you notice it is not: **a header is chrome and a footer is a link surface.**\nA footer carries the legal links — terms, privacy, accessibility statement, cookie preferences — and **those are the ones a regulator checks.** Treating it as a mirror of the header would have given it a logo and no way to reach a privacy notice.\n**Where it is stored.** `legalLinks` and `copyrightText` are columns of `whitelabel.footer_config`; each entry of `columns` is a `whitelabel.footer_config_column` row and each entry of `socialLinks` a `whitelabel.footer_config_social_link` row. Part of the working draft (see the header). **In the tenant's own database, not the control plane (decided 28 September, audit R163)**: it moved from `control.footer_config` (renamed `whitelabel.footer_config`) and its two child tables.\n",
+  "description": "BL-002. **`setHeader` and `HeaderConfig` exist and the footer does not**, which looked like symmetry until you notice it is not: **a header is chrome and a footer is a link surface.**\nA footer carries the legal links — terms, privacy, accessibility statement, cookie preferences — and **those are the ones a regulator checks.** Treating it as a mirror of the header would have given it a logo and no way to reach a privacy notice.\n**Where it is stored.** `legalLinks` and `copyrightText` are columns of `whitelabel.footer_config`; each entry of `columns` is a `whitelabel.footer_config_column` row and each entry of `socialLinks` a `whitelabel.footer_config_social_link` row. Part of the working draft (see the header). **In the tenant's own database, not the control plane (decided 28 September, audit R163)**: it moved from `control.footer_config` (renamed `whitelabel.footer_config`) and its two child tables.\n**Links and order** (R8 blocker WHITE-C24 and IDENTITY-C60): a column's `links` are stored with the column, as one jsonb value in their array order; each column and each social link keeps its `sortOrder`, which `setFooter` writes from its position in the array (0 first), and every read returns `columns` and `socialLinks` ordered by it.\n",
   "required": [
    "id",
    "scopePath"
@@ -762,8 +822,16 @@
       "heading": {
        "type": "string"
       },
+      "sortOrder": {
+       "type": "integer",
+       "readOnly": true,
+       "description": "The column's position, written by `setFooter` from the array order (R8 blocker IDENTITY-C60)."
+      },
       "links": {
        "type": "array",
+       "x-ticvai-persistence-column": "jsonb",
+       "x-ticvai-persistence-kind": "valueObject",
+       "description": "The column's links in display order, stored on the column row as one value (R8 blocker WHITE-C24).",
        "items": {
         "type": "object",
         "properties": {
@@ -816,6 +884,11 @@
       },
       "url": {
        "type": "string"
+      },
+      "sortOrder": {
+       "type": "integer",
+       "readOnly": true,
+       "description": "The link's position, written by `setFooter` from the array order (R8 blocker IDENTITY-C60)."
       }
      }
     }
@@ -1130,7 +1203,7 @@
    },
    "url": {
     "type": "string",
-    "description": "Signed and expiring for private assets; stable CDN URL for public ones."
+    "description": "Signed and expiring for private assets; stable CDN URL for public ones. **A public asset that a published white-label version references is served at its stable CDN URL**, and `getPublishedTenantConfig` returns that address (`brandUrls`, `banners[].imageUrl`) so a guest client never needs this read (r8 walk of ticket 28335)."
    },
    "thumbnailUrl": {
     "type": "string",
@@ -1156,6 +1229,27 @@
    "createdAt": {
     "type": "string",
     "format": "date-time"
+   },
+   "extractedText": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**The text pulled out of an uploaded document** (R8 blocker ORDERS-MONEY-C19): written by the upload's processing job once text extraction finishes (PDF, Word and plain-text kinds), replaced when the file is replaced, null for an image, video or audio file or while the asset is still processing. One value per asset, so AI's `ingestKnowledgeDocument` reads it through `mediaAssetRecords`."
+   },
+   "releasedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-references": "identity.principal",
+    "description": "The reviewer who released the asset from `quarantined` (R8 blocker ORDERS-MONEY-C24, CHG-R8MIG-022); null if it never was."
+   },
+   "releasedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "When it was released from `quarantined`."
    }
   }
  },
@@ -1254,7 +1348,7 @@
   "x-ticvai-persistence": "none — embedded in tenant_config",
   "type": "object",
   "nullable": true,
-  "description": "**The oldest guest app build still allowed to run (decided 28 September, audit R073).** A guest app whose own version is below the one for its platform shows the forced-upgrade screen (GST-047) and nothing else. Null, or a platform left null, forces nothing. Live at once through `setMaintenanceMode`, because an upgrade that must wait for a publish is not forced.\n",
+  "description": "**The oldest guest app build still allowed to run (decided 28 September, audit R073).** A guest app whose own version is below the one for its platform shows the forced-upgrade screen (GST-047) and nothing else. Null, or a platform left null, forces nothing. Live at once through `setMaintenanceMode`, because an upgrade that must wait for a publish is not forced.\n\n**`storeUrl`** (r8 walk of ticket 27893): the store page GST-047's \"Update\" button opens, one per platform, set with `setMaintenanceMode` beside the versions and live at once like them. Optional. A store address cannot be derived from `StoreAccount.appIdentifier`, which is a bundle id. The forced-upgrade screen opens the URL for the platform it runs on; where it is null the screen shows the message without the button and the guest updates from the store by hand.\n",
   "properties": {
    "ios": {
     "type": "string",
@@ -1265,6 +1359,25 @@
     "type": "string",
     "nullable": true,
     "pattern": "^\\d+\\.\\d+\\.\\d+$"
+   },
+   "storeUrl": {
+    "type": "object",
+    "nullable": true,
+    "description": "The store page of the tenant's app for each platform. https only.",
+    "properties": {
+     "ios": {
+      "type": "string",
+      "format": "uri",
+      "pattern": "^https://",
+      "nullable": true
+     },
+     "android": {
+      "type": "string",
+      "format": "uri",
+      "pattern": "^https://",
+      "nullable": true
+     }
+    }
    }
   }
  },
@@ -1534,6 +1647,8 @@
    "LOYALTY_ACCRUE",
    "LOYALTY_REDEEM",
    "LOYALTY_ADJUST",
+   "MEMBERSHIP_VIEW",
+   "MEMBERSHIP_MANAGE",
    "MARKETING_VIEW",
    "MARKETING_MANAGE",
    "MARKETING_SEND",
@@ -1633,11 +1748,11 @@
     "format": "uuid"
    },
    "operatorPrincipalId": {
-    "x-ticvai-references": "identity.principal",
+    "x-ticvai-references": "none",
     "type": "string",
     "format": "uuid",
     "readOnly": true,
-    "description": "The platform operator, from the Control Plane token. Set by the server."
+    "description": "The platform operator, from the Control Plane token (its subject). Set by the server. **Not a row in this tenant's `identity.principal`** (R8 blocker IDENTITY-C20, CHG-R8MIG-006; the lead's answer, option A): an operator is the Control Plane's, so this is a plain uuid with no foreign key, and the key V0107 adds is dropped by the next forward migration."
    },
    "operatorDisplayName": {
     "type": "string",
@@ -1770,6 +1885,119 @@
    }
   }
  },
+ "RoleSummary": {
+  "x-ticvai-persistence": "none — projection over role",
+  "type": "object",
+  "required": [
+   "id",
+   "code",
+   "name"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "isPrimary": {
+    "type": "boolean",
+    "description": "True for the role that is the principal's `primaryRoleId` (`identity.principal.primary_role_id`); false for the others (14 October 2026, ADAM CR-077; CHG-IDR-002)."
+   },
+   "grantId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "**The grant this card stands for** (`identity.delegated_access.id`; IDENTITY-C45, CHG-R8SPN-032). A role held at two venues is two grants and two cards; `selectRole` takes the chosen one."
+   },
+   "scope": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/ScopeRef"
+     }
+    ],
+    "description": "The scope node the grant is held at (`platform.scope`), with its name, so the card can say which venue (IDENTITY-C45)."
+   }
+  }
+ },
+ "Session": {
+  "type": "object",
+  "required": [
+   "sessionId",
+   "principalId",
+   "roleId",
+   "scope",
+   "effectivePermissions"
+  ],
+  "properties": {
+   "sessionId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "principalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "roleId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "displayName": {
+    "type": "string"
+   },
+   "scope": {
+    "type": "array",
+    "description": "Scope nodes this session may act within, resolved once at login from the ltree hierarchy with deny-overrides-allow. Clients filter navigation against this — they never compute it.\n",
+    "items": {
+     "$ref": "../shared/common.yaml#/components/schemas/ScopeRef"
+    }
+   },
+   "effectivePermissions": {
+    "allOf": [
+     {
+      "$ref": "../shared/permissions.yaml#/components/schemas/PermissionSet"
+     }
+    ],
+    "description": "Flattened set across all granted scopes, after deny resolution. Convenience for coarse checks. Anything scope-sensitive must use `permissionsByScope`.\n"
+   },
+   "permissionsByScope": {
+    "type": "array",
+    "description": "Permissions effective at each granted scope path. Clients filter navigation on this and never compute permissions themselves.\n",
+    "items": {
+     "$ref": "../shared/permissions.yaml#/components/schemas/ScopedPermissions"
+    }
+   },
+   "saleBoardId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Landing surface, derived from the WORKSTATION, not the role (12 Aug 2026 §3). Ticketing, F&B or Retail board.\n\n**Optional since 2 October 2026: only a till session carries it** (Chinmay, door follow-ups; CHG-CSP-002; breaking change against r1 approved as BC-001 to BC-005 in `docs/active/breaking-changes.yaml`). A browser door (ADM-001, SUP-001, PTR-001) and a staff handheld (EMP-001) sign in with no workstation since CHG-DOOR-001, so they have no board to land on and the field is absent. On a till it is the workstation's effective board: the outlet's board unless the till overrides it (`tenancy.Workstation.saleBoardSource`; CHG-CSP-006). A client reads its landing from this field when present and from its own platform otherwise.\n"
+   },
+   "workstation": {
+    "$ref": "#/components/schemas/WorkstationContext"
+   },
+   "availableRoles": {
+    "type": "array",
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "**The roles the principal may choose, one per grant** (IDENTITY-C45, CHG-R8SPN-032), resolved on read as `LoginResponse.availableRoles` is, so EMP-002 can list them on a cold open or after a relaunch (`getCurrentSession`) without signing in again.",
+    "items": {
+     "$ref": "#/components/schemas/RoleSummary"
+    }
+   },
+   "openedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "When the session ends at the latest: `openedAt` plus `PasswordPolicy.sessionMaxHours` (12 hours by default; proposed, client to correct). A till session ends earlier, when the shift on its workstation closes; any session ends at `logout` or a revocation. Refreshing the access token never moves this time (IDENTITY-C25, FOUNDATION-AI-C27; CHG-R8SPN-014)."
+   }
+  }
+ },
  "SitePackage": {
   "x-ticvai-persistence": "whitelabel.site_package",
   "type": "object",
@@ -1840,6 +2068,18 @@
  },
  "Tenant": {
   "x-ticvai-persistence": "control.tenant",
+  "x-ticvai-required-when": {
+   "planVersion": {
+    "planId": {
+     "not": null
+    }
+   },
+   "planId": {
+    "planVersion": {
+     "not": null
+    }
+   }
+  },
   "type": "object",
   "required": [
    "id",
@@ -1903,9 +2143,17 @@
     "nullable": true
    },
    "planId": {
+    "x-ticvai-references": "control.plan",
+    "x-ticvai-references-version": "planVersion",
     "type": "string",
     "format": "uuid",
     "nullable": true
+   },
+   "planVersion": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The version of the plan the tenant is on (with `planId`, the key of the plan row; R8 blocker APPROVALS-TENANCY-C15, CHG-R8INT-023). Null when `planId` is."
    },
    "planName": {
     "type": "string",
@@ -1916,6 +2164,46 @@
    },
    "venueCount": {
     "type": "integer"
+   },
+   "cellHost": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "x-ticvai-derived": "onRead",
+    "description": "The host of the tenant's home cell (the host part of `Cell.apiEndpoint` of the cell that holds the tenant in its home region), derived on read through `control.cell_tenant`. Added for ADM-018 (r8 walk of ticket 27886): the console reaches the cell's grant and language operations at this host without holding `PLATFORM_CELL_VIEW`, which `listTenantCells` needs. Null while the tenant has no cell.\n"
+   },
+   "cellHosts": {
+    "type": "array",
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "x-ticvai-derived": "onRead",
+    "description": "One entry per region the tenant is in, for a multi-region tenant; the entry with `isHome` true is `cellHost`. The screen uses the home cell for language and grant operations.\n",
+    "items": {
+     "type": "object",
+     "required": [
+      "regionId",
+      "cellId",
+      "host",
+      "isHome"
+     ],
+     "properties": {
+      "regionId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "cellId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "host": {
+       "type": "string"
+      },
+      "isHome": {
+       "type": "boolean"
+      }
+     }
+    }
    },
    "regionId": {
     "type": "string",
@@ -2434,6 +2722,15 @@
   "x-ticvai-persistence": "platform.venue_settings",
   "description": "**Venue-level operational configuration that no other level can answer.**\nRegion owns currency, tax regime and fiscal year (ADR-0011). Venue owns the things that vary between two venues in one region — **opening hours, support hours, and what the local law requires of the gate.**\n**And the configured limits** (decided 28 September, audit R094): every limit the contracts call *configured* is a field here, from `displayCurrencies` and `cartLeaseSeconds` down to the grouped `catalogue`, `inventory`, `seating`, `promotions`, `fnb`, `queue`, `reporting`, `marketing` and `identity` settings. **Each has a tenant-level default**: the tenant sets it once with `setVenueSettingsDefaults`, a venue overrides it within the field's bounds, and a null field here inherits it. Each field's `default` is the proposed tenant default, marked proposed, client to correct (audit R094); `docs/active/configured-limits-proposal.md` is the sheet the client corrects, and where the two differ this contract is what runs.\n",
   "properties": {
+   "contact": {
+    "allOf": [
+     {
+      "$ref": "../satellite/white-label.yaml#/components/schemas/VenueContact"
+     }
+    ],
+    "nullable": true,
+    "description": "**How a guest reaches this venue** (R8 blocker WHITE-C16, the storage-sat lane's request 5; CHG-R8MIG-011): phone, email, WhatsApp, address and opening-hours prose, one jsonb column, written by the venue settings write and read by White-Label's getTenantAppStatus through tenancy#venueSettingsRecords. Null means the tenant's contact is shown."
+   },
    "id": {
     "type": "string",
     "format": "uuid",
@@ -3075,6 +3372,102 @@
       }
      }
     }
+   }
+  }
+ },
+ "WorkstationContext": {
+  "type": "object",
+  "required": [
+   "id",
+   "code",
+   "venueId",
+   "regionId"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "regionId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "accessPointId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Inherited from the workstation, never selected by the operator."
+   },
+   "devices": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "kind",
+      "driver"
+     ],
+     "properties": {
+      "kind": {
+       "type": "string",
+       "enum": [
+        "receiptPrinter",
+        "ticketPrinter",
+        "cashDrawer",
+        "barcodeScanner",
+        "rfidReader",
+        "paymentTerminal",
+        "customerDisplay"
+       ]
+      },
+      "driver": {
+       "type": "string"
+      },
+      "identifier": {
+       "type": "string"
+      }
+     }
+    }
+   },
+   "currency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$"
+   },
+   "currencyScale": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 4
+   },
+   "timezone": {
+    "type": "string"
+   },
+   "cellName": {
+    "type": "string",
+    "description": "The cell this workstation's region is served from, which is the cell the commerce host answering this request is deployed in (one cell per tenant per region, ADR-0014): the host fills it from its own configuration and reads no table (ADAM CR-096, CHG-RTE-001). A client uses this only for diagnostics and telemetry tagging — never for routing, which the Control Plane resolves.\n"
+   },
+   "deploymentProfile": {
+    "type": "string",
+    "enum": [
+     "terminalLocal",
+     "venueEdge",
+     "thin"
+    ],
+    "description": "Whether this surface reads catalogue locally (ADR-0013). Determines which flows the client enables offline.\n"
+   },
+   "pinLength": {
+    "type": "integer",
+    "enum": [
+     4,
+     6,
+     8
+    ],
+    "readOnly": true,
+    "description": "**The tenant's `PasswordPolicy.pinLength`, carried to the device** (14 October 2026, CHG-CRD-002, ADAM CR-078). A device door draws its PIN keypad, and its supervisor step-up prompt, at this many digits; the device keeps it with the workstation context of the last session on it, so the door needs nothing fetched before sign-in. A device that has never had a session accepts 4 to 8 digits and the server decides. Read from `identity.password_policy`, not stored on the workstation."
    }
   }
  }

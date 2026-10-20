@@ -32,6 +32,11 @@ been used, or forwarded a confirmation for a cancelled event.
 The screen **names the thing, says whether it is expired, cancelled or withdrawn, and offers the
 list it came from.** A silent 404 on a shared link is a support call.
 
+**Relaxed for promotions and for another guest's record** (20 October 2026, r8 cause ORDERS-MONEY-C01): a dead
+promotion link says only "This offer is no longer available" and offers the list it came from, with no name and
+no reason (an ended offer's terms are not the guest's to read); a record that is not the guest's answers 404 like
+one that does not exist (Pattern 4), so the screen shows the same neutral message and never says whose it is.
+
 ### Staff — resolve it or say plainly that it is gone
 
 **No silent redirect.** A supervisor following a link from an alert needs to know whether the record

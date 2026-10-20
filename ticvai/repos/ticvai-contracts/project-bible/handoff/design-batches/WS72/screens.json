@@ -15,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/policy/waiver-consent-command-center-cms-041",
-   "component": "apps/venue-management-web/src/routes/policy/WaiverConsentCommandCenter.tsx",
+   "component": "src/routes/policy/WaiverConsentCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -380,7 +380,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/policy/waiver-template-library-master-setup-cms-042",
-   "component": "apps/venue-management-web/src/routes/policy/WaiverTemplateLibraryMasterSetup.tsx",
+   "component": "src/routes/policy/WaiverTemplateLibraryMasterSetup.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -596,7 +596,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/policy/digital-waiver-form-builder-cms-043",
-   "component": "apps/venue-management-web/src/routes/policy/DigitalWaiverFormBuilder.tsx",
+   "component": "src/routes/policy/DigitalWaiverFormBuilder.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -776,7 +776,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/policy/dynamic-fields-questions-conditional-logic-cms-044",
-   "component": "apps/venue-management-web/src/routes/policy/DynamicFieldsQuestionsConditionalLogic.tsx",
+   "component": "src/routes/policy/DynamicFieldsQuestionsConditionalLogic.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -991,7 +991,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/policy/signatory-signature-guardian-rule-configuration-cms-045",
-   "component": "apps/venue-management-web/src/routes/policy/SignatorySignatureGuardianRuleConfiguration.tsx",
+   "component": "src/routes/policy/SignatorySignatureGuardianRuleConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1200,7 +1200,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/policy/product-event-experience-association-cms-046",
-   "component": "apps/venue-management-web/src/routes/policy/ProductEventExperienceAssociation.tsx",
+   "component": "src/routes/policy/ProductEventExperienceAssociation.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1369,7 +1369,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/policy/waiver-trigger-eligibility-completion-rules-cms-047",
-   "component": "apps/venue-management-web/src/routes/policy/WaiverTriggerEligibilityCompletionRules.tsx",
+   "component": "src/routes/policy/WaiverTriggerEligibilityCompletionRules.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1548,7 +1548,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/policy/versioning-effective-dates-legal-change-control-cms-048",
-   "component": "apps/venue-management-web/src/routes/policy/VersioningEffectiveDatesLegalChangeControl.tsx",
+   "component": "src/routes/policy/VersioningEffectiveDatesLegalChangeControl.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1703,7 +1703,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/policy/localization-branding-customer-experience-configuration-cms-049",
-   "component": "apps/venue-management-web/src/routes/policy/LocalizationBrandingCustomerExperienceConfigurat.tsx",
+   "component": "src/routes/policy/LocalizationBrandingCustomerExperienceConfigurat.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1877,7 +1877,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/policy/waiver-approval-testing-publication-workspace-cms-050",
-   "component": "apps/venue-management-web/src/routes/policy/WaiverApprovalTestingPublicationWorkspace.tsx",
+   "component": "src/routes/policy/WaiverApprovalTestingPublicationWorkspace.tsx",
    "status": "notStarted"
   },
   "navigation": {

@@ -120,6 +120,12 @@ whether there is one control database or one per region.
 schema, disagreeing by two, and the provisioning script will be generated from one of them. It is
 worth reconciling before that script exists rather than after.
 
+**The control database has no row-level security** (decided 20 October 2026, the lead, option A of R8
+blocker IDENTITY-C16; CHG-R8MIG-005; r8 integration, CHG-R8INT-024). It holds no scope tree, so there is no
+`scope_path` to write a policy against; it is guarded by the connection (only the control plane's role is granted on
+it) and by each operation's `PLATFORM_*` permission and tenant check. backend/MIGRATIONS.md, "The control database
+has no row-level security", has the rule and the tables it names.
+
 ---
 
 ## When this is reopened
@@ -149,3 +155,5 @@ tables that join to each other is the defect this ADR is correcting.
 
 **Leave the canary at cell granularity.** Rejected on the arithmetic: the point of a canary is that
 its failure is cheap, and a first cell holding two hundred tenant databases is not a cheap failure.
+
+**Amended 20 October 2026 (r8 cause IDENTITY-C59): content blocks are tenant data.** `ContentBlock` lives in `whitelabel.content_block` in the tenant database (scope row security), not in the control database: a block is a tenant's page content, read and written by its own white label module; the old control table is retired by the migration owner (storage-core).

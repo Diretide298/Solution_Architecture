@@ -23,6 +23,7 @@ operations:
   - cache:idempotency
   - orders.deposit_box
   - orders.pos_shift
+  - orders.pos_shift_approval
   - platform.outbox
 - operation: adjustDepositBoxFloat
   verb: POST
@@ -71,10 +72,12 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - orders.pos_shift
   - orders.pos_shift_approval
   - orders.pos_shift_incident
   writes:
+  - cache:idempotency
   - orders.pos_shift
   - orders.pos_shift_approval
   - platform.outbox
@@ -94,6 +97,7 @@ operations:
   writes:
   - cache:idempotency
   - orders.pos_shift
+  - orders.pos_shift_approval
 - operation: closeDepositBoxes
   verb: POST
   path: /deposit-boxes/close
@@ -117,11 +121,11 @@ operations:
 - operation: closeShift
   verb: POST
   path: /shifts/{shiftId}/close
-  scope: workstation
+  scope: venue
   permission: SHIFT_CLOSE
   audience:
   - staff
-  offline: true
+  offline: false
   reads:
   - cache:idempotency
   - ledger.fx_rate
@@ -131,10 +135,11 @@ operations:
   - orders.pos_shift
   - orders.pos_shift_approval
   - orders.pos_shift_incident
+  - orders.sales_order
+  - orders.till_shift_policy
   - platform.venue_settings
   writes:
   - cache:idempotency
-  - ledger.journal_entry
   - orders.cash_count_line
   - orders.pos_shift
   - platform.outbox
@@ -223,8 +228,10 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - cache:idempotency
   writes:
+  - cache:idempotency
   - orders.pos_shift
   - platform.outbox
 - operation: listCashMovements
@@ -285,14 +292,17 @@ operations:
   permission: SHIFT_OPEN
   audience:
   - staff
-  offline: true
+  offline: false
   reads:
   - cache:idempotency
   - identity.principal
   - orders.cash_count_line
+  - orders.cash_movement
+  - orders.deposit_box
   - orders.pos_shift
   - orders.pos_shift_approval
   - orders.pos_shift_incident
+  - orders.till_shift_policy
   - platform.venue_settings
   - platform.workstation
   writes:
@@ -301,11 +311,12 @@ operations:
   - orders.pos_shift
   - orders.pos_shift_approval
   - orders.pos_shift_incident
+  - platform.outbox
 - operation: recordNoSale
   verb: POST
   path: /shifts/{shiftId}/no-sale
   scope: workstation
-  permission: SHIFT_SUSPEND
+  permission: CASH_NO_SALE
   audience:
   - staff
   offline: true
@@ -324,10 +335,12 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - orders.pos_shift
   - orders.pos_shift_approval
   - orders.pos_shift_incident
   writes:
+  - cache:idempotency
   - orders.pos_shift
   - orders.pos_shift_incident
 - operation: reopenShift
@@ -385,8 +398,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - orders.till_shift_policy
   writes:
+  - cache:idempotency
   - orders.till_shift_policy
 - operation: submitShiftCount
   verb: POST
@@ -408,7 +423,6 @@ operations:
   - platform.venue_settings
   writes:
   - cache:idempotency
-  - ledger.journal_entry
   - orders.cash_count_line
   - orders.pos_shift
   - platform.outbox

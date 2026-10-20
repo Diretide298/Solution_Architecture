@@ -5,7 +5,7 @@
   "module": "Sell",
   "requiresModule": "membership",
   "wave": 3,
-  "permission": "PLATFORM_TENANT_VIEW",
+  "permission": "MEMBERSHIP_VIEW",
   "source": {
    "pack": "Membership___Annual_Pass_Management_Reference.pdf",
    "board": "1",
@@ -391,7 +391,7 @@
   "module": "Sell",
   "requiresModule": "membership",
   "wave": 3,
-  "permission": "PLATFORM_CELL_MANAGE",
+  "permission": "MEMBERSHIP_MANAGE",
   "source": {
    "pack": "Membership___Annual_Pass_Management_Reference.pdf",
    "board": "1",
@@ -699,7 +699,7 @@
   "module": "Sell",
   "requiresModule": "membership",
   "wave": 3,
-  "permission": "PLATFORM_CELL_MANAGE",
+  "permission": "MEMBERSHIP_MANAGE",
   "source": {
    "pack": "Membership___Annual_Pass_Management_Reference.pdf",
    "board": "1",
@@ -1244,7 +1244,7 @@
   "module": "Sell",
   "requiresModule": "membership",
   "wave": 3,
-  "permission": "PLATFORM_TENANT_VIEW",
+  "permission": "MEMBERSHIP_VIEW",
   "source": {
    "pack": "Membership___Annual_Pass_Management_Reference.pdf",
    "board": "1",
@@ -1660,7 +1660,7 @@
   "module": "Sell",
   "requiresModule": "membership",
   "wave": 3,
-  "permission": "PLATFORM_TENANT_VIEW",
+  "permission": "MEMBERSHIP_VIEW",
   "source": {
    "pack": "Membership___Annual_Pass_Management_Reference.pdf",
    "board": "1",
@@ -1706,51 +1706,61 @@
       {
        "kind": "selectField",
        "label": "B2C",
+       "operation": "getChannelAvailability",
        "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 14 §Configure sale through"
       },
       {
        "kind": "selectField",
        "label": "Mobile App",
+       "operation": "getChannelAvailability",
        "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 14 §Configure sale through"
       },
       {
        "kind": "selectField",
        "label": "POS",
+       "operation": "getChannelAvailability",
        "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 14 §Configure sale through"
       },
       {
        "kind": "selectField",
        "label": "Call Center",
+       "operation": "getChannelAvailability",
        "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 14 §Configure sale through"
       },
       {
        "kind": "selectField",
        "label": "Box Office",
+       "operation": "getChannelAvailability",
        "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 14 §Configure sale through"
       },
       {
        "kind": "selectField",
        "label": "Kiosk",
+       "operation": "getChannelAvailability",
        "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 14 §Configure sale through"
       },
       {
        "kind": "selectField",
        "label": "B2B",
+       "operation": "getChannelAvailability",
        "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 14 §Configure sale through"
       },
       {
        "kind": "selectField",
        "label": "Corporate",
+       "operation": "getChannelAvailability",
        "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 14 §Configure sale through"
       },
       {
        "kind": "selectField",
        "label": "Reseller",
+       "operation": "getChannelAvailability",
        "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 14 §Configure sale through"
       },
       {
        "kind": "selectField",
        "label": "API",
+       "operation": "getChannelAvailability",
        "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 14 §Configure sale through"
       },
       {
@@ -1824,17 +1834,31 @@
     "provenance": "decided 29 September, VM close-out (venue management and configuration)"
    },
    {
+    "operationId": "getChannelAvailability",
+    "contract": "catalogue",
+    "purpose": "The membership product's channels as published now (r8, GPS-C39): fills the channel fields, and the publish sends that answer back whole with the guest's changes (capacityLimited and fixedSalesWindow are left to ADM-124).",
+    "trigger": "onLoad",
+    "provenance": "r8 integration, GPS-C39 (CHG-R8INT-007)"
+   },
+   {
     "operationId": "publishChannelAvailability",
     "contract": "catalogue",
-    "purpose": "Choose the channels that sell the membership",
+    "purpose": "Choose the channels that sell the membership: the whole map `getChannelAvailability` read, with the changes (r8, GPS-C39)",
     "trigger": "onAction",
     "provenance": "decided 29 September, VM close-out (venue management and configuration)"
    },
    {
     "operationId": "listPriceLists",
     "contract": "catalogue",
-    "purpose": "The price lists a membership is priced on",
+    "purpose": "The price lists a membership is priced on, and the options of the save form's base pricing profile picker (r8, GPS-C34)",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listTaxProfiles",
+    "contract": "catalogue",
+    "purpose": "The options of the save form's tax profile picker (r8, GPS-C34): `taxProfile` is a catalogue tax profile's id. Read once when the screen opens; no component of its own, the picker is in the form. Not background (r8 integration, CHG-R8INT-008): the user sees the options, and the approved screen draws the picker only in the form overlay's body, not as a component.",
+    "trigger": "onLoad",
+    "provenance": "r8 second round, GPS-C34 (ticket 29883)"
    },
    {
     "operationId": "setMembershipCommercialConfig",
@@ -1869,7 +1893,7 @@
     "id": "formSetMembershipCommercialConfig",
     "component": "modal",
     "trigger": "Save membership commercial config",
-    "body": "**Collects what `setMembershipCommercialConfig` sends before it is called.** Required: `membershipCode`, `basePricingProfile`, `taxProfile`, `salesPeriod`. Optional: `feeProfile`, `upgradePricePolicy`, `promotionalPricingEligibility`, `paymentTerms`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setMembershipCommercialConfig` sends before it is called.** Required: `membershipCode`, `basePricingProfile`, `taxProfile`, `salesPeriod`. Optional: `feeProfile`, `upgradePricePolicy`, `promotionalPricingEligibility`, `paymentTerms`. Dismissing sends nothing; the screen behind is unchanged. **Pickers** (r8, GPS-C34): `basePricingProfile` is picked from the price lists (`listPriceLists`), `taxProfile` from the tax profiles (`listTaxProfiles`); `feeProfile` and `upgradePricePolicy` are typed codes, since no entity holds them yet.",
     "bindsTo": "MembershipCommercialConfigInput",
     "confirm": {
      "label": "Save membership commercial config",
@@ -1920,7 +1944,7 @@
   "module": "Sell",
   "requiresModule": "membership",
   "wave": 3,
-  "permission": "PLATFORM_CELL_MANAGE",
+  "permission": "MEMBERSHIP_MANAGE",
   "source": {
    "pack": "Membership___Annual_Pass_Management_Reference.pdf",
    "board": "1",
@@ -2098,7 +2122,7 @@
   "module": "Sell",
   "requiresModule": "membership",
   "wave": 3,
-  "permission": "PLATFORM_CELL_MANAGE",
+  "permission": "MEMBERSHIP_MANAGE",
   "source": {
    "pack": "Membership___Annual_Pass_Management_Reference.pdf",
    "board": "1",
@@ -2310,7 +2334,7 @@
     }
    ]
   },
-  "notes": "**Bound 4 October 2026: the screen reads the version it works on (getMembershipProductValidation, agreed in the ledger) by the membershipCode and version BO-284 carries; the eight publication targets are read, and the action, effective date, migration policy and reason are the inputs the PUT takes** (CHG-FXS-002)",
+  "notes": "**Bound 4 October 2026: the screen reads the version it works on (getMembershipProductValidation, agreed in the ledger) by the membershipCode and version BO-284 carries; the eight publication targets are read, and the action, effective date, migration policy and reason are the inputs the PUT takes** (CHG-FXS-002)\n\nBuild note (r8 second round, GPS-C33, the lead 20 October 2026, option A): the membership-product operations now need the venue permissions `MEMBERSHIP_VIEW` and `MEMBERSHIP_MANAGE`, not platform-staff ones; build the no-access state naming `MEMBERSHIP_MANAGE`. The state text above still names `PLATFORM_CELL_MANAGE` until the client approves the new wording (pending entry GPS-C33).",
   "_platform": {
    "code": "P08",
    "audience": "staff",

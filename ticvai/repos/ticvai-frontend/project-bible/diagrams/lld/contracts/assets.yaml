@@ -1,5 +1,5 @@
 id: LLD-assets
-title: assets — 26 operations
+title: assets — 28 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -39,6 +39,20 @@ operations:
   - assets.media_asset
   - assets.tag
   - cache:idempotency
+- operation: completeGuestUpload
+  verb: POST
+  path: /media/guest-uploads/{uploadId}/complete
+  scope: tenant
+  permission: null
+  audience:
+  - guest
+  offline: false
+  reads:
+  - assets.guest_upload
+  - cache:idempotency
+  writes:
+  - assets.guest_upload
+  - cache:idempotency
 - operation: completeUpload
   verb: POST
   path: /media/uploads/{uploadId}/complete
@@ -52,8 +66,12 @@ operations:
   - assets.media_upload
   - cache:idempotency
   writes:
+  - assets.asset_version
   - assets.media_asset
+  - assets.media_collection_member
   - assets.media_fingerprint
+  - assets.media_upload
+  - assets.rendition
   - cache:idempotency
 - operation: createCollection
   verb: POST
@@ -70,6 +88,21 @@ operations:
   - assets.media_collection
   - assets.media_collection_member
   - cache:idempotency
+- operation: createGuestUpload
+  verb: POST
+  path: /media/guest-uploads
+  scope: tenant
+  permission: null
+  audience:
+  - guest
+  offline: false
+  reads:
+  - assets.media_upload
+  - cache:idempotency
+  writes:
+  - assets.guest_upload
+  - assets.media_upload
+  - cache:idempotency
 - operation: createMediaShare
   verb: POST
   path: /media-shares
@@ -80,8 +113,10 @@ operations:
   offline: false
   reads:
   - assets.share
+  - cache:idempotency
   writes:
   - assets.share
+  - cache:idempotency
 - operation: createUpload
   verb: POST
   path: /media/uploads
@@ -105,9 +140,11 @@ operations:
   - staff
   offline: false
   reads:
+  - assets.media_asset
   - assets.media_usage
   - cache:idempotency
   writes:
+  - assets.media_asset
   - assets.media_usage
   - cache:idempotency
 - operation: findSimilarMediaAssets
@@ -145,8 +182,12 @@ operations:
   - staff
   offline: true
   reads:
+  - assets.asset_version
   - assets.media_asset
+  - assets.media_collection
+  - assets.media_collection_member
   - assets.media_usage
+  - assets.rendition
   writes: []
 - operation: getMediaDistribution
   verb: GET
@@ -243,11 +284,14 @@ operations:
   offline: false
   reads:
   - assets.media_asset
+  - assets.media_upload
+  - assets.media_usage
   - cache:idempotency
   writes:
   - assets.asset_version
   - assets.media_asset
   - assets.media_fingerprint
+  - assets.media_upload
   - cache:idempotency
 - operation: requestMediaRendition
   verb: POST
@@ -259,8 +303,10 @@ operations:
   offline: false
   reads:
   - assets.rendition
+  - cache:idempotency
   writes:
   - assets.rendition
+  - cache:idempotency
 - operation: searchMedia
   verb: GET
   path: /media
@@ -283,8 +329,10 @@ operations:
   offline: false
   reads:
   - assets.approval
+  - cache:idempotency
   writes:
   - assets.approval
+  - cache:idempotency
 - operation: setMediaAssetRights
   verb: PUT
   path: /media-assets/{assetId}/rights
@@ -309,9 +357,11 @@ operations:
   offline: false
   reads:
   - assets.tag
+  - cache:idempotency
   writes:
   - assets.media_asset
   - assets.tag
+  - cache:idempotency
 - operation: setMediaDistributionChannels
   verb: PUT
   path: /media-distribution/channels/{code}
@@ -322,8 +372,10 @@ operations:
   offline: false
   reads:
   - assets.distribution_channel
+  - cache:idempotency
   writes:
   - assets.distribution_channel
+  - cache:idempotency
 - operation: setMediaTaxonomy
   verb: PUT
   path: /media-taxonomy
@@ -334,8 +386,10 @@ operations:
   offline: false
   reads:
   - assets.taxonomy
+  - cache:idempotency
   writes:
   - assets.taxonomy
+  - cache:idempotency
 - operation: updateMediaAsset
   verb: PATCH
   path: /media/{mediaId}

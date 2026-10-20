@@ -1327,7 +1327,7 @@
    },
    "url": {
     "type": "string",
-    "description": "Signed and expiring for private assets; stable CDN URL for public ones."
+    "description": "Signed and expiring for private assets; stable CDN URL for public ones. **A public asset that a published white-label version references is served at its stable CDN URL**, and `getPublishedTenantConfig` returns that address (`brandUrls`, `banners[].imageUrl`) so a guest client never needs this read (r8 walk of ticket 28335)."
    },
    "thumbnailUrl": {
     "type": "string",
@@ -1353,6 +1353,27 @@
    "createdAt": {
     "type": "string",
     "format": "date-time"
+   },
+   "extractedText": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**The text pulled out of an uploaded document** (R8 blocker ORDERS-MONEY-C19): written by the upload's processing job once text extraction finishes (PDF, Word and plain-text kinds), replaced when the file is replaced, null for an image, video or audio file or while the asset is still processing. One value per asset, so AI's `ingestKnowledgeDocument` reads it through `mediaAssetRecords`."
+   },
+   "releasedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-references": "identity.principal",
+    "description": "The reviewer who released the asset from `quarantined` (R8 blocker ORDERS-MONEY-C24, CHG-R8MIG-022); null if it never was."
+   },
+   "releasedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "When it was released from `quarantined`."
    }
   }
  },
@@ -2045,7 +2066,47 @@
     "format": "uuid",
     "nullable": true,
     "readOnly": true,
+    "x-ticvai-references": "ai.translation_job",
     "description": "The `proposeTranslations` job that drafted this proposal; `getTranslationProposals` reads a job's rows by it. Null on every other proposal (CHG-RFM-004)."
+   },
+   "targetKind": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "enum": [
+     "contentBlock",
+     "productName",
+     "emailTemplate",
+     "messageTemplate"
+    ],
+    "description": "For a translation draft, what kind of thing it sits on (`TranslationProposals.drafts[].targetKind`); null on every other proposal (R8 blocker FOUNDATION-AI-C40)."
+   },
+   "targetRef": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "maxLength": 200,
+    "description": "For a translation draft, the id of the block, product or template it sits on (the path id of the target's own write, e.g. a content block's `blockId`); null otherwise (R8 blocker FOUNDATION-AI-C40)."
+   },
+   "locale": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "maxLength": 20,
+    "description": "For a translation draft, the language it is in (the job's `targetLocale`); null otherwise."
+   },
+   "fieldPath": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "maxLength": 300,
+    "description": "For a translation draft, where it goes inside the target, as a dotted path in the target's own body (`TranslationProposals.drafts[].fieldPath`); null otherwise. Empty for a field that is not text."
+   },
+   "draftText": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "For a translation draft, the proposed text; null otherwise. `payload` stays the request body of the target's write, with this text at `fieldPath` (R8 blocker FOUNDATION-AI-C40)."
    },
    "kind": {
     "type": "string",
@@ -2744,8 +2805,10 @@
      "payment",
      "refund",
      "void",
-     "scan"
-    ]
+     "scan",
+     "cashMovement"
+    ],
+    "description": "What was refused. `cashMovement` (20 October 2026, R8 blocker cause FOUNDATION-AI-C13; CHG-R8SPN-021) is an offline lift or float replayed through `shift.createCashMovement` and refused `409 shift-not-open` or `lift-exceeds-float`; its `payload` is the `CreateCashMovementRequest` the till sent."
    },
    "recordedAt": {
     "type": "string",

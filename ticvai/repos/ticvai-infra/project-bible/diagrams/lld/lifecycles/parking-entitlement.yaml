@@ -1,5 +1,5 @@
 id: LLD-Parking entitlement
-title: Parking entitlement — 11 transitions
+title: Parking entitlement — 12 transitions
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/04-lifecycles.yaml
 source: states/parking-entitlement.yaml
@@ -71,6 +71,14 @@ transitions:
   trigger: operation
   guard: '**The guest changed car.** The common case, and it must work after purchase — someone booking
     a month ahead does not know which car they will bring'
+  isReversal: true
+- from: pushed
+  to: pending
+  operation: updateParkingEntitlement
+  trigger: operation
+  guard: '**The plate changed after it was pushed** (R8 blocker ORDERS-MONEY-C22, CHG-R8MIG-023): the
+    new plate is pushed again, so the entitlement goes back to pending until the parking system takes
+    it'
   isReversal: true
 notes: '`pushFailed` is not terminal and does not invalidate anything. The entitlement is valid; the
   integration failed, and those are different facts.

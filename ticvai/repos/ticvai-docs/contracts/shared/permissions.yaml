@@ -210,6 +210,8 @@ x-ticvai-permission-modules:
       - LOYALTY_ACCRUE
       - LOYALTY_REDEEM
       - LOYALTY_ADJUST
+      - MEMBERSHIP_VIEW
+      - MEMBERSHIP_MANAGE
       - MEMBERSHIP_AI_PUBLISH
     marketing:
       - GUEST_VIEW
@@ -380,6 +382,8 @@ x-ticvai-permission-presets:
         - TICKET_LOOKUP
       inventory:
         - PROCUREMENT_VIEW
+      membership:
+        - MEMBERSHIP_VIEW
       marketing:
         - GUEST_VIEW
         - GUEST_VIEW_PII
@@ -469,6 +473,7 @@ x-ticvai-permission-presets:
         - PROCUREMENT_RECEIVE
       membership:
         - LOYALTY_REDEEM
+        - MEMBERSHIP_VIEW
       marketing:
         - GUEST_VIEW
         - GUEST_VIEW_PII
@@ -733,6 +738,11 @@ components:
         - LOYALTY_ACCRUE              # awarded by order completion, never by a person
         - LOYALTY_REDEEM              # spending points. Two-phase, like every stored value
         - LOYALTY_ADJUST              # a manual correction, and the one an auditor reads
+        # **Membership has its own pair** (r8, GPS-C33, the lead's answer A of 20 October 2026): the
+        # membership book (BO-284..303) rode PLATFORM_TENANT_VIEW and PLATFORM_CELL_MANAGE, Control Plane
+        # permissions no tenant role holds, so no venue's staff could open it. Venue scope, like PRODUCT_*.
+        - MEMBERSHIP_VIEW             # membership products, tiers, passes, usage and renewals
+        - MEMBERSHIP_MANAGE           # build and change them, approve a product's validation, a member's account
         - MARKETING_VIEW              # segments, campaigns, loyalty, reviews
         - MARKETING_MANAGE            # create and amend
         - MARKETING_SEND              # launch or stop a campaign. Separate from MANAGE

@@ -131,6 +131,11 @@ version.
 | Stale-key handling | A terminal offline across a rotation cannot verify. Needs a grace window |
 | Bundle size | Full catalogue for a large venue may be substantial. Delta strategy matters |
 
+**Settled for the first release (20 October 2026, r8 cause FOUNDATION-AI-C14):** the bundle is signed with
+**Ed25519 over its `contentHash`**; the public keys are served by `catalogue.getBundleSigningKeys`, and a retired
+key stays verifiable for a **7-day grace** so a terminal offline across a rotation still verifies. The signing key
+lives in the cell's Key Vault (ADR-0063). A bundle that does not verify is refused whole.
+
 ### C103 — Inventory lease management
 
 Grant, renew, release, expire, reconcile. Server-side allocation ledger; client-side held
@@ -141,6 +146,13 @@ lease with a countdown.
 | **Lease stranding** | A terminal that dies holding a lease strands capacity until TTL. At a gate during peak that is visible. Short TTLs with aggressive renewal, or an operator-triggered force-release? |
 | Sub-leasing | Edge node holds a venue lease and sub-leases to terminals. Two-level TTLs |
 | Oversell tolerance | Is any oversell acceptable, or is exhaustion always a hard refusal? |
+
+**Settled for the first release (20 October 2026, r8 causes FOUNDATION-AI-C45, GPS-C37, FOUNDATION-AI-C46):**
+**Block A takes no standing lease.** Contended timed entry is online-only at the till: offline, the sale drawer
+refuses it and says it needs a connection; the cart's hold, taken online by `addCartLine`, is the only hold.
+**Oversell:** an offline sale replayed after the hold it relied on expired is **accepted and flagged `unitsGone`**
+for the reconciler, never dropped and never silently counted; exhaustion online is still a hard refusal. Lease
+stranding and sub-leasing return with standing leases, not before.
 
 ### C104 — Catalogue staleness policy
 

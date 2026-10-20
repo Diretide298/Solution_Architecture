@@ -1,6 +1,6 @@
 # Guest web and guest app — parity audit
 
-**Derived.** `python3 tools/audit-guest-parity.py`, 2026-10-18. Reads only.
+**Derived.** `python3 tools/audit-guest-parity.py`, 2026-10-20. Reads only.
 
 **The rule, decided 12 September 2026: guest web (P01) and guest app (P02) are identical.** Every difference below either has a reason recorded against it or is a defect waiting for a decision. Which web screen is which app screen is `screens/_guest-pairs.yaml`.
 
@@ -8,24 +8,24 @@
 |---|---|
 | Screens | P01 50 · P02 77 |
 | Capability groups | 56 — appOnly 6 · folded 3 · paired 46 · webOnly 1 |
-| Operations | web 201 · app 211 · shared 195 |
-| Findings | high 27 · medium 156 · low 218 · info 3 |
+| Operations | web 204 · app 217 · shared 198 |
+| Findings | high 28 · medium 170 · low 217 · info 4 |
 
 ## By dimension
 
 | Dimension | high | medium | low | info |
 |---|---|---|---|---|
-| operations | 15 | 37 |  | 1 |
-| licence | 10 |  |  |  |
-| coverage | 2 | 4 | 2 | 2 |
+| operations | 16 | 39 |  | 2 |
+| licence | 9 |  |  |  |
+| coverage | 3 | 4 | 1 | 2 |
 | bindings |  | 26 |  |  |
 | entry parameters |  | 24 |  |  |
 | states |  | 19 |  |  |
+| unbound operations |  | 16 | 17 |  |
 | flows |  | 13 |  |  |
 | cross-shell handover |  | 8 |  |  |
 | overlays |  | 7 |  |  |
 | contracts |  | 5 |  |  |
-| unbound operations |  | 4 | 17 |  |
 | platform |  | 3 |  |  |
 | events |  | 2 |  |  |
 | design |  | 1 |  |  |
@@ -56,15 +56,15 @@
 - **density** — compact on the web, comfortable on the app: the input, not the product
 - **routes and component paths** — each shell's own codebase
 
-## High — 27
+## High — 28
 
 | Dimension | Where | Difference | Resolve by |
 |---|---|---|---|
 | coverage | add-to-calendar | GST-018 Add to Calendar / Reminders — app only (gap). Adding a visit to a calendar is as much a desktop act as a phone one, and issueWalletPass is already on the web's My Tickets. Not callable on the web: getOrderCalendarEvent, getVisitReminder, setVisitReminder. | add the screen to the web |
+| coverage | refunds-and-resale | GST-067 Refunds & Resale has no web screen; its operations are on WEB-019, WEB-030; **not callable on the web at all: getGuestRefundPolicy** | draw the screen on the other shell, or record the fold as the decision |
 | coverage | reserve-table-or-cabana | GST-070 Reserve a Table has no web screen; its operations are on WEB-031, WEB-036, WEB-040; **not callable on the web at all: listBookableOutlets** | draw the screen on the other shell, or record the fold as the decision |
 | licence | ai-concierge (WEB-044 ↔ GST-031/GST-032/GST-033) | web requires ['ai'], app requires ['ai', 'ticketing'] — a tenant licensed for one and not the other sees it on one shell only | one requiresModule for the capability |
 | licence | checkout-and-payment (WEB-011/WEB-012/WEB-014 ↔ GST-009) | web requires ['marketing', 'ticketing'], app requires ['ticketing'] — a tenant licensed for one and not the other sees it on one shell only | one requiresModule for the capability |
-| licence | help-content-and-accessibility (WEB-045 ↔ GST-040/GST-057) | web requires ['core'], app requires ['core', 'marketing'] — a tenant licensed for one and not the other sees it on one shell only | one requiresModule for the capability |
 | licence | home (WEB-001 ↔ GST-001) | web requires ['ticketing'], app requires ['marketing'] — a tenant licensed for one and not the other sees it on one shell only | one requiresModule for the capability |
 | licence | in-venue-notifications (WEB-046 ↔ GST-030) | web requires ['marketing'], app requires ['fnb'] — a tenant licensed for one and not the other sees it on one shell only | one requiresModule for the capability |
 | licence | itinerary-planning (WEB-050 ↔ GST-051/GST-052/GST-053/GST-054/GST-059) | web requires ['ticketing'], app requires ['ai', 'ticketing'] — a tenant licensed for one and not the other sees it on one shell only | one requiresModule for the capability |
@@ -72,23 +72,24 @@
 | licence | privacy-security-devices (WEB-024 ↔ GST-066/GST-073) | web requires ['marketing'], app requires ['core'] — a tenant licensed for one and not the other sees it on one shell only | one requiresModule for the capability |
 | licence | venue-map-and-wait-times (WEB-039 ↔ GST-021/GST-022) | web requires ['queue'], app requires ['queue', 'seating'] — a tenant licensed for one and not the other sees it on one shell only | one requiresModule for the capability |
 | licence | wallet-and-payment-methods (WEB-021 ↔ GST-011/GST-071) | web requires ['retail'], app requires ['core', 'retail'] — a tenant licensed for one and not the other sees it on one shell only | one requiresModule for the capability |
-| operations | app only | bindCredentialDevice, claimTicketTransfer, enrolFacePass, enrolMfaMethod, getOrderCalendarEvent, getTransportDeparture, getVisitReminder, getWalletAutoReloadSetting, grantDelegation, listBookableOutlets, listCatalogueBundles, registerGuestDevice, reserveMerchandise, setVisitReminder, setWalletAutoReloadSetting, verifyMfaEnrolment |  |
+| operations | app only | bindCredentialDevice, claimTicketTransfer, enrolFacePass, enrolMfaMethod, getGuestRefundPolicy, getMyCase, getOrderCalendarEvent, getTransportDeparture, getVisitReminder, getWalletAutoReloadSetting, grantDelegation, listBookableOutlets, listEvents, listMyVisitPlans, registerGuestDevice, reserveMerchandise, setVisitReminder, setWalletAutoReloadSetting, verifyMfaEnrolment |  |
 | operations | cart (WEB-010 ↔ GST-041) | the web calls evaluatePromotions and the app cannot call it anywhere |  |
 | operations | checkout-and-payment (WEB-011/WEB-012/WEB-014 ↔ GST-009) | the web calls extendSeatHold and the app cannot call it anywhere |  |
-| operations | itinerary-planning (WEB-050 ↔ GST-051/GST-052/GST-053/GST-054/GST-059) | the app calls listCatalogueBundles and the web cannot call it anywhere |  |
+| operations | help-and-cases (WEB-025 ↔ GST-068) | the app calls getMyCase and the web cannot call it anywhere |  |
+| operations | itinerary-planning (WEB-050 ↔ GST-051/GST-052/GST-053/GST-054/GST-059) | the app calls listMyVisitPlans and the web cannot call it anywhere |  |
 | operations | memberships (WEB-022/WEB-023 ↔ GST-015) | the app calls grantDelegation and the web cannot call it anywhere |  |
 | operations | privacy-security-devices (WEB-024 ↔ GST-066/GST-073) | the web calls getWaiverStatus and the app cannot call it anywhere |  |
 | operations | privacy-security-devices (WEB-024 ↔ GST-066/GST-073) | the app calls enrolMfaMethod, registerGuestDevice, verifyMfaEnrolment and the web cannot call it anywhere |  |
 | operations | profile (WEB-020 ↔ GST-039) | the web calls updateGuestPreferences and the app cannot call it anywhere |  |
-| operations | reservations (WEB-031 ↔ GST-016/GST-017) | the web calls getResourceAvailability and the app cannot call it anywhere |  |
+| operations | reservations (WEB-031 ↔ GST-016/GST-017) | the web calls listOwnGroupBookings and the app cannot call it anywhere |  |
 | operations | shop (WEB-033 ↔ GST-026) | the app calls reserveMerchandise and the web cannot call it anywhere |  |
 | operations | ticket-selection (WEB-005 ↔ GST-008) | the web calls evaluatePromotions and the app cannot call it anywhere |  |
 | operations | ticket-transfer (WEB-030 ↔ GST-014/GST-045) | the app calls claimTicketTransfer and the web cannot call it anywhere |  |
 | operations | tickets (WEB-018 ↔ GST-012/GST-013) | the app calls bindCredentialDevice and the web cannot call it anywhere |  |
 | operations | wallet-and-payment-methods (WEB-021 ↔ GST-011/GST-071) | the app calls getWalletAutoReloadSetting, setWalletAutoReloadSetting and the web cannot call it anywhere |  |
-| operations | web only | evaluatePromotions, extendSeatHold, getMyChallenges, getResourceAvailability, getWaiverStatus, updateGuestPreferences |  |
+| operations | web only | evaluatePromotions, extendSeatHold, getMyChallenges, getWaiverStatus, listOwnGroupBookings, updateGuestPreferences |  |
 
-## Medium — 156
+## Medium — 170
 
 | Dimension | Where | Difference | Resolve by |
 |---|---|---|---|
@@ -137,17 +138,17 @@
 | cross-shell handover | ticket-transfer (WEB-030 ↔ GST-014/GST-045) | WEB-030 hands the guest to GST-014 on the app — "The friend claims it in the app" (flow F55 step 4→5) | a twin exists on the same shell; hand over only where the device matters |
 | design | Claude Design | web 14/14 batches drawn, app 19/19 — the web is designed and the app is generated boxes, and the only app reference (TICVAI_Mobile.dc.html) uses a different design system from the drawn web frames | draw the app batches against the web's house style, or decide which system is the guest's |
 | documents | docs/active/mom-digest.md:3908 | "can differ in functionality" — a client minute says web and app may differ — the 12 September rule says they do not; worth confirming with the client | confirm with the client |
-| entry parameters | add-ons (WEB-008 ↔ GST-048/GST-056) | web opens with ['bundleId', 'cartId', 'venueId'], app with ['bundleId', 'cartId'] — one shared link cannot open both | one deep-link shape per capability |
+| entry parameters | add-ons (WEB-008 ↔ GST-048/GST-056) | web opens with ['bundleId', 'cartId', 'venueId'], app with ['bundleId', 'cartId', 'productId'] — one shared link cannot open both | one deep-link shape per capability |
 | entry parameters | ai-concierge (WEB-044 ↔ GST-031/GST-032/GST-033) | web opens with ['conversationId', 'messageId', 'outletId'], app with ['cartId', 'conversationId', 'messageId', 'orderId', 'outletId'] — one shared link cannot open both | one deep-link shape per capability |
 | entry parameters | cart (WEB-010 ↔ GST-041) | web opens with ['cartId', 'code', 'holdId', 'lineId', 'performanceId', 'venueId'], app with ['cartId', 'holdId', 'lineId', 'performanceId', 'productId', 'venueId'] — one shared link cannot open both | one deep-link shape per capability |
 | entry parameters | checkout-and-payment (WEB-011/WEB-012/WEB-014 ↔ GST-009) | web opens with ['cartId', 'holdId', 'orderId', 'paymentId', 'subjectId', 'token', 'venueId'], app with ['cartId', 'orderId', 'paymentId', 'token', 'venueId'] — one shared link cannot open both | one deep-link shape per capability |
-| entry parameters | date-and-session (WEB-006 ↔ GST-007) | web opens with ['cartId', 'entryId', 'eventId', 'performanceId', 'venueId'], app with ['cartId', 'entryId', 'eventId', 'venueId'] — one shared link cannot open both | one deep-link shape per capability |
-| entry parameters | detail (WEB-004 ↔ GST-004/GST-006) | web opens with ['eventId', 'productId'], app with ['bundleId', 'eventId', 'mapId', 'performanceId', 'productId'] — one shared link cannot open both | one deep-link shape per capability |
+| entry parameters | date-and-session (WEB-006 ↔ GST-007) | web opens with ['cartId', 'entryId', 'eventId', 'performanceId', 'productId', 'venueId'], app with ['cartId', 'entryId', 'eventId', 'venueId'] — one shared link cannot open both | one deep-link shape per capability |
+| entry parameters | detail (WEB-004 ↔ GST-004/GST-006) | web opens with ['eventId', 'productId', 'venueId'], app with ['bundleId', 'eventId', 'mapId', 'performanceId', 'productId'] — one shared link cannot open both | one deep-link shape per capability |
 | entry parameters | fnb-order (WEB-036 ↔ GST-024) | web opens with ['cartId', 'entryId', 'orderId', 'outletId', 'reservationId', 'venueId'], app with ['orderId', 'outletId', 'venueId'] — one shared link cannot open both | one deep-link shape per capability |
 | entry parameters | help-and-cases (WEB-025 ↔ GST-068) | web opens with ['caseId'], app with ['caseId', 'subjectId'] — one shared link cannot open both | one deep-link shape per capability |
 | entry parameters | help-content-and-accessibility (WEB-045 ↔ GST-040/GST-057) | web opens with —, app with ['caseId'] — one shared link cannot open both | one deep-link shape per capability |
 | entry parameters | home (WEB-001 ↔ GST-001) | web opens with —, app with ['subjectId'] — one shared link cannot open both | one deep-link shape per capability |
-| entry parameters | itinerary-planning (WEB-050 ↔ GST-051/GST-052/GST-053/GST-054/GST-059) | web opens with ['itemId', 'planId', 'venueId'], app with ['cartId', 'conversationId', 'itemId', 'planId', 'venueId'] — one shared link cannot open both | one deep-link shape per capability |
+| entry parameters | itinerary-planning (WEB-050 ↔ GST-051/GST-052/GST-053/GST-054/GST-059) | web opens with ['itemId', 'planId', 'venueId'], app with ['cartId', 'conversationId', 'dates', 'itemId', 'party', 'planId', 'venueId'] — one shared link cannot open both | one deep-link shape per capability |
 | entry parameters | memberships (WEB-022/WEB-023 ↔ GST-015) | web opens with ['caseId', 'orderId', 'productId', 'statementId', 'subjectId'], app with ['caseId', 'guestLinkId', 'statementId', 'subjectId'] — one shared link cannot open both | one deep-link shape per capability |
 | entry parameters | newsletter (WEB-027 ↔ GST-065) | web opens with ['subjectId', 'unsubscribeToken'], app with ['subjectId'] — one shared link cannot open both | one deep-link shape per capability |
 | entry parameters | offers (WEB-032 ↔ GST-037) | web opens with ['promotionId'], app with ['code', 'promotionId'] — one shared link cannot open both | one deep-link shape per capability |
@@ -155,7 +156,7 @@
 | entry parameters | parking (WEB-041 ↔ GST-027/GST-028) | web opens with ['cartId', 'entitlementId', 'venueId'], app with ['cartId', 'entitlementId', 'orderId', 'subjectId'] — one shared link cannot open both | one deep-link shape per capability |
 | entry parameters | privacy-security-devices (WEB-024 ↔ GST-066/GST-073) | web opens with ['deviceId', 'enrolmentId', 'itemId', 'methodId', 'subjectId'], app with ['challengeId', 'deviceId', 'methodId', 'subjectId'] — one shared link cannot open both | one deep-link shape per capability |
 | entry parameters | reservations (WEB-031 ↔ GST-016/GST-017) | web opens with ['groupBookingId', 'productId', 'reservationId', 'resourceId', 'subjectId'], app with ['reservationId', 'subjectId'] — one shared link cannot open both | one deep-link shape per capability |
-| entry parameters | seat-selection (WEB-007 ↔ GST-049) | web opens with ['eventId', 'holdId', 'performanceId', 'venueId'], app with ['eventId', 'holdId', 'performanceId'] — one shared link cannot open both | one deep-link shape per capability |
+| entry parameters | seat-selection (WEB-007 ↔ GST-049) | web opens with ['eventId', 'holdId', 'performanceId', 'productId', 'venueId'], app with ['eventId', 'holdId', 'performanceId'] — one shared link cannot open both | one deep-link shape per capability |
 | entry parameters | shop-and-drop (WEB-042 ↔ GST-062) | web opens with ['cartId', 'outletId'], app with ['subjectId'] — one shared link cannot open both | one deep-link shape per capability |
 | entry parameters | ticket-selection (WEB-005 ↔ GST-008) | web opens with ['cartId', 'productId', 'venueId'], app with ['cartId', 'performanceId', 'productId', 'venueId'] — one shared link cannot open both | one deep-link shape per capability |
 | entry parameters | tickets (WEB-018 ↔ GST-012/GST-013) | web opens with ['entitlementId', 'orderId', 'subjectId'], app with ['credentialId', 'entitlementId', 'orderId', 'subjectId'] — one shared link cannot open both | one deep-link shape per capability |
@@ -179,14 +180,15 @@
 | frontend manifest | frontend/guest-app.yaml | also carries KSK screens — the kiosk (reactWeb) ships inside the reactNative guest app while the web, the app's sibling, ships separately | decide whether TICVAI Guest is one codebase or three |
 | machine | itinerary-planning (WEB-050 ↔ GST-051/GST-052/GST-053/GST-054/GST-059) | declared on the app only |  |
 | operations | add-ons (WEB-008 ↔ GST-048/GST-056) | the web calls getPublishedBookingFlow here; the app calls getPublishedBookingFlow on GST-007/GST-008/GST-009/GST-041 | same operations on the same capability, so a guest finds it in the same place |
-| operations | add-ons (WEB-008 ↔ GST-048/GST-056) | the app calls getCart here; the web calls getCart on WEB-006/WEB-010/WEB-011 | same operations on the same capability, so a guest finds it in the same place |
+| operations | add-ons (WEB-008 ↔ GST-048/GST-056) | the app calls getCart, listProductVariants here; the web calls getCart on WEB-006/WEB-010/WEB-011; listProductVariants on WEB-005/WEB-048 | same operations on the same capability, so a guest finds it in the same place |
 | operations | ai-concierge (WEB-044 ↔ GST-031/GST-032/GST-033) | the app calls addCartLine, checkoutCart, createGuestFnbOrder, getCart, getGuestOrderStatus here; the web calls addCartLine on WEB-005/WEB-006/WEB-008/WEB-010/WEB-033/WEB-036/WEB-041/WEB-042/WEB-047/WEB-048/WEB-049; checkoutCart on WEB-010/WEB-012/WEB-033; createGuestFnbOrder on WEB-036; getCart on WEB-006/WEB-010/WEB-011; getGuestOrderStatus on WEB-036/WEB-038 | same operations on the same capability, so a guest finds it in the same place |
-| operations | cart (WEB-010 ↔ GST-041) | the web calls addCartLine, getCouponCode here; the app calls addCartLine on GST-007/GST-008/GST-026/GST-027/GST-032/GST-048/GST-050/GST-056/GST-070/GST-074/GST-075/GST-077/GST-078; getCouponCode on GST-037 | same operations on the same capability, so a guest finds it in the same place |
+| operations | cart (WEB-010 ↔ GST-041) | the web calls addCartLine, getGuestCouponCode here; the app calls addCartLine on GST-007/GST-008/GST-026/GST-027/GST-032/GST-048/GST-050/GST-056/GST-070/GST-074/GST-075/GST-077/GST-078; getGuestCouponCode on GST-037 | same operations on the same capability, so a guest finds it in the same place |
 | operations | cart (WEB-010 ↔ GST-041) | the app calls claimCart, listProductVariants here; the web calls claimCart on WEB-016; listProductVariants on WEB-005/WEB-048 | same operations on the same capability, so a guest finds it in the same place |
 | operations | checkout-and-payment (WEB-011/WEB-012/WEB-014 ↔ GST-009) | the web calls getMyProfile, getOrder, listConsentPurposes, recordConsentAnswers, updateMyProfile here; the app calls getMyProfile on GST-001/GST-039; getOrder on GST-010/GST-018/GST-019/GST-028/GST-067; listConsentPurposes on GST-039/GST-065/GST-066/GST-071; recordConsentAnswers on GST-007; updateMyProfile on GST-039 | same operations on the same capability, so a guest finds it in the same place |
-| operations | date-and-session (WEB-006 ↔ GST-007) | the web calls getPerformance here; the app calls getPerformance on GST-006/GST-041 | same operations on the same capability, so a guest finds it in the same place |
+| operations | date-and-session (WEB-006 ↔ GST-007) | the web calls createCart, getPerformance, getProduct here; the app calls createCart on GST-008/GST-041/GST-050/GST-075; getPerformance on GST-006/GST-041/GST-049; getProduct on GST-004/GST-006 | same operations on the same capability, so a guest finds it in the same place |
 | operations | date-and-session (WEB-006 ↔ GST-007) | the app calls listProductCategories, listProducts here; the web calls listProductCategories on WEB-002/WEB-005; listProducts on WEB-001/WEB-002/WEB-003/WEB-005/WEB-022/WEB-035/WEB-048/WEB-050 | same operations on the same capability, so a guest finds it in the same place |
-| operations | detail (WEB-004 ↔ GST-004/GST-006) | the app calls getBundle, getPerformance, getVenueMap here; the web calls getBundle on WEB-008; getPerformance on WEB-006/WEB-010; getVenueMap on WEB-039/WEB-047 | same operations on the same capability, so a guest finds it in the same place |
+| operations | detail (WEB-004 ↔ GST-004/GST-006) | the web calls getPublishedBookingFlow here; the app calls getPublishedBookingFlow on GST-007/GST-008/GST-009/GST-041 | same operations on the same capability, so a guest finds it in the same place |
+| operations | detail (WEB-004 ↔ GST-004/GST-006) | the app calls getGuestBundle, getPerformance, getVenueMap here; the web calls getGuestBundle on WEB-008; getPerformance on WEB-006/WEB-007/WEB-010; getVenueMap on WEB-039/WEB-047 | same operations on the same capability, so a guest finds it in the same place |
 | operations | fnb-order (WEB-036 ↔ GST-024) | the web calls addCartLine, createTableReservation, joinRestaurantWaitlist, leaveRestaurantWaitlist, listMyTableReservations, updateTableReservation here; the app calls addCartLine on GST-007/GST-008/GST-026/GST-027/GST-032/GST-048/GST-050/GST-056/GST-070/GST-074/GST-075/GST-077/GST-078; createTableReservation on GST-070; joinRestaurantWaitlist on GST-070; leaveRestaurantWaitlist on GST-070; listMyTableReservations on GST-070; updateTableReservation on GST-070 | same operations on the same capability, so a guest finds it in the same place |
 | operations | help-and-cases (WEB-025 ↔ GST-068) | the web calls getTenantAppStatus, listPublishedFaqs here; the app calls getTenantAppStatus on GST-001/GST-029/GST-038/GST-040/GST-047/GST-051; listPublishedFaqs on GST-040 | same operations on the same capability, so a guest finds it in the same place |
 | operations | help-and-cases (WEB-025 ↔ GST-068) | the app calls listAiConversations here; the web calls listAiConversations on WEB-044 | same operations on the same capability, so a guest finds it in the same place |
@@ -195,26 +197,27 @@
 | operations | itinerary-planning (WEB-050 ↔ GST-051/GST-052/GST-053/GST-054/GST-059) | the app calls createAiConversation, getWaitTimes, requestSuggestion, sendAiMessage here; the web calls createAiConversation on WEB-044; getWaitTimes on WEB-002/WEB-004/WEB-039/WEB-040; requestSuggestion on WEB-044; sendAiMessage on WEB-044 | same operations on the same capability, so a guest finds it in the same place |
 | operations | memberships (WEB-022/WEB-023 ↔ GST-015) | the web calls getProduct here; the app calls getProduct on GST-004/GST-006 | same operations on the same capability, so a guest finds it in the same place |
 | operations | memberships (WEB-022/WEB-023 ↔ GST-015) | the app calls listDelegations here; the web calls listDelegations on WEB-024 | same operations on the same capability, so a guest finds it in the same place |
-| operations | offers (WEB-032 ↔ GST-037) | the app calls getCouponCode here; the web calls getCouponCode on WEB-010 | same operations on the same capability, so a guest finds it in the same place |
-| operations | order-history (WEB-019 ↔ GST-019) | the web calls createRefundRequest here; the app calls createRefundRequest on GST-067 | same operations on the same capability, so a guest finds it in the same place |
+| operations | offers (WEB-032 ↔ GST-037) | the app calls getGuestCouponCode here; the web calls getGuestCouponCode on WEB-010 | same operations on the same capability, so a guest finds it in the same place |
+| operations | order-history (WEB-019 ↔ GST-019) | the web calls createRefundRequest, listOwnRefundRequests here; the app calls createRefundRequest on GST-067; listOwnRefundRequests on GST-067 | same operations on the same capability, so a guest finds it in the same place |
 | operations | parking (WEB-041 ↔ GST-027/GST-028) | the app calls getOrder, listMyEntitlements here; the web calls getOrder on WEB-012/WEB-013/WEB-019; listMyEntitlements on WEB-001/WEB-017/WEB-018/WEB-024 | same operations on the same capability, so a guest finds it in the same place |
 | operations | privacy-security-devices (WEB-024 ↔ GST-066/GST-073) | the web calls getFacePassEnrolment, getWishlist, listDelegations, listMyEntitlements, revokeFacePass here; the app calls getFacePassEnrolment on GST-069; getWishlist on GST-020; listDelegations on GST-015/GST-069; listMyEntitlements on GST-001/GST-012/GST-028/GST-045/GST-055/GST-062/GST-069; revokeFacePass on GST-069 | same operations on the same capability, so a guest finds it in the same place |
 | operations | privacy-security-devices (WEB-024 ↔ GST-066/GST-073) | the app calls getGuestSession, guestLogout, verifyGuestEmail here; the web calls getGuestSession on WEB-016; guestLogout on WEB-016; verifyGuestEmail on WEB-013/WEB-020 | same operations on the same capability, so a guest finds it in the same place |
 | operations | profile (WEB-020 ↔ GST-039) | the web calls verifyGuestEmail here; the app calls verifyGuestEmail on GST-010/GST-073 | same operations on the same capability, so a guest finds it in the same place |
-| operations | reservations (WEB-031 ↔ GST-016/GST-017) | the web calls getGroupBooking, getGroupPackageDefinition, listGroupPackages, listMyTableReservations, requestGroupBooking, updateTableReservation here; the app calls getGroupBooking on GST-072; getGroupPackageDefinition on GST-072; listGroupPackages on GST-072; listMyTableReservations on GST-070; requestGroupBooking on GST-072; updateTableReservation on GST-070 | same operations on the same capability, so a guest finds it in the same place |
-| operations | search (WEB-003 ↔ GST-063) | the web calls listProducts here; the app calls listProducts on GST-001/GST-002/GST-003/GST-005/GST-007/GST-008/GST-015/GST-021/GST-038/GST-044/GST-050/GST-051/GST-052/GST-075 | same operations on the same capability, so a guest finds it in the same place |
+| operations | reservations (WEB-031 ↔ GST-016/GST-017) | the web calls getGroupBooking, getGroupPackageDefinition, listGroupPackages, listMyTableReservations, listProductStartTimes, requestGroupBooking, updateTableReservation here; the app calls getGroupBooking on GST-072; getGroupPackageDefinition on GST-072; listGroupPackages on GST-072; listMyTableReservations on GST-070; listProductStartTimes on GST-075; requestGroupBooking on GST-072; updateTableReservation on GST-070 | same operations on the same capability, so a guest finds it in the same place |
+| operations | search (WEB-003 ↔ GST-063) | the web calls listProducts here; the app calls listProducts on GST-001/GST-002/GST-003/GST-005/GST-007/GST-008/GST-015/GST-021/GST-038/GST-044/GST-050/GST-051/GST-075 | same operations on the same capability, so a guest finds it in the same place |
 | operations | seat-selection (WEB-007 ↔ GST-049) | the web calls getPublishedBookingFlow here; the app calls getPublishedBookingFlow on GST-007/GST-008/GST-009/GST-041 | same operations on the same capability, so a guest finds it in the same place |
 | operations | shop (WEB-033 ↔ GST-026) | the web calls checkoutCart, createPayment here; the app calls checkoutCart on GST-009/GST-032/GST-041; createPayment on GST-009 | same operations on the same capability, so a guest finds it in the same place |
 | operations | shop-and-drop (WEB-042 ↔ GST-062) | the web calls addCartLine, listMerchandise here; the app calls addCartLine on GST-007/GST-008/GST-026/GST-027/GST-032/GST-048/GST-050/GST-056/GST-070/GST-074/GST-075/GST-077/GST-078; listMerchandise on GST-026 | same operations on the same capability, so a guest finds it in the same place |
 | operations | shop-and-drop (WEB-042 ↔ GST-062) | the app calls listMyEntitlements here; the web calls listMyEntitlements on WEB-001/WEB-017/WEB-018/WEB-024 | same operations on the same capability, so a guest finds it in the same place |
 | operations | sign-in (WEB-016 ↔ GST-042) | the web calls claimCart here; the app calls claimCart on GST-041 | same operations on the same capability, so a guest finds it in the same place |
-| operations | ticket-transfer (WEB-030 ↔ GST-014/GST-045) | the web calls createResaleListing here; the app calls createResaleListing on GST-067 | same operations on the same capability, so a guest finds it in the same place |
+| operations | ticket-selection (WEB-005 ↔ GST-008) | the app calls createCart here; the web calls createCart on WEB-006/WEB-010/WEB-048 | same operations on the same capability, so a guest finds it in the same place |
+| operations | ticket-transfer (WEB-030 ↔ GST-014/GST-045) | the web calls createResaleListing, listOwnResaleListings here; the app calls createResaleListing on GST-067; listOwnResaleListings on GST-067 | same operations on the same capability, so a guest finds it in the same place |
 | operations | ticket-transfer (WEB-030 ↔ GST-014/GST-045) | the app calls listMyEntitlements, listTicketTransfers here; the web calls listMyEntitlements on WEB-001/WEB-017/WEB-018/WEB-024; listTicketTransfers on WEB-018 | same operations on the same capability, so a guest finds it in the same place |
 | operations | tickets (WEB-018 ↔ GST-012/GST-013) | the web calls issueWalletPass, shareEntitlement here; the app calls issueWalletPass on GST-018; shareEntitlement on GST-072 | same operations on the same capability, so a guest finds it in the same place |
 | operations | venue-info (WEB-028 ↔ GST-029) | the app calls listDeliveryLocations, listDiningOutlets here; the web calls listDeliveryLocations on WEB-036; listDiningOutlets on WEB-036 | same operations on the same capability, so a guest finds it in the same place |
 | operations | venue-map-and-wait-times (WEB-039 ↔ GST-021/GST-022) | the web calls listQueues here; the app calls listQueues on GST-023 | same operations on the same capability, so a guest finds it in the same place |
 | operations | venue-map-and-wait-times (WEB-039 ↔ GST-021/GST-022) | the app calls listProducts here; the web calls listProducts on WEB-001/WEB-002/WEB-003/WEB-005/WEB-022/WEB-035/WEB-048/WEB-050 | same operations on the same capability, so a guest finds it in the same place |
-| operations | wallet-and-payment-methods (WEB-021 ↔ GST-011/GST-071) | the app calls getPublishedTenantConfig, listConsentPurposes, redeemLoyaltyPoints here; the web calls getPublishedTenantConfig on WEB-001/WEB-029; listConsentPurposes on WEB-011/WEB-020/WEB-024/WEB-027; redeemLoyaltyPoints on WEB-043 | same operations on the same capability, so a guest finds it in the same place |
+| operations | wallet-and-payment-methods (WEB-021 ↔ GST-011/GST-071) | the app calls getLoyaltyPosition, listRewards, redeemLoyaltyPoints here; the web calls getLoyaltyPosition on WEB-017/WEB-043; listRewards on WEB-043; redeemLoyaltyPoints on WEB-043 | same operations on the same capability, so a guest finds it in the same place |
 | overlays | ai-concierge (WEB-044 ↔ GST-031/GST-032/GST-033) | declared on the app only |  |
 | overlays | checkout-and-payment (WEB-011/WEB-012/WEB-014 ↔ GST-009) | declared on the web only |  |
 | overlays | fnb-order (WEB-036 ↔ GST-024) | declared on the web only |  |
@@ -244,12 +247,24 @@
 | states | virtual-queue (WEB-040 ↔ GST-023) | web only ['emptyNoResults'], app only — |  |
 | states | waiting-room (WEB-015 ↔ GST-046) | web only ['emptyNoAccess'], app only — |  |
 | states | wishlist (WEB-009 ↔ GST-020) | web only ['emptyNoAccess'], app only — |  |
+| unbound operations | add-ons (WEB-008 ↔ GST-048/GST-056) | GST-048 declares listProductVariants, recordRecommendationEvents and no component in its layout calls them; the twin binds or lacks listProductVariants | bind each to a component, or move it to the screen that calls it |
+| unbound operations | browse (WEB-002 ↔ GST-002/GST-003/GST-005) | GST-005 declares listEvents and no component in its layout calls it; the twin binds or lacks listEvents | bind each to a component, or move it to the screen that calls it |
+| unbound operations | date-and-session (WEB-006 ↔ GST-007) | WEB-006 declares checkBookingEligibility, createCart, getCart, getProduct, recordConsentAnswers and no component in its layout calls them; the twin binds or lacks createCart, getProduct | bind each to a component, or move it to the screen that calls it |
 | unbound operations | date-and-session (WEB-006 ↔ GST-007) | GST-007 declares addCartLine, checkBookingEligibility, getCart, recordConsentAnswers and no component in its layout calls them; the twin binds or lacks addCartLine | bind each to a component, or move it to the screen that calls it |
+| unbound operations | detail (WEB-004 ↔ GST-004/GST-006) | WEB-004 declares getPublishedBookingFlow and no component in its layout calls it; the twin binds or lacks getPublishedBookingFlow | bind each to a component, or move it to the screen that calls it |
 | unbound operations | fnb-order (WEB-036 ↔ GST-024) | WEB-036 declares addCartLine and no component in its layout calls it; the twin binds or lacks addCartLine | bind each to a component, or move it to the screen that calls it |
+| unbound operations | help-and-cases (WEB-025 ↔ GST-068) | GST-068 declares getMyCase and no component in its layout calls it; the twin binds or lacks getMyCase | bind each to a component, or move it to the screen that calls it |
 | unbound operations | itinerary-planning (WEB-050 ↔ GST-051/GST-052/GST-053/GST-054/GST-059) | GST-054 declares createAiConversation, requestSuggestion and no component in its layout calls them; the twin binds or lacks createAiConversation, requestSuggestion | bind each to a component, or move it to the screen that calls it |
+| unbound operations | itinerary-planning (WEB-050 ↔ GST-051/GST-052/GST-053/GST-054/GST-059) | GST-059 declares listMyVisitPlans and no component in its layout calls it; the twin binds or lacks listMyVisitPlans | bind each to a component, or move it to the screen that calls it |
+| unbound operations | order-history (WEB-019 ↔ GST-019) | WEB-019 declares listOwnRefundRequests and no component in its layout calls it; the twin binds or lacks listOwnRefundRequests | bind each to a component, or move it to the screen that calls it |
 | unbound operations | privacy-security-devices (WEB-024 ↔ GST-066/GST-073) | GST-073 declares registerGuestDevice, verifyMfaEnrolment and no component in its layout calls them; the twin binds or lacks registerGuestDevice, verifyMfaEnrolment | bind each to a component, or move it to the screen that calls it |
+| unbound operations | reservations (WEB-031 ↔ GST-016/GST-017) | WEB-031 declares listOwnGroupBookings and no component in its layout calls it; the twin binds or lacks listOwnGroupBookings | bind each to a component, or move it to the screen that calls it |
+| unbound operations | ticket-selection (WEB-005 ↔ GST-008) | GST-008 declares createCart and no component in its layout calls it; the twin binds or lacks createCart | bind each to a component, or move it to the screen that calls it |
+| unbound operations | ticket-transfer (WEB-030 ↔ GST-014/GST-045) | WEB-030 declares listOwnResaleListings and no component in its layout calls it; the twin binds or lacks listOwnResaleListings | bind each to a component, or move it to the screen that calls it |
+| unbound operations | wallet-and-payment-methods (WEB-021 ↔ GST-011/GST-071) | WEB-021 declares getPublishedTenantConfig, listConsentPurposes and no component in its layout calls them; the twin binds or lacks getPublishedTenantConfig, listConsentPurposes | bind each to a component, or move it to the screen that calls it |
+| unbound operations | wallet-and-payment-methods (WEB-021 ↔ GST-011/GST-071) | GST-071 declares getLoyaltyPosition, listRewards and no component in its layout calls them; the twin binds or lacks getLoyaltyPosition, listRewards | bind each to a component, or move it to the screen that calls it |
 
-## Low — 218
+## Low — 217
 
 | Dimension | Where | Difference | Resolve by |
 |---|---|---|---|
@@ -323,9 +338,8 @@
 | components | venue-info (WEB-028 ↔ GST-029) | web only —, app only ['cardList', 'selectField', 'toggle'] (1 vs 5 components) |  |
 | components | wallet-and-payment-methods (WEB-021 ↔ GST-011/GST-071) | web only —, app only ['consentBlock', 'numberField', 'selectField', 'toggle'] (7 vs 15 components) |  |
 | components | wishlist (WEB-009 ↔ GST-020) | web only ['confirmDialog'], app only — (5 vs 4 components) |  |
-| coverage | refunds-and-resale | GST-067 Refunds & Resale has no web screen; its operations are on WEB-019, WEB-030 | draw the screen on the other shell, or record the fold as the decision |
 | coverage | share-and-group-booking | GST-072 Share & Group Booking has no web screen; its operations are on WEB-017, WEB-018, WEB-031, WEB-043 | draw the screen on the other shell, or record the fold as the decision |
-| documents | contracts/spine/catalogue.yaml:1612 | "browses by category and cannot search" — GST-063 Search exists since 17 August | rewrite to the 12 September rule |
+| documents | contracts/spine/catalogue.yaml:1683 | "browses by category and cannot search" — GST-063 Search exists since 17 August | rewrite to the 12 September rule |
 | documents | docs/active/design-plan.md:267 | "guest-app surfaces are not" — P02 is offlineCapable: true | rewrite to the 12 September rule |
 | documents | docs/registers/conflicts.md:145 | "stay app-only by design" — CF-93 predates WEB-036–046 and the 10 September decision | rewrite to the 12 September rule |
 | layout split | add-ons (WEB-008 ↔ GST-048/GST-056) | 1 screen(s) on the web, 2 on the app: Add-ons & Upsell ↔ Upsell / Cross-Sell; Bundle Package | fine if deliberate; a builder should know it is one capability |
@@ -455,29 +469,30 @@
 | state wording | wallet-and-payment-methods (WEB-021 ↔ GST-011/GST-071) | 5 state(s) worded differently: emptyFirstRun, emptyNoAccess, emptyNoResults, error, loading | one copy per state — the 12 September offline sync is the model |
 | state wording | wishlist (WEB-009 ↔ GST-020) | 3 state(s) worded differently: emptyFirstRun, error, loading | one copy per state — the 12 September offline sync is the model |
 | unbound operations | add-ons (WEB-008 ↔ GST-048/GST-056) | WEB-008 declares recordRecommendationEvents and no component in its layout calls it | bind each to a component, or move it to the screen that calls it |
-| unbound operations | add-ons (WEB-008 ↔ GST-048/GST-056) | GST-048 declares recordRecommendationEvents and no component in its layout calls it | bind each to a component, or move it to the screen that calls it |
 | unbound operations | ai-concierge (WEB-044 ↔ GST-031/GST-032/GST-033) | WEB-044 declares createAiConversation, requestSuggestion and no component in its layout calls them | bind each to a component, or move it to the screen that calls it |
 | unbound operations | ai-concierge (WEB-044 ↔ GST-031/GST-032/GST-033) | GST-031 declares createAiConversation, requestSuggestion and no component in its layout calls them | bind each to a component, or move it to the screen that calls it |
 | unbound operations | ai-concierge (WEB-044 ↔ GST-031/GST-032/GST-033) | GST-033 declares createAiConversation and no component in its layout calls it | bind each to a component, or move it to the screen that calls it |
 | unbound operations | cart (WEB-010 ↔ GST-041) | WEB-010 declares createCart, getResourceHold and no component in its layout calls them | bind each to a component, or move it to the screen that calls it |
 | unbound operations | cart (WEB-010 ↔ GST-041) | GST-041 declares createCart, getResourceHold and no component in its layout calls them | bind each to a component, or move it to the screen that calls it |
-| unbound operations | date-and-session (WEB-006 ↔ GST-007) | WEB-006 declares checkBookingEligibility, getCart, recordConsentAnswers and no component in its layout calls them | bind each to a component, or move it to the screen that calls it |
 | unbound operations | home (WEB-001 ↔ GST-001) | WEB-001 declares getCookieConsentRuntime, recordStorefrontSessionEvents and no component in its layout calls them | bind each to a component, or move it to the screen that calls it |
 | unbound operations | home (WEB-001 ↔ GST-001) | GST-001 declares getCookieConsentRuntime, recordStorefrontSessionEvents and no component in its layout calls them | bind each to a component, or move it to the screen that calls it |
-| unbound operations | seat-selection (WEB-007 ↔ GST-049) | WEB-007 declares relinquishSeatHold and no component in its layout calls it | bind each to a component, or move it to the screen that calls it |
-| unbound operations | seat-selection (WEB-007 ↔ GST-049) | GST-049 declares relinquishSeatHold and no component in its layout calls it | bind each to a component, or move it to the screen that calls it |
+| unbound operations | seat-selection (WEB-007 ↔ GST-049) | WEB-007 declares getPerformance, relinquishSeatHold and no component in its layout calls them | bind each to a component, or move it to the screen that calls it |
+| unbound operations | seat-selection (WEB-007 ↔ GST-049) | GST-049 declares getPerformance, relinquishSeatHold and no component in its layout calls them | bind each to a component, or move it to the screen that calls it |
 | unbound operations | sign-in (WEB-016 ↔ GST-042) | WEB-016 declares claimDeviceConsent, createMfaChallenge, refreshToken and no component in its layout calls them | bind each to a component, or move it to the screen that calls it |
 | unbound operations | sign-in (WEB-016 ↔ GST-042) | GST-042 declares claimDeviceConsent, createMfaChallenge, refreshToken and no component in its layout calls them | bind each to a component, or move it to the screen that calls it |
+| unbound operations | space-by-the-hour (WEB-048 ↔ GST-075) | WEB-048 declares createCart and no component in its layout calls it | bind each to a component, or move it to the screen that calls it |
+| unbound operations | space-by-the-hour (WEB-048 ↔ GST-075) | GST-075 declares createCart and no component in its layout calls it | bind each to a component, or move it to the screen that calls it |
 | unbound operations | tickets (WEB-018 ↔ GST-012/GST-013) | WEB-018 declares listTicketTransfers and no component in its layout calls it | bind each to a component, or move it to the screen that calls it |
 | unbound operations | tickets (WEB-018 ↔ GST-012/GST-013) | GST-012 declares listTicketTransfers and no component in its layout calls it | bind each to a component, or move it to the screen that calls it |
 | unbound operations | tickets (WEB-018 ↔ GST-012/GST-013) | GST-013 declares listTicketTransfers and no component in its layout calls it | bind each to a component, or move it to the screen that calls it |
 
-## Info — 3
+## Info — 4
 
 | Dimension | Where | Difference | Resolve by |
 |---|---|---|---|
 | coverage | dynamic-qr-ticket | GST-055 Dynamic QR Ticket — app only (deliberate). The 2 September session decided a dynamic-QR ticket bought on the web is redirected into the app, because a credential that needs a network round trip at a gate fails at the gate (_components.yaml, credentialPresenter). Since 28 September the code is derived on the device from the `rotation` seed (audit R230), and the web's My Tickets shows the same rotating code. Not callable on the web: bindCredentialDevice. |  |
 | coverage | face-pass | GST-069 Face Pass — app only (deliberate). enrolFacePass needs a camera and a liveness check (apply-web-parity.py). Viewing and revoking an enrolment are on the web's Devices, Wishlist & Consent. Not callable on the web: enrolFacePass. |  |
+| operations | browse (WEB-002 ↔ GST-002/GST-003/GST-005) | the app calls listEvents and the web cannot call it anywhere — sanctioned: r8 integration (GPS-C30, CHG-R8INT-017): the app's What's On (GST-005) lists the venue's events with `listEvents`, because the prototype's rows name the event and its run; the web's one listing (WEB-002) shows the same events as products with their performances (`listProducts`, `listPerformances`), so it has no events list of its own to call it for. |  |
 | operations | transport (WEB-049 ↔ GST-076/GST-077/GST-078/GST-079) | the app calls getTransportDeparture and the web cannot call it anywhere — sanctioned: CHG-GTRB-007 - GST-077 is a screen of its own, opened on one departure, so it reloads that departure (getTransportDeparture, CHG-R1S-004); WEB-049 draws the departures beside the route from searchTransportDepartures and never opens one by id. The two shells read the same records through different operations. |  |
 
 ## Capability groups

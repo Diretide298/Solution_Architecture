@@ -1,7 +1,7 @@
 {
  "CapacityPack": {
   "type": "object",
-  "x-ticvai-persistence": "subscription.capacity_pack",
+  "x-ticvai-persistence": "control.capacity_pack",
   "description": "Board 3.8. **A good season should not require renegotiating a contract in August.**\n",
   "required": [
    "tenantId",
@@ -14,7 +14,7 @@
     "format": "uuid"
    },
    "tenantId": {
-    "x-ticvai-references": "none",
+    "x-ticvai-references": "control.tenant",
     "type": "string",
     "format": "uuid"
    },
@@ -128,6 +128,7 @@
     "description": "**Three standard packages, and custom ones allowed** (decided 29 September, Chinmay)."
    },
    "offeredToTenantId": {
+    "x-ticvai-references": "control.tenant",
     "type": "string",
     "format": "uuid",
     "nullable": true,
@@ -137,7 +138,7 @@
  },
  "ModuleListing": {
   "type": "object",
-  "x-ticvai-persistence": "subscription.module_listing",
+  "x-ticvai-persistence": "control.module_listing",
   "description": "Board 4.6. **A marketplace without a dependency graph sells combinations that cannot be provisioned.**\n**TICVAI configures each module's price here, and tenants are billed per module (decided 29 September, Chinmay).** A usage-priced module (the AI module's tokens) has `pricingBasis` `metered`: `price` is then per `meteredUnitSize` units of `meteredMetric`, and the invoice carries it as a `metered` line.\n",
   "required": [
    "moduleCode"
@@ -348,8 +349,13 @@
   }
  },
  "Plan": {
-  "x-ticvai-persistence": "subscription.plan + subscription.plan_module + subscription.plan_limit",
-  "description": "**A plan's modules and limits are rows, keyed on `plan_id`.** `licensedModules` and `limits` are required on every plan, and `subscription.plan` alone had no column for either — so the licence position, the downgrade check and every module gate had nothing to read. `plan_module` holds one row per licensed `ModuleKey`; `plan_limit` one row per `EntitlementLimit`. Both belong to the plan version the row is, so a subscriber on an earlier version keeps the modules and limits they were sold.",
+  "x-ticvai-persistence": "control.plan + control.plan_module + control.plan_limit",
+  "x-ticvai-version-key": "version",
+  "x-ticvai-primary-key": [
+   "id",
+   "version"
+  ],
+  "description": "**A plan's modules and limits are rows, keyed on `plan_id`.** `licensedModules` and `limits` are required on every plan, and `control.plan` alone had no column for either — so the licence position, the downgrade check and every module gate had nothing to read. `plan_module` holds one row per licensed `ModuleKey`; `plan_limit` one row per `EntitlementLimit`. Both belong to the plan version the row is, so a subscriber on an earlier version keeps the modules and limits they were sold.",
   "allOf": [
    {
     "$ref": "#/components/schemas/CreatePlanRequest"

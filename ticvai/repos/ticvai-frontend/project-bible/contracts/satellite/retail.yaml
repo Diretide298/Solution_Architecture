@@ -458,6 +458,9 @@ paths:
                     running out, which is almost always a configuration error.
                 imageAssetRef: { type: string, nullable: true }
                 isReturnable: { type: boolean }
+                isDroppable:
+                  type: boolean
+                  description: Whether the item may go to shop-and-drop (R8 blocker APPROVALS-TENANCY-C34).
                 returnWindowDays: { type: integer, minimum: 0 }
                 requiresSerialNumber: { type: boolean }
                 isActive: { type: boolean }
@@ -522,6 +525,11 @@ paths:
         Pattern 4; CHG-GCF-001; `x-ticvai-guest-callable`): a guest or a visitor gets active merchandise that
         is on sale, and nothing in draft, unpublished or withdrawn; asked for by id, such a record answers as
         not found. `PRODUCT_VIEW` is what a staff caller must hold, and staff also see drafts (ADR-0025).
+
+        **A guest gets a narrower answer** (r8 walk of ticket 27820): `sku` and `siblingOutlets` are staff-only
+        (`x-ticvai-staff-only`) and are left out of a guest response, which shows `isAvailable`. `onHand` stays in it,
+        because `PriceCheck` requires it and leaving it out would break the tills built against it. "Published" is the
+        merchandise record's `isPublished` flag, set by `PRODUCT_CONFIGURE` holders.
       tags: [floor]
       x-ticvai-permission: PRODUCT_VIEW
       x-ticvai-guest-callable: true
@@ -914,6 +922,14 @@ paths:
         principal, who must hold `ORDER_REFUND_APPROVE` at this venue and must not be the caller;
         a failure is a `403` (`supervisor-step-up-refused`) and nothing is written. Missing when
         the amount needs it, the return is refused with the `409` below.
+
+        **Thresholds: two, both step-up** (r8 walk of tickets 27820 and 27823; lead decision of 20 October 2026,
+        option A, following R144 and POS-011 "no approval-request path"). `ReturnPolicy.selfAuthoriseLimit` (up to
+        it, one cashier alone) and `requiresSecondUserAbove` (above it, a second user) both mean the supervisor
+        step-up above; neither raises an approval request. **`requiresApprovalAbove` is retired** and `requiresApproval`
+        is no longer a refused reason. **A cash refund on a card sale is refused** with `refusedReason`
+        `cashRefundOnCardSale` unless the outlet's `allowCashRefundOnCardSale` is true; flow F34's "cannot configure
+        its way out" is corrected to that.
       tags: [return]
       x-ticvai-permission: ORDER_REFUND
       x-ticvai-permission-escalated: ORDER_REFUND_APPROVE
@@ -1164,6 +1180,11 @@ paths:
         out, pays at checkout, and on payment the order service calls this with `orderId`
         (and no `saleId`), once per order, naming the retail lines marked for collection in
         `lineIds`. A staff caller at a till sends `saleId`. Exactly one of the two is sent.
+
+        **Collection point hours** (r8 walk of ticket 27820): the collection point (`fnb.DeliveryLocation`) has
+        `opensAt` and `closesAt` (time of day, local to the venue). The drop is refused 409 `collectionPointClosed`
+        when it would be collected while the point is closed, and `collectBy` defaults to the close of the point's
+        day when the request sends none.
       tags: [floor]
       x-ticvai-permission: ORDER_CREATE
       x-ticvai-scope-level: workstation
@@ -1300,11 +1321,20 @@ paths:
       operationId: collectShopAndDrop
       x-ticvai-consumed-by:
         - "P04 POS-012 Omnichannel Order & Fulfilment Center"
+      x-ticvai-read-via:
+      - query: fnb#deliveryLocationRecords
+        route: in-process
+        for: 'the collection point''s closing time behind the default collectBy, fnb.delivery_location, F&B''s data (r8 integration, CHG-R8INT-014)'
       x-ticvai-audience: [staff]
       summary: Hand the goods over
       description: >
         Records who handed over and against what. Partial collection is permitted — a guest
         may take some and leave the rest for a later trip on the same ticket.
+
+        **The collection deadline** (r8 walk of ticket 27820): `pastCollectBy` applies to a drop in
+        `awaitingCollection` or `partiallyCollected` only. A drop that was never collected (the uncollected reversal
+        has run) collects without it. The default `collectBy` is the close of the collection point's day (its
+        `closesAt`, see `createShopAndDrop`).
       tags: [floor]
       x-ticvai-permission: ORDER_MODIFY
       x-ticvai-scope-level: venue
@@ -1323,6 +1353,19 @@ paths:
                 lineIds:
                   type: array
                   items: { type: string }
+                  description: Lines collected in full. Kept for clients built before `lines`; ignored when `lines` is sent.
+                lines:
+                  type: array
+                  description: '**What is handed over, per line** (R8 blocker APPROVALS-TENANCY-C34): each line''s
+                    `collectedQuantity` grows by `quantity`, never past the line''s `quantity` (a larger one is 400).
+                    Neither `lines` nor `lineIds` sent: every line''s remaining quantity is collected. The drop becomes
+                    `collected` when every line is fully collected, else `partiallyCollected`.'
+                  items:
+                    type: object
+                    required: [lineId, quantity]
+                    properties:
+                      lineId: { type: string }
+                      quantity: { type: integer, minimum: 1 }
                 verifiedBy:
                   type: string
                   enum: [entitlementScan, receipt, dropReference, staffOverride]
@@ -1367,6 +1410,10 @@ paths:
       - query: inventory#stockEarmarkRecords
         route: in-process
         for: 'its read of inventory.stock_earmark, Inventory''s data (CHG-MOD-001)'
+      # Retail and Inventory run in one deployable (operations), so the earmark is an in-process call, not a
+      # cross-deployable route (check-cross-deployable-writes X-STALE; r8 integration, CHG-R8INT-015).
+      x-ticvai-calls:
+      - inventory.createStockReservation
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -1395,6 +1442,11 @@ paths:
         `x-ticvai-guest-callable`): a guest needs no permission and acts only for themselves, on their own
         cart, hold, order or payment in their own session. `ORDER_CREATE` is what a staff caller must hold to
         do it for a guest at a till or in the back office (ADR-0025).
+
+
+        **The stock is set aside by Inventory, not by Retail** (R8 blocker APPROVALS-TENANCY-C34): each line
+        earmarks its merchandise's stock item through Inventory's `createStockReservation`, in process, with
+        `sourceType` `retailReservation` and `sourceId` this reservation's `id`; the earmark expires with it.
       tags: [floor]
       x-ticvai-permission: ORDER_CREATE
       x-ticvai-guest-callable: true
@@ -1762,6 +1814,12 @@ components:
         requiresSerialNumber: { type: boolean, default: false }
         imageAssetRef: { type: string, nullable: true }
         isActive: { type: boolean }
+        isDroppable:
+          type: boolean
+          default: true
+          description: '**Whether the item may be dropped for later collection** (R8 blocker APPROVALS-TENANCY-C34). True
+            unless the venue sets it false for a chilled, fragile or oversized item; `createShopAndDrop` refuses a sale
+            with such a line, 409 `itemNotDroppable`.'
 
     GuestMerchandiseItem:
       x-ticvai-persistence: "none — guest projection of MerchandiseItem"
@@ -1834,6 +1892,11 @@ components:
         returnWindowDays: { type: integer }
         requiresSerialNumber: { type: boolean, default: false }
         imageAssetRef: { type: string }
+        isDroppable:
+          type: boolean
+          default: true
+          description: Whether the item may go to shop-and-drop; the venue sets chilled, fragile or oversized items
+            false (R8 blocker APPROVALS-TENANCY-C34).
 
     PriceCheck:
       x-ticvai-persistence: "none — computed"
@@ -1847,7 +1910,9 @@ components:
           description: >
             The outlet whose price and stock this is: the asking workstation's outlet, or
             `outletId` for a caller with none (decided 28 September, audit R215).
-        sku: { type: string }
+        sku:
+          type: string
+          x-ticvai-staff-only: Omitted from the response when the caller is a guest or a visitor (r8 walk of ticket 27820).
         name: { type: string }
         listPrice: { $ref: '../shared/common.yaml#/components/schemas/Money' }
         effectivePrice:
@@ -1859,6 +1924,7 @@ components:
         isAvailable: { type: boolean }
         siblingOutlets:
           type: array
+          x-ticvai-staff-only: Omitted from the response when the caller is a guest or a visitor (r8 walk of ticket 27820).
           description: Stock elsewhere in the venue, so a colleague can be sent.
           items:
             type: object
@@ -1918,6 +1984,22 @@ components:
             so a sale made offline prints its number at once and the server accepts it on
             sync. **Not gapless**: an unused reserved number is skipped, not reissued. Only
             tax invoices are gapless, per legal entity.
+        receiptBarcode:
+          type: string
+          readOnly: true
+          maxLength: 64
+          x-ticvai-unique-compare: exact
+          description: '**The barcode printed on the receipt** (R8 blocker APPROVALS-TENANCY-C34): the receipt number as
+            printed, encoded as a Code 128 barcode, stored so `lookupRetailSale` finds a sale by `receiptBarcode` with
+            an exact match. Set by the server with `receiptNumber`.'
+        cashierPrincipalId:
+          type: string
+          format: uuid
+          readOnly: true
+          nullable: true
+          x-ticvai-references: identity.principal
+          description: The staff member who rang the sale up, from the session (null for a guest's own sale). R8
+            blocker APPROVALS-TENANCY-C34.
         orderId:
           type: string
           description: The order in the Order & Payment context. Retail does not keep its own ledger.
@@ -1933,6 +2015,12 @@ components:
               merchandiseId: { type: string, format: uuid }
               name: { type: string }
               quantity: { type: integer }
+              overrideReason:
+                type: string
+                maxLength: 200
+                nullable: true
+                description: The reason given with a manual price override (`CreateRetailSaleLine.overrideReason`); null
+                  when the price was not overridden. R8 blocker APPROVALS-TENANCY-C34.
               unitPrice: { $ref: '../shared/common.yaml#/components/schemas/Money', x-ticvai-column: unit_amount }
               discount: { $ref: '../shared/common.yaml#/components/schemas/Money', x-ticvai-column: discount_amount }
               lineTotal: { $ref: '../shared/common.yaml#/components/schemas/Money', x-ticvai-column: gross_amount }
@@ -2100,8 +2188,8 @@ components:
         - itemNotReturnable
         - alreadyReturned
         - requiresSecondUser
-        - requiresApproval
         - receiptRequired
+        - cashRefundOnCardSale
         - serialNumberMismatch
 
     ReturnPolicyProblem:
@@ -2143,7 +2231,13 @@ components:
             - $ref: '../shared/common.yaml#/components/schemas/Money'
           description: Up to this, one cashier may accept a return alone.
         requiresSecondUserAbove: { $ref: '../shared/common.yaml#/components/schemas/Money', x-ticvai-column: second_user_above_amount }
-        requiresApprovalAbove: { $ref: '../shared/common.yaml#/components/schemas/Money', x-ticvai-column: approval_above_amount }
+        requiresApprovalAbove:
+          deprecated: true
+          x-ticvai-retired: true
+          allOf:
+            - $ref: '../shared/common.yaml#/components/schemas/Money'
+          description: Retired (r8, decision R144), so no return raises an approval request. Ignored, and no longer read or returned.
+          x-ticvai-column: approval_above_amount
         restockableConditions:
           type: array
           description: >
@@ -2250,7 +2344,12 @@ components:
           description: >
             The ticket that claims these goods. The point of 4.4.7 — a guest does not have to
             keep a receipt safe for eight hours in a water park.
-        subjectId: { type: string, format: uuid, nullable: true }
+        subjectId:
+          type: string
+          format: uuid
+          nullable: true
+          description: The guest the goods are for, set at the drop from the sale's `subjectId` or, for an online
+            order, the order's buyer; null when the sale named no guest (R8 blocker APPROVALS-TENANCY-C34).
         collectionPointId: { type: string, format: uuid, x-ticvai-column: collection_location_id, x-ticvai-references: fnb.delivery_location}
         collectionPointName: { type: string }
         status:

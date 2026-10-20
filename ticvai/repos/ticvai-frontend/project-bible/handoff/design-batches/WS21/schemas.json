@@ -2131,6 +2131,44 @@
    }
   }
  },
+ "RoleSummary": {
+  "x-ticvai-persistence": "none — projection over role",
+  "type": "object",
+  "required": [
+   "id",
+   "code",
+   "name"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "isPrimary": {
+    "type": "boolean",
+    "description": "True for the role that is the principal's `primaryRoleId` (`identity.principal.primary_role_id`); false for the others (14 October 2026, ADAM CR-077; CHG-IDR-002)."
+   },
+   "grantId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "**The grant this card stands for** (`identity.delegated_access.id`; IDENTITY-C45, CHG-R8SPN-032). A role held at two venues is two grants and two cards; `selectRole` takes the chosen one."
+   },
+   "scope": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/ScopeRef"
+     }
+    ],
+    "description": "The scope node the grant is held at (`platform.scope`), with its name, so the card can say which venue (IDENTITY-C45)."
+   }
+  }
+ },
  "Session": {
   "type": "object",
   "required": [
@@ -2186,13 +2224,23 @@
    "workstation": {
     "$ref": "#/components/schemas/WorkstationContext"
    },
+   "availableRoles": {
+    "type": "array",
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "**The roles the principal may choose, one per grant** (IDENTITY-C45, CHG-R8SPN-032), resolved on read as `LoginResponse.availableRoles` is, so EMP-002 can list them on a cold open or after a relaunch (`getCurrentSession`) without signing in again.",
+    "items": {
+     "$ref": "#/components/schemas/RoleSummary"
+    }
+   },
    "openedAt": {
     "type": "string",
     "format": "date-time"
    },
    "expiresAt": {
     "type": "string",
-    "format": "date-time"
+    "format": "date-time",
+    "description": "When the session ends at the latest: `openedAt` plus `PasswordPolicy.sessionMaxHours` (12 hours by default; proposed, client to correct). A till session ends earlier, when the shift on its workstation closes; any session ends at `logout` or a revocation. Refreshing the access token never moves this time (IDENTITY-C25, FOUNDATION-AI-C27; CHG-R8SPN-014)."
    }
   }
  },

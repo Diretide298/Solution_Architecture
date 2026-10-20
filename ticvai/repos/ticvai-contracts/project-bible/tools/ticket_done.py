@@ -28,6 +28,28 @@ BUILDS = re.compile(r"Builds: ((?:`[^`]+`(?:, )?)+)")
 OP_ID = re.compile(r"^[a-z][A-Za-z0-9]+$")
 
 
+def hand_db_tables(task: dict) -> list:
+    """The tables a hand-written [DB] task (docs/active/block-a-extra-tasks.json) creates: its `builds` entries `table
+    <schema.name>`, when the task is marked a database task (a key ending `-DB`, as PRD-W1-DB, or `"track":
+    "Database"`) and claims no operation. Such a task is the migration of those tables (CHG-R8MIG-016). Other tasks
+    list the tables they work on (PLATFORM-OUTBOX names platform.outbox, which MIG-PLATFORM creates), not create."""
+    if task.get("operations") or not (str(task.get("key") or "").endswith("-DB") or task.get("track") == "Database"):
+        return []
+    return [b.split(" ", 1)[1].strip() for b in task.get("builds") or [] if str(b).startswith("table ")]
+
+
+def built_tables(description: str, key: str = "") -> list:
+    """The tables a [DB] ticket's text says it creates: its "Tables: ..." sentence, else, for a hand-written
+    migration (not a MIG- key: MIG-PARTITIONS lists the tables it partitions, which other migrations create), the
+    `table` items of its "Builds:" lead (CHG-R8MIG-016)."""
+    m = re.search(r"Tables: (.+?)\. Source", description or "")
+    if m:
+        return [x.strip() for x in m.group(1).split(", ")]
+    if MIGRATION_KEY.match(key or ""):
+        return []
+    return [b.split(" ", 1)[1] for b in listed_builds(description) if b.startswith("table ")]
+
+
 def listed_builds(text):
     """The artefacts a "Builds:" lead names, as written ("operation ai#x", "table s.t", "screen S", "adr ADR-0058")."""
     m = BUILDS.search(text or "")
@@ -76,6 +98,63 @@ def builds_of(r, part, lineage):
 DONE_WHEN = re.compile(r"Done when[:,]?\s*(.+)", re.S | re.I)
 
 
+def claimed_ops_sentence(served, is_ai: bool) -> str:
+    """What a hand-written task says of the operations it claims (block-a-extra-tasks.json `operations`). Only an AI
+    engine task's are served by ticvai-ai behind the AI gateway; any other task builds them itself (CHG-R8MIG-012: the
+    products wave 1 tasks claim catalogue operations). Either way no back-end task of the operation formula does."""
+    names = ", ".join(served)
+    verb = "is" if len(served) == 1 else "are"
+    if is_ai:
+        return (f"{names} {verb} served by ticvai-ai behind the AI gateway, to their contracts at the release tag in "
+                "ADAM; no back-end task builds them. ")
+    return (f"{names} {verb} built by this task, to their contracts at the release tag in ADAM; no other back-end "
+            "task builds them. ")
+
+# **The control database has no row-level security** (ADR-0039; R8 blocker causes IDENTITY-C16, FOUNDATION-AI-C36,
+# APPROVALS-TENANCY-C18; the lead, 20 October 2026: option A; CHG-R8MIG-005). It holds no scope tree: only the control
+# plane's role reaches it, and each operation checks its PLATFORM_* permission and the tenant (an API client's
+# allowedTenantIds). A ticket that builds only control tables or operations was told "under row-level security", which
+# no developer could meet; it is told the rule that does hold.
+CONTROL_RULE = ("checked by the operation's permission and tenant check (the control database has no row-level "
+                "security: only the control plane's role reaches it, backend/MIGRATIONS.md)")
+_LINEAGE: dict | None = None
+
+
+def _lineage() -> dict:
+    global _LINEAGE
+    if _LINEAGE is None:
+        import json
+        from pathlib import Path
+        p = Path(__file__).resolve().parents[1] / "handoff" / "api-data-lineage.json"
+        try:
+            _LINEAGE = json.loads(p.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            _LINEAGE = {}
+    return _LINEAGE
+
+
+def control_only(names, lineage: dict | None = None) -> bool:
+    """True when every artefact named is in the control database: a table `control.*`, or an operation whose
+    lineage reads and writes only `control.*` tables (stores such as `cache:` are not tables)."""
+    lin = _lineage() if lineage is None else lineage
+    seen = False
+    for n in names:
+        n = n.split("#", 1)[-1]
+        if "." in n and " " not in n:
+            if not n.startswith("control."):
+                return False
+            seen = True
+            continue
+        e = lin.get(n)
+        if not isinstance(e, dict):
+            return False
+        tables = [t for t in (e.get("reads") or []) + (e.get("writes") or []) if "." in t and ":" not in t]
+        if not tables or any(not t.startswith("control.") for t in tables):
+            return False
+        seen = True
+    return seen
+
+
 def done_when(r, part, builds):
     """What finishes this ticket, as one line every pointer carries (CHG-REL-003). The plan's own "Done when" when the
     task has one; otherwise the test strategy's (docs/active/block-test-strategy.md) for its kind, naming what it
@@ -97,13 +176,21 @@ def done_when(r, part, builds):
         return ("Done when every ticket under it is done and its module test passes on the integration environment with "
                 "no open severity 1 or 2 defect (block-test-strategy).")
     if kind == "Backend" and names:
+        guard = CONTROL_RULE if control_only(names) else "under row-level security"
         return (f"Done when {named} pass their contract tests against the contract in ADAM, including every documented "
-                "error response; each reads and writes only the tables its spec lists, under row-level security; unit "
+                f"error response; each reads and writes only the tables its spec lists, {guard}; unit "
                 "tests cover its rules; and a peer in the same stack has reviewed and tested it.")
     if kind == "Database" and names:
-        return (f"Done when the migration for {named} runs forward on an empty database and on the previous release's "
-                "schema, every table matches its spec in ADAM (columns, keys, indexes, row-level security), and a peer "
-                "has reviewed it.")
+        # **How a [DB] ticket is proven** (CHG-R8MIG-008; the lead's delegate, 20 October 2026, from the ADAM
+        # faster-db-tickets report, item 5 point 6): on a copy of the database as it was, twice, and ADAM's db-ticket
+        # script comparing the result with the package; the full chain from empty runs daily and in every merge request.
+        guard = ("columns, keys and indexes; no row-level security, which the control database does not have "
+                 "(backend/MIGRATIONS.md)") if control_only(names) else "columns, keys, indexes, row-level security"
+        return (f"Done when the migration for {named} applies on a copy of the database at the previous state, a "
+                "second run applies nothing (it is safe to run twice: every ADD CONSTRAINT copied from the package "
+                "is written guarded), and `node .claude/scripts/db-ticket.mjs <ticket>` says MATCH "
+                f"({guard}); every migration from an empty database runs once a day and in the merge-request "
+                "pipeline; and a peer has reviewed it.")
     if kind == "Frontend" and names:
         step = {"build": "the layout is built from the screen spec (and its wireframe once client-verified)",
                 "wire": "every bound operation is called as the screen spec says, with its loading, empty and error states",
@@ -272,11 +359,17 @@ def baseline_functions(root) -> dict:
     return out
 
 
-AFTER_R1_FILE = re.compile(r"^V0[1-9]\d\d__after_r1_\d{8}\.sql$")
+AFTER_R1_FILE = re.compile(r"^V0[1-9]\d\d[a-z]?__(?:names_(?:early_)?)?after_r1_\d{8}\.sql$")
+# A block of the names file (ddl_forward.tag): `-- <table> | <kind> | <detail> [| <other table>]` (R8-MIG-001)
+NAMES_TAG = re.compile(r"^-- (\w+\.\w+) \| (rename column|rename constraint|rename index|create index|drop index|"
+                       r"drop foreign key|foreign key) \| (\S+(?: to \S+)?)(?: \| (\w+\.\w+))?$")
 _AR1 = [
     (re.compile(r"^CREATE TABLE IF NOT EXISTS (\w+\.\w+)"), None),
     (re.compile(r"^ALTER TABLE (?:ONLY )?(\w+\.\w+) ADD COLUMN (?:IF NOT EXISTS )?(\w+)"), "column"),
     (re.compile(r"^ALTER TABLE (?:ONLY )?(\w+\.\w+) ADD CONSTRAINT (\w+)"), "constraint"),
+    # a key the additive file adds guarded (ddl_forward.guard_add_constraint, CHG-R8MIG-010)
+    (re.compile(r"^DO \$\$ BEGIN IF NOT EXISTS \(SELECT 1 FROM pg_constraint WHERE .*? THEN ALTER TABLE (?:ONLY )?"
+                r"(\w+\.\w+) ADD CONSTRAINT (\w+)"), "constraint"),
     (re.compile(r"^CREATE (?:UNIQUE )?INDEX (?:IF NOT EXISTS )?(\w+) ON (?:ONLY )?(\w+\.\w+)"), "index"),
     (re.compile(r"^SELECT platform\.(apply_\w+)\('(\w+\.\w+)'"), "row-level security"),
     (re.compile(r"^ALTER TABLE (?:ONLY )?(\w+\.\w+) (.+?);?$"), "change"),
@@ -329,6 +422,12 @@ def after_r1_changes(root) -> dict:
         made, seen = set(), []
         for ln in f.read_text(encoding="utf-8").splitlines():
             ln = ln.strip()
+            tg = NAMES_TAG.match(ln)
+            if tg:
+                seen.append((tg.group(1), tg.group(2), tg.group(3)))
+                if tg.group(4):   # a key names its parent too: the later of the two migrations adds it
+                    seen.append((tg.group(4), tg.group(2), f"{tg.group(3)} (from {tg.group(1)})"))
+                continue
             for rx, kind in _AR1:
                 m = rx.match(ln)
                 if not m:
@@ -368,15 +467,267 @@ def after_r1_sentence(rel: str, changes: dict) -> str:
             "which creates those tables, carries these changes too.")
 
 
+def names_sentence(rel: str, changes: dict) -> str:
+    """The sentence a migration ticket carries for the names file (R8-MIG-001): what the file does to its tables."""
+    parts = []
+    for t, items in sorted(changes.items()):
+        parts.append(f"{t}: " + ", ".join(f"{k} {d}" for k, d in items))
+    return (f"Source DDL after r1: {rel} (the names the contracts use: {'; '.join(parts)}); the files above create "
+            "these tables with the names they had at r1, so this migration copies the blocks of that file that name "
+            "its tables, after its tables are created (each block is guarded and does nothing when its table, key or "
+            "index is not there). A key between this migration's table and one a later migration creates is copied "
+            "by both, and takes effect in the later one.")
+
+
 def baseline_wording(root) -> str:
     """The sentences MIG-BASELINE carries: its file is ours to write, and the helper functions it copies, by name."""
     fns = baseline_functions(root)
     parts = [f"from the top of {name}: {', '.join(names)}" for name, names in fns.items() if names]
-    # no V-number here: check-ticket-text T-MIG-DONE keeps file numbers to the subject and MIGRATIONS.md
+    # **The helpers only an after-r1 file creates** (FOUNDATION-AI-C03): platform.drop_rls_policies, apply_read_beneath_rls,
+    # apply_grant_holder_read_rls and the rest exist in V0102-V0105 alone, and the schema tickets say "call" them.
+    # A function an after-r1 file defines again is copied from the latest file that defines it.
+    from pathlib import Path
+    have = {n for names in fns.values() for n in names}
+    later = {}
+    for f in sorted((Path(root) / "backend" / "tenant").glob("V0*.sql")):
+        if AFTER_R1_FILE.match(f.name):
+            for n in FUNCTION_DEF.findall(f.read_text(encoding="utf-8")):
+                if n not in have:
+                    later[n] = f.name
+    by_file = {}
+    for n, fname in later.items():
+        by_file.setdefault(fname, []).append(n)
+    parts += [f"from backend/tenant/{fname} (created by no other file): {', '.join(names)}" for fname, names in sorted(by_file.items())]
+    # no bare V-number here: check-ticket-text T-MIG-DONE keeps file numbers to the subject and MIGRATIONS.md; a
+    # source file is named by its path under backend/ (CHG-R8MIG-024, the refresh rehearsal of 20 October)
     return ("The baseline file named in the subject is one you write in our repository; the package keeps no baseline "
             "file of its own. It creates the helper functions every later migration calls, copied as they are "
             + "; ".join(parts) + " (the row-level security of each schema migration calls the platform.apply_* "
-            "functions, so they come first).")
+            "functions, so they come first). " + BASELINE_BODIES)
+
+
+# **Every key copied from the package is written guarded** (CHG-R8MIG-013; the coordinator, 20 October 2026: ADAM's
+# database-ticket check applies each migration twice). CREATE TABLE, CREATE INDEX and ADD COLUMN have IF NOT EXISTS,
+# ADD CONSTRAINT has none, so the frozen 900-foreign-keys.sql lines (and V0102's) fail a second run as written.
+GUARDED_KEYS = ("**Safe to run twice**: write every ALTER TABLE ... ADD CONSTRAINT copied from the package guarded, "
+                "either preceded by `ALTER TABLE ... DROP CONSTRAINT IF EXISTS <name>;` or inside "
+                "`DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = '<name>' AND conrelid = "
+                "'<schema.table>'::regclass) THEN ALTER TABLE ... ADD CONSTRAINT ...; END IF; END $$;` (the package's "
+                "900-foreign-keys.sql lines are written unguarded and fail a second run as they are).")
+
+
+# **The runner records a migration itself** (CHG-R8MIG-016; the coordinator, 20 October 2026, from ADAM's database-ticket
+# check): the package's after-r1 files end with their own `INSERT INTO platform.schema_version`, which a copied file must
+# leave out, or the version row is written twice.
+SCHEMA_VERSION_LINE = ("Do not copy the `INSERT INTO platform.schema_version ...` statement at the end of a package "
+                       "after-r1 file: SqlMigrationRunner records this migration in platform.schema_version itself.")
+
+# **A key into a table a later migration creates moves to that migration** (CHG-R8MIG-016; the coordinator: ADAM's check
+# found promotions.voucher's key to promotions.voucher_batch, V1017 before V1114, on no ticket). The first release's own
+# cross-schema keys stay MIG-FOREIGN-KEYS' (both ends there); every other key whose parent a later migration creates
+# goes in that later migration, both tickets saying so, as a parent-row policy does (parent_policy_moves).
+FK_LINE = re.compile(r"ALTER TABLE (?:ONLY )?(\w+\.\w+) ADD CONSTRAINT (\w+) FOREIGN KEY \([^)]*\) REFERENCES "
+                     r"(\w+\.\w+)\s*\(")
+
+
+def foreign_keys(root) -> dict:
+    """{key name: (child table, parent table)} from the 900 files and the after-r1 files (tenant and control)."""
+    from pathlib import Path
+    out = {}
+    for db in ("tenant", "control"):
+        d = Path(root) / "backend" / db
+        files = [d / "900-foreign-keys.sql"] + sorted(f for f in d.glob("V0*.sql") if AFTER_R1_FILE.match(f.name))
+        for f in files:
+            if not f.exists():
+                continue
+            for ln in f.read_text(encoding="utf-8").splitlines():
+                if ln.lstrip().startswith("--"):
+                    continue
+                for child, name, parent in FK_LINE.findall(ln):
+                    out[name] = (child, parent)
+    return out
+
+
+def key_moves(keys: dict, made_by: dict, order: dict, moves: dict | None = None, first=(2, 99)) -> dict:
+    """{key name: (child's migration, parent's later migration, child, parent)} for every key whose parent a later
+    migration creates, except when both migrations are first-release ones (MIG-FOREIGN-KEYS adds those)."""
+    moves = moves or {}
+    out = {}
+    for name, (child, parent) in sorted(keys.items()):
+        child, parent = moves.get(child, child), moves.get(parent, parent)
+        mc, mp = made_by.get(child), made_by.get(parent)
+        if not mc or not mp or mc == mp:
+            continue
+        oc, op_ = order.get(mc, 0), order.get(mp, 0)
+        if op_ <= oc or (first[0] <= oc <= first[1] and first[0] <= op_ <= first[1]):
+            continue
+        out[name] = (mc, mp, child, parent)
+    return out
+
+
+def key_move_sentences(moved: dict) -> dict:
+    """{migration key: [sentence]} for both ends of each moved key."""
+    out = {}
+    for name, (mc, mp, child, parent) in sorted(moved.items()):
+        out.setdefault(mc, []).append(f"**Leave out the key {name}** ({child} to {parent}): {mp} creates {parent} "
+                                      f"later and adds it.")
+        out.setdefault(mp, []).append(f"**Also add the key {name} here** ({child} to {parent}, guarded): {mc} creates "
+                                      f"{child} before {parent} exists.")
+    return out
+
+
+# **The baseline creates on an empty database only with function-body checks off** (CHG-R8MIG-008; ADAM faster-db-tickets
+# report, package problem 2). The SQL-language helpers of 920 and 930 read platform.scope, which MIG-PLATFORM creates
+# later, and PostgreSQL parses a SQL function's body when it is created unless check_function_bodies is off.
+BASELINE_BODIES = ("Start the file with `SET check_function_bodies = off;`: the SQL-language helpers read "
+                   "platform.scope, which the platform migration creates later, and PostgreSQL checks a function's body "
+                   "against the tables that exist when it is created unless that setting is off (the body is checked "
+                   "when the function first runs instead).")
+
+
+# **A type the frozen DDL names and no file creates** (CHG-R8MIG-008; ADAM CR-001; the faster-db-tickets report, package
+# problem 1). backend/tenant/010-pii.sql types pii.subject.kind as pii.subject_kind and pii.subject_contact.kind as
+# pii.contact_kind; the schema reference has since made them text with a CHECK, but 010 is frozen at r1, so the
+# migration that copies it cannot apply. Its ticket says what creates each type, with the values the schema reference
+# (from the contracts) gives the column.
+TYPE_USE = re.compile(r"^\s+(\w+)\s+([a-z_]+\.[a-z_0-9]+)(?:\[\])?\b", re.M)
+TYPE_DEF = re.compile(r"CREATE\s+(?:TYPE|DOMAIN)\s+(?:IF\s+NOT\s+EXISTS\s+)?([a-z_]+\.[a-z_0-9]+)", re.I)
+
+
+def undefined_types(root) -> dict:
+    """{table: [(type, column, [values])]} for every column of a baseline 0*.sql CREATE TABLE typed by a
+    schema-qualified type no backend file creates; the values are the column's `enum` in handoff/schema-reference.json."""
+    import json
+    from pathlib import Path
+    root = Path(root)
+    files = sorted((root / "backend").rglob("*.sql"))
+    defined = {n for f in files for n in TYPE_DEF.findall(f.read_text(encoding="utf-8"))}
+    try:
+        ref = json.loads((root / "handoff" / "schema-reference.json").read_text(encoding="utf-8")).get("cols") or {}
+    except (OSError, ValueError):
+        ref = {}
+    out = {}
+    for f in files:
+        if not re.match(r"^0\d\d-", f.name):
+            continue
+        for m in re.finditer(r"CREATE TABLE IF NOT EXISTS (\w+\.\w+) \((.*?)\n\)", f.read_text(encoding="utf-8"), re.S):
+            for col, typ in TYPE_USE.findall(m.group(2)):
+                if typ in defined or typ.split(".")[0] in ("pg_catalog", "public"):
+                    continue
+                rec = next((c for c in ref.get(m.group(1), []) if c.get("column") == col), {})
+                out.setdefault(m.group(1), []).append((typ, col, [str(v) for v in rec.get("enum") or []]))
+    return out
+
+
+def type_sentence(table: str, uses: list) -> str:
+    """What the migration creating `table` writes first, so the frozen file it copies applies."""
+    parts = []
+    for typ, col, values in uses:
+        vals = ", ".join("'" + v.replace("'", "''") + "'" for v in values)
+        parts.append(f"`CREATE TYPE {typ} AS ENUM ({vals});` ({table}.{col})" if values else
+                     f"`{typ}` ({table}.{col}: no values are recorded; ask the migration owner)")
+    return ("**Create the types the copied DDL names first** (ADAM CR-001): the frozen file types these columns with "
+            "enum types no package file creates, so before its CREATE TABLE write " + "; ".join(parts) + ". The values "
+            "are the contracts' (handoff/schema-reference.json); a later forward migration turns the column into text "
+            "with the same CHECK.")
+
+
+# **A parent's row-level security waits for the parent** (CHG-R8MIG-008; the faster-db-tickets report, item 5 point 7 and
+# package problem 3). A table protected through its parent row (`platform.apply_parent_rls`) reads the parent in its
+# policy, so its policy cannot be created before the parent table: like a cross-schema key, it moves to the later
+# migration. `policies` is {child: parent} from 920 and the after-r1 files; `made_by` is {table: migration key};
+# `order` is {migration key: its file number}.
+PARENT_POLICY = re.compile(r"SELECT platform\.apply_parent(?:_split)?_rls\('(\w+\.\w+)'::regclass, '\w+', "
+                           r"'(\w+\.\w+)'::regclass")
+
+
+# **Changes no file writes reach a ticket** (CHG-R8MIG-013; R8 blocker causes IDENTITY-C43 and FOUNDATION-AI-C38). The
+# renames, moves, type and NOT NULL changes derive-ddl leaves for a person (handoff/migration-review.md) were on no
+# ticket: catalogue's inventory_hold -> inventory_reservation and identity's otp_challenge nullability among them. Each
+# row goes to the migration ticket that creates its table (by its name now), which writes it.
+REVIEW_ROW = re.compile(r"^\| ([^|]+?) \| (tenant|control) \| `([^`]+)` \| (.*?) \| (.*) \|\s*$")
+
+
+def review_rows(root) -> list:
+    """[(table now, kind, object, what a person does)] for every row of handoff/migration-review.md."""
+    from pathlib import Path
+    p = Path(root) / "handoff" / "migration-review.md"
+    if not p.exists():
+        return []
+    out = []
+    for ln in p.read_text(encoding="utf-8").splitlines():
+        m = REVIEW_ROW.match(ln)
+        if not m:
+            continue
+        kind, obj = m.group(1).strip(), m.group(3).strip()
+        left, _, right = obj.partition(" -> ")
+        # `t.old -> new` renames a column (the right side has no schema); `a -> b` moves a table; `a, b` names two
+        name = (right if "." in right else left).split(" ")[0].split(",")[0]
+        parts = name.split(".")
+        table = ".".join(parts[:2]) if len(parts) >= 2 else name
+        out.append((table, kind, obj, m.group(5).strip()))
+    return out
+
+
+def review_sentence(rows: list) -> str:
+    """The sentence a migration ticket carries for its tables' review rows."""
+    items = "; ".join(f"{kind} `{obj}`" for _t, kind, obj, _w in rows)
+    return ("**Changes no file writes, for this migration to write** (handoff/migration-review.md, where each row says "
+            f"what to write; CHG-R8MIG-013): {items}.")
+
+
+def parent_policies(root) -> dict:
+    """{child: parent} for every parent-row policy in the tenant and control 920 files and the after-r1 files (a
+    later file's call wins: it re-applies the policy)."""
+    from pathlib import Path
+    out = {}
+    for db in ("tenant", "control"):
+        d = Path(root) / "backend" / db
+        files = [d / "920-row-level-security.sql"] + sorted(f for f in d.glob("V0*.sql") if AFTER_R1_FILE.match(f.name))
+        for f in files:
+            if not f.exists():
+                continue
+            text = f.read_text(encoding="utf-8")
+            for ln in text.splitlines():
+                if ln.lstrip().startswith("--"):
+                    continue
+                for child, parent in PARENT_POLICY.findall(ln):
+                    out[child] = parent
+                m = re.match(r"SELECT platform\.apply_(?!parent)\w+\('(\w+\.\w+)'::regclass", ln.strip())
+                if m and m.group(1) in out and f.name != "920-row-level-security.sql":
+                    out.pop(m.group(1))     # a later file gave it another rule
+    return out
+
+
+def parent_policy_moves(policies: dict, made_by: dict, order: dict, moves: dict | None = None) -> tuple:
+    """(moved, orphans): moved is {child: (its migration, the parent's later migration, parent)}; orphans is
+    {child: parent} where no migration ticket creates the parent. `moves` maps a table's r1 name to its name now
+    (declared_moves): 920 names inventory.item, which the migration tickets create as its name now."""
+    moves = moves or {}
+    moved, orphans = {}, {}
+    for child, parent in sorted(policies.items()):
+        child, parent = moves.get(child, child), moves.get(parent, parent)
+        mc, mp = made_by.get(child), made_by.get(parent)
+        if not mc:
+            continue
+        if not mp:
+            orphans[child] = parent
+        elif mp != mc and order.get(mp, 0) > order.get(mc, 0):
+            moved[child] = (mc, mp, parent)
+    return moved, orphans
+
+
+def parent_policy_sentences(moved: dict, orphans: dict) -> dict:
+    """{migration key: [sentence]} for both ends of each moved policy, and for an orphan's own migration."""
+    out = {}
+    for child, (mc, mp, parent) in sorted(moved.items()):
+        out.setdefault(mc, []).append(
+            f"**{child}'s row-level security waits for its parent**: its policy reads {parent}, which {mp} creates "
+            f"later, so leave out its `platform.apply_parent_rls` call here; {mp} applies it.")
+        out.setdefault(mp, []).append(
+            f"**Also apply {child}'s row-level security here** (its `platform.apply_parent_rls` call, "
+            f"920-row-level-security.sql, through {parent}): {mc} creates {child} before {parent} exists.")
+    return out
 
 
 def carried(r) -> list:

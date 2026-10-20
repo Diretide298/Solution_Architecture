@@ -90,7 +90,6 @@ paths:
     get:
       operationId: listSeededReports
       x-ticvai-consumed-by:
-        - "P04 POS-020 Shift Exceptions & Alerts"
         - "P16 ANL-031 Report Catalogue & Library"
       summary: The reports every venue starts with
       description: 'BL-053. **A venue opening on Monday does not want a report builder — it wants the

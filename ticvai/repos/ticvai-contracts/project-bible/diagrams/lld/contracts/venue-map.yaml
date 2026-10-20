@@ -1,5 +1,5 @@
 id: LLD-venue-map
-title: venue-map — 22 operations
+title: venue-map — 26 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -182,6 +182,18 @@ operations:
   - venuemap.visit_plan
   - venuemap.visit_plan_item
   writes: []
+- operation: getVisitPlannerOptions
+  verb: GET
+  path: /venues/{venueId}/visit-planner-options
+  scope: venue
+  permission: VENUE_MAP_VIEW
+  audience:
+  - staff
+  - guest
+  offline: true
+  reads:
+  - venuemap.visit_plan_preset
+  writes: []
 - operation: importVenueGeometry
   verb: POST
   path: /venue-maps/{mapId}/import
@@ -213,6 +225,18 @@ operations:
   - venuemap.map_version
   - venuemap.placed_resource
   writes: []
+- operation: listMyVisitPlans
+  verb: GET
+  path: /visit-plans
+  scope: venue
+  permission: null
+  audience:
+  - guest
+  offline: true
+  reads:
+  - venuemap.visit_plan
+  - venuemap.visit_plan_item
+  writes: []
 - operation: listVenueMaps
   verb: GET
   path: /venue-maps
@@ -241,6 +265,17 @@ operations:
   - venuemap.point
   - venuemap.visit_plan
   - venuemap.visit_plan_item
+  writes: []
+- operation: listVisitPlanPresets
+  verb: GET
+  path: /venues/{venueId}/visit-plan-presets
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - venuemap.visit_plan_preset
   writes: []
 - operation: publishVenueMap
   verb: POST
@@ -289,8 +324,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - venuemap.placed_resource
   writes:
+  - cache:idempotency
   - venuemap.placed_resource
 - operation: setVenueMapArtwork
   verb: POST
@@ -301,8 +338,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - venuemap.map
   writes:
+  - cache:idempotency
   - venuemap.map
 - operation: setVenuePoint
   verb: POST
@@ -324,6 +363,20 @@ operations:
   writes:
   - cache:idempotency
   - venuemap.point
+- operation: setVisitPlanPreset
+  verb: PUT
+  path: /venues/{venueId}/visit-plan-presets/{presetKey}
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - venuemap.visit_plan_preset
+  writes:
+  - cache:idempotency
+  - venuemap.visit_plan_preset
 - operation: updateVisitPlan
   verb: PUT
   path: /visit-plans/{planId}
@@ -354,7 +407,9 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - venuemap.map
   - venuemap.path
   - venuemap.point
-  writes: []
+  writes:
+  - cache:idempotency

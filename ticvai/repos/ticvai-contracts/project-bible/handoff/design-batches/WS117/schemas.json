@@ -611,6 +611,8 @@
    "LOYALTY_ACCRUE",
    "LOYALTY_REDEEM",
    "LOYALTY_ADJUST",
+   "MEMBERSHIP_VIEW",
+   "MEMBERSHIP_MANAGE",
    "MARKETING_VIEW",
    "MARKETING_MANAGE",
    "MARKETING_SEND",
@@ -710,11 +712,11 @@
     "format": "uuid"
    },
    "operatorPrincipalId": {
-    "x-ticvai-references": "identity.principal",
+    "x-ticvai-references": "none",
     "type": "string",
     "format": "uuid",
     "readOnly": true,
-    "description": "The platform operator, from the Control Plane token. Set by the server."
+    "description": "The platform operator, from the Control Plane token (its subject). Set by the server. **Not a row in this tenant's `identity.principal`** (R8 blocker IDENTITY-C20, CHG-R8MIG-006; the lead's answer, option A): an operator is the Control Plane's, so this is a plain uuid with no foreign key, and the key V0107 adds is dropped by the next forward migration."
    },
    "operatorDisplayName": {
     "type": "string",
@@ -760,6 +762,18 @@
  },
  "Tenant": {
   "x-ticvai-persistence": "control.tenant",
+  "x-ticvai-required-when": {
+   "planVersion": {
+    "planId": {
+     "not": null
+    }
+   },
+   "planId": {
+    "planVersion": {
+     "not": null
+    }
+   }
+  },
   "type": "object",
   "required": [
    "id",
@@ -823,9 +837,17 @@
     "nullable": true
    },
    "planId": {
+    "x-ticvai-references": "control.plan",
+    "x-ticvai-references-version": "planVersion",
     "type": "string",
     "format": "uuid",
     "nullable": true
+   },
+   "planVersion": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The version of the plan the tenant is on (with `planId`, the key of the plan row; R8 blocker APPROVALS-TENANCY-C15, CHG-R8INT-023). Null when `planId` is."
    },
    "planName": {
     "type": "string",
@@ -836,6 +858,46 @@
    },
    "venueCount": {
     "type": "integer"
+   },
+   "cellHost": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "x-ticvai-derived": "onRead",
+    "description": "The host of the tenant's home cell (the host part of `Cell.apiEndpoint` of the cell that holds the tenant in its home region), derived on read through `control.cell_tenant`. Added for ADM-018 (r8 walk of ticket 27886): the console reaches the cell's grant and language operations at this host without holding `PLATFORM_CELL_VIEW`, which `listTenantCells` needs. Null while the tenant has no cell.\n"
+   },
+   "cellHosts": {
+    "type": "array",
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "x-ticvai-derived": "onRead",
+    "description": "One entry per region the tenant is in, for a multi-region tenant; the entry with `isHome` true is `cellHost`. The screen uses the home cell for language and grant operations.\n",
+    "items": {
+     "type": "object",
+     "required": [
+      "regionId",
+      "cellId",
+      "host",
+      "isHome"
+     ],
+     "properties": {
+      "regionId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "cellId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "host": {
+       "type": "string"
+      },
+      "isHome": {
+       "type": "boolean"
+      }
+     }
+    }
    },
    "regionId": {
     "type": "string",

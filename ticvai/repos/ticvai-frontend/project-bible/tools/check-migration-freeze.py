@@ -39,7 +39,8 @@ except Exception:
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from release_baseline import ROOT, baseline_commit, changed_since, describe  # noqa: E402
 
-FORWARD = re.compile(r"^backend/(?:control|tenant)/V\d+__[\w.-]+\.sql$")
+# `V0103a__`: a file that runs between two frozen ones (ddl_forward.early_version, CHG-R8MIG-003)
+FORWARD = re.compile(r"^backend/(?:control|tenant)/V\d+[a-z]?__[\w.-]+\.sql$")
 REVIEW = ROOT / "handoff" / "migration-review.md"
 
 # Deleted on purpose after r1, decided by the lead (CHG-SQL-001, Chinmay, 6 October 2026): the forward

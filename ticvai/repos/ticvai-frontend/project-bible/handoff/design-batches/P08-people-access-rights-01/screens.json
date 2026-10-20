@@ -1027,7 +1027,8 @@
     "RotaAssignment.restPeriodBefore",
     "RotaAssignment.breachesWorkingHourLimit",
     "RotaAssignment.labourCost",
-    "RotaAssignment.id"
+    "RotaAssignment.id",
+    "VenueSettings.calendarDayStartHour"
    ]
   },
   "wireframe": {

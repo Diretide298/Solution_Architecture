@@ -1,5 +1,5 @@
 id: LLD-Seat hold
-title: Seat hold — 3 transitions
+title: Seat hold — 4 transitions
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/04-lifecycles.yaml
 source: states/seat-hold.yaml
@@ -13,7 +13,7 @@ owner: seating
 initial:
 - held
 terminal:
-- converted
+- sold
 - released
 - expired
 transitions:
@@ -23,6 +23,13 @@ transitions:
   trigger: operation
   guard: '**Became an order. The hold transfers rather than releasing** — releasing first lets another
     guest take the seat between the calls'
+- from: converted
+  to: sold
+  operation: convertInventoryHold
+  trigger: operation
+  guard: '**The order is paid** (ADAM CR-169, 18 October 2026; CHG-CRA-007): `catalogue.convertInventoryHold`
+    sells the hold''s units and moves the order''s seat reservations, found by their `inventoryReservationId`,
+    to `sold`, writing `seat.sold` once per seat'
 - from: held
   to: released
   operation: relinquishSeatHold

@@ -281,8 +281,8 @@
    },
    "placedResourceCount": {
     "type": "integer",
-    "minimum": 1,
-    "description": "Placed resources on the published version."
+    "minimum": 0,
+    "description": "Placed resources on the published version. 0 only when the caller sent `onlyBookable=false`."
    },
    "kinds": {
     "type": "array",
@@ -357,10 +357,31 @@
     "type": "string",
     "format": "uuid"
    },
+   "anonymousSessionToken": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "The `guestAuth` token of the anonymous session `createCart` opened for a visitor with no credential (GPS-C23, CHG-R8SPN-031); null on every other answer. Not stored on the cart."
+   },
    "token": {
     "type": "string",
     "readOnly": true,
     "description": "**How an anonymous guest returns to their cart**, including from a recovery email. Rotated on claim, so a link shared before signing in does not reach the account after.\n"
+   },
+   "sessionId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The staff or partner session that started the cart (a till's cart is its session's own); null for a guest's cart (R8 blocker IDENTITY-C49, CHG-R8MIG-021)."
+   },
+   "workstationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The workstation of that session; null for a guest's cart."
    },
    "venueId": {
     "type": "string",
@@ -948,6 +969,18 @@
     "type": "string",
     "nullable": true
    },
+   "opensAt": {
+    "type": "string",
+    "format": "time",
+    "nullable": true,
+    "description": "When a collection point opens, local to the venue (r8 walk of ticket 27820). Used by retail `createShopAndDrop` (`collectionPointClosed`). Null means no stated hours."
+   },
+   "closesAt": {
+    "type": "string",
+    "format": "time",
+    "nullable": true,
+    "description": "When a collection point closes, local to the venue; retail `collectBy` defaults to this on the day. Null means no stated hours."
+   },
    "tableId": {
     "type": "string",
     "format": "uuid",
@@ -1105,6 +1138,33 @@
     "type": "string",
     "format": "uuid"
    },
+   "productName": {
+    "type": "string",
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "**Read with the entitlement, not stored on it** (R8 blocker ORDERS-MONEY-C20, CHG-R8MIG-009), as `TicketStatus.productName`: the product's name from `catalogue.product` (catalogue#productRecords), in the caller's language. The ticket card shows it."
+   },
+   "venueName": {
+    "type": "string",
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "The venue's name, read from `platform.scope` by `venueId`; not stored."
+   },
+   "imageUrl": {
+    "type": "string",
+    "format": "uri",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "The product's primary image (`catalogue.product_media`), read with the entitlement; null when the product has none. Not stored."
+   },
+   "guestCategory": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "The guest category of the order line it was issued for (adult, child, ...), from the line's variant (catalogue#productRecords); null for an entitlement no order line issued. Not stored."
+   },
    "orderId": {
     "type": "string",
     "format": "uuid",
@@ -1113,7 +1173,8 @@
    },
    "orderLineId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "description": "The order line it was issued for; the ticket list groups cards by it (CHG-R8MIG-009)."
    },
    "subjectId": {
     "type": "string",
@@ -1924,7 +1985,7 @@
   "x-ticvai-persistence": "none — embedded in tenant_config",
   "type": "object",
   "nullable": true,
-  "description": "**The oldest guest app build still allowed to run (decided 28 September, audit R073).** A guest app whose own version is below the one for its platform shows the forced-upgrade screen (GST-047) and nothing else. Null, or a platform left null, forces nothing. Live at once through `setMaintenanceMode`, because an upgrade that must wait for a publish is not forced.\n",
+  "description": "**The oldest guest app build still allowed to run (decided 28 September, audit R073).** A guest app whose own version is below the one for its platform shows the forced-upgrade screen (GST-047) and nothing else. Null, or a platform left null, forces nothing. Live at once through `setMaintenanceMode`, because an upgrade that must wait for a publish is not forced.\n\n**`storeUrl`** (r8 walk of ticket 27893): the store page GST-047's \"Update\" button opens, one per platform, set with `setMaintenanceMode` beside the versions and live at once like them. Optional. A store address cannot be derived from `StoreAccount.appIdentifier`, which is a bundle id. The forced-upgrade screen opens the URL for the platform it runs on; where it is null the screen shows the message without the button and the guest updates from the store by hand.\n",
   "properties": {
    "ios": {
     "type": "string",
@@ -1935,6 +1996,25 @@
     "type": "string",
     "nullable": true,
     "pattern": "^\\d+\\.\\d+\\.\\d+$"
+   },
+   "storeUrl": {
+    "type": "object",
+    "nullable": true,
+    "description": "The store page of the tenant's app for each platform. https only.",
+    "properties": {
+     "ios": {
+      "type": "string",
+      "format": "uri",
+      "pattern": "^https://",
+      "nullable": true
+     },
+     "android": {
+      "type": "string",
+      "format": "uri",
+      "pattern": "^https://",
+      "nullable": true
+     }
+    }
    }
   }
  },
@@ -2079,6 +2159,13 @@
     "type": "string",
     "format": "uuid",
     "description": "The client UUIDv7 from `CreateOrderRequest.id`."
+   },
+   "orderAccessToken": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "**What lets the device that just checked out read the order it paid for** (decided 20 October 2026, Chinmay, R8 blocker cause IDENTITY-C52, option A; CHG-R8SPN-025). Returned only in `checkoutCart`'s answer, null everywhere else: a signed token bound to this order and to the cart's device, valid 24 hours, never stored. `getOrder` accepts it in `X-Order-Access-Token` in place of a session, so a guest who checked out with no account, or whose session ended, still sees the confirmation (WEB-013 keeps it in its navigation state). It reads this order only and grants nothing else."
    },
    "orderNumber": {
     "x-ticvai-unique": "tenant",
@@ -2375,10 +2462,88 @@
   "nullable": true,
   "additionalProperties": true,
   "x-ticvai-persistence": "none — embedded as attributes (jsonb) on orders.cart_line and orders.order_line",
-  "description": "Open attributes of a line, kept from the cart to the order line. **`transport` is the one with a defined shape** (decided 29 September, rev 3 REV3-21); other keys are free.\n",
+  "description": "Open attributes of a line, kept from the cart to the order line. **`transport` is the one with a defined shape** (decided 29 September, rev 3 REV3-21); other keys are free. **`attendees` is the second** (20 October 2026, R8 blocker cause GPS-C28; CHG-R8SPN-034), and **`parking` and `bundle` have a defined shape too** (R8 blockers ORDERS-MONEY-C22 and C43, CHG-R8MIG-023).\n",
   "properties": {
    "transport": {
     "$ref": "#/components/schemas/TransportLineAttributes"
+   },
+   "attendees": {
+    "type": "integer",
+    "minimum": 1,
+    "nullable": true,
+    "description": "**How many people a meeting-room booking is for** (GST-075; R8 blocker cause GPS-C28, CHG-R8SPN-034). Sent with `addCartLine` for a meeting-room product, kept from the cart line to the order line, and shown on the venue's reception list for the booking. It must not exceed the room type's capacity, which the guest step shows beside each room type: more is refused `422 attendees-over-capacity` by `addCartLine`, naming the capacity. The guest steps run in the order `listProductStartTimes` can answer (lead answer, option A): date, room type, length, then start time."
+   },
+   "parking": {
+    "type": "object",
+    "nullable": true,
+    "description": "**A parking line's plate and day** (R8 blocker ORDERS-MONEY-C22, CHG-R8MIG-023): carried from `addCartLine` to the order line and passed to `issueOrderEntitlements`, which writes the parking entitlement's plate, `validFrom` and `validTo` from it. A sold-out answer (`soldOutForDay`) means the facility's capacity on the `validFrom` day.",
+    "required": [
+     "plate",
+     "validFrom",
+     "validTo"
+    ],
+    "properties": {
+     "plate": {
+      "type": "object",
+      "required": [
+       "number"
+      ],
+      "properties": {
+       "number": {
+        "type": "string",
+        "maxLength": 16
+       },
+       "country": {
+        "type": "string",
+        "maxLength": 3,
+        "nullable": true,
+        "description": "ISO 3166 code of the plate's country; null for the venue's own."
+       }
+      }
+     },
+     "validFrom": {
+      "type": "string",
+      "format": "date-time"
+     },
+     "validTo": {
+      "type": "string",
+      "format": "date-time"
+     }
+    }
+   },
+   "bundle": {
+    "type": "object",
+    "nullable": true,
+    "description": "**A bundle line's picks** (R8 blocker ORDERS-MONEY-C43, the lead's answer B for r8; CHG-R8MIG-023): the bundle and the option the guest chose in each choice group. The line's `variantId` is the bundle's own (`Bundle.variantId`); the server prices it at the bundle's own price and freezes the allocation at `createOrder` (ADR-0019). In r8 a bundle's admission is open-dated, so no date or session is asked.",
+    "required": [
+     "bundleId"
+    ],
+    "properties": {
+     "bundleId": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "choices": {
+      "type": "array",
+      "items": {
+       "type": "object",
+       "required": [
+        "choiceGroupId",
+        "optionId"
+       ],
+       "properties": {
+        "choiceGroupId": {
+         "type": "string",
+         "format": "uuid"
+        },
+        "optionId": {
+         "type": "string",
+         "format": "uuid"
+        }
+       }
+      }
+     }
+    }
    }
   }
  },
@@ -2593,6 +2758,11 @@
  },
  "Payment": {
   "x-ticvai-persistence": "orders.payment",
+  "x-ticvai-index": [
+   [
+    "providerReference"
+   ]
+  ],
   "type": "object",
   "required": [
    "id",
@@ -3625,6 +3795,15 @@
     "x-ticvai-derived": "onRead",
     "description": "True once any version has been published."
    },
+   "darkAppModules": {
+    "type": "array",
+    "readOnly": true,
+    "x-ticvai-derived": "onRead",
+    "description": "**The app-modules switched off for this tenant** (ADAM CR-164, option A, 18 October 2026; CHG-CRA-005): their keys (for example `AM-MARKETING-CRM-P01`), from the tenant's release flags. Returned to guests and staff alike; the apps leave those modules' screens out of navigation (the map is `handoff/release-flags.json`). An operation is dark for the tenant only when every app-module that binds it is off, so an operation shared with a live module stays callable. A flag the configuration does not declare counts as on. Additive: nothing new shows on screen.",
+    "items": {
+     "type": "string"
+    }
+   },
    "publishedVersion": {
     "type": "string",
     "nullable": true
@@ -3708,6 +3887,15 @@
        "type": "string",
        "maxLength": 200,
        "description": "The venue's name (`tenancy.OrgUnit.name`)."
+      },
+      "contact": {
+       "allOf": [
+        {
+         "$ref": "#/components/schemas/VenueContact"
+        }
+       ],
+       "nullable": true,
+       "description": "The venue's own contact (address, phone, email), from the venue's settings (`tenancy.VenueSettings`, read through `venueSettingsRecords`). Null when the venue has none set; the app then shows the tenant's `contact` (R8 blocker WHITE-C16)."
       },
       "city": {
        "type": "string",

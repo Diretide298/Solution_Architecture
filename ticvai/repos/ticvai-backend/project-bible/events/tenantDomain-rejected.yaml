@@ -1,0 +1,29 @@
+# tenantDomain.rejected v1 — published by platform
+# Added 20 October 2026 (r8 cause APPROVALS-TENANCY-C11): the control plane refuses a mapping whose hostname
+# another tenant holds, decided in its consumer of tenantDomain.mapped; white label shows the refusal.
+
+name: tenantDomain.rejected
+version: 1
+publisher: platform
+description: A custom domain mapping was refused because another tenant holds the hostname.
+aggregate: tenantDomain
+emittedWhen: Platform's consumer of tenantDomain.mapped finds the hostname held by another tenant (the final check
+  under the partial unique index on active hostnames)
+payload:
+- field: id
+  type: uuid
+  notes: The domain's id (the aggregateId)
+- field: hostname
+  type: string
+- field: tenantId
+  type: uuid
+- field: reason
+  type: string
+  notes: hostname-taken
+consumers:
+- context: white-label
+  purpose: Mark the tenant's custom domain refused (hostname taken) so CMS shows why it is not connected
+  idempotencyKey: eventId
+  onFailure: retryThenDeadLetter
+  isCritical: false
+retention: 30 days after publication

@@ -367,6 +367,7 @@ operations:
   - service
   offline: false
   reads:
+  - cache:idempotency
   - ledger.fx_rate
   - platform.region_settings
   writes:
@@ -680,6 +681,7 @@ operations:
   - service
   offline: false
   reads:
+  - cache:idempotency
   - ledger.account
   - ledger.journal_entry
   - ledger.journal_line
@@ -687,6 +689,7 @@ operations:
   - orders.order_line
   - orders.sales_order
   writes:
+  - cache:idempotency
   - ledger.journal_entry
   - ledger.journal_line
   - platform.idempotency_record
@@ -927,6 +930,7 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - ledger.fx_provider_assignment
   - platform.region_settings
   writes:
@@ -1041,9 +1045,11 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - catalogue.product
   - ledger.recognition_schedule
-  writes: []
+  writes:
+  - cache:idempotency
 - operation: verifyTaxExemption
   verb: POST
   path: /tax-exemptions/{exemptionId}/verify
@@ -1053,6 +1059,8 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - ledger.tax_exemption
   writes:
+  - cache:idempotency
   - ledger.tax_exemption

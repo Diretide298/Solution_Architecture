@@ -1,5 +1,5 @@
 id: LLD-approvals
-title: approvals — 58 operations
+title: approvals — 59 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: spine
@@ -31,7 +31,7 @@ operations:
   verb: PUT
   path: /matrix-multi-level
   scope: venue
-  permission: APPROVAL_REQUEST
+  permission: APPROVAL_CONFIGURE
   audience:
   - staff
   offline: false
@@ -47,7 +47,7 @@ operations:
   verb: PUT
   path: /role-authority-delegation
   scope: venue
-  permission: APPROVAL_REQUEST
+  permission: APPROVAL_CONFIGURE
   audience:
   - staff
   offline: false
@@ -85,7 +85,7 @@ operations:
   verb: PUT
   path: /versioning-governance
   scope: venue
-  permission: APPROVAL_REQUEST
+  permission: APPROVAL_CONFIGURE
   audience:
   - staff
   offline: false
@@ -108,10 +108,15 @@ operations:
   offline: false
   reads:
   - approvals.decision
+  - approvals.delegation
   - approvals.escalation
+  - approvals.matrix
   - approvals.request
+  - cache:idempotency
   writes:
   - approvals.request
+  - cache:idempotency
+  - platform.outbox
 - operation: cancelApprovalRequest
   verb: POST
   path: /approval-requests/{requestId}/cancel
@@ -124,8 +129,10 @@ operations:
   - approvals.decision
   - approvals.escalation
   - approvals.request
+  - cache:idempotency
   writes:
   - approvals.request
+  - cache:idempotency
 - operation: createApprovalDelegation
   verb: POST
   path: /delegations
@@ -154,8 +161,10 @@ operations:
   offline: false
   reads:
   - approvals.evidence_package
+  - cache:idempotency
   writes:
   - approvals.evidence_package
+  - cache:idempotency
 - operation: createApprovalRequest
   verb: POST
   path: /approval-requests
@@ -181,7 +190,7 @@ operations:
   verb: POST
   path: /automation-autonomou-action
   scope: venue
-  permission: APPROVAL_REQUEST
+  permission: APPROVAL_CONFIGURE
   audience:
   - staff
   offline: false
@@ -203,7 +212,9 @@ operations:
   offline: false
   reads:
   - approvals.decision
+  - approvals.delegation
   - approvals.escalation
+  - approvals.matrix
   - approvals.request
   - approvals.rule
   - cache:idempotency
@@ -230,6 +241,7 @@ operations:
   - approvals.escalation
   - approvals.request
   - approvals.rule
+  - approvals.sla_policy
   - cache:idempotency
   writes:
   - approvals.escalation
@@ -301,8 +313,10 @@ operations:
   offline: false
   reads:
   - approvals.accreditation_badge
+  - cache:idempotency
   writes:
   - approvals.accreditation_badge
+  - cache:idempotency
 - operation: listAccreditationBadges
   verb: GET
   path: /accreditation-badges
@@ -381,7 +395,9 @@ operations:
   offline: false
   reads:
   - approvals.decision
+  - approvals.delegation
   - approvals.escalation
+  - approvals.matrix
   - approvals.request
   writes: []
 - operation: listApprovedActionExecutions
@@ -436,7 +452,7 @@ operations:
   verb: GET
   path: /process-automation-opportunity
   scope: venue
-  permission: APPROVAL_VIEW
+  permission: REPORT_VIEW_VENUE
   audience:
   - staff
   offline: false
@@ -579,7 +595,7 @@ operations:
   verb: GET
   path: /workflow-process-performance
   scope: venue
-  permission: APPROVAL_VIEW
+  permission: REPORT_VIEW_VENUE
   audience:
   - staff
   offline: false
@@ -595,6 +611,20 @@ operations:
   - approvals.workflow_instance
   - approvals.workflow_step_execution
   writes: []
+- operation: recordApprovedActionOutcome
+  verb: POST
+  path: /internal/approval-requests/{requestId}/action-outcome
+  scope: tenant
+  permission: null
+  audience:
+  - service
+  offline: false
+  reads:
+  - approvals.approved_action_execution
+  - cache:idempotency
+  writes:
+  - approvals.approved_action_execution
+  - cache:idempotency
 - operation: recordExternalApprovalDecision
   verb: POST
   path: /approval-requests/{requestId}/external-decision
@@ -629,9 +659,11 @@ operations:
   - approvals.decision
   - approvals.escalation
   - approvals.request
+  - cache:idempotency
   writes:
   - approvals.escalation
   - approvals.request
+  - cache:idempotency
 - operation: resolveApprovedActionExecution
   verb: POST
   path: /approved-action-executions/{executionId}/resolve
@@ -642,8 +674,10 @@ operations:
   offline: false
   reads:
   - approvals.approved_action_execution
+  - cache:idempotency
   writes:
   - approvals.approved_action_execution
+  - cache:idempotency
 - operation: resubmitApprovalRequest
   verb: POST
   path: /approval-requests/{requestId}/resubmit
@@ -654,13 +688,16 @@ operations:
   offline: false
   reads:
   - approvals.decision
+  - approvals.delegation
   - approvals.escalation
+  - approvals.matrix
   - approvals.request
   - cache:idempotency
   writes:
   - approvals.escalation
   - approvals.request
   - cache:idempotency
+  - platform.outbox
 - operation: revokeApprovalDelegation
   verb: DELETE
   path: /delegations/{delegationId}
@@ -685,8 +722,10 @@ operations:
   offline: false
   reads:
   - approvals.control_policy
+  - cache:idempotency
   writes:
   - approvals.control_policy
+  - cache:idempotency
 - operation: setApprovalExternalProvider
   verb: PUT
   path: /approval-external-providers/{externalProviderId}
@@ -743,8 +782,10 @@ operations:
   offline: false
   reads:
   - approvals.sla_policy
+  - cache:idempotency
   writes:
   - approvals.sla_policy
+  - cache:idempotency
 - operation: setApproverAvailability
   verb: PUT
   path: /approval-delegations/availability/{availabilityId}
@@ -755,8 +796,10 @@ operations:
   offline: false
   reads:
   - approvals.approver_availability
+  - cache:idempotency
   writes:
   - approvals.approver_availability
+  - cache:idempotency
 - operation: setStepUpPolicy
   verb: PUT
   path: /step-up-policies
@@ -767,13 +810,15 @@ operations:
   offline: false
   reads:
   - approvals.step_up_policy
+  - cache:idempotency
   writes:
   - approvals.step_up_policy
+  - cache:idempotency
 - operation: setTriggerActionCross
   verb: PUT
   path: /trigger-action-cross
   scope: venue
-  permission: APPROVAL_REQUEST
+  permission: APPROVAL_CONFIGURE
   audience:
   - staff
   offline: false
@@ -788,7 +833,7 @@ operations:
   verb: PUT
   path: /visual-business-rule
   scope: venue
-  permission: APPROVAL_REQUEST
+  permission: APPROVAL_CONFIGURE
   audience:
   - staff
   offline: false
@@ -802,7 +847,7 @@ operations:
   verb: PUT
   path: /visual-workflow
   scope: venue
-  permission: APPROVAL_REQUEST
+  permission: APPROVAL_CONFIGURE
   audience:
   - staff
   offline: false
@@ -824,13 +869,15 @@ operations:
   offline: false
   reads:
   - approvals.signature
+  - cache:idempotency
   writes:
   - approvals.signature
+  - cache:idempotency
 - operation: simulateWorkflowTestingImpact
   verb: PUT
   path: /workflow-testing-impact
   scope: venue
-  permission: APPROVAL_REQUEST
+  permission: APPROVAL_CONFIGURE
   audience:
   - staff
   offline: false
@@ -862,7 +909,9 @@ operations:
   offline: false
   reads:
   - approvals.decision
+  - approvals.delegation
   - approvals.escalation
+  - approvals.matrix
   - approvals.request
   - approvals.rule
   - cache:idempotency
@@ -886,3 +935,4 @@ operations:
   writes:
   - approvals.request
   - cache:idempotency
+  - platform.outbox

@@ -1,5 +1,5 @@
 id: LLD-ai
-title: ai — 144 operations
+title: ai — 146 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -422,7 +422,7 @@ operations:
   verb: POST
   path: /proposed-actions/{actionId}/decide
   scope: venue
-  permission: AI_APPROVE
+  permission: AI_USE
   audience:
   - staff
   offline: false
@@ -471,6 +471,20 @@ operations:
   - ai.case_evidence
   - ai.risk_alert
   - ai.risk_case
+  - cache:idempotency
+- operation: eraseSubject
+  verb: POST
+  path: /internal/subjects/{subjectId}/ai-erasure
+  scope: tenant
+  permission: null
+  audience:
+  - service
+  offline: false
+  reads:
+  - cache:idempotency
+  writes:
+  - ai.chunk_embedding
+  - ai.index_entry
   - cache:idempotency
 - operation: evaluateAiGovernance
   verb: POST
@@ -663,7 +677,7 @@ operations:
 - operation: getAiPolicy
   verb: GET
   path: /policy
-  scope: tenant
+  scope: venue
   permission: AI_CONFIGURE
   audience:
   - staff
@@ -793,6 +807,7 @@ operations:
   offline: false
   reads:
   - ai.forecast_accuracy
+  - ai.forecast_definition
   writes: []
 - operation: getGuidedChoiceSuggestion
   verb: GET
@@ -854,6 +869,7 @@ operations:
   - assets.media_asset
   - cache:idempotency
   writes:
+  - ai.capability_maturity
   - ai.history_import
   - ai.history_observation
   - cache:idempotency
@@ -1021,7 +1037,7 @@ operations:
 - operation: listAiProviders
   verb: GET
   path: /providers
-  scope: region
+  scope: tenant
   permission: AI_CONFIGURE
   audience:
   - staff
@@ -1140,6 +1156,7 @@ operations:
   - staff
   offline: false
   reads:
+  - ai.forecast_definition
   - ai.forecast_version
   writes: []
 - operation: listIndexFailures
@@ -1238,7 +1255,7 @@ operations:
   verb: GET
   path: /proposed-actions
   scope: venue
-  permission: AI_APPROVE
+  permission: AI_USE
   audience:
   - staff
   offline: false
@@ -1324,6 +1341,7 @@ operations:
   - staff
   offline: false
   reads:
+  - ai.action_plan
   - ai.capability
   - cache:idempotency
   writes:
@@ -1331,12 +1349,13 @@ operations:
   - ai.capability
   - ai.decision_record
   - ai.intervention
+  - ai.outbox
   - cache:idempotency
 - operation: promoteAiRelease
   verb: POST
   path: /releases/{releaseId}/promote
   scope: tenant
-  permission: AI_APPROVE
+  permission: AI_USE
   audience:
   - staff
   offline: false
@@ -1391,7 +1410,6 @@ operations:
   - cache:idempotency
   - catalogue.event
   - catalogue.product
-  - control.content_block
   - marketing.campaign
   - marketing.message_template
   - promotions.promotion
@@ -1462,12 +1480,12 @@ operations:
   - ai.policy
   - ai.provider
   - cache:idempotency
-  - control.content_block
   - marketing.message_template
   - marketing.message_template_version
   writes:
   - ai.activity
   - ai.proposed_action
+  - ai.translation_job
   - cache:idempotency
 - operation: proposeVenueLabels
   verb: POST
@@ -1528,7 +1546,7 @@ operations:
   verb: POST
   path: /forecast-versions/{versionId}/publish
   scope: venue
-  permission: AI_APPROVE
+  permission: AI_USE
   audience:
   - staff
   offline: false
@@ -1861,6 +1879,20 @@ operations:
   - ai.forecast_point
   - ai.forecast_version
   - cache:idempotency
+- operation: runGuidedChoiceSuggestionJob
+  verb: POST
+  path: /venues/{venueId}/guided-choice-suggestion-jobs
+  scope: venue
+  permission: null
+  audience:
+  - service
+  offline: false
+  reads:
+  - ai.guided_choice_suggestion
+  - cache:idempotency
+  writes:
+  - ai.guided_choice_suggestion
+  - cache:idempotency
 - operation: scoreApprovalRequest
   verb: POST
   path: /approval-requests/{approvalRequestId}/score
@@ -1979,7 +2011,7 @@ operations:
   verb: PUT
   path: /ai-providers/{providerId}/credential
   scope: tenant
-  permission: AI_CONFIGURE
+  permission: PLATFORM_TENANT_MANAGE
   audience:
   - staff
   offline: false
@@ -2007,7 +2039,7 @@ operations:
 - operation: setAiPolicy
   verb: PUT
   path: /policy
-  scope: tenant
+  scope: venue
   permission: AI_CONFIGURE
   audience:
   - staff
@@ -2021,8 +2053,8 @@ operations:
 - operation: setAiProvider
   verb: PUT
   path: /providers/{providerId}
-  scope: region
-  permission: AI_CONFIGURE
+  scope: tenant
+  permission: PLATFORM_TENANT_MANAGE
   audience:
   - staff
   offline: false
@@ -2058,8 +2090,10 @@ operations:
   offline: false
   reads:
   - ai.spend_ceiling
+  - cache:idempotency
   writes:
   - ai.spend_ceiling
+  - cache:idempotency
 - operation: setAiTool
   verb: PUT
   path: /tools/{toolKey}
@@ -2224,6 +2258,8 @@ operations:
   - staff
   offline: false
   reads:
+  - ai.byok_enablement
+  - ai.model
   - ai.provider
   - cache:idempotency
   writes:

@@ -28,7 +28,7 @@ steps:
   - getCart
   - addCartLine
   - evaluatePromotions
-  - getCouponCode
+  - getGuestCouponCode
   - extendCart
   outcome: '**`extendCart` exists because a cart with a timed-entry lease expires.** A guest deciding
     for ten minutes should not lose the slot silently.'

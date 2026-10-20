@@ -9,7 +9,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/general/support-and-escalation-console",
-   "component": "apps/ticvai-web/src/routes/general/SupportAndEscalationConsoleDetail.tsx",
+   "component": "src/routes/general/SupportAndEscalationConsoleDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -217,7 +217,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/general/platform-notification-broadcast",
-   "component": "apps/ticvai-web/src/routes/general/PlatformNotificationBroadcastForm.tsx",
+   "component": "src/routes/general/PlatformNotificationBroadcastForm.tsx",
    "status": "notStarted"
   },
   "navigation": {

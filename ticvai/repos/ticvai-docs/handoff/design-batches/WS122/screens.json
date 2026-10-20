@@ -15,7 +15,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/platform/ai-human-oversight-command-center-adm-529",
-   "component": "apps/ticvai-web/src/routes/platform/AiHumanOversightCommandCenter.tsx",
+   "component": "src/routes/platform/AiHumanOversightCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -375,7 +375,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/platform/ai-approval-requirement-routing-configuration-adm-530",
-   "component": "apps/ticvai-web/src/routes/platform/AiApprovalRequirementRoutingConfiguration.tsx",
+   "component": "src/routes/platform/AiApprovalRequirementRoutingConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -689,7 +689,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/platform/ai-approval-review-workspace-adm-531",
-   "component": "apps/ticvai-web/src/routes/platform/AiApprovalReviewWorkspace.tsx",
+   "component": "src/routes/platform/AiApprovalReviewWorkspace.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -900,7 +900,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/platform/conditional-approval-approval-conditions-adm-532",
-   "component": "apps/ticvai-web/src/routes/platform/ConditionalApprovalApprovalConditions.tsx",
+   "component": "src/routes/platform/ConditionalApprovalApprovalConditions.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1171,7 +1171,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/platform/human-review-challenge-ai-clarification-workspace-adm-533",
-   "component": "apps/ticvai-web/src/routes/platform/HumanReviewChallengeAiClarificationWorkspace.tsx",
+   "component": "src/routes/platform/HumanReviewChallengeAiClarificationWorkspace.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1426,7 +1426,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/platform/escalation-delegation-approval-sla-management-adm-534",
-   "component": "apps/ticvai-web/src/routes/platform/EscalationDelegationApprovalSlaManagement.tsx",
+   "component": "src/routes/platform/EscalationDelegationApprovalSlaManagement.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1730,7 +1730,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/platform/live-ai-execution-oversight-human-intervention-adm-535",
-   "component": "apps/ticvai-web/src/routes/platform/LiveAiExecutionOversightHumanIntervention.tsx",
+   "component": "src/routes/platform/LiveAiExecutionOversightHumanIntervention.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -2056,7 +2056,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/platform/human-override-manual-control-center-adm-536",
-   "component": "apps/ticvai-web/src/routes/platform/HumanOverrideManualControlCenter.tsx",
+   "component": "src/routes/platform/HumanOverrideManualControlCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -2452,7 +2452,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/platform/approval-intervention-history-decision-timeline-adm-537",
-   "component": "apps/ticvai-web/src/routes/platform/ApprovalInterventionHistoryDecisionTimeline.tsx",
+   "component": "src/routes/platform/ApprovalInterventionHistoryDecisionTimeline.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -2684,7 +2684,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/platform/human-oversight-workflow-simulator-readiness-center-adm-538",
-   "component": "apps/ticvai-web/src/routes/platform/HumanOversightWorkflowSimulatorReadinessCenter.tsx",
+   "component": "src/routes/platform/HumanOversightWorkflowSimulatorReadinessCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {

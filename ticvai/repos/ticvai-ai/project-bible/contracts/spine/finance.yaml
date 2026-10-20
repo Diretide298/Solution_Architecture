@@ -5101,8 +5101,12 @@ components:
           type: string
           format: uuid
           nullable: true
-          description: A simplified invoice this full invoice replaces for the same supply. Refused unless the law
-            allows it (make-or-break on issueTaxInvoice).
+          description: 'A simplified invoice this full invoice replaces for the same supply. Refused unless the law
+            allows it (make-or-break on issueTaxInvoice). **Not sent in r8** (decided 20 October 2026, Chinmay, R8
+            blocker cause ORDERS-MONEY-C06, option C; CHG-R8SPN-026): until the client''s written answer to CF-133,
+            the server refuses any value `422 supersede-not-allowed`, and "Get a tax invoice" is not offered for an
+            order already on an invoice: that order answers `409 order-already-invoiced` and the screen shows the
+            invoice it has.'
         deliverToEmail:
           type: string
           format: email
@@ -5122,6 +5126,10 @@ components:
           type: string
           maxLength: 1000
           nullable: true
+          description: 'The recipient''s postal address. **Required, not null and not empty, on a `full` or
+            `consolidated` invoice** (Executive Regulation Article 59; R8 blocker cause ORDERS-MONEY-C06,
+            CHG-R8SPN-026): without it `issueTaxInvoice` refuses `422 recipient-required`, so the guest form that
+            asks for a full invoice (GST-019) collects it. Null on a `simplified` invoice.'
         countryCode:
           type: string
           pattern: ^[A-Z]{2}$
@@ -6320,11 +6328,17 @@ components:
       - chargebackFee       # the scheme or acquirer fee, won or lost
     AccountMapping:
       x-ticvai-persistence: ledger.account_mapping
+      # A venue reads its region's row (ADAM CR-168; CHG-CRA-007): read-beneath, writes stay with the row's own scope.
+      x-ticvai-rls: read-beneath
       type: object
+      description: '**Found by venue, then region** (ADAM CR-168, option A, 18 October 2026; CHG-CRA-007): a posting
+        uses the venue''s own row for its event type, else the row for the venue''s region, else it is refused. A
+        region''s row carries the region''s scope path, so the venue''s row-level security reads it too.'
       required:
       - eventType
       - debitAccountId
       - creditAccountId
+      - scopePath
       properties:
         eventType:
           $ref: '#/components/schemas/PostingEventType'
@@ -6339,6 +6353,11 @@ components:
           format: uuid
           nullable: true
           description: Null applies the mapping to every venue in the region.
+        scopePath:
+          type: string
+          readOnly: true
+          description: 'Where the row is owned: the venue''s path for a venue row, the region''s path for a region row
+            (`venueId` null), set by the server from `setAccountMappings`'' scope (ADAM CR-168; CHG-CRA-007).'
     CostCenter:
       x-ticvai-persistence: ledger.cost_center
       type: object
@@ -6942,6 +6961,7 @@ components:
       - reversal
       - writeOff   # posted by recordWriteOff
       - chargeback # posted by orders recordChargeback and recordChargebackOutcome (29 September)
+      - payment    # the cash receipt orders createPayment posts: sourceId the payment, reference the order (CR-168)
     JournalLine:
       x-ticvai-append-only: postedAt
       type: object
@@ -7008,6 +7028,9 @@ components:
             $ref: '#/components/schemas/JournalLine'
     JournalEntry:
       x-ticvai-persistence: ledger.journal_entry + ledger.journal_line
+      # Entry numbers are unique per legal entity (ADAM CR-168, 18 October 2026; CHG-CRA-007), replacing the
+      # tenant-wide index: journal_entry_legal_entity_id_entry_number_uniq on (legal_entity_id, lower(entry_number)).
+      x-ticvai-unique-together: [[legalEntityId, entryNumber]]
       type: object
       required:
       - id
@@ -7025,14 +7048,23 @@ components:
           type: string
           format: uuid
         entryNumber:
-          x-ticvai-unique: tenant
           type: string
           readOnly: true
           description: 'Server-assigned, **in sequence per legal entity per fiscal year** (decided 28 September,
             audit R191), for example `JE-2026-000123`. Gapless within the legal entity and year: a number is
-            taken when the entry reaches the ledger, not when a draft is saved.
+            taken when the entry reaches the ledger, not when a draft is saved. **Unique per legal entity**,
+            whatever its case (ADAM CR-168, 18 October 2026; CHG-CRA-007). **The year in it is the fiscal year''s
+            label, the calendar year the fiscal year starts in**: a proposed default, for the client''s finance team
+            to correct.
 
             '
+        legalEntityId:
+          type: string
+          format: uuid
+          readOnly: true
+          x-ticvai-references: ledger.legal_entity
+          description: 'The legal entity whose ledger the entry is in: its fiscal period''s, copied so the entry number
+            is unique per legal entity (ADAM CR-168; CHG-CRA-007).'
         fiscalPeriodId:
           type: string
           format: uuid

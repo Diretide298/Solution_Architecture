@@ -169,3 +169,5 @@ breaks two decisions already taken.
 3. [ ] Producer interface, maturity block, starting answers for the Block A suggestion kinds (queue balancing, prep plan, upsell). (about 1.5 AI-weeks, second AI engineer)
 
 **Block B** — per the AI2 sprint plan: packs, venue profile and forecast prior (S3), statistical producers (S4–S5), training and backtest job (S6), promotion rule (S7), learned producers in shadow (S8).
+
+**Amended 20 October 2026 (r8 cause FOUNDATION-AI-C54): a starting pattern is a file, not a row.** `startingPatternKey` names a pack file inside the ticvai-ai image (`<venueType>@<n>`, with `other` the flat-curve fallback); there is no table of packs. Writing the packs' content is TICVAI's work in ticvai-ai, versioned with the image.

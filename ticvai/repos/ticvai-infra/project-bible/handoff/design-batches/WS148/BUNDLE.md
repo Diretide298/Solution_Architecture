@@ -107,9 +107,9 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `ADM-569` | Payment Orchestration Command Center | C | 0 | 21 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-570` | Gateway, PSP & Acquirer Directory | A | 25 | 44 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-571` | Provider Connection & Adapter Configuration | C | 0 | 41 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-572` | Gateway Capability & Payment Method Mapping | C | 0 | 19 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-570` | Gateway, PSP & Acquirer Directory | A | 26 | 46 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-571` | Provider Connection & Adapter Configuration | C | 0 | 42 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-572` | Gateway Capability & Payment Method Mapping | C | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `ADM-573` | Payment Routing Rule Builder | C | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `ADM-574` | Routing Strategy, Priority & Load Distribution | C | 0 | 18 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `ADM-575` | Failover, Retry & Resilience Manager | C | 8 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
@@ -367,6 +367,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
 | ID `id` | picker: choose an id | optional | — | — | shows names, sends the id | — | `createPaymentProviderConnection` body |
+| Provider `providerId` | picker: choose a provider | optional | — | — | shows names, sends the id | Which provider this connection is to (ADAM CR-165, 18 October 2026; CHG-CRA-004): a key to `payments.provider`, whose `kind` already says `stripe` or `networkInternational`. | `createPaymentProviderConnection` body |
 | Code `code` | text field | required | — | — | — | — | `createPaymentProviderConnection` body |
 | Name `name` | text field | optional | — | — | — | — | `createPaymentProviderConnection` body |
 | Provider kind `providerKind` | radio group | required | — | Gateway · Psp · Acquirer · Wallet provider · Bnpl provider | — | — | `createPaymentProviderConnection` body |
@@ -411,6 +412,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Shows | Format | Notes |
 |---|---|---|
 | ID | the name it points at, never the id | — |
+| Provider | the name it points at, never the id | Which provider this connection is to (ADAM CR-165, 18 October 2026; CHG-CRA-004): a key to `payments.provider`, whose `kind` already says … |
 | Code | text | — |
 | Name | text | — |
 | Provider kind | chip: Gateway, Psp, Acquirer, Wallet provider, Bnpl provider | — |
@@ -435,6 +437,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Shows | Format | Notes |
 |---|---|---|
 | ID | the name it points at, never the id | — |
+| Provider | the name it points at, never the id | Which provider this connection is to (ADAM CR-165, 18 October 2026; CHG-CRA-004): a key to `payments.provider`, whose `kind` already says … |
 | Code | text | — |
 | Name | text | — |
 | Provider kind | chip: Gateway, Psp, Acquirer, Wallet provider, Bnpl provider | — |
@@ -536,8 +539,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (25), with its required mark, default, format and its error state (409).
-- [ ] Every output is drawn (44 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (26), with its required mark, default, format and its error state (409).
+- [ ] Every output is drawn (46 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-570?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Connect a provider, Connect, Cancel.
 - [ ] Every transition is wired: `ADM-569`.
@@ -605,6 +608,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Shows | Format | Notes |
 |---|---|---|
 | ID | the name it points at, never the id | — |
+| Provider | the name it points at, never the id | Which provider this connection is to (ADAM CR-165, 18 October 2026; CHG-CRA-004): a key to `payments.provider`, whose `kind` already says … |
 | Code | text | — |
 | Name | text | — |
 | Provider kind | chip: Gateway, Psp, Acquirer, Wallet provider, Bnpl provider | — |
@@ -720,7 +724,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state (409).
-- [ ] Every output is drawn (41 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (42 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-571?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: API endpoint reference, Webhook configuration, Callback configuration, Retry configuration.
 - [ ] Every transition is wired: `ADM-569`.
@@ -771,6 +775,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Shows | Format | Notes |
 |---|---|---|
 | ID | the name it points at, never the id | — |
+| Provider | the name it points at, never the id | Which provider this connection is to (ADAM CR-165, 18 October 2026; CHG-CRA-004): a key to `payments.provider`, whose `kind` already says … |
 | Code | text | — |
 | Name | text | — |
 | Provider kind | chip: Gateway, Psp, Acquirer, Wallet provider, Bnpl provider | — |
@@ -855,7 +860,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (19 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-572?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `ADM-569`.
@@ -1811,7 +1816,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 ```json
 {
 "PaymentFailoverPolicy": {"type":"object","x-ticvai-persistence":"payments.failover_policy","description":"Board 2.7. **A decline is final; a timeout is not. Retrying the first is how a guest gets charged twice.**\n","properties":{"retryableOutcomes":{"type":"array","items":{"type":"string","enum":["timeout","connectionRefused","providerError5xx","rateLimited","issuerUnavailable"]},"description":"**Explicit, rather than \"anything that was not a success\".**"},"maxAttempts":{"type":"integer","default":2},"backoffMs":{"type":"integer","default":500},"failoverToNextProvider":{"type":"boolean","default":true},"circuitBreaker":{"type":"object","description":"**A hundred tills each discovering an outage independently is a hundred queues.**\n","properties":{"failureThresholdPercent":{"type":"number","default":25},"windowSeconds":{"type":"integer","default":60},"minimumSample":{"type":"integer","default":20},"openForSeconds":{"type":"integer","default":300},"alertOnOpen":{"type":"boolean","default":true}}},"scopePath":{"type":"string"}}},
-"PaymentProviderConnection": {"x-ticvai-rls":"read-beneath","type":"object","x-ticvai-persistence":"payments.provider_connection","description":"Boards 2.2 and 2.4. **Capability mapping is the part that gets skipped.**","required":["code","providerKind"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"x-ticvai-unique":"tenant","type":"string"},"name":{"type":"string"},"providerKind":{"type":"string","enum":["gateway","psp","acquirer","walletProvider","bnplProvider"]},"environment":{"type":"string","enum":["sandbox","production"]},"credentialFingerprint":{"type":"string","readOnly":true,"description":"**Written, never read back.** Enough to confirm which key is in use without the key being retrievable from a screen.\n"},"capabilities":{"type":"object","properties":{"methods":{"type":"array","items":{"type":"string"}},"currencies":{"type":"array","items":{"type":"string"}},"partialCapture":{"type":"boolean","default":false},"multipleCapture":{"type":"boolean","default":false},"refundWindowDays":{"type":"integer","nullable":true},"tokenisation":{"type":"boolean","default":false},"threeDSecure":{"type":"boolean","default":false},"cardPresent":{"type":"boolean","default":false}}},"merchantAccountId":{"type":"string","format":"uuid","nullable":true},"status":{"type":"string","enum":["draft","testing","active","degraded","disabled"]},"lastTestedAt":{"type":"string","format":"date-time","nullable":true},"scopePath":{"type":"string"},"credentialRef":{"x-ticvai-secret":"vault-reference","type":"string","writeOnly":true,"description":"**Where the provider credential is kept** (4 October 2026, CHG-FXC-010; ADM-570): the vault reference the credential was stored under, as `SetPaymentProviderRequest.credentialRef`. Sent on create, never returned; `credentialFingerprint` is what reads show."}}},
+"PaymentProviderConnection": {"x-ticvai-rls":"read-beneath","type":"object","x-ticvai-persistence":"payments.provider_connection","description":"Boards 2.2 and 2.4. **Capability mapping is the part that gets skipped.**","required":["code","providerKind"],"properties":{"id":{"type":"string","format":"uuid"},"providerId":{"type":"string","format":"uuid","nullable":true,"x-ticvai-references":"payments.provider","description":"**Which provider this connection is to** (ADAM CR-165, 18 October 2026; CHG-CRA-004): a key to `payments.provider`, whose `kind` already says `stripe` or `networkInternational`. The payment webhook checks it against the `{provider}` in its path, so an event for another provider is a 404."},"code":{"x-ticvai-unique":"tenant","type":"string"},"name":{"type":"string"},"providerKind":{"type":"string","enum":["gateway","psp","acquirer","walletProvider","bnplProvider"]},"environment":{"type":"string","enum":["sandbox","production"]},"credentialFingerprint":{"type":"string","readOnly":true,"description":"**Written, never read back.** Enough to confirm which key is in use without the key being retrievable from a screen.\n"},"capabilities":{"type":"object","properties":{"methods":{"type":"array","items":{"type":"string"}},"currencies":{"type":"array","items":{"type":"string"}},"partialCapture":{"type":"boolean","default":false},"multipleCapture":{"type":"boolean","default":false},"refundWindowDays":{"type":"integer","nullable":true},"tokenisation":{"type":"boolean","default":false},"threeDSecure":{"type":"boolean","default":false},"cardPresent":{"type":"boolean","default":false}}},"merchantAccountId":{"type":"string","format":"uuid","nullable":true},"status":{"type":"string","enum":["draft","testing","active","degraded","disabled"]},"lastTestedAt":{"type":"string","format":"date-time","nullable":true},"scopePath":{"type":"string"},"credentialRef":{"x-ticvai-secret":"vault-reference","type":"string","writeOnly":true,"description":"**Where the provider credential is kept** (4 October 2026, CHG-FXC-010; ADM-570): the vault reference the credential was stored under, as `SetPaymentProviderRequest.credentialRef`. Sent on create, never returned; `credentialFingerprint` is what reads show."}}},
 "PaymentRoutingRule": {"type":"object","x-ticvai-persistence":"payments.routing_rule","description":"Boards 2.5 and 2.6. **Priority and distribution are both needed.**","required":["code"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"priority":{"type":"integer","default":0},"conditions":{"type":"object","properties":{"methodIds":{"type":"array","items":{"type":"string","format":"uuid"}},"currencies":{"type":"array","items":{"type":"string"}},"venueIds":{"type":"array","items":{"type":"string","format":"uuid"}},"channels":{"type":"array","items":{"type":"string"}},"minimumAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"maximumAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"cardSchemes":{"type":"array","items":{"type":"string"}},"cardIssuerCountries":{"type":"array","items":{"type":"string"}}}},"targets":{"x-ticvai-persistence-column":"jsonb","x-ticvai-persistence-kind":"valueObject","type":"array","items":{"type":"object","properties":{"connectionId":{"type":"string","format":"uuid"},"sharePercent":{"type":"integer","nullable":true},"rank":{"type":"integer"}}}},"strategy":{"type":"string","enum":["priorityOrder","loadShare","lowestCost","highestAuthRate"],"default":"priorityOrder"},"scopePath":{"type":"string"},"isActive":{"type":"boolean","default":true}}},
 "ProviderEconomics": {"type":"object","description":"Board 2.9. **Cost per transaction is a routing input.**","properties":{"connectionId":{"type":"string","format":"uuid"},"providerName":{"type":"string"},"transactions":{"type":"integer"},"grossVolume":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"schemeFees":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"interchange":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"acquirerMargin":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"fxSpread":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"chargebackCost":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"totalCost":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"effectiveRatePercent":{"type":"number"}}},
 "ProviderHealth": {"type":"object","description":"Board 2.8. **Authorisation rate is the number, and it is not uptime.**","properties":{"connectionId":{"type":"string","format":"uuid"},"providerName":{"type":"string"},"transactions":{"type":"integer"},"authorisationRate":{"type":"number"},"baselineAuthorisationRate":{"type":"number","nullable":true},"declineRate":{"type":"number"},"errorRate":{"type":"number"},"p50LatencyMs":{"type":"integer"},"p95LatencyMs":{"type":"integer"},"circuitState":{"type":"string","enum":["closed","open","halfOpen"]},"status":{"type":"string","enum":["healthy","degraded","failing","disabled"]}}},

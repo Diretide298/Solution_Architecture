@@ -3894,9 +3894,11 @@ components:
       - rentalAgreement
       - order
       - transfer
+      - retailReservation
       - other
       description: What a stock reservation is for (decided 17 September, M17-02; `rentalAgreement` is the
-        existing use from `rental.agreement_item`).
+        existing use from `rental.agreement_item`; `retailReservation` is Retail's `reserveMerchandise`, whose
+        reservation id is `sourceId`, R8 blocker APPROVALS-TENANCY-C34).
     InventorySupplierContract:
       type: object
       x-ticvai-persistence: inventory.supplier_contract

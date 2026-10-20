@@ -56,7 +56,7 @@
  },
  "CapacityPack": {
   "type": "object",
-  "x-ticvai-persistence": "subscription.capacity_pack",
+  "x-ticvai-persistence": "control.capacity_pack",
   "description": "Board 3.8. **A good season should not require renegotiating a contract in August.**\n",
   "required": [
    "tenantId",
@@ -69,7 +69,7 @@
     "format": "uuid"
    },
    "tenantId": {
-    "x-ticvai-references": "none",
+    "x-ticvai-references": "control.tenant",
     "type": "string",
     "format": "uuid"
    },
@@ -122,7 +122,7 @@
     "type": "integer",
     "nullable": true,
     "x-ticvai-column": "limit_value",
-    "description": "Null means unlimited. Stored as `limit_value` — `limit` is a reserved word, and `subscription.tier_allowance` already names the same figure `limit_value`."
+    "description": "Null means unlimited. Stored as `limit_value` — `limit` is a reserved word, and `control.tier_allowance` already names the same figure `limit_value`."
    },
    "overageAllowed": {
     "type": "boolean",
@@ -136,6 +136,7 @@
  "EntitlementUsage": {
   "x-ticvai-persistence": "none — aggregated from usage_record",
   "type": "object",
+  "description": "**How each figure is worked out** (R8 blocker APPROVALS-TENANCY-C14; the lead's answer of 20 October 2026: proposed, client to correct). `current`: for a stock metric (`venues`, `workstations`, `activeUsers`, `devices`, `brandedApps`, `guestProfiles`, `storageGb`) the latest `control.usage_record` per venue, summed over the tenant's venues; for a flow metric (`aiTokens`, `apiCalls`, `transactions`) the sum of the records in the contract's current billing period. Rounded up to a whole number. `limit`: the plan's `control.plan_limit` for the metric (`aiTokens`: the plan's `includedAiTokens`), plus every add-on limit in force today (`validFrom` <= today <= `validTo` or no `validTo`), plus every unexpired capacity pack; null when any of them is unlimited, and then `percentUsed`, `isNearLimit` and `isExceeded` are null, false and false. `percentUsed` = current / limit x 100. `isNearLimit`: `percentUsed` at or above the lowest `atPercentOfAllowance` of the enforcement policy's `notify` thresholds, or 80 when it has none. `isExceeded`: current above limit and the plan limit does not allow overage. `asAt`: the latest `recordedAt` read.",
   "required": [
    "tenantId",
    "metrics"
@@ -246,7 +247,7 @@
  },
  "LicenceEnforcementPolicy": {
   "type": "object",
-  "x-ticvai-persistence": "subscription.enforcement_policy",
+  "x-ticvai-persistence": "control.enforcement_policy",
   "description": "Board 9.5. **Refusing service to a paying customer mid-season is a commercial decision.**\n",
   "properties": {
    "id": {
@@ -295,7 +296,7 @@
   }
  },
  "LicencePosition": {
-  "x-ticvai-persistence": "none — union of the tenant's plan (control.tenant.plan_id -> subscription.plan_module, subscription.plan_limit) and its add-ons (control.licence_add_on, control.licence_add_on_limit by tenant_id)",
+  "x-ticvai-persistence": "none — union of the tenant's plan (control.tenant.plan_id -> control.plan_module, control.plan_limit) and its add-ons (control.licence_add_on, control.licence_add_on_limit by tenant_id)",
   "type": "object",
   "required": [
    "tenantId",
@@ -320,7 +321,7 @@
    },
    "licensedModules": {
     "type": "array",
-    "description": "Union of plan modules and add-ons. The White Label Builder reads this and cannot enable anything absent from it.\n\n**`moduleKey` values are `ModuleKey`s** (4 October 2026, CHG-FXC-010; ADM-424), the vocabulary of\n`white-label.ModuleEnablement.moduleKey`.",
+    "description": "Union of plan modules and add-ons. The White Label Builder reads this and cannot enable anything absent from it.\n\n**`moduleKey` values are the licence modules of `ModuleKey` in common.yaml** (R8 blocker fix, IDENTITY-C31).\nThey are **not** the white-label app features of `white-label.ModuleEnablement.moduleKey`, a finer list;\ncommon.yaml maps each feature to the licence module that licenses it, and a feature key is never listed here.",
     "items": {
      "type": "object",
      "required": [

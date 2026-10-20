@@ -15,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/media-library/ai-asset-intelligence-command-center-cms-071",
-   "component": "apps/venue-management-web/src/routes/media-library/AiAssetIntelligenceCommandCenter.tsx",
+   "component": "src/routes/media-library/AiAssetIntelligenceCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -339,7 +339,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/media-library/ai-auto-tagging-content-understanding-cms-072",
-   "component": "apps/venue-management-web/src/routes/media-library/AiAutoTaggingContentUnderstanding.tsx",
+   "component": "src/routes/media-library/AiAutoTaggingContentUnderstanding.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -508,7 +508,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/media-library/semantic-natural-language-asset-search-cms-073",
-   "component": "apps/venue-management-web/src/routes/media-library/SemanticNaturalLanguageAssetSearch.tsx",
+   "component": "src/routes/media-library/SemanticNaturalLanguageAssetSearch.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -659,7 +659,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/media-library/visual-similarity-related-asset-discovery-cms-074",
-   "component": "apps/venue-management-web/src/routes/media-library/VisualSimilarityRelatedAssetDiscovery.tsx",
+   "component": "src/routes/media-library/VisualSimilarityRelatedAssetDiscovery.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -818,7 +818,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/media-library/duplicate-near-duplicate-management-cms-075",
-   "component": "apps/venue-management-web/src/routes/media-library/DuplicateNearDuplicateManagement.tsx",
+   "component": "src/routes/media-library/DuplicateNearDuplicateManagement.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1039,7 +1039,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/media-library/asset-version-control-revision-history-cms-076",
-   "component": "apps/venue-management-web/src/routes/media-library/AssetVersionControlRevisionHistory.tsx",
+   "component": "src/routes/media-library/AssetVersionControlRevisionHistory.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1192,7 +1192,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/media-library/version-comparison-replacement-impact-cms-077",
-   "component": "apps/venue-management-web/src/routes/media-library/VersionComparisonReplacementImpact.tsx",
+   "component": "src/routes/media-library/VersionComparisonReplacementImpact.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1315,7 +1315,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/media-library/transformation-rendition-management-cms-078",
-   "component": "apps/venue-management-web/src/routes/media-library/TransformationRenditionManagement.tsx",
+   "component": "src/routes/media-library/TransformationRenditionManagement.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1456,7 +1456,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/media-library/rendition-processing-delivery-readiness-cms-079",
-   "component": "apps/venue-management-web/src/routes/media-library/RenditionProcessingDeliveryReadiness.tsx",
+   "component": "src/routes/media-library/RenditionProcessingDeliveryReadiness.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1611,7 +1611,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/media-library/ai-quality-intelligence-review-recommendations-cms-080",
-   "component": "apps/venue-management-web/src/routes/media-library/AiQualityIntelligenceReviewRecommendations.tsx",
+   "component": "src/routes/media-library/AiQualityIntelligenceReviewRecommendations.tsx",
    "status": "notStarted"
   },
   "navigation": {

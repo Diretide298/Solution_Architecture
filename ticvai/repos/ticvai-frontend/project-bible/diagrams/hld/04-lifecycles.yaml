@@ -1,13 +1,13 @@
 id: HLD-LIFECYCLES
 sourceFiles:
   folder: states/
-  files: 208
-  drawn: 207
+  files: 209
+  drawn: 208
   skipped:
   - _schema.yaml
   why: '**`_schema.yaml` is the shape, not a model.** Every state file validates against it; it has
     no entity and no transitions.'
-title: 207 state models and 89 events
+title: 208 state models and 96 events
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/00-platform.yaml
 about: '**What can happen to a thing, and in what order.** A state model is a lifecycle within one entity;
@@ -986,7 +986,7 @@ stateModels:
   owner: control
   service: PlatformService
   states: null
-  transitions: 9
+  transitions: 10
   initial:
   - provisioning
   terminal:
@@ -997,7 +997,8 @@ stateModels:
   - decommissionCell
   - reactivateTenant
   - suspendTenant
-  guarded: 9
+  - updateCellTier
+  guarded: 10
   ref: diagrams/lld/lifecycles/cell.yaml
 - entity: Challenge
   contract: marketing-crm
@@ -1741,13 +1742,14 @@ stateModels:
   owner: assets
   service: VenueOpsService
   states: null
-  transitions: 6
+  transitions: 8
   initial:
   - processing
   terminal: []
   operations:
+  - replaceMediaAsset
   - updateMediaAsset
-  guarded: 6
+  guarded: 8
   ref: diagrams/lld/lifecycles/media.yaml
 - entity: Membership product
   contract: subscription
@@ -1801,7 +1803,7 @@ stateModels:
   owner: platform-ops
   service: PlatformService
   states: null
-  transitions: 9
+  transitions: 10
   initial:
   - queued
   terminal:
@@ -1809,10 +1811,9 @@ stateModels:
   - rolledBack
   operations:
   - applyMigration
-  - pauseRollout
   - planMigration
-  - rollbackRollout
-  guarded: 9
+  - rollbackMigrationRun
+  guarded: 10
   ref: diagrams/lld/lifecycles/migration-run.yaml
 - entity: Onboarding application
   contract: subscription
@@ -1888,7 +1889,7 @@ stateModels:
   owner: access
   service: AccessService
   states: null
-  transitions: 11
+  transitions: 12
   initial:
   - pending
   terminal:
@@ -1898,7 +1899,7 @@ stateModels:
   operations:
   - createParkingEntitlement
   - updateParkingEntitlement
-  guarded: 11
+  guarded: 12
   ref: diagrams/lld/lifecycles/parking-entitlement.yaml
 - entity: Partner agreement
   contract: subscription
@@ -2081,7 +2082,7 @@ stateModels:
   owner: orders
   service: OrderService
   states: null
-  transitions: 11
+  transitions: 15
   initial:
   - authorised
   - pendingConfirmation
@@ -2095,8 +2096,9 @@ stateModels:
   - cleanupFailedPayment
   - createRefund
   - inquirePaymentStatus
+  - receivePaymentProviderWebhook
   - voidPayment
-  guarded: 11
+  guarded: 15
   ref: diagrams/lld/lifecycles/payment.yaml
 - entity: Performance
   contract: catalogue
@@ -2440,7 +2442,7 @@ stateModels:
   states: null
   transitions: 14
   initial:
-  - offline
+  - unknown
   terminal: []
   operations:
   - recordDeviceHeartbeat
@@ -2735,19 +2737,20 @@ stateModels:
 - entity: Seat hold
   contract: seating
   owner: seating
-  service: OrderService
+  service: CatalogueService
   states: null
-  transitions: 3
+  transitions: 4
   initial:
   - held
   terminal:
-  - converted
+  - sold
   - released
   - expired
   operations:
+  - convertInventoryHold
   - createOrder
   - relinquishSeatHold
-  guarded: 3
+  guarded: 4
   ref: diagrams/lld/lifecycles/seat-hold.yaml
 - entity: SeatMapImportJob
   contract: seating
@@ -3029,17 +3032,15 @@ stateModels:
   owner: control
   service: PlatformService
   states: null
-  transitions: 7
+  transitions: 8
   initial:
   - onboarding
   terminal:
   - terminated
   operations:
-  - reactivateTenant
-  - suspendTenant
   - terminateTenant
   - updateTenant
-  guarded: 7
+  guarded: 8
   ref: diagrams/lld/lifecycles/tenant.yaml
 - entity: Ticket transfer
   contract: orders
@@ -3310,6 +3311,20 @@ stateModels:
   operations: []
   guarded: 6
   ref: diagrams/lld/lifecycles/webhook-delivery.yaml
+- entity: Webhook replay
+  contract: public-api
+  owner: public-api
+  service: null
+  states: null
+  transitions: 3
+  initial:
+  - queued
+  terminal:
+  - completed
+  - failed
+  operations: []
+  guarded: 3
+  ref: diagrams/lld/lifecycles/webhook-replay.yaml
 - entity: Webhook subscription
   contract: public-api
   owner: public-api
@@ -3433,6 +3448,8 @@ events:
 - event: approval-stepCompleted
   description: One level of a multi-level approval chain was approved and the request moved to the next
     level.
+- event: approval-withdrawn
+  description: The requester took an approval request back before anyone decided it.
 - event: assets-documentIndexed
   description: Text was extracted from an uploaded document and is ready to embed.
 - event: biometric-enrolmentChanged
@@ -3441,6 +3458,8 @@ events:
   description: A cart lapsed without checking out.
 - event: catalogue-productPublished
   description: A product is on sale, or has returned to sale.
+- event: catalogue-productWithdrawn
+  description: A product was withdrawn from sale.
 - event: consent-deviceConsentClaimed
   description: A browser's cookie decision was attached to the guest who signed in or registered on
     it, and the guest's consent became the narrower of the two per category.
@@ -3491,6 +3510,8 @@ events:
 - event: identity-credentialResetRequested
   description: Somebody asked for a password or PIN to be reset — a guest asked for a reset code, or
     a supervisor reset a member of staff's credential.
+- event: identity-guestRegistered
+  description: A guest registered an account, with the consents they gave on the form.
 - event: identity-loginRecorded
   description: Somebody tried to sign in — a staff or partner principal, or a guest — and it succeeded,
     failed, or was asked for a second factor.
@@ -3568,6 +3589,8 @@ events:
   description: A seat map version was published and is now the layout sold against.
 - event: shift-closed
   description: A till has been counted and closed.
+- event: shift-opened
+  description: A till shift was opened.
 - event: stock-depleted
   description: Stock left a location — sold, wasted, transferred or counted out.
 - event: storefront-sessionEvent
@@ -3575,10 +3598,16 @@ events:
     and with no personal data.
 - event: sync-rejectionRaised
   description: An entry replayed by an offline device was refused on its merits and quarantined.
+- event: tenant-provisioned
+  description: A tenant's database was provisioned on a cell and the tenant can be used.
 - event: tenant-suspended
   description: A tenant has been suspended, in one of three modes.
+- event: tenant-terminated
+  description: A terminated tenant's retention window has ended and its data is being removed.
 - event: tenantDomain-mapped
   description: A hostname was routed to a tenant, re-routed, or released.
+- event: tenantDomain-rejected
+  description: A custom domain mapping was refused because another tenant holds the hostname.
 - event: wallet-credited
   description: Money reached a wallet's available balance (top-up, refund, adjustment, a released hold).
 - event: wallet-debited

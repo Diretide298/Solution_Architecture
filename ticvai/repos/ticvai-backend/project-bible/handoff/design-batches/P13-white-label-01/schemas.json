@@ -159,7 +159,7 @@
     ],
     "readOnly": true,
     "x-ticvai-derived": "sweeper",
-    "description": "Moved by `updateBanner` between `draft` and `scheduled`, and by the schedule timer from `scheduled` to `active` and `active` to `expired` at `startsAt` and `endsAt`, in the tenant's timezone (`states/schedule.yaml`)."
+    "description": "Moved by `updateBanner` between `draft` and `scheduled`, and by the schedule timer from `scheduled` to `active` and `active` to `expired` at `startsAt` and `endsAt`, in the tenant's timezone (`states/schedule.yaml`). **The rule, which no request field moves** (r8 walk of ticket 27920): a new banner is `draft`. The server sets `scheduled` when `updateBanner` leaves `startsAt` set (`endsAt` null means no end, so the banner runs until switched off; when `endsAt` is set it must follow `startsAt`), and sets `draft` again when a later update clears `startsAt`. Sending `isActive` false on an `active` banner pulls it to `draft`. `state` is derived by the server on every save and is never in a request."
    },
    "sortOrder": {
     "type": "integer"
@@ -528,7 +528,7 @@
  "BrandIdentity": {
   "x-ticvai-persistence": "none — embedded in tenant_config",
   "type": "object",
-  "description": "Every `*AssetRef` here is a `MediaAsset` id from the `assets` library (`createUpload` then `completeUpload`), PNG or SVG and at most 2 MB (decided 28 September, audit R270).\n",
+  "description": "Every `*AssetRef` here is a `MediaAsset` id from the `assets` library (`createUpload` then `completeUpload`). The image fields are PNG or SVG and at most 2 MB (decided 28 September, audit R270); `introVideoAssetRef` is a video asset within the library's limit for kind `video` (`assets.createUpload`).\n",
   "required": [
    "logoAssetRef"
   ],
@@ -666,7 +666,7 @@
  },
  "ContentBlock": {
   "type": "object",
-  "x-ticvai-persistence": "control.content_block",
+  "x-ticvai-persistence": "whitelabel.content_block",
   "description": "BL-172. **`white-label` is excellent as a configuration model and is not an authoring surface.** `HomepageLayout` with ordered sections, `Banner`, `PromoBlock` and `ContentPage` describe what a venue has chosen; **none of them lets a marketer write something new without a developer.**\nA block is a piece of authored content with a type, a body and a schedule. **The page builder is a frontend over this**, the same way the venue map's canvas is a frontend over its graph.\n",
   "required": [
    "id",
@@ -706,7 +706,7 @@
    "body": {
     "type": "object",
     "additionalProperties": true,
-    "description": "Typed by `kind`, and validated against the block's own schema at save."
+    "description": "Typed by `kind`, and validated against the block's own schema at save. **The text a translation may fill** (R8 blocker FOUNDATION-AI-C40; the keys a body of each kind uses for its words, and the `fieldPath` a translation draft names, under `localeVariants.<locale>.`): richText `text`; image `altText`, `caption`; video `title`, `caption`; gallery `items[].altText`, `items[].caption`; cta `heading`, `text`, `label`; faq `items[].question`, `items[].answer`; form `title`, `fields[].label`, `submitLabel`; embed `title`; productGrid `heading`; countdown `heading`, `endedText`; testimonial `quote`, `author`. Every other key (links, ids, numbers, media references) is not translated."
    },
    "localeVariants": {
     "type": "object",
@@ -747,6 +747,18 @@
     "format": "uuid",
     "nullable": true,
     "readOnly": true
+   },
+   "reviewStatus": {
+    "type": "string",
+    "readOnly": true,
+    "enum": [
+     "notRequired",
+     "pending",
+     "approved",
+     "rejected"
+    ],
+    "default": "notRequired",
+    "description": "The review step of `publishContentBlock`, where the tenant's publish-review policy is on (r8 walk of ticket 27919). `pending` from the 202 until the approval is decided; `status` does not change meanwhile."
    },
    "scopePath": {
     "type": "string",
@@ -845,7 +857,7 @@
    },
    "patterns": {
     "type": "array",
-    "description": "**The patterns, fixed** (4 October 2026, CHG-FXC-009). One per target kind, under `baseUrl`:\n`product` `/p/{productId}`, `event` `/e/{eventId}`, `contentPage` `/c/{contentPageId}`, `module` `/m/{moduleKey}`,\n`appSection` `/s/{appSection}`, `bookingFlow` `/book/{productId}` (optionally `?date=YYYY-MM-DD`). `externalUrl` and\n`none` have no pattern. Campaign tags are appended as `utm_*` query parameters. A released pattern never changes: a new\ntarget kind gets a new prefix, so a link a tenant printed keeps working. Where app links are enabled the same path opens\nthe app (universal links and app links on the primary domain) and the storefront where the app is not installed;\n`buildDeepLink` returns the URL from these patterns and `appLink` as the same URL.",
+    "description": "**The patterns, fixed** (4 October 2026, CHG-FXC-009). One per target kind, under `baseUrl`:\n`product` `/p/{productId}`, `event` `/e/{eventId}`, `contentPage` `/c/{contentPageId}`, `module` `/m/{moduleKey}`,\n`appSection` `/s/{appSection}`, `bookingFlow` `/book/{productId}` (optionally `?date=YYYY-MM-DD`),\n`transferClaim` `/t/{transferId}?token={claimToken}` (opens `/general/ticket-transfer` in the app; ORDERS-MONEY-C12; to be confirmed before release, because a released pattern never changes). `externalUrl` and\n`none` have no pattern. Campaign tags are appended as `utm_*` query parameters. A released pattern never changes: a new\ntarget kind gets a new prefix, so a link a tenant printed keeps working. Where app links are enabled the same path opens\nthe app (universal links and app links on the primary domain) and the storefront where the app is not installed;\n`buildDeepLink` returns the URL from these patterns and `appLink` as the same URL.",
     "items": {
      "type": "object",
      "required": [
@@ -859,7 +871,7 @@
       },
       "pattern": {
        "type": "string",
-       "description": "e.g. `/p/{productId}`, `/e/{eventId}`, `/book/{flowKey}`."
+       "description": "e.g. `/p/{productId}`, `/e/{eventId}`, `/book/{productId}`."
       }
      }
     }
@@ -917,7 +929,69 @@
  },
  "FeatureKey": {
   "type": "string",
-  "description": "The feature toggles a tenant can set — one list for `FeatureToggle` and the `setFeatureToggles` body, which took a free string where the response had this enum.\n",
+  "description": "The feature toggles a tenant can set — one list for `FeatureToggle` and the `setFeatureToggles` body, which took a free string where the response had this enum.\n\n**The catalogue** (`x-ticvai-feature-catalogue`; r8 walk of ticket 27776): the table below is the one source of each key's `displayName`, `changeScope` and `requiresConfiguration`. `setFeatureToggles` takes only `featureKey` and `isEnabled` from the caller; it fills the other three columns of the `whitelabel.feature_toggle` row from this table when it inserts the row, and its whole-set replace does the same for every row it writes, so no caller can set or change them. `buildTime` means a native app needs a new release to take the change, a `runtime` one takes it on the next publish. **Wallet and payment keys are `buildTime`** (stated before r8); the other values are proposals for the owner to confirm and are marked below.\n| featureKey | displayName | changeScope | requiresConfiguration |\n|---|---|---|---|\n| digitalCompanionMode | Digital companion mode | runtime | false (proposed) |\n| aiConciergeChat | AI concierge chat | runtime | true: the platform must have set an AI provider (proposed) |\n| lostAndFound | Lost and found | runtime | false (proposed) |\n| pushNotifications | Push notifications | buildTime | true: push credentials in the app build (proposed) |\n| socialSharing | Social sharing | runtime | false (proposed) |\n| multiLanguage | Multiple languages | runtime | false (proposed) |\n| appleWallet | Apple Wallet passes | buildTime | true: pass certificate on the store account |\n| googlePay | Google Pay | buildTime | true: payment provider setup |\n| applePay | Apple Pay | buildTime | true: payment provider setup |\n| cashOnDelivery | Cash on delivery | runtime | false (proposed) |\n| guestCheckout | Guest checkout | runtime | false |\n| uaePassLogin | UAE PASS sign-in | buildTime | true: UAE PASS client credentials (proposed) |\n",
+  "x-ticvai-feature-catalogue": {
+   "digitalCompanionMode": {
+    "displayName": "Digital companion mode",
+    "changeScope": "runtime",
+    "requiresConfiguration": false
+   },
+   "aiConciergeChat": {
+    "displayName": "AI concierge chat",
+    "changeScope": "runtime",
+    "requiresConfiguration": true
+   },
+   "lostAndFound": {
+    "displayName": "Lost and found",
+    "changeScope": "runtime",
+    "requiresConfiguration": false
+   },
+   "pushNotifications": {
+    "displayName": "Push notifications",
+    "changeScope": "buildTime",
+    "requiresConfiguration": true
+   },
+   "socialSharing": {
+    "displayName": "Social sharing",
+    "changeScope": "runtime",
+    "requiresConfiguration": false
+   },
+   "multiLanguage": {
+    "displayName": "Multiple languages",
+    "changeScope": "runtime",
+    "requiresConfiguration": false
+   },
+   "appleWallet": {
+    "displayName": "Apple Wallet passes",
+    "changeScope": "buildTime",
+    "requiresConfiguration": true
+   },
+   "googlePay": {
+    "displayName": "Google Pay",
+    "changeScope": "buildTime",
+    "requiresConfiguration": true
+   },
+   "applePay": {
+    "displayName": "Apple Pay",
+    "changeScope": "buildTime",
+    "requiresConfiguration": true
+   },
+   "cashOnDelivery": {
+    "displayName": "Cash on delivery",
+    "changeScope": "runtime",
+    "requiresConfiguration": false
+   },
+   "guestCheckout": {
+    "displayName": "Guest checkout",
+    "changeScope": "runtime",
+    "requiresConfiguration": false
+   },
+   "uaePassLogin": {
+    "displayName": "UAE PASS sign-in",
+    "changeScope": "buildTime",
+    "requiresConfiguration": true
+   }
+  },
   "enum": [
    "digitalCompanionMode",
    "aiConciergeChat",
@@ -1018,7 +1092,7 @@
  "FooterConfig": {
   "type": "object",
   "x-ticvai-persistence": "whitelabel.footer_config + whitelabel.footer_config_column + whitelabel.footer_config_social_link",
-  "description": "BL-002. **`setHeader` and `HeaderConfig` exist and the footer does not**, which looked like symmetry until you notice it is not: **a header is chrome and a footer is a link surface.**\nA footer carries the legal links — terms, privacy, accessibility statement, cookie preferences — and **those are the ones a regulator checks.** Treating it as a mirror of the header would have given it a logo and no way to reach a privacy notice.\n**Where it is stored.** `legalLinks` and `copyrightText` are columns of `whitelabel.footer_config`; each entry of `columns` is a `whitelabel.footer_config_column` row and each entry of `socialLinks` a `whitelabel.footer_config_social_link` row. Part of the working draft (see the header). **In the tenant's own database, not the control plane (decided 28 September, audit R163)**: it moved from `control.footer_config` (renamed `whitelabel.footer_config`) and its two child tables.\n",
+  "description": "BL-002. **`setHeader` and `HeaderConfig` exist and the footer does not**, which looked like symmetry until you notice it is not: **a header is chrome and a footer is a link surface.**\nA footer carries the legal links — terms, privacy, accessibility statement, cookie preferences — and **those are the ones a regulator checks.** Treating it as a mirror of the header would have given it a logo and no way to reach a privacy notice.\n**Where it is stored.** `legalLinks` and `copyrightText` are columns of `whitelabel.footer_config`; each entry of `columns` is a `whitelabel.footer_config_column` row and each entry of `socialLinks` a `whitelabel.footer_config_social_link` row. Part of the working draft (see the header). **In the tenant's own database, not the control plane (decided 28 September, audit R163)**: it moved from `control.footer_config` (renamed `whitelabel.footer_config`) and its two child tables.\n**Links and order** (R8 blocker WHITE-C24 and IDENTITY-C60): a column's `links` are stored with the column, as one jsonb value in their array order; each column and each social link keeps its `sortOrder`, which `setFooter` writes from its position in the array (0 first), and every read returns `columns` and `socialLinks` ordered by it.\n",
   "required": [
    "id",
    "scopePath"
@@ -1042,8 +1116,16 @@
       "heading": {
        "type": "string"
       },
+      "sortOrder": {
+       "type": "integer",
+       "readOnly": true,
+       "description": "The column's position, written by `setFooter` from the array order (R8 blocker IDENTITY-C60)."
+      },
       "links": {
        "type": "array",
+       "x-ticvai-persistence-column": "jsonb",
+       "x-ticvai-persistence-kind": "valueObject",
+       "description": "The column's links in display order, stored on the column row as one value (R8 blocker WHITE-C24).",
        "items": {
         "type": "object",
         "properties": {
@@ -1096,6 +1178,11 @@
       },
       "url": {
        "type": "string"
+      },
+      "sortOrder": {
+       "type": "integer",
+       "readOnly": true,
+       "description": "The link's position, written by `setFooter` from the array order (R8 blocker IDENTITY-C60)."
       }
      }
     }
@@ -1235,7 +1322,7 @@
  },
  "HomepageSectionKind": {
   "type": "string",
-  "description": "**Which module each section needs, proposed, client to correct (decided 28 September, audit R163).** `tickets` needs `ticketsAndBooking`; `whatsOn` needs `events`; `attractions` needs `attractions`; `membership` needs `membership`; `dining` needs `diningAndFnb`; `shop` needs `shop`; `map` needs `map`. `heroBanner`, `quickActions`, `promotions`, `customContent`, `venueOverview` and `spacer` need no module. `venueOverview` (decided 29 September, MOB-3) is the mobile Home's description, opening hours (from `getTenantAppStatus`) and type tiles. `setHomepageLayout` refuses a visible section whose module is not enabled, and `setModuleEnablement` refuses to disable a module a section still needs.\n",
+  "description": "**Which module each section needs, proposed, client to correct (decided 28 September, audit R163).** `tickets` needs `ticketsAndBooking`; `whatsOn` needs `events`; `attractions` needs `attractions`; `membership` needs `membership`; `dining` needs `diningAndFnb`; `shop` needs `shop`; `map` needs `map`. `heroBanner`, `quickActions`, `promotions`, `customContent`, `venueOverview` and `spacer` need no module. `venueOverview` (decided 29 September, MOB-3) is the mobile Home's description, opening hours (from `getTenantAppStatus`) and type tiles. `setHomepageLayout` refuses a visible section whose module is not enabled, and `setModuleEnablement` refuses to disable a module a section still needs.\n\n**Which catalogue slice a type tile shows, and whose card count applies** (r8 walk of tickets 28335 and 28682; lead decision of 20 October 2026, option 1, no schema change; DEC-152 and DEC-153 stand as they are). A Home type tile is a product category, and its highlights are `listProducts(venueId, categoryId, pageSize)` in `displayOrder`, the order `listProducts` documents. The card count (`maxItems`) is that of the section whose kind matches the tile: `attractions`, `dining` or `shop`; **every other category uses the count of the `whatsOn` section**. On GST-038 (At the Venue), Food is kind `fnb` (opens GST-024), Shop is kind `retail` (GST-026), Services opens GST-029, Shows is `listPerformances` of the venue for today, and Map and Waits show in place.\n\n**Where the Home overview, its quick actions and \"Book a trip\" come from in r8** (R8 blocker WHITE-C07, the lead's answer of 20 October 2026: option 3, nothing new stored). The `venueOverview` description is the published content page its section names (`contentPageId`, read with `listPublishedContentPages`); none named, the line is left out. The `quickActions` tiles are a fixed list the app shows, one per enabled module (`enabledModules` of the published configuration), in the order of the approved frame; a venue does not configure them in r8. \"Book a trip\" shows when the venue has a published booking flow of type `transport` (`getPublishedBookingFlow`). Configurable tiles (a section's own actions) come later, when the client asks for them.\n",
   "enum": [
    "heroBanner",
    "quickActions",
@@ -1378,9 +1465,10 @@
      "event",
      "externalUrl",
      "appSection",
+     "bookingFlow",
      "none"
     ],
-    "description": "`appSection` points at a section of the guest mobile app (decided 29 September, MOB-1), so the bottom navigation can hold Home, Explore, Plan and Tickets."
+    "description": "`appSection` points at a section of the guest mobile app (decided 29 September, MOB-1), so the bottom navigation can hold Home, Explore, Plan and Tickets. `bookingFlow` (r8 walk of ticket 27905) opens the booking flow of one product, optionally on a date: `productId` is required, `date` optional; the link is `/book/{productId}?date=YYYY-MM-DD` (see `DeepLinkScheme`), and the flow shown is the one that product resolves to."
    },
    "moduleKey": {
     "$ref": "#/components/schemas/white-label::ModuleKey"
@@ -1409,6 +1497,12 @@
    "eventId": {
     "type": "string",
     "format": "uuid"
+   },
+   "date": {
+    "type": "string",
+    "format": "date",
+    "nullable": true,
+    "description": "Used when `kind` is `bookingFlow`, the date the flow opens on. Absent opens it on today or the first date with availability, as the product page does."
    },
    "url": {
     "type": "string"
@@ -1520,7 +1614,7 @@
    },
    "url": {
     "type": "string",
-    "description": "Signed and expiring for private assets; stable CDN URL for public ones."
+    "description": "Signed and expiring for private assets; stable CDN URL for public ones. **A public asset that a published white-label version references is served at its stable CDN URL**, and `getPublishedTenantConfig` returns that address (`brandUrls`, `banners[].imageUrl`) so a guest client never needs this read (r8 walk of ticket 28335)."
    },
    "thumbnailUrl": {
     "type": "string",
@@ -1546,6 +1640,27 @@
    "createdAt": {
     "type": "string",
     "format": "date-time"
+   },
+   "extractedText": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**The text pulled out of an uploaded document** (R8 blocker ORDERS-MONEY-C19): written by the upload's processing job once text extraction finishes (PDF, Word and plain-text kinds), replaced when the file is replaced, null for an image, video or audio file or while the asset is still processing. One value per asset, so AI's `ingestKnowledgeDocument` reads it through `mediaAssetRecords`."
+   },
+   "releasedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-references": "identity.principal",
+    "description": "The reviewer who released the asset from `quarantined` (R8 blocker ORDERS-MONEY-C24, CHG-R8MIG-022); null if it never was."
+   },
+   "releasedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "When it was released from `quarantined`."
    }
   }
  },
@@ -1756,7 +1871,7 @@
   "properties": {
    "extractedText": {
     "type": "string",
-    "description": "**Text pulled out of an uploaded document**, after extraction. The generic retrieval path for anything a tenant uploads — a PDF nobody can search is a PDF nobody reads.\n"
+    "description": "**Not written; read `MediaAsset.extractedText`** (R8 blocker ORDERS-MONEY-C19). Text pulled out of an uploaded document belongs to the asset, not to one place it is used, and nothing could query it here. Kept on the wire for clients built before; always absent.\n"
    },
    "id": {
     "type": "string",
@@ -1778,7 +1893,15 @@
      "workOrder",
      "incident",
      "inspection",
-     "campaign"
+     "campaign",
+     "aiConfigSource",
+     "aiHistoryImport",
+     "aiLayoutDraft",
+     "workOrderAttachment",
+     "seatingSection",
+     "transportNetworkImport",
+     "venueMap",
+     "venueMapVersion"
     ]
    },
    "referenceId": {
@@ -1797,7 +1920,7 @@
   "x-ticvai-persistence": "none — embedded in tenant_config",
   "type": "object",
   "nullable": true,
-  "description": "**The oldest guest app build still allowed to run (decided 28 September, audit R073).** A guest app whose own version is below the one for its platform shows the forced-upgrade screen (GST-047) and nothing else. Null, or a platform left null, forces nothing. Live at once through `setMaintenanceMode`, because an upgrade that must wait for a publish is not forced.\n",
+  "description": "**The oldest guest app build still allowed to run (decided 28 September, audit R073).** A guest app whose own version is below the one for its platform shows the forced-upgrade screen (GST-047) and nothing else. Null, or a platform left null, forces nothing. Live at once through `setMaintenanceMode`, because an upgrade that must wait for a publish is not forced.\n\n**`storeUrl`** (r8 walk of ticket 27893): the store page GST-047's \"Update\" button opens, one per platform, set with `setMaintenanceMode` beside the versions and live at once like them. Optional. A store address cannot be derived from `StoreAccount.appIdentifier`, which is a bundle id. The forced-upgrade screen opens the URL for the platform it runs on; where it is null the screen shows the message without the button and the guest updates from the store by hand.\n",
   "properties": {
    "ios": {
     "type": "string",
@@ -1808,6 +1931,25 @@
     "type": "string",
     "nullable": true,
     "pattern": "^\\d+\\.\\d+\\.\\d+$"
+   },
+   "storeUrl": {
+    "type": "object",
+    "nullable": true,
+    "description": "The store page of the tenant's app for each platform. https only.",
+    "properties": {
+     "ios": {
+      "type": "string",
+      "format": "uri",
+      "pattern": "^https://",
+      "nullable": true
+     },
+     "android": {
+      "type": "string",
+      "format": "uri",
+      "pattern": "^https://",
+      "nullable": true
+     }
+    }
    }
   }
  },
@@ -2072,7 +2214,7 @@
     ],
     "readOnly": true,
     "x-ticvai-derived": "sweeper",
-    "description": "Moved by the schedule timer at `startsAt` and `endsAt`, in the tenant's timezone, as for `Banner.state`. Once `active` or `expired` the block may only be withdrawn (audit R163)."
+    "description": "Moved by the schedule timer at `startsAt` and `endsAt`, in the tenant's timezone, as for `Banner.state`. A new block is `draft` and moves to `scheduled` the same way as a banner: when an update leaves `startsAt` set (a null `endsAt` means no end), and back to `draft` when `startsAt` is cleared. Once `active` or `expired` the block may only be withdrawn (audit R163)."
    },
    "sortOrder": {
     "type": "integer"
@@ -2114,7 +2256,47 @@
     "format": "uuid",
     "nullable": true,
     "readOnly": true,
+    "x-ticvai-references": "ai.translation_job",
     "description": "The `proposeTranslations` job that drafted this proposal; `getTranslationProposals` reads a job's rows by it. Null on every other proposal (CHG-RFM-004)."
+   },
+   "targetKind": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "enum": [
+     "contentBlock",
+     "productName",
+     "emailTemplate",
+     "messageTemplate"
+    ],
+    "description": "For a translation draft, what kind of thing it sits on (`TranslationProposals.drafts[].targetKind`); null on every other proposal (R8 blocker FOUNDATION-AI-C40)."
+   },
+   "targetRef": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "maxLength": 200,
+    "description": "For a translation draft, the id of the block, product or template it sits on (the path id of the target's own write, e.g. a content block's `blockId`); null otherwise (R8 blocker FOUNDATION-AI-C40)."
+   },
+   "locale": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "maxLength": 20,
+    "description": "For a translation draft, the language it is in (the job's `targetLocale`); null otherwise."
+   },
+   "fieldPath": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "maxLength": 300,
+    "description": "For a translation draft, where it goes inside the target, as a dotted path in the target's own body (`TranslationProposals.drafts[].fieldPath`); null otherwise. Empty for a field that is not text."
+   },
+   "draftText": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "For a translation draft, the proposed text; null otherwise. `payload` stays the request body of the target's write, with this text at `fieldPath` (R8 blocker FOUNDATION-AI-C40)."
    },
    "kind": {
     "type": "string",
@@ -2216,6 +2398,40 @@
    }
   }
  },
+ "PublishReviewPolicy": {
+  "x-ticvai-persistence": "whitelabel.publish_review_policy",
+  "type": "object",
+  "description": "Whether publishing goes through a review step (CHG-CSA-042). One row per tenant; off by default.",
+  "required": [
+   "enabled"
+  ],
+  "properties": {
+   "enabled": {
+    "type": "boolean",
+    "default": false
+   },
+   "requiresReviewerOtherThanAuthor": {
+    "type": "boolean",
+    "default": true
+   },
+   "appliesTo": {
+    "type": "array",
+    "description": "What the review covers. Empty means both.",
+    "items": {
+     "type": "string",
+     "enum": [
+      "tenantConfig",
+      "contentBlocks"
+     ]
+    }
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "The partition key (ADR-0005). Written at `tenant` scope."
+   }
+  }
+ },
  "ScheduleState": {
   "type": "string",
   "enum": [
@@ -2230,7 +2446,16 @@
   "x-ticvai-persistence": "none — computed",
   "properties": {
    "kind": {
-    "type": "string"
+    "type": "string",
+    "enum": [
+     "product",
+     "entitlement",
+     "knowledge",
+     "faq",
+     "report",
+     "media"
+    ],
+    "description": "The search kind of the index source the result came from (`IndexSource.kind`)."
    },
    "id": {
     "type": "string"
@@ -2304,7 +2529,7 @@
      "multiVenue",
      null
     ],
-    "description": "The starting point. Each preset proposes the modules, the booking flow types (with their default step order), the homepage sections, the mobile tabs and a booking-flow `preset`; nothing is written until the operator accepts a step."
+    "description": "The starting point. Each preset proposes the modules, the booking flow types (with their default step order), the homepage sections, the mobile tabs and a booking-flow `preset`; nothing is written until the operator accepts a step.\n\n**What each preset proposes** (r8 walk of tickets 27908, 27899 and 27905; lead decision of 20 October 2026, option 2). `waterPark` is DEC-159: modules `ticketsAndBooking`, `diningAndFnb`, `shop`, `map`; flows `datedDayPass` and `cabanaMap`; sections `heroBanner`, `tickets`, `attractions`, `dining`; tabs Home, Explore, Map, Tickets. **Every other preset (`themePark`, `museum`, `theatreAndArena`, `singleAttraction`, `playCentre`, `multiVenue`) proposes the same neutral default until the client supplies its own values, which then arrive as data:** flow `datedDayPass`; theme primary `#1F4E79`, secondary `#5B6770`, accent `#B85C00`, background `#FFFFFF`, text `#1A1A1A` (all pass the contrast pairs of `Theme`); header layout `logoLeft` with logo, menu and notifications shown; footer with one column, \"Information\", holding the policy links, and the copyright line; homepage sections and tabs from `listLandingPageTemplates` for the preset. **These values are a placeholder, not a client decision** (DI-885 awaits the client's feedback): the CMS marks them \"placeholder\" and must not present them as decided."
    },
    "currentStep": {
     "allOf": [
@@ -2395,6 +2620,15 @@
     "x-ticvai-derived": "onRead",
     "description": "True once any version has been published."
    },
+   "darkAppModules": {
+    "type": "array",
+    "readOnly": true,
+    "x-ticvai-derived": "onRead",
+    "description": "**The app-modules switched off for this tenant** (ADAM CR-164, option A, 18 October 2026; CHG-CRA-005): their keys (for example `AM-MARKETING-CRM-P01`), from the tenant's release flags. Returned to guests and staff alike; the apps leave those modules' screens out of navigation (the map is `handoff/release-flags.json`). An operation is dark for the tenant only when every app-module that binds it is off, so an operation shared with a live module stays callable. A flag the configuration does not declare counts as on. Additive: nothing new shows on screen.",
+    "items": {
+     "type": "string"
+    }
+   },
    "publishedVersion": {
     "type": "string",
     "nullable": true
@@ -2478,6 +2712,15 @@
        "type": "string",
        "maxLength": 200,
        "description": "The venue's name (`tenancy.OrgUnit.name`)."
+      },
+      "contact": {
+       "allOf": [
+        {
+         "$ref": "#/components/schemas/VenueContact"
+        }
+       ],
+       "nullable": true,
+       "description": "The venue's own contact (address, phone, email), from the venue's settings (`tenancy.VenueSettings`, read through `venueSettingsRecords`). Null when the venue has none set; the app then shows the tenant's `contact` (R8 blocker WHITE-C16)."
       },
       "city": {
        "type": "string",

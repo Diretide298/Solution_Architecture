@@ -15,7 +15,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/tenants-licensing/billing-commercial-command-center-adm-459",
-   "component": "apps/ticvai-web/src/routes/tenants-licensing/BillingCommercialCommandCenter.tsx",
+   "component": "src/routes/tenants-licensing/BillingCommercialCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -313,7 +313,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/tenants-licensing/billing-calculation-charge-breakdown-adm-460",
-   "component": "apps/ticvai-web/src/routes/tenants-licensing/BillingCalculationChargeBreakdown.tsx",
+   "component": "src/routes/tenants-licensing/BillingCalculationChargeBreakdown.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -528,7 +528,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/tenants-licensing/consumption-reconciliation-billing-approval-adm-461",
-   "component": "apps/ticvai-web/src/routes/tenants-licensing/ConsumptionReconciliationBillingApproval.tsx",
+   "component": "src/routes/tenants-licensing/ConsumptionReconciliationBillingApproval.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -655,7 +655,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/tenants-licensing/invoice-payment-management-adm-462",
-   "component": "apps/ticvai-web/src/routes/tenants-licensing/InvoicePaymentManagement.tsx",
+   "component": "src/routes/tenants-licensing/InvoicePaymentManagement.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -810,7 +810,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/tenants-licensing/subscription-commercial-change-management-adm-463",
-   "component": "apps/ticvai-web/src/routes/tenants-licensing/SubscriptionCommercialChangeManagement.tsx",
+   "component": "src/routes/tenants-licensing/SubscriptionCommercialChangeManagement.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -965,7 +965,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/tenants-licensing/renewal-management-center-adm-464",
-   "component": "apps/ticvai-web/src/routes/tenants-licensing/RenewalManagementCenter.tsx",
+   "component": "src/routes/tenants-licensing/RenewalManagementCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1187,7 +1187,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/tenants-licensing/ai-upgrade-downgrade-commercial-right-sizing-adm-465",
-   "component": "apps/ticvai-web/src/routes/tenants-licensing/AiUpgradeDowngradeCommercialRightSizing.tsx",
+   "component": "src/routes/tenants-licensing/AiUpgradeDowngradeCommercialRightSizing.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1314,7 +1314,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/tenants-licensing/commercial-scenario-simulator-adm-466",
-   "component": "apps/ticvai-web/src/routes/tenants-licensing/CommercialScenarioSimulator.tsx",
+   "component": "src/routes/tenants-licensing/CommercialScenarioSimulator.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1474,7 +1474,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/tenants-licensing/discount-credit-commercial-override-management-adm-467",
-   "component": "apps/ticvai-web/src/routes/tenants-licensing/DiscountCreditCommercialOverrideManagement.tsx",
+   "component": "src/routes/tenants-licensing/DiscountCreditCommercialOverrideManagement.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1655,7 +1655,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/tenants-licensing/renewal-approval-activation-commercial-handoff-adm-468",
-   "component": "apps/ticvai-web/src/routes/tenants-licensing/RenewalApprovalActivationCommercialHandoff.tsx",
+   "component": "src/routes/tenants-licensing/RenewalApprovalActivationCommercialHandoff.tsx",
    "status": "notStarted"
   },
   "navigation": {

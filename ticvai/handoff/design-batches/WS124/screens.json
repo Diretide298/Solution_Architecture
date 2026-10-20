@@ -15,7 +15,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/platform/ai-governance-monitoring-command-center-adm-549",
-   "component": "apps/ticvai-web/src/routes/platform/AiGovernanceMonitoringCommandCenter.tsx",
+   "component": "src/routes/platform/AiGovernanceMonitoringCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -439,7 +439,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/platform/ai-risk-register-risk-exposure-management-adm-550",
-   "component": "apps/ticvai-web/src/routes/platform/AiRiskRegisterRiskExposureManagement.tsx",
+   "component": "src/routes/platform/AiRiskRegisterRiskExposureManagement.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -703,7 +703,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/platform/ai-governance-control-library-control-effectiveness-adm-551",
-   "component": "apps/ticvai-web/src/routes/platform/AiGovernanceControlLibraryControlEffectiveness.tsx",
+   "component": "src/routes/platform/AiGovernanceControlLibraryControlEffectiveness.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -937,7 +937,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/platform/ai-policy-compliance-violation-monitoring-adm-552",
-   "component": "apps/ticvai-web/src/routes/platform/AiPolicyComplianceViolationMonitoring.tsx",
+   "component": "src/routes/platform/AiPolicyComplianceViolationMonitoring.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1225,7 +1225,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/platform/ai-data-privacy-usage-compliance-monitoring-adm-553",
-   "component": "apps/ticvai-web/src/routes/platform/AiDataPrivacyUsageComplianceMonitoring.tsx",
+   "component": "src/routes/platform/AiDataPrivacyUsageComplianceMonitoring.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1539,7 +1539,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/platform/ai-quality-behavior-governance-drift-monitoring-adm-554",
-   "component": "apps/ticvai-web/src/routes/platform/AiQualityBehaviorGovernanceDriftMonitoring.tsx",
+   "component": "src/routes/platform/AiQualityBehaviorGovernanceDriftMonitoring.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1903,7 +1903,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/platform/ai-governance-alert-detection-center-adm-555",
-   "component": "apps/ticvai-web/src/routes/platform/AiGovernanceAlertDetectionCenter.tsx",
+   "component": "src/routes/platform/AiGovernanceAlertDetectionCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -2137,7 +2137,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/platform/ai-incident-remediation-management-adm-556",
-   "component": "apps/ticvai-web/src/routes/platform/AiIncidentRemediationManagement.tsx",
+   "component": "src/routes/platform/AiIncidentRemediationManagement.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -2551,7 +2551,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/platform/ai-compliance-assurance-governance-reporting-adm-557",
-   "component": "apps/ticvai-web/src/routes/platform/AiComplianceAssuranceGovernanceReporting.tsx",
+   "component": "src/routes/platform/AiComplianceAssuranceGovernanceReporting.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -2809,7 +2809,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/platform/ai-governance-review-action-plan-continuous-improvement-adm-558",
-   "component": "apps/ticvai-web/src/routes/platform/AiGovernanceReviewActionPlanContinuousImprovemen.tsx",
+   "component": "src/routes/platform/AiGovernanceReviewActionPlanContinuousImprovemen.tsx",
    "status": "notStarted"
   },
   "navigation": {

@@ -354,6 +354,12 @@ def load_breaking() -> tuple[list[dict], list[str]]:
         if missing:
             errors.append(f"{e.get('id') or f'entry {i + 1}'}: missing {', '.join(missing)}; it approves nothing")
             continue
+        # **An approval still pending approves nothing** (18 October 2026, lane H review I-2): an entry may record a
+        # change before the lead has confirmed it is breaking, written `approved-by: pending (...)`; until a name
+        # replaces it, the change it covers fails like any unapproved one.
+        if str(e.get("approved-by")).strip().lower().startswith("pending"):
+            errors.append(f"{e.get('id')}: approved-by is pending ({e.get('approved-by')}); it approves nothing yet")
+            continue
         entries.append(e)
     return entries, errors
 

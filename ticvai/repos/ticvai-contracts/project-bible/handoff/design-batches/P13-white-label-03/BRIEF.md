@@ -1,6 +1,6 @@
 # P13-white-label-03 — P13 · White Label (3 of 3)
 
-**3 screens · 27 operations · 40 schemas · 6 permissions**
+**3 screens · 28 operations · 41 schemas · 6 permissions**
 
 Platform P13 Venue CMS · ships as **venue-management** ·
 staff audience · web ·
@@ -102,7 +102,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|---|---|---|---|---|---|---|---|---|
 | `CMS-102` | Site Builder | A | 20 | 15 | 6 | 2 | 7 | 6 | configures | notStarted (generated) |
 | `CMS-103` | Booking Flows | A | 78 | 49 | 6 | 18 | 27 | 6 | configures | notStarted (generated) |
-| `CMS-104` | App Build & Store Publishing | A | 24 | 35 | 6 | 17 | 6 | 6 | configures | notStarted (generated) |
+| `CMS-104` | App Build & Store Publishing | A | 25 | 35 | 6 | 17 | 6 | 6 | configures | notStarted (generated) |
 
 ## Design inputs from the client meetings
 

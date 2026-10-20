@@ -3,8 +3,8 @@
 **10 September 2026. Fifteen of seventeen checks pass; the two that do not are named below.**
 
 ```
-2804 operations · 33 contracts · 1129 tables · 3195 relationships
-207 state models · 89 events · 98 flows · 71 ADRs
+2844 operations · 33 contracts · 1149 tables · 3246 relationships
+208 state models · 96 events · 98 flows · 71 ADRs
 2453 screens · 16 platforms · 13 frontends · 5 apps · 218 boards
 ```
 
@@ -78,13 +78,13 @@ decision somebody has to make, and the register says which.
 contracts/      28 OpenAPI files — the source of truth. Everything else derives from here.
 screens/        2453 screens across 16 platforms
 flows/          203 journey files · 106 derived from the client boards, one per board but B2B board 1
-states/         207 state models
+states/         208 state models
 events/         29 declared events
 docs/adr/       44 architecture decisions
 docs/active/    the working documents — audits, briefs, handoffs
 docs/registers/ conflicts (CF-*), backlog, decisions
 
-backend/        DDL, generated — 1129 tables, 815 foreign keys, 2924 indexes
+backend/        DDL, generated — 1149 tables, 815 foreign keys, 2924 indexes
 services/       16 FastAPI skeletons for topology benchmarking
 deploy/         four deployment configurations plus three burst variants
 tools/          the generators and the checks
@@ -169,7 +169,7 @@ specification problem and belongs in the log, not in a picture.
 **`handoff/api-data-lineage.json`** — every operation with its verb, path, scope, permission,
 audience, service, reads and writes. **The join everything else resolves through.**
 
-**`handoff/schema-reference.json`** — 1129 tables, every column, every reference, and a description
+**`handoff/schema-reference.json`** — 1149 tables, every column, every reference, and a description
 for all of them.
 
 **`handoff/burst-scope.json`** — what a flash-sale environment runs, and what it does not. **Thirteen

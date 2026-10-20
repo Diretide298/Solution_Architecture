@@ -14,8 +14,10 @@ operations:
   - staff
   offline: true
   reads:
+  - cache:idempotency
   - games.authorisation
   writes:
+  - cache:idempotency
   - games.authorisation
 - operation: cloneGame
   verb: POST
@@ -26,11 +28,13 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - games.game
   - games.operational_config
   - games.pricing
   - games.reader_profile
   writes:
+  - cache:idempotency
   - games.game
   - games.operational_config
   - games.pricing
@@ -44,8 +48,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - games.reader
   writes:
+  - cache:idempotency
   - games.reader
 - operation: createGame
   verb: POST
@@ -70,8 +76,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - games.entitlement
   writes:
+  - cache:idempotency
   - games.entitlement
 - operation: createPrize
   verb: POST
@@ -96,16 +104,19 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - games.reader_deployment
   writes:
+  - cache:idempotency
   - games.reader_deployment
 - operation: getGameCard
   verb: GET
   path: /game-cards/{cardCode}
   scope: venue
-  permission: null
+  permission: WALLET_VIEW
   audience:
   - guest
+  - staff
   offline: true
   reads:
   - games.card
@@ -268,7 +279,7 @@ operations:
   scope: venue
   permission: null
   audience:
-  - staff
+  - device
   offline: true
   reads:
   - cache:idempotency
@@ -316,8 +327,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - games.attraction_type
   writes:
+  - cache:idempotency
   - games.attraction_type
 - operation: setGameCardExpiryRules
   verb: PUT
@@ -328,8 +341,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - games.card_expiry_rules
   writes:
+  - cache:idempotency
   - games.card_expiry_rules
 - operation: setGameCardLifecycle
   verb: POST
@@ -340,8 +355,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - games.card
   writes:
+  - cache:idempotency
   - games.card
 - operation: setGameKioskConfiguration
   verb: PUT
@@ -352,8 +369,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - games.kiosk_config
   writes:
+  - cache:idempotency
   - games.kiosk_config
 - operation: setGameOperationalConfiguration
   verb: PUT
@@ -364,8 +383,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - games.operational_config
   writes:
+  - cache:idempotency
   - games.operational_config
 - operation: setGamePricing
   verb: PUT
@@ -392,8 +413,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - games.validation_rules
   writes:
+  - cache:idempotency
   - games.validation_rules
 - operation: setPrizeCost
   verb: PUT
@@ -404,8 +427,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - games.prize_cost
   writes:
+  - cache:idempotency
   - games.prize_cost
 - operation: setReaderConfiguration
   verb: PUT
@@ -416,8 +441,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - games.reader
   writes:
+  - cache:idempotency
   - games.reader
 - operation: setReaderProfile
   verb: PUT
@@ -443,8 +470,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - games.redemption_rules
   writes:
+  - cache:idempotency
   - games.redemption_rules
 - operation: simulateGameplayAuthorisation
   verb: POST
@@ -455,8 +484,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - games.authorisation
-  writes: []
+  writes:
+  - cache:idempotency
 - operation: syncGamePlays
   verb: POST
   path: /game-plays/sync
@@ -466,9 +497,11 @@ operations:
   - device
   offline: false
   reads:
+  - cache:idempotency
   - games.card
   - games.game
   writes:
+  - cache:idempotency
   - games.credit_ledger
   - games.play
   - games.reader_sync_status

@@ -7,7 +7,7 @@
  "audience": "staff",
  "formFactor": "web",
  "offlineCapable": false,
- "generated": "2026-10-18",
+ "generated": "2026-10-20",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 28,
@@ -15,7 +15,7 @@
   "contracts": 8,
   "modules": 5,
   "undrawn": 0,
-  "operationsWithNoScreen": 83
+  "operationsWithNoScreen": 87
  },
  "waves": {
   "wave1": 4,
@@ -82,15 +82,15 @@
    "operations": 2
   },
   {
+   "contract": "finance",
+   "operations": 1
+  },
+  {
    "contract": "orders",
    "operations": 1
   },
   {
    "contract": "white-label",
-   "operations": 1
-  },
-  {
-   "contract": "finance",
    "operations": 1
   }
  ],
@@ -402,7 +402,7 @@
     "operation": "setSuggestionProvider",
     "contract": "ai",
     "verb": "PUT",
-    "summary": ""
+    "summary": "Point a question at a rule, a model, or both"
    },
    {
     "operation": "calculateTax",
@@ -483,6 +483,12 @@
     "summary": "What this person may do, as ticks"
    },
    {
+    "operation": "getSessionVenue",
+    "contract": "identity",
+    "verb": "GET",
+    "summary": "Which venue this back-office session is working in, and which it may switch to"
+   },
+   {
     "operation": "listAccessDecisions",
     "contract": "identity",
     "verb": "GET",
@@ -519,10 +525,22 @@
     "summary": "Who already holds a conflicting pair"
    },
    {
+    "operation": "listStepUpSupervisors",
+    "contract": "identity",
+    "verb": "GET",
+    "summary": "Who may sign a supervisor step-up here"
+   },
+   {
     "operation": "setPrincipalModuleAccess",
     "contract": "identity",
     "verb": "PUT",
     "summary": "Tick what they may do"
+   },
+   {
+    "operation": "setSessionVenue",
+    "contract": "identity",
+    "verb": "PUT",
+    "summary": "Switch the back-office session to another venue it may act at"
    },
    {
     "operation": "updateRole",
@@ -840,7 +858,13 @@
     "operation": "listAlertRules",
     "contract": "reporting",
     "verb": "GET",
-    "summary": "What raises an alert, and when"
+    "summary": "Thresholds being watched"
+   },
+   {
+    "operation": "getPreview",
+    "contract": "white-label",
+    "verb": "GET",
+    "summary": "Read a preview while its link lives"
    },
    {
     "operation": "setFaqs",

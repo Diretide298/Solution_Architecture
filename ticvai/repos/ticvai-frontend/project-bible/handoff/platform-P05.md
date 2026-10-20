@@ -9,12 +9,12 @@
 | Contracts | 7 |
 | Modules | 2 |
 | Undrawn | 0 |
-| Operations with no screen | 12 |
+| Operations with no screen | 14 |
 | Waves | wave1 2 · wave2 15 |
 
 ## Gaps
 
-### 12 operations with no screen here
+### 14 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -31,7 +31,9 @@
 | `listPublishedTrackingTechnologies` | marketing-crm | GET | The approved cookie registry, as the preference centre shows it |
 | `recordDeviceConsent` | marketing-crm | POST | Record a visitor's cookie decision, before anyone is known |
 | `uploadGuestDocument` | marketing-crm | POST | Store a guest photo, ID or signed document |
+| `convertToTermProduct` | orders | POST | Turn a visit into a membership or season pass |
 | `revokeEntitlementShare` | orders | POST | Take back a share |
+| `revokePaymentToken` | orders | DELETE | Remove a saved payment method |
 
 ### 1 modules split across waves
 

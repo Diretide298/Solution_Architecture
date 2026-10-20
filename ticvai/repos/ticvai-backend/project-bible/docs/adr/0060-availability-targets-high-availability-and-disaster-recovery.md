@@ -74,7 +74,7 @@ This is where 99.99% can honestly be offered: the venue keeps selling and scanni
   - Kafka on Event Hubs: the namespace's zone redundancy in UAE North (confirm for the chosen tier).
   - **The outbox is the record** (ADR-0058, partitions per ADR-0056). A broker outage delays delivery; it loses nothing, because the relay re-publishes what is not yet relayed and consumers de-duplicate through the inbox.
 - **Qdrant: 3 nodes, one per zone, replication factor 2** (ADR-0049).
-- pgbouncer as a pair.
+- pgbouncer as a pair. **Amended 20 October 2026 (the lead, r8 cause FOUNDATION-AI-C53): Block A uses Azure's built-in PgBouncer on the Flexible Server (port 6432), whose availability is the server's; the self-run pair is the fallback if the built-in one cannot report one tenant's share of its pool (docs/architecture/observability.md).**
 
 ### Backup and restore
 

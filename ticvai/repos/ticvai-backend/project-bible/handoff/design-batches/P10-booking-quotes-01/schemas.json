@@ -109,10 +109,31 @@
     "type": "string",
     "format": "uuid"
    },
+   "anonymousSessionToken": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "The `guestAuth` token of the anonymous session `createCart` opened for a visitor with no credential (GPS-C23, CHG-R8SPN-031); null on every other answer. Not stored on the cart."
+   },
    "token": {
     "type": "string",
     "readOnly": true,
     "description": "**How an anonymous guest returns to their cart**, including from a recovery email. Rotated on claim, so a link shared before signing in does not reach the account after.\n"
+   },
+   "sessionId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The staff or partner session that started the cart (a till's cart is its session's own); null for a guest's cart (R8 blocker IDENTITY-C49, CHG-R8MIG-021)."
+   },
+   "workstationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The workstation of that session; null for a guest's cart."
    },
    "venueId": {
     "type": "string",
@@ -517,7 +538,7 @@
     "x-ticvai-references": "catalogue.inventory_reservation",
     "type": "string",
     "nullable": true,
-    "description": "Lease the units were drawn from — a `catalogue.InventoryHold.id`. Absent for uncontended products."
+    "description": "Lease the units were drawn from — a `catalogue.InventoryHold.id`. Absent for uncontended products. **A standing-zone line** (zone-priced general admission at POS-004 and WEB-007; decided 20 October 2026, Chinmay, R8 blocker cause GPS-C38, option A; CHG-R8SPN-040) carries no `seatIds`: it is `quantity` places in one zone, held by `seating.createSeatHold` with `zoneId` and `quantity`, and this names that hold's inventory hold; the zone, its price band and keep-the-party- together come from the hold, and a lapsed one is `409 hold-not-active` as for seats."
    },
    "seatIds": {
     "type": "array",
@@ -1111,6 +1132,13 @@
     "format": "uuid",
     "description": "The client UUIDv7 from `CreateOrderRequest.id`."
    },
+   "orderAccessToken": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "**What lets the device that just checked out read the order it paid for** (decided 20 October 2026, Chinmay, R8 blocker cause IDENTITY-C52, option A; CHG-R8SPN-025). Returned only in `checkoutCart`'s answer, null everywhere else: a signed token bound to this order and to the cart's device, valid 24 hours, never stored. `getOrder` accepts it in `X-Order-Access-Token` in place of a session, so a guest who checked out with no account, or whose session ended, still sees the confirmation (WEB-013 keeps it in its navigation state). It reads this order only and grants nothing else."
+   },
    "orderNumber": {
     "x-ticvai-unique": "tenant",
     "type": "string",
@@ -1460,10 +1488,88 @@
   "nullable": true,
   "additionalProperties": true,
   "x-ticvai-persistence": "none — embedded as attributes (jsonb) on orders.cart_line and orders.order_line",
-  "description": "Open attributes of a line, kept from the cart to the order line. **`transport` is the one with a defined shape** (decided 29 September, rev 3 REV3-21); other keys are free.\n",
+  "description": "Open attributes of a line, kept from the cart to the order line. **`transport` is the one with a defined shape** (decided 29 September, rev 3 REV3-21); other keys are free. **`attendees` is the second** (20 October 2026, R8 blocker cause GPS-C28; CHG-R8SPN-034), and **`parking` and `bundle` have a defined shape too** (R8 blockers ORDERS-MONEY-C22 and C43, CHG-R8MIG-023).\n",
   "properties": {
    "transport": {
     "$ref": "#/components/schemas/TransportLineAttributes"
+   },
+   "attendees": {
+    "type": "integer",
+    "minimum": 1,
+    "nullable": true,
+    "description": "**How many people a meeting-room booking is for** (GST-075; R8 blocker cause GPS-C28, CHG-R8SPN-034). Sent with `addCartLine` for a meeting-room product, kept from the cart line to the order line, and shown on the venue's reception list for the booking. It must not exceed the room type's capacity, which the guest step shows beside each room type: more is refused `422 attendees-over-capacity` by `addCartLine`, naming the capacity. The guest steps run in the order `listProductStartTimes` can answer (lead answer, option A): date, room type, length, then start time."
+   },
+   "parking": {
+    "type": "object",
+    "nullable": true,
+    "description": "**A parking line's plate and day** (R8 blocker ORDERS-MONEY-C22, CHG-R8MIG-023): carried from `addCartLine` to the order line and passed to `issueOrderEntitlements`, which writes the parking entitlement's plate, `validFrom` and `validTo` from it. A sold-out answer (`soldOutForDay`) means the facility's capacity on the `validFrom` day.",
+    "required": [
+     "plate",
+     "validFrom",
+     "validTo"
+    ],
+    "properties": {
+     "plate": {
+      "type": "object",
+      "required": [
+       "number"
+      ],
+      "properties": {
+       "number": {
+        "type": "string",
+        "maxLength": 16
+       },
+       "country": {
+        "type": "string",
+        "maxLength": 3,
+        "nullable": true,
+        "description": "ISO 3166 code of the plate's country; null for the venue's own."
+       }
+      }
+     },
+     "validFrom": {
+      "type": "string",
+      "format": "date-time"
+     },
+     "validTo": {
+      "type": "string",
+      "format": "date-time"
+     }
+    }
+   },
+   "bundle": {
+    "type": "object",
+    "nullable": true,
+    "description": "**A bundle line's picks** (R8 blocker ORDERS-MONEY-C43, the lead's answer B for r8; CHG-R8MIG-023): the bundle and the option the guest chose in each choice group. The line's `variantId` is the bundle's own (`Bundle.variantId`); the server prices it at the bundle's own price and freezes the allocation at `createOrder` (ADR-0019). In r8 a bundle's admission is open-dated, so no date or session is asked.",
+    "required": [
+     "bundleId"
+    ],
+    "properties": {
+     "bundleId": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "choices": {
+      "type": "array",
+      "items": {
+       "type": "object",
+       "required": [
+        "choiceGroupId",
+        "optionId"
+       ],
+       "properties": {
+        "choiceGroupId": {
+         "type": "string",
+         "format": "uuid"
+        },
+        "optionId": {
+         "type": "string",
+         "format": "uuid"
+        }
+       }
+      }
+     }
+    }
    }
   }
  },
@@ -2290,6 +2396,11 @@
  },
  "Payment": {
   "x-ticvai-persistence": "orders.payment",
+  "x-ticvai-index": [
+   [
+    "providerReference"
+   ]
+  ],
   "type": "object",
   "required": [
    "id",
@@ -3001,8 +3112,17 @@
      "held",
      "converted",
      "released",
-     "expired"
-    ]
+     "expired",
+     "sold"
+    ],
+    "description": "`converted` when the order is created; `sold` when the order is paid and `catalogue.convertInventoryHold` sells the units (ADAM CR-169, 18 October 2026; CHG-CRA-007)."
+   },
+   "inventoryReservationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "x-ticvai-references": "catalogue.inventory_reservation",
+    "description": "**The inventory hold these seats sit under** (ADAM CR-169; CHG-CRA-007), so `convertInventoryHold` finds the order's seat reservations from the hold it converts."
    },
    "totalPrice": {
     "x-ticvai-column": "gross_amount",

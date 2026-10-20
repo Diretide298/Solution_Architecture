@@ -39,6 +39,20 @@ meta:
     Patterns are added deliberately, not discovered. A screen that fits none of these is either a
     genuinely new interaction — in which case add a pattern and say when to use it — or it is a
     screen that has not been thought about, which is the more common case by a wide margin.
+  rules:
+  - id: guestSignInReturn
+    decided: r8 second round, 20 October 2026 (cause WHITE-C13, ticket 27891)
+    rule: >
+      **Every guest screen whose no-access state offers sign-in has an edge to the sign-in screen,
+      and sign-in brings the guest back.** On P01 (web) the sign-in screen is WEB-016, on P02 (app)
+      GST-042. The edge is this rule's, not drawn on each screen (navigation provenance `rule`):
+      any guest screen whose `emptyNoAccess` says the guest "is offered sign-in and brought back"
+      opens the sign-in screen carrying `returnTo` (its own screen id) and `returnParams` (its own
+      entry parameters as it was opened). After sign-in the sign-in screen opens `returnTo` with
+      `returnParams`; with neither, it goes on as it does today (home, or the cart it was opened
+      from). A `returnTo` that is not a screen of the same app is ignored, so a link cannot send a
+      guest somewhere else. Written once here so that the 4 P02 and 27 P01 screens with that
+      sentence do not each carry a hand-drawn edge that drifts.
 
 patterns:
 

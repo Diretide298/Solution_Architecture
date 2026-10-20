@@ -68,11 +68,34 @@ consumers:
 - context: subscription
   purpose: Apply the decision to the partner record it was about (agreement, application, change request).
     decideApprovalRequest runs in commerce and the partner tables are in the control database, which
-    PlatformService owns in operations (ADR-0055 rule 4, ADAM CR-002, CHG-R6-020)
+    PlatformService owns in operations (ADR-0055 rule 4, ADAM CR-002, CHG-R6-020). **And to a tenant**
+    (`subjectContract` subscription, `subjectType` tenant; ADAM CR-172, 19 October 2026, CHG-CRA-005; fix round
+    3), the way white-label's consumer below applies a reviewed publishTenantConfig - it learns what to apply from
+    the record the call wrote, named by the event (and a version that waits is validated again when it falls due).
+    suspendTenant and reactivateTenant
+    write only the approval request, and the payload names the tenant (`subjectId`) and not the change, so the
+    consumer reads that request by `requestId` through approvals#requestRecords (route service, the declared query
+    Subscription already reads approvals.request through) for its stored `attributes`
+    (ApprovalRequest.attributes), and reads the tenant from control.tenant. It then re-checks the tenant and, in
+    one transaction - `attributes.action` suspend applies the suspension suspendTenant raised (now, or pending
+    until its effectiveAt) and writes tenant.suspended to control.outbox; reactivate moves the tenant to active or
+    cancels its pending suspension. **Re-checked on arrival**, since the tenant may have moved while the request
+    was open. Already in the target state (suspended, or active with a suspension granted and not yet in effect,
+    which counts as suspended and keeps its time, mode and notice; or, for reactivate, active with nothing
+    pending) changes nothing and is recorded as a no-op; a state that no longer allows the change (suspend -
+    onboarding, terminating or terminated, tenant-not-active; reactivate - terminated, tenant-terminated, or
+    onboarding, tenant-not-suspended) changes nothing, with that reason. The approved request itself never
+    changes (approvals keeps it immutable); both outcomes are recorded on the request's approved-action
+    execution, where approvals keeps whether an approved action ran (succeeded with a note; failed with
+    failureReason the reason, and a Retry of it on BO-382 would be refused again by the same re-check, so it is
+    closed with investigate and a note). The consumer is the only writer of the tenant row and of
+    tenant.suspended on this path (lane H review 3 N-2, N-4; CHG-R8SPN-015)
   writes:
   - control.partner_agreement
   - control.partner_application
   - control.partner_change_request
+  - control.tenant
+  - control.outbox
   idempotencyKey: requestId
   onFailure: retryThenDeadLetter
   isCritical: true
@@ -81,6 +104,15 @@ consumers:
     MarketingService's, in operations (ADR-0055 rule 4, ADAM CR-002, CHG-R6-020)
   writes:
   - marketing.privacy_notice_governance
+  idempotencyKey: requestId
+  onFailure: retryThenDeadLetter
+  isCritical: true
+- context: white-label
+  purpose: Make the approved white-label version current (`reviewStatus` approved, `isCurrent` true, the previous
+    current version no longer current) and emit whitelabel.contentPublished, when `subjectType` is
+    `whiteLabelPublication` (ADAM CR-154, 18 October 2026; CHG-CRA-004)
+  writes:
+  - whitelabel.config_version
   idempotencyKey: requestId
   onFailure: retryThenDeadLetter
   isCritical: true

@@ -1,6 +1,6 @@
 # WS30 — Membership   Annual Pass Management board 2
 
-**10 screens · 19 operations · 32 schemas · 6 permissions**
+**10 screens · 19 operations · 32 schemas · 7 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -48,8 +48,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 6 permissions apply here:
-  `APPROVAL_REQUEST, GUEST_MANAGE, ORDER_MODIFY, PLATFORM_CELL_MANAGE, PLATFORM_TENANT_VIEW, PRODUCT_CONFIGURE`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 7 permissions apply here:
+  `APPROVAL_REQUEST, GUEST_MANAGE, MEMBERSHIP_MANAGE, MEMBERSHIP_VIEW, ORDER_MODIFY, PLATFORM_TENANT_VIEW, PRODUCT_CONFIGURE`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that

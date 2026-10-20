@@ -10,7 +10,7 @@
   "implementation": {
    "app": "venue-scanner",
    "route": "/access/gate-mode",
-   "component": "apps/venue-scanner/src/routes/access/GateModeDetail.tsx",
+   "component": "src/routes/access/GateModeDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {

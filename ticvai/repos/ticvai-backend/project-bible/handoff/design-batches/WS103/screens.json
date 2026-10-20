@@ -15,7 +15,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/tenants-licensing/provisioning-command-center-adm-419",
-   "component": "apps/ticvai-web/src/routes/tenants-licensing/ProvisioningCommandCenter.tsx",
+   "component": "src/routes/tenants-licensing/ProvisioningCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -221,7 +221,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/tenants-licensing/tenant-organization-provisioning-adm-420",
-   "component": "apps/ticvai-web/src/routes/tenants-licensing/TenantOrganizationProvisioning.tsx",
+   "component": "src/routes/tenants-licensing/TenantOrganizationProvisioning.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -236,7 +236,10 @@
      "to": "ADM-419",
      "trigger": "Back to Provisioning Command Center",
      "provenance": "structural — pack board 6 wiring, 11 September 2026",
-     "back": true
+     "back": true,
+     "carries": [
+      "cellId"
+     ]
     }
    ]
   },
@@ -465,7 +468,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/tenants-licensing/venue-operational-structure-creation-adm-421",
-   "component": "apps/ticvai-web/src/routes/tenants-licensing/VenueOperationalStructureCreation.tsx",
+   "component": "src/routes/tenants-licensing/VenueOperationalStructureCreation.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -480,7 +483,10 @@
      "to": "ADM-419",
      "trigger": "Back to Provisioning Command Center",
      "provenance": "structural — pack board 6 wiring, 11 September 2026",
-     "back": true
+     "back": true,
+     "carries": [
+      "cellId"
+     ]
     }
    ]
   },
@@ -718,7 +724,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/tenants-licensing/administrator-security-initialization-adm-422",
-   "component": "apps/ticvai-web/src/routes/tenants-licensing/AdministratorSecurityInitialization.tsx",
+   "component": "src/routes/tenants-licensing/AdministratorSecurityInitialization.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -733,7 +739,10 @@
      "to": "ADM-419",
      "trigger": "Back to Provisioning Command Center",
      "provenance": "structural — pack board 6 wiring, 11 September 2026",
-     "back": true
+     "back": true,
+     "carries": [
+      "cellId"
+     ]
     }
    ]
   },
@@ -1018,7 +1027,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/tenants-licensing/license-entitlement-activation-adm-423",
-   "component": "apps/ticvai-web/src/routes/tenants-licensing/LicenseEntitlementActivation.tsx",
+   "component": "src/routes/tenants-licensing/LicenseEntitlementActivation.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1132,7 +1141,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/tenants-licensing/module-activation-dependency-validation-adm-424",
-   "component": "apps/ticvai-web/src/routes/tenants-licensing/ModuleActivationDependencyValidation.tsx",
+   "component": "src/routes/tenants-licensing/ModuleActivationDependencyValidation.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1148,7 +1157,10 @@
      "to": "ADM-419",
      "trigger": "Back to Provisioning Command Center",
      "provenance": "structural — pack board 6 wiring, 11 September 2026",
-     "back": true
+     "back": true,
+     "carries": [
+      "cellId"
+     ]
     }
    ]
   },
@@ -1402,7 +1414,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/tenants-licensing/venue-template-application-adm-425",
-   "component": "apps/ticvai-web/src/routes/tenants-licensing/VenueTemplateApplication.tsx",
+   "component": "src/routes/tenants-licensing/VenueTemplateApplication.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1417,7 +1429,10 @@
      "to": "ADM-419",
      "trigger": "Back to Provisioning Command Center",
      "provenance": "structural — pack board 6 wiring, 11 September 2026",
-     "back": true
+     "back": true,
+     "carries": [
+      "cellId"
+     ]
     }
    ]
   },
@@ -1617,7 +1632,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/tenants-licensing/initial-configuration-regional-defaults-adm-426",
-   "component": "apps/ticvai-web/src/routes/tenants-licensing/InitialConfigurationRegionalDefaults.tsx",
+   "component": "src/routes/tenants-licensing/InitialConfigurationRegionalDefaults.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1632,7 +1647,10 @@
      "to": "ADM-419",
      "trigger": "Back to Provisioning Command Center",
      "provenance": "structural — pack board 6 wiring, 11 September 2026",
-     "back": true
+     "back": true,
+     "carries": [
+      "cellId"
+     ]
     }
    ]
   },
@@ -1960,7 +1978,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/tenants-licensing/provisioning-validation-exception-management-adm-427",
-   "component": "apps/ticvai-web/src/routes/tenants-licensing/ProvisioningValidationExceptionManagement.tsx",
+   "component": "src/routes/tenants-licensing/ProvisioningValidationExceptionManagement.tsx",
    "status": "notStarted"
   },
   "navigation": {

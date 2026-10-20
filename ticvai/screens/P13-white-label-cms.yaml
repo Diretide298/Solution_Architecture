@@ -501,13 +501,13 @@ screens:
     component: modal
     trigger: Save brand identity
     body: '**Collects what `setBrandIdentity` sends before it is called.** Required: `logoAssetRef`. Optional:
-      `logoVariant` (light, dark or duotone: which lockup sits in the nav bar and which colour reading of
-      it drives the theme, decided 29 September, rev 3 CFG-4), `logoDarkAssetRef`, `faviconAssetRef`. The
-      splash, intro video and `showPoweredBy` are not asked here: they are sent as read (CMS-004 owns the
-      splash and intro video, CMS-104 the credit; CHG-SGU-022, CHG-R1S-012). Reads `getBrandIdentity` first
-      and sends the whole record back with the fields owned by CMS-004 as read (the PUT replaces the whole
-      record; `setBrandIdentity` takes no If-Match, so if two people save at once the last write wins).
-      Dismissing sends nothing; the screen behind is unchanged.'
+      `logoVariant` (light, dark or duotone: which lockup sits in the nav bar and which colour reading
+      of it drives the theme, decided 29 September, rev 3 CFG-4), `logoDarkAssetRef`, `faviconAssetRef`.
+      The splash, intro video and `showPoweredBy` are not asked here: they are sent as read (CMS-004 owns
+      the splash and intro video, CMS-104 the credit; CHG-SGU-022, CHG-R1S-012). Reads `getBrandIdentity`
+      first and sends the whole record back with the fields owned by CMS-004 as read (the PUT replaces
+      the whole record; `setBrandIdentity` takes no If-Match, so if two people save at once the last write
+      wins). Dismissing sends nothing; the screen behind is unchanged.'
     bindsTo: BrandIdentity
     confirm:
       label: Save brand identity
@@ -557,14 +557,15 @@ screens:
     - to: CMS-006
       trigger: Component Preview
       provenance: flow F102 step 2→3
-  notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations still
-    to be written. States derived from the screen pattern on 17 August, not individually considered — sound
-    for a list, a form or a money screen, and worth revisiting where this screen is unusual. **37 operations
-    removed 24 August.** Every white-label screen across P09, P12 and P13 declared the **identical 41 operations**
-    — a Typography screen that could create banners and a Component Preview that could set FAQs. **The worst
-    instance of the 18 August bulk attach found so far**, and only walking the white-label journey surfaced
-    it. Build note (r8, WHITE-C03): the generated first-run text "Offers no create action" is wrong. `setFonts`
-    creates the part on first save: build the form empty with Save fonts when `getFonts` answers 404 not-configured.'
+  notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written. States derived from the screen pattern on 17 August, not individually considered
+    — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. **37
+    operations removed 24 August.** Every white-label screen across P09, P12 and P13 declared the **identical
+    41 operations** — a Typography screen that could create banners and a Component Preview that could
+    set FAQs. **The worst instance of the 18 August bulk attach found so far**, and only walking the white-label
+    journey surfaced it. Build note (r8, WHITE-C03): the generated first-run text "Offers no create action"
+    is wrong. `setFonts` creates the part on first save: build the form empty with Save fonts when `getFonts`
+    answers 404 not-configured.'
   density: compact
   pattern: statusTracker
   patternReason: '`getFonts` reads one record and nothing reads a population — the screen is about that
@@ -689,24 +690,24 @@ screens:
       trigger: Typography
       provenance: 'derived — CMS-003 declares entryState.params  and CMS-004 holds none of them. The edge
         carries nothing: CMS-003 needs nothing to open'
-  notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations still
-    to be written. States derived from the screen pattern on 17 August, not individually considered — sound
-    for a list, a form or a money screen, and worth revisiting where this screen is unusual.
-  
-  
-    **Rewired 23 September (L7).** The screen called the maintenance equipment register, guest CRM or subscription
-    billing where its purpose names White Labelling. Its operations now match its purpose.
-  
-  
-    **This screen owns the app icons, the splash and the intro video**; the marks and the logo variant are
-    CMS-002''s (CHG-SGU-022).
-  
-  
-    **Asset ids (the logo, icon source, splash and video) come from the media library (searchMedia) or an
-    upload (createUpload, completeUpload), bound 4 October 2026** (CHG-FXS-003) Build note (r8, WHITE-C23):
+  notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written. States derived from the screen pattern on 17 August, not individually considered
+    — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
+
+
+    **Rewired 23 September (L7).** The screen called the maintenance equipment register, guest CRM or
+    subscription billing where its purpose names White Labelling. Its operations now match its purpose.
+
+
+    **This screen owns the app icons, the splash and the intro video**; the marks and the logo variant
+    are CMS-002''s (CHG-SGU-022).
+
+
+    **Asset ids (the logo, icon source, splash and video) come from the media library (searchMedia) or
+    an upload (createUpload, completeUpload), bound 4 October 2026** (CHG-FXS-003) Build note (r8, WHITE-C23):
     the first-run text "Offers no create action" is wrong. With no logo yet (`getBrandIdentity` returns
-    none) show "Set the logo on CMS-002 first" and keep Save off; the form''s Required `logoAssetRef` is
-    gone because the logo is CMS-002''s. The detail panel above still shows the marks read-only.'
+    none) show "Set the logo on CMS-002 first" and keep Save off; the form''s Required `logoAssetRef`
+    is gone because the logo is CMS-002''s. The detail panel above still shows the marks read-only.'
   density: compact
   pattern: statusTracker
   patternReason: '`getBrandIdentity` reads one record and nothing reads a population — the screen is about
@@ -843,15 +844,15 @@ screens:
     component: modal
     trigger: Save brand identity
     body: '**Collects what `setBrandIdentity` sends before it is called.** Optional: `splashImageAssetRefs`,
-      `splashDurationSeconds`, `splashBackgroundColour`, `showLoadingIndicator`, `introVideoAssetRef` and
-      `introVideoMode` (off, first launch or every launch; MOB-5). `logoAssetRef`, `logoVariant`, `logoDarkAssetRef`,
-      `faviconAssetRef` and `showPoweredBy` are not asked here: they are sent as read (CMS-002 owns the
-      marks, CMS-104 the credit; CHG-SGU-022). Reads `getBrandIdentity` first and sends the whole record
-      back with the fields owned by CMS-002 as read (the PUT replaces the whole record; `setBrandIdentity`
-      takes no If-Match, so if two people save at once the last write wins). `logoAssetRef` is required
-      by the record, so before anything is saved here the logo must exist: when `getBrandIdentity` returns
-      none, this form shows "Set the logo on CMS-002 first" and Save is off. Dismissing sends nothing; the
-      screen behind is unchanged.'
+      `splashDurationSeconds`, `splashBackgroundColour`, `showLoadingIndicator`, `introVideoAssetRef`
+      and `introVideoMode` (off, first launch or every launch; MOB-5). `logoAssetRef`, `logoVariant`,
+      `logoDarkAssetRef`, `faviconAssetRef` and `showPoweredBy` are not asked here: they are sent as read
+      (CMS-002 owns the marks, CMS-104 the credit; CHG-SGU-022). Reads `getBrandIdentity` first and sends
+      the whole record back with the fields owned by CMS-002 as read (the PUT replaces the whole record;
+      `setBrandIdentity` takes no If-Match, so if two people save at once the last write wins). `logoAssetRef`
+      is required by the record, so before anything is saved here the logo must exist: when `getBrandIdentity`
+      returns none, this form shows "Set the logo on CMS-002 first" and Save is off. Dismissing sends
+      nothing; the screen behind is unchanged.'
     bindsTo: BrandIdentity
     confirm:
       label: Save brand identity
@@ -3009,17 +3010,17 @@ screens:
       trigger: Typography
       provenance: 'derived — CMS-003 declares entryState.params  and CMS-012 holds none of them. The edge
         carries nothing: CMS-003 needs nothing to open'
-  notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations still
-    to be written. States derived from the screen pattern on 17 August, not individually considered — sound
-    for a list, a form or a money screen, and worth revisiting where this screen is unusual. Build note
-    (r8, WHITE-C03): nothing is read on entry. The preview is made by `createPreview` when the person presses
-    the action and is empty until then (not a 404); Validate calls `validateTenantConfig`; the no-access
-    state names `TENANT_CONFIGURE` for those two operations. Ignore the generated first-run text "Offers
-    no create action" and the `getTenantConfig` wording in the no-access state.'
+  notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written. States derived from the screen pattern on 17 August, not individually considered
+    — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. Build
+    note (r8, WHITE-C03): nothing is read on entry. The preview is made by `createPreview` when the person
+    presses the action and is empty until then (not a 404); Validate calls `validateTenantConfig`; the
+    no-access state names `TENANT_CONFIGURE` for those two operations. Ignore the generated first-run
+    text "Offers no create action" and the `getTenantConfig` wording in the no-access state.'
   density: compact
   pattern: statusTracker
-  patternReason: 'authored: the preview is made by `createPreview` when the person asks and the draft is
-    checked by `validateTenantConfig`; nothing on this screen reads a record on entry.'
+  patternReason: 'authored: the preview is made by `createPreview` when the person asks and the draft
+    is checked by `validateTenantConfig`; nothing on this screen reads a record on entry.'
   purpose: See the site as an Arabic reader sees it.
   layout:
     template: detail
@@ -15125,13 +15126,14 @@ screens:
       - kind: livePreview
         label: Preview
         operation: previewGuidedChoice
-        notes: '**What each combination of answers leaves comes from `previewGuidedChoice`** (r8, WHITE-C26), the
-          same filter guests meet, so a combination that leaves nothing shows before publishing. **Renders the draft as a guest would meet it**: the button or pop-up, the banner, each
-          question and the result card, in each language and in both directions. Drawn from the record
-          in hand; it calls nothing and publishes nothing, and guests keep seeing the published set-up
-          until Publish. **Preview the filtered list**: for each combination of answers, the products
-          left (read with `listProducts` and the answer''s filter), so an answer that leaves nothing bookable
-          shows before it is published (W4).'
+        notes: '**What each combination of answers leaves comes from `previewGuidedChoice`** (r8, WHITE-C26),
+          the same filter guests meet, so a combination that leaves nothing shows before publishing. **Renders
+          the draft as a guest would meet it**: the button or pop-up, the banner, each question and the
+          result card, in each language and in both directions. Drawn from the record in hand; it calls
+          nothing and publishes nothing, and guests keep seeing the published set-up until Publish. **Preview
+          the filtered list**: for each combination of answers, the products left (read with `listProducts`
+          and the answer''s filter), so an answer that leaves nothing bookable shows before it is published
+          (W4).'
         provenance: authored 29 September, rev 3 REV3-11
       - kind: publishGate
         label: What publishing changes
@@ -15245,8 +15247,8 @@ screens:
     provenance: build, 29 September 2026
   - operationId: previewGuidedChoice
     contract: white-label
-    purpose: 'The products each combination of the draft''s answers leaves, for the preview (r8, WHITE-C26); called
-      when the draft changes, nothing stored'
+    purpose: The products each combination of the draft's answers leaves, for the preview (r8, WHITE-C26);
+      called when the draft changes, nothing stored
     trigger: onAction
     provenance: r8 second round, WHITE-C26 (the core lane's request)
   entryState:
@@ -15799,10 +15801,11 @@ screens:
         impliedBy: publishTenantConfig
         operation: diffConfigVersion
         notes: '**Read with `diffConfigVersion`** (r8, WHITE-C18): the draft against the published version,
-          its `bookingFlows` area and `affectedProducts`. **Flows publish with the whole site**, never alone: the gate names every venue flow that
-          changed since the last version and the products whose steps will change for guests, and says
-          the rest of the draft (theme, pages, navigation) goes live with it. Refused while any enabled
-          flow is invalid (`409`, `bookingFlowInvalid`). Needs `TENANT_PUBLISH`.'
+          its `bookingFlows` area and `affectedProducts`. **Flows publish with the whole site**, never
+          alone: the gate names every venue flow that changed since the last version and the products
+          whose steps will change for guests, and says the rest of the draft (theme, pages, navigation)
+          goes live with it. Refused while any enabled flow is invalid (`409`, `bookingFlowInvalid`).
+          Needs `TENANT_PUBLISH`.'
         provenance: contract white-label.yaml POST /tenant-config/publish
     - name: actionBar
       slot: rowActions
@@ -16115,9 +16118,9 @@ screens:
         notes: '**The in-platform guide M24-08 asks for**: how to get a D-U-N-S number, open each account,
           fill the listing and answer store review. Grounded on a store-publishing knowledge source, no
           tenant data. `unavailable` until the ai "app publishing guide" assistant profile exists; the
-          checklist guidance works without it. The conversation is started with `createAiConversation` and
-          `profileKey` `guide.appPublishing`; a 404 `assistant-profile-unavailable` shows the panel''s unavailable
-          state, not an error (r8, WHITE-C27).'
+          checklist guidance works without it. The conversation is started with `createAiConversation`
+          and `profileKey` `guide.appPublishing`; a 404 `assistant-profile-unavailable` shows the panel''s
+          unavailable state, not an error (r8, WHITE-C27).'
         provenance: authored 29 September, M24-08
       - kind: publishGate
         label: What a build and a submission do

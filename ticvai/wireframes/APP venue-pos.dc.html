@@ -416,10 +416,10 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
 
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getAvailability · acquireInventoryHold · listProductVariants · getProduct +4</div>
+          <div><b>OPERATIONS</b> &middot; getAvailability · listProductVariants · getProduct · listAlternativeCodes +2</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline · denied</span></div>
           <div><b>ARRIVES WITH</b> &middot; inventoryHoldId&larr;deepLink, productId&larr;POS-002</div>
-          <div><b>GOES TO</b> &middot; <a href="#pos-002">POS-002</a>  &mdash; <i>Back</i> <span class="car">productId</span><br><a href="#pos-004">POS-004</a>  &mdash; <i>Sell — Seat Map</i> <span class="car">holdId · performanceId</span><br><a href="#pos-005">POS-005</a>  &mdash; <i>Add to sale, then charge</i><br><a href="#pos-006">POS-006</a>  &mdash; <i>Held Orders</i></div>
+          <div><b>GOES TO</b> &middot; <a href="#pos-002">POS-002</a>  &mdash; <i>Back</i> <span class="car">productId</span><br><a href="#pos-004">POS-004</a>  &mdash; <i>Sell — Seat Map</i> <span class="car">performanceId</span><br><a href="#pos-005">POS-005</a>  &mdash; <i>Add to sale, then charge</i><br><a href="#pos-006">POS-006</a>  &mdash; <i>Held Orders</i></div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formAcquireInventoryHold &middot; <i>Acquire inventory hold</i> &middot; <b>Acquire inventory hold</b> &middot; Cancel <span class="dis">discards id · channelCapacityId · requestedUnits · ttlSeconds · channel</span></div></div>
         </div>
@@ -435,9 +435,9 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
 
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getSeatAvailability · createSeatHold · getPerformance · getSeatHold +3</div>
+          <div><b>OPERATIONS</b> &middot; getSeatAvailability · createSeatHold · getPerformance · getSeatHold +4</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoAccess · offline · denied · zoneUnavailable</span></div>
-          <div><b>ARRIVES WITH</b> &middot; holdId&larr;deepLink, performanceId&larr;deepLink</div>
+          <div><b>ARRIVES WITH</b> &middot; holdId&larr;deepLink, performanceId&larr;deepLink, eventId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#pos-002">POS-002</a>  &mdash; <i>Back</i> <span class="car">orderId</span><br><a href="#pos-003">POS-003</a>  &mdash; <i>Sell — Timed Entry</i><br><a href="#pos-005">POS-005</a>  &mdash; <i>Add seats to sale, then charge</i> <span class="car">paymentId</span><br><a href="#pos-006">POS-006</a>  &mdash; <i>Held Orders</i> <span class="car">orderId</span></div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formCreateSeatHold &middot; <i>Create seat hold</i> &middot; <b>Create seat hold</b> &middot; Cancel <span class="dis">discards id · performanceId · seatIds · ttlSeconds · subjectId</span></div><div class="ov"><b>modal</b> formCreateOrder &middot; <i>Create order</i> &middot; <b>Create order</b> &middot; Cancel <span class="dis">discards id · venueId · channel · lines · recordedAt · shiftId · subjectId · guestLinkId · catalogueBundleVersion</span></div><div class="ov"><b>modal</b> formCreatePayment &middot; <i>Create payment</i> &middot; <b>Create payment</b> &middot; Cancel <span class="dis">discards id · orderId · tender · amount · recordedAt · tenderCurrency · tenderAmount · walletAuthorisationId · deviceId</span></div></div>
@@ -909,7 +909,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
 
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; allocateDepositBox · configureWorkstation · listDevices · setDeviceAssignment +1</div>
+          <div><b>OPERATIONS</b> &middot; allocateDepositBox · configureWorkstation · listDevices · setDeviceAssignment +5</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; workstationId&larr;session, deviceId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#pos-001">POS-001</a>  &mdash; <i>Begin Shift</i> <span class="car">shiftId</span><br><a href="#pos-019">POS-019</a>  &mdash; <i>Shift policy is set</i></div>

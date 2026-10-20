@@ -5781,6 +5781,14 @@ screens:
     contract: catalogue
     purpose: List performances of an event
     trigger: onAction
+  - operationId: listProductCategories
+    contract: catalogue
+    purpose: 'The options of the calendar''s category filter (r8, GPS-C18), read once when the screen
+      opens; the chosen category is sent to `listPerformances` as `categoryId`. No component of its own:
+      the filter is part of the calendar. Not background (r8 integration, CHG-R8INT-008): the user sees
+      the options, and the approved screen has no element of its own for the filter.'
+    trigger: onLoad
+    provenance: r8 second round, GPS-C18 (ticket 28195)
   - operationId: getPerformance
     contract: catalogue
     purpose: Read a performance
@@ -5850,6 +5858,7 @@ screens:
     - Performance.startsAt
     - Performance.endsAt
     - Performance.approvalRequestId
+    - VenueSettings.calendarDayStartHour
   wireframe:
     status: notStarted
     provenance: generated
@@ -13109,6 +13118,7 @@ screens:
     - Settlement.providerName
     - Settlement.periodStart
     - Settlement.periodEnd
+    - VenueSettings.calendarDayStartHour
   wireframe:
     status: notStarted
     provenance: generated
@@ -16829,6 +16839,7 @@ screens:
     - RotaAssignment.breachesWorkingHourLimit
     - RotaAssignment.labourCost
     - RotaAssignment.id
+    - VenueSettings.calendarDayStartHour
   wireframe:
     status: notStarted
     provenance: generated
@@ -26905,6 +26916,8 @@ screens:
     - name: resourceId
       from: BO-095
     coldEntry: Resolves from the session; a cold arrival is the ordinary case.
+    preloaded:
+    - VenueSettings.calendarDayStartHour
   wireframe:
     status: notStarted
     provenance: generated
@@ -33983,6 +33996,7 @@ screens:
       trigger: The failing till is found, with its alerts
       provenance: flow F95 step 1→2
       carries:
+      - deviceId
       - workstationId
   notes: '**Added 20 August from the client design board.** The operations existed and no screen called
     them. **Owns POS board frame(s) POS-5B** (client pack, 24 August). **Assigned by board purpose rather
@@ -34135,6 +34149,7 @@ screens:
       provenance: flow F79 step 2→3
       operation: setConfigurationProfile
       carries:
+      - deviceId
       - profileId
   notes: '**Added 20 August from the client design board.** The operations existed and no screen called
     them. **Owns POS board frame(s) POS-5D** (client pack, 24 August). **Assigned by board purpose rather
@@ -38086,6 +38101,8 @@ screens:
       optional: true
       notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listOperatingCalendarSpecial`
         and the user picks one; an edge that holds one may still carry it to open on that record.'
+    preloaded:
+    - VenueSettings.calendarDayStartHour
   notes: '**Overlapping entries: the venue sets a priority per entry (decided 2 October 2026 by Chinmay,
     DEC-229; CHG-CSP-027);** equal priorities on an overlap are refused. An entry can close the whole
     venue (`venueClosed`).'
@@ -55003,7 +55020,7 @@ screens:
   module: Sell
   requiresModule: membership
   wave: 3
-  permission: PLATFORM_TENANT_VIEW
+  permission: MEMBERSHIP_VIEW
   source:
     pack: Membership___Annual_Pass_Management_Reference.pdf
     board: '1'
@@ -55291,7 +55308,7 @@ screens:
   module: Sell
   requiresModule: membership
   wave: 3
-  permission: PLATFORM_CELL_MANAGE
+  permission: MEMBERSHIP_MANAGE
   source:
     pack: Membership___Annual_Pass_Management_Reference.pdf
     board: '1'
@@ -55507,7 +55524,7 @@ screens:
   module: Sell
   requiresModule: membership
   wave: 3
-  permission: PLATFORM_CELL_MANAGE
+  permission: MEMBERSHIP_MANAGE
   source:
     pack: Membership___Annual_Pass_Management_Reference.pdf
     board: '1'
@@ -55864,7 +55881,7 @@ screens:
   module: Sell
   requiresModule: membership
   wave: 3
-  permission: PLATFORM_TENANT_VIEW
+  permission: MEMBERSHIP_VIEW
   source:
     pack: Membership___Annual_Pass_Management_Reference.pdf
     board: '1'
@@ -56153,7 +56170,7 @@ screens:
   module: Sell
   requiresModule: membership
   wave: 3
-  permission: PLATFORM_TENANT_VIEW
+  permission: MEMBERSHIP_VIEW
   source:
     pack: Membership___Annual_Pass_Management_Reference.pdf
     board: '1'
@@ -56193,33 +56210,43 @@ screens:
       components:
       - kind: selectField
         label: B2C
+        operation: getChannelAvailability
         provenance: pack Membership___Annual_Pass_Management_Reference.pdf, page 14 §Configure sale through
       - kind: selectField
         label: Mobile App
+        operation: getChannelAvailability
         provenance: pack Membership___Annual_Pass_Management_Reference.pdf, page 14 §Configure sale through
       - kind: selectField
         label: POS
+        operation: getChannelAvailability
         provenance: pack Membership___Annual_Pass_Management_Reference.pdf, page 14 §Configure sale through
       - kind: selectField
         label: Call Center
+        operation: getChannelAvailability
         provenance: pack Membership___Annual_Pass_Management_Reference.pdf, page 14 §Configure sale through
       - kind: selectField
         label: Box Office
+        operation: getChannelAvailability
         provenance: pack Membership___Annual_Pass_Management_Reference.pdf, page 14 §Configure sale through
       - kind: selectField
         label: Kiosk
+        operation: getChannelAvailability
         provenance: pack Membership___Annual_Pass_Management_Reference.pdf, page 14 §Configure sale through
       - kind: selectField
         label: B2B
+        operation: getChannelAvailability
         provenance: pack Membership___Annual_Pass_Management_Reference.pdf, page 14 §Configure sale through
       - kind: selectField
         label: Corporate
+        operation: getChannelAvailability
         provenance: pack Membership___Annual_Pass_Management_Reference.pdf, page 14 §Configure sale through
       - kind: selectField
         label: Reseller
+        operation: getChannelAvailability
         provenance: pack Membership___Annual_Pass_Management_Reference.pdf, page 14 §Configure sale through
       - kind: selectField
         label: API
+        operation: getChannelAvailability
         provenance: pack Membership___Annual_Pass_Management_Reference.pdf, page 14 §Configure sale through
       - kind: selectField
         label: Always Available
@@ -56271,15 +56298,32 @@ screens:
     purpose: Set the membership price in a price list
     trigger: onAction
     provenance: decided 29 September, VM close-out (venue management and configuration)
+  - operationId: getChannelAvailability
+    contract: catalogue
+    purpose: 'The membership product''s channels as published now (r8, GPS-C39): fills the channel fields,
+      and the publish sends that answer back whole with the guest''s changes (capacityLimited and fixedSalesWindow
+      are left to ADM-124).'
+    trigger: onLoad
+    provenance: r8 integration, GPS-C39 (CHG-R8INT-007)
   - operationId: publishChannelAvailability
     contract: catalogue
-    purpose: Choose the channels that sell the membership
+    purpose: 'Choose the channels that sell the membership: the whole map `getChannelAvailability` read,
+      with the changes (r8, GPS-C39)'
     trigger: onAction
     provenance: decided 29 September, VM close-out (venue management and configuration)
   - operationId: listPriceLists
     contract: catalogue
-    purpose: The price lists a membership is priced on
+    purpose: The price lists a membership is priced on, and the options of the save form's base pricing
+      profile picker (r8, GPS-C34)
     trigger: onLoad
+  - operationId: listTaxProfiles
+    contract: catalogue
+    purpose: 'The options of the save form''s tax profile picker (r8, GPS-C34): `taxProfile` is a catalogue
+      tax profile''s id. Read once when the screen opens; no component of its own, the picker is in the
+      form. Not background (r8 integration, CHG-R8INT-008): the user sees the options, and the approved
+      screen draws the picker only in the form overlay''s body, not as a component.'
+    trigger: onLoad
+    provenance: r8 second round, GPS-C34 (ticket 29883)
   - operationId: setMembershipCommercialConfig
     contract: subscription
     purpose: Save a membership product's commercial references, payment eligibility and sales period
@@ -56310,7 +56354,9 @@ screens:
     body: '**Collects what `setMembershipCommercialConfig` sends before it is called.** Required: `membershipCode`,
       `basePricingProfile`, `taxProfile`, `salesPeriod`. Optional: `feeProfile`, `upgradePricePolicy`,
       `promotionalPricingEligibility`, `paymentTerms`. Dismissing sends nothing; the screen behind is
-      unchanged.'
+      unchanged. **Pickers** (r8, GPS-C34): `basePricingProfile` is picked from the price lists (`listPriceLists`),
+      `taxProfile` from the tax profiles (`listTaxProfiles`); `feeProfile` and `upgradePricePolicy` are
+      typed codes, since no entity holds them yet.'
     bindsTo: MembershipCommercialConfigInput
     confirm:
       label: Save membership commercial config
@@ -56332,7 +56378,7 @@ screens:
   module: Sell
   requiresModule: membership
   wave: 3
-  permission: PLATFORM_CELL_MANAGE
+  permission: MEMBERSHIP_MANAGE
   source:
     pack: Membership___Annual_Pass_Management_Reference.pdf
     board: '1'
@@ -56447,7 +56493,7 @@ screens:
   module: Sell
   requiresModule: membership
   wave: 3
-  permission: PLATFORM_CELL_MANAGE
+  permission: MEMBERSHIP_MANAGE
   source:
     pack: Membership___Annual_Pass_Management_Reference.pdf
     board: '1'
@@ -56624,7 +56670,13 @@ screens:
   notes: '**Bound 4 October 2026: the screen reads the version it works on (getMembershipProductValidation,
     agreed in the ledger) by the membershipCode and version BO-284 carries; the eight publication targets
     are read, and the action, effective date, migration policy and reason are the inputs the PUT takes**
-    (CHG-FXS-002)'
+    (CHG-FXS-002)
+
+
+    Build note (r8 second round, GPS-C33, the lead 20 October 2026, option A): the membership-product
+    operations now need the venue permissions `MEMBERSHIP_VIEW` and `MEMBERSHIP_MANAGE`, not platform-staff
+    ones; build the no-access state naming `MEMBERSHIP_MANAGE`. The state text above still names `PLATFORM_CELL_MANAGE`
+    until the client approves the new wording (pending entry GPS-C33).'
 - id: BO-294
   name: Member Operations Command Center
   module: Sell
@@ -56885,7 +56937,7 @@ screens:
   module: Sell
   requiresModule: membership
   wave: 3
-  permission: PLATFORM_CELL_MANAGE
+  permission: MEMBERSHIP_MANAGE
   source:
     pack: Membership___Annual_Pass_Management_Reference.pdf
     board: '2'
@@ -57045,7 +57097,7 @@ screens:
   module: Sell
   requiresModule: membership
   wave: 3
-  permission: PLATFORM_TENANT_VIEW
+  permission: MEMBERSHIP_VIEW
   source:
     pack: Membership___Annual_Pass_Management_Reference.pdf
     board: '2'
@@ -57321,7 +57373,7 @@ screens:
   module: Sell
   requiresModule: membership
   wave: 3
-  permission: PLATFORM_TENANT_VIEW
+  permission: MEMBERSHIP_VIEW
   source:
     pack: Membership___Annual_Pass_Management_Reference.pdf
     board: '2'
@@ -57463,7 +57515,7 @@ screens:
   module: Sell
   requiresModule: membership
   wave: 3
-  permission: PLATFORM_TENANT_VIEW
+  permission: MEMBERSHIP_VIEW
   source:
     pack: Membership___Annual_Pass_Management_Reference.pdf
     board: '2'
@@ -57934,7 +57986,7 @@ screens:
   module: Sell
   requiresModule: membership
   wave: 3
-  permission: PLATFORM_TENANT_VIEW
+  permission: MEMBERSHIP_VIEW
   source:
     pack: Membership___Annual_Pass_Management_Reference.pdf
     board: '2'
@@ -89771,7 +89823,10 @@ screens:
   apisNote: Regenerated 9 September 2026 from Rental_Management.pdf page 111. 0 of 0 labels bound to a
     contract property; 7 of 20 pack bullets carried onto the screen — the rest are acceptance prose, worked
     examples and AI narrative, which belong to the matrix and the contracts rather than here.
-  entryState: {}
+  entryState:
+    params: []
+    preloaded:
+    - VenueSettings.calendarDayStartHour
 - id: BO-577
   name: Maintenance Work Order
   module: Rentals
@@ -117627,8 +117682,8 @@ screens:
       - kind: secondaryButton
         label: Award to this guest
         operation: awardBadge
-        notes: Shown only when the screen was opened from a guest (customerId); sends badgeId, status
-          awarded and awardedAt now, sourceType manual.
+        notes: 'Shown only when the screen was opened from a guest (customerId); sends badgeId, awardedAt
+          now and sourceType `manager`, and no status: the server writes `awarded` (r8, ORDERS-MONEY-C14).'
         provenance: defined 4 October 2026 (CHG-FXS-001)
       - kind: secondaryButton
         label: Cancel
@@ -122757,6 +122812,8 @@ screens:
     params:
     - name: resourceId
       from: navigation
+    preloaded:
+    - VenueSettings.calendarDayStartHour
   overlays:
   - id: formSetResourceSchedule
     component: modal
@@ -131767,6 +131824,7 @@ screens:
     - Completed
     - Changed
     - Cancelled
+    - VenueSettings.calendarDayStartHour
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-934
@@ -172214,6 +172272,7 @@ screens:
     - SeasonalCalendarDayTimeslotDynamicRulesView.week
     - SeasonalCalendarDayTimeslotDynamicRulesView.dateRange
     - SeasonalCalendarDayTimeslotDynamicRulesView.dimension
+    - VenueSettings.calendarDayStartHour
     params:
     - name: signalId
       from: navigation
@@ -179554,6 +179613,7 @@ screens:
   entryState:
     preloaded:
     - CampaignCalendarTimelineView.calendarState
+    - VenueSettings.calendarDayStartHour
   wireframe:
     status: notStarted
     provenance: generated
@@ -207946,6 +208006,7 @@ screens:
     entryFrom:
     - ADM-599
     - BO-102
+    - ADM-602
     exitTo:
     - ADM-599
     transitions:
@@ -207986,6 +208047,9 @@ screens:
         provenance: contract payments.yaml GET /b2b-credit-accounts/{accountId}/terms
       - kind: selectField
         label: Customer/account
+        operation: listB2bCreditAccounts
+        notes: The B2B credit accounts (`listB2bCreditAccounts`); the picked account's id is the `accountId`
+          the terms are read and saved for (r8, ORDERS-MONEY-C28).
         provenance: pack Payment_Payment_Orchestration.pdf, page 95 §Define
       - kind: selectField
         label: Credit agreement
@@ -208046,6 +208110,11 @@ screens:
     purpose: Read the account's current payment terms before they are changed
     trigger: onLoad
     provenance: deferred workshop-pack gap closed 2 October 2026 (CHG-MOV-007)
+  - operationId: listB2bCreditAccounts
+    contract: payments
+    purpose: The accounts the terms can be set for, the Customer/account picker (r8, ORDERS-MONEY-C28)
+    trigger: onLoad
+    provenance: r8 second round, ORDERS-MONEY-C28 (the storage-sat lane's request)
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#adm-603
@@ -210678,6 +210747,7 @@ screens:
     - Expected settlement date
     - Actual settlement date
     - Status
+    - VenueSettings.calendarDayStartHour
     params:
     - name: merchantAccountId
       from: navigation

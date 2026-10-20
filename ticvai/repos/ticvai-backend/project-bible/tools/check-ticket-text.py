@@ -188,7 +188,7 @@ def main() -> int:
                                                  "forward-only runner")
             # A source path under backend/ is the file the tables come from (derive-ddl's after-r1 forward file,
             # CHG-TBF-002), not a number given to this migration; the ticket's own file is in its subject.
-            if re.search(r"\bV\d{3,4}(__|\b)", re.sub(r"backend/(?:tenant|control)/V\d+__[\w.-]+\.sql", "", text)):
+            if re.search(r"\bV\d{3,4}(__|\b)", re.sub(r"backend/(?:tenant|control)/V\d+[a-z]?__[\w.-]+\.sql", "", text)):
                 guard.add("T-MIG-DONE", key + ":vnumber",
                           f"{key}: names a V-number; MIGRATIONS.md numbers the files")
         # --- boilerplate ------------------------------------------------------------------------

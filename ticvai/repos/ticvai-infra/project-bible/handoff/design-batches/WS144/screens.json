@@ -617,7 +617,7 @@
        "kind": "secondaryButton",
        "label": "Award to this guest",
        "operation": "awardBadge",
-       "notes": "Shown only when the screen was opened from a guest (customerId); sends badgeId, status awarded and awardedAt now, sourceType manual.",
+       "notes": "Shown only when the screen was opened from a guest (customerId); sends badgeId, awardedAt now and sourceType `manager`, and no status: the server writes `awarded` (r8, ORDERS-MONEY-C14).",
        "provenance": "defined 4 October 2026 (CHG-FXS-001)"
       },
       {

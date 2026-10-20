@@ -417,7 +417,7 @@ WHAT = {
     "control.licence_add_on": "**Something bought beyond the plan.**",
     "control.migration_plan": "**A set of migrations to apply together**, with the cells they target.",
     "control.migration_plan_cell": "**One cell in a plan**, and its own readiness.",
-    "control.migration_run": "**One execution of a plan.** Runs are append-only; a retry is a new run.",
+    "control.migration_run": "**One execution of a plan.** A failed run is resumed, not repeated: applying its plan again retries the failed tenant from its row and leaves the completed tenants as they are (ADAM CR-160, CHG-CRA-006).",
     "control.migration_run_cell": "**What happened in one cell during one run.** Where a partial failure is named rather than counted.",
     "control.release_component": "**One service and version inside a release.** A release is not a single artefact.",
     "control.rollout_cell": "**One cell in a rollout** — its wave, whether it is the canary, and what version it moved between.",

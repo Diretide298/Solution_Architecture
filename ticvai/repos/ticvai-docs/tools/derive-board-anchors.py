@@ -30,6 +30,16 @@ import sys
 
 import yaml
 
+
+def _yload(src):
+    """YAML with the C loader, the pure one where a file defeats it (20 October 2026, CHG-R8GEN-016): the screen files
+    are 25 MB and the pure loader took most of each refresh step's minute; the loaded data is the same."""
+    text = src.read() if hasattr(src, "read") else src
+    try:
+        return yaml.load(text, Loader=getattr(yaml, "CSafeLoader", yaml.SafeLoader))
+    except Exception:
+        return yaml.safe_load(text)
+
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 
 
@@ -49,7 +59,7 @@ def main() -> int:
     filled, skipped = [], []
     for f in sorted((ROOT / "screens").glob("P*.yaml")):
         text = f.read_text(encoding="utf-8")
-        doc = yaml.safe_load(text) or {}
+        doc = _yload(text) or {}
         plat = doc.get("platform") or {}
         code = plat.get("code") or f.name.split("-")[0]
         board = plat.get("wireframeBoard")

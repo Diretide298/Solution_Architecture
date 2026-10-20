@@ -224,9 +224,9 @@ screens:
         edge into it carries them
     - to: GST-011
       trigger: Wallet Overview
-      provenance: 'derived — GST-011 declares entryState.params cardCode, walletId and GST-001 holds none
-        of them. The edge carries nothing: cardCode, walletId only pre-select (deep link or optional),
-        and GST-011 opens on its own'
+      provenance: 'derived — GST-011 declares entryState.params cardCode, cardKind, walletId and GST-001
+        holds none of them. The edge carries nothing: cardCode, cardKind, walletId only pre-select (deep
+        link or optional), and GST-011 opens on its own'
     - to: GST-012
       trigger: My Tickets
       carries:
@@ -356,8 +356,8 @@ screens:
       trigger: Simple Registration & OTP
       carries:
       - subjectId
-      provenance: derived — GST-042 declares entryState.params challengeId, subjectId and GST-001 holds
-        subjectId, so an edge into it carries them
+      provenance: derived — GST-042 declares entryState.params challengeId, returnParams, returnTo, subjectId
+        and GST-001 holds subjectId, so an edge into it carries them
     - to: GST-045
       trigger: Ticket Delivery & Sharing
       carries:
@@ -372,8 +372,9 @@ screens:
         holds eventId, so an edge into it carries them
     - to: GST-052
       trigger: Suggested Itineraries
-      provenance: 'derived — GST-052 declares entryState.params  and GST-001 holds none of them. The edge
-        carries nothing: GST-052 needs nothing to open'
+      provenance: 'derived — GST-052 declares entryState.params dates, party and GST-001 holds none of
+        them. The edge carries nothing: party, dates only pre-select (deep link or optional), and GST-052
+        opens on its own'
     - to: GST-054
       trigger: AI Optimized Itinerary
       provenance: 'derived — GST-054 declares entryState.params conversationId, planId and GST-001 holds
@@ -394,8 +395,8 @@ screens:
     - to: GST-059
       trigger: Plan My Day – In Progress
       provenance: 'derived — GST-059 declares entryState.params itemId, planId and GST-001 holds none
-        of them. The edge carries nothing: itemId only pre-selects (deep link or optional); GST-059 opens
-        on getWaitTimes, and planId has no source on GST-059 yet (a gap in GST-059, not in this edge)'
+        of them. The edge carries nothing: itemId only pre-selects (deep link or optional); GST-059 finds
+        planId (listMyVisitPlans) itself, and GST-059 opens on its own'
     - to: GST-061
       trigger: Menu Item Detail
       provenance: 'derived — GST-061 declares entryState.params menuItemId, outletId and GST-001 holds
@@ -441,6 +442,8 @@ screens:
     - to: GST-048
       trigger: Upsell / Cross-Sell
       provenance: structural — GST-001 is P02's home screen and its exits are its launcher
+      carries:
+      - productId
     - to: GST-050
       trigger: Resource Booking – Cabana
       provenance: structural — GST-001 is P02's home screen and its exits are its launcher
@@ -507,7 +510,13 @@ screens:
 
     **The client-approved app wireframe is the layout** (decided by Chinmay, 2 October 2026; DEC-163);
     it changes only where the spec breaks. The card count per section is the venue''s choice (DEC-152)
-    (CHG-SGU-005).'
+    (CHG-SGU-005).
+
+
+    Build note (r8 second round, ORDERS-MONEY-C05): the edge to GST-056 carries no `bundleId`, so GST-056
+    cannot know which bundle to show; it should carry the bundle the tile names (as GST-004''s edge does)
+    or be dropped. Home holds no bundle id, and dropping the drawn edge waits for the client (pending
+    entry ORDERS-MONEY-C05); until then build no Home control that opens GST-056 without a bundle.'
   density: comfortable
   pattern: listDetail
   patternReason: '`listMyEntitlements` reads the population and `getTenantAppStatus` reads one of them
@@ -979,7 +988,10 @@ screens:
       provenance: decided 29 September 2026, MOB-2, W9
     - to: GST-056
       trigger: Book a bundle (e.g. meal combo with admission)
-      provenance: decided 29 September 2026, MOB-2, MOB-4
+      provenance: 'decided 29 September 2026, MOB-2, MOB-4. Carries the card''s bundleId (r8, ORDERS-MONEY-C05):
+        GST-056 needs it to open'
+      carries:
+      - bundleId
     - to: BO-005
       trigger: A supervisor sees the queue building
       provenance: flow F21 step 2→3
@@ -1012,7 +1024,12 @@ screens:
     of the app shell opens it from any screen except the booking and checkout steps. The booking steps
     behind it are unchanged and follow the published booking flow (W12). **W4:** Help me choose filters
     this list (`listProducts` `guidedAnswerIds`) with a *Show everything* link. **W3:** info-only products
-    show Call sales / Email sales instead of Book.'
+    show Call sales / Email sales instead of Book.
+
+
+    Build note (r8 second round, ORDERS-MONEY-C05): the edge to GST-056 now carries the `bundleId` of
+    the bundle the card shows, as GST-004''s edge does (this screen holds it: its edge to GST-004 carries
+    it too).'
   density: comfortable
   pattern: listDetail
   patternReason: '`listProducts` reads the population and `getWaitTimes` reads one of them — list, select,
@@ -1315,7 +1332,7 @@ screens:
       - kind: cardList
         label: The product for it
         bindsTo: VenuePoint.featuredOffer
-        operation: getBundle
+        operation: getGuestBundle
         notes: '**The right product** (MOB-4): `VenuePoint.featuredOffer` names a product (`getProduct`)
           or a bundle (`getBundle`), on any kind of point. A restaurant proposes **Buy meal combo**: a
           bundle with an admission component and a meal component, so the park ticket is included and
@@ -1421,9 +1438,10 @@ screens:
     purpose: The item's point on the 2D/3D venue map, with its description, media and featured offer (MOB-4)
     trigger: onLoad
     provenance: decided 29 September 2026, MOB-4
-  - operationId: getBundle
+  - operationId: getGuestBundle
     contract: promotions
-    purpose: The featured offer when it is a bundle, e.g. meal combo with admission (MOB-4)
+    purpose: The featured offer when it is a bundle, e.g. meal combo with admission (MOB-4), in the guest
+      shape (r8, ORDERS-MONEY-C32, CHG-R8INT-009)
     trigger: onLoad
     provenance: decided 29 September 2026, MOB-4
   entryState:
@@ -1578,9 +1596,18 @@ screens:
       Anything that spends money, holds capacity or changes the account waits for the connection, and
       its button says so rather than failing.'
   apis:
+  - operationId: listEvents
+    contract: catalogue
+    purpose: 'The venue''s events on sale or live (r8, GPS-C30): `venueId` from the session (a visitor''s
+      chosen venue), then `listPerformances` per event fills This week. The rows of the prototype''s What''s
+      on name the event and its run (an exhibition "Until 30 Nov").'
+    trigger: onLoad
+    shownBy: Until 30 Nov
+    provenance: r8 integration, GPS-C30 (CHG-R8INT-007)
   - operationId: listPerformances
     contract: catalogue
-    purpose: List performances of an event
+    purpose: List performances of each event `listEvents` returned (r8, GPS-C30), over the dates the guest
+      picks
     trigger: onLoad
   - operationId: listProducts
     contract: catalogue
@@ -1590,6 +1617,9 @@ screens:
     params:
     - name: eventId
       from: deepLink
+      optional: true
+      notes: 'Optional (r8, GPS-C30): the screen lists the venue''s events with `listEvents`; a link that
+        names one event opens on it.'
     coldEntry: '**A guest arriving cold on a link that no longer resolves is shown what happened and one
       way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened
       three weeks late all land here, and the person holding the link did nothing wrong. **The screen
@@ -1709,18 +1739,26 @@ screens:
   apis:
   - operationId: getPerformance
     contract: catalogue
-    purpose: Read a performance
+    purpose: Read a performance, when the screen is opened with `performanceId` (What's On, GST-005, or
+      a link) (r8, GPS-C05)
     trigger: onLoad
   - operationId: getProduct
     contract: catalogue
-    purpose: Read a product
+    purpose: Read a product, when the screen is opened with `productId` (Home, GST-001, or a link) (r8,
+      GPS-C05)
     trigger: onLoad
   entryState:
     params:
     - name: performanceId
       from: deepLink
+      optional: true
+      notes: 'r8 (GPS-C05): **one of `performanceId` and `productId` is enough.** What''s On opens this
+        screen with a performance, Home with a product; neither can be derived from the other (a performance
+        names its event, not a product). The panel of the id given loads; the other stays closed.'
     - name: productId
       from: deepLink
+      optional: true
+      notes: 'r8 (GPS-C05): see `performanceId`: one of the two is enough.'
     coldEntry: '**A link to a performance that has happened.** Offers the next performance of the same
       event. **A shared product link after the product retired.** Shows what replaced it where a successor
       exists, and the catalogue where none does.'
@@ -2285,6 +2323,14 @@ screens:
     purpose: 'The published booking flow for this product: which steps it has and in what order (W12)'
     trigger: onLoad
     provenance: decided 29 September 2026, W12
+  - operationId: createCart
+    contract: orders
+    purpose: 'Started by the runtime the first time a line is added, before the first addCartLine, against
+      the guest or the anonymous cart token (2.1.31); never a button or a form (GFIX-3). With the guest
+      session the device already holds: signed in, or the anonymous cart session a visitor gets with the
+      first line (ADR-0045; r8, GPS-C23).'
+    trigger: background
+    provenance: r8 second round, GPS-C23 (the core lane's request)
   entryState:
     params:
     - name: productId
@@ -2599,8 +2645,8 @@ screens:
     - PublishedTenantConfig (bookingFlow and the venue-wide settings), loaded once by the app shell with
       getPublishedTenantConfig (WEB-001, GST-001, KSK-002)
   wireframe:
-    status: notStarted
-    provenance: designed
+    status: approved
+    provenance: client-verified
     board: wireframes/P02 Guest App.dc.html#gst-009
     prototype:
       file: sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html
@@ -2608,16 +2654,14 @@ screens:
       match: none
       note: 'Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the
         v4 look (the frame on this screen''s board, wireframes/frames/gst-009.html, and #GST-009 in handoff/design-batches/apps/1-guest-app/return/TICVAI
-        Guest App.dc.html). NOT client-verified: awaiting the client''s design reviewer. Build the layout
+        Guest App.dc.html). Client-approved 19 October 2026 (confirmed by Chinmay Parab). Build the layout
         from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at:
         Account → All screens → Wave 1 → Review & payment; also the "Confirm and pay" sheet in the booking
         flow (exact). What v2 did differently: Prototype offers Tabby and wallet credit as payment methods;
         the YAML does not name them.'
-    source: Claude Code, 30 September 2026, drawn in the Mobile App v4 look
-    note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified,
-      awaiting the client''s design reviewer.** `provenance: designed` because the accepted vocabulary
-      has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September
-      carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
+    source: client approval, confirmed by Chinmay Parab 19 October 2026
+    note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; client-approved 19 October
+      2026, confirmed by Chinmay Parab.** Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
   apisNote: 'Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -2681,7 +2725,14 @@ screens:
     **Create an account collects the email and the code its two calls send** (CHG-FXS-003)
 
 
-    **The code is collected by the verify form (formVerifyGuestEmail)** (CHG-FXS-003)'
+    **The code is collected by the verify form (formVerifyGuestEmail)** (CHG-FXS-003)
+
+
+    Build note (r8 second round, GPS-C09): **build the no-access state as GFIX-4 says, not as the state
+    text above reads.** A guest holds no permission, so the state never names one (the text above still
+    names staff permissions); signed out, the guest is offered sign-in and brought back here; a record
+    that is not theirs says so without saying whose. The corrected wording waits for the client''s approval
+    of the visible text (pending entry GPS-C09).'
   density: comfortable
   pattern: statusTracker
   patternReason: '`getOrder` reads one record and nothing reads a population — the screen is about that
@@ -2889,14 +2940,31 @@ screens:
     from the screen name and its operations on 17 August, not from a requirement.
 
 
-    **The guest''s saved cards are read with listPaymentTokens (4 October 2026) so the auto top-up and
-    a stored-card exit settlement have a paymentTokenId to send; the walletId is the wallet''s own id
-    (Wallet.id, agreed with contracts in the ledger)** (CHG-FXS-003)'
+    **The guest''s saved cards are read with listPaymentTokens (4 October 2026) so the auto top-up has
+    a paymentTokenId to send; the walletId is the wallet''s own id (Wallet.id, agreed with contracts in
+    the ledger)** (CHG-FXS-003)
+
+
+    Build note (r8 second round, ORDERS-MONEY-C07, the lead 20 October 2026, option A): **build to this
+    definition, not to the frame** (wireframes/frames/gst-011.html): no Top up button and no "Leaving
+    today? Settle" panel; the client-approved wallet screen shows neither, and `getWalletExitBalance`
+    and `settleWalletAtExit` are gone from this screen. **The game card panel follows the WEB-021 ruling
+    (CR-143, CHG-CRA-008)**: it opens only from a deep link carrying `cardCode` and `cardKind` `gameCard`,
+    and is read with `getGameCard` on open; without the link it stays closed. The card''s credits and
+    bonus credits (`GameCard.credits`, `bonusCredits`) are what the panel''s balance shows; adding them
+    as drawn fields waits for the client (pending entry ORDERS-MONEY-C07).
+
+
+    Build note (r8 second round, GPS-C09): **build the no-access state as GFIX-4 says, not as the state
+    text above reads.** A guest holds no permission, so the state never names one (the text above still
+    names staff permissions); signed out, the guest is offered sign-in and brought back here; a record
+    that is not theirs says so without saying whose. The corrected wording waits for the client''s approval
+    of the visible text (pending entry GPS-C09).'
   density: comfortable
   pattern: listDetail
   patternReason: '`listWalletTransactions` reads the population and `getWallet` reads one of them — list,
     select, act'
-  purpose: 'My wallet: balance, activity and auto top-up, and what is due or refundable at exit.'
+  purpose: 'My wallet: balance, activity and auto top-up.'
   layout:
     template: split
     regions:
@@ -3007,13 +3075,13 @@ screens:
     provenance: build, 29 September 2026
   - operationId: getGameCard
     contract: games
-    purpose: Balance on a game card
-    trigger: onAction
+    purpose: Balance on a game card, read when the screen opens from a deep link with `cardCode` and `cardKind`
+      `gameCard` (the WEB-021 ruling, CR-143; r8, ORDERS-MONEY-C07); never called without the link
+    trigger: onLoad
     provenance: flow F18 step 2, 2 October 2026 (CHG-CLN-006)
   - operationId: listPaymentTokens
     contract: orders
-    purpose: 'The guest''s saved cards: the auto top-up card and a stored-card exit settlement pick one
-      (paymentTokenId)'
+    purpose: 'The guest''s saved cards: the auto top-up card picks one (paymentTokenId)'
     trigger: onLoad
     provenance: defined 4 October 2026 (CHG-FXS-003)
   entryState:
@@ -3023,6 +3091,12 @@ screens:
     - name: cardCode
       from: deepLink
       optional: true
+    - name: cardKind
+      from: deepLink
+      optional: true
+      notes: '`gameCard` (ADAM CR-143; CHG-CRA-008; r8, ORDERS-MONEY-C07): with `cardCode`, opens the
+        game card panel, read with `getGameCard` (the guest''s own cards only). Never shown. Without it,
+        or without `cardCode`, the panel stays closed.'
     - name: walletId
       from: navigation
       optional: true
@@ -3035,8 +3109,8 @@ screens:
     - WalletTransaction.balanceAfter
     - WalletTransaction.orderId
   wireframe:
-    status: notStarted
-    provenance: designed
+    status: approved
+    provenance: client-verified
     board: wireframes/P02 Guest App.dc.html#gst-011
     prototype:
       file: sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html
@@ -3044,14 +3118,12 @@ screens:
       match: none
       note: 'Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the
         v4 look (the frame on this screen''s board, wireframes/frames/gst-011.html, and #GST-011 in handoff/design-batches/apps/1-guest-app/return/TICVAI
-        Guest App.dc.html). NOT client-verified: awaiting the client''s design reviewer. Build the layout
+        Guest App.dc.html). Client-approved 19 October 2026 (confirmed by Chinmay Parab). Build the layout
         from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at:
         Account → All screens → Wave 2 → Wallet overview (exact).'
-    source: Claude Code, 30 September 2026, drawn in the Mobile App v4 look
-    note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified,
-      awaiting the client''s design reviewer.** `provenance: designed` because the accepted vocabulary
-      has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September
-      carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
+    source: client approval, confirmed by Chinmay Parab 19 October 2026
+    note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; client-approved 19 October
+      2026, confirmed by Chinmay Parab.** Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
   apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -3109,7 +3181,24 @@ screens:
 
 
     **Mobile v4 (decided 29 September, MOB-1, MOB-7).** The **Tickets** tab root. GST-013 Ticket Details
-    and GST-055 Dynamic QR Ticket (refresh every 30 s) are unchanged.'
+    and GST-055 Dynamic QR Ticket (refresh every 30 s) are unchanged.
+
+
+    Build note (r8 second round, ORDERS-MONEY-C05, the lead 20 October 2026): **Show QR** on a ticket
+    opens GST-055 with its `entitlementId`, and the drawn **Scan a ticket** button reads a ticket''s QR
+    with the camera: a scanned ticket is added to this guest only when its owner has shared it (an open
+    transfer, claimed as GST-014 claims one); the scan reads the transfer QR or the ticket QR and resolves
+    to the open transfer, and with no open transfer the guest is told plainly that the ticket has not
+    been shared with them. The operation that does this is requested of the core lane (orders.yaml, beside
+    claimTicketTransfer); the edge to GST-055 and the button''s binding wait for the client''s approval
+    of the visible navigation (pending entries ORDERS-MONEY-C05).
+
+
+    Build note (r8 second round, ORDERS-MONEY-C01, from the core lane): build the no-access state as two
+    cases, not signed in (401: offered sign-in and brought back) and otherwise one neutral message with
+    the list it came from; "a record that is not theirs" is not a case of its own, because another guest''s
+    record answers 404 like a missing one (Pattern 4). The wording waits for the client (pending entry
+    ORDERS-MONEY-C01).'
   density: comfortable
   pattern: listDetail
   patternReason: '`listMyEntitlements` reads the population and `getEntitlement` reads one of them — list,
@@ -3901,8 +3990,8 @@ screens:
     - BillingStatement.periodEnd
     - BillingStatement.lines
   wireframe:
-    status: notStarted
-    provenance: designed
+    status: approved
+    provenance: client-verified
     board: wireframes/P02 Guest App.dc.html#gst-015
     prototype:
       file: sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html
@@ -3910,16 +3999,14 @@ screens:
       match: none
       note: 'Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the
         v4 look (the frame on this screen''s board, wireframes/frames/gst-015.html, and #GST-015 in handoff/design-batches/apps/1-guest-app/return/TICVAI
-        Guest App.dc.html). NOT client-verified: awaiting the client''s design reviewer. Build the layout
+        Guest App.dc.html). Client-approved 19 October 2026 (confirmed by Chinmay Parab). Build the layout
         from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at:
         Account → All screens → Wave 2 → Memberships; billing in "Also built, not in the plan" → Membership
         billing (#billing) (exact). What v2 did differently: Prototype splits the screen in two (benefits
         and delegation vs billing statement and dunning retries).'
-    source: Claude Code, 30 September 2026, drawn in the Mobile App v4 look
-    note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified,
-      awaiting the client''s design reviewer.** `provenance: designed` because the accepted vocabulary
-      has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September
-      carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
+    source: client approval, confirmed by Chinmay Parab 19 October 2026
+    note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; client-approved 19 October
+      2026, confirmed by Chinmay Parab.** Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
   apisNote: 'Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -4028,9 +4115,11 @@ screens:
         - Reservation.convertedOrderId
         operation: listReservations
         provenance: decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)
-        notes: Upcoming and Past, as two tabs; each card shows when it expires. Was the generated table
-          'Every reservation'; staff and plumbing columns removed (decided by Chinmay, fix before Block
-          A starts, 2 October 2026 (GFIX-3)).
+        notes: Upcoming and Past, as two tabs; each card shows when it expires. **Upcoming** is every
+          reservation still held whose `expiresAt` is in the future; **Past** is the rest (expired, converted
+          to an order, or cancelled) (r8, ORDERS-MONEY-C13). Was the generated table 'Every reservation';
+          staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October
+          2026 (GFIX-3)).
     - name: contextPanel
       slot: selection
       components:
@@ -4610,8 +4699,8 @@ screens:
     - OrderSummary.grossAmount
     - OrderSummary.refundedAmount
   wireframe:
-    status: notStarted
-    provenance: designed
+    status: approved
+    provenance: client-verified
     board: wireframes/P02 Guest App.dc.html#gst-019
     prototype:
       file: sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html
@@ -4619,14 +4708,12 @@ screens:
       match: none
       note: 'Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the
         v4 look (the frame on this screen''s board, wireframes/frames/gst-019.html, and #GST-019 in handoff/design-batches/apps/1-guest-app/return/TICVAI
-        Guest App.dc.html). NOT client-verified: awaiting the client''s design reviewer. Build the layout
+        Guest App.dc.html). Client-approved 19 October 2026 (confirmed by Chinmay Parab). Build the layout
         from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at:
         Account → All screens → Wave 2 → Order history (exact).'
-    source: Claude Code, 30 September 2026, drawn in the Mobile App v4 look
-    note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified,
-      awaiting the client''s design reviewer.** `provenance: designed` because the accepted vocabulary
-      has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September
-      carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
+    source: client approval, confirmed by Chinmay Parab 19 October 2026
+    note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; client-approved 19 October
+      2026, confirmed by Chinmay Parab.** Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
   apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -4645,7 +4732,8 @@ screens:
     component: modal
     trigger: Get a tax invoice
     body: The company name and TRN to put on the invoice, and where to email it; the order is the one
-      selected and the invoice type is full.
+      selected and the invoice type is full. A full invoice also asks the recipient's address, its country
+      as `buyerCountryCode` (r8, ORDERS-MONEY-C06).
     confirm:
       label: Get a tax invoice
       operation: issueTaxInvoice
@@ -4832,7 +4920,15 @@ screens:
 
 
     **The map comes from listBookableVenueMaps?venueId (contracts, ledger: the venue -> map read exists),
-    so a normal visit has a map to load** (CHG-FXS-003)'
+    so a normal visit has a map to load** (CHG-FXS-003) Build note (r8, GPS-C08): send `onlyBookable=false`
+    on `listBookableVenueMaps`, so a venue map with no bookable resource still opens.
+
+
+    Build note (r8 second round, GPS-C09): **build the no-access state as GFIX-4 says, not as the state
+    text above reads.** A guest holds no permission, so the state never names one (the text above still
+    names staff permissions); signed out, the guest is offered sign-in and brought back here; a record
+    that is not theirs says so without saying whose. The corrected wording waits for the client''s approval
+    of the visible text (pending entry GPS-C09).'
   density: comfortable
   boardFrames:
   - Seat Board 4.dc.html#seat-4b
@@ -5028,8 +5124,8 @@ screens:
     - to: GST-059
       trigger: Plan My Day – In Progress
       provenance: 'derived — GST-059 declares entryState.params itemId, planId and GST-022 holds none
-        of them. The edge carries nothing: itemId only pre-selects (deep link or optional); GST-059 opens
-        on getWaitTimes, and planId has no source on GST-059 yet (a gap in GST-059, not in this edge)'
+        of them. The edge carries nothing: itemId only pre-selects (deep link or optional); GST-059 finds
+        planId (listMyVisitPlans) itself, and GST-059 opens on its own'
   notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement. Pulled forward (CF-101)
     with the queue platform F21 runs on; in Block A since the 1 October plan.
@@ -5911,7 +6007,14 @@ screens:
 
 
     **The car park''s parking product is ParkingFacility.productVariantId (agreed with contracts in the
-    ledger 4 October 2026): Add parking to my cart sends it as addCartLine''s variantId** (CHG-FXS-003)'
+    ledger 4 October 2026): Add parking to my cart sends it as addCartLine''s variantId** (CHG-FXS-003)
+
+
+    Build note (r8 second round, ORDERS-MONEY-C01, from the core lane): build the no-access state as two
+    cases, not signed in (401: offered sign-in and brought back) and otherwise one neutral message with
+    the list it came from; "a record that is not theirs" is not a case of its own, because another guest''s
+    record answers 404 like a missing one (Pattern 4). The wording waits for the client (pending entry
+    ORDERS-MONEY-C01).'
   density: comfortable
   pattern: listDetail
   patternReason: '`listParkingFacilities` reads a population and nothing reads one of them; the detail
@@ -6130,7 +6233,14 @@ screens:
 
 
     **entitlementId comes from the order''s parking entitlement in listMyEntitlements (check-screens)**
-    (CHG-FXS-003)'
+    (CHG-FXS-003)
+
+
+    Build note (r8 second round, GPS-C09): **build the no-access state as GFIX-4 says, not as the state
+    text above reads.** A guest holds no permission, so the state never names one (the text above still
+    names staff permissions); signed out, the guest is offered sign-in and brought back here; a record
+    that is not theirs says so without saying whose. The corrected wording waits for the client''s approval
+    of the visible text (pending entry GPS-C09).'
   density: comfortable
   pattern: listDetail
   patternReason: '`listParkingFacilities` reads a population and nothing reads one of them; the detail
@@ -6703,8 +6813,8 @@ screens:
     coldEntry: 'A guest opening a notification about their own conversation (an agent replied, a handover
       was picked up): it opens that conversation, or says it was closed.'
   wireframe:
-    status: notStarted
-    provenance: designed
+    status: approved
+    provenance: client-verified
     board: wireframes/P02 Guest App.dc.html#gst-031
     prototype:
       file: sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html
@@ -6712,14 +6822,12 @@ screens:
       match: none
       note: 'Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the
         v4 look (the frame on this screen''s board, wireframes/frames/gst-031.html, and #GST-031 in handoff/design-batches/apps/1-guest-app/return/TICVAI
-        Guest App.dc.html). NOT client-verified: awaiting the client''s design reviewer. Build the layout
+        Guest App.dc.html). Client-approved 19 October 2026 (confirmed by Chinmay Parab). Build the layout
         from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at:
         Account → All screens → Wave 2 → AI concierge – home (exact).'
-    source: Claude Code, 30 September 2026, drawn in the Mobile App v4 look
-    note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified,
-      awaiting the client''s design reviewer.** `provenance: designed` because the accepted vocabulary
-      has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September
-      carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
+    source: client approval, confirmed by Chinmay Parab 19 October 2026
+    note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; client-approved 19 October
+      2026, confirmed by Chinmay Parab.** Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
   apisNote: 'Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -6920,8 +7028,8 @@ screens:
       if it was refunded or the performance passed, says which and offers the order list rather than an
       error.
   wireframe:
-    status: notStarted
-    provenance: designed
+    status: approved
+    provenance: client-verified
     board: wireframes/P02 Guest App.dc.html#gst-032
     prototype:
       file: sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html
@@ -6929,14 +7037,12 @@ screens:
       match: none
       note: 'Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the
         v4 look (the frame on this screen''s board, wireframes/frames/gst-032.html, and #GST-032 in handoff/design-batches/apps/1-guest-app/return/TICVAI
-        Guest App.dc.html). NOT client-verified: awaiting the client''s design reviewer. Build the layout
+        Guest App.dc.html). Client-approved 19 October 2026 (confirmed by Chinmay Parab). Build the layout
         from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at:
         Account → All screens → Wave 2 → AI concierge – chat (exact).'
-    source: Claude Code, 30 September 2026, drawn in the Mobile App v4 look
-    note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified,
-      awaiting the client''s design reviewer.** `provenance: designed` because the accepted vocabulary
-      has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September
-      carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
+    source: client approval, confirmed by Chinmay Parab 19 October 2026
+    note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; client-approved 19 October
+      2026, confirmed by Chinmay Parab.** Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
   apisNote: 'Rebuilt 9 September 2026 from the 8 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -7153,8 +7259,8 @@ screens:
     coldEntry: 'A guest opening a notification about their own conversation: it opens the conversation,
       or says it was closed.'
   wireframe:
-    status: notStarted
-    provenance: designed
+    status: approved
+    provenance: client-verified
     board: wireframes/P02 Guest App.dc.html#gst-033
     prototype:
       file: sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html
@@ -7163,7 +7269,9 @@ screens:
       match: exact
       view: Account → All screens → Wave 2 → AI concierge – contextual help
     note: 'Corrected 2 October 2026 (CHG-SGU-016): the prototype view is a catalogue entry ("Account →
-      All screens → Wave 2"), not a client-drawn layout, so the frame is treated as designed, not client-verified.'
+      All screens → Wave 2"), not a client-drawn layout, so the frame was treated as designed, not client-verified,
+      until the client approved the whole guest app (confirmed by Chinmay Parab, 19 October 2026).'
+    source: client approval, confirmed by Chinmay Parab 19 October 2026
   apisNote: 'Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
     — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -7700,8 +7808,8 @@ screens:
     purpose: Issue my referral code
     trigger: onAction
   wireframe:
-    status: notStarted
-    provenance: designed
+    status: approved
+    provenance: client-verified
     board: wireframes/P02 Guest App.dc.html#gst-036
     prototype:
       file: sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html
@@ -7709,14 +7817,12 @@ screens:
       match: none
       note: 'Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the
         v4 look (the frame on this screen''s board, wireframes/frames/gst-036.html, and #GST-036 in handoff/design-batches/apps/1-guest-app/return/TICVAI
-        Guest App.dc.html). NOT client-verified: awaiting the client''s design reviewer. Build the layout
+        Guest App.dc.html). Client-approved 19 October 2026 (confirmed by Chinmay Parab). Build the layout
         from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at:
         Account → All screens → Wave 2 → Loyalty & rewards (exact).'
-    source: Claude Code, 30 September 2026, drawn in the Mobile App v4 look
-    note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified,
-      awaiting the client''s design reviewer.** `provenance: designed` because the accepted vocabulary
-      has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September
-      carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
+    source: client approval, confirmed by Chinmay Parab 19 October 2026
+    note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; client-approved 19 October
+      2026, confirmed by Chinmay Parab.** Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
   apisNote: 'Rebuilt 9 September 2026 from the operations this screen declares (4 then; evaluatePromotions
     removed 27 September), not from a workshop pack — it has none. Columns narrowed on 3 October 2026
     to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and
@@ -7842,7 +7948,7 @@ screens:
         - CouponCode.redemptionCount
         - CouponCode.discount
         - CouponCode.validFrom
-        operation: getCouponCode
+        operation: getGuestCouponCode
         provenance: contract promotions.yaml GET /coupon-codes/{code}
   states:
     loading: The offers promotions list.
@@ -7868,9 +7974,10 @@ screens:
     contract: promotions
     purpose: Read a promotion
     trigger: onAction
-  - operationId: getCouponCode
+  - operationId: getGuestCouponCode
     contract: promotions
-    purpose: Resolve a code the guest typed
+    purpose: 'Resolve a code the guest typed, in the guest shape (r8, ORDERS-MONEY-C32, CHG-R8INT-009):
+      the staff read `getCouponCode` is the back office''s'
     trigger: onAction
   entryState:
     params:
@@ -8230,8 +8337,8 @@ screens:
       from: session
     coldEntry: Resolves from the session; a cold arrival is the ordinary case.
   wireframe:
-    status: notStarted
-    provenance: designed
+    status: approved
+    provenance: client-verified
     board: wireframes/P02 Guest App.dc.html#gst-039
     prototype:
       file: sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html
@@ -8239,16 +8346,14 @@ screens:
       match: none
       note: 'Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the
         v4 look (the frame on this screen''s board, wireframes/frames/gst-039.html, and #GST-039 in handoff/design-batches/apps/1-guest-app/return/TICVAI
-        Guest App.dc.html). NOT client-verified: awaiting the client''s design reviewer. Build the layout
+        Guest App.dc.html). Client-approved 19 October 2026 (confirmed by Chinmay Parab). Build the layout
         from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at:
         Account → All screens → Wave 1 → Profile (also Account → Profile) (exact). What v2 did differently:
         Emirates ID upload is on Profile in the prototype; the YAML has uploadGuestDocument on GST-066.
         Account also has a "Saved guests (heights on file)" row that no screen defines.'
-    source: Claude Code, 30 September 2026, drawn in the Mobile App v4 look
-    note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified,
-      awaiting the client''s design reviewer.** `provenance: designed` because the accepted vocabulary
-      has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September
-      carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
+    source: client approval, confirmed by Chinmay Parab 19 October 2026
+    note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; client-approved 19 October
+      2026, confirmed by Chinmay Parab.** Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
   apisNote: 'Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
     — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -8276,7 +8381,7 @@ screens:
 - id: GST-040
   name: Help & Support
   module: Engagement & Support
-  requiresModule: marketing
+  requiresModule: core
   wave: 1
   capability: C17
   implementation:
@@ -8311,7 +8416,17 @@ screens:
     `raiseMyCase` and `replyToMyCase` are scoped to the caller rather than filtered by a subject parameter.
 
 
-    **Rev 3 (decided 29 September).** The Help screen shows app status and a public *What''s new* (GAP-B2).'
+    **Rev 3 (decided 29 September).** The Help screen shows app status and a public *What''s new* (GAP-B2).
+    Build note (r8, WHITE-C14): the body of a help page or a policy comes with the list read that shows
+    it (`PublishedContentPage.body` from `listPublishedContentPages`, `PublishedPolicy.body` from `listPublishedPolicies`);
+    nothing more is read to open one.
+
+    Build note (r8 second round): **this screen reads no single case.** Its client-verified prototype
+    view (Help & support) shows no case thread; its "Raise a question" opens GST-068 (Help & My Cases),
+    which reads one case with `getMyCase` when the guest opens a row. A case link from a notification
+    opens GST-068 with the `caseId`, not this screen. `getMyCase` was bound here in the first r8 round
+    and is taken off again; it also loaded on open, before sign-in, a read that needs a signed-in guest
+    (check-preauth-session).'
   density: comfortable
   pattern: commandCentre
   patternReason: 3 independent reads and no read of one record — the screen watches a population rather
@@ -8841,6 +8956,8 @@ screens:
       back: false
       carries:
       - challengeId
+      - returnParams
+      - returnTo
       - subjectId
   notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement. **Corrected 24 August**:
@@ -9150,12 +9267,22 @@ screens:
         a link or an edge that holds one opens it instead.'
     - name: subjectId
       from: navigation
+    - name: returnTo
+      from: navigation
+      optional: true
+      notes: 'r8 (WHITE-C13, screens/_patterns.yaml rule guestSignInReturn): the screen that sent a signed-out
+        guest here from its no-access state; after sign-in this screen opens it again. Ignored unless
+        it is a screen of this app.'
+    - name: returnParams
+      from: navigation
+      optional: true
+      notes: 'r8 (WHITE-C13): the entry parameters `returnTo` was opened with, handed back to it unchanged.'
     coldEntry: '**Needs nothing.** A guest arriving cold signs in and goes Home; one sent from the cart
       carries `cartId` and goes back to it. The SSO deep-link parameter (`providerId`) went with the operations
       that used it (audit R167); a second-factor challenge is created in place, never arrives by link.'
   wireframe:
-    status: notStarted
-    provenance: designed
+    status: approved
+    provenance: client-verified
     board: wireframes/P02 Guest App.dc.html#gst-042
     prototype:
       file: sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html
@@ -9163,16 +9290,14 @@ screens:
       match: none
       note: 'Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the
         v4 look (the frame on this screen''s board, wireframes/frames/gst-042.html, and #GST-042 in handoff/design-batches/apps/1-guest-app/return/TICVAI
-        Guest App.dc.html). NOT client-verified: awaiting the client''s design reviewer. Build the layout
+        Guest App.dc.html). Client-approved 19 October 2026 (confirmed by Chinmay Parab). Build the layout
         from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at:
         Account → All screens → Wave 1 → Simple registration & OTP (same #ident screen) + "Log in or register"
         sheet from home (partial). What v2 did differently: Prototype has email code, Apple and Google
         only; the YAML also has password login, UAE Pass and explicit registration.'
-    source: Claude Code, 30 September 2026, drawn in the Mobile App v4 look
-    note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified,
-      awaiting the client''s design reviewer.** `provenance: designed` because the accepted vocabulary
-      has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September
-      carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
+    source: client approval, confirmed by Chinmay Parab 19 October 2026
+    note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; client-approved 19 October
+      2026, confirmed by Chinmay Parab.** Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
   apisNote: 'Rebuilt 9 September 2026 from the 18 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -9445,7 +9570,13 @@ screens:
 
 
     **The tickets to send are read with listMyEntitlements (4 October 2026); orderId is optional and comes
-    from the chosen tickets'' orderId when the screen opens from Home** (CHG-FXS-003)'
+    from the chosen tickets'' orderId when the screen opens from Home** (CHG-FXS-003)
+
+
+    Build note (r8 second round, ORDERS-MONEY-C05): after Send tickets the guest goes to My tickets (GST-012)
+    or the order''s tickets (GST-019); a guest who is not signed in is offered sign-in and brought back
+    (the _patterns.yaml rule guestSignInReturn), as on GST-013 and GST-014. The exits and that state wait
+    for the client (pending entries ORDERS-MONEY-C05).'
   density: comfortable
   pattern: configEditor
   patternReason: the screen declares only writes (`transferOrderTickets`) and no read of a population
@@ -9680,11 +9811,11 @@ screens:
       provenance: 'derived — GST-001 declares entryState.params  and GST-047 holds none of them. The edge
         carries nothing: GST-047 is opened from GST-001, so this edge is the way back and GST-001 keeps
         its own state'
-  notes: Merged with GST-060 on 18 August. The client storyboard shows this on two boards — G7 panel 7
-    and G8 panel 10 — which is a **board convention for a screen every journey can land on**, not two
+  notes: 'Merged with GST-060 on 18 August. The client storyboard shows this on two boards — G7 panel
+    7 and G8 panel 10 — which is a **board convention for a screen every journey can land on**, not two
     screens. Both had the same single operation and the same purpose. **Bound 28 September** to `getTenantAppStatus.minimumAppVersion`
     for the forced upgrade and to `availability` and `availabilityMessage` for sold out and closed (decided
-    28 September, audit R073 (b)(f)).
+    28 September, audit R073 (b)(f)). Build note (r8, WHITE-C10): the store link comes from `MinimumAppVersion.storeUrl`.'
   density: comfortable
   pattern: statusTracker
   patternReason: '`getTenantAppStatus` reads one record and nothing reads a population — the screen is
@@ -9801,8 +9932,15 @@ screens:
       provenance: 'derived — GST-001 declares entryState.params  and GST-048 holds none of them. The edge
         carries nothing: GST-048 is opened from GST-001, so this edge is the way back and GST-001 keeps
         its own state'
-  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
+  notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
+
+
+    Build note (r8 second round, ORDERS-MONEY-C05): this screen is reached from GST-053 (Your Plan) and
+    leaves to the checkout entry GST-041 once the guest has added what they want; with no cart (`getCart`
+    404, or no `cartId` in the session) it shows no suggestions and offers to go back. Those edges and
+    that state are not drawn on this client-approved screen yet; they wait for the client (pending entries
+    ORDERS-MONEY-C05).'
   density: comfortable
   pattern: statusTracker
   patternReason: '`getUpsellSuggestions` reads one record and nothing reads a population — the screen
@@ -9882,14 +10020,27 @@ screens:
       signed in, or the anonymous cart session a visitor gets with the first line (ADR-0045)'
     trigger: onLoad
     provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
+  - operationId: listProductVariants
+    contract: catalogue
+    purpose: 'The variants of a suggested product that carries no `variantId` (r8, ORDERS-MONEY-C40, option
+      B), read when the guest taps it, so the add-to-cart form lets them choose; no component of its own.
+      Not background (r8 integration, CHG-R8INT-008): the guest sees and picks the variants, and the approved
+      screen has no element of its own for them (the prototype has no view of this screen).'
+    trigger: onAction
+    provenance: r8 second round, ORDERS-MONEY-C40
   entryState:
     params:
     - name: cartId
       from: session
+    - name: productId
+      from: navigation
+      optional: true
+      notes: 'r8 (ORDERS-MONEY-C40): the product of the suggestion the guest tapped, picked on this screen,
+        for `listProductVariants` when the suggestion carries no `variantId`.'
     coldEntry: Resolves from the session; a cold arrival is the ordinary case.
   wireframe:
-    status: notStarted
-    provenance: designed
+    status: approved
+    provenance: client-verified
     board: wireframes/P02 Guest App.dc.html#gst-048
     prototype:
       file: sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html
@@ -9897,14 +10048,12 @@ screens:
       match: none
       note: 'Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the
         v4 look (the frame on this screen''s board, wireframes/frames/gst-048.html, and #GST-048 in handoff/design-batches/apps/1-guest-app/return/TICVAI
-        Guest App.dc.html). NOT client-verified: awaiting the client''s design reviewer. Build the layout
+        Guest App.dc.html). Client-approved 19 October 2026 (confirmed by Chinmay Parab). Build the layout
         from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at:
         Account → All screens → Wave 2 → Upsell / cross-sell (exact).'
-    source: Claude Code, 30 September 2026, drawn in the Mobile App v4 look
-    note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified,
-      awaiting the client''s design reviewer.** `provenance: designed` because the accepted vocabulary
-      has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September
-      carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
+    source: client approval, confirmed by Chinmay Parab 19 October 2026
+    note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; client-approved 19 October
+      2026, confirmed by Chinmay Parab.** Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
   apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -9912,9 +10061,12 @@ screens:
   - id: formAddCartLine
     component: modal
     trigger: Add cart line
-    body: '**Collects what `addCartLine` sends before it is called.** Required: `variantId`, `quantity`.
-      Optional: `performanceId`, `seatIds`, `parentLineId`, `attributes`. Dismissing sends nothing; the
-      screen behind is unchanged.'
+    body: '**Asks only what the guest decides** (r8, ORDERS-MONEY-C40): the quantity, and a date for a
+      timed product. `variantId` (and `performanceId`) come from the suggestion (`AiRecommendationItem.variantId`);
+      when the suggestion has none, the form lists the product''s variants (`listProductVariants`) and
+      the guest picks one. Never `seatIds`, `parentLineId` or `attributes`. The suggestion''s `trackingId`
+      is sent as `recommendationId`. An offer, reward or challenge suggestion has its own action and never
+      opens this form. Dismissing sends nothing; the screen behind is unchanged.'
     bindsTo: AddCartLineRequest
     confirm:
       label: Add cart line
@@ -9988,7 +10140,11 @@ screens:
 
 
     **29 September (W2).** Sections first, zoom into a section for seats, pinch out or *Whole map* back
-    to the full map; held seats are kept.'
+    to the full map; held seats are kept. Build note (r8, GPS-C03, decided by the lead 20 October 2026):
+    `recommendSeats` takes `partySize` from the guest in the Recommend seats overlay (a How many seats
+    stepper, capped by maxSeatsPerGuestOrder) with the preference best available or together. Tickets
+    are chosen after seats, so there is no ticket count to read. The stepper is new to an approved frame:
+    raise it with the client; until then default the stepper to 2.'
   density: comfortable
   boardFrames:
   - Seat Board 4.dc.html#seat-4a
@@ -10086,12 +10242,25 @@ screens:
       for the old performance (decided 29 September), with the guest session the device already holds:
       signed in, or the anonymous cart session a visitor gets with the first line (ADR-0045)'
     trigger: background
+  - operationId: getPerformance
+    contract: catalogue
+    purpose: 'Resolves a performance given without its event (r8, GPS-C05): its `eventId` drives `listPerformances`
+      (time bar, fixture strip, date pop-up), and its `startsAt` and `status` the cold entry (a performance
+      that has happened offers the next one of the same event). No component of its own.'
+    trigger: background
+    provenance: r8 second round, GPS-C05 (ticket 28202)
   entryState:
     params:
     - name: performanceId
       from: deepLink
+      optional: true
+      notes: 'r8 (GPS-C05): an edge that carries only `eventId` (from GST-001) opens on the event''s first
+        on-sale performance, the first `listPerformances` returns.'
     - name: eventId
       from: GST-007
+      optional: true
+      notes: 'r8 (GPS-C05): read from `Performance.eventId` (`getPerformance`) when a deep link or the
+        GST-077 edge carries only `performanceId`.'
     - name: holdId
       from: navigation
       optional: true
@@ -10125,8 +10294,9 @@ screens:
   - id: formRecommendSeats
     component: modal
     trigger: Recommend seats
-    body: '**How many seats, and best available or together.** The party size is the tickets already chosen;
-      the guest only picks the preference, then `recommendSeats` places them.'
+    body: '**How many seats, and best available or together.** The guest sets the party size (a How many
+      seats stepper, at most `maxSeatsPerGuestOrder`) and picks the preference, then `recommendSeats`
+      places them. Tickets are chosen after seats, so there are none to count yet.'
     bindsTo: SeatRecommendationRequest
     confirm:
       label: Recommend seats
@@ -10270,6 +10440,14 @@ screens:
     contract: catalogue
     purpose: Live remaining capacity
     trigger: onLoad
+  - operationId: createCart
+    contract: orders
+    purpose: 'Started by the runtime the first time a line is added, before the first addCartLine, against
+      the guest or the anonymous cart token (2.1.31); never a button or a form (GFIX-3). With the guest
+      session the device already holds: signed in, or the anonymous cart session a visitor gets with the
+      first line (ADR-0045; r8, GPS-C23).'
+    trigger: background
+    provenance: r8 second round, GPS-C23 (the core lane's request)
   entryState:
     params:
     - name: cartId
@@ -10277,8 +10455,8 @@ screens:
     coldEntry: Resolves from the session; a cold arrival is the ordinary case.
     preloaded: []
   wireframe:
-    status: notStarted
-    provenance: designed
+    status: approved
+    provenance: client-verified
     board: wireframes/P02 Guest App.dc.html#gst-050
     prototype:
       file: sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html
@@ -10286,17 +10464,15 @@ screens:
       match: none
       note: 'Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the
         v4 look (the frame on this screen''s board, wireframes/frames/gst-050.html, and #GST-050 in handoff/design-batches/apps/1-guest-app/return/TICVAI
-        Guest App.dc.html). NOT client-verified: awaiting the client''s design reviewer. Build the layout
+        Guest App.dc.html). Client-approved 19 October 2026 (confirmed by Chinmay Parab). Build the layout
         from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at:
         Account → All screens → Wave 3 → Resource booking – cabana; Rev 3 feedback → Cabana map (partial).
         What v2 did differently: Rev 3 books from a map, with a hold countdown and sold-out cabanas; the
         YAML is a list with addCartLine and no hold. YAML GST-070 also says cabanas are booked by staff
         (R073c), which contradicts both this screen and the prototype.'
-    source: Claude Code, 30 September 2026, drawn in the Mobile App v4 look
-    note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified,
-      awaiting the client''s design reviewer.** `provenance: designed` because the accepted vocabulary
-      has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September
-      carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
+    source: client approval, confirmed by Chinmay Parab 19 October 2026
+    note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; client-approved 19 October
+      2026, confirmed by Chinmay Parab.** Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
   apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -10357,6 +10533,9 @@ screens:
     - to: GST-052
       trigger: Take a ready-made plan
       provenance: decided 29 September 2026, MOB-6
+      carries:
+      - party
+      - dates
     - to: GST-001
       trigger: Home tab
       provenance: decided 29 September 2026, MOB-1
@@ -10443,7 +10622,7 @@ screens:
         provenance: decided 29 September 2026, MOB-6
       - kind: multiSelect
         label: What are you most interested in?
-        operation: listProducts
+        operation: getVisitPlannerOptions
         notes: 'Interest tags from the venue''s points (`VenuePoint.interestTags`): thrill rides, family
           rides, shows, water, shopping.'
         provenance: decided 29 September 2026, MOB-6
@@ -10507,6 +10686,13 @@ screens:
     purpose: The tenant's active venues, for the park-per-day choice in a multi-venue tenant
     trigger: onLoad
     provenance: decided 30 September 2026, client meeting MoM 4.7 (Allam)
+  - operationId: getVisitPlannerOptions
+    contract: venue-map
+    purpose: 'The planner''s choices from the venue''s data (r8, GPS-C21): the interest tags of its parks
+      fill What are you most interested in?, and the ready-made plans and Fast Track bundles come from
+      the same read.'
+    trigger: onLoad
+    provenance: r8 integration, GPS-C21 (CHG-R8INT-007)
   entryState:
     params:
     - name: venueId
@@ -10593,8 +10779,8 @@ screens:
     by `generateVisitPlan` from preset inputs, then edited on GST-053.'
   density: comfortable
   pattern: listDetail
-  patternReason: '`listProducts` reads a population and nothing reads one of them; the detail is the row
-    until a `get` exists'
+  patternReason: '`getVisitPlannerOptions` reads the venue''s ready-made plans and nothing reads one of
+    them; the detail is the row until a `get` exists'
   purpose: Ready-made day plans for this venue that a guest can take instead of answering questions.
   layout:
     template: split
@@ -10604,14 +10790,14 @@ screens:
       components:
       - kind: cardList
         label: Ready-made plans
-        operation: listProducts
+        operation: getVisitPlannerOptions
         notes: 'The venue''s preset plans (e.g. *Thrill day*, *Family day*, *Relaxed day*), each a set
           of planner inputs; **Use this plan** runs `generateVisitPlan` with those inputs and the guest''s
           party size and date. Rules-built, not AI: seeded, not learned, on day one.'
         provenance: decided 29 September 2026, MOB-6
       - kind: dataTable
         label: Every bundle
-        operation: listCatalogueBundles
+        operation: getVisitPlannerOptions
         notes: Bundles a preset plan can include (e.g. Fast Track).
         provenance: contract catalogue.yaml GET /catalogue/bundles
     - name: contextPanel
@@ -10634,27 +10820,41 @@ screens:
       Anything that spends money, holds capacity or changes the account waits for the connection, and
       its button says so rather than failing.'
   apis:
-  - operationId: listProducts
-    contract: catalogue
-    purpose: List products
+  - operationId: getVisitPlannerOptions
+    contract: venue-map
+    purpose: 'The venue''s ready-made plans (its active `VisitPlanPreset` rows, in their order) and the
+      Fast Track bundles a plan can include (r8, GPS-C21): the presets replace the product list and the
+      catalogue''s bundles on this screen; Use this plan sends the preset''s `presetKey` to `generateVisitPlan`.'
     trigger: onLoad
-  - operationId: listCatalogueBundles
-    contract: catalogue
-    purpose: List published bundles
-    trigger: onLoad
+    provenance: r8 integration, GPS-C21 (CHG-R8INT-007)
   - operationId: generateVisitPlan
     contract: venue-map
-    purpose: Build a rules plan from the inputs (party, heights, dates, pace, interests, cuisine)
+    purpose: 'Build a rules plan from the preset''s inputs (`presetKey`) with the party and dates this
+      screen holds (r8, GPS-C14): the ones carried from GST-051 when the guest answered the questions
+      there; on the cold entry from GST-001, `dates` is today (the venue''s business date) and `party`
+      one adult, proposed, client to confirm. The guest changes either on GST-051 (Make my own) before
+      using a plan.'
     trigger: onAction
     provenance: decided 29 September 2026, MOB-6
   entryState:
     params:
     - name: venueId
       from: session
-    coldEntry: Lists the venue's ready-made plans; nothing is needed upstream.
+    - name: party
+      from: GST-051
+      optional: true
+      notes: 'r8 (GPS-C14): the party the guest gave on GST-051 (`VisitPlanRequest.party`). Absent on
+        the cold entry: one adult, proposed, client to confirm.'
+    - name: dates
+      from: GST-051
+      optional: true
+      notes: 'r8 (GPS-C14): the dates the guest gave on GST-051 (`VisitPlanRequest.dates`). Absent on
+        the cold entry: today, the venue''s business date.'
+    coldEntry: Lists the venue's ready-made plans; nothing is needed upstream. Use this plan sends the
+      preset with today and one adult unless GST-051 carried a party and dates (r8, GPS-C14).
   wireframe:
-    status: notStarted
-    provenance: designed
+    status: approved
+    provenance: client-verified
     board: wireframes/P02 Guest App.dc.html#gst-052
     prototype:
       file: sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html
@@ -10662,16 +10862,14 @@ screens:
       match: none
       note: 'Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the
         v4 look (the frame on this screen''s board, wireframes/frames/gst-052.html, and #GST-052 in handoff/design-batches/apps/1-guest-app/return/TICVAI
-        Guest App.dc.html). NOT client-verified: awaiting the client''s design reviewer. Build the layout
+        Guest App.dc.html). Client-approved 19 October 2026 (confirmed by Chinmay Parab). Build the layout
         from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at:
         Account → All screens → Wave 3 → Suggested itineraries (exact). What v2 did differently: Mobile
         v4 draws no ready-made plans list: its Plan tab goes straight to the questions. Built from this
         definition in the v4 style.'
-    source: Claude Code, 30 September 2026, drawn in the Mobile App v4 look
-    note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified,
-      awaiting the client''s design reviewer.** `provenance: designed` because the accepted vocabulary
-      has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September
-      carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
+    source: client approval, confirmed by Chinmay Parab 19 October 2026
+    note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; client-approved 19 October
+      2026, confirmed by Chinmay Parab.** Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
   apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -11420,7 +11618,7 @@ screens:
         - Bundle.description
         - Bundle.price
         - Bundle.savingsAmount
-        operation: getBundle
+        operation: getGuestBundle
         provenance: contract promotions.yaml GET /bundles/{bundleId}
     - name: actionBar
       slot: rowActions
@@ -11444,9 +11642,10 @@ screens:
       Anything that spends money, holds capacity or changes the account waits for the connection, and
       its button says so rather than failing.'
   apis:
-  - operationId: getBundle
+  - operationId: getGuestBundle
     contract: promotions
-    purpose: Read a bundle with components and allocation
+    purpose: Read a bundle with its components and choice groups, in the guest shape (r8, ORDERS-MONEY-C32,
+      CHG-R8INT-009)
     trigger: onLoad
   - operationId: addCartLine
     contract: orders
@@ -11470,8 +11669,8 @@ screens:
     - BundleSummary.contentHash
     - BundleSummary.signatureKeyId
   wireframe:
-    status: notStarted
-    provenance: designed
+    status: approved
+    provenance: client-verified
     board: wireframes/P02 Guest App.dc.html#gst-056
     prototype:
       file: sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html
@@ -11479,14 +11678,12 @@ screens:
       match: none
       note: 'Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the
         v4 look (the frame on this screen''s board, wireframes/frames/gst-056.html, and #GST-056 in handoff/design-batches/apps/1-guest-app/return/TICVAI
-        Guest App.dc.html). NOT client-verified: awaiting the client''s design reviewer. Build the layout
+        Guest App.dc.html). Client-approved 19 October 2026 (confirmed by Chinmay Parab). Build the layout
         from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at:
         Account → All screens → Wave 2 → Bundle package (exact).'
-    source: Claude Code, 30 September 2026, drawn in the Mobile App v4 look
-    note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified,
-      awaiting the client''s design reviewer.** `provenance: designed` because the accepted vocabulary
-      has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September
-      carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
+    source: client approval, confirmed by Chinmay Parab 19 October 2026
+    note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; client-approved 19 October
+      2026, confirmed by Chinmay Parab.** Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
   apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -11678,7 +11875,14 @@ screens:
 
     **Availability is the map''s (4 October 2026): listBookableVenueMaps gives the mapId and getMapResourceAvailability
     every cabana''s status for the day, as GST-074 books them; getAvailability needs a performance, event
-    or capacity id no cabana product has, and left the screen** (CHG-FXS-003)'
+    or capacity id no cabana product has, and left the screen** (CHG-FXS-003)
+
+
+    Build note (r8 second round, GPS-C09): **build the no-access state as GFIX-4 says, not as the state
+    text above reads.** A guest holds no permission, so the state never names one (the text above still
+    names staff permissions); signed out, the guest is offered sign-in and brought back here; a record
+    that is not theirs says so without saying whose. The corrected wording waits for the client''s approval
+    of the visible text (pending entry GPS-C09).'
   density: comfortable
   pattern: listDetail
   patternReason: '`listProducts` reads the population and `getAvailability` reads one of them — list,
@@ -11744,8 +11948,8 @@ screens:
   entryState:
     preloaded: []
   wireframe:
-    status: notStarted
-    provenance: designed
+    status: approved
+    provenance: client-verified
     board: wireframes/P02 Guest App.dc.html#gst-058
     prototype:
       file: sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html
@@ -11753,15 +11957,13 @@ screens:
       match: none
       note: 'Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the
         v4 look (the frame on this screen''s board, wireframes/frames/gst-058.html, and #GST-058 in handoff/design-batches/apps/1-guest-app/return/TICVAI
-        Guest App.dc.html). NOT client-verified: awaiting the client''s design reviewer. Build the layout
+        Guest App.dc.html). Client-approved 19 October 2026 (confirmed by Chinmay Parab). Build the layout
         from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at:
         Account → All screens → Wave 3 → Resource availability (cabana); Rev 3 feedback → Cabana map (exact).
         What v2 did differently: The Rev 3 cabana map puts availability and booking on one screen.'
-    source: Claude Code, 30 September 2026, drawn in the Mobile App v4 look
-    note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified,
-      awaiting the client''s design reviewer.** `provenance: designed` because the accepted vocabulary
-      has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September
-      carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
+    source: client approval, confirmed by Chinmay Parab 19 October 2026
+    note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; client-approved 19 October
+      2026, confirmed by Chinmay Parab.** Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
   apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -11824,7 +12026,9 @@ screens:
 
 
     **Mobile v4 role (MOB-6): "Plan in Progress".** Today''s plan against live waits (`getWaitTimes`);
-    rules-based, AI not required.'
+    rules-based, AI not required. Build note (r8, GPS-C15): the cold entry (no planId) reads `listMyVisitPlans`
+    for today; the edges from GST-001, GST-022 and GST-041 carry the chosen plan''s id, so the earlier
+    "planId has no source" notes no longer apply.'
   density: comfortable
   pattern: listDetail
   patternReason: '`listProducts` reads the population and `getWaitTimes` reads one of them — list, select,
@@ -11893,6 +12097,15 @@ screens:
     purpose: Swap candidates for one item that suit everyone in the party
     trigger: onAction
     provenance: decided 29 September 2026, MOB-6
+  - operationId: listMyVisitPlans
+    contract: venue-map
+    purpose: 'Only when signed in, like `getVisitPlan` (GFIX-6): on the cold entry (no `planId`) it asks
+      for the guest''s plans with `date` today, newest first, and takes the first one''s `id` for `getVisitPlan`.
+      No component shows the list itself: what it finds fills the Today timeline, and an empty page is
+      the emptyFirstRun state (offer to make a plan on GST-051). Opened with a `planId`, it is not called.
+      Not background (r8 integration, CHG-R8INT-008): the guest sees what it finds, and the approved screen
+      has no element of its own for it (the prototype has no view of this screen).'
+    trigger: onLoad
   entryState:
     params:
     - name: planId
@@ -11905,8 +12118,8 @@ screens:
     coldEntry: 'Opened from a reminder on the visit day: today''s plan, or an offer to make one when there
       is none. `itemId` is the plan item the guest taps Swap on, picked on this screen.'
   wireframe:
-    status: notStarted
-    provenance: designed
+    status: approved
+    provenance: client-verified
     board: wireframes/P02 Guest App.dc.html#gst-059
     prototype:
       file: sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html
@@ -11914,15 +12127,13 @@ screens:
       match: none
       note: 'Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the
         v4 look (the frame on this screen''s board, wireframes/frames/gst-059.html, and #GST-059 in handoff/design-batches/apps/1-guest-app/return/TICVAI
-        Guest App.dc.html). NOT client-verified: awaiting the client''s design reviewer. Build the layout
+        Guest App.dc.html). Client-approved 19 October 2026 (confirmed by Chinmay Parab). Build the layout
         from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at:
         Account → All screens → Wave 3 → Plan my day – in progress (exact). What v2 did differently: Mobile
         v4 draws no in-progress view of the plan; built from this definition in the v4 style.'
-    source: Claude Code, 30 September 2026, drawn in the Mobile App v4 look
-    note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified,
-      awaiting the client''s design reviewer.** `provenance: designed` because the accepted vocabulary
-      has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September
-      carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
+    source: client approval, confirmed by Chinmay Parab 19 October 2026
+    note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; client-approved 19 October
+      2026, confirmed by Chinmay Parab.** Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
   apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -12102,7 +12313,14 @@ screens:
 
 
     **The guest''s drops are found by their own tickets (listMyEntitlements, then lookupShopAndDrop per
-    entitlementId), bound 4 October 2026** (CHG-FXS-003)'
+    entitlementId), bound 4 October 2026** (CHG-FXS-003)
+
+
+    Build note (r8 second round, GPS-C09): **build the no-access state as GFIX-4 says, not as the state
+    text above reads.** A guest holds no permission, so the state never names one (the text above still
+    names staff permissions); signed out, the guest is offered sign-in and brought back here; a record
+    that is not theirs says so without saying whose. The corrected wording waits for the client''s approval
+    of the visible text (pending entry GPS-C09).'
   density: comfortable
   pattern: statusTracker
   patternReason: A status list of every shop-and-drop waiting for the guest, read by `lookupShopAndDrop`
@@ -12566,8 +12784,8 @@ screens:
     coldEntry: '**Resolves from the session.** A guest arriving cold is asked to sign in and returned
       here afterwards — never a 404, and never a screen that silently shows somebody else''s data (ADR-0030).'
   wireframe:
-    status: notStarted
-    provenance: designed
+    status: approved
+    provenance: client-verified
     board: wireframes/P02 Guest App.dc.html#gst-066
     prototype:
       file: sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html
@@ -12575,17 +12793,15 @@ screens:
       match: none
       note: 'Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the
         v4 look (the frame on this screen''s board, wireframes/frames/gst-066.html, and #GST-066 in handoff/design-batches/apps/1-guest-app/return/TICVAI
-        Guest App.dc.html). NOT client-verified: awaiting the client''s design reviewer. Build the layout
+        Guest App.dc.html). Client-approved 19 October 2026 (confirmed by Chinmay Parab). Build the layout
         from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at:
         Account → All screens → Wave 2 → Privacy & my data (#privacy; also Account → Data & privacy) (exact).
         What v2 did differently: The prototype labels this screen "GST-070 · Your data" (aria-label "GST-070
         Data and privacy"), but GST-070 is Reserve a Table in the YAML, so the label is wrong. Document
         upload is on Profile instead.'
-    source: Claude Code, 30 September 2026, drawn in the Mobile App v4 look
-    note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified,
-      awaiting the client''s design reviewer.** `provenance: designed` because the accepted vocabulary
-      has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September
-      carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
+    source: client approval, confirmed by Chinmay Parab 19 October 2026
+    note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; client-approved 19 October
+      2026, confirmed by Chinmay Parab.** Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
   apisNote: 'Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -12696,6 +12912,24 @@ screens:
     offline: '**Not available, and the offline banner says why.** Refunds and resale listings need the
       server — a queued refund request is a promise nobody made.'
   apis:
+  - operationId: listOwnRefundRequests
+    contract: orders
+    purpose: The guest's own refund requests and their status
+    trigger: onLoad
+    provenance: r8 walk, 20 October 2026 (ORDERS-MONEY-C26, CHG-R8SPN-012)
+    shownBy: Tickets you can act on
+  - operationId: listOwnResaleListings
+    contract: orders
+    purpose: The guest's own resale listings and their status
+    trigger: onLoad
+    provenance: r8 walk, 20 October 2026 (ORDERS-MONEY-C26, CHG-R8SPN-012)
+    shownBy: Tickets you can act on
+  - operationId: getGuestRefundPolicy
+    contract: orders
+    purpose: How much comes back and until when, before any request
+    trigger: onLoad
+    provenance: r8 walk, 20 October 2026 (ORDERS-MONEY-C26, CHG-R8SPN-012)
+    shownBy: Rules
   - operationId: createRefundRequest
     contract: orders
     purpose: Guest-initiated refund request
@@ -12715,6 +12949,8 @@ screens:
       from: session
     - name: orderId
       from: navigation
+    - name: venueId
+      from: session
     coldEntry: '**Resolves from the session.** A guest arriving cold is asked to sign in and returned
       here afterwards — never a 404, and never a screen that silently shows somebody else''s data (ADR-0030).'
   wireframe:
@@ -12870,6 +13106,13 @@ screens:
     contract: marketing-crm
     purpose: Reply on a case the guest raised
     trigger: onAction
+  - operationId: getMyCase
+    contract: marketing-crm
+    purpose: Read one of the guest's own cases with its thread, when the guest opens a row of My cases
+      (the prototype's View on a closed case, Reply on an open one, and the message thread under the lists).
+      Opened with a `caseId` from an edge or a notification, the screen reads that case at once.
+    trigger: onAction
+    shownBy: View
   entryState:
     params:
     - name: subjectId
@@ -12969,7 +13212,14 @@ screens:
     still open (ADR-0063); the build uses a stub until it is named** (CHG-FXS-003)
 
 
-    **The face is captured inside the enrol form (formEnrolFacePass) by the vendor SDK** (CHG-FXS-003)'
+    **The face is captured inside the enrol form (formEnrolFacePass) by the vendor SDK** (CHG-FXS-003)
+
+
+    Build note (r8 second round, GPS-C09): **build the no-access state as GFIX-4 says, not as the state
+    text above reads.** A guest holds no permission, so the state never names one (the text above still
+    names staff permissions); signed out, the guest is offered sign-in and brought back here; a record
+    that is not theirs says so without saying whose. The corrected wording waits for the client''s approval
+    of the visible text (pending entry GPS-C09).'
   density: comfortable
   offline: false
   pattern: statusTracker
@@ -13440,7 +13690,14 @@ screens:
     is the guest''s wallet id from getWallet (Wallet.id, agreed). Bound 4 October 2026** (CHG-FXS-003)
 
 
-    **The card is entered in the provider''s secure fields, named by the published config** (CHG-FXS-003)'
+    **The card is entered in the provider''s secure fields, named by the published config** (CHG-FXS-003)
+
+
+    Build note (r8 second round, GPS-C09): **build the no-access state as GFIX-4 says, not as the state
+    text above reads.** A guest holds no permission, so the state never names one (the text above still
+    names staff permissions); signed out, the guest is offered sign-in and brought back here; a record
+    that is not theirs says so without saying whose. The corrected wording waits for the client''s approval
+    of the visible text (pending entry GPS-C09).'
   density: comfortable
   offline: false
   pattern: listDetail
@@ -13577,6 +13834,16 @@ screens:
     purpose: The guest's wallet and its id, for a balance transfer
     trigger: onLoad
     provenance: defined 4 October 2026 (CHG-FXS-003)
+  - operationId: getLoyaltyPosition
+    contract: marketing-crm
+    purpose: The guest's loyalty position
+    trigger: onLoad
+    shownBy: Balances
+  - operationId: listRewards
+    contract: marketing-crm
+    purpose: The rewards the guest can redeem
+    trigger: onLoad
+    shownBy: Spend points
   entryState:
     params:
     - name: subjectId
@@ -14061,8 +14328,8 @@ screens:
     coldEntry: '**Resolves from the session.** A guest arriving cold is asked to sign in and returned
       here afterwards — never a 404, and never a screen that silently shows somebody else''s data (ADR-0030).'
   wireframe:
-    status: notStarted
-    provenance: designed
+    status: approved
+    provenance: client-verified
     board: wireframes/P02 Guest App.dc.html#gst-073
     prototype:
       file: sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html
@@ -14070,16 +14337,14 @@ screens:
       match: none
       note: 'Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the
         v4 look (the frame on this screen''s board, wireframes/frames/gst-073.html, and #GST-073 in handoff/design-batches/apps/1-guest-app/return/TICVAI
-        Guest App.dc.html). NOT client-verified: awaiting the client''s design reviewer. Build the layout
+        Guest App.dc.html). Client-approved 19 October 2026 (confirmed by Chinmay Parab). Build the layout
         from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at:
         Account → All screens → Wave 2 → Security & sign-in (partial). What v2 did differently: Prototype
         offers two-step verification and a trusted-device skip, but the YAML says guests have no second
         factor (R167). Either remove the toggle from the prototype or reopen the decision.'
-    source: Claude Code, 30 September 2026, drawn in the Mobile App v4 look
-    note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified,
-      awaiting the client''s design reviewer.** `provenance: designed` because the accepted vocabulary
-      has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September
-      carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
+    source: client approval, confirmed by Chinmay Parab 19 October 2026
+    note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; client-approved 19 October
+      2026, confirmed by Chinmay Parab.** Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
   apisNote: 'Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
     — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -14357,8 +14622,8 @@ screens:
     coldEntry: '**A link to a map that is no longer published, or a day that has passed,** says which
       and offers today on the current map. Nothing is held on arrival.'
   wireframe:
-    status: notStarted
-    provenance: designed
+    status: approved
+    provenance: client-verified
     board: wireframes/P02 Guest App.dc.html#gst-074
     prototype:
       file: sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html
@@ -14366,14 +14631,12 @@ screens:
       match: none
       note: 'Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the
         v4 look (the frame on this screen''s board, wireframes/frames/gst-074.html, and #GST-074 in handoff/design-batches/apps/1-guest-app/return/TICVAI
-        Guest App.dc.html). NOT client-verified: awaiting the client''s design reviewer. Build the layout
+        Guest App.dc.html). Client-approved 19 October 2026 (confirmed by Chinmay Parab). Build the layout
         from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at:
         Account → All screens → Rev 3 feedback → Cabana map (r3cabmap) (exact).'
-    source: Claude Code, 30 September 2026, drawn in the Mobile App v4 look
-    note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified,
-      awaiting the client''s design reviewer.** `provenance: designed` because the accepted vocabulary
-      has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September
-      carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
+    source: client approval, confirmed by Chinmay Parab 19 October 2026
+    note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; client-approved 19 October
+      2026, confirmed by Chinmay Parab.** Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
   apisNote: Authored 29 September 2026 from the rev 3 decisions and the client prototype view named in
     `wireframe.prototype`; every operation exists in the contracts (decided 29 September, rev 3).
   overlays:
@@ -14475,7 +14738,9 @@ screens:
         provenance: decided 29 September, rev 3 REV3-13
       - kind: numberField
         label: Attendees
-        notes: For the visitor list at reception; a room type smaller than the party is not offered.
+        notes: For the visitor list at reception; a room type smaller than the party is not offered. Sent
+          as `attributes.attendees` on `addCartLine` (r8, GPS-C28, `OrderLineAttributes.attendees`); a
+          422 `attendees-over-capacity` sends the guest back to How long and Start time.
         provenance: decided 29 September, rev 3 REV3-13
       - kind: cardList
         label: Add to the booking
@@ -14521,8 +14786,18 @@ screens:
     trigger: onAction
   - operationId: addCartLine
     contract: orders
-    purpose: Add the room type for the booked window, then the add-ons
+    purpose: Add the room type for the booked window with the party as `attributes.attendees` (r8, GPS-C28),
+      then the add-ons; 422 `attendees-over-capacity` sends the guest back to the length and start-time
+      steps
     trigger: onAction
+  - operationId: createCart
+    contract: orders
+    purpose: 'Started by the runtime the first time a line is added, before the first addCartLine, against
+      the guest or the anonymous cart token (2.1.31); never a button or a form (GFIX-3). With the guest
+      session the device already holds: signed in, or the anonymous cart session a visitor gets with the
+      first line (ADR-0045; r8, GPS-C23).'
+    trigger: background
+    provenance: r8 second round, GPS-C23 (the core lane's request)
   entryState:
     params:
     - name: productId
@@ -14532,8 +14807,8 @@ screens:
       from: session
     coldEntry: Resolves the venue the app is in and lists its room types; nothing is booked on arrival.
   wireframe:
-    status: notStarted
-    provenance: designed
+    status: approved
+    provenance: client-verified
     board: wireframes/P02 Guest App.dc.html#gst-075
     prototype:
       file: sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html
@@ -14541,14 +14816,12 @@ screens:
       match: none
       note: 'Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the
         v4 look (the frame on this screen''s board, wireframes/frames/gst-075.html, and #GST-075 in handoff/design-batches/apps/1-guest-app/return/TICVAI
-        Guest App.dc.html). NOT client-verified: awaiting the client''s design reviewer. Build the layout
+        Guest App.dc.html). Client-approved 19 October 2026 (confirmed by Chinmay Parab). Build the layout
         from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at:
         Account → All screens → Rev 3 feedback → Meeting room by the hour (r3room) (exact).'
-    source: Claude Code, 30 September 2026, drawn in the Mobile App v4 look
-    note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified,
-      awaiting the client''s design reviewer.** `provenance: designed` because the accepted vocabulary
-      has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September
-      carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
+    source: client approval, confirmed by Chinmay Parab 19 October 2026
+    note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; client-approved 19 October
+      2026, confirmed by Chinmay Parab.** Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
   apisNote: Authored 29 September 2026 from the rev 3 decisions and the client prototype view named in
     `wireframe.prototype`; every operation exists in the contracts (decided 29 September, rev 3).
 - id: GST-076

@@ -275,7 +275,7 @@
        ],
        "operation": "listReservations",
        "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)",
-       "notes": "Upcoming and Past, as two tabs; each card shows when it expires. Was the generated table 'Every reservation'; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3))."
+       "notes": "Upcoming and Past, as two tabs; each card shows when it expires. **Upcoming** is every reservation still held whose `expiresAt` is in the future; **Past** is the rest (expired, converted to an order, or cancelled) (r8, ORDERS-MONEY-C13). Was the generated table 'Every reservation'; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3))."
       }
      ]
     },

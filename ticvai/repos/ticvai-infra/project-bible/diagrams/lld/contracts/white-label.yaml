@@ -1,5 +1,5 @@
 id: LLD-white-label
-title: white-label — 108 operations
+title: white-label — 110 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -14,6 +14,7 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - platform.workstation
   - whitelabel.kiosk_assignment
   - whitelabel.kiosk_config
@@ -68,6 +69,7 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - whitelabel.booking_flow
   - whitelabel.booking_flow_step
   writes:
@@ -84,11 +86,11 @@ operations:
   offline: false
   reads:
   - cache:idempotency
-  - control.content_block
   - marketing.segment
+  - whitelabel.content_block
   writes:
   - cache:idempotency
-  - control.content_block
+  - whitelabel.content_block
 - operation: createContentPage
   verb: POST
   path: /tenant-config/pages
@@ -112,10 +114,12 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - whitelabel.guided_choice
   - whitelabel.guided_choice_answer
   - whitelabel.guided_choice_question
   writes:
+  - cache:idempotency
   - whitelabel.guided_choice
   - whitelabel.guided_choice_answer
   - whitelabel.guided_choice_question
@@ -128,6 +132,7 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - whitelabel.kiosk_config
   - whitelabel.kiosk_config_attract_slide
   - whitelabel.kiosk_config_start_tile
@@ -188,6 +193,7 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - catalogue.product
   - catalogue.product_category
   - whitelabel.booking_flow
@@ -237,6 +243,7 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - whitelabel.kiosk_assignment
   - whitelabel.kiosk_config
   writes:
@@ -267,6 +274,7 @@ operations:
   - staff
   offline: false
   reads:
+  - whitelabel.config_version
   - whitelabel.tenant_config
   writes: []
 - operation: exportSitePackage
@@ -278,8 +286,11 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
+  - whitelabel.config_version
   - whitelabel.site_package
   writes:
+  - cache:idempotency
   - whitelabel.site_package
 - operation: getAppBuild
   verb: GET
@@ -423,9 +434,9 @@ operations:
   offline: false
   reads:
   - cache:resolution
+  - control.contract
   - control.licence_add_on
-  - subscription.contract
-  - subscription.plan
+  - control.plan
   - whitelabel.module_enablement
   writes:
   - cache:resolution
@@ -453,6 +464,16 @@ operations:
   offline: false
   reads: []
   writes: []
+- operation: getPreview
+  verb: GET
+  path: /tenant-config/preview/{previewId}
+  scope: tenant
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: getPublishReviewPolicy
   verb: GET
   path: /publish-review-policy
@@ -471,6 +492,7 @@ operations:
   permission: null
   audience:
   - guest
+  - staff
   offline: true
   reads:
   - catalogue.product
@@ -521,6 +543,8 @@ operations:
   - device
   offline: true
   reads:
+  - whitelabel.analytics_provider
+  - whitelabel.config_version
   - whitelabel.footer_config
   - whitelabel.footer_config_column
   - whitelabel.footer_config_social_link
@@ -528,6 +552,7 @@ operations:
   - whitelabel.homepage_section
   - whitelabel.navigation_config
   - whitelabel.navigation_item
+  - whitelabel.tenant_config
   writes: []
 - operation: getSitePackage
   verb: GET
@@ -586,9 +611,12 @@ operations:
   audience:
   - device
   - guest
+  - staff
   offline: true
   reads:
   - whitelabel.config_version
+  - whitelabel.content_page
+  - whitelabel.module_enablement
   - whitelabel.tenant_config
   writes: []
 - operation: getTenantConfig
@@ -603,6 +631,7 @@ operations:
   reads:
   - whitelabel.booking_flow
   - whitelabel.booking_flow_step
+  - whitelabel.config_version
   - whitelabel.feature_toggle
   - whitelabel.footer_config
   - whitelabel.footer_config_column
@@ -703,7 +732,7 @@ operations:
   - staff
   offline: false
   reads:
-  - control.content_block
+  - whitelabel.content_block
   writes: []
 - operation: listContentPages
   verb: GET
@@ -860,6 +889,16 @@ operations:
   offline: true
   reads: []
   writes: []
+- operation: previewGuidedChoice
+  verb: POST
+  path: /venues/{venueId}/guided-choice-previews
+  scope: venue
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: proposeGuidedChoice
   verb: POST
   path: /venues/{venueId}/guided-choice-suggestions
@@ -869,10 +908,12 @@ operations:
   - service
   offline: false
   reads:
+  - cache:idempotency
   - whitelabel.guided_choice
   - whitelabel.guided_choice_answer
   - whitelabel.guided_choice_question
   writes:
+  - cache:idempotency
   - whitelabel.guided_choice
   - whitelabel.guided_choice_answer
   - whitelabel.guided_choice_question
@@ -886,12 +927,14 @@ operations:
   offline: false
   reads:
   - cache:idempotency
-  - control.content_block
   - identity.principal
+  - whitelabel.content_block
+  - whitelabel.publish_review_policy
   writes:
+  - approvals.request
   - cache:idempotency
   - cache:resolution
-  - control.content_block
+  - whitelabel.content_block
 - operation: publishGuidedChoice
   verb: POST
   path: /guided-choices/{guidedChoiceId}/publish
@@ -901,6 +944,7 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - whitelabel.booking_flow
   - whitelabel.guided_choice
   - whitelabel.guided_choice_answer
@@ -917,6 +961,7 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - whitelabel.kiosk_config
   - whitelabel.kiosk_config_attract_slide
   - whitelabel.kiosk_config_start_tile
@@ -934,14 +979,27 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
+  - whitelabel.analytics_provider
   - whitelabel.booking_flow
   - whitelabel.booking_flow_step
   - whitelabel.config_version
+  - whitelabel.content_page
+  - whitelabel.feature_toggle
+  - whitelabel.footer_config
+  - whitelabel.homepage_layout
+  - whitelabel.homepage_section
+  - whitelabel.module_enablement
+  - whitelabel.navigation_config
+  - whitelabel.navigation_item
+  - whitelabel.publish_review_policy
   - whitelabel.tenant_config
   writes:
+  - approvals.request
   - cache:idempotency
   - platform.outbox
   - whitelabel.config_version
+  - whitelabel.content_page
 - operation: recordStorefrontSessionEvents
   verb: POST
   path: /storefront/session-events
@@ -965,8 +1023,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - whitelabel.custom_domain
   writes:
+  - cache:idempotency
   - whitelabel.custom_domain
 - operation: relinquishCustomDomain
   verb: DELETE
@@ -977,8 +1037,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - whitelabel.custom_domain
   writes:
+  - cache:idempotency
   - whitelabel.custom_domain
 - operation: requestAppBuild
   verb: POST
@@ -989,6 +1051,7 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - whitelabel.app_build
   - whitelabel.config_version
   - whitelabel.store_account
@@ -1007,6 +1070,7 @@ operations:
   - cache:idempotency
   - whitelabel.booking_flow
   - whitelabel.booking_flow_step
+  - whitelabel.config_version
   - whitelabel.feature_toggle
   - whitelabel.footer_config
   - whitelabel.footer_config_column
@@ -1020,9 +1084,13 @@ operations:
   writes:
   - cache:idempotency
   - cache:resolution
+  - whitelabel.booking_flow
   - whitelabel.feature_toggle
+  - whitelabel.footer_config
+  - whitelabel.homepage_layout
   - whitelabel.homepage_section
   - whitelabel.module_enablement
+  - whitelabel.navigation_config
   - whitelabel.navigation_item
   - whitelabel.tenant_config
 - operation: restoreKioskConfigVersion
@@ -1034,6 +1102,7 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - whitelabel.kiosk_config
   - whitelabel.kiosk_config_attract_slide
   - whitelabel.kiosk_config_start_tile
@@ -1203,6 +1272,7 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - whitelabel.kiosk_config
   writes:
   - cache:idempotency
@@ -1231,6 +1301,8 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - whitelabel.content_page
+  - whitelabel.module_enablement
   - whitelabel.tenant_config
   writes:
   - cache:idempotency
@@ -1245,14 +1317,16 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - control.contract
   - control.licence_add_on
-  - subscription.contract
-  - subscription.plan
+  - control.plan
   - whitelabel.module_enablement
+  - whitelabel.tenant_config
   writes:
   - cache:idempotency
   - cache:resolution
   - whitelabel.module_enablement
+  - whitelabel.tenant_config
 - operation: setNavigation
   verb: PUT
   path: /tenant-config/navigation
@@ -1293,8 +1367,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - whitelabel.custom_domain
   writes:
+  - cache:idempotency
   - whitelabel.custom_domain
 - operation: setPublishReviewPolicy
   verb: PUT
@@ -1305,8 +1381,11 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - whitelabel.publish_review_policy
   writes:
+  - approvals.matrix
+  - cache:idempotency
   - whitelabel.publish_review_policy
 - operation: setSiteSetupProgress
   verb: PUT
@@ -1317,6 +1396,7 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - whitelabel.config_version
   - whitelabel.site_setup_progress
   writes:
@@ -1331,6 +1411,7 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - whitelabel.store_account
   writes:
   - cache:idempotency
@@ -1359,10 +1440,12 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - whitelabel.guided_choice
   - whitelabel.guided_choice_answer
   - whitelabel.guided_choice_question
   writes:
+  - cache:idempotency
   - whitelabel.guided_choice
 - operation: updateBanner
   verb: PATCH
@@ -1387,6 +1470,7 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - whitelabel.booking_flow
   - whitelabel.booking_flow_step
   writes:
@@ -1402,9 +1486,11 @@ operations:
   - staff
   offline: false
   reads:
-  - control.content_block
+  - cache:idempotency
+  - whitelabel.content_block
   writes:
-  - control.content_block
+  - cache:idempotency
+  - whitelabel.content_block
 - operation: updateContentPage
   verb: PUT
   path: /tenant-config/pages/{pageId}
@@ -1446,6 +1532,7 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - whitelabel.kiosk_config
   - whitelabel.kiosk_config_attract_slide
   - whitelabel.kiosk_config_start_tile
@@ -1477,6 +1564,7 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - whitelabel.booking_flow
   - whitelabel.booking_flow_step
   writes:
@@ -1491,8 +1579,15 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - whitelabel.booking_flow
   - whitelabel.booking_flow_step
+  - whitelabel.content_page
+  - whitelabel.homepage_section
+  - whitelabel.module_enablement
+  - whitelabel.navigation_config
+  - whitelabel.navigation_item
+  - whitelabel.publish_review_policy
   - whitelabel.tenant_config
   writes:
   - cache:idempotency

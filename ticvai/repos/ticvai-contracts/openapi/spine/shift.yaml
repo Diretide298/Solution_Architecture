@@ -221,6 +221,7 @@ paths:
       x-ticvai-consumed-by:
         - "P04 POS-007 Close Shift"
         - "P04 POS-009 Staff Roster"
+        - "P04 POS-016 Till Configuration"
         - "P04 POS-019 Shift Templates & Policies"
         - "P04 POS-025 Till Home"
         - "P06 EMP-008 Shift summary"
@@ -284,8 +285,8 @@ paths:
         - "P04 POS-001 Begin Shift"
       x-ticvai-read-via:
       - query: tenancy#deviceRecords
-        route: in-process
-        for: 'its read of the registered device, Tenancy''s data (CHG-MOD-001; R8 lineage request)'
+        route: service
+        for: 'its read of the registered device, Tenancy''s data, through Tenancy''s service route, the only one the query serves (CHG-MOD-001; R8 lineage request; CHG-R8INT-005)'
       - query: identity#principalRecords
         route: in-process
         for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
@@ -437,6 +438,7 @@ paths:
       x-ticvai-consumed-by:
         - "P04 POS-001 Begin Shift"
         - "P04 POS-007 Close Shift"
+        - "P04 POS-016 Till Configuration"
         - "P08 BO-1065 Currency, Timezone & Channels"
       x-ticvai-read-via:
       - query: tenancy#denominationRecords
@@ -1134,6 +1136,8 @@ paths:
       operationId: reopenShift
       x-ticvai-consumed-by:
         - "P04 POS-025 Till Home"
+      # The first count is left where the first close wrote it; reopening reads and writes no count line (r8 integration, CHG-R8INT-014; check-parameter-columns P-NAMED-TABLE).
+      x-ticvai-names-for-context: [orders.cash_count_line]
       x-ticvai-audience: [staff]
       summary: Reopen a shift closed in error
       description: >
@@ -1216,8 +1220,8 @@ paths:
           description: >
             Shift is not closed (problem type `shift-not-closed`), the fiscal period has closed
             over it (`fiscal-period-closed`), or another shift is now open or suspended on the same
-            workstation (`shift-already-open`: the check `openShift` makes, under the same lock, so
-            two shifts are never open on one till)
+            till (`shift-already-open`: the check `openShift` makes on the shift rows, under the same lock,
+            so two shifts are never open on one till)
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
@@ -1796,7 +1800,12 @@ paths:
         raised to the supervisors holding OVERSHORT_ACCEPT at the venue, on the venue's alerting
         channel (`tenancy.VenueSettings.alerting`); the shift appears on BO-040 and on the till's
         exceptions list (POS-020) for a supervisor, and the supervisor sees counted, expected and
-        variance there (`getShift`, `closeShift`, `acceptShiftVariance`). The cashier may give a
+        variance there (`getShift`, `closeShift`, `acceptShiftVariance`). **The alert itself is read only by
+        those it is for** (decided 20 October 2026, Chinmay, R8 blocker cause APPROVALS-TENANCY-C36, option A;
+        CHG-R8SPN-020): reporting's `listAlerts` returns a shift-variance alert, with its observed value and
+        threshold, only to a caller holding one of the alert rule's recipient roles or OVERSHORT_ACCEPT at the
+        venue; any other caller, the shift's own cashier among them, gets no such alert at all (POS-025's
+        banner simply shows fewer). The cashier may give a
         reason and a note with the count (`cashierReason`, `notes`; DI-803) without being told the
         amount. **A recount the supervisor asks for** (DI-804) is submitted the same way from
         `pendingVariance`; every count is kept (`CashCountLine`, `countKind` close) and the latest
@@ -2151,6 +2160,14 @@ paths:
         warning never blocks a sale, and the cashier is told only that the drawer is over its limit, not
         what it holds (CHG-FIN-003). A supervisor recording the lift counts what they take, which makes it
         counted cash.
+
+        **Offline, the till journals the movement and replays this same call** (decided 20 October 2026,
+        Chinmay, R8 blocker cause FOUNDATION-AI-C13, option A; CHG-R8SPN-021). On reconnect the journal calls
+        `createCashMovement` itself, with the `Idempotency-Key` the movement was taken with and its
+        `recordedAt` (when it happened at the till), so a replay sent twice records it once. It is not part
+        of `syncOrders`. A replay refused `409 shift-not-open` or `lift-exceeds-float` is not retried: the till
+        quarantines it through `recordSyncRejection` with `kind` `cashMovement` and the request body as the
+        `payload`, and a supervisor resolves it on the sync rejections list like any other.
       tags: [cash]
       x-ticvai-permission: CASH_LIFT
       x-ticvai-scope-level: venue
@@ -2283,7 +2300,7 @@ components:
         openingFloat: { $ref: '#/components/schemas/DepositBox/properties/openingFloat' }
         openingDenominations: { $ref: '#/components/schemas/DepositBox/properties/openingDenominations' }
         withdrawnTotal: { $ref: '#/components/schemas/DepositBox/properties/withdrawnTotal' }
-        overDrawerLimit: { $ref: '#/components/schemas/DepositBox/properties/overDrawerLimit' }
+        overDrawerLimit: { $ref: '#/components/schemas/DepositBox/properties/overDrawerLimit', readOnly: true }  # computed on read, never sent (CHG-R8INT-015)
         foreignHoldings: { $ref: '#/components/schemas/DepositBox/properties/foreignHoldings' }
         expectedTotal: { $ref: '#/components/schemas/DepositBox/properties/expectedTotal' }
         countedTotal: { $ref: '#/components/schemas/DepositBox/properties/countedTotal' }
@@ -2535,9 +2552,11 @@ components:
         total:
           allOf:
             - $ref: '../shared/common.yaml#/components/schemas/Money'
+          x-ticvai-column: counted_value
           description: >
             `count` times the face value, in the denomination's currency. Optional on the way in (the
-            server computes it) and checked when sent.
+            server computes it) and checked when sent. Stored as `orders.cash_count_line.counted_value`
+            (r8 integration, CHG-R8INT-005).
 
     CashCountLine:
       x-ticvai-persistence: "orders.cash_count_line"

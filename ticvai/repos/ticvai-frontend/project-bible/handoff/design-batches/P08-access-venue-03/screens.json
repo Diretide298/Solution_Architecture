@@ -123,7 +123,10 @@
      "from": "BO-095"
     }
    ],
-   "coldEntry": "Resolves from the session; a cold arrival is the ordinary case."
+   "coldEntry": "Resolves from the session; a cold arrival is the ordinary case.",
+   "preloaded": [
+    "VenueSettings.calendarDayStartHour"
+   ]
   },
   "wireframe": {
    "status": "notStarted",

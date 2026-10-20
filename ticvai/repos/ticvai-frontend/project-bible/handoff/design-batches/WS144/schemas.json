@@ -462,6 +462,7 @@
  },
  "LoyaltyProgramme": {
   "x-ticvai-persistence": "marketing.loyalty_programme + marketing.points_earning_rule + marketing.programme_tier",
+  "x-ticvai-rls": "read-beneath",
   "type": "object",
   "required": [
    "id",
@@ -581,7 +582,7 @@
   }
  },
  "MarketingBadge": {
-  "x-ticvai-rls": "grant-holder-read",
+  "x-ticvai-rls": "signed-in-read",
   "type": "object",
   "x-ticvai-persistence": "marketing.badge",
   "description": "**Taken from the backend workbook, 20 September.** Defines a digital badge that can be awarded to a customer for challenge completion or other engagement achievement.",
@@ -672,7 +673,13 @@
    "sourceType": {
     "type": "string",
     "maxLength": 30,
-    "nullable": true
+    "nullable": true,
+    "enum": [
+     "challenge",
+     "purchase",
+     "manager"
+    ],
+    "description": "Why the badge was awarded (R8 blocker ORDERS-MONEY-C14): `challenge` (a completed challenge, `challengeId` set), `purchase` (`sourceReferenceId` the order), `manager` (awarded by hand, as BO-826 does)."
    },
    "sourceReferenceId": {
     "type": "string",
@@ -691,7 +698,13 @@
    "status": {
     "readOnly": true,
     "type": "string",
-    "maxLength": 20
+    "maxLength": 20,
+    "enum": [
+     "awarded",
+     "expired",
+     "revoked"
+    ],
+    "description": "Written by the server, never sent (R8 blocker ORDERS-MONEY-C14). `awardBadge` stores `awarded`. `expired` is worked out when the badge is read, from `expiresAt` in the past (no job rewrites the row). `revoked` is reserved: no operation revokes a badge yet."
    }
   }
  },
@@ -883,7 +896,7 @@
  "MarketingProgrammeTier": {
   "type": "object",
   "x-ticvai-persistence": "marketing.programme_tier",
-  "description": "**The tier definition decision 8 promised and nobody built.** `marketing.loyalty_position` carried `tierCode`, `tierName` and `pointsToNextTier` as denormalised strings and a number, with no table saying what tiers exist or what each one requires — so `pointsToNextTier` was computed from a threshold that lived nowhere.\n**Not named `marketing.loyalty_tier`**: that name is recorded in `schema-history.json` as renamed to `marketing.points_earning_rule` on 20 September, and a rename record that contradicts the schema is worse than a longer name. Not named `marketing.tier` either, because `subscription.tier_allowance` is a SaaS plan's tier and one bare `tier` in a package with two tier concepts is how `plan_id` came to point at `subscription.plan`.\n**The denormalised copy on the position stays.** A till rendering *Gold* beside a balance must not join, and must certainly not cross a cell boundary to print a word. This table is the source of truth and those columns are its cache.\n",
+  "description": "**The tier definition decision 8 promised and nobody built.** `marketing.loyalty_position` carried `tierCode`, `tierName` and `pointsToNextTier` as denormalised strings and a number, with no table saying what tiers exist or what each one requires — so `pointsToNextTier` was computed from a threshold that lived nowhere.\n**Not named `marketing.loyalty_tier`**: that name is recorded in `schema-history.json` as renamed to `marketing.points_earning_rule` on 20 September, and a rename record that contradicts the schema is worse than a longer name. Not named `marketing.tier` either, because the control database's tier allowance is a SaaS plan's tier and one bare `tier` in a package with two tier concepts is how `plan_id` came to point at the SaaS plan catalogue.\n**The denormalised copy on the position stays.** A till rendering *Gold* beside a balance must not join, and must certainly not cross a cell boundary to print a word. This table is the source of truth and those columns are its cache.\n",
   "required": [
    "loyaltyProgrammeId",
    "code",

@@ -26,6 +26,9 @@ The bundle holds:
   unexplained  pushed tickets that left the plan with no reason in op-retire.py: listed, never touched
   successors   team.json `successors` in OpenProject names (a person who left -> who took their place): a New
                ticket's field still on a leaver goes to the successor when the plan's person has no account yet
+  held         plan tickets the lead holds (docs/active/held-tasks.yaml, CHG-R8DEC-004): a task and its sub-tasks keep
+               their key and row, and carry `hold` (the comment); op-release.rb sets a New one On hold, off the board
+               (no assignee, no sprint, as op-retire's Deferred), never reopens it, and lists a started one untouched
 
 **Pointer bodies (C7).** OpenProject holds who, when, state and order; the package, served by ADAM at a release
 tag, holds what. A ticket's description becomes a pointer: a one-line summary, its key, the artefact ids it
@@ -67,6 +70,8 @@ POINTER_PREFIX = "Pull via ADAM:"               # a description holding this lin
 RELEASE_PREFIX = "- Written at release "        # the one pointer line that may differ without a rewrite
 COMMENT_MARKER = "The spec for this ticket lives in ADAM"   # the one comment a started ticket gets, found by it
 REOPEN_MARKER = "Back in the plan"              # an On hold plan ticket set back to New, with one comment
+HOLD_MARKER = "On hold in the plan"             # a held plan ticket set On hold, with one comment (CHG-R8DEC-004)
+HELD = ROOT / "docs" / "active" / "held-tasks.yaml"
 MAX_BUILDS = 60
 ARCHIVED_PROJECT = 153                          # the old project, archived at the fresh start of 3 October
 LAST_SPRINT = 13                                # Sprint 13 ends 2 April 2027; later work is planned into it
@@ -100,6 +105,46 @@ def successors_op() -> dict:
     sp = _load("sprint_plan", "sprint_plan.py")
     team_ = json.loads((ROOT / "docs" / "active" / "team.json").read_text(encoding="utf-8"))
     return {OP_NAME.get(a, a): OP_NAME.get(b, b) for a, b in sorted(sp.successors(team_).items())}
+
+
+def load_held(path=None):
+    """**Plan tasks the lead holds** (docs/active/held-tasks.yaml; the lead, 20 October 2026, CHG-R8DEC-004): {key: the
+    hold it is in}. A hold keeps the task in the plan (its key, its row, its place in the schedule) and only changes what
+    the release push does with its ticket: op-release.rb used to put an On hold plan ticket back to New ("Back in the
+    plan"), so a hold made in OpenProject alone was undone by the next push. Returns (holds, problems); no file, no holds.
+    """
+    import yaml
+    path = HELD if path is None else Path(path)
+    if not path.exists():
+        return {}, []
+    doc = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+    out, problems = {}, []
+    for hid, h in sorted((doc.get("holds") or {}).items()):
+        h = h or {}
+        dec = h.get("decided") or {}
+        miss = [f for f in ("reason", "until") if not str(h.get(f) or "").strip()]
+        miss += [f"decided.{f}" for f in ("by", "date", "quote") if not str(dec.get(f) or "").strip()]
+        if miss:
+            problems.append(f"held-tasks.yaml hold {hid}: no {', '.join(miss)}")
+        for k in h.get("keys") or []:
+            if k in out:
+                problems.append(f"held-tasks.yaml: {k} is in two holds ({out[k]['id']}, {hid})")
+            out[k] = {"id": hid, "reason": " ".join(str(h.get("reason") or "").split()),
+                      "until": " ".join(str(h.get("until") or "").split()), "decided": dec}
+    return out, problems
+
+
+def hold_note(h, release):
+    """The one comment a held ticket gets when the push sets it On hold."""
+    d = h["decided"]
+    try:
+        day = datetime.strptime(str(d.get("date")), "%Y-%m-%d")
+        when = f"{day.day} {day:%B %Y}"
+    except ValueError:
+        when = str(d.get("date"))
+    return (f"**{HOLD_MARKER}** (release {release}; decided by {d.get('by')} on {when}): "
+            f"{h['reason']} The ticket keeps its key and stays in the plan, off the board (no assignee, no sprint) "
+            f"until {h['until']}; then a release puts it back to New. Nobody builds it before that.")
 
 
 def pushed(mp):
@@ -186,10 +231,16 @@ def shared_ids(ids):
     return {v: sorted(ks) for v, ks in by_id.items() if len(ks) > 1}
 
 
-def build(rows, mp, sched, lineage, retire_plan, unexplained, release):
-    """The bundle, from the plan rows, the map and the schedule. No files read or written: tests call this."""
+def build(rows, mp, sched, lineage, retire_plan, unexplained, release, held=None):
+    """The bundle, from the plan rows, the map and the schedule. No files read or written: tests call this.
+    `held`: load_held()'s {task key: hold}; each held task and its sub-tasks carry `hold`, the comment (CHG-R8DEC-004)."""
     ids = pushed(mp)
     errors = []
+    held = held or {}
+    tasks_ = {r["key"] for r in rows if r["type"] == "Task"}
+    for k in sorted(set(held) - tasks_):
+        errors.append(f"held-tasks.yaml holds {k}, which is not a task in the plan (a hold keeps a planned task; "
+                      "a task that left the plan is op-retire's)")
     for i, ks in sorted(shared_ids(ids).items()):
         errors.append(f"id #{i} is mapped to {len(ks)} keys: {', '.join(ks)} (repair pms-map.json first)")
     by_key = {r["key"]: r for r in rows}
@@ -257,7 +308,8 @@ def build(rows, mp, sched, lineage, retire_plan, unexplained, release):
                                what=(r.get("description") or "") if (not builds or (typ != "Sub Task"
                                      and _done.listed_builds(r.get("description")))) else "",
                                done=done_when(r, part, builds) if typ != "Sub Task" or builds else "",
-                               carry=carry)})
+                               carry=carry),
+            "hold": hold_note(held[base], release) if base in held else None})
 
     for r in rows:
         add(r["key"], r["type"], r["parent"], r["subject"], r, "")
@@ -313,7 +365,7 @@ def build(rows, mp, sched, lineage, retire_plan, unexplained, release):
     bundle = {
         "release": release, "project": push.PROJECT, "field": push.PRIORITY_NO,
         "statuses": {"new": 1, "on_hold": 13, "rejected": 14},
-        "reopen_marker": REOPEN_MARKER,
+        "reopen_marker": REOPEN_MARKER, "hold_marker": HOLD_MARKER,
         "author": "Chinmay Parab", "aliases": OP_NAME, "successors": successors_op(),
         "markers": {"pointer": POINTER_PREFIX, "release": RELEASE_PREFIX, "comment": COMMENT_MARKER},
         "comment": comment(release),
@@ -343,6 +395,8 @@ def counts(b):
         "with_builds": sum(1 for t in b["tickets"] if t["builds"]),
         "links": len(b["links"]), "edges": len(b["edges"]), "tasks": len(b["tasks"]),
         "retire": dict(Counter(r["action"] for r in b["retire"])), "unexplained": len(b["unexplained"]),
+        "held": dict(Counter(t["type"] for t in b["tickets"] if t.get("hold"))),
+        "held_pushed": sum(1 for t in b["tickets"] if t.get("hold") and t["key"] in b["ids"]),
     }
 
 
@@ -424,6 +478,27 @@ def op10_problems():
             for rx, why in OP10_FORBIDDEN if rx.search(line) and not line.lstrip().startswith("#")]
 
 
+# **A held ticket is never reopened** (CHG-R8DEC-004). The assign phase of op-release.rb puts an On hold plan ticket
+# back to New ("Back in the plan"); a ticket the bundle marks `hold` must be left out of that, and out of the
+# assignment that follows. The server script cannot be run here, so its source is held to these lines, as OP10_FORBIDDEN
+# holds it to what OpenProject 10 can run; tools/tests/test_op_release.py proves a reopen without the guard is caught.
+HOLD_REQUIRED = [
+    (re.compile(r"^\s*reopen\s*=\s*tickets\b.*status_hold.*&&\s*!held_keys\.include\?\(t\[\"key\"\]\)"),
+     "the reopen of On hold plan tickets (\"Back in the plan\") does not leave out the held ones "
+     "(&& !held_keys.include?(t[\"key\"])): the push would undo the lead's hold"),
+    (re.compile(r"^\s*held_keys\s*=.*\[\"hold\"\]"), "held_keys is not built from the bundle tickets' `hold`"),
+    (re.compile(r"^\s*next if held_keys\.include\?\(t\[\"key\"\]\)"),
+     "the assignment (and the descriptions) do not skip held tickets: a held ticket would be given a person and a sprint"),
+]
+
+
+def hold_problems(rb=None):
+    """What op-release.rb lacks of the hold (HOLD_REQUIRED), as refusals; [] when every line is there."""
+    rb = (ROOT / "tools" / "op-release.rb").read_text(encoding="utf-8") if rb is None else rb
+    code = [l for l in rb.splitlines() if not l.lstrip().startswith("#")]
+    return [f"tools/op-release.rb: {why}" for rx, why in HOLD_REQUIRED if not any(rx.search(l) for l in code)]
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--release", help="the tag the pointers are written at (r1, r2, ...); default: the tag on HEAD")
@@ -447,7 +522,9 @@ def main() -> int:
     _, retire_plan, unexplained = op_retire.build_plan(release, day)
     retire_plan, unexplained = regroup(rows, mp, retire_plan, unexplained, release, day=day)
 
-    bundle, errors = build(rows, mp, sched, lineage, retire_plan, unexplained, release)
+    held, held_errors = load_held()
+    bundle, errors = build(rows, mp, sched, lineage, retire_plan, unexplained, release, held)
+    errors += held_errors + hold_problems()
     # **Fresh start** (Chinmay, 3 October, CHG-GTR-001): r1 goes into a NEW OpenProject project; project 153's map
     # is in service-docs/archive/ and pms-map.json starts empty. An empty map run against 153 would create every
     # ticket a second time in the archived project, so the new project's id must be named.
@@ -480,10 +557,13 @@ def main() -> int:
         return 1
 
     commit = git("rev-parse", "HEAD")
-    dirty = bool(git("status", "--porcelain", "--", *(f"handoff/service-docs/{f}" for f in INPUTS)))
+    dirty = bool(git("status", "--porcelain", "--", *(f"handoff/service-docs/{f}" for f in INPUTS),
+                     "docs/active/held-tasks.yaml"))
     # The git blob id each input will have once committed (hash-object applies the same line-ending filter a
     # commit does). op-release-server.sh compares them with the files at the tag and refuses a stale bundle.
     inputs = {f: git("hash-object", f"handoff/service-docs/{f}") for f in INPUTS}
+    if HELD.exists():   # the holds too (CHG-R8DEC-004): op-release-server.sh compares it with the tag's
+        inputs["held-tasks.yaml"] = git("hash-object", "docs/active/held-tasks.yaml")
     bundle = {"release": bundle.pop("release"), "built_from": commit + ("+local-changes" if dirty else ""),
               "built_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"), "inputs": inputs, **bundle}
     Path(a.out).write_text(json.dumps(bundle, indent=0, ensure_ascii=False), encoding="utf-8")
@@ -494,6 +574,8 @@ def main() -> int:
     print(f"  pointers {c['tickets']} ({c['with_builds']} name artefact ids)")
     print(f"  links {c['links']} to have ({c['edges']} plan waits over {c['tasks']} tasks, for pruning)")
     print(f"  leaving the plan {sum(c['retire'].values())} {c['retire']}; unexplained {c['unexplained']} (not touched)")
+    print(f"  held in the plan {sum(c['held'].values())} {c['held']} ({c['held_pushed']} pushed; the server sets a New "
+          f"one On hold, leaves a started one): {len(held)} task(s) in docs/active/held-tasks.yaml")
     print(f"  -> {a.out}")
     kinds = Counter(unexplained_kind(u) for u in bundle["unexplained"])
     if kinds:

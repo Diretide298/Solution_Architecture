@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Promotions & Bundles
   version: 0.1.0
-  x-ticvai-screen-count: 134
+  x-ticvai-screen-count: 135
   x-ticvai-tier: satellite
   x-ticvai-module: 4 — Bundles and Promotions
   x-ticvai-requirements: 229
@@ -1410,9 +1410,6 @@ paths:
         type: string
     get:
       operationId: getCouponCode
-      x-ticvai-consumed-by:
-        - "P01 WEB-010 Shopping Cart"
-        - "P02 GST-037 Offers & Promotions"
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -1445,6 +1442,104 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CouponCode'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /guest-coupon-codes/{code}:
+    parameters:
+    - name: code
+      in: path
+      required: true
+      schema:
+        type: string
+    get:
+      operationId: getGuestCouponCode
+      x-ticvai-consumed-by:
+        - "P01 WEB-010 Shopping Cart"
+        - "P02 GST-037 Offers & Promotions"
+      x-ticvai-audience:
+      - guest
+      security:
+      - guestAuth: []
+      x-ticvai-read-routing: primary
+      summary: What a guest is told about a coupon code
+      description: 'A guest''s check of a code before applying it (R8 blocker ORDERS-MONEY-C32, the lead''s answer A of
+        20 October 2026; GST-037). Answers `GuestCouponCode`: the code, its status, whether it can be applied now and
+        why not, the discount and the validity window, never its campaign, batch, assignee, assignment, counts or the
+        order it was redeemed on. `getCouponCode` stays the staff read and is unchanged.
+
+        **The rule, on what is stored** (a coupon campaign has `is_active`, `valid_from` and `valid_to` and no link to
+        a promotion): an unknown code is 404. A known code is 200, and when it cannot be applied `invalidReason` is
+        `expired`, `notYetValid`, `voided` (also when the campaign is not active), `alreadyRedeemed` (the guest''s own
+        redemption), `notAssignedToGuest` (assigned to someone else, without saying to whom) or `wrongVenue` (only
+        when `venueId` is sent and the code is not valid there). A guest needs no permission; the code is what the
+        guest holds, and the existing `429` limits stop guessing.'
+      tags:
+      - coupon
+      x-ticvai-permission: null
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - name: venueId
+        in: query
+        required: false
+        description: The venue the guest is buying at, so `wrongVenue` can be answered; a guest session carries no venue.
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: The guest's view of the code.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GuestCouponCode'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /guest-bundles/{bundleId}:
+    parameters:
+    - name: bundleId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    get:
+      operationId: getGuestBundle
+      x-ticvai-consumed-by:
+        - "P01 WEB-008 Add-ons & Upsell"
+        - "P02 GST-004 Item Detail"
+        - "P02 GST-056 Bundle Package"
+      x-ticvai-audience:
+      - guest
+      # Public, with an optional token, as getBundle: a visitor browses before signing in.
+      security:
+      - {}
+      - guestAuth: []
+      x-ticvai-read-routing: replica
+      summary: What a guest is shown of a bundle
+      description: 'A published bundle as a guest or a visitor sees it (R8 blocker ORDERS-MONEY-C32, the lead''s answer A
+        of 20 October 2026; GST-004, GST-056, WEB-008). Answers `GuestBundle`: name, description, kind, price and
+        savings, components and choice groups, and validity, never the allocation, owner, campaign, code or whether it
+        has been sold. A bundle in draft, unpublished or withdrawn answers 404. `getBundle` stays the staff read and
+        is unchanged. Published catalogue data, so no permission is needed.'
+      tags:
+      - bundle
+      x-ticvai-permission: null
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: The guest's view of the bundle.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GuestBundle'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '429':
@@ -1827,9 +1922,6 @@ paths:
     get:
       operationId: getBundle
       x-ticvai-consumed-by:
-        - "P01 WEB-008 Add-ons & Upsell"
-        - "P02 GST-004 Item Detail"
-        - "P02 GST-056 Bundle Package"
         - "P08 ADM-180 Bundle Component Builder"
         - "P08 ADM-181 Guest Choice & Build-Your-Own Bundle Designer"
         - "P08 ADM-187 Bundle Preview, Simulation & AI Recommendation"
@@ -10197,6 +10289,89 @@ components:
           type: string
           nullable: true
           description: The channel's last rejection, while status is `publicationFailed` or `outOfSync`.
+    GuestCouponCode:
+      x-ticvai-persistence: none — guest projection of promotions.coupon_code and its campaign
+      type: object
+      description: '**What a guest may see of a coupon code** (R8 blocker ORDERS-MONEY-C32), as `GuestPromotion` is
+        for a promotion: never the campaign, batch, assignee, assignment, redemption counts or the order it was
+        redeemed on. `additionalProperties: false` is the point.'
+      additionalProperties: false
+      required:
+      - code
+      - status
+      properties:
+        code:
+          type: string
+        status:
+          $ref: '#/components/schemas/CouponStatus'
+        isValid:
+          type: boolean
+          description: True when the code can be applied now; else `invalidReason` says why.
+        invalidReason:
+          type: string
+          nullable: true
+          enum:
+          - expired
+          - notYetValid
+          - voided
+          - alreadyRedeemed
+          - notAssignedToGuest
+          - wrongVenue
+        discount:
+          $ref: '#/components/schemas/Discount'
+        validFrom:
+          type: string
+          format: date-time
+          nullable: true
+        validTo:
+          type: string
+          format: date-time
+          nullable: true
+    GuestBundle:
+      x-ticvai-persistence: none — guest projection of promotions.bundle and its components
+      type: object
+      description: '**What a guest may see of a bundle** (R8 blocker ORDERS-MONEY-C32), as `GuestPromotion` is for a
+        promotion: never the allocation, owner, campaign, code or whether it has been sold.
+        `additionalProperties: false` is the point.'
+      additionalProperties: false
+      required:
+      - id
+      - name
+      - price
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        description:
+          type: string
+          nullable: true
+        kind:
+          $ref: '#/components/schemas/BundleKind'
+        price:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        savingsAmount:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        savingsPercentage:
+          type: number
+          nullable: true
+        components:
+          type: array
+          items:
+            $ref: '#/components/schemas/BundleComponent'
+        choiceGroups:
+          type: array
+          items:
+            $ref: '#/components/schemas/BundleChoiceGroup'
+        validFrom:
+          type: string
+          format: date-time
+          nullable: true
+        validTo:
+          type: string
+          format: date-time
+          nullable: true
     GuestPromotion:
       x-ticvai-persistence: none — guest projection of promotions.promotion
       type: object
@@ -11129,6 +11304,16 @@ components:
           id:
             type: string
             format: uuid
+          variantId:
+            type: string
+            format: uuid
+            nullable: true
+            readOnly: true
+            x-ticvai-references: catalogue.variant
+            description: '**The catalogue variant a cart line of this bundle names** (R8 blocker ORDERS-MONEY-C43,
+              CHG-R8MIG-023): each sold bundle has a catalogue product of kind bundle with one variant, made when the
+              bundle is published; `addCartLine` sends it as `variantId`, with the picks in `attributes.bundle`. Null
+              until published.'
           savingsAmount:
             allOf:
             - $ref: ../shared/common.yaml#/components/schemas/Money

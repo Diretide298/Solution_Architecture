@@ -41,21 +41,22 @@
     "PTR-042"
    ],
    "fromFlows": true,
+   "notes": "**Landing table** (the lead, 20 October 2026, r8 cause IDENTITY-C07, option A). The door has no launcher: its approved exits are where sign-in lands, chosen by permission. After sign-in, the second factor when demanded and the role prompt, the door opens the first of these the partner may open: PTR-002 Partner Dashboard (ORDER_VIEW), then PTR-005 Inventory & Allocation View (PRODUCT_VIEW), then PTR-021 Support & Contact (CASE_VIEW); a platform operator holding PLATFORM_TENANT_VIEW lands on PTR-022. Every other exit is reached from the portal's own navigation after landing. Someone who may open none of them stays on the door with \"Your account has no section in the partner portal; ask your administrator\".",
    "transitions": [
     {
      "to": "PTR-002",
      "trigger": "Partner Dashboard",
-     "provenance": "structural — PTR-001 is P10's home screen and its exits are its launcher"
+     "provenance": "landing target (r8, IDENTITY-C07, the lead's option A): not a control on the sign-in form; after sign-in the door opens the first screen of the landing table (navigation.notes) the partner may open, and this screen is reached from there"
     },
     {
      "to": "PTR-003",
      "trigger": "Profile & Company Details",
-     "provenance": "structural — PTR-001 is P10's home screen and its exits are its launcher"
+     "provenance": "landing target (r8, IDENTITY-C07, the lead's option A): not a control on the sign-in form; after sign-in the door opens the first screen of the landing table (navigation.notes) the partner may open, and this screen is reached from there"
     },
     {
      "to": "PTR-004",
      "trigger": "Notifications",
-     "provenance": "structural — PTR-001 is P10's home screen and its exits are its launcher"
+     "provenance": "landing target (r8, IDENTITY-C07, the lead's option A): not a control on the sign-in form; after sign-in the door opens the first screen of the landing table (navigation.notes) the partner may open, and this screen is reached from there"
     },
     {
      "to": "PTR-022",
@@ -140,22 +141,22 @@
     {
      "to": "PTR-007",
      "trigger": "Availability Search",
-     "provenance": "structural — PTR-001 is P10's home screen and its exits are its launcher"
+     "provenance": "landing target (r8, IDENTITY-C07, the lead's option A): not a control on the sign-in form; after sign-in the door opens the first screen of the landing table (navigation.notes) the partner may open, and this screen is reached from there"
     },
     {
      "to": "PTR-032",
      "trigger": "Commercial Agreement Command Center",
-     "provenance": "structural — PTR-001 is P10's home screen and its exits are its launcher"
+     "provenance": "landing target (r8, IDENTITY-C07, the lead's option A): not a control on the sign-in form; after sign-in the door opens the first screen of the landing table (navigation.notes) the partner may open, and this screen is reached from there"
     },
     {
      "to": "PTR-042",
      "trigger": "Partner Operations Command Center",
-     "provenance": "structural — PTR-001 is P10's home screen and its exits are its launcher"
+     "provenance": "landing target (r8, IDENTITY-C07, the lead's option A): not a control on the sign-in form; after sign-in the door opens the first screen of the landing table (navigation.notes) the partner may open, and this screen is reached from there"
     },
     {
      "to": "PTR-005",
      "trigger": "Books against the allocation",
-     "provenance": "flow F10 step 1→2",
+     "provenance": "landing target (r8, IDENTITY-C07): a partner whose first permitted screen is the allocation view lands here. F10 no longer starts at this door: it runs PTR-002 -> PTR-008 (CHG-WIR-018, CHG-WIR-021)",
      "operation": "login"
     },
     {
@@ -198,7 +199,7 @@
        "kind": "primaryButton",
        "label": "Sign in",
        "operation": "login",
-       "notes": "Sends `LoginRequest`. 409 means this person already holds a session elsewhere (audit R184): the screen says where and since when, and that only a holder of SESSION_FORCE_LOGOUT can end it; signing in never ends the other session.",
+       "notes": "Sends `LoginRequest`. 409 means this person already holds a session elsewhere (audit R184): the screen says where and since when, and that only a holder of SESSION_FORCE_LOGOUT can end it; signing in never ends the other session. **Bound** (ADAM CR-170, 19 October 2026; CHG-CRA-009): the denied state's attempts left is the 401's `attemptsRemaining` (`LoginDeniedProblem`), its \"try again\" time the 429's `Retry-After`; the sessionHeld state's \"since when\" and \"where\" are the 409's `openedAt` and `deviceLabel` (`SessionHeldProblem`). Nothing new shows.",
        "provenance": "contract identity.yaml POST /auth/login"
       },
       {
@@ -346,7 +347,7 @@
    {
     "operationId": "verifyMfaChallenge",
     "contract": "identity",
-    "purpose": "Completes sign-in with the code; the session is usable only after it. Five wrong codes lock step-up (audit R126 (6))",
+    "purpose": "Completes sign-in with the code; the session is usable only after it. Five wrong codes lock step-up (audit R126 (6)); a wrong code's 422 carries `attemptsRemaining` (ADAM CR-170)",
     "trigger": "onAction"
    },
    {
@@ -384,7 +385,9 @@
    "params": [
     {
      "name": "challengeId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "r8 (IDENTITY-C07): made by this form's own sign-in (`createMfaChallenge`); never needed to open the door."
     },
     {
      "name": "providerId",
@@ -393,7 +396,9 @@
     },
     {
      "name": "methodId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "r8 (IDENTITY-C07): picked on this form; never needed to open the door."
     }
    ],
    "coldEntry": "**Needs nothing; that is what makes it the door.** No workstation travels with a browser sign-in (CHG-DOOR-001). `providerId` arrives only on the identity provider's redirect back, with the `code` and `state` that `completeSsoAuthorization` exchanges; an expired or replayed redirect lands on the form with \"That sign-in link has expired; sign in again\"."

@@ -18,12 +18,13 @@ transitions:
   to: scheduled
   operation: updateBanner
   trigger: operation
-  guard: Given a start and end
+  guard: 'startsAt is set. endsAt null means no end: it runs until switched off; when endsAt is set
+    it follows startsAt'
 - from: scheduled
   to: draft
   operation: updateBanner
   trigger: operation
-  guard: Unscheduled before starting
+  guard: Clearing startsAt before it starts returns it to draft
 - from: scheduled
   to: active
   trigger: timer

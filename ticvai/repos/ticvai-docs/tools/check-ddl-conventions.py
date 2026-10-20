@@ -453,7 +453,12 @@ def reads_as_assertion(column: str) -> bool:
 _cache: dict = {}
 # A key may name its target's concept rather than its table (ADR-0056 venue keys, principal actors).
 FK_ALIASES = {"venue": "scope", "region": "scope", "department": "scope", "org_unit": "scope",
-              "scope": "scope", "parent": "", "principal": "principal", "subject": "subject"}
+              "scope": "scope", "parent": "", "principal": "principal", "subject": "subject",
+              # a tenant's subscription is its contract: `control.subscription` became `subscription.contract` on
+              # 20 September ("contract rather than subscription.subscription"), and the contract moved to control
+              # with the plan catalogue on 18 October (ADAM CR-150; CHG-CRA-003), so `control.tenant.subscription_id`
+              # now keys inside one database and is read here for the first time
+              "subscription": ("contract", "subscription")}
 
 TYPES = r"(uuid|text|integer|bigint|smallint|numeric|boolean|timestamptz|timestamp|date|time|jsonb|json|" \
         r"ltree|bytea|interval|inet|char|varchar|character|double|real|serial|bigserial|citext|point|" \
@@ -724,7 +729,7 @@ def main() -> int:
         akey = stem if stem in FK_ALIASES else head if FK_ALIASES.get(head) else None
         if akey:
             alias = FK_ALIASES[akey]
-            if alias and alias not in tname:
+            if alias and not any(a in tname for a in (alias if isinstance(alias, tuple) else (alias,))):
                 guard.add("D-FK-TARGET-NAME", f"{t}.{cols[-1]}", f"{t}.{cols[-1]} references {target}")
             continue
         if not (tname.endswith(stem) or stem.endswith(tname) or head in tname.split("_") or tname in stem

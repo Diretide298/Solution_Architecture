@@ -790,7 +790,8 @@
     "Settlement.currencyCode",
     "Settlement.providerName",
     "Settlement.periodStart",
-    "Settlement.periodEnd"
+    "Settlement.periodEnd",
+    "VenueSettings.calendarDayStartHour"
    ]
   },
   "wireframe": {

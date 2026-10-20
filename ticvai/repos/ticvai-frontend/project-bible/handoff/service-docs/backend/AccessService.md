@@ -254,6 +254,7 @@ Deletes a group. **Refused `409 group-in-use`** while another group is nested un
 No image is stored — a template is. **The template cannot reconstruct the face**, and that is the property that makes retention defensible at all (CF-35, CF-64).
 **The face-capture SDK and the template format are an open value** (decided 28 September, audit R077 (b)): they are those of the facial-reader vendor the client has contracted, and the client names that vendor. Until then the template is carried as the vendor's opaque format and nothing here depends on which one it is.
 
+**How a caller knows it is a re-enrolment, and what the face-on-another-pass refusal is** (R8 blocker fix, ORDERS-MONEY-C15). A subject who already has an active Face Pass **on any pass** is re-enrolling and must send `reasonForReEnrollment` (missing: `422`); a guest screen tells this from `listMyEntitlements`, whose `facePassEnrolmentId` is set when the subject has one, and shows the reason question only then. A face already held by a **different** subject is `409 face-on-another-pass`, whoever asks.
 **Re-enrolment is recorded** (decided 29 September, writers pass): where the subject already has a Face Pass, the call writes one `access.face_reenrolment_attempt` (opaque capture references, never templates) and needs `reasonForReEnrollment`. A new capture within policy of the old one replaces it (`outcome: updated`, `201`); a significantly different one is held (`outcome: pendingReview`, `202`) for `reviewFaceReenrolment`, so nobody can swap another person's face onto a pass at a counter. Every enrolment and re-enrolment also writes an `access.biometric_audit_event`.
 **A guest acts on their own only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-002; `x-ticvai-self-scoped: subject`): a guest caller needs no permission and is answered for their own FacePass enrolment; another guest's enrolment is refused exactly as one that does not exist, never returned. `GUEST_MANAGE` is what a staff caller must hold to act for any guest (ADR-0025).
 
@@ -434,8 +435,12 @@ No image is stored — a template is. **The template cannot reconstruct the face
 | id | string (uuid) | yes | A UUIDv7, matching TicketStatus.ticketId — stable for the life of the ticket and independent of the media carrying it. |
 | templateId | string (uuid) | yes | The definition it was issued against. |
 | productId | string (uuid) | yes |  |
+| productName | string |  | Read with the entitlement, not stored on it (R8 blocker ORDERS-MONEY-C20, CHG-R8MIG-009), as TicketStatus.productName: the product's name from catalogue.product (catalogue#productRecords), in the cal… (read-only) |
+| venueName | string |  | The venue's name, read from platform.scope by venueId; not stored. (read-only) |
+| imageUrl | string (uri) |  | The product's primary image (catalogue.product_media), read with the entitlement; null when the product has none. (read-only; nullable) |
+| guestCategory | string |  | The guest category of the order line it was issued for (adult, child, ...), from the line's variant (catalogue#productRecords); null for an entitlement no order line issued. (read-only; nullable) |
 | orderId | string (uuid) | yes | The order's id, a UUIDv7 as in /orders/{orderId} (orders.sales_order.id). (nullable) |
-| orderLineId | string (uuid) |  |  |
+| orderLineId | string (uuid) |  | The order line it was issued for; the ticket list groups cards by it (CHG-R8MIG-009). |
 | subjectId | string (uuid) | yes | Who holds it. (nullable) |
 | venueId | string (uuid) |  |  |
 | scopePath | string |  |  |
@@ -657,8 +662,12 @@ The QR payload, wallet pass reference or wristband serial. **Separated from `get
 | items[].id | string (uuid) | yes | A UUIDv7, matching TicketStatus.ticketId — stable for the life of the ticket and independent of the media carrying it. |
 | items[].templateId | string (uuid) | yes | The definition it was issued against. |
 | items[].productId | string (uuid) | yes |  |
+| items[].productName | string |  | Read with the entitlement, not stored on it (R8 blocker ORDERS-MONEY-C20, CHG-R8MIG-009), as TicketStatus.productName: the product's name from catalogue.product (catalogue#productRecords), in the cal… (read-only) |
+| items[].venueName | string |  | The venue's name, read from platform.scope by venueId; not stored. (read-only) |
+| items[].imageUrl | string (uri) |  | The product's primary image (catalogue.product_media), read with the entitlement; null when the product has none. (read-only; nullable) |
+| items[].guestCategory | string |  | The guest category of the order line it was issued for (adult, child, ...), from the line's variant (catalogue#productRecords); null for an entitlement no order line issued. (read-only; nullable) |
 | items[].orderId | string (uuid) | yes | The order's id, a UUIDv7 as in /orders/{orderId} (orders.sales_order.id). (nullable) |
-| items[].orderLineId | string (uuid) |  |  |
+| items[].orderLineId | string (uuid) |  | The order line it was issued for; the ticket list groups cards by it (CHG-R8MIG-009). |
 | items[].subjectId | string (uuid) | yes | Who holds it. (nullable) |
 | items[].venueId | string (uuid) |  |  |
 | items[].scopePath | string |  |  |
@@ -727,7 +736,7 @@ The QR payload, wallet pass reference or wristband serial. **Separated from `get
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | X-Consistency-Token | header |  | string | Opaque token returned by a prior write: the database instance and its WAL LSN (SD-025, 29 September; ADR-0040 allows several instances per region, so an LSN alone is ambiguous). |
-| state | query |  | enum (usableNow, upcoming, expired, all) |  |
+| state | query |  | enum (usableNow, upcoming, expired, all) | What each value returns (R8 blocker fix, WHITE-C08), against the entitlement's status (states/entitlement-status.yaml), its validFrom and validTo, and now in the venue's time zone (a null validTo is… |
 | includeShared | query |  | boolean | Entitlements shared with this guest by somebody else (shareEntitlement). |
 | pageSize | query |  | integer |  |
 | cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
@@ -740,8 +749,12 @@ The QR payload, wallet pass reference or wristband serial. **Separated from `get
 | items[].id | string (uuid) | yes | A UUIDv7, matching TicketStatus.ticketId — stable for the life of the ticket and independent of the media carrying it. |
 | items[].templateId | string (uuid) | yes | The definition it was issued against. |
 | items[].productId | string (uuid) | yes |  |
+| items[].productName | string |  | Read with the entitlement, not stored on it (R8 blocker ORDERS-MONEY-C20, CHG-R8MIG-009), as TicketStatus.productName: the product's name from catalogue.product (catalogue#productRecords), in the cal… (read-only) |
+| items[].venueName | string |  | The venue's name, read from platform.scope by venueId; not stored. (read-only) |
+| items[].imageUrl | string (uri) |  | The product's primary image (catalogue.product_media), read with the entitlement; null when the product has none. (read-only; nullable) |
+| items[].guestCategory | string |  | The guest category of the order line it was issued for (adult, child, ...), from the line's variant (catalogue#productRecords); null for an entitlement no order line issued. (read-only; nullable) |
 | items[].orderId | string (uuid) | yes | The order's id, a UUIDv7 as in /orders/{orderId} (orders.sales_order.id). (nullable) |
-| items[].orderLineId | string (uuid) |  |  |
+| items[].orderLineId | string (uuid) |  | The order line it was issued for; the ticket list groups cards by it (CHG-R8MIG-009). |
 | items[].subjectId | string (uuid) | yes | Who holds it. (nullable) |
 | items[].venueId | string (uuid) |  |  |
 | items[].scopePath | string |  |  |
@@ -1743,6 +1756,8 @@ A fourth case is out of scope: pay-per-hour parking unrelated to a ticket runs o
 Revocation removes the plate from the whitelist. A refunded parking entitlement whose plate still opens the barrier is a car park giving away spaces.
 **The body is the change, not the entitlement.** A PATCH carries only what moves — a new plate, or `status: revoked` — through `UpdateParkingEntitlementRequest`. Facility, order and validity window are fixed at purchase and are not resent.
 
+**When the plate may change** (R8 blocker ORDERS-MONEY-C22, CHG-R8MIG-023): while the entitlement is `pending`, `active`, `pushFailed` or `pushed` (a pushed one is pushed again: back to `pending`); a `used`, `expired` or `revoked` one is `409 plate-change-not-allowed`.
+
 |  |  |
 |---|---|
 | Permission | `None` |
@@ -1754,7 +1769,7 @@ Revocation removes the plate from the whitelist. A refunded parking entitlement 
 | Reads | `access.parking_entitlement`, `cache:idempotency` |
 | Writes | `access.parking_entitlement`, `cache:idempotency` |
 | Called by | GST-027, WEB-041 |
-| State model | Parking entitlement ([states/parking-entitlement.yaml](../../../states/parking-entitlement.yaml)): moves `pushFailed` -> `pushed`, `active` -> `revoked`, `pushed` -> `revoked`, `active` -> `pending` |
+| State model | Parking entitlement ([states/parking-entitlement.yaml](../../../states/parking-entitlement.yaml)): moves `pushFailed` -> `pushed`, `active` -> `revoked`, `pushed` -> `revoked`, `active` -> `pending`, `pushed` -> `pending` |
 
 **Parameters**
 
@@ -1793,6 +1808,7 @@ Revocation removes the plate from the whitelist. A refunded parking entitlement 
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Updated, and re-pushed |
+| 409 |  | The plate cannot change in the entitlement's state (used, expired, revoked). |
 | 400 | BadRequest | Validation failed |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
@@ -1901,6 +1917,7 @@ Denies outright regardless of entitlement state. Included in the offline package
 | code | string | yes |  |
 | name | string | yes |  |
 | venueId | string (uuid) | yes |  |
+| accessAreaId | string (uuid) |  | The zone this access point admits to (R8 blocker FOUNDATION-AI-C12, CHG-R8MIG-004): an access.access_area row whose entityType is zone (named for the table it keys, as every key is). (nullable) |
 | scopePath | string |  |  |
 | externalCredentialSources | object |  | BL-108. |
 | scanAnomalyRules | object |  | BL-104. |
@@ -2078,8 +2095,8 @@ Denies outright regardless of entitlement state. Included in the offline package
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `access.access_point`, `access.gate_mode_change` |
-| Writes | `access.access_point`, `access.configuration_change`, `access.gate_mode_change` |
+| Reads | `access.access_point`, `access.gate_mode_change`, `cache:idempotency` |
+| Writes | `access.access_point`, `access.configuration_change`, `access.gate_mode_change`, `cache:idempotency` |
 | Called by | BO-230, SCN-016 |
 
 **Parameters**
@@ -2105,6 +2122,7 @@ Denies outright regardless of entitlement state. Included in the offline package
 | code | string | yes |  |
 | name | string | yes |  |
 | venueId | string (uuid) | yes |  |
+| accessAreaId | string (uuid) |  | The zone this access point admits to (R8 blocker FOUNDATION-AI-C12, CHG-R8MIG-004): an access.access_area row whose entityType is zone (named for the table it keys, as every key is). (nullable) |
 | scopePath | string |  |  |
 | externalCredentialSources | object |  | BL-108. |
 | scanAnomalyRules | object |  | BL-104. |
@@ -2188,6 +2206,7 @@ Enforcement is configurable — `off`, `warn` or `deny` — because GPS accuracy
 | code | string | yes |  |
 | name | string | yes |  |
 | venueId | string (uuid) | yes |  |
+| accessAreaId | string (uuid) |  | The zone this access point admits to (R8 blocker FOUNDATION-AI-C12, CHG-R8MIG-004): an access.access_area row whose entityType is zone (named for the table it keys, as every key is). (nullable) |
 | scopePath | string |  |  |
 | externalCredentialSources | object |  | BL-108. |
 | scanAnomalyRules | object |  | BL-104. |
@@ -2273,6 +2292,7 @@ Podium operation. Changes what the gate does, not who may pass it.
 | code | string | yes |  |
 | name | string | yes |  |
 | venueId | string (uuid) | yes |  |
+| accessAreaId | string (uuid) |  | The zone this access point admits to (R8 blocker FOUNDATION-AI-C12, CHG-R8MIG-004): an access.access_area row whose entityType is zone (named for the table it keys, as every key is). (nullable) |
 | scopePath | string |  |  |
 | externalCredentialSources | object |  | BL-108. |
 | scanAnomalyRules | object |  | BL-104. |
@@ -2359,6 +2379,7 @@ Podium operation. Changes what the gate does, not who may pass it.
 | code | string | yes |  |
 | name | string | yes |  |
 | venueId | string (uuid) | yes |  |
+| accessAreaId | string (uuid) |  | The zone this access point admits to (R8 blocker FOUNDATION-AI-C12, CHG-R8MIG-004): an access.access_area row whose entityType is zone (named for the table it keys, as every key is). (nullable) |
 | scopePath | string |  |  |
 | externalCredentialSources | object |  | BL-108. |
 | scanAnomalyRules | object |  | BL-104. |
@@ -2534,6 +2555,9 @@ Changes take effect at terminals after the next offline package refresh, not imm
 **`GET /parking-entitlements/{entitlementId}`**: One of the guest's parking entitlements
 
 **Added by the r1 gate fix of 3 October 2026 (CHG-R1S-004): the read this write was missing.** WEB-041 and GST-027 change a parking entitlement with `updateParkingEntitlement` and never read it, so the plate and the dates they edit came from nowhere. Self-scoped, as the update is. Returns what the write stores, in the write's own shape.
+**Another guest's entitlement is `404`, exactly as one that does not exist** (Pattern 4; Chinmay, 3 October 2026, CHG-GCF-002): there is no `403` here, so a guest cannot learn that an id belongs to someone else (R8 blocker cause ORDERS-MONEY-C01, CHG-R8SPN-018).
+**A guest's read only** (R8 blocker ORDERS-MONEY-C22, CHG-R8MIG-023): the audience is guest, so a staff session's token is refused 403.
+**The two refusals do not meet** (r8 integration, CHG-R8INT-021): a guest never gets `403` (another guest's entitlement answers `404`, Pattern 4); a staff or partner token is refused `403` because the operation is guest-only, before any entitlement is looked up.
 
 |  |  |
 |---|---|
@@ -2576,7 +2600,6 @@ Changes take effect at terminals after the next offline package refresh, not imm
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | One of the guest's parking entitlements |
-| 403 | Forbidden | Authenticated but not permitted at the requested scope |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
@@ -2609,6 +2632,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | code | text | yes |  |
 | name | text | yes |  |
 | venue_id | uuid | yes |  |
+| access_area_id | uuid | no | The zone this access point admits to (R8 blocker FOUNDATION-AI-C12, CHG-R8MIG-004): an access.access_area row whose entityType is zone (named for the table it keys, as every key is). |
 | scope_path | text | no |  |
 | external_credential_sources | jsonb | no | BL-108. |
 | scan_anomaly_rules | jsonb | no | BL-104. |
@@ -2850,7 +2874,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | template_id | uuid | yes | The definition it was issued against. |
 | product_id | uuid | yes |  |
 | order_id | uuid | no | The order's id, a UUIDv7 as in /orders/{orderId} (orders.sales_order.id). |
-| order_line_id | uuid | no |  |
+| order_line_id | uuid | no | The order line it was issued for; the ticket list groups cards by it (CHG-R8MIG-009). |
 | subject_id | uuid | no | Who holds it. |
 | venue_id | uuid | no |  |
 | scope_path | text | no |  |
@@ -2924,6 +2948,9 @@ Every table this service owns that the slice reads or writes, with its columns a
 | effective_at | timestamptz | no |  |
 | changed_by_principal_id | uuid | yes | Operator |
 | changed_at | timestamptz | yes |  |
+| cancelled_by_principal_id | uuid | no | Who cancelled the pending change (ADAM CR-171, option B, 19 October 2026; CHG-CRA-010), set by cancelGateModeChange from the caller. |
+| cancelled_at | timestamptz | no | When cancelGateModeChange cancelled it (CR-171). |
+| cancel_reason | text | no | The reason sent to cancelGateModeChange (CR-171), kept apart from the scheduler's reason. |
 | scope_path | text | yes | ltree of the owning scope node (ADR-0005) |
 
 ### `access.gate_mode_policy`

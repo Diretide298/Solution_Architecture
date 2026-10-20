@@ -47,6 +47,16 @@ import sys
 
 import yaml
 
+
+def _yload(src):
+    """YAML with the C loader, the pure one where a file defeats it (20 October 2026, CHG-R8GEN-016): the screen files
+    are 25 MB and the pure loader took most of each refresh step's minute; the loaded data is the same."""
+    text = src.read() if hasattr(src, "read") else src
+    try:
+        return yaml.load(text, Loader=getattr(yaml, "CSafeLoader", yaml.SafeLoader))
+    except Exception:
+        return yaml.safe_load(text)
+
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 MINE = "flow "
 
@@ -67,7 +77,7 @@ def main() -> int:
     adopt = "--adopt" in sys.argv
 
     files = sorted(glob.glob(str(ROOT / "screens" / "P*.yaml")))
-    docs = {f: yaml.safe_load(open(f, encoding="utf-8")) for f in files}
+    docs = {f: _yload(open(f, encoding="utf-8")) for f in files}
     screens = {s["id"]: s for d in docs.values() for s in d["screens"]}
     platform = {s["id"]: d["platform"]["code"] for d in docs.values() for s in d["screens"]}
 
@@ -76,7 +86,7 @@ def main() -> int:
         lambda: {"triggers": [], "cites": [], "ops": []})
 
     for f in sorted(glob.glob(str(ROOT / "flows" / "F*.yaml"))):
-        d = yaml.safe_load(open(f, encoding="utf-8")) or {}
+        d = _yload(open(f, encoding="utf-8")) or {}
         steps = d.get("steps") or []
         for a, b in zip(steps, steps[1:]):
             sa, sb = a.get("screen"), b.get("screen")

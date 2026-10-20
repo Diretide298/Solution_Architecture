@@ -1,5 +1,5 @@
 id: LLD-identity
-title: identity — 98 operations
+title: identity — 101 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: spine
@@ -38,14 +38,19 @@ operations:
   - cache:idempotency
   - identity.delegated_access
   - identity.mfa_method
+  - identity.password_policy
   - identity.principal
+  - identity.principal_external_identity
   - identity.role
+  - identity.role_permission
   - identity.sso_group_mapping
   - identity.sso_provider
   writes:
   - cache:idempotency
   - identity.delegated_access
   - identity.principal
+  - identity.principal_external_identity
+  - identity.refresh_token
   - identity.session
   - platform.outbox
 - operation: createAccessReviewCampaign
@@ -79,8 +84,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - identity.authorisation_policy
   writes:
+  - cache:idempotency
   - identity.authorisation_policy
 - operation: createDelegatedAccess
   verb: POST
@@ -111,8 +118,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - identity.access_override
   writes:
+  - cache:idempotency
   - identity.access_override
 - operation: createMfaChallenge
   verb: POST
@@ -253,8 +262,10 @@ operations:
   - service
   offline: false
   reads:
+  - cache:idempotency
   - identity.guest_session
   writes:
+  - cache:idempotency
   - identity.guest_session
 - operation: endOwnSession
   verb: POST
@@ -266,8 +277,10 @@ operations:
   - partner
   offline: false
   reads:
+  - cache:idempotency
   - identity.session
   writes:
+  - cache:idempotency
   - identity.session
 - operation: enrolMfaMethod
   verb: POST
@@ -296,8 +309,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - identity.access_decision
   writes:
+  - cache:idempotency
   - identity.access_decision
 - operation: exportSubjectData
   verb: POST
@@ -334,6 +349,7 @@ operations:
   - identity.password_policy
   - identity.principal
   - identity.principal_credential
+  - identity.role_permission
   - identity.session
   - platform.workstation
   writes:
@@ -365,7 +381,7 @@ operations:
 - operation: getCurrentSession
   verb: GET
   path: /auth/session
-  scope: workstation
+  scope: tenant
   permission: null
   audience:
   - staff
@@ -374,8 +390,10 @@ operations:
   reads:
   - cache:resolution
   - identity.delegated_access
+  - identity.password_policy
   - identity.principal
   - identity.role
+  - identity.role_permission
   - identity.session
   writes:
   - cache:resolution
@@ -386,7 +404,6 @@ operations:
   permission: null
   audience:
   - guest
-  - partner
   offline: true
   reads:
   - identity.guest_session
@@ -465,6 +482,17 @@ operations:
   reads:
   - identity.module_access
   writes: []
+- operation: getSessionVenue
+  verb: GET
+  path: /auth/session/venue
+  scope: tenant
+  permission: null
+  audience:
+  - staff
+  offline: false
+  reads:
+  - identity.session
+  writes: []
 - operation: getSsoConfig
   verb: GET
   path: /tenants/sso-config
@@ -502,8 +530,10 @@ operations:
   - guest
   offline: false
   reads:
+  - cache:idempotency
   - identity.guest_session
   writes:
+  - cache:idempotency
   - identity.guest_session
 - operation: guestPasswordLogin
   verb: POST
@@ -514,11 +544,13 @@ operations:
   - anonymous
   offline: false
   reads:
+  - cache:idempotency
   - identity.guest_credential
   - identity.mfa_method
   - identity.password_policy
   - pii.subject_contact
   writes:
+  - cache:idempotency
   - identity.guest_credential
   - identity.guest_session
   - platform.outbox
@@ -534,10 +566,12 @@ operations:
   - cache:idempotency
   - identity.mfa_method
   - pii.subject_contact
+  - pii.subject_identity
   writes:
   - cache:idempotency
   - identity.guest_session
   - pii.subject
+  - pii.subject_identity
   - platform.outbox
 - operation: guestUaePassLogin
   verb: POST
@@ -551,11 +585,13 @@ operations:
   - cache:idempotency
   - identity.mfa_method
   - pii.subject_contact
+  - pii.subject_identity
   writes:
   - cache:idempotency
   - identity.guest_session
   - pii.subject
   - pii.subject_document
+  - pii.subject_identity
   - platform.outbox
 - operation: linkGuestCheckout
   verb: POST
@@ -622,6 +658,7 @@ operations:
   offline: false
   reads:
   - identity.principal
+  - identity.role
   - identity.session
   writes: []
 - operation: listAuthorisationPolicies
@@ -895,6 +932,16 @@ operations:
   reads:
   - identity.sso_provider
   writes: []
+- operation: listStepUpSupervisors
+  verb: GET
+  path: /auth/step-up-supervisors
+  scope: venue
+  permission: null
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: login
   verb: POST
   path: /auth/login
@@ -912,6 +959,7 @@ operations:
   - identity.principal
   - identity.principal_credential
   - identity.role
+  - identity.role_permission
   writes:
   - cache:idempotency
   - identity.principal_credential
@@ -925,6 +973,7 @@ operations:
   permission: null
   audience:
   - staff
+  - partner
   offline: true
   reads:
   - cache:idempotency
@@ -942,8 +991,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - identity.platform_staff_grant
   writes:
+  - cache:idempotency
   - identity.platform_staff_grant
 - operation: recordBenefitUsage
   verb: POST
@@ -955,8 +1006,10 @@ operations:
   - service
   offline: true
   reads:
+  - cache:idempotency
   - identity.benefit_usage
   writes:
+  - cache:idempotency
   - identity.benefit_usage
 - operation: recordConsentIdentifier
   verb: POST
@@ -966,8 +1019,10 @@ operations:
   audience:
   - service
   offline: false
-  reads: []
+  reads:
+  - cache:idempotency
   writes:
+  - cache:idempotency
   - pii.consent_identifier
 - operation: refreshToken
   verb: POST
@@ -1003,6 +1058,7 @@ operations:
   - cache:idempotency
   - identity.guest_credential
   - identity.guest_session
+  - identity.otp_challenge
   - pii.subject
   - pii.subject_contact
   - platform.outbox
@@ -1115,11 +1171,14 @@ operations:
   permission: null
   audience:
   - staff
+  - partner
   offline: false
   reads:
   - cache:idempotency
   - identity.delegated_access
+  - identity.password_policy
   - identity.role
+  - identity.role_permission
   - identity.session
   writes:
   - cache:idempotency
@@ -1133,8 +1192,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - identity.authorisation_policy
   writes:
+  - cache:idempotency
   - identity.authorisation_policy
 - operation: setCapabilityTemplate
   verb: PUT
@@ -1145,8 +1206,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - identity.capability_template
   writes:
+  - cache:idempotency
   - identity.capability_template
 - operation: setGuestVerificationPolicy
   verb: PUT
@@ -1185,11 +1248,13 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - identity.delegated_access
   - identity.module_access
   - identity.role_permission
   - identity.segregation_rule
   writes:
+  - cache:idempotency
   - identity.module_access
 - operation: setSegregationRules
   verb: PUT
@@ -1206,6 +1271,20 @@ operations:
   writes:
   - cache:idempotency
   - identity.segregation_rule
+- operation: setSessionVenue
+  verb: PUT
+  path: /auth/session/venue
+  scope: tenant
+  permission: null
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - identity.session
+  writes:
+  - cache:idempotency
+  - identity.session
 - operation: setSsoConfig
   verb: PUT
   path: /tenants/sso-config
@@ -1231,8 +1310,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - identity.access_decision
   writes:
+  - cache:idempotency
   - identity.authorisation_policy
 - operation: startProspectSignup
   verb: POST
@@ -1243,8 +1324,10 @@ operations:
   - public
   - prospect
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - cache:idempotency
+  writes:
+  - cache:idempotency
 - operation: startSsoAuthorization
   verb: GET
   path: /auth/sso/{providerId}/authorize
@@ -1299,8 +1382,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - identity.authorisation_policy
   writes:
+  - cache:idempotency
   - identity.authorisation_policy
 - operation: updateGuestSubjectDetails
   verb: PATCH
@@ -1311,8 +1396,10 @@ operations:
   - service
   offline: false
   reads:
+  - cache:idempotency
   - pii.subject
   writes:
+  - cache:idempotency
   - pii.subject
 - operation: updatePrincipal
   verb: PATCH
@@ -1325,10 +1412,14 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - identity.delegated_access
   - identity.principal
+  - identity.role
   writes:
   - cache:idempotency
   - identity.principal
+  - identity.refresh_token
+  - identity.session
 - operation: updateRole
   verb: PATCH
   path: /roles/{roleId}
@@ -1338,14 +1429,16 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - identity.role
   writes:
+  - cache:idempotency
   - identity.role
 - operation: verifyGuestEmail
   verb: POST
   path: /auth/guest/verify-email
   scope: tenant
-  permission: GUEST_VIEW
+  permission: null
   audience:
   - guest
   - anonymous
@@ -1354,6 +1447,7 @@ operations:
   - cache:idempotency
   - identity.otp_challenge
   - pii.subject
+  - pii.subject_contact
   writes:
   - cache:idempotency
   - identity.otp_challenge
@@ -1391,8 +1485,10 @@ operations:
   reads:
   - cache:idempotency
   - identity.mfa_challenge
+  - identity.mfa_method
   - identity.mfa_recovery_code
   - identity.password_policy
+  - identity.session
   writes:
   - cache:idempotency
   - identity.mfa_challenge
@@ -1424,8 +1520,10 @@ operations:
   - public
   - prospect
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - cache:idempotency
+  writes:
+  - cache:idempotency
 - operation: verifySupervisorStepUp
   verb: POST
   path: /internal/step-up/verify
@@ -1435,10 +1533,12 @@ operations:
   - service
   offline: false
   reads:
+  - cache:idempotency
   - identity.delegated_access
   - identity.password_policy
   - identity.principal
   - identity.principal_credential
   - identity.role_permission
   writes:
+  - cache:idempotency
   - identity.principal_credential

@@ -14,7 +14,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/tenants-licensing/welcome-start-your-ticvai-journey-adm-379",
-   "component": "apps/ticvai-web/src/routes/tenants-licensing/WelcomeStartYourTicvaiJourney.tsx",
+   "component": "src/routes/tenants-licensing/WelcomeStartYourTicvaiJourney.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -185,7 +185,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/tenants-licensing/customer-organization-registration-adm-380",
-   "component": "apps/ticvai-web/src/routes/tenants-licensing/CustomerOrganizationRegistration.tsx",
+   "component": "src/routes/tenants-licensing/CustomerOrganizationRegistration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -401,7 +401,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/tenants-licensing/venue-type-business-profile-adm-381",
-   "component": "apps/ticvai-web/src/routes/tenants-licensing/VenueTypeBusinessProfile.tsx",
+   "component": "src/routes/tenants-licensing/VenueTypeBusinessProfile.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -549,7 +549,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/tenants-licensing/visitor-capacity-operational-scale-adm-382",
-   "component": "apps/ticvai-web/src/routes/tenants-licensing/VisitorCapacityOperationalScale.tsx",
+   "component": "src/routes/tenants-licensing/VisitorCapacityOperationalScale.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -669,7 +669,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/tenants-licensing/sales-channel-assessment-adm-383",
-   "component": "apps/ticvai-web/src/routes/tenants-licensing/SalesChannelAssessment.tsx",
+   "component": "src/routes/tenants-licensing/SalesChannelAssessment.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -839,7 +839,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/tenants-licensing/ticketing-product-requirements-adm-384",
-   "component": "apps/ticvai-web/src/routes/tenants-licensing/TicketingProductRequirements.tsx",
+   "component": "src/routes/tenants-licensing/TicketingProductRequirements.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1025,7 +1025,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/tenants-licensing/access-queue-visitor-experience-assessment-adm-385",
-   "component": "apps/ticvai-web/src/routes/tenants-licensing/AccessQueueVisitorExperienceAssessment.tsx",
+   "component": "src/routes/tenants-licensing/AccessQueueVisitorExperienceAssessment.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1145,7 +1145,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/tenants-licensing/additional-business-module-assessment-adm-386",
-   "component": "apps/ticvai-web/src/routes/tenants-licensing/AdditionalBusinessModuleAssessment.tsx",
+   "component": "src/routes/tenants-licensing/AdditionalBusinessModuleAssessment.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1279,7 +1279,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/tenants-licensing/integration-payment-technical-readiness-adm-387",
-   "component": "apps/ticvai-web/src/routes/tenants-licensing/IntegrationPaymentTechnicalReadiness.tsx",
+   "component": "src/routes/tenants-licensing/IntegrationPaymentTechnicalReadiness.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1399,7 +1399,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/tenants-licensing/ai-assessment-summary-handoff-adm-388",
-   "component": "apps/ticvai-web/src/routes/tenants-licensing/AiAssessmentSummaryHandoff.tsx",
+   "component": "src/routes/tenants-licensing/AiAssessmentSummaryHandoff.tsx",
    "status": "notStarted"
   },
   "navigation": {

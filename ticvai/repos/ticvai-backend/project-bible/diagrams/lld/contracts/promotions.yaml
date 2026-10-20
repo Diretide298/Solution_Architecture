@@ -1,5 +1,5 @@
 id: LLD-promotions
-title: promotions — 143 operations
+title: promotions — 145 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -67,8 +67,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - promotions.recommendation_experiment
   writes:
+  - cache:idempotency
   - platform.outbox
   - promotions.recommendation_experiment
 - operation: createBundle
@@ -152,8 +154,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - promotions.recommendation_experiment
   writes:
+  - cache:idempotency
   - promotions.recommendation_experiment
 - operation: createRecommendationStrategy
   verb: POST
@@ -201,7 +205,7 @@ operations:
 - operation: deleteUpsellRule
   verb: DELETE
   path: /upsell-rules/{ruleId}
-  scope: venue
+  scope: region
   permission: PRODUCT_CONFIGURE
   audience:
   - staff
@@ -259,6 +263,7 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - catalogue.channel_capacity
   - catalogue.product
   - promotions.product_relationship
@@ -267,7 +272,8 @@ operations:
   - promotions.recommendation_strategy
   - promotions.recommendation_suppression
   - promotions.upsell_rule
-  writes: []
+  writes:
+  - cache:idempotency
 - operation: generateCouponCodes
   verb: POST
   path: /coupon-campaigns/{campaignId}/codes
@@ -322,6 +328,29 @@ operations:
   offline: false
   reads:
   - promotions.coupon_code_batch
+  writes: []
+- operation: getGuestBundle
+  verb: GET
+  path: /guest-bundles/{bundleId}
+  scope: venue
+  permission: null
+  audience:
+  - guest
+  offline: true
+  reads:
+  - promotions.bundle_choice_group
+  - promotions.bundle_choice_option
+  - promotions.bundle_component
+  writes: []
+- operation: getGuestCouponCode
+  verb: GET
+  path: /guest-coupon-codes/{code}
+  scope: venue
+  permission: null
+  audience:
+  - guest
+  offline: false
+  reads: []
   writes: []
 - operation: getProductAffinity
   verb: GET
@@ -381,14 +410,17 @@ operations:
   permission: PRODUCT_VIEW
   audience:
   - staff
+  - guest
   offline: false
   reads:
+  - cache:idempotency
   - catalogue.channel_capacity
   - catalogue.product
   - marketing.guest_profile
   - orders.cart
   - promotions.promotion
-  writes: []
+  writes:
+  - cache:idempotency
 - operation: getUpsellSuggestions
   verb: POST
   path: /upsell-suggestions
@@ -1680,8 +1712,10 @@ operations:
   - staff
   - guest
   offline: true
-  reads: []
+  reads:
+  - cache:idempotency
   writes:
+  - cache:idempotency
   - promotions.recommendation_outcome
 - operation: redeemVoucher
   verb: POST
@@ -1775,8 +1809,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - promotions.product_relationship
   writes:
+  - cache:idempotency
   - platform.outbox
   - promotions.product_relationship
 - operation: setPromotionStackingRule
@@ -1821,8 +1857,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - promotions.recommendation_suppression
   writes:
+  - cache:idempotency
   - platform.outbox
   - promotions.recommendation_suppression
 - operation: setRuleTestRecommendation
@@ -1870,11 +1908,13 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - catalogue.price
   - orders.order_line
   - orders.sales_order
   - promotions.promotion
-  writes: []
+  writes:
+  - cache:idempotency
 - operation: simulateRecommendationStrategy
   verb: POST
   path: /recommendation-simulations
@@ -1883,8 +1923,10 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - cache:idempotency
   writes:
+  - cache:idempotency
   - promotions.recommendation_strategy
 - operation: unschedulePromotion
   verb: POST

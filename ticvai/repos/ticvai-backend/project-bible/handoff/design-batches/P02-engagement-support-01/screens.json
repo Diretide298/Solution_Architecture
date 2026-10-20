@@ -377,17 +377,17 @@
    "coldEntry": "A guest opening a notification about their own conversation (an agent replied, a handover was picked up): it opens that conversation, or says it was closed."
   },
   "wireframe": {
-   "status": "notStarted",
-   "provenance": "designed",
+   "status": "approved",
+   "provenance": "client-verified",
    "board": "wireframes/P02 Guest App.dc.html#gst-031",
    "prototype": {
     "file": "sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html",
     "rev": "Mobile App v4, 29 September 2026",
     "match": "none",
-    "note": "Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the v4 look (the frame on this screen's board, wireframes/frames/gst-031.html, and #GST-031 in handoff/design-batches/apps/1-guest-app/return/TICVAI Guest App.dc.html). NOT client-verified: awaiting the client's design reviewer. Build the layout from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at: Account → All screens → Wave 2 → AI concierge – home (exact)."
+    "note": "Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the v4 look (the frame on this screen's board, wireframes/frames/gst-031.html, and #GST-031 in handoff/design-batches/apps/1-guest-app/return/TICVAI Guest App.dc.html). Client-approved 19 October 2026 (confirmed by Chinmay Parab). Build the layout from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at: Account → All screens → Wave 2 → AI concierge – home (exact)."
    },
-   "source": "Claude Code, 30 September 2026, drawn in the Mobile App v4 look",
-   "note": "**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified, awaiting the client's design reviewer.** `provenance: designed` because the accepted vocabulary has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md."
+   "source": "client approval, confirmed by Chinmay Parab 19 October 2026",
+   "note": "**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; client-approved 19 October 2026, confirmed by Chinmay Parab.** Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "_platform": {
@@ -653,17 +653,17 @@
    "coldEntry": "A conversation link an agent opens from a notification. Resolves, or says it was closed and by whom. **A guest opening an order link weeks later.** Shows the order if it still resolves; if it was refunded or the performance passed, says which and offers the order list rather than an error."
   },
   "wireframe": {
-   "status": "notStarted",
-   "provenance": "designed",
+   "status": "approved",
+   "provenance": "client-verified",
    "board": "wireframes/P02 Guest App.dc.html#gst-032",
    "prototype": {
     "file": "sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html",
     "rev": "Mobile App v4, 29 September 2026",
     "match": "none",
-    "note": "Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the v4 look (the frame on this screen's board, wireframes/frames/gst-032.html, and #GST-032 in handoff/design-batches/apps/1-guest-app/return/TICVAI Guest App.dc.html). NOT client-verified: awaiting the client's design reviewer. Build the layout from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at: Account → All screens → Wave 2 → AI concierge – chat (exact)."
+    "note": "Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the v4 look (the frame on this screen's board, wireframes/frames/gst-032.html, and #GST-032 in handoff/design-batches/apps/1-guest-app/return/TICVAI Guest App.dc.html). Client-approved 19 October 2026 (confirmed by Chinmay Parab). Build the layout from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at: Account → All screens → Wave 2 → AI concierge – chat (exact)."
    },
-   "source": "Claude Code, 30 September 2026, drawn in the Mobile App v4 look",
-   "note": "**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified, awaiting the client's design reviewer.** `provenance: designed` because the accepted vocabulary has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md."
+   "source": "client approval, confirmed by Chinmay Parab 19 October 2026",
+   "note": "**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; client-approved 19 October 2026, confirmed by Chinmay Parab.** Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 8 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
@@ -952,8 +952,8 @@
    "coldEntry": "A guest opening a notification about their own conversation: it opens the conversation, or says it was closed."
   },
   "wireframe": {
-   "status": "notStarted",
-   "provenance": "designed",
+   "status": "approved",
+   "provenance": "client-verified",
    "board": "wireframes/P02 Guest App.dc.html#gst-033",
    "prototype": {
     "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html",
@@ -962,7 +962,8 @@
     "match": "exact",
     "view": "Account → All screens → Wave 2 → AI concierge – contextual help"
    },
-   "note": "Corrected 2 October 2026 (CHG-SGU-016): the prototype view is a catalogue entry (\"Account → All screens → Wave 2\"), not a client-drawn layout, so the frame is treated as designed, not client-verified."
+   "note": "Corrected 2 October 2026 (CHG-SGU-016): the prototype view is a catalogue entry (\"Account → All screens → Wave 2\"), not a client-drawn layout, so the frame was treated as designed, not client-verified, until the client approved the whole guest app (confirmed by Chinmay Parab, 19 October 2026).",
+   "source": "client approval, confirmed by Chinmay Parab 19 October 2026"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "_platform": {
@@ -1226,7 +1227,7 @@
   "id": "GST-040",
   "name": "Help & Support",
   "module": "Engagement & Support",
-  "requiresModule": "marketing",
+  "requiresModule": "core",
   "wave": 1,
   "capability": "C17",
   "implementation": {
@@ -1262,7 +1263,7 @@
     }
    ]
   },
-  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Guest case operations wired 24 August.** **No case operation was guest-callable** — a guest could raise nothing and read nothing, and `check-screens` refused the staff-permissioned ones on a guest surface. `listMyCases`, `raiseMyCase` and `replyToMyCase` are scoped to the caller rather than filtered by a subject parameter.\n\n**Rev 3 (decided 29 September).** The Help screen shows app status and a public *What's new* (GAP-B2).",
+  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Guest case operations wired 24 August.** **No case operation was guest-callable** — a guest could raise nothing and read nothing, and `check-screens` refused the staff-permissioned ones on a guest surface. `listMyCases`, `raiseMyCase` and `replyToMyCase` are scoped to the caller rather than filtered by a subject parameter.\n\n**Rev 3 (decided 29 September).** The Help screen shows app status and a public *What's new* (GAP-B2). Build note (r8, WHITE-C14): the body of a help page or a policy comes with the list read that shows it (`PublishedContentPage.body` from `listPublishedContentPages`, `PublishedPolicy.body` from `listPublishedPolicies`); nothing more is read to open one.\nBuild note (r8 second round): **this screen reads no single case.** Its client-verified prototype view (Help & support) shows no case thread; its \"Raise a question\" opens GST-068 (Help & My Cases), which reads one case with `getMyCase` when the guest opens a row. A case link from a notification opens GST-068 with the `caseId`, not this screen. `getMyCase` was bound here in the first r8 round and is taken off again; it also loaded on open, before sign-in, a read that needs a signed-in guest (check-preauth-session).",
   "density": "comfortable",
   "pattern": "commandCentre",
   "patternReason": "3 independent reads and no read of one record — the screen watches a population rather than working one",
@@ -1574,7 +1575,11 @@
     {
      "to": "GST-052",
      "trigger": "Take a ready-made plan",
-     "provenance": "decided 29 September 2026, MOB-6"
+     "provenance": "decided 29 September 2026, MOB-6",
+     "carries": [
+      "party",
+      "dates"
+     ]
     },
     {
      "to": "GST-001",
@@ -1649,7 +1654,7 @@
       {
        "kind": "multiSelect",
        "label": "What are you most interested in?",
-       "operation": "listProducts",
+       "operation": "getVisitPlannerOptions",
        "notes": "Interest tags from the venue's points (`VenuePoint.interestTags`): thrill rides, family rides, shows, water, shopping.",
        "provenance": "decided 29 September 2026, MOB-6"
       },
@@ -1717,6 +1722,13 @@
     "purpose": "The tenant's active venues, for the park-per-day choice in a multi-venue tenant",
     "trigger": "onLoad",
     "provenance": "decided 30 September 2026, client meeting MoM 4.7 (Allam)"
+   },
+   {
+    "operationId": "getVisitPlannerOptions",
+    "contract": "venue-map",
+    "purpose": "The planner's choices from the venue's data (r8, GPS-C21): the interest tags of its parks fill What are you most interested in?, and the ready-made plans and Fast Track bundles come from the same read.",
+    "trigger": "onLoad",
+    "provenance": "r8 integration, GPS-C21 (CHG-R8INT-007)"
    }
   ],
   "entryState": {
@@ -1830,7 +1842,7 @@
   "notes": "Minuted 10 Aug §4.9. ** wired 24 August.** The board drew four bespoke AI endpoints for itinerary planning; **one operation with a kind answers all of them** (ADR-0028), and recording the outcome is what lets a model replace the heuristic later. **`recordSuggestionOutcome` removed from the guest surface.** `check-screens` refused it and was right: **a guest does not record an outcome — the platform observes what they did.** A guest app that self-reports whether it took the advice is a training label the guest could forge, and the observation belongs server-side where the plan and the visit can be compared. **Deferred on 28 September (audit R187), and brought back the next day**: the itinerary planner was put in `wave: 4` with a `deferred` block and kept rather than deleted; the 29 September re-plan below superseded that, and the screen is in Block A, wave 1 (3 October 2026, CHG-SPF-006). **Itinerary suggestion removed 28 September** (decided 28 September, audit R209): the planner was deferred (R187) and `requestSuggestion` refuses a guest anything but prepPlan, upsell and waitTime, so this screen no longer asks for a day plan.\n\n**Rev 3 (decided 29 September).** Had stayed deferred (GAP-C3); superseded the same day by the re-plan below.\n\n**Brought into Block A on 29 September** (Chinmay, the 29 September re-plan, MOB-6): a rules-based planner with the AI planner agent on top. This supersedes audit R187, the deferral half of R209 and rev 3 GAP-C3; the `deferred` block is removed and the screen is wave 1.\n\n**Mobile v4 role (MOB-6): ready-made day plans per venue** the guest can take; each is rules-built by `generateVisitPlan` from preset inputs, then edited on GST-053.",
   "density": "comfortable",
   "pattern": "listDetail",
-  "patternReason": "`listProducts` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
+  "patternReason": "`getVisitPlannerOptions` reads the venue's ready-made plans and nothing reads one of them; the detail is the row until a `get` exists",
   "purpose": "Ready-made day plans for this venue that a guest can take instead of answering questions.",
   "layout": {
    "template": "split",
@@ -1842,14 +1854,14 @@
       {
        "kind": "cardList",
        "label": "Ready-made plans",
-       "operation": "listProducts",
+       "operation": "getVisitPlannerOptions",
        "notes": "The venue's preset plans (e.g. *Thrill day*, *Family day*, *Relaxed day*), each a set of planner inputs; **Use this plan** runs `generateVisitPlan` with those inputs and the guest's party size and date. Rules-built, not AI: seeded, not learned, on day one.",
        "provenance": "decided 29 September 2026, MOB-6"
       },
       {
        "kind": "dataTable",
        "label": "Every bundle",
-       "operation": "listCatalogueBundles",
+       "operation": "getVisitPlannerOptions",
        "notes": "Bundles a preset plan can include (e.g. Fast Track).",
        "provenance": "contract catalogue.yaml GET /catalogue/bundles"
       }
@@ -1880,21 +1892,16 @@
   },
   "apis": [
    {
-    "operationId": "listProducts",
-    "contract": "catalogue",
-    "purpose": "List products",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "listCatalogueBundles",
-    "contract": "catalogue",
-    "purpose": "List published bundles",
-    "trigger": "onLoad"
+    "operationId": "getVisitPlannerOptions",
+    "contract": "venue-map",
+    "purpose": "The venue's ready-made plans (its active `VisitPlanPreset` rows, in their order) and the Fast Track bundles a plan can include (r8, GPS-C21): the presets replace the product list and the catalogue's bundles on this screen; Use this plan sends the preset's `presetKey` to `generateVisitPlan`.",
+    "trigger": "onLoad",
+    "provenance": "r8 integration, GPS-C21 (CHG-R8INT-007)"
    },
    {
     "operationId": "generateVisitPlan",
     "contract": "venue-map",
-    "purpose": "Build a rules plan from the inputs (party, heights, dates, pace, interests, cuisine)",
+    "purpose": "Build a rules plan from the preset's inputs (`presetKey`) with the party and dates this screen holds (r8, GPS-C14): the ones carried from GST-051 when the guest answered the questions there; on the cold entry from GST-001, `dates` is today (the venue's business date) and `party` one adult, proposed, client to confirm. The guest changes either on GST-051 (Make my own) before using a plan.",
     "trigger": "onAction",
     "provenance": "decided 29 September 2026, MOB-6"
    }
@@ -1904,22 +1911,34 @@
     {
      "name": "venueId",
      "from": "session"
+    },
+    {
+     "name": "party",
+     "from": "GST-051",
+     "optional": true,
+     "notes": "r8 (GPS-C14): the party the guest gave on GST-051 (`VisitPlanRequest.party`). Absent on the cold entry: one adult, proposed, client to confirm."
+    },
+    {
+     "name": "dates",
+     "from": "GST-051",
+     "optional": true,
+     "notes": "r8 (GPS-C14): the dates the guest gave on GST-051 (`VisitPlanRequest.dates`). Absent on the cold entry: today, the venue's business date."
     }
    ],
-   "coldEntry": "Lists the venue's ready-made plans; nothing is needed upstream."
+   "coldEntry": "Lists the venue's ready-made plans; nothing is needed upstream. Use this plan sends the preset with today and one adult unless GST-051 carried a party and dates (r8, GPS-C14)."
   },
   "wireframe": {
-   "status": "notStarted",
-   "provenance": "designed",
+   "status": "approved",
+   "provenance": "client-verified",
    "board": "wireframes/P02 Guest App.dc.html#gst-052",
    "prototype": {
     "file": "sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html",
     "rev": "Mobile App v4, 29 September 2026",
     "match": "none",
-    "note": "Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the v4 look (the frame on this screen's board, wireframes/frames/gst-052.html, and #GST-052 in handoff/design-batches/apps/1-guest-app/return/TICVAI Guest App.dc.html). NOT client-verified: awaiting the client's design reviewer. Build the layout from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at: Account → All screens → Wave 3 → Suggested itineraries (exact). What v2 did differently: Mobile v4 draws no ready-made plans list: its Plan tab goes straight to the questions. Built from this definition in the v4 style."
+    "note": "Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the v4 look (the frame on this screen's board, wireframes/frames/gst-052.html, and #GST-052 in handoff/design-batches/apps/1-guest-app/return/TICVAI Guest App.dc.html). Client-approved 19 October 2026 (confirmed by Chinmay Parab). Build the layout from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at: Account → All screens → Wave 3 → Suggested itineraries (exact). What v2 did differently: Mobile v4 draws no ready-made plans list: its Plan tab goes straight to the questions. Built from this definition in the v4 style."
    },
-   "source": "Claude Code, 30 September 2026, drawn in the Mobile App v4 look",
-   "note": "**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified, awaiting the client's design reviewer.** `provenance: designed` because the accepted vocabulary has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md."
+   "source": "client approval, confirmed by Chinmay Parab 19 October 2026",
+   "note": "**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; client-approved 19 October 2026, confirmed by Chinmay Parab.** Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "_platform": {

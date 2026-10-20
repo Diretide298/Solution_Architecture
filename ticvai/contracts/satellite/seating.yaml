@@ -1753,8 +1753,6 @@ paths:
     get:
       operationId: getSeatHold
       x-ticvai-consumed-by:
-        - "P01 WEB-007 Interactive Seat Selection"
-        - "P02 GST-049 Interactive Seat Selection"
         - "P04 POS-004 Sell — Seat Map"
         - "P08 BO-987 Hold Tracker"
         - "P08 BO-999 Cart & Multi-Seat Management"

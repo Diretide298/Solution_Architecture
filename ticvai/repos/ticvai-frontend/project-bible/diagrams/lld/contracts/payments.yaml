@@ -14,8 +14,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - payments.credit_account
   writes:
+  - cache:idempotency
   - payments.credit_account
 - operation: createInstalmentPlan
   verb: POST
@@ -50,8 +52,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - payments.method
   writes:
+  - cache:idempotency
   - payments.method
 - operation: createPaymentProviderConnection
   verb: POST
@@ -62,8 +66,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - payments.provider_connection
   writes:
+  - cache:idempotency
   - payments.provider_connection
 - operation: getB2bPaymentTerms
   verb: GET
@@ -325,6 +331,7 @@ operations:
   reads:
   - orders.payment
   - orders.sales_order
+  - payments.provider
   - payments.provider_connection
   - payments.provider_event
   writes:
@@ -347,8 +354,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - payments.deposit_activity
   writes:
+  - cache:idempotency
   - payments.deposit_activity
 - operation: recordPaymentTerminalCertification
   verb: PUT
@@ -377,8 +386,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - payments.dunning_case
   writes:
+  - cache:idempotency
   - payments.dunning_case
 - operation: retryMyDunningPayment
   verb: POST
@@ -406,8 +417,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - payments.payment_terms
   writes:
+  - cache:idempotency
   - payments.payment_terms
 - operation: setDunningPolicy
   verb: PUT
@@ -418,8 +431,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - payments.dunning_policy
   writes:
+  - cache:idempotency
   - payments.dunning_policy
 - operation: setHostedCheckoutConfiguration
   verb: PUT
@@ -430,8 +445,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - payments.hosted_checkout
   writes:
+  - cache:idempotency
   - payments.hosted_checkout
 - operation: setInstalmentPolicy
   verb: PUT
@@ -457,8 +474,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - payments.merchant_account
   writes:
+  - cache:idempotency
   - payments.merchant_account
 - operation: setMixedTenderRules
   verb: PUT
@@ -469,8 +488,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - payments.mixed_tender_rules
   writes:
+  - cache:idempotency
   - payments.mixed_tender_rules
 - operation: setPaymentAuthenticationPolicy
   verb: PUT
@@ -481,8 +502,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - payments.authentication_policy
   writes:
+  - cache:idempotency
   - payments.authentication_policy
 - operation: setPaymentFailoverPolicy
   verb: PUT
@@ -493,8 +516,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - payments.failover_policy
   writes:
+  - cache:idempotency
   - payments.failover_policy
 - operation: setPaymentRiskRules
   verb: PUT
@@ -505,8 +530,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - payments.risk_rules
   writes:
+  - cache:idempotency
   - payments.risk_rules
 - operation: setPaymentRoutingRules
   verb: PUT
@@ -517,8 +544,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - payments.routing_rule
   writes:
+  - cache:idempotency
   - payments.routing_rule
 - operation: setPaymentRules
   verb: PUT
@@ -529,10 +558,12 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - payments.currency_rule
   - payments.eligibility_rule
   - payments.fee_rule
   writes:
+  - cache:idempotency
   - payments.currency_rule
   - payments.eligibility_rule
   - payments.fee_rule
@@ -545,10 +576,12 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - payments.terminal
   - payments.terminal_certification
   - payments.terminal_certification_level3
   writes:
+  - cache:idempotency
   - payments.terminal
 - operation: setReconciliationMatchingRules
   verb: PUT
@@ -559,8 +592,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - payments.matching_rules
   writes:
+  - cache:idempotency
   - payments.matching_rules
 - operation: setReconciliationSource
   verb: PUT
@@ -571,8 +606,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - payments.reconciliation_source
   writes:
+  - cache:idempotency
   - payments.reconciliation_source
 - operation: simulatePaymentConfiguration
   verb: POST
@@ -622,8 +659,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - payments.chargeback_evidence
   writes:
+  - cache:idempotency
   - payments.chargeback_evidence
 - operation: testPaymentProviderConnection
   verb: POST
@@ -649,6 +688,8 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - payments.method
   writes:
+  - cache:idempotency
   - payments.method

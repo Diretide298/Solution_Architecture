@@ -69,8 +69,9 @@ transitions:
     — not retried, because retrying an unknown charge is how a guest is charged twice'
 - from: authorised
   to: declined
-  trigger: job
-  guard: Capture refused by the issuer
+  operation: receivePaymentProviderWebhook
+  trigger: externalEvent
+  guard: Capture refused by the issuer, as the provider's webhook reports it (ADAM CR-165, CHG-CRA-004)
 - from: captured
   to: refunded
   operation: createRefund
@@ -79,8 +80,36 @@ transitions:
     at this one
 - from: authorised
   to: failed
-  trigger: job
-  guard: The gateway rejected it outright
+  operation: receivePaymentProviderWebhook
+  trigger: externalEvent
+  guard: The gateway rejected it outright, as the provider's webhook reports it (ADAM CR-165, CHG-CRA-004)
+- from: pendingConfirmation
+  to: authorised
+  operation: receivePaymentProviderWebhook
+  trigger: externalEvent
+  guard: '**The provider''s webhook confirms the authorisation** (ADAM CR-165, 18 October 2026; CHG-CRA-004): a
+    3-D Secure, hosted-page or wallet payment completes asynchronously. For Network International, which never
+    redelivers, the scheduled `inquirePaymentStatus` poll is the other way out of `pendingConfirmation`'
+- from: pendingConfirmation
+  to: captured
+  operation: receivePaymentProviderWebhook
+  trigger: externalEvent
+  guard: The provider's webhook reports the payment captured (ADAM CR-165, CHG-CRA-004)
+  emits:
+  - order.paid
+- from: authorised
+  to: captured
+  operation: receivePaymentProviderWebhook
+  trigger: externalEvent
+  guard: The provider's webhook reports a capture the platform asked for or the provider made itself (ADAM
+    CR-165, CHG-CRA-004)
+  emits:
+  - order.paid
+- from: pendingConfirmation
+  to: declined
+  operation: receivePaymentProviderWebhook
+  trigger: externalEvent
+  guard: The provider's webhook reports the payment declined or expired (ADAM CR-165, CHG-CRA-004)
 notes: '**`pendingConfirmation` is the whole reason this model matters.** Every other state is ordinary;
   this one is a card that may or may not have been charged, and the only safe action is to ask the gateway
   rather than to guess.

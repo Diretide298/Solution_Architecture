@@ -2,6 +2,12 @@
  "AiConversation": {
   "type": "object",
   "x-ticvai-persistence": "ai.conversation",
+  "x-ticvai-exactly-one-of": [
+   [
+    "principalId",
+    "subjectId"
+   ]
+  ],
   "required": [
    "id",
    "principalId",
@@ -15,7 +21,20 @@
    },
    "principalId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "nullable": true,
+    "description": "The staff member who opened the conversation; null when a guest opened it (`subjectId`)."
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The guest who opened the conversation (a guest is not a principal); null for staff. Exactly one of `principalId` and `subjectId` is set."
+   },
+   "profileKey": {
+    "type": "string",
+    "nullable": true,
+    "description": "The assistant profile the conversation runs under (`configureAssistantProfile`), as `createAiConversation` set it; null for the module's default profile (R8 blocker WHITE-C27)."
    },
    "scopePath": {
     "type": "string"
@@ -460,6 +479,35 @@
        "format": "uuid",
        "nullable": true
       },
+      "name": {
+       "type": "string",
+       "nullable": true,
+       "x-ticvai-persisted": false,
+       "x-ticvai-derived": "onRead",
+       "description": "The point's name, worked out on read for the left-out banner (r8 walk of ticket 28693)."
+      },
+      "limit": {
+       "type": "object",
+       "nullable": true,
+       "x-ticvai-persisted": false,
+       "x-ticvai-derived": "onRead",
+       "description": "The rule that left it out, worked out on read from the product's eligibility rule: for `heightRule` a minimum or maximum height in centimetres, for `ageRule` a minimum or maximum age in years. Null for the other reasons. The banner says \"Min height 120 cm\" from it.\n",
+       "properties": {
+        "kind": {
+         "type": "string",
+         "enum": [
+          "minHeightCm",
+          "maxHeightCm",
+          "minAge",
+          "maxAge"
+         ]
+        },
+        "value": {
+         "type": "integer",
+         "minimum": 0
+        }
+       }
+      },
       "reason": {
        "type": "string",
        "enum": [
@@ -472,6 +520,26 @@
        ],
        "description": "`notAtVenue` (30 September, MoM 4.7): a must-include point that is at none of the plan's venues, so no day could hold it.\n"
       }
+     }
+    }
+   },
+   "estimate": {
+    "type": "object",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "x-ticvai-derived": "onRead",
+    "description": "**An estimated total, computed on read from current catalogue prices and stored nowhere** (r8 walk of tickets 28693 and 28200; lead decision of 20 October 2026, option A; DI-1098, \"with associated costing\"). The 3 October rule stands: no price is stored on the plan and add-ons are priced when booked. This only tells the guest roughly what the plan would cost today, for the group and the days; the price is fixed at booking and may differ. Null when no product on the plan has a current price.\n",
+    "required": [
+     "total",
+     "currency"
+    ],
+    "properties": {
+     "total": {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     },
+     "currency": {
+      "type": "string"
      }
     }
    },
@@ -709,6 +777,22 @@
     "nullable": true,
     "x-ticvai-references": "venuemap.point"
    },
+   "name": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "x-ticvai-derived": "onRead",
+    "description": "What the stop is called on the timeline (GST-059, GST-053; r8 walk of ticket 28693): the point's name, or the performance's title for a show, in the request language. Worked out on read from `pointId` or `performanceId`, as `VisitPlanAlternative.name` is; nothing is stored. Null for a travel stop."
+   },
+   "zoneName": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "x-ticvai-derived": "onRead",
+    "description": "The name of the zone the stop is in, from the point's zone on the map the plan was laid out on. Worked out on read; null when the point has no zone."
+   },
    "productId": {
     "type": "string",
     "format": "uuid",
@@ -759,6 +843,25 @@
      },
      "reason": {
       "type": "string"
+     },
+     "pricePerGuest": {
+      "allOf": [
+       {
+        "$ref": "../shared/common.yaml#/components/schemas/Money"
+       }
+      ],
+      "nullable": true,
+      "x-ticvai-persisted": false,
+      "x-ticvai-derived": "onRead",
+      "description": "The add-on's current price for one guest, computed on read and stored nowhere (the estimate rule of `VisitPlan.estimate`)."
+     },
+     "minutesSaved": {
+      "type": "integer",
+      "minimum": 0,
+      "nullable": true,
+      "x-ticvai-persisted": false,
+      "x-ticvai-derived": "onRead",
+      "description": "The wait the add-on would save at this stop, worked out on read from the expected wait."
      }
     }
    },
@@ -860,6 +963,7 @@
     "type": "string",
     "enum": [
      "packed",
+     "balanced",
      "relaxed"
     ],
     "default": "relaxed"

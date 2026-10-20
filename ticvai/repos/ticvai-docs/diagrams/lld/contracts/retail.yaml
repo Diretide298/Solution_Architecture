@@ -53,7 +53,7 @@ operations:
   - retail.shop_and_drop_line
   writes:
   - cache:idempotency
-  - retail.shop_and_drop
+  - retail.shop_and_drop_line
 - operation: createMerchandise
   verb: POST
   path: /merchandise
@@ -93,8 +93,12 @@ operations:
   reads:
   - cache:idempotency
   - inventory.kit_component
+  - retail.merchandise
   - retail.return
   - retail.return_line
+  - retail.return_policy
+  - retail.sale
+  - retail.sale_line
   writes:
   - cache:idempotency
   - inventory.movement
@@ -125,9 +129,12 @@ operations:
   permission: ORDER_CREATE
   audience:
   - staff
+  - service
   offline: false
   reads:
   - cache:idempotency
+  - retail.sale
+  - retail.sale_line
   - retail.shop_and_drop
   - retail.shop_and_drop_line
   writes:
@@ -279,6 +286,8 @@ operations:
   - guest
   offline: false
   reads:
+  - retail.sale
+  - retail.sale_line
   - retail.shop_and_drop
   - retail.shop_and_drop_line
   writes: []
@@ -309,6 +318,7 @@ operations:
   - cache:idempotency
   - inventory.movement
   - inventory.stock_earmark
+  - retail.merchandise
   - retail.reservation
   - retail.reservation_line
   writes:
@@ -340,8 +350,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - retail.store_rule
   writes:
+  - cache:idempotency
   - retail.store_rule
 - operation: updateMerchandise
   verb: PATCH

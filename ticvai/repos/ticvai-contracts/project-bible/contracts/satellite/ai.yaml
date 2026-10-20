@@ -221,6 +221,11 @@ paths:
         - "P08 BO-785 Template Library"
         - "P08 BO-793 AI Content, Translation & Audit"
         - "P13 CMS-011 Translations"
+      x-ticvai-writes:
+      - table: ai.translation_job
+        for: 'the translation job row, running until completed or failed (FOUNDATION-AI-C40) (r8 integration, CHG-R8INT-014; check-parameter-columns P-NAMED-TABLE)'
+      # The content block is read through white-label#contentBlockRecords (x-ticvai-read-via), never raw (r8 integration, CHG-R8INT-014; check-parameter-columns P-NAMED-TABLE).
+      x-ticvai-names-for-context: [whitelabel.content_block]
       x-ticvai-read-via:
       - query: marketing-crm#messageTemplateRecords
         route: service
@@ -228,9 +233,9 @@ paths:
       - query: marketing-crm#messageTemplateVersionRecords
         route: service
         for: 'its read of marketing.message_template_version, Marketing''s data (CHG-MOD-001)'
-      - query: platform-ops#contentBlockRecords
+      - query: white-label#contentBlockRecords
         route: service
-        for: 'its read of control.content_block, Platform''s data (CHG-MOD-001)'
+        for: 'its read of whitelabel.content_block, WhiteLabel''s data (CHG-MOD-001; moved from control, R8 blocker IDENTITY-C59)'
       summary: Fill translation gaps with a first pass, for a human to edit
       description: |-
         BL-071, 2.6.34. **`setLanguages` already measures the gap** — `translationGaps` reports content missing a version. What was absent is filling it.
@@ -239,8 +244,10 @@ paths:
 
         **Where a draft is stored** (4 October 2026, CHG-FXC-004; the Sprint 1-2 judging found "a draft on the block" and a
         lineage that never writes the block, which ADR-0020 forbids anyway). Each proposal is an `ai.proposed_action` row:
-        the block or template it is for (`control.content_block`, `marketing.message_template`), its job (`translationJobId`), the language, the proposed
-        text. Nothing outside the AI schema is written. The CMS shows the proposal beside the block's field as an AI draft; an
+        the block or template it is for (`whitelabel.content_block`, `marketing.message_template`), its job (`translationJobId`), the language, the proposed
+        text (its `targetKind`, `targetRef`, `locale`, `fieldPath` and `draftText` columns). The run itself is one
+        `ai.translation_job` row, `running` until it ends `completed` or `failed` (R8 blocker FOUNDATION-AI-C40). Nothing
+        outside the AI schema is written. The CMS shows the proposal beside the block's field as an AI draft; an
         operator's save goes through the block's own operation (`white-label` or `marketing-crm`), which is when it becomes
         content; `getTranslationProposals` reads the rows back by job.
       tags:
@@ -281,6 +288,10 @@ paths:
                   description: '**Terms that must not be translated** — a venue''s ride names, its brand,
                     its membership tiers. Without one, *Ladies Night* becomes a literal translation somebody
                     has to find and undo.
+
+                    **The glossary is the tenant AI policy''s `glossaryTerms`** (R8 blocker FOUNDATION-AI-C05, the
+                    lead''s answer of 20 October 2026), edited with `setAiPolicy`; every run applies it. This field is
+                    optional and kept for clients built before: any value, or none, means "the policy''s list".
 
                     '
       responses:
@@ -366,9 +377,9 @@ paths:
       - query: marketing-crm#messageTemplateRecords
         route: service
         for: 'its read of marketing.message_template, Marketing''s data (CHG-MOD-001)'
-      - query: platform-ops#contentBlockRecords
+      - query: white-label#contentBlockRecords
         route: service
-        for: 'its read of control.content_block, Platform''s data (CHG-MOD-001)'
+        for: 'its read of whitelabel.content_block, WhiteLabel''s data (CHG-MOD-001; moved from control, R8 blocker IDENTITY-C59)'
       - query: promotions#promotionRecords
         route: service
         for: 'its read of promotions.promotion, Catalogue''s data (CHG-MOD-001)'
@@ -939,9 +950,10 @@ paths:
         which is what `requestSuggestion` reads to route a kind to its producer. `setAiPolicy` does
         not change them; this operation is the only writer.
 
-        **What the PUT does.** Each assignment is matched on `kind`. An assignment in the body replaces
-        the stored one for that kind, or adds it where the kind had none; **a kind left out of the
-        body keeps its current assignment** — a partial body never leaves a question with nobody to
+        **What the PUT does** (r8 walk of ticket 27715; lead decision of 20 October 2026, option A). **It
+        replaces the whole routing table**, as the singleton note says: the body is the set in force afterwards,
+        and **a kind left out of the body is removed** from `AiPolicy.suggestionProviders`. A removed kind is
+        answered by its rule, as a kind with no assignment always is, so no question is left with nobody to
         answer it. The response is the full set after the write.
 
         **Also written by `promoteAiRelease`** (AI design 2.3, 3.5). Shadow mode here is the release
@@ -949,6 +961,12 @@ paths:
         gate a `promotionReady` governance alert is raised. **A person promotes it; nothing switches by
         itself** (decided 29 September). Setting a `model` basis here directly remains possible for a
         producer that has already been promoted.
+
+        **Refusals.** 422 `guard-rails-required`: an assignment with basis `model` and no `guardRails`. 422
+        `shadow-release-not-in-shadow`: a `shadowProducerRef` that does not name an `ai.release` in stage `shadow`
+        (matched on `ai.release.candidate_ref` = the `producerRef` and `suggestion_kind` = the `kind`). 409
+        `model-basis-needs-promotion`: basis `model` set directly for a producer not yet promoted. Nothing is
+        written in any of the three.
 
         '
       tags:
@@ -993,6 +1011,20 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/SuggestionProviderAssignment'
+        '409':
+          description: Basis `model` was set directly for a producer that has not been promoted (`model-basis-needs-promotion`). Nothing is written.
+          x-ticvai-problem-types: [model-basis-needs-promotion]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '422':
+          description: A `model` assignment has no guard rails (`guard-rails-required`), or a `shadowProducerRef` is not a release in stage `shadow` for that kind (`shadow-release-not-in-shadow`). Nothing is written.
+          x-ticvai-problem-types: [guard-rails-required, shadow-release-not-in-shadow]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /ai/venue-map/{mapId}/propose-walkways:
@@ -1430,10 +1462,16 @@ paths:
         the platform provisions for attribution; nobody types it, and this refuses it with 409
         `provider-managed-by-ticvai`.
 
+        **Platform staff only, as `setAiProvider`** (r8 walk of ticket 27711; lead decision of 20 October 2026,
+        option A: no tenant self-service in Block A). The key is stored by platform staff on ADM-037 holding
+        `PLATFORM_TENANT_MANAGE`, read from the operator''s platform token, with a platform-staff grant into the
+        tenant open (`openPlatformStaffGrant`). Without that grant it refuses `403 platform-grant-required`. **A
+        tenant''s own staff are refused whatever they hold**, `AI_CONFIGURE` included.
+
         '
       tags:
       - ai
-      x-ticvai-permission: AI_CONFIGURE
+      x-ticvai-permission: PLATFORM_TENANT_MANAGE
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -1479,6 +1517,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AiProvider'
+        '403':
+          description: The caller is a tenant's own staff, or platform staff with no grant into this tenant open (`platform-grant-required`). Nothing is stored.
+          x-ticvai-problem-types:
+          - platform-grant-required
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
           description: The provider is TICVAI-managed; its key is provisioned by the platform (`provider-managed-by-ticvai`).
           x-ticvai-problem-types:
@@ -1698,6 +1744,11 @@ paths:
                 locale:
                   type: string
                   description: 8.4.3. Multilingual, and Arabic is not an afterthought here.
+                profileKey:
+                  type: string
+                  description: 'The assistant profile to run the conversation under (`configureAssistantProfile`), e.g.
+                    `guide.appPublishing` on CMS-104 or `planner.guest`. Left out, the module''s default profile. Stored
+                    on the conversation; every `sendAiMessage` in it answers under that profile.'
       responses:
         '201':
           headers:
@@ -1708,6 +1759,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AiConversation'
+        '404':
+          description: '`profileKey` names no active assistant profile of the tenant for the caller''s audience
+            (`assistant-profile-unavailable`): unknown, `isActive` false, or a staff profile asked for by a guest. The
+            screen shows the assistant as unavailable (CMS-104).'
+          x-ticvai-problem-types: [assistant-profile-unavailable]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /conversations/{conversationId}/messages:
@@ -1920,6 +1980,14 @@ paths:
         and `mediaType` and are scoped to the caller like every other kind: an asset the caller could not open
         through `assets.searchMedia` is never returned.
 
+
+        **Which sources a kind searches** (R8 blocker ORDERS-MONEY-C37, the lead''s answer of 20 October 2026):
+        each index source declares the one search kind it feeds (`IndexSource.kind`), and a search over a kind
+        reads the entries of the active sources of that kind only; a result''s `kind` is its source''s. Six
+        kinds: `product` (products, membership products included), `entitlement`, `knowledge` (knowledge
+        collections and every document a tenant uploads), `faq`, `report` and `media`. A kind no active
+        source feeds returns no results, not an error. `membership` and `document` are no longer kinds.
+
         '
       tags:
       - retrieval
@@ -1950,8 +2018,6 @@ paths:
                     enum:
                     - product
                     - entitlement
-                    - membership
-                    - document
                     - knowledge
                     - faq
                     - report
@@ -2054,6 +2120,11 @@ paths:
       operationId: ingestKnowledgeDocument
       x-ticvai-consumed-by:
         - "P08 BO-798 Intent & Knowledge Management"
+      x-ticvai-read-via:
+      - query: assets#mediaAssetRecords
+        route: service
+        for: 'the source asset''s status and extracted text (assets.media_asset.extracted_text): 404 unknown asset, 409
+          asset not ready (R8 blocker ORDERS-MONEY-C19)'
       x-ticvai-audience:
       - staff
       summary: Add a document
@@ -2077,6 +2148,12 @@ paths:
 
         Sending both, or naming a document in another collection or in a state the transition does
         not start from, is refused as a validation failure.
+
+        **The text comes from the asset** (R8 blocker ORDERS-MONEY-C19): the job reads `sourceAssetId`''s
+        `status` and `extractedText` through Assets'' `mediaAssetRecords` (service route) and chunks that
+        text. An asset that does not exist or the caller cannot see is 404 `asset-not-found`; one that is
+        `processing`, `quarantined` or `failed`, or has no extracted text, is 409 `asset-not-ready`, and
+        nothing is written.
 
         '
       tags:
@@ -2103,6 +2180,21 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/KnowledgeDocument'
+        '404':
+          description: '`sourceAssetId` names no asset the caller can see (`asset-not-found`).'
+          x-ticvai-problem-types: [asset-not-found]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '409':
+          description: The source asset is processing, quarantined or failed, or has no extracted text yet
+            (`asset-not-ready`). Nothing is written.
+          x-ticvai-problem-types: [asset-not-ready]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /generate/configuration:
@@ -3065,11 +3157,15 @@ paths:
         keys as though they were meaning, and a search for "annual pass" then matches a UUID. Only the
         fields a person would read are embedded; the rest becomes payload used for filtering.
 
-        **What the PUT does.** One declaration per indexed table, so the match key is `table`. A body
-        naming a table already declared replaces that declaration in full — a field left out takes
-        its default, not its old value — and returns 200; a table not yet declared is created and returns
-        201. Other declarations are never touched. A change to `textFields` or `chunkStrategy` does
-        not re-embed anything by itself; `reindexSource` does.
+        **What the PUT does.** The path `{sourceId}` is the declaration''s identity, and a table has at
+        most one declaration (`table` is unique). A PUT to an existing id replaces that declaration in full
+        — a field left out takes its default, not its old value — and returns 200; a PUT to a new id
+        creates it and returns 201. A PUT whose id exists but names a different table is 409
+        `index-source-table-immutable` (a declaration never moves to another table; declare the new table
+        under a new id); a PUT to a new id naming a table another declaration already holds is 409
+        `index-source-table-taken`. `collectionId` names the knowledge collection the entries land in; an
+        unknown `collectionId` is 422 `collection-unknown`. Other declarations are never touched. A change
+        to `textFields` or `chunkStrategy` does not re-embed anything by itself; `reindexSource` does.
 
         '
       tags:
@@ -3097,17 +3193,33 @@ paths:
           headers:
             X-Consistency-Token:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
-          description: Declared — the table's existing declaration replaced
+          description: Declared — the declaration with this id replaced
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/IndexSource'
         '201':
-          description: Declared — the table had no declaration
+          description: Declared — no declaration had this id
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/IndexSource'
+        '409':
+          description: The id exists and names a different table (`index-source-table-immutable`), or the id is new
+            and another declaration already holds the table (`index-source-table-taken`). Nothing is written.
+          x-ticvai-problem-types: [index-source-table-immutable, index-source-table-taken]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '422':
+          description: '`collectionId` names no knowledge collection of the tenant (`collection-unknown`). Nothing is
+            written.'
+          x-ticvai-problem-types: [collection-unknown]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /index-sources/{sourceId}/reindex:
@@ -3160,9 +3272,15 @@ paths:
       description: 'Needed for three reasons and worth naming them: the embedding model changed, the `textFields`
         changed, or incremental indexing drifted and nobody knows why.
 
-        **Builds into a shadow collection and swaps on completion.** Reindexing in place leaves the assistant
-        answering from a half-built index, which is worse than answering from a stale one — a stale answer
-        is wrong in a knowable way.
+        **Builds without exposing a half-built index** (r8 walk of ticket 27841; lead decision of 20 October 2026,
+        option A, to be confirmed with the AI lead). A tenant has one collection per embedding model holding every
+        source and every document (ADR-0049), so rebuilding one source cannot swap a whole collection. **A rebuild
+        of one source uses no shadow collection.** The new points are written into the same collection carrying a new
+        index epoch in their payload; retrieval keeps filtering on the old epoch until the rebuild is verified, then
+        the filter flips to the new epoch in one step, and the old-epoch points of that source are deleted. The reader
+        sees either the old index or the new one, never a mix. **The shadow collection and alias swap are for a change
+        of embedding model only**, which rebuilds every source. `IndexJob.shadowCollection` is therefore null for a
+        single-source rebuild. `IndexJob.shardKey` names the tenant, which ADR-0049 makes the owner of the collection.
 
         '
       tags:
@@ -3269,6 +3387,94 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /internal/subjects/{subjectId}/ai-erasure:
+    parameters:
+    - name: subjectId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: eraseSubject
+      security:
+      - serviceAuth: []
+      x-ticvai-audience:
+      - service
+      x-ticvai-auth: service
+      # The rows it deletes are its writes (r8 gate residue, check-write-lineage W-NOTABLE; CHG-R8RES-002).
+      x-ticvai-writes:
+      - table: ai.index_entry
+        for: 'the subject''s index entries, deleted with its chunk rows in one transaction'
+      - table: ai.chunk_embedding
+        for: 'the subject''s chunk rows (subject_id), deleted with its index entries; their Qdrant points follow'
+      x-ticvai-no-wrong-state: 'the AI side keeps no state for a subject: a subject with nothing indexed, or already
+        erased, answers 200 with zeros, so a retry or a second call is never refused (CHG-R8RES-007)'
+      summary: Remove everything the AI index holds about a guest
+      description: '**Erasure reaches the AI data, and can be proven** (R8 blocker FOUNDATION-AI-C42, CHG-R8MIG-025;
+        ADR-0047: nothing cascades). Called by Identity''s erasure job, cell-internal over mTLS, for a subject
+        Identity has tombstoned (`deleteGuestAccount`''s erasure request): Identity''s tombstone is the record the job
+        works from, and `deleteGuestAccount` does not wait for this call (r8 gate residue, CHG-R8RES-003). **Built in
+        Block A** (the lead, 20 October 2026; CHG-R8ERA-001, AI-ENGINE-ERASE-SUBJECT): the job calls it for each
+        subject it tombstones and retries a failed call until one answers zero left, and its daily sweep calls it for
+        every tombstoned subject, so a retry lost with a stopped job is still made (CHG-R8ERA-002). For the subject it deletes, in this order and retried until both
+        are done: the `ai.index_entry` rows with that `subject_id` and the `ai.chunk_embedding` rows with that
+        `subject_id` (one transaction), then the Qdrant points with that subject in their payload (by payload filter on
+        `subjectId`, which also catches a point whose row went first). **The proof the erasure keeps**: zero rows in
+        `ai.index_entry` and `ai.chunk_embedding` with the subject, and a Qdrant count of 0 for the payload key; the
+        response carries the three counts removed and the two counts left (both 0 on success). A call for a subject
+        with nothing indexed answers the same with zeros, so a retry is safe.
+
+        '
+      tags:
+      - retrieval
+      x-ticvai-permission: null
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Erased, with the counts that prove it.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [subjectId, indexEntriesRemoved, chunksRemoved, pointsRemoved, rowsLeft, pointsLeft]
+                properties:
+                  subjectId:
+                    type: string
+                    format: uuid
+                  indexEntriesRemoved:
+                    type: integer
+                    minimum: 0
+                  chunksRemoved:
+                    type: integer
+                    minimum: 0
+                  pointsRemoved:
+                    type: integer
+                    minimum: 0
+                  rowsLeft:
+                    type: integer
+                    minimum: 0
+                    description: ai.index_entry and ai.chunk_embedding rows still naming the subject; 0 on success.
+                  pointsLeft:
+                    type: integer
+                    minimum: 0
+                    description: Qdrant points still carrying the subject; 0 on success.
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+        '502':
+          description: Qdrant could not be reached; the rows are removed and the points are retried.
+          x-ticvai-problem-types: [provider-connection-failed]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
   /index-jobs:
     get:
       operationId: listIndexJobs
@@ -3931,13 +4137,18 @@ paths:
         - "P08 ADM-696 AI Risk, Fairness, Explainability & Safety Center"
         - "P09 ADM-536 Human Override & Manual Control Center"
         - "P09 ADM-556 AI Incident & Remediation Management"
+      x-ticvai-writes:
+      - table: ai.outbox
+        for: 'ai.capabilityPaused, written to the AI outbox in the capabilitys transaction (FOUNDATION-AI-C41) (r8 integration, CHG-R8INT-014; check-parameter-columns P-NAMED-TABLE)'
       x-ticvai-agreed: '29 September: AI system design 2.3 governance, 3.2 events; our build plan, shape follows
         reindexSource'
       summary: Stop a capability now
       description: '**The kill switch** (AIC-189, ADM-519, ADM-536, ADM-556). The capability answers from its declared
         degradation mode until resumed: recommendations leave the slot empty, fraud scoring falls back to the owners''
         rules, the concierge offers a person (design 3.7). In-flight plans of the capability pause at their next
-        checkpoint. Emits `ai.capabilityPaused`.
+        checkpoint. Emits `ai.capabilityPaused`, written to `ai.outbox` in the same transaction as the capability,
+        intervention and plan writes; the decision record in the log database follows after commit, retried (R8
+        blocker FOUNDATION-AI-C41).
 
         '
       tags:
@@ -4585,6 +4796,9 @@ paths:
       description: '**Human override is always possible** (AIC-187, ADM-536): the original decision and the human
         one are kept side by side as an intervention and an annotation on the decision record. It changes what AI
         does next; it does not reach into an owning module (a correction there is that module''s own operation).
+        It writes the `ai.intervention` row and appends one annotation of `kind` `override` with its
+        `interventionId` to the decision record; `humanDecision` stays as it was written when the record was
+        created (R8 blocker FOUNDATION-AI-C33).
 
         '
       tags:
@@ -10024,6 +10238,83 @@ paths:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /venues/{venueId}/guided-choice-suggestion-jobs:
+    parameters:
+    - name: venueId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: runGuidedChoiceSuggestionJob
+      x-ticvai-agreed: '20 October 2026: r8 cause FOUNDATION-AI-C39 (the core lane''s request); shape follows
+        suggestGuidedChoice'
+      summary: Run the Help me choose job from an event (service callers)
+      description: '**The automatic half of `suggestGuidedChoice`** (r8, FOUNDATION-AI-C39). AI''s own consumers
+        call it: of `catalogue.productPublished` with `productsUploaded`, of `catalogue.productWithdrawn` with
+        `mappedProductWithdrawn` (for each published guided choice whose answers point at the product, found
+        through white-label''s `guidedChoiceRecords`), and the nightly check with `productsUncovered` when published
+        products fall in no answer. It runs the same job as `suggestGuidedChoice` and lands its draft the same
+        way; `suggestGuidedChoice`''s public body keeps only `manual`. Nothing is published.'
+      tags:
+      - configure
+      x-ticvai-permission: null
+      x-ticvai-auth: service
+      security:
+      - serviceAuth: []
+      x-ticvai-audience:
+      - service
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-via:
+      - query: white-label#guidedChoiceRecords
+        route: service
+        for: 'the published guided choices whose answers point at a withdrawn product (mappedProductWithdrawn)'
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - trigger
+              properties:
+                trigger:
+                  type: string
+                  enum:
+                  - productsUploaded
+                  - mappedProductWithdrawn
+                  - productsUncovered
+                productIds:
+                  type: array
+                  items:
+                    type: string
+                    format: uuid
+                  description: The products the event named (uploaded, withdrawn or uncovered).
+      responses:
+        '202':
+          description: 'Accepted: the job runs and lands a draft for review'
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AiGuidedChoiceSuggestion'
+        '409':
+          description: A suggestion for this venue is already running (`suggestion-in-progress`).
+          x-ticvai-problem-types:
+          - suggestion-in-progress
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /guided-choice-suggestions/{suggestionId}:
     parameters:
     - name: suggestionId
@@ -10531,6 +10822,178 @@ components:
       description: Cell-to-cell, as `../shared/common.yaml` `serviceAuth`. Used by `evaluateAiGovernance`,
         `scoreTransactionRisk` and `simulateRecommendationDecision`.
   schemas:
+    AiOutboxEntry:
+      x-ticvai-append-only: createdAt
+      type: object
+      x-ticvai-persistence: ai.outbox
+      # One aggregate's events in order, as platform.outbox (R8 blocker FOUNDATION-AI-C41, CHG-R8STO-005).
+      x-ticvai-index: [[aggregateId, sequence]]
+      description: '**The AI service''s outbox** (R8 blocker FOUNDATION-AI-C41, the lead''s answer A of 20 October 2026;
+        ADR-0058 amended). The columns and rules of `platform.outbox` (platform-ops `OutboxEntry`), in the tenant
+        database, written only by AI (ADR-0020: only AI writes AI tables) and drained by the regional relay like the
+        other outboxes and the control outbox. An AI operation that emits an event (`ai.capabilityPaused`,
+        `ai.planExecuted` and the rest) inserts it here **in the same transaction as its tenant-database writes**
+        (ADR-0033). A decision record in the AI log database is not in that transaction: it is written after the
+        tenant transaction commits, and retried until it is.'
+      required:
+      - id
+      - eventId
+      - eventName
+      - tenantId
+      - aggregateType
+      - aggregateId
+      - sequence
+      - payload
+      - occurredAt
+      - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        eventId:
+          x-ticvai-references: none
+          type: string
+          format: uuid
+          description: The envelope's event id, which is this row's `id` (ADR-0058; UUIDv7, ADR-0056).
+        eventName:
+          type: string
+          description: The `name` of an event in `events/` published by `ai`.
+        eventVersion:
+          type: integer
+          minimum: 1
+        tenantId:
+          x-ticvai-references: none
+          type: string
+          format: uuid
+          description: The tenant the change belongs to (envelope field, SD-030).
+        aggregateType:
+          type: string
+          description: The AI table the change happened in.
+        aggregateId:
+          type: string
+          format: uuid
+          description: Which row changed; also the broker ordering key (ADR-0058).
+        payload:
+          type: object
+          description: The event as it happened.
+        scopePath:
+          type: string
+          description: The partition key (ADR-0005).
+        sequence:
+          type: integer
+          description: '**Monotonic per aggregate**, allocated in the writing transaction from `ai.outbox_sequence`
+            (`INSERT ... ON CONFLICT (aggregate_id) DO UPDATE SET last_sequence = last_sequence + 1 RETURNING
+            last_sequence`), never `max(sequence) + 1`, as `platform.outbox_sequence` does for the other hosts.'
+        occurredAt:
+          type: string
+          format: date-time
+          description: When the change happened, set in the writing transaction; a consumer reads this.
+        traceId:
+          type: string
+          maxLength: 64
+          nullable: true
+        publishedAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: Null until the relay publishes it; unpublished rows in sequence order are the work.
+        attempts:
+          type: integer
+          default: 0
+          description: Five, exponential from one second, jittered; then the relay's dead letter, as for
+            `platform.outbox`.
+        lastError:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+    AiVectorStore:
+      type: object
+      x-ticvai-persistence: ai.vector_store
+      # One row per embedding model's collection of the tenant (R8 blocker FOUNDATION-AI-C43, CHG-R8STO-005).
+      x-ticvai-unique-together:
+      - [collectionName]
+      description: '**The tenant''s physical Qdrant collections, as AI provisioned them** (R8 blocker FOUNDATION-AI-C43).
+        In the tenant database beside `ai.knowledge_collection`, because it is per tenant. Never returned by an
+        operation. **Written by AI''s consumer of `tenant.provisioned`** (Subscription emits it from the control
+        outbox when a tenant''s database is provisioned): it creates the collection `t_<tenantId>_<model>`, points
+        the alias `tenant_<tenantId>` at it, issues the collection-scoped token and records the row `active`. **AI''s
+        consumer of `tenant.terminated`** (emitted once `terminateTenant`''s retention window has passed) deletes
+        the collections and the alias, revokes the token and marks the row `deleted`. A rebuild for a new model adds
+        a row and moves the alias at the swap (`reindexSource`).'
+      required: [id, collectionName, alias, model, status, createdAt]
+      properties:
+        id:
+          type: string
+          format: uuid
+        collectionName:
+          type: string
+          maxLength: 200
+          description: The physical collection, `t_<tenantId>_<model>`.
+        alias:
+          type: string
+          maxLength: 200
+          description: The alias searches use, `tenant_<tenantId>`.
+        model:
+          type: string
+          maxLength: 200
+          description: The embedding model the collection's vectors come from.
+        isAliasTarget:
+          type: boolean
+          default: false
+          description: Whether the alias points at this collection now (one row per tenant at a time).
+        tokenIssuedAt:
+          type: string
+          format: date-time
+          nullable: true
+        tokenExpiresAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: When the collection-scoped token expires; it is renewed before then.
+        status:
+          type: string
+          enum:
+          - provisioning
+          - active
+          - offboarding
+          - deleted
+          - failed
+        failureReason:
+          type: string
+          maxLength: 500
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        deletedAt:
+          type: string
+          format: date-time
+          nullable: true
+    AiOutboxSequence:
+      type: object
+      x-ticvai-persistence: ai.outbox_sequence
+      x-ticvai-primary-key: [aggregateId]
+      description: '**The last outbox sequence given to each AI aggregate** (R8 blocker FOUNDATION-AI-C41), as
+        `platform.outbox_sequence` for the other hosts; AI keeps its own so that only AI writes the tables it uses
+        (ADR-0020).'
+      required:
+      - aggregateId
+      - lastSequence
+      - scopePath
+      properties:
+        aggregateId:
+          x-ticvai-references: none
+          type: string
+          format: uuid
+        lastSequence:
+          type: integer
+          format: int64
+        scopePath:
+          type: string
+          readOnly: true
+          description: The aggregate's own scope path, the one its outbox rows carry, set on the first insert.
     AiInboxEntry:
       type: object
       x-ticvai-persistence: ai.inbox
@@ -10563,7 +11026,27 @@ components:
       x-ticvai-persistence: none — embedded as jsonb on ai.suggestion and ai.forecast_version
       description: '**Where an answer stands, on every answer** (29 September, AI functions review; baseline then learn).
         The customer sees a stage badge and a "Based on" chip, never a bare percentage (design 5.6), and "Limited
-        historical data" while the starting pattern carries more than half the weight.'
+        historical data" while the starting pattern carries more than half the weight.
+
+
+        **The stage rule per kind** (r8 walk of ticket 27723; lead decision of 20 October 2026, option A). The
+        stage of an answer is decided by the days of the tenant''s own data behind its kind, against that kind''s
+        `Minimum` in `SuggestionKind`: `starting` below the minimum, `learning` from the minimum, `established` from
+        three times the minimum, `learned` only by promotion (AI-D16). For the Block A kinds that is:
+
+        | kind | minimum | learning from | established from |
+
+        |---|---|---|---|
+
+        | queueBalancing | 14 days | day 14 | day 42 |
+
+        | prepPlan | 28 days (4 weeks) | day 28 | day 84 |
+
+        | upsell | 90 days | day 90 | day 270 |
+
+        The 28-day seeded run of AI-ENGINE-BASELINE therefore proves `learning` for `queueBalancing` and `prepPlan`.
+        `upsell` cannot read `learning` at day 28 and is checked at day 90 with a seeded fixture of 90 days of orders.
+        Other kinds follow the same rule with their own minimum.'
       required:
       - stage
       - basedOn
@@ -10717,7 +11200,14 @@ components:
         startingPatternKey:
           type: string
           readOnly: true
-          description: The pattern and version in use, e.g. `waterPark@3`.
+          description: '**The starting pattern and version in use**, e.g. `waterPark@3` (R8 blocker FOUNDATION-AI-C54,
+            the lead''s answer B of 20 October 2026). The packs are read-only files shipped in the ticvai-ai image,
+            versioned with it, one per venue type as `<venueType>@<n>` (a month curve and staff productivity per role,
+            with their source); no table holds them. `setAiVenueSettings` sets the key from the venue''s type to the
+            newest pack the image carries; a venue type with no pack gets `other@<n>`, a flat curve with wide
+            intervals. Block A ships packs for the venue types of the first client''s tenants plus `other`, for the
+            Block A kinds (queue balancing, prep plan, upsell); their figures are written by TICVAI from published
+            sources and are proposed, client to correct.'
         updatedAt:
           type: string
           format: date-time
@@ -11287,6 +11777,22 @@ components:
           description: 'The product recommended. **Exactly one of `productId`, `promotionId` or `couponRef`, `rewardId`
             or `challengeId` is set, by `kind`** (29 September, build): `offer` carries a promotion or coupon, `reward`
             a loyalty reward, `challenge` a challenge, every other kind a product.'
+        variantId:
+          type: string
+          format: uuid
+          nullable: true
+          description: '**What the guest adds to the cart, when there is nothing to choose** (r8, ORDERS-MONEY-C40, the
+            lead''s option A): for a product item whose product has one default variant, that variant, resolved from
+            the Pricing price reference the item carries; the add-to-cart asks only the quantity (and a date for a
+            timed product). Null when the product has several variants: the screen lets the guest choose
+            (`catalogue.listProductVariants`, option B). Null on non-product kinds (offer, reward, challenge),
+            which have their own action, never addCartLine.'
+        performanceId:
+          type: string
+          format: uuid
+          nullable: true
+          description: For a timed product with exactly one bookable performance in the context the engine was given
+            (the cart's date), that performance (r8, ORDERS-MONEY-C40); otherwise null and the screen asks for the date.
         promotionId:
           type: string
           format: uuid
@@ -12697,6 +13203,8 @@ components:
     AiChunkEmbedding:
       type: object
       x-ticvai-persistence: ai.chunk_embedding
+      # Erasure finds a subject's chunks by this (R8 blocker FOUNDATION-AI-C42, CHG-R8MIG-025).
+      x-ticvai-index: [[subjectId]]
       x-ticvai-retired-columns:
       - dense
       - sparse
@@ -12735,6 +13243,14 @@ components:
           nullable: true
           x-ticvai-references: ai.chunk_embedding
           description: The parent section's own row, where the source uses `parentChild` chunking.
+        subjectId:
+          type: string
+          format: uuid
+          nullable: true
+          x-ticvai-references: none
+          description: '**The guest the chunk is about, where there is one** (ADR-0049; R8 blocker FOUNDATION-AI-C42,
+            CHG-R8MIG-025), copied from its index entry, so `eraseSubject` finds every chunk of a subject without
+            reading the source tables. A plain value, not a key into `pii`. Null for content about nobody.'
         content:
           type: string
           description: The chunk text. Kept so an answer can cite it.
@@ -14768,7 +15284,24 @@ components:
         a governance block, a Help me choose suggestion. **Append-only; corrections are annotations; hash-chained
         per tenant** so tampering is detectable (AIC-203, AIC-204). **AI log database** (design 2.4): append-only,
         partitioned by month, one Postgres database per tenant on the regional AI log server. The table name stays
-        `ai.<table>`; which server holds it is a deployment matter, not a contract one.'
+        `ai.<table>`; which server holds it is a deployment matter, not a contract one.
+
+
+        **Which answers are governed** (R8 blocker FOUNDATION-AI-C33, the lead''s answer A of 20 October 2026): an
+        answer of a capability whose `riskClass` is `medium`, `high` or `critical` writes a decision record; a `low` one writes
+        `ai.activity` only. No column holds the depth: the capability registry''s risk class decides.
+
+
+        **The hash chain** (R8 blocker FOUNDATION-AI-C33). `recordHash` = SHA-256, as lowercase hex, of the
+        canonical JSON (RFC 8785) of this list of fields and nothing else: `id`, `capabilityKey`, `task`,
+        `inputsRef`, `evidence`, `producer`, `modelVersion`, `promptTemplateVersion`, `featureSetVersion`,
+        `knowledgeVersion`, `ruleVersions`, `governanceOutcome`, `policyVersion`, `approvals`, `outcome`,
+        `createdAt` and `previousHash`. `previousHash` is the `recordHash` of the tenant''s previous record in
+        (`createdAt`, `id`) order, an empty string for the first. The writer reads that head and inserts the new
+        row under `pg_advisory_xact_lock(hashtext(<tenant id>))`, so several pods cannot fork the chain.
+        `annotations` and `humanDecision` are not hashed: the hashed fields are never edited, and a correction is an
+        annotation. `hashVersion` names this field list, so a later change to it is a new version, never a rewrite.
+        A verifier replays the chain and recomputes every hash.'
       required:
       - traceId
       - capabilityKey
@@ -14870,14 +15403,33 @@ components:
                 format: uuid
               note:
                 type: string
+              kind:
+                type: string
+                enum:
+                - correction
+                - override
+                description: '`override` is the one `overrideAiDecision` appends (R8 blocker FOUNDATION-AI-C33).'
+              interventionId:
+                type: string
+                format: uuid
+                nullable: true
+                description: For `override`, the `ai.intervention` row it records.
           readOnly: true
-          description: Corrections, appended; the original fields are never edited.
+          description: Corrections, appended; the original fields are never edited and annotations are not part of
+            the hash.
         previousHash:
           type: string
           readOnly: true
         recordHash:
           type: string
           readOnly: true
+        hashVersion:
+          type: integer
+          minimum: 1
+          default: 1
+          readOnly: true
+          description: Which list of hashed fields `recordHash` covers; 1 is the list in this schema's description (R8
+            blocker FOUNDATION-AI-C33).
         createdAt:
           type: string
           format: date-time
@@ -17935,6 +18487,33 @@ components:
           default: true
           description: '**A refusal a rule can decide never reaches a model.** Cheaper, faster and more
             consistent than asking a model to refuse.'
+        glossaryTerms:
+          type: array
+          maxItems: 500
+          nullable: true
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
+          description: '**The tenant''s translation glossary** (R8 blocker FOUNDATION-AI-C05, the lead''s answer of 20
+            October 2026): terms `proposeTranslations` and `proposeContent` keep as they are (`keep`) or always
+            translate one way (`translateAs`, per locale). Held on the tenant row and written with `setAiPolicy`;
+            a venue row does not carry its own. Growing it from reviewers'' edits is not in Block A.'
+          items:
+            type: object
+            required: [term, rule]
+            properties:
+              term:
+                type: string
+                maxLength: 200
+              rule:
+                type: string
+                enum: [keep, translateAs]
+              translations:
+                type: object
+                nullable: true
+                additionalProperties:
+                  type: string
+                  maxLength: 200
+                description: For `translateAs`, the translation per locale (`ar`, `fr`, ...).
         suggestionProviders:
           allOf:
           - $ref: '#/components/schemas/SuggestionProviderAssignments'
@@ -17947,6 +18526,9 @@ components:
     AiConversation:
       type: object
       x-ticvai-persistence: ai.conversation
+      # The owner is a staff member or a guest, never both (R8 blocker FOUNDATION-AI-C06, CHG-R8STO-002).
+      x-ticvai-exactly-one-of:
+      - [principalId, subjectId]
       required:
       - id
       - principalId
@@ -17959,6 +18541,19 @@ components:
         principalId:
           type: string
           format: uuid
+          nullable: true
+          description: The staff member who opened the conversation; null when a guest opened it (`subjectId`).
+        subjectId:
+          type: string
+          format: uuid
+          nullable: true
+          description: The guest who opened the conversation (a guest is not a principal); null for staff. Exactly
+            one of `principalId` and `subjectId` is set.
+        profileKey:
+          type: string
+          nullable: true
+          description: The assistant profile the conversation runs under (`configureAssistantProfile`), as
+            `createAiConversation` set it; null for the module's default profile (R8 blocker WHITE-C27).
         scopePath:
           type: string
         module:
@@ -18084,8 +18679,46 @@ components:
           format: uuid
           nullable: true
           readOnly: true
+          x-ticvai-references: ai.translation_job
           description: The `proposeTranslations` job that drafted this proposal; `getTranslationProposals` reads a
             job's rows by it. Null on every other proposal (CHG-RFM-004).
+        targetKind:
+          type: string
+          nullable: true
+          readOnly: true
+          enum:
+          - contentBlock
+          - productName
+          - emailTemplate
+          - messageTemplate
+          description: For a translation draft, what kind of thing it sits on (`TranslationProposals.drafts[].targetKind`);
+            null on every other proposal (R8 blocker FOUNDATION-AI-C40).
+        targetRef:
+          type: string
+          nullable: true
+          readOnly: true
+          maxLength: 200
+          description: For a translation draft, the id of the block, product or template it sits on (the path id of the
+            target's own write, e.g. a content block's `blockId`); null otherwise (R8 blocker FOUNDATION-AI-C40).
+        locale:
+          type: string
+          nullable: true
+          readOnly: true
+          maxLength: 20
+          description: For a translation draft, the language it is in (the job's `targetLocale`); null otherwise.
+        fieldPath:
+          type: string
+          nullable: true
+          readOnly: true
+          maxLength: 300
+          description: For a translation draft, where it goes inside the target, as a dotted path in the target's own
+            body (`TranslationProposals.drafts[].fieldPath`); null otherwise. Empty for a field that is not text.
+        draftText:
+          type: string
+          nullable: true
+          readOnly: true
+          description: For a translation draft, the proposed text; null otherwise. `payload` stays the request body of
+            the target's write, with this text at `fieldPath` (R8 blocker FOUNDATION-AI-C40).
         kind:
           type: string
           enum:
@@ -18194,6 +18827,11 @@ components:
     AiInteraction:
       type: object
       x-ticvai-persistence: ai.activity
+      # A staff row names its principal, a guest row its subject: a guest is not a principal (R8 blocker
+      # FOUNDATION-AI-C06, CHG-R8STO-002).
+      x-ticvai-required-when:
+        principalId: {audience: staff}
+        subjectId: {audience: guest}
       required:
       - id
       - principalId
@@ -18243,6 +18881,9 @@ components:
         principalId:
           type: string
           format: uuid
+          nullable: true
+          description: The staff member who made the call. Null for a guest (`audience` `guest`), whose row names
+            `subjectId` instead; a row always has one or the other.
         audience:
           type: string
           enum:
@@ -18335,13 +18976,18 @@ components:
     IndexSource:
       type: object
       x-ticvai-persistence: ai.index_source
-      description: 'One declaration per indexed table. **The service that owns the table does not know
-        this exists** — the AI service consumes the domain event the owner already publishes.
+      # One declaration per table; the path id is the identity (R8 blocker FOUNDATION-AI-C08, CHG-R8STO-001).
+      x-ticvai-unique-together:
+      - [table]
+      description: 'One declaration per indexed table (`table` is unique; the id is the identity). **The service
+        that owns the table does not know this exists** — the AI service consumes the domain event the owner
+        already publishes.
 
         '
       required:
       - table
       - textFields
+      - collectionId
       - collection
       - scopeLevel
       properties:
@@ -18375,16 +19021,37 @@ components:
             '
           items:
             type: string
+        collectionId:
+          type: string
+          format: uuid
+          x-ticvai-references: ai.knowledge_collection
+          description: The knowledge collection the source's entries land in. Required on create; an unknown id is
+            422 `collection-unknown`.
         collection:
           type: string
-          description: Which embedding table it lands in (`ai.chunk_embedding` for the default model; one table
-            per embedding model, AI design 5.8). Was a Qdrant collection until 29 September.
+          readOnly: true
+          description: The name of the collection's Qdrant alias, set by the server from `collectionId` and never
+            sent. The vectors stay in a Qdrant collection, one per tenant per embedding model, behind the alias
+            `tenant_<id>` (AI system design of 30 September, ADR-0049, which replaced the contract note of 29
+            September that moved them into a database table).
         scopeLevel:
           type: string
           enum:
           - tenant
           - region
           - venue
+        kind:
+          type: string
+          nullable: true
+          enum:
+          - product
+          - entitlement
+          - knowledge
+          - faq
+          - report
+          - media
+          description: '**The `semanticSearch` kind this source feeds** (R8 blocker ORDERS-MONEY-C37). Set it on every
+            declaration: a source with no kind is indexed but no search kind reads it.'
         invalidatedBy:
           type: array
           description: 'Domain events that make an entry stale. `catalogue.product` names `catalogue.productPublished`,
@@ -18436,6 +19103,8 @@ components:
       # One entry per source record (14 October 2026, CHG-CRD-007).
       x-ticvai-unique-together:
       - [sourceId, recordKey]
+      # Erasure finds a subject's entries by this (R8 blocker FOUNDATION-AI-C42, CHG-R8MIG-025).
+      x-ticvai-index: [[subjectId]]
       description: '**One indexed record of a source, as stored** (14 October 2026, CHG-CRD-007, ADAM CR-078; the table
         held only `id` and `source_id`, so `removeIndexEntry` had nothing to find by the `{entryId}` it is called with
         and erasure could not find a person''s entries). Never returned by an operation. `reindexSource` writes one per
@@ -18531,8 +19200,9 @@ components:
         shadowCollection:
           type: string
           nullable: true
-          description: 'A full rebuild writes here and swaps on completion. Reindexing in place leaves
-            the assistant answering from a half-built index.
+          description: 'Set only for a change of embedding model: the rebuild writes here and the alias swaps on
+            completion. Null for a one-source rebuild, which uses an index epoch in the same collection
+            (`reindexSource`).
 
             '
         shardKey:
@@ -18579,7 +19249,10 @@ components:
           - venue
         scopePath:
           type: string
-          readOnly: true
+          description: '**The node the collection belongs to** (R8 blocker ORDERS-MONEY-C36). Optional on create: the
+            scope path of a tenant, region or venue node whose depth matches `scopeLevel` (else 400), inside the
+            caller''s grants (else 403); left out, the caller''s own node at `scopeLevel`. Set once: an update
+            never moves a collection. Returned on every read.'
         documentCount:
           type: integer
           readOnly: true
@@ -18663,6 +19336,15 @@ components:
           format: uuid
         mimeType:
           type: string
+        venueId:
+          type: string
+          format: uuid
+          nullable: true
+          writeOnly: true
+          x-ticvai-persisted: false
+          description: 'A venue to narrow the document to (R8 blocker ORDERS-MONEY-C36): the document''s `scopePath`
+            becomes that venue''s path, which must be at or below the collection''s node (else 400). Left out, the
+            document takes the collection''s own path. Not stored apart from `scopePath`.'
         reingestDocumentId:
           type: string
           format: uuid
@@ -18708,8 +19390,8 @@ components:
           readOnly: true
           description: '**Added 29 September (AI design 3.1):** `ai.knowledge_document` had no policy, so
             neither did its chunks. Copied from the collection at ingestion, narrowed where the document
-            is venue-specific ("documents carry the scope they may be retrieved at"). `ai.chunk_embedding`
-            is scoped through this row.
+            is venue-specific ("documents carry the scope they may be retrieved at"): the venue the request''s
+            `venueId` names. `ai.chunk_embedding` is scoped through this row.
 
             '
     SearchResult:
@@ -18718,6 +19400,14 @@ components:
       properties:
         kind:
           type: string
+          enum:
+          - product
+          - entitlement
+          - knowledge
+          - faq
+          - report
+          - media
+          description: The search kind of the index source the result came from (`IndexSource.kind`).
         id:
           type: string
         title:
@@ -19096,6 +19786,59 @@ components:
         '
       items:
         $ref: '#/components/schemas/SuggestionProviderAssignment'
+    TranslationJob:
+      type: object
+      x-ticvai-persistence: ai.translation_job
+      description: '**One `proposeTranslations` run, as stored** (R8 blocker FOUNDATION-AI-C40, CHG-R8STO-003). Never
+        returned on its own: `getTranslationProposals` returns its `status` with the drafts, which are
+        `ai.proposed_action` rows carrying `translationJobId`. A provider failure ends the job `failed` with
+        `failureReason` and no drafts.'
+      required: [id, scopePath, targetLocale, scope, status, createdAt]
+      properties:
+        id:
+          type: string
+          format: uuid
+        scopePath:
+          type: string
+          description: '**The partition key** (ADR-0005): the tenant the job ran for.'
+        targetLocale:
+          type: string
+          maxLength: 20
+        sourceLocale:
+          type: string
+          maxLength: 20
+          nullable: true
+          description: The language translated from; null means the tenant's default language.
+        scope:
+          type: string
+          enum:
+          - allGaps
+          - contentBlocks
+          - productNames
+          - emailTemplates
+          - messageTemplates
+        status:
+          type: string
+          enum:
+          - running
+          - completed
+          - failed
+        failureReason:
+          type: string
+          maxLength: 500
+          nullable: true
+        createdByPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+          x-ticvai-references: identity.principal
+        createdAt:
+          type: string
+          format: date-time
+        completedAt:
+          type: string
+          format: date-time
+          nullable: true
     TranslationProposals:
       type: object
       x-ticvai-persistence: 'none — each draft is an ai.proposed_action row (one per block and language), applied to the block only when an operator saves it through the block''s own write (ADR-0020); CHG-FXC-004'
@@ -19127,10 +19870,25 @@ components:
           items:
             type: object
             required:
+            - proposalId
             - targetKind
             - targetRef
+            - fieldPath
             - draftText
             properties:
+              proposalId:
+                type: string
+                format: uuid
+                description: 'The `ai.proposed_action` id of this draft (r8 walk of ticket 27926). **Accept** on CMS-011
+                  saves `draftText` at `fieldPath` through the contract that owns the target (a content block update, a
+                  product update, a template update; the saver needs the grant `proposeMarketingContent` there), then
+                  records `decideProposedAction` approve with this id. **Discard** is `decideProposedAction` reject with
+                  this id and a reason; nothing is saved on the target.'
+              fieldPath:
+                type: string
+                description: Where the draft goes inside the target, as a dotted path in the target's own body, for
+                  example `localeVariants.ar.title` on a content block or `name.ar` on a product. The saver writes
+                  `draftText` there and nothing else.
               targetKind:
                 type: string
                 enum:

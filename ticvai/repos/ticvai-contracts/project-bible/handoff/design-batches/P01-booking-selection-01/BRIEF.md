@@ -1,6 +1,6 @@
 # P01-booking-selection-01 — P01 · Booking & Selection
 
-**7 screens · 33 operations · 67 schemas · 7 permissions**
+**7 screens · 35 operations · 70 schemas · 7 permissions**
 
 Platform P01 Guest Web · ships as **guest** ·
 guest audience · web ·
@@ -174,13 +174,13 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `WEB-005` | Ticket Type Selection | A | 21 | 71 | 6 | 31 | 31 | 6 | guest | review (client-verified) |
-| `WEB-006` | Date & Performance Selection | A | 45 | 19 | 6 | 19 | 32 | 6 | guest | review (client-verified) |
+| `WEB-005` | Ticket Type Selection | A | 29 | 72 | 6 | 31 | 31 | 6 | guest | review (client-verified) |
+| `WEB-006` | Date & Performance Selection | A | 53 | 19 | 6 | 23 | 32 | 6 | guest | review (client-verified) |
 | `WEB-007` | Interactive Seat Selection | A | 8 | 40 | 6 | 30 | 22 | 6 | guest | review (client-verified) |
-| `WEB-008` | Add-ons & Upsell | A | 19 | 14 | 5 | 47 | 16 | 0 | guest | review (client-verified) |
+| `WEB-008` | Add-ons & Upsell | A | 27 | 14 | 5 | 47 | 16 | 0 | guest | review (client-verified) |
 | `WEB-009` | Wishlist | A | 0 | 16 | 5 | 1 | 2 | 0 | guest | review (client-verified) |
-| `WEB-047` | Map Booking — Cabanas & Spots | A | 24 | 38 | 6 | 5 | 4 | 6 | guest | notStarted (client-verified) |
-| `WEB-048` | Book a Space by the Hour | A | 23 | 40 | 6 | 25 | 7 | 0 | guest | notStarted (client-verified) |
+| `WEB-047` | Map Booking — Cabanas & Spots | A | 32 | 38 | 6 | 5 | 4 | 6 | guest | notStarted (client-verified) |
+| `WEB-048` | Book a Space by the Hour | A | 31 | 40 | 6 | 29 | 7 | 0 | guest | notStarted (client-verified) |
 
 ## Design inputs from the client meetings
 

@@ -126,9 +126,9 @@ x-ticvai-queries:
     served: [in-process, service]
   contractRecords:
     module: subscription
-    table: subscription.contract
+    table: control.contract
     inputs:
-      ids: {type: array, items: {type: string, format: uuid}, description: 'The subscription.contract rows asked for, by id.'}
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The control.contract rows asked for, by id.'}
       where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
     returns:
       type: array
@@ -136,7 +136,7 @@ x-ticvai-queries:
       items: {$ref: '#/components/schemas/Subscription'}
     rule: >-
       A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
-      October). Platform answers with its subscription.contract rows, as it stores them and as the caller's
+      October). Platform answers with its control.contract rows, as it stores them and as the caller's
       scope lets it see them (the table's row-level security, under the caller's connection and transaction). It
       decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
       a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
@@ -144,9 +144,9 @@ x-ticvai-queries:
     served: [in-process]
   planRecords:
     module: subscription
-    table: subscription.plan
+    table: control.plan
     inputs:
-      ids: {type: array, items: {type: string, format: uuid}, description: 'The subscription.plan rows asked for, by id.'}
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The control.plan rows asked for, by id.'}
       where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
     returns:
       type: array
@@ -154,7 +154,7 @@ x-ticvai-queries:
       items: {$ref: '#/components/schemas/Plan'}
     rule: >-
       A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
-      October). Platform answers with its subscription.plan rows, as it stores them and as the caller's scope
+      October). Platform answers with its control.plan rows, as it stores them and as the caller's scope
       lets it see them (the table's row-level security, under the caller's connection and transaction). It
       decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
       a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
@@ -176,8 +176,72 @@ x-ticvai-queries:
       them (the table's row-level security, under the caller's connection and transaction). It decides nothing: an
       asker that refuses or chooses on these rows states that rule in its own operation, and a question with a rule
       of its own (open, live, sellable) is declared as a query of its own. It is asked in process within operations,
-      through the C# query interface Platform implements.
+      through the C# query interface Platform implements, and from another deployable (tenancy's resolveTenantHost)
+      through the service route (serviceAuth; r8 integration, CHG-R8INT-014).
+    served: [in-process, service]
+  cellTenantRecords:
+    module: subscription
+    table: control.cell_tenant
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The control.cell_tenant rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as tenantId or cellId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Platform stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/CellTenant'}
+    rule: >-
+      A data read, not a rule question (ADR-0055 rule 2 as amended 14 October; r8 integration, CHG-R8INT-014).
+      Platform answers with its control.cell_tenant rows, as it stores them. It decides nothing: resolveTenantHost,
+      which asks it, states its own rule (one database that is live, suspended or draining). It is asked from another
+      deployable through Platform's service route (serviceAuth).
+    served: [service]
+  tenantRequestLimits:
+    module: subscription
+    table: control.plan
+    inputs:
+      tenantId: {type: string, format: uuid, description: 'The tenant whose limits the kernel middleware applies.'}
+    returns:
+      $ref: '#/components/schemas/PlanRequestLimits'
+    rule: >-
+      A rule question (R8 blocker FOUNDATION-AI-C20; the generators lane's request, applied at the r8 integration,
+      CHG-R8INT-016). The limits are `Plan.requestLimits` of the plan on the tenant's current contract (control.contract,
+      in force today), in the control database; a tenant with no current contract gets the platform default. Every
+      host's kernel middleware (ADR-0064) asks it through Platform's service route (serviceAuth), caches the answer
+      per tenant for 60 seconds and asks again when the tenant's contract changes plan, so a plan change reaches the
+      token buckets within a minute.
+    served: [service]
+  moduleListingRecords:
+    module: subscription
+    table: control.module_listing
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The control.module_listing rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as moduleKey); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Platform stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/ModuleListing'}
+    rule: >-
+      A data read, not a rule question (ADR-0055 rule 2 as amended 14 October; APPROVALS-TENANCY-C41, r8 integration,
+      CHG-R8INT-016). Platform answers with its control.module_listing rows as it stores them. It decides nothing:
+      white-label's setModuleEnablement, which asks it, states its own rule (requiresModules met,
+      incompatibleWithModules not both enabled). It is asked in process within operations, through the C# query
+      interface Platform implements.
     served: [in-process]
+  cellEndpointRecords:
+    module: subscription
+    table: control.cell_endpoint
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The control.cell_endpoint rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a cellId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Platform stores it; an id with no visible row is absent.'
+      items: {$ref: '../spine/tenancy.yaml#/components/schemas/PlatformCellEndpoint'}
+    rule: >-
+      A data read, not a rule question (R8 blocker APPROVALS-TENANCY-C10, CHG-R8MIG-018). Platform answers with its
+      control.cell_endpoint rows, which the control plane writes at cell provisioning. Asked from commerce through
+      Platform's service route (serviceAuth) by Tenancy's listCellEndpoints.
+    served: [in-process, service]
 paths:
   /onboarding-applications:
     post:
@@ -200,6 +264,12 @@ paths:
         **The billing entity is saved on the application** (Chinmay, 2 October, workbook Q223; CHG-CSA-030):
         `billingEntity` carries the company to be invoiced and its documents before verification; nothing is
         provisioned until it is verified.
+
+        **The plan choice is saved on the application too** (the lead, 20 October 2026, r8 cause
+        APPROVALS-TENANCY-C16, option B): `requestedPlanId` carries the plan and term the prospect picked on
+        SGN-012 and SGN-019 (sent from SGN-020). A prospect never calls `setSubscription`, which is
+        staff-only; platform staff set the first subscription from `requestedPlanId` when the application is
+        approved and provisioned.
 
         '
       tags:
@@ -1355,6 +1425,12 @@ paths:
       operationId: suspendTenant
       x-ticvai-consumed-by:
         - "P09 ADM-005 Tenant Directory"
+      x-ticvai-writes:
+      - table: control.outbox
+        for: 'tenant.suspended, written to the control databases outbox when the suspension takes effect (r8 integration, CHG-R8INT-014; check-parameter-columns P-NAMED-TABLE)'
+      x-ticvai-write-via:
+      - table: approvals.request
+        operation: createApprovalRequest
       x-ticvai-audience:
       - staff
       summary: Suspend a tenant
@@ -1363,6 +1439,63 @@ paths:
 
         **Access validation continues under every suspension mode.** A commercial dispute must not strand
         guests at a gate holding valid tickets.
+
+        **Approval is raised by the call itself** (ADAM CR-172, option (a), decided by Chinmay Parab on 19 October 2026;
+        CR-152; CHG-CRA-005). The tenant''s own 409 refusals below are checked first. Then this calls approvals''
+        `createApprovalRequest` (`x-ticvai-write-via`) with kind `configurationChange`, `subjectContract`
+        `subscription`, `subjectType` `tenant`, `subjectId` the tenant id, `scopePath` the tenant''s root
+        (`control.cell_tenant.root_scope_path`) and `attributes` `{action: suspend, mode, reason, effectiveAt,
+        noticeMessage}` as sent, and answers **202** with the request''s id. **The approval request is all this call
+        writes**: the tenant row and the outbox are written when the grant is applied, never here. No approval id is
+        ever sent by the caller, and there is no `409 approval-required`.
+
+        **The platform approves, never the tenant** (lead''s ruling on lane H review 3 N-1, 20 October 2026;
+        CHG-R8SPN-015). A platform suspension of a tenant is decided by the platform. Approvals routes the request
+        (kind `configurationChange`, subject type `tenant`) by the **platform rule**: a rule held in the control plane
+        and seeded when the platform is provisioned, whose approvers are holders of `PLATFORM_TENANT_MANAGE`, with four
+        eyes (the operator who raised the request can never decide it). A tenant''s own approval rules never match
+        subject type `tenant`, even a rule that names no subject types (as approvals says where it defines them).
+        **No route, no request**: where no active rule matches, `createApprovalRequest` refuses `422
+        no-approval-route` and writes nothing, and this call passes that refusal on (the 422 below); the tenant is
+        unchanged.
+
+        **The grant applies it, as `publishTenantConfig`''s does** (fix round 3; events/approval-granted.yaml).
+        White-label''s consumer of `approval.granted` learns what to apply from the record the call wrote, named by
+        the event (the pending `config_version`, by `subjectId`), and a version that waits is validated again when
+        it falls due (`scheduledFor`). Here the one record the call writes is the approval request, and the tenant
+        is re-checked when the grant arrives, so Subscription''s consumer takes the events whose
+        `subjectContract` is `subscription` and `subjectType` `tenant`, reads that request by the event''s `requestId`
+        through `approvals#requestRecords` (route `service`, the declared query Subscription already reads
+        `approvals.request` through) for its stored `attributes` (`ApprovalRequest.attributes`), reads the tenant
+        (`subjectId`) from `control.tenant`, re-checks it, and applies the suspension in one transaction, as below.
+        `approval.rejected` leaves the tenant as it was.
+
+        **Re-checked when the grant arrives**, because the tenant may have moved while the request was open. Already
+        `suspended`, **or `active` with a suspension already granted and not yet in effect** (a pending
+        `suspension_effective_at`; review 3 N-4): it is treated as already suspended, so nothing changes (the pending
+        suspension keeps its time, mode and notice) and the grant is recorded as applied with nothing to do (a
+        no-op). No longer `active` (`onboarding`, `terminating` or `terminated` by then): nothing changes, with the
+        reason `tenant-not-active`. **The approved request does not change**: approvals keeps a request immutable once
+        approved, and **the consumer records every outcome by calling approvals'' `recordApprovedActionOutcome`**
+        (route `service`, after its own transaction commits, with the event''s id as `Idempotency-Key`; the lead,
+        20 October 2026, option A, CHG-R8DEC-002) on the request''s approved-action execution
+        (`listApprovedActionExecutions`, BO-382), which is where approvals keeps whether an approved action ran:
+        `applied` when the suspension is applied, `noOp` with its reason for the already-suspended case (`succeeded`
+        with a note), `notApplied` with `tenant-not-active` for the refusal (`failed` with that `failureReason`;
+        review 3 N-2; the execution has no "not applied" status, and `failed` is the closest). **A Retry on BO-382
+        would be refused again** by the same re-check while the tenant stays as it is, so the refusal is closed there
+        with `investigate` and a note, not retried; a new suspension, if still wanted, is a new `suspendTenant`.
+
+        **ADM-005 does not change** (client-approved). After the 202 it re-reads the tenant, whose row keeps its
+        current status until the grant applies the change; the screen shows no pending state and no new text.
+
+        **Now or later, once approved.** With no `effectiveAt`, or one not in the future, the tenant moves `active`
+        to `suspended` and `tenant.suspended` is written to the control database''s outbox (`control.outbox`) in the
+        same transaction, with `tenantId` the suspended tenant and its scope path the tenant''s root
+        (`control.cell_tenant.root_scope_path`). With a future `effectiveAt` the suspension is **pending**: it is
+        recorded (`control.tenant.suspension_effective_at`, the mode and the notice), the tenant stays `active`, and
+        a job on the workers host moves it to `suspended` at that time and writes `tenant.suspended` then (the
+        timer transition of states/tenant.yaml). `reactivateTenant` cancels a pending suspension.
 
         '
       tags:
@@ -1392,25 +1525,46 @@ paths:
                 effectiveAt:
                   type: string
                   format: date-time
+                  description: 'When the suspension applies. Absent or not in the future: now. In the future: a
+                    pending suspension the workers job applies then (CR-152).'
                 noticeMessage:
                   $ref: '#/components/schemas/LocalisedText'
       responses:
-        '200':
+        '202':
           headers:
             X-Consistency-Token:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
-          description: Suspended
+          description: 'Submitted for approval (ADAM CR-172): the approval request is raised and the tenant is
+            unchanged until it is granted.'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Tenant'
+                $ref: '#/components/schemas/TenantChangeRequested'
         '409':
-          description: 'The tenant is already `suspended` (`tenant-already-suspended`), or is not `active` (`onboarding`, `terminating` or `terminated`; `tenant-not-active`). Nothing changes.'
-          x-ticvai-problem-types: [tenant-already-suspended, tenant-not-active]
+          description: 'The tenant is already `suspended` (`tenant-already-suspended`), or is not `active` (`onboarding`, `terminating` or `terminated`; `tenant-not-active`). Checked before any approval is raised. Nothing changes.
+            **Or an approval request about this tenant is already open** (`open-request-exists`; ADAM CR-172, fix
+            round 3): the 409 approvals'' `createApprovalRequest` declares for an open request on the same subject,
+            answered as it gives it (`refusedReason` `openRequestExists`, `requestId` the open request,
+            `currentStatus` its status), so nothing is raised and the caller can point at the open request. This is
+            not the retired `approval-required`. **Which refusal comes first** (review 3 N-3): the tenant''s own state refusals answer
+            first; `open-request-exists` comes only when the tenant''s state would allow a suspension, that is for an
+            `active` tenant (with or without a suspension already granted and pending) about which a suspension or a
+            reactivation request is still open.'
+          x-ticvai-problem-types: [tenant-already-suspended, tenant-not-active, open-request-exists]
           content:
             application/problem+json:
               schema:
-                $ref: '../shared/common.yaml#/components/schemas/Problem'
+                $ref: '#/components/schemas/TenantChangeConflictProblem'
+        '422':
+          description: 'No approval route (`no-approval-route`; lead''s ruling on lane H review 3 N-1, CHG-R8SPN-015):
+            approvals'' `createApprovalRequest` matched no active rule for kind `configurationChange` and subject type
+            `tenant` (the platform rule is missing or inactive), so it raised nothing and this call passes its refusal
+            on. Nothing is written and the tenant is unchanged.'
+          x-ticvai-problem-types: [no-approval-route]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /tenants/{tenantId}/reactivate:
@@ -1425,9 +1579,49 @@ paths:
       operationId: reactivateTenant
       x-ticvai-consumed-by:
         - "P09 ADM-005 Tenant Directory"
+      x-ticvai-write-via:
+      - table: approvals.request
+        operation: createApprovalRequest
       x-ticvai-audience:
       - staff
       summary: Lift a suspension
+      description: '**Reactivates a suspended tenant, cancels a pending suspension, or cancels a termination within
+        its notice period** (ADAM CR-152, 18 October 2026; CHG-CRA-005). `suspended` moves to `active`;
+        `terminating` moves back to `active` while the notice period runs (states/tenant.yaml); an `active` tenant
+        with a pending suspension (`suspension_effective_at` in the future) has it cancelled and stays `active`.
+        An `active` tenant with nothing pending, or an `onboarding` one, is refused `409 tenant-not-suspended`; a
+        `terminated` one `409 tenant-terminated`; both are checked before any approval is raised.
+
+        **Approval is raised by the call itself** (ADAM CR-172, option (a), decided by Chinmay Parab on 19 October 2026;
+        CR-152; CHG-CRA-005). The tenant''s own refusals above (the 409s below) are checked first. Then this calls approvals''
+        `createApprovalRequest` (`x-ticvai-write-via`) with kind `configurationChange`, `subjectContract`
+        `subscription`, `subjectType` `tenant`, `subjectId` the tenant id, `scopePath` the tenant''s root
+        (`control.cell_tenant.root_scope_path`) and `attributes` `{action: reactivate}`, and answers **202** with the
+        request''s id. **The approval request is all this call writes**: the tenant row is written when the grant is
+        applied, never here. No approval id is ever sent by the caller, and there is no `409 approval-required`.
+        **The platform approves, never the tenant**, by the platform rule for kind `configurationChange` and subject
+        type `tenant`, exactly as for `suspendTenant` (holders of `PLATFORM_TENANT_MANAGE`, four eyes; a tenant''s own
+        rules never match subject type `tenant`; CHG-R8SPN-015). Where no active rule matches, `createApprovalRequest`
+        refuses `422 no-approval-route`, writes nothing, and this call passes the refusal on.
+
+        **The grant applies it, as `publishTenantConfig`''s does** (fix round 3; events/approval-granted.yaml), the
+        same path as `suspendTenant`''s: Subscription''s consumer of `approval.granted` takes the events whose
+        `subjectContract` is `subscription` and `subjectType` `tenant`, reads the request by the event''s
+        `requestId` through `approvals#requestRecords` (route `service`) for its stored `attributes` (`action`
+        `reactivate`), reads the tenant from `control.tenant`, re-checks it, and in one transaction moves
+        `suspended` or `terminating` to `active`, or cancels the pending suspension. `approval.rejected` leaves the
+        tenant as it was.
+
+        **Re-checked when the grant arrives.** Already `active` with nothing pending: nothing changes, and the grant
+        is recorded as applied with nothing to do (a no-op). `terminated` by then (`tenant-terminated`), or
+        `onboarding` (`tenant-not-suspended`): nothing changes, with that reason. The approved request does not
+        change; the consumer records every outcome on the request''s approved-action execution by calling approvals''
+        `recordApprovedActionOutcome` as for `suspendTenant` (CHG-R8DEC-002): `applied`, `noOp` with its reason
+        (`succeeded` with a note), or `notApplied` with the reason (`failed`), and a Retry of the refusal on BO-382 would be refused
+        again by the same re-check, so it is closed there with `investigate` and a note.
+
+        **ADM-005 does not change** (client-approved). After the 202 it re-reads the tenant, whose row keeps its
+        current status until the grant applies the change; the screen shows no pending state and no new text.'
       tags:
       - tenant
       x-ticvai-permission: PLATFORM_TENANT_MANAGE
@@ -1437,18 +1631,39 @@ paths:
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
-        '200':
+        '202':
           headers:
             X-Consistency-Token:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
-          description: Reactivated
+          description: 'Submitted for approval (ADAM CR-172): the approval request is raised and the tenant is
+            unchanged until it is granted.'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Tenant'
+                $ref: '#/components/schemas/TenantChangeRequested'
         '409':
-          x-ticvai-problem-types: [tenant-terminated]
-          description: Tenant is terminated, not suspended. Termination is not reversible here
+          x-ticvai-problem-types: [tenant-terminated, tenant-not-suspended, open-request-exists]
+          description: 'Tenant is terminated, not suspended; termination is not reversible here (`tenant-terminated`).
+            Or it is `active` with no pending suspension, or `onboarding` (`tenant-not-suspended`; ADAM CR-152,
+            CHG-CRA-005). Checked before any approval is raised. Nothing changes. **Or an approval request about
+            this tenant is already open** (`open-request-exists`; ADAM CR-172, fix round 3): the 409 approvals''
+            `createApprovalRequest` declares for an open request on the same subject, answered as it gives it
+            (`refusedReason` `openRequestExists`, `requestId` the open request, `currentStatus` its status), so
+            nothing is raised and the caller can point at the open request. This is not the retired
+            `approval-required`. **Which refusal comes first** (review 3 N-3): the tenant''s own state refusals answer first;
+            `open-request-exists` comes only when the tenant''s state would allow a reactivation (`suspended`,
+            `terminating`, or `active` with a pending suspension) and a request about this tenant is still open, for
+            example a second reactivation, or a reactivation of a tenant with a pending suspension while a further
+            suspension request waits.'
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/TenantChangeConflictProblem'
+        '422':
+          description: 'No approval route (`no-approval-route`; CHG-R8SPN-015): approvals'' `createApprovalRequest`
+            matched no active rule for kind `configurationChange` and subject type `tenant`, so it raised nothing and
+            this call passes its refusal on. Nothing is written and the tenant is unchanged.'
+          x-ticvai-problem-types: [no-approval-route]
           content:
             application/problem+json:
               schema:
@@ -1767,16 +1982,19 @@ paths:
         - "P09 ADM-008 Subscription & Plan Management"
         - "P09 ADM-410 Contract & Billing Cycle Selection"
         - "P09 ADM-417 Subscription Confirmation & Commercial Activation"
-        - "P17 SGN-019 Contract & Billing Cycle Selection"
-        - "P17 SGN-024 Subscription Confirmation & Commercial Activation"
       security:
       - bearerAuth: []
-      - prospectAuth: []
       x-ticvai-audience:
       - staff
-      - prospect
       summary: Assign or change a subscription
-      description: 'Upgrades take effect immediately. **Downgrades are checked first**: if the target
+      description: '**Staff only** (the lead, 20 October 2026, r8 cause APPROVALS-TENANCY-C16, option B). A prospect
+        has no tenant and holds no permission, so it never calls this: its plan choice travels on the onboarding
+        application (`submitOnboardingApplication`, `requestedPlanId`), and platform staff set the first
+        subscription from it once the application is verified and the tenant is provisioned. `prospectAuth` and
+        the `prospect` audience are removed.
+
+
+        Upgrades take effect immediately. **Downgrades are checked first**: if the target
         plan licenses fewer modules than the tenant currently has enabled, or lower limits than they are
         currently using, the change is refused and the conflicts are named.
 
@@ -1973,6 +2191,12 @@ paths:
       description: 'A module or limit increase sold separately. Add-ons survive a plan change unless explicitly
         removed — a tenant who paid for something extra keeps it.
 
+        **One add-on per tenant and module at a time** (R8 blocker APPROVALS-TENANCY-C14): an add-on for a
+        `moduleKey` whose validity overlaps an add-on of the same tenant and module already in force is 409
+        `add-on-already-active` (change or remove that one instead); the check runs under a lock on the tenant''s
+        add-on rows, so two requests at once cannot both pass. A `moduleKey` that is not in the module listing
+        is 400.
+
         '
       tags:
       - licensing
@@ -1998,6 +2222,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/LicencePosition'
+        '409':
+          description: An add-on for this module is already in force for the tenant over an overlapping period
+            (`add-on-already-active`). Nothing is written.
+          x-ticvai-problem-types: [add-on-already-active]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     delete:
@@ -2028,7 +2260,9 @@ paths:
               - reason
               properties:
                 moduleKey:
-                  type: string
+                  $ref: '#/components/schemas/ModuleKey'
+                  description: 'The add-on to remove, by its licence module key: the shared `ModuleKey` (plan and
+                    licence vocabulary), never a white-label feature key (r8, APPROVALS-TENANCY-C17).'
                 reason:
                   type: string
                   minLength: 3
@@ -2247,6 +2481,15 @@ paths:
       description: 'Promotion from shared to dedicated is a migration, not a setting. Returns a job to
         track; the cell keeps trading throughout and cuts over at the end.
 
+        **What it reads and does** (R8 blocker APPROVALS-TENANCY-C19, the lead''s answer of 20 October 2026). It
+        reads the cell (`control.cell`): an unknown cell is 404; its jurisdiction is the cell''s `countryCode`.
+        **Tier by jurisdiction**: `shared`, `dedicated` and `isolated` are available in every jurisdiction;
+        `clientHosted` only in the jurisdictions agreed with the client (the list is the client''s to supply, held
+        as platform configuration); anything else is 400 `tier-unavailable-in-jurisdiction`. The same tier as
+        the cell''s is 409 `tier-unchanged`. The job (`kind: tierMigration`, `targetTier` stored on it) moves the
+        cell''s tenants with `planTenantMigration` and `executeTenantMigration`; the cell is `migrating` while it
+        runs, `cell.tier` is set to `targetTier` at cutover, and `cell.kind` does not change.
+
         '
       tags:
       - cell
@@ -2283,6 +2526,15 @@ paths:
         '400':
           x-ticvai-problem-types: [tier-unavailable-in-jurisdiction]
           description: Target tier is unavailable in this jurisdiction
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          x-ticvai-problem-types: [tier-unchanged]
+          description: The cell is already on the target tier (`tier-unchanged`). Nothing is scheduled.
           content:
             application/problem+json:
               schema:
@@ -3795,7 +4047,7 @@ paths:
         **Order.** Soonest first, by `effectiveFrom` ascending, then by `productId`.'
       tags:
       - drafted
-      x-ticvai-permission: PLATFORM_TENANT_VIEW
+      x-ticvai-permission: MEMBERSHIP_VIEW
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -3907,7 +4159,7 @@ paths:
         rather than rewriting active member contracts; publication of that version goes through approveMembershipProductValidation.'
       tags:
       - drafted
-      x-ticvai-permission: PLATFORM_CELL_MANAGE
+      x-ticvai-permission: MEMBERSHIP_MANAGE
       x-ticvai-scope-level: tenant
       x-ticvai-config-scope: tenant
       # Added 20 September when `IS_CONFIG` was widened to see `Tier`. A membership
@@ -3969,7 +4221,7 @@ paths:
         naming the failing rule; the same evaluation serves purchase, activation and renewal.'
       tags:
       - drafted
-      x-ticvai-permission: PLATFORM_CELL_MANAGE
+      x-ticvai-permission: MEMBERSHIP_MANAGE
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -4083,7 +4335,7 @@ paths:
         can trace each benefit to what grants it.'
       tags:
       - drafted
-      x-ticvai-permission: PLATFORM_CELL_MANAGE
+      x-ticvai-permission: MEMBERSHIP_MANAGE
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -4137,7 +4389,7 @@ paths:
         **Order.** Sorted by `membershipCode` ascending.'
       tags:
       - drafted
-      x-ticvai-permission: PLATFORM_TENANT_VIEW
+      x-ticvai-permission: MEMBERSHIP_VIEW
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -4264,7 +4516,7 @@ paths:
         **Order.** Sorted by `membershipCode` ascending.'
       tags:
       - drafted
-      x-ticvai-permission: PLATFORM_TENANT_VIEW
+      x-ticvai-permission: MEMBERSHIP_VIEW
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -4345,7 +4597,7 @@ paths:
         from the old expiry.'
       tags:
       - drafted
-      x-ticvai-permission: PLATFORM_CELL_MANAGE
+      x-ticvai-permission: MEMBERSHIP_MANAGE
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -4389,7 +4641,7 @@ paths:
         one membership product version; without `version`, the latest.
       tags:
       - drafted
-      x-ticvai-permission: PLATFORM_CELL_MANAGE
+      x-ticvai-permission: MEMBERSHIP_VIEW
       x-ticvai-audience:
       - staff
       x-ticvai-scope-level: tenant
@@ -4467,7 +4719,7 @@ paths:
         like every other action. Any other action on the wrong status answers 409 `invalid-product-transition`.'
       tags:
       - drafted
-      x-ticvai-permission: PLATFORM_CELL_MANAGE
+      x-ticvai-permission: MEMBERSHIP_MANAGE
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -4723,7 +4975,7 @@ paths:
         is written to the lifecycle history.'
       tags:
       - drafted
-      x-ticvai-permission: PLATFORM_CELL_MANAGE
+      x-ticvai-permission: MEMBERSHIP_MANAGE
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -4784,7 +5036,7 @@ paths:
         **Order.** Sorted by `membershipId` descending (a UUIDv7, so newest first).'
       tags:
       - drafted
-      x-ticvai-permission: PLATFORM_TENANT_VIEW
+      x-ticvai-permission: MEMBERSHIP_VIEW
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -4971,7 +5223,7 @@ paths:
         **Order.** Sorted by `membershipId` descending (a UUIDv7, so newest first).'
       tags:
       - drafted
-      x-ticvai-permission: PLATFORM_TENANT_VIEW
+      x-ticvai-permission: MEMBERSHIP_VIEW
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -5060,7 +5312,7 @@ paths:
         **Order.** Sorted by `membershipId` descending (a UUIDv7, so newest first).'
       tags:
       - drafted
-      x-ticvai-permission: PLATFORM_TENANT_VIEW
+      x-ticvai-permission: MEMBERSHIP_VIEW
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -5490,7 +5742,7 @@ paths:
         **Order.** Soonest first, by `expiryDate` ascending, then by `membershipId`.'
       tags:
       - drafted
-      x-ticvai-permission: PLATFORM_TENANT_VIEW
+      x-ticvai-permission: MEMBERSHIP_VIEW
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -9412,7 +9664,7 @@ paths:
         `retired` or `expired` answers 409.'
       tags:
       - subscription
-      x-ticvai-permission: PLATFORM_CELL_MANAGE
+      x-ticvai-permission: MEMBERSHIP_MANAGE
       x-ticvai-scope-level: tenant
       x-ticvai-config-scope: tenant
       x-ticvai-offline-capable: false
@@ -9475,6 +9727,9 @@ paths:
       - query: payments#instalmentPolicyRecords
         route: service
         for: 'whether payments supports instalments for the product (422 instalments-not-supported) (CHG-MOD-003)'
+      - query: catalogue#taxProfileRecords
+        route: service
+        for: 'that `taxProfile` names an active catalogue.tax_profile row (422 unknown-profile) (r8, GPS-C34)'
       x-ticvai-singleton: true
       x-ticvai-singleton-note: 'One per membership product, the one the body''s `membershipCode` names, within the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
@@ -9499,14 +9754,24 @@ paths:
         checks read what this saves.
 
 
-        Rules: `basePricingProfile` and `taxProfile` must name an active pricing and tax profile (422 otherwise);
+        **What each reference names** (r8, GPS-C34; ticket 29883). `basePricingProfile` is the id of a catalogue
+        price list (`listPriceLists`, read through catalogue#priceListRecords); `taxProfile` is the id of a
+        catalogue tax profile (`listTaxProfiles`, catalogue.tax_profile, read through catalogue#taxProfileRecords).
+        `feeProfile` and `upgradePricePolicy` name no entity yet: each is a code the venue keeps in its own price
+        and fee rules, stored as given and shown back as given, never checked against a table, until the client
+        names those entities (proposed, client to confirm). Pricing stays in pricing: none of the four is a
+        price.
+
+
+        Rules: `basePricingProfile` must name an active price list and `taxProfile` an active tax profile (422
+        unknown-profile otherwise);
         `autoRenewPayment` in `paymentTerms` needs the product''s `autoRenewEligible` (422); `installments`
         only where the payments module supports them (422). A recurring `billingFrequency` without `autoRenewPayment`
         or `installments`, or a billing cycle longer than the product''s term, is refused (422, 29 September, build:
         2.14.19). A product `retired` or `expired` answers 409.'
       tags:
       - subscription
-      x-ticvai-permission: PLATFORM_CELL_MANAGE
+      x-ticvai-permission: MEMBERSHIP_MANAGE
       x-ticvai-scope-level: tenant
       x-ticvai-config-scope: tenant
       x-ticvai-offline-capable: false
@@ -11665,18 +11930,22 @@ components:
           description: The membership product (subscription.membership_product) being associated.
         basePricingProfile:
           type: string
-          description: Base Pricing Profile id
+          description: 'Base Pricing Profile: the id of an active catalogue price list (`listPriceLists`) (r8,
+            GPS-C34)'
         taxProfile:
           type: string
-          description: Tax Profile id
+          description: 'Tax Profile: the id of an active catalogue.tax_profile row (`listTaxProfiles`) (r8, GPS-C34)'
         feeProfile:
           type: string
           nullable: true
-          description: Fee Profile id
+          description: 'Fee Profile: a code the venue keeps in its fee rules; no entity holds fee profiles yet, so it
+            is stored as given and not checked (proposed, client to confirm; r8, GPS-C34)'
         upgradePricePolicy:
           type: string
           nullable: true
-          description: Upgrade Price Policy id (pack p.14); pro-rata credit on upgrade per MoM 1 Sep §4.9
+          description: 'Upgrade Price Policy (pack p.14); pro-rata credit on upgrade per MoM 1 Sep §4.9. A code the
+            venue keeps in its price rules; no entity holds upgrade policies yet, so it is stored as given and not
+            checked (proposed, client to confirm; r8, GPS-C34)'
         promotionalPricingEligibility:
           type: boolean
           default: false
@@ -11749,10 +12018,11 @@ components:
     SubscriptionTierAllowance:
       x-ticvai-retired-columns: [tier_id]
       type: object
-      x-ticvai-persistence: subscription.tier_allowance
+      x-ticvai-persistence: control.tier_allowance
       description: '**Taken from the backend workbook, 20 September.** NEW TABLE. Defines usage/quantity allowances included in a subscription tier.'
       required:
       - tierId
+      - planVersion   # both columns of the plan key, always (r8 gate residue, CHG-R8RES-006)
       - code
       - name
       - isUnlimited
@@ -11764,9 +12034,15 @@ components:
           format: uuid
         tierId:
           x-ticvai-column: plan_id
-          x-ticvai-references: subscription.plan
+          x-ticvai-references: control.plan
+          x-ticvai-references-version: planVersion
           type: string
           format: uuid
+        planVersion:
+          type: string
+          readOnly: true
+          description: The version of the plan this row belongs to (with `tierId`, the key of the plan row; R8 blocker
+            APPROVALS-TENANCY-C15, CHG-R8INT-023). Set by the server to the plan's latest version when written.
         code:
           type: string
           maxLength: 100
@@ -11794,10 +12070,11 @@ components:
     SubscriptionTierModule:
       x-ticvai-retired-columns: [tier_id]
       type: object
-      x-ticvai-persistence: subscription.tier_module
+      x-ticvai-persistence: control.tier_module
       description: '**Taken from the backend workbook, 20 September.** NEW TABLE. Defines which TICVAI technical modules are commercially included in a subscription tier.'
       required:
       - tierId
+      - planVersion   # both columns of the plan key, always (r8 gate residue, CHG-R8RES-006)
       - code
       - isIncluded
       - isActive
@@ -11808,9 +12085,15 @@ components:
           format: uuid
         tierId:
           x-ticvai-column: plan_id
-          x-ticvai-references: subscription.plan
+          x-ticvai-references: control.plan
+          x-ticvai-references-version: planVersion
           type: string
           format: uuid
+        planVersion:
+          type: string
+          readOnly: true
+          description: The version of the plan this row belongs to (with `tierId`, the key of the plan row; R8 blocker
+            APPROVALS-TENANCY-C15, CHG-R8INT-023). Set by the server to the plan's latest version when written.
         code:
           type: string
           maxLength: 100
@@ -11831,7 +12114,7 @@ components:
           nullable: true
     VsiModel:
       type: object
-      x-ticvai-persistence: subscription.vsi_model
+      x-ticvai-persistence: control.vsi_model
       description: 'Board 3.2. **The number the whole commercial model hangs on**, and configurable so
         a prospect reaches a package without a sales call.
 
@@ -11894,8 +12177,11 @@ components:
           nullable: true
     VsiAssessment:
       type: object
-      x-ticvai-persistence: subscription.vsi_assessment
-      description: 'Board 2 — the ten-screen questionnaire, as data.'
+      x-ticvai-persistence: control.vsi_assessment
+      description: 'Board 2 — the ten-screen questionnaire, as data. **In the control database** (ADAM CR-150,
+        18 October 2026; CHG-CRA-003): a prospect''s sign-up answers are about a tenant to be, not inside one. It
+        holds an organisation name and a contact email, so **which control database holds it is ADR-0043''s
+        decision** (personal data stays in its region); the lead records it before rows are written.'
       properties:
         id:
           type: string
@@ -11961,7 +12247,7 @@ components:
           $ref: ../shared/common.yaml#/components/schemas/Money
     LicensingModel:
       type: object
-      x-ticvai-persistence: subscription.licensing_model
+      x-ticvai-persistence: control.licensing_model
       description: 'Boards 3.6 and 3.7. **The single most consequential commercial decision in the
         product.**
 
@@ -12036,7 +12322,7 @@ components:
           nullable: true
     ModuleListing:
       type: object
-      x-ticvai-persistence: subscription.module_listing
+      x-ticvai-persistence: control.module_listing
       description: 'Board 4.6. **A marketplace without a dependency graph sells combinations that
         cannot be provisioned.**
 
@@ -12201,7 +12487,7 @@ components:
           type: boolean
     TrialConfiguration:
       type: object
-      x-ticvai-persistence: subscription.trial_config
+      x-ticvai-persistence: control.trial_config
       description: 'Board 5.5. **A trial that expires with no conversion path is a tenant full of real
         data nobody can bill.**
 
@@ -12250,10 +12536,11 @@ components:
           default: 90
     GoLiveReadiness:
       type: object
-      x-ticvai-persistence: subscription.go_live_readiness
+      x-ticvai-persistence: control.go_live_readiness
       description: 'Board 8. **The screen that stops a launch going wrong in public.**'
       properties:
         tenantId:
+          x-ticvai-references: control.tenant
           type: string
           format: uuid
         runAt:
@@ -12323,7 +12610,7 @@ components:
           nullable: true
     LicenceEnforcementPolicy:
       type: object
-      x-ticvai-persistence: subscription.enforcement_policy
+      x-ticvai-persistence: control.enforcement_policy
       description: 'Board 9.5. **Refusing service to a paying customer mid-season is a commercial
         decision.**
 
@@ -12404,7 +12691,7 @@ components:
           type: integer
     CapacityPack:
       type: object
-      x-ticvai-persistence: subscription.capacity_pack
+      x-ticvai-persistence: control.capacity_pack
       description: 'Board 3.8. **A good season should not require renegotiating a contract in
         August.**
 
@@ -12418,7 +12705,7 @@ components:
           type: string
           format: uuid
         tenantId:
-          x-ticvai-references: none
+          x-ticvai-references: control.tenant
           type: string
           format: uuid
         unit:
@@ -16622,6 +16909,11 @@ components:
           format: uuid
     Tenant:
       x-ticvai-persistence: control.tenant
+      # The plan key is both columns or neither: a planId with no planVersion would leave the row's key to the plan
+      # unchecked, since a foreign key with a null column is not checked (r8 gate residue, CHG-R8RES-006).
+      x-ticvai-required-when:
+        planVersion: {planId: {not: null}}
+        planId: {planVersion: {not: null}}
       type: object
       required:
       - id
@@ -16677,9 +16969,17 @@ components:
           format: uuid
           nullable: true
         planId:
+          x-ticvai-references: control.plan
+          x-ticvai-references-version: planVersion
           type: string
           format: uuid
           nullable: true
+        planVersion:
+          type: string
+          nullable: true
+          readOnly: true
+          description: The version of the plan the tenant is on (with `planId`, the key of the plan row; R8 blocker
+            APPROVALS-TENANCY-C15, CHG-R8INT-023). Null when `planId` is.
         planName:
           type: string
           nullable: true
@@ -16687,6 +16987,35 @@ components:
           type: integer
         venueCount:
           type: integer
+        cellHost:
+          type: string
+          nullable: true
+          readOnly: true
+          x-ticvai-persisted: false
+          x-ticvai-derived: onRead
+          description: 'The host of the tenant''s home cell (the host part of `Cell.apiEndpoint` of the cell that
+            holds the tenant in its home region), derived on read through `control.cell_tenant`. Added for ADM-018
+            (r8 walk of ticket 27886): the console reaches the cell''s grant and language operations at this host
+            without holding `PLATFORM_CELL_VIEW`, which `listTenantCells` needs. Null while the tenant has no cell.
+
+            '
+        cellHosts:
+          type: array
+          readOnly: true
+          x-ticvai-persisted: false
+          x-ticvai-derived: onRead
+          description: 'One entry per region the tenant is in, for a multi-region tenant; the entry with `isHome`
+            true is `cellHost`. The screen uses the home cell for language and grant operations.
+
+            '
+          items:
+            type: object
+            required: [regionId, cellId, host, isHome]
+            properties:
+              regionId: { type: string, format: uuid }
+              cellId: { type: string, format: uuid }
+              host: { type: string }
+              isHome: { type: boolean }
         regionId:
           type: string
           format: uuid
@@ -16719,6 +17048,11 @@ components:
           nullable: true
     TenantDetail:
       x-ticvai-persistence: control.tenant
+      # On TenantDetail as well as Tenant: control.tenant's columns are named from TenantDetail, and derive-ddl reads
+      # the table's marks from that schema (r8 gate residue, CHG-R8RES-006).
+      x-ticvai-required-when:
+        planVersion: {planId: {not: null}}
+        planId: {planVersion: {not: null}}
       allOf:
       - $ref: '#/components/schemas/Tenant'
       - type: object
@@ -16773,7 +17107,7 @@ components:
           nullable: true
           x-ticvai-column: limit_value
           description: Null means unlimited. Stored as `limit_value` — `limit` is a reserved word, and
-            `subscription.tier_allowance` already names the same figure `limit_value`.
+            `control.tier_allowance` already names the same figure `limit_value`.
         overageAllowed:
           type: boolean
           default: false
@@ -16848,6 +17182,7 @@ components:
           default: standard
           description: '**Three standard packages, and custom ones allowed** (decided 29 September, Chinmay).'
         offeredToTenantId:
+          x-ticvai-references: control.tenant
           type: string
           format: uuid
           nullable: true
@@ -16857,7 +17192,7 @@ components:
     PlanRequestLimits:
       type: object
       nullable: true
-      x-ticvai-persistence: none — embedded in subscription.plan as its request_limits jsonb column
+      x-ticvai-persistence: none — embedded in control.plan as its request_limits jsonb column
       description: '**The limits section of a plan: every tenant has a request budget** (ADR-0064, accepted 1 October;
         it decides the per-tenant limit ADR-0032 deferred). A token bucket per tenant and audience in the kernel
         middleware of `commerce`, `access` and `operations`, counted in Azure Managed Redis so every replica agrees;
@@ -16915,9 +17250,16 @@ components:
           default: 10
           description: How long a burst may last.
     Plan:
-      x-ticvai-persistence: subscription.plan + subscription.plan_module + subscription.plan_limit
+      x-ticvai-persistence: control.plan + control.plan_module + control.plan_limit
+      # The key's second column is the version: plan_module and plan_limit carry plan_version beside plan_id (r8 gate
+      # residue, CHG-R8RES-006; derive-schema keys a derived child to its parent's version only where this says so).
+      x-ticvai-version-key: version
+      # Each version is its own row, so a subscriber on an earlier one keeps reading it (R8 blocker
+      # APPROVALS-TENANCY-C15, storage-sat request 8; r8 integration, CHG-R8INT-023). control.plan is first created by
+      # this release's control migration, so the key is right at creation.
+      x-ticvai-primary-key: [id, version]
       description: '**A plan''s modules and limits are rows, keyed on `plan_id`.** `licensedModules`
-        and `limits` are required on every plan, and `subscription.plan` alone had no column for
+        and `limits` are required on every plan, and `control.plan` alone had no column for
         either — so the licence position, the downgrade check and every module gate had nothing to
         read. `plan_module` holds one row per licensed `ModuleKey`; `plan_limit` one row per
         `EntitlementLimit`. Both belong to the plan version the row is, so a subscriber on an earlier
@@ -16974,7 +17316,10 @@ components:
           type: string
           maxLength: 500
     Subscription:
-      x-ticvai-persistence: subscription.contract
+      x-ticvai-persistence: control.contract
+      # Moved to the control database with the plan catalogue (ADAM CR-150, completing CR-097, 18 October 2026;
+      # CHG-CRA-003): what a tenant is paying for is about the tenant, not inside it (ADR-0039). Platform reads and
+      # writes it on its control connection.
       type: object
       required:
       - tenantId
@@ -16984,9 +17329,13 @@ components:
       - startsAt
       properties:
         tenantId:
+          x-ticvai-references: control.tenant
           type: string
           format: uuid
         planId:
+          x-ticvai-references: control.plan
+          # Keyed with planVersion to the plan row sold (R8 blocker APPROVALS-TENANCY-C15, CHG-R8INT-023).
+          x-ticvai-references-version: planVersion
           type: string
           format: uuid
         planName:
@@ -17112,7 +17461,13 @@ components:
           readOnly: true
           description: The tenant the add-on was sold to — the `tenantId` in the path, never the body.
         moduleKey:
-          type: string
+          $ref: '#/components/schemas/ModuleKey'
+          description: '**The licence vocabulary, not the white-label one** (the lead, 20 October 2026, r8 cause
+            APPROVALS-TENANCY-C17, option B): an add-on licenses a shared `ModuleKey` (`ticketing`, `fnb`,
+            `retail`, ...), or the add-on key `poweredByRemoval` that lets a tenant switch "Powered by TICVAI"
+            off. White label''s feature keys (`ticketsAndBooking`, `diningAndFnb`, `shop`, ...) are mapped to
+            these once, on `ModuleKey` in common.yaml and `x-ticvai-licence-module` in white-label.yaml, and
+            never stored here.'
         limitOverrides:
           type: array
           items:
@@ -17131,8 +17486,8 @@ components:
           type: string
           maxLength: 500
     LicencePosition:
-      x-ticvai-persistence: none — union of the tenant's plan (control.tenant.plan_id -> subscription.plan_module,
-        subscription.plan_limit) and its add-ons (control.licence_add_on, control.licence_add_on_limit
+      x-ticvai-persistence: none — union of the tenant's plan (control.tenant.plan_id -> control.plan_module,
+        control.plan_limit) and its add-ons (control.licence_add_on, control.licence_add_on_limit
         by tenant_id)
       type: object
       required:
@@ -17160,8 +17515,9 @@ components:
           description: |-
             Union of plan modules and add-ons. The White Label Builder reads this and cannot enable anything absent from it.
 
-            **`moduleKey` values are `ModuleKey`s** (4 October 2026, CHG-FXC-010; ADM-424), the vocabulary of
-            `white-label.ModuleEnablement.moduleKey`.
+            **`moduleKey` values are the licence modules of `ModuleKey` in common.yaml** (R8 blocker fix, IDENTITY-C31).
+            They are **not** the white-label app features of `white-label.ModuleEnablement.moduleKey`, a finer list;
+            common.yaml maps each feature to the licence module that licenses it, and a feature key is never listed here.
           items:
             type: object
             required:
@@ -17201,6 +17557,18 @@ components:
     EntitlementUsage:
       x-ticvai-persistence: none — aggregated from usage_record
       type: object
+      description: '**How each figure is worked out** (R8 blocker APPROVALS-TENANCY-C14; the lead''s answer of 20 October
+        2026: proposed, client to correct). `current`: for a stock metric (`venues`, `workstations`, `activeUsers`,
+        `devices`, `brandedApps`, `guestProfiles`, `storageGb`) the latest `control.usage_record` per venue, summed
+        over the tenant''s venues; for a flow metric (`aiTokens`, `apiCalls`, `transactions`) the sum of the records
+        in the contract''s current billing period. Rounded up to a whole number. `limit`: the plan''s
+        `control.plan_limit` for the metric (`aiTokens`: the plan''s `includedAiTokens`), plus every add-on limit in
+        force today (`validFrom` <= today <= `validTo` or no `validTo`), plus every unexpired capacity pack; null
+        when any of them is unlimited, and then `percentUsed`, `isNearLimit` and `isExceeded` are null, false and
+        false. `percentUsed` = current / limit x 100. `isNearLimit`: `percentUsed` at or above the lowest
+        `atPercentOfAllowance` of the enforcement policy''s `notify` thresholds, or 80 when it has none.
+        `isExceeded`: current above limit and the plan limit does not allow overage. `asAt`: the latest
+        `recordedAt` read.'
       required:
       - tenantId
       - metrics
@@ -17504,6 +17872,49 @@ components:
       - asynchronous
       - synchronous
 
+    TenantChangeRequested:
+      x-ticvai-persistence: none — response only; the request is approvals.request, the change is applied on approval.granted
+      description: '**A tenant suspension or reactivation waiting for approval** (ADAM CR-172, 19 October 2026;
+        CHG-CRA-005): what `suspendTenant` and `reactivateTenant` answer with 202: the tenant as it still is (the
+        same fields the 200 used to carry, so a client reading them keeps working), and the approval request raised.'
+      allOf:
+      - $ref: '#/components/schemas/Tenant'
+      - type: object
+        required: [action, approvalRequestId, requestedAt]
+        properties:
+          action:
+            type: string
+            enum: [suspend, reactivate]
+          approvalRequestId:
+            type: string
+            format: uuid
+            description: The approval request raised (`approvals.createApprovalRequest`); its decision applies the change.
+          requestedAt:
+            type: string
+            format: date-time
+    TenantChangeConflictProblem:
+      x-ticvai-persistence: none — error shape
+      description: '**`suspendTenant`''s and `reactivateTenant`''s 409** (ADAM CR-172, fix round 3; CHG-CRA-005): the
+        shared Problem, and with `open-request-exists` the fields of the 409 approvals'' `createApprovalRequest`
+        declares for an open request on the same subject (`ApprovalStateProblem`), passed through as it gives them,
+        so the caller can point at the open request rather than raise another. Absent with the tenant''s own
+        refusals.'
+      allOf:
+      - $ref: ../shared/common.yaml#/components/schemas/Problem
+      - type: object
+        properties:
+          refusedReason:
+            type: string
+            enum: [openRequestExists]
+            description: '`openRequestExists`, as `createApprovalRequest` gives it.'
+          requestId:
+            type: string
+            format: uuid
+            description: The approval request already open for this tenant.
+          currentStatus:
+            allOf:
+            - $ref: '../spine/approvals.yaml#/components/schemas/ApprovalStatus'
+            description: The status that request is in now.
     CellTenant:
       x-ticvai-persistence: control.cell_tenant
       description: 'Which tenants a cell holds, and the database each one is. **The relation that replaced
@@ -17524,10 +17935,21 @@ components:
       - instanceId
       - databaseName
       - status
+      - rootScopePath
       properties:
         id:
           type: string
           format: uuid
+        rootScopePath:
+          type: string
+          readOnly: true
+          pattern: '^[a-z0-9_]+$'
+          description: '**The tenant database''s root scope path** (ADAM CR-163, option A, 18 October 2026;
+            CHG-CRA-005): the `path` of the `level` tenant node the cell creates in that database at provisioning
+            (`provision-tenant.sh`), written then and never changed. It sits here because the path belongs to one
+            database. The migrator and the fan-out read it with `databaseName`, and `tenant.suspended` carries it
+            as its scope path. **Never derived from `control.tenant.code`**, whose pattern allows hyphens a scope
+            label does not.'
         cellId:
           x-ticvai-references: control.cell
           type: string
@@ -17979,6 +18401,12 @@ components:
           - backup
           - restore
           - decommission
+        targetTier:
+          allOf:
+          - $ref: '#/components/schemas/CellTier'
+          nullable: true
+          description: For a `tierMigration` job, the tier the cell moves to at cutover (`updateCellTier`); null for
+            every other kind (R8 blocker APPROVALS-TENANCY-C19).
         status:
           type: string
           enum:
@@ -19687,6 +20115,19 @@ components:
         the workshop pack''s own display and configuration directory for this screen; each property names
         the sentence it came from. **Not a row** - the screen is a view over the module''s existing state.'
       properties:
+        catalogueProductId:
+          type: string
+          format: uuid
+          nullable: true
+          description: 'The catalogue product this membership is sold as (`MembershipProduct.catalogueProductId`,
+            subscription.membership_product.catalogue_product_id), so BO-291 can read and send back its channel
+            availability and prices (r8, GPS-C39)'
+        variantId:
+          type: string
+          format: uuid
+          nullable: true
+          description: 'The variant of that product the price list prices (its default variant), for setPrices
+            (r8, GPS-C39); read from catalogue at read time, not stored here'
         basePricingProfile:
           type: string
           description: Base Pricing Profile id
@@ -19897,6 +20338,7 @@ components:
               - suggestedTier
           description: Tier Movement (pack p.16)
         cancellationPolicyId:
+          x-ticvai-references: none
           type: string
           description: 'Cancellation/refund policy from the central policy management (MoM 25 Aug: refund and
             cancellation rules are managed centrally). Empty means no refund on cancellation unless the commercial
@@ -20014,6 +20456,7 @@ components:
               - suggestedTier
           description: Tier Movement (pack p.16)
         cancellationPolicyId:
+          x-ticvai-references: none
           type: string
           description: 'Cancellation/refund policy from the central policy management (MoM 25 Aug: refund and
             cancellation rules are managed centrally). Empty means no refund on cancellation unless the commercial
@@ -21142,6 +21585,10 @@ components:
             - suggestedTier
           description: Tier Movement (pack p.16)
         cancellationPolicyId:
+          # A refund policy, never licence enforcement (ADAM CR-150 follow-up, CHG-CRA-003): the naming convention
+          # keyed it to subscription.enforcement_policy, which moves to control. Which refund-policy table it names
+          # is the lead's follow-up; until then it is not a key.
+          x-ticvai-references: none
           type: string
           description: 'Cancellation/refund policy from the central policy management (MoM 25 Aug: refund
             and cancellation rules are managed centrally). Empty means no refund on cancellation unless

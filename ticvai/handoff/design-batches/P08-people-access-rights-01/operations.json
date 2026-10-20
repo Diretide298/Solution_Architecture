@@ -317,6 +317,11 @@
     "required": false
    },
    {
+    "name": "X-Supervisor-Username",
+    "in": "header",
+    "required": false
+   },
+   {
     "name": "X-Supervisor-Pin",
     "in": "header",
     "required": false
@@ -333,6 +338,11 @@
    },
    {
     "name": "workstationId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
     "in": "query",
     "required": null
    },

@@ -6,13 +6,13 @@ description: '**Derived from what each app''s screens call, not decided here.** 
   and the approval hierarchy are deliberately absent: who at a venue may configure pricing is the client''s
   decision and a plausible answer written here would be read as one they made.'
 theTwoVocabularies:
-  onOperations: 174
-  inRolesYaml: 43
-  rolesYamlMapsTo: 12
-  shared: 10
+  onOperations: 176
+  inRolesYaml: 45
+  rolesYamlMapsTo: 14
+  shared: 12
   note: '**One vocabulary: the `Permission` enum in contracts/shared/permissions.yaml.** The contracts
-    require 174 of its values across 2633 operations; `roles.yaml`''s 43 POS action keys are presets,
-    each mapped to the enum values it covers (12 values, 10 of them required by an operation). check-permission-vocabulary
+    require 176 of its values across 2654 operations; `roles.yaml`''s 45 POS action keys are presets,
+    each mapped to the enum values it covers (14 values, 12 of them required by an operation). check-permission-vocabulary
     holds every place that names a permission to the enum.'
 tiers:
   read: Sees it. The floor of any signed-in session, and the tier a read-only audit or a duty manager
@@ -109,7 +109,9 @@ apps:
     - getCart
     - getCookieConsentRuntime
     - getGuestBill
+    - getGuestBundle
     - getGuestConversation
+    - getGuestCouponCode
     - getGuestMenu
     - getGuestOrderStatus
     - getGuestRefundPolicy
@@ -121,9 +123,7 @@ apps:
     - getPublishedBookingFlow
     - getPublishedGuidedChoice
     - getPublishedKioskConfig
-    - getPublishedTenantConfig
-    - getTenantAppStatus
-    operationsWithNoPermissionCount: 112
+    operationsWithNoPermissionCount: 115
   ticvai-control:
     name: TICVAI Control
     platforms:
@@ -302,8 +302,8 @@ apps:
     - P13
     - P16
     screens: 1866
-    operations: 2096
-    permissions: 149
+    operations: 2099
+    permissions: 151
     permissionSet:
     - ACCESS_DIRECTION_SET
     - ACCESS_OVERRIDE
@@ -363,6 +363,8 @@ apps:
     - MARKETING_MANAGE
     - MARKETING_SEND
     - MARKETING_VIEW
+    - MEMBERSHIP_MANAGE
+    - MEMBERSHIP_VIEW
     - ORDER_CREATE
     - ORDER_DISCOUNT
     - ORDER_EXCHANGE
@@ -471,6 +473,7 @@ apps:
       - INSPECTION_VIEW
       - LEDGER_VIEW
       - MARKETING_VIEW
+      - MEMBERSHIP_VIEW
       - ORDER_VIEW
       - PARTNER_VIEW
       - PAYMENT_VIEW
@@ -574,6 +577,7 @@ apps:
       - INCIDENT_MANAGE
       - INSPECTION_MANAGE
       - MARKETING_MANAGE
+      - MEMBERSHIP_MANAGE
       - PARKING_CONFIGURE
       - PARTNER_MANAGE
       - PAYMENT_CONFIGURE

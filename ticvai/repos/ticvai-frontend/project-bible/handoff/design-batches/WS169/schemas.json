@@ -71,9 +71,9 @@
   "type": "object",
   "required": [
    "id",
-   "performanceId",
-   "seatIds"
+   "performanceId"
   ],
+  "description": "**Seats or a standing zone, exactly one** (r8, GPS-C38): `seatIds` holds named seats; `zoneId` with `quantity` holds places in a standing zone (a zone has no seats), refused `409` `zone-unavailable` when the zone has fewer left. Both, or neither, is `400`.",
   "properties": {
    "id": {
     "type": "string",
@@ -82,6 +82,17 @@
    "performanceId": {
     "type": "string",
     "format": "uuid"
+   },
+   "zoneId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "A standing zone of the performance's map (`SeatAvailability.zones`), with `quantity` (r8, GPS-C38)."
+   },
+   "quantity": {
+    "type": "integer",
+    "minimum": 1,
+    "maximum": 50,
+    "description": "The places held in `zoneId`; the same per-booking limits as `seatIds` (r8, GPS-C38)."
    },
    "seatIds": {
     "type": "array",
@@ -203,6 +214,28 @@
     ],
     "description": "The mode the server actually used. With `mode=auto` this is how a client knows what it got: `list` means the map has no geometry (the seat map's `noGeometry` state), so the client sells from categories and best-available groups and does not draw a plan. `graphical` means every seat carries `position`.\n"
    },
+   "viewBox": {
+    "type": "object",
+    "nullable": true,
+    "description": "The coordinate space the seat positions are in, as `SeatMap.viewBox`, so the section view is drawn from this response alone (WEB-007, GST-049; r8 walk of ticket 28197). Null when `renderMode` is `list`.\n",
+    "properties": {
+     "width": {
+      "type": "number"
+     },
+     "height": {
+      "type": "number"
+     }
+    }
+   },
+   "stagePosition": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/Point"
+     }
+    ],
+    "nullable": true,
+    "description": "Where the stage sits in the same space, as `SeatMap.stagePosition`; the section view orients the seats towards it. Null when `renderMode` is `list`.\n"
+   },
    "totals": {
     "type": "object",
     "properties": {
@@ -243,6 +276,35 @@
       },
       "price": {
        "$ref": "../shared/common.yaml#/components/schemas/Money"
+      }
+     }
+    }
+   },
+   "zones": {
+    "type": "array",
+    "description": "**The standing zones and what is left in each** (r8, GPS-C38): a zone has no seats, so it is sold by quantity (`createSeatHold` `zoneId` and `quantity`). `keepTogether` says whether the venue keeps a party in one zone (a party larger than `remaining` is then refused rather than split).",
+    "items": {
+     "type": "object",
+     "required": [
+      "zoneId",
+      "name",
+      "remaining"
+     ],
+     "properties": {
+      "zoneId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "name": {
+       "type": "string"
+      },
+      "remaining": {
+       "type": "integer",
+       "minimum": 0
+      },
+      "keepTogether": {
+       "type": "boolean",
+       "default": true
       }
      }
     }
@@ -356,8 +418,17 @@
      "held",
      "converted",
      "released",
-     "expired"
-    ]
+     "expired",
+     "sold"
+    ],
+    "description": "`converted` when the order is created; `sold` when the order is paid and `catalogue.convertInventoryHold` sells the units (ADAM CR-169, 18 October 2026; CHG-CRA-007)."
+   },
+   "inventoryReservationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "x-ticvai-references": "catalogue.inventory_reservation",
+    "description": "**The inventory hold these seats sit under** (ADAM CR-169; CHG-CRA-007), so `convertInventoryHold` finds the order's seat reservations from the hold it converts."
    },
    "totalPrice": {
     "x-ticvai-column": "gross_amount",

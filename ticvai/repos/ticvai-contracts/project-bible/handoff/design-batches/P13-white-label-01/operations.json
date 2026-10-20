@@ -402,7 +402,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "ModuleEnablement"
  },
@@ -418,6 +424,19 @@
   "parameters": [],
   "requestBody": null,
   "responds": "NavigationConfig"
+ },
+ "getPublishReviewPolicy": {
+  "method": "GET",
+  "path": "/publish-review-policy",
+  "contract": "white-label",
+  "summary": "Whether publishing needs a review",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "PublishReviewPolicy"
  },
  "getSiteSetupProgress": {
   "method": "GET",
@@ -968,6 +987,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": null,
     "in": null,

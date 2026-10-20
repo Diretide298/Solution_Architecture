@@ -7,7 +7,7 @@
  "audience": "guest",
  "formFactor": "kiosk",
  "offlineCapable": false,
- "generated": "2026-10-18",
+ "generated": "2026-10-20",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 17,
@@ -15,7 +15,7 @@
   "contracts": 7,
   "modules": 2,
   "undrawn": 0,
-  "operationsWithNoScreen": 12
+  "operationsWithNoScreen": 14
  },
  "waves": {
   "wave1": 2,
@@ -56,15 +56,15 @@
    "operations": 3
   },
   {
-   "contract": "fnb",
-   "operations": 2
-  },
-  {
    "contract": "ai",
    "operations": 2
   },
   {
    "contract": "marketing-crm",
+   "operations": 2
+  },
+  {
+   "contract": "fnb",
    "operations": 2
   }
  ],
@@ -292,10 +292,22 @@
     "summary": "Store a guest photo, ID or signed document"
    },
    {
+    "operation": "convertToTermProduct",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "Turn a visit into a membership or season pass"
+   },
+   {
     "operation": "revokeEntitlementShare",
     "contract": "orders",
     "verb": "POST",
     "summary": "Take back a share"
+   },
+   {
+    "operation": "revokePaymentToken",
+    "contract": "orders",
+    "verb": "DELETE",
+    "summary": "Remove a saved payment method"
    }
   ],
   "modulesSplitAcrossWaves": [

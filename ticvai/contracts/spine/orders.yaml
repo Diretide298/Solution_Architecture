@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Order & Payment
   version: 0.1.0
-  x-ticvai-screen-count: 208
+  x-ticvai-screen-count: 212
   x-ticvai-tier: spine
   x-ticvai-module: 2 — Ticketing Sales
   x-ticvai-requirements: 343
@@ -364,8 +364,13 @@ paths:
     post:
       operationId: createCart
       x-ticvai-consumed-by:
+        - "P01 WEB-006 Date & Performance Selection"
         - "P01 WEB-010 Shopping Cart"
+        - "P01 WEB-048 Book a Space by the Hour"
+        - "P02 GST-008 Tickets & Add-ons"
         - "P02 GST-041 Checkout Entry"
+        - "P02 GST-050 Resource Booking – Cabana"
+        - "P02 GST-075 Book a Space by the Hour"
       x-ticvai-read-via:
       - query: identity#subjectRecords
         route: in-process
@@ -6007,13 +6012,13 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     get:
       operationId: listOwnRefundRequests
+      x-ticvai-consumed-by:
+        - "P01 WEB-019 Order History"
+        - "P02 GST-067 Refunds & Resale"
       x-ticvai-read-via:
       - query: finance#fxRateRecords
         route: in-process
         for: 'the rate a refund in another currency is shown at (Refund, ledger.fx_rate), Ledger''s data (r8 integration, CHG-R8INT-014)'
-      x-ticvai-consumed-by:
-        - "P01 WEB-019 Order History"
-        - "P02 GST-067 Refunds & Resale"
       x-ticvai-audience:
       - guest
       security:
@@ -6074,6 +6079,8 @@ paths:
         format: uuid
     get:
       operationId: getGuestRefundPolicy
+      x-ticvai-consumed-by:
+        - "P02 GST-067 Refunds & Resale"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
         route: in-process

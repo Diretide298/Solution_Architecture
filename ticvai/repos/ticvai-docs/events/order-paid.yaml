@@ -38,7 +38,8 @@ payload:
   type: Money
 - field: lines
   type: array
-  notes: variantId, quantity, lineTotal
+  notes: 'lineId (uuid, orders.order_line.id: the key a consumer''s idempotency names), variantId, quantity,
+    lineTotal, performanceId (null for an untimed line) (r8, FOUNDATION-AI-C04)'
 - field: paidAt
   type: timestamp
 - field: sequence

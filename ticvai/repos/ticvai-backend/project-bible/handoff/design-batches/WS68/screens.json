@@ -39,12 +39,18 @@
      "to": "ANL-001",
      "trigger": "Back to Executive Command Center",
      "provenance": "structural — pack board 3 wiring, 9 September 2026",
-     "back": true
+     "back": true,
+     "carries": [
+      "reportId"
+     ]
     },
     {
      "to": "ANL-040",
      "trigger": "Save, Run & Report Results Viewer",
-     "provenance": "structural — pack board 3 wiring, 9 September 2026"
+     "provenance": "structural — pack board 3 wiring, 9 September 2026",
+     "carries": [
+      "reportId"
+     ]
     },
     {
      "to": "ANL-032",
@@ -64,27 +70,42 @@
     {
      "to": "ANL-035",
      "trigger": "Filter & Parameter Builder",
-     "provenance": "structural — pack board 3 wiring, 9 September 2026"
+     "provenance": "structural — pack board 3 wiring, 9 September 2026",
+     "carries": [
+      "reportId"
+     ]
     },
     {
      "to": "ANL-036",
      "trigger": "Grouping, Aggregation & Calculation Builder",
-     "provenance": "structural — pack board 3 wiring, 9 September 2026"
+     "provenance": "structural — pack board 3 wiring, 9 September 2026",
+     "carries": [
+      "reportId"
+     ]
     },
     {
      "to": "ANL-037",
      "trigger": "Cross-Domain Report Composer",
-     "provenance": "structural — pack board 3 wiring, 9 September 2026"
+     "provenance": "structural — pack board 3 wiring, 9 September 2026",
+     "carries": [
+      "reportId"
+     ]
     },
     {
      "to": "ANL-038",
      "trigger": "Report Layout & Formatting Designer",
-     "provenance": "structural — pack board 3 wiring, 9 September 2026"
+     "provenance": "structural — pack board 3 wiring, 9 September 2026",
+     "carries": [
+      "reportId"
+     ]
     },
     {
      "to": "ANL-039",
      "trigger": "Report Preview, Test & Validation",
-     "provenance": "structural — pack board 3 wiring, 9 September 2026"
+     "provenance": "structural — pack board 3 wiring, 9 September 2026",
+     "carries": [
+      "reportId"
+     ]
     }
    ]
   },

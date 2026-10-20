@@ -1944,9 +1944,16 @@ screens:
     component: apps/signup-web/src/routes/purchase-activation/ContractBillingCycleSelection.tsx
     status: notStarted
   density: compact
-  notes: The self-service form of `ADM-410`, for a prospect with no account. Decided 11 September 2026;
+  notes: 'The self-service form of `ADM-410`, for a prospect with no account. Decided 11 September 2026;
     P09 keeps its screen for the operator-led path (BL-165). `tools/applied/apply-subscription-placement.py`
     keeps the two in step.
+
+
+    Build note (r8 second round, APPROVALS-TENANCY-C16, the lead 20 October 2026, option B): **a prospect does
+    not call `setSubscription`**, which is staff-only (a prospect has no tenant and no permission). The plan and
+    term chosen here are held by the sign-up and travel on the application as `requestedPlanId`, sent with
+    `submitOnboardingApplication` on SGN-020. The first subscription is set by platform staff
+    (ADM-417, `setSubscription`) when the application is approved and provisioned.'
   wireframe:
     status: notStarted
     board: wireframes/P17 TICVAI Sign-up.dc.html#sgn-019
@@ -1998,12 +2005,7 @@ screens:
     why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
       a default rather than a reading. It needs a person before it is built.'
     source: pack Subscription_Licensing_AI_Self_Service.pdf, page 59
-  apis:
-  - operationId: setSubscription
-    contract: subscription
-    purpose: Contract and billing cycle
-    trigger: onAction
-    provenance: board reading, 19 September 2026
+  apis: []
   apisNote: Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 59. 0 of
     0 labels bound to a contract property; 1 of 25 pack bullets carried onto the screen — the rest are
     acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather
@@ -2532,9 +2534,17 @@ screens:
     component: apps/signup-web/src/routes/purchase-activation/SubscriptionConfirmationCommercialActivation.tsx
     status: notStarted
   density: compact
-  notes: The self-service form of `ADM-417`, for a prospect with no account. Decided 11 September 2026;
+  notes: 'The self-service form of `ADM-417`, for a prospect with no account. Decided 11 September 2026;
     P09 keeps its screen for the operator-led path (BL-165). `tools/applied/apply-subscription-placement.py`
     keeps the two in step.
+
+
+    Build note (r8 second round, APPROVALS-TENANCY-C16, the lead 20 October 2026, option B): **Save subscription
+    calls nothing.** The prospect''s choices are already on the application: the plan (`requestedPlanId`, picked
+    on SGN-012 and SGN-019) and the billing entity were sent with `submitOnboardingApplication` on SGN-020. This
+    screen confirms them and moves on; `setSubscription` is staff-only, and platform staff set the first
+    subscription from `requestedPlanId` (ADM-417) once the application is verified. Nothing is provisioned
+    before that.'
   wireframe:
     status: notStarted
     board: wireframes/P17 TICVAI Sign-up.dc.html#sgn-024
@@ -2550,14 +2560,12 @@ screens:
       components:
       - kind: primaryButton
         derived: true
-        impliedBy: setSubscription
         label: Save subscription
-        notes: The act the screen exists for.
+        notes: The act the screen exists for. Calls nothing (r8, APPROVALS-TENANCY-C16); see the build note.
       - kind: secondaryButton
         label: Cancel
         notes: '**A screen that can submit must be leaveable without submitting.**'
         derived: true
-        impliedBy: setSubscription
   states:
     loading: The subscription confirmation commercial list.
     error: Could not load. Names which read failed and leaves the subscription confirmation commercial
@@ -2581,12 +2589,7 @@ screens:
     why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
       a default rather than a reading. It needs a person before it is built.'
     source: pack Subscription_Licensing_AI_Self_Service.pdf, page 67
-  apis:
-  - operationId: setSubscription
-    contract: subscription
-    purpose: Create the subscription
-    trigger: onAction
-    provenance: board reading, 19 September 2026
+  apis: []
   apisNote: Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 67. 0 of
     0 labels bound to a contract property; 0 of 24 pack bullets carried onto the screen — the rest are
     acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather

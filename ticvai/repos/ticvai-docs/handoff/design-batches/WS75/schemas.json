@@ -96,7 +96,7 @@
    },
    "url": {
     "type": "string",
-    "description": "Signed and expiring for private assets; stable CDN URL for public ones."
+    "description": "Signed and expiring for private assets; stable CDN URL for public ones. **A public asset that a published white-label version references is served at its stable CDN URL**, and `getPublishedTenantConfig` returns that address (`brandUrls`, `banners[].imageUrl`) so a guest client never needs this read (r8 walk of ticket 28335)."
    },
    "thumbnailUrl": {
     "type": "string",
@@ -122,12 +122,43 @@
    "createdAt": {
     "type": "string",
     "format": "date-time"
+   },
+   "extractedText": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**The text pulled out of an uploaded document** (R8 blocker ORDERS-MONEY-C19): written by the upload's processing job once text extraction finishes (PDF, Word and plain-text kinds), replaced when the file is replaced, null for an image, video or audio file or while the asset is still processing. One value per asset, so AI's `ingestKnowledgeDocument` reads it through `mediaAssetRecords`."
+   },
+   "releasedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-references": "identity.principal",
+    "description": "The reviewer who released the asset from `quarantined` (R8 blocker ORDERS-MONEY-C24, CHG-R8MIG-022); null if it never was."
+   },
+   "releasedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "When it was released from `quarantined`."
    }
   }
  },
  "MediaAssetVersion": {
   "type": "object",
   "x-ticvai-persistence": "assets.asset_version",
+  "x-ticvai-unique-when": [
+   {
+    "columns": [
+     "assetId"
+    ],
+    "when": {
+     "isCurrent": true
+    }
+   }
+  ],
   "description": "Boards 2.6 and 2.7. **Usage impact belongs to the version read**, because replacing a logo is routine or an incident depending on where it appears.\n",
   "properties": {
    "assetId": {
@@ -161,6 +192,19 @@
    },
    "isCurrent": {
     "type": "boolean"
+   },
+   "storageKey": {
+    "type": "string",
+    "nullable": true,
+    "writeOnly": true,
+    "maxLength": 500,
+    "description": "Where this version's file is kept in the asset store (R8 blocker ORDERS-MONEY-C29). Written by `replaceMediaAsset` for the file it replaces, so the previous version stays retrievable; never returned."
+   },
+   "contentType": {
+    "type": "string",
+    "nullable": true,
+    "maxLength": 200,
+    "description": "The media type of this version's file (R8 blocker ORDERS-MONEY-C29)."
    },
    "usageImpact": {
     "x-ticvai-persisted": false,

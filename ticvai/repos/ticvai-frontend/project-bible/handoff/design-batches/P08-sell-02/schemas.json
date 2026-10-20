@@ -19,6 +19,18 @@
     "nullable": true,
     "description": "The product recommended. **Exactly one of `productId`, `promotionId` or `couponRef`, `rewardId` or `challengeId` is set, by `kind`** (29 September, build): `offer` carries a promotion or coupon, `reward` a loyalty reward, `challenge` a challenge, every other kind a product."
    },
+   "variantId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**What the guest adds to the cart, when there is nothing to choose** (r8, ORDERS-MONEY-C40, the lead's option A): for a product item whose product has one default variant, that variant, resolved from the Pricing price reference the item carries; the add-to-cart asks only the quantity (and a date for a timed product). Null when the product has several variants: the screen lets the guest choose (`catalogue.listProductVariants`, option B). Null on non-product kinds (offer, reward, challenge), which have their own action, never addCartLine."
+   },
+   "performanceId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "For a timed product with exactly one bookable performance in the context the engine was given (the cart's date), that performance (r8, ORDERS-MONEY-C40); otherwise null and the screen asks for the date."
+   },
    "promotionId": {
     "type": "string",
     "format": "uuid",
@@ -321,6 +333,21 @@
     "type": "string",
     "format": "uuid"
    },
+   "publishedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "When the bundle was published; `BundleSummary.publishedAt` (CHG-R8MIG-015)."
+   },
+   "publishedBy": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-references": "identity.principal",
+    "description": "Who published it; `BundleSummary.publishedBy` (CHG-R8MIG-015)."
+   },
    "isDelta": {
     "type": "boolean"
    },
@@ -331,7 +358,7 @@
    },
    "signature": {
     "type": "string",
-    "description": "Detached signature over `contentHash`. The terminal verifies before applying and rolls back on failure — a half-applied catalogue is never traded against.\n"
+    "description": "Detached signature over `contentHash`. The terminal verifies before applying and rolls back on failure — a half-applied catalogue is never traded against.\n\n**Ed25519**, with the key `signatureKeyId` names, whose public half `getBundleSigningKeys` returns (FOUNDATION-AI-C14, CHG-R8SPN-022).\n"
    },
    "signatureKeyId": {
     "type": "string"
@@ -361,9 +388,9 @@
   }
  },
  "CatalogueState": {
-  "x-ticvai-persistence": "none — computed from workstation bundle_version",
+  "x-ticvai-persistence": "none — computed from catalogue.bundle_application, the workstation's latest applied report (CHG-R8MIG-015)",
   "type": "object",
-  "description": "The workstation's local catalogue position. A terminal beyond `staleAfter` must refuse to trade rather than transact against stale prices.\n",
+  "description": "The workstation's local catalogue position. A terminal beyond `staleAfter` must refuse to trade rather than transact against stale prices. **Read from Catalogue** (R8 blocker FOUNDATION-AI-C44, CHG-R8MIG-015): the workstation's latest `applied` row in `catalogue.bundle_application` (catalogue#bundleApplicationRecords) gives `appliedBundleVersion` and `appliedAt`, that bundle's `catalogue.published_bundle.stale_after` gives `staleAfter`, and the venue's newest published bundle, when newer, is `pendingBundleVersion`.\n",
   "required": [
    "appliedBundleVersion",
    "appliedAt",
@@ -976,13 +1003,19 @@
  },
  "DeviceBinding": {
   "x-ticvai-persistence": "platform.device",
-  "description": "A device as its workstation is configured with it. **Binding a device here moves its row to the workstation's scope**: `platform.device.scope_path` becomes the workstation's path, so the device's own session, scoped to that workstation, can write its heartbeat (ADAM CR-095, CHG-RSF-001).\n",
   "type": "object",
+  "description": "A device as its workstation is configured with it. **Binding a device here moves its row to the workstation's scope**: `platform.device.scope_path` becomes the workstation's path, so the device's own session, scoped to that workstation, can write its heartbeat (ADAM CR-095, CHG-RSF-001).\n\n**A registered device linked to the workstation** (ADAM CR-155, option A, 18 October 2026; CHG-CRA-004). `deviceId` names an existing `platform.device` (registered by `registerDevice`); in `configureWorkstation` it is what links the device (`platform.device.workstation_id`, `isRequired`). `kind`, `driver` and `identifier` are the device's own record, returned on `Workstation.devices`; a request's values for them are not written.",
   "required": [
    "kind",
    "driver"
   ],
   "properties": {
+   "deviceId": {
+    "type": "string",
+    "format": "uuid",
+    "x-ticvai-column": "id",
+    "description": "**The registered device** (CR-155): the `platform.device` row's own id. Every item `configureWorkstation` is sent names one; an item without one, or naming no registered device of this tenant, is `422 unknown-device`."
+   },
    "kind": {
     "$ref": "#/components/schemas/DeviceKind"
    },
@@ -1517,7 +1550,7 @@
     "readOnly": true,
     "type": "string",
     "pattern": "^[a-z0-9_]+(\\.[a-z0-9_]+)*$",
-    "description": "**The node this policy is for, and the key `setOfflinePolicy` upserts on.** The body names its target here, because the path does not.\n"
+    "description": "**The node this policy is for, and the key `setOfflinePolicy` upserts on.** Written by the server from the venue the caller's session acts at; a value sent in a body is ignored (APPROVALS-TENANCY-C07, CHG-R8SPN-017).\n"
    },
    "maxOfflineHours": {
     "type": "integer",
@@ -1679,6 +1712,11 @@
        "type": "string",
        "nullable": true,
        "description": "For a `rejected` or `blockedByRejection` entry, the `sync.rejection` row it was quarantined into (SD-028). The batch carried on past it."
+      },
+      "reconcilerFlag": {
+       "type": "string",
+       "nullable": true,
+       "description": "`unitsGone` on an `accepted` entry whose hold had expired before the sync and whose units were no longer free: the sale stands and the order is on the reconciliation queue, nothing refunded (FOUNDATION-AI-C46, CHG-R8SPN-033; as CR-169 for an online capture). Null otherwise. Plain text so a later flag adds no enum value."
       },
       "error": {
        "$ref": "../shared/common.yaml#/components/schemas/Problem"
@@ -2516,6 +2554,28 @@
     ],
     "description": "The mode the server actually used. With `mode=auto` this is how a client knows what it got: `list` means the map has no geometry (the seat map's `noGeometry` state), so the client sells from categories and best-available groups and does not draw a plan. `graphical` means every seat carries `position`.\n"
    },
+   "viewBox": {
+    "type": "object",
+    "nullable": true,
+    "description": "The coordinate space the seat positions are in, as `SeatMap.viewBox`, so the section view is drawn from this response alone (WEB-007, GST-049; r8 walk of ticket 28197). Null when `renderMode` is `list`.\n",
+    "properties": {
+     "width": {
+      "type": "number"
+     },
+     "height": {
+      "type": "number"
+     }
+    }
+   },
+   "stagePosition": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/Point"
+     }
+    ],
+    "nullable": true,
+    "description": "Where the stage sits in the same space, as `SeatMap.stagePosition`; the section view orients the seats towards it. Null when `renderMode` is `list`.\n"
+   },
    "totals": {
     "type": "object",
     "properties": {
@@ -2556,6 +2616,35 @@
       },
       "price": {
        "$ref": "../shared/common.yaml#/components/schemas/Money"
+      }
+     }
+    }
+   },
+   "zones": {
+    "type": "array",
+    "description": "**The standing zones and what is left in each** (r8, GPS-C38): a zone has no seats, so it is sold by quantity (`createSeatHold` `zoneId` and `quantity`). `keepTogether` says whether the venue keeps a party in one zone (a party larger than `remaining` is then refused rather than split).",
+    "items": {
+     "type": "object",
+     "required": [
+      "zoneId",
+      "name",
+      "remaining"
+     ],
+     "properties": {
+      "zoneId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "name": {
+       "type": "string"
+      },
+      "remaining": {
+       "type": "integer",
+       "minimum": 0
+      },
+      "keepTogether": {
+       "type": "boolean",
+       "default": true
       }
      }
     }
@@ -2947,16 +3036,20 @@
  },
  "SupervisorStepUp": {
   "type": "object",
-  "description": "**A supervisor signs the act in place, on the device making the call** (decided 28 September, audit R144). Used where the decision is a same-device step-up rather than an approval request: reopening a shift, recounting a stock count, a retail return above the venue threshold, and (proposed by the coordinator, client to confirm) closing a stock transfer short and cancelling a performance.\n\n**The verification rule, the same on every operation that takes it:** the server checks `credential` against `principalId`; that principal must hold the operation's `x-ticvai-permission` at the operation's scope, must be active at that venue, and must not be the person whose act is being reversed where the operation says so. Any failure is a `403` (`supervisor-step-up-refused`) and nothing is written. **No approval request is raised**, and the operation declares `x-ticvai-step-up: pin`.\n",
+  "description": "**A supervisor signs the act in place, on the device making the call** (decided 28 September, audit R144). Used where the decision is a same-device step-up rather than an approval request: reopening a shift, recounting a stock count, a retail return above the venue threshold, and (proposed by the coordinator, client to confirm) closing a stock transfer short and cancelling a performance.\n\n**The verification rule, the same on every operation that takes it:** the server checks `credential` against `principalId`; that principal must hold the operation's `x-ticvai-permission` at the operation's scope, must be active at that venue, and must not be the person whose act is being reversed where the operation says so. Any failure is a `403` (`supervisor-step-up-refused`) and nothing is written. **No approval request is raised**, and the operation declares `x-ticvai-step-up: pin`.\n\n**Where `principalId` comes from, on every operation that takes this** (decided 20 October 2026, Chinmay, R8 blocker cause GPS-C31, option A; CHG-R8SPN-035). The PIN prompt shows a picker filled by `identity.listStepUpSupervisors` with the operation's permission: the active principals who hold it at the caller's venue, by display name. The supervisor picks their own name and types their PIN; the prompt sends the picked `principalId` (or, where the prompt asks for an employee number instead, `supervisorUsername`). **Nobody signs their own act**: a `principalId` (or resolved `supervisorUsername`) equal to the caller's own principal is refused `403 supervisor-step-up-refused`, even when the caller holds the permission, and the picker leaves the caller out.\n",
   "required": [
-   "principalId",
    "credential"
   ],
   "properties": {
    "principalId": {
     "type": "string",
     "format": "uuid",
-    "description": "The supervisor signing. Recorded against the act."
+    "description": "The supervisor signing. Recorded against the act. **Exactly one of `principalId` or `supervisorUsername`** is sent (neither, or both, is `400`; not in the schema as a oneOf, so an r1 client still validates)."
+   },
+   "supervisorUsername": {
+    "type": "string",
+    "maxLength": 200,
+    "description": "**The supervisor's employee number**, which is what the step-up prompt asks for (R8 blocker fix, IDENTITY-C44). The server resolves it to the principal (`identity.principal.username`, within the tenant) before it checks the PIN; an unknown one is refused exactly as a wrong PIN, `403 supervisor-step-up-refused`, so the prompt does not reveal which employee numbers exist. The act is recorded against the resolved principal. Exactly one of this or `principalId`."
    },
    "credential": {
     "type": "string",
@@ -2992,8 +3085,10 @@
      "payment",
      "refund",
      "void",
-     "scan"
-    ]
+     "scan",
+     "cashMovement"
+    ],
+    "description": "What was refused. `cashMovement` (20 October 2026, R8 blocker cause FOUNDATION-AI-C13; CHG-R8SPN-021) is an offline lift or float replayed through `shift.createCashMovement` and refused `409 shift-not-open` or `lift-exceeds-float`; its `payload` is the `CreateCashMovementRequest` the till sent."
    },
    "recordedAt": {
     "type": "string",
@@ -3242,6 +3337,15 @@
   "x-ticvai-persistence": "platform.venue_settings",
   "description": "**Venue-level operational configuration that no other level can answer.**\nRegion owns currency, tax regime and fiscal year (ADR-0011). Venue owns the things that vary between two venues in one region — **opening hours, support hours, and what the local law requires of the gate.**\n**And the configured limits** (decided 28 September, audit R094): every limit the contracts call *configured* is a field here, from `displayCurrencies` and `cartLeaseSeconds` down to the grouped `catalogue`, `inventory`, `seating`, `promotions`, `fnb`, `queue`, `reporting`, `marketing` and `identity` settings. **Each has a tenant-level default**: the tenant sets it once with `setVenueSettingsDefaults`, a venue overrides it within the field's bounds, and a null field here inherits it. Each field's `default` is the proposed tenant default, marked proposed, client to correct (audit R094); `docs/active/configured-limits-proposal.md` is the sheet the client corrects, and where the two differ this contract is what runs.\n",
   "properties": {
+   "contact": {
+    "allOf": [
+     {
+      "$ref": "../satellite/white-label.yaml#/components/schemas/VenueContact"
+     }
+    ],
+    "nullable": true,
+    "description": "**How a guest reaches this venue** (R8 blocker WHITE-C16, the storage-sat lane's request 5; CHG-R8MIG-011): phone, email, WhatsApp, address and opening-hours prose, one jsonb column, written by the venue settings write and read by White-Label's getTenantAppStatus through tenancy#venueSettingsRecords. Null means the tenant's contact is shown."
+   },
    "id": {
     "type": "string",
     "format": "uuid",
@@ -4020,7 +4124,8 @@
    },
    "saleBoard": {
     "type": "object",
-    "description": "Determines which front end loads. Bound to the workstation, not the role — the F&B terminal opens the F&B board. What the operator may then DO within it is governed by their permissions.\n**The effective board** since 2 October 2026 (DEC-183; CHG-CSP-006): the till's own when it overrides the outlet, otherwise the outlet's (`saleBoardSource`).\n",
+    "x-ticvai-column-nullable": true,
+    "description": "Determines which front end loads. Bound to the workstation, not the role — the F&B terminal opens the F&B board. What the operator may then DO within it is governed by their permissions.\n**The effective board** since 2 October 2026 (DEC-183; CHG-CSP-006): the till's own when it overrides the outlet, otherwise the outlet's (`saleBoardSource`).\n**Resolved on read, never copied** (decided 20 October 2026, Chinmay, R8 blocker cause APPROVALS-TENANCY-C39, option A; CHG-R8SPN-013). `platform.workstation.sale_board` holds only this till's own override and is null when `saleBoardSource` is `outlet`. `getWorkstation`, `listWorkstations` and `configureWorkstation`'s answer build `saleBoard` from the override when there is one, otherwise from the outlet's `platform.outlet.sale_board_id` and that `platform.sale_board` row (its id, kind and name). So `updateOutlet` and `updateSaleBoard` change what every inheriting till shows with no write to `platform.workstation`, and no stored copy can go stale.\n",
     "required": [
      "id",
      "kind"
@@ -4136,7 +4241,15 @@
     "type": "string",
     "format": "uuid",
     "nullable": true,
+    "x-ticvai-references": "platform.configuration_profile",
+    "x-ticvai-references-version": "configurationProfileVersion",
     "description": "Which profile this workstation runs, and at which version. **The client's board shows a fleet split four ways — 72% latest, 18.8% one behind, 6.1% outdated** — and the package had a firmware version field and no profile.\n**A profile is what a venue changes; a version is what it deploys.** Conflating them means a venue cannot say *roll the ticketing counters back and leave the kiosks*.\n"
+   },
+   "configurationProfileVersion": {
+    "type": "integer",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The version of `configurationProfileId` this workstation runs, written when a deployment reaches it; null with no profile (R8 blocker APPROVALS-TENANCY-C08, CHG-R8MIG-019)."
    },
    "catalogueState": {
     "$ref": "#/components/schemas/CatalogueState"

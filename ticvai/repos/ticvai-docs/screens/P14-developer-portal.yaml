@@ -102,7 +102,10 @@ screens:
     from the release''s public contract and served with the portal (`/reference/{version}/openapi.json`);
     listApiVersions picks the version and listApiScopes groups the operations (ApiScope.operations). The
     operation panel, code samples and search read that file, so no API call returns them (default taken
-    4 October 2026, Chinmay to review)** (CHG-FXS-003)'
+    4 October 2026, Chinmay to review)** (CHG-FXS-003) Build note (r8, ticket 27983): `listApiVersions`
+    and `listApiScopes` hold no permission (open to an anonymous caller), so there is no DEVELOPER_VIEW
+    check to build. The no-access state is only a gateway refusal; the wording above that names DEVELOPER_VIEW
+    waits for client approval (lane-screens-pending-ui.json).'
   density: compact
   pattern: listDetail
   patternReason: '`listApiVersions` reads a population and nothing reads one of them; the detail is the

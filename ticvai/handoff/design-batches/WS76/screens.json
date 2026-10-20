@@ -15,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/media-library/dam-governance-rights-command-center-cms-081",
-   "component": "apps/venue-management-web/src/routes/media-library/DamGovernanceRightsCommandCenter.tsx",
+   "component": "src/routes/media-library/DamGovernanceRightsCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -273,7 +273,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/media-library/asset-ownership-responsibility-management-cms-082",
-   "component": "apps/venue-management-web/src/routes/media-library/AssetOwnershipResponsibilityManagement.tsx",
+   "component": "src/routes/media-library/AssetOwnershipResponsibilityManagement.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -419,7 +419,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/media-library/rights-license-usage-policy-management-cms-083",
-   "component": "apps/venue-management-web/src/routes/media-library/RightsLicenseUsagePolicyManagement.tsx",
+   "component": "src/routes/media-library/RightsLicenseUsagePolicyManagement.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -557,7 +557,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/media-library/asset-approval-workflow-management-cms-084",
-   "component": "apps/venue-management-web/src/routes/media-library/AssetApprovalWorkflowManagement.tsx",
+   "component": "src/routes/media-library/AssetApprovalWorkflowManagement.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -711,7 +711,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/media-library/publication-eligibility-governance-validation-cms-085",
-   "component": "apps/venue-management-web/src/routes/media-library/PublicationEligibilityGovernanceValidation.tsx",
+   "component": "src/routes/media-library/PublicationEligibilityGovernanceValidation.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -855,7 +855,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/media-library/role-based-asset-access-permission-management-cms-086",
-   "component": "apps/venue-management-web/src/routes/media-library/RoleBasedAssetAccessPermissionManagement.tsx",
+   "component": "src/routes/media-library/RoleBasedAssetAccessPermissionManagement.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1039,7 +1039,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/media-library/secure-internal-external-sharing-cms-087",
-   "component": "apps/venue-management-web/src/routes/media-library/SecureInternalExternalSharing.tsx",
+   "component": "src/routes/media-library/SecureInternalExternalSharing.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1198,7 +1198,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/media-library/rights-expiry-renewal-usage-impact-cms-088",
-   "component": "apps/venue-management-web/src/routes/media-library/RightsExpiryRenewalUsageImpact.tsx",
+   "component": "src/routes/media-library/RightsExpiryRenewalUsageImpact.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1390,7 +1390,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/media-library/governance-audit-trail-compliance-evidence-cms-089",
-   "component": "apps/venue-management-web/src/routes/media-library/GovernanceAuditTrailComplianceEvidence.tsx",
+   "component": "src/routes/media-library/GovernanceAuditTrailComplianceEvidence.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1516,7 +1516,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/media-library/governance-risk-compliance-ai-recommendations-cms-090",
-   "component": "apps/venue-management-web/src/routes/media-library/GovernanceRiskComplianceAiRecommendations.tsx",
+   "component": "src/routes/media-library/GovernanceRiskComplianceAiRecommendations.tsx",
    "status": "notStarted"
   },
   "navigation": {

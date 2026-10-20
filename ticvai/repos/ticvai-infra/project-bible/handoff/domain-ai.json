@@ -236,6 +236,14 @@
    "guestCallable": false,
    "scopeLevel": "venue"
   },
+  "eraseSubject": {
+   "path": "/internal/subjects/{subjectId}/ai-erasure",
+   "verb": "POST",
+   "summary": "Remove everything the AI index holds about a guest",
+   "permission": null,
+   "guestCallable": false,
+   "scopeLevel": "tenant"
+  },
   "evaluateAiGovernance": {
    "path": "/governance/evaluate",
    "verb": "POST",
@@ -980,6 +988,14 @@
    "guestCallable": false,
    "scopeLevel": "venue"
   },
+  "runGuidedChoiceSuggestionJob": {
+   "path": "/venues/{venueId}/guided-choice-suggestion-jobs",
+   "verb": "POST",
+   "summary": "Run the Help me choose job from an event (service callers)",
+   "permission": null,
+   "guestCallable": false,
+   "scopeLevel": "venue"
+  },
   "saveNaturalLanguageQuery": {
    "path": "/reports/ask/{conversationId}/save",
    "verb": "POST",
@@ -1041,7 +1057,7 @@
    "path": "/ai-providers/{providerId}/credential",
    "verb": "PUT",
    "summary": "Store or rotate a provider key",
-   "permission": "AI_CONFIGURE",
+   "permission": "PLATFORM_TENANT_MANAGE",
    "guestCallable": false,
    "scopeLevel": "tenant"
   },
@@ -1943,6 +1959,12 @@
    "critical": true
   },
   {
+   "name": "approval.withdrawn",
+   "publisher": "approvals",
+   "role": "consumes",
+   "critical": true
+  },
+  {
    "name": "assets.documentIndexed",
    "publisher": "assets",
    "role": "consumes",
@@ -1959,6 +1981,12 @@
    "publisher": "catalogue",
    "role": "consumes",
    "critical": true
+  },
+  {
+   "name": "catalogue.productWithdrawn",
+   "publisher": "catalogue",
+   "role": "consumes",
+   "critical": false
   },
   {
    "name": "conversation.handedOver",
@@ -2129,7 +2157,19 @@
    "critical": false
   },
   {
+   "name": "tenant.provisioned",
+   "publisher": "subscription",
+   "role": "consumes",
+   "critical": true
+  },
+  {
    "name": "tenant.suspended",
+   "publisher": "subscription",
+   "role": "consumes",
+   "critical": true
+  },
+  {
+   "name": "tenant.terminated",
    "publisher": "subscription",
    "role": "consumes",
    "critical": true
@@ -2235,7 +2275,6 @@
    "catalogue.price_list",
    "catalogue.product",
    "catalogue.variant_dimension",
-   "control.content_block",
    "fnb.menu_item",
    "fnb.production_plan",
    "inventory.movement",
@@ -2293,6 +2332,7 @@
    "ai.blueprint_decision",
    "ai.byok_enablement",
    "ai.capability",
+   "ai.capability_maturity",
    "ai.case_action",
    "ai.case_evidence",
    "ai.chunk_embedding",
@@ -2329,6 +2369,7 @@
    "ai.message",
    "ai.model",
    "ai.operational_requirement",
+   "ai.outbox",
    "ai.policy",
    "ai.policy_exception",
    "ai.prompt_template",
@@ -2348,6 +2389,7 @@
    "ai.suggestion",
    "ai.suggestion_outcome",
    "ai.tool",
+   "ai.translation_job",
    "ai.venue_settings",
    "cache:answer",
    "cache:embedding",
@@ -2406,6 +2448,7 @@
     "ai.layout_draft",
     "ai.model",
     "ai.operational_requirement",
+    "ai.outbox",
     "ai.policy",
     "ai.policy_exception",
     "ai.prompt_template",
@@ -2425,6 +2468,7 @@
     "ai.spend_ceiling",
     "ai.tool",
     "ai.training_run",
+    "ai.translation_job",
     "ai.venue_settings",
     "approvals.request",
     "approvals.sla_policy",
@@ -2437,7 +2481,6 @@
     "catalogue.price_list",
     "catalogue.product",
     "catalogue.variant_dimension",
-    "control.content_block",
     "fnb.menu_item",
     "fnb.production_plan",
     "inventory.movement",
@@ -4966,13 +5009,13 @@
    "file": "docs\\adr\\0047-how-long-data-is-kept-and-where-it-goes-next.md",
    "title": "ADR-0047: How long data is kept, and where it goes next",
    "status": "Accepted \u2014 the RPO floor decided 21 September; one number pe",
-   "mentions": 2
+   "mentions": 3
   },
   {
    "file": "docs\\adr\\0049-vectors-live-in-qdrant-one-collection-per-tenant.md",
    "title": "ADR-0049: Vectors live in Qdrant from day one, one collection per tenant, each with its own token",
    "status": "Accepted \u00b7 30 September 2026 \u00b7 Chinmay Parab",
-   "mentions": 2
+   "mentions": 4
   },
   {
    "file": "docs\\adr\\0050-one-autonomy-scale.md",
@@ -5020,7 +5063,7 @@
    "file": "docs\\adr\\0058-one-relay-per-region-and-an-inbox-per-tenant-database.md",
    "title": "ADR-0058: One relay per region reads every tenant's outbox, and every consumer has an inbox",
    "status": "Accepted \u00b7 30 September 2026 \u00b7 Chinmay Parab \u00b7 amended 1 Oct",
-   "mentions": 1
+   "mentions": 3
   },
   {
    "file": "docs\\adr\\0059-ai-phasing-against-the-six-month-plan.md",
@@ -5044,7 +5087,7 @@
    "file": "docs\\adr\\0063-encryption-keys-and-biometric-templates.md",
    "title": "ADR-0063: Encryption and keys, and biometric templates stay with the biometric vendor",
    "status": "Accepted in part \u00b7 2 October 2026: the biometric consent, en",
-   "mentions": 1
+   "mentions": 2
   },
   {
    "file": "docs\\adr\\0064-per-tenant-limits.md",
@@ -5068,7 +5111,7 @@
    "file": "docs\\architecture\\ai-system-design.md",
    "title": "TICVAI AI subsystem: system design",
    "status": "",
-   "mentions": 163
+   "mentions": 165
   },
   {
    "file": "docs\\architecture\\data-model.md",
@@ -5261,11 +5304,11 @@
   }
  ],
  "counts": {
-  "operations": 146,
+  "operations": 148,
   "schemas": 125,
   "states": 42,
-  "events": 48,
-  "tables": 138,
+  "events": 52,
+  "tables": 139,
   "screens": 183,
   "flows": 11,
   "documents": 68,

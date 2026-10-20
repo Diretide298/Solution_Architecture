@@ -7,7 +7,7 @@
 | Tier | platform: Provisioning, publishing, reporting, and the one cross-region path. |
 | Contracts | `subscription`, `platform-ops`, `public-api` |
 | Schemas owned | `control`, `subscription` |
-| Operations in the slice | 22 of 229 |
+| Operations in the slice | 20 of 229 |
 | Scale | Low volume, high consequence. Tenant provisioning and licensing. |
 | If it is down | Down blocks provisioning and the developer API. Trading is unaffected. |
 
@@ -40,11 +40,9 @@ Nothing outside itself.
 | publicApi | [`setDeveloperMembers`](#setdevelopermembers) | PUT | `/developers/{developerId}/members` | setup | 1 | DEV-002 |
 | subscription | [`listModuleCatalogue`](#listmodulecatalogue) | GET | `/module-catalogue` | core | 1 | ADM-386, ADM-401, ADM-402, ADM-403, ADM-404, ADM-423 … |
 | subscription | [`setModuleListing`](#setmodulelisting) | PUT | `/module-catalogue/{moduleCode}` | setup | 1 |  |
-| subscription | [`setSubscription`](#setsubscription) | PUT | `/tenants/{tenantId}/subscription` | setup | 1 | ADM-008, ADM-410, ADM-417, SGN-019, SGN-024 |
+| subscription | [`setSubscription`](#setsubscription) | PUT | `/tenants/{tenantId}/subscription` | setup | 1 | ADM-008, ADM-410, ADM-417 |
 | tenant | [`createTenant`](#createtenant) | POST | `/tenants` | setup | 1 | ADM-005, ADM-419, ADM-420 |
 | tenant | [`listTenants`](#listtenants) | GET | `/tenants` | core | 1 | ADM-002, ADM-004, ADM-005, ADM-006, ADM-007, ADM-008 … |
-| tenant | [`reactivateTenant`](#reactivatetenant) | POST | `/tenants/{tenantId}/reactivate` | setup | 1 | ADM-005 |
-| tenant | [`suspendTenant`](#suspendtenant) | POST | `/tenants/{tenantId}/suspend` | setup | 1 | ADM-005 |
 | tenant | [`terminateTenant`](#terminatetenant) | POST | `/tenants/{tenantId}/terminate` | setup | 1 | ADM-005 |
 | tenant | [`updateTenant`](#updatetenant) | PATCH | `/tenants/{tenantId}` | setup | 1 | ADM-005, ADM-006 |
 
@@ -55,16 +53,17 @@ Nothing outside itself.
 **`POST /tenants/{tenantId}/licences/add-ons`**: License a module outside the plan
 
 A module or limit increase sold separately. Add-ons survive a plan change unless explicitly removed — a tenant who paid for something extra keeps it.
+**One add-on per tenant and module at a time** (R8 blocker APPROVALS-TENANCY-C14): an add-on for a `moduleKey` whose validity overlaps an add-on of the same tenant and module already in force is 409 `add-on-already-active` (change or remove that one instead); the check runs under a lock on the tenant's add-on rows, so two requests at once cannot both pass. A `moduleKey` that is not in the module listing is 400.
 
 |  |  |
 |---|---|
 | Permission | `PLATFORM_TENANT_MANAGE` |
 | Scope level | tenant |
-| Part of slice | setup, makes `control.licence_add_on` non-empty |
+| Part of slice | setup, makes `control.licence_add_on`, `control.licence_add_on_limit` non-empty |
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `control.licence_add_on` |
+| Reads | `cache:idempotency`, `control.licence_add_on`, `control.licence_add_on_limit`, `control.tenant` |
 | Writes | `cache:idempotency`, `control.licence_add_on`, `control.licence_add_on_limit` |
 | Called by | ADM-005, ADM-007, ADM-011 |
 
@@ -80,7 +79,7 @@ A module or limit increase sold separately. Add-ons survive a plan change unless
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | tenantId | string (uuid) |  | The tenant the add-on was sold to — the tenantId in the path, never the body. (read-only) |
-| moduleKey | string | yes |  |
+| moduleKey | ModuleKey: enum (core, ticketing, access, fnb, retail, inventory, seating, membership, …) | yes | What a tenant buys, and what a screen belongs to. |
 | limitOverrides | array of EntitlementLimit |  |  |
 | limitOverrides[].metric | UsageMetric: enum (venues, workstations, activeUsers, devices, brandedApps, aiTokens, apiCalls, storageGb, …) | yes |  |
 | limitOverrides[].limit | integer | yes | Null means unlimited. (nullable) |
@@ -123,6 +122,7 @@ A module or limit increase sold separately. Add-ons survive a plan change unless
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Added |
+| 409 |  | An add-on for this module is already in force for the tenant over an overlapping period (add-on-already-active). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getTenantLicences
@@ -140,7 +140,7 @@ A module or limit increase sold separately. Add-ons survive a plan change unless
 | Offline | yes |
 | Conflict policy | serverWins |
 | Read routing | primary |
-| Reads | `control.licence_add_on`, `subscription.contract`, `subscription.plan` |
+| Reads | `control.contract`, `control.licence_add_on`, `control.licence_add_on_limit`, `control.plan`, `control.tenant` |
 | Writes | - |
 | Called by | ADM-002, ADM-005, ADM-006, ADM-007, ADM-008, ADM-009, ADM-010, ADM-011, ADM-012, ADM-015, ADM-422, ADM-424, ADM-450 |
 
@@ -193,12 +193,12 @@ A plan bundles licensed modules, entitlement limits and a cell tier. Plans are v
 |---|---|
 | Permission | `PLATFORM_PLAN_MANAGE` |
 | Scope level | tenant |
-| Part of slice | setup, makes `subscription.plan` non-empty |
+| Part of slice | setup, makes `control.plan` non-empty |
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `control.tenant`, `subscription.plan`, `subscription.plan_limit`, `subscription.plan_module` |
-| Writes | `cache:idempotency`, `subscription.plan`, `subscription.plan_limit`, `subscription.plan_module` |
+| Reads | `cache:idempotency`, `control.plan`, `control.plan_limit`, `control.plan_module`, `control.tenant` |
+| Writes | `cache:idempotency`, `control.plan`, `control.plan_limit`, `control.plan_module` |
 | Called by | ADM-008, ADM-392 |
 
 **Parameters**
@@ -323,12 +323,12 @@ Existing subscribers remain on their version until migrated deliberately. A pric
 |---|---|
 | Permission | `PLATFORM_PLAN_MANAGE` |
 | Scope level | tenant |
-| Part of slice | setup, makes `subscription.plan` non-empty |
+| Part of slice | setup, makes `control.plan` non-empty |
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `control.tenant`, `subscription.plan`, `subscription.plan_limit`, `subscription.plan_module` |
-| Writes | `cache:idempotency`, `subscription.plan`, `subscription.plan_limit`, `subscription.plan_module` |
+| Reads | `cache:idempotency`, `control.plan`, `control.plan_limit`, `control.plan_module`, `control.tenant` |
+| Writes | `cache:idempotency`, `control.plan`, `control.plan_limit`, `control.plan_module` |
 | Called by | ADM-008, ADM-398 |
 
 **Parameters**
@@ -829,8 +829,8 @@ Board 10, pp.115 and 122. **`revokeApiCredential` kills the secret; nothing paus
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `control.api_client` |
-| Writes | `control.api_client` |
+| Reads | `cache:idempotency`, `control.api_client` |
+| Writes | `cache:idempotency`, `control.api_client` |
 | Called by | ADM-356, BO-1179 |
 | State model | API client ([states/api-client.yaml](../../../states/api-client.yaml)): moves `active` -> `suspended`, `suspended` -> `active` |
 
@@ -1016,7 +1016,7 @@ Boards 4.3 and 4.6. **A module marketplace without a dependency graph sells comb
 | Offline | no |
 | Read routing | replica |
 | Guest callable | True |
-| Reads | `subscription.module_listing` |
+| Reads | `control.module_listing` |
 | Writes | - |
 | Called by | ADM-386, ADM-401, ADM-402, ADM-403, ADM-404, ADM-423, ADM-424, SGN-008, SGN-013, SGN-014, SGN-015, SGN-016 |
 
@@ -1035,11 +1035,11 @@ Boards 4.3 and 4.6. **A module marketplace without a dependency graph sells comb
 |---|---|
 | Permission | `PLATFORM_PLAN_MANAGE` |
 | Scope level | platform |
-| Part of slice | setup, makes `subscription.module_listing` non-empty |
+| Part of slice | setup, makes `control.module_listing` non-empty |
 | Wave | 1 |
 | Offline | no |
-| Reads | `subscription.module_listing` |
-| Writes | `subscription.module_listing` |
+| Reads | `cache:idempotency`, `control.module_listing` |
+| Writes | `cache:idempotency`, `control.module_listing` |
 | Called by | **no screen**: no screen lists it in its apis, so it is reachable only by API or import until one does (README, Known gaps) |
 
 **Parameters**
@@ -1104,6 +1104,8 @@ Boards 4.3 and 4.6. **A module marketplace without a dependency graph sells comb
 
 **`PUT /tenants/{tenantId}/subscription`**: Assign or change a subscription
 
+**Staff only** (the lead, 20 October 2026, r8 cause APPROVALS-TENANCY-C16, option B). A prospect has no tenant and holds no permission, so it never calls this: its plan choice travels on the onboarding application (`submitOnboardingApplication`, `requestedPlanId`), and platform staff set the first subscription from it once the application is verified and the tenant is provisioned. `prospectAuth` and the `prospect` audience are removed.
+
 Upgrades take effect immediately. **Downgrades are checked first**: if the target plan licenses fewer modules than the tenant currently has enabled, or lower limits than they are currently using, the change is refused and the conflicts are named.
 Silently switching off a module a venue is trading on is not an acceptable consequence of a billing change.
 **When a change takes effect, and what is prorated** (decided 28 September, audit R214 (1)). **An upgrade takes effect immediately and is always prorated**: the tenant pays the difference for the rest of the current term. **A downgrade takes effect at the next renewal** (`renewsAt`), is not prorated, and until then is held on `Subscription.scheduledChange`. `effectiveFrom` is therefore set by the server, today for an upgrade and `renewsAt` for a downgrade; a request that sends any other date is refused with 422 `effective-date-not-allowed`.
@@ -1114,13 +1116,13 @@ Silently switching off a module a venue is trading on is not an acceptable conse
 |---|---|
 | Permission | `PLATFORM_TENANT_MANAGE` |
 | Scope level | tenant |
-| Part of slice | setup, makes `subscription.contract` non-empty |
+| Part of slice | setup, makes `control.contract`, `control.tenant` non-empty |
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `subscription.contract`, `subscription.plan` |
-| Writes | `cache:idempotency`, `subscription.contract` |
-| Called by | ADM-008, ADM-410, ADM-417, SGN-019, SGN-024 |
+| Reads | `cache:idempotency`, `control.contract`, `control.plan` |
+| Writes | `cache:idempotency`, `control.contract`, `control.tenant` |
+| Called by | ADM-008, ADM-410, ADM-417 |
 | State model | Tenant subscription ([states/subscription.yaml](../../../states/subscription.yaml)): moves `trial` -> `active`, `pastDue` -> `active`, `cancelled` -> `active` |
 
 **Parameters**
@@ -1227,9 +1229,16 @@ Creates the record only. **No cell exists until a region is provisioned** — a 
 | terminationReason | string |  | (max length 1000; nullable) |
 | terminationRequestedByPrincipalId | string (uuid) |  | (nullable) |
 | planId | string (uuid) |  | (nullable) |
+| planVersion | string |  | The version of the plan the tenant is on (with planId, the key of the plan row; R8 blocker APPROVALS-TENANCY-C15, CHG-R8INT-023). (read-only; nullable) |
 | planName | string |  | (nullable) |
 | cellCount | integer |  |  |
 | venueCount | integer |  |  |
+| cellHost | string |  | The host of the tenant's home cell (the host part of Cell.apiEndpoint of the cell that holds the tenant in its home region), derived on read through control.cell_tenant. (read-only; nullable) |
+| cellHosts | array of object |  | One entry per region the tenant is in, for a multi-region tenant; the entry with isHome true is cellHost. (read-only) |
+| cellHosts[].regionId | string (uuid) | yes |  |
+| cellHosts[].cellId | string (uuid) | yes |  |
+| cellHosts[].host | string | yes |  |
+| cellHosts[].isHome | boolean | yes |  |
 | regionId | string (uuid) |  | The tenant's home region: the tenancy region node whose RegionSettings govern tenant-wide gates, today allowedAiResidencies (decided 28 September, audit R203). (read-only; nullable) |
 | billingEmail | string |  |  |
 | billingAddress | string |  | Accepted by createTenant and updateTenant; stored here so the response can return what was sent. (max length 500; nullable) |
@@ -1291,9 +1300,16 @@ Creates the record only. **No cell exists until a region is provisioned** — a 
 | items[].terminationReason | string |  | (max length 1000; nullable) |
 | items[].terminationRequestedByPrincipalId | string (uuid) |  | (nullable) |
 | items[].planId | string (uuid) |  | (nullable) |
+| items[].planVersion | string |  | The version of the plan the tenant is on (with planId, the key of the plan row; R8 blocker APPROVALS-TENANCY-C15, CHG-R8INT-023). (read-only; nullable) |
 | items[].planName | string |  | (nullable) |
 | items[].cellCount | integer |  |  |
 | items[].venueCount | integer |  |  |
+| items[].cellHost | string |  | The host of the tenant's home cell (the host part of Cell.apiEndpoint of the cell that holds the tenant in its home region), derived on read through control.cell_tenant. (read-only; nullable) |
+| items[].cellHosts | array of object |  | One entry per region the tenant is in, for a multi-region tenant; the entry with isHome true is cellHost. (read-only) |
+| items[].cellHosts[].regionId | string (uuid) | yes |  |
+| items[].cellHosts[].cellId | string (uuid) | yes |  |
+| items[].cellHosts[].host | string | yes |  |
+| items[].cellHosts[].isHome | boolean | yes |  |
 | items[].regionId | string (uuid) |  | The tenant's home region: the tenancy region node whose RegionSettings govern tenant-wide gates, today allowedAiResidencies (decided 28 September, audit R203). (read-only; nullable) |
 | items[].billingEmail | string |  |  |
 | items[].billingAddress | string |  | Accepted by createTenant and updateTenant; stored here so the response can return what was sent. (max length 500; nullable) |
@@ -1309,136 +1325,6 @@ Creates the record only. **No cell exists until a region is provisioned** — a 
 |---|---|---|
 | 200 |  | Tenants |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
-| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
-
-### reactivateTenant
-
-**`POST /tenants/{tenantId}/reactivate`**: Lift a suspension
-
-|  |  |
-|---|---|
-| Permission | `PLATFORM_TENANT_MANAGE` |
-| Scope level | tenant |
-| Part of slice | setup, makes `control.tenant` non-empty |
-| Wave | 1 |
-| Offline | no |
-| Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `control.tenant` |
-| Writes | `cache:idempotency`, `control.tenant` |
-| Called by | ADM-005 |
-| State model | Cell ([states/cell.yaml](../../../states/cell.yaml)): moves `suspended` -> `active`<br/>Tenant ([states/tenant.yaml](../../../states/tenant.yaml)): moves `suspended` -> `active`, `terminating` -> `active` |
-
-**Parameters**
-
-| Name | In | Required | Type | Notes |
-|---|---|---|---|---|
-| tenantId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
-
-**Response**: `Tenant`
-
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| id | string (uuid) | yes |  |
-| code | string | yes |  |
-| name | string | yes |  |
-| status | TenantStatus: enum (onboarding, active, suspended, terminating, terminated) | yes |  |
-| suspensionMode | SuspensionMode: enum (readOnly, noNewSales, fullLockout) |  | Access validation continues under every mode. |
-| suspensionReason | string |  | (nullable) |
-| suspensionEffectiveAt | string (date-time) |  | When the suspension takes, or took, effect — suspendTenant.effectiveAt. (nullable) |
-| suspensionNoticeMessage | LocalisedText |  | The notice shown to the tenant's users about the suspension — suspendTenant.noticeMessage. |
-| terminationScheduledAt | string (date-time) |  | When terminateTenant started the retention window. (nullable) |
-| terminationRetentionUntil | string (date-time) |  | terminationScheduledAt plus the request's retentionDays. (nullable) |
-| terminationReason | string |  | (max length 1000; nullable) |
-| terminationRequestedByPrincipalId | string (uuid) |  | (nullable) |
-| planId | string (uuid) |  | (nullable) |
-| planName | string |  | (nullable) |
-| cellCount | integer |  |  |
-| venueCount | integer |  |  |
-| regionId | string (uuid) |  | The tenant's home region: the tenancy region node whose RegionSettings govern tenant-wide gates, today allowedAiResidencies (decided 28 September, audit R203). (read-only; nullable) |
-| billingEmail | string |  |  |
-| billingAddress | string |  | Accepted by createTenant and updateTenant; stored here so the response can return what was sent. (max length 500; nullable) |
-| accountManagerPrincipalId | string (uuid) |  | (nullable) |
-| createdAt | string (date-time) | yes |  |
-| activatedAt | string (date-time) |  | (nullable) |
-
-**Responses**
-
-| Code | Shape | Meaning |
-|---|---|---|
-| 200 |  | Reactivated |
-| 409 |  | Tenant is terminated, not suspended. |
-| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
-
-### suspendTenant
-
-**`POST /tenants/{tenantId}/suspend`**: Suspend a tenant
-
-Graceful and reversible. Data is retained, cells stay provisioned, and the behaviour is configurable: read-only, no new sales, or full lockout.
-**Access validation continues under every suspension mode.** A commercial dispute must not strand guests at a gate holding valid tickets.
-
-|  |  |
-|---|---|
-| Permission | `PLATFORM_TENANT_MANAGE` |
-| Scope level | tenant |
-| Part of slice | setup, changes rows of `control.tenant` that another operation creates |
-| Wave | 1 |
-| Offline | no |
-| Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `control.tenant` |
-| Writes | `cache:idempotency`, `control.tenant`, `platform.outbox` |
-| Called by | ADM-005 |
-| State model | Cell ([states/cell.yaml](../../../states/cell.yaml)): moves `active` -> `suspended`<br/>Tenant ([states/tenant.yaml](../../../states/tenant.yaml)): moves `active` -> `suspended` |
-
-**Parameters**
-
-| Name | In | Required | Type | Notes |
-|---|---|---|---|---|
-| tenantId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
-
-**Request body**
-
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| mode | SuspensionMode: enum (readOnly, noNewSales, fullLockout) | yes | Access validation continues under every mode. |
-| reason | string | yes | (min length 3; max length 500) |
-| effectiveAt | string (date-time) |  |  |
-| noticeMessage | LocalisedText |  |  |
-
-**Response**: `Tenant`
-
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| id | string (uuid) | yes |  |
-| code | string | yes |  |
-| name | string | yes |  |
-| status | TenantStatus: enum (onboarding, active, suspended, terminating, terminated) | yes |  |
-| suspensionMode | SuspensionMode: enum (readOnly, noNewSales, fullLockout) |  | Access validation continues under every mode. |
-| suspensionReason | string |  | (nullable) |
-| suspensionEffectiveAt | string (date-time) |  | When the suspension takes, or took, effect — suspendTenant.effectiveAt. (nullable) |
-| suspensionNoticeMessage | LocalisedText |  | The notice shown to the tenant's users about the suspension — suspendTenant.noticeMessage. |
-| terminationScheduledAt | string (date-time) |  | When terminateTenant started the retention window. (nullable) |
-| terminationRetentionUntil | string (date-time) |  | terminationScheduledAt plus the request's retentionDays. (nullable) |
-| terminationReason | string |  | (max length 1000; nullable) |
-| terminationRequestedByPrincipalId | string (uuid) |  | (nullable) |
-| planId | string (uuid) |  | (nullable) |
-| planName | string |  | (nullable) |
-| cellCount | integer |  |  |
-| venueCount | integer |  |  |
-| regionId | string (uuid) |  | The tenant's home region: the tenancy region node whose RegionSettings govern tenant-wide gates, today allowedAiResidencies (decided 28 September, audit R203). (read-only; nullable) |
-| billingEmail | string |  |  |
-| billingAddress | string |  | Accepted by createTenant and updateTenant; stored here so the response can return what was sent. (max length 500; nullable) |
-| accountManagerPrincipalId | string (uuid) |  | (nullable) |
-| createdAt | string (date-time) | yes |  |
-| activatedAt | string (date-time) |  | (nullable) |
-
-**Responses**
-
-| Code | Shape | Meaning |
-|---|---|---|
-| 200 |  | Suspended |
-| 409 |  | The tenant is already suspended (tenant-already-suspended), or is not active (onboarding, terminating or terminated; tenant-not-active). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### terminateTenant
@@ -1457,12 +1343,12 @@ balance refuses the termination with 409 `unsettledBalances`, naming the legal e
 |---|---|
 | Permission | `PLATFORM_TENANT_TERMINATE` |
 | Scope level | tenant |
-| Part of slice | setup, makes `control.tenant`, `subscription.contract` non-empty |
+| Part of slice | setup, makes `control.contract`, `control.tenant` non-empty |
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `control.tenant`, `subscription.contract` |
-| Writes | `cache:idempotency`, `control.tenant`, `subscription.contract` |
+| Reads | `cache:idempotency`, `control.contract`, `control.tenant` |
+| Writes | `cache:idempotency`, `control.contract`, `control.tenant` |
 | Called by | ADM-005 |
 | State model | Tenant ([states/tenant.yaml](../../../states/tenant.yaml)): moves `active` -> `terminating`, `suspended` -> `terminating` |
 
@@ -1553,9 +1439,16 @@ balance refuses the termination with 409 `unsettledBalances`, naming the legal e
 | terminationReason | string |  | (max length 1000; nullable) |
 | terminationRequestedByPrincipalId | string (uuid) |  | (nullable) |
 | planId | string (uuid) |  | (nullable) |
+| planVersion | string |  | The version of the plan the tenant is on (with planId, the key of the plan row; R8 blocker APPROVALS-TENANCY-C15, CHG-R8INT-023). (read-only; nullable) |
 | planName | string |  | (nullable) |
 | cellCount | integer |  |  |
 | venueCount | integer |  |  |
+| cellHost | string |  | The host of the tenant's home cell (the host part of Cell.apiEndpoint of the cell that holds the tenant in its home region), derived on read through control.cell_tenant. (read-only; nullable) |
+| cellHosts | array of object |  | One entry per region the tenant is in, for a multi-region tenant; the entry with isHome true is cellHost. (read-only) |
+| cellHosts[].regionId | string (uuid) | yes |  |
+| cellHosts[].cellId | string (uuid) | yes |  |
+| cellHosts[].host | string | yes |  |
+| cellHosts[].isHome | boolean | yes |  |
 | regionId | string (uuid) |  | The tenant's home region: the tenancy region node whose RegionSettings govern tenant-wide gates, today allowedAiResidencies (decided 28 September, audit R203). (read-only; nullable) |
 | billingEmail | string |  |  |
 | billingAddress | string |  | Accepted by createTenant and updateTenant; stored here so the response can return what was sent. (max length 500; nullable) |
@@ -1624,6 +1517,23 @@ Every table this service owns that the slice reads or writes, with its columns a
 | changes | jsonb | no | The developer changelog for this version (17 September minutes, M17-14): every operation added, changed, deprecated or removed, and whether the change is breaking under ADR-0026. |
 | id | uuid | yes | Synthesised key. |
 
+### `control.contract`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes | Synthesised key. |
+| tenant_id | uuid | yes |  |
+| plan_id | uuid | yes |  |
+| plan_name | text | no |  |
+| plan_version | text | yes |  |
+| status | text | yes |  |
+| starts_at | date | yes |  |
+| renews_at | date | no |  |
+| cancelled_at | date | no |  |
+| scheduled_change | jsonb | no | A downgrade waiting for the next renewal (decided 28 September, audit R214 (1)). |
+| current_price | numeric(18,4) | no |  |
+| billing_period | text | no |  |
+
 ### `control.developer_account`
 
 | Column | Type | Required | Notes |
@@ -1671,7 +1581,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | Column | Type | Required | Notes |
 |---|---|---|---|
 | tenant_id | uuid | no | The tenant the add-on was sold to — the tenantId in the path, never the body. |
-| module_key | text | yes |  |
+| module_key | text | yes | The licence vocabulary, not the white-label one (the lead, 20 October 2026, r8 cause APPROVALS-TENANCY-C17, option B): an add-on licenses a shared ModuleKey (ticketing, fnb, retail, ...), or the add-… |
 | list_price | numeric(18,4) | no |  |
 | valid_from | date | no |  |
 | valid_to | date | no |  |
@@ -1688,6 +1598,68 @@ Every table this service owns that the slice reads or writes, with its columns a
 | is_overage_allowed | boolean | no |  |
 | overage_unit_price | numeric(18,4) | no |  |
 | id | uuid | yes | Synthesised key. |
+
+### `control.module_listing`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes | Synthesised key. |
+| module_code | text | yes | Values are ModuleKeys (4 October 2026, CHG-FXC-010; ADM-424): the vocabulary of white-label.ModuleEnablement.moduleKey, so a dependency is checked against what setModuleEnablement switches. |
+| name | text | no |  |
+| description | text | no |  |
+| category | text | no |  |
+| requires_modules | text[] | no | Values are ModuleKeys (4 October 2026, CHG-FXC-010; ADM-424): the vocabulary of white-label.ModuleEnablement.moduleKey, so a dependency is checked against what setModuleEnablement switches. |
+| incompatible_with_modules | text[] | no | Values are ModuleKeys (4 October 2026, CHG-FXC-010; ADM-424): the vocabulary of white-label.ModuleEnablement.moduleKey, so a dependency is checked against what setModuleEnablement switches. |
+| included_in_tiers | text[] | no |  |
+| list_price | numeric(18,4) | no |  |
+| pricing_basis | text | no |  |
+| metered_metric | text | no | For metered, what is counted (aiTokens for the AI module). |
+| metered_unit_size | integer | no | For metered, how many units price buys (e.g. |
+| provisioning_minutes | integer | no |  |
+| requires_professional_services | boolean | no |  |
+| status | text | no |  |
+
+### `control.plan`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| code | text | yes |  |
+| name | text | yes |  |
+| description | text | no |  |
+| cell_tier | text | yes |  |
+| base_price | numeric(18,4) | yes |  |
+| billing_period | text | no |  |
+| includes_branded_app | boolean | no | Branded native publishing carries per-tenant operational cost and is priced, not absorbed. |
+| included_ai_tokens | integer | no | AI tokens the package includes per billing period. |
+| request_limits | jsonb | no |  |
+| package_kind | text | no | Three standard packages, and custom ones allowed (decided 29 September, Chinmay). |
+| offered_to_tenant_id | uuid | no | Private to one tenant (decided 29 September, Chinmay): a custom package offered only to this tenant; listPlans shows it to no other tenant and setSubscription refuses it for any other (422 plan-not-o… |
+| id | uuid | yes |  |
+| version | text | yes | Existing subscribers stay on the version they were sold. |
+| is_active | boolean | yes |  |
+| subscriber_count | integer | yes |  |
+| published_at | timestamptz | no |  |
+
+### `control.plan_limit`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes | Synthesised key. |
+| plan_id | uuid | yes | The parent row. |
+| plan_version | text | yes | The parent row's version; with plan_id, the key of the parent row. |
+| metric | text | yes |  |
+| limit_value | integer | no | Null means unlimited. |
+| is_overage_allowed | boolean | no |  |
+| overage_unit_price | numeric(18,4) | no |  |
+
+### `control.plan_module`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes | Synthesised key. |
+| plan_id | uuid | yes | The parent row. |
+| plan_version | text | yes | The parent row's version; with plan_id, the key of the parent row. |
+| licensed_module | text | yes | One value from ModuleKey. |
 
 ### `control.production_access_request`
 
@@ -1725,6 +1697,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | termination_reason | text | no |  |
 | termination_requested_by_principal_id | uuid | no |  |
 | plan_id | uuid | no |  |
+| plan_version | text | no | The version of the plan the tenant is on (with planId, the key of the plan row; R8 blocker APPROVALS-TENANCY-C15, CHG-R8INT-023). |
 | plan_name | text | no |  |
 | cell_count | integer | no |  |
 | venue_count | integer | no |  |
@@ -1736,86 +1709,9 @@ Every table this service owns that the slice reads or writes, with its columns a
 | activated_at | timestamptz | no |  |
 | subscription_id | uuid | no |  |
 
-### `subscription.contract`
-
-| Column | Type | Required | Notes |
-|---|---|---|---|
-| tenant_id | uuid | yes |  |
-| plan_id | uuid | yes |  |
-| plan_name | text | no |  |
-| plan_version | text | yes |  |
-| status | text | yes |  |
-| starts_at | date | yes |  |
-| renews_at | date | no |  |
-| cancelled_at | date | no |  |
-| scheduled_change | jsonb | no | A downgrade waiting for the next renewal (decided 28 September, audit R214 (1)). |
-| current_price | numeric(18,4) | no |  |
-| billing_period | text | no |  |
-| id | uuid | yes | Synthesised key. |
-
-### `subscription.module_listing`
-
-| Column | Type | Required | Notes |
-|---|---|---|---|
-| module_code | text | yes | Values are ModuleKeys (4 October 2026, CHG-FXC-010; ADM-424): the vocabulary of white-label.ModuleEnablement.moduleKey, so a dependency is checked against what setModuleEnablement switches. |
-| name | text | no |  |
-| description | text | no |  |
-| category | text | no |  |
-| requires_modules | text[] | no | Values are ModuleKeys (4 October 2026, CHG-FXC-010; ADM-424): the vocabulary of white-label.ModuleEnablement.moduleKey, so a dependency is checked against what setModuleEnablement switches. |
-| incompatible_with_modules | text[] | no | Values are ModuleKeys (4 October 2026, CHG-FXC-010; ADM-424): the vocabulary of white-label.ModuleEnablement.moduleKey, so a dependency is checked against what setModuleEnablement switches. |
-| included_in_tiers | text[] | no |  |
-| list_price | numeric(18,4) | no |  |
-| pricing_basis | text | no |  |
-| metered_metric | text | no | For metered, what is counted (aiTokens for the AI module). |
-| metered_unit_size | integer | no | For metered, how many units price buys (e.g. |
-| provisioning_minutes | integer | no |  |
-| requires_professional_services | boolean | no |  |
-| status | text | no |  |
-| id | uuid | yes | Synthesised key. |
-
-### `subscription.plan`
-
-| Column | Type | Required | Notes |
-|---|---|---|---|
-| code | text | yes |  |
-| name | text | yes |  |
-| description | text | no |  |
-| cell_tier | text | yes |  |
-| base_price | numeric(18,4) | yes |  |
-| billing_period | text | no |  |
-| includes_branded_app | boolean | no | Branded native publishing carries per-tenant operational cost and is priced, not absorbed. |
-| included_ai_tokens | integer | no | AI tokens the package includes per billing period. |
-| request_limits | jsonb | no |  |
-| package_kind | text | no | Three standard packages, and custom ones allowed (decided 29 September, Chinmay). |
-| offered_to_tenant_id | uuid | no | Private to one tenant (decided 29 September, Chinmay): a custom package offered only to this tenant; listPlans shows it to no other tenant and setSubscription refuses it for any other (422 plan-not-o… |
-| id | uuid | yes |  |
-| version | text | yes | Existing subscribers stay on the version they were sold. |
-| is_active | boolean | yes |  |
-| subscriber_count | integer | yes |  |
-| published_at | timestamptz | no |  |
-
-### `subscription.plan_limit`
-
-| Column | Type | Required | Notes |
-|---|---|---|---|
-| plan_id | uuid | yes | The parent row. |
-| metric | text | yes |  |
-| limit_value | integer | no | Null means unlimited. |
-| is_overage_allowed | boolean | no |  |
-| overage_unit_price | numeric(18,4) | no |  |
-| id | uuid | yes | Synthesised key. |
-
-### `subscription.plan_module`
-
-| Column | Type | Required | Notes |
-|---|---|---|---|
-| plan_id | uuid | yes | The parent row. |
-| licensed_module | text | yes | One value from ModuleKey. |
-| id | uuid | yes | Synthesised key. |
-
 ## Not in the first release
 
-207 operations, added to this service in later releases without changing any of the above.
+209 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
@@ -1836,4 +1732,4 @@ Every table this service owns that the slice reads or writes, with its columns a
 | release | `createRelease`, `getRelease`, `getReleaseReadiness`, `listReleases`, `promoteRelease`, `rejectRelease`, `withdrawRelease` |
 | rollout | `getRollout`, `listRollouts`, `pauseRollout`, `rollbackRollout`, `startRollout` |
 | subscription | `actOnPartnerApplicationReview`, `actOnPartnerCase`, `actOnPartnerCommissionLine`, `actOnPartnerReconciliationException`, `actOnPartnerSettlementBatch`, `addCapacityPack`, `cancelSubscription`, `createPartnerAgreement`, `createPartnerCase`, `createPartnerChangeRequest`, `createPartnerUser`, `decommissionBurstEnvironment`, `drainBurstEnvironment`, `exportPartnerInvoice`, `getBillingReconciliation`, `getCommercialMetrics`, `getCommissionStatement`, `getGoLiveReadiness`, `getLicenceEnforcement`, `getPlanRecommendations`, `getPlanTiers`, `getSubscription`, `getVsiModel`, `listBurstEnvironments`, `listChannelListings`, `listLicensingModels`, `listPartnerAgreements`, `listPartnerUsers`, `listVenueTypeTemplates`, `previewSubscriptionChange`, `reconcileBurstEnvironment`, `registerPartner`, `requestBurstEnvironment`, `runGoLiveValidation`, `scoreVsiAssessment`, `setChannelListing`, `setLicenceEnforcementPolicy`, `setLicensingModel`, `setMembershipCommercialConfig`, `setMembershipUsagePolicy`, `setPartnerAllocations`, `setPartnerCapabilityGrants`, `setPartnerCommissionRules`, `setPartnerContact`, `setPartnerCreditProfile`, `setPartnerDistributionRights`, `setPartnerSecurity`, `setPlanTiers`, `setTrialConfiguration`, `setVsiModel`, `settleAiUsage`, `simulateCommercialPackage`, `submitOnboardingApplication`, `updatePartnerAgreement` |
-| tenant | `getTenant` |
+| tenant | `getTenant`, `reactivateTenant`, `suspendTenant` |

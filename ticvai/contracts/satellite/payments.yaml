@@ -1286,7 +1286,6 @@ paths:
         - "P08 ADM-599 Mixed Tender & Credit Command Center"
         - "P08 ADM-600 Mixed Tender Rule & Combination Builder"
         - "P08 ADM-605 Advanced Payment Eligibility, Sequence & Restriction Rules"
-        - "P08 ADM-606 Partial Payment, Failure & Recovery Manager"
       summary: Which tenders may be combined, and in what order
       tags:
       - payments
@@ -1360,6 +1359,7 @@ paths:
       operationId: listB2bCreditAccounts
       x-ticvai-consumed-by:
         - "P08 ADM-602 B2B Credit Account & Limit Manager"
+        - "P08 ADM-603 B2B Invoice, On-Account & Payment Terms Configuration"
         - "P08 ADM-608 Mixed Tender Simulator, Credit Exposure & AI Advisor"
       summary: On-account customers, their limits and their exposure
       description: 'Boards 5.4 and 5.5. **`CREDIT_MANAGE` and `CREDIT_OVERRIDE` existed as permissions

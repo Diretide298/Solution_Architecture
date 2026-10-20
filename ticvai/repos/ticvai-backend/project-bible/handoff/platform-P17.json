@@ -7,11 +7,11 @@
  "audience": "public",
  "formFactor": "web",
  "offlineCapable": false,
- "generated": "2026-10-18",
+ "generated": "2026-10-20",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 24,
-  "operations": 12,
+  "operations": 11,
   "contracts": 3,
   "modules": 3,
   "undrawn": 0,
@@ -46,7 +46,7 @@
  "contracts": [
   {
    "contract": "subscription",
-   "operations": 9
+   "operations": 8
   },
   {
    "contract": "identity",
@@ -226,7 +226,7 @@
    "module": "Purchase & Activation",
    "wave": 3,
    "route": "/purchase-activation/contract-billing-cycle-selection-sgn-019",
-   "operations": 1,
+   "operations": 0,
    "drawn": true
   },
   {
@@ -271,7 +271,7 @@
    "module": "Purchase & Activation",
    "wave": 3,
    "route": "/purchase-activation/subscription-confirmation-commercial-activation-sgn-024",
-   "operations": 1,
+   "operations": 0,
    "drawn": true
   }
  ],

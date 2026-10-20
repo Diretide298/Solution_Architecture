@@ -22,6 +22,7 @@ are tools/ticket_done.py MIGRATION_WORDING, written by tools/build-service-docs.
                  "Tables no migration creates" in MIGRATIONS.md) passes only when that row cites the file
                  ("Source DDL after r1: <file>"), so the migration planned with its operations applies the change
                  (CHG-GT1-007: CHG-MOD-007 scoped approvals.accreditation_badge in V0104)
+                 A table no operation reaches yet (`storage only:`) passes the same way (CHG-R8MIG-024).
 
 Read-only. Exit 1 on a finding not in `handoff/audit-baseline.json` (tools/audit_guard.py).
 
@@ -73,12 +74,29 @@ def main() -> int:
     if mmd.exists():
         seg = mmd.read_text(encoding="utf-8").split("## Tables no migration creates", 1)
         if len(seg) == 2:
-            for t, why in re.findall(r"^\| `([a-z_]+\.[a-z_0-9]+)` \| \w+ \| [^|]* \| (held: .+?) \|$", seg[1], re.M):
+            for t, why in re.findall(r"^\| `([a-z_]+\.[a-z_0-9]+)` \| \w+ \| [^|]* \| ((?:held|storage only): .+?) \|$", seg[1], re.M):
                 held[t] = why
+    # **A table a declared move took to another database** (ADAM CR-150, 18 October 2026; CHG-CRA-003): V0104 changed
+    # subscription.plan and four others in the tenant database before they moved to control, where the next forward
+    # migration creates them afresh and the tenant copy is dropped (handoff/migration-review.md). The change follows
+    # the table: the task that creates it under its new name answers for it.
+    try:
+        import importlib.util as _iu
+        _sp = _iu.spec_from_file_location("derive_schema_history", g.ROOT / "tools" / "derive-schema-history.py")
+        _mod = _iu.module_from_spec(_sp)
+        _sp.loader.exec_module(_mod)
+        moved_to = {x["from"]: x["to"] for x in _mod.RENAMES
+                    if x["from"].split(".")[0] != "control" and x["to"].split(".")[0] == "control"}
+    except Exception:          # noqa: BLE001 -- no history: nothing has moved
+        moved_to = {}
     n_ar1 = 0
     for (rel, t), _ in sorted(td.after_r1_changes(g.ROOT).items()):
         n_ar1 += 1
         r = made_by.get(t)
+        if r is None and moved_to.get(t) in made_by:
+            guard.note(f"{rel} changes {t}, which moved to {moved_to[t]} ({made_by[moved_to[t]]['key']} creates it "
+                       "there; the tenant copy is dropped)")
+            continue
         if r is None and f"Source DDL after r1: {rel}" in held.get(t, ""):
             continue          # held with its operations (CHG-FXP-003); the row cites the file (CHG-GT1-007)
         if r is None:

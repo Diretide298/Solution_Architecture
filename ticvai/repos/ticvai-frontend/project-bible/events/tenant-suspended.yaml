@@ -6,9 +6,12 @@ version: 1
 publisher: subscription
 description: A tenant has been suspended, in one of three modes.
 aggregate: tenant
-emittedWhen: TenantStatus active to suspended
-emittedBy:
-- suspendTenant
+emittedWhen: 'TenantStatus active to suspended: when Subscription''s approval.granted consumer applies the suspension
+  suspendTenant raised (ADAM CR-172), for an immediate one, or by the workers job at control.tenant.suspension_effective_at for a future one. Written to control.outbox in the same transaction
+  as the status change, with tenantId the suspended tenant and the scope path its root
+  (control.cell_tenant.root_scope_path); drained by the workers relay (ADAM CR-152, 18 October 2026; CHG-CRA-005).
+  **No operation emits it** (ADAM CR-172, fix round 3): suspendTenant writes only its approval request, so it is not
+  an emitter and `emittedBy` is left out, as for the other events only a consumer or a job writes'
 payload:
 - field: tenantId
   type: uuid

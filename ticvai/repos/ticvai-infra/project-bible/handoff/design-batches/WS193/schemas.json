@@ -578,7 +578,13 @@
  "WalletConfigurationVersion": {
   "type": "object",
   "x-ticvai-persistence": "wallet.configuration_version",
-  "description": "Boards 1.10 and 10.8. **Ten boards of configuration that interact.**",
+  "x-ticvai-unique-together": [
+   [
+    "scopePath",
+    "version"
+   ]
+  ],
+  "description": "Boards 1.10 and 10.8. **Ten boards of configuration that interact.** `version` is the highest at the scope plus one; (scope, version) is unique.",
   "properties": {
    "version": {
     "type": "integer"

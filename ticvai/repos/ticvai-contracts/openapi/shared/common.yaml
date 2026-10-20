@@ -335,6 +335,16 @@ components:
         (`supervisor-step-up-refused`) and nothing is written. **No approval request is raised**, and
         the operation declares `x-ticvai-step-up: pin`.
 
+
+        **Where `principalId` comes from, on every operation that takes this** (decided 20 October 2026, Chinmay,
+        R8 blocker cause GPS-C31, option A; CHG-R8SPN-035). The PIN prompt shows a picker filled by
+        `identity.listStepUpSupervisors` with the operation''s permission: the active principals who hold it at the
+        caller''s venue, by display name. The supervisor picks their own name and types their PIN; the prompt sends
+        the picked `principalId` (or, where the prompt asks for an employee number instead, `supervisorUsername`).
+        **Nobody signs their own act**: a `principalId` (or resolved `supervisorUsername`) equal to the caller''s own
+        principal is refused `403 supervisor-step-up-refused`, even when the caller holds the permission, and the
+        picker leaves the caller out.
+
         '
       required:
       - credential
@@ -407,7 +417,7 @@ components:
 
         **The white-label app feature list (`white-label.ModuleKey`) is a different, finer vocabulary, and this is
         the map between them** (R8 blocker fix, IDENTITY-C31; **proposed from the screens'' `requiresModule`, the
-        product owner confirms**). A feature is licensed when the licence module on its row is licensed, and
+        client confirms**). A feature is licensed when the licence module on its row is licensed, and
         `getModuleEnablement` / `setModuleEnablement` use this for `isLicensed` and for the "not licensed" refusal:
 
         | white-label feature | licence module here |
@@ -445,7 +455,13 @@ components:
       - developerApi
       - analytics
       - ai
-      x-ticvai-note: '**`core` is listed and cannot be unlicensed.** It exists so a screen can say it
+      - poweredByRemoval
+      x-ticvai-note: '**`poweredByRemoval` is an add-on key, never a plan module; no screen requires it** (r8,
+        APPROVALS-TENANCY-C17, the lead''s answer B of 20 October 2026). A licence add-on names a ModuleKey
+        (`addLicenceAddOn`), and the one add-on that lets a tenant switch off "Powered by TICVAI" is not a module a
+        venue runs, so it is listed here and nowhere else: no plan, permission group or `requiresModule` names it.
+
+        **`core` is listed and cannot be unlicensed.** It exists so a screen can say it
         belongs to no optional module rather than leaving the field empty — **an empty field and *always
         on* look identical, and only one of them is a decision.**
 
@@ -776,6 +792,14 @@ components:
             that inherits it. One type with one status wherever the rule is checked (`createRole`,
             `setRolePermissions`, `setPrincipalModuleAccess`, `createDelegatedAccess`, `createPrincipal`);
             `requireApproval` and `warn` never refuse.
+        no-approval-route:
+          status: 422
+          title: No approval route
+          when: An approval request that is not a draft matches no active approval rule for its kind and subject
+            type (for subject type `tenant`, no active platform rule), so nobody could be asked. Nothing is written
+            and the request is never approved automatically. Answered by approvals' `createApprovalRequest` and passed
+            on unchanged by the operation that raised the request (`suspendTenant`, `reactivateTenant`; lead's ruling
+            on lane H review 3 N-1, 20 October 2026; CHG-R8SPN-015).
         server-error:
           status: 500
           title: Server error
@@ -974,6 +998,19 @@ components:
         not carry them.
 
 
+        **Lifetimes and signing (proposed, client to correct;** decided 20 October 2026, Chinmay, R8 blocker
+        causes IDENTITY-C25 and FOUNDATION-AI-C27; CHG-R8SPN-014). The access token lives 15 minutes
+        (`TokenPair.expiresIn` 900). The refresh token lives 12 hours, sliding: every use of it at `refreshToken`
+        returns a new refresh token and retires the old one (rotation); a retired refresh token presented again
+        is a reuse, and the server then ends the session and revokes every refresh token issued from the same
+        sign-in (the family). The session ends when the shift on its workstation closes, or, for a session with no
+        shift (a browser door, a staff handheld), when it reaches its maximum age (12 hours) or ends at
+        `logout`. Each value is configurable per tenant on `PasswordPolicy` (`accessTokenMinutes`,
+        `refreshTokenHours`, `sessionMaxHours`); the numbers here are the defaults. Tokens are signed **RS256**
+        with **one key per cell**, held in the cell''s Key Vault and never exported; the token header carries the
+        key''s `kid`. The key rotates yearly, and the previous key still verifies for 24 hours after a rotation.
+
+
         **A Control Plane platform-staff token** is accepted by a cell only for `openPlatformStaffGrant`,
         and for any other operation only while an open platform-staff grant exists for that tenant.
         The cell then resolves the caller''s permissions from the grant, not from a role in the tenant,
@@ -990,6 +1027,11 @@ components:
         R126), and revoked independently. Scoped to the
         guest''s own resources — a guest token can never widen to another subject.
 
+
+        **An anonymous guest session** (20 October 2026, R8 blocker cause GPS-C23; CHG-R8SPN-031) is a guest token with
+        no subject, opened by `orders.createCart` for a visitor with no credential and bound to that cart; it reaches the
+        cart operations and nothing that needs a known guest, and it ends when `claimCart` moves the cart to an account.
+
         '
     serviceAuth:
       type: http
@@ -1004,7 +1046,23 @@ components:
 
         A caller presenting a valid token from the wrong certificate is rejected. Neither alone is sufficient.
 
+        **The connection context of a call with no user** (R8 blocker IDENTITY-C48, the lead''s option A; CHG-R8MIG-007;
+        backend/MIGRATIONS.md "The connection context"; r8 integration, CHG-R8INT-024): the tenant comes from the cell
+        token''s `tid` claim, `ticvai.scope_paths` is the tenant root, the calling cell is the audited actor, and its
+        idempotency records are claimed under that context.
+
         '
+    deviceAuth:
+      type: http
+      scheme: bearer
+      description: '**A registered device, authenticated as itself** (decided 20 October 2026, Chinmay, R8 blocker
+        cause APPROVALS-TENANCY-C27, option A; CHG-R8SPN-030). The credential is the one `enrolDevice` issued and
+        `tenancy.device_credential` holds (`kind` `clientCertificate`, `deviceToken` or `mutualTls`): a device token is
+        sent as the bearer value, a certificate is presented on the TLS connection (and the bearer value is then the
+        device id). The server checks it against an active, unrevoked `device_credential` row, resolves the device
+        (`platform.device`) and through it the workstation and scope the device is bound to, and acts as that device:
+        no person, no role, no permission. A device can only report about itself; a call naming another device is
+        `404`. A retired or unapproved device, or a revoked credential, is `401`.'
     apiKeyAuth:
       type: apiKey
       in: header

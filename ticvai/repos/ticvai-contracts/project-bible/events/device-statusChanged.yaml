@@ -23,6 +23,8 @@ payload:
   type: string
 - field: previousStatus
   type: string
+  notes: 'The stored status before this change: `unknown` on a device''s first heartbeat (r8, APPROVALS-TENANCY-C27);
+    `offline` only ever comes from the heartbeat timer, never from a heartbeat'
 - field: status
   type: string
 - field: health

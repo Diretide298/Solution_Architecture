@@ -15,7 +15,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/platform/ai-configuration-home-start-adm-469",
-   "component": "apps/ticvai-web/src/routes/platform/AiConfigurationHomeStart.tsx",
+   "component": "src/routes/platform/AiConfigurationHomeStart.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -402,7 +402,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/platform/setup-type-business-intent-discovery-adm-470",
-   "component": "apps/ticvai-web/src/routes/platform/SetupTypeBusinessIntentDiscovery.tsx",
+   "component": "src/routes/platform/SetupTypeBusinessIntentDiscovery.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -706,7 +706,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/platform/venue-business-model-discovery-adm-471",
-   "component": "apps/ticvai-web/src/routes/platform/VenueBusinessModelDiscovery.tsx",
+   "component": "src/routes/platform/VenueBusinessModelDiscovery.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1129,7 +1129,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/platform/guided-question-answer-workspace-adm-472",
-   "component": "apps/ticvai-web/src/routes/platform/GuidedQuestionAnswerWorkspace.tsx",
+   "component": "src/routes/platform/GuidedQuestionAnswerWorkspace.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1362,7 +1362,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/platform/product-admission-model-discovery-adm-473",
-   "component": "apps/ticvai-web/src/routes/platform/ProductAdmissionModelDiscovery.tsx",
+   "component": "src/routes/platform/ProductAdmissionModelDiscovery.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1595,7 +1595,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/platform/operational-requirement-discovery-adm-474",
-   "component": "apps/ticvai-web/src/routes/platform/OperationalRequirementDiscovery.tsx",
+   "component": "src/routes/platform/OperationalRequirementDiscovery.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1837,7 +1837,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/platform/commercial-requirement-discovery-adm-475",
-   "component": "apps/ticvai-web/src/routes/platform/CommercialRequirementDiscovery.tsx",
+   "component": "src/routes/platform/CommercialRequirementDiscovery.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -2070,7 +2070,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/platform/required-recommended-optional-decisions-adm-476",
-   "component": "apps/ticvai-web/src/routes/platform/RequiredRecommendedOptionalDecisions.tsx",
+   "component": "src/routes/platform/RequiredRecommendedOptionalDecisions.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -2293,7 +2293,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/platform/missing-information-clarification-center-adm-477",
-   "component": "apps/ticvai-web/src/routes/platform/MissingInformationClarificationCenter.tsx",
+   "component": "src/routes/platform/MissingInformationClarificationCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -2536,7 +2536,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/platform/configuration-blueprint-dependency-map-adm-478",
-   "component": "apps/ticvai-web/src/routes/platform/ConfigurationBlueprintDependencyMap.tsx",
+   "component": "src/routes/platform/ConfigurationBlueprintDependencyMap.tsx",
    "status": "notStarted"
   },
   "navigation": {

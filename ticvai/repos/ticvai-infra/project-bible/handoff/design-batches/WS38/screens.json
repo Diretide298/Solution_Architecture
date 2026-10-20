@@ -1129,7 +1129,8 @@
     "SeasonalCalendarDayTimeslotDynamicRulesView.month",
     "SeasonalCalendarDayTimeslotDynamicRulesView.week",
     "SeasonalCalendarDayTimeslotDynamicRulesView.dateRange",
-    "SeasonalCalendarDayTimeslotDynamicRulesView.dimension"
+    "SeasonalCalendarDayTimeslotDynamicRulesView.dimension",
+    "VenueSettings.calendarDayStartHour"
    ],
    "params": [
     {

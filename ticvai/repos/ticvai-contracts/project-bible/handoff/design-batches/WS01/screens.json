@@ -1656,6 +1656,9 @@
      "optional": true,
      "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listOperatingCalendarSpecial` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
+   ],
+   "preloaded": [
+    "VenueSettings.calendarDayStartHour"
    ]
   },
   "notes": "**Overlapping entries: the venue sets a priority per entry (decided 2 October 2026 by Chinmay, DEC-229; CHG-CSP-027);** equal priorities on an overlap are refused. An entry can close the whole venue (`venueClosed`).",

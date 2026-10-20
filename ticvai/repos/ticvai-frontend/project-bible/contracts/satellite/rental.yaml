@@ -1617,6 +1617,12 @@ paths:
         - "P08 BO-551 Deposit & Financial Handover Validation"
         - "P08 BO-553 Checkout Confirmation & Rental Activation"
         - "P08 BO-906 Resource Checkout Workspace"
+      # The payment is read through orders#paymentRecords (x-ticvai-read-via), never raw (r8 integration, CHG-R8INT-014; check-parameter-columns P-NAMED-TABLE).
+      x-ticvai-names-for-context: [orders.payment]
+      x-ticvai-read-via:
+      - query: orders#paymentRecords
+        route: service
+        for: 'the card deposit''s payment: refused 409 deposit-not-authorised until it is authorised (ADAM CR-146)'
       summary: Hand it over, with the deposit held and the condition recorded
       description: 'Board 6. **The readiness gate is enforced here and not on the screen before it.** A
         checkout that proceeds without the signed agreement, the captured requirements or the authorised
@@ -1633,6 +1639,10 @@ paths:
         booking (`RentalBooking.depositAuthorisationId`, whose writer this is) and **refuses the check-out with
         409 `deposit-not-authorised` until the pre-authorisation has succeeded**. A cash deposit, or a supervisor
         override (`overrideId`), is the only other way through.
+
+        **The authorisation is an `orders.payment`** (ADAM CR-146, 18 October 2026; CHG-CRA-002): the id stored
+        is the authorised card payment''s (tender card, status `authorised`, its terminal), on the rental''s
+        order. Return captures it in part or voids it; it is never a stored-value hold.
 
         '
       tags:
@@ -3722,12 +3732,17 @@ components:
           format: date-time
           nullable: true
         depositAuthorisationId:
-          x-ticvai-references: orders.stored_value_authorisation
+          x-ticvai-references: orders.payment
           type: string
           format: uuid
           nullable: true
-          description: The card deposit's terminal pre-authorisation, written by `checkOutRental` (workbook Q304;
-            CHG-CSA-029). The hold is kept whole until every unit is back (workbook Q306).
+          description: 'The card deposit''s terminal pre-authorisation, written by `checkOutRental` (workbook Q304;
+            CHG-CSA-029). The hold is kept whole until every unit is back (workbook Q306). **It is an
+            `orders.payment`** (ADAM CR-146, option A, 18 October 2026; CHG-CRA-002): a card payment with `tender`
+            card, `status` authorised and its `terminalId`, captured in part or voided when the rental comes back,
+            which is that payment''s own life. Orders'' stored-value authorisation holds wallet and stored-value
+            holds and has no card kind, so no card deposit could satisfy the key it used to name. The deposit
+            payment belongs to the rental''s order (`orderId`; the lead confirms, since `order_id` is nullable).'
         accruedLateFee:
           $ref: ../shared/common.yaml#/components/schemas/Money
         readiness:
@@ -3851,7 +3866,8 @@ components:
           format: uuid
           nullable: true
           description: '**The terminal pre-authorisation of a card deposit** (workbook Q304; CHG-CSA-029), as the
-            payments terminal returned it. Required where the deposit is on a card; stored on the booking.'
+            payments terminal returned it. Required where the deposit is on a card; stored on the booking. It is
+            the id of the authorised `orders.payment` (ADAM CR-146; CHG-CRA-002).'
         conditionNote:
           type: string
           nullable: true

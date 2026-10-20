@@ -168,7 +168,6 @@ paths:
     get:
       operationId: getResourceAvailability
       x-ticvai-consumed-by:
-        - "P01 WEB-031 My Reservations"
         - "P08 BO-096 Resource Calendar"
         - "P08 BO-857 Resource Creation & Profile"
         - "P08 BO-866 Resource Availability Schedule Configuration"
@@ -3044,6 +3043,7 @@ paths:
     get:
       operationId: listProductStartTimes
       x-ticvai-consumed-by:
+        - "P01 WEB-031 My Reservations"
         - "P01 WEB-048 Book a Space by the Hour"
         - "P02 GST-075 Book a Space by the Hour"
       x-ticvai-read-via:

@@ -15,7 +15,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/tenants-licensing/commercial-rules-engine-overview-adm-389",
-   "component": "apps/ticvai-web/src/routes/tenants-licensing/CommercialRulesEngineOverview.tsx",
+   "component": "src/routes/tenants-licensing/CommercialRulesEngineOverview.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -244,7 +244,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/tenants-licensing/vsi-model-builder-adm-390",
-   "component": "apps/ticvai-web/src/routes/tenants-licensing/VsiModelBuilder.tsx",
+   "component": "src/routes/tenants-licensing/VsiModelBuilder.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -417,7 +417,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/tenants-licensing/vsi-scoring-tier-threshold-configuration-adm-391",
-   "component": "apps/ticvai-web/src/routes/tenants-licensing/VsiScoringTierThresholdConfiguration.tsx",
+   "component": "src/routes/tenants-licensing/VsiScoringTierThresholdConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -541,7 +541,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/tenants-licensing/subscription-tier-configuration-adm-392",
-   "component": "apps/ticvai-web/src/routes/tenants-licensing/SubscriptionTierConfiguration.tsx",
+   "component": "src/routes/tenants-licensing/SubscriptionTierConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -676,7 +676,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/tenants-licensing/tier-included-allowances-adm-393",
-   "component": "apps/ticvai-web/src/routes/tenants-licensing/TierIncludedAllowances.tsx",
+   "component": "src/routes/tenants-licensing/TierIncludedAllowances.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -839,7 +839,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/tenants-licensing/commercial-licensing-model-configuration-adm-394",
-   "component": "apps/ticvai-web/src/routes/tenants-licensing/CommercialLicensingModelConfiguration.tsx",
+   "component": "src/routes/tenants-licensing/CommercialLicensingModelConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1086,7 +1086,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/tenants-licensing/billable-unit-minimum-guarantee-enforcement-rules-adm-395",
-   "component": "apps/ticvai-web/src/routes/tenants-licensing/BillableUnitMinimumGuaranteeEnforcementRules.tsx",
+   "component": "src/routes/tenants-licensing/BillableUnitMinimumGuaranteeEnforcementRules.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1297,7 +1297,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/tenants-licensing/overage-pricing-capacity-packs-adm-396",
-   "component": "apps/ticvai-web/src/routes/tenants-licensing/OveragePricingCapacityPacks.tsx",
+   "component": "src/routes/tenants-licensing/OveragePricingCapacityPacks.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1483,7 +1483,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/tenants-licensing/commercial-model-rule-simulation-adm-397",
-   "component": "apps/ticvai-web/src/routes/tenants-licensing/CommercialModelRuleSimulation.tsx",
+   "component": "src/routes/tenants-licensing/CommercialModelRuleSimulation.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1636,7 +1636,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/tenants-licensing/rule-versioning-approval-publication-adm-398",
-   "component": "apps/ticvai-web/src/routes/tenants-licensing/RuleVersioningApprovalPublication.tsx",
+   "component": "src/routes/tenants-licensing/RuleVersioningApprovalPublication.tsx",
    "status": "notStarted"
   },
   "navigation": {

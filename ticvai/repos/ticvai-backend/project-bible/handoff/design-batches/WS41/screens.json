@@ -15,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/policy/privacy-consent-configuration-command-center-cms-021",
-   "component": "apps/venue-management-web/src/routes/policy/PrivacyConsentConfigurationCommandCenter.tsx",
+   "component": "src/routes/policy/PrivacyConsentConfigurationCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -313,7 +313,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/policy/data-processing-purpose-lawful-basis-registry-cms-022",
-   "component": "apps/venue-management-web/src/routes/policy/DataProcessingPurposeLawfulBasisRegistry.tsx",
+   "component": "src/routes/policy/DataProcessingPurposeLawfulBasisRegistry.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -479,7 +479,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/policy/consent-purpose-consent-type-builder-cms-023",
-   "component": "apps/venue-management-web/src/routes/policy/ConsentPurposeConsentTypeBuilder.tsx",
+   "component": "src/routes/policy/ConsentPurposeConsentTypeBuilder.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -697,7 +697,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/policy/communication-preference-marketing-permission-configurat-cms-024",
-   "component": "apps/venue-management-web/src/routes/policy/CommunicationPreferenceMarketingPermissionConfig.tsx",
+   "component": "src/routes/policy/CommunicationPreferenceMarketingPermissionConfig.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -897,7 +897,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/policy/cookie-tracking-digital-technology-registry-cms-025",
-   "component": "apps/venue-management-web/src/routes/policy/CookieTrackingDigitalTechnologyRegistry.tsx",
+   "component": "src/routes/policy/CookieTrackingDigitalTechnologyRegistry.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1216,7 +1216,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/policy/cookie-banner-preference-center-designer-cms-026",
-   "component": "apps/venue-management-web/src/routes/policy/CookieBannerPreferenceCenterDesigner.tsx",
+   "component": "src/routes/policy/CookieBannerPreferenceCenterDesigner.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1477,7 +1477,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/policy/consent-capture-point-customer-journey-configuration-cms-027",
-   "component": "apps/venue-management-web/src/routes/policy/ConsentCapturePointCustomerJourneyConfiguration.tsx",
+   "component": "src/routes/policy/ConsentCapturePointCustomerJourneyConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1725,7 +1725,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/policy/privacy-notice-policy-terms-version-management-cms-028",
-   "component": "apps/venue-management-web/src/routes/policy/PrivacyNoticePolicyTermsVersionManagement.tsx",
+   "component": "src/routes/policy/PrivacyNoticePolicyTermsVersionManagement.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1907,7 +1907,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/policy/minor-guardian-age-based-privacy-configuration-cms-029",
-   "component": "apps/venue-management-web/src/routes/policy/MinorGuardianAgeBasedPrivacyConfiguration.tsx",
+   "component": "src/routes/policy/MinorGuardianAgeBasedPrivacyConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -2056,7 +2056,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/policy/privacy-configuration-testing-approval-publication-cms-030",
-   "component": "apps/venue-management-web/src/routes/policy/PrivacyConfigurationTestingApprovalPublication.tsx",
+   "component": "src/routes/policy/PrivacyConfigurationTestingApprovalPublication.tsx",
    "status": "notStarted"
   },
   "navigation": {

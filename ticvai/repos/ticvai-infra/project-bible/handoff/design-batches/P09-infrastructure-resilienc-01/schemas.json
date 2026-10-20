@@ -372,6 +372,15 @@
      "decommission"
     ]
    },
+   "targetTier": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/CellTier"
+     }
+    ],
+    "nullable": true,
+    "description": "For a `tierMigration` job, the tier the cell moves to at cutover (`updateCellTier`); null for every other kind (R8 blocker APPROVALS-TENANCY-C19)."
+   },
    "status": {
     "type": "string",
     "enum": [
@@ -421,6 +430,15 @@
    "onPremiseConnected",
    "controlPlane",
    "burst"
+  ]
+ },
+ "CellTier": {
+  "type": "string",
+  "enum": [
+   "shared",
+   "dedicated",
+   "isolated",
+   "clientHosted"
   ]
  },
  "Page": {

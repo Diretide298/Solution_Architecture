@@ -255,6 +255,11 @@ paths:
         **None of these states is final (decided 28 September, audit STATE-MEDIA).** An archived
         asset may be restored to `ready`, and a quarantined one released to `ready` after review;
         the only end of an asset's life is `deleteMediaAsset`.
+
+        **Who releases a quarantined asset** (R8 blocker ORDERS-MONEY-C24, the lead's answer C;
+        CHG-R8MIG-022): the reviewer, a caller who also holds `ASSET_LIBRARY_APPROVE` at the
+        asset's venue, makes the move directly on CMS-010 (`403` without it); the asset records
+        `releasedByPrincipalId` and `releasedAt`. No approval request is raised.
       tags: [asset]
       x-ticvai-permission: ASSET_LIBRARY_MANAGE
       x-ticvai-scope-level: venue
@@ -313,6 +318,8 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '#/components/schemas/MediaStatusRefusedProblem' }
+        '403':
+          $ref: '../shared/common.yaml#/components/responses/Forbidden'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
@@ -335,6 +342,16 @@ paths:
         **Deletion is the only end of an asset's life (decided 28 September, audit
         STATE-MEDIA).** It removes the row rather than moving the asset to a state; `archived`
         and `quarantined` are both reversible through `updateMediaAsset`.
+
+
+        **In use means** (R8 blocker ORDERS-MONEY-C29) any `assets.media_usage` row for the asset, or the
+        asset being a media collection's cover. The other modules that keep an asset's id (AI's
+        configuration sources, history imports and layout drafts; maintenance incident media and work-order
+        attachments; seating sections; transport network imports; venue maps and their versions) record
+        that use as a `media_usage` row when they take the asset, so Assets reads no other module's data
+        to answer. Any use is 409 `in-use`, naming it. **Otherwise the delete removes, in one transaction**, the asset's `media_collection_member`, `asset_version`, `rendition`
+        and `media_fingerprint` rows and clears `media_upload.asset_id`; the stored files of every version
+        and their derivatives are removed from the asset store after the transaction commits.
       tags: [asset]
       x-ticvai-permission: ASSET_LIBRARY_MANAGE
       x-ticvai-scope-level: venue
@@ -376,6 +393,15 @@ paths:
 
         Derivatives regenerate. The previous version is retained for rollback.
 
+        **Where the previous file is kept** (R8 blocker ORDERS-MONEY-C29): the replace writes one
+        `assets.asset_version` row for the file it replaces (its `storageKey`, `contentType`, `fileName`,
+        `sizeBytes`, `checksum`) with `isCurrent` false, and the new file becomes the current version; the
+        first replace of an asset also writes version 1 for the original, since `completeUpload` writes
+        none. The asset passes through `processing` (derivatives regenerating, scanned again) back to
+        `ready`; a flagged file goes to `quarantined`. A replace is allowed from `ready` and `archived`; in
+        any other status it is 409 `asset-not-replaceable`. No operation rolls a version back yet: only
+        the retention is defined here.
+
         **The fingerprint is recomputed with them**: the asset's one `assets.media_fingerprint` row
         is replaced by the processing job for the new file (decided 29 September, writers pass;
         DM4), so similarity and duplicate checks compare what is actually served.
@@ -410,8 +436,9 @@ paths:
             The upload cannot be used: it is a different kind — an image cannot replace a
             document (`kindMismatch`) — or the transfer never finished (`transferIncomplete`),
             the upload ticket expired (`uploadExpired`), or the stored file is larger than the
-            ticket allowed (`sizeExceeded`)
-          x-ticvai-problem-types: [kind-mismatch, transfer-incomplete, upload-expired, size-exceeded]
+            ticket allowed (`sizeExceeded`); or the asset is not `ready` or `archived`
+            (`assetNotReplaceable`, R8 blocker ORDERS-MONEY-C29)
+          x-ticvai-problem-types: [kind-mismatch, transfer-incomplete, upload-expired, size-exceeded, asset-not-replaceable]
           content:
             application/problem+json:
               schema: { $ref: '#/components/schemas/UploadRefusedProblem' }
@@ -448,6 +475,28 @@ paths:
         file is a `document` (`application/json`). Both stay in the tenant's region (UAE-hosted for a
         UAE tenant) and are served through the platform's delivery rules; no asset goes to a
         third-party map service. `venue-map.importVenueGeometry` measures the rest of the budget.
+
+        **What may be uploaded** (r8 walk of tickets 27839 and 27843; lead decision of 20 October 2026, option A: a
+        fixed table, the numbers proposals for the client to correct). The kind is **derived from `contentType`**
+        by this table, by `completeUpload` and by `replaceMediaAsset` (whose `kindMismatch` compares against it);
+        a content type in no row is 400 `media-type-not-permitted`, and a `sizeBytes` above the row's limit is 400
+        `media-too-large`, both before any transfer.
+
+        | MediaKind | Content types | Largest file |
+        |---|---|---|
+        | image | image/jpeg, image/png, image/webp, image/gif | 25 MB |
+        | video | video/mp4, video/webm, video/quicktime | 500 MB |
+        | audio | audio/mpeg, audio/mp4, audio/wav | 50 MB |
+        | document | application/pdf, application/vnd.openxmlformats-officedocument.wordprocessingml.document, text/html, text/plain | 20 MB |
+        | vector | image/svg+xml | 5 MB |
+        | font | font/woff2, font/ttf, font/otf | 5 MB |
+        | archive | application/zip | 100 MB |
+        | model3d | model/gltf-binary | 40 MB (41,943,040 bytes) |
+
+        The ticket the server issues carries `maxSizeBytes` (the row's limit) and expires 15 minutes after it is
+        issued (`expiresAt`); a transfer not finished by then is abandoned and `completeUpload` answers 409.
+        Surfaces that accept a narrower set (the brand logo accepts PNG or SVG up to 2 MB) say so themselves and
+        apply it after this table. Other contracts that mention "the media store's limit" mean this table.
       tags: [upload]
       x-ticvai-permission: ASSET_LIBRARY_MANAGE
       x-ticvai-scope-level: venue
@@ -525,6 +574,14 @@ paths:
         embedding, stamped with the model version) once the file passes scanning, so
         `findSimilarMediaAssets` sees a new asset without anyone asking for it (decided 29
         September, writers pass; DM4). A quarantined file gets no fingerprint.
+
+        **The derivatives are the asset's `assets.rendition` rows** (r8 gate residue, CHG-R8RES-005): the job
+        writes one row per derivative it generates (its `preset`), `queued` then `ready` or `failed`, which
+        `getMediaAsset` returns as `derivatives` and `listMediaRenditions` lists. `requestMediaRendition` adds a
+        size or format beyond them; an uploaded asset has its derivatives without it.
+      x-ticvai-writes:
+      - table: assets.rendition
+        for: 'the derivatives the processing job generates, one row per preset (CHG-R8RES-005)'
       tags: [upload]
       x-ticvai-permission: ASSET_LIBRARY_MANAGE
       x-ticvai-scope-level: venue
@@ -562,6 +619,112 @@ paths:
             The transfer never finished (`transferIncomplete`), the upload ticket expired
             (`uploadExpired`), or the stored file is larger than the ticket allowed
             (`sizeExceeded`). A file that fails scanning is not refused here — see above
+          x-ticvai-problem-types: [transfer-incomplete, upload-expired, size-exceeded]
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/UploadRefusedProblem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+
+  /media/guest-uploads:
+    post:
+      operationId: createGuestUpload
+      x-ticvai-writes:
+      - table: assets.guest_upload
+        for: 'the guest''s upload row, written `pending` with its purpose, content type and size (GuestUpload; r8 gate,
+          CHG-R8GT2-002; check-request-fields-stored RF-REQUEST-NOT-STORED)'
+      security:
+      - guestAuth: []
+      x-ticvai-self-scoped: subject
+      x-ticvai-audience: [guest]
+      summary: A guest requests a signed upload URL for an identity document or a selfie
+      description: >
+        **How a guest produces the `documentAssetId` and `selfieAssetId` that `submitGuestIdentityDocument`
+        needs** (R8 blocker IDENTITY-C66, CHG-R8MIG-027). The same direct-to-storage transfer as `createUpload`,
+        narrowed for a guest: the upload belongs to the caller's own subject, its `purpose` is `identityDocument`
+        or `selfie`, the content type is image/jpeg, image/png or (a document only) application/pdf, and the file
+        is at most 10 MB (proposed, client to confirm). Refused 400 `media-type-not-permitted` or `media-too-large`
+        before any transfer. The file goes to the tenant's private document store, never to the media library,
+        and is deleted under the verification policy's `documentImageRetention`, or 24 hours after upload when
+        no verification uses it. Confirm with `completeGuestUpload`.
+      tags: [upload]
+      x-ticvai-permission: null
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [purpose, contentType, sizeBytes]
+              properties:
+                purpose:
+                  type: string
+                  enum: [identityDocument, selfie]
+                contentType: { type: string, maxLength: 100 }
+                sizeBytes: { type: integer, minimum: 1 }
+      responses:
+        '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Signed URL issued
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/UploadTicket' }
+        '400':
+          x-ticvai-problem-types: [media-type-not-permitted, media-too-large]
+          description: Content type not permitted for the purpose, or larger than 10 MB.
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+
+  /media/guest-uploads/{uploadId}/complete:
+    parameters:
+      - name: uploadId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: completeGuestUpload
+      security:
+      - guestAuth: []
+      x-ticvai-self-scoped: subject
+      x-ticvai-audience: [guest]
+      summary: A guest confirms an upload
+      description: >
+        Verifies the transfer and marks the guest's upload `uploaded` (R8 blocker IDENTITY-C66, CHG-R8MIG-027).
+        The returned `uploadId` is what `submitGuestIdentityDocument` takes as `documentAssetId` or
+        `selfieAssetId`. Another guest's upload, or an unknown id, is `404`. No derivative, fingerprint or
+        library entry is made; the file is scanned like any upload and a flagged file is refused when submitted.
+      tags: [upload]
+      x-ticvai-permission: null
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Uploaded
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/GuestUpload' }
+        '404':
+          $ref: '../shared/common.yaml#/components/responses/NotFound'
+        '409':
+          description: >
+            The transfer never finished (`transferIncomplete`), the ticket expired (`uploadExpired`), or the stored
+            file is larger than the ticket allowed (`sizeExceeded`).
           x-ticvai-problem-types: [transfer-incomplete, upload-expired, size-exceeded]
           content:
             application/problem+json:
@@ -1591,6 +1754,11 @@ components:
     MediaAssetVersion:
       type: object
       x-ticvai-persistence: assets.asset_version
+      # One current version per asset (class 8 of the 18 October triage, the sibling of ADAM CR-154; CHG-CRA-004):
+      # `isCurrent` promised it and nothing kept it.
+      x-ticvai-unique-when:
+      - columns: [assetId]
+        when: {isCurrent: true}
       description: 'Boards 2.6 and 2.7. **Usage impact belongs to the version read**, because replacing a
         logo is routine or an incident depending on where it appears.
 
@@ -1619,6 +1787,18 @@ components:
           nullable: true
         isCurrent:
           type: boolean
+        storageKey:
+          type: string
+          nullable: true
+          writeOnly: true
+          maxLength: 500
+          description: 'Where this version''s file is kept in the asset store (R8 blocker ORDERS-MONEY-C29). Written by
+            `replaceMediaAsset` for the file it replaces, so the previous version stays retrievable; never returned.'
+        contentType:
+          type: string
+          nullable: true
+          maxLength: 200
+          description: The media type of this version's file (R8 blocker ORDERS-MONEY-C29).
         usageImpact:
           x-ticvai-persisted: false
           type: array
@@ -2054,7 +2234,10 @@ components:
         venueId: { type: string, format: uuid, nullable: true }
         url:
           type: string
-          description: Signed and expiring for private assets; stable CDN URL for public ones.
+          description: 'Signed and expiring for private assets; stable CDN URL for public ones. **A public asset that a
+            published white-label version references is served at its stable CDN URL**, and
+            `getPublishedTenantConfig` returns that address (`brandUrls`, `banners[].imageUrl`) so a guest client
+            never needs this read (r8 walk of ticket 28335).'
         thumbnailUrl: { type: string, nullable: true }
         referenceCount:
           type: integer
@@ -2065,6 +2248,28 @@ components:
         version: { type: integer }
         uploadedByPrincipalId: { type: string, format: uuid }
         createdAt: { type: string, format: date-time }
+        extractedText:
+          type: string
+          nullable: true
+          readOnly: true
+          description: '**The text pulled out of an uploaded document** (R8 blocker ORDERS-MONEY-C19): written by the
+            upload''s processing job once text extraction finishes (PDF, Word and plain-text kinds), replaced when the
+            file is replaced, null for an image, video or audio file or while the asset is still processing. One
+            value per asset, so AI''s `ingestKnowledgeDocument` reads it through `mediaAssetRecords`.'
+        releasedByPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          x-ticvai-references: identity.principal
+          description: The reviewer who released the asset from `quarantined` (R8 blocker ORDERS-MONEY-C24,
+            CHG-R8MIG-022); null if it never was.
+        releasedAt:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+          description: When it was released from `quarantined`.
 
     MediaAssetDetail:
       x-ticvai-persistence: "assets.media_asset"
@@ -2120,7 +2325,9 @@ components:
       properties:
         extractedText:
           type: string
-          description: '**Text pulled out of an uploaded document**, after extraction. The generic retrieval path for anything a tenant uploads — a PDF nobody can search is a PDF nobody reads.
+          description: '**Not written; read `MediaAsset.extractedText`** (R8 blocker ORDERS-MONEY-C19). Text pulled out of
+            an uploaded document belongs to the asset, not to one place it is used, and nothing could query it here.
+            Kept on the wire for clients built before; always absent.
 
             '
         id:
@@ -2144,6 +2351,16 @@ components:
             - incident
             - inspection
             - campaign
+            # r8 (ORDERS-MONEY-C29): the other modules' uses, so each owner records its own use as a media_usage
+            # row and Assets reads no other module to know an asset is in use.
+            - aiConfigSource
+            - aiHistoryImport
+            - aiLayoutDraft
+            - workOrderAttachment
+            - seatingSection
+            - transportNetworkImport
+            - venueMap
+            - venueMapVersion
         referenceId: { type: string }
         label: { type: string }
         isLive:
@@ -2189,7 +2406,7 @@ components:
           properties:
             refusedReason:
               type: string
-              enum: [transferIncomplete, uploadExpired, sizeExceeded, kindMismatch]
+              enum: [transferIncomplete, uploadExpired, sizeExceeded, kindMismatch, assetNotReplaceable]
             uploadId: { type: string, format: uuid }
             expectedKind:
               allOf:
@@ -2258,6 +2475,51 @@ components:
           description: Of those, how many are published to guests right now.
         derivativesRegenerating: { type: boolean }
 
+    GuestUpload:
+      type: object
+      x-ticvai-persistence: assets.guest_upload
+      description: >
+        **A file a guest uploaded for identity verification** (R8 blocker IDENTITY-C66, CHG-R8MIG-027): an identity
+        document's scan or a selfie, the caller's own (row-level security by subject), kept apart from the media
+        library and deleted under the verification policy's retention. `createGuestUpload` writes it `pending`,
+        `completeGuestUpload` makes it `uploaded`, the retention job `deleted`.
+      required: [uploadId, subjectId, purpose, status, createdAt]
+      properties:
+        uploadId:
+          type: string
+          format: uuid
+          readOnly: true
+          x-ticvai-column: id
+        subjectId:
+          type: string
+          format: uuid
+          readOnly: true
+          x-ticvai-references: none
+          description: The guest who uploaded it, from the session.
+        purpose:
+          type: string
+          enum: [identityDocument, selfie]
+        contentType:
+          type: string
+          maxLength: 100
+        sizeBytes:
+          type: integer
+          minimum: 1
+        storageKey:
+          type: string
+          writeOnly: true
+          maxLength: 500
+          description: Where the file is in the private document store; never returned.
+        status:
+          type: string
+          enum: [pending, uploaded, deleted]
+        createdAt:
+          type: string
+          format: date-time
+        deletedAt:
+          type: string
+          format: date-time
+          nullable: true
     UploadTicket:
       x-ticvai-persistence: "assets.media_upload"
       type: object

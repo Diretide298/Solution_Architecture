@@ -200,7 +200,7 @@
  },
  "BookingFlowTypeKey": {
   "type": "string",
-  "description": "**The flow types the system catalogue offers (decided 29 September, W12; impact.md b).** `seatedFixedPerformance` and `seatedDateTimeSeatMap` are the two seated flows; `cabanaMap` and `cabanaBySize` are the two cabana flows (W6); `experienceWorkshop` puts the product before the date (W8); `multiLocation` opens on the location switcher.\n",
+  "description": "**The flow types the system catalogue offers (decided 29 September, W12; impact.md b).** `seatedFixedPerformance` and `seatedDateTimeSeatMap` are the two seated flows; `cabanaMap` is the one cabana flow (W6; `cabanaBySize` was removed in r8: a guest books a cabana from the map only, lead decision of 20 October 2026); `experienceWorkshop` puts the product before the date (W8); `multiLocation` opens on the location switcher.\n",
   "enum": [
    "datedDayPass",
    "timedEntry",
@@ -211,7 +211,6 @@
    "surfSession",
    "meetingRoomHourly",
    "cabanaMap",
-   "cabanaBySize",
    "guidedTourByLanguage",
    "transport",
    "tableReservation",
@@ -235,10 +234,31 @@
     "type": "string",
     "format": "uuid"
    },
+   "anonymousSessionToken": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "The `guestAuth` token of the anonymous session `createCart` opened for a visitor with no credential (GPS-C23, CHG-R8SPN-031); null on every other answer. Not stored on the cart."
+   },
    "token": {
     "type": "string",
     "readOnly": true,
     "description": "**How an anonymous guest returns to their cart**, including from a recovery email. Rotated on claim, so a link shared before signing in does not reach the account after.\n"
+   },
+   "sessionId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The staff or partner session that started the cart (a till's cart is its session's own); null for a guest's cart (R8 blocker IDENTITY-C49, CHG-R8MIG-021)."
+   },
+   "workstationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The workstation of that session; null for a guest's cart."
    },
    "venueId": {
     "type": "string",
@@ -595,7 +615,7 @@
     "x-ticvai-references": "catalogue.inventory_reservation",
     "type": "string",
     "nullable": true,
-    "description": "Lease the units were drawn from — a `catalogue.InventoryHold.id`. Absent for uncontended products."
+    "description": "Lease the units were drawn from — a `catalogue.InventoryHold.id`. Absent for uncontended products. **A standing-zone line** (zone-priced general admission at POS-004 and WEB-007; decided 20 October 2026, Chinmay, R8 blocker cause GPS-C38, option A; CHG-R8SPN-040) carries no `seatIds`: it is `quantity` places in one zone, held by `seating.createSeatHold` with `zoneId` and `quantity`, and this names that hold's inventory hold; the zone, its price band and keep-the-party- together come from the hold, and a lapsed one is `409 hold-not-active` as for seats."
    },
    "seatIds": {
     "type": "array",
@@ -788,7 +808,7 @@
    },
    "identityProviders": {
     "type": "array",
-    "description": "Linked providers. Several may resolve to one account.",
+    "description": "Linked providers. Several may resolve to one account. Read from `pii.subject_identity` (apple, google, uaePass), `identity.guest_credential` (password) and a verified contact (otp) (CHG-R8MIG-015).",
     "items": {
      "type": "string",
      "enum": [
@@ -843,6 +863,14 @@
  "MfaMethod": {
   "x-ticvai-persistence": "identity.mfa_method",
   "type": "object",
+  "description": "**A second factor a principal or a guest has enrolled** (R8 blockers IDENTITY-C12 and IDENTITY-C34, CHG-R8MIG-007). Exactly one of `principalId` and `subjectId` is set, so a guest's method is stored like a staff member's and `GuestSession.requiresMfa` and `mfaMethods` are answered from here; the row is its owner's alone (`x-ticvai-rls: own-row`). Three fields are storage only and never returned (`handoff/schema-storage-only.md`): `secret` (a `totp` shared secret, which `verifyMfaChallenge` computes the code from), `destination` (the full phone number or email an `smsOtp` or `emailOtp` code is sent to; `maskedTarget` is the only form returned) and `pendingExpiresAt` (set while an enrolment awaits `verifyMfaEnrolment`; an expired pending row is deleted by the next `enrolMfaMethod` of its owner).",
+  "x-ticvai-exactly-one-of": [
+   [
+    "principalId",
+    "subjectId"
+   ]
+  ],
+  "x-ticvai-rls": "own-row",
   "required": [
    "id",
    "kind",
@@ -853,6 +881,44 @@
    "id": {
     "type": "string",
     "format": "uuid"
+   },
+   "principalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-references": "identity.principal",
+    "x-ticvai-staff-only": "Omitted from the response when the caller is a guest (R164; r8 gate residue, CHG-R8RES-008). A guest's own method has it null, so a guest screen never shows it.",
+    "description": "The principal who enrolled it; null for a guest."
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-references": "pii.subject",
+    "description": "The guest who enrolled it; null for a principal."
+   },
+   "secret": {
+    "type": "string",
+    "nullable": true,
+    "writeOnly": true,
+    "x-ticvai-secret": "field-encrypted",
+    "description": "The `totp` shared secret, encrypted with the tenant's field key (ADR-0063); null for other kinds. Never returned after `MfaEnrolment.secret`."
+   },
+   "destination": {
+    "type": "string",
+    "nullable": true,
+    "writeOnly": true,
+    "x-ticvai-secret": "field-encrypted",
+    "description": "The full phone number (`smsOtp`) or email (`emailOtp`) the code goes to, encrypted with the tenant's field key (ADR-0063); null for other kinds. Only `maskedTarget` is ever returned."
+   },
+   "pendingExpiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "writeOnly": true,
+    "description": "While `isActive` is false, when the unconfirmed enrolment lapses; null once verified."
    },
    "kind": {
     "$ref": "#/components/schemas/MfaKind"
@@ -935,6 +1001,13 @@
     "type": "string",
     "format": "uuid",
     "description": "The client UUIDv7 from `CreateOrderRequest.id`."
+   },
+   "orderAccessToken": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "**What lets the device that just checked out read the order it paid for** (decided 20 October 2026, Chinmay, R8 blocker cause IDENTITY-C52, option A; CHG-R8SPN-025). Returned only in `checkoutCart`'s answer, null everywhere else: a signed token bound to this order and to the cart's device, valid 24 hours, never stored. `getOrder` accepts it in `X-Order-Access-Token` in place of a session, so a guest who checked out with no account, or whose session ended, still sees the confirmation (WEB-013 keeps it in its navigation state). It reads this order only and grants nothing else."
    },
    "orderNumber": {
     "x-ticvai-unique": "tenant",
@@ -1303,6 +1376,11 @@
  },
  "Payment": {
   "x-ticvai-persistence": "orders.payment",
+  "x-ticvai-index": [
+   [
+    "providerReference"
+   ]
+  ],
   "type": "object",
   "required": [
    "id",
@@ -1555,6 +1633,7 @@
  },
  "PolicyKind": {
   "type": "string",
+  "description": "The kinds of policy a tenant publishes. **Each kind has one fixed title in English and Arabic** (r8 walk of ticket 27890), the only source of `PublishedPolicy.title`; `setPolicy` takes no title. The Arabic labels are the standard names of each document and the client should approve them.\n\n| kind | en | ar |\n|---|---|---|\n| privacy | Privacy policy | سياسة الخصوصية |\n| termsAndConditions | Terms and conditions | الشروط والأحكام |\n| refund | Refund policy | سياسة الاسترداد |\n| cookie | Cookie policy | سياسة ملفات تعريف الارتباط |\n| accessibility | Accessibility statement | بيان إمكانية الوصول |\n",
   "enum": [
    "privacy",
    "termsAndConditions",
@@ -1577,6 +1656,17 @@
    "id": {
     "type": "string",
     "format": "uuid"
+   },
+   "listPrice": {
+    "oneOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "**The list price on the caller's channel now**, resolved on read from the price lists (`listProductVariants`; R8 blocker cause GPS-C27, CHG-R8SPN-028). Not stored on the variant and ignored on input. Null where no price list prices it on that channel. The list price, not the total: promotions and bundles are applied at the basket."
    },
    "productId": {
     "type": "string",
@@ -1639,7 +1729,15 @@
     "$ref": "#/components/schemas/PolicyKind"
    },
    "title": {
-    "type": "string"
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/white-label::LocalisedText"
+     }
+    ],
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "x-ticvai-derived": "onRead",
+    "description": "The heading, with `en` and `ar`, derived on read from `kind` by the fixed label table on `PolicyKind`. Nothing is stored (`whitelabel.policy.title` stays unused), so a tenant cannot retitle a policy and the heading is the same in the app, on the web and in a consent record.\n"
    },
    "version": {
     "type": "string",
@@ -1696,7 +1794,7 @@
    },
    "consents": {
     "type": "array",
-    "description": "Consent captured at registration, recorded with the notice version.",
+    "description": "Consent captured at registration, recorded with the notice version. **Recorded by Marketing, not stored here**: `registerGuest` carries the list on `identity.guestRegistered`, and Marketing's consumer records each item as a consent (IDENTITY-C55, CHG-R8SPN-029).",
     "items": {
      "type": "object",
      "properties": {
@@ -1853,7 +1951,7 @@
    },
    "expiresIn": {
     "type": "integer",
-    "description": "Seconds"
+    "description": "Seconds until the access token expires: `PasswordPolicy.accessTokenMinutes` x 60, 900 by default (15 minutes; proposed, client to correct). The refresh token, its rotation and reuse detection, and the signing key are described once on `bearerAuth` in contracts/shared/common.yaml (IDENTITY-C25, FOUNDATION-AI-C27; CHG-R8SPN-014)."
    }
   }
  }

@@ -23,7 +23,7 @@ operations:
   verb: PUT
   path: /manual-override-supervisor
   scope: venue
-  permission: ACCESS_POINT_CONFIGURE
+  permission: ACCESS_OVERRIDE
   audience:
   - staff
   offline: false
@@ -134,7 +134,6 @@ operations:
   permission: null
   audience:
   - service
-  - guest
   offline: false
   reads:
   - access.parking_entitlement
@@ -482,7 +481,7 @@ operations:
   verb: GET
   path: /pdf-printable-pos
   scope: venue
-  permission: ACCESS_POINT_CONFIGURE
+  permission: PRODUCT_VIEW
   audience:
   - staff
   offline: false
@@ -510,6 +509,7 @@ operations:
   offline: false
   reads:
   - access.entitlement
+  - cache:idempotency
   - catalogue.entitlement_template
   - catalogue.variant
   - orders.order_line
@@ -517,6 +517,7 @@ operations:
   writes:
   - access.entitlement
   - access.parking_entitlement
+  - cache:idempotency
   - platform.idempotency_record
   - platform.outbox
 - operation: listAccess
@@ -558,7 +559,7 @@ operations:
   verb: GET
   path: /access-executive-insight
   scope: venue
-  permission: SCOPE_VIEW
+  permission: REPORT_VIEW_VENUE
   audience:
   - staff
   offline: false
@@ -583,7 +584,7 @@ operations:
   verb: GET
   path: /access-monitoring
   scope: venue
-  permission: SCOPE_VIEW
+  permission: REPORT_VIEW_VENUE
   audience:
   - staff
   offline: false
@@ -608,7 +609,7 @@ operations:
   verb: GET
   path: /access-report-scheduled
   scope: venue
-  permission: SCOPE_VIEW
+  permission: REPORT_VIEW_VENUE
   audience:
   - staff
   offline: false
@@ -693,7 +694,7 @@ operations:
   verb: GET
   path: /attendance-admission
   scope: venue
-  permission: SCOPE_VIEW
+  permission: REPORT_VIEW_VENUE
   audience:
   - staff
   offline: false
@@ -720,7 +721,7 @@ operations:
   verb: GET
   path: /biometric
   scope: venue
-  permission: SCOPE_VIEW
+  permission: AUDIT_VIEW
   audience:
   - staff
   offline: false
@@ -935,7 +936,7 @@ operations:
   verb: GET
   path: /credential-security
   scope: venue
-  permission: SCOPE_VIEW
+  permission: AUDIT_VIEW
   audience:
   - staff
   offline: false
@@ -950,7 +951,7 @@ operations:
   verb: GET
   path: /credential-security-operational
   scope: venue
-  permission: SCOPE_VIEW
+  permission: AUDIT_VIEW
   audience:
   - staff
   offline: false
@@ -990,7 +991,7 @@ operations:
   verb: GET
   path: /credential-usage-cross
   scope: venue
-  permission: SCOPE_VIEW
+  permission: TICKET_LOOKUP
   audience:
   - staff
   offline: false
@@ -1020,7 +1021,7 @@ operations:
   verb: GET
   path: /device-gate
   scope: venue
-  permission: SCOPE_VIEW
+  permission: DEVICE_VIEW
   audience:
   - staff
   offline: false
@@ -1033,7 +1034,7 @@ operations:
   verb: GET
   path: /device-type-hardware
   scope: venue
-  permission: SCOPE_VIEW
+  permission: DEVICE_VIEW
   audience:
   - staff
   offline: false
@@ -1146,7 +1147,7 @@ operations:
   verb: GET
   path: /entry-exit-crossover
   scope: venue
-  permission: SCOPE_VIEW
+  permission: REPORT_VIEW_VENUE
   audience:
   - staff
   offline: false
@@ -1370,7 +1371,7 @@ operations:
   verb: GET
   path: /guest-dwell-time
   scope: venue
-  permission: SCOPE_VIEW
+  permission: REPORT_VIEW_VENUE
   audience:
   - staff
   offline: false
@@ -1399,7 +1400,7 @@ operations:
   verb: GET
   path: /hardware-compatibility-health
   scope: venue
-  permission: SCOPE_VIEW
+  permission: DEVICE_VIEW
   audience:
   - staff
   offline: false
@@ -1682,7 +1683,7 @@ operations:
   verb: GET
   path: /parking-facilities
   scope: venue
-  permission: ACCESS_POINT_CONFIGURE
+  permission: PARKING_CONFIGURE
   audience:
   - staff
   - guest
@@ -1694,7 +1695,7 @@ operations:
   verb: GET
   path: /physical-device-registration
   scope: venue
-  permission: SCOPE_VIEW
+  permission: DEVICE_VIEW
   audience:
   - staff
   offline: false
@@ -1792,7 +1793,7 @@ operations:
   verb: GET
   path: /security-detection-governance
   scope: venue
-  permission: SCOPE_VIEW
+  permission: REPORT_VIEW_VENUE
   audience:
   - staff
   offline: false
@@ -1809,7 +1810,7 @@ operations:
   verb: GET
   path: /shift-handover-summary
   scope: venue
-  permission: SCOPE_VIEW
+  permission: AUDIT_VIEW
   audience:
   - staff
   offline: false
@@ -1837,7 +1838,7 @@ operations:
   verb: GET
   path: /throughput-queue-validation
   scope: venue
-  permission: SCOPE_VIEW
+  permission: REPORT_VIEW_VENUE
   audience:
   - staff
   offline: false
@@ -1849,7 +1850,7 @@ operations:
   verb: GET
   path: /ticket-credential-investigation
   scope: venue
-  permission: SCOPE_VIEW
+  permission: TICKET_LOOKUP
   audience:
   - staff
   offline: false
@@ -1865,7 +1866,7 @@ operations:
   verb: GET
   path: /ticket-media
   scope: venue
-  permission: SCOPE_VIEW
+  permission: REPORT_VIEW_VENUE
   audience:
   - staff
   offline: false
@@ -1908,7 +1909,7 @@ operations:
   verb: GET
   path: /validation-outcome-rejection
   scope: venue
-  permission: SCOPE_VIEW
+  permission: REPORT_VIEW_VENUE
   audience:
   - staff
   offline: false
@@ -1979,7 +1980,7 @@ operations:
   verb: GET
   path: /virtual-ticket-architecture
   scope: venue
-  permission: SCOPE_VIEW
+  permission: AUDIT_VIEW
   audience:
   - staff
   offline: false
@@ -2084,8 +2085,10 @@ operations:
   offline: false
   reads:
   - access.hardware_deployment
+  - cache:idempotency
   writes:
   - access.hardware_deployment
+  - cache:idempotency
 - operation: publishMediaCompatibilityTesting
   verb: PUT
   path: /media-compatibility-testing
@@ -2391,10 +2394,12 @@ operations:
   reads:
   - access.access_point
   - access.gate_mode_change
+  - cache:idempotency
   writes:
   - access.access_point
   - access.configuration_change
   - access.gate_mode_change
+  - cache:idempotency
 - operation: setAccessPointGeofence
   verb: PUT
   path: /access-points/{accessPointId}/geofence
@@ -2430,7 +2435,7 @@ operations:
   verb: PUT
   path: /apple-wallet-pass
   scope: venue
-  permission: ACCESS_POINT_CONFIGURE
+  permission: PRODUCT_CONFIGURE
   audience:
   - staff
   offline: false
@@ -2466,8 +2471,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - tenancy.data_retention_setting
   writes:
+  - cache:idempotency
   - tenancy.data_retention_setting
 - operation: setBiometricVerificationProfile
   verb: PUT
@@ -2573,9 +2580,11 @@ operations:
   offline: false
   reads:
   - access.credential_issuance_retry_policy
+  - cache:idempotency
   writes:
   - access.configuration_change
   - access.credential_issuance_retry_policy
+  - cache:idempotency
 - operation: setDeviceBindingPolicy
   verb: PUT
   path: /device-binding-policy
@@ -2595,7 +2604,7 @@ operations:
   verb: PUT
   path: /device-software-content
   scope: venue
-  permission: ACCESS_POINT_CONFIGURE
+  permission: DEVICE_CONFIGURE
   audience:
   - staff
   offline: false
@@ -2721,9 +2730,11 @@ operations:
   offline: false
   reads:
   - access.entry_rule_point
+  - cache:idempotency
   writes:
   - access.configuration_change
   - access.entry_rule_point
+  - cache:idempotency
 - operation: setFaceMatchingVerification
   verb: PUT
   path: /face-matching-verification/{profileId}
@@ -2850,7 +2861,7 @@ operations:
   verb: PUT
   path: /google-wallet-pass
   scope: venue
-  permission: ACCESS_POINT_CONFIGURE
+  permission: PRODUCT_CONFIGURE
   audience:
   - staff
   offline: false
@@ -2895,7 +2906,7 @@ operations:
   verb: PUT
   path: /handheld-mobile-access
   scope: venue
-  permission: ACCESS_POINT_CONFIGURE
+  permission: DEVICE_CONFIGURE
   audience:
   - staff
   offline: false
@@ -2931,8 +2942,11 @@ operations:
   offline: false
   reads:
   - access.hardware_certification
+  - cache:idempotency
   writes:
+  - access.configuration_change
   - access.hardware_certification
+  - cache:idempotency
 - operation: setHotelWalletExternal
   verb: PUT
   path: /hotel-wallet-external/{integrationId}
@@ -3079,7 +3093,7 @@ operations:
   verb: PUT
   path: /operational-incident-exception
   scope: venue
-  permission: ACCESS_POINT_CONFIGURE
+  permission: INCIDENT_MANAGE
   audience:
   - staff
   offline: false
@@ -3109,7 +3123,7 @@ operations:
   verb: PUT
   path: /pdf-printable-pos
   scope: venue
-  permission: ACCESS_POINT_CONFIGURE
+  permission: PRODUCT_CONFIGURE
   audience:
   - staff
   offline: false
@@ -3171,7 +3185,7 @@ operations:
   verb: PUT
   path: /reader-scanner-peripheral
   scope: venue
-  permission: ACCESS_POINT_CONFIGURE
+  permission: DEVICE_CONFIGURE
   audience:
   - staff
   offline: false
@@ -3533,8 +3547,10 @@ operations:
   offline: false
   reads:
   - access.access_point
+  - cache:idempotency
   writes:
   - access.scan_event
+  - cache:idempotency
   - platform.outbox
   - sync.rejection
 - operation: updateAccessDevicePlacement

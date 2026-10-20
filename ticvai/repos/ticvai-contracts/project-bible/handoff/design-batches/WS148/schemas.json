@@ -75,6 +75,13 @@
     "type": "string",
     "format": "uuid"
    },
+   "providerId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "x-ticvai-references": "payments.provider",
+    "description": "**Which provider this connection is to** (ADAM CR-165, 18 October 2026; CHG-CRA-004): a key to `payments.provider`, whose `kind` already says `stripe` or `networkInternational`. The payment webhook checks it against the `{provider}` in its path, so an event for another provider is a 404."
+   },
    "code": {
     "x-ticvai-unique": "tenant",
     "type": "string"

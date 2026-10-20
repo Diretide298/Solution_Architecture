@@ -1,10 +1,11 @@
 {
  "GoLiveReadiness": {
   "type": "object",
-  "x-ticvai-persistence": "subscription.go_live_readiness",
+  "x-ticvai-persistence": "control.go_live_readiness",
   "description": "Board 8. **The screen that stops a launch going wrong in public.**",
   "properties": {
    "tenantId": {
+    "x-ticvai-references": "control.tenant",
     "type": "string",
     "format": "uuid"
    },

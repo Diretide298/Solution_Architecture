@@ -10,7 +10,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/white-label/seo-metadata",
-   "component": "apps/venue-management-web/src/routes/white-label/SeoMetadataDetail.tsx",
+   "component": "src/routes/white-label/SeoMetadataDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -222,7 +222,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/white-label/translations",
-   "component": "apps/venue-management-web/src/routes/white-label/TranslationsDetail.tsx",
+   "component": "src/routes/white-label/TranslationsDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -410,7 +410,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/white-label/rtl-preview",
-   "component": "apps/venue-management-web/src/routes/white-label/RtlPreviewDetail.tsx",
+   "component": "src/routes/white-label/RtlPreviewDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -445,10 +445,10 @@
     }
    ]
   },
-  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.",
+  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. Build note (r8, WHITE-C03): nothing is read on entry. The preview is made by `createPreview` when the person presses the action and is empty until then (not a 404); Validate calls `validateTenantConfig`; the no-access state names `TENANT_CONFIGURE` for those two operations. Ignore the generated first-run text \"Offers no create action\" and the `getTenantConfig` wording in the no-access state.",
   "density": "compact",
   "pattern": "statusTracker",
-  "patternReason": "`getTenantConfig` reads one record and nothing reads a population — the screen is about that one thing",
+  "patternReason": "authored: the preview is made by `createPreview` when the person asks and the draft is checked by `validateTenantConfig`; nothing on this screen reads a record on entry.",
   "purpose": "See the site as an Arabic reader sees it.",
   "layout": {
    "template": "detail",
@@ -540,7 +540,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/white-label/publishing-workflow",
-   "component": "apps/venue-management-web/src/routes/white-label/PublishingWorkflowDetail.tsx",
+   "component": "src/routes/white-label/PublishingWorkflowDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -887,7 +887,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/white-label/version-history",
-   "component": "apps/venue-management-web/src/routes/white-label/VersionHistoryDetail.tsx",
+   "component": "src/routes/white-label/VersionHistoryDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1105,7 +1105,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/white-label/site-settings",
-   "component": "apps/venue-management-web/src/routes/white-label/SiteSettingsDetail.tsx",
+   "component": "src/routes/white-label/SiteSettingsDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1393,7 +1393,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/white-label/domain-certificate",
-   "component": "apps/venue-management-web/src/routes/white-label/DomainCertificateDetail.tsx",
+   "component": "src/routes/white-label/DomainCertificateDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1694,7 +1694,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/white-label/consent-legal",
-   "component": "apps/venue-management-web/src/routes/white-label/ConsentLegalDetail.tsx",
+   "component": "src/routes/white-label/ConsentLegalDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -2113,7 +2113,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/white-label/user-access",
-   "component": "apps/venue-management-web/src/routes/white-label/UserAccessDetail.tsx",
+   "component": "src/routes/white-label/UserAccessDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -2340,7 +2340,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/white-label/help-me-choose",
-   "component": "apps/venue-management-web/src/routes/white-label/HelpMeChoose.tsx",
+   "component": "src/routes/white-label/HelpMeChoose.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -2455,7 +2455,8 @@
       {
        "kind": "livePreview",
        "label": "Preview",
-       "notes": "**Renders the draft as a guest would meet it**: the button or pop-up, the banner, each question and the result card, in each language and in both directions. Drawn from the record in hand; it calls nothing and publishes nothing, and guests keep seeing the published set-up until Publish. **Preview the filtered list**: for each combination of answers, the products left (read with `listProducts` and the answer's filter), so an answer that leaves nothing bookable shows before it is published (W4).",
+       "operation": "previewGuidedChoice",
+       "notes": "**What each combination of answers leaves comes from `previewGuidedChoice`** (r8, WHITE-C26), the same filter guests meet, so a combination that leaves nothing shows before publishing. **Renders the draft as a guest would meet it**: the button or pop-up, the banner, each question and the result card, in each language and in both directions. Drawn from the record in hand; it calls nothing and publishes nothing, and guests keep seeing the published set-up until Publish. **Preview the filtered list**: for each combination of answers, the products left (read with `listProducts` and the answer's filter), so an answer that leaves nothing bookable shows before it is published (W4).",
        "provenance": "authored 29 September, rev 3 REV3-11"
       },
       {
@@ -2604,6 +2605,13 @@
     "purpose": "The reasons behind a Help me choose suggestion",
     "trigger": "onAction",
     "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "previewGuidedChoice",
+    "contract": "white-label",
+    "purpose": "The products each combination of the draft's answers leaves, for the preview (r8, WHITE-C26); called when the draft changes, nothing stored",
+    "trigger": "onAction",
+    "provenance": "r8 second round, WHITE-C26 (the core lane's request)"
    }
   ],
   "entryState": {

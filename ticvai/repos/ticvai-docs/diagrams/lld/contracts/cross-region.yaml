@@ -179,8 +179,10 @@ operations:
   - service
   offline: false
   reads:
+  - cache:idempotency
   - sync.rejection
   writes:
+  - cache:idempotency
   - sync.rejection
 - operation: recordSyncRejectionResolution
   verb: POST
@@ -191,8 +193,10 @@ operations:
   - service
   offline: false
   reads:
+  - cache:idempotency
   - sync.rejection
   writes:
+  - cache:idempotency
   - sync.rejection
 - operation: relinquishWalletAuthorisation
   verb: POST
@@ -203,8 +207,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - sync.wallet_authorisation
   writes:
+  - cache:idempotency
   - sync.wallet_authorisation
 - operation: resolveGuestLink
   verb: GET

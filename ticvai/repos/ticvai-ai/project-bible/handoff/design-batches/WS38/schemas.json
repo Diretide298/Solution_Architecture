@@ -901,28 +901,62 @@
    },
    "minimumTimeBetweenMovements": {
     "type": "integer",
-    "description": "Minimum minutes between movements; defaults to 60 (decided 29 September, readiness close-out)"
+    "deprecated": true,
+    "description": "Minimum minutes between movements; defaults to 60 (decided 29 September, readiness close-out). **Deprecated, same value as `minimumMinutesBetweenMovements`** (GPS-C32, CHG-R8SPN-028), kept for clients built on r1."
    },
    "reversalRules": {
+    "type": "string",
+    "deprecated": true,
+    "enum": [
+     "allowed",
+     "afterCooldown",
+     "notAllowed"
+    ],
+    "description": "Whether a movement may be reversed; defaults to afterCooldown (decided 29 September, readiness close-out). **Deprecated, same value as `reversalRule`** (GPS-C32), kept for clients built on r1."
+   },
+   "cooldownPeriod": {
+    "type": "integer",
+    "deprecated": true,
+    "description": "Cooldown in minutes after a movement; defaults to 60 (decided 29 September, readiness close-out). **Deprecated, same value as `cooldownMinutes`** (GPS-C32), kept for clients built on r1."
+   },
+   "ladderId": {
+    "type": "string",
+    "deprecated": true,
+    "description": "Ladder ID. **Deprecated, same value as `id`** (GPS-C32), kept for clients built on r1."
+   },
+   "strategyId": {
+    "type": "string",
+    "deprecated": true,
+    "description": "Strategy the ladder belongs to. **Deprecated, same value as `dynamicPricingStrategyId`** (GPS-C32), kept for clients built on r1."
+   },
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "description": "**The ladder's id, `PriceLadder.id`**: the read uses the write's names (decided 20 October 2026, R8 blocker cause GPS-C32; CHG-R8SPN-028), so ADM-094 reads back exactly what `setPriceLadderMatrix` took."
+   },
+   "dynamicPricingStrategyId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The strategy the ladder belongs to, `PriceLadder.dynamicPricingStrategyId` (GPS-C32)."
+   },
+   "minimumMinutesBetweenMovements": {
+    "type": "integer",
+    "nullable": true,
+    "description": "`PriceLadder.minimumMinutesBetweenMovements` (GPS-C32); 60 where the ladder sets none."
+   },
+   "cooldownMinutes": {
+    "type": "integer",
+    "nullable": true,
+    "description": "`PriceLadder.cooldownMinutes` (GPS-C32); 60 where the ladder sets none."
+   },
+   "reversalRule": {
     "type": "string",
     "enum": [
      "allowed",
      "afterCooldown",
      "notAllowed"
     ],
-    "description": "Whether a movement may be reversed; defaults to afterCooldown (decided 29 September, readiness close-out)"
-   },
-   "cooldownPeriod": {
-    "type": "integer",
-    "description": "Cooldown in minutes after a movement; defaults to 60 (decided 29 September, readiness close-out)"
-   },
-   "ladderId": {
-    "type": "string",
-    "description": "Ladder ID"
-   },
-   "strategyId": {
-    "type": "string",
-    "description": "Strategy the ladder belongs to"
+    "description": "`PriceLadder.reversalRule` (GPS-C32)."
    },
    "basePriceSource": {
     "type": "string",
@@ -1007,7 +1041,7 @@
       }
      ]
     },
-    "description": "Psychological pricing: governed endpoints (e.g. AED 249, 259, 279) a price may land on"
+    "description": "Psychological pricing: governed endpoints (e.g. AED 249, 259, 279) a price may land on. **The same values `PriceLadder.allowedEndpoints` stores as decimal strings, returned here as Money in the venue's currency** (GPS-C32, CHG-R8SPN-028): the editor sends `\"249.00\"` and reads back `{amount: 249.00, currency: AED}`."
    },
    "minimumPrice": {
     "allOf": [
@@ -2274,9 +2308,37 @@
     ]
    },
    "bands": {
-    "type": "object",
-    "additionalProperties": true,
-    "description": "`[{code, price, percent}]`, ascending."
+    "type": "array",
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
+    "description": "**The bands, lowest first** (typed 20 October 2026, R8 blocker cause GPS-C32; CHG-R8SPN-028: it was declared an object while every reader and writer used a list, so no valid body could carry it). The same shape `DynamicPriceBandsLaddersAdjustmentMatrixView.bands` returns. Stored as the jsonb list it always was.",
+    "items": {
+     "type": "object",
+     "required": [
+      "code"
+     ],
+     "properties": {
+      "code": {
+       "type": "string",
+       "maxLength": 40,
+       "description": "Band code, e.g. P4"
+      },
+      "price": {
+       "allOf": [
+        {
+         "$ref": "../shared/common.yaml#/components/schemas/Money"
+        }
+       ],
+       "nullable": true,
+       "description": "Band price (fixed and derived bands)"
+      },
+      "percent": {
+       "type": "number",
+       "nullable": true,
+       "description": "Band offset from base in percent (percentage bands)"
+      }
+     }
+    }
    },
    "baseBandCode": {
     "type": "string",
@@ -2360,7 +2422,7 @@
     "items": {
      "type": "string"
     },
-    "description": "Psychological price endings, e.g. `.99`, `.00`."
+    "description": "The governed price endpoints a price may land on, as decimal strings in the venue's currency (e.g. `\"249.00\"`, `\"259.00\"`), the DDL's text[]. ADM-094's view returns the same values as Money (GPS-C32, CHG-R8SPN-028)."
    },
    "createdAt": {
     "type": "string",

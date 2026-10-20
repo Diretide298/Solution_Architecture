@@ -112,7 +112,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `ADM-091` | Booking Velocity & Time-to-Event Rule Builder | A | 0 | 20 | 6 | 1 | 0 | 6 | — | notStarted (generated) |
 | `ADM-092` | Seasonal, Calendar, Day & Timeslot Dynamic Rules | B | 26 | 20 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
 | `ADM-093` | Channel, Customer Segment & Location Dynamic Rules | B | 0 | 0 | 6 | 0 | 0 | 6 | — | notStarted (generated) |
-| `ADM-094` | Dynamic Price Bands, Ladders & Adjustment Matrix | A | 24 | 0 | 5 | 0 | 2 | 0 | — | notStarted (generated) |
+| `ADM-094` | Dynamic Price Bands, Ladders & Adjustment Matrix | A | 27 | 0 | 5 | 0 | 2 | 0 | — | notStarted (generated) |
 | `ADM-095` | Dynamic Pricing Guardrails & Commercial Protection | A | 47 | 0 | 5 | 3 | 0 | 0 | — | notStarted (generated) |
 | `ADM-096` | Dynamic Pricing Automation Policy & Control | B | 50 | 0 | 5 | 3 | 0 | 0 | — | notStarted (generated) |
 | `ADM-097` | Rule Priority, Conflict Resolution & Dynamic Pricing Test Console | B–D | 0 | 2 | 6 | 0 | 0 | 0 | — | notStarted (generated) |

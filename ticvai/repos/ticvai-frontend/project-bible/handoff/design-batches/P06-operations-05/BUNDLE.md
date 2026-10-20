@@ -681,7 +681,7 @@ Errors to draw in the form: 400 Closure attempted without findings or a correcti
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on severity, status, isReportable and the post-incident restore are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `INCIDENT_VIEW`, which `listIncidents` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `INCIDENT_MANAGE` for `updateIncident`. |
 | Offline (`?state=offline`) | **Works offline by design.** Post-incident restore is exactly when the network is worst |
-| Validation and conflict | the form keeps what was entered and marks the problem: 400 Closure attempted without findings or a corrective action; 400 Content type not permitted, or size beyond the media store's limit for that kind.; 409 The incident is closed (`incident-closed`); reopen it first (CHG-RUL-011).; 422 A move outside the incident flow (`incident-transition-not-allowed`; CHG-RUL-011): to `actionRequired`, from `closed` to anything but `underInvestigation`, a … |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 Closure attempted without findings or a corrective action; 400 Content type not permitted, or size beyond the limit for that kind in the table on `assets.createUpload`.; 409 The incident is closed (`incident-closed`); reopen it first (CHG-RUL-011).; 422 A move outside the incident flow (`incident-transition-not-allowed`; CHG-RUL-011): to `actionRequired`, from `closed` to anything but … |
 
 #### Edge cases to draw
 
@@ -967,7 +967,7 @@ signedIn: Yusuf Rahman · Steward · since 07:58
 
 #### Permissions
 
-- `logout` → no permission · staff
+- `logout` → no permission · staff, partner
 
 #### Requirements it meets
 

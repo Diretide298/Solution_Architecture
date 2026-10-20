@@ -801,9 +801,10 @@
    "rentalAgreement",
    "order",
    "transfer",
+   "retailReservation",
    "other"
   ],
-  "description": "What a stock reservation is for (decided 17 September, M17-02; `rentalAgreement` is the existing use from `rental.agreement_item`)."
+  "description": "What a stock reservation is for (decided 17 September, M17-02; `rentalAgreement` is the existing use from `rental.agreement_item`; `retailReservation` is Retail's `reserveMerchandise`, whose reservation id is `sourceId`, R8 blocker APPROVALS-TENANCY-C34)."
  },
  "SubmitInspectionRequest": {
   "x-ticvai-persistence": "maintenance.inspection + maintenance.inspection_item",

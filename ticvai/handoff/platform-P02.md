@@ -5,22 +5,21 @@
 | | |
 |---|---|
 | Screens | 77 |
-| Operations | 211 |
+| Operations | 217 |
 | Contracts | 19 |
 | Modules | 17 |
 | Undrawn | 0 |
-| Operations with no screen | 19 |
+| Operations with no screen | 22 |
 | Waves | wave1 77 |
 
 ## Gaps
 
-### 19 operations with no screen here
+### 22 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
 | Operation | Contract | | |
 |---|---|---|---|
-| `createParkingEntitlement` | access | POST | A guest bought parking |
 | `getPlanBenefits` | catalogue | GET | Which benefits a plan grants, and how much of each |
 | `listGuestMemberships` | catalogue | GET | A guest's memberships, benefits and history |
 | `listMembershipBenefits` | catalogue | GET | Benefits a plan can grant |
@@ -35,7 +34,11 @@
 | `listPublishedTrackingTechnologies` | marketing-crm | GET | The approved cookie registry, as the preference centre shows it |
 | `recordDeviceConsent` | marketing-crm | POST | Record a visitor's cookie decision, before anyone is known |
 | `uploadGuestDocument` | marketing-crm | POST | Store a guest photo, ID or signed document |
+| `convertToTermProduct` | orders | POST | Turn a visit into a membership or season pass |
 | `revokeEntitlementShare` | orders | POST | Take back a share |
+| `revokePaymentToken` | orders | DELETE | Remove a saved payment method |
+| `getCouponCode` | promotions | GET | Look up a code |
+| `getRecommendations` | promotions | POST | What else this guest might want |
 | `getUpsellSuggestions` | promotions | POST | Suggestions for a cart |
 | `recordRecommendationOutcome` | promotions | POST | Shown, clicked, accepted or dismissed |
 | `listMyWaitingGuests` | queue | GET | The caller's own queue entries |
@@ -70,10 +73,10 @@
 | `GST-002` | Explore | Discovery & Browse | 1 | 3 | yes |
 | `GST-003` | Buy Tickets | Discovery & Browse | 1 | 5 | yes |
 | `GST-004` | Item Detail | Discovery & Browse | 1 | 7 | yes |
-| `GST-005` | What's On | Discovery & Browse | 1 | 2 | yes |
+| `GST-005` | What's On | Discovery & Browse | 1 | 3 | yes |
 | `GST-006` | Item Detail – Event / Exhibition | Discovery & Browse | 1 | 2 | yes |
 | `GST-007` | Select Date & Time | Booking & Selection | 1 | 11 | yes |
-| `GST-008` | Tickets & Add-ons | Booking & Selection | 1 | 6 | yes |
+| `GST-008` | Tickets & Add-ons | Booking & Selection | 1 | 7 | yes |
 | `GST-009` | Review & Payment | Cart & Checkout | 1 | 8 | yes |
 | `GST-010` | Booking Confirmation | Cart & Checkout | 1 | 5 | yes |
 | `GST-011` | Wallet Overview | Membership, Loyalty & Value | 1 | 6 | yes |
@@ -113,32 +116,32 @@
 | `GST-045` | Ticket Delivery & Sharing | Account & Self-Service | 1 | 3 | yes |
 | `GST-046` | Branded Queue / Waiting Room | High-Demand Access | 1 | 2 | yes |
 | `GST-047` | Maintenance / Upgrade Page | System States | 1 | 2 | yes |
-| `GST-048` | Upsell / Cross-Sell | Booking & Selection | 1 | 4 | yes |
-| `GST-049` | Interactive Seat Selection | Booking & Selection | 1 | 5 | yes |
-| `GST-050` | Resource Booking – Cabana | Booking & Selection | 1 | 3 | yes |
-| `GST-051` | Plan | Engagement & Support | 1 | 3 | yes |
-| `GST-052` | Suggested Itineraries | Engagement & Support | 1 | 3 | yes |
+| `GST-048` | Upsell / Cross-Sell | Booking & Selection | 1 | 5 | yes |
+| `GST-049` | Interactive Seat Selection | Booking & Selection | 1 | 6 | yes |
+| `GST-050` | Resource Booking – Cabana | Booking & Selection | 1 | 4 | yes |
+| `GST-051` | Plan | Engagement & Support | 1 | 4 | yes |
+| `GST-052` | Suggested Itineraries | Engagement & Support | 1 | 2 | yes |
 | `GST-053` | Your Plan | Engagement & Support | 1 | 5 | yes |
 | `GST-054` | AI Planner | Engagement & Support | 1 | 6 | yes |
 | `GST-055` | Dynamic QR Ticket | Account & Self-Service | 1 | 4 | yes |
 | `GST-056` | Bundle Package | Booking & Selection | 1 | 2 | yes |
 | `GST-057` | Accessibility Information | Discovery & Browse | 1 | 1 | yes |
 | `GST-058` | Resource Availability (Cabana) | Booking & Selection | 1 | 2 | yes |
-| `GST-059` | Plan in Progress | Engagement & Support | 1 | 4 | yes |
+| `GST-059` | Plan in Progress | Engagement & Support | 1 | 5 | yes |
 | `GST-061` | Menu Item Detail | In-Venue Experience | 1 | 1 | yes |
 | `GST-062` | Shop & Drop Collection | In-Venue Experience | 1 | 2 | yes |
 | `GST-063` | Explore – Search Results | Discovery | 1 | 1 | yes |
 | `GST-065` | Newsletter & Preferences | Marketing | 1 | 5 | yes |
 | `GST-066` | Privacy & My Data | Account & Self-Service | 1 | 5 | yes |
-| `GST-067` | Refunds & Resale | Account & Self-Service | 1 | 3 | yes |
-| `GST-068` | Help & My Cases | Engagement & Support | 1 | 4 | yes |
+| `GST-067` | Refunds & Resale | Account & Self-Service | 1 | 6 | yes |
+| `GST-068` | Help & My Cases | Engagement & Support | 1 | 5 | yes |
 | `GST-069` | Face Pass | Account & Self-Service | 1 | 5 | yes |
 | `GST-070` | Reserve a Table | In-venue Services | 1 | 7 | yes |
-| `GST-071` | Payment Methods | Account & Self-Service | 1 | 8 | yes |
+| `GST-071` | Payment Methods | Account & Self-Service | 1 | 10 | yes |
 | `GST-072` | Share & Group Booking | Booking & Selection | 1 | 6 | yes |
 | `GST-073` | Security & Sign-in | Account & Self-Service | 1 | 9 | yes |
 | `GST-074` | Map Booking — Cabanas & Spots | Booking & Selection | 1 | 8 | yes |
-| `GST-075` | Book a Space by the Hour | Booking & Selection | 1 | 4 | yes |
+| `GST-075` | Book a Space by the Hour | Booking & Selection | 1 | 5 | yes |
 | `GST-076` | Intercity Trip — Route & Schedule | Transport | 1 | 4 | yes |
 | `GST-077` | Intercity Trip — Route & Passengers | Transport | 1 | 6 | yes |
 | `GST-078` | Intercity Trip — Multi-trip Passes | Transport | 1 | 3 | yes |

@@ -1,6 +1,6 @@
 # venue-scanner — operated by venue · staff on handheld
 # Serves: P07 Venue Scanner — Access Control
-# Repository: P07 none yet (ask the lead) (docs/active/frontend-repos.yaml)
+# Repository: P07 ticvai-employee-app (docs/active/frontend-repos.yaml)
 # Derived by tools/derive-frontend.py from screens/*.yaml. Do not hand-edit.
 
 app: venue-scanner
@@ -16,13 +16,13 @@ directions:
 platforms:
 - P07 Venue Scanner — Access Control
 servesMultiplePlatforms: false
-repo: null
-repoUrl: null
+repo: ticvai-employee-app
+repoUrl: http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-employee-app.git
 repositories:
 - platform: P07
-  repo: null
-  repoUrl: null
-  assumed: false
+  repo: ticvai-employee-app
+  repoUrl: http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-employee-app.git
+  assumed: true
 packages:
 - design-tokens
 - ui
@@ -51,76 +51,87 @@ screens:
   name: Sign in
   platform: P07
   route: /access/sign-in
-  repo: null
+  repo: ticvai-employee-app
+  path: src/routes/access/SignInDetail.tsx
   wave: 1
   status: notStarted
 - id: SCN-002
   name: Access point & direction
   platform: P07
   route: /access/access-point-direction
-  repo: null
+  repo: ticvai-employee-app
+  path: src/routes/access/AccessPointDirectionDetail.tsx
   wave: 1
   status: notStarted
 - id: SCN-003
   name: Ready to scan
   platform: P07
   route: /access/ready-to-scan
-  repo: null
+  repo: ticvai-employee-app
+  path: src/routes/access/ReadyToScanDetail.tsx
   wave: 1
   status: notStarted
 - id: SCN-007
   name: Group admission
   platform: P07
   route: /access/group-admission
-  repo: null
+  repo: ticvai-employee-app
+  path: src/routes/access/GroupAdmissionDetail.tsx
   wave: 1
   status: notStarted
 - id: SCN-008
   name: Manual entry
   platform: P07
   route: /access/manual-entry
-  repo: null
+  repo: ticvai-employee-app
+  path: src/routes/access/ManualEntryDetail.tsx
   wave: 1
   status: notStarted
 - id: SCN-009
   name: Ticket lookup
   platform: P07
   route: /access/ticket-lookup
-  repo: null
+  repo: ticvai-employee-app
+  path: src/routes/access/TicketLookupDetail.tsx
   wave: 1
   status: notStarted
 - id: SCN-011
   name: Delegated right
   platform: P07
   route: /access/delegated-right
-  repo: null
+  repo: ticvai-employee-app
+  path: src/routes/access/DelegatedRightDetail.tsx
   wave: 1
   status: notStarted
 - id: SCN-013
   name: Offline journal
   platform: P07
   route: /access/offline-journal
-  repo: null
+  repo: ticvai-employee-app
+  path: src/routes/access/OfflineJournalDetail.tsx
   wave: 1
   status: notStarted
 - id: SCN-014
   name: Sync & reconciliation
   platform: P07
   route: /access/sync-reconciliation
-  repo: null
+  repo: ticvai-employee-app
+  path: src/routes/access/SyncReconciliationDetail.tsx
   wave: 1
   status: notStarted
 - id: SCN-015
   name: Offline package
   platform: P07
   route: /access/offline-package
-  repo: null
+  repo: ticvai-employee-app
+  path: src/routes/access/OfflinePackageDetail.tsx
   wave: 1
   status: notStarted
 - id: SCN-016
   name: Gate mode
   platform: P07
   route: /access/gate-mode
-  repo: null
+  repo: ticvai-employee-app
+  path: src/routes/access/GateModeDetail.tsx
   wave: 1
   status: notStarted

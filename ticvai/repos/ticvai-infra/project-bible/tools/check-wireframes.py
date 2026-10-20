@@ -325,7 +325,8 @@ def main() -> int:
     # claim is only worth something if a developer can open the view: so the prototype file must exist,
     # the match must say how close it is, and a verified date and a way to reach the view must be there.
     # A screen the prototype does not show keeps its board, carries `match: none`, and is built from its
-    # definition; it must not claim client-verified.
+    # definition; it must not claim client-verified unless `wireframe.source` begins "client approval" (the client
+    # approved the drawn frame itself, not a prototype view).
     for _f in sorted(SCREENS.glob("P*.yaml")):
         _d = yaml.safe_load(_f.read_text(encoding="utf-8"))
         for _s in _d.get("screens") or []:
@@ -341,7 +342,9 @@ def main() -> int:
             _pm = _p.get("match")
             if _pm not in ("exact", "partial", "none"):
                 ERRORS.append(f"{_s['id']}: wireframe.prototype.match is {_pm!r}; exact, partial or none")
-            elif _pm == "none" and _cv:
+            elif _pm == "none" and _cv and not str(_w.get("source", "")).startswith("client approval"):
+                # A screen the prototype does not show can still be client-verified when the client approved the
+                # drawn frame itself (19 October 2026: all P02 and P04 screens): `source` then says so.
                 ERRORS.append(f"{_s['id']}: client-verified, but its prototype has no view for it (match: none)")
             elif _pm != "none" and not (_p.get("verified") and _p.get("view") and _p.get("rev")):
                 ERRORS.append(f"{_s['id']}: wireframe.prototype needs rev, verified and view when it matches")

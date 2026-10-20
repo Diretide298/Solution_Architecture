@@ -57,13 +57,13 @@ modulesUsed:
   screens: 1
 servicesCalled:
 - service: CatalogueService
-  operationCalls: 830
+  operationCalls: 833
 - service: VenueOpsService
   operationCalls: 531
 - service: TenancyService
   operationCalls: 497
 - service: OrderService
-  operationCalls: 424
+  operationCalls: 425
 - service: AccessService
   operationCalls: 298
 - service: MarketingService
@@ -636,6 +636,7 @@ screens:
   - getSeatAvailability
   - listEvents
   - listPerformances
+  - listProductCategories
   - recommendSeats
   - updateEvent
   - updatePerformance
@@ -8353,8 +8354,10 @@ screens:
   wave: 3
   density: compact
   operations:
+  - getChannelAvailability
   - listMembershipCommercialPricing
   - listPriceLists
+  - listTaxProfiles
   - publishChannelAvailability
   - setMembershipCommercialConfig
   - setPrices
@@ -37721,6 +37724,7 @@ screens:
   operations:
   - getB2bPaymentTerms
   - getInstalmentPolicy
+  - listB2bCreditAccounts
   - setB2bPaymentTerms
   - setInstalmentPolicy
   states:

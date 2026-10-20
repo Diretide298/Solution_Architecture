@@ -54,6 +54,10 @@ RULES = {
     "SP-KEY-GUESSED": "a convention key the name rule pointed into another module's table (CR-070, CR-013)",
     "SP-KEY-TENANT-FALLBACK": "an undeclared key left a table written below tenant at the tenant-root policy while "
                               "its parent is scoped (CR-090)",
+    "SP-ONE-CURRENT": "a persisted schema with an isCurrent flag and no x-ticvai-unique-when keeping one current row "
+                      "(CR-154, CHG-CRA-004)",
+    "SP-REPLACE-NO-KEY": "a PUT replaces a list of rows another operation creates one by one, and its items carry no "
+                         "id to name them (CR-155, CHG-CRA-004)",
 }
 BELOW_TENANT = {"region", "brand", "venue", "workstation"}
 JUDGED_AUDIENCE = {"staff", "partner"}
@@ -400,7 +404,63 @@ def main() -> int:
                       f"declared key, and {', '.join((sl or ws)[:3])}" + (" (delivery slice)" if sl else "")
                       + " writes it below tenant",
                       strict=bool(sl) and key not in FALLBACK_DEBT)
+    check_rows_named(guard, by, ops)
     return guard.finish()
+
+
+def persisted_table(schema) -> str:
+    tag = str((schema or {}).get("x-ticvai-persistence") or "").strip().strip('"')
+    if not tag or tag.lower().startswith("none"):
+        return ""
+    return tag.split()[0]
+
+
+def check_rows_named(guard, by, ops) -> None:
+    """SP-ONE-CURRENT and SP-REPLACE-NO-KEY (class 8 of the 18 October triage, CHG-CRA-004).
+
+    **A promise the text makes and no index or key keeps.** `ConfigVersion.isCurrent` said one version is the one
+    guests read, and nothing stopped two publishes making two current (CR-154); configureWorkstation's `devices` list
+    replaced the workstation's devices, which registerDevice creates one by one, and its items had no id, so the PUT
+    could not say which registered device it meant (CR-155)."""
+    for (stem, name), s in sorted(by.items()):
+        table = persisted_table(s)
+        if table and "isCurrent" in props_of(s, stem, by) and not s.get("x-ticvai-unique-when"):
+            guard.add("SP-ONE-CURRENT", f"{stem}.{name}",
+                      f"{stem}.{name} ({table}) has isCurrent and no x-ticvai-unique-when: two rows can both be current")
+    created: dict = {}
+    for oid, f in ops.items():
+        if f["method"] != "post":
+            continue
+        for kind, node in body_schemas(f["op"]):
+            if kind == "res":
+                tgt, _ = deref(node, f["contract"], by)
+                t = persisted_table(tgt)
+                if t:
+                    created.setdefault(t, set()).add(oid)
+    for oid, f in sorted(ops.items()):
+        if f["method"] != "put":
+            continue
+        for kind, node in body_schemas(f["op"]):
+            if kind != "req":
+                continue
+            for p, ps in sorted(props_of(node, f["contract"], by).items()):
+                if ps.get("type") != "array" or not isinstance(ps.get("items"), dict):
+                    continue
+                item, istem = deref(ps["items"], f["contract"], by)
+                table = persisted_table(item)
+                makers = sorted(created.get(table, set()) - {oid})
+                if not table or not makers:
+                    continue
+                iprops = props_of(item, istem, by)
+                short = table.split(".")[-1]
+                own_key = re.sub(r"_([a-z])", lambda m: m.group(1).upper(), short) + "Id"
+                writable_id = "id" in iprops and not iprops["id"].get("readOnly")
+                if writable_id or own_key in iprops or any(
+                        k.endswith("Id") and k[:-2].lower() in short.replace("_", "") for k in iprops):
+                    continue
+                guard.add("SP-REPLACE-NO-KEY", f"{oid}.{p}",
+                          f"{oid} replaces {p}[] ({table}), rows {', '.join(makers[:2])} creates one by one, and an "
+                          f"item names none of them: give the item the row's id")
 
 
 if __name__ == "__main__":

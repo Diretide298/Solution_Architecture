@@ -424,7 +424,7 @@
   "x-ticvai-persistence": "none — embedded in tenant_config",
   "type": "object",
   "nullable": true,
-  "description": "**The oldest guest app build still allowed to run (decided 28 September, audit R073).** A guest app whose own version is below the one for its platform shows the forced-upgrade screen (GST-047) and nothing else. Null, or a platform left null, forces nothing. Live at once through `setMaintenanceMode`, because an upgrade that must wait for a publish is not forced.\n",
+  "description": "**The oldest guest app build still allowed to run (decided 28 September, audit R073).** A guest app whose own version is below the one for its platform shows the forced-upgrade screen (GST-047) and nothing else. Null, or a platform left null, forces nothing. Live at once through `setMaintenanceMode`, because an upgrade that must wait for a publish is not forced.\n\n**`storeUrl`** (r8 walk of ticket 27893): the store page GST-047's \"Update\" button opens, one per platform, set with `setMaintenanceMode` beside the versions and live at once like them. Optional. A store address cannot be derived from `StoreAccount.appIdentifier`, which is a bundle id. The forced-upgrade screen opens the URL for the platform it runs on; where it is null the screen shows the message without the button and the guest updates from the store by hand.\n",
   "properties": {
    "ios": {
     "type": "string",
@@ -435,6 +435,25 @@
     "type": "string",
     "nullable": true,
     "pattern": "^\\d+\\.\\d+\\.\\d+$"
+   },
+   "storeUrl": {
+    "type": "object",
+    "nullable": true,
+    "description": "The store page of the tenant's app for each platform. https only.",
+    "properties": {
+     "ios": {
+      "type": "string",
+      "format": "uri",
+      "pattern": "^https://",
+      "nullable": true
+     },
+     "android": {
+      "type": "string",
+      "format": "uri",
+      "pattern": "^https://",
+      "nullable": true
+     }
+    }
    }
   }
  },
@@ -459,6 +478,7 @@
  },
  "PolicyKind": {
   "type": "string",
+  "description": "The kinds of policy a tenant publishes. **Each kind has one fixed title in English and Arabic** (r8 walk of ticket 27890), the only source of `PublishedPolicy.title`; `setPolicy` takes no title. The Arabic labels are the standard names of each document and the client should approve them.\n\n| kind | en | ar |\n|---|---|---|\n| privacy | Privacy policy | سياسة الخصوصية |\n| termsAndConditions | Terms and conditions | الشروط والأحكام |\n| refund | Refund policy | سياسة الاسترداد |\n| cookie | Cookie policy | سياسة ملفات تعريف الارتباط |\n| accessibility | Accessibility statement | بيان إمكانية الوصول |\n",
   "enum": [
    "privacy",
    "termsAndConditions",
@@ -571,7 +591,15 @@
     "$ref": "#/components/schemas/PolicyKind"
    },
    "title": {
-    "type": "string"
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/white-label::LocalisedText"
+     }
+    ],
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "x-ticvai-derived": "onRead",
+    "description": "The heading, with `en` and `ar`, derived on read from `kind` by the fixed label table on `PolicyKind`. Nothing is stored (`whitelabel.policy.title` stays unused), so a tenant cannot retitle a policy and the heading is the same in the app, on the web and in a consent record.\n"
    },
    "version": {
     "type": "string",
@@ -608,6 +636,15 @@
     "type": "boolean",
     "x-ticvai-derived": "onRead",
     "description": "True once any version has been published."
+   },
+   "darkAppModules": {
+    "type": "array",
+    "readOnly": true,
+    "x-ticvai-derived": "onRead",
+    "description": "**The app-modules switched off for this tenant** (ADAM CR-164, option A, 18 October 2026; CHG-CRA-005): their keys (for example `AM-MARKETING-CRM-P01`), from the tenant's release flags. Returned to guests and staff alike; the apps leave those modules' screens out of navigation (the map is `handoff/release-flags.json`). An operation is dark for the tenant only when every app-module that binds it is off, so an operation shared with a live module stays callable. A flag the configuration does not declare counts as on. Additive: nothing new shows on screen.",
+    "items": {
+     "type": "string"
+    }
    },
    "publishedVersion": {
     "type": "string",
@@ -692,6 +729,15 @@
        "type": "string",
        "maxLength": 200,
        "description": "The venue's name (`tenancy.OrgUnit.name`)."
+      },
+      "contact": {
+       "allOf": [
+        {
+         "$ref": "#/components/schemas/VenueContact"
+        }
+       ],
+       "nullable": true,
+       "description": "The venue's own contact (address, phone, email), from the venue's settings (`tenancy.VenueSettings`, read through `venueSettingsRecords`). Null when the venue has none set; the app then shows the tenant's `contact` (R8 blocker WHITE-C16)."
       },
       "city": {
        "type": "string",

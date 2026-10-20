@@ -236,9 +236,14 @@
  "ApprovalDecision": {
   "type": "object",
   "x-ticvai-persistence": "approvals.decision",
+  "x-ticvai-exactly-one-of": [
+   [
+    "principalId",
+    "externalApproverRef"
+   ]
+  ],
   "required": [
    "level",
-   "principalId",
    "decision",
    "decidedAt"
   ],
@@ -254,7 +259,20 @@
    },
    "principalId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "nullable": true,
+    "description": "The approver; null when an external workflow system decided (`externalApproverRef` set)."
+   },
+   "externalApproverRef": {
+    "type": "string",
+    "nullable": true,
+    "description": "Who decided in the external provider's system, as it named them (`recordExternalApprovalDecision`); null for an internal approver (CHG-R8MIG-009)."
+   },
+   "externalApproverName": {
+    "type": "string",
+    "maxLength": 200,
+    "nullable": true,
+    "description": "The external approver's display name, where the provider sent one (CHG-R8MIG-009)."
    },
    "displayName": {
     "type": "string"
@@ -271,8 +289,11 @@
     "type": "string",
     "enum": [
      "approve",
-     "reject"
-    ]
+     "reject",
+     "return",
+     "requestInformation"
+    ],
+    "description": "`return` and `requestInformation` are stored as decisions too, their comment in `comment` (`decideApprovalRequest`; CHG-R8MIG-009)."
    },
    "comment": {
     "type": "string",
@@ -297,7 +318,7 @@
  },
  "ApprovalKind": {
   "type": "string",
-  "description": "11.1.7 and 11.1.30–11.1.37. **The first four already exist as bespoke implementations** and this contract is what they collapse into.\n**Which actions route here — decided 28 September, audit R144.** Finance and procurement acts go through this engine to a **finance approver**: closing a fiscal period (`periodClose`), reopening one (`periodReopen`), cancelling a purchase order (`purchaseOrderCancel`) and closing one short (`purchaseOrderShortClose`). The tenant default matrix for each of these names the finance approver role; a venue may tighten it and never loosen it. Starting a release rollout routes through `releasePromotion` to the platform release manager (a holder of `PLATFORM_RELEASE_PROMOTE`). **Not every `requiresApproval` goes here:** reopening a shift, recounting a stock count and a retail return above the venue threshold take a supervisor's step-up on the same device instead, and never raise a request.\n**Catalogue change requests route through `productChange` and `pricingChange`** (decided 29 September, writers pass): a product change and a price or pricing change raised in `catalogue` ask for approval under these two kinds, so a venue can route product edits and price edits to different approvers.\n\n**Optional review steps a venue switches on, decided 2 October 2026** (Chinmay; CHG-CSP-036, CHG-CSP-028, CHG-CSP-031). Each is an existing kind narrowed by the rule's `subjectTypes`, so no kind is added (a new value here would be a breaking change against r1) and each is off until the venue saves an active matrix for it:\n- **A purchase order** (`requisition`, subject `purchaseOrder`; Chinmay, 3 October 2026, Block A business rules; CHG-RUL-004): the PO approval matrix. Blanket and RFQ-award orders are raised without a requisition and are approved here instead; `inventory.createPurchaseOrder` asks for every order, by kind and value. - **Publishing white-label content** (`configurationChange`, subject `whiteLabelPublication`): simulate, then a single publish by a holder of the permission; a review step only where the venue sets one up (batch 1, CMS-014; DEC-156). - **Recording F&B waste above a value** (`stockWriteOff`, subject `fnbWaste`): the venue's waste-approval policy, value bands as `minAmount` and `maxAmount`, photo evidence above a value held by fnb (batch 6 #192, BO-139; DEC-192; R144). - **Publishing an access topology** (`configurationChange`, subject `topologyPublication`): second-person approval when the venue switches it on (batch 6 #230, BO-153; DEC-230). - **A permanent identity lock, a whitelist entry, or releasing a full-identity or permanent lock** (`accessPermissionChange`, subjects `identityLock`, `whitelistEntry`, `identityLockRelease`): always a second approver, never for an until-end-of-day lock (critical set 1, BO-229 and BO-247; DEC-254, DEC-260); the tenant default matrix names the security approver role and a venue may tighten it, never remove it.\n\n**A rota shift swap** (4 October 2026, CHG-FXC-008; Sprint 1-2 judging: `workforce.requestShiftSwap` raised a request\nwith no kind that fits). `configurationChange`, subject `shiftSwap`, `subjectContract` `workforce`, `subjectId` the\nShiftSwap id: an existing kind narrowed by `subjectTypes`, as the optional review steps above, so no kind is added.",
+  "description": "11.1.7 and 11.1.30–11.1.37. **The first four already exist as bespoke implementations** and this contract is what they collapse into.\n**Which actions route here — decided 28 September, audit R144.** Finance and procurement acts go through this engine to a **finance approver**: closing a fiscal period (`periodClose`), reopening one (`periodReopen`), cancelling a purchase order (`purchaseOrderCancel`) and closing one short (`purchaseOrderShortClose`). The tenant default matrix for each of these names the finance approver role; a venue may tighten it and never loosen it. Starting a release rollout routes through `releasePromotion` to the platform release manager (a holder of `PLATFORM_RELEASE_PROMOTE`). **Not every `requiresApproval` goes here:** reopening a shift, recounting a stock count and a retail return above the venue threshold take a supervisor's step-up on the same device instead, and never raise a request.\n**Catalogue change requests route through `productChange` and `pricingChange`** (decided 29 September, writers pass): a product change and a price or pricing change raised in `catalogue` ask for approval under these two kinds, so a venue can route product edits and price edits to different approvers.\n\n**Optional review steps a venue switches on, decided 2 October 2026** (Chinmay; CHG-CSP-036, CHG-CSP-028, CHG-CSP-031). Each is an existing kind narrowed by the rule's `subjectTypes`, so no kind is added (a new value here would be a breaking change against r1) and each is off until the venue saves an active matrix for it:\n- **A platform suspension or reactivation of a tenant** (`configurationChange`, subject `tenant`, `subjectContract` `subscription`; ADAM CR-172; lead''s ruling on lane H review 3 N-1, 20 October 2026; CHG-R8SPN-015): decided by the platform, never by the tenant''s own approvers. It is routed only by the **platform rule**, held in the control plane and seeded when the platform is provisioned, whose approvers hold `PLATFORM_TENANT_MANAGE`, with four eyes (the operator who raised it cannot decide it). It is not off by default like the review steps below: the platform rule always exists, and without it `createApprovalRequest` refuses `422 no-approval-route`.\n- **A purchase order** (`requisition`, subject `purchaseOrder`; Chinmay, 3 October 2026, Block A business rules; CHG-RUL-004): the PO approval matrix. Blanket and RFQ-award orders are raised without a requisition and are approved here instead; `inventory.createPurchaseOrder` asks for every order, by kind and value. - **Publishing white-label content** (`configurationChange`, subject `whiteLabelPublication`): simulate, then a single publish by a holder of the permission; a review step only where the venue sets one up (batch 1, CMS-014; DEC-156). - **Recording F&B waste above a value** (`stockWriteOff`, subject `fnbWaste`): the venue's waste-approval policy, value bands as `minAmount` and `maxAmount`, photo evidence above a value held by fnb (batch 6 #192, BO-139; DEC-192; R144). - **Publishing an access topology** (`configurationChange`, subject `topologyPublication`): second-person approval when the venue switches it on (batch 6 #230, BO-153; DEC-230). - **A permanent identity lock, a whitelist entry, or releasing a full-identity or permanent lock** (`accessPermissionChange`, subjects `identityLock`, `whitelistEntry`, `identityLockRelease`): always a second approver, never for an until-end-of-day lock (critical set 1, BO-229 and BO-247; DEC-254, DEC-260); the tenant default matrix names the security approver role and a venue may tighten it, never remove it.\n\n**A rota shift swap** (4 October 2026, CHG-FXC-008; Sprint 1-2 judging: `workforce.requestShiftSwap` raised a request\nwith no kind that fits). `configurationChange`, subject `shiftSwap`, `subjectContract` `workforce`, `subjectId` the\nShiftSwap id: an existing kind narrowed by `subjectTypes`, as the optional review steps above, so no kind is added.",
   "enum": [
    "refund",
    "priceOverride",
@@ -388,6 +409,13 @@
    },
    "amount": {
     "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "attributes": {
+    "type": "object",
+    "nullable": true,
+    "readOnly": true,
+    "additionalProperties": true,
+    "description": "**The attributes the raising contract sent** (`CreateApprovalRequest.attributes`), stored as given (ADAM CR-172, fix round 3; CHG-CRA-005). The rules match on them (`matchAttributes`), also when a draft is submitted later, and the contract that applies the decision reads them back with the request (`approvals#requestRecords`): Subscription's `approval.granted` consumer takes a tenant suspension's `action`, mode, reason, `effectiveAt` and notice from here. Null where none were sent."
    },
    "justification": {
     "type": "string",
@@ -520,6 +548,36 @@
     "format": "date-time",
     "nullable": true,
     "readOnly": true
+   },
+   "assignmentNote": {
+    "type": "string",
+    "maxLength": 500,
+    "nullable": true,
+    "readOnly": true,
+    "description": "The note `assignApprovalRequest` was given, kept with the assignment (R8 blocker APPROVALS-TENANCY-C02, CHG-R8MIG-009)."
+   },
+   "approvalMatrixId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-references": "approvals.matrix",
+    "description": "The matrix routing chose at submit (with `matrixVersion`), so a decision is checked against the matrix the request was routed by (CHG-R8MIG-009)."
+   },
+   "ruleId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-references": "approvals.rule",
+    "description": "The matrix rule that matched on kind, scope, amount and `attributes` (CHG-R8MIG-009)."
+   },
+   "cancelReason": {
+    "type": "string",
+    "maxLength": 500,
+    "nullable": true,
+    "readOnly": true,
+    "description": "Why the request was cancelled, as `cancelApprovalRequest` was given it (CHG-R8MIG-009)."
    },
    "requestedAt": {
     "type": "string",
@@ -980,7 +1038,13 @@
  "WalletConfigurationVersion": {
   "type": "object",
   "x-ticvai-persistence": "wallet.configuration_version",
-  "description": "Boards 1.10 and 10.8. **Ten boards of configuration that interact.**",
+  "x-ticvai-unique-together": [
+   [
+    "scopePath",
+    "version"
+   ]
+  ],
+  "description": "Boards 1.10 and 10.8. **Ten boards of configuration that interact.** `version` is the highest at the scope plus one; (scope, version) is unique.",
   "properties": {
    "version": {
     "type": "integer"
@@ -1452,6 +1516,13 @@
     "type": "boolean",
     "default": false
    },
+   "replayId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "x-ticvai-references": "control.webhook_replay",
+    "description": "The replay that re-delivered it (`replayEvents`; ADAM CR-140, CHG-CRA-004); null for a live delivery."
+   },
    "isTest": {
     "type": "boolean",
     "default": false,
@@ -1466,7 +1537,7 @@
  },
  "WebhookEventType": {
   "type": "string",
-  "description": "**The webhook event catalogue: every event a subscription may name** (29 September, build pass). Each value is the `name` of an event in `events/` — `aggregate.pastTenseFact`, published through `platform.outbox` by exactly one context. A name is added here in the same change that adds its event file, and never before.\n**Added 29 September**, each closing a requirement that had the webhook mechanism and nothing to subscribe to:\n| Events | Publisher | Requirement | |---|---|---| | `device.statusChanged`, `device.tamperDetected`, `device.enrolmentChanged`, `device.firmwareReleased`, `device.firmwareRolloutCompleted` | tenancy | 16.9.56 | | `accreditation.applicationDecided`, `accreditation.holderStatusChanged`, `accreditation.credentialIssued`, `accreditation.renewalDue` | accreditation | 12.1.53 | | `approval.requested`, `approval.escalated`, `approval.stepCompleted`, `approval.expired` | approvals | 11.1.64, 11.1.66 | | `seat.held`, `seat.released`, `seat.blocked`, `seatMap.published` | seating | 21.13.4 | | `consent.deviceConsentRecorded`, `consent.deviceConsentClaimed` | marketing | 2.6.65 | | `order.chargebackRecorded` | orders | 8.3.11 to 8.3.15 (a tenant's own finance or fraud tooling) | | `entitlement.expiringSoon` | access | 5.5.30 (a tenant's own CRM) | | `apiClient.anomalyDetected` | public-api | 17 September minutes M17-07 (added 30 September with its event file) |\n**Deprecated** (1 October, ADR-0067 amendment): `device.enrolmentChanged` is still offered but nothing inside the platform consumes it any more; it is removed at the next major version of this API. Subscribers are told in the release note.\n**Published and deliberately not offered** (29 September, build pass, group G2): `identity.credentialResetRequested` and `identity.loginRecorded` are security signals, and a stream of them to an outside receiver is a map of which accounts are under attack; `storefront.sessionEvent` is high-volume fraud telemetry, not a business fact a receiver acts on.\n",
+  "description": "**The webhook event catalogue: every event a subscription may name** (29 September, build pass). Each value is the `name` of an event in `events/` — `aggregate.pastTenseFact`, published through the outbox of the tenant database by exactly one context. A name is added here in the same change that adds its event file, and never before.\n**Added 29 September**, each closing a requirement that had the webhook mechanism and nothing to subscribe to:\n| Events | Publisher | Requirement | |---|---|---| | `device.statusChanged`, `device.tamperDetected`, `device.enrolmentChanged`, `device.firmwareReleased`, `device.firmwareRolloutCompleted` | tenancy | 16.9.56 | | `accreditation.applicationDecided`, `accreditation.holderStatusChanged`, `accreditation.credentialIssued`, `accreditation.renewalDue` | accreditation | 12.1.53 | | `approval.requested`, `approval.escalated`, `approval.stepCompleted`, `approval.expired` | approvals | 11.1.64, 11.1.66 | | `seat.held`, `seat.released`, `seat.blocked`, `seatMap.published` | seating | 21.13.4 | | `consent.deviceConsentRecorded`, `consent.deviceConsentClaimed` | marketing | 2.6.65 | | `order.chargebackRecorded` | orders | 8.3.11 to 8.3.15 (a tenant's own finance or fraud tooling) | | `entitlement.expiringSoon` | access | 5.5.30 (a tenant's own CRM) | | `apiClient.anomalyDetected` | public-api | 17 September minutes M17-07 (added 30 September with its event file) |\n**Deprecated** (1 October, ADR-0067 amendment): `device.enrolmentChanged` is still offered but nothing inside the platform consumes it any more; it is removed at the next major version of this API. Subscribers are told in the release note.\n**Published and deliberately not offered** (29 September, build pass, group G2): `identity.credentialResetRequested` and `identity.loginRecorded` are security signals, and a stream of them to an outside receiver is a map of which accounts are under attack; `storefront.sessionEvent` is high-volume fraud telemetry, not a business fact a receiver acts on.\n",
   "x-ticvai-deprecated-values": [
    "device.enrolmentChanged"
   ],

@@ -189,6 +189,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the event catalogue are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 No `venueId` from a caller with no venue (`venue-required`), or one that is not a venue of the tenant (`unknown-venue`). |
 
 #### Sample data for the mock-up
 
@@ -204,7 +205,7 @@ events:
 
 #### Permissions
 
-- `listEvents` → `PRODUCT_VIEW` (read) · staff
+- `listEvents` → `PRODUCT_VIEW` (read) · staff, guest, anonymous
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -236,7 +237,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (400).
 - [ ] Every output is drawn (12 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-694?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
@@ -655,7 +656,7 @@ Method, path, parameters, request and response for every operation these screens
 "cloneEvent": {"method":"POST","path":"/events/{eventId}/clone","contract":"catalogue","summary":"Copy an event, choosing what comes with it","permission":"EVENT_CONFIGURE","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"CloneEventRequest","responds":null},
 "getEvent": {"method":"GET","path":"/events/{eventId}","contract":"catalogue","summary":"Read an event","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"Event"},
 "listEventTypes": {"method":"GET","path":"/event-types","contract":"catalogue","summary":"The kinds of event, and how each behaves","permission":"EVENT_CONFIGURE","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"EventType"},
-"listEvents": {"method":"GET","path":"/events","contract":"catalogue","summary":"List events","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
+"listEvents": {"method":"GET","path":"/events","contract":"catalogue","summary":"List events","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"venueId","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "setEventType": {"method":"PUT","path":"/event-types/{eventTypeId}","contract":"catalogue","summary":"Define an event kind and its behaviour","permission":"EVENT_CONFIGURE","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"tenant","parameters":[{"name":"eventTypeId","in":"path","required":true},{"name":null,"in":null,"required":null}],"requestBody":"EventType","responds":"EventType"}
 }
 ```

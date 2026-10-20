@@ -4797,6 +4797,13 @@
     "trigger": "onAction"
    },
    {
+    "operationId": "listProductCategories",
+    "contract": "catalogue",
+    "purpose": "The options of the calendar's category filter (r8, GPS-C18), read once when the screen opens; the chosen category is sent to `listPerformances` as `categoryId`. No component of its own: the filter is part of the calendar. Not background (r8 integration, CHG-R8INT-008): the user sees the options, and the approved screen has no element of its own for the filter.",
+    "trigger": "onLoad",
+    "provenance": "r8 second round, GPS-C18 (ticket 28195)"
+   },
+   {
     "operationId": "getPerformance",
     "contract": "catalogue",
     "purpose": "Read a performance",
@@ -4894,7 +4901,8 @@
     "Performance.eventId",
     "Performance.startsAt",
     "Performance.endsAt",
-    "Performance.approvalRequestId"
+    "Performance.approvalRequestId",
+    "VenueSettings.calendarDayStartHour"
    ]
   },
   "wireframe": {

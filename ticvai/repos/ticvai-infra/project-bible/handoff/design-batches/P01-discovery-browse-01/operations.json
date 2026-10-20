@@ -152,6 +152,35 @@
   "requestBody": null,
   "responds": "ProductEligibilityRule"
  },
+ "getPublishedBookingFlow": {
+  "method": "GET",
+  "path": "/venues/{venueId}/booking-flow",
+  "contract": "white-label",
+  "summary": "The published booking flow a product or category books through",
+  "permission": null,
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "productId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "productCategoryId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "flowTypeKey",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "BookingFlow"
+ },
  "getPublishedGuidedChoice": {
   "method": "GET",
   "path": "/venues/{venueId}/guided-choice",
@@ -215,6 +244,19 @@
   ],
   "requestBody": null,
   "responds": "VisitPlan"
+ },
+ "getVisitPlannerOptions": {
+  "method": "GET",
+  "path": "/venues/{venueId}/visit-planner-options",
+  "contract": "venue-map",
+  "summary": "What a guest can choose from when planning a visit",
+  "permission": "VENUE_MAP_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "VisitPlannerOptions"
  },
  "getWaitTimes": {
   "method": "GET",
@@ -332,7 +374,18 @@
   "offlineCapable": true,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "kind",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": false
+   }
+  ],
   "requestBody": null,
   "responds": "ProductCategoryNode"
  },

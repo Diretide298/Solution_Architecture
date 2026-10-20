@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI White Label Builder
   version: 0.1.0
-  x-ticvai-screen-count: 106
+  x-ticvai-screen-count: 107
   x-ticvai-tier: satellite
   x-ticvai-module: 19 — Guest Mobile App & Branding (builder)
   x-ticvai-requirements: 107
@@ -981,12 +981,12 @@ paths:
   /site-package:
     post:
       operationId: exportSitePackage
-      x-ticvai-reads:
-      - table: whitelabel.config_version
-        for: 'the published version''s snapshot the package is built from (r8 integration, CHG-R8INT-014; check-parameter-columns P-NAMED-TABLE)'
       x-ticvai-consumed-by:
         - "P09 ADM-016 White-Label Branding Management"
         - "P13 CMS-014 Publishing Workflow"
+      x-ticvai-reads:
+      - table: whitelabel.config_version
+        for: 'the published version''s snapshot the package is built from (r8 integration, CHG-R8INT-014; check-parameter-columns P-NAMED-TABLE)'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '2 October: Chinmay, workbook Q144 ("self-hosted: the venue generates a site package"); shape
@@ -1084,6 +1084,7 @@ paths:
     get:
       operationId: getPublishReviewPolicy
       x-ticvai-consumed-by:
+        - "P13 CMS-007 Page Builder"
         - "P13 CMS-014 Publishing Workflow"
       x-ticvai-audience:
       - staff
@@ -4669,6 +4670,8 @@ paths:
         format: uuid
     post:
       operationId: previewGuidedChoice
+      x-ticvai-consumed-by:
+        - "P13 CMS-101 Help Me Choose"
       x-ticvai-idempotency-exempt: A preview computed in process from the draft answers; it writes nothing, so a replay duplicates no row (r8 integration, CHG-R8INT-014).
       x-ticvai-read-via:
       - query: catalogue#productRecords
@@ -5791,6 +5794,7 @@ paths:
     get:
       operationId: getPublishedBookingFlow
       x-ticvai-consumed-by:
+        - "P01 WEB-004 Attraction Details"
         - "P01 WEB-005 Ticket Type Selection"
         - "P01 WEB-006 Date & Performance Selection"
         - "P01 WEB-007 Interactive Seat Selection"

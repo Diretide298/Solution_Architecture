@@ -178,6 +178,12 @@
     "nullable": true,
     "description": "The date the guest asked for on `requestGroupBooking` — what its `409 dateUnavailable` is checked against. Null for a group a member of staff built from an order."
    },
+   "performanceId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**The session, for a timed or session package** (DEC-121, Chinmay, 2 October 2026: a date and, for session products, a session; R8 blocker ORDERS-MONEY-C41, CHG-R8MIG-017): a `catalogue.performance` on `preferredDate`. Null for an open-dated package; written from the request."
+   },
    "orderId": {
     "type": "string",
     "format": "uuid"
@@ -1271,12 +1277,38 @@
     "readOnly": true,
     "x-ticvai-references": "catalogue.product"
    },
+   "name": {
+    "type": "string",
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "**Read from the package's product, not stored here** (R8 blocker ORDERS-MONEY-C20, CHG-R8MIG-009): `catalogue.product.name`, in the caller's language."
+   },
+   "unitPrice": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "The product's price per participant (`pricingBasis` perParticipant) or per package, read from the product's current price; not stored here."
+   },
+   "minimumSize": {
+    "type": "integer",
+    "minimum": 1,
+    "nullable": true,
+    "description": "The smallest group the package is sold to; null means one participant. Stored on the package (`catalogue.group_package.minimum_size`), since the product carries no minimum (CHG-R8MIG-009)."
+   },
    "kind": {
     "type": "string",
     "enum": [
      "school",
-     "party"
-    ]
+     "party",
+     "corporate",
+     "tourOperator",
+     "community"
+    ],
+    "description": "`corporate`, `tourOperator` and `community` are the group types the approved group-booking screens draw beside school and party (CHG-SGU-024; R8 blocker ORDERS-MONEY-C20, CHG-R8MIG-009)."
    },
    "maxParticipants": {
     "type": "integer",

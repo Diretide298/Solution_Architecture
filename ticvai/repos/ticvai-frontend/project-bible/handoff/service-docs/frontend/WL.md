@@ -7,8 +7,8 @@
 | Audience | staff |
 | Runtime | reactWeb |
 | App | venue-management-web |
-| Repository | P09 none yet: ask the lead; P13 none yet: ask the lead |
-| Repository layout | no repository yet |
+| Repository | P09 ticvai-web; P13 ticvai-venue-management |
+| Repository layout | P09 ticvai-web: assumed: reactWeb (the package's runtime); package manager the one its lock file belongs to; screens in `src/routes/<area>/<Component>.tsx` (assumed); scripts: as its package.json says (not read: the clone of 2026-10-20 was refused; assumed; owner confirms); P13 ticvai-venue-management: assumed: reactWeb (the package's runtime); package manager the one its lock file belongs to; screens in `src/routes/<area>/<Component>.tsx` (assumed); scripts: as its package.json says (not read: the clone of 2026-10-14 was refused; assumed; owner confirms) |
 | Offline | no |
 | Themes |  |
 | Directions | ltr, rtl |
@@ -30,7 +30,7 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 |---|---|---|---|---|
 | [ADM-016](#adm-016-white-label-branding-management) | White-Label Branding Management | Branding & Localisation | 1 | 19 |
 | [ADM-017](#adm-017-domain-certificate-management) | Domain & Certificate Management | Branding & Localisation | 1 | 10 |
-| [ADM-018](#adm-018-interface-languages) | Interface Languages | Branding & Localisation | 1 | 5 |
+| [ADM-018](#adm-018-interface-languages) | Interface Languages | Branding & Localisation | 1 | 7 |
 | [ADM-424](#adm-424-module-activation-dependency-validation) | Module Activation & Dependency Validation | Tenants & Licensing | 1 | 7 |
 | [CMS-001](#cms-001-tenant-workspace) | Tenant Workspace | White Label | 1 | 7 |
 | [CMS-002](#cms-002-brand-kit) | Brand Kit | White Label | 1 | 4 |
@@ -38,7 +38,7 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | [CMS-004](#cms-004-logo-assets) | Logo & Assets | White Label | 1 | 7 |
 | [CMS-005](#cms-005-theme-editor) | Theme Editor | White Label | 1 | 2 |
 | [CMS-006](#cms-006-component-preview) | Component Preview | White Label | 1 | 6 |
-| [CMS-007](#cms-007-page-builder) | Page Builder | White Label | 1 | 15 |
+| [CMS-007](#cms-007-page-builder) | Page Builder | White Label | 1 | 16 |
 | [CMS-008](#cms-008-content-blocks) | Content Blocks | White Label | 1 | 11 |
 | [CMS-009](#cms-009-navigation-menus) | Navigation & Menus | White Label | 1 | 7 |
 | [CMS-010](#cms-010-media-library) | Media Library | White Label | 1 | 11 |
@@ -51,9 +51,9 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | [CMS-017](#cms-017-domain-certificate) | Domain & Certificate | White Label | 1 | 7 |
 | [CMS-018](#cms-018-consent-legal) | Consent & Legal | White Label | 1 | 8 |
 | [CMS-019](#cms-019-user-access) | User Access | White Label | 1 | 3 |
-| [CMS-101](#cms-101-help-me-choose) | Help Me Choose | White Label | 1 | 12 |
+| [CMS-101](#cms-101-help-me-choose) | Help Me Choose | White Label | 1 | 13 |
 | [CMS-102](#cms-102-site-builder) | Site Builder | White Label | 1 | 7 |
-| [CMS-103](#cms-103-booking-flows) | Booking Flows | White Label | 1 | 14 |
+| [CMS-103](#cms-103-booking-flows) | Booking Flows | White Label | 1 | 15 |
 | [CMS-104](#cms-104-app-build-store-publishing) | App Build & Store Publishing | White Label | 1 | 9 |
 
 ## ADM-016 White-Label Branding Management
@@ -66,8 +66,9 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | Wave | 1 |
 | Licensed module | core |
 | Route | `/general/white-label-branding-management` |
-| Repository | none yet: ask the lead |
+| Repository | ticvai-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-web.git); assumed by the lead, not yet confirmed |
 | Component | `WhiteLabelBrandingManagementForm` |
+| Suggested location | `src/routes/general/WhiteLabelBrandingManagementForm.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -131,8 +132,9 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | Wave | 1 |
 | Licensed module | core |
 | Route | `/general/domain-and-certificate-management` |
-| Repository | none yet: ask the lead |
+| Repository | ticvai-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-web.git); assumed by the lead, not yet confirmed |
 | Component | `DomainAndCertificateManagementForm` |
+| Suggested location | `src/routes/general/DomainAndCertificateManagementForm.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -186,8 +188,9 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | Wave | 1 |
 | Licensed module | core |
 | Route | `/general/localisation-and-language-pack` |
-| Repository | none yet: ask the lead |
+| Repository | ticvai-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-web.git); assumed by the lead, not yet confirmed |
 | Component | `LocalisationAndLanguagePackDetail` |
+| Suggested location | `src/routes/general/LocalisationAndLanguagePackDetail.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -199,6 +202,7 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | policyKind | deepLink |
 | version | deepLink |
 | tenantId | navigation |
+| challengeId | navigation |
 
 **Operations**
 
@@ -209,6 +213,8 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | `setLanguages` | [WhiteLabelService](../backend/WhiteLabelService.md#setlanguages) | onAction | from page inventory | `TENANT_CONFIGURE` |
 | `listOwnPlatformStaffGrants` | [IdentityService](../backend/IdentityService.md#listownplatformstaffgrants) | onAction | Find a grant into the picked tenant already open, after a reload (audit R098; CHG-SBO-001) | `PLATFORM_TENANT_ACCESS` |
 | `getTenantConfig` | [WhiteLabelService](../backend/WhiteLabelService.md#gettenantconfig) | onLoad | The tenant's languages in force | `TENANT_CONFIGURE` |
+| `createMfaChallenge` | [IdentityService](../backend/IdentityService.md#createmfachallenge) | background | The step-up before a grant (audit R135): sent as the Open access grant form opens, so the code reaches the operator's second factor while they fill in the reason and the permissions; nothing on the screen is pressed to send it (as on the sign-in screens GST-042 and WEB-016). | `None` |
+| `verifyMfaChallenge` | [IdentityService](../backend/IdentityService.md#verifymfachallenge) | onAction | Checks the code the operator enters in the Open access grant form, on its confirm; only when it is accepted does the same press open the grant (`openPlatformStaffGrant`). A wrong code keeps the form open with the reason and permissions kept. | `None` |
 
 **States**
 
@@ -225,7 +231,7 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| ADM-001 | Platform Login / MFA |  |  |
+| ADM-001 | Platform Login / MFA | challengeId |  |
 | ADM-002 | Platform Dashboard |  |  |
 
 ## ADM-424 Module Activation & Dependency Validation
@@ -238,8 +244,9 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | Wave | 1 |
 | Licensed module | core |
 | Route | `/tenants-licensing/module-activation-dependency-validation-adm-424` |
-| Repository | none yet: ask the lead |
+| Repository | ticvai-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-web.git); assumed by the lead, not yet confirmed |
 | Component | `ModuleActivationDependencyValidation` |
+| Suggested location | `src/routes/tenants-licensing/ModuleActivationDependencyValidation.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -275,7 +282,7 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| ADM-419 | Back to Provisioning Command Center |  |  |
+| ADM-419 | Back to Provisioning Command Center | cellId |  |
 
 ## CMS-001 Tenant Workspace
 
@@ -287,8 +294,9 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | Wave | 1 |
 | Licensed module | core |
 | Route | `/white-label/tenant-workspace` |
-| Repository | none yet: ask the lead |
+| Repository | ticvai-venue-management (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-venue-management.git); assumed by the lead, not yet confirmed |
 | Component | `TenantWorkspaceDetail` |
+| Suggested location | `src/routes/white-label/TenantWorkspaceDetail.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | statusTracker |
 
 **Operations**
@@ -348,8 +356,9 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | Wave | 1 |
 | Licensed module | core |
 | Route | `/white-label/brand-kit` |
-| Repository | none yet: ask the lead |
+| Repository | ticvai-venue-management (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-venue-management.git); assumed by the lead, not yet confirmed |
 | Component | `BrandKitDetail` |
+| Suggested location | `src/routes/white-label/BrandKitDetail.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | statusTracker |
 
 **Entry parameters**
@@ -395,8 +404,9 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | Wave | 1 |
 | Licensed module | core |
 | Route | `/white-label/typography` |
-| Repository | none yet: ask the lead |
+| Repository | ticvai-venue-management (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-venue-management.git); assumed by the lead, not yet confirmed |
 | Component | `TypographyDetail` |
+| Suggested location | `src/routes/white-label/TypographyDetail.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | statusTracker |
 
 **Operations**
@@ -434,8 +444,9 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | Wave | 1 |
 | Licensed module | core |
 | Route | `/white-label/logo-assets` |
-| Repository | none yet: ask the lead |
+| Repository | ticvai-venue-management (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-venue-management.git); assumed by the lead, not yet confirmed |
 | Component | `LogoAssetsDetail` |
+| Suggested location | `src/routes/white-label/LogoAssetsDetail.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | statusTracker |
 
 **Entry parameters**
@@ -483,8 +494,9 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | Wave | 1 |
 | Licensed module | core |
 | Route | `/white-label/theme-editor` |
-| Repository | none yet: ask the lead |
+| Repository | ticvai-venue-management (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-venue-management.git); assumed by the lead, not yet confirmed |
 | Component | `ThemeEditorDetail` |
+| Suggested location | `src/routes/white-label/ThemeEditorDetail.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | statusTracker |
 
 **Operations**
@@ -523,8 +535,9 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | Wave | 1 |
 | Licensed module | core |
 | Route | `/white-label/component-preview` |
-| Repository | none yet: ask the lead |
+| Repository | ticvai-venue-management (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-venue-management.git); assumed by the lead, not yet confirmed |
 | Component | `ComponentPreviewDetail` |
+| Suggested location | `src/routes/white-label/ComponentPreviewDetail.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -573,8 +586,9 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | Wave | 1 |
 | Licensed module | core |
 | Route | `/white-label/page-builder` |
-| Repository | none yet: ask the lead |
+| Repository | ticvai-venue-management (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-venue-management.git); assumed by the lead, not yet confirmed |
 | Component | `PageBuilderDetail` |
+| Suggested location | `src/routes/white-label/PageBuilderDetail.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | statusTracker |
 
 **Entry parameters**
@@ -604,6 +618,7 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | `listContentBlocks` | [WhiteLabelService](../backend/WhiteLabelService.md#listcontentblocks) | onLoad | The page's existing blocks, in order: agreed with the contracts agent, runs/fix-s12/LEDGER.md, 4 October 2026 | `TENANT_CONFIGURE` |
 | `updateContentBlock` | [WhiteLabelService](../backend/WhiteLabelService.md#updatecontentblock) | onAction | Edit or reorder a block (position): agreed with the contracts agent, runs/fix-s12/LEDGER.md, 4 October 2026 | `TENANT_CONFIGURE` |
 | `listProposedActions` | [AiService](../backend/AiService.md#listproposedactions) | onInterval | Follows decideProposedAction (202) until what it started settles: What the assistant has proposed and nobody has decided | `AI_USE` |
+| `getPublishReviewPolicy` | [WhiteLabelService](../backend/WhiteLabelService.md#getpublishreviewpolicy) | onLoad | Whether publishing a content block needs review; the screen shows each block's reviewStatus | `TENANT_CONFIGURE` |
 
 **States**
 
@@ -633,8 +648,9 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | Wave | 1 |
 | Licensed module | core |
 | Route | `/white-label/content-blocks` |
-| Repository | none yet: ask the lead |
+| Repository | ticvai-venue-management (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-venue-management.git); assumed by the lead, not yet confirmed |
 | Component | `ContentBlocksDetail` |
+| Suggested location | `src/routes/white-label/ContentBlocksDetail.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -689,8 +705,9 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | Wave | 1 |
 | Licensed module | core |
 | Route | `/white-label/navigation-menus` |
-| Repository | none yet: ask the lead |
+| Repository | ticvai-venue-management (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-venue-management.git); assumed by the lead, not yet confirmed |
 | Component | `NavigationMenusDetail` |
+| Suggested location | `src/routes/white-label/NavigationMenusDetail.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Operations**
@@ -732,8 +749,9 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | Wave | 1 |
 | Licensed module | core |
 | Route | `/white-label/media-library` |
-| Repository | none yet: ask the lead |
+| Repository | ticvai-venue-management (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-venue-management.git); assumed by the lead, not yet confirmed |
 | Component | `MediaLibraryDetail` |
+| Suggested location | `src/routes/white-label/MediaLibraryDetail.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -787,8 +805,9 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | Wave | 1 |
 | Licensed module | core |
 | Route | `/white-label/translations` |
-| Repository | none yet: ask the lead |
+| Repository | ticvai-venue-management (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-venue-management.git); assumed by the lead, not yet confirmed |
 | Component | `TranslationsDetail` |
+| Suggested location | `src/routes/white-label/TranslationsDetail.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | configEditor |
 
 **Entry parameters**
@@ -833,8 +852,9 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | Wave | 1 |
 | Licensed module | core |
 | Route | `/white-label/rtl-preview` |
-| Repository | none yet: ask the lead |
+| Repository | ticvai-venue-management (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-venue-management.git); assumed by the lead, not yet confirmed |
 | Component | `RtlPreviewDetail` |
+| Suggested location | `src/routes/white-label/RtlPreviewDetail.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | statusTracker |
 
 **Operations**
@@ -872,8 +892,9 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | Wave | 1 |
 | Licensed module | core |
 | Route | `/white-label/seo-metadata` |
-| Repository | none yet: ask the lead |
+| Repository | ticvai-venue-management (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-venue-management.git); assumed by the lead, not yet confirmed |
 | Component | `SeoMetadataDetail` |
+| Suggested location | `src/routes/white-label/SeoMetadataDetail.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | configEditor |
 
 **Operations**
@@ -911,8 +932,9 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | Wave | 1 |
 | Licensed module | core |
 | Route | `/white-label/publishing-workflow` |
-| Repository | none yet: ask the lead |
+| Repository | ticvai-venue-management (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-venue-management.git); assumed by the lead, not yet confirmed |
 | Component | `PublishingWorkflowDetail` |
+| Suggested location | `src/routes/white-label/PublishingWorkflowDetail.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | statusTracker |
 
 **Entry parameters**
@@ -969,8 +991,9 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | Wave | 1 |
 | Licensed module | core |
 | Route | `/white-label/version-history` |
-| Repository | none yet: ask the lead |
+| Repository | ticvai-venue-management (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-venue-management.git); assumed by the lead, not yet confirmed |
 | Component | `VersionHistoryDetail` |
+| Suggested location | `src/routes/white-label/VersionHistoryDetail.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -1016,8 +1039,9 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | Wave | 1 |
 | Licensed module | core |
 | Route | `/white-label/site-settings` |
-| Repository | none yet: ask the lead |
+| Repository | ticvai-venue-management (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-venue-management.git); assumed by the lead, not yet confirmed |
 | Component | `SiteSettingsDetail` |
+| Suggested location | `src/routes/white-label/SiteSettingsDetail.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | statusTracker |
 
 **Entry parameters**
@@ -1068,8 +1092,9 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | Wave | 1 |
 | Licensed module | core |
 | Route | `/white-label/domain-certificate` |
-| Repository | none yet: ask the lead |
+| Repository | ticvai-venue-management (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-venue-management.git); assumed by the lead, not yet confirmed |
 | Component | `DomainCertificateDetail` |
+| Suggested location | `src/routes/white-label/DomainCertificateDetail.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -1118,8 +1143,9 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | Wave | 1 |
 | Licensed module | core |
 | Route | `/white-label/consent-legal` |
-| Repository | none yet: ask the lead |
+| Repository | ticvai-venue-management (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-venue-management.git); assumed by the lead, not yet confirmed |
 | Component | `ConsentLegalDetail` |
+| Suggested location | `src/routes/white-label/ConsentLegalDetail.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -1170,8 +1196,9 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | Wave | 1 |
 | Licensed module | core |
 | Route | `/white-label/user-access` |
-| Repository | none yet: ask the lead |
+| Repository | ticvai-venue-management (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-venue-management.git); assumed by the lead, not yet confirmed |
 | Component | `UserAccessDetail` |
+| Suggested location | `src/routes/white-label/UserAccessDetail.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -1216,8 +1243,9 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | Wave | 1 |
 | Licensed module | core |
 | Route | `/white-label/help-me-choose` |
-| Repository | none yet: ask the lead |
+| Repository | ticvai-venue-management (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-venue-management.git); assumed by the lead, not yet confirmed |
 | Component | `HelpMeChoose` |
+| Suggested location | `src/routes/white-label/HelpMeChoose.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -1244,6 +1272,7 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | `listBookingFlows` | [WhiteLabelService](../backend/WhiteLabelService.md#listbookingflows) | onAction | The venue's flows an answer can open (target kind bookingFlow, W12) | `TENANT_CONFIGURE` |
 | `suggestGuidedChoice` | [AiService](../backend/AiService.md#suggestguidedchoice) | onAction | Ask the assistant for a question set from product attributes (age and height rules, level tags, certifications); it lands here as a draft through white-label proposeGuidedChoice (W4) | `AI_USE` |
 | `getGuidedChoiceSuggestion` | [AiService](../backend/AiService.md#getguidedchoicesuggestion) | onAction | The reasons behind a Help me choose suggestion | `AI_USE` |
+| `previewGuidedChoice` | [WhiteLabelService](../backend/WhiteLabelService.md#previewguidedchoice) | onAction | The products each combination of the draft's answers leaves, for the preview (r8, WHITE-C26); called when the draft changes, nothing stored | `TENANT_CONFIGURE` |
 
 **States**
 
@@ -1272,8 +1301,9 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | Wave | 1 |
 | Licensed module | core |
 | Route | `/white-label/site-builder` |
-| Repository | none yet: ask the lead |
+| Repository | ticvai-venue-management (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-venue-management.git); assumed by the lead, not yet confirmed |
 | Component | `SiteBuilder` |
+| Suggested location | `src/routes/white-label/SiteBuilder.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | multiStepForm |
 
 **Entry parameters**
@@ -1339,8 +1369,9 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | Wave | 1 |
 | Licensed module | core |
 | Route | `/white-label/booking-flows` |
-| Repository | none yet: ask the lead |
+| Repository | ticvai-venue-management (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-venue-management.git); assumed by the lead, not yet confirmed |
 | Component | `BookingFlows` |
+| Suggested location | `src/routes/white-label/BookingFlows.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -1349,6 +1380,7 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 |---|---|
 | venueId | session |
 | bookingFlowId | CMS-102 |
+| version | CMS-015 |
 | productId | navigation |
 
 **Operations**
@@ -1369,6 +1401,7 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | `updateProduct` | [CatalogueService](../backend/CatalogueService.md#updateproduct) | onAction | Assign the flow to a product (`bookingFlowId`) | `PRODUCT_CONFIGURE` |
 | `listProductCategories` | [CatalogueService](../backend/CatalogueService.md#listproductcategories) | onAction | The categories a flow can be assigned to | `PRODUCT_VIEW` |
 | `setProductCategories` | [CatalogueService](../backend/CatalogueService.md#setproductcategories) | onAction | Assign the flow to a category (`bookingFlowId`) | `PRODUCT_CONFIGURE` |
+| `diffConfigVersion` | [WhiteLabelService](../backend/WhiteLabelService.md#diffconfigversion) | onLoad | Compare two configuration versions, including the booking flows and the products they affect | `TENANT_CONFIGURE` |
 
 **States**
 
@@ -1399,8 +1432,9 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | Wave | 1 |
 | Licensed module | core |
 | Route | `/white-label/app-publishing` |
-| Repository | none yet: ask the lead |
+| Repository | ticvai-venue-management (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-venue-management.git); assumed by the lead, not yet confirmed |
 | Component | `AppPublishing` |
+| Suggested location | `src/routes/white-label/AppPublishing.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**

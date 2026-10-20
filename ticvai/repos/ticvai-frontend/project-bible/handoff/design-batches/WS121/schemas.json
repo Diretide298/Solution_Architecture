@@ -489,7 +489,7 @@
  "AiMaturity": {
   "type": "object",
   "x-ticvai-persistence": "none — embedded as jsonb on ai.suggestion and ai.forecast_version",
-  "description": "**Where an answer stands, on every answer** (29 September, AI functions review; baseline then learn). The customer sees a stage badge and a \"Based on\" chip, never a bare percentage (design 5.6), and \"Limited historical data\" while the starting pattern carries more than half the weight.",
+  "description": "**Where an answer stands, on every answer** (29 September, AI functions review; baseline then learn). The customer sees a stage badge and a \"Based on\" chip, never a bare percentage (design 5.6), and \"Limited historical data\" while the starting pattern carries more than half the weight.\n\n**The stage rule per kind** (r8 walk of ticket 27723; lead decision of 20 October 2026, option A). The stage of an answer is decided by the days of the tenant's own data behind its kind, against that kind's `Minimum` in `SuggestionKind`: `starting` below the minimum, `learning` from the minimum, `established` from three times the minimum, `learned` only by promotion (AI-D16). For the Block A kinds that is:\n| kind | minimum | learning from | established from |\n|---|---|---|---|\n| queueBalancing | 14 days | day 14 | day 42 |\n| prepPlan | 28 days (4 weeks) | day 28 | day 84 |\n| upsell | 90 days | day 90 | day 270 |\nThe 28-day seeded run of AI-ENGINE-BASELINE therefore proves `learning` for `queueBalancing` and `prepPlan`. `upsell` cannot read `learning` at day 28 and is checked at day 90 with a seeded fixture of 90 days of orders. Other kinds follow the same rule with their own minimum.",
   "required": [
    "stage",
    "basedOn"
@@ -1137,6 +1137,8 @@
    "LOYALTY_ACCRUE",
    "LOYALTY_REDEEM",
    "LOYALTY_ADJUST",
+   "MEMBERSHIP_VIEW",
+   "MEMBERSHIP_MANAGE",
    "MARKETING_VIEW",
    "MARKETING_MANAGE",
    "MARKETING_SEND",
@@ -1236,11 +1238,11 @@
     "format": "uuid"
    },
    "operatorPrincipalId": {
-    "x-ticvai-references": "identity.principal",
+    "x-ticvai-references": "none",
     "type": "string",
     "format": "uuid",
     "readOnly": true,
-    "description": "The platform operator, from the Control Plane token. Set by the server."
+    "description": "The platform operator, from the Control Plane token (its subject). Set by the server. **Not a row in this tenant's `identity.principal`** (R8 blocker IDENTITY-C20, CHG-R8MIG-006; the lead's answer, option A): an operator is the Control Plane's, so this is a plain uuid with no foreign key, and the key V0107 adds is dropped by the next forward migration."
    },
    "operatorDisplayName": {
     "type": "string",
@@ -1309,6 +1311,18 @@
  },
  "Tenant": {
   "x-ticvai-persistence": "control.tenant",
+  "x-ticvai-required-when": {
+   "planVersion": {
+    "planId": {
+     "not": null
+    }
+   },
+   "planId": {
+    "planVersion": {
+     "not": null
+    }
+   }
+  },
   "type": "object",
   "required": [
    "id",
@@ -1372,9 +1386,17 @@
     "nullable": true
    },
    "planId": {
+    "x-ticvai-references": "control.plan",
+    "x-ticvai-references-version": "planVersion",
     "type": "string",
     "format": "uuid",
     "nullable": true
+   },
+   "planVersion": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The version of the plan the tenant is on (with `planId`, the key of the plan row; R8 blocker APPROVALS-TENANCY-C15, CHG-R8INT-023). Null when `planId` is."
    },
    "planName": {
     "type": "string",
@@ -1385,6 +1407,46 @@
    },
    "venueCount": {
     "type": "integer"
+   },
+   "cellHost": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "x-ticvai-derived": "onRead",
+    "description": "The host of the tenant's home cell (the host part of `Cell.apiEndpoint` of the cell that holds the tenant in its home region), derived on read through `control.cell_tenant`. Added for ADM-018 (r8 walk of ticket 27886): the console reaches the cell's grant and language operations at this host without holding `PLATFORM_CELL_VIEW`, which `listTenantCells` needs. Null while the tenant has no cell.\n"
+   },
+   "cellHosts": {
+    "type": "array",
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "x-ticvai-derived": "onRead",
+    "description": "One entry per region the tenant is in, for a multi-region tenant; the entry with `isHome` true is `cellHost`. The screen uses the home cell for language and grant operations.\n",
+    "items": {
+     "type": "object",
+     "required": [
+      "regionId",
+      "cellId",
+      "host",
+      "isHome"
+     ],
+     "properties": {
+      "regionId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "cellId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "host": {
+       "type": "string"
+      },
+      "isHome": {
+       "type": "boolean"
+      }
+     }
+    }
    },
    "regionId": {
     "type": "string",

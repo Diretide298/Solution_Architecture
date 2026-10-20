@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Catalogue & Entitlement
   version: 0.1.0
-  x-ticvai-screen-count: 237
+  x-ticvai-screen-count: 238
   x-ticvai-tier: spine
   x-ticvai-module: 1 — Ticketing Catalogue
   x-ticvai-requirements: 312
@@ -493,6 +493,7 @@ paths:
         - "P02 GST-002 Explore"
         - "P02 GST-007 Select Date & Time"
         - "P02 GST-008 Tickets & Add-ons"
+        - "P08 BO-015 Performance Calendar"
         - "P08 BO-048 Retail Products"
         - "P08 BO-115 Category, Brand & Merchandise Hierarchy"
         - "P13 CMS-101 Help Me Choose"
@@ -2136,7 +2137,6 @@ paths:
         - "P02 GST-044 Multi-Currency & Pricing"
         - "P02 GST-050 Resource Booking – Cabana"
         - "P02 GST-051 Plan"
-        - "P02 GST-052 Suggested Itineraries"
         - "P02 GST-075 Book a Space by the Hour"
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-003 Sell — Timed Entry"
@@ -2713,6 +2713,7 @@ paths:
       operationId: getProduct
       x-ticvai-consumed-by:
         - "P01 WEB-004 Attraction Details"
+        - "P01 WEB-006 Date & Performance Selection"
         - "P01 WEB-022 Membership Plans"
         - "P02 GST-004 Item Detail"
         - "P02 GST-006 Item Detail – Event / Exhibition"
@@ -2998,6 +2999,7 @@ paths:
         - "P01 WEB-048 Book a Space by the Hour"
         - "P02 GST-008 Tickets & Add-ons"
         - "P02 GST-041 Checkout Entry"
+        - "P02 GST-048 Upsell / Cross-Sell"
         - "P02 GST-075 Book a Space by the Hour"
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-003 Sell — Timed Entry"
@@ -3381,6 +3383,7 @@ paths:
     get:
       operationId: listEvents
       x-ticvai-consumed-by:
+        - "P02 GST-005 What's On"
         - "P08 BO-015 Performance Calendar"
         - "P08 BO-019 Closures & Blackouts"
         - "P08 BO-694 Event Catalogue Command Center"
@@ -3506,6 +3509,7 @@ paths:
         - "P02 GST-005 What's On"
         - "P02 GST-007 Select Date & Time"
         - "P02 GST-049 Interactive Seat Selection"
+        - "P04 POS-004 Sell — Seat Map"
         - "P08 BO-015 Performance Calendar"
         - "P08 BO-019 Closures & Blackouts"
         - "P08 BO-725 Performance Operations Command Center"
@@ -3936,7 +3940,6 @@ paths:
     get:
       operationId: listCatalogueBundles
       x-ticvai-consumed-by:
-        - "P02 GST-052 Suggested Itineraries"
         - "P06 EMP-018 Offline package"
         - "P08 BO-011 Packages & Bundles"
         - "P08 BO-037 Offline Package Status"
@@ -4203,13 +4206,13 @@ paths:
         type: string
     post:
       operationId: reportBundleApplied
+      x-ticvai-consumed-by:
+        - "P06 EMP-018 Offline package"
+        - "P08 BO-037 Offline Package Status"
       x-ticvai-writes:
       - table: catalogue.bundle_application
         for: 'the one report row each call appends (BundleApplication; R8 blocker FOUNDATION-AI-C44) (r8 gate,
           CHG-R8GT2-003; check-parameter-columns P-NAMED-TABLE)'
-      x-ticvai-consumed-by:
-        - "P06 EMP-018 Offline package"
-        - "P08 BO-037 Offline Package Status"
       x-ticvai-audience:
       - staff
       summary: Report that a workstation applied a bundle
@@ -4263,7 +4266,6 @@ paths:
     get:
       operationId: listInventoryHolds
       x-ticvai-consumed-by:
-        - "P04 POS-003 Sell — Timed Entry"
         - "P08 BO-018 Allocation & Holds"
       x-ticvai-audience:
       - staff
@@ -4316,8 +4318,6 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: acquireInventoryHold
-      x-ticvai-consumed-by:
-        - "P04 POS-003 Sell — Timed Entry"
       x-ticvai-read-via:
       - query: tenancy#workstationRecords
         route: in-process
@@ -5497,9 +5497,11 @@ paths:
       operationId: getPerformance
       x-ticvai-consumed-by:
         - "P01 WEB-006 Date & Performance Selection"
+        - "P01 WEB-007 Interactive Seat Selection"
         - "P01 WEB-010 Shopping Cart"
         - "P02 GST-006 Item Detail – Event / Exhibition"
         - "P02 GST-041 Checkout Entry"
+        - "P02 GST-049 Interactive Seat Selection"
         - "P04 POS-004 Sell — Seat Map"
         - "P08 BO-015 Performance Calendar"
         - "P08 BO-019 Closures & Blackouts"
@@ -6276,6 +6278,8 @@ paths:
   /channel-availability:
     get:
       operationId: getChannelAvailability
+      x-ticvai-consumed-by:
+        - "P08 BO-291 Membership Commercial, Pricing & Channel Association"
       x-ticvai-audience:
         - staff
       x-ticvai-read-routing: primary
@@ -18989,6 +18993,8 @@ paths:
   /tax-profiles:
     get:
       operationId: listTaxProfiles
+      x-ticvai-consumed-by:
+        - "P08 BO-291 Membership Commercial, Pricing & Channel Association"
       summary: The tax profiles
       description: |-
         **Added 4 October 2026 (CHG-FXC-010; ADM-069): the screen manages many reusable tax profiles and the contract had one
@@ -19038,7 +19044,6 @@ paths:
   /product-tags:
     get:
       operationId: listProductTags
-      x-ticvai-consumed-by: []
       summary: The venue's tags, the master list products and promotions pick from
       description: >-
         **Tags are master data, not free text** (16 October 2026 minutes, 4.6 and section 5, CHG-R8PRD-002). A tag
@@ -19133,7 +19138,6 @@ paths:
       x-ticvai-writes:
       - table: catalogue.audit_entry
         for: 'the audit row of the tag change (r8 integration, CHG-R8INT-014; check-parameter-columns P-NAMED-TABLE)'
-      x-ticvai-consumed-by: []
       x-ticvai-read-via:
       - query: white-label#guidedChoiceAnswerRecords
         route: service
@@ -19235,7 +19239,6 @@ paths:
   /products/{productId}/classification:
     put:
       operationId: setProductClassification
-      x-ticvai-consumed-by: []
       x-ticvai-writes:
       - table: catalogue.product
         for: 'Product.categoryId and Product.segmentTags, the two things it files (r8 integration, CHG-R8INT-019;
@@ -19338,7 +19341,6 @@ paths:
   /product-categories/usage:
     get:
       operationId: listProductCategoryUsage
-      x-ticvai-consumed-by: []
       summary: How many products each category holds
       description: >-
         **The Products column of the category manager** (wireframe of 9 October, B1-S05 Category & Hierarchy
@@ -19415,7 +19417,6 @@ paths:
         format: uuid
     get:
       operationId: getProductChannelTexts
-      x-ticvai-consumed-by: []
       x-ticvai-read-via:
       - query: white-label#tenantLanguageRecords
         route: service
@@ -19466,7 +19467,6 @@ paths:
       x-ticvai-writes:
       - table: catalogue.audit_entry
         for: 'the audit row (category channelTexts, the texts before and after) (r8 integration, CHG-R8INT-014; check-parameter-columns P-NAMED-TABLE)'
-      x-ticvai-consumed-by: []
       x-ticvai-read-via:
       - query: white-label#tenantLanguageRecords
         route: service
@@ -19550,7 +19550,6 @@ paths:
         format: uuid
     get:
       operationId: getProductOwnerForms
-      x-ticvai-consumed-by: []
       x-ticvai-read-via:
       - query: marketing-crm#formDefinitionRecords
         route: service
@@ -19611,7 +19610,6 @@ paths:
       x-ticvai-writes:
       - table: catalogue.audit_entry
         for: 'the audit row (category ownerForms, the links before and after) (r8 integration, CHG-R8INT-014; check-parameter-columns P-NAMED-TABLE)'
-      x-ticvai-consumed-by: []
       x-ticvai-read-via:
       - query: marketing-crm#formDefinitionRecords
         route: service
@@ -19689,7 +19687,6 @@ paths:
   /owner-form-candidates:
     get:
       operationId: listOwnerFormCandidates
-      x-ticvai-consumed-by: []
       x-ticvai-read-via:
       - query: marketing-crm#formDefinitionRecords
         route: service
@@ -19775,7 +19772,6 @@ paths:
         format: uuid
     get:
       operationId: getProductSalePermissionRules
-      x-ticvai-consumed-by: []
       x-ticvai-read-via:
       - query: tenancy#activeVenues
         route: service
@@ -19828,7 +19824,6 @@ paths:
       x-ticvai-writes:
       - table: catalogue.audit_entry
         for: 'the audit row (category salePermissions, the rule set before and after) (r8 integration, CHG-R8INT-014; check-parameter-columns P-NAMED-TABLE)'
-      x-ticvai-consumed-by: []
       x-ticvai-read-via:
       - query: tenancy#activeVenues
         route: service
@@ -19937,7 +19932,6 @@ paths:
   /sale-permission-checks:
     post:
       operationId: checkProductSalePermission
-      x-ticvai-consumed-by: []
       x-ticvai-idempotency-exempt: A check that writes nothing; a replay answers the same and duplicates no row.
       summary: Would this seller, here, be allowed to sell these products
       description: >-
@@ -19993,7 +19987,6 @@ paths:
   /sale-permission-targets:
     get:
       operationId: listSalePermissionTargets
-      x-ticvai-consumed-by: []
       x-ticvai-read-via:
       - query: tenancy#activeVenues
         route: service
@@ -20106,7 +20099,6 @@ paths:
   /product-dashboard:
     get:
       operationId: getProductDashboard
-      x-ticvai-consumed-by: []
       summary: The products dashboard's counts
       description: >-
         **The first screen of the products module** (16 October 2026 minutes, 4.1: a dashboard of active products,
@@ -20173,7 +20165,6 @@ paths:
   /product-dashboard/attention:
     get:
       operationId: listProductAttentionItems
-      x-ticvai-consumed-by: []
       summary: The products that need someone to act, and why
       description: >-
         **The "needs attention" list** (16 October 2026 minutes, 4.1: a list of everything that requires action;

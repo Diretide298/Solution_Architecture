@@ -1,0 +1,30 @@
+# tenant.provisioned v1 — published by subscription
+# Added 20 October 2026 (r8 cause FOUNDATION-AI-C43): AI creates a new tenant's vector store when the tenant exists.
+
+name: tenant.provisioned
+version: 1
+publisher: subscription
+description: A tenant's database was provisioned on a cell and the tenant can be used.
+aggregate: tenant
+emittedWhen: 'TenantStatus provisioning to active: the provisioning job (createTenant''s, or the verified onboarding
+  application''s) writes it to control.outbox in the transaction that marks the tenant active; drained by the
+  workers relay. No operation emits it directly, as for tenant.suspended'
+payload:
+- field: tenantId
+  type: uuid
+- field: cellId
+  type: uuid
+- field: databaseName
+  type: string
+- field: provisionedAt
+  type: timestamp
+consumers:
+- context: ai
+  purpose: 'Create the tenant''s Qdrant collection and alias and record them, with the issued token''s expiry, on
+    ai.vector_store (ADR-0049; the workers host holds the admin key and issues the token)'
+  writes:
+  - ai.vector_store
+  idempotencyKey: tenantId
+  onFailure: retryThenDeadLetter
+  isCritical: true
+retention: 30 days after publication

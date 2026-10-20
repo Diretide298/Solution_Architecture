@@ -168,7 +168,6 @@ paths:
     get:
       operationId: getResourceAvailability
       x-ticvai-consumed-by:
-        - "P01 WEB-031 My Reservations"
         - "P08 BO-096 Resource Calendar"
         - "P08 BO-857 Resource Creation & Profile"
         - "P08 BO-866 Resource Availability Schedule Configuration"
@@ -2755,6 +2754,14 @@ paths:
         **Not paged, deliberately.** A map carries tens of resources, not thousands, and a paged answer
         would make the client stitch pages before it could grey a single cabana.
 
+
+        **The next free date** (r8 walk of ticket 28204). When no resource on the map is `available` for the
+        window, `nextAvailableDate` is the first date after `from` on which at least one placed resource is
+        free, looked for up to 30 days ahead (the horizon is fixed, not a parameter); null when the window has a
+        free resource or nothing is free within 30 days. GST-058 offers it as "next free date" and does not
+        call the operation day by day. The date is worked out the same way as `status`, with setup and teardown
+        subtracted, and for the same `kind` when `kind` is sent.
+
         '
       tags:
       - resources
@@ -2794,6 +2801,16 @@ paths:
         description: Only resources of this kind, e.g. `table` on a table-booking screen.
         schema:
           $ref: '#/components/schemas/ResourceKind'
+      - name: minCapacity
+        in: query
+        required: false
+        description: Only resources that seat or hold at least this many guests (`capacity`), so a party can narrow the
+          map to cabanas big enough for it (r8 walk of tickets 28163 and 28204; lead decision of 20 October 2026, so a
+          guest books a cabana from the map only, and by-size booking is removed). Resources below it are left out of
+          `resources` and of `totals`.
+        schema:
+          type: integer
+          minimum: 1
       responses:
         '200':
           description: Every placed resource with its status for the window
@@ -3026,6 +3043,7 @@ paths:
     get:
       operationId: listProductStartTimes
       x-ticvai-consumed-by:
+        - "P01 WEB-031 My Reservations"
         - "P01 WEB-048 Book a Space by the Hour"
         - "P02 GST-075 Book a Space by the Hour"
       x-ticvai-read-via:
@@ -3782,6 +3800,14 @@ components:
           type: integer
           minimum: 1
           description: Resources of the room type free for the whole window. Only times with at least one are returned.
+        maxCapacity:
+          type: integer
+          minimum: 1
+          nullable: true
+          description: 'The most people one free room of the type holds in this window (the largest `capacity` among
+            the free resources), so the guest sees before choosing whether the party fits; the cart line''s attendees
+            above the chosen room''s capacity are refused (orders addCartLine 422 attendees-over-capacity) (r8,
+            GPS-C28). Null where the resources declare no capacity.'
     MapResourceAvailability:
       x-ticvai-persistence: none — computed from placed resources, bookings, holds and blocks
       type: object
@@ -3822,6 +3848,16 @@ components:
               type: integer
             unavailable:
               type: integer
+        nextAvailableDate:
+          type: string
+          format: date
+          nullable: true
+          x-ticvai-persisted: false
+          x-ticvai-derived: onRead
+          description: 'The first date after `from`, within 30 days, with at least one free resource; null when this
+            window already has one or nothing is free within the horizon. Computed on read; stored nowhere.
+
+            '
         resources:
           type: array
           items:

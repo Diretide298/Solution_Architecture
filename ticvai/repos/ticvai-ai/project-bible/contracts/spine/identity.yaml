@@ -61,7 +61,7 @@ x-ticvai-queries:
   verifySupervisorStepUp:
     module: identity
     inputs:
-      principalId: uuid, the supervisor signing (SupervisorStepUp.principalId)
+      principalId: uuid, the supervisor signing (SupervisorStepUp.principalId); or supervisorUsername (SupervisorStepUp.supervisorUsername, the employee number), exactly one of the two, resolved to the principal here
       credential: string, the supervisor's PIN (SupervisorStepUp.credential); compared, never stored or logged
       permission: Permission, the asking operation's x-ticvai-permission (contracts/shared/permissions.yaml)
       scopePath: ltree, the scope the asking operation acts at (its venue or workstation)
@@ -483,6 +483,13 @@ paths:
         - "P09 ADM-001 Platform Login / MFA"
         - "P10 PTR-001 Partner Login / MFA"
         - "P12 SUP-001 Venue Management Sign In"
+      x-ticvai-read-via:
+      - query: tenancy#workstationRecords
+        route: in-process
+        for: 'its read of platform.workstation, Tenancy''s data (CHG-MOD-001; R8 IDENTITY-C10)'
+      - query: tenancy#regionSettingsRecords
+        route: in-process
+        for: 'its read of the region''s settings, Tenancy''s data (CHG-MOD-001; R8 IDENTITY-C10)'
       x-ticvai-audience:
       - anonymous
       - partner
@@ -491,6 +498,12 @@ paths:
       x-ticvai-permission: null
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
+      x-ticvai-offline-note: 'Signing in needs the network on every staff device in r8 (decided 20 October 2026, Chinmay,
+        R8 blocker cause IDENTITY-C01; CHG-R8SPN-027). A till (POS-000) or a staff handheld (EMP-001) already signed in
+        keeps working offline, but nobody signs in while it is offline, so their offline state says signing in needs a
+        connection, as ADM-001 does (approved wording, to be confirmed with the client). **Open for r9, not built in
+        r8**: offline sign-in on access-control devices (the handheld scanner SCN-001 and turnstiles), with a verifier
+        the device holds from the operator''s last online sign-in, an ADR-0071 exception and a security review.'
       x-ticvai-conflict-policy: serverWins
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
@@ -550,32 +563,43 @@ paths:
           description: 'The username and credential do not match (`unauthenticated`; one answer for an unknown
             username and a wrong credential), or the principal signs in only through the tenant''s single sign-on
             (`sso-sign-in-required`, 14 October 2026, CHG-CRD-001): `detail` names the provider so the door can offer
-            `startSsoAuthorization`.'
+            `startSsoAuthorization`. **Every wrong-credentials 401 (`unauthenticated`) carries `attemptsRemaining`**
+            (ADAM CR-170, option D, decided 19 October 2026; CHG-CRA-009; the lead''s reading of 19 October 2026,
+            narrowed and confirmed on 20 October 2026, CHG-R8DEC-001: every wrong-credentials 401 `login` returns, never
+            `sso-sign-in-required`; `verifyMfaChallenge` carries it on its wrong-code 422, not on its 401): the wrong attempts left before the lock, **counted per
+            submitted username whether or not a principal has it, and per sign-in method** (password, PIN, card,
+            RFID), so an unknown username has its own counter and its own lock for each method, as a known one
+            does, and nothing in the answer reveals which usernames exist. `sso-sign-in-required` checks no
+            credential, spends no attempt and does not carry `attemptsRemaining`.'
           x-ticvai-problem-types:
           - unauthenticated
           - sso-sign-in-required
           content:
             application/problem+json:
               schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
+                $ref: '#/components/schemas/LoginDeniedProblem'
         '409':
           x-ticvai-problem-types: [session-active-elsewhere, workstation-in-use]
           description: 'An active session already exists for this principal on another device. Per §3.1.3
             the new login is refused. A supervisor with the SESSION_FORCE_LOGOUT permission may terminate
             the existing session. **The same holds on a till somebody else is signed in to**: the sign-in
             is refused until a supervisor ends the other session with `forceLogout`; signing in never ends
-            it (confirmed 28 September, audit R184).
+            it (confirmed 28 September, audit R184). **The answer says since when and on what**
+            (`SessionHeldProblem`: `openedAt` and `deviceLabel` of the session held; ADAM CR-170, CHG-CRA-009).
 
             '
           content:
             application/problem+json:
               schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
+                $ref: '#/components/schemas/SessionHeldProblem'
         '429':
           description: 'The request budget is exceeded (`rate-limited`), or this principal''s password or PIN is
-            locked after too many wrong attempts (`credential-locked`, 14 October 2026, CHG-CRD-001):
+            locked after too many wrong attempts (`credential-locked`, 14 October 2026, CHG-CRD-001; an unknown
+            username is locked the same way after its own wrong attempts, ADAM CR-170, so the lock reveals nothing):
             `PrincipalCredential.lockedUntil` is in the future, and `Retry-After` says when it ends. The lock is
-            temporary (`PasswordPolicy.lockoutMinutes`) and per method: a locked PIN leaves a password sign-in open.'
+            temporary (`PasswordPolicy.lockoutMinutes`) and per method: a locked PIN leaves a password sign-in open.
+            An unknown username has no `PrincipalCredential`; its lock is held with its own counter, per method,
+            for the same time, and answers the same way.'
           x-ticvai-problem-types:
           - rate-limited
           - credential-locked
@@ -594,6 +618,10 @@ paths:
         - "P01 WEB-020 Profile & Preferences"
         - "P02 GST-010 Booking Confirmation"
         - "P02 GST-073 Security & Sign-in"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s guest code attempt limit (VenueSettings.identity), Tenancy''s data (r8 integration, CHG-R8INT-014)'
       x-ticvai-write-via:
       - table: marketing.message_dispatch
         operation: sendTransactionalMessage
@@ -601,7 +629,15 @@ paths:
       - guestAuth: []
       - {}
       summary: Send a verification link, or consume one
-      description: '**Raised in review by Deep.** `registerGuest` creates an account and nothing verifies
+      description: '**Two ways to prove the address, one operation** (R8 blocker fix, IDENTITY-C38). The approved screens
+        (WEB-013, GST-010, GST-073) ask for a **six-digit code**, so `mode` `code` takes it in `code`: checked against the
+        guest''s `identity.otp_challenge` row with purpose `emailVerification` and channel `email`, within the venue''s attempt
+        limit (`VenueSettings.identity.guestOtpMaxAttempts`); a wrong code is `422 email-code-invalid` with
+        `attemptsRemaining`, as `verifyMfaChallenge` answers, and the last wrong one voids the code (`410
+        verification-token-expired`; ask for a new `send`). The session is the guest''s own (`guestAuth`), so the code needs no
+        address. The link path (`send` an emailed single-use link, `confirm` its `token`) stays for emailed links.
+
+        **Raised in review by Deep.** `registerGuest` creates an account and nothing verifies
         the address on it — and **a guest account with an unverified email can receive somebody else''s
         tickets**, because a transfer is offered to an address.
 
@@ -650,8 +686,9 @@ paths:
         '
       tags:
       - identity
-      x-ticvai-permission: GUEST_VIEW
-      x-ticvai-guest-callable: true
+      # No staff permission: a guest or a visitor proves their own address (ADR-0025; R8 blocker cause IDENTITY-C28,
+      # CHG-R8SPN-025). GUEST_VIEW was a staff permission no guest holds, so nothing could be refused for lacking it.
+      x-ticvai-permission: null
       x-ticvai-audience:
       - guest
       - anonymous
@@ -674,6 +711,12 @@ paths:
                   enum:
                   - send
                   - confirm
+                  - code
+                code:
+                  type: string
+                  nullable: true
+                  pattern: '^[0-9]{6}$'
+                  description: For `code`. The six digits emailed by `send` or by `registerGuest` with channel `email`.
                 token:
                   type: string
                   nullable: true
@@ -702,6 +745,12 @@ paths:
                     type: string
                     format: date-time
                     nullable: true
+        '422':
+          description: 'A wrong code (`mode` `code`), attempts one up to the limit; `attemptsRemaining` says how many are left.'
+          x-ticvai-problem-types: [email-code-invalid]
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/MfaCodeInvalidProblem' }
         '410':
           x-ticvai-problem-types: [verification-token-expired, verification-token-used]
           description: '**The token expired or was already used.** Distinct from an invalid one — a guest
@@ -1318,6 +1367,10 @@ paths:
         - "P01 WEB-024 Devices, Wishlist & Consent"
         - "P02 GST-015 Memberships"
         - "P02 GST-069 Face Pass"
+      x-ticvai-read-via:
+      - query: tenancy#regionSettingsRecords
+        route: in-process
+        for: 'minorAgeThreshold, for overSubjectIsMinor (R8 blocker ORDERS-MONEY-C20, CHG-R8MIG-009)'
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -1371,6 +1424,10 @@ paths:
       operationId: grantDelegation
       x-ticvai-consumed-by:
         - "P02 GST-015 Memberships"
+      x-ticvai-read-via:
+      - query: tenancy#regionSettingsRecords
+        route: in-process
+        for: 'the minor age, RegionSettings.minorAgeThreshold in platform.region_settings, Tenancy''s data (IDENTITY-C19; CHG-R8SPN-024)'
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -1395,6 +1452,25 @@ paths:
         over anybody else''s account; staff holding `GUEST_MANAGE` record a grant on the account holder''s
         behalf. **A subject with no date of birth on file is treated as a minor.** The age below which a
         subject is a minor is an open value that client counsel sets; it is not assumed here.
+
+
+        **Built with a configurable age** (decided 20 October 2026, Chinmay, R8 blocker cause IDENTITY-C19, option
+        A; CHG-R8SPN-024; R205 still open with counsel): a subject is a minor below
+        `tenancy.RegionSettings.minorAgeThreshold` (18 by default, set per country), or with no date of birth.
+        **When the 409 `minor-grants-adult-authority` happens**: the holder the grant is for (the path''s
+        `subjectId`) is a minor and `overSubjectId` is an adult, whoever calls, a guest or staff on the guest''s
+        behalf. **How the first adult link over a minor is made**: the adult enrols the child from GST-069
+        (R205), which writes a `familyMember` or `primaryHolder` grant held by the adult over the child, with the
+        adult as grantor; this operation is how later grants are added.
+
+        **What a guest-made grant stores** (R8 blocker IDENTITY-C42, the lead''s answer A; CHG-R8MIG-021):
+        `grantedByKind` `subject` and `grantedBySubjectId` the granting guest (no principal); `scopePath` the tenant
+        root (a guest account is tenant-wide); `effect` ALLOW; `permission` one of the guest-delegable list for its
+        `delegationKind` (proposed, client to confirm): `primaryHolder` and `familyMember` ORDER_VIEW, ORDER_CREATE,
+        WALLET_VIEW; `carer` and `attendee` ORDER_VIEW; `groupLeader` ORDER_VIEW, ORDER_CREATE; `corporateAdmin`
+        ORDER_VIEW, ORDER_CREATE, WALLET_VIEW, WALLET_OPERATE; `corporateMember` ORDER_VIEW. Any other permission from a
+        guest is refused 403. A revocation by a guest is recorded the same way. Staff recording a grant on the holder''s
+        behalf store `grantedByKind` `principal`; the SSO callback''s group-to-role grants store `system`.
 
         '
       tags:
@@ -1463,7 +1539,9 @@ paths:
           description: '**A cycle, or a minor granting authority over an adult.** Both are refused — a
             delegation graph with a loop is one nobody can reason about, and the second is a safeguarding
             concern rather than a modelling one. A subject with no date of birth counts as a minor
-            (audit R126).
+            (audit R126). `minor-grants-adult-authority`: the path''s `subjectId` is a minor (below
+            `RegionSettings.minorAgeThreshold`, or no date of birth) and `overSubjectId` is an adult
+            (IDENTITY-C19, CHG-R8SPN-024).
 
             '
           content:
@@ -1484,6 +1562,13 @@ paths:
         - "P09 ADM-001 Platform Login / MFA"
         - "P10 PTR-001 Partner Login / MFA"
         - "P12 SUP-001 Venue Management Sign In"
+      x-ticvai-read-via:
+      - query: tenancy#workstationRecords
+        route: in-process
+        for: 'its read of platform.workstation, Tenancy''s data (CHG-MOD-001; R8 IDENTITY-C10)'
+      - query: tenancy#regionSettingsRecords
+        route: in-process
+        for: 'its read of the region''s settings, Tenancy''s data (CHG-MOD-001; R8 IDENTITY-C10)'
       x-ticvai-self-service: true
       x-ticvai-audience:
       - staff
@@ -1512,6 +1597,15 @@ paths:
         CHG-CSP-002, breaking change BC-001 to BC-005): a session opened from a browser or a handheld
         has no workstation and no board, and the field is absent rather than invented.
 
+
+        **The venue is chosen with the role** (decided 20 October 2026, Chinmay, R8 blocker cause IDENTITY-C45,
+        option A; CHG-R8SPN-032). A role is held through a grant, and the grant carries the scope: a steward at
+        AquaCove Abu Dhabi and at AquaCove Dubai holds two grants of one role, and `availableRoles` lists one
+        `RoleSummary` per grant, each naming its venue (`scope`). The client sends the chosen card''s `grantId`;
+        the session''s venue (`identity.session.venue_id`) and scope are set from that grant''s scope. `roleId`
+        alone still works for a role held at one venue; for a role held at several, a body with no `grantId` is
+        refused `422 grant-required`, and a `grantId` that is not the caller''s, or not of `roleId`, is `403`.
+
         '
       requestBody:
         required: true
@@ -1525,6 +1619,11 @@ paths:
                 roleId:
                   type: string
                   format: uuid
+                grantId:
+                  type: string
+                  format: uuid
+                  description: '`RoleSummary.grantId` of the card chosen: which grant of the role, and so which venue
+                    (IDENTITY-C45, CHG-R8SPN-032). Required when the role is held at more than one venue.'
       responses:
         '200':
           headers:
@@ -1537,6 +1636,14 @@ paths:
                 $ref: '#/components/schemas/Session'
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '422':
+          description: 'The role is held at more than one venue and the body names no `grantId` (`grant-required`;
+            IDENTITY-C45, CHG-R8SPN-032). Nothing changes; the client shows the cards and sends the chosen grant.'
+          x-ticvai-problem-types: [grant-required]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /auth/refresh:
@@ -1566,6 +1673,12 @@ paths:
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       summary: Rotate the access token
+      description: 'Exchanges a refresh token for a new access token **and a new refresh token**; the one sent is
+        retired (rotation). A staff refresh token slides: it lives `PasswordPolicy.refreshTokenHours` (12 hours by
+        default, proposed, client to correct) from its last use, and never past the session''s `expiresAt`. **A
+        retired refresh token sent again is a reuse**: the server ends the session, revokes every refresh token
+        issued from the same sign-in, and answers 401, so a stolen token works at most once (IDENTITY-C25,
+        FOUNDATION-AI-C27; CHG-R8SPN-014; the rule is written once on `bearerAuth`).'
       security: []
       requestBody:
         required: true
@@ -1588,6 +1701,73 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TokenPair'
+        '401':
+          $ref: ../shared/common.yaml#/components/responses/Unauthorized
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /auth/step-up-supervisors:
+    get:
+      operationId: listStepUpSupervisors
+      x-ticvai-audience:
+      - staff
+      x-ticvai-read-routing: replica
+      summary: Who may sign a supervisor step-up here
+      description: '**The picker of the supervisor PIN prompt** (decided 20 October 2026, Chinmay, R8 blocker cause
+        GPS-C31, option A; CHG-R8SPN-035; `SupervisorStepUp` in contracts/shared/common.yaml). Returns the active
+        principals who hold `permission` at the venue the caller''s session acts at (through their grants, after
+        deny resolution, as the step-up check itself resolves it), **leaving out the caller**, who may never sign
+        their own act. Only what the prompt shows: the principal id and display name.
+
+
+        **Who may ask.** Any staff session at the venue, with no permission of its own: the cashier whose act needs
+        a supervisor is the one who opens the prompt, and the answer is limited to the caller''s own venue and to
+        names, never roles, contact details or anything else of the principal.
+
+
+        **Order.** By `displayName` ascending, then by `principalId`. **Statuses.** Only active principals whose grant
+        is in force now; deactivated principals and expired grants are left out.'
+      tags:
+      - identity
+      # No permission: any staff session at the venue may ask who can sign for its own pending act; the answer is
+      # scoped to the caller's own venue and session (self-scoped) and carries names only (GPS-C31). Self-service: the
+      # signed-in staff member acts on their own session's pending act, not on the platform (check-package rule 23;
+      # r8 integration, CHG-R8INT-014).
+      x-ticvai-permission: null
+      x-ticvai-self-service: true
+      x-ticvai-self-scoped: principal
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - name: permission
+        in: query
+        required: true
+        description: The step-up operation's `x-ticvai-permission`, for example `ORDER_CANCEL`.
+        schema:
+          $ref: ../shared/permissions.yaml#/components/schemas/Permission
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: The principals who may sign, by display name
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        type: object
+                        required: [principalId, displayName]
+                        properties:
+                          principalId:
+                            type: string
+                            format: uuid
+                          displayName:
+                            type: string
         '401':
           $ref: ../shared/common.yaml#/components/responses/Unauthorized
         '429':
@@ -1712,6 +1892,7 @@ paths:
       x-ticvai-self-service: true
       x-ticvai-audience:
       - staff
+      - partner
       tags:
       - identity
       security:
@@ -1738,6 +1919,10 @@ paths:
       x-ticvai-consumed-by:
         - "P04 POS-000 Sign In"
         - "P08 BO-053 Staff Directory"
+      # The decision's identity.authz_audit row is the authorisation layer's, appended for every decision a request
+      # takes (CHG-R6-014), not this operation's own write; named to say the decision is audited (r8 gate,
+      # CHG-R8GT2-003; check-parameter-columns P-NAMED-TABLE).
+      x-ticvai-names-for-context: [identity.authz_audit]
       x-ticvai-read-via:
       - query: tenancy#workstationRecords
         route: in-process
@@ -1775,12 +1960,18 @@ paths:
         it authorises this one call. With a session (BO-053 Staff Directory) the caller''s own
         `SESSION_FORCE_LOGOUT` applies as before and no step-up is asked.
 
+
+        **What it writes** (R8 blocker IDENTITY-C46, CHG-R8MIG-015): the session''s `status` `terminated`, `endedAt`,
+        `endedByPrincipalId` (the caller, or the supervisor of the step-up) and `endReason` (the body''s `reason`), and
+        one `identity.authz_audit` row for the decision.
+
         '
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       - name: sessionId
         in: path
         required: true
+        description: The `sessionId` of an `ActiveSession` from `listActiveSessions` (the session's `identity.session.id`).
         schema:
           type: string
           format: uuid
@@ -1790,13 +1981,15 @@ paths:
           application/json:
             schema:
               type: object
-              required:
-              - reason
               properties:
                 reason:
                   type: string
                   minLength: 3
                   maxLength: 500
+                  default: supervisor-takeover
+                  description: 'Why the session is ended. **Optional (R8 blocker fix, IDENTITY-C44): the POS-000 door sends none,
+                    and the server records `supervisor-takeover`** when the call comes from the door with a supervisor step-up.
+                    BO-053 still sends one.'
                 workstationId:
                   type: string
                   format: uuid
@@ -1866,6 +2059,13 @@ paths:
       x-ticvai-offline-capable: true
       x-ticvai-conflict-policy: serverWins
       summary: Current session and effective permissions
+      description: '**A session that is not yet usable answers `409 session-pending`** (R8 blocker fix, IDENTITY-C04, lead
+        answer A of 20 October 2026). While a role has not been chosen, a credential change is required, or a second factor
+        is required, there is no `Session` to return (`roleId` and the permissions do not exist yet), so the answer is a `409`
+        problem with `pending`, a list of the steps still to do, in order, from `credentialChange`, `mfa`, `roleSelection`.
+        `Session.roleId` stays required: no schema change. EMP-002''s context panel and POS-000''s background read treat the
+        `409` as "not yet" and render once `selectRole` returns its `Session`. `LoginResponse.session` is present only
+        when no step is pending.'
       responses:
         '200':
           description: Active session
@@ -1873,6 +2073,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Session'
+        '409':
+          description: The session is pending (`session-pending`); `pending` names the steps left.
+          x-ticvai-problem-types: [session-pending]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/SessionPendingProblem'
         '401':
           $ref: ../shared/common.yaml#/components/responses/Unauthorized
         '429':
@@ -2163,6 +2370,12 @@ paths:
         `primaryRoleId` or to the principal''s permissions ends every live session of the principal at
         once** (decided 28 September, audit R126 (1)): the person signs in again and is resolved afresh.
         A change to `displayName` alone ends nothing.
+
+
+        **It never grants or removes a role** (decided 20 October 2026, Chinmay, R8 blocker cause IDENTITY-C15,
+        option A; CHG-R8SPN-024). A role held at a scope is a grant: `createDelegatedAccess` gives one (role,
+        scope, validity) and `deleteDelegatedAccess` takes one away. CMS-019''s Change access calls those two for
+        the roles it adds and removes, and this operation only for the display name, active flag and validity.
 
         '
       tags:
@@ -2461,6 +2674,11 @@ paths:
       operationId: listDelegatedAccess
       x-ticvai-consumed-by:
         - "P10 PTR-020 Sub-Agent Management"
+      x-ticvai-read-via:
+      - query: tenancy#regionSettingsRecords
+        route: in-process
+        for: 'minorAgeThreshold, for each grant''s overSubjectIsMinor (CHG-R8MIG-009) (r8 gate, CHG-R8GT2-007;
+          check-cross-module-reads XR-FACT)'
       x-ticvai-audience:
       - staff
       - partner
@@ -2511,6 +2729,11 @@ paths:
       operationId: createDelegatedAccess
       x-ticvai-consumed-by:
         - "P10 PTR-020 Sub-Agent Management"
+      x-ticvai-read-via:
+      - query: tenancy#regionSettingsRecords
+        route: in-process
+        for: 'minorAgeThreshold, for the returned grant''s overSubjectIsMinor (CHG-R8MIG-009) (r8 gate, CHG-R8GT2-007;
+          check-cross-module-reads XR-FACT)'
       x-ticvai-audience:
       - staff
       - partner
@@ -2564,8 +2787,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/DelegatedAccess'
         '400':
-          x-ticvai-problem-types: [wildcard-on-allow, scope-outside-own-grants]
-          description: Wildcard on an ALLOW, or scope outside the caller's own grants
+          x-ticvai-problem-types: [wildcard-on-allow, scope-outside-own-grants, validation]
+          description: Wildcard on an ALLOW, or scope outside the caller's own grants, or a grant naming both a
+            permission and a role, or neither (`validation`; ADAM CR-158)
           content:
             application/problem+json:
               schema:
@@ -2721,6 +2945,13 @@ paths:
         - "P01 WEB-016 Login / Register"
         - "P02 GST-010 Booking Confirmation"
         - "P02 GST-042 Simple Registration & OTP"
+      x-ticvai-writes:
+      - table: identity.otp_challenge
+        for: 'the six-digit e-mail code sent with channel email (IDENTITY-C38) (r8 integration, CHG-R8INT-014; check-parameter-columns P-NAMED-TABLE)'
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s two-step, step-up and one-time-code settings (guestTwoStep, stepUpActions, guestOtpMaxAttempts) in platform venue settings, Tenancy''s data (CHG-MOD-001; R8 IDENTITY-C08)'
       x-ticvai-audience:
       - anonymous
       summary: Create a guest account
@@ -2731,9 +2962,25 @@ paths:
         is on `verifyGuestEmail` (decided 17 September 2026; gate moved to checkout by ADR-0045, 18
         September 2026).
 
+        **With `channel` `email` it sends the six-digit code** the approved screens ask for (R8 blocker fix,
+        IDENTITY-C38): an `identity.otp_challenge` row with purpose `emailVerification`, channel `email`, and the venue''s
+        attempt limit, which the guest enters through `verifyGuestEmail` with `mode` `code`. The `GuestSession` returned
+        here is the session the guest continues in; it becomes verified when the code is confirmed, and
+        `linkGuestCheckout` then runs under that same session.
+
+        **The consents given at registration are recorded by Marketing, which owns consent** (20 October 2026, R8
+        blocker cause IDENTITY-C55; CHG-R8SPN-029). Identity stores none of them: in the same transaction as the
+        account it writes `identity.guestRegistered` to the outbox carrying the new `subjectId`, the channel and
+        each `consents[]` item (purpose, granted, noticeVersion), and Marketing''s consumer records one consent per
+        item through its own `recordConsent` rules (source `registration`, idempotent on the event id and purpose).
+        A registration with no `consents` still emits the event, with an empty list. Later changes of mind go
+        through `recordConsent` directly (F56 step 5).
+
         '
       tags:
       - guestAuth
+      x-ticvai-emits:
+      - identity.guestRegistered
       x-ticvai-permission: null
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
@@ -2775,6 +3022,10 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-016 Login / Register"
         - "P02 GST-042 Simple Registration & OTP"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s two-step, step-up and one-time-code settings (guestTwoStep, stepUpActions, guestOtpMaxAttempts) in platform venue settings, Tenancy''s data (CHG-MOD-001; R8 IDENTITY-C08)'
       x-ticvai-audience:
       - anonymous
       summary: Request a one-time code
@@ -2849,6 +3100,10 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-016 Login / Register"
         - "P02 GST-042 Simple Registration & OTP"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s two-step, step-up and one-time-code settings (guestTwoStep, stepUpActions, guestOtpMaxAttempts) in platform venue settings, Tenancy''s data (CHG-MOD-001; R8 IDENTITY-C08)'
       x-ticvai-audience:
       - anonymous
       summary: Verify a one-time code and issue a session
@@ -2918,6 +3173,10 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-016 Login / Register"
         - "P02 GST-042 Simple Registration & OTP"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s two-step, step-up and one-time-code settings (guestTwoStep, stepUpActions, guestOtpMaxAttempts) in platform venue settings, Tenancy''s data (CHG-MOD-001; R8 IDENTITY-C08)'
       x-ticvai-audience:
       - anonymous
       summary: Sign in with an email or mobile and a password
@@ -3017,12 +3276,37 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-016 Login / Register"
         - "P02 GST-042 Simple Registration & OTP"
+      x-ticvai-reads:
+      - table: pii.subject_identity
+        for: 'the provider and provider subject a returning guest is found by (R8 blocker IDENTITY-C54) (r8 gate,
+          CHG-R8GT2-003; check-parameter-columns P-NAMED-TABLE)'
+      x-ticvai-writes:
+      - table: pii.subject_identity
+        for: 'the link of a new provider identity to the account (R8 blocker IDENTITY-C54) (r8 gate, CHG-R8GT2-003)'
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s two-step, step-up and one-time-code settings (guestTwoStep, stepUpActions, guestOtpMaxAttempts) in platform venue settings, Tenancy''s data (CHG-MOD-001; R8 IDENTITY-C08)'
       x-ticvai-audience:
       - anonymous
       summary: Sign in with Apple or Google
-      description: 'Where the provider''s verified email matches an existing account, the identities are
+      description: '**Where the app gets what it needs to start this sign-in** (decided 20 October 2026, Chinmay,
+        R8 blocker cause IDENTITY-C21, option A; CHG-R8SPN-025): white-label''s published tenant config, which the
+        app shell loads before sign-in, carries a read-only `guestSignIn` block with the public values only (Apple
+        and Google client ids; the UAE Pass authorize URL and client id), derived on read from the tenant''s
+        provider rows. The client secret and the audience checks stay here, server-side, in the provider row
+        (`identity.sso_provider.client_secret_ref`). The app mints `state`; this operation checks the redirect URI
+        against the one registered (`DomainReadiness.uaePassRedirect`).
+
+        Where the provider''s verified email matches an existing account, the identities are
         linked rather than a duplicate created. Where it does not, a new account is created — an unverified
         email from a provider is not proof of ownership.
+
+
+        **The link is stored** (R8 blocker IDENTITY-C54, CHG-R8MIG-015): one `pii.subject_identity` row
+        (`SubjectIdentity`) per provider and provider subject (`sub`), unique on the pair, so a returning Apple user
+        whose email is a private-relay address still resolves to the same account. A new account also writes the
+        provider''s email to `pii.subject_contact`.
 
         '
       tags:
@@ -3086,10 +3370,29 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-016 Login / Register"
         - "P02 GST-042 Simple Registration & OTP"
+      x-ticvai-reads:
+      - table: pii.subject_identity
+        for: 'the UAE Pass user id a returning guest is found by (R8 blocker IDENTITY-C54) (r8 gate, CHG-R8GT2-003;
+          check-parameter-columns P-NAMED-TABLE)'
+      x-ticvai-writes:
+      - table: pii.subject_identity
+        for: 'the uaePass identity row of a new link (R8 blocker IDENTITY-C54) (r8 gate, CHG-R8GT2-003)'
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s two-step, step-up and one-time-code settings (guestTwoStep, stepUpActions, guestOtpMaxAttempts) in platform venue settings, Tenancy''s data (CHG-MOD-001; R8 IDENTITY-C08)'
       x-ticvai-audience:
       - anonymous
       summary: Sign in with a national identity provider
-      description: 'OAuth authorisation-code exchange. Returns a verified identity, so an account created
+      description: '**Where the app gets what it needs to start this sign-in** (decided 20 October 2026, Chinmay,
+        R8 blocker cause IDENTITY-C21, option A; CHG-R8SPN-025): white-label''s published tenant config, which the
+        app shell loads before sign-in, carries a read-only `guestSignIn` block with the public values only (Apple
+        and Google client ids; the UAE Pass authorize URL and client id), derived on read from the tenant''s
+        provider rows. The client secret and the audience checks stay here, server-side, in the provider row
+        (`identity.sso_provider.client_secret_ref`). The app mints `state`; this operation checks the redirect URI
+        against the one registered (`DomainReadiness.uaePassRedirect`).
+
+        OAuth authorisation-code exchange. Returns a verified identity, so an account created
         this way needs no further verification.
 
         Government onboarding has lead time and should be started before it becomes the critical path.
@@ -3101,6 +3404,12 @@ paths:
         client owns. A UAE Pass identity counts as ID-verified (`IdentityGuestVerificationPolicy.uaePassSatisfiesIdDocument`);
         the ICP check is a document verification, not a sign-in (`IdentityGuestVerificationPolicy.verificationProvider`
         `icp`). Each venue''s own redirect URI is part of its domain setup (white-label `CustomDomain`; DEC-547).
+
+
+        **What it stores** (R8 blocker IDENTITY-C54, CHG-R8MIG-015): a `pii.subject_identity` row (`provider`
+        `uaePass`, the UAE Pass user id as `providerSubject`), and on a new account a `pii.subject_document` of kind
+        `emiratesId` with the number from the UAE Pass identity-number claim (the claim''s name to be confirmed with the
+        client''s UAE Pass sandbox).
 
         '
       tags:
@@ -3159,6 +3468,10 @@ paths:
         - "P01 WEB-016 Login / Register"
         - "P02 GST-042 Simple Registration & OTP"
         - "P02 GST-073 Security & Sign-in"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s two-step, step-up and one-time-code settings (guestTwoStep, stepUpActions, guestOtpMaxAttempts) in platform venue settings, Tenancy''s data (CHG-MOD-001; R8 IDENTITY-C08)'
       x-ticvai-audience:
       - guest
       x-ticvai-read-routing: primary
@@ -3304,6 +3617,11 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-024 Devices, Wishlist & Consent"
         - "P02 GST-066 Privacy & My Data"
+      # The erasure job calls ai.eraseSubject after the tombstone, which keeps the AI erasure owed until a call answers
+      # zero left. Block A builds eraseSubject (the lead, 20 October 2026; CHG-R8ERA-001), so the call is back
+      # (CHG-R8ERA-002), replacing CHG-R8RES-003's catch-up from a later release.
+      x-ticvai-calls:
+      - ai.eraseSubject
       x-ticvai-singleton: true
       x-ticvai-singleton-note: 'The caller''s own account: one per signed-in guest, so there is no key in the path.'
       x-ticvai-audience:
@@ -3341,6 +3659,19 @@ paths:
         `GuestSession.guestLinkId` is set; ADR-0010) does it also call cross-region `createDsarRequest`
         (`kind: erasure`, `serviceAuth`), which raises the cross-cell sync.dsar_request and fans out. A
         guest who never transacted across regions has no link (cross-region.yaml) and raises no DSAR record.
+
+
+        **The same job erases the guest's AI index, and the tombstone keeps it owed until it is done**
+        (CHG-R8ERA-002, which replaces the later-release catch-up of CHG-R8RES-003; ADR-0047, ADR-0049). After it
+        tombstones the guest, the job calls `ai.eraseSubject` for the subject (cell-internal, `serviceAuth`), which
+        deletes the guest's index rows and search points and answers with the counts removed and left. The AI
+        erasure is done when a call answers `rowsLeft` 0 and `pointsLeft` 0. Until then the tombstone (`is_erased`,
+        `erased_at`, `erasure_request_id`) is the record that it is owed: a failed call (`502
+        provider-connection-failed`, no answer, or anything left) undoes nothing, and **the retry** is the job's
+        own: it calls `eraseSubject` again for that subject with backoff, and its daily sweep calls it for every
+        tombstoned subject, so a retry lost with a stopped job is made by the next sweep. `eraseSubject` answers
+        zeros for a subject with nothing left, so a retry or a sweep only repeats what is safe. Neither this
+        request nor its `202` waits for the AI erasure.
 
       x-ticvai-read-via:
       - query: access#liveEntitlementsForSubject
@@ -3463,6 +3794,12 @@ paths:
         UAE Pass, each returning a `GuestSession`; this flow maps groups to roles and returns a staff
         session, which a guest surface cannot use.
 
+
+        **The pending sign-in is kept in Redis** (R8 blocker IDENTITY-C58, CHG-R8MIG-015): `cache:sso-state:<state>`
+        holds the provider id, the nonce, the PKCE verifier, the redirect URI and the workstation, for as long as
+        `expiresAt`; `completeSsoAuthorization` takes it once and deletes it. A `redirectUri` that is not on the
+        provider''s `allowedRedirectUris` is refused 400.
+
         '
       tags:
       - sso
@@ -3509,6 +3846,21 @@ paths:
         - "P09 ADM-001 Platform Login / MFA"
         - "P10 PTR-001 Partner Login / MFA"
         - "P12 SUP-001 Venue Management Sign In"
+      x-ticvai-reads:
+      - table: identity.principal_external_identity
+        for: 'the IdP user (sub or SAML NameID) looked up for this provider (R8 blockers IDENTITY-C57, C58) (r8 gate,
+          CHG-R8GT2-003; check-parameter-columns P-NAMED-TABLE)'
+      x-ticvai-writes:
+      - table: identity.principal_external_identity
+        for: 'the link of an auto-provisioned principal to its IdP user (R8 blockers IDENTITY-C57, C58) (r8 gate,
+          CHG-R8GT2-003)'
+      x-ticvai-read-via:
+      - query: tenancy#workstationRecords
+        route: in-process
+        for: 'its read of platform.workstation, Tenancy''s data (CHG-MOD-001; R8 IDENTITY-C10)'
+      - query: tenancy#regionSettingsRecords
+        route: in-process
+        for: 'its read of the region''s settings, Tenancy''s data (CHG-MOD-001; R8 IDENTITY-C10)'
       x-ticvai-audience:
       - anonymous
       summary: Exchange an SSO code for a session
@@ -3517,6 +3869,16 @@ paths:
         way to mint access nobody configured.
 
         **Staff and partner sign-in only; guests never use SSO** (decided 28 September, audit R167).
+
+
+        **The state, and who the IdP user is here** (R8 blockers IDENTITY-C57 and IDENTITY-C58, CHG-R8MIG-015). The
+        callback takes the pending sign-in from `cache:sso-state:<state>` once; an unknown, expired or already used
+        state is 401 `sso-state-invalid` (the sign-in page says the link has expired), and the redirect URI used is
+        the stored one, whatever the body sends. The IdP user (`sub`, or the SAML NameID) is looked up in
+        `identity.principal_external_identity` (`PrincipalExternalIdentity`) for this provider. No match: with
+        `autoProvisionPrincipals` a principal is created (username, display name, home scope and primary role from
+        the provider''s claim mapping and `groupMappings`) and linked; without it, 403 `sso-principal-not-provisioned`.
+        A match whose principal is inactive is 403 `forbidden`.
 
         '
       tags:
@@ -3556,17 +3918,41 @@ paths:
               schema:
                 $ref: '#/components/schemas/LoginResponse'
         '401':
-          $ref: ../shared/common.yaml#/components/responses/Unauthorized
-        '403':
-          x-ticvai-problem-types: [sso-group-not-mapped]
-          description: 'Authenticated, but no group maps to a role in this tenant. The provider proved
-            who they are; it did not grant them anything.
+          x-ticvai-problem-types: [sso-state-invalid]
+          description: 'The `state` is unknown, already used or expired (`sso-state-invalid`; R8 blocker IDENTITY-C58,
+            CHG-R8MIG-015; r8 integration, CHG-R8INT-024): the sign-in page says the link has expired and starts
+            again. Not `unauthenticated`: this door takes no session.
 
             '
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '403':
+          x-ticvai-problem-types: [sso-group-not-mapped, sso-principal-not-provisioned, forbidden]
+          description: 'Authenticated, but no group maps to a role in this tenant (`sso-group-not-mapped`). The
+            provider proved who they are; it did not grant them anything. Or no principal is linked to the
+            provider''s subject and the provider is not set to provision one (`sso-principal-not-provisioned`; R8
+            blocker IDENTITY-C57, CHG-R8MIG-015, CHG-R8INT-024). A linked principal that is inactive is
+            `forbidden`.
+
+            '
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '409':
+          x-ticvai-problem-types: [session-active-elsewhere, workstation-in-use]
+          description: '**Refused exactly as `login` refuses** (decided 20 October 2026, Chinmay, R8 blocker cause
+            IDENTITY-C24, option A; CHG-R8SPN-025; ADR-0004, audit R184): the principal the provider proved already
+            holds an active session on another device (`session-active-elsewhere`), or the handheld or till is in
+            use by somebody else (`workstation-in-use`). Signing in through a provider never ends the other session;
+            a supervisor ends it with `forceLogout`. The answer says since when and on what (`SessionHeldProblem`:
+            `openedAt` and `deviceLabel`; ADAM CR-170).'
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/SessionHeldProblem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /tenants/sso-config:
@@ -3651,6 +4037,10 @@ paths:
         - "P06 EMP-042 Profile"
         - "P08 ADM-342 Authentication & MFA Policy Manager"
         - "P09 ADM-699 My Account & Security"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s two-step, step-up and one-time-code settings (guestTwoStep, stepUpActions, guestOtpMaxAttempts) in platform venue settings, Tenancy''s data (CHG-MOD-001; R8 IDENTITY-C08)'
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -3688,6 +4078,15 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/MfaMethod'
+        '403':
+          description: A guest caller while no venue of the tenant has guest two-step verification on
+            (rev 3 GAP-B1, per venue). For `listMfaMethods` it is also the signal GST-073 hides its security section on.
+          x-ticvai-problem-types:
+          - guest-two-step-disabled
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
@@ -3699,6 +4098,10 @@ paths:
         - "P09 ADM-699 My Account & Security"
         - "P10 PTR-001 Partner Login / MFA"
         - "P12 SUP-001 Venue Management Sign In"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s two-step, step-up and one-time-code settings (guestTwoStep, stepUpActions, guestOtpMaxAttempts) in platform venue settings, Tenancy''s data (CHG-MOD-001; R8 IDENTITY-C08)'
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -3804,6 +4207,10 @@ paths:
         - "P09 ADM-699 My Account & Security"
         - "P10 PTR-001 Partner Login / MFA"
         - "P12 SUP-001 Venue Management Sign In"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s two-step, step-up and one-time-code settings (guestTwoStep, stepUpActions, guestOtpMaxAttempts) in platform venue settings, Tenancy''s data (CHG-MOD-001; R8 IDENTITY-C08)'
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -3872,6 +4279,10 @@ paths:
       x-ticvai-consumed-by:
         - "P06 EMP-042 Profile"
         - "P09 ADM-699 My Account & Security"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s two-step, step-up and one-time-code settings (guestTwoStep, stepUpActions, guestOtpMaxAttempts) in platform venue settings, Tenancy''s data (CHG-MOD-001; R8 IDENTITY-C08)'
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -3913,6 +4324,15 @@ paths:
             X-Consistency-Token:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Removed
+        '403':
+          description: A guest caller while no venue of the tenant has guest two-step verification on
+            (rev 3 GAP-B1, per venue). For `listMfaMethods` it is also the signal GST-073 hides its security section on.
+          x-ticvai-problem-types:
+          - guest-two-step-disabled
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
           x-ticvai-problem-types: [last-required-mfa-method]
           description: Last remaining method of a principal who holds a permission that requires MFA
@@ -3941,12 +4361,17 @@ paths:
         - "P08 PTR-036 Credit Limit & Exposure Management"
         - "P08 PTR-048 Commission Calculation & Settlement Management"
         - "P09 ADM-001 Platform Login / MFA"
+        - "P09 ADM-018 Interface Languages"
         - "P09 ADM-699 My Account & Security"
         - "P09 ADM-700 Configuration Promotion"
         - "P10 PTR-001 Partner Login / MFA"
         - "P10 PTR-030 Partner Approval, Status & Lifecycle Management"
         - "P10 PTR-040 Booking Limits, Commercial Exceptions & Approval"
         - "P12 SUP-001 Venue Management Sign In"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s two-step, step-up and one-time-code settings (guestTwoStep, stepUpActions, guestOtpMaxAttempts) in platform venue settings, Tenancy''s data (CHG-MOD-001; R8 IDENTITY-C08)'
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -4038,8 +4463,49 @@ paths:
                   expiresAt:
                     type: string
                     format: date-time
+        '403':
+          description: A guest caller while no venue of the tenant has guest two-step verification on
+            (rev 3 GAP-B1, per venue). For `listMfaMethods` it is also the signal GST-073 hides its security section on.
+          x-ticvai-problem-types:
+          - guest-two-step-disabled
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '409':
+          description: A guest who signed in with an email code asks for `emailOtp` as the second factor, because the same inbox
+            twice is one factor (R8 blocker fix, IDENTITY-C18).
+          x-ticvai-problem-types:
+          - email-otp-not-second-factor
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '422':
+          description: The `methodId` names a method that is pending or inactive, or the principal has no active method
+            to challenge.
+          x-ticvai-problem-types:
+          - mfa-method-not-usable
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
-          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+          description: '**Step-up is locked** (audit R126 (6)): five wrong codes voided a challenge, and no new one is issued to
+            this principal until `voidedAt` plus `PasswordPolicy.lockoutMinutes`. `Retry-After` says how long. Also the
+            shared rate limit.
+
+            '
+          x-ticvai-problem-types:
+          - rate-limited
+          - step-up-locked
+          headers:
+            Retry-After:
+              $ref: '../shared/common.yaml#/components/headers/RetryAfter'
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
   /auth/mfa/challenge/{challengeId}/verify:
     parameters:
     - name: challengeId
@@ -4064,6 +4530,7 @@ paths:
         - "P08 PTR-036 Credit Limit & Exposure Management"
         - "P08 PTR-048 Commission Calculation & Settlement Management"
         - "P09 ADM-001 Platform Login / MFA"
+        - "P09 ADM-018 Interface Languages"
         - "P09 ADM-699 My Account & Security"
         - "P09 ADM-700 Configuration Promotion"
         - "P10 PTR-001 Partner Login / MFA"
@@ -4154,7 +4621,16 @@ paths:
                     allOf:
                     - $ref: '#/components/schemas/Session'
         '401':
-          $ref: ../shared/common.yaml#/components/responses/Unauthorized
+          description: 'Missing, expired or superseded session (`unauthenticated`, `session-superseded`), as the
+            shared answer says. **It does not carry `attemptsRemaining`**: a missing or expired challenge session is
+            not a wrong credential, and no code is checked without it (the lead, 20 October 2026, CHG-R8DEC-001). The
+            count is on the `422` of a wrong code (ADAM CR-170, option D) and on `login`''s wrong-credentials 401.'
+          x-ticvai-problem-types:
+          - unauthenticated
+          - session-superseded
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
         '410':
           description: The challenge has expired or was voided (by a fifth wrong code, or a newer challenge for the
             same purpose). Ask for a new one (CHG-R1S-025; the r1 gate).
@@ -4164,12 +4640,12 @@ paths:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
         '422':
           description: 'A wrong code, attempts one to four (CHG-R1S-025; the r1 gate found only the fifth failure
-            specified). The problem''s detail says how many attempts remain; the fifth wrong code is the `429`
-            below.'
+            specified). The problem''s detail says how many attempts remain, and **`attemptsRemaining` carries the
+            number** (ADAM CR-170, CHG-CRA-009); the fifth wrong code is the `429` below.'
           x-ticvai-problem-types: [mfa-code-invalid]
           content:
             application/problem+json:
-              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+              schema: { $ref: '#/components/schemas/MfaCodeInvalidProblem' }
         '409':
           description: 'The challenge was already completed; a challenge is single-use, so ask for a new one. Nothing changes.'
           x-ticvai-problem-types: [mfa-challenge-already-verified]
@@ -4221,7 +4697,7 @@ paths:
 
         **Ordered by `startedAt` descending, `sessionId` as the tiebreak** (decided 14 October 2026, ADAM
         CR-077; CHG-IDR-002): the session that began last is first, which on a till is the one somebody is
-        asking about.
+        asking about. **Only `active` sessions unless `status` asks for another** (CHG-R8MIG-015).
 
         '
       tags:
@@ -4229,6 +4705,9 @@ paths:
       x-ticvai-permission: SESSION_FORCE_LOGOUT
       x-ticvai-step-up: pin
       x-ticvai-read-via:
+      - query: tenancy#workstationRecords
+        route: in-process
+        for: 'its read of platform.workstation, Tenancy''s data (CHG-MOD-001; R8 IDENTITY-C10)'
       - query: identity#verifySupervisorStepUp
         route: in-process
         for: 'the PIN step-up in the X-Supervisor-Principal-Id and X-Supervisor-Pin headers is checked by Identity, never by reading identity.* here (CHG-CRD-004, ADAM CR-078); same deployable (commerce): the C# query interface Identity implements, in the caller''s transaction (ADR-0055 rule 2)'
@@ -4250,6 +4729,15 @@ paths:
         schema:
           type: string
           format: uuid
+      - name: X-Supervisor-Username
+        in: header
+        required: false
+        description: With no session (POS-000), the supervisor's employee number, **instead of** `X-Supervisor-Principal-Id`
+          (exactly one of the two; R8 blocker fix, IDENTITY-C44). Resolved as `SupervisorStepUp.supervisorUsername` is. Ignored
+          with a session.
+        schema:
+          type: string
+          maxLength: 200
       - name: X-Supervisor-Pin
         in: header
         required: false
@@ -4281,6 +4769,13 @@ paths:
         schema:
           type: string
           format: uuid
+      - name: status
+        in: query
+        description: '**Which sessions come back** (R8 blocker IDENTITY-C46, CHG-R8MIG-015): `active` when absent, the live
+          holder BO-053 and POS-000 ask about; another value returns the ended sessions of that status, kept with who
+          ended them and why.'
+        schema:
+          $ref: '#/components/schemas/SessionStatus'
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
       responses:
@@ -5289,6 +5784,13 @@ paths:
 
         Requires step-up: the operator holds `PLATFORM_*` permissions, which require MFA (audit R135).
 
+        **How the cell admits the operator here and in `listOwnPlatformStaffGrants`** (R8 blocker IDENTITY-C20,
+        CHG-R8MIG-006; the lead''s answer, option A). The operator is not a principal of this tenant: the cell
+        validates the Control Plane token, takes its subject as `operatorPrincipalId` (a plain uuid, no foreign
+        key) and reads the MFA step-up from the token''s `amr` claim, never from a tenant session. The transaction
+        runs with `ticvai.scope_paths` set to the tenant root and the operator as the audited actor
+        (`AuditRecord.platformStaffGrantId` once the grant exists).
+
         '
       tags:
       - administration
@@ -5299,9 +5801,10 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       x-ticvai-step-up: mfa
-      x-ticvai-step-up-carrier: session   # the MFA step-up verified on the caller's session (CHG-RUL-020)
+      x-ticvai-step-up-carrier: session   # the MFA step-up on the caller's Control Plane token, its amr claim (CHG-R8MIG-006)
       x-ticvai-step-up-reason: Opens a platform operator's access into a tenant's data.
       parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/TenantId
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -5492,6 +5995,7 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/TenantId
       - name: activeOnly
         in: query
         description: True returns only grants whose window is open now.
@@ -6063,8 +6567,9 @@ paths:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
-          x-ticvai-problem-types: [identity-document-expired, document-kind-not-accepted]
-          description: The document has expired, or its kind is not accepted by the tenant's policy
+          x-ticvai-problem-types: [identity-document-expired, document-kind-not-accepted, selfie-required]
+          description: The document has expired, or its kind is not accepted by the tenant's policy, or the policy
+            asks for a selfie and none was sent (`selfie-required`, CHG-R8MIG-027)
           content:
             application/problem+json:
               schema:
@@ -6881,6 +7386,149 @@ paths:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: ../shared/common.yaml#/components/responses/TooManyRequests
+  /auth/session/venue:
+    get:
+      operationId: getSessionVenue
+      x-ticvai-read-via:
+      - query: tenancy#activeVenues
+        route: service
+        for: 'the names of the venues the session may act at, and that each is active: platform.scope, Tenancy''s data'
+      x-ticvai-self-service: true
+      x-ticvai-audience:
+      - staff
+      tags:
+      - identity
+      x-ticvai-read-routing: primary
+      security:
+      - bearerAuth: []
+      x-ticvai-self-scoped: principal
+      x-ticvai-permission: null
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      summary: Which venue this back-office session is working in, and which it may switch to
+      description: >-
+        **The back office shows which venue you are in** (16 October 2026 minutes, 4.8: Allam noted there is nowhere
+        on screen to see which venue the user is working in; CHG-R8PRD-006). This is the session's **working venue**:
+        the venue the back office shows and works in.
+
+        **Where it comes from.** A till or handheld session acts at its workstation's venue; a session whose
+        selected role is granted at one venue works in that venue; both are fixed (`fixedBy`). A session whose grants reach several venues, such as one administrator for
+        every venue of the tenant (4.8: both models must be supported), acts at the venue last chosen with
+        `setSessionVenue`, or at none until one is chosen; `availableVenues` lists the venues it may choose,
+        those of `Session.scope` at venue level and every active venue under a wider scope node, in name order.
+
+        **Which operations use it** (CHG-R8PRD-010, CHG-R8PRD-011): exactly seven, each by its own text, as the venue they act at when
+        no `venueId` is sent: catalogue `listProductTags`, `setProductTagDefinition`, `listProductCategoryUsage`,
+        `listOwnerFormCandidates`, `listSalePermissionTargets`, `getProductDashboard` and `listProductAttentionItems`.
+        Every other operation resolves the caller's venue as before; the back office sends the working venue as their
+        `venueId` where they take one. How it reaches those seven is said once, in `setSessionVenue`.
+        It is kept in a column of its own (`identity.session.working_venue_id`), not in `venue_id`, so
+        `ActiveSession.venueId` and what `listActiveSessions` and `forceLogout` reach keep their meaning.
+
+        A session that is not yet usable answers `409 session-pending`, as `getCurrentSession` does.
+      responses:
+        '200':
+          description: The session's venue
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionVenue'
+        '401':
+          $ref: ../shared/common.yaml#/components/responses/Unauthorized
+        '409':
+          description: The session is pending (`session-pending`); `pending` names the steps left.
+          x-ticvai-problem-types:
+          - session-pending
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/SessionPendingProblem'
+        '429':
+          $ref: ../shared/common.yaml#/components/responses/TooManyRequests
+    put:
+      operationId: setSessionVenue
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per session, the caller''s own: a PUT replaces it. There is no key in the path.'
+      x-ticvai-read-via:
+      - query: tenancy#activeVenues
+        route: service
+        for: 'the chosen venue must be an active venue the session''s grants reach: platform.scope, Tenancy''s data'
+      x-ticvai-self-service: true
+      x-ticvai-audience:
+      - staff
+      tags:
+      - identity
+      security:
+      - bearerAuth: []
+      x-ticvai-self-scoped: principal
+      x-ticvai-permission: null
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      summary: Switch the back-office session to another venue it may act at
+      description: >-
+        **The venue switcher of the back office's top bar** (CHG-R8PRD-006). Sets the session's working venue, kept
+        on the session (`identity.session.working_venue_id`) until it ends or is switched again. It changes no grant: what the
+        caller may do at the new venue is what `Session.permissionsByScope` already says for it, so the back office
+        filters its navigation again after the switch.
+
+        **How it travels: with the caller's session, as the session's scope does** (ADR-0004; permission-resolution R7;
+        `bearerAuth`). The access token carries `sid`, and every service validates that `sid` per request against the
+        session registry, the cache in front of `identity.session` that already carries the session's resolved scope
+        and workstation. This operation writes the new working venue to the session row and to its registry entry in
+        one step, so the very next request made with the same token carries it; no token is reissued. A service that
+        falls back to it (the seven operations `getSessionVenue` lists) reads it from the caller's validated session,
+        as it reads the caller's scope, never from `identity.session` through a query. **Sign-in writes it too**
+        (CHG-R8PRD-012): when the session has exactly one venue, fixed by its workstation or the only venue its grants
+        reach, sign-in (and role selection) writes that venue into `working_venue_id` and the registry entry, so a
+        session that cannot call this operation (`409 venue-fixed`) still carries its venue.
+
+        **Refused** when the venue is not one of `availableVenues`, that is not an active venue the session's grants
+        reach (`403 venue-not-in-grants`), when the session's venue is fixed by its workstation or its role
+        (`409 venue-fixed`), and while the session is pending (`409 session-pending`). **Audited:** a switch changes
+        the security context the screens show, so it writes one entry to the security audit log that `listAuditRecords`
+        reads (the session, the venue before and after).
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SetSessionVenueRequest'
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Switched
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionVenue'
+        '401':
+          $ref: ../shared/common.yaml#/components/responses/Unauthorized
+        '403':
+          description: The venue is not one the session's grants reach, or not active (`venue-not-in-grants`).
+          x-ticvai-problem-types:
+          - venue-not-in-grants
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '409':
+          description: The session's venue is fixed by its workstation or its role (`venue-fixed`), or the session is
+            pending (`session-pending`).
+          x-ticvai-problem-types:
+          - venue-fixed
+          - session-pending
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: ../shared/common.yaml#/components/responses/TooManyRequests
 components:
   securitySchemes:
     bearerAuth:
@@ -6917,10 +7565,17 @@ components:
       required:
       - deviceConsentId
       - capturedAt
+      - scopePath
       properties:
         deviceConsentId:
           type: string
           format: uuid
+        scopePath:
+          type: string
+          description: '**The decision''s scope path** (R8 blocker fix, IDENTITY-C02; `pii.consent_identifier.scope_path`
+            is NOT NULL and under row-level security). Sent by `marketing-crm.recordDeviceConsent`, which holds it as
+            `marketing.device_consent.scope_path`; Identity may not read that table across deployables and so takes it
+            from the caller, refusing a path outside the caller''s scope.'
         ipAddress:
           type: string
           maxLength: 45
@@ -7457,13 +8112,16 @@ components:
         documentAssetId:
           type: string
           format: uuid
-          description: The uploaded scan or photo of the document.
+          description: The uploaded scan or photo of the document. **A guest makes it** with assets
+            `createGuestUpload` and `completeGuestUpload` (purpose `identityDocument`); this is the completed upload's
+            `uploadId`, which must be the caller's own (R8 blocker IDENTITY-C66, CHG-R8MIG-027).
         selfieAssetId:
           type: string
           format: uuid
           nullable: true
           description: A live photo for the reviewer to compare, where the policy asks for one. Deleted with the
-            scan.
+            scan. The caller's own completed guest upload with purpose `selfie`; required when the policy's
+            `selfieRequired` is true (422 `selfie-required`).
         reason:
           type: string
           enum:
@@ -7559,6 +8217,15 @@ components:
           nullable: true
           readOnly: true
           description: When the scan (and any selfie) was deleted under the policy's retention.
+        selfieUploadId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          x-ticvai-references: none
+          description: '**The selfie sent with the document** (R8 blocker IDENTITY-C66, CHG-R8MIG-027): the
+            `assets.guest_upload` id of the request''s `selfieAssetId`, kept for the reviewer and deleted with the scan
+            (`documentImageDeletedAt`, then null). Null when none was sent.'
     IdentityGuestVerificationPolicy:
       type: object
       x-ticvai-persistence: identity.guest_verification_policy
@@ -8203,6 +8870,10 @@ components:
       # One current credential per principal and method; the replaced ones are the history rows (CHG-CRD-001).
       x-ticvai-unique-together:
       - [principalId, method]
+      # The principal's own rows, a grant over the principal's home scope, and the tenant root (R8 blocker IDENTITY-C37,
+      # CHG-R8MIG-007): changeOwnCredential and the failed-attempt count run as the principal, at any venue;
+      # createPrincipal and resetPrincipalCredential run at the venue the principal is homed in.
+      x-ticvai-rls: own-or-home-scope
       type: object
       description: '**A staff or partner principal''s password or PIN, as stored** (14 October 2026, CHG-CRD-001, ADAM
         CR-078). `identity.principal_credential` held only `id` and a nullable `principal_id`, so `createPrincipal`,
@@ -8281,13 +8952,27 @@ components:
         `action`); `verifyMfaChallenge` reads it, counts wrong codes in `failedAttempts`, voids it at the fifth (audit
         R126 (6)), and on success sets `verifiedAt`; the operation that consumes the step-up sets `consumedAt`, so it is
         single-use (CHG-RUL-020). **Step-up is locked** for `PasswordPolicy.lockoutMinutes` after `voidedAt` of a
-        challenge voided by the fifth wrong code; no column more is needed. A guest''s challenge (rev 3 GAP-B1) has no
-        principal and is not stored here yet: guest second factors are not modelled in storage (`identity.mfa_method`
-        has no subject either).'
-      required: [principalId, action, status, expiresAt, failedAttempts]
+        challenge voided by the fifth wrong code; no column more is needed. **A guest''s challenge is stored here too**
+        (rev 3 GAP-B1; R8 blocker IDENTITY-C12, CHG-R8MIG-007): exactly one of `principalId` and `subjectId` is set,
+        and the row is its owner''s alone (`x-ticvai-rls: own-row`). **An enrolment''s code** (`smsOtp`, `emailOtp`) is a
+        challenge with `action` `enrol` and the pending `methodId`, so `identity.mfa_method` holds no code (IDENTITY-C34).'
+      x-ticvai-exactly-one-of: [[principalId, subjectId]]
+      x-ticvai-rls: own-row
+      required: [action, status, expiresAt, failedAttempts]
       properties:
         id: { type: string, format: uuid, readOnly: true, description: 'The `challengeId` the client verifies.' }
-        principalId: { type: string, format: uuid }
+        principalId:
+          type: string
+          format: uuid
+          nullable: true
+          x-ticvai-references: identity.principal
+          description: The staff or partner principal challenged; null for a guest.
+        subjectId:
+          type: string
+          format: uuid
+          nullable: true
+          x-ticvai-references: pii.subject
+          description: The guest challenged (`pii.subject`); null for a principal.
         methodId:
           type: string
           format: uuid
@@ -8306,8 +8991,9 @@ components:
           type: string
           writeOnly: true
           nullable: true
-          description: The PHC hash (ADR-0071) of a code the server sent (`emailOtp`); null for an authenticator
-            (`totp`), whose code is computed, never sent.
+          description: The PHC hash (ADR-0071) of a code the server sent (`smsOtp`, `emailOtp`, and the code of an
+            `enrol` challenge); null for an authenticator (`totp`), whose code is computed from the method's stored
+            `MfaMethod.secret`, never sent.
         status:
           type: string
           enum: [pending, verified, consumed, voided, expired]
@@ -8330,10 +9016,24 @@ components:
       description: '**One single-use recovery code, as stored** (14 October 2026, CHG-CRD-005, ADAM CR-078). Never
         returned after enrolment: `enrolMfaMethod` returns the codes once (`MfaEnrolment.recoveryCodes`) and writes
         their hashes here, replacing any earlier set; `verifyMfaChallenge` accepts one in place of a code, and sets its
-        `usedAt`. A code that can be re-read is a second password (`handoff/schema-storage-only.md`).'
-      required: [principalId, codeHash, issuedAt]
+        `usedAt`. A code that can be re-read is a second password (`handoff/schema-storage-only.md`). A guest''s codes
+        are stored the same way, against `subjectId` (R8 blocker IDENTITY-C12, CHG-R8MIG-007).'
+      x-ticvai-exactly-one-of: [[principalId, subjectId]]
+      x-ticvai-rls: own-row
+      required: [codeHash, issuedAt]
       properties:
-        principalId: { type: string, format: uuid }
+        principalId:
+          type: string
+          format: uuid
+          nullable: true
+          x-ticvai-references: identity.principal
+          description: The principal whose code this is; null for a guest.
+        subjectId:
+          type: string
+          format: uuid
+          nullable: true
+          x-ticvai-references: pii.subject
+          description: The guest whose code this is; null for a principal.
         codeHash:
           type: string
           writeOnly: true
@@ -8430,6 +9130,53 @@ components:
           format: date-time
           nullable: true
           description: When the supervisor's PIN unlocks, where `refusal` is `credentialLocked`.
+    OpenShiftMarker:
+      x-ticvai-persistence: identity.open_shift_marker
+      # Keyed on the shift; read by principal and workstation (storage-core request 2 at the merge, CHG-R8MIG-014).
+      # No enforced foreign key on any of its three ids: Identity's event consumers write it (CHG-R8INT-022).
+      x-ticvai-primary-key: [shiftId]
+      x-ticvai-index: [[principalId, workstationId]]
+      type: object
+      description: >-
+        **Which shifts are open, as Identity knows it** (decided 20 October 2026, Chinmay, R8 blocker cause
+        IDENTITY-C51, option A; CHG-R8SPN-036). A projection Identity keeps so `ActiveSession.hasOpenShift` can be
+        answered without reading Orders' `orders.pos_shift` (Identity is Foundation and reads nothing above it,
+        ADR-0028). **Never returned by any operation**, like `SubjectHolding`. No operation writes it; Identity's
+        consumers do: `shift.opened` inserts the row (when a shift opens, in any state before `closed`), and
+        `shift.closed` deletes it (a shift that ends `autoClosed` is closed by the same event). Idempotent on
+        `shiftId`. A lagging consumer can only show a shift as open a moment longer, which errs on the side of
+        warning before a session is revoked.
+      required: [shiftId, principalId, workstationId, openedAt]
+      properties:
+        shiftId:
+          type: string
+          format: uuid
+          x-ticvai-references: none
+          description: The shift (`orders.pos_shift.id`, carried by the event); the row's key; not a foreign key, since
+            Identity does not depend on Orders' table (ADR-0028).
+        principalId:
+          type: string
+          format: uuid
+          x-ticvai-references: none
+          description: The principal whose shift it is (`identity.principal.id`, carried by the event). Not an enforced
+            foreign key, since event consumers write this table and must never fail on a missing principal row (r8
+            integration, CHG-R8INT-022).
+        workstationId:
+          type: string
+          format: uuid
+          x-ticvai-references: none
+          description: The till (`platform.workstation.id`, carried by the event). Not an enforced foreign key, for the
+            same reason (the `shift.opened` consumer must never fail on a missing workstation row; CHG-R8INT-022).
+        venueId:
+          type: string
+          format: uuid
+        openedAt:
+          type: string
+          format: date-time
+        scopePath:
+          type: string
+          readOnly: true
+          description: The partition key (ADR-0005), the venue's path, as the event carries it.
     SubjectHolding:
       x-ticvai-persistence: identity.subject_holding
       # One row per order or entitlement: an entitlement has one holder at a time (CHG-GDL-001).
@@ -8821,11 +9568,14 @@ components:
           type: string
           format: uuid
         operatorPrincipalId:
-          x-ticvai-references: identity.principal
+          x-ticvai-references: none
           type: string
           format: uuid
           readOnly: true
-          description: The platform operator, from the Control Plane token. Set by the server.
+          description: 'The platform operator, from the Control Plane token (its subject). Set by the server. **Not a
+            row in this tenant''s `identity.principal`** (R8 blocker IDENTITY-C20, CHG-R8MIG-006; the lead''s answer,
+            option A): an operator is the Control Plane''s, so this is a plain uuid with no foreign key, and the key
+            V0107 adds is dropped by the next forward migration.'
         operatorDisplayName:
           type: string
           readOnly: true
@@ -8877,7 +9627,8 @@ components:
             '
         identityProviders:
           type: array
-          description: Linked providers. Several may resolve to one account.
+          description: Linked providers. Several may resolve to one account. Read from `pii.subject_identity`
+            (apple, google, uaePass), `identity.guest_credential` (password) and a verified contact (otp) (CHG-R8MIG-015).
           items:
             type: string
             enum:
@@ -9017,6 +9768,18 @@ components:
           default: true
           description: '**The single most effective rule.** Refusing a password known to be breached stops
             more account takeovers than every composition rule combined.
+
+
+            **Where the breach list comes from** (decided 20 October 2026, Chinmay, R8 blocker cause IDENTITY-C06,
+            option B; CHG-R8SPN-019; audit R117). A local corpus file shipped with each release: the SHA-1 hashes of
+            known breached passwords, sorted and indexed by their first five hex characters, held inside the region
+            with the service and never sent anywhere, so no credential hash leaves the region and there is no
+            outage mode. Identity reads it through one adapter, `checkPasswordBreached(passwordSha1Prefix)`, which
+            returns the corpus''s full hashes under that prefix with their counts; the service compares the full
+            hash itself. A match refuses the password `422 policy-not-met` (`changeOwnCredential`, and any
+            other operation that sets a password under this policy). The corpus is refreshed with the release, not at run
+            time. The client may still name a vendor under R117, which would be a second adapter behind the same
+            interface (handoff/integration-register.md row 20).
 
             '
         maxAgeDays:
@@ -9177,6 +9940,31 @@ components:
           - PLATFORM_RELEASE_PROMOTE
           - PLATFORM_MIGRATION_VIEW
           - PLATFORM_MIGRATION_APPLY
+          - PLATFORM_AI_MANAGE
+        accessTokenMinutes:
+          type: integer
+          default: 15
+          minimum: 5
+          maximum: 60
+          description: 'How long a staff access token lives (`TokenPair.expiresIn`). **15 minutes, proposed, client
+            to correct** (decided 20 October 2026, Chinmay, IDENTITY-C25; CHG-R8SPN-014). Staff tokens only; a
+            guest token follows `guestAuth`.'
+        refreshTokenHours:
+          type: integer
+          default: 12
+          minimum: 1
+          maximum: 24
+          description: 'How long a staff refresh token lives without use. Sliding: each refresh issues a new one
+            and retires the old, and a retired one presented again ends the session and revokes its family (see
+            `bearerAuth`). **12 hours, proposed, client to correct** (IDENTITY-C25; CHG-R8SPN-014).'
+        sessionMaxHours:
+          type: integer
+          default: 12
+          minimum: 1
+          maximum: 24
+          description: 'The longest a staff session lives (`Session.expiresAt`). A till session ends sooner, when
+            the shift on its workstation closes. **12 hours, proposed, client to correct** (IDENTITY-C25;
+            CHG-R8SPN-014).'
     SegregationViolation:
       type: object
       x-ticvai-persistence: none — computed from identity.grant against identity.segregation_rule
@@ -9550,7 +10338,9 @@ components:
           pattern: ^[a-z]{2}$
         consents:
           type: array
-          description: Consent captured at registration, recorded with the notice version.
+          description: 'Consent captured at registration, recorded with the notice version. **Recorded by Marketing,
+            not stored here**: `registerGuest` carries the list on `identity.guestRegistered`, and Marketing''s
+            consumer records each item as a consent (IDENTITY-C55, CHG-R8SPN-029).'
           items:
             type: object
             properties:
@@ -9627,6 +10417,72 @@ components:
         scopePath:
           type: string
           description: Scope the mapped role is granted at.
+    SubjectIdentity:
+      type: object
+      x-ticvai-persistence: pii.subject_identity
+      # One account per provider identity (R8 blocker IDENTITY-C54, CHG-R8MIG-015).
+      x-ticvai-unique-together: [[provider, providerSubject]]
+      description: '**An Apple, Google or UAE Pass identity linked to a guest account** (R8 blocker IDENTITY-C54,
+        CHG-R8MIG-015). Written by `guestSocialLogin` and `guestUaePassLogin` when they link or create an account, read
+        by them to find the account again (a private-relay email changes nothing) and by `GuestSession.identityProviders`.
+        Storage only, never returned.'
+      required: [id, subjectId, provider, providerSubject, linkedAt]
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        subjectId:
+          type: string
+          format: uuid
+          x-ticvai-references: pii.subject
+          description: The guest account.
+        provider:
+          type: string
+          enum: [apple, google, uaePass]
+        providerSubject:
+          type: string
+          maxLength: 255
+          x-ticvai-unique-compare: exact
+          description: The provider's own stable id for the user (`sub`; the UAE Pass user id), compared exactly.
+        emailAtLink:
+          type: string
+          maxLength: 320
+          nullable: true
+          description: The email the provider gave when the identity was linked (may be a private relay).
+        linkedAt:
+          type: string
+          format: date-time
+    PrincipalExternalIdentity:
+      type: object
+      x-ticvai-persistence: identity.principal_external_identity
+      # One principal per IdP identity (R8 blocker IDENTITY-C57, CHG-R8MIG-015).
+      x-ticvai-unique-together: [[ssoProviderId, externalSubject]]
+      description: '**Which principal an SSO user is** (R8 blocker IDENTITY-C57, CHG-R8MIG-015). Written by
+        `completeSsoAuthorization` when it provisions or first links a principal, read by it on every sign-in.
+        Storage only, never returned.'
+      required: [id, principalId, ssoProviderId, externalSubject, linkedAt]
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        principalId:
+          type: string
+          format: uuid
+          x-ticvai-references: identity.principal
+        ssoProviderId:
+          type: string
+          format: uuid
+          x-ticvai-references: identity.sso_provider
+        externalSubject:
+          type: string
+          maxLength: 255
+          x-ticvai-unique-compare: exact
+          description: The IdP's `sub` claim, or the SAML NameID, compared exactly.
+        linkedAt:
+          type: string
+          format: date-time
     SsoProviderConfig:
       x-ticvai-persistence: identity.sso_provider
       type: object
@@ -9670,6 +10526,36 @@ components:
           type: boolean
           default: false
           description: Create a principal on first successful sign-in.
+        usernameClaim:
+          type: string
+          maxLength: 100
+          nullable: true
+          description: 'The claim (OIDC) or attribute (SAML) a provisioned principal''s username is taken from; null
+            means `preferred_username`, else the email (R8 blocker IDENTITY-C57, CHG-R8MIG-015).'
+        displayNameClaim:
+          type: string
+          maxLength: 100
+          nullable: true
+          description: The claim a provisioned principal's display name is taken from; null means `name`.
+        groupsClaim:
+          type: string
+          maxLength: 100
+          nullable: true
+          description: The claim that lists the user's groups, matched against `groupMappings`; null means `groups`.
+        defaultHomeScopeId:
+          type: string
+          format: uuid
+          nullable: true
+          x-ticvai-references: platform.scope
+          description: The home scope a provisioned principal gets when its mapped groups name none; null means the
+            scope of the first mapped group.
+        allowedRedirectUris:
+          type: array
+          items:
+            type: string
+            maxLength: 2000
+          description: '**The only redirect URIs a start may name** (R8 blocker IDENTITY-C58, CHG-R8MIG-015):
+            `startSsoAuthorization` refuses 400 a `redirectUri` not on this list.'
         isEnforced:
           type: boolean
           default: false
@@ -9686,6 +10572,16 @@ components:
     MfaMethod:
       x-ticvai-persistence: identity.mfa_method
       type: object
+      description: '**A second factor a principal or a guest has enrolled** (R8 blockers IDENTITY-C12 and IDENTITY-C34,
+        CHG-R8MIG-007). Exactly one of `principalId` and `subjectId` is set, so a guest''s method is stored like a
+        staff member''s and `GuestSession.requiresMfa` and `mfaMethods` are answered from here; the row is its owner''s
+        alone (`x-ticvai-rls: own-row`). Three fields are storage only and never returned
+        (`handoff/schema-storage-only.md`): `secret` (a `totp` shared secret, which `verifyMfaChallenge` computes the
+        code from), `destination` (the full phone number or email an `smsOtp` or `emailOtp` code is sent to;
+        `maskedTarget` is the only form returned) and `pendingExpiresAt` (set while an enrolment awaits
+        `verifyMfaEnrolment`; an expired pending row is deleted by the next `enrolMfaMethod` of its owner).'
+      x-ticvai-exactly-one-of: [[principalId, subjectId]]
+      x-ticvai-rls: own-row
       required:
       - id
       - kind
@@ -9695,6 +10591,42 @@ components:
         id:
           type: string
           format: uuid
+        principalId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          x-ticvai-references: identity.principal
+          x-ticvai-staff-only: Omitted from the response when the caller is a guest (R164; r8 gate residue,
+            CHG-R8RES-008). A guest's own method has it null, so a guest screen never shows it.
+          description: The principal who enrolled it; null for a guest.
+        subjectId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          x-ticvai-references: pii.subject
+          description: The guest who enrolled it; null for a principal.
+        secret:
+          type: string
+          nullable: true
+          writeOnly: true
+          x-ticvai-secret: field-encrypted
+          description: The `totp` shared secret, encrypted with the tenant's field key (ADR-0063); null for other
+            kinds. Never returned after `MfaEnrolment.secret`.
+        destination:
+          type: string
+          nullable: true
+          writeOnly: true
+          x-ticvai-secret: field-encrypted
+          description: The full phone number (`smsOtp`) or email (`emailOtp`) the code goes to, encrypted with the
+            tenant's field key (ADR-0063); null for other kinds. Only `maskedTarget` is ever returned.
+        pendingExpiresAt:
+          type: string
+          format: date-time
+          nullable: true
+          writeOnly: true
+          description: While `isActive` is false, when the unconfirmed enrolment lapses; null once verified.
         kind:
           $ref: '#/components/schemas/MfaKind'
         label:
@@ -9800,6 +10732,12 @@ components:
             rather than an absence.
         sessionId:
           type: string
+          description: '**The session''s `identity.session.id`, written as text, and the key `forceLogout` takes in its
+            path** (R8 blocker fix, IDENTITY-C02). A client lists sessions, picks one and passes this value as `sessionId`;
+            nothing else names a session on the wire. The server opens a session with `session_id` set to its `id` as text,
+            so the stored `session_id` (the token''s `sid`) and the id are one value and a lookup by either finds the row.
+            It stays `type: string` here so a client built at r1 still validates; it is always a uuid, as `Session.sessionId`
+            declares.'
         principalId:
           type: string
           format: uuid
@@ -9807,6 +10745,27 @@ components:
           type: string
           x-ticvai-persisted: false
           description: Read from `identity.principal` with the row.
+        endedAt:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+          description: When the session ended; null while `active` (R8 blocker IDENTITY-C46, CHG-R8MIG-015).
+        endedByPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          x-ticvai-references: identity.principal
+          description: Who ended it (`forceLogout`'s caller or supervisor); null when the principal signed out or it
+            expired.
+        endReason:
+          type: string
+          minLength: 3
+          maxLength: 500
+          nullable: true
+          readOnly: true
+          description: Why it was ended, as `forceLogout` was given it (or `supervisor-takeover` from the till door).
         roleId:
           type: string
           format: uuid
@@ -9839,8 +10798,12 @@ components:
           type: boolean
           x-ticvai-persisted: false
           x-ticvai-derived: onRead
-          description: Revoking this session leaves cash unreconciled. **Computed on read** from the shift the
-            principal holds open at the workstation (`orders.pos_shift`), never stored here.
+          description: 'Revoking this session leaves cash unreconciled. **Computed on read, from Identity''s own
+            projection** (decided 20 October 2026, Chinmay, R8 blocker cause IDENTITY-C51, option A; CHG-R8SPN-036):
+            true when `identity.open_shift_marker` (`OpenShiftMarker`) holds a row for this principal at this
+            session''s workstation. Identity is Foundation and never reads `orders.pos_shift` (ADR-0028), so the
+            marker is fed by Shift''s events, as `identity.subject_holding` is fed by Orders''. BO-053 and POS-000
+            read it here; never stored on the session.'
         mfaSatisfied:
           type: boolean
         startedAt:
@@ -9851,8 +10814,10 @@ components:
           format: date-time
     Principal:
       x-ticvai-persistence: identity.principal
-      # CHG-GEN-005: any staff grant reads principals; writes stay at the tenant root (CR-076).
-      x-ticvai-rls: grant-holder-read
+      # CHG-GEN-005: any staff grant reads principals. Writes: the tenant root (CR-076) or a grant over the principal's
+      # home scope, so a venue manager creates and updates the principals homed in their venue (R8 blocker IDENTITY-C37,
+      # the lead's option A; CHG-R8MIG-007).
+      x-ticvai-rls: home-scope-write
       type: object
       required:
       - id
@@ -10116,6 +11081,16 @@ components:
             '
     DelegatedAccess:
       x-ticvai-persistence: identity.delegated_access
+      # **A grant names exactly one of a permission or a role** (ADAM CR-158, option A, 18 October 2026;
+      # CHG-CRA-002): a table CHECK, `num_nonnulls(permission, role_id) = 1`, NOT VALID then VALIDATE.
+      x-ticvai-exactly-one-of: [[permission, roleId]]
+      # Who granted it: a principal, a guest or the system, and the matching column set (R8 blocker IDENTITY-C42,
+      # CHG-R8MIG-021).
+      # A guest reads the grants it is party to and the account holder writes them (CHG-R8MIG-021; IDENTITY-C48).
+      x-ticvai-rls: scope-or-subject
+      x-ticvai-required-when:
+        grantedByPrincipalId: {grantedByKind: principal}
+        grantedBySubjectId: {grantedByKind: subject}
       type: object
       required:
       - id
@@ -10123,6 +11098,26 @@ components:
       - scopePath
       - effect
       properties:
+        grantedByKind:
+          type: string
+          enum: [principal, subject, system]
+          default: principal
+          readOnly: true
+          description: Who made the grant (CHG-R8MIG-021). `system` is the SSO callback's group-to-role grant.
+        grantedByPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          x-ticvai-references: identity.principal
+          description: The staff member who made the grant; set when `grantedByKind` is `principal`.
+        grantedBySubjectId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          x-ticvai-references: pii.subject
+          description: The guest who made the grant (the account holder); set when `grantedByKind` is `subject`.
         id:
           type: string
           format: uuid
@@ -10134,9 +11129,15 @@ components:
           type: string
           format: uuid
           nullable: true
+          description: 'The role this grant gives, with its own and inherited permissions. **Exactly one of
+            `roleId` and `permission` is set** (ADAM CR-158; CHG-CRA-002): a role grant carries no permission.'
         permission:
           type: string
-          description: From the permission enum. `*` permitted on DENY only.
+          nullable: true
+          description: 'From the permission enum. `*` permitted on DENY only. **Null on a role grant** (ADAM
+            CR-158, 18 October 2026; CHG-CRA-002): a grant names exactly one of a permission or a role (`roleId`),
+            so a role grant stores `role_id` and no permission. Nullable in responses since then, a breaking change
+            approved by the lead (BC-370).'
         subjectId:
           type: string
           format: uuid
@@ -10164,6 +11165,21 @@ components:
             grant written before 18 August means exactly what it meant before.
 
             '
+        overSubjectName:
+          type: string
+          nullable: true
+          readOnly: true
+          x-ticvai-persisted: false
+          description: The display name of the guest acted for (`pii.subject.display_name`), read with the grant;
+            null for a staff grant. Not stored (R8 blocker ORDERS-MONEY-C20, CHG-R8MIG-009).
+        overSubjectIsMinor:
+          type: boolean
+          nullable: true
+          readOnly: true
+          x-ticvai-persisted: false
+          description: Whether the guest acted for is under the region's `RegionSettings.minorAgeThreshold` today,
+            computed from their date of birth, which is never returned; null when no date of birth is held. Not
+            stored (CHG-R8MIG-009).
         overObjectRef:
           type: string
           nullable: true
@@ -10248,10 +11264,15 @@ components:
           format: date-time
     CreateGrantRequest:
       type: object
+      description: '**A grant names exactly one of `permission` and `roleId`** (ADAM CR-158, option A, 18 October
+        2026; CHG-CRA-002): a single permission, or a role with its own and inherited permissions. Both, or neither,
+        is refused 400 `validation`. `*` stays DENY-only.'
       required:
-      - permission
       - scopePath
       - effect
+      oneOf:
+      - required: [permission]
+      - required: [roleId]
       properties:
         principalId:
           type: string
@@ -10295,8 +11316,9 @@ components:
           maxLength: 256
         credential:
           type: string
-          description: 'Password, PIN, card token or RFID token depending on `method`. Compared with the
-            principal''s `PrincipalCredential.credentialHash` and never stored (ADR-0071, CHG-CRD-003).
+          description: 'The password for `password`; the PIN for `pin`, `card` and `rfid`. Compared with the
+            principal''s `PrincipalCredential.credentialHash` (method `password` or `pin`) and never stored (ADR-0071,
+            CHG-CRD-003). A badge carries no secret: see `method`.
 
             '
           maxLength: 512
@@ -10320,6 +11342,15 @@ components:
 
 
             Added 10 September 2026 for `POS-000 Sign In`.
+
+
+            **`card` and `rfid` say how the username was entered, not a credential of their own** (R8 blocker
+            IDENTITY-C36, CHG-R8MIG-006; the lead''s answer, option C). A badge tap at POS-000 or SCN-001 fills
+            `username` with the employee number the badge carries, and the operator still types the PIN in
+            `credential`, which is checked against the principal''s `pin` credential exactly as for `pin`. No badge
+            token is stored and `PrincipalCredential.method` stays `password` or `pin`. **`sso` is not a login
+            method**: an SSO sign-in goes through `startSsoAuthorization` and `completeSsoAuthorization`, and a
+            `login` with `method` `sso` is refused 400.
 
             '
           enum:
@@ -10345,6 +11376,68 @@ components:
         deviceFingerprint:
           type: string
           maxLength: 256
+    LoginDeniedProblem:
+      x-ticvai-persistence: none — error shape
+      description: '**`login`''s 401** (ADAM CR-170, option D, 19 October 2026; CHG-CRA-009): the shared Problem
+        and, on every wrong-credentials 401 (`unauthenticated`) `login` returns, the wrong attempts left before the
+        lock (`429 credential-locked` with `Retry-After`), counted per submitted username whether or not a principal
+        has it, and per sign-in method. **Not on `sso-sign-in-required`**, which checks no credential (the lead,
+        20 October 2026, CHG-R8DEC-001).'
+      allOf:
+      - $ref: ../shared/common.yaml#/components/schemas/Problem
+      - type: object
+        properties:
+          attemptsRemaining:
+            type: integer
+            minimum: 0
+            description: Wrong attempts left for this username and this sign-in method before they are locked.
+              Present on every `unauthenticated` 401 `login` returns, for a known and an unknown username alike;
+              absent on `sso-sign-in-required`.
+    SessionHeldProblem:
+      x-ticvai-persistence: none — error shape
+      description: '**`login`''s 409** (ADAM CR-170, CHG-CRA-009): the session that refuses this sign-in, so the
+        door says since when and on what (PTR-001''s sessionHeld state). With `session-active-elsewhere` it is this
+        person''s own session on another device; with the other cause (the till is in use) it is the session
+        somebody else holds on this till. `openedAt` and `deviceLabel` describe that session, and nothing else about
+        it is said.'
+      allOf:
+      - $ref: ../shared/common.yaml#/components/schemas/Problem
+      - type: object
+        properties:
+          openedAt:
+            type: string
+            format: date-time
+            description: When the held session was opened.
+          deviceLabel:
+            type: string
+            nullable: true
+            description: 'What the held session is on, as Identity''s own session register names it (a till''s
+              label, or the browser).'
+    SessionPendingProblem:
+      x-ticvai-persistence: none — error shape
+      description: '`getCurrentSession`''s 409 (IDENTITY-C04): the shared Problem and the steps the session still has to do.'
+      allOf:
+      - $ref: ../shared/common.yaml#/components/schemas/Problem
+      - type: object
+        required: [pending]
+        properties:
+          pending:
+            type: array
+            description: The steps left, in the order they are done.
+            items:
+              type: string
+              enum: [credentialChange, mfa, roleSelection]
+    MfaCodeInvalidProblem:
+      x-ticvai-persistence: none — error shape
+      description: '**`verifyMfaChallenge`''s 422** (ADAM CR-170, CHG-CRA-009): the shared Problem and the wrong
+        codes left on the challenge before it locks (the `429`). Not its 401 (CHG-R8DEC-001).'
+      allOf:
+      - $ref: ../shared/common.yaml#/components/schemas/Problem
+      - type: object
+        properties:
+          attemptsRemaining:
+            type: integer
+            minimum: 0
     LoginResponse:
       x-ticvai-persistence: none — computed
       allOf:
@@ -10359,7 +11452,10 @@ components:
             type: boolean
             description: '**The credential just used is temporary** (14 October 2026, CHG-CRD-001, ADAM CR-078): the
               principal''s `Principal.mustChangeCredential`, set at creation and by `resetPrincipalCredential`. While it is
-              true the session may call `changeOwnCredential` and `logout` and nothing else; the door asks for the new
+              true the session may call `changeOwnCredential` and `logout` and nothing else; **a successful `changeOwnCredential`
+              leaves the same session pending on the second factor when `requiresMfa`, and then `enrolMfaMethod`,
+              `verifyMfaEnrolment`, `createMfaChallenge` and `verifyMfaChallenge` are allowed, then role selection** (R8 blocker fix,
+              IDENTITY-C03, lead answer A: new credential first, then the second factor, then the role); the door asks for the new
               password or PIN (ADM-001, SUP-001, PTR-001, EMP-001, SCN-001, POS-000) before the role prompt and the landing.
               A successful `changeOwnCredential` clears it. Always false for a single sign-on principal.'
           requiresRoleSelection:
@@ -10400,7 +11496,10 @@ components:
           type: string
         expiresIn:
           type: integer
-          description: Seconds
+          description: 'Seconds until the access token expires: `PasswordPolicy.accessTokenMinutes` x 60, 900 by
+            default (15 minutes; proposed, client to correct). The refresh token, its rotation and reuse detection,
+            and the signing key are described once on `bearerAuth` in contracts/shared/common.yaml
+            (IDENTITY-C25, FOUNDATION-AI-C27; CHG-R8SPN-014).'
     RoleSummary:
       x-ticvai-persistence: none — projection over role
       type: object
@@ -10420,6 +11519,16 @@ components:
           type: boolean
           description: True for the role that is the principal's `primaryRoleId` (`identity.principal.primary_role_id`);
             false for the others (14 October 2026, ADAM CR-077; CHG-IDR-002).
+        grantId:
+          type: string
+          format: uuid
+          description: '**The grant this card stands for** (`identity.delegated_access.id`; IDENTITY-C45, CHG-R8SPN-032).
+            A role held at two venues is two grants and two cards; `selectRole` takes the chosen one.'
+        scope:
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/ScopeRef
+          description: The scope node the grant is held at (`platform.scope`), with its name, so the card can say which
+            venue (IDENTITY-C45).
     Session:
       type: object
       required:
@@ -10482,12 +11591,25 @@ components:
             '
         workstation:
           $ref: '#/components/schemas/WorkstationContext'
+        availableRoles:
+          type: array
+          readOnly: true
+          x-ticvai-persisted: false
+          description: '**The roles the principal may choose, one per grant** (IDENTITY-C45, CHG-R8SPN-032), resolved on
+            read as `LoginResponse.availableRoles` is, so EMP-002 can list them on a cold open or after a relaunch
+            (`getCurrentSession`) without signing in again.'
+          items:
+            $ref: '#/components/schemas/RoleSummary'
         openedAt:
           type: string
           format: date-time
         expiresAt:
           type: string
           format: date-time
+          description: 'When the session ends at the latest: `openedAt` plus `PasswordPolicy.sessionMaxHours` (12
+            hours by default; proposed, client to correct). A till session ends earlier, when the shift on its
+            workstation closes; any session ends at `logout` or a revocation. Refreshing the access token never
+            moves this time (IDENTITY-C25, FOUNDATION-AI-C27; CHG-R8SPN-014).'
     WorkstationContext:
       type: object
       required:
@@ -10569,3 +11691,59 @@ components:
             many digits; the device keeps it with the workstation context of the last session on it, so the door
             needs nothing fetched before sign-in. A device that has never had a session accepts 4 to 8 digits and the
             server decides. Read from `identity.password_policy`, not stored on the workstation.'
+    SessionVenue:
+      type: object
+      x-ticvai-persistence: identity.session
+      description: >-
+        **The venue a staff session acts at, and the venues it may switch to** (16 October 2026 minutes, 4.8,
+        CHG-R8PRD-006, CHG-R8PRD-009). Stored in one column of the session record of its own, `working_venue_id`;
+        the rest is resolved on read.
+      required:
+      - workingVenueId
+      - fixedBy
+      - availableVenues
+      properties:
+        workingVenueId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          x-ticvai-column: working_venue_id
+          description: The session's working venue; null while a session that may choose has not chosen. Set by `setSessionVenue`, or written at sign-in and role selection when the session has exactly one venue (its workstation's, or the only venue its grants reach). Its own column, `working_venue_id`; `venue_id`, which `ActiveSession.venueId` reads, is not touched.
+        venue:
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/ScopeRef
+          nullable: true
+          readOnly: true
+          x-ticvai-persisted: false
+          x-ticvai-derived: onRead
+          description: '`workingVenueId` as a scope node, with its name, for the top bar.'
+        fixedBy:
+          type: string
+          readOnly: true
+          x-ticvai-persisted: false
+          x-ticvai-derived: onRead
+          enum:
+          - workstation
+          - role
+          - none
+          description: '`workstation` or `role` when the venue cannot be switched (see `getSessionVenue`); `none` when it can.'
+        availableVenues:
+          type: array
+          readOnly: true
+          x-ticvai-persisted: false
+          x-ticvai-derived: onRead
+          description: The active venues the session may act at, in name order; one entry when the venue is fixed.
+          items:
+            $ref: ../shared/common.yaml#/components/schemas/ScopeRef
+    SetSessionVenueRequest:
+      type: object
+      x-ticvai-persistence: none — request body of setSessionVenue
+      description: The venue to switch to (CHG-R8PRD-006).
+      required:
+      - venueId
+      properties:
+        venueId:
+          type: string
+          format: uuid
+          description: One of `SessionVenue.availableVenues`.

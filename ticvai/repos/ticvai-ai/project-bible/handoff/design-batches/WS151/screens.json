@@ -736,7 +736,8 @@
   "navigation": {
    "entryFrom": [
     "ADM-599",
-    "BO-102"
+    "BO-102",
+    "ADM-602"
    ],
    "exitTo": [
     "ADM-599"
@@ -783,6 +784,8 @@
       {
        "kind": "selectField",
        "label": "Customer/account",
+       "operation": "listB2bCreditAccounts",
+       "notes": "The B2B credit accounts (`listB2bCreditAccounts`); the picked account's id is the `accountId` the terms are read and saved for (r8, ORDERS-MONEY-C28).",
        "provenance": "pack Payment_Payment_Orchestration.pdf, page 95 §Define"
       },
       {
@@ -872,6 +875,13 @@
     "purpose": "Read the account's current payment terms before they are changed",
     "trigger": "onLoad",
     "provenance": "deferred workshop-pack gap closed 2 October 2026 (CHG-MOV-007)"
+   },
+   {
+    "operationId": "listB2bCreditAccounts",
+    "contract": "payments",
+    "purpose": "The accounts the terms can be set for, the Customer/account picker (r8, ORDERS-MONEY-C28)",
+    "trigger": "onLoad",
+    "provenance": "r8 second round, ORDERS-MONEY-C28 (the storage-sat lane's request)"
    }
   ],
   "wireframe": {

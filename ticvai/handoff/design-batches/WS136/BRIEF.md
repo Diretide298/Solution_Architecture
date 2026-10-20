@@ -106,7 +106,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-744` | Data Governance Center | D | 0 | 20 | 6 | 1 | 0 | 0 | — | notStarted (—) |
 | `BO-745` | Identity Resolution Rules | D | 2 | 3 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-746` | Duplicate Review & Merge | D | 0 | 18 | 6 | 0 | 4 | 2 | — | notStarted (—) |
-| `BO-747` | Consent Policy Configuration | D | 24 | 30 | 6 | 76 | 1 | 4 | — | notStarted (—) |
+| `BO-747` | Consent Policy Configuration | D | 25 | 31 | 6 | 76 | 1 | 4 | — | notStarted (—) |
 | `BO-748` | Consent Capture & Versions | D | 0 | 7 | 6 | 10 | 0 | 4 | — | notStarted (—) |
 | `BO-749` | Guest Preference Center | D | 0 | 8 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-750` | Data Subject Requests | D | 17 | 20 | 6 | 0 | 1 | 0 | — | notStarted (—) |

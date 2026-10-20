@@ -1,4 +1,17 @@
 {
+ "getMyCase": {
+  "method": "GET",
+  "path": "/my/cases/{caseId}",
+  "contract": "marketing-crm",
+  "summary": "One case the guest raised, with its thread",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "CaseDetail"
+ },
  "getVisitPlan": {
   "method": "GET",
   "path": "/visit-plans/{planId}",
@@ -76,6 +89,40 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listMyVisitPlans": {
+  "method": "GET",
+  "path": "/visit-plans",
+  "contract": "venue-map",
+  "summary": "The caller's own visit plans, by date or status",
+  "permission": null,
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "date",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
    {
     "name": null,
     "in": null,

@@ -138,24 +138,24 @@ operationsByContract:
     scope: workstation
     permission: null
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: recordSyncRejectionResolution
     verb: POST
     path: /sync-rejections/{rejectionId}/resolution
     scope: venue
     permission: null
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: relinquishWalletAuthorisation
     verb: POST
     path: /wallet-authorisations/{authorisationId}/release
     scope: workstation
     permission: ORDER_CREATE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: resolveGuestLink
     verb: GET
     path: /guest-links/resolve
@@ -208,6 +208,9 @@ tables:
   - createGuestLink
   - propagateCrossRegionEntitlement
   - reconcileRedemptions
+  - recordSyncRejection
+  - recordSyncRejectionResolution
+  - relinquishWalletAuthorisation
   - revokeCrossRegionEntitlement
   - revokeGuestLink
   - setWalletAllocationPolicy
@@ -219,6 +222,9 @@ tables:
   - createGuestLink
   - propagateCrossRegionEntitlement
   - reconcileRedemptions
+  - recordSyncRejection
+  - recordSyncRejectionResolution
+  - relinquishWalletAuthorisation
   - revokeCrossRegionEntitlement
   - revokeGuestLink
   - setWalletAllocationPolicy

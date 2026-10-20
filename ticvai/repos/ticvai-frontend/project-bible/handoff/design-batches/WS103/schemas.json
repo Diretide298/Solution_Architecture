@@ -29,6 +29,15 @@
      "decommission"
     ]
    },
+   "targetTier": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/CellTier"
+     }
+    ],
+    "nullable": true,
+    "description": "For a `tierMigration` job, the tier the cell moves to at cutover (`updateCellTier`); null for every other kind (R8 blocker APPROVALS-TENANCY-C19)."
+   },
    "status": {
     "type": "string",
     "enum": [
@@ -67,6 +76,15 @@
     "nullable": true
    }
   }
+ },
+ "CellTier": {
+  "type": "string",
+  "enum": [
+   "shared",
+   "dedicated",
+   "isolated",
+   "clientHosted"
+  ]
  },
  "CreatePrincipalRequest": {
   "type": "object",
@@ -192,7 +210,7 @@
     "type": "integer",
     "nullable": true,
     "x-ticvai-column": "limit_value",
-    "description": "Null means unlimited. Stored as `limit_value` — `limit` is a reserved word, and `subscription.tier_allowance` already names the same figure `limit_value`."
+    "description": "Null means unlimited. Stored as `limit_value` — `limit` is a reserved word, and `control.tier_allowance` already names the same figure `limit_value`."
    },
    "overageAllowed": {
     "type": "boolean",
@@ -205,10 +223,11 @@
  },
  "GoLiveReadiness": {
   "type": "object",
-  "x-ticvai-persistence": "subscription.go_live_readiness",
+  "x-ticvai-persistence": "control.go_live_readiness",
   "description": "Board 8. **The screen that stops a launch going wrong in public.**",
   "properties": {
    "tenantId": {
+    "x-ticvai-references": "control.tenant",
     "type": "string",
     "format": "uuid"
    },
@@ -302,7 +321,7 @@
   }
  },
  "LicencePosition": {
-  "x-ticvai-persistence": "none — union of the tenant's plan (control.tenant.plan_id -> subscription.plan_module, subscription.plan_limit) and its add-ons (control.licence_add_on, control.licence_add_on_limit by tenant_id)",
+  "x-ticvai-persistence": "none — union of the tenant's plan (control.tenant.plan_id -> control.plan_module, control.plan_limit) and its add-ons (control.licence_add_on, control.licence_add_on_limit by tenant_id)",
   "type": "object",
   "required": [
    "tenantId",
@@ -327,7 +346,7 @@
    },
    "licensedModules": {
     "type": "array",
-    "description": "Union of plan modules and add-ons. The White Label Builder reads this and cannot enable anything absent from it.\n\n**`moduleKey` values are `ModuleKey`s** (4 October 2026, CHG-FXC-010; ADM-424), the vocabulary of\n`white-label.ModuleEnablement.moduleKey`.",
+    "description": "Union of plan modules and add-ons. The White Label Builder reads this and cannot enable anything absent from it.\n\n**`moduleKey` values are the licence modules of `ModuleKey` in common.yaml** (R8 blocker fix, IDENTITY-C31).\nThey are **not** the white-label app features of `white-label.ModuleEnablement.moduleKey`, a finer list;\ncommon.yaml maps each feature to the licence module that licenses it, and a feature key is never listed here.",
     "items": {
      "type": "object",
      "required": [
@@ -399,7 +418,7 @@
  },
  "ModuleListing": {
   "type": "object",
-  "x-ticvai-persistence": "subscription.module_listing",
+  "x-ticvai-persistence": "control.module_listing",
   "description": "Board 4.6. **A marketplace without a dependency graph sells combinations that cannot be provisioned.**\n**TICVAI configures each module's price here, and tenants are billed per module (decided 29 September, Chinmay).** A usage-priced module (the AI module's tokens) has `pricingBasis` `metered`: `price` is then per `meteredUnitSize` units of `meteredMetric`, and the invoice carries it as a `metered` line.\n",
   "required": [
    "moduleCode"
@@ -587,7 +606,7 @@
    "requireBreachCheck": {
     "type": "boolean",
     "default": true,
-    "description": "**The single most effective rule.** Refusing a password known to be breached stops more account takeovers than every composition rule combined.\n"
+    "description": "**The single most effective rule.** Refusing a password known to be breached stops more account takeovers than every composition rule combined.\n\n**Where the breach list comes from** (decided 20 October 2026, Chinmay, R8 blocker cause IDENTITY-C06, option B; CHG-R8SPN-019; audit R117). A local corpus file shipped with each release: the SHA-1 hashes of known breached passwords, sorted and indexed by their first five hex characters, held inside the region with the service and never sent anywhere, so no credential hash leaves the region and there is no outage mode. Identity reads it through one adapter, `checkPasswordBreached(passwordSha1Prefix)`, which returns the corpus's full hashes under that prefix with their counts; the service compares the full hash itself. A match refuses the password `422 policy-not-met` (`changeOwnCredential`, and any other operation that sets a password under this policy). The corpus is refreshed with the release, not at run time. The client may still name a vendor under R117, which would be a second adapter behind the same interface (handoff/integration-register.md row 20).\n"
    },
    "maxAgeDays": {
     "type": "integer",
@@ -720,8 +739,30 @@
      "PLATFORM_RELEASE_MANAGE",
      "PLATFORM_RELEASE_PROMOTE",
      "PLATFORM_MIGRATION_VIEW",
-     "PLATFORM_MIGRATION_APPLY"
+     "PLATFORM_MIGRATION_APPLY",
+     "PLATFORM_AI_MANAGE"
     ]
+   },
+   "accessTokenMinutes": {
+    "type": "integer",
+    "default": 15,
+    "minimum": 5,
+    "maximum": 60,
+    "description": "How long a staff access token lives (`TokenPair.expiresIn`). **15 minutes, proposed, client to correct** (decided 20 October 2026, Chinmay, IDENTITY-C25; CHG-R8SPN-014). Staff tokens only; a guest token follows `guestAuth`."
+   },
+   "refreshTokenHours": {
+    "type": "integer",
+    "default": 12,
+    "minimum": 1,
+    "maximum": 24,
+    "description": "How long a staff refresh token lives without use. Sliding: each refresh issues a new one and retires the old, and a retired one presented again ends the session and revokes its family (see `bearerAuth`). **12 hours, proposed, client to correct** (IDENTITY-C25; CHG-R8SPN-014)."
+   },
+   "sessionMaxHours": {
+    "type": "integer",
+    "default": 12,
+    "minimum": 1,
+    "maximum": 24,
+    "description": "The longest a staff session lives (`Session.expiresAt`). A till session ends sooner, when the shift on its workstation closes. **12 hours, proposed, client to correct** (IDENTITY-C25; CHG-R8SPN-014)."
    }
   }
  },
@@ -853,6 +894,8 @@
    "LOYALTY_ACCRUE",
    "LOYALTY_REDEEM",
    "LOYALTY_ADJUST",
+   "MEMBERSHIP_VIEW",
+   "MEMBERSHIP_MANAGE",
    "MARKETING_VIEW",
    "MARKETING_MANAGE",
    "MARKETING_SEND",
@@ -978,11 +1021,11 @@
     "format": "uuid"
    },
    "operatorPrincipalId": {
-    "x-ticvai-references": "identity.principal",
+    "x-ticvai-references": "none",
     "type": "string",
     "format": "uuid",
     "readOnly": true,
-    "description": "The platform operator, from the Control Plane token. Set by the server."
+    "description": "The platform operator, from the Control Plane token (its subject). Set by the server. **Not a row in this tenant's `identity.principal`** (R8 blocker IDENTITY-C20, CHG-R8MIG-006; the lead's answer, option A): an operator is the Control Plane's, so this is a plain uuid with no foreign key, and the key V0107 adds is dropped by the next forward migration."
    },
    "operatorDisplayName": {
     "type": "string",
@@ -1019,7 +1062,7 @@
  },
  "Principal": {
   "x-ticvai-persistence": "identity.principal",
-  "x-ticvai-rls": "grant-holder-read",
+  "x-ticvai-rls": "home-scope-write",
   "type": "object",
   "required": [
    "id",
@@ -1288,6 +1331,19 @@
    "isPrimary": {
     "type": "boolean",
     "description": "True for the role that is the principal's `primaryRoleId` (`identity.principal.primary_role_id`); false for the others (14 October 2026, ADAM CR-077; CHG-IDR-002)."
+   },
+   "grantId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "**The grant this card stands for** (`identity.delegated_access.id`; IDENTITY-C45, CHG-R8SPN-032). A role held at two venues is two grants and two cards; `selectRole` takes the chosen one."
+   },
+   "scope": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/ScopeRef"
+     }
+    ],
+    "description": "The scope node the grant is held at (`platform.scope`), with its name, so the card can say which venue (IDENTITY-C45)."
    }
   }
  },
@@ -1302,6 +1358,18 @@
  },
  "Tenant": {
   "x-ticvai-persistence": "control.tenant",
+  "x-ticvai-required-when": {
+   "planVersion": {
+    "planId": {
+     "not": null
+    }
+   },
+   "planId": {
+    "planVersion": {
+     "not": null
+    }
+   }
+  },
   "type": "object",
   "required": [
    "id",
@@ -1365,9 +1433,17 @@
     "nullable": true
    },
    "planId": {
+    "x-ticvai-references": "control.plan",
+    "x-ticvai-references-version": "planVersion",
     "type": "string",
     "format": "uuid",
     "nullable": true
+   },
+   "planVersion": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The version of the plan the tenant is on (with `planId`, the key of the plan row; R8 blocker APPROVALS-TENANCY-C15, CHG-R8INT-023). Null when `planId` is."
    },
    "planName": {
     "type": "string",
@@ -1378,6 +1454,46 @@
    },
    "venueCount": {
     "type": "integer"
+   },
+   "cellHost": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "x-ticvai-derived": "onRead",
+    "description": "The host of the tenant's home cell (the host part of `Cell.apiEndpoint` of the cell that holds the tenant in its home region), derived on read through `control.cell_tenant`. Added for ADM-018 (r8 walk of ticket 27886): the console reaches the cell's grant and language operations at this host without holding `PLATFORM_CELL_VIEW`, which `listTenantCells` needs. Null while the tenant has no cell.\n"
+   },
+   "cellHosts": {
+    "type": "array",
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "x-ticvai-derived": "onRead",
+    "description": "One entry per region the tenant is in, for a multi-region tenant; the entry with `isHome` true is `cellHost`. The screen uses the home cell for language and grant operations.\n",
+    "items": {
+     "type": "object",
+     "required": [
+      "regionId",
+      "cellId",
+      "host",
+      "isHome"
+     ],
+     "properties": {
+      "regionId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "cellId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "host": {
+       "type": "string"
+      },
+      "isHome": {
+       "type": "boolean"
+      }
+     }
+    }
    },
    "regionId": {
     "type": "string",
@@ -1444,6 +1560,15 @@
   "x-ticvai-persistence": "platform.venue_settings",
   "description": "**Venue-level operational configuration that no other level can answer.**\nRegion owns currency, tax regime and fiscal year (ADR-0011). Venue owns the things that vary between two venues in one region — **opening hours, support hours, and what the local law requires of the gate.**\n**And the configured limits** (decided 28 September, audit R094): every limit the contracts call *configured* is a field here, from `displayCurrencies` and `cartLeaseSeconds` down to the grouped `catalogue`, `inventory`, `seating`, `promotions`, `fnb`, `queue`, `reporting`, `marketing` and `identity` settings. **Each has a tenant-level default**: the tenant sets it once with `setVenueSettingsDefaults`, a venue overrides it within the field's bounds, and a null field here inherits it. Each field's `default` is the proposed tenant default, marked proposed, client to correct (audit R094); `docs/active/configured-limits-proposal.md` is the sheet the client corrects, and where the two differ this contract is what runs.\n",
   "properties": {
+   "contact": {
+    "allOf": [
+     {
+      "$ref": "../satellite/white-label.yaml#/components/schemas/VenueContact"
+     }
+    ],
+    "nullable": true,
+    "description": "**How a guest reaches this venue** (R8 blocker WHITE-C16, the storage-sat lane's request 5; CHG-R8MIG-011): phone, email, WhatsApp, address and opening-hours prose, one jsonb column, written by the venue settings write and read by White-Label's getTenantAppStatus through tenancy#venueSettingsRecords. Null means the tenant's contact is shown."
+   },
    "id": {
     "type": "string",
     "format": "uuid",

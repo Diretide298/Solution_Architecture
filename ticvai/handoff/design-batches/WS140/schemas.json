@@ -651,7 +651,47 @@
     "format": "uuid",
     "nullable": true,
     "readOnly": true,
+    "x-ticvai-references": "ai.translation_job",
     "description": "The `proposeTranslations` job that drafted this proposal; `getTranslationProposals` reads a job's rows by it. Null on every other proposal (CHG-RFM-004)."
+   },
+   "targetKind": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "enum": [
+     "contentBlock",
+     "productName",
+     "emailTemplate",
+     "messageTemplate"
+    ],
+    "description": "For a translation draft, what kind of thing it sits on (`TranslationProposals.drafts[].targetKind`); null on every other proposal (R8 blocker FOUNDATION-AI-C40)."
+   },
+   "targetRef": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "maxLength": 200,
+    "description": "For a translation draft, the id of the block, product or template it sits on (the path id of the target's own write, e.g. a content block's `blockId`); null otherwise (R8 blocker FOUNDATION-AI-C40)."
+   },
+   "locale": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "maxLength": 20,
+    "description": "For a translation draft, the language it is in (the job's `targetLocale`); null otherwise."
+   },
+   "fieldPath": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "maxLength": 300,
+    "description": "For a translation draft, where it goes inside the target, as a dotted path in the target's own body (`TranslationProposals.drafts[].fieldPath`); null otherwise. Empty for a field that is not text."
+   },
+   "draftText": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "For a translation draft, the proposed text; null otherwise. `payload` stays the request body of the target's write, with this text at `fieldPath` (R8 blocker FOUNDATION-AI-C40)."
    },
    "kind": {
     "type": "string",
@@ -1307,11 +1347,22 @@
     "items": {
      "type": "object",
      "required": [
+      "proposalId",
       "targetKind",
       "targetRef",
+      "fieldPath",
       "draftText"
      ],
      "properties": {
+      "proposalId": {
+       "type": "string",
+       "format": "uuid",
+       "description": "The `ai.proposed_action` id of this draft (r8 walk of ticket 27926). **Accept** on CMS-011 saves `draftText` at `fieldPath` through the contract that owns the target (a content block update, a product update, a template update; the saver needs the grant `proposeMarketingContent` there), then records `decideProposedAction` approve with this id. **Discard** is `decideProposedAction` reject with this id and a reason; nothing is saved on the target."
+      },
+      "fieldPath": {
+       "type": "string",
+       "description": "Where the draft goes inside the target, as a dotted path in the target's own body, for example `localeVariants.ar.title` on a content block or `name.ar` on a product. The saver writes `draftText` there and nothing else."
+      },
       "targetKind": {
        "type": "string",
        "enum": [

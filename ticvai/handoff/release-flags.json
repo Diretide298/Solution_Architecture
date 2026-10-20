@@ -6,8 +6,8 @@
  },
  "counts": {
   "appModules": 306,
-  "operations": 2550,
-  "sharedOperations": 1388
+  "operations": 2562,
+  "sharedOperations": 1396
  },
  "appModules": {
   "AM-ACCREDITATION-P08": {
@@ -751,6 +751,7 @@
   "AM-AI-ENGINE-A-BASELINE": {
    "screens": [],
    "operations": [
+    "ai#eraseSubject",
     "ai#runAiEvaluation",
     "ai#setAiVenueSettings"
    ]
@@ -780,7 +781,7 @@
     "marketing-crm#handoverToAgent",
     "marketing-crm#sendGuestConversationMessage",
     "orders#addCartLine",
-    "promotions#getBundle",
+    "promotions#getGuestBundle",
     "white-label#getPublishedBookingFlow"
    ]
   },
@@ -1489,7 +1490,8 @@
     "finance#listTaxInvoices",
     "orders#createRefundRequest",
     "orders#getOrder",
-    "orders#listMyOrders"
+    "orders#listMyOrders",
+    "orders#listOwnRefundRequests"
    ]
   },
   "AM-FINANCE-TAX-P02": {
@@ -2974,7 +2976,8 @@
     "GST-036",
     "GST-039",
     "GST-066",
-    "GST-068"
+    "GST-068",
+    "GST-071"
    ],
    "operations": [
     "ai#listAiConversations",
@@ -2985,6 +2988,7 @@
     "marketing-crm#getForm",
     "marketing-crm#getGuestConsents",
     "marketing-crm#getLoyaltyPosition",
+    "marketing-crm#getMyCase",
     "marketing-crm#getMyProfile",
     "marketing-crm#getWishlist",
     "marketing-crm#listConsentPurposes",
@@ -3006,7 +3010,13 @@
     "marketing-crm#submitReview",
     "marketing-crm#updateMyProfile",
     "orders#listMyOrders",
-    "promotions#listPromotions"
+    "orders#listPaymentTokens",
+    "orders#storePaymentToken",
+    "promotions#listPromotions",
+    "wallet#getGiftCard",
+    "wallet#getWallet",
+    "wallet#transferWalletBalance",
+    "white-label#getPublishedTenantConfig"
    ]
   },
   "AM-MARKETING-CRM-P04": {
@@ -3605,6 +3615,8 @@
     "orders#inquirePaymentStatus",
     "orders#listBillingStatements",
     "orders#listMyOrders",
+    "orders#listOwnGroupBookings",
+    "orders#listOwnResaleListings",
     "orders#listReservations",
     "orders#payByLink",
     "orders#removeCartLine",
@@ -3614,9 +3626,9 @@
     "payments#listMyPaymentIssues",
     "payments#retryMyDunningPayment",
     "promotions#evaluatePromotions",
-    "promotions#getCouponCode",
-    "resources#getResourceAvailability",
+    "promotions#getGuestCouponCode",
     "resources#getResourceHold",
+    "resources#listProductStartTimes",
     "retail#listMerchandise",
     "retail#lookupMerchandise",
     "white-label#getPublishedBookingFlow",
@@ -3635,6 +3647,7 @@
     "GST-041",
     "GST-045",
     "GST-048",
+    "GST-050",
     "GST-067",
     "GST-072"
    ],
@@ -3643,6 +3656,7 @@
     "ai#decideRecommendations",
     "ai#recordRecommendationEvents",
     "ai#sendAiMessage",
+    "catalogue#getAvailability",
     "catalogue#getGroupPackageDefinition",
     "catalogue#getMyMemberships",
     "catalogue#getPerformance",
@@ -3672,6 +3686,7 @@
     "orders#getBillingStatement",
     "orders#getCart",
     "orders#getGroupBooking",
+    "orders#getGuestRefundPolicy",
     "orders#getOrder",
     "orders#getOrderCalendarEvent",
     "orders#getPaymentLink",
@@ -3681,6 +3696,8 @@
     "orders#issueWalletPass",
     "orders#listBillingStatements",
     "orders#listMyOrders",
+    "orders#listOwnRefundRequests",
+    "orders#listOwnResaleListings",
     "orders#listReservations",
     "orders#listTicketTransfers",
     "orders#payByLink",
@@ -4433,6 +4450,7 @@
    "operations": [
     "payments#getB2bPaymentTerms",
     "payments#getInstalmentPolicy",
+    "payments#listB2bCreditAccounts",
     "payments#setB2bPaymentTerms",
     "payments#setInstalmentPolicy"
    ]
@@ -4532,8 +4550,8 @@
    ],
    "operations": [
     "orders#addCartLine",
-    "promotions#getBundle",
-    "promotions#getCouponCode",
+    "promotions#getGuestBundle",
+    "promotions#getGuestCouponCode",
     "promotions#getPromotion",
     "promotions#listPromotions"
    ]
@@ -5884,6 +5902,7 @@
     "WEB-050"
    ],
    "operations": [
+    "catalogue#getPerformance",
     "catalogue#listPerformances",
     "catalogue#listProducts",
     "queue#getWaitTimes",
@@ -5897,6 +5916,7 @@
     "venue-map#getVenueMap",
     "venue-map#getVenueMapGraph",
     "venue-map#getVisitPlan",
+    "venue-map#getVisitPlannerOptions",
     "venue-map#listBookableVenueMaps",
     "venue-map#listVisitPlanAlternatives",
     "venue-map#updateVisitPlan",
@@ -5908,11 +5928,14 @@
    "screens": [
     "GST-021",
     "GST-049",
+    "GST-051",
+    "GST-052",
     "GST-053",
     "GST-058",
     "GST-059"
    ],
    "operations": [
+    "catalogue#getPerformance",
     "catalogue#listPerformances",
     "catalogue#listProducts",
     "queue#getWaitTimes",
@@ -5922,12 +5945,16 @@
     "seating#recommendSeats",
     "seating#relinquishSeatHold",
     "venue-map#bookVisitPlan",
+    "venue-map#generateVisitPlan",
     "venue-map#getVenueMap",
     "venue-map#getVenueMapGraph",
     "venue-map#getVisitPlan",
+    "venue-map#getVisitPlannerOptions",
     "venue-map#listBookableVenueMaps",
+    "venue-map#listMyVisitPlans",
     "venue-map#listVisitPlanAlternatives",
-    "venue-map#updateVisitPlan"
+    "venue-map#updateVisitPlan",
+    "white-label#getTenantAppStatus"
    ]
   },
   "AM-SEATING-MAPS-P04": {
@@ -5936,6 +5963,7 @@
    ],
    "operations": [
     "catalogue#getPerformance",
+    "catalogue#listPerformances",
     "orders#createOrder",
     "orders#createPayment",
     "seating#createSeatHold",
@@ -7179,7 +7207,9 @@
     "BO-1018",
     "BO-1034",
     "BO-1045",
+    "BO-1088",
     "BO-1094",
+    "BO-1144",
     "BO-1162",
     "BO-117",
     "BO-1179",
@@ -7229,6 +7259,7 @@
     "catalogue#decidePricingRecommendation",
     "catalogue#getCatalogueImportJob",
     "catalogue#getChannelAllocations",
+    "catalogue#getChannelAvailability",
     "catalogue#getDynamicPriceRule",
     "catalogue#getEvent",
     "catalogue#getGroupPackageDefinition",
@@ -7256,10 +7287,12 @@
     "catalogue#listPriceLists",
     "catalogue#listPrices",
     "catalogue#listPricingRecommendationExplainability",
+    "catalogue#listProductCategories",
     "catalogue#listProductVariants",
     "catalogue#listProductVersions",
     "catalogue#listProducts",
     "catalogue#listRulePriorityConflict",
+    "catalogue#listTaxProfiles",
     "catalogue#publishBundle",
     "catalogue#publishChannelAvailability",
     "catalogue#publishChannelReadinessValidation",
@@ -7410,9 +7443,11 @@
     "venue-map#setVenueMapArtwork",
     "venue-map#setVenuePoint",
     "venue-map#validateVenueMapGraph",
+    "wallet#createCreditType",
     "wallet#diffWalletConfigurationVersion",
     "wallet#getWalletFundingRules",
     "wallet#getWalletRiskRules",
+    "wallet#listCreditTypes",
     "wallet#listWalletConfigurationVersions",
     "wallet#listWalletDisputes",
     "wallet#listWalletTypes",
@@ -7422,6 +7457,8 @@
     "wallet#setWalletFundingRules",
     "wallet#setWalletIntegrationMapping",
     "wallet#setWalletRiskRuleStatus",
+    "wallet#setWalletTransferRules",
+    "wallet#updateCreditType",
     "wallet#withdrawWalletDispute",
     "white-label#listBookingFlows"
    ]
@@ -7450,6 +7487,7 @@
     "BO-1018",
     "BO-1034",
     "BO-1045",
+    "BO-1088",
     "BO-1094",
     "BO-1162",
     "BO-117",
@@ -7491,6 +7529,7 @@
     "catalogue#decidePricingRecommendation",
     "catalogue#getCatalogueImportJob",
     "catalogue#getChannelAllocations",
+    "catalogue#getChannelAvailability",
     "catalogue#getDynamicPriceRule",
     "catalogue#getEvent",
     "catalogue#getGroupPackageDefinition",
@@ -7520,6 +7559,7 @@
     "catalogue#listProductVersions",
     "catalogue#listProducts",
     "catalogue#listRulePriorityConflict",
+    "catalogue#listTaxProfiles",
     "catalogue#publishBundle",
     "catalogue#publishChannelAvailability",
     "catalogue#relinquishChannelAllocation",
@@ -7644,15 +7684,18 @@
     "transport#updateTransportStation",
     "transport#updateTransportTimetable",
     "transport#withdrawTransportTimetable",
+    "wallet#createCreditType",
     "wallet#diffWalletConfigurationVersion",
     "wallet#getWalletFundingRules",
     "wallet#getWalletRiskRules",
+    "wallet#listCreditTypes",
     "wallet#listWalletConfigurationVersions",
     "wallet#listWalletTypes",
     "wallet#publishWalletConfiguration",
     "wallet#restoreWalletConfigurationVersion",
     "wallet#setWalletFundingRules",
     "wallet#setWalletRiskRuleStatus",
+    "wallet#updateCreditType",
     "white-label#listBookingFlows"
    ]
   },
@@ -8317,7 +8360,6 @@
     "subscription#previewSubscriptionChange",
     "subscription#scoreVsiAssessment",
     "subscription#setAgreementContractTerm",
-    "subscription#setSubscription",
     "subscription#simulateCommercialPackage",
     "subscription#submitOnboardingApplication"
    ]
@@ -8326,9 +8368,7 @@
    "screens": [
     "SGN-024"
    ],
-   "operations": [
-    "subscription#setSubscription"
-   ]
+   "operations": []
   },
   "AM-TENANCY-VENUES-P04": {
    "screens": [
@@ -8336,9 +8376,13 @@
    ],
    "operations": [
     "shift#allocateDepositBox",
+    "shift#listDenominations",
+    "shift#listShifts",
     "tenancy#configureWorkstation",
     "tenancy#getDeviceAssignment",
+    "tenancy#getWorkstation",
     "tenancy#listDevices",
+    "tenancy#listSaleBoards",
     "tenancy#setDeviceAssignment"
    ]
   },
@@ -8555,6 +8599,7 @@
     "catalogue#searchCatalogue",
     "marketing-crm#recordConsentAnswers",
     "orders#addCartLine",
+    "orders#createCart",
     "orders#getCart",
     "promotions#evaluatePromotions",
     "queue#getWaitTimes",
@@ -8573,9 +8618,6 @@
     "GST-007",
     "GST-008",
     "GST-046",
-    "GST-050",
-    "GST-051",
-    "GST-052",
     "GST-063",
     "GST-075"
    ],
@@ -8589,7 +8631,7 @@
     "catalogue#getWaitingRoomPosition",
     "catalogue#joinWaitlist",
     "catalogue#leaveWaitlist",
-    "catalogue#listCatalogueBundles",
+    "catalogue#listEvents",
     "catalogue#listPerformances",
     "catalogue#listProductCategories",
     "catalogue#listProductVariants",
@@ -8597,15 +8639,14 @@
     "catalogue#searchCatalogue",
     "marketing-crm#recordConsentAnswers",
     "orders#addCartLine",
+    "orders#createCart",
     "orders#getCart",
-    "promotions#getBundle",
+    "promotions#getGuestBundle",
     "queue#getWaitTimes",
     "resources#listProductStartTimes",
-    "venue-map#generateVisitPlan",
     "venue-map#getVenueMap",
     "white-label#getPublishedBookingFlow",
-    "white-label#getPublishedGuidedChoice",
-    "white-label#getTenantAppStatus"
+    "white-label#getPublishedGuidedChoice"
    ]
   },
   "AM-TICKETING-P04": {
@@ -8613,11 +8654,9 @@
     "POS-003"
    ],
    "operations": [
-    "catalogue#acquireInventoryHold",
     "catalogue#getAvailability",
     "catalogue#getProduct",
     "catalogue#listAlternativeCodes",
-    "catalogue#listInventoryHolds",
     "catalogue#listProductVariants",
     "catalogue#listProducts",
     "catalogue#resolveProductByCode"
@@ -9075,6 +9114,7 @@
     "catalogue#getPerformance",
     "catalogue#listEvents",
     "catalogue#listPerformances",
+    "catalogue#listProductCategories",
     "catalogue#updateEvent",
     "catalogue#updatePerformance",
     "seating#getSeatAvailability",
@@ -9272,22 +9312,15 @@
   },
   "AM-WALLET-CASHLESS-P02": {
    "screens": [
-    "GST-011",
-    "GST-071"
+    "GST-011"
    ],
    "operations": [
     "games#getGameCard",
-    "marketing-crm#listConsentPurposes",
-    "marketing-crm#redeemLoyaltyPoints",
     "orders#listPaymentTokens",
-    "orders#storePaymentToken",
-    "wallet#getGiftCard",
     "wallet#getWallet",
     "wallet#getWalletAutoReloadSetting",
     "wallet#listWalletTransactions",
-    "wallet#setWalletAutoReloadSetting",
-    "wallet#transferWalletBalance",
-    "white-label#getPublishedTenantConfig"
+    "wallet#setWalletAutoReloadSetting"
    ]
   },
   "AM-WALLET-CASHLESS-P08": {
@@ -9338,7 +9371,6 @@
     "BO-1085",
     "BO-1086",
     "BO-1087",
-    "BO-1088",
     "BO-1089",
     "BO-1090",
     "BO-1091",
@@ -9347,30 +9379,29 @@
     "BO-1095",
     "BO-1096",
     "BO-1097",
-    "BO-1098"
+    "BO-1098",
+    "BO-1099",
+    "BO-1100"
    ],
    "operations": [
-    "wallet#createCreditType",
+    "wallet#adjustWallet",
     "wallet#createWalletType",
     "wallet#getWallet",
     "wallet#getWalletFundingRules",
     "wallet#linkWalletCredential",
-    "wallet#listCreditTypes",
     "wallet#listSharedWallets",
     "wallet#listWalletConfigurationVersions",
     "wallet#listWalletTransactions",
     "wallet#listWalletTypes",
     "wallet#publishWalletConfiguration",
+    "wallet#reverseWalletFunding",
     "wallet#setSharedWalletMembers",
     "wallet#setWalletFundingRules",
-    "wallet#updateCreditType",
     "wallet#updateWalletType"
    ]
   },
   "AM-WALLET-CASHLESS-P08-3": {
    "screens": [
-    "BO-1099",
-    "BO-1100",
     "BO-1101",
     "BO-1102",
     "BO-1103",
@@ -9383,14 +9414,15 @@
     "BO-1110",
     "BO-1112",
     "BO-1113",
-    "BO-1114"
+    "BO-1114",
+    "BO-1115",
+    "BO-1116"
    ],
    "operations": [
-    "wallet#adjustWallet",
     "wallet#createCreditType",
     "wallet#createSharedWallet",
     "wallet#getCreditConsumptionPolicy",
-    "wallet#getWallet",
+    "wallet#getWalletBalance",
     "wallet#getWalletFundingRules",
     "wallet#getWalletLiability",
     "wallet#getWalletReconciliation",
@@ -9399,19 +9431,17 @@
     "wallet#listSharedWallets",
     "wallet#listWalletTransactions",
     "wallet#publishWalletConfiguration",
-    "wallet#reverseWalletFunding",
     "wallet#setCreditConsumptionPolicy",
     "wallet#setCreditEligibilityRules",
     "wallet#setSharedWalletMembers",
     "wallet#setWalletFundingRules",
     "wallet#simulateCreditConsumption",
+    "wallet#transferWalletBalance",
     "wallet#updateCreditType"
    ]
   },
   "AM-WALLET-CASHLESS-P08-4": {
    "screens": [
-    "BO-1115",
-    "BO-1116",
     "BO-1117",
     "BO-1118",
     "BO-1119",
@@ -9421,7 +9451,9 @@
     "BO-1123",
     "BO-1124",
     "BO-1125",
-    "BO-1126"
+    "BO-1126",
+    "BO-1127",
+    "BO-1128"
    ],
    "operations": [
     "approvals#listApprovalMatrices",
@@ -9444,8 +9476,6 @@
   },
   "AM-WALLET-CASHLESS-P08-5": {
    "screens": [
-    "BO-1127",
-    "BO-1128",
     "BO-1129",
     "BO-1130",
     "BO-1131",
@@ -9457,29 +9487,30 @@
     "BO-1138",
     "BO-1139",
     "BO-1140",
-    "BO-1142"
+    "BO-1142",
+    "BO-1143",
+    "BO-1145",
+    "BO-1148"
    ],
    "operations": [
-    "wallet#createVoucherType",
     "wallet#expireCreditLots",
     "wallet#getWalletLiability",
     "wallet#linkWalletCredential",
     "wallet#listCreditLots",
     "wallet#listVoucherTypes",
     "wallet#listWalletConfigurationVersions",
+    "wallet#listWalletDisputes",
     "wallet#listWalletTransactions",
     "wallet#publishWalletConfiguration",
+    "wallet#reverseWalletFunding",
     "wallet#setWalletAuthenticationPolicy",
     "wallet#setWalletChannelRules",
+    "wallet#setWalletTransferRules",
     "wallet#simulateCreditConsumption"
    ]
   },
   "AM-WALLET-CASHLESS-P08-6": {
    "screens": [
-    "BO-1143",
-    "BO-1144",
-    "BO-1145",
-    "BO-1148",
     "BO-1149",
     "BO-1150",
     "BO-1151",
@@ -9490,32 +9521,33 @@
     "BO-1156",
     "BO-1157",
     "BO-1158",
-    "BO-1159"
+    "BO-1159",
+    "BO-1163",
+    "BO-1164",
+    "BO-1165",
+    "BO-1166"
    ],
    "operations": [
     "approvals#listApprovalMatrices",
     "approvals#setApprovalMatrix",
     "wallet#adjustWallet",
     "wallet#getWallet",
+    "wallet#getWalletLiability",
+    "wallet#getWalletReconciliation",
     "wallet#linkWalletCredential",
     "wallet#listWalletDisputes",
-    "wallet#listWalletTransactions",
     "wallet#raiseWalletDispute",
     "wallet#resolveWalletDispute",
-    "wallet#reverseWalletFunding",
+    "wallet#setWalletAccountingMapping",
+    "wallet#setWalletReconciliationSources",
     "wallet#setWalletRestriction",
     "wallet#setWalletRiskRules",
-    "wallet#setWalletTransferRules",
     "wallet#suspendWallet",
     "wallet#withdrawWalletDispute"
    ]
   },
   "AM-WALLET-CASHLESS-P08-7": {
    "screens": [
-    "BO-1163",
-    "BO-1164",
-    "BO-1165",
-    "BO-1166",
     "BO-1167",
     "BO-1168",
     "BO-1169",
@@ -9540,8 +9572,7 @@
     "wallet#publishWalletConfiguration",
     "wallet#setWalletAccountingMapping",
     "wallet#setWalletChannelRules",
-    "wallet#setWalletIntegrationMapping",
-    "wallet#setWalletReconciliationSources"
+    "wallet#setWalletIntegrationMapping"
    ]
   },
   "AM-WALLET-CASHLESS-P08-BLOCK-A-COMPLETION": {
@@ -9779,6 +9810,7 @@
     "white-label#listGuidedChoices",
     "white-label#listLandingPageTemplates",
     "white-label#listPromoBlocks",
+    "white-label#previewGuidedChoice",
     "white-label#publishContentBlock",
     "white-label#publishGuidedChoice",
     "white-label#publishTenantConfig",

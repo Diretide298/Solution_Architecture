@@ -154,13 +154,6 @@ paths:
   /approval-requests:
     get:
       operationId: listApprovalRequests
-      x-ticvai-read-via:
-      - query: identity#principalRecords
-        route: in-process
-        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001; R8 lineage request)'
-      - query: identity#delegatedAccessRecords
-        route: in-process
-        for: 'its read of identity.delegated_access, Identity''s data (CHG-MOD-001; R8 lineage request)'
       x-ticvai-consumed-by:
         - "P04 POS-020 Shift Exceptions & Alerts"
         - "P06 EMP-037 Notifications"
@@ -180,6 +173,13 @@ paths:
         - "P08 BO-375 Business Context & Evidence Viewer"
         - "P08 BO-393 AI SLA & Escalation Advisor"
         - "P08 BO-940 Manager Mobile Approval Center"
+      x-ticvai-read-via:
+      - query: identity#principalRecords
+        route: in-process
+        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001; R8 lineage request)'
+      - query: identity#delegatedAccessRecords
+        route: in-process
+        for: 'its read of identity.delegated_access, Identity''s data (CHG-MOD-001; R8 lineage request)'
       x-ticvai-audience:
       - staff
       summary: Requests awaiting a decision, or already decided
@@ -1014,6 +1014,9 @@ paths:
         format: uuid
     post:
       operationId: resubmitApprovalRequest
+      x-ticvai-consumed-by:
+        - "P08 BO-085 Approval Request"
+        - "P08 BO-379 Requester Modification & Resubmission"
       x-ticvai-read-via:
       - query: identity#principalRecords
         route: in-process
@@ -1021,9 +1024,6 @@ paths:
       - query: identity#delegatedAccessRecords
         route: in-process
         for: 'its read of identity.delegated_access, Identity''s data (CHG-MOD-001; R8 lineage request)'
-      x-ticvai-consumed-by:
-        - "P08 BO-085 Approval Request"
-        - "P08 BO-379 Requester Modification & Resubmission"
       x-ticvai-audience:
       - staff
       summary: Amend a rejected request and try again
@@ -3845,7 +3845,6 @@ paths:
       x-ticvai-audience:
       - service
       x-ticvai-auth: service
-      x-ticvai-consumed-by: []
       x-ticvai-agreed: '20 October 2026: the lead''s answer to the r8 decisions sheet, item 4 option A ("Yes. to all
         decision. 1-4"; CHG-R8DEC-002)'
       summary: Record whether an approved action was applied

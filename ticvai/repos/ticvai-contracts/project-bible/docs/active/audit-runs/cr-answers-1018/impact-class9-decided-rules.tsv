@@ -1,0 +1,214 @@
+group	ticket	plan_key	status	type	assignee	subject	links
+started	27686	TEST-AM-FOUNDATION-DATABASE	On hold	Task	Pranay Shinde	[Test] Module test: Foundation · Database migrations	table:catalogue.channel_envelope, table:ledger.journal_entry, table:marketing.guest_profile, table:seating.seat_reservation
+started	30356	MIG-SEATING#seating.seat_hold	On hold	Sub Task		[DB] seating.seat_hold	table:seating.seat_reservation
+started	30386	MIG-CATALOGUE#catalogue.channel_allocation	On hold	Sub Task		[DB] catalogue.channel_allocation	table:catalogue.channel_envelope
+finished	27668	MIG-SEATING	Ready for QA	Task	Hrushikant Patkar	[DB] Migration V0019__seating.sql: seating (10 tables)	table:seating.seat_reservation
+finished	27671	MIG-CATALOGUE	Ready for QA	Task	Hrushikant Patkar	[DB] Migration V0022__catalogue.sql: catalogue (22 tables)	table:catalogue.channel_envelope
+finished	27672	MIG-LEDGER	Ready for QA	Task	Hrushikant Patkar	[DB] Migration V0023__ledger.sql: ledger (18 tables)	table:ledger.journal_entry
+finished	27677	MIG-MARKETING	Ready for QA	Task	Hrushikant Patkar	[DB] Migration V0028__marketing.sql: marketing (55 tables)	table:marketing.guest_profile
+finished	30416	MIG-LEDGER#ledger.journal_entry	Ready for QA	Sub Task	Hrushikant Patkar	[DB] ledger.journal_entry	table:ledger.journal_entry
+finished	30540	MIG-MARKETING#marketing.guest_profile	Ready for QA	Sub Task	Hrushikant Patkar	[DB] marketing.guest_profile	table:marketing.guest_profile
+finished	35651	MIG-SEATING#seating.seat_reservation	Ready for QA	Sub Task	Hrushikant Patkar	[DB] seating.seat_reservation	table:seating.seat_reservation
+finished	35659	MIG-CATALOGUE#catalogue.channel_envelope	Ready for QA	Sub Task	Hrushikant Patkar	[DB] catalogue.channel_envelope	table:catalogue.channel_envelope
+new	27645	AM-FOUNDATION-DATABASE	New	Feature	Hrushikant Patkar	Foundation · Database migrations	table:catalogue.channel_envelope, table:ledger.journal_entry, table:marketing.guest_profile, table:seating.seat_reservation
+new	27687	AM-FOUNDATION-PLATFORM	New	Feature	Pranay Shinde	Foundation · Platform kernel	operation:catalogue#convertInventoryHold, operation:orders#createPayment
+new	27691	PLATFORM-OBSERVE	New	Task	Pranay Shinde	[BE] Observability with tenant and venue on every trace, and the first dashboards	operation:orders#createPayment, table:ledger.journal_entry
+new	27692	PLATFORM-KERNEL	New	Task	Pranay Shinde	[BE] Request kernel: hostname to tenant routing, per-transaction scope, error model and 42	raised the CR
+new	27699	PLATFORM-PAYMENTS	New	Task	Hrushikant Patkar	[BE] Payment adapter and signed webhook against the provider's test mode	table:ledger.journal_entry
+new	27701	PLATFORM-SAGA-PAID	New	Task	Hrushikant Patkar	[BE] Order paid to tickets issued: the saga proven end to end	operation:catalogue#convertInventoryHold, operation:orders#createPayment, raised the CR, table:catalogue.channel_envelope, table:ledger.journal_entry, table:seating.seat_reservation
+new	27703	TEST-AM-FOUNDATION-PLATFORM	New	Task	Chinmay Patkar	[Test] Module test: Foundation · Platform kernel	operation:catalogue#convertInventoryHold, operation:orders#createPayment, table:catalogue.channel_envelope, table:ledger.journal_entry, table:seating.seat_reservation
+new	27704	AM-FOUNDATION-OFFLINE	New	Feature	Hrushikant Patkar	Foundation · Offline: POS, Kitchen Display and scanner	operation:orders#createPayment
+new	27705	OFFLINE-JOURNAL	New	Task	Pradnya Yeram	[BE] Offline journal in packages/offline-core: record, replay and the conflict policies	operation:orders#createPayment, table:ledger.journal_entry
+new	27706	OFFLINE-BUNDLE	New	Task	Hrushikant Patkar	[BE] Signed catalogue and entitlement bundles, and the lease client	table:catalogue.channel_envelope
+new	27709	TEST-AM-FOUNDATION-OFFLINE	New	Task	Deep Khanvilkar	[Test] Module test: Foundation · Offline: POS, Kitchen Display and scanner	operation:orders#createPayment, table:catalogue.channel_envelope, table:ledger.journal_entry
+new	27738	SVC-MARKETING-CONSENT-1	New	Task	Pranay Shinde	[BE] MarketingService: claimDeviceConsent, createConsentQuestion, getCookieConsentRuntime,	table:marketing.guest_profile
+new	27745	SVC-MARKETING-GUEST-2	New	Task	Sanket Keluskar	[BE] MarketingService: removeFromWishlist, revokeGuestDevice, searchGuests	operation:marketing-crm#searchGuests, table:marketing.guest_profile
+new	27750	SVC-IDENTITY-IDENTITY-1	New	Task	Deep Khanvilkar	[BE] IdentityService: changeOwnCredential, exportSubjectData, forceLogout, getCurrentSessi	table:marketing.guest_profile
+new	27792	SVC-ORDER-SHIFT-1	New	Task	Pranay Shinde	[BE] OrderService: acceptShiftVariance, allocateDepositBox, approveShiftOpen, closeShift	table:ledger.journal_entry
+new	27866	SVC-MARKETING-CONSENT-3	New	Task	Pranay Shinde	[BE] MarketingService: listPublishedTrackingTechnologies, recordConsent, recordConsentAnsw	table:marketing.guest_profile
+new	27871	SVC-MARKETING-MARKETING-3	New	Task	Pranay Shinde	[BE] MarketingService: getMyProfile, getSeoMetadata, getWaiverStatus, handoverToAgent	table:marketing.guest_profile
+new	27873	SVC-MARKETING-MARKETING-4	New	Task	Pranay Shinde	[BE] MarketingService: identifyGuest, listMyCases, raiseMyCase, recordLostItem	table:marketing.guest_profile
+new	27923	SVC-MARKETING-MARKETING-6	New	Task	Pranay Shinde	[BE] MarketingService: setAgentAvailability, setSeoMetadata, submitForm, updateGuestPrefer	table:marketing.guest_profile
+new	27924	SVC-MARKETING-MARKETING-7	New	Task	Sanket Keluskar	[BE] MarketingService: updateMyProfile, uploadGuestDocument	table:marketing.guest_profile
+new	27990	SVC-TENANCY-TENANCY-4	New	Task	Surendra Loke	[BE] TenancyService: resolveTenantHost, setTenantDomainMapping	operation:tenancy#resolveTenantHost
+new	28080	TEST-AM-SETUP-TICKETING-GUEST-COMMERCE-P08	New	Task	Pranay Shinde	[Test] Module test: Ticketing & Guest Commerce · Venue Management (setup)	table:catalogue.channel_envelope
+new	28097	VM-CATALOGUE-CAPACITY-1	New	Task	Deep Khanvilkar	[BE] CatalogueService: createChannelCapacity, getChannelAllocations, listChannelCapacities	table:catalogue.channel_envelope
+new	28098	VM-CATALOGUE-CAPACITY-2	New	Task	Sanket Keluskar	[BE] CatalogueService: setChannelAllocations, updateChannelCapacity	table:catalogue.channel_envelope
+new	28135	SVC-CATALOGUE-LEASE-1	New	Task	Deep Khanvilkar	[BE] CatalogueService: acquireInventoryHold, convertInventoryHold, listInventoryHolds	operation:catalogue#convertInventoryHold, table:catalogue.channel_envelope, table:seating.seat_reservation
+new	28144	SVC-ORDER-PAYMENT-1	New	Task	Pranay Shinde	[BE] OrderService: addTip, capturePayment, createPayment, inquirePaymentStatus	operation:orders#capturePayment, operation:orders#createPayment, table:ledger.journal_entry
+new	28191	AM-SEATING-MAPS-P01	New	Feature	Narayan Gaonkar	Seating & Maps · Guest Web	operation:seating#createSeatHold
+new	28192	SVC-CATALOGUE-HOLD-1	New	Task	Narayan Gaonkar	[BE] CatalogueService: createSeatHold, extendSeatHold, getSeatHold, relinquishSeatHold	operation:seating#createSeatHold, operation:seating#getSeatHold, table:seating.seat_reservation
+new	28193	SVC-CATALOGUE-AVAILABILITY-1	New	Task	Chinmay Patkar	[BE] CatalogueService: getSeatAvailability	table:seating.seat_reservation
+new	28194	SVC-CATALOGUE-RECOMMENDATION-1	New	Task	Chinmay Patkar	[BE] CatalogueService: recommendSeats	table:seating.seat_reservation
+new	28197	APP-WEB-WEB-007	New	Task	Chitrangi Mestry	[FE] WEB-007 Interactive Seat Selection	operation:seating#createSeatHold
+new	28201	AM-SEATING-MAPS-P02	New	Feature	Chinmay Patkar	Seating & Maps · Guest App	operation:seating#createSeatHold
+new	28202	APP-MOB-GST-049	New	Task	Chinmay Patkar	[FE] GST-049 Interactive Seat Selection	operation:seating#createSeatHold
+new	28205	AM-SEATING-MAPS-P04	New	Feature	Pradnya Yeram	Seating & Maps · POS	operation:orders#createPayment, operation:seating#createSeatHold, operation:seating#getSeatHold
+new	28206	APP-POS-POS-004	New	Task	Pradnya Yeram	[FE] POS-004 Sell — Seat Map	operation:orders#createPayment, operation:seating#createSeatHold, operation:seating#getSeatHold
+new	28218	AM-ORDERS-RESERVATIONS-P01	New	Feature	Narayan Gaonkar	Orders & Reservations · Guest Web	operation:orders#createPayment
+new	28222	APP-WEB-WEB-012	New	Task	Chinmay Patkar	[FE] WEB-012 Checkout — Payment	operation:orders#createPayment
+new	28225	APP-WEB-WEB-033	New	Task	Chitrangi Mestry	[FE] WEB-033 Shop	operation:orders#createPayment
+new	28230	AM-ORDERS-RESERVATIONS-P02	New	Feature	Narayan Gaonkar	Orders & Reservations · Guest App	operation:orders#createPayment
+new	28232	SVC-ORDER-REFUND-1	New	Task	Pranay Shinde	[BE] OrderService: createRefund, createRefundRequest, listOrderRefunds	table:ledger.journal_entry
+new	28236	APP-MOB-GST-009	New	Task	Chitrangi Mestry	[FE] GST-009 Review & Payment	operation:orders#createPayment
+new	28253	AM-ORDERS-RESERVATIONS-P04	New	Feature	Pradnya Yeram	Orders & Reservations · POS	operation:marketing-crm#searchGuests, operation:orders#createPayment
+new	28260	APP-POS-POS-030	New	Task	Pradnya Yeram	[FE] POS-030 Sales Journal	operation:marketing-crm#searchGuests
+new	28263	AM-ORDERS-RESERVATIONS-P08-BLOCK-A	New	Feature	Pranay Shinde	Orders & Reservations · Venue Management (Block A)	operation:orders#capturePayment
+new	28264	VM-MIG-LEDGER	New	Task	Hrushikant Patkar	[DB] Forward migration V1016__ledger.sql: ledger for Venue Management (7 tables)	table:ledger.account_mapping
+new	28277	VM-LEDGER-FINANCE-1	New	Task	Sanket Keluskar	[BE] LedgerService: settleDeposit, validateRecognitionSchedules	table:ledger.journal_entry
+new	28280	VM-ORDER-ORDERS-2	New	Task	Pranay Shinde	[BE] OrderService: getChargebackAnalytics, listDeposits, recordChargeback, recordChargebac	table:ledger.account_mapping, table:ledger.journal_entry
+new	28342	APP-POS-POS-002	New	Task	Pradnya Yeram	[FE] POS-002 Sell — Ticket Catalogue	operation:orders#createPayment
+new	28408	SVC-LEDGER-FINANCE-3	New	Task	Pranay Shinde	[BE] LedgerService: disputeObligation, recordWriteOff, resolveObligationDispute	table:ledger.journal_entry
+new	28409	SVC-LEDGER-LEDGER-3	New	Task	Surendra Loke	[BE] LedgerService: listInterEntityObligations, postOrderRevenue, runFxRevaluation	operation:finance#postOrderRevenue, table:ledger.journal_entry
+new	28412	VM-LEDGER-FISCAL-1	New	Task	Sanket Keluskar	[BE] LedgerService: closeFiscalPeriod, listFiscalPeriods	table:ledger.journal_entry
+new	28414	TEST-AM-FINANCE-TAX-API-BLOCK-A-COMPLETION	New	Task	Pranay Shinde	[Test] Module test: Finance & Tax · API only (Block A completion)	table:ledger.journal_entry
+new	28490	AM-SETUP-FINANCE-INSIGHTS-P08-REST	New	Feature	Surendra Loke	Finance & Insights · Venue Management (setup, the rest of the screens)	operation:finance#setAccountMappings
+new	28496	SVC-LEDGER-ACCOUNTS-1	New	Task		[BE] LedgerService: createAccount, createCostCenter, getAccount, listAccountMappings	table:ledger.account_mapping
+new	28497	SVC-LEDGER-ACCOUNTS-2	New	Task	Pranay Shinde	[BE] LedgerService: listAccounts, listCostCenters, setAccountMappings, updateAccount	operation:finance#setAccountMappings, table:ledger.account_mapping
+new	28505	APP-SETUP-BO-075-REST	New	Task	Sanket Keluskar	[FE] BO-075 Account Mapping (the rest of the screen: 6 of its 8 operations)	operation:finance#setAccountMappings
+new	28529	SVC-ORDER-SHIFT-5	New	Task	Pranay Shinde	[BE] OrderService: resumeShift, setDenominations, setTillShiftPolicy, submitShiftCount	table:ledger.journal_entry
+new	28577	AM-FOOD-BEVERAGE-P06-BLOCK-A	New	Feature	Chitrangi Mestry	Food & Beverage · Staff App (Block A)	operation:orders#createPayment
+new	28582	VM-BO-024	New	Task	Pallavi Sawant	[FE] BO-024 Payment Exceptions	operation:orders#capturePayment
+new	28585	APP-STAFF-EMP-059	New	Task	Chitrangi Mestry	[FE] EMP-059 Table Order, Bill & Payment Management	operation:orders#createPayment
+new	28615	AM-RETAIL-P04	New	Feature	Pradnya Yeram	Retail · POS	operation:orders#capturePayment, operation:orders#createPayment
+new	28621	APP-POS-POS-005	New	Task	Pradnya Yeram	[FE] POS-005 Payment	operation:orders#capturePayment, operation:orders#createPayment
+new	28648	AM-MAINTENANCE-SAFETY-P06-BLOCK-A	New	Feature	Narayan Gaonkar	Maintenance & Safety · Staff App (Block A)	operation:marketing-crm#searchGuests
+new	28657	APP-STAFF-EMP-026	New	Task	Chitrangi Mestry	[FE] EMP-026 Incident report	operation:marketing-crm#searchGuests
+new	28683	TEST-AM-WHITE-LABEL-P02	New	Task	Pallavi Sawant	[Test] Module test: White Label · Guest App	table:marketing.guest_profile
+new	28691	TEST-AM-SEATING-MAPS-P01	New	Task	Deep Khanvilkar	[Test] Module test: Seating & Maps · Guest Web	operation:seating#createSeatHold, table:seating.seat_reservation
+new	28728	TEST-AM-ORDERS-RESERVATIONS-P08-BLOCK-A	New	Task	Pallavi Sawant	[Test] Module test: Orders & Reservations · Venue Management (Block A)	table:ledger.account_mapping, table:ledger.journal_entry
+new	28741	TEST-AM-SETUP-FINANCE-INSIGHTS-P08-REST	New	Task	Narayan Gaonkar	[Test] Module test: Finance & Insights · Venue Management (setup, the rest of the screens)	operation:finance#setAccountMappings, table:ledger.account_mapping
+new	28754	TEST-AM-FOOD-BEVERAGE-P04	New	Task	Pranay Shinde	[Test] Module test: Food & Beverage · POS	table:ledger.journal_entry
+new	28759	TEST-AM-SETUP-TICKETING-GUEST-COMMERCE-P08-REST	New	Task	Narayan Gaonkar	[Test] Module test: Ticketing & Guest Commerce · Venue Management (setup, the rest of the 	table:catalogue.channel_envelope
+new	28800	SVC-MARKETING-MARKETING-1	New	Task	Pranay Shinde	[BE] MarketingService: createChallenge, createForm, createInvitationCampaign, createReferr	table:marketing.guest_profile
+new	28813	TEST-AM-MARKETING-CRM-P01	New	Task	Chinmay Patkar	[Test] Module test: Marketing & CRM · Guest Web	table:marketing.guest_profile
+new	28824	AM-MARKETING-CRM-P04	New	Feature	Pradnya Yeram	Marketing & CRM · POS	operation:marketing-crm#searchGuests
+new	28825	APP-POS-POS-027	New	Task	Pradnya Yeram	[FE] POS-027 Guest Lookup	operation:marketing-crm#searchGuests
+new	28837	SVC-MARKETING-CONSENT-7	New	Task	Surendra Loke	[BE] MarketingService: recordCheckoutConsents, setPrivacyAction, setPrivacyRequestTypes, s	table:marketing.guest_profile
+new	28874	SVC-MARKETING-SEGMENT-2	New	Task	Deep Khanvilkar	[BE] MarketingService: listSegmentMembers	table:marketing.guest_profile
+new	28886	AM-SETUP-CUSTOMER-MARKETING-P08-REST	New	Feature	Sanket Keluskar	Customer & Marketing · Venue Management (setup, the rest of the screens)	operation:marketing-crm#getGuestProfile
+new	28912	SVC-MARKETING-GUEST-4	New	Task	Deep Khanvilkar	[BE] MarketingService: getGuestProfile	operation:marketing-crm#getGuestProfile, table:marketing.guest_profile
+new	28913	APP-SETUP-BO-799-REST	New	Task	Sanket Keluskar	[FE] BO-799 Agent Workspace (the rest of the screen: 6 of its 7 operations)	operation:marketing-crm#getGuestProfile
+new	28914	SVC-MARKETING-SEGMENT-4	New	Task	Pranay Shinde	[BE] MarketingService: previewSegmentDraft	table:marketing.guest_profile
+new	28916	TEST-AM-SETUP-CUSTOMER-MARKETING-P08-REST	New	Task	Chinmay Patkar	[Test] Module test: Customer & Marketing · Venue Management (setup, the rest of the screen	operation:marketing-crm#getGuestProfile, table:marketing.guest_profile
+new	29155	SVC-MARKETING-GUESTS-2	New	Task	Chinmay Patkar	[BE] MarketingService: runDataRetention	table:marketing.guest_profile
+new	29157	TEST-AM-TENANCY-VENUES-P08-2	New	Task	Sanket Keluskar	[Test] Module test: Tenancy & Venues · Venue Management 2 of 3	table:marketing.guest_profile
+new	29247	VM-LEDGER-RECOGNITION-1	New	Task	Narayan Gaonkar	[BE] LedgerService: createRecognitionSchedule, getDeferredRevenue, listRecognitionSchedule	table:ledger.journal_entry
+new	29741	SVC-CATALOGUE-DRAFTED-22	New	Task	Narayan Gaonkar	[BE] CatalogueService: listDynamicPricingGuardrail, listInternalDemandBooking, listMarketT	table:catalogue.channel_envelope
+new	29762	SVC-CATALOGUE-DRAFTED-33	New	Task	Surendra Loke	[BE] CatalogueService: publishChannelReadinessValidation, setChannelFeePayment	table:catalogue.channel_envelope
+new	29763	SVC-CATALOGUE-DRAFTED-26	New	Task	Hrushikant Patkar	[BE] CatalogueService: listChannelSaleRule, listChannelSaleSchedule, listDynamicPricingPer	table:catalogue.channel_envelope
+new	29764	SVC-CATALOGUE-DRAFTED-28	New	Task	Pranay Shinde	[BE] CatalogueService: listRevenueDemandImpact, listSaleChannel, listScenarioModelingWhat,	table:catalogue.channel_envelope
+new	29771	SVC-CATALOGUE-DRAFTED-30	New	Task	Narayan Gaonkar	[BE] CatalogueService: listChannel, listChannel2, listChannelAllocationRebalancing, listCh	table:catalogue.channel_envelope
+new	29772	SVC-CATALOGUE-DRAFTED-32	New	Task	Narayan Gaonkar	[BE] CatalogueService: listCustomerEligibilityRule, listProductPriceAvailability, listReal	table:catalogue.channel_envelope
+new	29845	TEST-AM-TICKETING-P08-6	New	Task	Deep Khanvilkar	[Test] Module test: Ticketing · Venue Management 6 of 8	table:catalogue.channel_envelope
+new	29846	SVC-CATALOGUE-DRAFTED-31	New	Task		[BE] CatalogueService: listChannelExceptionIncident, listChannelGovernanceSla, listChannel	table:catalogue.channel_envelope
+new	29955	SVC-CATALOGUE-PROMOTIONS-3	New	Task	Deep Khanvilkar	[BE] CatalogueService: getRecommendations	table:marketing.guest_profile
+new	30020	AM-SEATING-MAPS-P08-4	New	Feature	Pallavi Sawant	Seating & Maps · Venue Management 4 of 5	operation:seating#getSeatHold
+new	30021	AM-SEATING-MAPS-P08-5	New	Feature	Hrushikant Patkar	Seating & Maps · Venue Management 5 of 5	operation:seating#createSeatHold, operation:seating#getSeatHold
+new	30023	AM-ORDERS-RESERVATIONS-P05	New	Feature	Pradnya Yeram	Orders & Reservations · Kiosk	operation:orders#createPayment
+new	30024	AM-ORDERS-RESERVATIONS-P06	New	Feature	Pradnya Yeram	Orders & Reservations · Staff App	operation:orders#capturePayment, operation:orders#createPayment
+new	30034	AM-ORDERS-RESERVATIONS-P10	New	Feature	Pallavi Sawant	Orders & Reservations · Partner Portal	operation:orders#capturePayment, operation:orders#createPayment
+new	30055	AM-FINANCE-TAX-P08	New	Feature	Pallavi Sawant	Finance & Tax · Venue Management	operation:finance#createJournalEntry, operation:finance#listJournalEntries
+new	30099	AM-MARKETING-CRM-P06	New	Feature	Chitrangi Mestry	Marketing & CRM · Staff App	operation:marketing-crm#getGuestProfile
+new	30100	AM-MARKETING-CRM-P08	New	Feature	Narayan Gaonkar	Marketing & CRM · Venue Management 1 of 5	operation:marketing-crm#getGuestProfile, operation:marketing-crm#searchGuests
+new	30112	AM-AI-P08	New	Feature	Narayan Gaonkar	AI · Venue Management 1 of 2	operation:marketing-crm#getGuestProfile
+new	30692	SVC-MARKETING-CONSENT-1#claimDeviceConsent	New	Sub Task	Pranay Shinde	[BE] claimDeviceConsent: POST /guests/{subjectId}/consents/claim-device	table:marketing.guest_profile
+new	30711	SVC-MARKETING-GUEST-2#searchGuests	New	Sub Task	Sanket Keluskar	[BE] searchGuests: GET /guests	operation:marketing-crm#searchGuests, raised the CR, table:marketing.guest_profile
+new	30720	SVC-IDENTITY-IDENTITY-1#exportSubjectData	New	Sub Task	Deep Khanvilkar	[BE] exportSubjectData: POST /guests/{subjectId}/data-export	table:marketing.guest_profile
+new	30806	SVC-ORDER-SHIFT-1#closeShift	New	Sub Task	Pranay Shinde	[BE] closeShift: POST /shifts/{shiftId}/close	table:ledger.journal_entry
+new	30997	SVC-MARKETING-CONSENT-3#recordConsent	New	Sub Task	Pranay Shinde	[BE] recordConsent: POST /guests/{subjectId}/consents	table:marketing.guest_profile
+new	31010	SVC-MARKETING-MARKETING-3#getMyProfile	New	Sub Task	Pranay Shinde	[BE] getMyProfile: GET /guests/me/profile	table:marketing.guest_profile
+new	31018	SVC-MARKETING-MARKETING-4#identifyGuest	New	Sub Task	Pranay Shinde	[BE] identifyGuest: POST /guests/identify	table:marketing.guest_profile
+new	31166	SVC-MARKETING-MARKETING-6#updateGuestPreferences	New	Sub Task	Pranay Shinde	[BE] updateGuestPreferences: PUT /guests/{subjectId}/preferences	table:marketing.guest_profile
+new	31167	SVC-MARKETING-MARKETING-7#updateMyProfile	New	Sub Task	Sanket Keluskar	[BE] updateMyProfile: PATCH /guests/me/profile	table:marketing.guest_profile
+new	31312	SVC-TENANCY-TENANCY-4#resolveTenantHost	New	Sub Task	Surendra Loke	[BE] resolveTenantHost: GET /tenant-domains/{hostname}	operation:tenancy#resolveTenantHost
+new	31625	VM-CATALOGUE-CAPACITY-1#getChannelAllocations	New	Sub Task	Deep Khanvilkar	[BE] getChannelAllocations: GET /channel-capacities/{channelCapacityId}/channel-allocation	table:catalogue.channel_envelope
+new	31627	VM-CATALOGUE-CAPACITY-1#relinquishChannelAllocation	New	Sub Task	Deep Khanvilkar	[BE] relinquishChannelAllocation: POST /channel-capacities/{channelCapacityId}/channel-all	table:catalogue.channel_envelope
+new	31628	VM-CATALOGUE-CAPACITY-2#setChannelAllocations	New	Sub Task	Sanket Keluskar	[BE] setChannelAllocations: PUT /channel-capacities/{channelCapacityId}/channel-allocation	table:catalogue.channel_envelope
+new	31711	SVC-CATALOGUE-LEASE-1#acquireInventoryHold	New	Sub Task	Deep Khanvilkar	[BE] acquireInventoryHold: POST /inventory-holds	table:catalogue.channel_envelope
+new	31712	SVC-CATALOGUE-LEASE-1#convertInventoryHold	New	Sub Task	Deep Khanvilkar	[BE] convertInventoryHold: POST /inventory-holds/{inventoryHoldId}/convert	operation:catalogue#convertInventoryHold, table:catalogue.channel_envelope, table:seating.seat_reservation
+new	31733	SVC-ORDER-PAYMENT-1#capturePayment	New	Sub Task	Pranay Shinde	[BE] capturePayment: POST /payments/{paymentId}/capture	operation:orders#capturePayment, table:ledger.journal_entry
+new	31734	SVC-ORDER-PAYMENT-1#createPayment	New	Sub Task	Pranay Shinde	[BE] createPayment: POST /payments	operation:orders#createPayment, table:ledger.journal_entry
+new	31839	SVC-CATALOGUE-HOLD-1#createSeatHold	New	Sub Task	Narayan Gaonkar	[BE] createSeatHold: POST /seat-holds	operation:seating#createSeatHold, table:seating.seat_reservation
+new	31840	SVC-CATALOGUE-HOLD-1#extendSeatHold	New	Sub Task	Narayan Gaonkar	[BE] extendSeatHold: POST /seat-holds/{holdId}/extend	table:seating.seat_reservation
+new	31841	SVC-CATALOGUE-HOLD-1#getSeatHold	New	Sub Task	Narayan Gaonkar	[BE] getSeatHold: GET /seat-holds/{holdId}	operation:seating#getSeatHold, table:seating.seat_reservation
+new	31842	SVC-CATALOGUE-HOLD-1#relinquishSeatHold	New	Sub Task	Narayan Gaonkar	[BE] relinquishSeatHold: DELETE /seat-holds/{holdId}	table:seating.seat_reservation
+new	31843	SVC-CATALOGUE-AVAILABILITY-1#getSeatAvailability	New	Sub Task	Chinmay Patkar	[BE] getSeatAvailability: GET /performances/{performanceId}/seat-availability	table:seating.seat_reservation
+new	31844	SVC-CATALOGUE-RECOMMENDATION-1#recommendSeats	New	Sub Task	Chinmay Patkar	[BE] recommendSeats: POST /performances/{performanceId}/seat-recommendations	table:seating.seat_reservation
+new	31848	APP-WEB-WEB-007#build	New	Sub Task	Chitrangi Mestry	[FE] WEB-007 Interactive Seat Selection: build with all states	operation:seating#createSeatHold
+new	31849	APP-WEB-WEB-007#wire	New	Sub Task	Chitrangi Mestry	[FE] WEB-007 Interactive Seat Selection: connect to API	operation:seating#createSeatHold
+new	31850	APP-WEB-WEB-007#test	New	Sub Task	Chitrangi Mestry	[FE] WEB-007 Interactive Seat Selection: tests	operation:seating#createSeatHold
+new	31858	APP-MOB-GST-049#build	New	Sub Task	Chinmay Patkar	[FE] GST-049 Interactive Seat Selection: build with all states	operation:seating#createSeatHold
+new	31859	APP-MOB-GST-049#wire	New	Sub Task	Chinmay Patkar	[FE] GST-049 Interactive Seat Selection: connect to API	operation:seating#createSeatHold
+new	31860	APP-MOB-GST-049#test	New	Sub Task	Chinmay Patkar	[FE] GST-049 Interactive Seat Selection: tests	operation:seating#createSeatHold
+new	31868	APP-POS-POS-004#build	New	Sub Task	Pradnya Yeram	[FE] POS-004 Sell — Seat Map: build with all states	operation:orders#createPayment, operation:seating#createSeatHold, operation:seating#getSeatHold
+new	31869	APP-POS-POS-004#wire	New	Sub Task	Pradnya Yeram	[FE] POS-004 Sell — Seat Map: connect to API	operation:orders#createPayment, operation:seating#createSeatHold, operation:seating#getSeatHold
+new	31870	APP-POS-POS-004#test	New	Sub Task	Pradnya Yeram	[FE] POS-004 Sell — Seat Map: tests	operation:orders#createPayment, operation:seating#createSeatHold, operation:seating#getSeatHold
+new	31898	APP-WEB-WEB-012#build	New	Sub Task	Chinmay Patkar	[FE] WEB-012 Checkout — Payment: build with all states	operation:orders#createPayment
+new	31899	APP-WEB-WEB-012#wire	New	Sub Task	Chinmay Patkar	[FE] WEB-012 Checkout — Payment: connect to API	operation:orders#createPayment
+new	31900	APP-WEB-WEB-012#test	New	Sub Task	Chinmay Patkar	[FE] WEB-012 Checkout — Payment: tests	operation:orders#createPayment
+new	31907	APP-WEB-WEB-033#build	New	Sub Task	Chitrangi Mestry	[FE] WEB-033 Shop: build with all states	operation:orders#createPayment
+new	31908	APP-WEB-WEB-033#wire	New	Sub Task	Chitrangi Mestry	[FE] WEB-033 Shop: connect to API	operation:orders#createPayment
+new	31909	APP-WEB-WEB-033#test	New	Sub Task	Chitrangi Mestry	[FE] WEB-033 Shop: tests	operation:orders#createPayment
+new	31924	SVC-ORDER-REFUND-1#createRefund	New	Sub Task	Pranay Shinde	[BE] createRefund: POST /orders/{orderId}/refunds	table:ledger.journal_entry
+new	31935	APP-MOB-GST-009#build	New	Sub Task	Chitrangi Mestry	[FE] GST-009 Review & Payment: build with all states	operation:orders#createPayment
+new	31936	APP-MOB-GST-009#wire	New	Sub Task	Chitrangi Mestry	[FE] GST-009 Review & Payment: connect to API	operation:orders#createPayment
+new	31937	APP-MOB-GST-009#test	New	Sub Task	Chitrangi Mestry	[FE] GST-009 Review & Payment: tests	operation:orders#createPayment
+new	32005	APP-POS-POS-030#build	New	Sub Task	Pradnya Yeram	[FE] POS-030 Sales Journal: build with all states	operation:marketing-crm#searchGuests
+new	32006	APP-POS-POS-030#wire	New	Sub Task	Pradnya Yeram	[FE] POS-030 Sales Journal: connect to API	operation:marketing-crm#searchGuests
+new	32007	APP-POS-POS-030#test	New	Sub Task	Pradnya Yeram	[FE] POS-030 Sales Journal: tests	operation:marketing-crm#searchGuests
+new	32014	VM-MIG-LEDGER#ledger.account_mapping	New	Sub Task	Hrushikant Patkar	[DB] ledger.account_mapping	table:ledger.account_mapping
+new	32059	VM-LEDGER-FINANCE-1#settleDeposit	New	Sub Task	Sanket Keluskar	[BE] settleDeposit: POST /deposits/{depositId}/settle	table:ledger.journal_entry
+new	32066	VM-ORDER-ORDERS-2#recordChargeback	New	Sub Task	Pranay Shinde	[BE] recordChargeback: POST /chargebacks/intake	table:ledger.account_mapping, table:ledger.journal_entry
+new	32067	VM-ORDER-ORDERS-2#recordChargebackOutcome	New	Sub Task	Pranay Shinde	[BE] recordChargebackOutcome: POST /chargebacks/{chargebackId}/outcome	table:ledger.account_mapping, table:ledger.journal_entry
+new	32192	APP-POS-POS-002#build	New	Sub Task	Pradnya Yeram	[FE] POS-002 Sell — Ticket Catalogue: build with all states	operation:orders#createPayment
+new	32193	APP-POS-POS-002#wire	New	Sub Task	Pradnya Yeram	[FE] POS-002 Sell — Ticket Catalogue: connect to API	operation:orders#createPayment
+new	32194	APP-POS-POS-002#test	New	Sub Task	Pradnya Yeram	[FE] POS-002 Sell — Ticket Catalogue: tests	operation:orders#createPayment
+new	32328	SVC-LEDGER-FINANCE-3#recordWriteOff	New	Sub Task	Pranay Shinde	[BE] recordWriteOff: POST /write-offs	table:ledger.journal_entry
+new	32331	SVC-LEDGER-LEDGER-3#postOrderRevenue	New	Sub Task	Surendra Loke	[BE] postOrderRevenue: POST /internal/order-postings	operation:finance#postOrderRevenue, table:ledger.journal_entry
+new	32332	SVC-LEDGER-LEDGER-3#runFxRevaluation	New	Sub Task	Surendra Loke	[BE] runFxRevaluation: POST /fx/revaluation	table:ledger.journal_entry
+new	32335	VM-LEDGER-FISCAL-1#closeFiscalPeriod	New	Sub Task	Sanket Keluskar	[BE] closeFiscalPeriod: POST /fiscal-periods/{periodId}/close	table:ledger.journal_entry
+new	32579	SVC-LEDGER-ACCOUNTS-1#listAccountMappings	New	Sub Task		[BE] listAccountMappings: GET /account-mappings	table:ledger.account_mapping
+new	32582	SVC-LEDGER-ACCOUNTS-2#setAccountMappings	New	Sub Task	Pranay Shinde	[BE] setAccountMappings: PUT /account-mappings	operation:finance#setAccountMappings, table:ledger.account_mapping
+new	32603	APP-SETUP-BO-075-REST#build	New	Sub Task	Sanket Keluskar	[FE] BO-075 Account Mapping (the rest of the screen: 6 of its 8 operations): build with al	operation:finance#setAccountMappings
+new	32604	APP-SETUP-BO-075-REST#wire	New	Sub Task	Sanket Keluskar	[FE] BO-075 Account Mapping (the rest of the screen: 6 of its 8 operations): connect to AP	operation:finance#setAccountMappings
+new	32605	APP-SETUP-BO-075-REST#test	New	Sub Task	Sanket Keluskar	[FE] BO-075 Account Mapping (the rest of the screen: 6 of its 8 operations): tests	operation:finance#setAccountMappings
+new	32649	SVC-ORDER-SHIFT-5#submitShiftCount	New	Sub Task	Pranay Shinde	[BE] submitShiftCount: POST /shifts/{shiftId}/count	table:ledger.journal_entry
+new	32792	VM-BO-024#build	New	Sub Task	Pallavi Sawant	[FE] BO-024 Payment Exceptions: build with all states	operation:orders#capturePayment
+new	32793	VM-BO-024#wire	New	Sub Task	Pallavi Sawant	[FE] BO-024 Payment Exceptions: connect to API	operation:orders#capturePayment
+new	32794	VM-BO-024#test	New	Sub Task	Pallavi Sawant	[FE] BO-024 Payment Exceptions: tests	operation:orders#capturePayment
+new	32801	APP-STAFF-EMP-059#build	New	Sub Task	Chitrangi Mestry	[FE] EMP-059 Table Order, Bill & Payment Management: build with all states	operation:orders#createPayment
+new	32802	APP-STAFF-EMP-059#wire	New	Sub Task	Chitrangi Mestry	[FE] EMP-059 Table Order, Bill & Payment Management: connect to API	operation:orders#createPayment
+new	32803	APP-STAFF-EMP-059#test	New	Sub Task	Chitrangi Mestry	[FE] EMP-059 Table Order, Bill & Payment Management: tests	operation:orders#createPayment
+new	32871	APP-POS-POS-005#build	New	Sub Task	Pradnya Yeram	[FE] POS-005 Payment: build with all states	operation:orders#capturePayment, operation:orders#createPayment
+new	32872	APP-POS-POS-005#wire	New	Sub Task	Pradnya Yeram	[FE] POS-005 Payment: connect to API	operation:orders#capturePayment, operation:orders#createPayment
+new	32873	APP-POS-POS-005#test	New	Sub Task	Pradnya Yeram	[FE] POS-005 Payment: tests	operation:orders#capturePayment, operation:orders#createPayment
+new	32945	APP-STAFF-EMP-026#build	New	Sub Task	Chitrangi Mestry	[FE] EMP-026 Incident report: build with all states	operation:marketing-crm#searchGuests
+new	32946	APP-STAFF-EMP-026#wire	New	Sub Task	Chitrangi Mestry	[FE] EMP-026 Incident report: connect to API	operation:marketing-crm#searchGuests
+new	32947	APP-STAFF-EMP-026#test	New	Sub Task	Chitrangi Mestry	[FE] EMP-026 Incident report: tests	operation:marketing-crm#searchGuests
+new	33241	SVC-MARKETING-MARKETING-1#createReferral	New	Sub Task	Pranay Shinde	[BE] createReferral: POST /referrals	table:marketing.guest_profile
+new	33304	APP-POS-POS-027#build	New	Sub Task	Pradnya Yeram	[FE] POS-027 Guest Lookup: build with all states	operation:marketing-crm#searchGuests
+new	33305	APP-POS-POS-027#wire	New	Sub Task	Pradnya Yeram	[FE] POS-027 Guest Lookup: connect to API	operation:marketing-crm#searchGuests
+new	33306	APP-POS-POS-027#test	New	Sub Task	Pradnya Yeram	[FE] POS-027 Guest Lookup: tests	operation:marketing-crm#searchGuests
+new	33361	SVC-MARKETING-CONSENT-7#recordCheckoutConsents	New	Sub Task	Surendra Loke	[BE] recordCheckoutConsents: POST /consent-records/checkout	table:marketing.guest_profile
+new	33438	SVC-MARKETING-SEGMENT-2#listSegmentMembers	New	Sub Task	Deep Khanvilkar	[BE] listSegmentMembers: GET /segments/{segmentId}/members	table:marketing.guest_profile
+new	33524	SVC-MARKETING-GUEST-4#getGuestProfile	New	Sub Task	Deep Khanvilkar	[BE] getGuestProfile: GET /guests/{subjectId}	operation:marketing-crm#getGuestProfile, table:marketing.guest_profile
+new	33525	APP-SETUP-BO-799-REST#build	New	Sub Task	Sanket Keluskar	[FE] BO-799 Agent Workspace (the rest of the screen: 6 of its 7 operations): build with al	operation:marketing-crm#getGuestProfile
+new	33526	APP-SETUP-BO-799-REST#wire	New	Sub Task	Sanket Keluskar	[FE] BO-799 Agent Workspace (the rest of the screen: 6 of its 7 operations): connect to AP	operation:marketing-crm#getGuestProfile
+new	33527	APP-SETUP-BO-799-REST#test	New	Sub Task	Sanket Keluskar	[FE] BO-799 Agent Workspace (the rest of the screen: 6 of its 7 operations): tests	operation:marketing-crm#getGuestProfile
+new	33528	SVC-MARKETING-SEGMENT-4#previewSegmentDraft	New	Sub Task	Pranay Shinde	[BE] previewSegmentDraft: POST /segments/preview	table:marketing.guest_profile
+new	33994	SVC-MARKETING-GUESTS-2#runDataRetention	New	Sub Task	Chinmay Patkar	[BE] runDataRetention: POST /retention-runs	table:marketing.guest_profile
+new	34218	VM-LEDGER-RECOGNITION-1#runRecognition	New	Sub Task	Narayan Gaonkar	[BE] runRecognition: POST /recognition/run	table:ledger.journal_entry
+new	35222	SVC-CATALOGUE-DRAFTED-22#listInternalDemandBooking	New	Sub Task	Narayan Gaonkar	[BE] listInternalDemandBooking: GET /internal-demand-booking	table:catalogue.channel_envelope
+new	35237	SVC-CATALOGUE-DRAFTED-33#publishChannelReadinessValidation	New	Sub Task	Surendra Loke	[BE] publishChannelReadinessValidation: PUT /channel-readiness-validation	table:catalogue.channel_envelope
+new	35242	SVC-CATALOGUE-DRAFTED-26#listInventoryCapacityChannel	New	Sub Task	Hrushikant Patkar	[BE] listInventoryCapacityChannel: GET /inventory-capacity-channel	table:catalogue.channel_envelope
+new	35244	SVC-CATALOGUE-DRAFTED-28#listSaleChannel	New	Sub Task	Pranay Shinde	[BE] listSaleChannel: GET /sale-channel	table:catalogue.channel_envelope
+new	35247	SVC-CATALOGUE-DRAFTED-30#listChannel	New	Sub Task	Narayan Gaonkar	[BE] listChannel: GET /channel	table:catalogue.channel_envelope
+new	35248	SVC-CATALOGUE-DRAFTED-30#listChannel2	New	Sub Task	Narayan Gaonkar	[BE] listChannel2: GET /channel-2	table:catalogue.channel_envelope
+new	35249	SVC-CATALOGUE-DRAFTED-30#listChannelAllocationRebalancing	New	Sub Task	Narayan Gaonkar	[BE] listChannelAllocationRebalancing: GET /channel-allocation-rebalancing	table:catalogue.channel_envelope
+new	35252	SVC-CATALOGUE-DRAFTED-32#listProductPriceAvailability	New	Sub Task	Narayan Gaonkar	[BE] listProductPriceAvailability: GET /product-price-availability	table:catalogue.channel_envelope
+new	35254	SVC-CATALOGUE-DRAFTED-32#listRealTimeChannel	New	Sub Task	Narayan Gaonkar	[BE] listRealTimeChannel: GET /real-time-channel	table:catalogue.channel_envelope
+new	35337	SVC-CATALOGUE-DRAFTED-31#listChannelPerformanceCommercial	New	Sub Task		[BE] listChannelPerformanceCommercial: GET /channel-performance-commercial	table:catalogue.channel_envelope
+new	35561	SVC-CATALOGUE-PROMOTIONS-3#getRecommendations	New	Sub Task	Deep Khanvilkar	[BE] getRecommendations: POST /recommendations	table:marketing.guest_profile
+new	35772	VM-LEDGER-LEDGER-2	New	Task	Deep Khanvilkar	[BE] LedgerService: rejectJournal, reopenPeriod	table:ledger.journal_entry
+new	36015	VM-LEDGER-LEDGER-2#rejectJournal	New	Sub Task	Deep Khanvilkar	[BE] rejectJournal: POST /journal-entries/{entryId}/reject	table:ledger.journal_entry

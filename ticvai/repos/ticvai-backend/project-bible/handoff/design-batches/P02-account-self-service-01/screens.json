@@ -42,7 +42,7 @@
     "appTabs"
    ]
   },
-  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement. My Tickets. **Declared only `transferOrderTickets` until 20 August** — a guest could give a ticket away and could not read one. Raised by Pranay. **Rewired on the 20 August review.** **Cross-surface parity, 31 August**: added getEntitlementCredential, getEntitlementHistory, listEntitlements. **The same screen on web and app was calling different operations** — one side could do something the other could not, and nothing recorded the difference as deliberate.\n\n**Mobile v4 (decided 29 September, MOB-1, MOB-7).** The **Tickets** tab root. GST-013 Ticket Details and GST-055 Dynamic QR Ticket (refresh every 30 s) are unchanged.",
+  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement. My Tickets. **Declared only `transferOrderTickets` until 20 August** — a guest could give a ticket away and could not read one. Raised by Pranay. **Rewired on the 20 August review.** **Cross-surface parity, 31 August**: added getEntitlementCredential, getEntitlementHistory, listEntitlements. **The same screen on web and app was calling different operations** — one side could do something the other could not, and nothing recorded the difference as deliberate.\n\n**Mobile v4 (decided 29 September, MOB-1, MOB-7).** The **Tickets** tab root. GST-013 Ticket Details and GST-055 Dynamic QR Ticket (refresh every 30 s) are unchanged.\n\nBuild note (r8 second round, ORDERS-MONEY-C05, the lead 20 October 2026): **Show QR** on a ticket opens GST-055 with its `entitlementId`, and the drawn **Scan a ticket** button reads a ticket's QR with the camera: a scanned ticket is added to this guest only when its owner has shared it (an open transfer, claimed as GST-014 claims one); the scan reads the transfer QR or the ticket QR and resolves to the open transfer, and with no open transfer the guest is told plainly that the ticket has not been shared with them. The operation that does this is requested of the core lane (orders.yaml, beside claimTicketTransfer); the edge to GST-055 and the button's binding wait for the client's approval of the visible navigation (pending entries ORDERS-MONEY-C05).\n\nBuild note (r8 second round, ORDERS-MONEY-C01, from the core lane): build the no-access state as two cases, not signed in (401: offered sign-in and brought back) and otherwise one neutral message with the list it came from; \"a record that is not theirs\" is not a case of its own, because another guest's record answers 404 like a missing one (Pattern 4). The wording waits for the client (pending entry ORDERS-MONEY-C01).",
   "density": "comfortable",
   "pattern": "listDetail",
   "patternReason": "`listMyEntitlements` reads the population and `getEntitlement` reads one of them — list, select, act",
@@ -1049,17 +1049,17 @@
    ]
   },
   "wireframe": {
-   "status": "notStarted",
-   "provenance": "designed",
+   "status": "approved",
+   "provenance": "client-verified",
    "board": "wireframes/P02 Guest App.dc.html#gst-019",
    "prototype": {
     "file": "sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html",
     "rev": "Mobile App v4, 29 September 2026",
     "match": "none",
-    "note": "Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the v4 look (the frame on this screen's board, wireframes/frames/gst-019.html, and #GST-019 in handoff/design-batches/apps/1-guest-app/return/TICVAI Guest App.dc.html). NOT client-verified: awaiting the client's design reviewer. Build the layout from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at: Account → All screens → Wave 2 → Order history (exact)."
+    "note": "Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the v4 look (the frame on this screen's board, wireframes/frames/gst-019.html, and #GST-019 in handoff/design-batches/apps/1-guest-app/return/TICVAI Guest App.dc.html). Client-approved 19 October 2026 (confirmed by Chinmay Parab). Build the layout from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at: Account → All screens → Wave 2 → Order history (exact)."
    },
-   "source": "Claude Code, 30 September 2026, drawn in the Mobile App v4 look",
-   "note": "**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified, awaiting the client's design reviewer.** `provenance: designed` because the accepted vocabulary has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md."
+   "source": "client approval, confirmed by Chinmay Parab 19 October 2026",
+   "note": "**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; client-approved 19 October 2026, confirmed by Chinmay Parab.** Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "gaps": [
@@ -1081,7 +1081,7 @@
     "id": "formIssueTaxInvoice",
     "component": "modal",
     "trigger": "Get a tax invoice",
-    "body": "The company name and TRN to put on the invoice, and where to email it; the order is the one selected and the invoice type is full.",
+    "body": "The company name and TRN to put on the invoice, and where to email it; the order is the one selected and the invoice type is full. A full invoice also asks the recipient's address, its country as `buyerCountryCode` (r8, ORDERS-MONEY-C06).",
     "confirm": {
      "label": "Get a tax invoice",
      "operation": "issueTaxInvoice"
@@ -1469,17 +1469,17 @@
    "coldEntry": "Resolves from the session; a cold arrival is the ordinary case."
   },
   "wireframe": {
-   "status": "notStarted",
-   "provenance": "designed",
+   "status": "approved",
+   "provenance": "client-verified",
    "board": "wireframes/P02 Guest App.dc.html#gst-039",
    "prototype": {
     "file": "sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html",
     "rev": "Mobile App v4, 29 September 2026",
     "match": "none",
-    "note": "Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the v4 look (the frame on this screen's board, wireframes/frames/gst-039.html, and #GST-039 in handoff/design-batches/apps/1-guest-app/return/TICVAI Guest App.dc.html). NOT client-verified: awaiting the client's design reviewer. Build the layout from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at: Account → All screens → Wave 1 → Profile (also Account → Profile) (exact). What v2 did differently: Emirates ID upload is on Profile in the prototype; the YAML has uploadGuestDocument on GST-066. Account also has a \"Saved guests (heights on file)\" row that no screen defines."
+    "note": "Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the v4 look (the frame on this screen's board, wireframes/frames/gst-039.html, and #GST-039 in handoff/design-batches/apps/1-guest-app/return/TICVAI Guest App.dc.html). Client-approved 19 October 2026 (confirmed by Chinmay Parab). Build the layout from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at: Account → All screens → Wave 1 → Profile (also Account → Profile) (exact). What v2 did differently: Emirates ID upload is on Profile in the prototype; the YAML has uploadGuestDocument on GST-066. Account also has a \"Saved guests (heights on file)\" row that no screen defines."
    },
-   "source": "Claude Code, 30 September 2026, drawn in the Mobile App v4 look",
-   "note": "**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified, awaiting the client's design reviewer.** `provenance: designed` because the accepted vocabulary has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md."
+   "source": "client approval, confirmed by Chinmay Parab 19 October 2026",
+   "note": "**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; client-approved 19 October 2026, confirmed by Chinmay Parab.** Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
@@ -1588,6 +1588,8 @@
      "back": false,
      "carries": [
       "challengeId",
+      "returnParams",
+      "returnTo",
       "subjectId"
      ]
     }
@@ -1933,22 +1935,34 @@
     {
      "name": "subjectId",
      "from": "navigation"
+    },
+    {
+     "name": "returnTo",
+     "from": "navigation",
+     "optional": true,
+     "notes": "r8 (WHITE-C13, screens/_patterns.yaml rule guestSignInReturn): the screen that sent a signed-out guest here from its no-access state; after sign-in this screen opens it again. Ignored unless it is a screen of this app."
+    },
+    {
+     "name": "returnParams",
+     "from": "navigation",
+     "optional": true,
+     "notes": "r8 (WHITE-C13): the entry parameters `returnTo` was opened with, handed back to it unchanged."
     }
    ],
    "coldEntry": "**Needs nothing.** A guest arriving cold signs in and goes Home; one sent from the cart carries `cartId` and goes back to it. The SSO deep-link parameter (`providerId`) went with the operations that used it (audit R167); a second-factor challenge is created in place, never arrives by link."
   },
   "wireframe": {
-   "status": "notStarted",
-   "provenance": "designed",
+   "status": "approved",
+   "provenance": "client-verified",
    "board": "wireframes/P02 Guest App.dc.html#gst-042",
    "prototype": {
     "file": "sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html",
     "rev": "Mobile App v4, 29 September 2026",
     "match": "none",
-    "note": "Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the v4 look (the frame on this screen's board, wireframes/frames/gst-042.html, and #GST-042 in handoff/design-batches/apps/1-guest-app/return/TICVAI Guest App.dc.html). NOT client-verified: awaiting the client's design reviewer. Build the layout from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at: Account → All screens → Wave 1 → Simple registration & OTP (same #ident screen) + \"Log in or register\" sheet from home (partial). What v2 did differently: Prototype has email code, Apple and Google only; the YAML also has password login, UAE Pass and explicit registration."
+    "note": "Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the v4 look (the frame on this screen's board, wireframes/frames/gst-042.html, and #GST-042 in handoff/design-batches/apps/1-guest-app/return/TICVAI Guest App.dc.html). Client-approved 19 October 2026 (confirmed by Chinmay Parab). Build the layout from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at: Account → All screens → Wave 1 → Simple registration & OTP (same #ident screen) + \"Log in or register\" sheet from home (partial). What v2 did differently: Prototype has email code, Apple and Google only; the YAML also has password login, UAE Pass and explicit registration."
    },
-   "source": "Claude Code, 30 September 2026, drawn in the Mobile App v4 look",
-   "note": "**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified, awaiting the client's design reviewer.** `provenance: designed` because the accepted vocabulary has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md."
+   "source": "client approval, confirmed by Chinmay Parab 19 October 2026",
+   "note": "**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; client-approved 19 October 2026, confirmed by Chinmay Parab.** Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 18 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "_platform": {
@@ -2012,7 +2026,7 @@
     }
    ]
   },
-  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement.\n\n**Rev 3 (decided 29 September).** GST-014 and GST-045 (and the old GST-008 transfer reading) are one implementation with several screen ids; the ids are kept (GAP-D3).\n\n**The tickets to send are read with listMyEntitlements (4 October 2026); orderId is optional and comes from the chosen tickets' orderId when the screen opens from Home** (CHG-FXS-003)",
+  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement.\n\n**Rev 3 (decided 29 September).** GST-014 and GST-045 (and the old GST-008 transfer reading) are one implementation with several screen ids; the ids are kept (GAP-D3).\n\n**The tickets to send are read with listMyEntitlements (4 October 2026); orderId is optional and comes from the chosen tickets' orderId when the screen opens from Home** (CHG-FXS-003)\n\nBuild note (r8 second round, ORDERS-MONEY-C05): after Send tickets the guest goes to My tickets (GST-012) or the order's tickets (GST-019); a guest who is not signed in is offered sign-in and brought back (the _patterns.yaml rule guestSignInReturn), as on GST-013 and GST-014. The exits and that state wait for the client (pending entries ORDERS-MONEY-C05).",
   "density": "comfortable",
   "pattern": "configEditor",
   "patternReason": "the screen declares only writes (`transferOrderTickets`) and no read of a population — it is settings, not a list",
@@ -2554,17 +2568,17 @@
    "coldEntry": "**Resolves from the session.** A guest arriving cold is asked to sign in and returned here afterwards — never a 404, and never a screen that silently shows somebody else's data (ADR-0030)."
   },
   "wireframe": {
-   "status": "notStarted",
-   "provenance": "designed",
+   "status": "approved",
+   "provenance": "client-verified",
    "board": "wireframes/P02 Guest App.dc.html#gst-066",
    "prototype": {
     "file": "sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html",
     "rev": "Mobile App v4, 29 September 2026",
     "match": "none",
-    "note": "Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the v4 look (the frame on this screen's board, wireframes/frames/gst-066.html, and #GST-066 in handoff/design-batches/apps/1-guest-app/return/TICVAI Guest App.dc.html). NOT client-verified: awaiting the client's design reviewer. Build the layout from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at: Account → All screens → Wave 2 → Privacy & my data (#privacy; also Account → Data & privacy) (exact). What v2 did differently: The prototype labels this screen \"GST-070 · Your data\" (aria-label \"GST-070 Data and privacy\"), but GST-070 is Reserve a Table in the YAML, so the label is wrong. Document upload is on Profile instead."
+    "note": "Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the v4 look (the frame on this screen's board, wireframes/frames/gst-066.html, and #GST-066 in handoff/design-batches/apps/1-guest-app/return/TICVAI Guest App.dc.html). Client-approved 19 October 2026 (confirmed by Chinmay Parab). Build the layout from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at: Account → All screens → Wave 2 → Privacy & my data (#privacy; also Account → Data & privacy) (exact). What v2 did differently: The prototype labels this screen \"GST-070 · Your data\" (aria-label \"GST-070 Data and privacy\"), but GST-070 is Reserve a Table in the YAML, so the label is wrong. Document upload is on Profile instead."
    },
-   "source": "Claude Code, 30 September 2026, drawn in the Mobile App v4 look",
-   "note": "**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified, awaiting the client's design reviewer.** `provenance: designed` because the accepted vocabulary has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md."
+   "source": "client approval, confirmed by Chinmay Parab 19 October 2026",
+   "note": "**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; client-approved 19 October 2026, confirmed by Chinmay Parab.** Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "gaps": [

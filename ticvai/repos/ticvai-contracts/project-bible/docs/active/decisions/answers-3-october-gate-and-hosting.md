@@ -69,3 +69,11 @@ stays mandatory in every residency class.
 - The AWS GPU node: g6.2xlarge is offered in me-central-1, $1.20043 an hour, $876.31 a month a node.
 - Disaster recovery on AWS is **not decided**: AWS has one region in the UAE. The options and their consequences
   are in the AWS LLD; the choice is Chinmay's and the client's.
+
+## Where dev and staging run, and where Terraform state lives (the lead, 20 October 2026, r8 causes FOUNDATION-AI-C23 and C52)
+
+- Dev is not on Azure: it runs on laptops with docker compose (C52, option B).
+- Staging is one shared pre-production environment in the **Softlabs** Azure subscription and Entra tenant (we
+  host non-production ourselves); its Terraform state is a storage account in that subscription, named by the
+  infra owner (SETUP-ENV) and given at `terraform init` (`repos/ticvai-infra/terraform/environments/staging`).
+- The client hosts production later, in its own subscription, with its own state.

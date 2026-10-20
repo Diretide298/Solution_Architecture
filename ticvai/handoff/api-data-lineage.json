@@ -1073,6 +1073,8 @@
     "id",
     "is_delta",
     "payload",
+    "published_at",
+    "published_by",
     "signature",
     "signature_key_id",
     "stale_after",
@@ -1091,6 +1093,7 @@
   ],
   "writes": [
    "cache:idempotency",
+   "catalogue.bundle_application",
    "catalogue.published_bundle"
   ],
   "routing": "",
@@ -2495,6 +2498,7 @@
     "cashier_input_mode",
     "code",
     "configuration_profile_id",
+    "configuration_profile_version",
     "department_id",
     "deployment_profile",
     "deposit_box_limit_amount",
@@ -2513,7 +2517,19 @@
     "time_zone",
     "venue_id"
    ]
-  }
+  },
+  "readVia": [
+   {
+    "query": "catalogue#bundleApplicationRecords",
+    "route": "in-process",
+    "for": "each workstation's catalogueState, from catalogue.bundle_application, Catalogue's data (R8 blocker FOUNDATION-AI-C44) (r8 gate, CHG-R8GT2-007; check-cross-module-reads XR-FACT)"
+   },
+   {
+    "query": "catalogue#publishedBundleRecords",
+    "route": "in-process",
+    "for": "catalogueState.staleAfter and pendingBundleVersion, from catalogue.published_bundle, Catalogue's data (r8 gate, CHG-R8GT2-007)"
+   }
+  ]
  },
  "getWorkstation": {
   "contract": "tenancy",
@@ -2551,6 +2567,7 @@
     "cashier_input_mode",
     "code",
     "configuration_profile_id",
+    "configuration_profile_version",
     "department_id",
     "deployment_profile",
     "deposit_box_limit_amount",
@@ -2569,7 +2586,19 @@
     "time_zone",
     "venue_id"
    ]
-  }
+  },
+  "readVia": [
+   {
+    "query": "catalogue#bundleApplicationRecords",
+    "route": "in-process",
+    "for": "catalogueState, from catalogue.bundle_application, Catalogue's data (R8 blocker FOUNDATION-AI-C44, CHG-R8MIG-015)"
+   },
+   {
+    "query": "catalogue#publishedBundleRecords",
+    "route": "in-process",
+    "for": "catalogueState.staleAfter and pendingBundleVersion, from catalogue.published_bundle, Catalogue's data (r8 gate, CHG-R8GT2-007; check-cross-module-reads XR-FACT)"
+   }
+  ]
  },
  "configureWorkstation": {
   "contract": "tenancy",
@@ -2606,6 +2635,16 @@
   "fixNote": "14 October 2026: reads orders.pos_shift (CHG-TEN-004: through Orders' openShiftForWorkstation (x-ticvai-read-via; ADAM CR-083), in process)",
   "readVia": [
    {
+    "query": "catalogue#bundleApplicationRecords",
+    "route": "in-process",
+    "for": "the returned workstation's catalogueState, from catalogue.bundle_application, Catalogue's data (R8 blocker FOUNDATION-AI-C44) (r8 gate, CHG-R8GT2-007; check-cross-module-reads XR-FACT)"
+   },
+   {
+    "query": "catalogue#publishedBundleRecords",
+    "route": "in-process",
+    "for": "catalogueState.staleAfter and pendingBundleVersion, from catalogue.published_bundle, Catalogue's data (r8 gate, CHG-R8GT2-007)"
+   },
+   {
     "query": "shift#openShiftForWorkstation",
     "route": "in-process",
     "for": "the open-shift refusal (409 shift-open), asked after locking the workstation row"
@@ -2625,6 +2664,7 @@
     "cashier_input_mode",
     "code",
     "configuration_profile_id",
+    "configuration_profile_version",
     "department_id",
     "deployment_profile",
     "deposit_box_limit_amount",
@@ -6195,6 +6235,7 @@
   "lineageNote": "writes one access.gate_mode_change per call (applied, or pending with a future effectiveAt, 202); enforces access.gate_mode_policy; opens an access_incident where the policy says createsIncident; not logged in configuration_change (operational)",
   "readColumns": {
    "access.access_point": [
+    "access_area_id",
     "captures_vehicle_location",
     "code",
     "direction",
@@ -6259,6 +6300,7 @@
   ],
   "readColumns": {
    "access.access_point": [
+    "access_area_id",
     "captures_vehicle_location",
     "code",
     "direction",
@@ -6312,6 +6354,7 @@
   "lineageNote": "x-ticvai-config-change-log: also appends access.configuration_change (writers pass convention)",
   "readColumns": {
    "access.access_point": [
+    "access_area_id",
     "captures_vehicle_location",
     "code",
     "direction",
@@ -6358,6 +6401,7 @@
   ],
   "readColumns": {
    "access.access_point": [
+    "access_area_id",
     "captures_vehicle_location",
     "code",
     "direction",
@@ -6411,6 +6455,7 @@
   "lineageNote": "x-ticvai-config-change-log: also appends access.configuration_change (writers pass convention)",
   "readColumns": {
    "access.access_point": [
+    "access_area_id",
     "captures_vehicle_location",
     "code",
     "direction",
@@ -6730,6 +6775,11 @@
     "query": "catalogue#entitlementTemplateRecords",
     "route": "service",
     "for": "its read of catalogue.entitlement_template, Catalogue's data (CHG-MOD-001)"
+   },
+   {
+    "query": "catalogue#productRecords",
+    "route": "service",
+    "for": "the group entitlement's productName and imageUrl, from catalogue.product and its catalogue.product_media, Catalogue's data (CHG-R8MIG-009) (r8 gate, CHG-R8GT2-007; check-cross-module-reads XR-FACT)"
    }
   ]
  },
@@ -6763,6 +6813,7 @@
   "lineageNote": "x-ticvai-config-change-log: also appends access.configuration_change (writers pass convention)",
   "readColumns": {
    "access.access_point": [
+    "access_area_id",
     "captures_vehicle_location",
     "code",
     "direction",
@@ -8465,6 +8516,7 @@
   "fixNote": "14 October 2026 (CHG-CRD-001, ADAM CR-078): the credential's hash, its lockout counted against the tenant's policy (PrincipalCredential)",
   "readColumns": {
    "identity.mfa_method": [
+    "destination",
     "enrolled_at",
     "id",
     "is_active",
@@ -8472,7 +8524,11 @@
     "kind",
     "label",
     "last_used_at",
-    "masked_target"
+    "masked_target",
+    "pending_expires_at",
+    "principal_id",
+    "secret",
+    "subject_id"
    ]
   },
   "readVia": [
@@ -9005,6 +9061,9 @@
     "created_by_principal_id",
     "delegation_kind",
     "effect",
+    "granted_by_kind",
+    "granted_by_principal_id",
+    "granted_by_subject_id",
     "id",
     "is_revocable_by_subject",
     "over_object_ref",
@@ -9020,7 +9079,14 @@
     "valid_from",
     "valid_to"
    ]
-  }
+  },
+  "readVia": [
+   {
+    "query": "tenancy#regionSettingsRecords",
+    "route": "in-process",
+    "for": "minorAgeThreshold, for each grant's overSubjectIsMinor (CHG-R8MIG-009) (r8 gate, CHG-R8GT2-007; check-cross-module-reads XR-FACT)"
+   }
+  ]
  },
  "createDelegatedAccess": {
   "contract": "identity",
@@ -9071,6 +9137,9 @@
     "created_by_principal_id",
     "delegation_kind",
     "effect",
+    "granted_by_kind",
+    "granted_by_principal_id",
+    "granted_by_subject_id",
     "id",
     "is_revocable_by_subject",
     "over_object_ref",
@@ -9086,7 +9155,14 @@
     "valid_from",
     "valid_to"
    ]
-  }
+  },
+  "readVia": [
+   {
+    "query": "tenancy#regionSettingsRecords",
+    "route": "in-process",
+    "for": "minorAgeThreshold, for the returned grant's overSubjectIsMinor (CHG-R8MIG-009) (r8 gate, CHG-R8GT2-007; check-cross-module-reads XR-FACT)"
+   }
+  ]
  },
  "deleteDelegatedAccess": {
   "contract": "identity",
@@ -9213,6 +9289,7 @@
   "fixNote": "4 October 2026 (CHG-FXC-004): the optional password's hash",
   "readColumns": {
    "identity.mfa_method": [
+    "destination",
     "enrolled_at",
     "id",
     "is_active",
@@ -9220,7 +9297,11 @@
     "kind",
     "label",
     "last_used_at",
-    "masked_target"
+    "masked_target",
+    "pending_expires_at",
+    "principal_id",
+    "secret",
+    "subject_id"
    ],
    "pii.subject": [
     "display_name",
@@ -9309,6 +9390,7 @@
   "fixNote": "14 October 2026 (CHG-CRD-005, ADAM CR-078): wrong codes are counted and a correct one is consumed",
   "readColumns": {
    "identity.mfa_method": [
+    "destination",
     "enrolled_at",
     "id",
     "is_active",
@@ -9316,7 +9398,11 @@
     "kind",
     "label",
     "last_used_at",
-    "masked_target"
+    "masked_target",
+    "pending_expires_at",
+    "principal_id",
+    "secret",
+    "subject_id"
    ]
   },
   "readVia": [
@@ -9334,12 +9420,14 @@
   "reads": [
    "cache:idempotency",
    "identity.mfa_method",
-   "pii.subject_contact"
+   "pii.subject_contact",
+   "pii.subject_identity"
   ],
   "writes": [
    "cache:idempotency",
    "identity.guest_session",
    "pii.subject",
+   "pii.subject_identity",
    "platform.outbox"
   ],
   "routing": "",
@@ -9359,6 +9447,7 @@
   "lineageNote": "emits identity.loginRecorded",
   "readColumns": {
    "identity.mfa_method": [
+    "destination",
     "enrolled_at",
     "id",
     "is_active",
@@ -9366,7 +9455,11 @@
     "kind",
     "label",
     "last_used_at",
-    "masked_target"
+    "masked_target",
+    "pending_expires_at",
+    "principal_id",
+    "secret",
+    "subject_id"
    ]
   },
   "readVia": [
@@ -9384,13 +9477,15 @@
   "reads": [
    "cache:idempotency",
    "identity.mfa_method",
-   "pii.subject_contact"
+   "pii.subject_contact",
+   "pii.subject_identity"
   ],
   "writes": [
    "cache:idempotency",
    "identity.guest_session",
    "pii.subject",
    "pii.subject_document",
+   "pii.subject_identity",
    "platform.outbox"
   ],
   "routing": "",
@@ -9410,6 +9505,7 @@
   "lineageNote": "emits identity.loginRecorded",
   "readColumns": {
    "identity.mfa_method": [
+    "destination",
     "enrolled_at",
     "id",
     "is_active",
@@ -9417,7 +9513,11 @@
     "kind",
     "label",
     "last_used_at",
-    "masked_target"
+    "masked_target",
+    "pending_expires_at",
+    "principal_id",
+    "secret",
+    "subject_id"
    ]
   },
   "readVia": [
@@ -9454,6 +9554,7 @@
   ],
   "readColumns": {
    "identity.mfa_method": [
+    "destination",
     "enrolled_at",
     "id",
     "is_active",
@@ -9461,7 +9562,11 @@
     "kind",
     "label",
     "last_used_at",
-    "masked_target"
+    "masked_target",
+    "pending_expires_at",
+    "principal_id",
+    "secret",
+    "subject_id"
    ],
    "pii.subject": [
     "display_name",
@@ -9641,6 +9746,7 @@
    "identity.mfa_method",
    "identity.password_policy",
    "identity.principal",
+   "identity.principal_external_identity",
    "identity.role",
    "identity.role_permission",
    "identity.sso_group_mapping",
@@ -9650,6 +9756,7 @@
    "cache:idempotency",
    "identity.delegated_access",
    "identity.principal",
+   "identity.principal_external_identity",
    "identity.refresh_token",
    "identity.session",
    "platform.outbox"
@@ -9672,6 +9779,7 @@
   "fixNote": "4 October 2026 (CHG-FXC-004): group-to-role mapping, availableRoles and requiresMfa",
   "readColumns": {
    "identity.mfa_method": [
+    "destination",
     "enrolled_at",
     "id",
     "is_active",
@@ -9679,7 +9787,11 @@
     "kind",
     "label",
     "last_used_at",
-    "masked_target"
+    "masked_target",
+    "pending_expires_at",
+    "principal_id",
+    "secret",
+    "subject_id"
    ]
   },
   "readVia": [
@@ -9726,16 +9838,21 @@
     "scope_path"
    ],
    "identity.sso_provider": [
+    "allowed_redirect_uris",
     "client_id",
     "client_secret_ref",
+    "default_home_scope_id",
     "display_name",
+    "display_name_claim",
+    "groups_claim",
     "id",
     "is_active",
     "is_auto_provision_principals",
     "is_enforced",
     "issuer",
     "metadata_url",
-    "protocol"
+    "protocol",
+    "username_claim"
    ]
   }
  },
@@ -9776,16 +9893,21 @@
     "scope_path"
    ],
    "identity.sso_provider": [
+    "allowed_redirect_uris",
     "client_id",
     "client_secret_ref",
+    "default_home_scope_id",
     "display_name",
+    "display_name_claim",
+    "groups_claim",
     "id",
     "is_active",
     "is_auto_provision_principals",
     "is_enforced",
     "issuer",
     "metadata_url",
-    "protocol"
+    "protocol",
+    "username_claim"
    ]
   }
  },
@@ -9814,6 +9936,7 @@
   ],
   "readColumns": {
    "identity.mfa_method": [
+    "destination",
     "enrolled_at",
     "id",
     "is_active",
@@ -9821,7 +9944,11 @@
     "kind",
     "label",
     "last_used_at",
-    "masked_target"
+    "masked_target",
+    "pending_expires_at",
+    "principal_id",
+    "secret",
+    "subject_id"
    ]
   },
   "readVia": [
@@ -9900,6 +10027,7 @@
   ],
   "readColumns": {
    "identity.mfa_method": [
+    "destination",
     "enrolled_at",
     "id",
     "is_active",
@@ -9907,7 +10035,11 @@
     "kind",
     "label",
     "last_used_at",
-    "masked_target"
+    "masked_target",
+    "pending_expires_at",
+    "principal_id",
+    "secret",
+    "subject_id"
    ]
   },
   "readVia": [
@@ -10075,6 +10207,9 @@
    ],
    "identity.session": [
     "device_info",
+    "end_reason",
+    "ended_at",
+    "ended_by_principal_id",
     "id",
     "ip_address",
     "is_mfa_satisfied",
@@ -12357,6 +12492,7 @@
     "name",
     "plan_id",
     "plan_name",
+    "plan_version",
     "region_id",
     "status",
     "suspension_effective_at",
@@ -12410,6 +12546,7 @@
     "name",
     "plan_id",
     "plan_name",
+    "plan_version",
     "region_id",
     "status",
     "suspension_effective_at",
@@ -12496,6 +12633,7 @@
     "name",
     "plan_id",
     "plan_name",
+    "plan_version",
     "region_id",
     "status",
     "subscription_id",
@@ -12551,6 +12689,7 @@
     "name",
     "plan_id",
     "plan_name",
+    "plan_version",
     "region_id",
     "status",
     "suspension_effective_at",
@@ -12605,6 +12744,7 @@
     "name",
     "plan_id",
     "plan_name",
+    "plan_version",
     "region_id",
     "status",
     "suspension_effective_at",
@@ -12665,6 +12805,7 @@
     "name",
     "plan_id",
     "plan_name",
+    "plan_version",
     "region_id",
     "status",
     "suspension_effective_at",
@@ -23390,6 +23531,8 @@
     "is_rights_expired",
     "kind",
     "reference_count",
+    "released_at",
+    "released_by_principal_id",
     "rights",
     "shared_with_tenant_ids",
     "size_bytes",
@@ -23447,6 +23590,8 @@
     "is_rights_expired",
     "kind",
     "reference_count",
+    "released_at",
+    "released_by_principal_id",
     "rights",
     "shared_with_tenant_ids",
     "size_bytes",
@@ -23522,6 +23667,8 @@
     "is_rights_expired",
     "kind",
     "reference_count",
+    "released_at",
+    "released_by_principal_id",
     "rights",
     "shared_with_tenant_ids",
     "size_bytes",
@@ -23628,6 +23775,8 @@
     "is_rights_expired",
     "kind",
     "reference_count",
+    "released_at",
+    "released_by_principal_id",
     "rights",
     "shared_with_tenant_ids",
     "size_bytes",
@@ -23701,6 +23850,7 @@
    "assets.media_collection_member",
    "assets.media_fingerprint",
    "assets.media_upload",
+   "assets.rendition",
    "cache:idempotency"
   ],
   "routing": "",
@@ -23734,6 +23884,8 @@
     "is_rights_expired",
     "kind",
     "reference_count",
+    "released_at",
+    "released_by_principal_id",
     "rights",
     "shared_with_tenant_ids",
     "size_bytes",
@@ -27024,6 +27176,7 @@
     "savings_percentage",
     "valid_from",
     "valid_to",
+    "variant_id",
     "venue_id"
    ],
    "promotions.bundle_choice_group": [
@@ -27127,6 +27280,7 @@
     "savings_percentage",
     "valid_from",
     "valid_to",
+    "variant_id",
     "venue_id"
    ],
    "promotions.bundle_choice_group": [
@@ -27225,6 +27379,7 @@
     "savings_percentage",
     "valid_from",
     "valid_to",
+    "variant_id",
     "venue_id"
    ],
    "promotions.bundle_choice_group": [
@@ -27324,6 +27479,7 @@
     "savings_percentage",
     "valid_from",
     "valid_to",
+    "variant_id",
     "venue_id"
    ],
    "promotions.bundle_choice_group": [
@@ -32462,6 +32618,8 @@
     "delegated_from",
     "did_use_mfa",
     "display_name",
+    "external_approver_name",
+    "external_approver_ref",
     "id",
     "is_delegate",
     "level",
@@ -32485,10 +32643,13 @@
     "ai_assessment",
     "allow_email_approval",
     "amount",
+    "approval_matrix_id",
     "assigned_at",
     "assigned_to_department_id",
     "assigned_to_principal_id",
+    "assignment_note",
     "attributes",
+    "cancel_reason",
     "completed_at",
     "current_level",
     "expires_at",
@@ -32505,6 +32666,7 @@
     "requested_by_principal_id",
     "reroutes_on_no_approver",
     "resubmitted_from_id",
+    "rule_id",
     "scope_path",
     "sla_due_at",
     "status",
@@ -32569,6 +32731,8 @@
     "delegated_from",
     "did_use_mfa",
     "display_name",
+    "external_approver_name",
+    "external_approver_ref",
     "id",
     "is_delegate",
     "level",
@@ -32592,10 +32756,13 @@
     "ai_assessment",
     "allow_email_approval",
     "amount",
+    "approval_matrix_id",
     "assigned_at",
     "assigned_to_department_id",
     "assigned_to_principal_id",
+    "assignment_note",
     "attributes",
+    "cancel_reason",
     "completed_at",
     "current_level",
     "expires_at",
@@ -32612,6 +32779,7 @@
     "requested_by_principal_id",
     "reroutes_on_no_approver",
     "resubmitted_from_id",
+    "rule_id",
     "scope_path",
     "sla_due_at",
     "status",
@@ -32778,6 +32946,8 @@
     "delegated_from",
     "did_use_mfa",
     "display_name",
+    "external_approver_name",
+    "external_approver_ref",
     "id",
     "is_delegate",
     "level",
@@ -32801,10 +32971,13 @@
     "ai_assessment",
     "allow_email_approval",
     "amount",
+    "approval_matrix_id",
     "assigned_at",
     "assigned_to_department_id",
     "assigned_to_principal_id",
+    "assignment_note",
     "attributes",
+    "cancel_reason",
     "completed_at",
     "current_level",
     "expires_at",
@@ -32821,6 +32994,7 @@
     "requested_by_principal_id",
     "reroutes_on_no_approver",
     "resubmitted_from_id",
+    "rule_id",
     "scope_path",
     "sla_due_at",
     "status",
@@ -32881,6 +33055,8 @@
     "delegated_from",
     "did_use_mfa",
     "display_name",
+    "external_approver_name",
+    "external_approver_ref",
     "id",
     "is_delegate",
     "level",
@@ -32904,10 +33080,13 @@
     "ai_assessment",
     "allow_email_approval",
     "amount",
+    "approval_matrix_id",
     "assigned_at",
     "assigned_to_department_id",
     "assigned_to_principal_id",
+    "assignment_note",
     "attributes",
+    "cancel_reason",
     "completed_at",
     "current_level",
     "expires_at",
@@ -32924,6 +33103,7 @@
     "requested_by_principal_id",
     "reroutes_on_no_approver",
     "resubmitted_from_id",
+    "rule_id",
     "scope_path",
     "sla_due_at",
     "status",
@@ -32976,6 +33156,8 @@
     "delegated_from",
     "did_use_mfa",
     "display_name",
+    "external_approver_name",
+    "external_approver_ref",
     "id",
     "is_delegate",
     "level",
@@ -32999,10 +33181,13 @@
     "ai_assessment",
     "allow_email_approval",
     "amount",
+    "approval_matrix_id",
     "assigned_at",
     "assigned_to_department_id",
     "assigned_to_principal_id",
+    "assignment_note",
     "attributes",
+    "cancel_reason",
     "completed_at",
     "current_level",
     "expires_at",
@@ -33019,6 +33204,7 @@
     "requested_by_principal_id",
     "reroutes_on_no_approver",
     "resubmitted_from_id",
+    "rule_id",
     "scope_path",
     "sla_due_at",
     "status",
@@ -33070,6 +33256,8 @@
     "delegated_from",
     "did_use_mfa",
     "display_name",
+    "external_approver_name",
+    "external_approver_ref",
     "id",
     "is_delegate",
     "level",
@@ -33093,10 +33281,13 @@
     "ai_assessment",
     "allow_email_approval",
     "amount",
+    "approval_matrix_id",
     "assigned_at",
     "assigned_to_department_id",
     "assigned_to_principal_id",
+    "assignment_note",
     "attributes",
+    "cancel_reason",
     "completed_at",
     "current_level",
     "expires_at",
@@ -33113,6 +33304,7 @@
     "requested_by_principal_id",
     "reroutes_on_no_approver",
     "resubmitted_from_id",
+    "rule_id",
     "scope_path",
     "sla_due_at",
     "status",
@@ -34436,7 +34628,9 @@
   ],
   "audience": [
    "guest",
-   "anonymous"
+   "anonymous",
+   "staff",
+   "partner"
   ],
   "audienceNote": "Narrowed 31 August: created implicitly by the first add, never called directly.",
   "readColumns": {
@@ -34466,12 +34660,14 @@
     "locale",
     "max_extensions",
     "net_amount",
+    "session_id",
     "status",
     "subject_id",
     "tax_total",
     "token",
     "updated_at",
-    "venue_id"
+    "venue_id",
+    "workstation_id"
    ],
    "orders.cart_line": [
     "attributes",
@@ -34545,7 +34741,8 @@
   "audience": [
    "guest",
    "partner",
-   "staff"
+   "staff",
+   "device"
   ],
   "readColumns": {
    "marketing.consent_question": [
@@ -34574,12 +34771,14 @@
     "locale",
     "max_extensions",
     "net_amount",
+    "session_id",
     "status",
     "subject_id",
     "tax_total",
     "token",
     "updated_at",
-    "venue_id"
+    "venue_id",
+    "workstation_id"
    ],
    "orders.cart_line": [
     "attributes",
@@ -34744,12 +34943,14 @@
     "locale",
     "max_extensions",
     "net_amount",
+    "session_id",
     "status",
     "subject_id",
     "tax_total",
     "token",
     "updated_at",
-    "venue_id"
+    "venue_id",
+    "workstation_id"
    ],
    "orders.cart_line": [
     "attributes",
@@ -34835,12 +35036,14 @@
     "locale",
     "max_extensions",
     "net_amount",
+    "session_id",
     "status",
     "subject_id",
     "tax_total",
     "token",
     "updated_at",
-    "venue_id"
+    "venue_id",
+    "workstation_id"
    ],
    "orders.cart_line": [
     "attributes",
@@ -34942,12 +35145,14 @@
     "locale",
     "max_extensions",
     "net_amount",
+    "session_id",
     "status",
     "subject_id",
     "tax_total",
     "token",
     "updated_at",
-    "venue_id"
+    "venue_id",
+    "workstation_id"
    ],
    "orders.cart_line": [
     "attributes",
@@ -35044,12 +35249,14 @@
     "locale",
     "max_extensions",
     "net_amount",
+    "session_id",
     "status",
     "subject_id",
     "tax_total",
     "token",
     "updated_at",
-    "venue_id"
+    "venue_id",
+    "workstation_id"
    ],
    "orders.cart_line": [
     "attributes",
@@ -35156,12 +35363,14 @@
     "locale",
     "max_extensions",
     "net_amount",
+    "session_id",
     "status",
     "subject_id",
     "tax_total",
     "token",
     "updated_at",
-    "venue_id"
+    "venue_id",
+    "workstation_id"
    ],
    "orders.cart_line": [
     "attributes",
@@ -39847,6 +40056,7 @@
     "cart_max_extensions",
     "catalogue",
     "charge_currencies",
+    "contact",
     "currency_code",
     "currency_scale",
     "deposit_box_limit_amount",
@@ -39921,6 +40131,7 @@
     "cart_max_extensions",
     "catalogue",
     "charge_currencies",
+    "contact",
     "currency_code",
     "currency_scale",
     "deposit_box_limit_amount",
@@ -40678,6 +40889,7 @@
     "masked_identifier",
     "method",
     "provider_id",
+    "revoked_at",
     "subject_id",
     "token"
    ]
@@ -40695,7 +40907,6 @@
   ],
   "writes": [
    "cache:idempotency",
-   "marketing.consent_record",
    "payments.token",
    "platform.outbox"
   ],
@@ -40715,12 +40926,6 @@
    "guest"
   ],
   "guestCallable": true,
-  "writeVia": [
-   {
-    "table": "marketing.consent_record",
-    "event": "paymentToken.stored"
-   }
-  ],
   "readColumns": {
    "payments.token": [
     "consent_purpose_id",
@@ -40730,6 +40935,7 @@
     "masked_identifier",
     "method",
     "provider_id",
+    "revoked_at",
     "subject_id",
     "token"
    ]
@@ -42458,6 +42664,9 @@
     "created_by_principal_id",
     "delegation_kind",
     "effect",
+    "granted_by_kind",
+    "granted_by_principal_id",
+    "granted_by_subject_id",
     "id",
     "is_revocable_by_subject",
     "over_object_ref",
@@ -42477,7 +42686,14 @@
     "id"
    ]
   },
-  "fixNote": "14 October 2026: marketing.guest_profile no longer read (CHG-MOD-002: Identity reads nothing above it (ADR-0028); the names are the guests' own in pii.subject)"
+  "fixNote": "14 October 2026: marketing.guest_profile no longer read (CHG-MOD-002: Identity reads nothing above it (ADR-0028); the names are the guests' own in pii.subject)",
+  "readVia": [
+   {
+    "query": "tenancy#regionSettingsRecords",
+    "route": "in-process",
+    "for": "minorAgeThreshold, for overSubjectIsMinor (R8 blocker ORDERS-MONEY-C20, CHG-R8MIG-009)"
+   }
+  ]
  },
  "grantDelegation": {
   "contract": "identity",
@@ -42514,6 +42730,9 @@
     "created_by_principal_id",
     "delegation_kind",
     "effect",
+    "granted_by_kind",
+    "granted_by_principal_id",
+    "granted_by_subject_id",
     "id",
     "is_revocable_by_subject",
     "over_object_ref",
@@ -44376,6 +44595,10 @@
     "valid_to",
     "venue_id",
     "wallet_value_id"
+   ],
+   "catalogue.product": [
+    "id",
+    "name"
    ]
   },
   "readVia": [
@@ -44461,6 +44684,11 @@
     "query": "catalogue#entitlementTemplateRecords",
     "route": "service",
     "for": "its read of catalogue.entitlement_template, Catalogue's data (CHG-MOD-001)"
+   },
+   {
+    "query": "catalogue#productRecords",
+    "route": "service",
+    "for": "productName, imageUrl and guestCategory of each entitlement, Catalogue's data (R8 blocker ORDERS-MONEY-C20, CHG-R8MIG-009)"
    },
    {
     "query": "identity#delegatedAccessRecords",
@@ -45241,6 +45469,7 @@
     "order_id",
     "organisation_name",
     "package_product_id",
+    "performance_id",
     "preferred_date",
     "quote_sent_at",
     "risk_assessment_sent_at",
@@ -49021,6 +49250,10 @@
     "valid_to",
     "venue_id",
     "wallet_value_id"
+   ],
+   "catalogue.product": [
+    "id",
+    "name"
    ]
   },
   "readVia": [
@@ -49447,9 +49680,12 @@
   ],
   "readColumns": {
    "platform.dead_letter": [
+    "aggregate_id",
+    "aggregate_type",
     "attempts",
     "consumer",
     "created_at",
+    "event_id",
     "event_name",
     "id",
     "last_attempt_at",
@@ -49457,7 +49693,9 @@
     "outbox_id",
     "payload",
     "replay_count",
-    "scope_path"
+    "scope_path",
+    "sequence",
+    "tenant_id"
    ]
   },
   "readVia": [
@@ -49507,9 +49745,12 @@
   "fixNote": "14 October 2026: CHG-XDW-003: platform.dead_letter is written by tenancy requeueDeadLetter (writeVia), which also writes the outbox row; this no longer writes platform.outbox itself",
   "readColumns": {
    "platform.dead_letter": [
+    "aggregate_id",
+    "aggregate_type",
     "attempts",
     "consumer",
     "created_at",
+    "event_id",
     "event_name",
     "id",
     "last_attempt_at",
@@ -49517,7 +49758,9 @@
     "outbox_id",
     "payload",
     "replay_count",
-    "scope_path"
+    "scope_path",
+    "sequence",
+    "tenant_id"
    ]
   },
   "readVia": [
@@ -83954,6 +84197,7 @@
     "name",
     "period",
     "plan_id",
+    "plan_version",
     "updated_at"
    ],
    "control.tier_module": [
@@ -83964,6 +84208,7 @@
     "is_included",
     "notes",
     "plan_id",
+    "plan_version",
     "updated_at"
    ]
   }
@@ -84142,7 +84387,7 @@
   "verb": "GET",
   "path": "/cells/{cellId}/endpoints",
   "reads": [
-   "platform.cell_endpoint"
+   "control.cell_endpoint"
   ],
   "writes": [],
   "routing": "replica",
@@ -84160,7 +84405,7 @@
    "redis"
   ],
   "readColumns": {
-   "platform.cell_endpoint": [
+   "control.cell_endpoint": [
     "authentication_type",
     "cell_id",
     "contract_version",
@@ -84173,7 +84418,14 @@
     "updated_at",
     "url"
    ]
-  }
+  },
+  "readVia": [
+   {
+    "query": "subscription#cellEndpointRecords",
+    "route": "service",
+    "for": "its read of control.cell_endpoint, Platform's data (CHG-R8MIG-018)"
+   }
+  ]
  },
  "listCrossCellRequests": {
   "contract": "cross-region",
@@ -85055,6 +85307,7 @@
     "name",
     "period",
     "plan_id",
+    "plan_version",
     "updated_at"
    ],
    "control.tier_module": [
@@ -85065,6 +85318,7 @@
     "is_included",
     "notes",
     "plan_id",
+    "plan_version",
     "updated_at"
    ]
   }
@@ -86179,6 +86433,7 @@
     "order_id",
     "organisation_name",
     "package_product_id",
+    "performance_id",
     "preferred_date",
     "quote_sent_at",
     "risk_assessment_sent_at",
@@ -86416,6 +86671,7 @@
     "order_id",
     "organisation_name",
     "package_product_id",
+    "performance_id",
     "preferred_date",
     "quote_sent_at",
     "risk_assessment_sent_at",
@@ -86750,6 +87006,7 @@
     "includes",
     "kind",
     "max_participants",
+    "minimum_size",
     "payment_mode",
     "pricing_basis",
     "product_id",
@@ -86870,6 +87127,7 @@
     "includes",
     "kind",
     "max_participants",
+    "minimum_size",
     "payment_mode",
     "pricing_basis",
     "product_id",
@@ -86964,6 +87222,7 @@
     "order_id",
     "organisation_name",
     "package_product_id",
+    "performance_id",
     "preferred_date",
     "quote_sent_at",
     "risk_assessment_sent_at",
@@ -87203,6 +87462,7 @@
     "includes",
     "kind",
     "max_participants",
+    "minimum_size",
     "payment_mode",
     "pricing_basis",
     "product_id",
@@ -88175,12 +88435,14 @@
     "locale",
     "max_extensions",
     "net_amount",
+    "session_id",
     "status",
     "subject_id",
     "tax_total",
     "token",
     "updated_at",
-    "venue_id"
+    "venue_id",
+    "workstation_id"
    ],
    "orders.cart_line": [
     "attributes",
@@ -88380,6 +88642,7 @@
     "cart_max_extensions",
     "catalogue",
     "charge_currencies",
+    "contact",
     "currency_code",
     "currency_scale",
     "deposit_box_limit_amount",
@@ -88440,6 +88703,7 @@
   "fixNote": "4 October 2026 (CHG-FXC-004): the account by identifier, its hash and lockout, the per-device session",
   "readColumns": {
    "identity.mfa_method": [
+    "destination",
     "enrolled_at",
     "id",
     "is_active",
@@ -88447,7 +88711,11 @@
     "kind",
     "label",
     "last_used_at",
-    "masked_target"
+    "masked_target",
+    "pending_expires_at",
+    "principal_id",
+    "secret",
+    "subject_id"
    ]
   },
   "readVia": [
@@ -88732,6 +89000,7 @@
     "cart_max_extensions",
     "catalogue",
     "charge_currencies",
+    "contact",
     "currency_code",
     "currency_scale",
     "deposit_box_limit_amount",
@@ -88798,6 +89067,8 @@
     "delegated_from",
     "did_use_mfa",
     "display_name",
+    "external_approver_name",
+    "external_approver_ref",
     "id",
     "is_delegate",
     "level",
@@ -88821,10 +89092,13 @@
     "ai_assessment",
     "allow_email_approval",
     "amount",
+    "approval_matrix_id",
     "assigned_at",
     "assigned_to_department_id",
     "assigned_to_principal_id",
+    "assignment_note",
     "attributes",
+    "cancel_reason",
     "completed_at",
     "current_level",
     "expires_at",
@@ -88841,6 +89115,7 @@
     "requested_by_principal_id",
     "reroutes_on_no_approver",
     "resubmitted_from_id",
+    "rule_id",
     "scope_path",
     "sla_due_at",
     "status",
@@ -101222,6 +101497,7 @@
     "id",
     "method",
     "reason",
+    "selfie_upload_id",
     "status",
     "subject_document_id",
     "subject_id",
@@ -102773,6 +103049,7 @@
     "id",
     "method",
     "reason",
+    "selfie_upload_id",
     "status",
     "subject_document_id",
     "subject_id",
@@ -104268,6 +104545,7 @@
     "level",
     "provider_id",
     "request_id",
+    "requester_reference",
     "scope_path",
     "sent_at",
     "status"
@@ -104894,6 +105172,7 @@
     "id",
     "method",
     "reason",
+    "selfie_upload_id",
     "status",
     "subject_document_id",
     "subject_id",
@@ -106693,6 +106972,8 @@
     "delegated_from",
     "did_use_mfa",
     "display_name",
+    "external_approver_name",
+    "external_approver_ref",
     "id",
     "is_delegate",
     "level",
@@ -106716,10 +106997,13 @@
     "ai_assessment",
     "allow_email_approval",
     "amount",
+    "approval_matrix_id",
     "assigned_at",
     "assigned_to_department_id",
     "assigned_to_principal_id",
+    "assignment_note",
     "attributes",
+    "cancel_reason",
     "completed_at",
     "current_level",
     "expires_at",
@@ -106736,6 +107020,7 @@
     "requested_by_principal_id",
     "reroutes_on_no_approver",
     "resubmitted_from_id",
+    "rule_id",
     "scope_path",
     "sla_due_at",
     "status",
@@ -109021,6 +109306,7 @@
     "id",
     "method",
     "reason",
+    "selfie_upload_id",
     "status",
     "subject_document_id",
     "subject_id",
@@ -110648,6 +110934,11 @@
     "query": "catalogue#entitlementTemplateRecords",
     "route": "service",
     "for": "its read of catalogue.entitlement_template, Catalogue's data (CHG-MOD-001)"
+   },
+   {
+    "query": "catalogue#productRecords",
+    "route": "service",
+    "for": "the issued entitlements' productName and imageUrl, from catalogue.product and its catalogue.product_media, Catalogue's data (CHG-R8MIG-009) (r8 gate, CHG-R8GT2-007; check-cross-module-reads XR-FACT)"
    },
    {
     "query": "catalogue#variantRecords",
@@ -112853,6 +113144,8 @@
     "delegated_from",
     "did_use_mfa",
     "display_name",
+    "external_approver_name",
+    "external_approver_ref",
     "id",
     "is_delegate",
     "level",
@@ -112876,10 +113169,13 @@
     "ai_assessment",
     "allow_email_approval",
     "amount",
+    "approval_matrix_id",
     "assigned_at",
     "assigned_to_department_id",
     "assigned_to_principal_id",
+    "assignment_note",
     "attributes",
+    "cancel_reason",
     "completed_at",
     "current_level",
     "expires_at",
@@ -112896,6 +113192,7 @@
     "requested_by_principal_id",
     "reroutes_on_no_approver",
     "resubmitted_from_id",
+    "rule_id",
     "scope_path",
     "sla_due_at",
     "status",
@@ -113005,6 +113302,8 @@
     "delegated_from",
     "did_use_mfa",
     "display_name",
+    "external_approver_name",
+    "external_approver_ref",
     "id",
     "is_delegate",
     "level",
@@ -113028,10 +113327,13 @@
     "ai_assessment",
     "allow_email_approval",
     "amount",
+    "approval_matrix_id",
     "assigned_at",
     "assigned_to_department_id",
     "assigned_to_principal_id",
+    "assignment_note",
     "attributes",
+    "cancel_reason",
     "completed_at",
     "current_level",
     "expires_at",
@@ -113048,6 +113350,7 @@
     "requested_by_principal_id",
     "reroutes_on_no_approver",
     "resubmitted_from_id",
+    "rule_id",
     "scope_path",
     "sla_due_at",
     "status",
@@ -113192,6 +113495,9 @@
   "readColumns": {
    "identity.session": [
     "device_info",
+    "end_reason",
+    "ended_at",
+    "ended_by_principal_id",
     "id",
     "ip_address",
     "is_mfa_satisfied",
@@ -114097,6 +114403,9 @@
   "readColumns": {
    "identity.session": [
     "device_info",
+    "end_reason",
+    "ended_at",
+    "ended_by_principal_id",
     "id",
     "ip_address",
     "is_mfa_satisfied",
@@ -114400,6 +114709,8 @@
     "delegated_from",
     "did_use_mfa",
     "display_name",
+    "external_approver_name",
+    "external_approver_ref",
     "id",
     "is_delegate",
     "level",
@@ -114423,10 +114734,13 @@
     "ai_assessment",
     "allow_email_approval",
     "amount",
+    "approval_matrix_id",
     "assigned_at",
     "assigned_to_department_id",
     "assigned_to_principal_id",
+    "assignment_note",
     "attributes",
+    "cancel_reason",
     "completed_at",
     "current_level",
     "expires_at",
@@ -114443,6 +114757,7 @@
     "requested_by_principal_id",
     "reroutes_on_no_approver",
     "resubmitted_from_id",
+    "rule_id",
     "scope_path",
     "sla_due_at",
     "status",
@@ -114486,6 +114801,7 @@
   "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table",
   "readColumns": {
    "access.access_point": [
+    "access_area_id",
     "captures_vehicle_location",
     "code",
     "direction",
@@ -116357,6 +116673,8 @@
     "delegated_from",
     "did_use_mfa",
     "display_name",
+    "external_approver_name",
+    "external_approver_ref",
     "id",
     "is_delegate",
     "level",
@@ -116380,10 +116698,13 @@
     "ai_assessment",
     "allow_email_approval",
     "amount",
+    "approval_matrix_id",
     "assigned_at",
     "assigned_to_department_id",
     "assigned_to_principal_id",
+    "assignment_note",
     "attributes",
+    "cancel_reason",
     "completed_at",
     "current_level",
     "expires_at",
@@ -116400,6 +116721,7 @@
     "requested_by_principal_id",
     "reroutes_on_no_approver",
     "resubmitted_from_id",
+    "rule_id",
     "scope_path",
     "sla_due_at",
     "status",
@@ -118232,6 +118554,7 @@
     "order_id",
     "organisation_name",
     "package_product_id",
+    "performance_id",
     "preferred_date",
     "quote_sent_at",
     "risk_assessment_sent_at",
@@ -118897,13 +119220,13 @@
     "id",
     "kiosk_label",
     "partner_description",
-    "pos_button_label",
     "product_id",
     "receipt_name",
     "scope_path",
     "terms_and_conditions",
     "visit_instructions",
-    "web_description"
+    "web_description",
+    "workstation_button_label"
    ]
   }
  },
@@ -118951,13 +119274,13 @@
     "id",
     "kiosk_label",
     "partner_description",
-    "pos_button_label",
     "product_id",
     "receipt_name",
     "scope_path",
     "terms_and_conditions",
     "visit_instructions",
-    "web_description"
+    "web_description",
+    "workstation_button_label"
    ]
   }
  },
@@ -129558,6 +129881,7 @@
    "orders.group_booking": [
     "id",
     "leader_subject_id",
+    "performance_id",
     "status"
    ],
    "pii.subject": [
@@ -132568,5 +132892,144 @@
     "unit_index"
    ]
   }
+ },
+ "eraseSubject": {
+  "contract": "ai",
+  "verb": "POST",
+  "path": "/internal/subjects/{subjectId}/ai-erasure",
+  "reads": [
+   "cache:idempotency"
+  ],
+  "writes": [
+   "ai.chunk_embedding",
+   "ai.index_entry",
+   "cache:idempotency"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": null,
+  "offline": false,
+  "summary": "Remove everything the AI index holds about a guest",
+  "source": "derived",
+  "audience": [
+   "service"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ]
+ },
+ "createGuestUpload": {
+  "contract": "assets",
+  "verb": "POST",
+  "path": "/media/guest-uploads",
+  "reads": [
+   "assets.media_upload",
+   "cache:idempotency"
+  ],
+  "writes": [
+   "assets.guest_upload",
+   "assets.media_upload",
+   "cache:idempotency"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": null,
+  "offline": false,
+  "summary": "A guest requests a signed upload URL for an identity document or a selfie",
+  "source": "derived",
+  "audience": [
+   "guest"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "readColumns": {
+   "assets.media_upload": [
+    "asset_id",
+    "content_type",
+    "expires_at",
+    "filename",
+    "headers",
+    "id",
+    "max_size_bytes",
+    "method",
+    "size_bytes",
+    "upload_id",
+    "upload_url",
+    "venue_id"
+   ]
+  }
+ },
+ "completeGuestUpload": {
+  "contract": "assets",
+  "verb": "POST",
+  "path": "/media/guest-uploads/{uploadId}/complete",
+  "reads": [
+   "assets.guest_upload",
+   "cache:idempotency"
+  ],
+  "writes": [
+   "assets.guest_upload",
+   "cache:idempotency"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": null,
+  "offline": false,
+  "summary": "A guest confirms an upload",
+  "source": "derived",
+  "audience": [
+   "guest"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "readColumns": {
+   "assets.guest_upload": [
+    "content_type",
+    "created_at",
+    "deleted_at",
+    "id",
+    "purpose",
+    "size_bytes",
+    "status",
+    "storage_key",
+    "subject_id"
+   ]
+  }
+ },
+ "revokePaymentToken": {
+  "contract": "orders",
+  "verb": "DELETE",
+  "path": "/payment-tokens/{tokenId}",
+  "reads": [
+   "cache:idempotency"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "payments.token"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": null,
+  "offline": false,
+  "summary": "Remove a saved payment method",
+  "source": "derived",
+  "audience": [
+   "guest"
+  ],
+  "service": "OrderService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
  }
 }

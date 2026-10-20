@@ -223,6 +223,18 @@
     "nullable": true,
     "description": "The product recommended. **Exactly one of `productId`, `promotionId` or `couponRef`, `rewardId` or `challengeId` is set, by `kind`** (29 September, build): `offer` carries a promotion or coupon, `reward` a loyalty reward, `challenge` a challenge, every other kind a product."
    },
+   "variantId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**What the guest adds to the cart, when there is nothing to choose** (r8, ORDERS-MONEY-C40, the lead's option A): for a product item whose product has one default variant, that variant, resolved from the Pricing price reference the item carries; the add-to-cart asks only the quantity (and a date for a timed product). Null when the product has several variants: the screen lets the guest choose (`catalogue.listProductVariants`, option B). Null on non-product kinds (offer, reward, challenge), which have their own action, never addCartLine."
+   },
+   "performanceId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "For a timed product with exactly one bookable performance in the context the engine was given (the cart's date), that performance (r8, ORDERS-MONEY-C40); otherwise null and the screen asks for the date."
+   },
    "promotionId": {
     "type": "string",
     "format": "uuid",

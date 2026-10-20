@@ -48,7 +48,9 @@ steps:
   - createOrder
   - createPayment
   outcome: '**The hold converts server-side on payment success.** A till that converts locally has sold
-    a seat the platform may already have given away.'
+    a seat the platform may already have given away. POS-005 creates the order (with the `holdId` POS-004
+    carried) and the payment; a hold that lapsed meanwhile answers `createOrder` 409 `hold-not-active`, and the
+    cashier is sent back to the seat map to pick again (r8, GPS-C13).'
 branches:
 - at: 2
   condition: Another till or the web holds the seat first.

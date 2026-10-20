@@ -7,15 +7,15 @@
  "audience": "staff",
  "formFactor": "web",
  "offlineCapable": false,
- "generated": "2026-10-18",
+ "generated": "2026-10-20",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 1663,
-  "operations": 1892,
+  "operations": 1894,
   "contracts": 31,
   "modules": 19,
   "undrawn": 0,
-  "operationsWithNoScreen": 185
+  "operationsWithNoScreen": 206
  },
  "waves": {
   "wave1": 141,
@@ -183,7 +183,7 @@
   },
   {
    "contract": "catalogue",
-   "operations": 227
+   "operations": 229
   },
   {
    "contract": "orders",
@@ -210,11 +210,11 @@
    "operations": 61
   },
   {
-   "contract": "ai",
+   "contract": "resources",
    "operations": 56
   },
   {
-   "contract": "resources",
+   "contract": "ai",
    "operations": 56
   },
   {
@@ -250,11 +250,11 @@
    "operations": 41
   },
   {
-   "contract": "maintenance",
+   "contract": "workforce",
    "operations": 41
   },
   {
-   "contract": "workforce",
+   "contract": "maintenance",
    "operations": 41
   },
   {
@@ -3657,7 +3657,7 @@
    "module": "Commercial",
    "wave": 1,
    "route": "/commercial/b2b-invoice-on-account-payment-terms-configuration-t96-adm-603",
-   "operations": 4,
+   "operations": 5,
    "drawn": true
   },
   {
@@ -4638,7 +4638,7 @@
    "module": "Sell",
    "wave": 1,
    "route": "/venue-operations/session-calendar",
-   "operations": 11,
+   "operations": 12,
    "drawn": true
   },
   {
@@ -8850,7 +8850,7 @@
    "module": "Sell",
    "wave": 3,
    "route": "/sell/membership-commercial-pricing-channel-association-bo-291",
-   "operations": 5,
+   "operations": 7,
    "drawn": true
   },
   {
@@ -15373,7 +15373,7 @@
     "operation": "setSuggestionProvider",
     "contract": "ai",
     "verb": "PUT",
-    "summary": ""
+    "summary": "Point a question at a rule, a model, or both"
    },
    {
     "operation": "approveMatrixMultiLevel",
@@ -15433,7 +15433,25 @@
     "operation": "submitApprovalRequest",
     "contract": "approvals",
     "verb": "POST",
-    "summary": "Send a saved draft for approval"
+    "summary": "Send a saved draft, or a returned request, for approval"
+   },
+   {
+    "operation": "acquireInventoryHold",
+    "contract": "catalogue",
+    "verb": "POST",
+    "summary": "Acquire an inventory hold"
+   },
+   {
+    "operation": "checkProductSalePermission",
+    "contract": "catalogue",
+    "verb": "POST",
+    "summary": "Would this seller, here, be allowed to sell these products"
+   },
+   {
+    "operation": "getBundleSigningKeys",
+    "contract": "catalogue",
+    "verb": "GET",
+    "summary": "The public keys a till verifies catalogue bundles with"
    },
    {
     "operation": "getEventChangeTreatmentPolicy",
@@ -15446,6 +15464,30 @@
     "contract": "catalogue",
     "verb": "GET",
     "summary": "Which benefits a plan grants, and how much of each"
+   },
+   {
+    "operation": "getProductChannelTexts",
+    "contract": "catalogue",
+    "verb": "GET",
+    "summary": "The product's texts per sales channel, in each of the tenant's languages"
+   },
+   {
+    "operation": "getProductDashboard",
+    "contract": "catalogue",
+    "verb": "GET",
+    "summary": "The products dashboard's counts"
+   },
+   {
+    "operation": "getProductOwnerForms",
+    "contract": "catalogue",
+    "verb": "GET",
+    "summary": "Which form a sale of this product asks the buyer, and which it asks each ticket owner"
+   },
+   {
+    "operation": "getProductSalePermissionRules",
+    "contract": "catalogue",
+    "verb": "GET",
+    "summary": "Who can sell this product"
    },
    {
     "operation": "getWaitingRoomStatus",
@@ -15472,22 +15514,46 @@
     "summary": "Membership schemes, the level above a plan"
    },
    {
+    "operation": "listOwnerFormCandidates",
+    "contract": "catalogue",
+    "verb": "GET",
+    "summary": "The forms a product can link for its reservation owner or ticket owner"
+   },
+   {
     "operation": "listProductApprovalWorkflows",
     "contract": "catalogue",
     "verb": "GET",
     "summary": "The product approval workflows `approveWorkflow` saved"
    },
    {
+    "operation": "listProductAttentionItems",
+    "contract": "catalogue",
+    "verb": "GET",
+    "summary": "The products that need someone to act, and why"
+   },
+   {
+    "operation": "listProductCategoryUsage",
+    "contract": "catalogue",
+    "verb": "GET",
+    "summary": "How many products each category holds"
+   },
+   {
+    "operation": "listProductTags",
+    "contract": "catalogue",
+    "verb": "GET",
+    "summary": "The venue's tags, the master list products and promotions pick from"
+   },
+   {
+    "operation": "listSalePermissionTargets",
+    "contract": "catalogue",
+    "verb": "GET",
+    "summary": "What a sale permission rule can name at one level, with names"
+   },
+   {
     "operation": "listSeatPricingRules",
     "contract": "catalogue",
     "verb": "GET",
     "summary": "Seat-level dynamic pricing rules"
-   },
-   {
-    "operation": "listTaxProfiles",
-    "contract": "catalogue",
-    "verb": "GET",
-    "summary": "The tax profiles"
    },
    {
     "operation": "relinquishInventoryHold",
@@ -15499,13 +15565,43 @@
     "operation": "renewInventoryHold",
     "contract": "catalogue",
     "verb": "POST",
-    "summary": "Extend a lease TTL"
+    "summary": "Extend an inventory hold's TTL"
    },
    {
     "operation": "setEventChangeTreatmentPolicy",
     "contract": "catalogue",
     "verb": "PUT",
     "summary": "Set the default treatment per kind of event change"
+   },
+   {
+    "operation": "setProductChannelTexts",
+    "contract": "catalogue",
+    "verb": "PUT",
+    "summary": "Set the product's texts per sales channel"
+   },
+   {
+    "operation": "setProductClassification",
+    "contract": "catalogue",
+    "verb": "PUT",
+    "summary": "File a product under a category and give it its tags, both from the master lists"
+   },
+   {
+    "operation": "setProductOwnerForms",
+    "contract": "catalogue",
+    "verb": "PUT",
+    "summary": "Link a product to the forms its sale asks"
+   },
+   {
+    "operation": "setProductSalePermissionRules",
+    "contract": "catalogue",
+    "verb": "PUT",
+    "summary": "Set who can sell this product"
+   },
+   {
+    "operation": "setProductTagDefinition",
+    "contract": "catalogue",
+    "verb": "PUT",
+    "summary": "Create or replace one tag of the venue's list"
    },
    {
     "operation": "setSeatPricingRule",
@@ -15616,12 +15712,6 @@
     "summary": "Decide a tap, now"
    },
    {
-    "operation": "recordGamePlay",
-    "contract": "games",
-    "verb": "POST",
-    "summary": "Record a play"
-   },
-   {
     "operation": "transferGameCard",
     "contract": "games",
     "verb": "POST",
@@ -15656,6 +15746,12 @@
     "contract": "identity",
     "verb": "GET",
     "summary": "What this person may do, as ticks"
+   },
+   {
+    "operation": "getSessionVenue",
+    "contract": "identity",
+    "verb": "GET",
+    "summary": "Which venue this back-office session is working in, and which it may switch to"
    },
    {
     "operation": "listAccessDecisions",
@@ -15694,10 +15790,22 @@
     "summary": "Who already holds a conflicting pair"
    },
    {
+    "operation": "listStepUpSupervisors",
+    "contract": "identity",
+    "verb": "GET",
+    "summary": "Who may sign a supervisor step-up here"
+   },
+   {
     "operation": "setPrincipalModuleAccess",
     "contract": "identity",
     "verb": "PUT",
     "summary": "Tick what they may do"
+   },
+   {
+    "operation": "setSessionVenue",
+    "contract": "identity",
+    "verb": "PUT",
+    "summary": "Switch the back-office session to another venue it may act at"
    },
    {
     "operation": "updateRole",
@@ -16036,6 +16144,12 @@
     "summary": "Why this was offered, and what was suppressed"
    },
    {
+    "operation": "getCouponCode",
+    "contract": "promotions",
+    "verb": "GET",
+    "summary": "Look up a code"
+   },
+   {
     "operation": "getRecommendations",
     "contract": "promotions",
     "verb": "POST",
@@ -16117,7 +16231,7 @@
     "operation": "listAlertRules",
     "contract": "reporting",
     "verb": "GET",
-    "summary": "What raises an alert, and when"
+    "summary": "Thresholds being watched"
    },
    {
     "operation": "createRetailExchange",
@@ -16234,12 +16348,6 @@
     "summary": "Move the orders into the permanent platform"
    },
    {
-    "operation": "registerPartner",
-    "contract": "subscription",
-    "verb": "POST",
-    "summary": "A business applies to become a partner"
-   },
-   {
     "operation": "requestBurstEnvironment",
     "contract": "subscription",
     "verb": "POST",
@@ -16312,6 +16420,18 @@
     "summary": "A device reports interference"
    },
    {
+    "operation": "listVisitPlanPresets",
+    "contract": "venue-map",
+    "verb": "GET",
+    "summary": "A venue's ready-made day plans, as staff edit them"
+   },
+   {
+    "operation": "setVisitPlanPreset",
+    "contract": "venue-map",
+    "verb": "PUT",
+    "summary": "Add or replace one of a venue's ready-made day plans"
+   },
+   {
     "operation": "adjustGameCard",
     "contract": "wallet",
     "verb": "POST",
@@ -16360,6 +16480,12 @@
     "summary": "Give held wallet funds back"
    },
    {
+    "operation": "getPreview",
+    "contract": "white-label",
+    "verb": "GET",
+    "summary": "Read a preview while its link lives"
+   },
+   {
     "operation": "setFaqs",
     "contract": "white-label",
     "verb": "PUT",
@@ -16369,7 +16495,7 @@
     "operation": "broadcastToGuests",
     "contract": "workforce",
     "verb": "POST",
-    "summary": ""
+    "summary": "Venue-wide notice to every guest on site"
    },
    {
     "operation": "claimOpenShift",

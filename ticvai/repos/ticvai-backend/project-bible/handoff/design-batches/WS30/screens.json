@@ -358,7 +358,7 @@
   "module": "Sell",
   "requiresModule": "membership",
   "wave": 3,
-  "permission": "PLATFORM_CELL_MANAGE",
+  "permission": "MEMBERSHIP_MANAGE",
   "source": {
    "pack": "Membership___Annual_Pass_Management_Reference.pdf",
    "board": "2",
@@ -569,7 +569,7 @@
   "module": "Sell",
   "requiresModule": "membership",
   "wave": 3,
-  "permission": "PLATFORM_TENANT_VIEW",
+  "permission": "MEMBERSHIP_VIEW",
   "source": {
    "pack": "Membership___Annual_Pass_Management_Reference.pdf",
    "board": "2",
@@ -964,7 +964,7 @@
   "module": "Sell",
   "requiresModule": "membership",
   "wave": 3,
-  "permission": "PLATFORM_TENANT_VIEW",
+  "permission": "MEMBERSHIP_VIEW",
   "source": {
    "pack": "Membership___Annual_Pass_Management_Reference.pdf",
    "board": "2",
@@ -1169,7 +1169,7 @@
   "module": "Sell",
   "requiresModule": "membership",
   "wave": 3,
-  "permission": "PLATFORM_TENANT_VIEW",
+  "permission": "MEMBERSHIP_VIEW",
   "source": {
    "pack": "Membership___Annual_Pass_Management_Reference.pdf",
    "board": "2",
@@ -1838,7 +1838,7 @@
   "module": "Sell",
   "requiresModule": "membership",
   "wave": 3,
-  "permission": "PLATFORM_TENANT_VIEW",
+  "permission": "MEMBERSHIP_VIEW",
   "source": {
    "pack": "Membership___Annual_Pass_Management_Reference.pdf",
    "board": "2",

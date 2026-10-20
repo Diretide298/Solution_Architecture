@@ -113,7 +113,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-1097` | Auto-Reload Configuration | C | 18 | 20 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-1098` | Recurring Funding Schedule | C | 17 | 20 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-1099` | Funding Authorization & Approval Rules | C | 21 | 20 | 6 | 0 | 1 | 3 | — | notStarted (—) |
-| `BO-1100` | Funding Reversal & Correction Management | C | 12 | 15 | 6 | 28 | 1 | 0 | — | notStarted (—) |
+| `BO-1100` | Funding Reversal & Correction Management | C | 12 | 19 | 6 | 28 | 1 | 0 | — | notStarted (—) |
 | `BO-1101` | Funding Limits & Velocity Controls | C | 30 | 20 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-1102` | Funding Transaction Audit & Reconciliation | C | 0 | 0 | 6 | 3 | 1 | 0 | — | notStarted (—) |
 

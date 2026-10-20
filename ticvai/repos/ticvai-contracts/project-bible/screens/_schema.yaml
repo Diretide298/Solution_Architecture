@@ -203,6 +203,17 @@ properties:
                   **What has to be refetched after this operation succeeds.** The object a data
                   layer is configured from, and the reason a list still shows a row somebody just
                   deleted when nobody writes it down.
+              shownBy:
+                type: string
+                description: >
+                  **The element of the client's prototype that shows what this read returns**
+                  (20 October 2026, CHG-R8INT-003), as its text appears there (a list's title,
+                  a note's heading). Only on a screen whose layout is an exact, client-verified
+                  prototype view, or a partial one that names its `prototype.view` (CHG-R8INT-008),
+                  whose visible YAML is fixed: the read fills what the client approved, and no
+                  component is added. A read a person sees is never `background` (the lead, 20
+                  October 2026): without such an element it stays onLoad and unreached. check-screen-wiring counts the read as
+                  reached and checks the text is in the prototype file (S-SHOWN-BY).
         layout:
           type: object
           properties:
@@ -574,7 +585,7 @@ properties:
                 screen's own name and operations; `designed` is a frame a person drew. A
                 generated frame agreeing with the operation it was generated from is not
                 corroboration. `client-verified` (added 29 September) means the client signed off
-                a prototype that shows this screen; `prototype` says which view.
+                a prototype that shows this screen; `prototype` says which view. Since 19 October 2026 it also covers a drawn frame the client approved without a prototype view (all of P02 and P04): `source` then begins "client approval" and `prototype.match` may be `none`.
             board:
               type: string
               description: The frame this screen renders as, as `<board file>#<anchor>`.

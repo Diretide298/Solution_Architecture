@@ -33,15 +33,15 @@ modulesUsed:
   screens: 1
 servicesCalled:
 - service: OrderService
-  operationCalls: 96
+  operationCalls: 98
 - service: FnbService
   operationCalls: 31
 - service: CatalogueService
-  operationCalls: 26
+  operationCalls: 25
+- service: TenancyService
+  operationCalls: 19
 - service: RetailService
   operationCalls: 18
-- service: TenancyService
-  operationCalls: 17
 - service: IdentityService
   operationCalls: 9
 - service: MarketingService
@@ -243,11 +243,9 @@ screens:
   wave: 1
   density: touchLarge
   operations:
-  - acquireInventoryHold
   - getAvailability
   - getProduct
   - listAlternativeCodes
-  - listInventoryHolds
   - listProductVariants
   - listProducts
   - resolveProductByCode
@@ -285,6 +283,7 @@ screens:
   - getPerformance
   - getSeatAvailability
   - getSeatHold
+  - listPerformances
   - relinquishSeatHold
   states:
   - denied
@@ -298,6 +297,7 @@ screens:
   entryParams:
   - holdId<-deepLink
   - performanceId<-deepLink
+  - eventId<-navigation
   goesTo:
   - POS-002
   - POS-003
@@ -706,7 +706,11 @@ screens:
   - allocateDepositBox
   - configureWorkstation
   - getDeviceAssignment
+  - getWorkstation
+  - listDenominations
   - listDevices
+  - listSaleBoards
+  - listShifts
   - setDeviceAssignment
   states:
   - emptyFirstRun

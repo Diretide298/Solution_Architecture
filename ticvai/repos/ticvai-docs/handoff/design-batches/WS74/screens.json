@@ -15,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/media-library/digital-asset-management-command-center-cms-061",
-   "component": "apps/venue-management-web/src/routes/media-library/DigitalAssetManagementCommandCenter.tsx",
+   "component": "src/routes/media-library/DigitalAssetManagementCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -271,7 +271,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/media-library/central-digital-asset-library-cms-062",
-   "component": "apps/venue-management-web/src/routes/media-library/CentralDigitalAssetLibrary.tsx",
+   "component": "src/routes/media-library/CentralDigitalAssetLibrary.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -508,7 +508,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/media-library/upload-asset-ingestion-workspace-cms-063",
-   "component": "apps/venue-management-web/src/routes/media-library/UploadAssetIngestionWorkspace.tsx",
+   "component": "src/routes/media-library/UploadAssetIngestionWorkspace.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -680,7 +680,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/media-library/folder-collection-workspace-management-cms-064",
-   "component": "apps/venue-management-web/src/routes/media-library/FolderCollectionWorkspaceManagement.tsx",
+   "component": "src/routes/media-library/FolderCollectionWorkspaceManagement.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -846,7 +846,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/media-library/metadata-taxonomy-management-cms-065",
-   "component": "apps/venue-management-web/src/routes/media-library/MetadataTaxonomyManagement.tsx",
+   "component": "src/routes/media-library/MetadataTaxonomyManagement.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -997,7 +997,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/media-library/tags-keywords-classification-cms-066",
-   "component": "apps/venue-management-web/src/routes/media-library/TagsKeywordsClassification.tsx",
+   "component": "src/routes/media-library/TagsKeywordsClassification.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1145,7 +1145,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/media-library/advanced-search-discovery-cms-067",
-   "component": "apps/venue-management-web/src/routes/media-library/AdvancedSearchDiscovery.tsx",
+   "component": "src/routes/media-library/AdvancedSearchDiscovery.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1286,7 +1286,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/media-library/digital-asset-360-profile-cms-068",
-   "component": "apps/venue-management-web/src/routes/media-library/DigitalAsset360Profile.tsx",
+   "component": "src/routes/media-library/DigitalAsset360Profile.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1487,7 +1487,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/media-library/bulk-asset-management-workspace-cms-069",
-   "component": "apps/venue-management-web/src/routes/media-library/BulkAssetManagementWorkspace.tsx",
+   "component": "src/routes/media-library/BulkAssetManagementWorkspace.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1622,7 +1622,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/media-library/asset-activity-recent-assets-library-health-cms-070",
-   "component": "apps/venue-management-web/src/routes/media-library/AssetActivityRecentAssetsLibraryHealth.tsx",
+   "component": "src/routes/media-library/AssetActivityRecentAssetsLibraryHealth.tsx",
    "status": "notStarted"
   },
   "navigation": {

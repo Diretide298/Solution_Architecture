@@ -122,7 +122,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `SCN-001` | Sign in | A | 14 | 20 | 8 | 5 | 0 | 0 | — | notStarted (generated) |
+| `SCN-001` | Sign in | A | 15 | 20 | 8 | 5 | 0 | 0 | — | notStarted (generated) |
 | `SCN-002` | Access point & direction | C | 4 | 9 | 6 | 6 | 0 | 0 | — | notStarted (generated) |
 | `SCN-003` | Ready to scan | A | 21 | 0 | 10 | 46 | 8 | 0 | — | notStarted (generated) |
 | `SCN-007` | Group admission | C | 6 | 5 | 6 | 13 | 2 | 0 | — | notStarted (generated) |

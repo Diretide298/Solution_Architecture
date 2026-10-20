@@ -9,12 +9,12 @@
 | Contracts | 5 |
 | Modules | 1 |
 | Undrawn | 0 |
-| Operations with no screen | 42 |
+| Operations with no screen | 45 |
 | Waves | wave1 11 |
 
 ## Gaps
 
-### 42 operations with no screen here
+### 45 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -40,13 +40,16 @@
 | `getAuthorisationPolicyBundle` | identity | GET | The policies a device needs to decide for itself |
 | `getMembership` | identity | GET | A membership with its history, usage and renewals |
 | `getPrincipalModuleAccess` | identity | GET | What this person may do, as ticks |
+| `getSessionVenue` | identity | GET | Which venue this back-office session is working in, and which it may switch to |
 | `listAccessDecisions` | identity | GET | What was decided, for whom, where and why |
 | `listAuthorisationPolicyTemplates` | identity | GET | Reusable policy shapes |
 | `listCustomerMemberships` | identity | GET | Memberships a customer holds |
 | `listModuleCapabilities` | identity | GET | What a person can be allowed to do, per module |
 | `listModules` | identity | GET | The module tree permissions are grouped under |
 | `listSegregationViolations` | identity | GET | Who already holds a conflicting pair |
+| `listStepUpSupervisors` | identity | GET | Who may sign a supervisor step-up here |
 | `setPrincipalModuleAccess` | identity | PUT | Tick what they may do |
+| `setSessionVenue` | identity | PUT | Switch the back-office session to another venue it may act at |
 | `updateRole` | identity | PATCH | Rename a role or change its description |
 | `convertToTermProduct` | orders | POST | Turn a visit into a membership or season pass |
 | `issueInvitation` | orders | POST | Issue a complimentary entitlement, with no payment expected |
@@ -57,10 +60,7 @@
 | `openGuestCreditAccount` | orders | POST | A credit limit for an individual booking ahead |
 | `overrideCreditLimit` | orders | POST | Authorise an order beyond the credit limit |
 | `pushWalletPassUpdate` | orders | POST | Push a change to every device holding it |
-| `revokeEntitlementShare` | orders | POST | Take back a share |
-| `setB2bCreditLimit` | orders | PUT | Set a partner credit limit |
-| `setOrderAmendment` | orders | PUT | Order Amendment Workspace |
-| … | | | 2 more |
+| … | | | 5 more |
 
 ## Modules
 

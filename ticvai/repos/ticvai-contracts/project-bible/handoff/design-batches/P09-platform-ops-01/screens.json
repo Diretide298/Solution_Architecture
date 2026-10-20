@@ -10,7 +10,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/platform/dead-letters",
-   "component": "apps/ticvai-web/src/routes/DeadLetters.tsx",
+   "component": "src/routes/DeadLetters.tsx",
    "status": "notStarted"
   },
   "navigation": {

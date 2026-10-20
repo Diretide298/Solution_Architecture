@@ -1,0 +1,39 @@
+# catalogue.productWithdrawn v1 — published by catalogue
+# Added 20 October 2026 (r8 cause FOUNDATION-AI-C39; the core lane's withdraw path writes it, CHG-R8SPN):
+# a withdrawn product leaves Help me choose and the caches, not only the shelf.
+
+name: catalogue.productWithdrawn
+version: 1
+publisher: catalogue
+description: A product was withdrawn from sale.
+aggregate: product
+emittedWhen: ProductLifecycleState to withdrawn (transitionProductLifecycle)
+emittedBy:
+- transitionProductLifecycle
+payload:
+- field: productId
+  type: uuid
+- field: venueIds
+  type: array
+- field: variantIds
+  type: array
+- field: withdrawnAt
+  type: timestamp
+consumers:
+- context: ai
+  purpose: Remove the product's chunks from retrieval, then re-run Help me choose for each guided choice that maps
+    to it (trigger mappedProductWithdrawn)
+  idempotencyKey: eventId
+  onFailure: retryThenDeadLetter
+  isCritical: false
+- context: white-label
+  purpose: Flag every published guided choice whose answers point at the product, so CMS shows it needs review
+  idempotencyKey: eventId
+  onFailure: retryThenDeadLetter
+  isCritical: false
+- context: cache
+  purpose: Drop the product's cached published views
+  idempotencyKey: eventId
+  onFailure: retry
+  isCritical: false
+retention: 30 days after publication

@@ -53,7 +53,7 @@ Four schemes, defined in `shared/common.yaml`:
 Operations without a permission fall into three groups, each marked explicitly:
 
 - `x-ticvai-auth: service` — 11 cell-to-cell operations
-- `x-ticvai-self-scoped: principal \| subject` — 15 operations acting only on the caller's own resources. Supplying another identifier is 403, not silently honoured
+- `x-ticvai-self-scoped: principal \| subject` — 15 operations acting only on the caller's own resources. Supplying another identifier is never silently honoured: **a guest naming another guest's record gets 404, exactly as for a record that does not exist** (Pattern 4; Chinmay, 3 October 2026, CHG-GCF-002), so nothing reveals that the id exists; 403 is only for a staff caller without the permission (R8 blocker cause ORDERS-MONEY-C01, CHG-R8SPN-018)
 - `security: []` — genuinely public: login, OTP request, SSO discovery, maintenance status
 
 ## Amended 13 Aug — decisions landed

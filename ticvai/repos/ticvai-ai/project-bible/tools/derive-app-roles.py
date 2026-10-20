@@ -37,9 +37,18 @@ import collections
 import glob
 import pathlib
 import sys
-from datetime import date
 
 import yaml
+
+
+def _yload(src):
+    """YAML with the C loader, the pure one where a file defeats it (20 October 2026, CHG-R8GEN-016): the screen files
+    are 25 MB and the pure loader took most of each refresh step's minute; the loaded data is the same."""
+    text = src.read() if hasattr(src, "read") else src
+    try:
+        return yaml.load(text, Loader=getattr(yaml, "CSafeLoader", yaml.SafeLoader))
+    except Exception:
+        return yaml.safe_load(text)
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 OUT = ROOT / "roles-by-app.yaml"
@@ -70,7 +79,7 @@ def op_permissions() -> dict:
     out = {}
     for f in pathlib.Path(ROOT / "contracts").rglob("*.yaml"):
         try:
-            doc = yaml.safe_load(f.read_text(encoding="utf-8"))
+            doc = _yload(f.read_text(encoding="utf-8"))
         except Exception:
             continue
         for item in (doc.get("paths") or {}).values():
@@ -92,7 +101,7 @@ def main() -> int:
     apps: dict = collections.defaultdict(lambda: {"platforms": [], "ops": set(), "screens": 0,
                                                   "unpermissioned": set()})
     for f in sorted(glob.glob(str(ROOT / "screens" / "P*.yaml"))):
-        d = yaml.safe_load(open(f, encoding="utf-8"))
+        d = _yload(open(f, encoding="utf-8"))
         p = d["platform"]
         app = (p.get("targetApp") or {}).get("app")
         if not app:
@@ -114,15 +123,18 @@ def main() -> int:
                 elif oid in perms:
                     a["unpermissioned"].add(oid)
 
-    hand = yaml.safe_load((ROOT / "roles.yaml").read_text(encoding="utf-8"))
+    hand = _yload((ROOT / "roles.yaml").read_text(encoding="utf-8"))
     granted = {g["key"] for v in hand["roles"].values() for g in (v.get("grants") or [])}
+    # **The presets' action keys map to the enum** (CHG-R8GEN-003): since audit R278 each roles.yaml grant names the
+    # `Permission` values it covers (`permission:`), so the join is counted in those values, not the dotted keys.
+    granted_values = {p for v in hand["roles"].values() for g in (v.get("grants") or [])
+                      for p in ([g["permission"]] if isinstance(g.get("permission"), str) else (g.get("permission") or []))}
     declared = {k for k in perms.values() if k}
 
     doc = {
         "$id": "ticvai/roles-by-app.yaml",
         "title": "Permissions each shipped app requires",
         "generatedBy": "tools/derive-app-roles.py",
-        "generated": date.today().isoformat(),
         "description": (
             "**Derived from what each app's screens call, not decided here.** For every app, the "
             "permissions its operations declare in `x-ticvai-permission`, tiered by what the key "
@@ -132,15 +144,15 @@ def main() -> int:
         "theTwoVocabularies": {
             "onOperations": len(declared),
             "inRolesYaml": len(granted),
-            "shared": len(declared & granted),
+            "rolesYamlMapsTo": len(granted_values),
+            "shared": len(declared & granted_values),
             "note": (
-                "**Zero shared keys.** The contracts carry %d permission keys across %d operations; "
-                "`roles.yaml` grants %d, all of them POS. `check-screens` validates a screen's "
-                "`guard` against `roles.yaml`, so the only guards anyone could write were POS ones "
-                "— and that is what the package shows: venue-pos declares every guard in it and "
-                "the other four apps declare none. **Joining these two is the work; this file is "
-                "the evidence for what the join has to cover.**"
-                % (len(declared), sum(1 for v in perms.values() if v), len(granted))),
+                "**One vocabulary: the `Permission` enum in contracts/shared/permissions.yaml.** The contracts "
+                "require %d of its values across %d operations; `roles.yaml`'s %d POS action keys are presets, "
+                "each mapped to the enum values it covers (%d values, %d of them required by an operation). "
+                "check-permission-vocabulary holds every place that names a permission to the enum."
+                % (len(declared), sum(1 for v in perms.values() if v), len(granted), len(granted_values),
+                   len(declared & granted_values))),
         },
         "tiers": {name: note for name, _s, note in TIERS},
         "apps": {},
@@ -158,6 +170,10 @@ def main() -> int:
             "screens": a["screens"],
             "operations": len(a["ops"]),
             "permissions": len(keys),
+            # **The app's permission set, as data** (20 October 2026, r8 cause IDENTITY-C11, CHG-R8GEN-006): a
+            # principal holds a role in this app when at least one live grant resolves to a value in this list, which
+            # is the predicate login and selectRole answer 403 no-role-in-app on.
+            "permissionSet": sorted(keys),
             "tiers": {t: by_tier.get(t, []) for t, _s, _n in TIERS},
             "operationsWithNoPermission": sorted(a["unpermissioned"])[:40],
             "operationsWithNoPermissionCount": len(a["unpermissioned"]),

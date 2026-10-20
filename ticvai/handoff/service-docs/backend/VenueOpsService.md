@@ -7,7 +7,7 @@
 | Tier | operations: What a venue does with what it sold. Licensed per module. |
 | Contracts | `queue`, `maintenance`, `resources`, `venue-map`, `assets`, `games`, `rental`, `transport` |
 | Schemas owned | `queue`, `maintenance`, `resources`, `venuemap`, `assets`, `games`, `rental`, `transport` |
-| Operations in the slice | 77 of 291 |
+| Operations in the slice | 79 of 297 |
 | Scale | Low and steady. Queue readings are the only frequent write. |
 | If it is down | Down degrades venue operations. Selling and admitting continue. |
 
@@ -67,9 +67,8 @@
 | resources | [`createResourcePackage`](#createresourcepackage) | POST | `/resource-packages` | setup | 1 | BO-861, BO-895, BO-918 |
 | resources | [`extendResourceHold`](#extendresourcehold) | POST | `/resource-holds/{holdId}/extend` | core | 1 | GST-074, WEB-047 |
 | resources | [`getMapResourceAvailability`](#getmapresourceavailability) | GET | `/resource-availability` | core | 1 | GST-058, GST-074, WEB-047 |
-| resources | [`getResourceAvailability`](#getresourceavailability) | GET | `/resources/{resourceId}/availability` | core | 1 | BO-096, BO-857, BO-866, WEB-031 |
 | resources | [`getResourceHold`](#getresourcehold) | GET | `/resource-holds/{holdId}` | core | 1 | GST-041, GST-074, WEB-010, WEB-047 |
-| resources | [`listProductStartTimes`](#listproductstarttimes) | GET | `/resource-start-times` | core | 1 | GST-075, WEB-048 |
+| resources | [`listProductStartTimes`](#listproductstarttimes) | GET | `/resource-start-times` | core | 1 | GST-075, WEB-031, WEB-048 |
 | resources | [`releaseResourceBlock`](#releaseresourceblock) | DELETE | `/resource-blocks/{blockId}` | setup | 1 | BO-870, BO-910 |
 | resources | [`relinquishResourceHold`](#relinquishresourcehold) | DELETE | `/resource-holds/{holdId}` | core | 1 | GST-074, WEB-047 |
 | resources | [`setExperienceResourceRequirements`](#setexperienceresourcerequirements) | PUT | `/experiences/{experienceId}/resource-requirements` | setup | 1 | BO-877, BO-893, BO-894 |
@@ -103,7 +102,10 @@
 | visitPlan | [`bookVisitPlan`](#bookvisitplan) | POST | `/visit-plans/{planId}/booking` | core | 1 | GST-053, WEB-050 |
 | visitPlan | [`generateVisitPlan`](#generatevisitplan) | POST | `/visit-plans` | core | 1 | GST-051, GST-052, WEB-050 |
 | visitPlan | [`getVisitPlan`](#getvisitplan) | GET | `/visit-plans/{planId}` | core | 1 | GST-053, GST-054, GST-059, WEB-050 |
+| visitPlan | [`getVisitPlannerOptions`](#getvisitplanneroptions) | GET | `/venues/{venueId}/visit-planner-options` | core | 1 | GST-051, GST-052, WEB-050 |
+| visitPlan | [`listMyVisitPlans`](#listmyvisitplans) | GET | `/visit-plans` | core | 1 | GST-059 |
 | visitPlan | [`listVisitPlanAlternatives`](#listvisitplanalternatives) | GET | `/visit-plans/{planId}/items/{itemId}/alternatives` | core | 1 | GST-053, GST-059, WEB-050 |
+| visitPlan | [`setVisitPlanPreset`](#setvisitplanpreset) | PUT | `/venues/{venueId}/visit-plan-presets/{presetKey}` | setup | 1 |  |
 | visitPlan | [`updateVisitPlan`](#updatevisitplan) | PUT | `/visit-plans/{planId}` | core | 1 | GST-053, GST-054, GST-059, WEB-050 |
 | waitTime | [`getWaitTimes`](#getwaittimes) | GET | `/queues/wait-times` | core | 1 | BO-001, BO-002, BO-004, BO-005, EMP-031, EMP-032 … |
 
@@ -116,6 +118,8 @@
 **Refused while the asset is referenced.** The response names every reference so the holder can be cleared first — deleting the image on a live homepage should not be one keystroke away.
 **Deletion is the only end of an asset's life (decided 28 September, audit STATE-MEDIA).** It removes the row rather than moving the asset to a state; `archived` and `quarantined` are both reversible through `updateMediaAsset`.
 
+**In use means** (R8 blocker ORDERS-MONEY-C29) any `assets.media_usage` row for the asset, or the asset being a media collection's cover. The other modules that keep an asset's id (AI's configuration sources, history imports and layout drafts; maintenance incident media and work-order attachments; seating sections; transport network imports; venue maps and their versions) record that use as a `media_usage` row when they take the asset, so Assets reads no other module's data to answer. Any use is 409 `in-use`, naming it. **Otherwise the delete removes, in one transaction**, the asset's `media_collection_member`, `asset_version`, `rendition` and `media_fingerprint` rows and clears `media_upload.asset_id`; the stored files of every version and their derivatives are removed from the asset store after the transaction commits.
+
 |  |  |
 |---|---|
 | Permission | `ASSET_LIBRARY_MANAGE` |
@@ -124,8 +128,8 @@
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `assets.media_usage`, `cache:idempotency` |
-| Writes | `assets.media_usage`, `cache:idempotency` |
+| Reads | `assets.media_asset`, `assets.media_usage`, `cache:idempotency` |
+| Writes | `assets.media_asset`, `assets.media_usage`, `cache:idempotency` |
 | Called by | CMS-010, CMS-075 |
 
 **Parameters**
@@ -159,7 +163,7 @@ Returns every generated size and every place the asset is referenced. Usage is w
 | Conflict policy | serverWins |
 | Read routing | replica |
 | Offline note | 24 August: The asset is on the device before the shift; a media issue with no artwork is a blank card. |
-| Reads | `assets.media_asset`, `assets.media_usage` |
+| Reads | `assets.asset_version`, `assets.media_asset`, `assets.media_collection`, `assets.media_collection_member`, `assets.media_usage`, `assets.rendition` |
 | Writes | - |
 | Called by | CMS-010, CMS-068, CMS-082 |
 
@@ -210,6 +214,9 @@ Returns every generated size and every place the asset is referenced. Usage is w
 | version | integer |  |  |
 | uploadedByPrincipalId | string (uuid) |  |  |
 | createdAt | string (date-time) | yes |  |
+| extractedText | string |  | The text pulled out of an uploaded document (R8 blocker ORDERS-MONEY-C19): written by the upload's processing job once text extraction finishes (PDF, Word and plain-text kinds), replaced when the fil… (read-only; nullable) |
+| releasedByPrincipalId | string (uuid) |  | The reviewer who released the asset from quarantined (R8 blocker ORDERS-MONEY-C24, CHG-R8MIG-022); null if it never was. (read-only; nullable) |
+| releasedAt | string (date-time) |  | When it was released from quarantined. (read-only; nullable) |
 | derivatives | array of object |  | Generated from the original, never uploaded separately. |
 | derivatives[].label | string |  |  |
 | derivatives[].width | integer |  |  |
@@ -217,7 +224,7 @@ Returns every generated size and every place the asset is referenced. Usage is w
 | derivatives[].sizeBytes | integer |  |  |
 | derivatives[].url | string |  |  |
 | usage | array of MediaUsage |  | Every place this asset is referenced. |
-| usage[].extractedText | string |  | Text pulled out of an uploaded document, after extraction. |
+| usage[].extractedText | string |  | Not written; read MediaAsset.extractedText (R8 blocker ORDERS-MONEY-C19). |
 | usage[].id | string (uuid) |  | Added 20 August. (read-only) |
 | usage[].surface | enum (tenantBranding, homepageBanner, promoBlock, contentPage, product, event, menuItem, merchandise, …) | yes |  |
 | usage[].referenceId | string | yes |  |
@@ -245,6 +252,7 @@ Returns every generated size and every place the asset is referenced. Usage is w
 
 The reference is stable, so every surface using it updates at once. This is how a brand refresh happens without editing thirty screens.
 Derivatives regenerate. The previous version is retained for rollback.
+**Where the previous file is kept** (R8 blocker ORDERS-MONEY-C29): the replace writes one `assets.asset_version` row for the file it replaces (its `storageKey`, `contentType`, `fileName`, `sizeBytes`, `checksum`) with `isCurrent` false, and the new file becomes the current version; the first replace of an asset also writes version 1 for the original, since `completeUpload` writes none. The asset passes through `processing` (derivatives regenerating, scanned again) back to `ready`; a flagged file goes to `quarantined`. A replace is allowed from `ready` and `archived`; in any other status it is 409 `asset-not-replaceable`. No operation rolls a version back yet: only the retention is defined here.
 **The fingerprint is recomputed with them**: the asset's one `assets.media_fingerprint` row is replaced by the processing job for the new file (decided 29 September, writers pass; DM4), so similarity and duplicate checks compare what is actually served.
 
 |  |  |
@@ -255,9 +263,10 @@ Derivatives regenerate. The previous version is retained for rollback.
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `assets.media_asset`, `cache:idempotency` |
-| Writes | `assets.asset_version`, `assets.media_asset`, `assets.media_fingerprint`, `cache:idempotency` |
+| Reads | `assets.media_asset`, `assets.media_upload`, `assets.media_usage`, `cache:idempotency` |
+| Writes | `assets.asset_version`, `assets.media_asset`, `assets.media_fingerprint`, `assets.media_upload`, `cache:idempotency` |
 | Called by | CMS-010, CMS-076 |
+| State model | Media asset ([states/media.yaml](../../../states/media.yaml)): moves `ready` -> `processing`, `archived` -> `processing` |
 
 **Parameters**
 
@@ -315,6 +324,9 @@ Derivatives regenerate. The previous version is retained for rollback.
 | asset.version | integer |  |  |
 | asset.uploadedByPrincipalId | string (uuid) |  |  |
 | asset.createdAt | string (date-time) | yes |  |
+| asset.extractedText | string |  | The text pulled out of an uploaded document (R8 blocker ORDERS-MONEY-C19): written by the upload's processing job once text extraction finishes (PDF, Word and plain-text kinds), replaced when the fil… (read-only; nullable) |
+| asset.releasedByPrincipalId | string (uuid) |  | The reviewer who released the asset from quarantined (R8 blocker ORDERS-MONEY-C24, CHG-R8MIG-022); null if it never was. (read-only; nullable) |
+| asset.releasedAt | string (date-time) |  | When it was released from quarantined. (read-only; nullable) |
 | affectedSurfaces | integer | yes | How many surfaces now show the new file. |
 | liveSurfaces | integer |  | Of those, how many are published to guests right now. |
 | derivativesRegenerating | boolean |  |  |
@@ -404,6 +416,9 @@ Filter by kind, tag, collection, venue or usage. `unusedOnly` surfaces assets no
 | items[].version | integer |  |  |
 | items[].uploadedByPrincipalId | string (uuid) |  |  |
 | items[].createdAt | string (date-time) | yes |  |
+| items[].extractedText | string |  | The text pulled out of an uploaded document (R8 blocker ORDERS-MONEY-C19): written by the upload's processing job once text extraction finishes (PDF, Word and plain-text kinds), replaced when the fil… (read-only; nullable) |
+| items[].releasedByPrincipalId | string (uuid) |  | The reviewer who released the asset from quarantined (R8 blocker ORDERS-MONEY-C24, CHG-R8MIG-022); null if it never was. (read-only; nullable) |
+| items[].releasedAt | string (date-time) |  | When it was released from quarantined. (read-only; nullable) |
 | nextCursor | string |  |  |
 | hasMore | boolean | yes |  |
 
@@ -422,6 +437,7 @@ Filter by kind, tag, collection, venue or usage. `unusedOnly` surfaces assets no
 A partial update: only the fields sent change. `collectionIds`, when sent, replaces the asset's collection memberships (`MediaCollectionMember` rows) with exactly that list.
 `status` moves the asset along `states/media.yaml`, and only along the transitions that model gives this operation: `ready` to `archived`, `archived` to `ready`, and `quarantined` to `ready` (the reversal of a scan flag, which the state model marks as requiring approval). **Archiving is refused while the asset is referenced**, for the same reason deletion is: an archived image on a live homepage is a broken image.
 **None of these states is final (decided 28 September, audit STATE-MEDIA).** An archived asset may be restored to `ready`, and a quarantined one released to `ready` after review; the only end of an asset's life is `deleteMediaAsset`.
+**Who releases a quarantined asset** (R8 blocker ORDERS-MONEY-C24, the lead's answer C; CHG-R8MIG-022): the reviewer, a caller who also holds `ASSET_LIBRARY_APPROVE` at the asset's venue, makes the move directly on CMS-010 (`403` without it); the asset records `releasedByPrincipalId` and `releasedAt`. No approval request is raised.
 
 |  |  |
 |---|---|
@@ -508,6 +524,9 @@ A partial update: only the fields sent change. `collectionIds`, when sent, repla
 | version | integer |  |  |
 | uploadedByPrincipalId | string (uuid) |  |  |
 | createdAt | string (date-time) | yes |  |
+| extractedText | string |  | The text pulled out of an uploaded document (R8 blocker ORDERS-MONEY-C19): written by the upload's processing job once text extraction finishes (PDF, Word and plain-text kinds), replaced when the fil… (read-only; nullable) |
+| releasedByPrincipalId | string (uuid) |  | The reviewer who released the asset from quarantined (R8 blocker ORDERS-MONEY-C24, CHG-R8MIG-022); null if it never was. (read-only; nullable) |
+| releasedAt | string (date-time) |  | When it was released from quarantined. (read-only; nullable) |
 
 **Responses**
 
@@ -515,6 +534,7 @@ A partial update: only the fields sent change. `collectionIds`, when sent, repla
 |---|---|---|
 | 200 |  | Updated |
 | 409 |  | Status change refused: archiving an asset that is still referenced (inUse, with every reference listed), or a transition states/media.yaml does not allow from the asset's current status (transitionNo… |
+| 403 | Forbidden | Authenticated but not permitted at the requested scope |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
@@ -880,8 +900,8 @@ request; a refusal from it (capacity below seats sold) is returned as this opera
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `transport.departure` |
-| Writes | `transport.departure` |
+| Reads | `cache:idempotency`, `transport.departure` |
+| Writes | `cache:idempotency`, `transport.departure` |
 | Called by | BO-1187 |
 
 **Parameters**
@@ -1272,8 +1292,8 @@ Replaces the route's fare table as a whole (decided 29 September, rev 3 REV3-21)
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `transport.fare_matrix_cell`, `transport.fare_passenger_type`, `transport.fare_table`, `transport.route` |
-| Writes | `transport.fare_matrix_cell`, `transport.fare_passenger_type`, `transport.fare_table` |
+| Reads | `cache:idempotency`, `transport.fare_matrix_cell`, `transport.fare_passenger_type`, `transport.fare_table`, `transport.route` |
+| Writes | `cache:idempotency`, `transport.fare_matrix_cell`, `transport.fare_passenger_type`, `transport.fare_table` |
 | Called by | BO-1185 |
 
 **Parameters**
@@ -1467,8 +1487,8 @@ The Favourites tab (decided 29 September, rev 3 REV3-21): each saved pair of sta
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `transport.favourite_route`, `transport.station` |
-| Writes | `transport.favourite_route` |
+| Reads | `cache:idempotency`, `transport.favourite_route`, `transport.station` |
+| Writes | `cache:idempotency`, `transport.favourite_route` |
 | Called by | GST-077, WEB-049 |
 
 **Parameters**
@@ -1677,8 +1697,8 @@ Refused `409` while the import has any `error` finding, is not `previewReady`, o
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `transport.network_import` |
-| Writes | `transport.fare_table`, `transport.route`, `transport.route_stop`, `transport.station`, `transport.timetable`, `transport.timetable_run` |
+| Reads | `cache:idempotency`, `transport.network_import` |
+| Writes | `cache:idempotency`, `transport.fare_table`, `transport.route`, `transport.route_stop`, `transport.station`, `transport.timetable`, `transport.timetable_run` |
 | Called by | BO-1189 |
 | State model | Transport network import ([states/transport-network-import.yaml](../../../states/transport-network-import.yaml)): moves `previewReady` -> `applied` |
 
@@ -1743,8 +1763,8 @@ Refused `409` while the import has any `error` finding, is not `previewReady`, o
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `transport.network_import` |
-| Writes | `transport.network_import` |
+| Reads | `cache:idempotency`, `transport.network_import` |
+| Writes | `cache:idempotency`, `transport.network_import` |
 | Called by | BO-1189 |
 
 **Parameters**
@@ -1817,8 +1837,8 @@ Refused `409` while the import has any `error` finding, is not `previewReady`, o
 | Offline | no |
 | Config scope | venue |
 | Conflict policy | serverWins |
-| Reads | `transport.pass_type` |
-| Writes | `transport.pass_type` |
+| Reads | `cache:idempotency`, `transport.pass_type` |
+| Writes | `cache:idempotency`, `transport.pass_type` |
 | Called by | BO-1188 |
 
 **Parameters**
@@ -1950,8 +1970,8 @@ The Multi-trip tab (decided 29 September, rev 3 REV3-21): 5-trip and 10-trip car
 | Offline | no |
 | Config scope | venue |
 | Conflict policy | serverWins |
-| Reads | `transport.pass_type` |
-| Writes | `transport.pass_type` |
+| Reads | `cache:idempotency`, `transport.pass_type` |
+| Writes | `cache:idempotency`, `transport.pass_type` |
 | Called by | BO-1188 |
 
 **Parameters**
@@ -2326,8 +2346,8 @@ Clone copies configuration and never copies identity: code, serial and barcode a
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `resources.resource` |
-| Writes | `resources.resource` |
+| Reads | `cache:idempotency`, `resources.resource` |
+| Writes | `cache:idempotency`, `resources.resource` |
 | Called by | BO-857 |
 
 **Parameters**
@@ -2468,8 +2488,8 @@ Board 2.07. **A block is not a booking and the difference is operational.** An o
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `resources.resource_block` |
-| Writes | `resources.resource_block` |
+| Reads | `cache:idempotency`, `resources.resource_block` |
+| Writes | `cache:idempotency`, `resources.resource_block` |
 | Called by | BO-864, BO-870, BO-880, BO-910 |
 
 **Parameters**
@@ -2532,8 +2552,8 @@ Board 2.07. **A block is not a booking and the difference is operational.** An o
 | Conflict policy | serverWins |
 | Lock | rowExclusive |
 | Guest callable | True |
-| Reads | `resources.booking`, `resources.resource`, `resources.resource_block`, `resources.resource_reservation`, `venuemap.map`, `venuemap.placed_resource` |
-| Writes | `resources.resource_reservation` |
+| Reads | `cache:idempotency`, `resources.booking`, `resources.resource`, `resources.resource_block`, `resources.resource_reservation`, `venuemap.map`, `venuemap.placed_resource` |
+| Writes | `cache:idempotency`, `resources.resource_reservation` |
 | Called by | GST-074, WEB-047 |
 | State model | Resource hold ([states/resource-hold.yaml](../../../states/resource-hold.yaml)): created as `held` |
 
@@ -2601,8 +2621,8 @@ Board 2.07. **A block is not a booking and the difference is operational.** An o
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `resources.resource_package`, `resources.resource_requirement` |
-| Writes | `resources.resource_package`, `resources.resource_requirement` |
+| Reads | `cache:idempotency`, `resources.resource_package`, `resources.resource_requirement` |
+| Writes | `cache:idempotency`, `resources.resource_package`, `resources.resource_requirement` |
 | Called by | BO-861, BO-895, BO-918 |
 
 **Parameters**
@@ -2702,8 +2722,8 @@ For a guest still completing payment. **The same bounds as a seat hold**: `Venue
 | Offline | no |
 | Conflict policy | serverWins |
 | Guest callable | True |
-| Reads | `resources.resource_reservation` |
-| Writes | `resources.resource_reservation` |
+| Reads | `cache:idempotency`, `resources.resource_reservation` |
+| Writes | `cache:idempotency`, `resources.resource_reservation` |
 | Called by | GST-074, WEB-047 |
 
 **Parameters**
@@ -2754,6 +2774,8 @@ For a guest still completing payment. **The same bounds as a seat hold**: `Venue
 
 **Not paged, deliberately.** A map carries tens of resources, not thousands, and a paged answer would make the client stitch pages before it could grey a single cabana.
 
+**The next free date** (r8 walk of ticket 28204). When no resource on the map is `available` for the window, `nextAvailableDate` is the first date after `from` on which at least one placed resource is free, looked for up to 30 days ahead (the horizon is fixed, not a parameter); null when the window has a free resource or nothing is free within 30 days. GST-058 offers it as "next free date" and does not call the operation day by day. The date is worked out the same way as `status`, with setup and teardown subtracted, and for the same `kind` when `kind` is sent.
+
 |  |  |
 |---|---|
 | Permission | `RESOURCE_VIEW` |
@@ -2776,6 +2798,7 @@ For a guest still completing payment. **The same bounds as a seat hold**: `Venue
 | from | query | yes | string (date-time) | Start of the window. |
 | to | query | yes | string (date-time) |  |
 | kind | query |  | ResourceKind: enum (cabana, lounger, locker, wheelchair, stroller, equipment, room, auditorium, …) | Only resources of this kind, e.g. |
+| minCapacity | query |  | integer | Only resources that seat or hold at least this many guests (capacity), so a party can narrow the map to cabanas big enough for it (r8 walk of tickets 28163 and 28204; lead decision of 20 October 2026… |
 
 **Response**: `MapResourceAvailability`
 
@@ -2791,6 +2814,7 @@ For a guest still completing payment. **The same bounds as a seat hold**: `Venue
 | totals.held | integer |  |  |
 | totals.booked | integer |  |  |
 | totals.unavailable | integer |  |  |
+| nextAvailableDate | string (date) |  | The first date after from, within 30 days, with at least one free resource; null when this window already has one or nothing is free within the horizon. (nullable) |
 | resources | array of object | yes |  |
 | resources[].resourceId | string (uuid) | yes |  |
 | resources[].placedResourceId | string (uuid) |  | The venue-map.PlacedResource it was read from. |
@@ -2812,57 +2836,6 @@ For a guest still completing payment. **The same bounds as a seat hold**: `Venue
 |---|---|---|
 | 200 |  | Every placed resource with its status for the window |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
-| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
-
-### getResourceAvailability
-
-**`GET /resources/{resourceId}/availability`**: When it is free, with conflicts already resolved
-
-**Returns free windows, not a list of bookings for the caller to subtract.** A client computing availability from bookings will forget setup time, and a cabana booked 14:00–16:00 with a 30-minute turnaround is not free at 16:00.
-Includes maintenance windows and blackouts. **A resource under repair is unavailable for a different reason from one that is booked**, and the response says which — an operator looking for something free needs to know whether to wait or to look elsewhere.
-**Per resource.** A guest booking a meeting room never names one, so the start times they choose from come from `listProductStartTimes` (product, length variant, date), not from here (decided 29 September, rev 3 REV3-13).
-**Cleanings are subtracted** (decided 29 September, W10): each cleaning the resource's `cleaningPolicy` places in the window comes back as a blocked window with reason `cleaning`, placed as `ResourceCleaningPolicy` describes.
-
-|  |  |
-|---|---|
-| Permission | `RESOURCE_VIEW` |
-| Scope level | venue |
-| Part of slice | core |
-| Wave | 1 |
-| Offline | no |
-| Conflict policy | serverWins |
-| Read routing | replica |
-| Guest callable | True |
-| Reads | `maintenance.work_order`, `resources.booking`, `resources.resource`, `resources.resource_block`, `resources.resource_reservation` |
-| Writes | - |
-| Called by | BO-096, BO-857, BO-866, WEB-031 |
-
-**Parameters**
-
-| Name | In | Required | Type | Notes |
-|---|---|---|---|---|
-| resourceId | path | yes | string (uuid) |  |
-| from | query | yes | string (date-time) |  |
-| to | query | yes | string (date-time) |  |
-
-**Response**: `ResourceAvailability`
-
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| resourceId | string (uuid) |  |  |
-| freeWindows | array of object |  |  |
-| freeWindows[].from | string (date-time) |  |  |
-| freeWindows[].to | string (date-time) |  |  |
-| blockedWindows | array of object |  | With a reason, because they are not the same. |
-| blockedWindows[].from | string (date-time) |  |  |
-| blockedWindows[].to | string (date-time) |  |  |
-| blockedWindows[].reason | enum (booked, held, setup, teardown, maintenance, blackout, closed, cleaning) |  | held is a live ResourceHold (rev 3 REV3-15): taken now, free again if it expires. |
-
-**Responses**
-
-| Code | Shape | Meaning |
-|---|---|---|
-| 200 |  | Free windows |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getResourceHold
@@ -2943,9 +2916,9 @@ Start times fall on `stepMinutes` from the venue's opening on that date, and a w
 | Conflict policy | serverWins |
 | Read routing | replica |
 | Guest callable | True |
-| Reads | `resources.booking`, `resources.resource`, `resources.resource_block`, `resources.resource_reservation`, `resources.resource_requirement`, `resources.resource_schedule` |
+| Reads | `resources.booking`, `resources.resource`, `resources.resource_block`, `resources.resource_requirement`, `resources.resource_reservation`, `resources.resource_schedule` |
 | Writes | - |
-| Called by | GST-075, WEB-048 |
+| Called by | GST-075, WEB-031, WEB-048 |
 
 **Parameters**
 
@@ -2966,6 +2939,7 @@ Start times fall on `stepMinutes` from the venue's opening on that date, and a w
 | items[].startsAt | string (date-time) | yes |  |
 | items[].endsAt | string (date-time) | yes | startsAt plus the variant's durationMinutes; the cart line's bookedWindow.endsAt. |
 | items[].freeCount | integer | yes | Resources of the room type free for the whole window. (min 1) |
+| items[].maxCapacity | integer |  | The most people one free room of the type holds in this window (the largest capacity among the free resources), so the guest sees before choosing whether the party fits; the cart line's attendees abo… (min 1; nullable) |
 | nextCursor | string |  |  |
 | hasMore | boolean | yes |  |
 
@@ -3058,8 +3032,8 @@ Requirements are stated as type and quantity with optional qualifications — *o
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `resources.resource_requirement` |
-| Writes | `resources.resource_requirement` |
+| Reads | `cache:idempotency`, `resources.resource_requirement` |
+| Writes | `cache:idempotency`, `resources.resource_requirement` |
 | Called by | BO-877, BO-893, BO-894 |
 
 **Parameters**
@@ -3109,8 +3083,8 @@ Board 1.10. **One operation, not seven.** Draft, pending approval, approved, act
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `resources.resource` |
-| Writes | `resources.resource` |
+| Reads | `cache:idempotency`, `resources.resource` |
+| Writes | `cache:idempotency`, `resources.resource` |
 | Called by | BO-857, BO-863, BO-912 |
 | State model | Resource ([states/resource.yaml](../../../states/resource.yaml)): moves `maintenance` -> `available` |
 
@@ -3190,8 +3164,8 @@ Boards 2.03 and 2.04. **A pattern, not a list of days.** A schedule written as c
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `resources.resource_schedule` |
-| Writes | `resources.resource_schedule` |
+| Reads | `cache:idempotency`, `resources.resource_schedule` |
+| Writes | `cache:idempotency`, `resources.resource_schedule` |
 | Called by | BO-866, BO-867, BO-878 |
 
 **Parameters**
@@ -3267,8 +3241,8 @@ Boards 2.03 and 2.04. **A pattern, not a list of days.** A schedule written as c
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `resources.resource` |
-| Writes | `resources.resource` |
+| Reads | `cache:idempotency`, `resources.resource` |
+| Writes | `cache:idempotency`, `resources.resource` |
 | Called by | BO-857, BO-866 |
 
 **Parameters**
@@ -3369,8 +3343,8 @@ Boards 2.03 and 2.04. **A pattern, not a list of days.** A schedule written as c
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `resources.resource_package`, `resources.resource_requirement` |
-| Writes | `resources.resource_package`, `resources.resource_requirement` |
+| Reads | `cache:idempotency`, `resources.resource_package`, `resources.resource_requirement` |
+| Writes | `cache:idempotency`, `resources.resource_package`, `resources.resource_requirement` |
 | Called by | BO-861, BO-895, BO-918 |
 
 **Parameters**
@@ -3514,8 +3488,8 @@ owns those tables); their ids are stored on `transport.route`. This operation wr
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `transport.route`, `transport.route_stop`, `transport.station` |
-| Writes | `transport.route`, `transport.route_stop` |
+| Reads | `cache:idempotency`, `transport.route`, `transport.route_stop`, `transport.station` |
+| Writes | `cache:idempotency`, `transport.route`, `transport.route_stop` |
 | Called by | BO-1184 |
 | State model | Transport route ([states/transport-route.yaml](../../../states/transport-route.yaml)): created as `draft` |
 
@@ -3731,8 +3705,8 @@ A guest or public caller sees `active` routes only; `status` is honoured only fo
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `transport.departure`, `transport.fare_table`, `transport.route`, `transport.route_stop`, `transport.station` |
-| Writes | `transport.route` |
+| Reads | `cache:idempotency`, `transport.departure`, `transport.fare_table`, `transport.route`, `transport.route_stop`, `transport.station` |
+| Writes | `cache:idempotency`, `transport.route` |
 | Called by | BO-1184 |
 | State model | Transport route ([states/transport-route.yaml](../../../states/transport-route.yaml)): moves `draft` -> `active`, `active` -> `suspended`, `suspended` -> `active`, `active` -> `retired`, `suspended` -> `retired`, `draft` -> `retired` |
 
@@ -3807,8 +3781,8 @@ A guest or public caller sees `active` routes only; `status` is honoured only fo
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `transport.route`, `transport.route_stop`, `transport.station`, `transport.timetable` |
-| Writes | `transport.route`, `transport.route_stop` |
+| Reads | `cache:idempotency`, `transport.route`, `transport.route_stop`, `transport.station`, `transport.timetable` |
+| Writes | `cache:idempotency`, `transport.route`, `transport.route_stop` |
 | Called by | BO-1184 |
 
 **Parameters**
@@ -3893,8 +3867,8 @@ Venue Management transport setup (decided 29 September, rev 3 REV3-21). **A stat
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `transport.station` |
-| Writes | `transport.station` |
+| Reads | `cache:idempotency`, `transport.station` |
+| Writes | `cache:idempotency`, `transport.station` |
 | Called by | BO-1183 |
 
 **Parameters**
@@ -4002,8 +3976,8 @@ The From and To station menus (decided 29 September, rev 3 REV3-21). A guest or 
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `transport.station` |
-| Writes | `transport.station` |
+| Reads | `cache:idempotency`, `transport.station` |
+| Writes | `cache:idempotency`, `transport.station` |
 | Called by | BO-1183 |
 
 **Parameters**
@@ -4063,8 +4037,8 @@ Departure times from the route's origin by day of week, valid over a date range.
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `transport.route`, `transport.timetable`, `transport.timetable_run` |
-| Writes | `transport.timetable`, `transport.timetable_run` |
+| Reads | `cache:idempotency`, `transport.route`, `transport.timetable`, `transport.timetable_run` |
+| Writes | `cache:idempotency`, `transport.timetable`, `transport.timetable_run` |
 | Called by | BO-1186 |
 | State model | Transport timetable ([states/transport-timetable.yaml](../../../states/transport-timetable.yaml)): created as `draft` |
 
@@ -4134,8 +4108,8 @@ The route must be `active` and have a fare table.
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `transport.timetable`, `transport.timetable_run` |
-| Writes | `transport.departure`, `transport.timetable` |
+| Reads | `cache:idempotency`, `transport.timetable`, `transport.timetable_run` |
+| Writes | `cache:idempotency`, `transport.departure`, `transport.timetable` |
 | Called by | BO-1186 |
 | State model | Transport timetable ([states/transport-timetable.yaml](../../../states/transport-timetable.yaml)): moves `draft` -> `published`, `published` -> `superseded` |
 
@@ -4189,8 +4163,8 @@ Removes its unsold future departures and stops releasing new ones. **Refused whi
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `transport.timetable`, `transport.timetable_run` |
-| Writes | `transport.timetable` |
+| Reads | `cache:idempotency`, `transport.timetable`, `transport.timetable_run` |
+| Writes | `cache:idempotency`, `transport.timetable` |
 | Called by | BO-1186 |
 | State model | Transport timetable ([states/transport-timetable.yaml](../../../states/transport-timetable.yaml)): moves `published` -> `withdrawn`, `draft` -> `withdrawn` |
 
@@ -4247,6 +4221,7 @@ Verifies the transfer, reads dimensions and duration, generates derivatives, and
 Files are scanned before becoming available. An asset that fails scanning is quarantined, not published — a tenant uploading a compromised file must not have it served to guests.
 **Scanning and derivatives run after this call returns** (`states/media.yaml`). The 201 carries the asset in `processing`; the job moves it to `ready`, `quarantined` or `failed`. A failed scan is therefore an asset in `quarantined`, not a refusal here — a client reads `status` rather than assuming the file is servable.
 **The same job writes the asset's `assets.media_fingerprint` row** (perceptual hash and embedding, stamped with the model version) once the file passes scanning, so `findSimilarMediaAssets` sees a new asset without anyone asking for it (decided 29 September, writers pass; DM4). A quarantined file gets no fingerprint.
+**The derivatives are the asset's `assets.rendition` rows** (r8 gate residue, CHG-R8RES-005): the job writes one row per derivative it generates (its `preset`), `queued` then `ready` or `failed`, which `getMediaAsset` returns as `derivatives` and `listMediaRenditions` lists. `requestMediaRendition` adds a size or format beyond them; an uploaded asset has its derivatives without it.
 
 |  |  |
 |---|---|
@@ -4257,7 +4232,7 @@ Files are scanned before becoming available. An asset that fails scanning is qua
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `assets.media_asset`, `assets.media_upload`, `cache:idempotency` |
-| Writes | `assets.media_asset`, `assets.media_fingerprint`, `cache:idempotency` |
+| Writes | `assets.asset_version`, `assets.media_asset`, `assets.media_collection_member`, `assets.media_fingerprint`, `assets.media_upload`, `assets.rendition`, `cache:idempotency` |
 | Called by | ADM-016, BO-093, BO-094, BO-1189, BO-798, BO-955, CMS-002, CMS-004, CMS-010, CMS-063, SUP-013 |
 | State model | Media asset ([states/media.yaml](../../../states/media.yaml)): created as `processing` |
 
@@ -4331,6 +4306,9 @@ Files are scanned before becoming available. An asset that fails scanning is qua
 | version | integer |  |  |
 | uploadedByPrincipalId | string (uuid) |  |  |
 | createdAt | string (date-time) | yes |  |
+| extractedText | string |  | The text pulled out of an uploaded document (R8 blocker ORDERS-MONEY-C19): written by the upload's processing job once text extraction finishes (PDF, Word and plain-text kinds), replaced when the fil… (read-only; nullable) |
+| releasedByPrincipalId | string (uuid) |  | The reviewer who released the asset from quarantined (R8 blocker ORDERS-MONEY-C24, CHG-R8MIG-022); null if it never was. (read-only; nullable) |
+| releasedAt | string (date-time) |  | When it was released from quarantined. (read-only; nullable) |
 
 **Responses**
 
@@ -4347,6 +4325,9 @@ Files are scanned before becoming available. An asset that fails scanning is qua
 Uploads go **direct to object storage**, not through this API. Large media passing through an application tier is latency, memory and a timeout waiting to happen.
 Confirm with `POST /media/uploads/{id}/complete` once the transfer finishes. The `MediaAsset.id` that returns is the reference every other contract stores for the file.
 **A 3D venue model is a `model3d` asset** (ADR-0069 section 7, contract item closed 3 October 2026, r1 additions): content type `model/gltf-binary` (`.glb`), **at most 41,943,040 bytes (40 MB)**, refused here with `400` beyond that, before the transfer starts. Its navigation file is a `document` (`application/json`). Both stay in the tenant's region (UAE-hosted for a UAE tenant) and are served through the platform's delivery rules; no asset goes to a third-party map service. `venue-map.importVenueGeometry` measures the rest of the budget.
+**What may be uploaded** (r8 walk of tickets 27839 and 27843; lead decision of 20 October 2026, option A: a fixed table, the numbers proposals for the client to correct). The kind is **derived from `contentType`** by this table, by `completeUpload` and by `replaceMediaAsset` (whose `kindMismatch` compares against it); a content type in no row is 400 `media-type-not-permitted`, and a `sizeBytes` above the row's limit is 400 `media-too-large`, both before any transfer.
+| MediaKind | Content types | Largest file | |---|---|---| | image | image/jpeg, image/png, image/webp, image/gif | 25 MB | | video | video/mp4, video/webm, video/quicktime | 500 MB | | audio | audio/mpeg, audio/mp4, audio/wav | 50 MB | | document | application/pdf, application/vnd.openxmlformats-officedocument.wordprocessingml.document, text/html, text/plain | 20 MB | | vector | image/svg+xml | 5 MB | | font | font/woff2, font/ttf, font/otf | 5 MB | | archive | application/zip | 100 MB | | model3d | model/gltf-binary | 40 MB (41,943,040 bytes) |
+The ticket the server issues carries `maxSizeBytes` (the row's limit) and expires 15 minutes after it is issued (`expiresAt`); a transfer not finished by then is abandoned and `completeUpload` answers 409. Surfaces that accept a narrower set (the brand logo accepts PNG or SVG up to 2 MB) say so themselves and apply it after this table. Other contracts that mention "the media store's limit" mean this table.
 
 |  |  |
 |---|---|
@@ -4907,6 +4888,7 @@ Carries every lesson CF-122 taught on the seat importer, because it is the same 
 **Published only, always.** A draft or archived map never appears here, whoever calls, so unfinished work cannot reach a guest; staff read drafts through `listVenueMaps`.
 **No date filter, by design.** A map changes when it is republished, not by day; what is free on a date is `resources.getMapResourceAvailability` for the chosen `mapId`. With `productId`, only maps carrying a spot sold by one of that product's price-band variants are returned, which is how the product page (WEB-004) opens straight onto the right map. A venue with one bookable map returns one entry and the screen skips the choice.
 A venue with no published bookable map is an empty `maps` list, not a 404.
+**`onlyBookable`** (r8 walk of ticket 28690). The default `true` is the behaviour above, for the booking screens (WEB-047, GST-058, GST-074). The map-viewing screens (WEB-039, GST-021) send `false`: they list every **published** map of the venue whether or not it carries a placed resource, so a guest can open a map of walkways and attractions that has no cabana on it. Published only, still; with `false`, `placedResourceCount` may be 0, and `productId` and `kind` still narrow the list when sent.
 
 |  |  |
 |---|---|
@@ -4929,6 +4911,7 @@ A venue with no published bookable map is an empty `maps` list, not a 404.
 | venueId | query | yes | string (uuid) | The venue whose bookable maps are wanted. |
 | productId | query |  | string (uuid) | Only maps with a placed resource sold by this product's price-band variants. |
 | kind | query |  | enum (cabana, lounger, table, pitch, other) | Only maps carrying at least one placed resource of this kind (PlacedResource.kind). |
+| onlyBookable | query |  | boolean | true (default): only maps whose published version carries at least one placed resource. |
 
 **Response**: `BookableVenueMaps`
 
@@ -4941,7 +4924,7 @@ A venue with no published bookable map is an empty `maps` list, not a 404.
 | maps[].kind | enum (park, floor, zone, parking) | yes |  |
 | maps[].floorLevel | integer |  | (nullable) |
 | maps[].publishedVersion | integer | yes | The VenueMap.publishedVersion a guest is served; send it to getVenueMap as version. |
-| maps[].placedResourceCount | integer | yes | Placed resources on the published version. (min 1) |
+| maps[].placedResourceCount | integer | yes | Placed resources on the published version. (min 0) |
 | maps[].kinds | array of enum (cabana, lounger, table, pitch, other) |  | The kinds of spot on this map, e.g. |
 
 **Responses**
@@ -5055,8 +5038,8 @@ Refuses a draft with unresolved proposals or a point linked to something that no
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `venuemap.placed_resource` |
-| Writes | `venuemap.placed_resource` |
+| Reads | `cache:idempotency`, `venuemap.placed_resource` |
+| Writes | `cache:idempotency`, `venuemap.placed_resource` |
 | Called by | BO-094 |
 
 **Parameters**
@@ -5134,8 +5117,8 @@ Refuses a draft with unresolved proposals or a point linked to something that no
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `venuemap.map` |
-| Writes | `venuemap.map` |
+| Reads | `cache:idempotency`, `venuemap.map` |
+| Writes | `cache:idempotency`, `venuemap.map` |
 | Called by | BO-094 |
 
 **Parameters**
@@ -5332,7 +5315,7 @@ Unlinked points are fine and expected — a toilet is a toilet.
 **"Book this plan"** (29 September, MOB-6). For each item that is bought (an admission per day, a timed attraction, a show performance, a meal combo, an accepted Fast Track add-on) the server adds a line to the guest's cart **by the orders service's `addCartLine`, with its rules unchanged**: the 15-minute lease, the capacity refusal, the seat limit, the info-only refusal. Free items (a walk-up ride, a toilet, a photo spot) add nothing. Quantities come from the party: one admission per person by their age band's variant, per day, **for that day's venue** (`VisitPlan.days[].venueId`; 30 September, MoM 4.7), so a two-park plan books each park's own admission.
 **The cart handoff.** With `cartId`, lines are added to that cart; without it a cart is created for the venue and the guest channel (`orders.createCart`), exactly as the Buy tickets button would. The response is the cart id, the lines added and each item that could not be added with the `addCartLine` refusal it met (`soldOutForSession`, `productInfoOnly`, ...). **A partly booked plan is still a success**: the guest goes to GST-041 with what was added and the plan marks the rest, rather than losing the whole plan to one sold-out show. Nothing is paid here; checkout is `orders.checkoutCart`.
 The plan moves to `booked` and keeps `cartId`, so reopening it from Tickets shows what was bought. `baseVersion` must be current (409 as `updateVisitPlan`).
-**Sign in to book** (Chinmay, 3 October 2026, Block A business rules; CHG-RUL-003). An anonymous device session is refused `403 sign-in-required` and nothing is added; the app asks the guest to sign in, the plan moves to the account (`generateVisitPlan`), and the guest books it. Add-ons on the plan (`addOnProductIds`, `addOnAccepted`) are priced here, at booking, by the lines `addCartLine` creates; the plan itself carries no price.
+**Sign in to book** (Chinmay, 3 October 2026, Block A business rules; CHG-RUL-003). An anonymous device session is refused `403 sign-in-required` and nothing is added; the app asks the guest to sign in, the plan moves to the account (`generateVisitPlan`), and the guest books it. Add-ons on the plan (`addOnProductIds`, `addOnAccepted`) are priced here, at booking, by the lines `addCartLine` creates; the plan stores no price, shows only an estimate computed on read (`VisitPlan.estimate`), and the price is fixed when booked.
 
 |  |  |
 |---|---|
@@ -5393,9 +5376,9 @@ The plan moves to `booked` and keeps `cartId`, so reopening it from Tickets show
 
 **`POST /visit-plans`**: Build a visit plan from the party, the dates and what they like
 
-**The Plan tab's first answer, and it needs no AI** (29 September, MOB-6). The guest gives party size, each person's height or age, the dates, the pace (packed or relaxed), interests and cuisines; the planner returns one itinerary per day with timed items and add-ons such as Fast Track.
+**The Plan tab's first answer, and it needs no AI** (29 September, MOB-6). The guest gives party size, each person's height or age, the dates, the pace (packed, balanced or relaxed), interests and cuisines; the planner returns one itinerary per day with timed items and add-ons such as Fast Track.
 **Each day is planned from its own venue, never from the tenant as a whole** (30 September client meeting, MoM 4.7, Allam's requirement). In a multi-venue tenant the guest may put each date at a different venue (`dayVenues`; a date not listed is at `venueId`). Every candidate for a day comes from **that day's venue's own published map**: its rides and attractions, its dining points (restaurant, cafe, food kiosk) and its retail points (shop, retail kiosk), and the performances dated at that venue. A preference is matched against the amenities of that venue only: when one park has the only Indian restaurant, a party that asked for `indian` gets it on that park's day and nowhere else, and a day at a park without one says so (`unmatchedPreferences`) rather than placing a restaurant the guest cannot walk to.
-**Rules, in order, per day.** (1) Candidates: the day venue's published map points that are destinations and have a `typicalDurationMinutes`, and the performances dated that day at that venue. **Retail is a candidate as F&B is** (30 September, MoM 4.7; until then only dining points were venue-linked): a `shop`, or a `kiosk` carrying `retailTags`, is placed as a `shop` stop. (2) Eligibility: a ride whose product's `catalogue.ProductEligibilityRule` excludes anyone in the party by height or age is dropped, and the reason is kept on the plan (`excluded`); a `mustIncludePointIds` point that is at none of the plan's venues is kept there with `notAtVenue`. (3) Scoring: interest tags matched, then the venue's featured order. (4) Layout: from opening time, the next item is the best-scoring one reachable by walking time over the published graph (`venuemap.path`), with the typical wait for that hour and its duration; a meal is placed at a dining point of the day's venue whose `cuisineTags` match, around 12:30 and 19:00, and where no dining point of that venue matches, at its best other dining point, with the unmatched cuisine recorded; a retail stop is placed when the party chose `shopping` or a `retailTags` value, at a retail point of the day's venue that matches, late in the day or on the way to the exit; `relaxed` leaves a 30-minute gap after every two items and stops by 18:00, `packed` fills to closing. (5) Add-ons: where the expected wait on a planned ride exceeds 30 minutes and the venue sells a Fast Track for it, the add-on is suggested on that item, never added.
+**Rules, in order, per day.** (1) Candidates: the day venue's published map points that are destinations and have a `typicalDurationMinutes`, and the performances dated that day at that venue. **Retail is a candidate as F&B is** (30 September, MoM 4.7; until then only dining points were venue-linked): a `shop`, or a `kiosk` carrying `retailTags`, is placed as a `shop` stop. (2) Eligibility: a ride whose product's `catalogue.ProductEligibilityRule` excludes anyone in the party by height or age is dropped, and the reason is kept on the plan (`excluded`); a `mustIncludePointIds` point that is at none of the plan's venues is kept there with `notAtVenue`. (3) Scoring: interest tags matched, then the venue's featured order. (4) Layout: from opening time, the next item is the best-scoring one reachable by walking time over the published graph (`venuemap.path`), with the typical wait for that hour and its duration; a meal is placed at a dining point of the day's venue whose `cuisineTags` match, around 12:30 and 19:00, and where no dining point of that venue matches, at its best other dining point, with the unmatched cuisine recorded; a retail stop is placed when the party chose `shopping` or a `retailTags` value, at a retail point of the day's venue that matches, late in the day or on the way to the exit; `relaxed` leaves a 30-minute gap after every two items and stops by 18:00, `packed` fills to closing, and `balanced` (DI-1098, agreed 30 September; r8 walk of tickets 28701 and 28200) sits between them: a 15-minute gap after every two items, filling to 85% of the venue's opening hours. **The balanced numbers are the planner owner's proposal, to be confirmed by the lead.** (5) Add-ons: where the expected wait on a planned ride exceeds 30 minutes and the venue sells a Fast Track for it, the add-on is suggested on that item, never added.
 **The same inputs give the same plan**, so the guest can trust that a regenerate changes only what they changed. `presetKey` (or the older `preset`) gives the ready-made day plans of GST-052 (the same rules with preset interests and pace). **The AI planner agent refines a plan; it does not make the first one** (ai `requestSuggestion` kind `itinerary`): when AI is off or fails, this answer is the plan.
 **Owned by the guest session**, as a cart is: a signed-in guest's plan is theirs, an anonymous one is bound to the device session and claimed on sign-in. Nothing is held or sold here; `bookVisitPlan` turns the plan into cart lines.
 **Signed out, a guest builds and changes; signed in, they save, share and book** (Chinmay, 3 October 2026, Block A business rules; CHG-RUL-003). This operation, `getVisitPlan`, `updateVisitPlan` and `listVisitPlanAlternatives` accept the anonymous guest session a device holds before sign-in (the `guestAuth` token `orders.createCart` uses), so the Plan tab works without an account. The plan is kept against that device session (`VisitPlan.sessionRef`) and is not saved to any account: it lapses with the session. **When the guest signs in on that device, every draft plan of the session moves to the account** (`subjectId` set, `sessionRef` cleared, `ownership` becomes `account`), in the same step as the cart is claimed, with no call from the client and with its versions intact. Booking (`bookVisitPlan`) needs a signed-in guest; sharing a plan is a signed-in act as well (no share operation is contracted yet).
@@ -5431,7 +5414,7 @@ The plan moves to `booked` and keeps `cartId`, so reopening it from Tickets show
 | party | array of object | yes | One entry per person. (min items 1; max items 20) |
 | party[].heightCm | integer |  | (min 40; max 230; nullable) |
 | party[].ageYears | integer |  | (min 0; max 120; nullable) |
-| pace | enum (packed, relaxed) |  | (default relaxed) |
+| pace | enum (packed, balanced, relaxed) |  | (default relaxed) |
 | interestTags | array of string |  | The same closed list as VenuePoint.interestTags. (max items 12) |
 | cuisineTags | array of string |  | Matched per day against the cuisineTags of that day's venue's dining points only (30 September, MoM 4.7). (max items 8) |
 | retailTags | array of string |  | Shops the party would like to visit (30 September client meeting, MoM 4.7: retail and kiosk shops join F&B as venue-linked planner options), e.g. (max items 8) |
@@ -5463,7 +5446,7 @@ The plan moves to `booked` and keeps `cartId`, so reopening it from Tickets show
 | inputs.party | array of object | yes | One entry per person. (min items 1; max items 20) |
 | inputs.party[].heightCm | integer |  | (min 40; max 230; nullable) |
 | inputs.party[].ageYears | integer |  | (min 0; max 120; nullable) |
-| inputs.pace | enum (packed, relaxed) |  | (default relaxed) |
+| inputs.pace | enum (packed, balanced, relaxed) |  | (default relaxed) |
 | inputs.interestTags | array of string |  | The same closed list as VenuePoint.interestTags. (max items 12) |
 | inputs.cuisineTags | array of string |  | Matched per day against the cuisineTags of that day's venue's dining points only (30 September, MoM 4.7). (max items 8) |
 | inputs.retailTags | array of string |  | Shops the party would like to visit (30 September client meeting, MoM 4.7: retail and kiosk shops join F&B as venue-linked planner options), e.g. (max items 8) |
@@ -5477,7 +5460,17 @@ The plan moves to `booked` and keeps `cartId`, so reopening it from Tickets show
 | excluded | array of object |  | What was left out and why, e.g. (read-only) |
 | excluded[].pointId | string (uuid) |  |  |
 | excluded[].productId | string (uuid) |  | (nullable) |
+| excluded[].name | string |  | The point's name, worked out on read for the left-out banner (r8 walk of ticket 28693). (nullable) |
+| excluded[].limit | object |  | The rule that left it out, worked out on read from the product's eligibility rule: for heightRule a minimum or maximum height in centimetres, for ageRule a minimum or maximum age in years. (nullable) |
+| excluded[].limit.kind | enum (minHeightCm, maxHeightCm, minAge, maxAge) |  |  |
+| excluded[].limit.value | integer |  | (min 0) |
 | excluded[].reason | enum (heightRule, ageRule, closedOnDate, notInInterests, noTime, notAtVenue) |  | notAtVenue (30 September, MoM 4.7): a must-include point that is at none of the plan's venues, so no day could hold it. |
+| estimate | object |  | An estimated total, computed on read from current catalogue prices and stored nowhere (r8 walk of tickets 28693 and 28200; lead decision of 20 October 2026, option A; DI-1098, "with associated costin… (read-only; nullable) |
+| estimate.total | Money | yes | On the wire this is three fields; in the database it is one column. |
+| estimate.total.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| estimate.total.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| estimate.total.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| estimate.currency | string | yes |  |
 | unmatchedPreferences | array of object |  | A preference a day's venue cannot meet is said, never faked (30 September client meeting, MoM 4.7, Allam's requirement). (read-only) |
 | unmatchedPreferences[].date | string (date) | yes |  |
 | unmatchedPreferences[].venueId | string (uuid) | yes | The day's venue, which has no match. |
@@ -5498,6 +5491,8 @@ The plan moves to `booked` and keeps `cartId`, so reopening it from Tickets show
 | days[].items[].kind | enum (attraction, show, meal, shop, rest, travel) | yes | meal is a stop at a dining point (restaurant, cafe or food kiosk); shop is a retail stop at a shop or a retail kiosk (30 September client meeting, MoM 4.7: retail is placed from the day venue's own p… |
 | days[].items[].venueId | string (uuid) |  | The venue of this stop (30 September client meeting, MoM 4.7): always the day's venue, and the venue whose map pointId is on. (read-only) |
 | days[].items[].pointId | string (uuid) |  | (nullable) |
+| days[].items[].name | string |  | What the stop is called on the timeline (GST-059, GST-053; r8 walk of ticket 28693): the point's name, or the performance's title for a show, in the request language. (read-only; nullable) |
+| days[].items[].zoneName | string |  | The name of the zone the stop is in, from the point's zone on the map the plan was laid out on. (read-only; nullable) |
 | days[].items[].productId | string (uuid) |  | What is bought for this stop, where it is bought. (nullable) |
 | days[].items[].bundleId | string (uuid) |  | A meal combo or package, from the point's featuredOffer. (nullable) |
 | days[].items[].performanceId | string (uuid) |  | (nullable) |
@@ -5571,7 +5566,7 @@ The plan with its days and items (29 September, MOB-6). **`version` reads an ear
 | inputs.party | array of object | yes | One entry per person. (min items 1; max items 20) |
 | inputs.party[].heightCm | integer |  | (min 40; max 230; nullable) |
 | inputs.party[].ageYears | integer |  | (min 0; max 120; nullable) |
-| inputs.pace | enum (packed, relaxed) |  | (default relaxed) |
+| inputs.pace | enum (packed, balanced, relaxed) |  | (default relaxed) |
 | inputs.interestTags | array of string |  | The same closed list as VenuePoint.interestTags. (max items 12) |
 | inputs.cuisineTags | array of string |  | Matched per day against the cuisineTags of that day's venue's dining points only (30 September, MoM 4.7). (max items 8) |
 | inputs.retailTags | array of string |  | Shops the party would like to visit (30 September client meeting, MoM 4.7: retail and kiosk shops join F&B as venue-linked planner options), e.g. (max items 8) |
@@ -5585,7 +5580,17 @@ The plan with its days and items (29 September, MOB-6). **`version` reads an ear
 | excluded | array of object |  | What was left out and why, e.g. (read-only) |
 | excluded[].pointId | string (uuid) |  |  |
 | excluded[].productId | string (uuid) |  | (nullable) |
+| excluded[].name | string |  | The point's name, worked out on read for the left-out banner (r8 walk of ticket 28693). (nullable) |
+| excluded[].limit | object |  | The rule that left it out, worked out on read from the product's eligibility rule: for heightRule a minimum or maximum height in centimetres, for ageRule a minimum or maximum age in years. (nullable) |
+| excluded[].limit.kind | enum (minHeightCm, maxHeightCm, minAge, maxAge) |  |  |
+| excluded[].limit.value | integer |  | (min 0) |
 | excluded[].reason | enum (heightRule, ageRule, closedOnDate, notInInterests, noTime, notAtVenue) |  | notAtVenue (30 September, MoM 4.7): a must-include point that is at none of the plan's venues, so no day could hold it. |
+| estimate | object |  | An estimated total, computed on read from current catalogue prices and stored nowhere (r8 walk of tickets 28693 and 28200; lead decision of 20 October 2026, option A; DI-1098, "with associated costin… (read-only; nullable) |
+| estimate.total | Money | yes | On the wire this is three fields; in the database it is one column. |
+| estimate.total.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| estimate.total.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| estimate.total.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| estimate.currency | string | yes |  |
 | unmatchedPreferences | array of object |  | A preference a day's venue cannot meet is said, never faked (30 September client meeting, MoM 4.7, Allam's requirement). (read-only) |
 | unmatchedPreferences[].date | string (date) | yes |  |
 | unmatchedPreferences[].venueId | string (uuid) | yes | The day's venue, which has no match. |
@@ -5606,6 +5611,8 @@ The plan with its days and items (29 September, MOB-6). **`version` reads an ear
 | days[].items[].kind | enum (attraction, show, meal, shop, rest, travel) | yes | meal is a stop at a dining point (restaurant, cafe or food kiosk); shop is a retail stop at a shop or a retail kiosk (30 September client meeting, MoM 4.7: retail is placed from the day venue's own p… |
 | days[].items[].venueId | string (uuid) |  | The venue of this stop (30 September client meeting, MoM 4.7): always the day's venue, and the venue whose map pointId is on. (read-only) |
 | days[].items[].pointId | string (uuid) |  | (nullable) |
+| days[].items[].name | string |  | What the stop is called on the timeline (GST-059, GST-053; r8 walk of ticket 28693): the point's name, or the performance's title for a show, in the request language. (read-only; nullable) |
+| days[].items[].zoneName | string |  | The name of the zone the stop is in, from the point's zone on the map the plan was laid out on. (read-only; nullable) |
 | days[].items[].productId | string (uuid) |  | What is bought for this stop, where it is bought. (nullable) |
 | days[].items[].bundleId | string (uuid) |  | A meal combo or package, from the point's featuredOffer. (nullable) |
 | days[].items[].performanceId | string (uuid) |  | (nullable) |
@@ -5627,6 +5634,172 @@ The plan with its days and items (29 September, MOB-6). **`version` reads an ear
 |---|---|---|
 | 200 |  | The plan |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
+### getVisitPlannerOptions
+
+**`GET /venues/{venueId}/visit-planner-options`**: What a guest can choose from when planning a visit
+
+**The planner's questions, answered from the venue's data** (R8 blocker GPS-C21, the lead's answer B of 20 October 2026; r8 integration, CHG-R8INT-007). GST-051 and WEB-050 ask the guest for a ready-made plan, interests and Fast Track; GST-052 lists the ready-made plans. Each choice they show comes from here:
+- `presets`: the venue's active `VisitPlanPreset` rows (`venuemap.visit_plan_preset`, `isActive` true),
+  ordered by `sortOrder` then `presetKey`, with the name and description in the caller's locale where the
+  row has one. A venue starts with the six built-in rows, so the list is never empty unless the venue
+  switched all of them off.
+- `interestTags`: per published park map of the venue, the interest tags its published points carry
+  (`VenuePoint.interestTags`), each tag once.
+- `fastTrackBundles`: the venue's published bundles that carry Fast Track, read from Promotions
+  (`promotions#bundleRecords`), as id and name only.
+
+Published data only, whoever calls; a venue with no published map has an empty `interestTags`. Not a list operation: one venue's options, a handful of each (bounded below).
+
+|  |  |
+|---|---|
+| Permission | `VENUE_MAP_VIEW` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | yes |
+| Conflict policy | serverWins |
+| Read routing | replica |
+| Guest callable | True |
+| Reads | `venuemap.visit_plan_preset` |
+| Writes | - |
+| Called by | GST-051, GST-052, WEB-050 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| venueId | path | yes | string (uuid) |  |
+
+**Response**: `VisitPlannerOptions`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| venueId | string (uuid) | yes |  |
+| presets | array of VisitPlanPreset | yes | (max items 50) |
+| presets[].id | string (uuid) | yes | (read-only) |
+| presets[].presetKey | string | yes | The key generateVisitPlan.presetKey names. (max length 64; pattern ^[a-z][a-zA-Z0-9]*$) |
+| presets[].name | string | yes | (max length 120) |
+| presets[].nameLocalised | object |  | (nullable) |
+| presets[].description | string |  | (max length 500; nullable) |
+| presets[].descriptionLocalised | object |  | (nullable) |
+| presets[].pace | enum (packed, balanced, relaxed) | yes |  |
+| presets[].interestTags | array of string |  | The same closed list as VenuePoint.interestTags. (max items 12) |
+| presets[].mustIncludePointIds | array of string (uuid) |  | (max items 10) |
+| presets[].isBuiltIn | boolean | yes | True for the six seeded rows; a built-in row can be changed or switched off, never deleted. (read-only) |
+| presets[].isActive | boolean | yes | (default True) |
+| presets[].sortOrder | integer | yes | The order GST-052 lists the presets in. (min 0) |
+| presets[].scopePath | string | yes | The partition key (ADR-0005): the venue the preset belongs to. (read-only) |
+| presets[].updatedAt | string (date-time) |  | (read-only) |
+| interestTags | array of object | yes | Per published park map of the venue, the interest tags its points carry. (max items 50) |
+| interestTags[].mapId | string (uuid) | yes |  |
+| interestTags[].mapName | string |  |  |
+| interestTags[].tags | array of string | yes | (max items 50) |
+| fastTrackBundles | array of object | yes | (max items 50) |
+| fastTrackBundles[].bundleId | string (uuid) | yes |  |
+| fastTrackBundles[].name | string | yes |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | The venue's planner options |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
+### listMyVisitPlans
+
+**`GET /visit-plans`**: The caller's own visit plans, by date or status
+
+**How a screen finds today's plan without being handed a `planId`** (r8 walk of ticket 28694). GST-059 (Plan in Progress), opened cold, calls this with `date` set to today and `status=draft` or `booked`; it shows the plan it finds, or offers to make one when the list is empty.
+**Only the caller's own plans**, by the same owner rule as `getVisitPlan`: a signed-in guest's plans (`subjectId`), or the plans of the device session the anonymous guest holds (`sessionRef`). Another guest's plan is never listed. Ordered by `updatedAt`, newest first, then by `id`; paged.
+`date` keeps the plans whose current version has a day on that date (`VisitPlan.days[].date`). `status` keeps one status. With neither, every plan of the caller. An empty page is a 200, not a 404.
+
+|  |  |
+|---|---|
+| Permission | `None` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | yes |
+| Conflict policy | serverWins |
+| Read routing | primary |
+| Guest callable | True |
+| Reads | `venuemap.visit_plan`, `venuemap.visit_plan_item` |
+| Writes | - |
+| Called by | GST-059 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| date | query |  | string (date) | Only plans with a day on this date. |
+| status | query |  | enum (draft, booked, archived) | Only plans in this status. |
+| pageSize | query |  | integer |  |
+| cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
+
+**Response**: `object`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| items | array of VisitPlan | yes |  |
+| items[].id | string (uuid) | yes | (read-only) |
+| items[].venueId | string (uuid) | yes |  |
+| items[].scopePath | string |  | Derived from venueId. (read-only) |
+| items[].subjectId | string (uuid) |  | The signed-in guest. (read-only; nullable) |
+| items[].sessionRef | string |  | The anonymous device session that owns the plan until sign-in. (read-only; nullable) |
+| items[].ownership | enum (anonymous, account) |  | anonymous while the plan belongs to a device session (built and changed only; it lapses with the session), account once the guest signed in and the plan moved to their account, where it is saved and… (read-only) |
+| items[].status | enum (draft, booked, archived) | yes | booked after bookVisitPlan; a booked plan is read-only. (read-only) |
+| items[].version | integer | yes | The current version. (min 1; read-only) |
+| items[].source | enum (rules, preset, aiAgent) |  | What produced the current version: the rules planner, a preset, or the AI planner agent acting for the guest. (read-only) |
+| items[].inputs | VisitPlanRequest |  | What generateVisitPlan takes (29 September, MOB-6): the Plan tab's form on GST-051 and WEB-050. |
+| items[].inputs.venueId | string (uuid) | yes | The venue the guest picked in the app (GST-001 / WEB-001), which scopes the plan. |
+| items[].inputs.dayVenues | array of object |  | Which venue on which date, in a multi-venue tenant (30 September client meeting, MoM 4.7, Allam's requirement). (max items 7) |
+| items[].inputs.dates | array of string (date) | yes | (min items 1; max items 7) |
+| items[].inputs.party | array of object | yes | One entry per person. (min items 1; max items 20) |
+| items[].inputs.pace | enum (packed, balanced, relaxed) |  | (default relaxed) |
+| items[].inputs.interestTags | array of string |  | The same closed list as VenuePoint.interestTags. (max items 12) |
+| items[].inputs.cuisineTags | array of string |  | Matched per day against the cuisineTags of that day's venue's dining points only (30 September, MoM 4.7). (max items 8) |
+| items[].inputs.retailTags | array of string |  | Shops the party would like to visit (30 September client meeting, MoM 4.7: retail and kiosk shops join F&B as venue-linked planner options), e.g. (max items 8) |
+| items[].inputs.mustIncludePointIds | array of string (uuid) |  | Placed on a day whose venue has the point. (max items 10) |
+| items[].inputs.preset | enum (highlights, family, thrillSeeker, waterDay, relaxed, showsAndDining) |  | A ready-made day plan (GST-052 Suggested Itineraries): the preset fixes the interests and the pace, and the party still decides eligibility. (nullable) |
+| items[].inputs.presetKey | string |  | The ready-made plan the guest took on GST-052 (30 September, second wave of the 29 September pass, MOB-6): one of the built-in preset keys above, or a key of a ready-made plan the venue defines. (max length 64; pattern ^[a-z][a-zA-Z0-9]*$; nullable) |
+| items[].inputs.startTime | string |  | When the party arrives. (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$; nullable) |
+| items[].inputs.locale | string |  | (nullable) |
+| items[].mapVersion | integer |  | The published map version the plan was laid out on. (read-only) |
+| items[].cartId | string (uuid) |  | The cart bookVisitPlan filled. (read-only; nullable) |
+| items[].excluded | array of object |  | What was left out and why, e.g. (read-only) |
+| items[].excluded[].pointId | string (uuid) |  |  |
+| items[].excluded[].productId | string (uuid) |  | (nullable) |
+| items[].excluded[].name | string |  | The point's name, worked out on read for the left-out banner (r8 walk of ticket 28693). (nullable) |
+| items[].excluded[].limit | object |  | The rule that left it out, worked out on read from the product's eligibility rule: for heightRule a minimum or maximum height in centimetres, for ageRule a minimum or maximum age in years. (nullable) |
+| items[].excluded[].reason | enum (heightRule, ageRule, closedOnDate, notInInterests, noTime, notAtVenue) |  | notAtVenue (30 September, MoM 4.7): a must-include point that is at none of the plan's venues, so no day could hold it. |
+| items[].estimate | object |  | An estimated total, computed on read from current catalogue prices and stored nowhere (r8 walk of tickets 28693 and 28200; lead decision of 20 October 2026, option A; DI-1098, "with associated costin… (read-only; nullable) |
+| items[].estimate.total | Money | yes | On the wire this is three fields; in the database it is one column. |
+| items[].estimate.currency | string | yes |  |
+| items[].unmatchedPreferences | array of object |  | A preference a day's venue cannot meet is said, never faked (30 September client meeting, MoM 4.7, Allam's requirement). (read-only) |
+| items[].unmatchedPreferences[].date | string (date) | yes |  |
+| items[].unmatchedPreferences[].venueId | string (uuid) | yes | The day's venue, which has no match. |
+| items[].unmatchedPreferences[].preference | enum (cuisine, retail, interest) | yes |  |
+| items[].unmatchedPreferences[].tag | string | yes | (max length 30) |
+| items[].unmatchedPreferences[].availableAtVenueIds | array of string (uuid) |  | Other active venues of the tenant where the tag is matched. |
+| items[].days | array of object | yes | One per date, in order. (read-only) |
+| items[].days[].date | string (date) | yes |  |
+| items[].days[].venueId | string (uuid) | yes | The venue this day is planned at (30 September, MoM 4.7): VisitPlanRequest.dayVenues for the date, else venueId. |
+| items[].days[].opensAt | string |  | (nullable) |
+| items[].days[].closesAt | string |  | (nullable) |
+| items[].days[].items | array of VisitPlanItem | yes |  |
+| items[].createdAt | string (date-time) |  | (read-only) |
+| items[].updatedAt | string (date-time) |  | (read-only) |
+| nextCursor | string |  |  |
+| hasMore | boolean | yes |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | The caller's plans, newest first |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listVisitPlanAlternatives
@@ -5689,6 +5862,79 @@ The plan with its days and items (29 September, MOB-6). **`version` reads an ear
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
+### setVisitPlanPreset
+
+**`PUT /venues/{venueId}/visit-plan-presets/{presetKey}`**: Add or replace one of a venue's ready-made day plans
+
+**Whole replace, keyed on the venue and `presetKey`** (R8 blocker GPS-C21; r8 integration, CHG-R8INT-007): the body is the preset as it should be (name, description, pace, interest tags, must-include points, `isActive`, `sortOrder`); a key the venue does not have yet adds a preset, an existing key replaces it. A built-in row keeps its key and `isBuiltIn`; switching it off is `isActive` false, and there is no delete, so a built-in row is never removed. `mustIncludePointIds` must be points of the venue's published maps, else 422 `unknown-point`; an interest tag outside `VenuePoint.interestTags`' list is 400. A change reaches `generateVisitPlan` and `getVisitPlannerOptions` at once; a plan already made keeps its own copy.
+
+|  |  |
+|---|---|
+| Permission | `PRODUCT_CONFIGURE` |
+| Scope level | venue |
+| Part of slice | setup, makes `venuemap.visit_plan_preset` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Config scope | venue |
+| Conflict policy | serverWins |
+| Reads | `cache:idempotency`, `venuemap.visit_plan_preset` |
+| Writes | `cache:idempotency`, `venuemap.visit_plan_preset` |
+| Called by | **no screen**: no screen lists it in its apis, so it is reachable only by API or import until one does (README, Known gaps) |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| venueId | path | yes | string (uuid) |  |
+| presetKey | path | yes | string |  |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
+
+**Request body**: `VisitPlanPreset`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) | yes | (read-only) |
+| presetKey | string | yes | The key generateVisitPlan.presetKey names. (max length 64; pattern ^[a-z][a-zA-Z0-9]*$) |
+| name | string | yes | (max length 120) |
+| nameLocalised | object |  | (nullable) |
+| description | string |  | (max length 500; nullable) |
+| descriptionLocalised | object |  | (nullable) |
+| pace | enum (packed, balanced, relaxed) | yes |  |
+| interestTags | array of string |  | The same closed list as VenuePoint.interestTags. (max items 12) |
+| mustIncludePointIds | array of string (uuid) |  | (max items 10) |
+| isBuiltIn | boolean | yes | True for the six seeded rows; a built-in row can be changed or switched off, never deleted. (read-only) |
+| isActive | boolean | yes | (default True) |
+| sortOrder | integer | yes | The order GST-052 lists the presets in. (min 0) |
+| scopePath | string | yes | The partition key (ADR-0005): the venue the preset belongs to. (read-only) |
+| updatedAt | string (date-time) |  | (read-only) |
+
+**Response**: `VisitPlanPreset`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) | yes | (read-only) |
+| presetKey | string | yes | The key generateVisitPlan.presetKey names. (max length 64; pattern ^[a-z][a-zA-Z0-9]*$) |
+| name | string | yes | (max length 120) |
+| nameLocalised | object |  | (nullable) |
+| description | string |  | (max length 500; nullable) |
+| descriptionLocalised | object |  | (nullable) |
+| pace | enum (packed, balanced, relaxed) | yes |  |
+| interestTags | array of string |  | The same closed list as VenuePoint.interestTags. (max items 12) |
+| mustIncludePointIds | array of string (uuid) |  | (max items 10) |
+| isBuiltIn | boolean | yes | True for the six seeded rows; a built-in row can be changed or switched off, never deleted. (read-only) |
+| isActive | boolean | yes | (default True) |
+| sortOrder | integer | yes | The order GST-052 lists the presets in. (min 0) |
+| scopePath | string | yes | The partition key (ADR-0005): the venue the preset belongs to. (read-only) |
+| updatedAt | string (date-time) |  | (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | The preset as stored |
+| 422 |  | A must-include point that is not a point of the venue's published maps |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
 ### updateVisitPlan
 
 **`PUT /visit-plans/{planId}`**: Swap, remove, add, move or undo, as a new version
@@ -5697,7 +5943,8 @@ The plan with its days and items (29 September, MOB-6). **`version` reads an ear
 **A stale `baseVersion` is refused 409 `plan-version-conflict`** rather than merged: the AI planner agent and the guest can both change a plan, and a change made against a plan the guest no longer sees is a change they did not choose.
 **The AI planner agent calls this as the guest** (ai `setAiTool`, toolKey `venue-map.updateVisitPlan`): the agent's proposal becomes a version the guest can undo. AI never writes the plan tables itself (ADR-0020).
 **A day keeps to its venue** (30 September client meeting, MoM 4.7). An `add` or `swap` may only name a point on the published map of that day's venue, or a performance dated at that venue; anything else is refused 422 `point-not-at-day-venue`, whoever sends it. This is the backstop for the AI planner agent: a restaurant or shop it names from another park never reaches the plan. Moving a day to another venue is a new plan from changed answers (`generateVisitPlan` with `dayVenues`), not a change here.
-**Add-ons are changes too** (Chinmay, 3 October 2026, Block A business rules, GST-053; CHG-RUL-009). `addAddOn` puts an add-on the venue sells for that stop (`addOnProductId`, e.g. Fast Track on a ride, a photo pass) on an item, whether or not the planner suggested it; `removeAddOn` takes one off. `acceptAddOn` and `declineAddOn` still answer the planner's own suggestion (`addOnSuggestion`). An add-on not sold for that stop's product is refused 422 `add-on-not-offered`. **Nothing is priced on the plan**: the add-on is priced when the plan is booked (`bookVisitPlan`, by `addCartLine`). Allowed in an anonymous session, like every change here.
+**Add-ons are changes too** (Chinmay, 3 October 2026, Block A business rules, GST-053; CHG-RUL-009). `addAddOn` puts an add-on the venue sells for that stop (`addOnProductId`, e.g. Fast Track on a ride, a photo pass) on an item, whether or not the planner suggested it; `removeAddOn` takes one off. `acceptAddOn` and `declineAddOn` still answer the planner's own suggestion (`addOnSuggestion`). An add-on not sold for that stop's product is refused 422 `add-on-not-offered`. **No price is stored on the plan**: an estimate is computed on read (`VisitPlan.estimate`), and the add-on is priced when the plan is booked (`bookVisitPlan`, by `addCartLine`). Allowed in an anonymous session, like every change here.
+**The waits-changed re-order on GST-059** (r8 walk of ticket 28694; lead decision of 20 October 2026, option A). The server proposes nothing. A stop is **late** when its planned start has passed by more than 15 minutes (a proposal, owner to confirm) because the live wait (`getWaitTimes`) exceeds the item's `expectedWaitMinutes`. The app works out the proposed new order from the live waits, shows it, and when the guest taps "Re-order my day" sends the moves as `updateVisitPlan` operations (`move`), which the server lays out and checks like any other change and saves as a new version, so undo works.
 
 |  |  |
 |---|---|
@@ -5756,7 +6003,7 @@ The plan with its days and items (29 September, MOB-6). **`version` reads an ear
 | inputs.party | array of object | yes | One entry per person. (min items 1; max items 20) |
 | inputs.party[].heightCm | integer |  | (min 40; max 230; nullable) |
 | inputs.party[].ageYears | integer |  | (min 0; max 120; nullable) |
-| inputs.pace | enum (packed, relaxed) |  | (default relaxed) |
+| inputs.pace | enum (packed, balanced, relaxed) |  | (default relaxed) |
 | inputs.interestTags | array of string |  | The same closed list as VenuePoint.interestTags. (max items 12) |
 | inputs.cuisineTags | array of string |  | Matched per day against the cuisineTags of that day's venue's dining points only (30 September, MoM 4.7). (max items 8) |
 | inputs.retailTags | array of string |  | Shops the party would like to visit (30 September client meeting, MoM 4.7: retail and kiosk shops join F&B as venue-linked planner options), e.g. (max items 8) |
@@ -5770,7 +6017,17 @@ The plan with its days and items (29 September, MOB-6). **`version` reads an ear
 | excluded | array of object |  | What was left out and why, e.g. (read-only) |
 | excluded[].pointId | string (uuid) |  |  |
 | excluded[].productId | string (uuid) |  | (nullable) |
+| excluded[].name | string |  | The point's name, worked out on read for the left-out banner (r8 walk of ticket 28693). (nullable) |
+| excluded[].limit | object |  | The rule that left it out, worked out on read from the product's eligibility rule: for heightRule a minimum or maximum height in centimetres, for ageRule a minimum or maximum age in years. (nullable) |
+| excluded[].limit.kind | enum (minHeightCm, maxHeightCm, minAge, maxAge) |  |  |
+| excluded[].limit.value | integer |  | (min 0) |
 | excluded[].reason | enum (heightRule, ageRule, closedOnDate, notInInterests, noTime, notAtVenue) |  | notAtVenue (30 September, MoM 4.7): a must-include point that is at none of the plan's venues, so no day could hold it. |
+| estimate | object |  | An estimated total, computed on read from current catalogue prices and stored nowhere (r8 walk of tickets 28693 and 28200; lead decision of 20 October 2026, option A; DI-1098, "with associated costin… (read-only; nullable) |
+| estimate.total | Money | yes | On the wire this is three fields; in the database it is one column. |
+| estimate.total.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| estimate.total.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| estimate.total.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| estimate.currency | string | yes |  |
 | unmatchedPreferences | array of object |  | A preference a day's venue cannot meet is said, never faked (30 September client meeting, MoM 4.7, Allam's requirement). (read-only) |
 | unmatchedPreferences[].date | string (date) | yes |  |
 | unmatchedPreferences[].venueId | string (uuid) | yes | The day's venue, which has no match. |
@@ -5791,6 +6048,8 @@ The plan with its days and items (29 September, MOB-6). **`version` reads an ear
 | days[].items[].kind | enum (attraction, show, meal, shop, rest, travel) | yes | meal is a stop at a dining point (restaurant, cafe or food kiosk); shop is a retail stop at a shop or a retail kiosk (30 September client meeting, MoM 4.7: retail is placed from the day venue's own p… |
 | days[].items[].venueId | string (uuid) |  | The venue of this stop (30 September client meeting, MoM 4.7): always the day's venue, and the venue whose map pointId is on. (read-only) |
 | days[].items[].pointId | string (uuid) |  | (nullable) |
+| days[].items[].name | string |  | What the stop is called on the timeline (GST-059, GST-053; r8 walk of ticket 28693): the point's name, or the performance's title for a show, in the request language. (read-only; nullable) |
+| days[].items[].zoneName | string |  | The name of the zone the stop is in, from the point's zone on the map the plan was laid out on. (read-only; nullable) |
 | days[].items[].productId | string (uuid) |  | What is bought for this stop, where it is bought. (nullable) |
 | days[].items[].bundleId | string (uuid) |  | A meal combo or package, from the point's featuredOffer. (nullable) |
 | days[].items[].performanceId | string (uuid) |  | (nullable) |
@@ -5870,6 +6129,8 @@ Every table this service owns that the slice reads or writes, with its columns a
 | created_at | timestamptz | no |  |
 | note | text | no |  |
 | is_current | boolean | no |  |
+| storage_key | text | no | Where this version's file is kept in the asset store (R8 blocker ORDERS-MONEY-C29). |
+| content_type | text | no | The media type of this version's file (R8 blocker ORDERS-MONEY-C29). |
 | scope_path | text | no |  |
 | id | uuid | yes | Synthesised key. |
 
@@ -5902,6 +6163,9 @@ Every table this service owns that the slice reads or writes, with its columns a
 | version | integer | no |  |
 | uploaded_by_principal_id | uuid | no |  |
 | created_at | timestamptz | yes |  |
+| extracted_text | text | no | The text pulled out of an uploaded document (R8 blocker ORDERS-MONEY-C19): written by the upload's processing job once text extraction finishes (PDF, Word and plain-text kinds), replaced when the fil… |
+| released_by_principal_id | uuid | no | The reviewer who released the asset from quarantined (R8 blocker ORDERS-MONEY-C24, CHG-R8MIG-022); null if it never was. |
+| released_at | timestamptz | no | When it was released from quarantined. |
 
 ### `assets.media_collection`
 
@@ -5958,13 +6222,29 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| extracted_text | text | no | Text pulled out of an uploaded document, after extraction. |
+| extracted_text | text | no | Not written; read MediaAsset.extractedText (R8 blocker ORDERS-MONEY-C19). |
 | id | uuid | yes | Added 20 August. |
 | surface | text | yes |  |
 | reference_id | text | yes |  |
 | label | text | no |  |
 | is_live | boolean | no | True where the referencing surface is published to guests. |
 | asset_id | uuid | yes | Points at assets.media_asset. |
+
+### `assets.rendition`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| preset | text | yes | e.g. |
+| format | text | no |  |
+| width | integer | no |  |
+| height | integer | no |  |
+| size_bytes | integer | no |  |
+| status | text | no |  |
+| failure_reason | text | no |  |
+| url | text | no |  |
+| scope_path | text | no |  |
+| asset_id | uuid | no | The media asset this is a rendition of, from the path of requestMediaRendition. |
 
 ### `games.card`
 
@@ -6665,9 +6945,28 @@ Every table this service owns that the slice reads or writes, with its columns a
 | is_pinned | boolean | no | The guest fixed this stop; a re-lay moves other stops around it. |
 | note | text | no |  |
 
+### `venuemap.visit_plan_preset`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| preset_key | text | yes | The key generateVisitPlan.presetKey names. |
+| name | text | yes |  |
+| name_localised | jsonb | no |  |
+| description | text | no |  |
+| description_localised | jsonb | no |  |
+| pace | text | yes |  |
+| interest_tags | text[] | no | The same closed list as VenuePoint.interestTags. |
+| must_include_point_ids | text[] | no |  |
+| is_built_in | boolean | yes | True for the six seeded rows; a built-in row can be changed or switched off, never deleted. |
+| is_active | boolean | yes |  |
+| sort_order | integer | yes | The order GST-052 lists the presets in. |
+| scope_path | text | yes | The partition key (ADR-0005): the venue the preset belongs to. |
+| updated_at | timestamptz | no |  |
+
 ## Not in the first release
 
-214 operations, added to this service in later releases without changing any of the above.
+218 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
@@ -6689,11 +6988,13 @@ Every table this service owns that the slice reads or writes, with its columns a
 | prize | `createPrize`, `listPrizes`, `lookupPrize`, `redeemPrize` |
 | queue | `getQueue`, `setQueueStatus` |
 | rental | `assessRentalDamage`, `assignRentalEquipment`, `checkOutRental`, `createRentalAgreement`, `createRentalBlackout`, `createRentalBooking`, `createRentalCategory`, `createRentalPricingProfile`, `createRentalProduct`, `explainRentalPrice`, `extendRental`, `getRentalAgreement`, `getRentalAvailability`, `getRentalBooking`, `getRentalProduct`, `importRentalCatalogue`, `listOverdueRentals`, `listRentalAgreements`, `listRentalBookings`, `listRentalCategories`, `listRentalPricingProfiles`, `listRentalProducts`, `publishRentalProduct`, `quoteRentalPrice`, `recordRentalInspection`, `reportRentalIncident`, `requestRentalCommercialOverride`, `returnRental`, `setRentalAgreementRequirements`, `setRentalAvailabilityRules`, `setRentalDepositPolicy`, `setRentalDurationRules`, `setRentalFeePolicy`, `setRentalInventoryModel`, `setRentalOperationalRules`, `setRentalProductLocations`, `signRentalAgreement`, `simulateRentalPricing`, `swapRentalEquipment`, `updateRentalBooking`, `updateRentalPricingProfile`, `updateRentalProduct`, `validateRentalProduct` |
-| resources | `allocateResources`, `bookResource`, `cancelResourceBooking`, `checkInResource`, `checkOutResource`, `createResourceAttribute`, `createResourceCategory`, `createResourceCost`, `createResourceType`, `deleteResourceCost`, `getExperienceResourceRequirements`, `getPerformanceManifest`, `getResource`, `getResourceAllocationPolicy`, `getResourceAuditTrail`, `getResourceBooking`, `getResourceCalendar`, `getResourceCostAnalytics`, `getResourceDependencies`, `getResourceHierarchy`, `getResourceQualifications`, `getResourceSchedule`, `getResourceUtilisation`, `listResourceAttributes`, `listResourceBlocks`, `listResourceBookings`, `listResourceCategories`, `listResourceCosts`, `listResourcePackages`, `listResourceTypes`, `listResources`, `raiseResourceRequest`, `reorderPerformanceManifest`, `replaceResourceAllocation`, `setResourceAllocationPolicy`, `setResourceBookingProgress`, `setResourceDependencies`, `setResourceHierarchy`, `setResourceQualifications`, `setResourceSelectionPolicy`, `setResourceVenueAssignment`, `suggestResources`, `updateResourceBooking`, `updateResourceCategory`, `updateResourceType` |
+| resources | `allocateResources`, `bookResource`, `cancelResourceBooking`, `checkInResource`, `checkOutResource`, `createResourceAttribute`, `createResourceCategory`, `createResourceCost`, `createResourceType`, `deleteResourceCost`, `getExperienceResourceRequirements`, `getPerformanceManifest`, `getResource`, `getResourceAllocationPolicy`, `getResourceAuditTrail`, `getResourceAvailability`, `getResourceBooking`, `getResourceCalendar`, `getResourceCostAnalytics`, `getResourceDependencies`, `getResourceHierarchy`, `getResourceQualifications`, `getResourceSchedule`, `getResourceUtilisation`, `listResourceAttributes`, `listResourceBlocks`, `listResourceBookings`, `listResourceCategories`, `listResourceCosts`, `listResourcePackages`, `listResourceTypes`, `listResources`, `raiseResourceRequest`, `reorderPerformanceManifest`, `replaceResourceAllocation`, `setResourceAllocationPolicy`, `setResourceBookingProgress`, `setResourceDependencies`, `setResourceHierarchy`, `setResourceQualifications`, `setResourceSelectionPolicy`, `setResourceVenueAssignment`, `suggestResources`, `updateResourceBooking`, `updateResourceCategory`, `updateResourceType` |
 | route | `getTransportRoute` |
 | signage | `getSignageQueueBoard`, `getSignageQueueCalls` |
 | timetable | `listTransportTimetables`, `updateTransportTimetable` |
+| upload | `completeGuestUpload`, `createGuestUpload` |
 | venueMap | `acceptVenueLabelProposals`, `acceptWalkwayProposals`, `getVenueMapImportJob`, `getVenueMapLive`, `getVenueNavigationFile`, `listVenueMaps`, `setPathClosure`, `validateVenueMapGraph` |
+| visitPlan | `listVisitPlanPresets` |
 | waitTime | `setWaitTime` |
 | work | `cancelWorkOrder` |
 | workOrder | `completeWorkOrder`, `createVendorServiceRequest`, `createWorkOrder`, `getWorkOrder`, `getWorkOrderPriorityPolicy`, `listVendorServiceRequests`, `listWorkOrders`, `recordWorkOrderParts`, `recordWorkOrderTime`, `setWorkOrderPriorityPolicy`, `suggestWorkOrderAssignee`, `updateVendorServiceRequest`, `updateWorkOrder`, `verifyWorkOrder` |

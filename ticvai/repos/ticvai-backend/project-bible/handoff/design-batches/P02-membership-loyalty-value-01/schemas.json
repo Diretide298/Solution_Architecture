@@ -235,6 +235,21 @@
  },
  "DelegatedAccess": {
   "x-ticvai-persistence": "identity.delegated_access",
+  "x-ticvai-exactly-one-of": [
+   [
+    "permission",
+    "roleId"
+   ]
+  ],
+  "x-ticvai-rls": "scope-or-subject",
+  "x-ticvai-required-when": {
+   "grantedByPrincipalId": {
+    "grantedByKind": "principal"
+   },
+   "grantedBySubjectId": {
+    "grantedByKind": "subject"
+   }
+  },
   "type": "object",
   "required": [
    "id",
@@ -243,6 +258,33 @@
    "effect"
   ],
   "properties": {
+   "grantedByKind": {
+    "type": "string",
+    "enum": [
+     "principal",
+     "subject",
+     "system"
+    ],
+    "default": "principal",
+    "readOnly": true,
+    "description": "Who made the grant (CHG-R8MIG-021). `system` is the SSO callback's group-to-role grant."
+   },
+   "grantedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-references": "identity.principal",
+    "description": "The staff member who made the grant; set when `grantedByKind` is `principal`."
+   },
+   "grantedBySubjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-references": "pii.subject",
+    "description": "The guest who made the grant (the account holder); set when `grantedByKind` is `subject`."
+   },
    "id": {
     "type": "string",
     "format": "uuid"
@@ -255,11 +297,13 @@
    "roleId": {
     "type": "string",
     "format": "uuid",
-    "nullable": true
+    "nullable": true,
+    "description": "The role this grant gives, with its own and inherited permissions. **Exactly one of `roleId` and `permission` is set** (ADAM CR-158; CHG-CRA-002): a role grant carries no permission."
    },
    "permission": {
     "type": "string",
-    "description": "From the permission enum. `*` permitted on DENY only."
+    "nullable": true,
+    "description": "From the permission enum. `*` permitted on DENY only. **Null on a role grant** (ADAM CR-158, 18 October 2026; CHG-CRA-002): a grant names exactly one of a permission or a role (`roleId`), so a role grant stores `role_id` and no permission. Nullable in responses since then, a breaking change approved by the lead (BC-370)."
    },
    "subjectId": {
     "type": "string",
@@ -272,6 +316,20 @@
     "format": "uuid",
     "nullable": true,
     "description": "Whose behalf. **Null for a staff grant, which is the existing behaviour** — every grant written before 18 August means exactly what it meant before.\n"
+   },
+   "overSubjectName": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "The display name of the guest acted for (`pii.subject.display_name`), read with the grant; null for a staff grant. Not stored (R8 blocker ORDERS-MONEY-C20, CHG-R8MIG-009)."
+   },
+   "overSubjectIsMinor": {
+    "type": "boolean",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "Whether the guest acted for is under the region's `RegionSettings.minorAgeThreshold` today, computed from their date of birth, which is never returned; null when no date of birth is held. Not stored (CHG-R8MIG-009)."
    },
    "overObjectRef": {
     "type": "string",
@@ -858,6 +916,7 @@
  },
  "LoyaltyProgramme": {
   "x-ticvai-persistence": "marketing.loyalty_programme + marketing.points_earning_rule + marketing.programme_tier",
+  "x-ticvai-rls": "read-beneath",
   "type": "object",
   "required": [
    "id",
@@ -974,7 +1033,13 @@
    "sourceType": {
     "type": "string",
     "maxLength": 30,
-    "nullable": true
+    "nullable": true,
+    "enum": [
+     "challenge",
+     "purchase",
+     "manager"
+    ],
+    "description": "Why the badge was awarded (R8 blocker ORDERS-MONEY-C14): `challenge` (a completed challenge, `challengeId` set), `purchase` (`sourceReferenceId` the order), `manager` (awarded by hand, as BO-826 does)."
    },
    "sourceReferenceId": {
     "type": "string",
@@ -993,14 +1058,20 @@
    "status": {
     "readOnly": true,
     "type": "string",
-    "maxLength": 20
+    "maxLength": 20,
+    "enum": [
+     "awarded",
+     "expired",
+     "revoked"
+    ],
+    "description": "Written by the server, never sent (R8 blocker ORDERS-MONEY-C14). `awardBadge` stores `awarded`. `expired` is worked out when the badge is read, from `expiresAt` in the past (no job rewrites the row). `revoked` is reserved: no operation revokes a badge yet."
    }
   }
  },
  "MarketingProgrammeTier": {
   "type": "object",
   "x-ticvai-persistence": "marketing.programme_tier",
-  "description": "**The tier definition decision 8 promised and nobody built.** `marketing.loyalty_position` carried `tierCode`, `tierName` and `pointsToNextTier` as denormalised strings and a number, with no table saying what tiers exist or what each one requires — so `pointsToNextTier` was computed from a threshold that lived nowhere.\n**Not named `marketing.loyalty_tier`**: that name is recorded in `schema-history.json` as renamed to `marketing.points_earning_rule` on 20 September, and a rename record that contradicts the schema is worse than a longer name. Not named `marketing.tier` either, because `subscription.tier_allowance` is a SaaS plan's tier and one bare `tier` in a package with two tier concepts is how `plan_id` came to point at `subscription.plan`.\n**The denormalised copy on the position stays.** A till rendering *Gold* beside a balance must not join, and must certainly not cross a cell boundary to print a word. This table is the source of truth and those columns are its cache.\n",
+  "description": "**The tier definition decision 8 promised and nobody built.** `marketing.loyalty_position` carried `tierCode`, `tierName` and `pointsToNextTier` as denormalised strings and a number, with no table saying what tiers exist or what each one requires — so `pointsToNextTier` was computed from a threshold that lived nowhere.\n**Not named `marketing.loyalty_tier`**: that name is recorded in `schema-history.json` as renamed to `marketing.points_earning_rule` on 20 September, and a rename record that contradicts the schema is worse than a longer name. Not named `marketing.tier` either, because the control database's tier allowance is a SaaS plan's tier and one bare `tier` in a package with two tier concepts is how `plan_id` came to point at the SaaS plan catalogue.\n**The denormalised copy on the position stays.** A till rendering *Gold* beside a balance must not join, and must certainly not cross a cell boundary to print a word. This table is the source of truth and those columns are its cache.\n",
   "required": [
    "loyaltyProgrammeId",
    "code",
@@ -1187,6 +1258,13 @@
     "type": "string",
     "format": "date",
     "nullable": true
+   },
+   "revokedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "When the guest removed it (`revokePaymentToken`); a removed token is never returned or charged (CHG-R8MIG-022)."
    },
    "isDefault": {
     "type": "boolean"
@@ -1913,6 +1991,30 @@
     "type": "string",
     "format": "uuid"
    },
+   "transferRules": {
+    "type": "object",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "x-ticvai-derived": "onRead",
+    "description": "What the venue allows this guest to do with a transfer, read from the venue's `WalletTransferRules` so a guest screen can hide or limit the action (r8 walk of tickets 28310 and 28345). Worked out on read.",
+    "properties": {
+     "peerToPeerAllowed": {
+      "type": "boolean"
+     },
+     "withinSharedWalletOnly": {
+      "type": "boolean"
+     },
+     "maximumPerTransfer": {
+      "allOf": [
+       {
+        "$ref": "../shared/common.yaml#/components/schemas/Money"
+       }
+      ],
+      "nullable": true
+     }
+    }
+   },
    "balance": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
     "x-ticvai-column": "balance_amount"
@@ -1936,7 +2038,7 @@
         "refund",
         "goodwill"
        ],
-       "description": "**`cash` is money the guest paid and the others are not.** That distinction decides what is refundable, what expires, and what shows as a liability.\n",
+       "description": "**`cash` is money the guest paid and the others are not.** That distinction decides what is refundable, what expires, and what shows as a liability. Worked out from the lot's credit type `category` (proposed, client to correct): `cash` -> cash; `bonus`, `promotional`, `loyalty`, `membership`, `giftCard` -> bonus; `redemption`, `ride`, `attraction`, `fnb`, `retail`, `parking`, `event` -> redemption; `refund` -> refund; `other` -> bonus. `goodwill` comes only from a lot whose `sourceKind` is `adjustment` and whose adjustment (`sourceReference`) is of kind `goodwill`, whatever the category (R8 blocker APPROVALS-TENANCY-C32).\n",
        "x-ticvai-persisted": false
       },
       "amount": {

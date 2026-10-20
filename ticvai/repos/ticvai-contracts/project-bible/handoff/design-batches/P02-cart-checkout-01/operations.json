@@ -165,6 +165,11 @@
     "name": null,
     "in": null,
     "required": null
+   },
+   {
+    "name": "X-Order-Access-Token",
+    "in": "header",
+    "required": false
    }
   ],
   "requestBody": null,
@@ -286,6 +291,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
    {
     "name": null,
     "in": null,
@@ -424,7 +434,7 @@
   "path": "/auth/guest/verify-email",
   "contract": "identity",
   "summary": "Send a verification link, or consume one",
-  "permission": "GUEST_VIEW",
+  "permission": null,
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",

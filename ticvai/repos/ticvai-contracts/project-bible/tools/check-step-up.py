@@ -32,6 +32,13 @@ approving a journal entry need a second factor?* has to be one answer and not th
   body or a header and every MFA step-up on the session (`verifyMfaChallenge` says how), and a
   `session` carrier on a PIN step-up is refused.
 
+- **SU-RULE: a rule-dependent step-up** (20 October 2026, r8 cause APPROVALS-TENANCY-C46, CHG-R8GEN-004). An
+  operation whose second factor is demanded only where the matched approval rule (`requires_mfa`) or the tenant's
+  step-up policy asks for it declares `x-ticvai-step-up: rule-dependent` rather than a fixed strength: it is no
+  floor (the policy raises it, nothing lowers it), so it is not ordered with `pin` and `mfa`. It still needs its
+  reason and a carrier, and its carrier is the session (an MFA factor verified on the caller's session) or the
+  body; the reason must say which rule or policy demands it.
+
 **And what it reports without refusing:** a screen calling a step-up operation that declares no way
 to present the challenge. That is authoring work on real screens rather than a defect in the
 contract, and failing the package for it would only teach people to run the pipeline less.
@@ -52,6 +59,8 @@ ROOT = pathlib.Path(__file__).resolve().parents[1]
 # Ordered weakest first. `pin` is a supervisor PIN captured in place, which `roles.yaml` already
 # resolves; `mfa` is a challenge against an enrolled method.
 STRENGTH = ["none", "pin", "mfa"]
+# Not a strength and not ordered with them: the matched rule or the step-up policy decides (SU-RULE, CHG-R8GEN-004).
+RULE_DEPENDENT = "rule-dependent"
 
 # What a screen needs to be able to raise a challenge in front of somebody.
 CHALLENGE = {"createMfaChallenge", "verifyMfaChallenge"}
@@ -107,7 +116,7 @@ def carrier_problems(oid: str, op: dict, doc: dict, path_params: list) -> list:
             if h not in names:
                 out.append(f"{oid}: step-up carrier header {h} is not a header parameter of the operation")
     elif kind == "session":
-        if op.get("x-ticvai-step-up") != "mfa":
+        if op.get("x-ticvai-step-up") not in ("mfa", RULE_DEPENDENT):
             out.append(f"{oid}: carries a {op.get('x-ticvai-step-up')} step-up on the session -- only an MFA factor "
                        "verified on the caller's session travels there; a PIN travels in the body (CHG-RUL-020)")
         if sessionless:
@@ -161,8 +170,12 @@ def main() -> int:
     errors += carrier_errors
 
     for oid, (strength, reason, level, fname) in sorted(guarded.items()):
-        if strength not in STRENGTH:
-            errors.append(f"{oid}: step-up {strength!r} is not one of {', '.join(STRENGTH)}")
+        if strength == RULE_DEPENDENT:
+            if reason and not any(w in str(reason).lower() for w in ("rule", "policy")):
+                errors.append(f"{oid}: SU-RULE a rule-dependent step-up whose reason names no rule or policy that "
+                              "demands it (CHG-R8GEN-004)")
+        elif strength not in STRENGTH:
+            errors.append(f"{oid}: step-up {strength!r} is not one of {', '.join(STRENGTH)} or {RULE_DEPENDENT}")
         if not reason:
             errors.append(f"{oid} ({fname}): declares step-up and gives no reason -- "
                           "an unexplained control is the one somebody removes")

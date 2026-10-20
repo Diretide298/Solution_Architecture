@@ -149,7 +149,7 @@
     }
    ]
   },
-  "notes": "Merged with GST-060 on 18 August. The client storyboard shows this on two boards — G7 panel 7 and G8 panel 10 — which is a **board convention for a screen every journey can land on**, not two screens. Both had the same single operation and the same purpose. **Bound 28 September** to `getTenantAppStatus.minimumAppVersion` for the forced upgrade and to `availability` and `availabilityMessage` for sold out and closed (decided 28 September, audit R073 (b)(f)).",
+  "notes": "Merged with GST-060 on 18 August. The client storyboard shows this on two boards — G7 panel 7 and G8 panel 10 — which is a **board convention for a screen every journey can land on**, not two screens. Both had the same single operation and the same purpose. **Bound 28 September** to `getTenantAppStatus.minimumAppVersion` for the forced upgrade and to `availability` and `availabilityMessage` for sold out and closed (decided 28 September, audit R073 (b)(f)). Build note (r8, WHITE-C10): the store link comes from `MinimumAppVersion.storeUrl`.",
   "density": "comfortable",
   "pattern": "statusTracker",
   "patternReason": "`getTenantAppStatus` reads one record and nothing reads a population — the screen is about that one thing",

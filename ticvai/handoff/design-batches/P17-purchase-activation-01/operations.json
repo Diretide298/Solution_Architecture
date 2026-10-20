@@ -66,25 +66,6 @@
   "requestBody": "SetPaymentProviderRequest",
   "responds": "PaymentProvider"
  },
- "setSubscription": {
-  "method": "PUT",
-  "path": "/tenants/{tenantId}/subscription",
-  "contract": "subscription",
-  "summary": "Assign or change a subscription",
-  "permission": "PLATFORM_TENANT_MANAGE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "SetSubscriptionRequest",
-  "responds": "Subscription"
- },
  "submitOnboardingApplication": {
   "method": "POST",
   "path": "/onboarding-applications",

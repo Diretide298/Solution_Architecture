@@ -1,10 +1,10 @@
 id: LLD-OrderService
-title: OrderService — 299 operations, 115 tables
+title: OrderService — 304 operations, 115 tables
 generatedBy: tools/derive-diagrams.py
 tier: commerce
 deployable: commerce
 index: diagrams/hld/02-services.yaml
-why: '**The transactional core.** 299 operations, 115 tables, and the highest write rate in the platform.
+why: '**The transactional core.** 304 operations, 115 tables, and the highest write rate in the platform.
   Separate because its scaling profile is unlike anything else — a Saturday evening is ten times a Tuesday
   morning.
 
@@ -28,9 +28,9 @@ why: '**The transactional core.** 299 operations, 115 tables, and the highest wr
 scale: Write-heavy, spiky, latency-critical. **The one that autoscales.**
 ifDown: '**Down means no sales.** Highest availability target in the platform.'
 coverage:
-  operations: 299
+  operations: 304
   inAFlow: 141
-  percent: 47%
+  percent: 46%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
@@ -46,7 +46,7 @@ schemas:
   largestTable: payments.payment_attempt
 operationsByContract:
 - contract: orders
-  count: 222
+  count: 227
   operations:
   - operation: abandonCart
     verb: DELETE
@@ -62,8 +62,8 @@ operationsByContract:
     scope: venue
     permission: null
     offline: false
-    reads: 8
-    writes: 3
+    reads: 9
+    writes: 4
   - operation: addTip
     verb: POST
     path: /payments/{paymentId}/tip
@@ -86,8 +86,8 @@ operationsByContract:
     scope: venue
     permission: null
     offline: false
-    reads: 6
-    writes: 2
+    reads: 7
+    writes: 3
   - operation: applyManualDiscount
     verb: POST
     path: /orders/{orderId}/discounts
@@ -142,7 +142,7 @@ operationsByContract:
     scope: venue
     permission: ORDER_CREATE
     offline: false
-    reads: 4
+    reads: 5
     writes: 2
   - operation: cancelPaymentLink
     verb: POST
@@ -150,8 +150,8 @@ operationsByContract:
     scope: venue
     permission: ORDER_CREATE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: cancelReservation
     verb: DELETE
     path: /reservations/{reservationId}
@@ -166,7 +166,7 @@ operationsByContract:
     scope: workstation
     permission: ORDER_CREATE
     offline: false
-    reads: 3
+    reads: 4
     writes: 10
   - operation: captureStoredValue
     verb: POST
@@ -174,7 +174,7 @@ operationsByContract:
     scope: venue
     permission: ORDER_CREATE
     offline: false
-    reads: 1
+    reads: 2
     writes: 3
   - operation: checkoutCart
     verb: POST
@@ -182,8 +182,8 @@ operationsByContract:
     scope: venue
     permission: null
     offline: false
-    reads: 10
-    writes: 9
+    reads: 11
+    writes: 10
   - operation: claimCart
     verb: POST
     path: /carts/{cartId}/claim
@@ -206,16 +206,16 @@ operationsByContract:
     scope: venue
     permission: ORDER_VOID
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: cloneTicketTemplate
     verb: POST
     path: /ticket-templates/{templateId}/clone
     scope: venue
     permission: PRODUCT_CONFIGURE
     offline: false
-    reads: 2
-    writes: 2
+    reads: 3
+    writes: 3
   - operation: convertReservation
     verb: POST
     path: /reservations/{reservationId}/convert
@@ -262,8 +262,8 @@ operationsByContract:
     scope: venue
     permission: ORDER_CREATE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: createListingSeller
     verb: POST
     path: /listing-seller
@@ -278,8 +278,8 @@ operationsByContract:
     scope: venue
     permission: ORDER_MODIFY
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: createOrder
     verb: POST
     path: /orders
@@ -302,7 +302,7 @@ operationsByContract:
     scope: workstation
     permission: ORDER_CREATE
     offline: true
-    reads: 6
+    reads: 7
     writes: 10
   - operation: createPaymentLink
     verb: POST
@@ -366,7 +366,7 @@ operationsByContract:
     scope: venue
     permission: ORDER_EXCHANGE
     offline: false
-    reads: 2
+    reads: 5
     writes: 5
   - operation: extendCart
     verb: POST
@@ -432,6 +432,14 @@ operationsByContract:
     offline: false
     reads: 3
     writes: 0
+  - operation: getGuestRefundPolicy
+    verb: GET
+    path: /venues/{venueId}/guest-refund-policy
+    scope: venue
+    permission: null
+    offline: false
+    reads: 0
+    writes: 0
   - operation: getMediaEntitlements
     verb: GET
     path: /media/{mediaCode}/entitlements
@@ -454,7 +462,7 @@ operationsByContract:
     scope: venue
     permission: ORDER_VIEW
     offline: false
-    reads: 3
+    reads: 4
     writes: 0
   - operation: getOrderStatement
     verb: GET
@@ -462,7 +470,7 @@ operationsByContract:
     scope: venue
     permission: ORDER_VIEW
     offline: false
-    reads: 4
+    reads: 7
     writes: 0
   - operation: getPaymentLink
     verb: GET
@@ -510,7 +518,7 @@ operationsByContract:
     scope: venue
     permission: ORDER_VIEW
     offline: false
-    reads: 1
+    reads: 2
     writes: 0
   - operation: holdOrder
     verb: POST
@@ -526,16 +534,16 @@ operationsByContract:
     scope: venue
     permission: SETTLEMENT_RECONCILE
     offline: false
-    reads: 1
-    writes: 2
+    reads: 2
+    writes: 3
   - operation: importTicketTemplate
     verb: POST
     path: /ticket-templates/imports
     scope: venue
     permission: PRODUCT_CONFIGURE
     offline: false
-    reads: 2
-    writes: 2
+    reads: 3
+    writes: 3
   - operation: inquirePaymentStatus
     verb: POST
     path: /payments/{paymentId}/inquiry
@@ -926,7 +934,31 @@ operationsByContract:
     scope: venue
     permission: ORDER_VIEW
     offline: true
-    reads: 2
+    reads: 3
+    writes: 0
+  - operation: listOwnGroupBookings
+    verb: GET
+    path: /group-booking-requests
+    scope: venue
+    permission: null
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listOwnRefundRequests
+    verb: GET
+    path: /refund-requests
+    scope: venue
+    permission: null
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listOwnResaleListings
+    verb: GET
+    path: /resale-listings
+    scope: venue
+    permission: null
+    offline: false
+    reads: 1
     writes: 0
   - operation: listParticipantGuestList
     verb: GET
@@ -1262,23 +1294,23 @@ operationsByContract:
     scope: venue
     permission: ORDER_MODIFY
     offline: false
-    reads: 5
-    writes: 8
+    reads: 6
+    writes: 9
   - operation: migrateMembership
     verb: POST
     path: /memberships/{membershipId}/migrations
     scope: venue
     permission: ORDER_MODIFY
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: modifyOrder
     verb: POST
     path: /orders/{orderId}/modify
     scope: venue
     permission: ORDER_MODIFY
     offline: false
-    reads: 6
+    reads: 8
     writes: 5
   - operation: openGuestCreditAccount
     verb: POST
@@ -1334,8 +1366,8 @@ operationsByContract:
     scope: venue
     permission: ORDER_MODIFY
     offline: false
-    reads: 4
-    writes: 0
+    reads: 5
+    writes: 1
   - operation: recordChargeback
     verb: POST
     path: /chargebacks/intake
@@ -1358,16 +1390,16 @@ operationsByContract:
     scope: venue
     permission: ORDER_MODIFY
     offline: false
-    reads: 4
-    writes: 1
+    reads: 5
+    writes: 2
   - operation: recordGroupCheckIn
     verb: POST
     path: /group-bookings/{groupBookingId}/check-in
     scope: venue
     permission: ORDER_MODIFY
     offline: false
-    reads: 2
-    writes: 2
+    reads: 3
+    writes: 3
   - operation: reissueEntitlement
     verb: POST
     path: /entitlements/{entitlementId}/reissue
@@ -1382,16 +1414,16 @@ operationsByContract:
     scope: venue
     permission: SETTLEMENT_RECONCILE
     offline: false
-    reads: 2
-    writes: 2
+    reads: 3
+    writes: 3
   - operation: relinquishStoredValue
     verb: POST
     path: /stored-value/authorisations/{authorisationId}/release
     scope: venue
     permission: ORDER_CREATE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: removeCartLine
     verb: DELETE
     path: /carts/{cartId}/lines/{lineId}
@@ -1404,18 +1436,18 @@ operationsByContract:
     verb: POST
     path: /memberships/{membershipId}/renewals
     scope: venue
-    permission: ORDER_MANAGE
+    permission: ORDER_MODIFY
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: reprintOrder
     verb: POST
     path: /orders/{orderId}/reprints
     scope: venue
     permission: ORDER_REPRINT
     offline: true
-    reads: 2
-    writes: 2
+    reads: 3
+    writes: 4
   - operation: requestGroupBooking
     verb: POST
     path: /group-booking-requests
@@ -1430,7 +1462,7 @@ operationsByContract:
     scope: venue
     permission: ORDER_RESCHEDULE
     offline: false
-    reads: 2
+    reads: 5
     writes: 3
   - operation: resendPaymentLink
     verb: POST
@@ -1446,16 +1478,16 @@ operationsByContract:
     scope: venue
     permission: ORDER_MODIFY
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: resolveSyncRejection
     verb: POST
     path: /sync/rejections/{rejectionId}/resolve
     scope: venue
     permission: ORDER_MODIFY
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: respondToChargeback
     verb: POST
     path: /chargebacks/{chargebackId}/respond
@@ -1480,6 +1512,14 @@ operationsByContract:
     offline: false
     reads: 3
     writes: 4
+  - operation: revokePaymentToken
+    verb: DELETE
+    path: /payment-tokens/{tokenId}
+    scope: venue
+    permission: null
+    offline: false
+    reads: 1
+    writes: 2
   - operation: setAfterSaleFinancial
     verb: PUT
     path: /after-sale-financial
@@ -1526,8 +1566,8 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_CONFIGURE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setFraudRules
     verb: PUT
     path: /fraud-rules
@@ -1550,8 +1590,8 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_CONFIGURE
     offline: false
-    reads: 2
-    writes: 1
+    reads: 3
+    writes: 2
   - operation: setGroupOperationalPlanning
     verb: PUT
     path: /group-operational-planning
@@ -1574,8 +1614,8 @@ operationsByContract:
     scope: venue
     permission: ORDER_MODIFY
     offline: false
-    reads: 2
-    writes: 1
+    reads: 3
+    writes: 2
   - operation: setGroupQuotationProposal
     verb: PUT
     path: /group-quotation-proposal
@@ -1590,16 +1630,16 @@ operationsByContract:
     scope: venue
     permission: ORDER_MODIFY
     offline: false
-    reads: 2
-    writes: 1
+    reads: 3
+    writes: 2
   - operation: setGroupTicketFulfillment
     verb: PUT
     path: /group-bookings/{groupBookingId}/fulfillment
     scope: venue
     permission: ORDER_MODIFY
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setMultiPaymentSplit
     verb: PUT
     path: /multi-payment-split
@@ -1638,8 +1678,8 @@ operationsByContract:
     scope: venue
     permission: ORDER_MODIFY
     offline: false
-    reads: 2
-    writes: 1
+    reads: 3
+    writes: 2
   - operation: setPaymentProvider
     verb: PUT
     path: /payment-providers/{providerId}
@@ -1662,8 +1702,8 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_CONFIGURE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setRefundPolicy
     verb: PUT
     path: /venues/{venueId}/refund-policy
@@ -1684,18 +1724,18 @@ operationsByContract:
     verb: PUT
     path: /resale-fee-policy
     scope: venue
-    permission: ORDER_CONFIGURE
+    permission: PRODUCT_CONFIGURE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setResaleMarketplaceConfig
     verb: PUT
     path: /resale-marketplace-config
     scope: venue
     permission: PRODUCT_CONFIGURE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setResaleMarketplaceRecommendation
     verb: PUT
     path: /resale-marketplace-recommendation
@@ -1726,8 +1766,8 @@ operationsByContract:
     scope: venue
     permission: ORDER_VIEW
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: shareEntitlement
     verb: POST
     path: /entitlements/{entitlementId}/share
@@ -1759,15 +1799,15 @@ operationsByContract:
     permission: ORDER_CREATE
     offline: false
     reads: 4
-    writes: 4
+    writes: 3
   - operation: syncOrders
     verb: POST
     path: /sync/orders
     scope: workstation
     permission: ORDER_CREATE
     offline: false
-    reads: 4
-    writes: 10
+    reads: 5
+    writes: 11
   - operation: transferOrderTickets
     verb: POST
     path: /orders/{orderId}/transfer
@@ -1806,8 +1846,8 @@ operationsByContract:
     scope: venue
     permission: ORDER_VOID
     offline: false
-    reads: 1
-    writes: 2
+    reads: 2
+    writes: 3
   - operation: voidOrder
     verb: POST
     path: /orders/{orderId}/voids
@@ -1833,8 +1873,8 @@ operationsByContract:
     scope: tenant
     permission: CREDIT_MANAGE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: createInstalmentPlan
     verb: POST
     path: /instalment-plans
@@ -1849,16 +1889,16 @@ operationsByContract:
     scope: tenant
     permission: PAYMENT_CONFIGURE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: createPaymentProviderConnection
     verb: POST
     path: /payment-providers
     scope: tenant
     permission: PAYMENT_PROVIDER_MANAGE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: getB2bPaymentTerms
     verb: GET
     path: /b2b-credit-accounts/{accountId}/terms
@@ -2033,7 +2073,7 @@ operationsByContract:
     scope: tenant
     permission: null
     offline: false
-    reads: 4
+    reads: 5
     writes: 10
   - operation: recordDepositActivity
     verb: POST
@@ -2041,8 +2081,8 @@ operationsByContract:
     scope: venue
     permission: PAYMENT_CONFIGURE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: recordPaymentTerminalCertification
     verb: PUT
     path: /payment-terminal-certifications/{modelCode}
@@ -2057,8 +2097,8 @@ operationsByContract:
     scope: venue
     permission: PAYMENT_CONFIGURE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: retryMyDunningPayment
     verb: POST
     path: /dunning-cases/{caseId}/retry
@@ -2073,24 +2113,24 @@ operationsByContract:
     scope: tenant
     permission: CREDIT_MANAGE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setDunningPolicy
     verb: PUT
     path: /dunning-policy
     scope: tenant
     permission: PAYMENT_CONFIGURE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setHostedCheckoutConfiguration
     verb: PUT
     path: /hosted-checkout-config
     scope: tenant
     permission: PAYMENT_CONFIGURE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setInstalmentPolicy
     verb: PUT
     path: /instalment-policy
@@ -2105,80 +2145,80 @@ operationsByContract:
     scope: tenant
     permission: PAYMENT_CONFIGURE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setMixedTenderRules
     verb: PUT
     path: /mixed-tender-rules
     scope: venue
     permission: PAYMENT_CONFIGURE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setPaymentAuthenticationPolicy
     verb: PUT
     path: /payment-authentication-policy
     scope: tenant
     permission: PAYMENT_CONFIGURE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setPaymentFailoverPolicy
     verb: PUT
     path: /payment-failover-policy
     scope: tenant
     permission: PAYMENT_CONFIGURE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setPaymentRiskRules
     verb: PUT
     path: /payment-risk-rules
     scope: tenant
     permission: PAYMENT_CONFIGURE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setPaymentRoutingRules
     verb: PUT
     path: /payment-routing-rules
     scope: tenant
     permission: PAYMENT_CONFIGURE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setPaymentRules
     verb: PUT
     path: /payments/rules
     scope: venue
     permission: PAYMENT_CONFIGURE
     offline: false
-    reads: 3
-    writes: 3
+    reads: 4
+    writes: 4
   - operation: setPaymentTerminalConfiguration
     verb: PUT
     path: /payment-terminals/{deviceId}
     scope: venue
     permission: PAYMENT_CONFIGURE
     offline: false
-    reads: 3
-    writes: 1
+    reads: 4
+    writes: 2
   - operation: setReconciliationMatchingRules
     verb: PUT
     path: /reconciliation-rules
     scope: tenant
     permission: PAYMENT_CONFIGURE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setReconciliationSource
     verb: PUT
     path: /reconciliation-sources/{sourceId}
     scope: tenant
     permission: PAYMENT_CONFIGURE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: simulatePaymentConfiguration
     verb: POST
     path: /payment-configuration/simulate
@@ -2201,8 +2241,8 @@ operationsByContract:
     scope: tenant
     permission: PAYMENT_DISPUTE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: testPaymentProviderConnection
     verb: POST
     path: /payment-providers/{connectionId}/test
@@ -2217,8 +2257,8 @@ operationsByContract:
     scope: venue
     permission: PAYMENT_CONFIGURE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
 - contract: shift
   count: 28
   operations:
@@ -2229,7 +2269,7 @@ operationsByContract:
     permission: OVERSHORT_ACCEPT
     offline: false
     reads: 5
-    writes: 4
+    writes: 5
   - operation: adjustDepositBoxFloat
     verb: POST
     path: /deposit-boxes/{boxId}/adjust-float
@@ -2252,8 +2292,8 @@ operationsByContract:
     scope: venue
     permission: SHIFT_APPROVE_CLOSE
     offline: false
-    reads: 3
-    writes: 3
+    reads: 4
+    writes: 4
   - operation: approveShiftOpen
     verb: POST
     path: /shifts/{shiftId}/approve-open
@@ -2261,7 +2301,7 @@ operationsByContract:
     permission: SHIFT_APPROVE_OPEN
     offline: false
     reads: 4
-    writes: 2
+    writes: 3
   - operation: closeDepositBoxes
     verb: POST
     path: /deposit-boxes/close
@@ -2273,11 +2313,11 @@ operationsByContract:
   - operation: closeShift
     verb: POST
     path: /shifts/{shiftId}/close
-    scope: workstation
+    scope: venue
     permission: SHIFT_CLOSE
-    offline: true
-    reads: 9
-    writes: 5
+    offline: false
+    reads: 11
+    writes: 4
   - operation: createCashMovement
     verb: POST
     path: /shifts/{shiftId}/cash-movements
@@ -2332,8 +2372,8 @@ operationsByContract:
     scope: venue
     permission: SHIFT_CLOSE
     offline: false
-    reads: 0
-    writes: 2
+    reads: 1
+    writes: 3
   - operation: listCashMovements
     verb: GET
     path: /shifts/{shiftId}/cash-movements
@@ -2371,14 +2411,14 @@ operationsByContract:
     path: /shifts
     scope: workstation
     permission: SHIFT_OPEN
-    offline: true
-    reads: 8
-    writes: 5
+    offline: false
+    reads: 11
+    writes: 6
   - operation: recordNoSale
     verb: POST
     path: /shifts/{shiftId}/no-sale
     scope: workstation
-    permission: SHIFT_SUSPEND
+    permission: CASH_NO_SALE
     offline: true
     reads: 2
     writes: 2
@@ -2388,8 +2428,8 @@ operationsByContract:
     scope: venue
     permission: OVERSHORT_ACCEPT
     offline: false
-    reads: 3
-    writes: 2
+    reads: 4
+    writes: 3
   - operation: reopenShift
     verb: POST
     path: /shifts/{shiftId}/reopen
@@ -2420,8 +2460,8 @@ operationsByContract:
     scope: venue
     permission: WORKSTATION_CONFIGURE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: submitShiftCount
     verb: POST
     path: /shifts/{shiftId}/count
@@ -2429,7 +2469,7 @@ operationsByContract:
     permission: SHIFT_CLOSE
     offline: false
     reads: 9
-    writes: 5
+    writes: 4
   - operation: suspendShift
     verb: POST
     path: /shifts/{shiftId}/suspend
@@ -2461,37 +2501,49 @@ tables:
   writtenBy:
   - abandonCart
   - acceptShiftVariance
+  - addCartLine
   - addTip
   - adjustDepositBoxFloat
   - allocateDepositBox
   - appendEntitlementToMedia
+  - applyCartPromoCode
   - applyManualDiscount
   - approveExceptionServiceRecovery
   - approveGroupDiscountException
   - approveListingModeration
   - approveRefund
+  - approveShiftClose
   - approveShiftOpen
   - assignChargeback
   - authoriseStoredValue
+  - cancelPaymentLink
   - cancelReservation
   - capturePayment
   - captureStoredValue
+  - checkoutCart
   - claimCart
   - claimTicketTransfer
+  - cleanupFailedPayment
+  - cloneTicketTemplate
   - closeDepositBoxes
   - closeShift
   - convertReservation
   - convertToTermProduct
+  - createB2bCreditAccount
   - createBulkRefund
   - createCart
   - createCashMovement
   - createGroupBooking
+  - createGroupEnquiry
   - createInstalmentPlan
   - createListingSeller
+  - createMemberException
   - createOrder
   - createOrderSourceChannel
   - createPayment
   - createPaymentLink
+  - createPaymentMethod
+  - createPaymentProviderConnection
   - createRefund
   - createRefundRequest
   - createResaleListing
@@ -2501,10 +2553,15 @@ tables:
   - exchangeOrderLines
   - extendCart
   - extendReservation
+  - giveShiftVarianceReason
   - holdOrder
+  - holdResaleSettlement
+  - importTicketTemplate
   - inquirePaymentStatus
   - issueInvitation
   - issueWalletPass
+  - mergeOrders
+  - migrateMembership
   - modifyOrder
   - openGuestCreditAccount
   - openShift
@@ -2512,90 +2569,146 @@ tables:
   - payByLink
   - printTicketProof
   - pushWalletPassUpdate
+  - quoteUpgrade
   - recordChargeback
   - recordChargebackOutcome
+  - recordDepositActivity
+  - recordExternalReference
+  - recordGroupCheckIn
   - recordNoSale
   - recordPaymentTerminalCertification
   - reissueEntitlement
+  - rejectShiftVariance
+  - releaseResaleSettlementHold
+  - relinquishStoredValue
   - removeCartLine
+  - renewMembership
   - reopenShift
   - reprintOrder
   - requestGroupBooking
   - rescheduleOrder
   - resendPaymentLink
+  - resolveDunningCase
+  - resolveMembershipActivation
+  - resolveSyncRejection
   - respondToChargeback
   - resumeOrder
   - resumeShift
   - retryMyDunningPayment
   - revokeEntitlementShare
+  - revokePaymentToken
   - setAfterSaleFinancial
   - setAmendmentEligibilityPolicy
   - setB2bCreditLimit
+  - setB2bPaymentTerms
   - setCancellationPartialPolicy
   - setCustomerGuestAccount
   - setDenominations
+  - setDepositPolicy
+  - setDunningPolicy
   - setFraudRules
   - setGroupBookingHandover
+  - setGroupCustomerOrganization
   - setGroupOperationalPlanning
   - setGroupPackageExperience
+  - setGroupPaymentSchedule
   - setGroupQuotationProposal
+  - setGroupTicketAllocation
+  - setGroupTicketFulfillment
+  - setHostedCheckoutConfiguration
   - setInstalmentPolicy
+  - setMerchantAccount
+  - setMixedTenderRules
   - setMultiPaymentSplit
   - setOrderAmendment
   - setOrderDetailTransaction
   - setOrderReservationStatus
+  - setParticipantGuestList
+  - setPaymentAuthenticationPolicy
+  - setPaymentFailoverPolicy
   - setPaymentProvider
+  - setPaymentRiskRules
+  - setPaymentRoutingRules
+  - setPaymentRules
+  - setPaymentTerminalConfiguration
   - setProRataResidual
+  - setReconciliationMatchingRules
+  - setReconciliationSource
+  - setRefundCalculationPolicy
   - setRefundPolicy
   - setResaleEligibilityRule
+  - setResaleFeePolicy
+  - setResaleMarketplaceConfig
   - setResaleMarketplaceRecommendation
   - setReservationHoldPolicy
+  - setTillShiftPolicy
   - setUpgradeConversionPath
+  - setVisitReminder
   - shareEntitlement
   - simulatePaymentConfiguration
   - simulatePaymentRouting
   - splitOrder
   - storePaymentToken
+  - submitChargebackEvidence
   - submitShiftCount
   - suspendShift
+  - syncOrders
   - testPaymentProviderConnection
   - transferOrderTickets
   - updateCartLine
   - updateGroupBooking
+  - updatePaymentMethod
   - updateTicketTemplate
+  - voidEntitlement
   - voidOrder
   - voidPayment
   - withdrawFromDepositBox
   readBy:
   - abandonCart
   - acceptShiftVariance
+  - addCartLine
   - addTip
   - adjustDepositBoxFloat
   - allocateDepositBox
   - appendEntitlementToMedia
+  - applyCartPromoCode
   - applyManualDiscount
   - approveExceptionServiceRecovery
   - approveGroupDiscountException
   - approveListingModeration
   - approveRefund
+  - approveShiftClose
   - approveShiftOpen
   - assignChargeback
+  - authoriseStoredValue
+  - cancelPaymentLink
   - cancelReservation
+  - capturePayment
+  - captureStoredValue
+  - checkoutCart
   - claimCart
   - claimTicketTransfer
+  - cleanupFailedPayment
+  - cloneTicketTemplate
   - closeDepositBoxes
   - closeShift
   - convertReservation
   - convertToTermProduct
+  - createB2bCreditAccount
   - createBulkRefund
   - createCart
   - createCashMovement
   - createGroupBooking
+  - createGroupEnquiry
   - createInstalmentPlan
   - createListingSeller
+  - createMemberException
   - createOrder
   - createOrderSourceChannel
+  - createPayment
   - createPaymentLink
+  - createPaymentMethod
+  - createPaymentProviderConnection
   - createRefund
   - createRefundRequest
   - createResaleListing
@@ -2605,10 +2718,15 @@ tables:
   - exchangeOrderLines
   - extendCart
   - extendReservation
+  - giveShiftVarianceReason
   - holdOrder
+  - holdResaleSettlement
+  - importTicketTemplate
   - inquirePaymentStatus
   - issueInvitation
   - issueWalletPass
+  - mergeOrders
+  - migrateMembership
   - modifyOrder
   - openGuestCreditAccount
   - openShift
@@ -2616,57 +2734,97 @@ tables:
   - payByLink
   - printTicketProof
   - pushWalletPassUpdate
+  - quoteUpgrade
   - recordChargeback
   - recordChargebackOutcome
+  - recordDepositActivity
+  - recordExternalReference
+  - recordGroupCheckIn
   - recordNoSale
   - recordPaymentTerminalCertification
   - reissueEntitlement
+  - rejectShiftVariance
+  - releaseResaleSettlementHold
+  - relinquishStoredValue
   - removeCartLine
+  - renewMembership
   - reopenShift
   - reprintOrder
   - requestGroupBooking
   - rescheduleOrder
   - resendPaymentLink
+  - resolveDunningCase
+  - resolveMembershipActivation
+  - resolveSyncRejection
   - respondToChargeback
   - resumeOrder
   - resumeShift
   - retryMyDunningPayment
   - revokeEntitlementShare
+  - revokePaymentToken
   - setAfterSaleFinancial
   - setAmendmentEligibilityPolicy
   - setB2bCreditLimit
+  - setB2bPaymentTerms
   - setCancellationPartialPolicy
   - setCustomerGuestAccount
   - setDenominations
+  - setDepositPolicy
+  - setDunningPolicy
   - setFraudRules
   - setGroupBookingHandover
+  - setGroupCustomerOrganization
   - setGroupOperationalPlanning
   - setGroupPackageExperience
+  - setGroupPaymentSchedule
   - setGroupQuotationProposal
+  - setGroupTicketAllocation
+  - setGroupTicketFulfillment
+  - setHostedCheckoutConfiguration
   - setInstalmentPolicy
+  - setMerchantAccount
+  - setMixedTenderRules
   - setMultiPaymentSplit
   - setOrderAmendment
   - setOrderDetailTransaction
   - setOrderReservationStatus
+  - setParticipantGuestList
+  - setPaymentAuthenticationPolicy
+  - setPaymentFailoverPolicy
   - setPaymentProvider
+  - setPaymentRiskRules
+  - setPaymentRoutingRules
+  - setPaymentRules
+  - setPaymentTerminalConfiguration
   - setProRataResidual
+  - setReconciliationMatchingRules
+  - setReconciliationSource
+  - setRefundCalculationPolicy
   - setRefundPolicy
   - setResaleEligibilityRule
+  - setResaleFeePolicy
+  - setResaleMarketplaceConfig
   - setResaleMarketplaceRecommendation
   - setReservationHoldPolicy
+  - setTillShiftPolicy
   - setUpgradeConversionPath
+  - setVisitReminder
   - shareEntitlement
   - simulatePaymentConfiguration
   - simulatePaymentRouting
   - splitOrder
   - storePaymentToken
+  - submitChargebackEvidence
   - submitShiftCount
   - suspendShift
+  - syncOrders
   - testPaymentProviderConnection
   - transferOrderTickets
   - updateCartLine
   - updateGroupBooking
+  - updatePaymentMethod
   - updateTicketTemplate
+  - voidEntitlement
   - voidOrder
   - voidPayment
   - withdrawFromDepositBox
@@ -2770,7 +2928,7 @@ tables:
   - orders
   foreignWriters: null
 - table: orders.cart
-  columns: 18
+  columns: 20
   store: postgres
   parent: null
   writtenBy:
@@ -2887,7 +3045,7 @@ tables:
   - orders
   foreignWriters: null
 - table: orders.group_booking
-  columns: 21
+  columns: 22
   store: postgres
   parent: null
   writtenBy:
@@ -3355,7 +3513,7 @@ tables:
   - payments
   foreignWriters: null
 - table: payments.currency_rule
-  columns: 12
+  columns: 11
   store: postgres
   parent: null
   writtenBy:
@@ -3383,7 +3541,7 @@ tables:
   - payments
   foreignWriters: null
 - table: payments.eligibility_rule
-  columns: 14
+  columns: 13
   store: postgres
   parent: null
   writtenBy:
@@ -3397,7 +3555,7 @@ tables:
   - payments
   foreignWriters: null
 - table: payments.fee_rule
-  columns: 17
+  columns: 16
   store: postgres
   parent: null
   writtenBy:
@@ -3453,7 +3611,7 @@ tables:
   - payments
   foreignWriters: null
 - table: payments.method_config
-  columns: 11
+  columns: 10
   store: postgres
   parent: payments.method
   writtenBy: []
@@ -3488,9 +3646,9 @@ tables:
   - orders
   foreignWriters: null
 - table: payments.provider_connection
-  columns: 12
+  columns: 13
   store: postgres
-  parent: null
+  parent: payments.provider
   writtenBy:
   - payments
   foreignWriters: null
@@ -3503,7 +3661,7 @@ tables:
   foreignWriters:
   - finance
 - table: payments.provider_event
-  columns: 11
+  columns: 12
   store: postgres
   parent: null
   writtenBy:
@@ -3559,7 +3717,7 @@ tables:
   - payments
   foreignWriters: null
 - table: payments.token
-  columns: 9
+  columns: 10
   store: postgres
   parent: null
   writtenBy:
@@ -3584,7 +3742,7 @@ readsFrom:
   operations: 1
 writesOutside:
 - service: TenancyService
-  operations: 38
+  operations: 39
   rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
     published.'
   why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
@@ -3654,6 +3812,9 @@ writesOutside:
   - operation: mergeOrders
     tables:
     - platform.outbox
+  - operation: openShift
+    tables:
+    - platform.outbox
   - operation: payByLink
     tables:
     - platform.outbox
@@ -3710,59 +3871,6 @@ writesOutside:
   - operation: voidOrder
     tables:
     - platform.outbox
-- service: LedgerService
-  operations: 12
-  rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
-    published.'
-  why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
-    each inserts or updates, or which operation or event LedgerService published for it — check each
-    against ADR-0028.'
-  writes:
-  - operation: capturePayment
-    tables:
-    - ledger.journal_entry
-    - ledger.journal_line
-  - operation: closeDepositBoxes
-    tables:
-    - ledger.posting
-  - operation: closeShift
-    tables:
-    - ledger.journal_entry
-  - operation: createPayment
-    tables:
-    - ledger.journal_entry
-    - ledger.journal_line
-  - operation: createRefund
-    tables:
-    - ledger.journal_entry
-    - ledger.posting
-  - operation: mergeOrders
-    tables:
-    - ledger.journal_entry
-    - ledger.posting
-  - operation: receivePaymentProviderWebhook
-    tables:
-    - ledger.journal_entry
-    - ledger.journal_line
-  - operation: recordChargeback
-    tables:
-    - ledger.journal_entry
-    - ledger.journal_line
-    - ledger.posting
-  - operation: recordChargebackOutcome
-    tables:
-    - ledger.journal_entry
-    - ledger.journal_line
-    - ledger.posting
-  - operation: respondToChargeback
-    tables:
-    - ledger.posting
-  - operation: submitShiftCount
-    tables:
-    - ledger.journal_entry
-  - operation: syncOrders
-    tables:
-    - ledger.price_variance
 - service: AccessService
   operations: 10
   rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
@@ -3843,8 +3951,55 @@ writesOutside:
   - operation: updateCartLine
     tables:
     - catalogue.inventory_reservation
+- service: LedgerService
+  operations: 10
+  rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
+    published.'
+  why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
+    each inserts or updates, or which operation or event LedgerService published for it — check each
+    against ADR-0028.'
+  writes:
+  - operation: capturePayment
+    tables:
+    - ledger.journal_entry
+    - ledger.journal_line
+  - operation: closeDepositBoxes
+    tables:
+    - ledger.posting
+  - operation: createPayment
+    tables:
+    - ledger.journal_entry
+    - ledger.journal_line
+  - operation: createRefund
+    tables:
+    - ledger.journal_entry
+    - ledger.posting
+  - operation: mergeOrders
+    tables:
+    - ledger.journal_entry
+    - ledger.posting
+  - operation: receivePaymentProviderWebhook
+    tables:
+    - ledger.journal_entry
+    - ledger.journal_line
+  - operation: recordChargeback
+    tables:
+    - ledger.journal_entry
+    - ledger.journal_line
+    - ledger.posting
+  - operation: recordChargebackOutcome
+    tables:
+    - ledger.journal_entry
+    - ledger.journal_line
+    - ledger.posting
+  - operation: respondToChargeback
+    tables:
+    - ledger.posting
+  - operation: syncOrders
+    tables:
+    - ledger.price_variance
 - service: MarketingService
-  operations: 4
+  operations: 3
   rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
     published.'
   why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
@@ -3860,9 +4015,6 @@ writesOutside:
   - operation: resendPaymentLink
     tables:
     - marketing.message_dispatch
-  - operation: storePaymentToken
-    tables:
-    - marketing.consent_record
 - service: CrossRegionService
   operations: 2
   rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner

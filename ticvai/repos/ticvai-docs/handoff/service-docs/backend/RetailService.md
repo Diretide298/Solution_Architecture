@@ -49,6 +49,7 @@ Merchandise, wallets and gift cards. Modest at 35 operations, and separate becau
 **`POST /shop-and-drop/{dropId}/collect`**: Hand the goods over
 
 Records who handed over and against what. Partial collection is permitted — a guest may take some and leave the rest for a later trip on the same ticket.
+**The collection deadline** (r8 walk of ticket 27820): `pastCollectBy` applies to a drop in `awaitingCollection` or `partiallyCollected` only. A drop that was never collected (the uncollected reversal has run) collects without it. The default `collectBy` is the close of the collection point's day (its `closesAt`, see `createShopAndDrop`).
 
 |  |  |
 |---|---|
@@ -59,7 +60,7 @@ Records who handed over and against what. Partial collection is permitted — a 
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `retail.shop_and_drop`, `retail.shop_and_drop_line` |
-| Writes | `cache:idempotency`, `retail.shop_and_drop` |
+| Writes | `cache:idempotency`, `retail.shop_and_drop_line` |
 | Called by | POS-012 |
 | State model | Shop and drop ([states/shop-and-drop.yaml](../../../states/shop-and-drop.yaml)): moves `awaitingCollection` -> `partiallyCollected`, `partiallyCollected` -> `collected`, `awaitingCollection` -> `collected`, `uncollected` -> `collected` |
 
@@ -74,7 +75,10 @@ Records who handed over and against what. Partial collection is permitted — a 
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| lineIds | array of string |  |  |
+| lineIds | array of string |  | Lines collected in full. |
+| lines | array of object |  | What is handed over, per line (R8 blocker APPROVALS-TENANCY-C34): each line's collectedQuantity grows by quantity, never past the line's quantity (a larger one is 400). |
+| lines[].lineId | string | yes |  |
+| lines[].quantity | integer | yes | (min 1) |
 | verifiedBy | enum (entitlementScan, receipt, dropReference, staffOverride) |  |  |
 | note | string |  | (max length 500) |
 | recordedAt | string (date-time) | yes |  |
@@ -88,7 +92,7 @@ Records who handed over and against what. Partial collection is permitted — a 
 | saleId | string |  | The till sale. (nullable) |
 | orderId | string (uuid) |  | The paid online order that created this collection (audit R236). (nullable) |
 | entitlementId | string |  | The ticket that claims these goods. (nullable) |
-| subjectId | string (uuid) |  | (nullable) |
+| subjectId | string (uuid) |  | The guest the goods are for, set at the drop from the sale's subjectId or, for an online order, the order's buyer; null when the sale named no guest (R8 blocker APPROVALS-TENANCY-C34). (nullable) |
 | collectionPointId | string (uuid) | yes |  |
 | collectionPointName | string |  |  |
 | status | enum (awaitingCollection, partiallyCollected, collected, uncollected, disposed) | yes |  |
@@ -121,6 +125,7 @@ The goods leave stock at purchase, not at collection. They are sold; they are me
 Not a reservation. `reserveMerchandise` holds unsold stock for someone who has not paid; this is paid goods awaiting handover, and conflating the two produces a stock figure nobody can explain.
 
 **Also called by the order service when an online order is paid** (decided 28 September, audit R236): a guest on the web buys merchandise to collect on the way out, pays at checkout, and on payment the order service calls this with `orderId` (and no `saleId`), once per order, naming the retail lines marked for collection in `lineIds`. A staff caller at a till sends `saleId`. Exactly one of the two is sent.
+**Collection point hours** (r8 walk of ticket 27820): the collection point (`fnb.DeliveryLocation`) has `opensAt` and `closesAt` (time of day, local to the venue). The drop is refused 409 `collectionPointClosed` when it would be collected while the point is closed, and `collectBy` defaults to the close of the point's day when the request sends none.
 
 |  |  |
 |---|---|
@@ -130,7 +135,7 @@ Not a reservation. `reserveMerchandise` holds unsold stock for someone who has n
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `retail.shop_and_drop`, `retail.shop_and_drop_line` |
+| Reads | `cache:idempotency`, `retail.sale`, `retail.sale_line`, `retail.shop_and_drop`, `retail.shop_and_drop_line` |
 | Writes | `cache:idempotency`, `retail.shop_and_drop`, `retail.shop_and_drop_line` |
 | Called by | POS-005 |
 | State model | Shop and drop ([states/shop-and-drop.yaml](../../../states/shop-and-drop.yaml)): created as `awaitingCollection` |
@@ -163,7 +168,7 @@ Not a reservation. `reserveMerchandise` holds unsold stock for someone who has n
 | saleId | string |  | The till sale. (nullable) |
 | orderId | string (uuid) |  | The paid online order that created this collection (audit R236). (nullable) |
 | entitlementId | string |  | The ticket that claims these goods. (nullable) |
-| subjectId | string (uuid) |  | (nullable) |
+| subjectId | string (uuid) |  | The guest the goods are for, set at the drop from the sale's subjectId or, for an online order, the order's buyer; null when the sale named no guest (R8 blocker APPROVALS-TENANCY-C34). (nullable) |
 | collectionPointId | string (uuid) | yes |  |
 | collectionPointName | string |  |  |
 | status | enum (awaitingCollection, partiallyCollected, collected, uncollected, disposed) | yes |  |
@@ -195,6 +200,7 @@ The most-used operation on a shop floor. Returns price after any live promotion,
 
 **"This outlet" is the outlet of the workstation asking** (decided 28 September, audit R215): price and `onHand` are that outlet's row. A caller with no workstation (a guest on the web shop or app) names the outlet with `outletId`; a workstation caller's own outlet always wins. **An inactive item is not found**: it answers `404`, exactly as an unknown barcode does.
 **A guest calls this without a permission and sees published data only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-001; `x-ticvai-guest-callable`): a guest or a visitor gets active merchandise that is on sale, and nothing in draft, unpublished or withdrawn; asked for by id, such a record answers as not found. `PRODUCT_VIEW` is what a staff caller must hold, and staff also see drafts (ADR-0025).
+**A guest gets a narrower answer** (r8 walk of ticket 27820): `sku` and `siblingOutlets` are staff-only (`x-ticvai-staff-only`) and are left out of a guest response, which shows `isAvailable`. `onHand` stays in it, because `PriceCheck` requires it and leaving it out would break the tills built against it. "Published" is the merchandise record's `isPublished` flag, set by `PRODUCT_CONFIGURE` holders.
 
 |  |  |
 |---|---|
@@ -268,7 +274,7 @@ Scanned at the collection point. Accepts the entitlement, the drop reference, or
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | primary |
-| Reads | `retail.shop_and_drop`, `retail.shop_and_drop_line` |
+| Reads | `retail.sale`, `retail.sale_line`, `retail.shop_and_drop`, `retail.shop_and_drop_line` |
 | Writes | - |
 | Called by | BO-143, GST-062, POS-012, WEB-042 |
 
@@ -299,6 +305,8 @@ A guest who cannot carry a purchase around a venue collects it on the way out. T
 **Not the guest path for buying to collect, on the web or in the app** (decided 28 September, audit R236). A guest buying to collect pays online at checkout (`addCartLine`, `checkoutCart`, `createPayment`), and the order service creates the collection with `createShopAndDrop`. This holds unpaid stock only: in the guest app (GST-026) it is offered as a hold the guest pays for at the shop, and staff use it at a till or an outlet. A held item is never collected unpaid.
 **A guest does this within their own session** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-003; `x-ticvai-guest-callable`): a guest needs no permission and acts only for themselves, on their own cart, hold, order or payment in their own session. `ORDER_CREATE` is what a staff caller must hold to do it for a guest at a till or in the back office (ADR-0025).
 
+**The stock is set aside by Inventory, not by Retail** (R8 blocker APPROVALS-TENANCY-C34): each line earmarks its merchandise's stock item through Inventory's `createStockReservation`, in process, with `sourceType` `retailReservation` and `sourceId` this reservation's `id`; the earmark expires with it.
+
 |  |  |
 |---|---|
 | Permission | `ORDER_CREATE` |
@@ -308,7 +316,7 @@ A guest who cannot carry a purchase around a venue collects it on the way out. T
 | Offline | no |
 | Conflict policy | serverWins |
 | Guest callable | True |
-| Reads | `cache:idempotency`, `inventory.movement`, `inventory.stock_earmark`, `retail.reservation`, `retail.reservation_line` |
+| Reads | `cache:idempotency`, `inventory.movement`, `inventory.stock_earmark`, `retail.merchandise`, `retail.reservation`, `retail.reservation_line` |
 | Writes | `cache:idempotency`, `inventory.stock_earmark`, `retail.reservation`, `retail.reservation_line` |
 | Called by | EMP-068, GST-026, KSK-017, POS-012 |
 | State model | Merchandise reservation ([states/merchandise-reservation.yaml](../../../states/merchandise-reservation.yaml)): created as `reserved` |
@@ -401,6 +409,7 @@ Links a sellable catalogue variant to an inventory item. That link is what makes
 | returnWindowDays | integer |  |  |
 | requiresSerialNumber | boolean |  | (default False) |
 | imageAssetRef | string |  |  |
+| isDroppable | boolean |  | Whether the item may go to shop-and-drop; the venue sets chilled, fragile or oversized items false (R8 blocker APPROVALS-TENANCY-C34). (default True) |
 
 **Response**: `MerchandiseItem`
 
@@ -425,6 +434,7 @@ Links a sellable catalogue variant to an inventory item. That link is what makes
 | requiresSerialNumber | boolean |  | (default False) |
 | imageAssetRef | string |  | (nullable) |
 | isActive | boolean | yes |  |
+| isDroppable | boolean |  | Whether the item may be dropped for later collection (R8 blocker APPROVALS-TENANCY-C34). (default True) |
 
 **Responses**
 
@@ -521,6 +531,7 @@ Two callers. **The back office** lists and manages the range. **The guest shop s
 | inventoryItemId | string (uuid) |  | Re-points the stock item a sale depletes. (nullable) |
 | imageAssetRef | string |  | (nullable) |
 | isReturnable | boolean |  |  |
+| isDroppable | boolean |  | Whether the item may go to shop-and-drop (R8 blocker APPROVALS-TENANCY-C34). |
 | returnWindowDays | integer |  | (min 0) |
 | requiresSerialNumber | boolean |  |  |
 | isActive | boolean |  |  |
@@ -548,6 +559,7 @@ Two callers. **The back office** lists and manages the range. **The guest shop s
 | requiresSerialNumber | boolean |  | (default False) |
 | imageAssetRef | string |  | (nullable) |
 | isActive | boolean | yes |  |
+| isDroppable | boolean |  | Whether the item may be dropped for later collection (R8 blocker APPROVALS-TENANCY-C34). (default True) |
 
 **Responses**
 
@@ -571,6 +583,7 @@ Goods returned damaged or opened are written off rather than restocked, and that
 **A refused return is recorded** (F34 `refusedReturn`: a refused return is a guest who may complain). The 409 writes a `RetailReturn` with `status: refused`, the `refusedReason`, nothing refunded, restocked or written off, and a new id that the server assigns and returns as `refusalId`. The request's own `id` stays unused, so the same return can be sent again, under a new `Idempotency-Key`, once the second authoriser is in hand.
 
 **Above the outlet's self-authorise limit, a supervisor's step-up on the same device** (decided 28 September, audit R144), never an approval request. `secondaryAuthorisation` carries the supervisor's principal and staff PIN (a PIN, never a password, audit R123 (7)). The rule is `SupervisorStepUp` in `common.yaml`: the PIN is verified against the principal, who must hold `ORDER_REFUND_APPROVE` at this venue and must not be the caller; a failure is a `403` (`supervisor-step-up-refused`) and nothing is written. Missing when the amount needs it, the return is refused with the `409` below.
+**Thresholds: two, both step-up** (r8 walk of tickets 27820 and 27823; lead decision of 20 October 2026, option A, following R144 and POS-011 "no approval-request path"). `ReturnPolicy.selfAuthoriseLimit` (up to it, one cashier alone) and `requiresSecondUserAbove` (above it, a second user) both mean the supervisor step-up above; neither raises an approval request. **`requiresApprovalAbove` is retired** and `requiresApproval` is no longer a refused reason. **A cash refund on a card sale is refused** with `refusedReason` `cashRefundOnCardSale` unless the outlet's `allowCashRefundOnCardSale` is true; flow F34's "cannot configure its way out" is corrected to that.
 
 |  |  |
 |---|---|
@@ -580,7 +593,7 @@ Goods returned damaged or opened are written off rather than restocked, and that
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `inventory.kit_component`, `retail.return`, `retail.return_line` |
+| Reads | `cache:idempotency`, `inventory.kit_component`, `retail.merchandise`, `retail.return`, `retail.return_line`, `retail.return_policy`, `retail.sale`, `retail.sale_line` |
 | Writes | `cache:idempotency`, `inventory.movement`, `retail.return`, `retail.return_line` |
 | Called by | POS-011 |
 | State model | SerialisedItem ([states/serialised-item.yaml](../../../states/serialised-item.yaml)): moves `sold` -> `returned` |
@@ -606,7 +619,8 @@ Goods returned damaged or opened are written off rather than restocked, and that
 | reason | ReturnReason: enum (changedMind, wrongSize, wrongItem, faulty, damagedInTransit, duplicatePurchase, giftReturn, other) | yes |  |
 | refundTender | string |  | Defaults to the original tender. |
 | secondaryAuthorisation | object |  | Required above the outlet's self-authorise limit. |
-| secondaryAuthorisation.principalId | string (uuid) | yes | The supervisor signing. |
+| secondaryAuthorisation.principalId | string (uuid) |  | The supervisor signing. |
+| secondaryAuthorisation.supervisorUsername | string |  | The supervisor's employee number, which is what the step-up prompt asks for (R8 blocker fix, IDENTITY-C44). (max length 200) |
 | secondaryAuthorisation.credential | string | yes | The supervisor's staff PIN, as they sign in at a till with it. (max length 512) |
 | recordedAt | string (date-time) | yes |  |
 
@@ -694,7 +708,7 @@ Separate from the ticket refund policy. A t-shirt and a timed admission have not
 | requiresSecondUserAbove.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | requiresSecondUserAbove.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | requiresSecondUserAbove.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| requiresApprovalAbove | Money |  | On the wire this is three fields; in the database it is one column. |
+| requiresApprovalAbove | object |  | Retired (r8, decision R144), so no return raises an approval request. |
 | requiresApprovalAbove.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | requiresApprovalAbove.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | requiresApprovalAbove.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
@@ -747,6 +761,8 @@ By receipt number, order number or the barcode printed on the receipt. A guest a
 | items | array of RetailSale | yes |  |
 | items[].id | string | yes |  |
 | items[].receiptNumber | string | yes | Server-assigned: the venue prefix plus a sequence per venue (decided 28 September, audit R152). (read-only) |
+| items[].receiptBarcode | string |  | The barcode printed on the receipt (R8 blocker APPROVALS-TENANCY-C34): the receipt number as printed, encoded as a Code 128 barcode, stored so lookupRetailSale finds a sale by receiptBarcode with an… (max length 64; read-only) |
+| items[].cashierPrincipalId | string (uuid) |  | The staff member who rang the sale up, from the session (null for a guest's own sale). (read-only; nullable) |
 | items[].orderId | string | yes | The order in the Order & Payment context. |
 | items[].outletId | string (uuid) | yes |  |
 | items[].shiftId | string |  | (nullable) |
@@ -756,6 +772,7 @@ By receipt number, order number or the barcode printed on the receipt. A guest a
 | items[].lines[].merchandiseId | string (uuid) |  |  |
 | items[].lines[].name | string |  |  |
 | items[].lines[].quantity | integer |  |  |
+| items[].lines[].overrideReason | string |  | The reason given with a manual price override (CreateRetailSaleLine.overrideReason); null when the price was not overridden. (max length 200; nullable) |
 | items[].lines[].unitPrice | Money |  | On the wire this is three fields; in the database it is one column. |
 | items[].lines[].discount | Money |  | On the wire this is three fields; in the database it is one column. |
 | items[].lines[].lineTotal | Money |  | On the wire this is three fields; in the database it is one column. |
@@ -836,7 +853,7 @@ By receipt number, order number or the barcode printed on the receipt. A guest a
 | requiresSecondUserAbove.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | requiresSecondUserAbove.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | requiresSecondUserAbove.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| requiresApprovalAbove | Money |  | On the wire this is three fields; in the database it is one column. |
+| requiresApprovalAbove | object |  | Retired (r8, decision R144), so no return raises an approval request. |
 | requiresApprovalAbove.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | requiresApprovalAbove.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | requiresApprovalAbove.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
@@ -860,7 +877,7 @@ By receipt number, order number or the barcode printed on the receipt. A guest a
 | requiresSecondUserAbove.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | requiresSecondUserAbove.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | requiresSecondUserAbove.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| requiresApprovalAbove | Money |  | On the wire this is three fields; in the database it is one column. |
+| requiresApprovalAbove | object |  | Retired (r8, decision R144), so no return raises an approval request. |
 | requiresApprovalAbove.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | requiresApprovalAbove.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | requiresApprovalAbove.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
@@ -931,6 +948,8 @@ Creates an order in the Order & Payment context and a `saleDepletion` movement i
 |---|---|---|---|
 | id | string | yes |  |
 | receiptNumber | string | yes | Server-assigned: the venue prefix plus a sequence per venue (decided 28 September, audit R152). (read-only) |
+| receiptBarcode | string |  | The barcode printed on the receipt (R8 blocker APPROVALS-TENANCY-C34): the receipt number as printed, encoded as a Code 128 barcode, stored so lookupRetailSale finds a sale by receiptBarcode with an… (max length 64; read-only) |
+| cashierPrincipalId | string (uuid) |  | The staff member who rang the sale up, from the session (null for a guest's own sale). (read-only; nullable) |
 | orderId | string | yes | The order in the Order & Payment context. |
 | outletId | string (uuid) | yes |  |
 | shiftId | string |  | (nullable) |
@@ -940,6 +959,7 @@ Creates an order in the Order & Payment context and a `saleDepletion` movement i
 | lines[].merchandiseId | string (uuid) |  |  |
 | lines[].name | string |  |  |
 | lines[].quantity | integer |  |  |
+| lines[].overrideReason | string |  | The reason given with a manual price override (CreateRetailSaleLine.overrideReason); null when the price was not overridden. (max length 200; nullable) |
 | lines[].unitPrice | Money |  | On the wire this is three fields; in the database it is one column. |
 | lines[].unitPrice.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | lines[].unitPrice.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
@@ -1016,6 +1036,8 @@ Also the receipt lookup a returns desk starts from. Returns whether each line is
 |---|---|---|---|
 | id | string | yes |  |
 | receiptNumber | string | yes | Server-assigned: the venue prefix plus a sequence per venue (decided 28 September, audit R152). (read-only) |
+| receiptBarcode | string |  | The barcode printed on the receipt (R8 blocker APPROVALS-TENANCY-C34): the receipt number as printed, encoded as a Code 128 barcode, stored so lookupRetailSale finds a sale by receiptBarcode with an… (max length 64; read-only) |
+| cashierPrincipalId | string (uuid) |  | The staff member who rang the sale up, from the session (null for a guest's own sale). (read-only; nullable) |
 | orderId | string | yes | The order in the Order & Payment context. |
 | outletId | string (uuid) | yes |  |
 | shiftId | string |  | (nullable) |
@@ -1025,6 +1047,7 @@ Also the receipt lookup a returns desk starts from. Returns whether each line is
 | lines[].merchandiseId | string (uuid) |  |  |
 | lines[].name | string |  |  |
 | lines[].quantity | integer |  |  |
+| lines[].overrideReason | string |  | The reason given with a manual price override (CreateRetailSaleLine.overrideReason); null when the price was not overridden. (max length 200; nullable) |
 | lines[].unitPrice | Money |  | On the wire this is three fields; in the database it is one column. |
 | lines[].unitPrice.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | lines[].unitPrice.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
@@ -1106,6 +1129,8 @@ Also the receipt lookup a returns desk starts from. Returns whether each line is
 | items | array of RetailSale | yes |  |
 | items[].id | string | yes |  |
 | items[].receiptNumber | string | yes | Server-assigned: the venue prefix plus a sequence per venue (decided 28 September, audit R152). (read-only) |
+| items[].receiptBarcode | string |  | The barcode printed on the receipt (R8 blocker APPROVALS-TENANCY-C34): the receipt number as printed, encoded as a Code 128 barcode, stored so lookupRetailSale finds a sale by receiptBarcode with an… (max length 64; read-only) |
+| items[].cashierPrincipalId | string (uuid) |  | The staff member who rang the sale up, from the session (null for a guest's own sale). (read-only; nullable) |
 | items[].orderId | string | yes | The order in the Order & Payment context. |
 | items[].outletId | string (uuid) | yes |  |
 | items[].shiftId | string |  | (nullable) |
@@ -1115,6 +1140,7 @@ Also the receipt lookup a returns desk starts from. Returns whether each line is
 | items[].lines[].merchandiseId | string (uuid) |  |  |
 | items[].lines[].name | string |  |  |
 | items[].lines[].quantity | integer |  |  |
+| items[].lines[].overrideReason | string |  | The reason given with a manual price override (CreateRetailSaleLine.overrideReason); null when the price was not overridden. (max length 200; nullable) |
 | items[].lines[].unitPrice | Money |  | On the wire this is three fields; in the database it is one column. |
 | items[].lines[].discount | Money |  | On the wire this is three fields; in the database it is one column. |
 | items[].lines[].lineTotal | Money |  | On the wire this is three fields; in the database it is one column. |
@@ -1219,6 +1245,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | requires_serial_number | boolean | no |  |
 | image_asset_ref | text | no |  |
 | is_active | boolean | yes |  |
+| is_droppable | boolean | no | Whether the item may be dropped for later collection (R8 blocker APPROVALS-TENANCY-C34). |
 
 ### `retail.reservation`
 
@@ -1287,7 +1314,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | allow_cash_refund_on_card_sale | boolean | no |  |
 | self_authorise_limit_amount | numeric(18,4) | no | Up to this, one cashier may accept a return alone. |
 | second_user_above_amount | numeric(18,4) | no |  |
-| approval_above_amount | numeric(18,4) | no |  |
+| approval_above_amount | numeric(18,4) | no | Retired (r8, decision R144), so no return raises an approval request. |
 | restockable_conditions | text[] | no | Conditions that return stock to sale. |
 | non_returnable_category_ids | text[] | no |  |
 
@@ -1297,6 +1324,8 @@ Every table this service owns that the slice reads or writes, with its columns a
 |---|---|---|---|
 | id | text | yes |  |
 | receipt_number | text | yes | Server-assigned: the venue prefix plus a sequence per venue (decided 28 September, audit R152). |
+| receipt_barcode | text | no | The barcode printed on the receipt (R8 blocker APPROVALS-TENANCY-C34): the receipt number as printed, encoded as a Code 128 barcode, stored so lookupRetailSale finds a sale by receiptBarcode with an… |
+| cashier_principal_id | uuid | no | The staff member who rang the sale up, from the session (null for a guest's own sale). |
 | order_id | uuid | yes | The order in the Order & Payment context. |
 | outlet_id | uuid | yes |  |
 | shift_id | uuid | no |  |
@@ -1318,6 +1347,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | merchandise_id | uuid | no |  |
 | name | text | no |  |
 | quantity | integer | no |  |
+| override_reason | text | no | The reason given with a manual price override (CreateRetailSaleLine.overrideReason); null when the price was not overridden. |
 | unit_amount | numeric(18,4) | no |  |
 | discount_amount | numeric(18,4) | no |  |
 | gross_amount | numeric(18,4) | no |  |
@@ -1336,7 +1366,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | sale_id | text | no | The till sale. |
 | order_id | uuid | no | The paid online order that created this collection (audit R236). |
 | entitlement_id | uuid | no | The ticket that claims these goods. |
-| subject_id | uuid | no |  |
+| subject_id | uuid | no | The guest the goods are for, set at the drop from the sale's subjectId or, for an online order, the order's buyer; null when the sale named no guest (R8 blocker APPROVALS-TENANCY-C34). |
 | collection_location_id | uuid | yes |  |
 | collection_point_name | text | no |  |
 | status | text | yes |  |

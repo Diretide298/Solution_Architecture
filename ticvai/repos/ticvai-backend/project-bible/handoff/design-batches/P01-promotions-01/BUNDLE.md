@@ -120,10 +120,10 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · the venue's theme |
 | Pattern | listDetail (compact density): `listPromotions` reads the population and `getPromotion` reads one of them — list, select, act |
 | Offline | **The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
-| Opens with | `promotionId` (deepLink) · cold entry: **A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared ticket, a forwarded confirmation … |
+| Opens with | `promotionId` (deepLink) · cold entry: **A dead promotion link says "This offer is no longer available" and shows the list it came from** (the offers active now), with no name and no reason (r8 … |
 | Route | `/offers-promotions` |
 
-**What the spec says about it.** Added 17 August for parity with GST-037. **Not on the wireframe board** — needs drawing. CF-93. **`evaluatePromotions` removed 27 September 2026 (audit root R292).** It evaluates promotions against a cart — `EvaluatePromotionsRequest` requires `venueId`, `channel` and at least one line with a variant, quantity and unit price — and this screen has no cart: it arrives with `promotionId` alone. Offers apply where the cart is, on WEB-005 and WEB-010, which keep the call.
+**What the spec says about it.** Added 17 August for parity with GST-037. **Not on the wireframe board** — needs drawing. CF-93. **`evaluatePromotions` removed 27 September 2026 (audit root R292).** It evaluates promotions against a cart — `EvaluatePromotionsRequest` requires `venueId`, `channel` and at least one line with a variant, quantity and unit price — and this screen has no cart: it arrives with `promotionId` alone. Offers apply where the cart is, on WEB-005 and WEB-010, which keep the call. Build note (r8 second round, ORDERS-MONEY-C11): **Use this offer** on a promotion with a code applies it to the guest's cart with `applyCartPromoCode` and that code; an automatic promotion needs nothing applied, so it goes back to the list. The button is not drawn on this client-approved screen's definition yet; adding it and its binding waits for the client (pending entry ORDERS-MONEY-C11).
 
 **From the Ticketing & Guest Commerce (guest web, guest app, kiosk, partner portal, POS ticket sale) process.** What offers are on at the venue, in guest language, each with a way to use it. Block A. The page has no basket, so it explains and links; the price effect is shown where the basket is.
 
@@ -238,13 +238,14 @@ Also apply: 39 for all of P01, 29 for every app (section *Design inputs from the
 
 This is a white-label guest screen: it is drawn in the venue's brand, never TICVAI's (except the *Powered by TICVAI* credit, a tenant toggle that is on by default: `brand.showPoweredBy`). It has no dark or light mode: the venue's theme applies on every device setting. Draw it with the **default theme**, and on the key screens one **alternate tenant theme** (`handoff/design-batches/apps/1-guest-app/WHITE-LABEL.md`).
 
-**Shell-wide, on every guest screen:** Brand (11, CMS-002, CMS-004, CMS-104); Theme (27, CMS-005, ADM-016); Fonts (5, CMS-003); Header (5, CMS-009); Navigation (17, CMS-009); Footer (website) (15, CMS-009); Languages and right-to-left (2, CMS-011, ADM-018); Modules shown to guests (3, CMS-001, ADM-424); Features (3, CMS-001); Custom domain (website) (3, CMS-017, ADM-017); SEO metadata (website) (13, CMS-013). Each element, its CMS field, allowed values and default: `handoff/design-batches/apps/1-guest-app/WHITE-LABEL.md`.
+**Shell-wide, on every guest screen:** Brand (11, CMS-002, CMS-004, CMS-104); Theme (27, CMS-005, ADM-016); Fonts (5, CMS-003); Header (5, CMS-009); Navigation (18, CMS-009); Footer (website) (15, CMS-009); Languages and right-to-left (2, CMS-011, ADM-018); Modules shown to guests (3, CMS-001, ADM-424); Features (3, CMS-001); Custom domain (website) (3, CMS-017, ADM-017); SEO metadata (website) (13, CMS-013). Each element, its CMS field, allowed values and default: `handoff/design-batches/apps/1-guest-app/WHITE-LABEL.md`.
 
 #### References
 
 - Wireframe frame: `wireframes/P01 Guest Web.dc.html#web-032` · status **review** · provenance client-verified
 - Prototype (rev 3 (pointer moved to the 30 September build, CHG-R1S-015), verified 2026-09-28, match exact): `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, view *Discover → 'Offers & promotions'*. Differences: 'Use this offer' returns to the listing; no personalised 'applies to you' filter.
 - ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
+- ADR-0030 *A deep link is a pointer, not authorisation* (`docs/adr/0030-deep-link-cold-entry.md`)
 
 #### Acceptance for the design
 

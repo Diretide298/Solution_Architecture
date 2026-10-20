@@ -28,8 +28,10 @@ operations:
   - staff
   offline: true
   reads:
+  - cache:idempotency
   - maintenance.incident_involved_party
   writes:
+  - cache:idempotency
   - maintenance.incident_involved_party
 - operation: attachWorkOrderEvidence
   verb: POST
@@ -54,7 +56,7 @@ operations:
   permission: WORK_ORDER_MANAGE
   audience:
   - staff
-  offline: false
+  offline: true
   reads:
   - cache:idempotency
   - maintenance.work_order
@@ -68,7 +70,7 @@ operations:
   permission: MAINTENANCE_APPROVE
   audience:
   - staff
-  offline: false
+  offline: true
   reads:
   - cache:idempotency
   - maintenance.asset
@@ -356,7 +358,7 @@ operations:
   permission: INCIDENT_MANAGE
   audience:
   - staff
-  offline: false
+  offline: true
   reads:
   - cache:idempotency
   - maintenance.incident
@@ -371,7 +373,7 @@ operations:
   permission: WORK_ORDER_MANAGE
   audience:
   - staff
-  offline: false
+  offline: true
   reads:
   - cache:idempotency
   - inventory.stock_earmark
@@ -533,7 +535,7 @@ operations:
   permission: INCIDENT_MANAGE
   audience:
   - staff
-  offline: false
+  offline: true
   reads:
   - cache:idempotency
   - maintenance.incident
@@ -590,10 +592,12 @@ operations:
   permission: INCIDENT_REPORT
   audience:
   - staff
-  offline: false
+  offline: true
   reads:
+  - cache:idempotency
   - maintenance.incident_media
   writes:
+  - cache:idempotency
   - maintenance.incident_media
 - operation: verifyWorkOrder
   verb: POST
@@ -602,7 +606,7 @@ operations:
   permission: WORK_ORDER_VERIFY
   audience:
   - staff
-  offline: false
+  offline: true
   reads:
   - cache:idempotency
   - maintenance.work_order

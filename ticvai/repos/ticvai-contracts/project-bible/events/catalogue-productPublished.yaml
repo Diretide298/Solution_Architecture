@@ -33,7 +33,8 @@ consumers:
   onFailure: retryThenDeadLetter
   isCritical: true
 - context: ai
-  purpose: Re-embed the description. **`catalogue.product` is one of the eleven RAG sources and the
+  purpose: Re-embed the description; then re-run Help me choose (runGuidedChoiceSuggestionJob, trigger
+    productsUploaded; r8, FOUNDATION-AI-C39). **`catalogue.product` is one of the eleven RAG sources and the
     busiest** — a product renamed or repriced with a stale index means the assistant answers with yesterday’s
     catalogue, confidently
   idempotencyKey: productId+version

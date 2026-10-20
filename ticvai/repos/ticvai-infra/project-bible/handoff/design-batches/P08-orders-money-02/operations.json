@@ -388,6 +388,11 @@
     "name": null,
     "in": null,
     "required": null
+   },
+   {
+    "name": "X-Order-Access-Token",
+    "in": "header",
+    "required": false
    }
   ],
   "requestBody": null,
@@ -1022,7 +1027,18 @@
   "offlineCapable": true,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "kind",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": false
+   }
+  ],
   "requestBody": null,
   "responds": "ProductCategoryNode"
  },
@@ -1036,6 +1052,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
    {
     "name": null,
     "in": null,

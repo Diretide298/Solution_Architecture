@@ -363,7 +363,7 @@
   }
  },
  "Subscription": {
-  "x-ticvai-persistence": "subscription.contract",
+  "x-ticvai-persistence": "control.contract",
   "type": "object",
   "required": [
    "tenantId",
@@ -374,10 +374,13 @@
   ],
   "properties": {
    "tenantId": {
+    "x-ticvai-references": "control.tenant",
     "type": "string",
     "format": "uuid"
    },
    "planId": {
+    "x-ticvai-references": "control.plan",
+    "x-ticvai-references-version": "planVersion",
     "type": "string",
     "format": "uuid"
    },
@@ -578,6 +581,18 @@
  },
  "Tenant": {
   "x-ticvai-persistence": "control.tenant",
+  "x-ticvai-required-when": {
+   "planVersion": {
+    "planId": {
+     "not": null
+    }
+   },
+   "planId": {
+    "planVersion": {
+     "not": null
+    }
+   }
+  },
   "type": "object",
   "required": [
    "id",
@@ -641,9 +656,17 @@
     "nullable": true
    },
    "planId": {
+    "x-ticvai-references": "control.plan",
+    "x-ticvai-references-version": "planVersion",
     "type": "string",
     "format": "uuid",
     "nullable": true
+   },
+   "planVersion": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The version of the plan the tenant is on (with `planId`, the key of the plan row; R8 blocker APPROVALS-TENANCY-C15, CHG-R8INT-023). Null when `planId` is."
    },
    "planName": {
     "type": "string",
@@ -654,6 +677,46 @@
    },
    "venueCount": {
     "type": "integer"
+   },
+   "cellHost": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "x-ticvai-derived": "onRead",
+    "description": "The host of the tenant's home cell (the host part of `Cell.apiEndpoint` of the cell that holds the tenant in its home region), derived on read through `control.cell_tenant`. Added for ADM-018 (r8 walk of ticket 27886): the console reaches the cell's grant and language operations at this host without holding `PLATFORM_CELL_VIEW`, which `listTenantCells` needs. Null while the tenant has no cell.\n"
+   },
+   "cellHosts": {
+    "type": "array",
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "x-ticvai-derived": "onRead",
+    "description": "One entry per region the tenant is in, for a multi-region tenant; the entry with `isHome` true is `cellHost`. The screen uses the home cell for language and grant operations.\n",
+    "items": {
+     "type": "object",
+     "required": [
+      "regionId",
+      "cellId",
+      "host",
+      "isHome"
+     ],
+     "properties": {
+      "regionId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "cellId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "host": {
+       "type": "string"
+      },
+      "isHome": {
+       "type": "boolean"
+      }
+     }
+    }
    },
    "regionId": {
     "type": "string",
@@ -699,8 +762,8 @@
  },
  "VsiAssessment": {
   "type": "object",
-  "x-ticvai-persistence": "subscription.vsi_assessment",
-  "description": "Board 2 — the ten-screen questionnaire, as data.",
+  "x-ticvai-persistence": "control.vsi_assessment",
+  "description": "Board 2 — the ten-screen questionnaire, as data. **In the control database** (ADAM CR-150, 18 October 2026; CHG-CRA-003): a prospect's sign-up answers are about a tenant to be, not inside one. It holds an organisation name and a contact email, so **which control database holds it is ADR-0043's decision** (personal data stays in its region); the lead records it before rows are written.",
   "properties": {
    "id": {
     "type": "string",

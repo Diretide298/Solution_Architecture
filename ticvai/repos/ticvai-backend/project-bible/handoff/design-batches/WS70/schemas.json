@@ -180,7 +180,7 @@
  "AiDecisionRecord": {
   "type": "object",
   "x-ticvai-persistence": "ai.decision_record",
-  "description": "**The standard record for every governed decision** (design 3.9, C12; AIC-193..209): a recommendation summary, a risk assessment, a forecast publication, a plan step, an assistant answer at significant depth, a governance block, a Help me choose suggestion. **Append-only; corrections are annotations; hash-chained per tenant** so tampering is detectable (AIC-203, AIC-204). **AI log database** (design 2.4): append-only, partitioned by month, one Postgres database per tenant on the regional AI log server. The table name stays `ai.<table>`; which server holds it is a deployment matter, not a contract one.",
+  "description": "**The standard record for every governed decision** (design 3.9, C12; AIC-193..209): a recommendation summary, a risk assessment, a forecast publication, a plan step, an assistant answer at significant depth, a governance block, a Help me choose suggestion. **Append-only; corrections are annotations; hash-chained per tenant** so tampering is detectable (AIC-203, AIC-204). **AI log database** (design 2.4): append-only, partitioned by month, one Postgres database per tenant on the regional AI log server. The table name stays `ai.<table>`; which server holds it is a deployment matter, not a contract one.\n\n**Which answers are governed** (R8 blocker FOUNDATION-AI-C33, the lead's answer A of 20 October 2026): an answer of a capability whose `riskClass` is `medium`, `high` or `critical` writes a decision record; a `low` one writes `ai.activity` only. No column holds the depth: the capability registry's risk class decides.\n\n**The hash chain** (R8 blocker FOUNDATION-AI-C33). `recordHash` = SHA-256, as lowercase hex, of the canonical JSON (RFC 8785) of this list of fields and nothing else: `id`, `capabilityKey`, `task`, `inputsRef`, `evidence`, `producer`, `modelVersion`, `promptTemplateVersion`, `featureSetVersion`, `knowledgeVersion`, `ruleVersions`, `governanceOutcome`, `policyVersion`, `approvals`, `outcome`, `createdAt` and `previousHash`. `previousHash` is the `recordHash` of the tenant's previous record in (`createdAt`, `id`) order, an empty string for the first. The writer reads that head and inserts the new row under `pg_advisory_xact_lock(hashtext(<tenant id>))`, so several pods cannot fork the chain. `annotations` and `humanDecision` are not hashed: the hashed fields are never edited, and a correction is an annotation. `hashVersion` names this field list, so a later change to it is a new version, never a rewrite. A verifier replays the chain and recomputes every hash.",
   "required": [
    "traceId",
    "capabilityKey",
@@ -310,11 +310,25 @@
       },
       "note": {
        "type": "string"
+      },
+      "kind": {
+       "type": "string",
+       "enum": [
+        "correction",
+        "override"
+       ],
+       "description": "`override` is the one `overrideAiDecision` appends (R8 blocker FOUNDATION-AI-C33)."
+      },
+      "interventionId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true,
+       "description": "For `override`, the `ai.intervention` row it records."
       }
      }
     },
     "readOnly": true,
-    "description": "Corrections, appended; the original fields are never edited."
+    "description": "Corrections, appended; the original fields are never edited and annotations are not part of the hash."
    },
    "previousHash": {
     "type": "string",
@@ -323,6 +337,13 @@
    "recordHash": {
     "type": "string",
     "readOnly": true
+   },
+   "hashVersion": {
+    "type": "integer",
+    "minimum": 1,
+    "default": 1,
+    "readOnly": true,
+    "description": "Which list of hashed fields `recordHash` covers; 1 is the list in this schema's description (R8 blocker FOUNDATION-AI-C33)."
    },
    "createdAt": {
     "type": "string",
@@ -671,6 +692,14 @@
  "AiInteraction": {
   "type": "object",
   "x-ticvai-persistence": "ai.activity",
+  "x-ticvai-required-when": {
+   "principalId": {
+    "audience": "staff"
+   },
+   "subjectId": {
+    "audience": "guest"
+   }
+  },
   "required": [
    "id",
    "principalId",
@@ -728,7 +757,9 @@
    },
    "principalId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "nullable": true,
+    "description": "The staff member who made the call. Null for a guest (`audience` `guest`), whose row names `subjectId` instead; a row always has one or the other."
    },
    "audience": {
     "type": "string",
@@ -836,7 +867,7 @@
  "AiMaturity": {
   "type": "object",
   "x-ticvai-persistence": "none — embedded as jsonb on ai.suggestion and ai.forecast_version",
-  "description": "**Where an answer stands, on every answer** (29 September, AI functions review; baseline then learn). The customer sees a stage badge and a \"Based on\" chip, never a bare percentage (design 5.6), and \"Limited historical data\" while the starting pattern carries more than half the weight.",
+  "description": "**Where an answer stands, on every answer** (29 September, AI functions review; baseline then learn). The customer sees a stage badge and a \"Based on\" chip, never a bare percentage (design 5.6), and \"Limited historical data\" while the starting pattern carries more than half the weight.\n\n**The stage rule per kind** (r8 walk of ticket 27723; lead decision of 20 October 2026, option A). The stage of an answer is decided by the days of the tenant's own data behind its kind, against that kind's `Minimum` in `SuggestionKind`: `starting` below the minimum, `learning` from the minimum, `established` from three times the minimum, `learned` only by promotion (AI-D16). For the Block A kinds that is:\n| kind | minimum | learning from | established from |\n|---|---|---|---|\n| queueBalancing | 14 days | day 14 | day 42 |\n| prepPlan | 28 days (4 weeks) | day 28 | day 84 |\n| upsell | 90 days | day 90 | day 270 |\nThe 28-day seeded run of AI-ENGINE-BASELINE therefore proves `learning` for `queueBalancing` and `prepPlan`. `upsell` cannot read `learning` at day 28 and is checked at day 90 with a seeded fixture of 90 days of orders. Other kinds follow the same rule with their own minimum.",
   "required": [
    "stage",
    "basedOn"

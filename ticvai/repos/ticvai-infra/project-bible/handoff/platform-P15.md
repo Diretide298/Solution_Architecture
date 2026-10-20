@@ -27,7 +27,7 @@
 | `setFnbReservationPolicy` | fnb | PUT | Set turn times and seating buffers |
 | `setPrepSheetTemplate` | fnb | PUT | Set the prep-sheet print template |
 | `updateTable` | fnb | PUT | Change what a table is |
-| `listAlertRules` | reporting | GET | What raises an alert, and when |
+| `listAlertRules` | reporting | GET | Thresholds being watched |
 
 ## Modules
 

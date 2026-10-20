@@ -101,6 +101,19 @@
   "requestBody": null,
   "responds": "GiftCard"
  },
+ "getGuestRefundPolicy": {
+  "method": "GET",
+  "path": "/venues/{venueId}/guest-refund-policy",
+  "contract": "orders",
+  "summary": "What a guest is told about refunds at a venue",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "GuestRefundPolicy"
+ },
  "getGuestSession": {
   "method": "GET",
   "path": "/auth/guest/session",
@@ -113,6 +126,25 @@
   "parameters": [],
   "requestBody": null,
   "responds": "GuestSession"
+ },
+ "getLoyaltyPosition": {
+  "method": "GET",
+  "path": "/loyalty/position",
+  "contract": "marketing-crm",
+  "summary": "A guest's points, tier and what is within reach",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "programmeId",
+    "in": "query",
+    "required": true
+   }
+  ],
+  "requestBody": null,
+  "responds": null
  },
  "getOrder": {
   "method": "GET",
@@ -128,6 +160,11 @@
     "name": null,
     "in": null,
     "required": null
+   },
+   {
+    "name": "X-Order-Access-Token",
+    "in": "header",
+    "required": false
    }
   ],
   "requestBody": null,
@@ -319,6 +356,69 @@
   "requestBody": null,
   "responds": "Page"
  },
+ "listOwnRefundRequests": {
+  "method": "GET",
+  "path": "/refund-requests",
+  "contract": "orders",
+  "summary": "The caller's own refund requests",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "orderId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listOwnResaleListings": {
+  "method": "GET",
+  "path": "/resale-listings",
+  "contract": "orders",
+  "summary": "The caller's own resale listings",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "entitlementId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "listPaymentTokens": {
   "method": "GET",
   "path": "/payment-tokens",
@@ -329,6 +429,35 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listRewards": {
+  "method": "GET",
+  "path": "/loyalty/rewards",
+  "contract": "marketing-crm",
+  "summary": "What points can be turned into",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "programmeId",
+    "in": "query",
+    "required": null
+   },
    {
     "name": null,
     "in": null,
@@ -462,7 +591,7 @@
   "path": "/auth/guest/verify-email",
   "contract": "identity",
   "summary": "Send a verification link, or consume one",
-  "permission": "GUEST_VIEW",
+  "permission": null,
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",

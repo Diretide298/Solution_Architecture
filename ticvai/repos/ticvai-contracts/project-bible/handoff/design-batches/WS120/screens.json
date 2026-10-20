@@ -15,7 +15,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/analytics/operational-forecasting-command-center-adm-509",
-   "component": "apps/ticvai-web/src/routes/analytics/OperationalForecastingCommandCenter.tsx",
+   "component": "src/routes/analytics/OperationalForecastingCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -381,7 +381,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/analytics/capacity-occupancy-forecast-adm-510",
-   "component": "apps/ticvai-web/src/routes/analytics/CapacityOccupancyForecast.tsx",
+   "component": "src/routes/analytics/CapacityOccupancyForecast.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -622,7 +622,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/analytics/attraction-utilization-queue-forecast-adm-511",
-   "component": "apps/ticvai-web/src/routes/analytics/AttractionUtilizationQueueForecast.tsx",
+   "component": "src/routes/analytics/AttractionUtilizationQueueForecast.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -850,7 +850,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/analytics/entry-access-guest-flow-forecast-adm-512",
-   "component": "apps/ticvai-web/src/routes/analytics/EntryAccessGuestFlowForecast.tsx",
+   "component": "src/routes/analytics/EntryAccessGuestFlowForecast.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1057,7 +1057,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/analytics/workforce-demand-staffing-forecast-adm-513",
-   "component": "apps/ticvai-web/src/routes/analytics/WorkforceDemandStaffingForecast.tsx",
+   "component": "src/routes/analytics/WorkforceDemandStaffingForecast.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1304,7 +1304,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/analytics/pos-kiosk-frontline-service-forecast-adm-514",
-   "component": "apps/ticvai-web/src/routes/analytics/PosKioskFrontlineServiceForecast.tsx",
+   "component": "src/routes/analytics/PosKioskFrontlineServiceForecast.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1541,7 +1541,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/analytics/f-b-retail-inventory-demand-forecast-adm-515",
-   "component": "apps/ticvai-web/src/routes/analytics/FBRetailInventoryDemandForecast.tsx",
+   "component": "src/routes/analytics/FBRetailInventoryDemandForecast.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1748,7 +1748,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/analytics/resource-equipment-facility-requirement-forecast-adm-516",
-   "component": "apps/ticvai-web/src/routes/analytics/ResourceEquipmentFacilityRequirementForecast.tsx",
+   "component": "src/routes/analytics/ResourceEquipmentFacilityRequirementForecast.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1955,7 +1955,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/analytics/operational-scenario-readiness-simulator-adm-517",
-   "component": "apps/ticvai-web/src/routes/analytics/OperationalScenarioReadinessSimulator.tsx",
+   "component": "src/routes/analytics/OperationalScenarioReadinessSimulator.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -2168,7 +2168,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/analytics/operational-forecast-review-recommendations-handover-adm-518",
-   "component": "apps/ticvai-web/src/routes/analytics/OperationalForecastReviewRecommendationsHandover.tsx",
+   "component": "src/routes/analytics/OperationalForecastReviewRecommendationsHandover.tsx",
    "status": "notStarted"
   },
   "navigation": {

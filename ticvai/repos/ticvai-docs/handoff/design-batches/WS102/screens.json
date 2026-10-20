@@ -14,7 +14,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/tenants-licensing/purchase-trial-journey-selection-adm-409",
-   "component": "apps/ticvai-web/src/routes/tenants-licensing/PurchaseTrialJourneySelection.tsx",
+   "component": "src/routes/tenants-licensing/PurchaseTrialJourneySelection.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -177,7 +177,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/tenants-licensing/contract-billing-cycle-selection-adm-410",
-   "component": "apps/ticvai-web/src/routes/tenants-licensing/ContractBillingCycleSelection.tsx",
+   "component": "src/routes/tenants-licensing/ContractBillingCycleSelection.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -315,7 +315,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/tenants-licensing/billing-legal-entity-information-adm-411",
-   "component": "apps/ticvai-web/src/routes/tenants-licensing/BillingLegalEntityInformation.tsx",
+   "component": "src/routes/tenants-licensing/BillingLegalEntityInformation.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -577,7 +577,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/tenants-licensing/payment-method-settlement-setup-adm-412",
-   "component": "apps/ticvai-web/src/routes/tenants-licensing/PaymentMethodSettlementSetup.tsx",
+   "component": "src/routes/tenants-licensing/PaymentMethodSettlementSetup.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -894,7 +894,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/tenants-licensing/trial-configuration-conversion-rules-adm-413",
-   "component": "apps/ticvai-web/src/routes/tenants-licensing/TrialConfigurationConversionRules.tsx",
+   "component": "src/routes/tenants-licensing/TrialConfigurationConversionRules.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1096,7 +1096,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/tenants-licensing/order-commercial-pricing-review-adm-414",
-   "component": "apps/ticvai-web/src/routes/tenants-licensing/OrderCommercialPricingReview.tsx",
+   "component": "src/routes/tenants-licensing/OrderCommercialPricingReview.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1249,7 +1249,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/tenants-licensing/commercial-agreement-billable-definition-customer-accept-adm-415",
-   "component": "apps/ticvai-web/src/routes/tenants-licensing/CommercialAgreementBillableDefinitionCustomerAcc.tsx",
+   "component": "src/routes/tenants-licensing/CommercialAgreementBillableDefinitionCustomerAcc.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1402,7 +1402,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/tenants-licensing/payment-contract-commercial-validation-adm-416",
-   "component": "apps/ticvai-web/src/routes/tenants-licensing/PaymentContractCommercialValidation.tsx",
+   "component": "src/routes/tenants-licensing/PaymentContractCommercialValidation.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1522,7 +1522,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/tenants-licensing/subscription-confirmation-commercial-activation-adm-417",
-   "component": "apps/ticvai-web/src/routes/tenants-licensing/SubscriptionConfirmationCommercialActivation.tsx",
+   "component": "src/routes/tenants-licensing/SubscriptionConfirmationCommercialActivation.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1651,7 +1651,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/tenants-licensing/subscription-lifecycle-trial-to-paid-handoff-adm-418",
-   "component": "apps/ticvai-web/src/routes/tenants-licensing/SubscriptionLifecycleTrialToPaidHandoff.tsx",
+   "component": "src/routes/tenants-licensing/SubscriptionLifecycleTrialToPaidHandoff.tsx",
    "status": "notStarted"
   },
   "navigation": {

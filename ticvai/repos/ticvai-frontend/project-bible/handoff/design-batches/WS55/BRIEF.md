@@ -1,6 +1,6 @@
 # WS55 — Rules  Workflow  Approval   Automation Engine board 1
 
-**10 screens · 15 operations · 22 schemas · 3 permissions**
+**10 screens · 15 operations · 23 schemas · 3 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·

@@ -10,7 +10,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/general/tenant-directory",
-   "component": "apps/ticvai-web/src/routes/general/TenantDirectoryList.tsx",
+   "component": "src/routes/general/TenantDirectoryList.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -658,7 +658,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/general/tenant-hierarchy-explorer",
-   "component": "apps/ticvai-web/src/routes/general/TenantHierarchyExplorerList.tsx",
+   "component": "src/routes/general/TenantHierarchyExplorerList.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1102,7 +1102,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/general/module-and-feature-entitlement",
-   "component": "apps/ticvai-web/src/routes/general/ModuleAndFeatureEntitlementDetail.tsx",
+   "component": "src/routes/general/ModuleAndFeatureEntitlementDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1472,7 +1472,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/general/subscription-and-plan-management",
-   "component": "apps/ticvai-web/src/routes/general/SubscriptionAndPlanManagementForm.tsx",
+   "component": "src/routes/general/SubscriptionAndPlanManagementForm.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -2039,7 +2039,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/general/tenant-billing-and-invoicing",
-   "component": "apps/ticvai-web/src/routes/general/TenantBillingAndInvoicingDetail.tsx",
+   "component": "src/routes/general/TenantBillingAndInvoicingDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -2366,7 +2366,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/general/usage-metering",
-   "component": "apps/ticvai-web/src/routes/general/UsageMeteringDetail.tsx",
+   "component": "src/routes/general/UsageMeteringDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -2632,7 +2632,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/general/licence-and-seat-management",
-   "component": "apps/ticvai-web/src/routes/general/LicenceAndSeatManagementForm.tsx",
+   "component": "src/routes/general/LicenceAndSeatManagementForm.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -3036,7 +3036,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/general/tenant-isolation-and-resource-pool",
-   "component": "apps/ticvai-web/src/routes/general/TenantIsolationAndResourcePoolDetail.tsx",
+   "component": "src/routes/general/TenantIsolationAndResourcePoolDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -3372,7 +3372,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/general/api-rate-limit-and-quota-management",
-   "component": "apps/ticvai-web/src/routes/general/ApiRateLimitAndQuotaManagementForm.tsx",
+   "component": "src/routes/general/ApiRateLimitAndQuotaManagementForm.tsx",
    "status": "notStarted"
   },
   "navigation": {

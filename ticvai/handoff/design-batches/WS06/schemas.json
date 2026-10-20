@@ -340,6 +340,13 @@
     "type": "string",
     "format": "uuid"
    },
+   "accessAreaId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "x-ticvai-references": "access.access_area",
+    "description": "**The zone this access point admits to** (R8 blocker FOUNDATION-AI-C12, CHG-R8MIG-004): an `access.access_area` row whose `entityType` is `zone` (named for the table it keys, as every key is). `getOfflinePackage` and `validateAccess` filter accreditation credentials and dynamic policies by it (their `zoneIds` / `allowedZoneIds` must contain it, compared as text); null means the point is venue-wide and no zone filter applies."
+   },
    "scopePath": {
     "type": "string"
    },
@@ -1868,6 +1875,7 @@
      "localMode",
      "unknown"
     ],
+    "default": "unknown",
     "description": "What the device last said on its heartbeat; `unknown` until it has. `localMode` is an access-control device validating from its offline package with its link down (ADR-0067).\n"
    },
    "batteryPercent": {
@@ -1896,7 +1904,7 @@
     ],
     "default": "unknown",
     "readOnly": true,
-    "description": "**Derived, not reported.** Computed from heartbeat age, battery, firmware currency and error rate — a device does not know whether it is healthy, and asking it produces a fleet that is 100% healthy and 12% broken.\n"
+    "description": "**Derived, not reported.** Computed from heartbeat age, battery, firmware currency and error rate — a device does not know whether it is healthy, and asking it produces a fleet that is 100% healthy and 12% broken.\n**The formula, proposed, client to correct** (decided 20 October 2026, R8 blocker cause APPROVALS-TENANCY-C27; CHG-R8SPN-030), the weights of `Workstation.healthScore` applied to one device: score = 40 if its last reported `status` is `online` or `localMode` (0 otherwise) + 25 heartbeat freshness (25 at one minute old or less, 0 at 15 minutes or more, linear between) + 20 firmware currency (20 on the latest, 10 one version behind, 0 older) + 15 errors in the last hour (15 at none, 0 at 10 or more, linear between). `healthy` at 80 or more, `warning` at 60 or more, `degraded` below 60; `offline` after 15 minutes with no heartbeat, whatever the score; `unknown` until the first heartbeat. A battery under 15% caps the device at `warning`.\n"
    },
    "lastHeartbeatAt": {
     "type": "string",

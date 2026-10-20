@@ -560,6 +560,9 @@
      "name": "resourceId",
      "from": "navigation"
     }
+   ],
+   "preloaded": [
+    "VenueSettings.calendarDayStartHour"
    ]
   },
   "overlays": [

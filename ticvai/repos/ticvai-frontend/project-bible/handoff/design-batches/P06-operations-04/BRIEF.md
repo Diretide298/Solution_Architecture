@@ -1,6 +1,6 @@
 # P06-operations-04 — P06 · Operations (4 of 5)
 
-**10 screens · 26 operations · 38 schemas · 10 permissions**
+**10 screens · 26 operations · 39 schemas · 10 permissions**
 
 Platform P06 Venue Staff App · ships as **venue-staff-mobile** ·
 staff audience · mobileApp ·

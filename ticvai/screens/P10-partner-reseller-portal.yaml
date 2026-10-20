@@ -93,29 +93,30 @@ screens:
     - PTR-032
     - PTR-042
     fromFlows: true
-    notes: '**Landing table** (the lead, 20 October 2026, r8 cause IDENTITY-C07, option A). The door has no
-      launcher: its approved exits are where sign-in lands, chosen by permission. After sign-in, the second
-      factor when demanded and the role prompt, the door opens the first of these the partner may open: PTR-002
-      Partner Dashboard (ORDER_VIEW), then PTR-005 Inventory & Allocation View (PRODUCT_VIEW), then PTR-021
-      Support & Contact (CASE_VIEW); a platform operator holding PLATFORM_TENANT_VIEW lands on PTR-022. Every
-      other exit is reached from the portal''s own navigation after landing. Someone who may open none of them
-      stays on the door with "Your account has no section in the partner portal; ask your administrator".'
+    notes: '**Landing table** (the lead, 20 October 2026, r8 cause IDENTITY-C07, option A). The door has
+      no launcher: its approved exits are where sign-in lands, chosen by permission. After sign-in, the
+      second factor when demanded and the role prompt, the door opens the first of these the partner may
+      open: PTR-002 Partner Dashboard (ORDER_VIEW), then PTR-005 Inventory & Allocation View (PRODUCT_VIEW),
+      then PTR-021 Support & Contact (CASE_VIEW); a platform operator holding PLATFORM_TENANT_VIEW lands
+      on PTR-022. Every other exit is reached from the portal''s own navigation after landing. Someone
+      who may open none of them stays on the door with "Your account has no section in the partner portal;
+      ask your administrator".'
     transitions:
     - to: PTR-002
       trigger: Partner Dashboard
-      provenance: 'landing target (r8, IDENTITY-C07, the lead''s option A): not a control on the sign-in form; after
-        sign-in the door opens the first screen of the landing table (navigation.notes) the partner may open, and
-        this screen is reached from there'
+      provenance: 'landing target (r8, IDENTITY-C07, the lead''s option A): not a control on the sign-in
+        form; after sign-in the door opens the first screen of the landing table (navigation.notes) the
+        partner may open, and this screen is reached from there'
     - to: PTR-003
       trigger: Profile & Company Details
-      provenance: 'landing target (r8, IDENTITY-C07, the lead''s option A): not a control on the sign-in form; after
-        sign-in the door opens the first screen of the landing table (navigation.notes) the partner may open, and
-        this screen is reached from there'
+      provenance: 'landing target (r8, IDENTITY-C07, the lead''s option A): not a control on the sign-in
+        form; after sign-in the door opens the first screen of the landing table (navigation.notes) the
+        partner may open, and this screen is reached from there'
     - to: PTR-004
       trigger: Notifications
-      provenance: 'landing target (r8, IDENTITY-C07, the lead''s option A): not a control on the sign-in form; after
-        sign-in the door opens the first screen of the landing table (navigation.notes) the partner may open, and
-        this screen is reached from there'
+      provenance: 'landing target (r8, IDENTITY-C07, the lead''s option A): not a control on the sign-in
+        form; after sign-in the door opens the first screen of the landing table (navigation.notes) the
+        partner may open, and this screen is reached from there'
     - to: PTR-022
       trigger: Opens the partner command centre
       provenance: flow F110 step 1→2
@@ -192,19 +193,19 @@ screens:
         its own'
     - to: PTR-007
       trigger: Availability Search
-      provenance: 'landing target (r8, IDENTITY-C07, the lead''s option A): not a control on the sign-in form; after
-        sign-in the door opens the first screen of the landing table (navigation.notes) the partner may open, and
-        this screen is reached from there'
+      provenance: 'landing target (r8, IDENTITY-C07, the lead''s option A): not a control on the sign-in
+        form; after sign-in the door opens the first screen of the landing table (navigation.notes) the
+        partner may open, and this screen is reached from there'
     - to: PTR-032
       trigger: Commercial Agreement Command Center
-      provenance: 'landing target (r8, IDENTITY-C07, the lead''s option A): not a control on the sign-in form; after
-        sign-in the door opens the first screen of the landing table (navigation.notes) the partner may open, and
-        this screen is reached from there'
+      provenance: 'landing target (r8, IDENTITY-C07, the lead''s option A): not a control on the sign-in
+        form; after sign-in the door opens the first screen of the landing table (navigation.notes) the
+        partner may open, and this screen is reached from there'
     - to: PTR-042
       trigger: Partner Operations Command Center
-      provenance: 'landing target (r8, IDENTITY-C07, the lead''s option A): not a control on the sign-in form; after
-        sign-in the door opens the first screen of the landing table (navigation.notes) the partner may open, and
-        this screen is reached from there'
+      provenance: 'landing target (r8, IDENTITY-C07, the lead''s option A): not a control on the sign-in
+        form; after sign-in the door opens the first screen of the landing table (navigation.notes) the
+        partner may open, and this screen is reached from there'
     - to: PTR-005
       trigger: Books against the allocation
       provenance: 'landing target (r8, IDENTITY-C07): a partner whose first permitted screen is the allocation
@@ -212,10 +213,13 @@ screens:
       operation: login
     - to: SUP-001
       trigger: A back-office user signs in through the same door
-      provenance: 'flow F104 step 4→5. Carries nothing (r8, IDENTITY-C07): a challenge or method of this door means
-        nothing to another app''s door; the back-office user starts SUP-001''s own sign-in'
+      provenance: flow F104 step 4→5
       crossesDevice: true
       back: false
+      carries:
+      - challengeId
+      - methodId
+      - providerId
   notes: '**Rebuilt as a sign-in form on 2 October 2026 (CHG-DOOR-002/003; Chinmay, 2 October 2026: fix
     the Block A blockers now).** It was generated as a list over active sessions, MFA methods and SSO
     providers with Force logout and Revoke all sessions on the door, which a person who is not yet signed
@@ -253,9 +257,9 @@ screens:
         notes: 'Sends `LoginRequest`. 409 means this person already holds a session elsewhere (audit R184):
           the screen says where and since when, and that only a holder of SESSION_FORCE_LOGOUT can end
           it; signing in never ends the other session. **Bound** (ADAM CR-170, 19 October 2026; CHG-CRA-009):
-          the denied state''s attempts left is the 401''s `attemptsRemaining` (`LoginDeniedProblem`), its "try again"
-          time the 429''s `Retry-After`; the sessionHeld state''s "since when" and "where" are the 409''s `openedAt`
-          and `deviceLabel` (`SessionHeldProblem`). Nothing new shows.'
+          the denied state''s attempts left is the 401''s `attemptsRemaining` (`LoginDeniedProblem`),
+          its "try again" time the 429''s `Retry-After`; the sessionHeld state''s "since when" and "where"
+          are the 409''s `openedAt` and `deviceLabel` (`SessionHeldProblem`). Nothing new shows.'
         provenance: contract identity.yaml POST /auth/login
       - kind: cardList
         label: Sign in with your organisation
@@ -425,7 +429,8 @@ screens:
     - name: challengeId
       from: navigation
       optional: true
-      notes: 'r8 (IDENTITY-C07): made by this form''s own sign-in (`createMfaChallenge`); never needed to open the door.'
+      notes: 'r8 (IDENTITY-C07): made by this form''s own sign-in (`createMfaChallenge`); never needed
+        to open the door.'
     - name: providerId
       from: deepLink
       optional: true

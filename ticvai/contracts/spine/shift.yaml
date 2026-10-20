@@ -221,6 +221,7 @@ paths:
       x-ticvai-consumed-by:
         - "P04 POS-007 Close Shift"
         - "P04 POS-009 Staff Roster"
+        - "P04 POS-016 Till Configuration"
         - "P04 POS-019 Shift Templates & Policies"
         - "P04 POS-025 Till Home"
         - "P06 EMP-008 Shift summary"
@@ -437,6 +438,7 @@ paths:
       x-ticvai-consumed-by:
         - "P04 POS-001 Begin Shift"
         - "P04 POS-007 Close Shift"
+        - "P04 POS-016 Till Configuration"
         - "P08 BO-1065 Currency, Timezone & Channels"
       x-ticvai-read-via:
       - query: tenancy#denominationRecords
@@ -1132,10 +1134,10 @@ paths:
         schema: { type: string, format: uuid }
     post:
       operationId: reopenShift
-      # The first count is left where the first close wrote it; reopening reads and writes no count line (r8 integration, CHG-R8INT-014; check-parameter-columns P-NAMED-TABLE).
-      x-ticvai-names-for-context: [orders.cash_count_line]
       x-ticvai-consumed-by:
         - "P04 POS-025 Till Home"
+      # The first count is left where the first close wrote it; reopening reads and writes no count line (r8 integration, CHG-R8INT-014; check-parameter-columns P-NAMED-TABLE).
+      x-ticvai-names-for-context: [orders.cash_count_line]
       x-ticvai-audience: [staff]
       summary: Reopen a shift closed in error
       description: >

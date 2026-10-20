@@ -36,7 +36,7 @@ processSummary:
   elements:
   # ---------------------------------------------------------------- identity and assets
   - element: Primary logo
-    configuredOn: [CMS-004, CMS-002, ADM-016]
+    configuredOn: [CMS-002, ADM-016]
     field: BrandIdentity.logoAssetRef
     values: a MediaAsset id; PNG or SVG, at most 2 MB, uploaded through assets createUpload then completeUpload
     default: none; required before any brand save, and a missing logo blocks publish (missingRequiredAsset)
@@ -44,7 +44,7 @@ processSummary:
     changes: [appHeader on every P01, P02 and P05 screen, the powered-by strip, WEB-029, GST-047, KSK-002]
     source: [contracts/satellite/white-label.yaml#/components/schemas/BrandIdentity, R270, DI-108, DI-187]
   - element: Logo for dark backgrounds and logo variant
-    configuredOn: [CMS-004]
+    configuredOn: [CMS-002]
     field: BrandIdentity.logoDarkAssetRef, BrandIdentity.logoVariant
     values: logoVariant light | dark | duotone; dark logo optional, falls back to the primary logo
     default: logoVariant light
@@ -52,8 +52,8 @@ processSummary:
     changes: [the nav-bar lockup on every guest screen, the theme tint that follows the logo's colours]
     source: [DI-1068, contracts/satellite/white-label.yaml#/components/schemas/BrandIdentity, sources/designs/guest-rev3-30-september/TICVAI Engine Controls Manual.dc.html]
   - element: Favicon and web icons
-    configuredOn: [CMS-004]
-    field: BrandIdentity.faviconAssetRef; AppIcons.derived (web 16, 32, 48 px, 180 px touch icon, 192 and 512 px manifest)
+    configuredOn: [CMS-002, CMS-004]
+    field: BrandIdentity.faviconAssetRef; AppIcons.derived (web 16, 32, 48 px, 180 px touch icon, 192 and 512 px manifest) (the favicon file is set on CMS-002; the generated web icons come with the app icon on CMS-004)
     values: PNG or SVG at most 2 MB (favicon); the web icons are generated from the 1024 px app icon source
     default: none
     changeScope: runtime for web

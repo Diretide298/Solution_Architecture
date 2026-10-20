@@ -61,8 +61,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - workforce.open_shift
   writes:
+  - cache:idempotency
   - workforce.open_shift
 - operation: createRotaAssignment
   verb: POST
@@ -439,8 +441,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - workforce.leave_request
   writes:
+  - cache:idempotency
   - workforce.leave_request
 - operation: requestShiftSwap
   verb: POST
@@ -449,7 +453,7 @@ operations:
   permission: WORKFORCE_VIEW
   audience:
   - staff
-  offline: false
+  offline: true
   reads:
   - cache:idempotency
   - identity.principal
@@ -468,8 +472,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - workforce.sync_conflict
   writes:
+  - cache:idempotency
   - workforce.sync_conflict
 - operation: sendStaffMessage
   verb: POST
@@ -499,8 +505,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - workforce.field_ownership
   writes:
+  - cache:idempotency
   - workforce.field_ownership
 - operation: setIntegrationSource
   verb: PUT
@@ -511,8 +519,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - workforce.integration_source
   writes:
+  - cache:idempotency
   - workforce.integration_source
 - operation: setJobTitle
   verb: PUT
@@ -523,8 +533,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - workforce.job_title
   writes:
+  - cache:idempotency
   - workforce.job_title
 - operation: setLabourBudget
   verb: PUT
@@ -549,8 +561,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - workforce.leave_type
   writes:
+  - cache:idempotency
   - workforce.leave_type
 - operation: setShiftPattern
   verb: PUT
@@ -561,8 +575,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - workforce.shift
   writes:
+  - cache:idempotency
   - workforce.shift
 - operation: setShiftTemplate
   verb: PUT
@@ -573,8 +589,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - workforce.shift_template
   writes:
+  - cache:idempotency
   - workforce.shift_template
 - operation: setStaffingRules
   verb: PUT
@@ -585,6 +603,7 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - workforce.position_requirement
   - workforce.staffing_rules
   writes:
@@ -600,8 +619,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - workforce.work_assignment
   writes:
+  - cache:idempotency
   - workforce.work_assignment
 - operation: startSync
   verb: POST
@@ -612,8 +633,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - workforce.sync_run
   writes:
+  - cache:idempotency
   - workforce.employee
   - workforce.sync_run
 - operation: updateRotaAssignment

@@ -1,5 +1,5 @@
 id: LLD-marketing-crm
-title: marketing-crm — 278 operations
+title: marketing-crm — 280 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -49,8 +49,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - marketing.audience_activation
   writes:
+  - cache:idempotency
   - marketing.audience_activation
 - operation: activateChallenge
   verb: POST
@@ -61,8 +63,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - marketing.challenge
   writes:
+  - cache:idempotency
   - marketing.challenge
 - operation: activateJourney
   verb: POST
@@ -126,7 +130,7 @@ operations:
 - operation: addToWishlist
   verb: POST
   path: /guests/{subjectId}/wishlist
-  scope: venue
+  scope: subject
   permission: null
   audience:
   - guest
@@ -164,25 +168,29 @@ operations:
   verb: PUT
   path: /privacy-testing
   scope: venue
-  permission: MARKETING_MANAGE
+  permission: GUEST_MANAGE
   audience:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - marketing.privacy_change_set
   writes:
+  - cache:idempotency
   - marketing.privacy_change_set
 - operation: approveWaiverTesting
   verb: PUT
   path: /waiver-testing
   scope: venue
-  permission: MARKETING_MANAGE
+  permission: GUEST_MANAGE
   audience:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - marketing.waiver_version_control
   writes:
+  - cache:idempotency
   - marketing.waiver_version_control
 - operation: awardBadge
   verb: POST
@@ -194,8 +202,10 @@ operations:
   - service
   offline: false
   reads:
+  - cache:idempotency
   - marketing.customer_badge
   writes:
+  - cache:idempotency
   - marketing.customer_badge
 - operation: checkGuestCheckoutMatch
   verb: POST
@@ -206,10 +216,12 @@ operations:
   - guest
   offline: false
   reads:
+  - cache:idempotency
   - marketing.guest_match_policy
   - marketing.guest_profile
   - orders.cart
-  writes: []
+  writes:
+  - cache:idempotency
 - operation: claimConversation
   verb: POST
   path: /conversations/{conversationId}/claim
@@ -305,7 +317,7 @@ operations:
   verb: POST
   path: /case-classification-intelligent
   scope: venue
-  permission: MARKETING_MANAGE
+  permission: CASE_MANAGE
   audience:
   - staff
   offline: false
@@ -346,9 +358,11 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - marketing.consent_question
   - marketing.consent_question_version
   writes:
+  - cache:idempotency
   - marketing.consent_question
   - marketing.consent_question_version
 - operation: createForm
@@ -491,8 +505,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - marketing.duplicate_candidate
   writes:
+  - cache:idempotency
   - marketing.duplicate_candidate
 - operation: decideGuestCheckoutMatch
   verb: POST
@@ -533,7 +549,7 @@ operations:
   audience:
   - staff
   - partner
-  offline: false
+  offline: true
   reads:
   - cache:idempotency
   - marketing.case
@@ -776,6 +792,7 @@ operations:
   permission: GUEST_VIEW
   audience:
   - staff
+  - service
   offline: false
   reads:
   - marketing.loyalty_position
@@ -933,6 +950,18 @@ operations:
   reads:
   - marketing.message_dispatch
   writes: []
+- operation: getMyCase
+  verb: GET
+  path: /my/cases/{caseId}
+  scope: tenant
+  permission: null
+  audience:
+  - guest
+  offline: false
+  reads:
+  - marketing.case
+  - marketing.case_message
+  writes: []
 - operation: getMyChallenges
   verb: GET
   path: /guests/me/challenges
@@ -1022,7 +1051,7 @@ operations:
 - operation: getWishlist
   verb: GET
   path: /guests/{subjectId}/wishlist
-  scope: venue
+  scope: subject
   permission: null
   audience:
   - guest
@@ -1067,10 +1096,12 @@ operations:
   reads:
   - access.blacklist
   - access.entitlement
+  - cache:idempotency
   - marketing.guest_profile
   - marketing.loyalty_position
   - pii.subject
-  writes: []
+  writes:
+  - cache:idempotency
 - operation: importAudienceList
   verb: POST
   path: /audience-lists
@@ -1080,8 +1111,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - marketing.audience_list
   writes:
+  - cache:idempotency
   - marketing.audience_list
 - operation: issueReward
   verb: POST
@@ -1092,8 +1125,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - marketing.reward_assignment
   writes:
+  - cache:idempotency
   - marketing.reward_assignment
 - operation: launchCampaign
   verb: POST
@@ -1116,7 +1151,7 @@ operations:
   verb: GET
   path: /agent-workload-availability
   scope: venue
-  permission: MARKETING_VIEW
+  permission: CASE_VIEW
   audience:
   - staff
   offline: false
@@ -1203,7 +1238,7 @@ operations:
   verb: GET
   path: /case-resolution-closure
   scope: venue
-  permission: MARKETING_VIEW
+  permission: CASE_VIEW
   audience:
   - staff
   offline: false
@@ -1254,7 +1289,7 @@ operations:
   verb: GET
   path: /compliance-evidence-waiver
   scope: venue
-  permission: MARKETING_VIEW
+  permission: GUEST_VIEW_PII
   audience:
   - staff
   offline: false
@@ -1284,7 +1319,7 @@ operations:
   verb: GET
   path: /consent-evidence-withdrawal
   scope: venue
-  permission: MARKETING_VIEW
+  permission: GUEST_VIEW
   audience:
   - staff
   offline: false
@@ -1298,7 +1333,7 @@ operations:
   verb: GET
   path: /consent-preference-communication
   scope: venue
-  permission: MARKETING_VIEW
+  permission: GUEST_VIEW
   audience:
   - staff
   offline: false
@@ -1339,7 +1374,7 @@ operations:
   verb: GET
   path: /contact
   scope: venue
-  permission: MARKETING_VIEW
+  permission: CASE_VIEW
   audience:
   - staff
   offline: false
@@ -1355,7 +1390,7 @@ operations:
   verb: GET
   path: /contact-automation
   scope: venue
-  permission: MARKETING_VIEW
+  permission: CASE_VIEW
   audience:
   - staff
   offline: false
@@ -1380,7 +1415,7 @@ operations:
   verb: GET
   path: /cookie-banner-preference
   scope: venue
-  permission: MARKETING_VIEW
+  permission: GUEST_VIEW
   audience:
   - staff
   offline: false
@@ -1424,7 +1459,7 @@ operations:
   verb: GET
   path: /cookie-tracking-digital
   scope: venue
-  permission: MARKETING_VIEW
+  permission: GUEST_VIEW
   audience:
   - staff
   offline: false
@@ -1447,7 +1482,7 @@ operations:
   verb: GET
   path: /customer-privacy-consent
   scope: venue
-  permission: MARKETING_VIEW
+  permission: GUEST_VIEW_PII
   audience:
   - staff
   offline: false
@@ -1466,7 +1501,7 @@ operations:
   verb: GET
   path: /customer-satisfaction-feedback
   scope: venue
-  permission: MARKETING_VIEW
+  permission: CASE_VIEW
   audience:
   - staff
   offline: false
@@ -1481,7 +1516,7 @@ operations:
   verb: GET
   path: /customer-service
   scope: venue
-  permission: MARKETING_VIEW
+  permission: CASE_VIEW
   audience:
   - staff
   offline: false
@@ -1496,7 +1531,7 @@ operations:
   verb: GET
   path: /customer-service-profile
   scope: venue
-  permission: MARKETING_VIEW
+  permission: CASE_VIEW
   audience:
   - staff
   offline: false
@@ -1518,7 +1553,7 @@ operations:
   verb: GET
   path: /data-processing-purpose
   scope: venue
-  permission: MARKETING_VIEW
+  permission: GUEST_VIEW
   audience:
   - staff
   offline: false
@@ -1529,7 +1564,7 @@ operations:
   verb: GET
   path: /data-retention-expiry
   scope: venue
-  permission: MARKETING_VIEW
+  permission: GUEST_VIEW
   audience:
   - staff
   offline: false
@@ -1540,7 +1575,7 @@ operations:
   verb: GET
   path: /data-subject-customer
   scope: venue
-  permission: MARKETING_VIEW
+  permission: GUEST_VIEW
   audience:
   - staff
   offline: false
@@ -1551,7 +1586,7 @@ operations:
   verb: GET
   path: /deletion-anonymization-restriction
   scope: venue
-  permission: MARKETING_VIEW
+  permission: GUEST_VIEW
   audience:
   - staff
   offline: false
@@ -1606,7 +1641,7 @@ operations:
   verb: GET
   path: /digital-signing-collection
   scope: venue
-  permission: MARKETING_VIEW
+  permission: GUEST_VIEW
   audience:
   - staff
   offline: false
@@ -1631,7 +1666,7 @@ operations:
   verb: GET
   path: /dynamic-field-question
   scope: venue
-  permission: MARKETING_VIEW
+  permission: GUEST_VIEW
   audience:
   - staff
   offline: false
@@ -1643,7 +1678,7 @@ operations:
   verb: GET
   path: /escalation-collaboration-internal
   scope: venue
-  permission: MARKETING_VIEW
+  permission: CASE_VIEW
   audience:
   - staff
   offline: false
@@ -1654,7 +1689,7 @@ operations:
   verb: GET
   path: /escalation-critical-case
   scope: venue
-  permission: MARKETING_VIEW
+  permission: CASE_VIEW
   audience:
   - staff
   offline: false
@@ -1678,7 +1713,7 @@ operations:
 - operation: listGuestDevices
   verb: GET
   path: /guests/{subjectId}/devices
-  scope: tenant
+  scope: subject
   permission: null
   audience:
   - guest
@@ -1739,6 +1774,7 @@ operations:
   permission: CASE_VIEW
   audience:
   - staff
+  - guest
   offline: false
   reads:
   - marketing.lost_item
@@ -1817,7 +1853,7 @@ operations:
   verb: GET
   path: /minor-guardian-group
   scope: venue
-  permission: MARKETING_VIEW
+  permission: GUEST_VIEW_PII
   audience:
   - staff
   offline: false
@@ -1834,7 +1870,7 @@ operations:
   verb: GET
   path: /missing-expired-invalid
   scope: venue
-  permission: MARKETING_VIEW
+  permission: GUEST_VIEW_PII
   audience:
   - staff
   offline: false
@@ -1877,7 +1913,7 @@ operations:
   verb: GET
   path: /participant-waiver-statu
   scope: venue
-  permission: MARKETING_VIEW
+  permission: GUEST_VIEW_PII
   audience:
   - staff
   offline: false
@@ -1896,7 +1932,7 @@ operations:
   verb: GET
   path: /privacy
   scope: venue
-  permission: MARKETING_VIEW
+  permission: GUEST_VIEW
   audience:
   - staff
   offline: false
@@ -1914,7 +1950,7 @@ operations:
   verb: GET
   path: /privacy-compliance
   scope: venue
-  permission: MARKETING_VIEW
+  permission: GUEST_VIEW
   audience:
   - staff
   offline: false
@@ -1945,7 +1981,7 @@ operations:
   verb: GET
   path: /privacy-consent
   scope: venue
-  permission: MARKETING_VIEW
+  permission: GUEST_VIEW
   audience:
   - staff
   offline: false
@@ -1959,7 +1995,7 @@ operations:
   verb: GET
   path: /privacy-evidence-compliance
   scope: venue
-  permission: MARKETING_VIEW
+  permission: AUDIT_VIEW
   audience:
   - staff
   offline: false
@@ -1970,7 +2006,7 @@ operations:
   verb: GET
   path: /privacy-notice-policy
   scope: venue
-  permission: MARKETING_VIEW
+  permission: GUEST_VIEW
   audience:
   - staff
   offline: false
@@ -1982,7 +2018,7 @@ operations:
   verb: GET
   path: /product-event-experience
   scope: venue
-  permission: MARKETING_VIEW
+  permission: GUEST_VIEW
   audience:
   - staff
   offline: false
@@ -2018,7 +2054,7 @@ operations:
   verb: GET
   path: /quality-agent-evaluation
   scope: venue
-  permission: MARKETING_VIEW
+  permission: CASE_VIEW
   audience:
   - staff
   offline: false
@@ -2111,7 +2147,7 @@ operations:
   verb: GET
   path: /service-root-cause
   scope: venue
-  permission: MARKETING_VIEW
+  permission: CASE_VIEW
   audience:
   - staff
   offline: false
@@ -2126,7 +2162,7 @@ operations:
   verb: GET
   path: /site-waiver-exception
   scope: venue
-  permission: MARKETING_VIEW
+  permission: GUEST_VIEW_PII
   audience:
   - staff
   offline: false
@@ -2149,7 +2185,7 @@ operations:
   verb: GET
   path: /sla-policy-service
   scope: venue
-  permission: MARKETING_VIEW
+  permission: CASE_VIEW
   audience:
   - staff
   offline: false
@@ -2186,7 +2222,7 @@ operations:
   verb: GET
   path: /unified-interaction-communication
   scope: venue
-  permission: MARKETING_VIEW
+  permission: CASE_VIEW
   audience:
   - staff
   offline: false
@@ -2202,7 +2238,7 @@ operations:
   verb: GET
   path: /versioning-effective-date
   scope: venue
-  permission: MARKETING_VIEW
+  permission: GUEST_VIEW
   audience:
   - staff
   offline: false
@@ -2216,7 +2252,7 @@ operations:
   verb: GET
   path: /waiver
   scope: venue
-  permission: MARKETING_VIEW
+  permission: GUEST_VIEW
   audience:
   - staff
   offline: false
@@ -2235,7 +2271,7 @@ operations:
   verb: GET
   path: /waiver-compliance-operational
   scope: venue
-  permission: MARKETING_VIEW
+  permission: GUEST_VIEW
   audience:
   - staff
   offline: false
@@ -2251,7 +2287,7 @@ operations:
   verb: GET
   path: /waiver-compliance-risk
   scope: venue
-  permission: MARKETING_VIEW
+  permission: GUEST_VIEW
   audience:
   - staff
   offline: false
@@ -2272,7 +2308,7 @@ operations:
   verb: GET
   path: /waiver-consent
   scope: venue
-  permission: MARKETING_VIEW
+  permission: GUEST_VIEW
   audience:
   - staff
   offline: false
@@ -2297,7 +2333,7 @@ operations:
   verb: GET
   path: /waiver-template-master
   scope: venue
-  permission: MARKETING_VIEW
+  permission: GUEST_VIEW
   audience:
   - staff
   offline: false
@@ -2308,7 +2344,7 @@ operations:
   verb: GET
   path: /waiver-trigger-eligibility
   scope: venue
-  permission: MARKETING_VIEW
+  permission: GUEST_VIEW
   audience:
   - staff
   offline: false
@@ -2354,9 +2390,11 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - marketing.guest_profile
   - pii.subject
-  writes: []
+  writes:
+  - cache:idempotency
 - operation: matchLostItem
   verb: POST
   path: /lost-items/{itemId}/match
@@ -2470,7 +2508,7 @@ operations:
   permission: null
   audience:
   - guest
-  offline: true
+  offline: false
   reads:
   - cache:idempotency
   - marketing.case
@@ -2486,22 +2524,25 @@ operations:
   - service
   offline: false
   reads:
+  - cache:idempotency
   - marketing.consent_record
   - marketing.consent_record_channel
   - marketing.guest_match_policy
   - marketing.guest_profile
   - platform.idempotency_record
   writes:
+  - cache:idempotency
   - marketing.consent_record
   - marketing.consent_record_channel
   - platform.idempotency_record
 - operation: recordConsent
   verb: POST
   path: /guests/{subjectId}/consents
-  scope: venue
+  scope: subject
   permission: GUEST_MANAGE
   audience:
   - guest
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -2522,8 +2563,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - marketing.booking_consent_record
   writes:
+  - cache:idempotency
   - marketing.booking_consent_record
 - operation: recordCookieScan
   verb: POST
@@ -2571,7 +2614,8 @@ operations:
   permission: CASE_MANAGE
   audience:
   - staff
-  offline: true
+  - guest
+  offline: false
   reads:
   - cache:idempotency
   - marketing.lost_item
@@ -2595,6 +2639,22 @@ operations:
   writes:
   - cache:idempotency
   - marketing.privacy_incident
+- operation: recordSaleOwnerAnswers
+  verb: POST
+  path: /internal/sale-owner-answers
+  scope: venue
+  permission: null
+  audience:
+  - service
+  offline: false
+  reads:
+  - cache:idempotency
+  - marketing.form_submission
+  - marketing.form_submission_sale_link
+  writes:
+  - cache:idempotency
+  - marketing.form_submission
+  - marketing.form_submission_sale_link
 - operation: recordTouchPoint
   verb: POST
   path: /attribution/touches
@@ -2631,7 +2691,7 @@ operations:
 - operation: registerGuestDevice
   verb: POST
   path: /guests/{subjectId}/devices
-  scope: tenant
+  scope: subject
   permission: null
   audience:
   - guest
@@ -2645,7 +2705,7 @@ operations:
 - operation: removeFromWishlist
   verb: DELETE
   path: /guests/{subjectId}/wishlist/{itemId}
-  scope: venue
+  scope: subject
   permission: null
   audience:
   - guest
@@ -2664,7 +2724,7 @@ operations:
   audience:
   - staff
   - partner
-  offline: false
+  offline: true
   reads:
   - cache:idempotency
   - marketing.case
@@ -2739,7 +2799,7 @@ operations:
 - operation: revokeGuestDevice
   verb: DELETE
   path: /guests/{subjectId}/devices/{deviceId}
-  scope: tenant
+  scope: subject
   permission: null
   audience:
   - guest
@@ -2779,6 +2839,7 @@ operations:
   - staff
   offline: false
   reads:
+  - marketing.consent_record
   - marketing.guest_profile
   writes: []
 - operation: sendConversationMessage
@@ -2808,14 +2869,16 @@ operations:
   audience:
   - guest
   offline: false
-  reads: []
+  reads:
+  - cache:idempotency
   writes:
+  - cache:idempotency
   - marketing.conversation_message
 - operation: sendTransactionalMessage
   verb: POST
   path: /messages
   scope: venue
-  permission: null
+  permission: MARKETING_SEND
   audience:
   - service
   - partner
@@ -2852,8 +2915,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - marketing.agent_service_profile
   writes:
+  - cache:idempotency
   - marketing.agent_service_profile
 - operation: setBadge
   verb: PUT
@@ -2864,8 +2929,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - marketing.badge
   writes:
+  - cache:idempotency
   - marketing.badge
 - operation: setBusinessEventMapping
   verb: PUT
@@ -2925,20 +2992,24 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - marketing.case_internal_request
   writes:
+  - cache:idempotency
   - marketing.case_internal_request
 - operation: setCaseInvestigationResolution
   verb: PUT
   path: /case-investigation-resolution
   scope: venue
-  permission: MARKETING_MANAGE
+  permission: CASE_MANAGE
   audience:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - marketing.case_linked_record
   writes:
+  - cache:idempotency
   - marketing.case_linked_record
 - operation: setCaseResolution
   verb: PUT
@@ -2949,8 +3020,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - marketing.case_resolution
   writes:
+  - cache:idempotency
   - marketing.case_resolution
 - operation: setChannelProvider
   verb: PUT
@@ -2961,20 +3034,24 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - marketing.communication_provider
   writes:
+  - cache:idempotency
   - marketing.communication_provider
 - operation: setCommunicationPreferenceMarketing
   verb: PUT
   path: /communication-preference-marketing
   scope: venue
-  permission: MARKETING_MANAGE
+  permission: GUEST_MANAGE
   audience:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - marketing.communication_preference_type
   writes:
+  - cache:idempotency
   - marketing.communication_preference_type
 - operation: setCommunicationRoutingRule
   verb: PUT
@@ -2985,20 +3062,24 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - marketing.communication_routing_rule
   writes:
+  - cache:idempotency
   - marketing.communication_routing_rule
 - operation: setConsentCapturePoint
   verb: PUT
   path: /consent-capture-point
   scope: venue
-  permission: MARKETING_MANAGE
+  permission: GUEST_MANAGE
   audience:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - marketing.consent_capture_point
   writes:
+  - cache:idempotency
   - marketing.consent_capture_point
 - operation: setConsentPurposes
   verb: PUT
@@ -3026,8 +3107,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - marketing.contact_automation
   writes:
+  - cache:idempotency
   - marketing.contact_automation
 - operation: setCookieBannerDesign
   verb: PUT
@@ -3038,8 +3121,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - marketing.cookie_banner_design
   writes:
+  - cache:idempotency
   - marketing.cookie_banner_design
 - operation: setCookieScanPolicy
   verb: PUT
@@ -3059,25 +3144,29 @@ operations:
   verb: PUT
   path: /customer-service-copilot
   scope: venue
-  permission: MARKETING_MANAGE
+  permission: AI_CONFIGURE
   audience:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - marketing.service_copilot_config
   writes:
+  - cache:idempotency
   - marketing.service_copilot_config
 - operation: setDataDiscoveryAccess
   verb: PUT
   path: /data-discovery-access
   scope: venue
-  permission: MARKETING_MANAGE
+  permission: GUEST_VIEW_PII
   audience:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - marketing.privacy_export_package
   writes:
+  - cache:idempotency
   - marketing.privacy_export_package
 - operation: setDataProcessingPurpose
   verb: PUT
@@ -3088,8 +3177,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - marketing.processing_purpose
   writes:
+  - cache:idempotency
   - marketing.processing_purpose
 - operation: setDataRetentionPolicy
   verb: PUT
@@ -3100,6 +3191,7 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - marketing.retention_policy
   - tenancy.data_retention_setting
   writes:
@@ -3109,13 +3201,15 @@ operations:
   verb: PUT
   path: /digital-waiver-form
   scope: venue
-  permission: MARKETING_MANAGE
+  permission: GUEST_MANAGE
   audience:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - marketing.waiver_form_layout
   writes:
+  - cache:idempotency
   - marketing.waiver_form_layout
 - operation: setDynamicFieldQuestion
   verb: PUT
@@ -3126,9 +3220,11 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - marketing.form_definition_field
   - marketing.waiver_field_rule
   writes:
+  - cache:idempotency
   - marketing.form_definition_field
   - marketing.waiver_field_rule
 - operation: setGuestAttributeModel
@@ -3140,8 +3236,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - marketing.guest_attribute_model
   writes:
+  - cache:idempotency
   - marketing.guest_attribute_model
 - operation: setGuestExtraFields
   verb: PUT
@@ -3152,9 +3250,11 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - marketing.guest_extra_field
   - marketing.guest_extra_option
   writes:
+  - cache:idempotency
   - marketing.guest_extra_field
   - marketing.guest_extra_option
 - operation: setGuestExtraValues
@@ -3166,8 +3266,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - marketing.guest_extra_value
   writes:
+  - cache:idempotency
   - marketing.guest_extra_value
 - operation: setGuestMatchPolicy
   verb: PUT
@@ -3178,8 +3280,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - marketing.guest_match_policy
   writes:
+  - cache:idempotency
   - marketing.guest_match_policy
 - operation: setGuestRelationships
   verb: PUT
@@ -3190,8 +3294,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - marketing.guest_relationship
   writes:
+  - cache:idempotency
   - marketing.guest_relationship
 - operation: setIdentityResolutionRules
   verb: PUT
@@ -3202,32 +3308,38 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - marketing.identity_rules
   writes:
+  - cache:idempotency
   - marketing.identity_rules
 - operation: setIntelligentRoutingSkill
   verb: PUT
   path: /intelligent-routing-skill/{routingRuleId}
   scope: venue
-  permission: MARKETING_MANAGE
+  permission: CASE_MANAGE
   audience:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - marketing.case_routing_rule
   writes:
+  - cache:idempotency
   - marketing.case_routing_rule
 - operation: setLeaderboardNickname
   verb: PUT
   path: /loyalty/leaderboard-nickname
-  scope: tenant
+  scope: subject
   permission: null
   audience:
   - guest
   offline: false
   reads:
+  - cache:idempotency
   - marketing.loyalty_position
   writes:
+  - cache:idempotency
   - marketing.loyalty_position
 - operation: setLegalHold
   verb: PUT
@@ -3238,20 +3350,24 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - marketing.legal_hold
   writes:
+  - cache:idempotency
   - marketing.legal_hold
 - operation: setLocalizationBrandingCustomer
   verb: PUT
   path: /localization-branding-customer
   scope: venue
-  permission: MARKETING_MANAGE
+  permission: GUEST_MANAGE
   audience:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - marketing.waiver_localisation
   writes:
+  - cache:idempotency
   - marketing.waiver_localisation
 - operation: setLoyaltyCampaign
   verb: PUT
@@ -3262,8 +3378,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - marketing.loyalty_campaign
   writes:
+  - cache:idempotency
   - marketing.loyalty_campaign
 - operation: setLoyaltyRules
   verb: PUT
@@ -3274,10 +3392,12 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - marketing.loyalty_rule
   - marketing.points_redemption_rule
   - marketing.programme_tier
   writes:
+  - cache:idempotency
   - marketing.loyalty_rule
   - marketing.points_redemption_rule
   - marketing.programme_tier
@@ -3290,8 +3410,10 @@ operations:
   - guest
   offline: false
   reads:
+  - cache:idempotency
   - marketing.subscription
   writes:
+  - cache:idempotency
   - marketing.subscription
 - operation: setMessageTrigger
   verb: POST
@@ -3312,25 +3434,29 @@ operations:
   verb: PUT
   path: /minor-guardian-age
   scope: venue
-  permission: MARKETING_MANAGE
+  permission: GUEST_MANAGE
   audience:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - marketing.minor_privacy_rule
   writes:
+  - cache:idempotency
   - marketing.minor_privacy_rule
 - operation: setOrderBookingTicket
   verb: PUT
   path: /order-booking-ticket/{serviceActionId}
   scope: venue
-  permission: MARKETING_MANAGE
+  permission: CASE_MANAGE
   audience:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - marketing.case_service_action
   writes:
+  - cache:idempotency
   - marketing.case_service_action
 - operation: setPrivacyAction
   verb: PUT
@@ -3341,20 +3467,24 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - marketing.privacy_action
   writes:
+  - cache:idempotency
   - marketing.privacy_action
 - operation: setPrivacyComplianceException
   verb: PUT
   path: /privacy-compliance-exception/{exceptionId}
   scope: venue
-  permission: MARKETING_MANAGE
+  permission: GUEST_MANAGE
   audience:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - marketing.privacy_exception
   writes:
+  - cache:idempotency
   - marketing.privacy_exception
 - operation: setPrivacyNoticePolicyGovernance
   verb: PUT
@@ -3380,8 +3510,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - marketing.privacy_request
   writes:
+  - cache:idempotency
   - marketing.privacy_request
 - operation: setPrivacyRequestTypes
   verb: PUT
@@ -3392,9 +3524,11 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - marketing.privacy_request_deadline
   - marketing.privacy_request_type
   writes:
+  - cache:idempotency
   - marketing.privacy_request_deadline
   - marketing.privacy_request_type
 - operation: setQualityEvaluation
@@ -3406,20 +3540,24 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - marketing.quality_evaluation
   writes:
+  - cache:idempotency
   - marketing.quality_evaluation
 - operation: setRefundCompensationService
   verb: PUT
   path: /refund-compensation-service/{compensationRequestId}
   scope: venue
-  permission: MARKETING_MANAGE
+  permission: ORDER_REFUND
   audience:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - marketing.case_compensation_request
   writes:
+  - cache:idempotency
   - marketing.case_compensation_request
 - operation: setReward
   verb: PUT
@@ -3430,8 +3568,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - marketing.reward
   writes:
+  - cache:idempotency
   - marketing.reward
 - operation: setSenderIdentityDomain
   verb: PUT
@@ -3442,8 +3582,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - marketing.sender_identity
   writes:
+  - cache:idempotency
   - marketing.sender_identity
 - operation: setSeoMetadata
   verb: PUT
@@ -3481,13 +3623,15 @@ operations:
   verb: PUT
   path: /signatory-signature-guardian
   scope: venue
-  permission: MARKETING_MANAGE
+  permission: GUEST_MANAGE
   audience:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - marketing.waiver_signatory_rule
   writes:
+  - cache:idempotency
   - marketing.waiver_signatory_rule
 - operation: setSlaPolicy
   verb: PUT
@@ -3498,8 +3642,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - marketing.sla_policy
   writes:
+  - cache:idempotency
   - marketing.sla_policy
 - operation: setTrackingTechnology
   verb: PUT
@@ -3510,8 +3656,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - marketing.tracking_technology
   writes:
+  - cache:idempotency
   - marketing.tracking_technology
 - operation: setTrackingTechnologyCatalogueEntry
   verb: PUT
@@ -3522,8 +3670,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - marketing.tracking_technology_catalogue
   writes:
+  - cache:idempotency
   - marketing.tracking_technology_catalogue
 - operation: setWaiverAssociation
   verb: PUT
@@ -3534,8 +3684,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - marketing.waiver_association
   writes:
+  - cache:idempotency
   - marketing.waiver_association
 - operation: setWaiverException
   verb: PUT
@@ -3546,9 +3698,11 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - marketing.waiver_exception
   - marketing.waiver_requirement
   writes:
+  - cache:idempotency
   - marketing.waiver_exception
   - marketing.waiver_requirement_event
 - operation: setWaiverTemplateMaster
@@ -3560,8 +3714,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - marketing.waiver_master
   writes:
+  - cache:idempotency
   - marketing.waiver_master
 - operation: setWaiverTriggerRule
   verb: PUT
@@ -3572,22 +3728,26 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - marketing.waiver_trigger_rule
   writes:
+  - cache:idempotency
   - marketing.waiver_trigger_rule
 - operation: setWaiverVerificationValidation
   verb: PUT
   path: /waiver-verification-validation/{verificationId}
   scope: venue
-  permission: MARKETING_MANAGE
+  permission: GUEST_MANAGE
   audience:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - marketing.form_submission
   - marketing.waiver_requirement
   - marketing.waiver_verification
   writes:
+  - cache:idempotency
   - marketing.waiver_requirement
   - marketing.waiver_requirement_event
   - marketing.waiver_verification
@@ -3631,18 +3791,21 @@ operations:
   permission: GUEST_VIEW
   audience:
   - staff
-  offline: true
+  - guest
+  offline: false
   reads:
   - cache:idempotency
   - marketing.consent_record
   - marketing.form_definition
   - marketing.form_submission
+  - marketing.form_submission_sale_link
   - marketing.waiver_requirement
   - pii.subject
   writes:
   - cache:idempotency
   - marketing.consent_record
   - marketing.form_submission
+  - marketing.form_submission_sale_link
   - marketing.waiver_requirement
   - marketing.waiver_requirement_event
 - operation: submitReview
@@ -3735,7 +3898,7 @@ operations:
   audience:
   - staff
   - partner
-  offline: false
+  offline: true
   reads:
   - cache:idempotency
   - marketing.case
@@ -3751,15 +3914,17 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - marketing.consent_question
   - marketing.consent_question_version
   writes:
+  - cache:idempotency
   - marketing.consent_question
   - marketing.consent_question_version
 - operation: updateGuestPreferences
   verb: PUT
   path: /guests/{subjectId}/preferences
-  scope: tenant
+  scope: subject
   permission: GUEST_MANAGE
   audience:
   - staff
@@ -3824,7 +3989,7 @@ operations:
 - operation: updateMyProfile
   verb: PATCH
   path: /guests/me/profile
-  scope: venue
+  scope: subject
   permission: GUEST_VIEW
   audience:
   - guest

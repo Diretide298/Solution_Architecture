@@ -22,9 +22,9 @@ modulesUsed:
 - module: ticketing
   screens: 31
 - module: core
-  screens: 12
+  screens: 13
 - module: marketing
-  screens: 7
+  screens: 6
 - module: fnb
   screens: 6
 - module: access
@@ -43,13 +43,13 @@ modulesUsed:
   screens: 2
 servicesCalled:
 - service: OrderService
-  operationCalls: 70
+  operationCalls: 76
 - service: MarketingService
-  operationCalls: 57
+  operationCalls: 60
 - service: CatalogueService
-  operationCalls: 57
+  operationCalls: 58
 - service: VenueOpsService
-  operationCalls: 53
+  operationCalls: 56
 - service: AccessService
   operationCalls: 26
 - service: IdentityService
@@ -238,7 +238,7 @@ screens:
   density: comfortable
   operations:
   - getAvailability
-  - getBundle
+  - getGuestBundle
   - getProduct
   - getProductEligibilityRule
   - getVenueMap
@@ -280,6 +280,7 @@ screens:
   wave: 1
   density: comfortable
   operations:
+  - listEvents
   - listPerformances
   - listProducts
   states:
@@ -377,6 +378,7 @@ screens:
   density: comfortable
   operations:
   - addCartLine
+  - createCart
   - getPublishedBookingFlow
   - getPublishedGuidedChoice
   - listProductCategories
@@ -493,6 +495,7 @@ screens:
   entryParams:
   - subjectId<-session
   - cardCode<-deepLink
+  - cardKind<-deepLink
   - walletId<-navigation
   goesTo:
   - GST-001
@@ -1268,7 +1271,7 @@ screens:
   wave: 1
   density: comfortable
   operations:
-  - getCouponCode
+  - getGuestCouponCode
   - getPromotion
   - listPromotions
   states:
@@ -1359,7 +1362,7 @@ screens:
 - screen: GST-040
   name: Help & Support
   module: Engagement & Support
-  requiresModule: marketing
+  requiresModule: core
   wave: 1
   density: comfortable
   operations:
@@ -1464,6 +1467,8 @@ screens:
   - cartId<-session
   - challengeId<-navigation
   - subjectId<-navigation
+  - returnTo<-navigation
+  - returnParams<-navigation
   goesTo:
   - GST-001
   - GST-002
@@ -1605,6 +1610,7 @@ screens:
   - addCartLine
   - decideRecommendations
   - getCart
+  - listProductVariants
   - recordRecommendationEvents
   states:
   - emptyFirstRun
@@ -1615,6 +1621,7 @@ screens:
   offlineState: true
   entryParams:
   - cartId<-session
+  - productId<-navigation
   goesTo:
   - GST-001
   - GST-002
@@ -1629,6 +1636,7 @@ screens:
   density: comfortable
   operations:
   - createSeatHold
+  - getPerformance
   - getSeatAvailability
   - listPerformances
   - recommendSeats
@@ -1661,6 +1669,7 @@ screens:
   density: comfortable
   operations:
   - addCartLine
+  - createCart
   - getAvailability
   - listProducts
   states:
@@ -1689,6 +1698,7 @@ screens:
   operations:
   - generateVisitPlan
   - getTenantAppStatus
+  - getVisitPlannerOptions
   - listProducts
   states:
   - emptyFirstRun
@@ -1717,8 +1727,7 @@ screens:
   density: comfortable
   operations:
   - generateVisitPlan
-  - listCatalogueBundles
-  - listProducts
+  - getVisitPlannerOptions
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -1729,6 +1738,8 @@ screens:
   offlineState: true
   entryParams:
   - venueId<-session
+  - party<-GST-051
+  - dates<-GST-051
   goesTo:
   - GST-001
   - GST-051
@@ -1845,7 +1856,7 @@ screens:
   density: comfortable
   operations:
   - addCartLine
-  - getBundle
+  - getGuestBundle
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -1923,6 +1934,7 @@ screens:
   operations:
   - getVisitPlan
   - getWaitTimes
+  - listMyVisitPlans
   - listVisitPlanAlternatives
   - updateVisitPlan
   states:
@@ -2082,7 +2094,10 @@ screens:
   operations:
   - createRefundRequest
   - createResaleListing
+  - getGuestRefundPolicy
   - getOrder
+  - listOwnRefundRequests
+  - listOwnResaleListings
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -2094,6 +2109,7 @@ screens:
   entryParams:
   - subjectId<-session
   - orderId<-navigation
+  - venueId<-session
   goesTo:
   - GST-039
   boardFrames: null
@@ -2106,6 +2122,7 @@ screens:
   wave: 1
   density: comfortable
   operations:
+  - getMyCase
   - listAiConversations
   - listMyCases
   - raiseMyCase
@@ -2196,10 +2213,12 @@ screens:
   density: comfortable
   operations:
   - getGiftCard
+  - getLoyaltyPosition
   - getPublishedTenantConfig
   - getWallet
   - listConsentPurposes
   - listPaymentTokens
+  - listRewards
   - redeemLoyaltyPoints
   - storePaymentToken
   - transferWalletBalance
@@ -2330,6 +2349,7 @@ screens:
   density: comfortable
   operations:
   - addCartLine
+  - createCart
   - listProductStartTimes
   - listProductVariants
   - listProducts

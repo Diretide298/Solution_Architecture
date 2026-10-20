@@ -9,7 +9,7 @@ operations:
   verb: POST
   path: /purchase-orders/{purchaseOrderId}/acknowledge
   scope: venue
-  permission: PRODUCT_CONFIGURE
+  permission: PROCUREMENT_MANAGE
   audience:
   - staff
   offline: false
@@ -58,7 +58,7 @@ operations:
   verb: POST
   path: /purchase-orders/{purchaseOrderId}/cancel
   scope: venue
-  permission: ORDER_CANCEL
+  permission: PROCUREMENT_MANAGE
   audience:
   - staff
   offline: false
@@ -73,7 +73,7 @@ operations:
   verb: POST
   path: /requisitions/{requisitionId}/cancel
   scope: venue
-  permission: PRODUCT_CONFIGURE
+  permission: PROCUREMENT_REQUEST
   audience:
   - staff
   offline: false
@@ -103,7 +103,7 @@ operations:
   verb: POST
   path: /purchase-orders/{purchaseOrderId}/close-short
   scope: venue
-  permission: LEDGER_APPROVE
+  permission: PROCUREMENT_MANAGE
   audience:
   - staff
   offline: false
@@ -133,7 +133,7 @@ operations:
   verb: GET
   path: /requisitions/{requisitionId}/quotations
   scope: venue
-  permission: PRODUCT_VIEW
+  permission: PROCUREMENT_VIEW
   audience:
   - staff
   offline: false
@@ -145,7 +145,7 @@ operations:
   verb: POST
   path: /goods-receipts
   scope: venue
-  permission: PRODUCT_CONFIGURE
+  permission: PROCUREMENT_RECEIVE
   audience:
   - staff
   offline: true
@@ -176,7 +176,7 @@ operations:
   verb: POST
   path: /purchase-orders
   scope: venue
-  permission: ORDER_CREATE
+  permission: PROCUREMENT_MANAGE
   audience:
   - staff
   offline: false
@@ -192,7 +192,7 @@ operations:
   verb: POST
   path: /requisitions
   scope: venue
-  permission: ORDER_CREATE
+  permission: PROCUREMENT_REQUEST
   audience:
   - staff
   offline: true
@@ -256,7 +256,7 @@ operations:
   permission: PRODUCT_CONFIGURE
   audience:
   - staff
-  offline: false
+  offline: true
   reads:
   - cache:idempotency
   - inventory.transfer
@@ -268,8 +268,8 @@ operations:
 - operation: createSupplier
   verb: POST
   path: /suppliers
-  scope: region
-  permission: PRODUCT_CONFIGURE
+  scope: tenant
+  permission: PROCUREMENT_MANAGE
   audience:
   - staff
   offline: false
@@ -333,7 +333,7 @@ operations:
   verb: GET
   path: /purchase-orders/{purchaseOrderId}
   scope: venue
-  permission: PRODUCT_VIEW
+  permission: PROCUREMENT_VIEW
   audience:
   - staff
   offline: false
@@ -386,7 +386,7 @@ operations:
   verb: GET
   path: /requisitions/suggested
   scope: venue
-  permission: PRODUCT_VIEW
+  permission: PROCUREMENT_VIEW
   audience:
   - staff
   offline: false
@@ -398,7 +398,7 @@ operations:
   verb: GET
   path: /stock-batches/expiring
   scope: venue
-  permission: INVENTORY_VIEW
+  permission: PRODUCT_VIEW
   audience:
   - staff
   offline: true
@@ -410,7 +410,7 @@ operations:
   verb: GET
   path: /goods-receipts
   scope: venue
-  permission: PRODUCT_VIEW
+  permission: PROCUREMENT_VIEW
   audience:
   - staff
   offline: false
@@ -433,7 +433,7 @@ operations:
   verb: GET
   path: /purchase-orders
   scope: venue
-  permission: PRODUCT_VIEW
+  permission: PROCUREMENT_VIEW
   audience:
   - staff
   offline: false
@@ -445,7 +445,7 @@ operations:
   verb: GET
   path: /requisitions
   scope: venue
-  permission: PRODUCT_VIEW
+  permission: PROCUREMENT_VIEW
   audience:
   - staff
   offline: true
@@ -550,8 +550,8 @@ operations:
 - operation: listSuppliers
   verb: GET
   path: /suppliers
-  scope: region
-  permission: PRODUCT_VIEW
+  scope: venue
+  permission: PROCUREMENT_VIEW
   audience:
   - staff
   offline: false
@@ -593,7 +593,7 @@ operations:
   permission: PRODUCT_CONFIGURE
   audience:
   - staff
-  offline: false
+  offline: true
   reads:
   - cache:idempotency
   - inventory.transfer
@@ -606,7 +606,7 @@ operations:
   verb: POST
   path: /suppliers/{supplierId}/quotations
   scope: venue
-  permission: PRODUCT_CONFIGURE
+  permission: PROCUREMENT_MANAGE
   audience:
   - staff
   offline: false
@@ -637,7 +637,7 @@ operations:
   verb: POST
   path: /goods-receipts/{receiptId}/reject
   scope: venue
-  permission: PRODUCT_CONFIGURE
+  permission: PROCUREMENT_RECEIVE
   audience:
   - staff
   offline: false
@@ -653,7 +653,7 @@ operations:
   verb: POST
   path: /requisitions/{requisitionId}/reject
   scope: venue
-  permission: LEDGER_APPROVE
+  permission: APPROVAL_ACT
   audience:
   - staff
   offline: false
@@ -682,7 +682,7 @@ operations:
   verb: POST
   path: /requisitions/{requisitionId}/return
   scope: venue
-  permission: LEDGER_APPROVE
+  permission: APPROVAL_ACT
   audience:
   - staff
   offline: false
@@ -697,7 +697,7 @@ operations:
   verb: POST
   path: /purchase-orders/{purchaseOrderId}/send
   scope: venue
-  permission: PRODUCT_CONFIGURE
+  permission: PROCUREMENT_MANAGE
   audience:
   - staff
   offline: false
@@ -790,7 +790,7 @@ operations:
   verb: PUT
   path: /requisitions/{requisitionId}/lines
   scope: venue
-  permission: PRODUCT_CONFIGURE
+  permission: PROCUREMENT_REQUEST
   audience:
   - staff
   offline: true
@@ -807,7 +807,7 @@ operations:
   verb: PUT
   path: /suppliers/{supplierId}
   scope: tenant
-  permission: PRODUCT_CONFIGURE
+  permission: PROCUREMENT_MANAGE
   audience:
   - staff
   offline: false

@@ -18240,7 +18240,10 @@ screens:
     - field: instalment policy
       rule: >-
         Eligible product kinds, minimum order value, maximum instalments, frequencies, share due at purchase, fee,
-        stored card required.
+        stored card required. The kinds map to the catalogue's product kinds (membership; annual and season
+        passes as membership or open-dated; event as timed, dated or seated; group bookings by a flag), and the
+        maximum is checked against a product's term only when a plan is made, not when this is saved (r8,
+        ORDERS-MONEY-C16).
       source: contracts/satellite/payments.yaml#setInstalmentPolicy
     sampleData:
       terms:

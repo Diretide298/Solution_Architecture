@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Order & Payment
   version: 0.1.0
-  x-ticvai-screen-count: 208
+  x-ticvai-screen-count: 212
   x-ticvai-tier: spine
   x-ticvai-module: 2 — Ticketing Sales
   x-ticvai-requirements: 343
@@ -364,8 +364,13 @@ paths:
     post:
       operationId: createCart
       x-ticvai-consumed-by:
+        - "P01 WEB-006 Date & Performance Selection"
         - "P01 WEB-010 Shopping Cart"
+        - "P01 WEB-048 Book a Space by the Hour"
+        - "P02 GST-008 Tickets & Add-ons"
         - "P02 GST-041 Checkout Entry"
+        - "P02 GST-050 Resource Booking – Cabana"
+        - "P02 GST-075 Book a Space by the Hour"
       x-ticvai-read-via:
       - query: identity#subjectRecords
         route: in-process
@@ -378,9 +383,14 @@ paths:
         for: 'its read of marketing.consent_question_version, Marketing''s data (CHG-MOD-001)'
       security:
       - guestAuth: []
+      - {}
+      - bearerAuth: []
       x-ticvai-self-scoped: subject
       x-ticvai-audience:
       - guest
+      - anonymous
+      - staff
+      - partner
       summary: Start a cart
       description: '**A cart holds leases; an order holds money.** Different lifetimes, different failure
         modes, and merging them is why this contract did not exist until 17 August — `createOrder` takes
@@ -389,8 +399,25 @@ paths:
         Created against a guest subject where one is known, or an anonymous token where it is not. **The
         token is what lets a guest browse before signing in** and keep their cart when they do (2.1.31).
 
+        **A visitor with no credential gets the token here** (decided 20 October 2026, Chinmay, R8 blocker cause
+        GPS-C23, option A; CHG-R8SPN-031). Called with no credential, this creates the cart and an anonymous guest
+        session for it, and returns the session''s token in `Cart.anonymousSessionToken` (a `guestAuth` token with
+        no subject, bound to this cart and the device, sliding like any guest token). The app calls this on the
+        first Continue or Add (trigger background) and then `addCartLine` with that token; `checkBookingEligibility`,
+        `joinWaitlist` and `leaveWaitlist` run under it too. On sign-in `claimCart` moves the cart to the account
+        and the anonymous session ends. Nothing about the visitor is stored but the cart (ADR-0045: the contact is
+        proven at checkout, not here). Called with a guest token, the token is the caller''s and
+        `anonymousSessionToken` is null.
+
         **POS does not use this.** A till builds its sale locally and submits atomically, because it works
         offline and does not need a resumable cart. Same order contract, different channel.
+
+
+        **Who may start one** (R8 blocker IDENTITY-C49, CHG-R8MIG-021): a signed-in guest (the cart is theirs), an
+        anonymous guest token (`guestAuth` with no subject: the cart is anonymous and its `token` brings the guest
+        back), or a staff or partner session, whose cart records the session and its workstation
+        (`orders.cart.session_id`, `workstation_id`) and is that session''s own. A till''s cart is also created
+        implicitly by its first `addCartLine`.
 
         '
       tags:
@@ -735,6 +762,59 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/GroupBookingRequest'
+    get:
+      operationId: listOwnGroupBookings
+      x-ticvai-consumed-by:
+        - "P01 WEB-031 My Reservations"
+      x-ticvai-audience:
+      - guest
+      security:
+      - guestAuth: []
+      x-ticvai-self-scoped: subject
+      x-ticvai-read-routing: replica
+      summary: The group bookings the caller asked for
+      description: 'Added for My Reservations (R8 blocker ORDERS-MONEY-C26): after `requestGroupBooking` answered 201 a
+        guest could never see the request again, because `getGroupBooking` needs an id no screen carries and
+        `listGroupBooking` is the staff command centre. Each item is a `GroupBooking` whose `leaderSubjectId` is the
+        caller, provisional ones included. **Every status is returned, `cancelled` too**, so a guest sees a request the
+        venue turned down; `status` narrows the list.
+
+        **A guest acts on their own only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-002;
+        `x-ticvai-self-scoped: subject`): a guest sees only the groups they lead; another guest''s group is not in
+        the list and, by id, is refused as one that does not exist.
+
+        **Order.** Soonest `preferredDate` first, then by `id`.'
+      tags:
+      - orders
+      x-ticvai-permission: null
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - name: status
+        in: query
+        description: Exact match. Omit for every status, `cancelled` included.
+        schema:
+          type: string
+          enum: [provisional, confirmed, namesPending, complete, cancelled]
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: The caller's group bookings.
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/GroupBooking'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /deposit-policy:
     get:
       operationId: getDepositPolicy
@@ -2048,6 +2128,66 @@ paths:
                 $ref: '#/components/schemas/ResaleRefusedProblem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+    get:
+      operationId: listOwnResaleListings
+      x-ticvai-consumed-by:
+        - "P01 WEB-030 Ticket Transfer"
+        - "P02 GST-067 Refunds & Resale"
+      x-ticvai-audience:
+      - guest
+      security:
+      - guestAuth: []
+      x-ticvai-self-scoped: subject
+      x-ticvai-read-routing: replica
+      summary: The caller's own resale listings
+      description: 'Added for the Refunds & Resale tracker (R8 blocker ORDERS-MONEY-C26): a listing made with
+        `createResaleListing` was never readable again by the seller. Each item is a `ResaleListing` whose
+        `sellerSubjectId` is the caller, with its `status`.
+
+        **A guest acts on their own only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-002;
+        `x-ticvai-self-scoped: subject`): another guest''s listing, named by `entitlementId`, is refused exactly as
+        one that does not exist (404).
+
+        **Order.** Newest first, by `listedAt` descending, then by `id`.'
+      tags:
+      - orders
+      x-ticvai-permission: null
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - name: entitlementId
+        in: query
+        description: Only the listings of this entitlement. Omit for every listing of the caller.
+        schema:
+          type: string
+          format: uuid
+      - name: status
+        in: query
+        description: Exact match. Omit for every status.
+        schema:
+          type: string
+          enum: [pendingReview, listed, reserved, sold, withdrawn, expired, rejected]
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: The caller's listings, newest first.
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/ResaleListing'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /orders/{orderId}/upgrade-quote:
     parameters:
     - name: orderId
@@ -2614,7 +2754,8 @@ paths:
       - bearerAuth: []
       summary: A guest's saved payment methods
       description: '**Masked, always.** The last four digits and the brand — enough to choose between
-        two saved cards and not enough to use one.
+        two saved cards and not enough to use one. A removed token (`revokedAt` set) is not returned
+        (CHG-R8MIG-022).
 
         
 
@@ -2658,9 +2799,6 @@ paths:
       - query: marketing-crm#consentRecords
         route: service
         for: 'its read of marketing.consent_record, Marketing''s data (CHG-MOD-001)'
-      x-ticvai-write-via:
-      - table: marketing.consent_record
-        event: paymentToken.stored
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -2673,6 +2811,13 @@ paths:
 
         **Requires its own consent purpose.** Storing a card for future use is not the same act as paying
         now, and a token taken without it is a card kept on a guest''s behalf that they never agreed to.
+
+
+        **The consent comes first, by `recordConsent`** (R8 blocker ORDERS-MONEY-C21, the lead''s answer A, as CR-142
+        decided for the web wallet; CHG-R8MIG-022): Save card on GST-071 and WEB-021 records the guest''s consent to the
+        `storedPaymentCredential` purpose (`ConsentPurposeConfig.id`) with `recordConsent`, then calls this, which reads
+        the granted record and refuses `409 consent-not-given` without it (the error offers the consent step). The
+        `paymentToken.stored` event no longer creates a consent record.
 
         '
       tags:
@@ -2735,6 +2880,60 @@ paths:
                 $ref: '#/components/schemas/PaymentProblem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /payment-tokens/{tokenId}:
+    parameters:
+    - name: tokenId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    delete:
+      operationId: revokePaymentToken
+      security:
+      - guestAuth: []
+      # The row it marks removed is its write (r8 gate residue, check-write-lineage W-NOTABLE; CHG-R8RES-002).
+      x-ticvai-writes:
+      - table: payments.token
+        for: 'the caller''s token row: revokedAt set and isDefault cleared; the row stays for the audit trail'
+      x-ticvai-self-scoped: subject
+      x-ticvai-audience:
+      - guest
+      summary: Remove a saved payment method
+      description: '**A guest removes a card they saved** (R8 blocker ORDERS-MONEY-C38, the lead''s answer A;
+        CHG-R8MIG-022): GST-071 and WEB-021 exist so a guest can see and remove stored cards. The caller''s own token
+        only: another guest''s, or an unknown id, is `404`, never `403`, so a token id cannot be probed. The server
+        asks the payment provider to detach the stored credential, then marks the row removed (`revokedAt`; the row
+        stays for the audit trail and `listPaymentTokens` no longer returns it), clears `isDefault`, and emits
+        `paymentToken.revoked` in the same transaction. A token already removed answers `204` again, so a retry is
+        safe. A provider that cannot be reached leaves the row as it was and answers `502`; the guest can try again.
+
+        '
+      tags:
+      - orders
+      x-ticvai-permission: null
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      responses:
+        '204':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Removed (or already removed).
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+        '502':
+          description: The payment provider could not be reached; nothing changed.
+          x-ticvai-problem-types: [provider-connection-failed]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
   /payment-links:
     post:
       operationId: createPaymentLink
@@ -3123,8 +3322,10 @@ paths:
       x-ticvai-lock: rowExclusive
       x-ticvai-lock-excludes:
       - wallet.wallet_transaction
+      - cache:idempotency
       x-ticvai-lock-excludes-note: 'ADR-0037. **Resolved before the transaction opens, never inside the
-        lock.** A Postgres row l ock costs microseconds and this one measured six milliseconds — the difference
+        lock.** The Idempotency-Key is looked up before it too (r8 integration, CHG-R8INT-014: since the lineage
+        derives `cache:idempotency` for every write that takes the header). A Postgres row l ock costs microseconds and this one measured six milliseconds — the difference
         was a Redis r ound trip and a read the decision does not use. **A lock held across a hop is a
         lock held fo r the latency of the slowest thing on the path.**
 
@@ -3275,6 +3476,7 @@ paths:
       - guest
       - partner
       - staff
+      - device
       summary: The cart, priced and checked, right now
       description: '**A till''s cart is the session''s own** (decided 2 October 2026, CHG-SEED-013). On the till the cart
         belongs to the workstation session that opened it; `x-ticvai-self-scoped: subject` means the caller''s
@@ -3567,7 +3769,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/CartProblem'
         '422':
-          x-ticvai-problem-types: [window-required, window-not-allowed, window-length-mismatch, deposit-not-due, seat-limit-exceeded, transport-fare-unavailable, pass-not-valid-for-trip]
+          x-ticvai-problem-types: [window-required, window-not-allowed, window-length-mismatch, deposit-not-due, seat-limit-exceeded, transport-fare-unavailable, pass-not-valid-for-trip, attendees-over-capacity]
           description: 'The booked window is missing, not allowed or the wrong length for the variant
             (`windowRequired`, `windowNotAllowed`, `windowLengthMismatch`; rev 3 REV3-13), or a table deposit
             line names a booking that is not awaiting one (`depositNotDue`; rev 3 REV3-8b). More seats for
@@ -3575,6 +3777,8 @@ paths:
             `seat-limit-exceeded`; rev 3 REV3-7). A transport fare that cannot be quoted
             (`transportFareUnavailable`) or a pass that does not cover the trip (`passNotValidForTrip`;
             rev 3 REV3-21).
+            More attendees than the meeting room type holds (`attendees-over-capacity`, naming the capacity;
+            GPS-C28, CHG-R8SPN-034).
 
             '
           content:
@@ -3858,6 +4062,11 @@ paths:
         a cart at the moment of signing in is the worst possible time to lose one. Lines that cannot be
         re-leased are reported rather than dropped silently.
 
+
+        **The anonymous cart''s `token` proves it** (R8 blocker IDENTITY-C49, the lead''s answer A; CHG-R8MIG-021): the
+        body''s `cartToken` must equal the cart''s `token` (403 otherwise), and the claim rotates the token, so a link
+        shared before signing in does not reach the account after.
+
         '
       tags:
       - cart
@@ -3867,10 +4076,32 @@ paths:
       x-ticvai-conflict-policy: serverWins
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                cartToken:
+                  type: string
+                  writeOnly: true
+                  x-ticvai-persisted: false
+                  description: The anonymous cart's `token`, as the device that built it holds it (CHG-R8MIG-021).
+                    Without it, or with another, the claim is refused 403.
       responses:
         '409':
           description: 'The cart is `checkedOut` or `abandoned` (`cart-not-open`), or already belongs to another guest (`cart-already-claimed`). Nothing is attached or merged.'
           x-ticvai-problem-types: [cart-not-open, cart-already-claimed]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
+        '403':
+          x-ticvai-problem-types: [cart-token-mismatch]
+          description: '**The cart''s token was not sent, or does not match** (R8 blocker IDENTITY-C49, the lead''s answer A;
+            CHG-R8MIG-021): only the device that built the anonymous cart holds its `token`, so it is the proof. Nothing
+            is attached.'
           content:
             application/problem+json:
               schema:
@@ -4665,7 +4896,15 @@ paths:
             bound (`bundleStale`). `lineIds` names the lines a lease or capacity refusal is about. A
             resource hold that cannot be converted (`resourceHoldInvalid`, rev 3 REV3-15).
 
+            **A seat hold that lapsed before the order** (`holdNotActive`, problem type `hold-not-active`;
+            decided 20 October 2026, Chinmay, R8 blocker cause GPS-C13, option A; CHG-R8SPN-023): a line''s
+            `inventoryHoldId`, the hold behind the seats POS-004 held, is no longer active (expired, released
+            or already converted). Nothing is written; `lineIds` names the lines. At the window the order is
+            created by POS-005, which received the hold from POS-004 (F59 step 4), and on this refusal the
+            cashier goes back to the seat map to hold the seats again.
+
             '
+          x-ticvai-problem-types: [lease-expired, capacity-exhausted, bundle-stale, resource-hold-invalid, hold-not-active]
           content:
             application/problem+json:
               schema:
@@ -4724,9 +4963,18 @@ paths:
       x-ticvai-api-scope: ticketing.read
       parameters:
       - $ref: '../shared/common.yaml#/components/parameters/ConsistencyToken'
+      - name: X-Order-Access-Token
+        in: header
+        required: false
+        description: '`Order.orderAccessToken` from `checkoutCart`''s answer, in place of a session (IDENTITY-C52,
+          CHG-R8SPN-025). Valid 24 hours for this order only; a token for another order, expired or forged, is
+          `404`, as an order that does not exist.'
+        schema:
+          type: string
       security:
       - guestAuth: []
       - bearerAuth: []
+      - {}
       x-ticvai-audience:
       - staff
       - guest
@@ -4738,6 +4986,13 @@ paths:
         `x-ticvai-self-scoped: subject`): a guest caller needs no permission and is answered for an order they
         placed; another guest's order is refused exactly as one that does not exist, never returned.
         `ORDER_VIEW` is what a staff caller must hold to act for any guest (ADR-0025).
+
+        **Or with the order's access token and no session** (decided 20 October 2026, Chinmay, R8 blocker
+        cause IDENTITY-C52, option A; CHG-R8SPN-025): the device that checked out, or a payer with no
+        session, sends `X-Order-Access-Token` (`Order.orderAccessToken`, from `checkoutCart`) and reads this
+        one order for 24 hours. With neither a session nor a valid token for this order the answer is `404`.
+        For a signed-in guest a `404` is also what WEB-013 and WEB-012 show as their no-access state: the
+        guest's own order lookup found nothing they may see (IDENTITY-C28); no permission is involved.
       tags:
       - order
       x-ticvai-permission: ORDER_VIEW
@@ -5755,6 +6010,111 @@ paths:
                     - declined
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+    get:
+      operationId: listOwnRefundRequests
+      x-ticvai-consumed-by:
+        - "P01 WEB-019 Order History"
+        - "P02 GST-067 Refunds & Resale"
+      x-ticvai-read-via:
+      - query: finance#fxRateRecords
+        route: in-process
+        for: 'the rate a refund in another currency is shown at (Refund, ledger.fx_rate), Ledger''s data (r8 integration, CHG-R8INT-014)'
+      x-ticvai-audience:
+      - guest
+      security:
+      - guestAuth: []
+      x-ticvai-self-scoped: subject
+      x-ticvai-read-routing: replica
+      summary: The caller's own refund requests
+      description: 'Added for the Refunds & Resale tracker (R8 blocker ORDERS-MONEY-C26): a request made with
+        `createRefundRequest` was never readable again, so the screen showed nothing after a reload. Each item is
+        the `Refund` row the request made (`requestId` in the 202 is its `id`), with its `status`.
+
+        **A guest acts on their own only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-002;
+        `x-ticvai-self-scoped: subject`): the list holds the refunds on orders that belong to the caller, and
+        another guest''s order, named in `orderId`, is refused exactly as one that does not exist (404), never
+        returned and never an empty list that hints it is there.
+
+        **Order.** Newest first, by `createdAt` descending, then by `id`.'
+      tags:
+      - refund
+      x-ticvai-permission: null
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - name: orderId
+        in: query
+        description: Only the refunds on this order. Omit for every order of the caller.
+        schema:
+          type: string
+          format: uuid
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: The caller's refund requests, newest first.
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/Refund'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /venues/{venueId}/guest-refund-policy:
+    parameters:
+    - name: venueId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    get:
+      operationId: getGuestRefundPolicy
+      x-ticvai-consumed-by:
+        - "P02 GST-067 Refunds & Resale"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s refund settings the policy is told from, Tenancy''s data (r8 integration, CHG-R8INT-014)'
+      x-ticvai-audience:
+      - guest
+      security:
+      - guestAuth: []
+      x-ticvai-read-routing: replica
+      summary: What a guest is told about refunds at a venue
+      description: 'The part of the venue''s refund policy a guest is told before asking for a refund (R8 blocker
+        ORDERS-MONEY-C26; GST-067 shows it before any request exists): the time bands, whether a part of an order can
+        be refunded, and the refund window, read from the same `orders.refund_policy` row `getRefundPolicy` returns
+        to staff. Who may authorise a refund (`selfAuthoriseLimit`, `requiresSecondUserAbove`,
+        `requiresApprovalAbove`) and `varianceThreshold` are staff matters and are not in `GuestRefundPolicy`.
+
+        A venue with no refund policy answers `404`.'
+      tags:
+      - policy
+      x-ticvai-permission: null
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: The guest's view of the policy.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GuestRefundPolicy'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /venues/{venueId}/refund-policy:
     parameters:
     - name: venueId
@@ -5778,6 +6138,8 @@ paths:
       summary: Read a venue's refund policy
       description: 'Thresholds and time bands are venue configuration, not permission scope (CF-36). Cached
         locally so a terminal can present the right prompt before it calls.
+
+        A guest reads the part that concerns them with `getGuestRefundPolicy` (R8 blocker ORDERS-MONEY-C26).
 
         '
       tags:
@@ -5873,6 +6235,12 @@ paths:
       - query: finance#fxRateRecords
         route: in-process
         for: 'its read of ledger.fx_rate, Ledger''s data (CHG-MOD-001)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s settings for the cash receipt: its region and trading currency (ADAM CR-168)'
+      - query: tenancy#regionSettingsRecords
+        route: in-process
+        for: 'the region''s settings for the cash receipt: the region''s account mappings and fiscal setup (ADAM CR-168)'
       x-ticvai-api-scope: ticketing.write
       x-ticvai-note: >-
         **Order, payment, ticket: the saga** (system-design review SD-026, 29 September). When this payment
@@ -5933,6 +6301,14 @@ paths:
         `walletReceived`, each to the accounts `finance.setAccountMappings` holds for the venue, and to
         the fiscal period that is open for the payment date. An offline cash payment replayed through
         `syncOrders` posts the same event, dated by its `recordedAt`.
+
+        **The cash receipt, decided 18 October 2026** (ADAM CR-168, option A; CHG-CRA-007). The mapping is the
+        venue''s own row for the event, else the row for the venue''s region, else the posting is refused. The entry''s
+        `source` is `payment`, its `sourceId` the payment id and its `reference` the order id, so
+        `postOrderRevenue` never mistakes a cash receipt for revenue. Where the payment date''s period is closed or
+        missing, the entry posts to the legal entity''s **next open period**: a capture the provider has taken is
+        never refused. "One ledger posting" (PLATFORM-SAGA-PAID) means one cash-receipt entry per payment, never one
+        more from a replay; revenue is `postOrderRevenue`''s own.
 
         **Writes one `payments.payment_attempt` row per provider call**, including a declined, errored
         or abandoned attempt that never becomes a payment: `orders.payment` records what was taken, the
@@ -6050,6 +6426,9 @@ paths:
         **The reconciler threshold is the provider''s own recommended status-poll interval** (Stripe and
         Network International each publish one), held per provider in the adapter configuration and
         never shorter than that interval. Proposed, client to correct (decided 28 September, audit R065).
+        **For Network International this poll is how a payment is confirmed** (ADAM CR-165, 18 October 2026;
+        CHG-CRA-004): the provider never redelivers its webhook, so the scheduled job polls every Network
+        International payment still `pendingConfirmation`, and the webhook is only the faster path.
 
         **A guest does this within their own session** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-003;
         `x-ticvai-guest-callable`): a guest needs no permission and acts only for themselves, on their own
@@ -6197,6 +6576,12 @@ paths:
       - query: finance#fxRateRecords
         route: in-process
         for: 'its read of ledger.fx_rate, Ledger''s data (CHG-MOD-001)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s settings for the cash receipt: its region and trading currency (ADAM CR-168)'
+      - query: tenancy#regionSettingsRecords
+        route: in-process
+        for: 'the region''s settings for the cash receipt: the region''s account mappings and fiscal setup (ADAM CR-168)'
       x-ticvai-api-scope: ticketing.write
       x-ticvai-note: >-
         **Order, payment, ticket: the saga** (system-design review SD-026, 29 September). When this payment
@@ -6369,6 +6754,14 @@ paths:
         quarantined with it, so a void is never evaluated before its sale. **Only a transient failure stops the
         batch** (a database or provider error): `stoppedAtSequence` names it and the till retries from there.
         A bad sale therefore never halts the till.
+        **A sale made under a hold that expired before the till synced is accepted** (decided 20 October 2026,
+        Chinmay, R8 blocker cause FOUNDATION-AI-C46, option A; CHG-R8SPN-033), on the principle CR-169 set for an
+        online capture: the guest already has the product, so the entry is `accepted`, the units are taken again
+        if they are still free, and otherwise the entry carries `reconcilerFlag` `unitsGone` and the order goes to
+        the reconciliation queue; nothing is refunded or voided automatically. The till stops selling against a
+        hold a minute before its `expiresAt`, so this is rare; and since contended timed entry is online only at
+        the till in Block A (FOUNDATION-AI-C45), it arises only for a sale made online whose journal entry
+        reached the server late.
       x-ticvai-emits:
       - order.paid
       - sync.rejectionRaised
@@ -7051,6 +7444,10 @@ paths:
         permission; it reprints only an order the guest at it has identified (KSK-012 booking found, KSK-009
         ticket issued, KSK-010 print failure), and each reprint is recorded against the device.
 
+        **`delivery` `wallet` is "Add to wallet"** (decided 20 October 2026, Chinmay, R8 blocker cause IDENTITY-C29,
+        option A; CHG-R8SPN-025): one call adds every ticket of the order (or the lines named) to the guest''s
+        phone wallet, which is what WEB-013''s approved button does; no other operation is needed.
+
         '
       tags:
       - order
@@ -7335,7 +7732,9 @@ paths:
         appears where the caller is its sender (`fromSubjectId`) or, once claimed, its recipient
         (`toSubjectId`).
 
-        
+        **`claimUrl` is null on a transfer the caller sent** (decided 20 October 2026, Chinmay, R8 blocker cause
+        IDENTITY-C26, option A; CHG-R8SPN-025): it carries the claim token, and the sender must not be able to
+        claim on the recipient''s behalf. It is returned only on the recipient''s own rows.
 
         **Order.** Soonest first, by `expiresAt` ascending, then by `id`.'
       tags:
@@ -7374,7 +7773,8 @@ paths:
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
       responses:
         '200':
-          description: Transfers, newest offer first — `offeredAt` descending, `id` as the tiebreak.
+          description: Transfers, soonest to lapse first — `expiresAt` ascending, `id` as the tiebreak (the order the
+            description and the cursor use; IDENTITY-C26).
           content:
             application/json:
               schema:
@@ -7465,7 +7865,12 @@ paths:
         reservations; another guest''s reservation is refused exactly as one that does not exist, never
         returned. `ORDER_VIEW` is what a staff caller must hold to act for any guest (ADR-0025).
 
-        
+        **Upcoming and Past, as GST-016 splits them** (decided 20 October 2026, Chinmay, R8 blocker cause
+        ORDERS-MONEY-C13, option A; CHG-R8SPN-026): by status and hold expiry, from fields every row carries.
+        **Upcoming** is `status` `held` with `expiresAt` in the future; **Past** is every other row (`converted`,
+        `expired` or `cancelled`, and a `held` row whose `expiresAt` has passed but the sweeper has not yet
+        expired). The screen asks once with no `status` and splits the page itself; the card already shows when
+        the hold expires.
 
         **Order.** Newest first, by `createdAt` descending, then by `id`.'
       tags:
@@ -7503,7 +7908,8 @@ paths:
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
       responses:
         '200':
-          description: Reservations, soonest `expiresAt` first, `id` as the tiebreak.
+          description: Reservations, newest first (`createdAt` descending, `id` as the tiebreak), the order the
+            operation states and the cursor follows (R8 blocker ORDERS-MONEY-C35, CHG-R8MIG-017).
           content:
             application/json:
               schema:
@@ -13761,6 +14167,9 @@ paths:
       - query: marketing-crm#consentQuestionVersionRecords
         route: service
         for: 'its read of marketing.consent_question_version, Marketing''s data (CHG-MOD-001)'
+      - query: promotions#promotionRecords
+        route: in-process
+        for: 'its lookup of a promotion''s own code, promotions.promotion, Promotions'' data (ORDERS-MONEY-C11; CHG-R8SPN-026)'
       - query: promotions#couponCampaignRecords
         route: in-process
         for: 'its read of promotions.coupon_campaign, Catalogue''s data (CHG-MOD-001)'
@@ -13786,6 +14195,15 @@ paths:
         every read, like `appliedPromotionIds`.
 
         Applying a code the cart already holds returns the cart unchanged.
+
+        **A promotion''s own code is accepted as well as a coupon campaign''s** (decided 20 October 2026, Chinmay,
+        R8 blocker cause ORDERS-MONEY-C11: option A for automatic promotions, B for code promotions; CHG-R8SPN-026).
+        The code is looked up first among the venue''s live promotions that need a code (`promotions.Promotion`
+        with a code), then among coupon campaign codes; either way it is kept on `Cart.couponCodes` and
+        evaluated as above. This is what WEB-032''s "Use this offer" does for a promotion that needs a code: it
+        carries the code to the cart through this call, so the offer shows on the price before the guest pays.
+        An automatic promotion needs no call: `evaluatePromotions` already applies it at the basket, and the
+        button only returns to the list. No new cart field.
 
         '
       tags:
@@ -18689,10 +19107,14 @@ components:
         `cancelReservation`, `convertReservation`, `createPayment`, `capturePayment`, `voidPayment`,
         `createRefund`, `approveRefund`, `createBulkRefund` and `recordGroupCheckIn`; and by the jobs
         that expire reservations, receive payment callbacks and sync partner orders, with `actorSystem`
-        set. Nothing updates or deletes a row.'
+        set. Nothing updates or deletes a row. **A held reservation has no order yet** (R8 blocker ORDERS-MONEY-C35,
+        CHG-R8MIG-017): `createReservation`, `extendReservation` and `cancelReservation` log with `reservationId` only, so
+        `orderId` is null there and `reservationId` is then required.'
+      # A row names its order, its reservation, or both (CHG-R8MIG-017).
+      x-ticvai-required-when:
+        reservationId: {orderId: null}
       required:
       - id
-      - orderId
       - eventType
       - occurredAt
       properties:
@@ -18704,6 +19126,8 @@ components:
           x-ticvai-references: orders.sales_order
           type: string
           format: uuid
+          nullable: true
+          description: The order; null on a reservation's own events before it is converted.
         reservationId:
           type: string
           format: uuid
@@ -19687,6 +20111,14 @@ components:
         preferredDate:
           type: string
           format: date
+        performanceId:
+          type: string
+          format: uuid
+          nullable: true
+          description: '**The session, for a timed or session package** (DEC-121, Chinmay, 2 October 2026: a date and,
+            for session products, a session; R8 blocker ORDERS-MONEY-C41, CHG-R8MIG-017): a `catalogue.performance` on
+            `preferredDate`. Required when the package product is a timed or session product (400 otherwise), null for an
+            open-dated one.'
         expectedSize:
           type: integer
           minimum: 2
@@ -19949,6 +20381,13 @@ components:
           nullable: true
           description: The date the guest asked for on `requestGroupBooking` — what its `409
             dateUnavailable` is checked against. Null for a group a member of staff built from an order.
+        performanceId:
+          type: string
+          format: uuid
+          nullable: true
+          description: '**The session, for a timed or session package** (DEC-121, Chinmay, 2 October 2026: a date and,
+            for session products, a session; R8 blocker ORDERS-MONEY-C41, CHG-R8MIG-017): a `catalogue.performance` on
+            `preferredDate`. Null for an open-dated package; written from the request.'
         orderId:
           type: string
           format: uuid
@@ -20023,6 +20462,15 @@ components:
           - google
         serialNumber:
           type: string
+        passUrl:
+          type: string
+          format: uri
+          readOnly: true
+          x-ticvai-persisted: false
+          description: '**What the app adds to the wallet** (R8 blocker ORDERS-MONEY-C39, CHG-R8MIG-017): for `apple` a
+            short-lived signed link to the `.pkpass` file (signed with the brand''s Pass Type ID certificate), for
+            `google` the "Save to Google Wallet" link (a signed JWT). Made when the pass is issued or read, never stored;
+            valid for 15 minutes (proposed, client to confirm), after which a read of the pass gives a new one.'
         authenticationToken:
           x-ticvai-secret: blind-index
           type: string
@@ -21423,6 +21871,13 @@ components:
           type: string
           format: date
           nullable: true
+        revokedAt:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+          description: When the guest removed it (`revokePaymentToken`); a removed token is never returned or charged
+            (CHG-R8MIG-022).
         isDefault:
           type: boolean
         consentPurposeId:
@@ -21719,6 +22174,12 @@ components:
         claimUrl:
           type: string
           nullable: true
+          description: '**The link the recipient is sent** (R8 blocker fix, ORDERS-MONEY-C12). Built from the tenant''s
+            deep-link table (`white-label.DeepLinkScheme`), pattern `transferClaim`: the tenant''s `baseUrl` plus
+            `/t/{transferId}?token={claimToken}`. It opens the app on `/general/ticket-transfer` (GST-014) where the
+            app is installed, and the storefront claim page otherwise. Once released the pattern never changes, so
+            a link already sent keeps working. **Never returned to the sender** in `listTicketTransfers` (null on
+            the rows the caller sent; IDENTITY-C26, CHG-R8SPN-025).'
         claimToken:
           x-ticvai-secret: blind-index
           type: string
@@ -22479,8 +22940,12 @@ components:
           x-ticvai-references: catalogue.inventory_reservation
           type: string
           nullable: true
-          description: Lease the units were drawn from — a `catalogue.InventoryHold.id`. Absent for
-            uncontended products.
+          description: 'Lease the units were drawn from — a `catalogue.InventoryHold.id`. Absent for
+            uncontended products. **A standing-zone line** (zone-priced general admission at POS-004 and WEB-007;
+            decided 20 October 2026, Chinmay, R8 blocker cause GPS-C38, option A; CHG-R8SPN-040) carries no
+            `seatIds`: it is `quantity` places in one zone, held by `seating.createSeatHold` with `zoneId` and
+            `quantity`, and this names that hold''s inventory hold; the zone, its price band and keep-the-party-
+            together come from the hold, and a lapsed one is `409 hold-not-active` as for seats.'
         seatIds:
           type: array
           maxItems: 50
@@ -22869,6 +23334,13 @@ components:
         id:
           type: string
           format: uuid
+        anonymousSessionToken:
+          type: string
+          nullable: true
+          readOnly: true
+          x-ticvai-persisted: false
+          description: 'The `guestAuth` token of the anonymous session `createCart` opened for a visitor with no
+            credential (GPS-C23, CHG-R8SPN-031); null on every other answer. Not stored on the cart.'
         token:
           type: string
           readOnly: true
@@ -22876,6 +23348,19 @@ components:
             Rotated on claim, so a link shared before signing in does not reach the account after.
 
             '
+        sessionId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          description: The staff or partner session that started the cart (a till's cart is its session's own); null
+            for a guest's cart (R8 blocker IDENTITY-C49, CHG-R8MIG-021).
+        workstationId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          description: The workstation of that session; null for a guest's cart.
         venueId:
           type: string
           format: uuid
@@ -23044,10 +23529,73 @@ components:
       x-ticvai-persistence: none — embedded as attributes (jsonb) on orders.cart_line and orders.order_line
       description: >
         Open attributes of a line, kept from the cart to the order line. **`transport` is the one with a
-        defined shape** (decided 29 September, rev 3 REV3-21); other keys are free.
+        defined shape** (decided 29 September, rev 3 REV3-21); other keys are free. **`attendees` is the
+        second** (20 October 2026, R8 blocker cause GPS-C28; CHG-R8SPN-034), and **`parking` and `bundle` have
+        a defined shape too** (R8 blockers ORDERS-MONEY-C22 and C43, CHG-R8MIG-023).
       properties:
         transport:
           $ref: '#/components/schemas/TransportLineAttributes'
+        attendees:
+          type: integer
+          minimum: 1
+          nullable: true
+          description: '**How many people a meeting-room booking is for** (GST-075; R8 blocker cause GPS-C28,
+            CHG-R8SPN-034). Sent with `addCartLine` for a meeting-room product, kept from the cart line to the order
+            line, and shown on the venue''s reception list for the booking. It must not exceed the room type''s
+            capacity, which the guest step shows beside each room type: more is refused `422 attendees-over-capacity`
+            by `addCartLine`, naming the capacity. The guest steps run in the order `listProductStartTimes` can
+            answer (lead answer, option A): date, room type, length, then start time.'
+        parking:
+          type: object
+          nullable: true
+          description: '**A parking line''s plate and day** (R8 blocker ORDERS-MONEY-C22, CHG-R8MIG-023): carried from
+            `addCartLine` to the order line and passed to `issueOrderEntitlements`, which writes the parking
+            entitlement''s plate, `validFrom` and `validTo` from it. A sold-out answer (`soldOutForDay`) means the
+            facility''s capacity on the `validFrom` day.'
+          required: [plate, validFrom, validTo]
+          properties:
+            plate:
+              type: object
+              required: [number]
+              properties:
+                number:
+                  type: string
+                  maxLength: 16
+                country:
+                  type: string
+                  maxLength: 3
+                  nullable: true
+                  description: ISO 3166 code of the plate's country; null for the venue's own.
+            validFrom:
+              type: string
+              format: date-time
+            validTo:
+              type: string
+              format: date-time
+        bundle:
+          type: object
+          nullable: true
+          description: '**A bundle line''s picks** (R8 blocker ORDERS-MONEY-C43, the lead''s answer B for r8;
+            CHG-R8MIG-023): the bundle and the option the guest chose in each choice group. The line''s `variantId` is
+            the bundle''s own (`Bundle.variantId`); the server prices it at the bundle''s own price and freezes the allocation at
+            `createOrder` (ADR-0019). In r8 a bundle''s admission is open-dated, so no date or session is asked.'
+          required: [bundleId]
+          properties:
+            bundleId:
+              type: string
+              format: uuid
+            choices:
+              type: array
+              items:
+                type: object
+                required: [choiceGroupId, optionId]
+                properties:
+                  choiceGroupId:
+                    type: string
+                    format: uuid
+                  optionId:
+                    type: string
+                    format: uuid
     TransportLineAttributes:
       type: object
       nullable: true
@@ -23191,6 +23739,18 @@ components:
           type: string
           format: uuid
           description: The client UUIDv7 from `CreateOrderRequest.id`.
+        orderAccessToken:
+          type: string
+          nullable: true
+          readOnly: true
+          x-ticvai-persisted: false
+          description: '**What lets the device that just checked out read the order it paid for** (decided 20 October
+            2026, Chinmay, R8 blocker cause IDENTITY-C52, option A; CHG-R8SPN-025). Returned only in
+            `checkoutCart`''s answer, null everywhere else: a signed token bound to this order and to the cart''s
+            device, valid 24 hours, never stored. `getOrder` accepts it in `X-Order-Access-Token` in place of a
+            session, so a guest who checked out with no account, or whose session ended, still sees the
+            confirmation (WEB-013 keeps it in its navigation state). It reads this order only and grants nothing
+            else.'
         orderNumber:
           x-ticvai-unique: tenant
           type: string
@@ -23415,6 +23975,33 @@ components:
         createdAt:
           type: string
           format: date-time
+    GuestRefundPolicy:
+      x-ticvai-persistence: "none — guest projection of RefundPolicy"
+      type: object
+      description: >
+        **What `getGuestRefundPolicy` returns** (R8 blocker ORDERS-MONEY-C26): how much of a ticket
+        comes back and until when, and nothing about who authorises a refund. `additionalProperties: false` is the
+        guarantee: a staff field added to `RefundPolicy` does not reach a guest by default.
+      additionalProperties: false
+      required: [venueId, timeBands, allowPartial, refundWindowDays]
+      properties:
+        venueId: { type: string, format: uuid }
+        timeBands:
+          type: array
+          description: Refundable percentage by time before the performance, as on `RefundPolicy`.
+          items:
+            type: object
+            required: [hoursBefore, percentage]
+            properties:
+              hoursBefore: { type: integer, minimum: 0 }
+              percentage: { type: number, minimum: 0, maximum: 100 }
+        allowPartial: { type: boolean }
+        refundWindowDays:
+          type: integer
+          minimum: 0
+          nullable: true
+          description: As on `RefundPolicy`; null means no window.
+
     RefundPolicy:
       # `timeBands` is an array of objects, so its rows live in a child table rather than a column the
       # derived DDL would silently drop — until 26 September a PUT that sent bands had nowhere to keep them.
@@ -23792,6 +24379,9 @@ components:
           format: date-time
     Payment:
       x-ticvai-persistence: orders.payment
+      # The payment webhook matches an event on providerReference (ADAM CR-165, 18 October 2026; CHG-CRA-004):
+      # payment_provider_reference_idx.
+      x-ticvai-index: [[providerReference]]
       type: object
       required:
       - id
@@ -24075,6 +24665,13 @@ components:
                 nullable: true
                 description: For a `rejected` or `blockedByRejection` entry, the `sync.rejection` row it was
                   quarantined into (SD-028). The batch carried on past it.
+              reconcilerFlag:
+                type: string
+                nullable: true
+                description: '`unitsGone` on an `accepted` entry whose hold had expired before the sync and whose units
+                  were no longer free: the sale stands and the order is on the reconciliation queue, nothing refunded
+                  (FOUNDATION-AI-C46, CHG-R8SPN-033; as CR-169 for an online capture). Null otherwise. Plain text so
+                  a later flag adds no enum value.'
               error:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
     SyncRejection:
@@ -24101,6 +24698,11 @@ components:
           - refund
           - void
           - scan
+          - cashMovement
+          description: 'What was refused. `cashMovement` (20 October 2026, R8 blocker cause FOUNDATION-AI-C13;
+            CHG-R8SPN-021) is an offline lift or float replayed through `shift.createCashMovement` and refused
+            `409 shift-not-open` or `lift-exceeds-float`; its `payload` is the `CreateCashMovementRequest` the till
+            sent.'
         recordedAt:
           type: string
           format: date-time
@@ -24670,6 +25272,7 @@ components:
             - seatLimitExceeded      # addCartLine 422: over VenueSettings.seating.maxSeatsPerGuestOrder; problem type seat-limit-exceeded (REV3-7)
             - transportFareUnavailable # addCartLine 422: transport.quoteTransportFare refused (REV3-21)
             - passNotValidForTrip    # addCartLine 422: the owned pass does not cover the stations, has no entry left or is outside its validity (REV3-21)
+            - attendeesOverCapacity  # addCartLine 422: more attendees than the meeting room type holds (GPS-C28, CHG-R8SPN-034)
           lineIds:
             type: array
             description: The cart lines the refusal is about, where it is about lines.
@@ -24690,6 +25293,7 @@ components:
             - leaseExpired              # createOrder
             - capacityExhausted         # createOrder
             - resourceHoldInvalid       # createOrder 409: the resource hold is expired, converted, released or not the caller's (REV3-15)
+            - holdNotActive             # createOrder 409: a line's inventory (seat) hold lapsed, was released or converted (GPS-C13, CHG-R8SPN-023)
             - seatLimitExceeded         # createOrder 422: over the seat limit for the channel; problem type seat-limit-exceeded (REV3-7)
             - bundleStale               # createOrder: the priced-from bundle is past its staleness bound
             - noDatedLine               # getOrderCalendarEvent

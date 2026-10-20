@@ -31,9 +31,10 @@ transitions:
   guard: '**Failed on the canary, which is where it should fail.** Nothing else was touched'
 - from: running
   to: paused
-  operation: pauseRollout
-  trigger: operation
-  guard: Halted mid-wave. Cells already migrated stay migrated
+  trigger: job
+  guard: 'Halted mid-wave by the run itself (its maintenance window closed). Cells already migrated stay migrated.
+    **No operation pauses a migration run** (ADAM CR-160, 18 October 2026; CHG-CRA-006: the edge named the rollout''s
+    pauseRollout); one is added only if the lead wants it'
 - from: paused
   to: running
   operation: applyMigration
@@ -50,14 +51,23 @@ transitions:
   guard: A cell failed mid-wave. **The estate is now mixed**, which is the state to design for rather
     than avoid
 - from: failed
+  to: running
+  operation: applyMigration
+  trigger: operation
+  guard: '**Resumed once the cause is fixed** (ADAM CR-160, 18 October 2026; CHG-CRA-006; PLATFORM-MIGRATE''s spec
+    of 4 October): applying the run''s plan again resumes this run. Tenants already `complete` stay complete; the
+    failed tenant is retried from its `migration_run_tenant` row, then the wave goes on. Refused only for a run
+    already rolled back'
+  isReversal: true
+- from: failed
   to: rolledBack
-  operation: rollbackRollout
+  operation: rollbackMigrationRun
   trigger: operation
   guard: '**Only where the migration is reversible.** An additive column is; a dropped one is not, and
     the plan must say which before it runs'
 - from: paused
   to: rolledBack
-  operation: rollbackRollout
+  operation: rollbackMigrationRun
   trigger: operation
   guard: Abandoned and reversed
 notes: '**A mixed estate is normal mid-migration and must be supported, not treated as an error.** Cells
@@ -65,4 +75,9 @@ notes: '**A mixed estate is normal mid-migration and must be supported, not trea
   duration.
 
 
-  `canary` exists because the alternative is discovering a migration defect on the fortieth cell.'
+  `canary` exists because the alternative is discovering a migration defect on the fortieth cell.
+
+
+  **`failed` is not the end** (ADAM CR-160, 18 October 2026): a failed run is resumed with `applyMigration` once
+  the cause is fixed, from the failed tenant''s row, or rolled back with `rollbackMigrationRun`. A retry is the same
+  run, not a new one.'

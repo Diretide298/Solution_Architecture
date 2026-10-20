@@ -1,5 +1,5 @@
 id: LLD-WhiteLabelService
-title: WhiteLabelService — 108 operations, 34 tables
+title: WhiteLabelService — 110 operations, 35 tables
 generatedBy: tools/derive-diagrams.py
 tier: platform
 deployable: operations
@@ -10,20 +10,20 @@ why: Branding, content, navigation and the tenant's own app configuration. Separ
 scale: Read-heavy and heavily cached. Published, not queried.
 ifDown: Down freezes the current published config. Guests see the last good version.
 coverage:
-  operations: 108
+  operations: 110
   inAFlow: 30
-  percent: 28%
+  percent: 27%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
 - schema: whitelabel
-  tables: 34
+  tables: 35
   stores:
   - postgres
   largestTable: whitelabel.tenant_config
 operationsByContract:
 - contract: white-label
-  count: 108
+  count: 110
   operations:
   - operation: assignKiosk
     verb: PUT
@@ -31,7 +31,7 @@ operationsByContract:
     scope: venue
     permission: DEVICE_MANAGE
     offline: false
-    reads: 3
+    reads: 4
     writes: 2
   - operation: buildDeepLink
     verb: POST
@@ -63,7 +63,7 @@ operationsByContract:
     scope: venue
     permission: TENANT_CONFIGURE
     offline: false
-    reads: 2
+    reads: 3
     writes: 3
   - operation: createContentBlock
     verb: POST
@@ -87,15 +87,15 @@ operationsByContract:
     scope: venue
     permission: TENANT_CONFIGURE
     offline: false
-    reads: 3
-    writes: 3
+    reads: 4
+    writes: 4
   - operation: createKioskConfig
     verb: POST
     path: /venues/{venueId}/kiosk-configs
     scope: venue
     permission: TENANT_CONFIGURE
     offline: false
-    reads: 3
+    reads: 4
     writes: 4
   - operation: createPreview
     verb: POST
@@ -127,7 +127,7 @@ operationsByContract:
     scope: venue
     permission: TENANT_CONFIGURE
     offline: false
-    reads: 3
+    reads: 4
     writes: 3
   - operation: deleteContentPage
     verb: DELETE
@@ -151,7 +151,7 @@ operationsByContract:
     scope: venue
     permission: TENANT_CONFIGURE
     offline: false
-    reads: 2
+    reads: 3
     writes: 4
   - operation: deletePromoBlock
     verb: DELETE
@@ -167,7 +167,7 @@ operationsByContract:
     scope: tenant
     permission: TENANT_CONFIGURE
     offline: false
-    reads: 1
+    reads: 2
     writes: 0
   - operation: exportSitePackage
     verb: POST
@@ -175,8 +175,8 @@ operationsByContract:
     scope: tenant
     permission: TENANT_PUBLISH
     offline: false
-    reads: 1
-    writes: 1
+    reads: 3
+    writes: 2
   - operation: getAppBuild
     verb: GET
     path: /tenant-config/app-builds/{appBuildId}
@@ -289,6 +289,14 @@ operationsByContract:
     offline: false
     reads: 0
     writes: 0
+  - operation: getPreview
+    verb: GET
+    path: /tenant-config/preview/{previewId}
+    scope: tenant
+    permission: TENANT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
   - operation: getPublishReviewPolicy
     verb: GET
     path: /publish-review-policy
@@ -327,7 +335,7 @@ operationsByContract:
     scope: tenant
     permission: null
     offline: true
-    reads: 7
+    reads: 10
     writes: 0
   - operation: getSitePackage
     verb: GET
@@ -367,7 +375,7 @@ operationsByContract:
     scope: tenant
     permission: null
     offline: true
-    reads: 2
+    reads: 4
     writes: 0
   - operation: getTenantConfig
     verb: GET
@@ -375,7 +383,7 @@ operationsByContract:
     scope: tenant
     permission: TENANT_CONFIGURE
     offline: false
-    reads: 12
+    reads: 13
     writes: 0
   - operation: getTheme
     verb: GET
@@ -545,29 +553,37 @@ operationsByContract:
     offline: true
     reads: 0
     writes: 0
+  - operation: previewGuidedChoice
+    verb: POST
+    path: /venues/{venueId}/guided-choice-previews
+    scope: venue
+    permission: TENANT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
   - operation: proposeGuidedChoice
     verb: POST
     path: /venues/{venueId}/guided-choice-suggestions
     scope: venue
     permission: null
     offline: false
-    reads: 3
-    writes: 3
+    reads: 4
+    writes: 4
   - operation: publishContentBlock
     verb: POST
     path: /content-blocks/{blockId}/publish
     scope: tenant
     permission: TENANT_PUBLISH
     offline: false
-    reads: 3
-    writes: 3
+    reads: 4
+    writes: 4
   - operation: publishGuidedChoice
     verb: POST
     path: /guided-choices/{guidedChoiceId}/publish
     scope: venue
     permission: TENANT_PUBLISH
     offline: false
-    reads: 4
+    reads: 5
     writes: 2
   - operation: publishKioskConfigs
     verb: POST
@@ -575,7 +591,7 @@ operationsByContract:
     scope: venue
     permission: TENANT_PUBLISH
     offline: false
-    reads: 4
+    reads: 5
     writes: 3
   - operation: publishTenantConfig
     verb: POST
@@ -583,8 +599,8 @@ operationsByContract:
     scope: tenant
     permission: TENANT_PUBLISH
     offline: false
-    reads: 4
-    writes: 3
+    reads: 15
+    writes: 5
   - operation: recordStorefrontSessionEvents
     verb: POST
     path: /storefront/session-events
@@ -599,23 +615,23 @@ operationsByContract:
     scope: tenant
     permission: TENANT_CONFIGURE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: relinquishCustomDomain
     verb: DELETE
     path: /tenant-domains/{domainId}
     scope: tenant
     permission: TENANT_CONFIGURE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: requestAppBuild
     verb: POST
     path: /tenant-config/app-builds
     scope: tenant
     permission: TENANT_PUBLISH
     offline: false
-    reads: 3
+    reads: 4
     writes: 2
   - operation: restoreConfigVersion
     verb: POST
@@ -623,15 +639,15 @@ operationsByContract:
     scope: tenant
     permission: TENANT_PUBLISH
     offline: false
-    reads: 13
-    writes: 7
+    reads: 14
+    writes: 11
   - operation: restoreKioskConfigVersion
     verb: POST
     path: /kiosk-configs/{kioskConfigId}/versions/{versionNumber}/restore
     scope: venue
     permission: TENANT_PUBLISH
     offline: false
-    reads: 4
+    reads: 5
     writes: 4
   - operation: setAnalyticsProvider
     verb: PUT
@@ -719,7 +735,7 @@ operationsByContract:
     scope: venue
     permission: TENANT_CONFIGURE
     offline: false
-    reads: 1
+    reads: 2
     writes: 2
   - operation: setLanguages
     verb: PUT
@@ -735,7 +751,7 @@ operationsByContract:
     scope: tenant
     permission: TENANT_CONFIGURE
     offline: false
-    reads: 2
+    reads: 4
     writes: 2
   - operation: setModuleEnablement
     verb: PUT
@@ -743,8 +759,8 @@ operationsByContract:
     scope: tenant
     permission: TENANT_CONFIGURE
     offline: false
-    reads: 5
-    writes: 3
+    reads: 6
+    writes: 4
   - operation: setNavigation
     verb: PUT
     path: /tenant-config/navigation
@@ -767,23 +783,23 @@ operationsByContract:
     scope: tenant
     permission: TENANT_CONFIGURE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setPublishReviewPolicy
     verb: PUT
     path: /publish-review-policy
     scope: tenant
     permission: TENANT_PUBLISH
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 3
   - operation: setSiteSetupProgress
     verb: PUT
     path: /tenant-config/site-setup
     scope: tenant
     permission: TENANT_CONFIGURE
     offline: false
-    reads: 2
+    reads: 3
     writes: 2
   - operation: setStoreAccounts
     verb: PUT
@@ -791,7 +807,7 @@ operationsByContract:
     scope: tenant
     permission: TENANT_CONFIGURE
     offline: false
-    reads: 1
+    reads: 2
     writes: 2
   - operation: setTheme
     verb: PUT
@@ -807,8 +823,8 @@ operationsByContract:
     scope: venue
     permission: TENANT_PUBLISH
     offline: false
-    reads: 3
-    writes: 1
+    reads: 4
+    writes: 2
   - operation: updateBanner
     verb: PATCH
     path: /tenant-config/banners/{bannerId}
@@ -823,7 +839,7 @@ operationsByContract:
     scope: venue
     permission: TENANT_CONFIGURE
     offline: false
-    reads: 2
+    reads: 3
     writes: 3
   - operation: updateContentBlock
     verb: PATCH
@@ -831,8 +847,8 @@ operationsByContract:
     scope: tenant
     permission: TENANT_CONFIGURE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: updateContentPage
     verb: PUT
     path: /tenant-config/pages/{pageId}
@@ -855,7 +871,7 @@ operationsByContract:
     scope: venue
     permission: TENANT_CONFIGURE
     offline: false
-    reads: 3
+    reads: 4
     writes: 4
   - operation: updatePromoBlock
     verb: PATCH
@@ -871,7 +887,7 @@ operationsByContract:
     scope: venue
     permission: TENANT_CONFIGURE
     offline: false
-    reads: 2
+    reads: 3
     writes: 2
   - operation: validateTenantConfig
     verb: POST
@@ -879,7 +895,7 @@ operationsByContract:
     scope: tenant
     permission: TENANT_CONFIGURE
     offline: false
-    reads: 3
+    reads: 10
     writes: 1
   - operation: verifyCustomDomain
     verb: POST
@@ -908,6 +924,7 @@ tables:
   - createBookingFlowDefinition
   - createContentBlock
   - createContentPage
+  - createGuidedChoice
   - createKioskConfig
   - createPreview
   - createPromoBlock
@@ -917,11 +934,15 @@ tables:
   - deleteGuidedChoice
   - deleteKioskConfig
   - deletePromoBlock
+  - exportSitePackage
+  - proposeGuidedChoice
   - publishContentBlock
   - publishGuidedChoice
   - publishKioskConfigs
   - publishTenantConfig
   - recordStorefrontSessionEvents
+  - regenerateDomainToken
+  - relinquishCustomDomain
   - requestAppBuild
   - restoreConfigVersion
   - restoreKioskConfigVersion
@@ -941,11 +962,15 @@ tables:
   - setModuleEnablement
   - setNavigation
   - setPolicy
+  - setPrimaryDomain
+  - setPublishReviewPolicy
   - setSiteSetupProgress
   - setStoreAccounts
   - setTheme
+  - unpublishGuidedChoice
   - updateBanner
   - updateBookingFlowDefinition
+  - updateContentBlock
   - updateContentPage
   - updateGuidedChoice
   - updateKioskConfig
@@ -954,19 +979,34 @@ tables:
   - validateTenantConfig
   - verifyCustomDomain
   readBy:
+  - assignKiosk
   - claimCustomDomain
   - createBanner
+  - createBookingFlowDefinition
   - createContentBlock
   - createContentPage
+  - createGuidedChoice
+  - createKioskConfig
   - createPreview
   - createPromoBlock
   - deleteBanner
+  - deleteBookingFlow
   - deleteContentPage
   - deleteGuidedChoice
+  - deleteKioskConfig
   - deletePromoBlock
+  - exportSitePackage
+  - proposeGuidedChoice
   - publishContentBlock
+  - publishGuidedChoice
+  - publishKioskConfigs
+  - publishTenantConfig
   - recordStorefrontSessionEvents
+  - regenerateDomainToken
+  - relinquishCustomDomain
+  - requestAppBuild
   - restoreConfigVersion
+  - restoreKioskConfigVersion
   - setAnalyticsProvider
   - setAppIcons
   - setBookingFlowConfig
@@ -977,21 +1017,33 @@ tables:
   - setFooter
   - setHeader
   - setHomepageLayout
+  - setKioskOutOfService
   - setLanguages
   - setMaintenanceMode
   - setModuleEnablement
   - setNavigation
   - setPolicy
+  - setPrimaryDomain
+  - setPublishReviewPolicy
+  - setSiteSetupProgress
+  - setStoreAccounts
   - setTheme
+  - unpublishGuidedChoice
   - updateBanner
+  - updateBookingFlowDefinition
+  - updateContentBlock
   - updateContentPage
   - updateGuidedChoice
+  - updateKioskConfig
   - updatePromoBlock
+  - validateBookingFlow
+  - validateTenantConfig
   - verifyCustomDomain
   keys:
     publishContentBlock:
       role: evicts
       resolvers: &id001
+      - approvals.request
       - tenant-config
       key: res:{tenantId}:{resolver}:{scopePath}
       bump: INCR resver:{tenantId}:{resolver}
@@ -1202,7 +1254,14 @@ tables:
   - white-label
   foreignWriters: null
 - table: whitelabel.config_version
-  columns: 14
+  columns: 16
+  store: postgres
+  parent: null
+  writtenBy:
+  - white-label
+  foreignWriters: null
+- table: whitelabel.content_block
+  columns: 13
   store: postgres
   parent: null
   writtenBy:
@@ -1251,14 +1310,14 @@ tables:
   - white-label
   foreignWriters: null
 - table: whitelabel.footer_config_column
-  columns: 3
+  columns: 5
   store: postgres
   parent: whitelabel.footer_config
   writtenBy:
   - white-label
   foreignWriters: null
 - table: whitelabel.footer_config_social_link
-  columns: 4
+  columns: 5
   store: postgres
   parent: whitelabel.footer_config
   writtenBy:
@@ -1405,9 +1464,9 @@ tables:
   - white-label
   foreignWriters: null
 readsFrom:
-- service: PlatformService
-  operations: 7
 - service: CatalogueService
+  operations: 3
+- service: PlatformService
   operations: 3
 - service: IdentityService
   operations: 1
@@ -1416,40 +1475,31 @@ readsFrom:
 - service: TenancyService
   operations: 1
 writesOutside:
-- service: PlatformService
-  operations: 3
-  rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
-    published.'
-  why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
-    each inserts or updates, or which operation or event PlatformService published for it — check each
-    against ADR-0028.'
-  writes:
-  - operation: createContentBlock
-    tables:
-    - control.content_block
-  - operation: publishContentBlock
-    tables:
-    - control.content_block
-  - operation: updateContentBlock
-    tables:
-    - control.content_block
 - service: TenancyService
-  operations: 2
+  operations: 4
   rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
     published.'
   why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
     each inserts or updates, or which operation or event TenancyService published for it — check each
     against ADR-0028.'
   writes:
+  - operation: publishContentBlock
+    tables:
+    - approvals.request
   - operation: publishTenantConfig
     tables:
+    - approvals.request
     - platform.outbox
   - operation: recordStorefrontSessionEvents
     tables:
     - platform.outbox
+  - operation: setPublishReviewPolicy
+    tables:
+    - approvals.matrix
 screens:
 - P01:WEB-001 Home / Landing
 - P01:WEB-002 Event & Attraction Listing
+- P01:WEB-004 Attraction Details
 - P01:WEB-005 Ticket Type Selection
 - P01:WEB-006 Date & Performance Selection
 - P01:WEB-007 Interactive Seat Selection
@@ -1457,6 +1507,7 @@ screens:
 - P01:WEB-010 Shopping Cart
 - P01:WEB-011 Guest Details & Attendee Forms
 - P01:WEB-012 Checkout — Payment
+- P01:WEB-021 Wallet & Gift Cards
 - P01:WEB-025 Help Centre / FAQ
 - P01:WEB-028 Contact & Venue Information
 - P01:WEB-029 Error / Sold Out / Maintenance

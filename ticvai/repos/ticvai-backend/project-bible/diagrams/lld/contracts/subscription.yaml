@@ -104,11 +104,14 @@ operations:
   permission: PLATFORM_BILLING_MANAGE
   audience:
   - staff
+  - prospect
   offline: false
   reads:
-  - subscription.capacity_pack
+  - cache:idempotency
+  - control.capacity_pack
   writes:
-  - subscription.capacity_pack
+  - cache:idempotency
+  - control.capacity_pack
 - operation: addLicenceAddOn
   verb: POST
   path: /tenants/{tenantId}/licences/add-ons
@@ -120,6 +123,8 @@ operations:
   reads:
   - cache:idempotency
   - control.licence_add_on
+  - control.licence_add_on_limit
+  - control.tenant
   writes:
   - cache:idempotency
   - control.licence_add_on
@@ -147,7 +152,7 @@ operations:
   verb: PUT
   path: /membership-product-validation
   scope: tenant
-  permission: PLATFORM_CELL_MANAGE
+  permission: MEMBERSHIP_MANAGE
   audience:
   - staff
   offline: false
@@ -228,11 +233,11 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - control.contract
   - control.tenant
-  - subscription.contract
   writes:
   - cache:idempotency
-  - subscription.contract
+  - control.contract
 - operation: createPartnerAgreement
   verb: POST
   path: /partner-agreements
@@ -307,8 +312,10 @@ operations:
   - partner
   offline: false
   reads:
+  - cache:idempotency
   - subscription.partner_quote
   writes:
+  - cache:idempotency
   - subscription.partner_quote
 - operation: createPartnerUser
   verb: POST
@@ -340,15 +347,15 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - control.plan
+  - control.plan_limit
+  - control.plan_module
   - control.tenant
-  - subscription.plan
-  - subscription.plan_limit
-  - subscription.plan_module
   writes:
   - cache:idempotency
-  - subscription.plan
-  - subscription.plan_limit
-  - subscription.plan_module
+  - control.plan
+  - control.plan_limit
+  - control.plan_module
 - operation: createPlanVersion
   verb: POST
   path: /plans/{planId}
@@ -359,15 +366,15 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - control.plan
+  - control.plan_limit
+  - control.plan_module
   - control.tenant
-  - subscription.plan
-  - subscription.plan_limit
-  - subscription.plan_module
   writes:
   - cache:idempotency
-  - subscription.plan
-  - subscription.plan_limit
-  - subscription.plan_module
+  - control.plan
+  - control.plan_limit
+  - control.plan_module
 - operation: createTenant
   verb: POST
   path: /tenants
@@ -391,6 +398,7 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - control.burst_environment
   writes:
   - cache:idempotency
@@ -432,6 +440,7 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - control.burst_environment
   writes:
   - cache:idempotency
@@ -476,14 +485,14 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - control.contract
   - control.credit_note
   - control.invoice
   - control.invoice_line
+  - control.module_listing
+  - control.plan
+  - control.plan_module
   - control.usage_record
-  - subscription.contract
-  - subscription.module_listing
-  - subscription.plan
-  - subscription.plan_module
   writes:
   - cache:idempotency
   - control.invoice
@@ -508,11 +517,11 @@ operations:
   - staff
   offline: false
   reads:
+  - control.contract
   - control.invoice
   - control.invoice_line
+  - control.licensing_model
   - control.usage_record
-  - subscription.contract
-  - subscription.licensing_model
   writes: []
 - operation: getCell
   verb: GET
@@ -585,8 +594,9 @@ operations:
   - staff
   offline: false
   reads:
-  - access.entitlement
   - control.licence_add_on
+  - control.licence_add_on_limit
+  - control.tenant
   - control.usage_record
   writes: []
 - operation: getGoLiveReadiness
@@ -598,7 +608,7 @@ operations:
   - staff
   offline: false
   reads:
-  - subscription.go_live_readiness
+  - control.go_live_readiness
   writes: []
 - operation: getLicenceEnforcement
   verb: GET
@@ -609,19 +619,19 @@ operations:
   - staff
   offline: false
   reads:
+  - control.capacity_pack
+  - control.contract
+  - control.enforcement_policy
   - control.licence_add_on_limit
+  - control.plan_limit
+  - control.tier_allowance
   - control.usage_record
-  - subscription.capacity_pack
-  - subscription.contract
-  - subscription.enforcement_policy
-  - subscription.plan_limit
-  - subscription.tier_allowance
   writes: []
 - operation: getMembershipProductValidation
   verb: GET
   path: /membership-product-validation
   scope: tenant
-  permission: PLATFORM_CELL_MANAGE
+  permission: MEMBERSHIP_VIEW
   audience:
   - staff
   offline: false
@@ -645,9 +655,9 @@ operations:
   - staff
   offline: false
   reads:
-  - subscription.plan
-  - subscription.plan_limit
-  - subscription.plan_module
+  - control.plan
+  - control.plan_limit
+  - control.plan_module
   writes: []
 - operation: getPlanRecommendations
   verb: GET
@@ -658,19 +668,19 @@ operations:
   - staff
   offline: false
   reads:
+  - control.capacity_pack
+  - control.contract
+  - control.enforcement_policy
   - control.licence_add_on
   - control.licence_add_on_limit
+  - control.licensing_model
+  - control.module_listing
+  - control.plan
+  - control.plan_limit
+  - control.plan_module
+  - control.tier_allowance
+  - control.tier_module
   - control.usage_record
-  - subscription.capacity_pack
-  - subscription.contract
-  - subscription.enforcement_policy
-  - subscription.licensing_model
-  - subscription.module_listing
-  - subscription.plan
-  - subscription.plan_limit
-  - subscription.plan_module
-  - subscription.tier_allowance
-  - subscription.tier_module
   writes: []
 - operation: getPlanTiers
   verb: GET
@@ -681,8 +691,8 @@ operations:
   - staff
   offline: false
   reads:
-  - subscription.tier_allowance
-  - subscription.tier_module
+  - control.tier_allowance
+  - control.tier_module
   writes: []
 - operation: getSubscription
   verb: GET
@@ -693,7 +703,7 @@ operations:
   - staff
   offline: false
   reads:
-  - subscription.contract
+  - control.contract
   writes: []
 - operation: getTenant
   verb: GET
@@ -706,8 +716,8 @@ operations:
   reads:
   - control.cell
   - control.cell_tenant
+  - control.contract
   - control.tenant
-  - subscription.contract
   writes: []
 - operation: getTenantLicences
   verb: GET
@@ -718,9 +728,11 @@ operations:
   - staff
   offline: true
   reads:
+  - control.contract
   - control.licence_add_on
-  - subscription.contract
-  - subscription.plan
+  - control.licence_add_on_limit
+  - control.plan
+  - control.tenant
   writes: []
 - operation: getUsageMetering
   verb: GET
@@ -731,8 +743,8 @@ operations:
   - staff
   offline: false
   reads:
+  - control.contract
   - control.usage_record
-  - subscription.contract
   writes: []
 - operation: getVsiModel
   verb: GET
@@ -743,7 +755,7 @@ operations:
   - staff
   offline: false
   reads:
-  - subscription.vsi_model
+  - control.vsi_model
   writes: []
 - operation: issueCreditNote
   verb: POST
@@ -884,9 +896,10 @@ operations:
   verb: GET
   path: /commercial-allocation-quota
   scope: tenant
-  permission: PLATFORM_TENANT_VIEW
+  permission: PARTNER_VIEW
   audience:
   - partner
+  - staff
   offline: false
   reads:
   - catalogue.channel_capacity
@@ -902,9 +915,10 @@ operations:
   verb: GET
   path: /commission-calculation-settlement
   scope: tenant
-  permission: PLATFORM_TENANT_VIEW
+  permission: PARTNER_VIEW
   audience:
   - partner
+  - staff
   offline: false
   reads:
   - control.partner
@@ -922,9 +936,10 @@ operations:
   verb: GET
   path: /commission-margin-incentive
   scope: tenant
-  permission: PLATFORM_TENANT_VIEW
+  permission: PARTNER_VIEW
   audience:
   - partner
+  - staff
   offline: false
   reads:
   - catalogue.price_list
@@ -938,9 +953,10 @@ operations:
   verb: GET
   path: /credit-limit-exposure
   scope: tenant
-  permission: PLATFORM_TENANT_VIEW
+  permission: PARTNER_VIEW
   audience:
   - partner
+  - staff
   offline: false
   reads:
   - control.partner
@@ -967,9 +983,10 @@ operations:
   verb: GET
   path: /deposit-guarantee-financial
   scope: tenant
-  permission: PLATFORM_TENANT_VIEW
+  permission: PARTNER_VIEW
   audience:
   - partner
+  - staff
   offline: false
   reads:
   - control.partner_agreement
@@ -986,7 +1003,7 @@ operations:
   - staff
   offline: false
   reads:
-  - subscription.licensing_model
+  - control.licensing_model
   writes: []
 - operation: listMember
   verb: GET
@@ -1035,7 +1052,7 @@ operations:
   verb: GET
   path: /membership-activation-credential
   scope: tenant
-  permission: PLATFORM_TENANT_VIEW
+  permission: MEMBERSHIP_VIEW
   audience:
   - staff
   offline: false
@@ -1050,7 +1067,7 @@ operations:
   verb: GET
   path: /membership-annual-pass
   scope: tenant
-  permission: PLATFORM_TENANT_VIEW
+  permission: MEMBERSHIP_VIEW
   audience:
   - staff
   offline: false
@@ -1068,7 +1085,7 @@ operations:
   verb: GET
   path: /membership-commercial-pricing
   scope: tenant
-  permission: PLATFORM_TENANT_VIEW
+  permission: MEMBERSHIP_VIEW
   audience:
   - staff
   offline: false
@@ -1082,7 +1099,7 @@ operations:
   verb: GET
   path: /membership-freeze-suspension
   scope: tenant
-  permission: PLATFORM_TENANT_VIEW
+  permission: MEMBERSHIP_VIEW
   audience:
   - staff
   offline: false
@@ -1095,7 +1112,7 @@ operations:
   verb: GET
   path: /membership-renewal-retention
   scope: tenant
-  permission: PLATFORM_TENANT_VIEW
+  permission: MEMBERSHIP_VIEW
   audience:
   - staff
   offline: false
@@ -1111,7 +1128,7 @@ operations:
   verb: GET
   path: /membership-upgrade-downgrade
   scope: tenant
-  permission: PLATFORM_TENANT_VIEW
+  permission: MEMBERSHIP_VIEW
   audience:
   - staff
   offline: false
@@ -1126,7 +1143,7 @@ operations:
   verb: GET
   path: /membership-usage-visit
   scope: tenant
-  permission: PLATFORM_TENANT_VIEW
+  permission: MEMBERSHIP_VIEW
   audience:
   - staff
   offline: false
@@ -1143,9 +1160,10 @@ operations:
   audience:
   - staff
   - guest
+  - prospect
   offline: false
   reads:
-  - subscription.module_listing
+  - control.module_listing
   writes: []
 - operation: listPartner
   verb: GET
@@ -1197,9 +1215,10 @@ operations:
   verb: GET
   path: /partner-access-role
   scope: tenant
-  permission: PLATFORM_TENANT_VIEW
+  permission: PARTNER_VIEW
   audience:
   - partner
+  - staff
   offline: false
   reads:
   - approvals.request
@@ -1377,9 +1396,10 @@ operations:
   verb: GET
   path: /partner-reconciliation-exception
   scope: tenant
-  permission: PLATFORM_TENANT_VIEW
+  permission: PARTNER_VIEW
   audience:
   - partner
+  - staff
   offline: false
   reads:
   - control.channel_listing
@@ -1445,11 +1465,12 @@ operations:
   permission: PLATFORM_TENANT_VIEW
   audience:
   - staff
+  - prospect
   offline: false
   reads:
-  - subscription.plan
-  - subscription.plan_limit
-  - subscription.plan_module
+  - control.plan
+  - control.plan_limit
+  - control.plan_module
   writes: []
 - operation: listRenewalAuto
   verb: GET
@@ -1533,9 +1554,10 @@ operations:
   verb: GET
   path: /territory-market-distribution
   scope: tenant
-  permission: PLATFORM_TENANT_VIEW
+  permission: PARTNER_VIEW
   audience:
   - partner
+  - staff
   offline: false
   reads:
   - control.partner_agreement
@@ -1546,7 +1568,7 @@ operations:
   verb: GET
   path: /venue-type-templates
   scope: tenant
-  permission: TENANT_VIEW
+  permission: TENANT_CONFIGURE
   audience:
   - staff
   offline: false
@@ -1590,12 +1612,13 @@ operations:
   permission: PLATFORM_TENANT_VIEW
   audience:
   - staff
+  - prospect
   offline: false
   reads:
   - cache:idempotency
+  - control.contract
+  - control.plan
   - platform.tenant
-  - subscription.contract
-  - subscription.plan
   writes:
   - cache:idempotency
 - operation: provisionCell
@@ -1626,8 +1649,8 @@ operations:
   - cache:idempotency
   - control.tenant
   writes:
+  - approvals.request
   - cache:idempotency
-  - control.tenant
 - operation: reconcileBurstEnvironment
   verb: POST
   path: /burst-environments/{burstEnvironmentId}/reconcile
@@ -1637,6 +1660,7 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - orders.sales_order
   writes:
   - cache:idempotency
@@ -1681,7 +1705,7 @@ operations:
   scope: tenant
   permission: null
   audience:
-  - staff
+  - anonymous
   offline: false
   reads:
   - cache:idempotency
@@ -1710,8 +1734,8 @@ operations:
   - control.licence_add_on
   writes:
   - cache:idempotency
+  - control.contract
   - control.licence_add_on
-  - subscription.contract
 - operation: requestBurstEnvironment
   verb: POST
   path: /burst-environments
@@ -1721,6 +1745,7 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - catalogue.performance
   - control.burst_environment
   - control.cell
@@ -1764,9 +1789,11 @@ operations:
   - staff
   offline: false
   reads:
-  - subscription.go_live_readiness
+  - cache:idempotency
+  - control.go_live_readiness
   writes:
-  - subscription.go_live_readiness
+  - cache:idempotency
+  - control.go_live_readiness
 - operation: scoreVsiAssessment
   verb: POST
   path: /vsi-assessments
@@ -1775,17 +1802,22 @@ operations:
   audience:
   - staff
   - guest
+  - prospect
   offline: false
-  reads: []
+  reads:
+  - cache:idempotency
   writes:
-  - subscription.vsi_assessment
+  - cache:idempotency
+  - control.vsi_assessment
 - operation: setAgreementContractTerm
   verb: PUT
   path: /agreement-contract-term
   scope: tenant
   permission: PLATFORM_CELL_MANAGE
   audience:
+  - staff
   - partner
+  - prospect
   offline: false
   reads:
   - cache:idempotency
@@ -1808,8 +1840,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - control.billing_entity
   writes:
+  - cache:idempotency
   - control.billing_entity
 - operation: setChannelListing
   verb: PUT
@@ -1854,9 +1888,11 @@ operations:
   - staff
   offline: false
   reads:
-  - subscription.enforcement_policy
+  - cache:idempotency
+  - control.enforcement_policy
   writes:
-  - subscription.enforcement_policy
+  - cache:idempotency
+  - control.enforcement_policy
 - operation: setLicensingModel
   verb: PUT
   path: /licensing-models/{licensingModelId}
@@ -1866,14 +1902,16 @@ operations:
   - staff
   offline: false
   reads:
-  - subscription.licensing_model
+  - cache:idempotency
+  - control.licensing_model
   writes:
-  - subscription.licensing_model
+  - cache:idempotency
+  - control.licensing_model
 - operation: setMemberMembershipAccount
   verb: PUT
   path: /member-membership-account
   scope: tenant
-  permission: PLATFORM_CELL_MANAGE
+  permission: MEMBERSHIP_MANAGE
   audience:
   - staff
   offline: false
@@ -1890,7 +1928,7 @@ operations:
   verb: PUT
   path: /membership-commercial-config
   scope: tenant
-  permission: PLATFORM_CELL_MANAGE
+  permission: MEMBERSHIP_MANAGE
   audience:
   - staff
   offline: false
@@ -1907,7 +1945,7 @@ operations:
   verb: PUT
   path: /membership-eligibility-qualification
   scope: tenant
-  permission: PLATFORM_CELL_MANAGE
+  permission: MEMBERSHIP_MANAGE
   audience:
   - staff
   offline: false
@@ -1924,7 +1962,7 @@ operations:
   verb: PUT
   path: /membership-entitlement-admission
   scope: tenant
-  permission: PLATFORM_CELL_MANAGE
+  permission: MEMBERSHIP_MANAGE
   audience:
   - staff
   offline: false
@@ -1941,7 +1979,7 @@ operations:
   verb: PUT
   path: /membership-product-tier
   scope: tenant
-  permission: PLATFORM_CELL_MANAGE
+  permission: MEMBERSHIP_MANAGE
   audience:
   - staff
   offline: false
@@ -1957,7 +1995,7 @@ operations:
   verb: PUT
   path: /membership-usage-policy
   scope: tenant
-  permission: PLATFORM_CELL_MANAGE
+  permission: MEMBERSHIP_MANAGE
   audience:
   - staff
   offline: false
@@ -1979,9 +2017,11 @@ operations:
   - staff
   offline: false
   reads:
-  - subscription.module_listing
+  - cache:idempotency
+  - control.module_listing
   writes:
-  - subscription.module_listing
+  - cache:idempotency
+  - control.module_listing
 - operation: setPartnerAllocations
   verb: PUT
   path: /partner-agreements/{agreementId}/allocations
@@ -2201,16 +2241,18 @@ operations:
   - staff
   offline: false
   reads:
-  - subscription.tier_allowance
-  - subscription.tier_module
+  - cache:idempotency
+  - control.tier_allowance
+  - control.tier_module
   writes:
-  - subscription.tier_allowance
-  - subscription.tier_module
+  - cache:idempotency
+  - control.tier_allowance
+  - control.tier_module
 - operation: setRenewalAutoMembership
   verb: PUT
   path: /renewal-auto-membership
   scope: tenant
-  permission: PLATFORM_CELL_MANAGE
+  permission: MEMBERSHIP_MANAGE
   audience:
   - staff
   offline: false
@@ -2232,11 +2274,12 @@ operations:
   offline: false
   reads:
   - cache:idempotency
-  - subscription.contract
-  - subscription.plan
+  - control.contract
+  - control.plan
   writes:
   - cache:idempotency
-  - subscription.contract
+  - control.contract
+  - control.tenant
 - operation: setTrialConfiguration
   verb: PUT
   path: /trial-configurations/{trialConfigurationId}
@@ -2246,9 +2289,11 @@ operations:
   - staff
   offline: false
   reads:
-  - subscription.trial_config
+  - cache:idempotency
+  - control.trial_config
   writes:
-  - subscription.trial_config
+  - cache:idempotency
+  - control.trial_config
 - operation: setValidityActivationExpiry
   verb: PUT
   path: /validity-activation-expiry
@@ -2273,9 +2318,11 @@ operations:
   - staff
   offline: false
   reads:
-  - subscription.vsi_model
+  - cache:idempotency
+  - control.vsi_model
   writes:
-  - subscription.vsi_model
+  - cache:idempotency
+  - control.vsi_model
 - operation: settleAiUsage
   verb: POST
   path: /ai-usage/settle
@@ -2288,8 +2335,8 @@ operations:
   - ai.activity
   - ai.policy
   - cache:idempotency
-  - subscription.contract
-  - subscription.plan
+  - control.contract
+  - control.plan
   writes:
   - cache:idempotency
   - control.usage_record
@@ -2301,33 +2348,35 @@ operations:
   audience:
   - staff
   - guest
+  - prospect
   offline: false
   reads:
   - cache:idempotency
+  - control.capacity_pack
   - control.licence_add_on
   - control.licence_add_on_limit
-  - subscription.capacity_pack
-  - subscription.licensing_model
-  - subscription.module_listing
-  - subscription.plan
-  - subscription.tier_allowance
-  - subscription.tier_module
+  - control.licensing_model
+  - control.module_listing
+  - control.plan
+  - control.tier_allowance
+  - control.tier_module
   writes:
   - cache:idempotency
 - operation: submitOnboardingApplication
   verb: POST
   path: /onboarding-applications
   scope: tenant
-  permission: TENANT_VIEW
+  permission: TENANT_CONFIGURE
   audience:
   - staff
+  - prospect
   offline: false
   reads:
   - cache:idempotency
   - control.billing_entity
   - control.onboarding_application
+  - control.plan
   - control.venue_type_template
-  - subscription.plan
   writes:
   - cache:idempotency
   - control.billing_entity
@@ -2344,9 +2393,9 @@ operations:
   - cache:idempotency
   - control.tenant
   writes:
+  - approvals.request
   - cache:idempotency
-  - control.tenant
-  - platform.outbox
+  - control.outbox
 - operation: terminateTenant
   verb: POST
   path: /tenants/{tenantId}/terminate
@@ -2357,12 +2406,12 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - control.contract
   - control.tenant
-  - subscription.contract
   writes:
   - cache:idempotency
+  - control.contract
   - control.tenant
-  - subscription.contract
 - operation: updateCellTier
   verb: PATCH
   path: /cells/{cellId}
@@ -2373,6 +2422,7 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - control.cell
   - control.cell_job
   writes:
   - cache:idempotency

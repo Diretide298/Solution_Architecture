@@ -1,6 +1,6 @@
 # P02-engagement-support-02 — P02 · Engagement & Support (2 of 2)
 
-**2 screens · 8 operations · 17 schemas · 1 permissions**
+**2 screens · 10 operations · 17 schemas · 1 permissions**
 
 Platform P02 Guest App · ships as **guest** ·
 guest audience · mobileApp ·
@@ -51,7 +51,7 @@ convincingly. It is never a caption.
 - **Every control that can be refused must be gated.** 1 permissions apply here:
   `AI_USE`. A control nobody can use must say so,
   not sit enabled and fail.
-- **2 of these operations work offline**: getVisitPlan, getWaitTimes
+- **3 of these operations work offline**: getVisitPlan, getWaitTimes, listMyVisitPlans
   — and the rest do not. A surface that looks the same online and off is lying.
 - **Offline, every screen shows one banner, the same on web and app:** *"You're offline. Connect to the internet to book, pay, order or join a queue."* The moment the connection drops, on every screen, above the screen's own content. By itself as soon as the connection is back, with a short "Back online" confirmation. **It never** Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing. Each screen's `states.offline` says what stays on screen and what waits.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -127,7 +127,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `GST-059` | Plan in Progress | A | 10 | 31 | 6 | 4 | 0 | 1 | guest | notStarted (designed) |
+| `GST-059` | Plan in Progress | A | 10 | 31 | 6 | 4 | 0 | 1 | guest | approved (client-verified) |
 | `GST-068` | Help & My Cases | A | 8 | 7 | 5 | 2 | 3 | 0 | guest | notStarted (client-verified) |
 
 ## Design inputs from the client meetings

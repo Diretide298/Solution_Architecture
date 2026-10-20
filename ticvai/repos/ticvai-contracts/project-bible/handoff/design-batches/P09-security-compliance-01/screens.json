@@ -10,7 +10,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/general/security-and-compliance-dashboard",
-   "component": "apps/ticvai-web/src/routes/general/SecurityAndComplianceDashboard.tsx",
+   "component": "src/routes/general/SecurityAndComplianceDashboard.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -381,7 +381,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/general/waf-and-security-policy-view",
-   "component": "apps/ticvai-web/src/routes/general/WafAndSecurityPolicyViewForm.tsx",
+   "component": "src/routes/general/WafAndSecurityPolicyViewForm.tsx",
    "status": "notStarted"
   },
   "navigation": {

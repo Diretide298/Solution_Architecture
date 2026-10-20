@@ -37,7 +37,7 @@ operationsByContract:
     verb: POST
     path: /gift-cards/{giftCardId}/activate
     scope: venue
-    permission: ORDER_CREATE
+    permission: WALLET_OPERATE
     offline: false
     reads: 2
     writes: 2
@@ -45,7 +45,7 @@ operationsByContract:
     verb: POST
     path: /game-cards/{cardCode}/adjust
     scope: venue
-    permission: LEDGER_POST
+    permission: WALLET_OPERATE
     offline: false
     reads: 5
     writes: 6
@@ -53,7 +53,7 @@ operationsByContract:
     verb: POST
     path: /wallets/{subjectId}/adjust
     scope: venue
-    permission: LEDGER_POST
+    permission: WALLET_OPERATE
     offline: false
     reads: 3
     writes: 3
@@ -61,7 +61,7 @@ operationsByContract:
     verb: POST
     path: /gift-cards/{cardCode}/block
     scope: venue
-    permission: PRICE_CONFIGURE
+    permission: WALLET_OPERATE
     offline: false
     reads: 2
     writes: 2
@@ -71,13 +71,13 @@ operationsByContract:
     scope: venue
     permission: WALLET_OPERATE
     offline: false
-    reads: 2
-    writes: 5
+    reads: 3
+    writes: 6
   - operation: closeWallet
     verb: POST
     path: /wallets/{walletId}/close
     scope: venue
-    permission: ORDER_MODIFY
+    permission: WALLET_OPERATE
     offline: false
     reads: 4
     writes: 2
@@ -87,32 +87,32 @@ operationsByContract:
     scope: tenant
     permission: WALLET_CONFIGURE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: createSharedWallet
     verb: POST
     path: /shared-wallets
     scope: venue
     permission: WALLET_OPERATE
     offline: false
-    reads: 2
-    writes: 2
+    reads: 3
+    writes: 3
   - operation: createVoucherType
     verb: POST
     path: /voucher-types
     scope: venue
     permission: WALLET_CONFIGURE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: createWalletType
     verb: POST
     path: /wallet-types
     scope: tenant
     permission: WALLET_CONFIGURE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: diffWalletConfigurationVersion
     verb: GET
     path: /wallet-configuration/versions/{version}/diff
@@ -141,7 +141,7 @@ operationsByContract:
     verb: GET
     path: /gift-cards/{cardCode}
     scope: venue
-    permission: ORDER_VIEW
+    permission: WALLET_VIEW
     offline: false
     reads: 1
     writes: 0
@@ -149,7 +149,7 @@ operationsByContract:
     verb: GET
     path: /wallets/{subjectId}
     scope: venue
-    permission: ORDER_VIEW
+    permission: WALLET_VIEW
     offline: false
     reads: 2
     writes: 0
@@ -239,13 +239,13 @@ operationsByContract:
     scope: venue
     permission: WALLET_OPERATE
     offline: false
-    reads: 3
-    writes: 5
+    reads: 4
+    writes: 6
   - operation: issueGiftCard
     verb: POST
     path: /gift-cards
     scope: workstation
-    permission: ORDER_CREATE
+    permission: WALLET_OPERATE
     offline: false
     reads: 2
     writes: 2
@@ -255,8 +255,8 @@ operationsByContract:
     scope: venue
     permission: WALLET_OPERATE
     offline: true
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: listCreditLots
     verb: GET
     path: /credit-lots
@@ -317,7 +317,7 @@ operationsByContract:
     verb: GET
     path: /wallets/{subjectId}/transactions
     scope: venue
-    permission: ORDER_VIEW
+    permission: WALLET_VIEW
     offline: false
     reads: 1
     writes: 0
@@ -333,7 +333,7 @@ operationsByContract:
     verb: POST
     path: /game-cards/{cardCode}/load
     scope: workstation
-    permission: ORDER_CREATE
+    permission: WALLET_OPERATE
     offline: false
     reads: 5
     writes: 7
@@ -351,13 +351,13 @@ operationsByContract:
     scope: venue
     permission: WALLET_OPERATE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: redeemGiftCard
     verb: POST
     path: /gift-cards/{giftCardId}/redeem
     scope: venue
-    permission: ORDER_CREATE
+    permission: WALLET_OPERATE
     offline: false
     reads: 2
     writes: 3
@@ -365,7 +365,7 @@ operationsByContract:
     verb: POST
     path: /wallets/{walletId}/reinstate
     scope: venue
-    permission: ORDER_MODIFY
+    permission: WALLET_OPERATE
     offline: false
     reads: 3
     writes: 2
@@ -375,16 +375,16 @@ operationsByContract:
     scope: venue
     permission: WALLET_OPERATE
     offline: false
-    reads: 2
-    writes: 5
+    reads: 3
+    writes: 6
   - operation: resolveWalletDispute
     verb: POST
     path: /wallet-disputes/{disputeId}/resolve
     scope: venue
     permission: WALLET_OPERATE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: restoreWalletConfigurationVersion
     verb: POST
     path: /wallet-configuration/versions/{version}/restore
@@ -399,56 +399,56 @@ operationsByContract:
     scope: venue
     permission: WALLET_OPERATE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setCreditConsumptionPolicy
     verb: PUT
     path: /credit-consumption-policy
     scope: venue
     permission: WALLET_CONFIGURE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setCreditEligibilityRules
     verb: PUT
     path: /credit-types/{creditTypeId}/eligibility
     scope: venue
     permission: WALLET_CONFIGURE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setGiftCardProduct
     verb: PUT
     path: /gift-card-products/{giftCardProductId}
     scope: tenant
     permission: WALLET_CONFIGURE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setSharedWalletMembers
     verb: PUT
     path: /shared-wallets/{sharedWalletId}/members
     scope: venue
     permission: WALLET_OPERATE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setWalletAccountingMapping
     verb: PUT
     path: /wallet-accounting
     scope: tenant
     permission: WALLET_CONFIGURE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setWalletAuthenticationPolicy
     verb: PUT
     path: /wallet-authentication-policy
     scope: venue
     permission: WALLET_CONFIGURE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setWalletAutoReloadSetting
     verb: PUT
     path: /wallets/{walletId}/auto-reload
@@ -463,72 +463,72 @@ operationsByContract:
     scope: venue
     permission: WALLET_CONFIGURE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setWalletFundingRules
     verb: PUT
     path: /wallet-funding-rules
     scope: venue
     permission: WALLET_CONFIGURE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setWalletIntegrationMapping
     verb: PUT
     path: /wallet-integration-mappings
     scope: tenant
     permission: WALLET_CONFIGURE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setWalletReconciliationSources
     verb: PUT
     path: /wallet-reconciliation-sources
     scope: tenant
     permission: WALLET_CONFIGURE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setWalletRefundPolicy
     verb: PUT
     path: /wallet-refund-policy
     scope: venue
     permission: WALLET_CONFIGURE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setWalletRestriction
     verb: POST
     path: /wallet-restrictions
     scope: venue
     permission: WALLET_OPERATE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setWalletRiskRuleStatus
     verb: POST
     path: /wallet-risk-rules/{ruleCode}/status
     scope: tenant
     permission: WALLET_CONFIGURE
     offline: false
-    reads: 2
-    writes: 2
+    reads: 3
+    writes: 3
   - operation: setWalletRiskRules
     verb: PUT
     path: /wallet-risk-rules
     scope: tenant
     permission: WALLET_CONFIGURE
     offline: false
-    reads: 2
-    writes: 2
+    reads: 3
+    writes: 3
   - operation: setWalletTransferRules
     verb: PUT
     path: /wallet-transfer-rules
     scope: tenant
     permission: WALLET_CONFIGURE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: settleWalletAtExit
     verb: POST
     path: /wallets/{walletId}/exit-settlement
@@ -549,7 +549,7 @@ operationsByContract:
     verb: POST
     path: /wallets/{walletId}/suspend
     scope: venue
-    permission: ORDER_MODIFY
+    permission: WALLET_OPERATE
     offline: false
     reads: 3
     writes: 2
@@ -557,7 +557,7 @@ operationsByContract:
     verb: POST
     path: /wallets/{subjectId}/top-ups
     scope: workstation
-    permission: ORDER_CREATE
+    permission: WALLET_OPERATE
     offline: false
     reads: 4
     writes: 6
@@ -565,34 +565,34 @@ operationsByContract:
     verb: POST
     path: /wallets/{walletId}/transfer
     scope: venue
-    permission: WALLET_MANAGE
+    permission: WALLET_OPERATE
     offline: false
-    reads: 4
-    writes: 3
+    reads: 8
+    writes: 5
   - operation: updateCreditType
     verb: PUT
     path: /credit-types/{creditTypeId}
     scope: tenant
     permission: WALLET_CONFIGURE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: updateWalletType
     verb: PUT
     path: /wallet-types/{walletTypeId}
     scope: tenant
     permission: WALLET_CONFIGURE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: withdrawWalletDispute
     verb: POST
     path: /wallet-disputes/{disputeId}/withdraw
     scope: venue
     permission: WALLET_OPERATE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
 tables:
 - store: cache:idempotency
   kind: cache
@@ -610,39 +610,97 @@ tables:
   - adjustGameCard
   - adjustWallet
   - blockGiftCard
+  - captureWalletHold
   - closeWallet
+  - createCreditType
+  - createSharedWallet
+  - createVoucherType
+  - createWalletType
   - expireCreditLots
+  - holdWalletFunds
   - issueGiftCard
+  - linkWalletCredential
   - loadGameCredits
   - publishWalletConfiguration
+  - raiseWalletDispute
   - redeemGiftCard
   - reinstateWallet
+  - releaseWalletHold
+  - resolveWalletDispute
   - restoreWalletConfigurationVersion
+  - reverseWalletFunding
+  - setCreditConsumptionPolicy
+  - setCreditEligibilityRules
+  - setGiftCardProduct
+  - setSharedWalletMembers
+  - setWalletAccountingMapping
+  - setWalletAuthenticationPolicy
   - setWalletAutoReloadSetting
+  - setWalletChannelRules
+  - setWalletFundingRules
+  - setWalletIntegrationMapping
+  - setWalletReconciliationSources
+  - setWalletRefundPolicy
+  - setWalletRestriction
+  - setWalletRiskRuleStatus
+  - setWalletRiskRules
+  - setWalletTransferRules
   - settleWalletAtExit
   - simulateCreditConsumption
   - suspendWallet
   - topUpWallet
   - transferWalletBalance
+  - updateCreditType
+  - updateWalletType
+  - withdrawWalletDispute
   readBy:
   - activateGiftCard
   - adjustGameCard
   - adjustWallet
   - blockGiftCard
+  - captureWalletHold
   - closeWallet
+  - createCreditType
+  - createSharedWallet
+  - createVoucherType
+  - createWalletType
   - expireCreditLots
+  - holdWalletFunds
   - issueGiftCard
+  - linkWalletCredential
   - loadGameCredits
   - publishWalletConfiguration
+  - raiseWalletDispute
   - redeemGiftCard
   - reinstateWallet
+  - releaseWalletHold
+  - resolveWalletDispute
   - restoreWalletConfigurationVersion
+  - reverseWalletFunding
+  - setCreditConsumptionPolicy
+  - setCreditEligibilityRules
+  - setGiftCardProduct
+  - setSharedWalletMembers
+  - setWalletAccountingMapping
+  - setWalletAuthenticationPolicy
   - setWalletAutoReloadSetting
+  - setWalletChannelRules
+  - setWalletFundingRules
+  - setWalletIntegrationMapping
+  - setWalletReconciliationSources
+  - setWalletRefundPolicy
+  - setWalletRestriction
+  - setWalletRiskRuleStatus
+  - setWalletRiskRules
+  - setWalletTransferRules
   - settleWalletAtExit
   - simulateCreditConsumption
   - suspendWallet
   - topUpWallet
   - transferWalletBalance
+  - updateCreditType
+  - updateWalletType
+  - withdrawWalletDispute
   keys:
     setWalletAutoReloadSetting:
       role: evicts
@@ -751,7 +809,7 @@ tables:
   - wallet
   foreignWriters: null
 - table: wallet.credit_lot
-  columns: 12
+  columns: 13
   store: postgres
   parent: null
   writtenBy:

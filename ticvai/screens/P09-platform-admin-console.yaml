@@ -595,8 +595,8 @@ screens:
       trigger: Localisation & Language Pack
       carries:
       - tenantId
-      provenance: derived — ADM-018 declares entryState.params bannerId, pageId, policyKind, tenantId,
-        version and ADM-002 holds tenantId, so an edge into it carries them
+      provenance: derived — ADM-018 declares entryState.params bannerId, challengeId, pageId, policyKind,
+        tenantId, version and ADM-002 holds tenantId, so an edge into it carries them
     - to: ADM-019
       trigger: Global Configuration & Defaults
       carries:
@@ -1316,9 +1316,10 @@ screens:
         its own state'
     - to: ADM-003
       trigger: Cross-Tenant Health Dashboard
-      provenance: 'derived — ADM-003 declares entryState.params cellId and ADM-004 holds none of them.
-        The edge carries nothing: cellId only pre-selects (deep link or optional), and ADM-003 opens on
-        its own'
+      carries:
+      - cellId
+      provenance: derived — ADM-003 declares entryState.params cellId and ADM-004 holds cellId, so an
+        edge into it carries them
     - to: BO-068
       trigger: Audit Log
       provenance: flow F106 step 2→3
@@ -5819,10 +5820,10 @@ screens:
     transitions:
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId, providerId and
-        ADM-018 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or
-        optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001
-        opens on its own'
+      carries:
+      - challengeId
+      provenance: derived — ADM-001 declares entryState.params challengeId, methodId, providerId and ADM-018
+        holds challengeId, so an edge into it carries them
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: 'derived — ADM-002 declares entryState.params  and ADM-018 holds none of them. The edge
@@ -5940,15 +5941,15 @@ screens:
     provenance: design-note correction, 2 October 2026 (ADM-018)
   - operationId: createMfaChallenge
     contract: identity
-    purpose: 'The step-up before a grant (audit R135): sent as the Open access grant form opens, so the code
-      reaches the operator''s second factor while they fill in the reason and the permissions; nothing on the
-      screen is pressed to send it (as on the sign-in screens GST-042 and WEB-016).'
+    purpose: 'The step-up before a grant (audit R135): sent as the Open access grant form opens, so the
+      code reaches the operator''s second factor while they fill in the reason and the permissions; nothing
+      on the screen is pressed to send it (as on the sign-in screens GST-042 and WEB-016).'
     trigger: background
   - operationId: verifyMfaChallenge
     contract: identity
-    purpose: 'Checks the code the operator enters in the Open access grant form, on its confirm; only when it
-      is accepted does the same press open the grant (`openPlatformStaffGrant`). A wrong code keeps the form
-      open with the reason and permissions kept.'
+    purpose: Checks the code the operator enters in the Open access grant form, on its confirm; only when
+      it is accepted does the same press open the grant (`openPlatformStaffGrant`). A wrong code keeps
+      the form open with the reason and permissions kept.
     trigger: onAction
   entryState:
     params:
@@ -5975,6 +5976,10 @@ screens:
     - name: tenantId
       from: navigation
       optional: true
+    - name: challengeId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen makes one with `createMfaChallenge`.'
     coldEntry: '**A version link is expected to point at something superseded — that is what versions
       are for.** The screen opens the requested version read-only, says it is not current, and links to
       the one that is. **An old version is history, not an error.** Arrives with `bannerId`, `pageId`,
@@ -17519,6 +17524,8 @@ screens:
       trigger: Back to Provisioning Command Center
       provenance: structural — pack board 6 wiring, 11 September 2026
       back: true
+      carries:
+      - cellId
   density: compact
   pattern: listDetail
   patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
@@ -17708,6 +17715,8 @@ screens:
       trigger: Back to Provisioning Command Center
       provenance: structural — pack board 6 wiring, 11 September 2026
       back: true
+      carries:
+      - cellId
   density: compact
   pattern: configEditor
   patternReason: the pack gives this screen a configuration directory (§Venue Settings) and no display
@@ -17907,6 +17916,8 @@ screens:
       trigger: Back to Provisioning Command Center
       provenance: structural — pack board 6 wiring, 11 September 2026
       back: true
+      carries:
+      - cellId
   density: compact
   pattern: configEditor
   patternReason: the pack gives this screen a configuration directory (§Security Setup) and no display
@@ -18212,6 +18223,8 @@ screens:
       trigger: Back to Provisioning Command Center
       provenance: structural — pack board 6 wiring, 11 September 2026
       back: true
+      carries:
+      - cellId
   density: compact
   pattern: listDetail
   patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
@@ -18415,6 +18428,8 @@ screens:
       trigger: Back to Provisioning Command Center
       provenance: structural — pack board 6 wiring, 11 September 2026
       back: true
+      carries:
+      - cellId
   density: compact
   pattern: listDetail
   patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
@@ -18589,6 +18604,8 @@ screens:
       trigger: Back to Provisioning Command Center
       provenance: structural — pack board 6 wiring, 11 September 2026
       back: true
+      carries:
+      - cellId
   density: compact
   pattern: configEditor
   patternReason: the pack gives this screen a configuration directory (§Low-risk settings such as; Business-critical

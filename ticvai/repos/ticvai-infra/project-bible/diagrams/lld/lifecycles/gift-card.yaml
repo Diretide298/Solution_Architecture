@@ -51,7 +51,8 @@ transitions:
   to: active
   operation: activateGiftCard
   trigger: operation
-  guard: Unblocked, or reissued to the same holder
+  guard: 'Unblocked by a staff member (r8, ORDERS-MONEY-C27): a gift card is a bearer card with no holder,
+    so nothing checks who presents it; the staff member who unblocks is recorded'
   isReversal: true
 - from: active
   to: expired

@@ -12,7 +12,7 @@ operations:
   permission: REPORT_VIEW_VENUE
   audience:
   - staff
-  offline: false
+  offline: true
   reads:
   - cache:idempotency
   - identity.principal
@@ -84,8 +84,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - reporting.kpi_definition
   writes:
+  - cache:idempotency
   - reporting.kpi_definition
 - operation: createReport
   verb: POST
@@ -134,8 +136,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - reporting.subscription
   writes:
+  - cache:idempotency
   - reporting.subscription
 - operation: deleteDashboard
   verb: DELETE
@@ -350,7 +354,7 @@ operations:
   verb: GET
   path: /suppliers/{supplierId}/performance
   scope: venue
-  permission: REPORT_VIEW
+  permission: REPORT_VIEW_VENUE
   audience:
   - staff
   offline: false
@@ -504,7 +508,7 @@ operations:
   verb: GET
   path: /reports/seeded
   scope: venue
-  permission: REPORT_VIEW
+  permission: REPORT_VIEW_VENUE
   audience:
   - staff
   offline: false
@@ -548,7 +552,9 @@ operations:
   reads:
   - cache:idempotency
   - reporting.execution
+  - reporting.report_column
   - reporting.report_definition
+  - reporting.report_filter
   - reporting.report_parameter
   writes:
   - cache:idempotency
@@ -619,8 +625,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - reporting.analytics_governance_policy
   writes:
+  - cache:idempotency
   - reporting.analytics_governance_policy
 - operation: setKpiTargets
   verb: PUT
@@ -631,8 +639,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - reporting.kpi_target
   writes:
+  - cache:idempotency
   - reporting.kpi_target
 - operation: setSemanticModel
   verb: PUT
@@ -643,8 +653,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - reporting.semantic_model
   writes:
+  - cache:idempotency
   - reporting.semantic_model
 - operation: setSiteNormalisationBasis
   verb: PUT

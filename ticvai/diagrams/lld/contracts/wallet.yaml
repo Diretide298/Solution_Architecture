@@ -9,7 +9,7 @@ operations:
   verb: POST
   path: /gift-cards/{giftCardId}/activate
   scope: venue
-  permission: ORDER_CREATE
+  permission: WALLET_OPERATE
   audience:
   - staff
   offline: false
@@ -23,7 +23,7 @@ operations:
   verb: POST
   path: /game-cards/{cardCode}/adjust
   scope: venue
-  permission: LEDGER_POST
+  permission: WALLET_OPERATE
   audience:
   - staff
   offline: false
@@ -44,7 +44,7 @@ operations:
   verb: POST
   path: /wallets/{subjectId}/adjust
   scope: venue
-  permission: LEDGER_POST
+  permission: WALLET_OPERATE
   audience:
   - staff
   offline: false
@@ -60,7 +60,7 @@ operations:
   verb: POST
   path: /gift-cards/{cardCode}/block
   scope: venue
-  permission: PRICE_CONFIGURE
+  permission: WALLET_OPERATE
   audience:
   - staff
   offline: false
@@ -80,9 +80,11 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - wallet.balance
   - wallet.fund_reservation
   writes:
+  - cache:idempotency
   - platform.idempotency_record
   - platform.outbox
   - wallet.balance
@@ -92,7 +94,7 @@ operations:
   verb: POST
   path: /wallets/{walletId}/close
   scope: venue
-  permission: ORDER_MODIFY
+  permission: WALLET_OPERATE
   audience:
   - staff
   offline: false
@@ -113,8 +115,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - wallet.credit_type
   writes:
+  - cache:idempotency
   - wallet.credit_type
 - operation: createSharedWallet
   verb: POST
@@ -125,9 +129,11 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - wallet.shared_wallet
   - wallet.shared_wallet_member
   writes:
+  - cache:idempotency
   - wallet.shared_wallet
   - wallet.shared_wallet_member
 - operation: createVoucherType
@@ -139,8 +145,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - wallet.voucher_type
   writes:
+  - cache:idempotency
   - wallet.voucher_type
 - operation: createWalletType
   verb: POST
@@ -151,8 +159,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - wallet.wallet_type
   writes:
+  - cache:idempotency
   - wallet.wallet_type
 - operation: diffWalletConfigurationVersion
   verb: GET
@@ -213,7 +223,7 @@ operations:
   verb: GET
   path: /gift-cards/{cardCode}
   scope: venue
-  permission: ORDER_VIEW
+  permission: WALLET_VIEW
   audience:
   - staff
   - guest
@@ -225,7 +235,7 @@ operations:
   verb: GET
   path: /wallets/{subjectId}
   scope: venue
-  permission: ORDER_VIEW
+  permission: WALLET_VIEW
   audience:
   - staff
   - guest
@@ -365,10 +375,12 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - wallet.balance
   - wallet.fund_reservation
   - wallet.wallet
   writes:
+  - cache:idempotency
   - platform.idempotency_record
   - platform.outbox
   - wallet.balance
@@ -378,7 +390,7 @@ operations:
   verb: POST
   path: /gift-cards
   scope: workstation
-  permission: ORDER_CREATE
+  permission: WALLET_OPERATE
   audience:
   - staff
   offline: false
@@ -397,8 +409,10 @@ operations:
   - staff
   offline: true
   reads:
+  - cache:idempotency
   - wallet.credential
   writes:
+  - cache:idempotency
   - wallet.credential
 - operation: listCreditLots
   verb: GET
@@ -482,7 +496,7 @@ operations:
   verb: GET
   path: /wallets/{subjectId}/transactions
   scope: venue
-  permission: ORDER_VIEW
+  permission: WALLET_VIEW
   audience:
   - staff
   - guest
@@ -505,9 +519,10 @@ operations:
   verb: POST
   path: /game-cards/{cardCode}/load
   scope: workstation
-  permission: ORDER_CREATE
+  permission: WALLET_OPERATE
   audience:
   - staff
+  - guest
   offline: false
   reads:
   - cache:idempotency
@@ -559,14 +574,16 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - wallet.dispute
   writes:
+  - cache:idempotency
   - wallet.dispute
 - operation: redeemGiftCard
   verb: POST
   path: /gift-cards/{giftCardId}/redeem
   scope: venue
-  permission: ORDER_CREATE
+  permission: WALLET_OPERATE
   audience:
   - staff
   offline: false
@@ -581,7 +598,7 @@ operations:
   verb: POST
   path: /wallets/{walletId}/reinstate
   scope: venue
-  permission: ORDER_MODIFY
+  permission: WALLET_OPERATE
   audience:
   - staff
   offline: false
@@ -602,9 +619,11 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - wallet.balance
   - wallet.fund_reservation
   writes:
+  - cache:idempotency
   - platform.idempotency_record
   - platform.outbox
   - wallet.balance
@@ -619,8 +638,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - wallet.dispute
   writes:
+  - cache:idempotency
   - wallet.dispute
 - operation: restoreWalletConfigurationVersion
   verb: POST
@@ -657,8 +678,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - wallet.adjustment
   writes:
+  - cache:idempotency
   - wallet.adjustment
 - operation: setCreditConsumptionPolicy
   verb: PUT
@@ -669,8 +692,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - wallet.consumption_policy
   writes:
+  - cache:idempotency
   - wallet.consumption_policy
 - operation: setCreditEligibilityRules
   verb: PUT
@@ -681,8 +706,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - wallet.credit_eligibility
   writes:
+  - cache:idempotency
   - wallet.credit_eligibility
 - operation: setGiftCardProduct
   verb: PUT
@@ -693,8 +720,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - wallet.gift_card_product
   writes:
+  - cache:idempotency
   - wallet.gift_card_product
 - operation: setSharedWalletMembers
   verb: PUT
@@ -706,8 +735,10 @@ operations:
   - guest
   offline: false
   reads:
+  - cache:idempotency
   - wallet.shared_wallet_member
   writes:
+  - cache:idempotency
   - wallet.shared_wallet_member
 - operation: setWalletAccountingMapping
   verb: PUT
@@ -718,8 +749,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - wallet.accounting_mapping
   writes:
+  - cache:idempotency
   - wallet.accounting_mapping
 - operation: setWalletAuthenticationPolicy
   verb: PUT
@@ -730,8 +763,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - wallet.authentication_policy
   writes:
+  - cache:idempotency
   - wallet.authentication_policy
 - operation: setWalletAutoReloadSetting
   verb: PUT
@@ -761,8 +796,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - wallet.channel_rule
   writes:
+  - cache:idempotency
   - wallet.channel_rule
 - operation: setWalletFundingRules
   verb: PUT
@@ -773,8 +810,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - wallet.funding_rule
   writes:
+  - cache:idempotency
   - wallet.funding_rule
 - operation: setWalletIntegrationMapping
   verb: PUT
@@ -785,8 +824,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - wallet.integration_mapping
   writes:
+  - cache:idempotency
   - wallet.integration_mapping
 - operation: setWalletReconciliationSources
   verb: PUT
@@ -797,8 +838,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - wallet.reconciliation_source
   writes:
+  - cache:idempotency
   - wallet.reconciliation_source
 - operation: setWalletRefundPolicy
   verb: PUT
@@ -809,8 +852,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - wallet.refund_policy
   writes:
+  - cache:idempotency
   - wallet.refund_policy
 - operation: setWalletRestriction
   verb: POST
@@ -821,8 +866,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - wallet.restriction
   writes:
+  - cache:idempotency
   - wallet.restriction
 - operation: setWalletRiskRuleStatus
   verb: POST
@@ -833,9 +880,11 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - wallet.risk_rule
   - wallet.risk_rule_set
   writes:
+  - cache:idempotency
   - wallet.risk_rule
   - wallet.risk_rule_set
 - operation: setWalletRiskRules
@@ -847,9 +896,11 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - wallet.risk_rule
   - wallet.risk_rule_set
   writes:
+  - cache:idempotency
   - wallet.risk_rule
   - wallet.risk_rule_set
 - operation: setWalletTransferRules
@@ -861,8 +912,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - wallet.transfer_rule
   writes:
+  - cache:idempotency
   - wallet.transfer_rule
 - operation: settleWalletAtExit
   verb: POST
@@ -910,7 +963,7 @@ operations:
   verb: POST
   path: /wallets/{walletId}/suspend
   scope: venue
-  permission: ORDER_MODIFY
+  permission: WALLET_OPERATE
   audience:
   - staff
   offline: false
@@ -925,9 +978,10 @@ operations:
   verb: POST
   path: /wallets/{subjectId}/top-ups
   scope: workstation
-  permission: ORDER_CREATE
+  permission: WALLET_OPERATE
   audience:
   - staff
+  - guest
   offline: false
   reads:
   - cache:idempotency
@@ -945,7 +999,7 @@ operations:
   verb: POST
   path: /wallets/{walletId}/transfer
   scope: venue
-  permission: WALLET_MANAGE
+  permission: WALLET_OPERATE
   audience:
   - staff
   - guest
@@ -953,10 +1007,16 @@ operations:
   reads:
   - cache:idempotency
   - pii.subject
+  - wallet.balance
+  - wallet.credit_lot
+  - wallet.credit_type
+  - wallet.transfer_rule
   - wallet.wallet
   - wallet.wallet_transaction
   writes:
   - cache:idempotency
+  - wallet.balance
+  - wallet.credit_lot
   - wallet.wallet
   - wallet.wallet_transaction
 - operation: updateCreditType
@@ -968,8 +1028,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - wallet.credit_type
   writes:
+  - cache:idempotency
   - wallet.credit_type
 - operation: updateWalletType
   verb: PUT
@@ -980,8 +1042,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - wallet.wallet_type
   writes:
+  - cache:idempotency
   - wallet.wallet_type
 - operation: withdrawWalletDispute
   verb: POST
@@ -993,6 +1057,8 @@ operations:
   - guest
   offline: false
   reads:
+  - cache:idempotency
   - wallet.dispute
   writes:
+  - cache:idempotency
   - wallet.dispute

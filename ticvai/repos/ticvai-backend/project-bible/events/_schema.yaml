@@ -25,6 +25,11 @@ description: >
   **Every event is versioned, and the version is in the payload.** A consumer running an older
   version must be able to tell. Adding a field is a minor bump and is safe; removing or
   retyping one is a new event name, because a consumer cannot be asked to handle both.
+  **Or a new major version, published beside the old one while consumers move** (r8 integration,
+  20 October 2026, CHG-R8INT-004; wallet.credited v2, tenantDomain.mapped v2): `version` goes up by one, the
+  file's header says what a v1 reader could not read, and the publisher writes both versions to the outbox
+  (one envelope each) until every listed consumer is built to the new one. No consumer handles both: each
+  reads one version, so the rule above still holds per consumer.
 
   **Ordering is per aggregate, never global.** Two orders may be processed in any order. Two
   events about the *same* order may not, and the sequence is what makes that enforceable.

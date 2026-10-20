@@ -39,8 +39,8 @@
 | [POS-000](#pos-000-sign-in) | Sign In | Shift | 1 | 8 |
 | [POS-001](#pos-001-begin-shift) | Begin Shift | Shift | 1 | 7 |
 | [POS-002](#pos-002-sell-ticket-catalogue) | Sell — Ticket Catalogue | Sell | 1 | 32 |
-| [POS-003](#pos-003-sell-timed-entry) | Sell — Timed Entry | Sell | 1 | 8 |
-| [POS-004](#pos-004-sell-seat-map) | Sell — Seat Map | Sell | 1 | 7 |
+| [POS-003](#pos-003-sell-timed-entry) | Sell — Timed Entry | Sell | 1 | 6 |
+| [POS-004](#pos-004-sell-seat-map) | Sell — Seat Map | Sell | 1 | 8 |
 | [POS-005](#pos-005-payment) | Payment | Payment | 1 | 13 |
 | [POS-006](#pos-006-held-orders) | Held Orders | Sell | 1 | 14 |
 | [POS-007](#pos-007-close-shift) | Close Shift | Shift | 1 | 10 |
@@ -52,7 +52,7 @@
 | [POS-013](#pos-013-mobile-pos-event-sales-offline-operations) | Mobile POS, Event Sales & Offline Operations | Sell | 1 | 3 |
 | [POS-014](#pos-014-sales-exceptions-controls-operational-actions) | Sales Exceptions, Controls & Operational Actions | Sell | 1 | 4 |
 | [POS-015](#pos-015-cash-operations-dashboard) | Cash Operations Dashboard | Sell | 1 | 2 |
-| [POS-016](#pos-016-till-configuration) | Till Configuration | Sell | 1 | 5 |
+| [POS-016](#pos-016-till-configuration) | Till Configuration | Sell | 1 | 9 |
 | [POS-017](#pos-017-cash-in-cash-out-operations) | Cash In / Cash Out Operations | Sell | 1 | 2 |
 | [POS-018](#pos-018-safe-drop-cash-transfer-management) | Safe Drop & Cash Transfer Management | Sell | 1 | 3 |
 | [POS-019](#pos-019-shift-templates-policies) | Shift Templates & Policies | Sell | 1 | 3 |
@@ -811,11 +811,9 @@
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
 | `getAvailability` | [CatalogueService](../backend/CatalogueService.md#getavailability) | onLoad | Per-session remaining | `PRODUCT_VIEW` |
-| `acquireInventoryHold` | [CatalogueService](../backend/CatalogueService.md#acquireinventoryhold) | onAction | Hold capacity for this terminal | `ORDER_CREATE` |
 | `listProductVariants` | [CatalogueService](../backend/CatalogueService.md#listproductvariants) | onLoad | Ticket types | `PRODUCT_VIEW` |
 | `getProduct` | [CatalogueService](../backend/CatalogueService.md#getproduct) | onLoad | Read a product | `PRODUCT_VIEW` |
 | `listAlternativeCodes` | [CatalogueService](../backend/CatalogueService.md#listalternativecodes) | onLoad | External identifiers for a product | `PRODUCT_VIEW` |
-| `listInventoryHolds` | [CatalogueService](../backend/CatalogueService.md#listinventoryholds) | onLoad | List leases | `PRODUCT_VIEW` |
 | `listProducts` | [CatalogueService](../backend/CatalogueService.md#listproducts) | onLoad | List products | `PRODUCT_VIEW` |
 | `resolveProductByCode` | [CatalogueService](../backend/CatalogueService.md#resolveproductbycode) | onAction | Resolve a partner code to a product | `PRODUCT_VIEW` |
 
@@ -837,7 +835,7 @@
 |---|---|---|---|
 | POS-002 | Back | productId |  |
 | POS-005 | Add to sale, then charge |  | payment.take |
-| POS-004 | Sell — Seat Map | holdId, performanceId |  |
+| POS-004 | Sell — Seat Map | performanceId |  |
 | POS-006 | Held Orders |  |  |
 
 ## POS-004 Sell — Seat Map
@@ -861,6 +859,7 @@
 |---|---|
 | holdId | deepLink |
 | performanceId | deepLink |
+| eventId | navigation |
 
 **Operations**
 
@@ -873,6 +872,7 @@
 | `relinquishSeatHold` | [CatalogueService](../backend/CatalogueService.md#relinquishseathold) | onAction | Release a hold | `ORDER_CREATE` |
 | `createOrder` | [OrderService](../backend/OrderService.md#createorder) | onAction | Create an order | `ORDER_CREATE` |
 | `createPayment` | [OrderService](../backend/OrderService.md#createpayment) | onAction | Take a payment against an order | `ORDER_CREATE` |
+| `listPerformances` | [CatalogueService](../backend/CatalogueService.md#listperformances) | onLoad | The cold entry (r8, GPS-C05): a link to a performance that has happened offers the next performance of the same event, the first upcoming one `listPerformances` returns for the performance's `eventId` (`getPerformance`). Not called on the ordinary way in. Not background (r8 integration, CHG-R8INT-008): the cashier sees the performance it offers, and the approved screen has no element of its own for the offer. | `PRODUCT_VIEW` |
 
 **States**
 
@@ -1516,7 +1516,11 @@
 | `configureWorkstation` | [TenancyService](../backend/TenancyService.md#configureworkstation) | onAction | Configure a workstation | `WORKSTATION_CONFIGURE` |
 | `listDevices` | [TenancyService](../backend/TenancyService.md#listdevices) | onLoad | The peripherals bound to this workstation | `DEVICE_VIEW` |
 | `setDeviceAssignment` | [TenancyService](../backend/TenancyService.md#setdeviceassignment) | onAction | Assign a reader, scanner or printer to this till | `DEVICE_MANAGE` |
-| `getDeviceAssignment` | [TenancyService](../backend/TenancyService.md#getdeviceassignment) | onLoad | Show where the selected device is assigned | `DEVICE_VIEW` |
+| `getDeviceAssignment` | [TenancyService](../backend/TenancyService.md#getdeviceassignment) | onLoad | Show where the selected device is assigned; it also fills the Assign peripheral form, which sends the record back whole (r8, APPROVALS-TENANCY-C24) | `DEVICE_VIEW` |
+| `getWorkstation` | [TenancyService](../backend/TenancyService.md#getworkstation) | onLoad | This till as saved (`workstationId` from the session): it fills the drawer limit and sale board fields and the Configure workstation form, which `configureWorkstation` sends back whole; its linked `devices` are this till's peripherals (r8, APPROVALS-TENANCY-C24) | `SCOPE_VIEW` |
+| `listShifts` | [OrderService](../backend/OrderService.md#listshifts) | onLoad | The cashier picker: the open shifts (status open) at this till's venue, and so the staff on shift; also the custodian picker of the Assign peripheral form (r8, APPROVALS-TENANCY-C24) | `REPORT_VIEW_WORKSTATION` |
+| `listDenominations` | [OrderService](../backend/OrderService.md#listdenominations) | onLoad | The denominations the float is counted in (r8, APPROVALS-TENANCY-C24) | `SHIFT_OPEN` |
+| `listSaleBoards` | [TenancyService](../backend/TenancyService.md#listsaleboards) | onLoad | The sale boards a till may override its outlet's board with (r8, APPROVALS-TENANCY-C24) | `SCOPE_VIEW` |
 
 **States**
 

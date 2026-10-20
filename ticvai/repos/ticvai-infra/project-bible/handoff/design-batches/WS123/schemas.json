@@ -290,7 +290,7 @@
  "AiDecisionRecord": {
   "type": "object",
   "x-ticvai-persistence": "ai.decision_record",
-  "description": "**The standard record for every governed decision** (design 3.9, C12; AIC-193..209): a recommendation summary, a risk assessment, a forecast publication, a plan step, an assistant answer at significant depth, a governance block, a Help me choose suggestion. **Append-only; corrections are annotations; hash-chained per tenant** so tampering is detectable (AIC-203, AIC-204). **AI log database** (design 2.4): append-only, partitioned by month, one Postgres database per tenant on the regional AI log server. The table name stays `ai.<table>`; which server holds it is a deployment matter, not a contract one.",
+  "description": "**The standard record for every governed decision** (design 3.9, C12; AIC-193..209): a recommendation summary, a risk assessment, a forecast publication, a plan step, an assistant answer at significant depth, a governance block, a Help me choose suggestion. **Append-only; corrections are annotations; hash-chained per tenant** so tampering is detectable (AIC-203, AIC-204). **AI log database** (design 2.4): append-only, partitioned by month, one Postgres database per tenant on the regional AI log server. The table name stays `ai.<table>`; which server holds it is a deployment matter, not a contract one.\n\n**Which answers are governed** (R8 blocker FOUNDATION-AI-C33, the lead's answer A of 20 October 2026): an answer of a capability whose `riskClass` is `medium`, `high` or `critical` writes a decision record; a `low` one writes `ai.activity` only. No column holds the depth: the capability registry's risk class decides.\n\n**The hash chain** (R8 blocker FOUNDATION-AI-C33). `recordHash` = SHA-256, as lowercase hex, of the canonical JSON (RFC 8785) of this list of fields and nothing else: `id`, `capabilityKey`, `task`, `inputsRef`, `evidence`, `producer`, `modelVersion`, `promptTemplateVersion`, `featureSetVersion`, `knowledgeVersion`, `ruleVersions`, `governanceOutcome`, `policyVersion`, `approvals`, `outcome`, `createdAt` and `previousHash`. `previousHash` is the `recordHash` of the tenant's previous record in (`createdAt`, `id`) order, an empty string for the first. The writer reads that head and inserts the new row under `pg_advisory_xact_lock(hashtext(<tenant id>))`, so several pods cannot fork the chain. `annotations` and `humanDecision` are not hashed: the hashed fields are never edited, and a correction is an annotation. `hashVersion` names this field list, so a later change to it is a new version, never a rewrite. A verifier replays the chain and recomputes every hash.",
   "required": [
    "traceId",
    "capabilityKey",
@@ -420,11 +420,25 @@
       },
       "note": {
        "type": "string"
+      },
+      "kind": {
+       "type": "string",
+       "enum": [
+        "correction",
+        "override"
+       ],
+       "description": "`override` is the one `overrideAiDecision` appends (R8 blocker FOUNDATION-AI-C33)."
+      },
+      "interventionId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true,
+       "description": "For `override`, the `ai.intervention` row it records."
       }
      }
     },
     "readOnly": true,
-    "description": "Corrections, appended; the original fields are never edited."
+    "description": "Corrections, appended; the original fields are never edited and annotations are not part of the hash."
    },
    "previousHash": {
     "type": "string",
@@ -433,6 +447,13 @@
    "recordHash": {
     "type": "string",
     "readOnly": true
+   },
+   "hashVersion": {
+    "type": "integer",
+    "minimum": 1,
+    "default": 1,
+    "readOnly": true,
+    "description": "Which list of hashed fields `recordHash` covers; 1 is the list in this schema's description (R8 blocker FOUNDATION-AI-C33)."
    },
    "createdAt": {
     "type": "string",
@@ -520,6 +541,14 @@
  "AiInteraction": {
   "type": "object",
   "x-ticvai-persistence": "ai.activity",
+  "x-ticvai-required-when": {
+   "principalId": {
+    "audience": "staff"
+   },
+   "subjectId": {
+    "audience": "guest"
+   }
+  },
   "required": [
    "id",
    "principalId",
@@ -577,7 +606,9 @@
    },
    "principalId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "nullable": true,
+    "description": "The staff member who made the call. Null for a guest (`audience` `guest`), whose row names `subjectId` instead; a row always has one or the other."
    },
    "audience": {
     "type": "string",
@@ -1198,6 +1229,8 @@
    "LOYALTY_ACCRUE",
    "LOYALTY_REDEEM",
    "LOYALTY_ADJUST",
+   "MEMBERSHIP_VIEW",
+   "MEMBERSHIP_MANAGE",
    "MARKETING_VIEW",
    "MARKETING_MANAGE",
    "MARKETING_SEND",
@@ -1297,11 +1330,11 @@
     "format": "uuid"
    },
    "operatorPrincipalId": {
-    "x-ticvai-references": "identity.principal",
+    "x-ticvai-references": "none",
     "type": "string",
     "format": "uuid",
     "readOnly": true,
-    "description": "The platform operator, from the Control Plane token. Set by the server."
+    "description": "The platform operator, from the Control Plane token (its subject). Set by the server. **Not a row in this tenant's `identity.principal`** (R8 blocker IDENTITY-C20, CHG-R8MIG-006; the lead's answer, option A): an operator is the Control Plane's, so this is a plain uuid with no foreign key, and the key V0107 adds is dropped by the next forward migration."
    },
    "operatorDisplayName": {
     "type": "string",
@@ -1347,6 +1380,18 @@
  },
  "Tenant": {
   "x-ticvai-persistence": "control.tenant",
+  "x-ticvai-required-when": {
+   "planVersion": {
+    "planId": {
+     "not": null
+    }
+   },
+   "planId": {
+    "planVersion": {
+     "not": null
+    }
+   }
+  },
   "type": "object",
   "required": [
    "id",
@@ -1410,9 +1455,17 @@
     "nullable": true
    },
    "planId": {
+    "x-ticvai-references": "control.plan",
+    "x-ticvai-references-version": "planVersion",
     "type": "string",
     "format": "uuid",
     "nullable": true
+   },
+   "planVersion": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The version of the plan the tenant is on (with `planId`, the key of the plan row; R8 blocker APPROVALS-TENANCY-C15, CHG-R8INT-023). Null when `planId` is."
    },
    "planName": {
     "type": "string",
@@ -1423,6 +1476,46 @@
    },
    "venueCount": {
     "type": "integer"
+   },
+   "cellHost": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "x-ticvai-derived": "onRead",
+    "description": "The host of the tenant's home cell (the host part of `Cell.apiEndpoint` of the cell that holds the tenant in its home region), derived on read through `control.cell_tenant`. Added for ADM-018 (r8 walk of ticket 27886): the console reaches the cell's grant and language operations at this host without holding `PLATFORM_CELL_VIEW`, which `listTenantCells` needs. Null while the tenant has no cell.\n"
+   },
+   "cellHosts": {
+    "type": "array",
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "x-ticvai-derived": "onRead",
+    "description": "One entry per region the tenant is in, for a multi-region tenant; the entry with `isHome` true is `cellHost`. The screen uses the home cell for language and grant operations.\n",
+    "items": {
+     "type": "object",
+     "required": [
+      "regionId",
+      "cellId",
+      "host",
+      "isHome"
+     ],
+     "properties": {
+      "regionId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "cellId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "host": {
+       "type": "string"
+      },
+      "isHome": {
+       "type": "boolean"
+      }
+     }
+    }
    },
    "regionId": {
     "type": "string",

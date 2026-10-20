@@ -11801,7 +11801,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listPerformances · getPerformance · createPerformances · cancelPerformance +7</div>
+          <div><b>OPERATIONS</b> &middot; listPerformances · listProductCategories · getPerformance · createPerformances +8</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; eventId&larr;deepLink, performanceId&larr;deepLink</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-007">BO-007</a>  &mdash; <i>Product Directory</i><br><a href="#bo-009">BO-009</a>  &mdash; <i>Pricing Rules</i><br><a href="#bo-099">BO-099</a>  &mdash; <i>Performance manifest</i> <span class="car">performanceId</span><br><a href="#bo-023">BO-023</a>  &mdash; <i>Cancels it and reviews the refund exposure</i></div>
@@ -13452,7 +13452,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listMembershipCommercialPricing · setPrices · publishChannelAvailability · listPriceLists +1</div>
+          <div><b>OPERATIONS</b> &middot; listMembershipCommercialPricing · setPrices · getChannelAvailability · publishChannelAvailability +3</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; priceListId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-284">BO-284</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
@@ -20146,7 +20146,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>OPERATIONS</b> &middot; getWorkstationHealth · listWorkstations</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; venueId&larr;session, workstationId&larr;deepLink</div>
-          <div><b>GOES TO</b> &middot; <a href="#bo-036">BO-036</a>  &mdash; <i>The failing till is found, with its alerts</i> <span class="car">workstationId</span><br><a href="#bo-037">BO-037</a>  &mdash; <i>What the tills did offline is reconciled</i><br><a href="#bo-108">BO-108</a>  &mdash; <i>Venue Operations</i><br><a href="#bo-129">BO-129</a>  &mdash; <i>Software, Configuration &amp; Version Management</i> <span class="car">workstationId</span></div>
+          <div><b>GOES TO</b> &middot; <a href="#bo-036">BO-036</a>  &mdash; <i>The failing till is found, with its alerts</i> <span class="car">deviceId · workstationId</span><br><a href="#bo-037">BO-037</a>  &mdash; <i>What the tills did offline is reconciled</i><br><a href="#bo-108">BO-108</a>  &mdash; <i>Venue Operations</i><br><a href="#bo-129">BO-129</a>  &mdash; <i>Software, Configuration &amp; Version Management</i> <span class="car">workstationId</span></div>
           
           
         </div>
@@ -20176,7 +20176,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>OPERATIONS</b> &middot; setConfigurationProfile · deployConfigurationProfile · getWorkstationHealth · listWorkstations +6</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; venueId&larr;session, profileId&larr;deepLink, workstationId&larr;deepLink</div>
-          <div><b>GOES TO</b> &middot; <a href="#bo-037">BO-037</a>  &mdash; <i>Each device&#x27;s cached package is checked</i> <span class="car">version</span><br><a href="#bo-108">BO-108</a>  &mdash; <i>Venue Operations</i><br><a href="#bo-124">BO-124</a>  &mdash; <i>Its sale board layout is built</i> <span class="car">profileId</span><br><a href="#bo-130">BO-130</a>  &mdash; <i>Offline Policy &amp; Rules Configuration</i></div>
+          <div><b>GOES TO</b> &middot; <a href="#bo-037">BO-037</a>  &mdash; <i>Each device&#x27;s cached package is checked</i> <span class="car">version</span><br><a href="#bo-108">BO-108</a>  &mdash; <i>Venue Operations</i><br><a href="#bo-124">BO-124</a>  &mdash; <i>Its sale board layout is built</i> <span class="car">deviceId · profileId</span><br><a href="#bo-130">BO-130</a>  &mdash; <i>Offline Policy &amp; Rules Configuration</i></div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetConfigurationProfile &middot; <i>Save configuration profile</i> &middot; <b>Save configuration profile</b> &middot; Cancel <span class="dis">discards name · venueKindScope · scopePath · settings</span></div><div class="ov"><b>modal</b> formDeployConfigurationProfile &middot; <i>Deploy configuration profile</i> &middot; <b>Deploy configuration profile</b> &middot; Cancel <span class="dis">discards targetWorkstationIds · targetFilter · strategy</span></div></div>
         </div>
@@ -43989,12 +43989,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><b>Current payment terms</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">What setB2bPaymentTerms will replace, read for the picked account, so the form opens on the saved terms rather than empty (PR-9).</span></div><div class="panel"><b>Customer/account</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Credit agreement</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div></div><div class="side"><div class="panel"><b>Payment term</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Currency</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Current payment terms</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">What setB2bPaymentTerms will replace, read for the picked account, so the form opens on the saved terms rather than empty (PR-9).</span></div><div class="panel"><b>Customer/account</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">The B2B credit accounts (`listB2bCreditAccounts`); the picked account&#x27;s id is the `accountId` the terms are read and saved for (r8, ORDERS-MONEY-C28).</span></div><div class="panel"><b>Credit agreement</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div></div><div class="side"><div class="panel"><b>Payment term</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Currency</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; setB2bPaymentTerms · getInstalmentPolicy · setInstalmentPolicy · getB2bPaymentTerms</div>
+          <div><b>OPERATIONS</b> &middot; setB2bPaymentTerms · getInstalmentPolicy · setInstalmentPolicy · getB2bPaymentTerms +1</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess · emptyNoResults</span></div>
           <div><b>ARRIVES WITH</b> &middot; accountId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-599">ADM-599</a>  &mdash; <i>Back to Mixed Tender &amp; Credit Command Center</i></div>

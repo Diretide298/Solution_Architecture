@@ -14,8 +14,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - control.config_package_application
   writes:
+  - cache:idempotency
   - control.config_package_application
 - operation: applyMigration
   verb: POST
@@ -45,6 +47,7 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - control.outbox_republish
   writes:
   - cache:idempotency
@@ -74,8 +77,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - control.config_package_diff
   writes:
+  - cache:idempotency
   - control.config_package_diff
 - operation: exportConfigPackage
   verb: POST
@@ -86,8 +91,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - control.config_package
   writes:
+  - cache:idempotency
   - control.config_package
 - operation: getMigrationRun
   verb: GET
@@ -392,6 +399,7 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - platform.dead_letter
   writes:
   - cache:idempotency
@@ -405,6 +413,7 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - control.outbox_republish
   - platform.outbox
   writes:
@@ -469,8 +478,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - control.scaling_policy
   writes:
+  - cache:idempotency
   - control.scaling_policy
 - operation: setWafPolicy
   verb: PUT
@@ -481,8 +492,10 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - control.waf_rule
   writes:
+  - cache:idempotency
   - control.waf_rule
 - operation: skipRolloutCell
   verb: POST

@@ -49,7 +49,7 @@
     "x-ticvai-references": "catalogue.inventory_reservation",
     "type": "string",
     "nullable": true,
-    "description": "Lease the units were drawn from — a `catalogue.InventoryHold.id`. Absent for uncontended products."
+    "description": "Lease the units were drawn from — a `catalogue.InventoryHold.id`. Absent for uncontended products. **A standing-zone line** (zone-priced general admission at POS-004 and WEB-007; decided 20 October 2026, Chinmay, R8 blocker cause GPS-C38, option A; CHG-R8SPN-040) carries no `seatIds`: it is `quantity` places in one zone, held by `seating.createSeatHold` with `zoneId` and `quantity`, and this names that hold's inventory hold; the zone, its price band and keep-the-party- together come from the hold, and a lapsed one is `409 hold-not-active` as for seats."
    },
    "seatIds": {
     "type": "array",
@@ -382,6 +382,12 @@
     "nullable": true,
     "description": "The date the guest asked for on `requestGroupBooking` — what its `409 dateUnavailable` is checked against. Null for a group a member of staff built from an order."
    },
+   "performanceId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**The session, for a timed or session package** (DEC-121, Chinmay, 2 October 2026: a date and, for session products, a session; R8 blocker ORDERS-MONEY-C41, CHG-R8MIG-017): a `catalogue.performance` on `preferredDate`. Null for an open-dated package; written from the request."
+   },
    "orderId": {
     "type": "string",
     "format": "uuid"
@@ -455,6 +461,12 @@
     "type": "string",
     "format": "date"
    },
+   "performanceId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**The session, for a timed or session package** (DEC-121, Chinmay, 2 October 2026: a date and, for session products, a session; R8 blocker ORDERS-MONEY-C41, CHG-R8MIG-017): a `catalogue.performance` on `preferredDate`. Required when the package product is a timed or session product (400 otherwise), null for an open-dated one."
+   },
    "expectedSize": {
     "type": "integer",
     "minimum": 2
@@ -513,12 +525,38 @@
     "readOnly": true,
     "x-ticvai-references": "catalogue.product"
    },
+   "name": {
+    "type": "string",
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "**Read from the package's product, not stored here** (R8 blocker ORDERS-MONEY-C20, CHG-R8MIG-009): `catalogue.product.name`, in the caller's language."
+   },
+   "unitPrice": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "The product's price per participant (`pricingBasis` perParticipant) or per package, read from the product's current price; not stored here."
+   },
+   "minimumSize": {
+    "type": "integer",
+    "minimum": 1,
+    "nullable": true,
+    "description": "The smallest group the package is sold to; null means one participant. Stored on the package (`catalogue.group_package.minimum_size`), since the product carries no minimum (CHG-R8MIG-009)."
+   },
    "kind": {
     "type": "string",
     "enum": [
      "school",
-     "party"
-    ]
+     "party",
+     "corporate",
+     "tourOperator",
+     "community"
+    ],
+    "description": "`corporate`, `tourOperator` and `community` are the group types the approved group-booking screens draw beside school and party (CHG-SGU-024; R8 blocker ORDERS-MONEY-C20, CHG-R8MIG-009)."
    },
    "maxParticipants": {
     "type": "integer",
@@ -645,6 +683,13 @@
     "type": "string",
     "format": "uuid",
     "description": "The client UUIDv7 from `CreateOrderRequest.id`."
+   },
+   "orderAccessToken": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "**What lets the device that just checked out read the order it paid for** (decided 20 October 2026, Chinmay, R8 blocker cause IDENTITY-C52, option A; CHG-R8SPN-025). Returned only in `checkoutCart`'s answer, null everywhere else: a signed token bound to this order and to the cart's device, valid 24 hours, never stored. `getOrder` accepts it in `X-Order-Access-Token` in place of a session, so a guest who checked out with no account, or whose session ended, still sees the confirmation (WEB-013 keeps it in its navigation state). It reads this order only and grants nothing else."
    },
    "orderNumber": {
     "x-ticvai-unique": "tenant",
@@ -972,6 +1017,11 @@
  },
  "Payment": {
   "x-ticvai-persistence": "orders.payment",
+  "x-ticvai-index": [
+   [
+    "providerReference"
+   ]
+  ],
   "type": "object",
   "required": [
    "id",
@@ -1524,6 +1574,38 @@
    }
   }
  },
+ "ProductStartTime": {
+  "x-ticvai-persistence": "none — computed on read",
+  "type": "object",
+  "description": "One start time a room type can be booked at for the chosen length (rev 3 REV3-13).",
+  "required": [
+   "startsAt",
+   "endsAt",
+   "freeCount"
+  ],
+  "properties": {
+   "startsAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "endsAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "`startsAt` plus the variant's `durationMinutes`; the cart line's `bookedWindow.endsAt`."
+   },
+   "freeCount": {
+    "type": "integer",
+    "minimum": 1,
+    "description": "Resources of the room type free for the whole window. Only times with at least one are returned."
+   },
+   "maxCapacity": {
+    "type": "integer",
+    "minimum": 1,
+    "nullable": true,
+    "description": "The most people one free room of the type holds in this window (the largest `capacity` among the free resources), so the guest sees before choosing whether the party fits; the cart line's attendees above the chosen room's capacity are refused (orders addCartLine 422 attendees-over-capacity) (r8, GPS-C28). Null where the resources declare no capacity."
+   }
+  }
+ },
  "ResaleListing": {
   "type": "object",
   "x-ticvai-persistence": "orders.resale_listing",
@@ -1704,63 +1786,6 @@
     "type": "string",
     "format": "uuid",
     "nullable": true
-   }
-  }
- },
- "ResourceAvailability": {
-  "type": "object",
-  "description": "**Free windows, with setup and teardown already subtracted.** A client computing this from bookings will forget the turnaround.\n",
-  "properties": {
-   "resourceId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "freeWindows": {
-    "type": "array",
-    "items": {
-     "type": "object",
-     "properties": {
-      "from": {
-       "type": "string",
-       "format": "date-time"
-      },
-      "to": {
-       "type": "string",
-       "format": "date-time"
-      }
-     }
-    }
-   },
-   "blockedWindows": {
-    "type": "array",
-    "description": "**With a reason, because they are not the same.** Booked and under repair need different responses from an operator looking for something free — wait, or look elsewhere.\n",
-    "items": {
-     "type": "object",
-     "properties": {
-      "from": {
-       "type": "string",
-       "format": "date-time"
-      },
-      "to": {
-       "type": "string",
-       "format": "date-time"
-      },
-      "reason": {
-       "type": "string",
-       "enum": [
-        "booked",
-        "held",
-        "setup",
-        "teardown",
-        "maintenance",
-        "blackout",
-        "closed",
-        "cleaning"
-       ],
-       "description": "`held` is a live `ResourceHold` (rev 3 REV3-15): taken now, free again if it expires. `cleaning` is a cleaning the resource's `cleaningPolicy` places (W10, 29 September).\n"
-      }
-     }
-    }
    }
   }
  },

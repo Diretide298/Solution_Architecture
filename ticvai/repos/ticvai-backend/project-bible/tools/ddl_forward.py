@@ -273,9 +273,16 @@ ACROSS_HELPERS = ("apply_parent_across_rls", "apply_parent_split_across_rls")
 # **A table that was the tenant root's alone has rows only the tenant root wrote** (MOD audit, 14 October 2026,
 # CHG-MOD-007). Until its scope_path arrives, its policy (`apply_tenant_rls`) let no other connection insert a row, so
 # every row it holds sits at the tenant root by construction: the backfill is the tenant root's path, then NOT NULL.
-def scope_path_backfill(t: str, cols, was_tenant_root: bool = False) -> str | None:
+#
+# **A table that was under the venue policy has rows owned by their venue** (r8 gate residue, 20 October 2026,
+# CHG-R8RES-001). `apply_venue_rls` showed a row exactly where `platform.venue_in_scope(venue_id)` held: the venue's
+# own `platform.scope` row by its id, and the tenant root for a null `venue_id`. A scope_path that replaces that policy
+# (ledger.account_mapping, ADAM CR-168, CHG-CRA-007) is backfilled to the same answer, so no row moves: the venue's
+# path, else the tenant root's; then NOT NULL. `was_venue`: the policy in force before this migration was the venue's.
+def scope_path_backfill(t: str, cols, was_tenant_root: bool = False, was_venue: bool = False) -> str | None:
     """The statements that fill and then close a scope_path added nullable to `t`, or None when the owner is unknown.
-    `was_tenant_root`: the table's policy before this migration was the tenant root's alone."""
+    `was_tenant_root`: the table's policy before this migration was the tenant root's alone. `was_venue`: it was
+    `apply_venue_rls`, so `venue_id` (a platform.scope id) owned each row."""
     if t in SCOPE_FOLLOWS and SCOPE_FOLLOWS[t][0] in cols:
         key, parent, _level = SCOPE_FOLLOWS[t]
         return (f"UPDATE {t} x SET scope_path = p.scope_path FROM {parent} p WHERE p.id = x.{key} AND x.scope_path IS "
@@ -287,6 +294,8 @@ def scope_path_backfill(t: str, cols, was_tenant_root: bool = False) -> str | No
                 f"NULL; UPDATE {t} SET scope_path = (SELECT path FROM platform.scope WHERE level = 'tenant') WHERE "
                 f"scope_path IS NULL; ALTER TABLE {t} ALTER COLUMN scope_path SET NOT NULL")
     owner = next((c for c in SCOPE_OWNER_KEYS if c in cols), None)
+    if not owner and was_venue and "venue_id" in cols:
+        owner = "venue_id"
     if not owner and was_tenant_root:
         return (f"UPDATE {t} SET scope_path = (SELECT path FROM platform.scope WHERE level = 'tenant') WHERE "
                 f"scope_path IS NULL; ALTER TABLE {t} ALTER COLUMN scope_path SET NOT NULL")
@@ -313,6 +322,83 @@ def retire_not_null(t: str, c: str) -> str:
     return (f"DO $$ BEGIN IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = '{unq(sch)}' AND "
             f"table_name = '{unq(name)}' AND column_name = '{unq(c)}' AND is_nullable = 'NO') THEN ALTER TABLE {t} "
             f"ALTER COLUMN {c} DROP NOT NULL; END IF; END $$")
+
+
+def _inline_check(coldef: str):
+    """(name, the whole `CONSTRAINT <name> CHECK (...)` text, the expression inside) of a column's inline CHECK."""
+    m = re.search(r"CONSTRAINT (\S+) CHECK \(", coldef, re.I)
+    if not m:
+        return None
+    depth, i = 0, m.end() - 1
+    for j in range(i, len(coldef)):
+        depth += {"(": 1, ")": -1}.get(coldef[j], 0)
+        if depth == 0:
+            return m.group(1), coldef[m.start():j + 1], coldef[i + 1:j]
+    return None
+
+
+IN_LIST = re.compile(r"^(\w+) IN \((.*)\)$", re.S)
+
+
+def widened_check(old_def: str, new_def: str):
+    """**A column CHECK that only gained values** (CHG-R8MIG-006): the same column but for an inline
+    `CHECK (col IN (...))` whose new list holds every old value and more. Returns (constraint name, the new
+    `CONSTRAINT ... CHECK (...)` clause), else None. Widening refuses no row that was valid, so it is additive."""
+    o, n = _inline_check(old_def), _inline_check(new_def)
+    if not o or not n or o[0] != n[0]:
+        return None
+    if norm(old_def.replace(o[1], "")) != norm(new_def.replace(n[1], "")):
+        return None
+    mo, mn = IN_LIST.match(o[2].strip()), IN_LIST.match(n[2].strip())
+    if not mo or not mn or mo.group(1) != mn.group(1):
+        return None
+    vals = lambda s: {v.strip() for v in re.findall(r"'(?:[^']|'')*'", s)}
+    old_v, new_v = vals(mo.group(2)), vals(mn.group(2))
+    if not old_v or not old_v < new_v:
+        return None
+    return n[0], n[1]
+
+
+def changed_check_only(old_def: str, new_def: str):
+    """(name, the new `CONSTRAINT ... CHECK (...)` clause) when the column changes only by gaining an inline CHECK or
+    by a CHECK of the same name that is not a widening (CHG-R8MIG-011); else None."""
+    n = _inline_check(new_def)
+    if not n:
+        return None
+    o = _inline_check(old_def)
+    if o and o[0] != n[0]:
+        return None
+    if norm(old_def.replace(o[1], "") if o else old_def) != norm(new_def.replace(n[1], "")):
+        return None
+    return n[0], n[1]
+
+
+def guard_add_constraint(t: str, name: str, stmt: str) -> str:
+    """`stmt` (an ALTER TABLE ... ADD CONSTRAINT) only when the constraint is not there yet (CHG-R8MIG-010)."""
+    return (f"DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = '{name}' AND conrelid = "
+            f"to_regclass('{t}')) THEN {norm(stmt).rstrip(';')}; END IF; END $$")
+
+
+def guard_drop_constraint(t: str, name: str) -> str:
+    return (f"DO $$ BEGIN IF EXISTS (SELECT 1 FROM pg_constraint WHERE conname = '{name}' AND conrelid = "
+            f"to_regclass('{t}')) THEN ALTER TABLE {t} DROP CONSTRAINT {name}; END IF; END $$")
+
+
+def pk_columns(t) -> set:
+    """The columns of a table's PRIMARY KEY (...) constraint: never relaxed, the key keeps them NOT NULL."""
+    out = set()
+    for c in t.constraints:
+        m = re.search(r"PRIMARY KEY\s*\(([^)]*)\)", c, re.I)
+        if m:
+            out |= {unq(x.strip()) for x in m.group(1).split(",")}
+    return out
+
+
+def only_not_null_dropped(old_def: str, new_def: str) -> bool:
+    """`new_def` is `old_def` with its NOT NULL taken off and nothing else changed (not a key column)."""
+    if "PRIMARY KEY" in old_def.upper() or not re.search(r"\bNOT NULL\b", old_def, re.I):
+        return False
+    return norm(re.sub(r"\s+NOT NULL\b", "", old_def, flags=re.I)) == norm(new_def)
 
 
 class Model:
@@ -352,6 +438,65 @@ class Model:
             order.append((nk, pat.sub(new, st)))
         self.stmts, self.order = stmts, order
 
+    def rename_column(self, t: str, a: str, b: str) -> None:
+        """`RENAME COLUMN a TO b` on `t`: the indexes, keys and policy calls that name the column follow, as
+        PostgreSQL rewrites them. A foreign key from another table follows only inside `REFERENCES t (...)`."""
+        word = re.compile(r"(?<![\w.])" + re.escape(a) + r"(?![\w])")
+        tab = self.tables[t]
+        if a in tab.cols:
+            d = word.sub(b, tab.cols.pop(a))
+            tab.cols[b] = d
+        tab.constraints = {word.sub(b, c) if not re.search(r"REFERENCES", c, re.I)
+                           else self._ref_sub(word, b, c, t) for c in tab.constraints}
+        qt = re.compile(r"(?<![\w.])" + re.escape(t) + r"(?![\w])")
+
+        def fix(k, st):
+            if k[0] == "index" and qt.search(st):
+                head, _, rest = st.partition(" ON ")
+                return head + " ON " + word.sub(b, rest)
+            if k[0] == "constraint":
+                return self._ref_sub(word, b, st, t, only_target=k[1] != t)
+            if k[0] == "stmt":
+                c = rls_call(st)
+                if c and c[1] == t:
+                    return st.replace(f"'{a}'", f"'{b}'")
+            return st
+
+        new_stmts, new_order = {}, []
+        for k, st in self.order:
+            new_order.append((k, fix(k, st)))
+        for k, st in self.stmts.items():
+            new_stmts[k] = fix(k, st)
+        self.stmts, self.order = new_stmts, new_order
+
+    @staticmethod
+    def _ref_sub(word, b, st, t, only_target: bool = False) -> str:
+        """Substitute a column name in a foreign key: the key's own columns (the table is `t`) and, when the key
+        points at `t`, the target list. Spacing is kept as written."""
+        m = re.search(r"REFERENCES", st, re.I)
+        if not m:
+            return st if only_target else word.sub(b, st)
+        head, tail = st[:m.start()], st[m.start():]
+        mm = re.match(r"(REFERENCES\s+(\S+?)\s*)(\([^)]*\))", tail, re.I)
+        if mm and unq(mm.group(2)) == t:
+            tail = tail[:mm.start(3)] + word.sub(b, mm.group(3)) + tail[mm.end(3):]
+        if not only_target:
+            head = word.sub(b, head)
+        return head + tail
+
+    def rename_constraint(self, t: str, old: str, new: str) -> None:
+        tab = self.tables.get(t)
+        if tab is not None:
+            for c, d in list(tab.cols.items()):
+                tab.cols[c] = d.replace(f"CONSTRAINT {old} ", f"CONSTRAINT {new} ")
+            tab.constraints = {c.replace(f"CONSTRAINT {old} ", f"CONSTRAINT {new} ") for c in tab.constraints}
+        k = ("constraint", t, old)
+        if k in self.stmts:
+            nk = ("constraint", t, new)
+            self.stmts[nk] = self.stmts.pop(k).replace(f"ADD CONSTRAINT {old} ", f"ADD CONSTRAINT {new} ")
+            self.order = [(nk if ok == k else ok, st.replace(f"ADD CONSTRAINT {old} ", f"ADD CONSTRAINT {new} ")
+                           if ok == k else st) for ok, st in self.order]
+
     def drop(self, pred) -> None:
         for k in [k for k in self.stmts if pred(k)]:
             del self.stmts[k]
@@ -363,6 +508,11 @@ class Model:
             s = norm(stmt)
             if re.match(r"INSERT INTO platform\.schema_version\b", s, re.I):
                 continue
+            g = None if RETIRE_GUARD.match(s) else GUARD.match(s)
+            from_guard = bool(g)
+            if g:
+                # a guarded rename, key or dropped index (R8-MIG-001): fold in the one change it makes
+                stmt = s = re.sub(r" NOT VALID$", "", norm(g.group("body")), flags=re.I)
             m = RETIRE_GUARD.match(s)
             if m and f"{m.group(1)}.{m.group(2)}" in self.tables:
                 t, c = f"{m.group(1)}.{m.group(2)}", m.group(3)
@@ -384,8 +534,10 @@ class Model:
                 name, to = unq(m.group(1)), unq(m.group(2))
                 for k in [k for k in self.stmts if k[0] == "index" and (k[1] == name or k[1].split(".", 1)[1] == name)]:
                     nk = ("index", k[1].split(".")[0] + "." + to)
-                    self.stmts[nk] = self.stmts.pop(k)
-                    self.order = [(nk if ok == k else ok, st) for ok, st in self.order]
+                    ren = lambda x, o=k[1].split(".", 1)[1]: re.sub(
+                        rf"(INDEX (?:IF NOT EXISTS )?){re.escape(o)}\b", rf"\g<1>{to}", x, count=1)
+                    self.stmts[nk] = ren(self.stmts.pop(k))
+                    self.order = [(nk, ren(st)) if ok == k else (ok, st) for ok, st in self.order]
                 continue
             m = re.match(rf"ALTER TABLE (?:ONLY )?(?:IF EXISTS )?({QNAME}) (.*)$", s, re.I)
             if m and unq(m.group(1)) in self.tables:
@@ -409,16 +561,35 @@ class Model:
                         continue
                     a = re.match(rf"RENAME COLUMN ({NAME}) TO ({NAME})", action, re.I)
                     if a and unq(a.group(1)) in tab.cols:
-                        old = tab.cols.pop(unq(a.group(1)))
-                        tab.cols[unq(a.group(2))] = norm(unq(a.group(2)) + " " + old.split(" ", 1)[1])
-                        self.handled.add((t, unq(a.group(2))))
+                        self.rename_column(t, unq(a.group(1)), unq(a.group(2)))
+                        if not from_guard:   # a written rename leaves the column's other differences listed
+                            self.handled.add((t, unq(a.group(2))))
+                        handled = True
+                        continue
+                    a = re.match(rf"RENAME CONSTRAINT ({NAME}) TO ({NAME})", action, re.I)
+                    if a:
+                        self.rename_constraint(t, unq(a.group(1)), unq(a.group(2)))
                         handled = True
                         continue
                     # A table CHECK a forward migration added (NOT VALID, then VALIDATE; CHG-MGN-001) is the table's
                     # constraint, as it is in the generated CREATE TABLE, so the next diff does not write it again.
                     a = re.match(rf"ADD (CONSTRAINT {NAME} CHECK .*?)(?: NOT VALID)?$", action, re.I)
                     if a:
-                        tab.constraints.add(norm(a.group(1)))
+                        # a column CHECK widened in place (CHG-R8MIG-006) replaces the column's inline CHECK
+                        added = norm(a.group(1))
+                        nm = _inline_check(added)
+                        inline = [c_ for c_, d_ in tab.cols.items()
+                                  if nm and (_inline_check(d_) or ("",))[0] == nm[0]]
+                        # a CHECK added to a column that had none (CHG-R8MIG-011): named `<table>_<column>_chk`
+                        bare = [c_ for c_, d_ in tab.cols.items() if nm and not _inline_check(d_)
+                                and nm[0] == f"{t.split('.', 1)[1]}_{c_}_chk"]
+                        if inline:
+                            d_ = tab.cols[inline[0]]
+                            tab.cols[inline[0]] = norm(d_.replace(_inline_check(d_)[1], added))
+                        elif bare:
+                            tab.cols[bare[0]] = norm(tab.cols[bare[0]] + " " + added)
+                        else:
+                            tab.constraints.add(added)
                         handled = True
                         continue
                     if re.match(rf"VALIDATE CONSTRAINT {NAME}$", action, re.I):
@@ -446,6 +617,105 @@ class Model:
             self.add(stmt)
 
 
+# **Renames, keys and dropped indexes are written, guarded** (R8-MIG-001, cause ORDERS-MONEY-C23, 19 October 2026).
+# Until now every pure column rename (254 of them), every foreign key declared since r1 and every index that is no
+# longer generated sat in handoff/migration-review.md "for a person", and no migration ticket carried them, so the
+# DDL a developer copies had the old names. They go into a second forward file (the "reconcile" file). Each statement
+# is a `DO $$ ... IF <guard> THEN <one change>; END IF; END $$` block, because the databases it runs on were built
+# from the old DDL by migrations written before this file existed, and some tables are created by migrations that
+# come after it (V1000 upwards, copied from the same DDL): a block whose objects are not there yet does nothing, and
+# the migration that creates them copies the block for its own tables (the ticket says so). Applying the file twice
+# changes nothing. A `DO` block is recognised again by `unwrap_guard`, so the next run sees the change as done.
+GUARD = re.compile(r"^DO \$\$ BEGIN IF (?P<guard>.*?) THEN (?P<body>(?:ALTER TABLE|ALTER INDEX|DROP INDEX|CREATE (?:UNIQUE )?INDEX) .*?); "
+                   r"END IF; END \$\$$", re.I | re.S)
+
+
+def _col_exists(sch: str, tab: str, col: str) -> str:
+    return (f"EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = '{sch}' AND "
+            f"table_name = '{tab}' AND column_name = '{col}')")
+
+
+def _split_t(t: str) -> tuple:
+    sch, name = unq(t).split(".", 1)
+    return sch, name
+
+
+def tag(table: str, kind: str, detail: str, stmt: str, other: str = "") -> str:
+    """A one-line comment before a block, `-- <table> | <kind> | <detail> [| <other table>]`, so the migration ticket of
+    the table can list what the block does to it (ticket_done.names_changes). Comments are not statements."""
+    return f"-- {table} | {kind} | {detail}" + (f" | {other}" if other else "") + "\n" + stmt
+
+
+def guard_rename_column(t: str, old: str, new: str) -> str:
+    sch, name = _split_t(t)
+    return (f"DO $$ BEGIN IF {_col_exists(sch, name, old)} AND NOT {_col_exists(sch, name, new)} THEN "
+            f"ALTER TABLE {t} RENAME COLUMN {old} TO {new}; END IF; END $$")
+
+
+def guard_rename_index(t: str, old: str, new: str) -> str:
+    sch, _ = _split_t(t)
+    return (f"DO $$ BEGIN IF to_regclass('{sch}.{old}') IS NOT NULL AND to_regclass('{sch}.{new}') IS NULL THEN "
+            f"ALTER INDEX {sch}.{old} RENAME TO {new}; END IF; END $$")
+
+
+def guard_rename_constraint(t: str, old: str, new: str) -> str:
+    return (f"DO $$ BEGIN IF EXISTS (SELECT 1 FROM pg_constraint WHERE conname = '{old}' AND conrelid = "
+            f"to_regclass('{t}')) AND NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = '{new}' AND conrelid = "
+            f"to_regclass('{t}')) THEN ALTER TABLE {t} RENAME CONSTRAINT {old} TO {new}; END IF; END $$")
+
+
+def guard_create_index(t: str, stmt: str, cols) -> str:
+    sch, name = _split_t(t)
+    have = " AND ".join(_col_exists(sch, name, c) for c in sorted(cols))
+    return f"DO $$ BEGIN IF {have} THEN {norm(stmt).rstrip(';')}; END IF; END $$"
+
+
+def guard_drop_index(idx: str) -> str:
+    return f"DO $$ BEGIN IF to_regclass('{idx}') IS NOT NULL THEN DROP INDEX {idx}; END IF; END $$"
+
+
+FK = re.compile(rf"^ALTER TABLE (?:ONLY )?({QNAME}) ADD CONSTRAINT ({NAME}) FOREIGN KEY \(([^)]*)\) REFERENCES "
+                rf"({QNAME})\s*\(([^)]*)\)(.*)$", re.I)
+
+
+def parse_fk(stmt: str):
+    m = FK.match(norm(stmt))
+    if not m:
+        return None
+    cols = [unq(x.strip()) for x in m.group(3).split(",")]
+    pcols = [unq(x.strip()) for x in m.group(5).split(",")]
+    return unq(m.group(1)), unq(m.group(2)), cols, unq(m.group(4)), pcols, m.group(6).strip()
+
+
+def guard_foreign_key(stmt: str, not_valid: bool = True) -> str | None:
+    """The foreign key, added NOT VALID when both tables exist, its columns exist and have the same type, the
+    parent's columns are a unique key, and the constraint is not there. NOT VALID: it enforces every new write and
+    takes no scan of the rows already there, so a database holding a row that breaks it still applies this file;
+    `VALIDATE CONSTRAINT` is the owner's, when the data is clean. **A partitioned table cannot take a NOT VALID key**
+    (PostgreSQL 12 to 17: "cannot add NOT VALID foreign key on partitioned table"), so its key is added checked,
+    which scans the rows already there; on the partitioned tables of the first release that is a few rows."""
+    f = parse_fk(stmt)
+    if not f:
+        return None
+    t, name, cols, parent, pcols, tail = f
+    if "NOT VALID" in tail.upper():
+        return None
+    (tsch, tn), (psch, pn) = _split_t(t), _split_t(parent)
+    exist = " AND ".join([f"to_regclass('{t}') IS NOT NULL", f"to_regclass('{parent}') IS NOT NULL",
+                          f"NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = '{name}' AND conrelid = "
+                          f"to_regclass('{t}'))"])
+    same_type = " AND ".join(
+        f"(SELECT atttypid FROM pg_attribute WHERE attrelid = to_regclass('{t}') AND attname = '{c}') = "
+        f"(SELECT atttypid FROM pg_attribute WHERE attrelid = to_regclass('{parent}') AND attname = '{pc}')"
+        for c, pc in zip(cols, pcols))
+    arr = "ARRAY[" + ", ".join(f"'{c}'" for c in sorted(pcols)) + "]"
+    unique = (f"EXISTS (SELECT 1 FROM pg_index i WHERE i.indrelid = to_regclass('{parent}') AND i.indisunique AND "
+              f"i.indpred IS NULL AND i.indexprs IS NULL AND (SELECT array_agg(a.attname::text ORDER BY a.attname) "
+              f"FROM pg_attribute a WHERE a.attrelid = i.indrelid AND a.attnum = ANY (i.indkey)) = {arr})")
+    body = norm(stmt).rstrip(";") + (" NOT VALID" if not_valid else "")
+    return f"DO $$ BEGIN IF {exist} AND {same_type} AND {unique} THEN {body}; END IF; END $$"
+
+
 RLS_CALL = re.compile(r"^SELECT platform\.(apply_\w*rls|drop_rls_policies)\('([^']+)'::regclass", re.I)
 
 
@@ -466,6 +736,19 @@ def was_tenant_root(model, t: str) -> bool:
     return False
 
 
+def was_venue_rls(model, t: str) -> bool:
+    """`t`'s first policy in `model`, before any scope policy, was `apply_venue_rls`: each row it held then was owned
+    by its `venue_id`, a platform.scope id, and a null one by the tenant root (CHG-R8RES-001). The first, as
+    was_tenant_root reads it, and not the last: once the forward migration that adds the scope_path is applied, the
+    table's last policy is the new one, and the backfill the review names must survive the next derive (the
+    CHG-MOD-007 class: a review row dropped for a column nobody changed)."""
+    for _k, st in model.order:
+        rc = rls_call(st)
+        if rc and rc[1] == t and rc[0] != "drop_rls_policies":
+            return rc[0] == "apply_venue_rls"
+    return False
+
+
 def tables_named(stmt: str, known: set) -> set:
     return {unq(x) for x in re.findall(rf"(?<![\w.]){QNAME}(?![\w(])", stmt)} & known
 
@@ -483,6 +766,11 @@ class Plan:
     rollback: list = field(default_factory=list)
     review: list = field(default_factory=list)    # (kind, object, change, what a person does)
     counts: dict = field(default_factory=lambda: {"tables": 0, "columns": 0, "indexes": 0, "other": 0})
+    # The second forward file (R8-MIG-001): what the first release's generated schema differs from the baseline by
+    # NAME, not by shape, written so a database built from the old DDL ends up with the names the contracts use.
+    recon: list = field(default_factory=list)
+    recon_rollback: list = field(default_factory=list)
+    recon_counts: dict = field(default_factory=lambda: {"renames": 0, "keys": 0, "indexes": 0})
 
 
 def _cols_in_parens(stmt: str) -> set:
@@ -501,12 +789,22 @@ def move_sql(old: str, new: str) -> str:
     return sql + (f"; ALTER TABLE {ns}.{on} RENAME TO {nn}" if on != nn else "")
 
 
+def _renamed_name(new_name: str, rc: dict, tables) -> str:
+    """The name an index had before its column was renamed: the new name with each old column put back."""
+    out = new_name
+    for (t, nc), oc in rc.items():
+        if t in tables:
+            out = re.sub(r"(?<![a-z0-9])" + re.escape(nc) + r"(?![a-z0-9])", oc, out)
+    return out
+
+
 def diff(area: str, old: Model, new: Model, renames: dict | None = None, retired: dict | None = None) -> Plan:
     """`renames`: {"tables": {old: new}, "columns": {(table as named now, old column): new column}}, the
     declared renames (CHG-R6-010). Only a table that exists on the old side under its old name and on the new
     side under its new one is treated as renamed; likewise a column. `retired`: {table: {column}}, the columns the
     contracts withdraw (`x-ticvai-retired-columns`, CHG-MGN-001)."""
     p = Plan(area)
+    recon_cols, recon_names, recon_fk, recon_drop = [], [], [], []   # (statement, rollback), in the order they run
     renames = renames or {}
     retired = retired or {}
     known = set(old.tables) | set(new.tables)
@@ -560,6 +858,18 @@ def diff(area: str, old: Model, new: Model, renames: dict | None = None, retired
                + (f"drop {', '.join(objs)}, " if objs else "")
                + f"then ALTER TABLE {t} DROP COLUMN {c} in a later forward migration")
 
+    def add_fk(k, t, name) -> bool:
+        """A foreign key added since the old side: written guarded, NOT VALID (R8-MIG-001). Not for a table or a
+        parent that is renamed, which still has its old name in the databases: those wait with the rename."""
+        fk = parse_fk(new.stmts[k])
+        partitioned = bool(fk) and "PARTITION BY" in ((new.tables.get(t) or Table()).tail or "").upper()
+        g = guard_foreign_key(new.stmts[k], not_valid=not partitioned) if fk else None
+        if g and t in old.tables and t not in rt and fk[3] not in rt and fk[3] in known:
+            recon_fk.append((tag(t, "foreign key", name, g, fk[3]), f"ALTER TABLE {t} DROP CONSTRAINT IF EXISTS {name};"))
+            p.recon_counts["keys"] += 1
+            return True
+        return False
+
     def on_renamed_col(t, cols) -> bool:
         return bool(cols) and any((t, c) in rc for c in cols)
 
@@ -570,6 +880,17 @@ def diff(area: str, old: Model, new: Model, renames: dict | None = None, retired
         was = re.sub(r"(?<![\w])" + re.escape(old_name) + r"(?![\w])", new_name, old_def)
         strip = lambda d: norm(re.sub(r"(?<![\w])CONSTRAINT \S+ ", "", d))
         return strip(was) == strip(new_def)
+
+    def pure_rename(t, c) -> bool:
+        """The renamed column `t.c` changes nothing but its name, so this file renames it (R8-MIG-001)."""
+        oc = rc.get((t, c))
+        if oc is None or t in rt:
+            return False
+        was, now = old.tables[t].cols[oc], new.tables[t].cols[c]
+        return same_but_name(c, was, now) or same_but_name(c, was, relaxed(now))
+
+    def all_pure(t, cols) -> bool:
+        return all(pure_rename(t, c) for c in (cols or ()) if (t, c) in rc)
 
     for t in sorted(rt):
         o = rt[t]
@@ -619,6 +940,21 @@ def diff(area: str, old: Model, new: Model, renames: dict | None = None, retired
                 if (t, c) in rc:
                     oc = rc[(t, c)]
                     same = same_but_name(c, a.cols[oc], d)
+                    if same or same_but_name(c, a.cols[oc], relaxed(d)):
+                        # (a NOT NULL the new column adds is its own "not null" row, listed after this rename)
+                        if not same:
+                            review("not null", f"{t}.{c}", "renamed by the names file; the schema reference says NOT NULL",
+                                   "backfill, then ALTER COLUMN ... SET NOT NULL")
+                        # **A pure rename is written** (R8-MIG-001): no type, default or data question behind it.
+                        recon_cols.append((tag(t, "rename column", f"{oc} to {c}", guard_rename_column(t, oc, c)), f"ALTER TABLE {t} RENAME COLUMN {c} TO {oc};"))
+                        p.recon_counts["renames"] += 1
+                        # an inline CHECK is named for its table and column: its name moves with the column
+                        for on_, nn_ in zip(re.findall(r"CONSTRAINT (\S+) ", a.cols[oc]),
+                                            re.findall(r"CONSTRAINT (\S+) ", d)):
+                            if on_ != nn_:
+                                recon_names.append((tag(t, "rename constraint", f"{on_} to {nn_}", guard_rename_constraint(t, on_, nn_)),
+                                                    f"ALTER TABLE {t} RENAME CONSTRAINT {nn_} TO {on_};"))
+                        continue
                     review("column renamed", f"{t}.{oc} -> {c}",
                            "declared rename (derive-schema-history.py COLUMN_RENAMES)"
                            + ("" if same else f"; the definition changes too: `{a.cols[oc]}` -> `{d}`"),
@@ -636,7 +972,7 @@ def diff(area: str, old: Model, new: Model, renames: dict | None = None, retired
                         # CHG-GEN-008: a row with no scope_path is invisible to every grant once the table's policy reads
                         # it, so the backfill is due in the same release as the column, not later. CHG-R6G-002: the
                         # backfill is named when the table holds its owning scope's key, before the NOT NULL.
-                        fill = scope_path_backfill(t, b.cols, was_tenant_root(old, t))
+                        fill = scope_path_backfill(t, b.cols, was_tenant_root(old, t), was_venue_rls(old, t))
                         review("not null", f"{t}.{c}", "added nullable; the schema reference says NOT NULL, and row-"
                                "level security reads it",
                                (f"in the forward migration that adds it, backfill first, then the NOT NULL: {fill}"
@@ -647,7 +983,8 @@ def diff(area: str, old: Model, new: Model, renames: dict | None = None, retired
                         review("not null", f"{t}.{c}", "added nullable; the schema reference says NOT NULL",
                                "backfill, then ALTER COLUMN ... SET NOT NULL in a forward migration")
                 elif a.cols[c] != d and (t, c) not in old.handled:
-                    fill = scope_path_backfill(t, b.cols, was_tenant_root(old, t)) if c == "scope_path" else None
+                    fill = (scope_path_backfill(t, b.cols, was_tenant_root(old, t), was_venue_rls(old, t))
+                            if c == "scope_path" else None)
                     if a.cols[c] == relaxed(d) and fill:
                         # **A scope_path an earlier forward migration added keeps its named backfill** (MOD audit,
                         # 14 October 2026, CHG-MOD-007). Once that migration is in the old side, the column is "still
@@ -660,6 +997,43 @@ def diff(area: str, old: Model, new: Model, renames: dict | None = None, retired
                     elif a.cols[c] == relaxed(d):
                         review("not null", f"{t}.{c}", "still nullable in the databases; the schema reference "
                                "says NOT NULL", "backfill, then ALTER COLUMN ... SET NOT NULL")
+                    elif widened_check(a.cols[c], d):
+                        # **A column CHECK that only gained values is written** (CHG-R8MIG-006: an enum value the
+                        # contract adds, TenantDomain.channel staffApp): dropped and added again NOT VALID, then
+                        # VALIDATE, as a new table CHECK is; apply_forward folds it into the column, so once.
+                        name, clause = widened_check(a.cols[c], d)
+                        p.statements += [f"ALTER TABLE {t} DROP CONSTRAINT IF EXISTS {name}",
+                                         f"ALTER TABLE {t} ADD {clause} NOT VALID",
+                                         f"ALTER TABLE {t} VALIDATE CONSTRAINT {name}"]
+                        old_clause = _inline_check(a.cols[c])[1]
+                        p.rollback.append(f"ALTER TABLE {t} DROP CONSTRAINT IF EXISTS {name}; "
+                                          f"ALTER TABLE {t} ADD {old_clause} NOT VALID;")
+                        p.counts["other"] += 1
+                    elif changed_check_only(a.cols[c], d):
+                        # **A column CHECK added or narrowed is written NOT VALID** (CHG-R8MIG-011; the storage-sat
+                        # lane's request 3: marketing.customer_badge.source_type and status became enums). It binds
+                        # every new write at once; the rows already there are the migration owner's to check, so
+                        # VALIDATE is a review row, not a statement that could fail the migration.
+                        name, clause = changed_check_only(a.cols[c], d)
+                        p.statements += [f"ALTER TABLE {t} DROP CONSTRAINT IF EXISTS {name}",
+                                         f"ALTER TABLE {t} ADD {clause} NOT VALID"]
+                        old_ic = _inline_check(a.cols[c])
+                        p.rollback.append(f"ALTER TABLE {t} DROP CONSTRAINT IF EXISTS {name};"
+                                          + (f" ALTER TABLE {t} ADD {old_ic[1]} NOT VALID;" if old_ic else ""))
+                        p.counts["other"] += 1
+                        # a "column changed" row on the column, so the checks reading the frozen DDL see it pending
+                        review("column changed", f"{t}.{c}", f"`{clause}` added NOT VALID by the forward migration",
+                               f"check the rows, then ALTER TABLE {t} VALIDATE CONSTRAINT {name}")
+                    elif only_not_null_dropped(a.cols[c], d) and c in pk_columns(b):
+                        pass   # a column the new primary key covers stays NOT NULL through the key
+                    elif only_not_null_dropped(a.cols[c], d) and c not in pk_columns(b):
+                        # **A column the contract makes optional loses its NOT NULL here** (CHG-R8MIG-004, R8 blockers
+                        # APPROVALS-TENANCY-C09, ORDERS-MONEY-C35, IDENTITY-C12): relaxing NOT NULL touches no row and
+                        # no reader, so it is additive. Guarded like a retired column's, and folded back the same way
+                        # (RETIRE_GUARD), so the next run writes nothing.
+                        p.statements.append(retire_not_null(t, c))
+                        p.rollback.append(f"ALTER TABLE {t} ALTER COLUMN {c} SET NOT NULL;")
+                        p.counts["other"] += 1
                     else:
                         review("column changed", f"{t}.{c}", f"`{a.cols[c]}` -> `{d}`",
                                "type, default, nullability or check changed: write the ALTER COLUMN (and any "
@@ -715,9 +1089,29 @@ def diff(area: str, old: Model, new: Model, renames: dict | None = None, retired
                 replaces = any(ok[0] == "index" and ok not in new.stmts and _cols_in_parens(ost) in was
                                and on & tables_named(ost, known) for ok, ost in old.stmts.items())
                 if replaces:
+                    sch = k[1].split(".", 1)[0]
+                    new_name = k[1].split(".", 1)[1]
+                    cands = [ok for ok, ost in old.stmts.items()
+                             if ok[0] == "index" and ok not in new.stmts and _cols_in_parens(ost) in was
+                             and on & tables_named(ost, known) and ok[1].split(".", 1)[0] == sch]
+                    if len(cands) > 1:
+                        exact = [ok for ok in cands if ok[1].split(".", 1)[1] == _renamed_name(new_name, rc, on)]
+                        cands = exact or cands
+                    if len(cands) == 1 and all(all_pure(t, _cols_in_parens(stmt)) for t in on):
+                        old_name = cands[0][1].split(".", 1)[1]
+                        tt = sorted(on)[0]
+                        recon_names.append((tag(tt, "rename index", f"{old_name} to {new_name}", guard_rename_index(tt, old_name, new_name)),
+                                            f"ALTER INDEX {sch}.{new_name} RENAME TO {old_name};"))
+                        p.recon_counts["indexes"] += 1
+                        continue
                     review("index after rename", k[1], f"`{new.stmts[k]}`",
                            "names a renamed column: rename the old index to this name (ALTER INDEX ... RENAME TO) "
                            "after the RENAME COLUMN")
+                elif all(all_pure(t, _cols_in_parens(stmt)) for t in on) and len(on) == 1:
+                    tt = next(iter(on))
+                    recon_names.append((tag(tt, "create index", k[1].split(".", 1)[1], guard_create_index(tt, new.stmts[k], _cols_in_parens(stmt))),
+                                        f"DROP INDEX IF EXISTS {k[1]};"))
+                    p.recon_counts["indexes"] += 1
                 else:
                     review("index added after rename", k[1], "a new index on a renamed column",
                            f"after the RENAME COLUMN, create it: {new.stmts[k]}")
@@ -746,6 +1140,22 @@ def diff(area: str, old: Model, new: Model, renames: dict | None = None, retired
                 follows[t].append(name)
                 continue
             if on_renamed_col(t, cols):
+                back = {nc: oc for (tt, nc), oc in rc.items() if tt == t}
+                nf = parse_fk(new.stmts[k])
+                cands = []
+                for ok, ost in old.stmts.items():
+                    if ok[0] != "constraint" or ok[1] != t or ok in new.stmts or not nf:
+                        continue
+                    of = parse_fk(ost)
+                    if of and {back.get(c, c) for c in nf[2]} == set(of[2]) and (of[3] == nf[3] or rt.get(nf[3]) == of[3]):
+                        cands.append(ok[2])
+                if len(cands) == 1 and cands[0] != name and all_pure(t, cols):
+                    recon_names.append((tag(t, "rename constraint", f"{cands[0]} to {name}", guard_rename_constraint(t, cands[0], name)),
+                                        f"ALTER TABLE {t} RENAME CONSTRAINT {name} TO {cands[0]};"))
+                    p.recon_counts["keys"] += 1
+                    continue
+                if not cands and k not in old.stmts and all_pure(t, cols) and add_fk(k, t, name):
+                    continue   # a key that is new, on a column renamed in this file: added after the rename
                 review("constraint after rename", f"{t} {name}", f"`{new.stmts[k]}`",
                        "names a renamed column: rename the old constraint to this name (ALTER TABLE ... RENAME "
                        "CONSTRAINT) after the RENAME COLUMN")
@@ -753,11 +1163,16 @@ def diff(area: str, old: Model, new: Model, renames: dict | None = None, retired
             if k in old.stmts and subst(old.stmts[k]) == new.stmts[k]:
                 continue   # a key to a renamed table: Postgres follows the rename
             if k not in old.stmts and (t in new_tables or (cols and cols <= new_cols.get(t, set()))):
-                p.statements.append(stmt)
+                # **Guarded, so the file applies twice** (CHG-R8MIG-010, the storage-sat lane's request): every other
+                # statement of the file is IF [NOT] EXISTS, and ADD CONSTRAINT has no such form, so a second run
+                # stopped at the first key. Checked, not NOT VALID: the column is new, so no row can break it.
+                p.statements.append(guard_add_constraint(t, name, stmt) if parse_fk(stmt) else stmt)
                 if t not in new_tables:
                     p.rollback.append(f"ALTER TABLE {t} DROP CONSTRAINT IF EXISTS {name};")
                 p.counts["other"] += 1
             elif k not in old.stmts:
+                if add_fk(k, t, name):
+                    continue
                 review("constraint added", f"{t} {name}", f"`{new.stmts[k]}`",
                        "existing rows may violate it: validate, then add by hand (NOT VALID, then VALIDATE)")
             else:
@@ -903,8 +1318,26 @@ def diff(area: str, old: Model, new: Model, renames: dict | None = None, retired
                    "a rename or a drop: decide, then ALTER TABLE ... RENAME or DROP TABLE by hand")
         elif kind in ("index",):
             if not any(k[1].split(".", 1)[1].startswith(t.split(".", 1)[1] + "_") for t in removed_tables):
+                on_ = tables_named(old.stmts[k], known)
+                if on_ and not (on_ & renamed_away) and not (on_ & removed_tables):
+                    # **An index the schema reference no longer asks for is dropped** (R8-MIG-001): it is an index on
+                    # a column that is not a foreign key any more. Guarded, and the rollback creates it again.
+                    recon_drop.append((tag(sorted(on_)[0], "drop index", k[1].split(".", 1)[1], guard_drop_index(k[1])), old.stmts[k].rstrip().rstrip(";") + ";"))
+                    p.recon_counts["indexes"] += 1
+                    continue
                 review("index dropped", k[1], "no longer generated", "DROP INDEX by hand if intended")
         elif kind == "constraint":
+            fk_ = parse_fk(old.stmts[k])
+            nt_ = new.tables.get(k[1])
+            if (fk_ and k[1] not in removed_tables and k[1] not in renamed_away and nt_ is not None
+                    and all(c_ in nt_.cols for c_ in fk_[2])):
+                # **A foreign key the contract withdraws is dropped** (CHG-R8MIG-006, R8 blocker IDENTITY-C20:
+                # `x-ticvai-references: none` on PlatformStaffGrant.operatorPrincipalId). Its column stays; dropping a
+                # key refuses no write. Guarded, and the rollback adds it again.
+                recon_drop.append((tag(k[1], "drop foreign key", k[2], guard_drop_constraint(k[1], k[2]), fk_[3]),
+                                   old.stmts[k].rstrip().rstrip(";") + " NOT VALID;"))
+                p.recon_counts["keys"] += 1
+                continue
             if k[1] not in removed_tables:
                 review("constraint dropped", f"{k[1]} {k[2]}", "no longer generated",
                        "ALTER TABLE ... DROP CONSTRAINT by hand if intended")
@@ -915,6 +1348,10 @@ def diff(area: str, old: Model, new: Model, renames: dict | None = None, retired
             if not (refs and refs <= removed_tables):
                 review("statement dropped", ", ".join(sorted(refs)) or "(database)", f"`{old.stmts[k]}`",
                        "undo it by hand if intended")
+    # Renames first (a key or an index below names the new column), then the keys, then the drops.
+    for stmt_, back_ in recon_cols + recon_names + recon_fk + recon_drop:
+        p.recon.append(stmt_)
+        p.recon_rollback.append(back_)
     return p
 
 
@@ -947,6 +1384,88 @@ def render(p: Plan, version: str, baseline: str, stamp: str) -> str:
         "-- Commented out so that applying this file never runs it: the rollback is run by removing the",
         "-- leading `-- `, and is tested in CI against a restored snapshot (backend/MIGRATIONS.md).",
     ] + [f"-- {r}" for r in reversed(p.rollback)] + [
+        f"-- DELETE FROM platform.schema_version WHERE version = '{version}';",
+        "",
+    ]
+    return "\n".join(lines)
+
+
+def split_early(p: Plan, frozen: dict) -> tuple:
+    """(early, rest): the renames a frozen forward file already depends on, and everything else (R8-MIG-001).
+    `frozen` = {file name: text} of the forward files written before the names file. V0104 calls
+    `apply_parent_rls('t'::regclass, 'new_name', ...)` for four columns that exist under their old names until renamed,
+    so on a fresh database V0104 stops unless the rename comes first. A rename is *early* when a frozen file names
+    `'<table>'::regclass, '<new column>'`. Returns the first frozen file that needs one (or None) as well."""
+    early, rest, first = ([], []), ([], []), None
+    for stmt, back in zip(p.recon, p.recon_rollback):
+        m = re.match(r"-- (\S+) \| rename column \| (\S+) to (\S+)\n", stmt)
+        need = None
+        if m:
+            pat = f"'{m.group(1)}'::regclass, '{m.group(3)}'"
+            need = next((n for n, txt in sorted(frozen.items()) if pat in txt), None)
+        tgt = early if need else rest
+        tgt[0].append(stmt)
+        tgt[1].append(back)
+        if need and (first is None or need < first):
+            first = need
+    return early, rest, first
+
+
+def early_version(first: str, taken: set) -> str:
+    """The version of the file that runs just before the frozen file `first` (R8-MIG-001, CHG-R8MIG-003): the number
+    before it and the first letter not taken, `V0103a` for `V0104__...`. By name (SqlMigrationRunner sorts ordinal)
+    `V0103__` < `V0103a__` < `V0104__`, since `_` sorts before every lower-case letter. A longer number does not do it:
+    V01035 sorts before V0103 (`5` < `_`), reads as 1035, the plan's V1035__fnb.sql, and no check reads five digits."""
+    n = int(re.match(r"V(\d+)", first).group(1)) - 1
+    for letter in "abcdefghijklmnopqrstuvwxyz":
+        if f"V{n:04d}{letter}" not in taken:
+            return f"V{n:04d}{letter}"
+    raise ValueError(f"no free letter after V{n:04d}")
+
+
+def render_recon(p: Plan, version: str, baseline: str, stamp: str, before: str = "", rest: str = "") -> str:
+    """The second forward file for one database: the renames, keys and dropped indexes (R8-MIG-001). With `before`,
+    the early file: the renames the frozen file `before` names by their new names, the rest in `rest`."""
+    import hashlib as _h
+    body = "\n\n".join(x.rstrip().rstrip(";") + ";" for x in p.recon)
+    checksum = _h.sha256(body.encode("utf-8")).hexdigest()
+    c = p.recon_counts
+    what = (f"{c['renames']} column rename(s), {c['keys']} key(s) added, renamed or dropped, {c['indexes']} index(es) "
+            "renamed or dropped")
+    desc = f"after {baseline}, names the contracts use: {what}"
+    lines = [
+        f"-- {version} -- {p.area} database, after {baseline} ({stamp}): the names the contracts use.",
+        "-- **Written by tools/derive-ddl.py in frozen mode. Do not edit after merge; a mistake is a new migration.**",
+        "--",
+        f"-- The baseline under backend/{p.area}/ is frozen at {baseline}, but the schema reference has renamed columns,",
+        "-- added foreign keys and stopped generating some indexes since. Migrations written from the baseline DDL",
+        "-- create the old names; this file brings a database built from them to the names the contracts use.",
+        "-- Every statement is a guarded block: it does nothing when its table, key or index is not there yet, or is",
+        "-- there already under the new name, so the file can be applied twice and in any database. A table created",
+        "-- by a migration that runs after this one copies the blocks that name it (ticket text: 'Changes this file",
+        "-- makes to your tables'). A foreign key is added NOT VALID: it checks every new write, and the owner runs",
+        "-- ALTER TABLE ... VALIDATE CONSTRAINT when the rows already there are known to be clean.",
+        f"-- {what}.",
+    ] + ([
+        "--",
+        f"-- **This file runs before {before}**, which applies row-level security on these columns by their new",
+        f"-- names: without it a database built from the files in name order stops at {before}. The other renames,",
+        f"-- with the keys and indexes that follow them, are in {rest}; its blocks for these columns find them renamed",
+        "-- and do nothing.",
+    ] if before else []) + [
+        "",
+        body,
+        "",
+        "INSERT INTO platform.schema_version (version, description, checksum)",
+        f"VALUES ('{version}', '{desc}', '{checksum}')",
+        "ON CONFLICT (version) DO NOTHING;",
+        "",
+        "-- ============================================================================",
+        "-- ROLLBACK",
+        "-- ============================================================================",
+        "-- Commented out so that applying this file never runs it: the rollback is run by removing the",
+        "-- leading `-- `, and is tested in CI against a restored snapshot (backend/MIGRATIONS.md).",
+    ] + [f"-- {r}" for r in reversed(p.recon_rollback)] + [
         f"-- DELETE FROM platform.schema_version WHERE version = '{version}';",
         "",
     ]

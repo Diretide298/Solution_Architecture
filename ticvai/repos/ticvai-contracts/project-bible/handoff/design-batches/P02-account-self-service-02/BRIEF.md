@@ -1,6 +1,6 @@
 # P02-account-self-service-02 — P02 · Account & Self-Service (2 of 2)
 
-**4 screens · 25 operations · 47 schemas · 7 permissions**
+**4 screens · 30 operations · 52 schemas · 8 permissions**
 
 Platform P02 Guest App · ships as **guest** ·
 guest audience · mobileApp ·
@@ -48,8 +48,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 7 permissions apply here:
-  `GUEST_MANAGE, GUEST_VIEW, LOYALTY_REDEEM, ORDER_CREATE, ORDER_VIEW, WALLET_OPERATE, WALLET_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 8 permissions apply here:
+  `GUEST_MANAGE, GUEST_VIEW, LOYALTY_REDEEM, MARKETING_VIEW, ORDER_CREATE, ORDER_VIEW, WALLET_OPERATE, WALLET_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **5 of these operations work offline**: getGuestSession, getOrder, getPublishedTenantConfig, listConsentPurposes, listMyEntitlements
   — and the rest do not. A surface that looks the same online and off is lying.
@@ -147,8 +147,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|---|---|---|---|---|---|---|---|---|
 | `GST-067` | Refunds & Resale | A | 6 | 5 | 6 | 14 | 7 | 6 | guest | notStarted (client-verified) |
 | `GST-069` | Face Pass | A | 14 | 9 | 7 | 38 | 5 | 6 | guest | notStarted (client-verified) |
-| `GST-071` | Payment Methods | A | 10 | 12 | 6 | 34 | 1 | 0 | guest | notStarted (client-verified) |
-| `GST-073` | Security & Sign-in | A | 5 | 15 | 5 | 3 | 2 | 0 | guest | notStarted (designed) |
+| `GST-071` | Payment Methods | A | 10 | 12 | 6 | 40 | 1 | 0 | guest | notStarted (client-verified) |
+| `GST-073` | Security & Sign-in | A | 6 | 20 | 5 | 3 | 2 | 0 | guest | approved (client-verified) |
 
 ## Thin screens in this batch
 

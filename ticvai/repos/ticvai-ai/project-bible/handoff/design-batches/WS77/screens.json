@@ -15,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/media-library/asset-distribution-delivery-command-center-cms-091",
-   "component": "apps/venue-management-web/src/routes/media-library/AssetDistributionDeliveryCommandCenter.tsx",
+   "component": "src/routes/media-library/AssetDistributionDeliveryCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -298,7 +298,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/media-library/asset-usage-distribution-map-cms-092",
-   "component": "apps/venue-management-web/src/routes/media-library/AssetUsageDistributionMap.tsx",
+   "component": "src/routes/media-library/AssetUsageDistributionMap.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -451,7 +451,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/media-library/channel-distribution-configuration-cms-093",
-   "component": "apps/venue-management-web/src/routes/media-library/ChannelDistributionConfiguration.tsx",
+   "component": "src/routes/media-library/ChannelDistributionConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -637,7 +637,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/media-library/secure-delivery-url-cdn-rendition-delivery-cms-094",
-   "component": "apps/venue-management-web/src/routes/media-library/SecureDeliveryUrlCdnRenditionDelivery.tsx",
+   "component": "src/routes/media-library/SecureDeliveryUrlCdnRenditionDelivery.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -787,7 +787,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/media-library/asset-replacement-propagation-management-cms-095",
-   "component": "apps/venue-management-web/src/routes/media-library/AssetReplacementPropagationManagement.tsx",
+   "component": "src/routes/media-library/AssetReplacementPropagationManagement.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -938,7 +938,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/media-library/fallback-expiry-distribution-continuity-cms-096",
-   "component": "apps/venue-management-web/src/routes/media-library/FallbackExpiryDistributionContinuity.tsx",
+   "component": "src/routes/media-library/FallbackExpiryDistributionContinuity.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1107,7 +1107,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/media-library/dam-api-integration-hub-cms-097",
-   "component": "apps/venue-management-web/src/routes/media-library/DamApiIntegrationHub.tsx",
+   "component": "src/routes/media-library/DamApiIntegrationHub.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1233,7 +1233,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/media-library/delivery-monitoring-integration-health-cms-098",
-   "component": "apps/venue-management-web/src/routes/media-library/DeliveryMonitoringIntegrationHealth.tsx",
+   "component": "src/routes/media-library/DeliveryMonitoringIntegrationHealth.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1411,7 +1411,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/media-library/asset-usage-performance-analytics-cms-099",
-   "component": "apps/venue-management-web/src/routes/media-library/AssetUsagePerformanceAnalytics.tsx",
+   "component": "src/routes/media-library/AssetUsagePerformanceAnalytics.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1589,7 +1589,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/media-library/distribution-intelligence-ai-insights-optimization-cms-100",
-   "component": "apps/venue-management-web/src/routes/media-library/DistributionIntelligenceAiInsightsOptimization.tsx",
+   "component": "src/routes/media-library/DistributionIntelligenceAiInsightsOptimization.tsx",
    "status": "notStarted"
   },
   "navigation": {

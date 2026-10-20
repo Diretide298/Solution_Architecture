@@ -299,6 +299,17 @@ resolved in the application layer at login; RLS enforces the result.
 Every tenant-scoped table carries `ENABLE` **and** `FORCE ROW LEVEL SECURITY`. Without
 FORCE the table owner bypasses every policy, and it reviews clean.
 
+**Three settings, and the context before and without a session** (decided 20 October 2026, the
+lead, option A of R8 blocker IDENTITY-C48; CHG-R8MIG-007; r8 integration, CHG-R8INT-024). Beside
+`ticvai.scope_paths` the policies read `ticvai.subject_id` (a guest's own rows) and
+`ticvai.principal_id` (the signed-in principal's own rows: credentials and second factors). A call
+before a session (login, the guest sign-ins) opens in an explicit system context, the tenant root,
+confined to Identity's own verification statements, and narrows with `SET LOCAL` before any other
+table is touched; a guest reads and writes its own `pii.subject` row and the rows keyed to its
+subject; a `serviceAuth` call has no user, takes its tenant from the cell token's `tid` claim, runs
+at the tenant root and is audited as the calling cell. The full rule is in backend/MIGRATIONS.md,
+"The connection context".
+
 ### 7.2 Service layer — defence in depth
 
 Every operation declares `x-ticvai-permission` and `x-ticvai-scope-level` in the contract.

@@ -220,9 +220,9 @@
   ]
  },
  "CatalogueState": {
-  "x-ticvai-persistence": "none — computed from workstation bundle_version",
+  "x-ticvai-persistence": "none — computed from catalogue.bundle_application, the workstation's latest applied report (CHG-R8MIG-015)",
   "type": "object",
-  "description": "The workstation's local catalogue position. A terminal beyond `staleAfter` must refuse to trade rather than transact against stale prices.\n",
+  "description": "The workstation's local catalogue position. A terminal beyond `staleAfter` must refuse to trade rather than transact against stale prices. **Read from Catalogue** (R8 blocker FOUNDATION-AI-C44, CHG-R8MIG-015): the workstation's latest `applied` row in `catalogue.bundle_application` (catalogue#bundleApplicationRecords) gives `appliedBundleVersion` and `appliedAt`, that bundle's `catalogue.published_bundle.stale_after` gives `staleAfter`, and the venue's newest published bundle, when newer, is `pendingBundleVersion`.\n",
   "required": [
    "appliedBundleVersion",
    "appliedAt",
@@ -501,7 +501,8 @@
       "$ref": "../shared/common.yaml#/components/schemas/Money"
      }
     ],
-    "description": "`count` times the face value, in the denomination's currency. Optional on the way in (the server computes it) and checked when sent.\n"
+    "x-ticvai-column": "counted_value",
+    "description": "`count` times the face value, in the denomination's currency. Optional on the way in (the server computes it) and checked when sent. Stored as `orders.cash_count_line.counted_value` (r8 integration, CHG-R8INT-005).\n"
    }
   }
  },
@@ -682,7 +683,7 @@
     "x-ticvai-references": "catalogue.inventory_reservation",
     "type": "string",
     "nullable": true,
-    "description": "Lease the units were drawn from — a `catalogue.InventoryHold.id`. Absent for uncontended products."
+    "description": "Lease the units were drawn from — a `catalogue.InventoryHold.id`. Absent for uncontended products. **A standing-zone line** (zone-priced general admission at POS-004 and WEB-007; decided 20 October 2026, Chinmay, R8 blocker cause GPS-C38, option A; CHG-R8SPN-040) carries no `seatIds`: it is `quantity` places in one zone, held by `seating.createSeatHold` with `zoneId` and `quantity`, and this names that hold's inventory hold; the zone, its price band and keep-the-party- together come from the hold, and a lapsed one is `409 hold-not-active` as for seats."
    },
    "seatIds": {
     "type": "array",
@@ -1454,13 +1455,19 @@
  },
  "DeviceBinding": {
   "x-ticvai-persistence": "platform.device",
-  "description": "A device as its workstation is configured with it. **Binding a device here moves its row to the workstation's scope**: `platform.device.scope_path` becomes the workstation's path, so the device's own session, scoped to that workstation, can write its heartbeat (ADAM CR-095, CHG-RSF-001).\n",
   "type": "object",
+  "description": "A device as its workstation is configured with it. **Binding a device here moves its row to the workstation's scope**: `platform.device.scope_path` becomes the workstation's path, so the device's own session, scoped to that workstation, can write its heartbeat (ADAM CR-095, CHG-RSF-001).\n\n**A registered device linked to the workstation** (ADAM CR-155, option A, 18 October 2026; CHG-CRA-004). `deviceId` names an existing `platform.device` (registered by `registerDevice`); in `configureWorkstation` it is what links the device (`platform.device.workstation_id`, `isRequired`). `kind`, `driver` and `identifier` are the device's own record, returned on `Workstation.devices`; a request's values for them are not written.",
   "required": [
    "kind",
    "driver"
   ],
   "properties": {
+   "deviceId": {
+    "type": "string",
+    "format": "uuid",
+    "x-ticvai-column": "id",
+    "description": "**The registered device** (CR-155): the `platform.device` row's own id. Every item `configureWorkstation` is sent names one; an item without one, or naming no registered device of this tenant, is `422 unknown-device`."
+   },
    "kind": {
     "$ref": "#/components/schemas/DeviceKind"
    },
@@ -1895,7 +1902,7 @@
     "type": "string",
     "format": "uuid",
     "nullable": true,
-    "description": "A simplified invoice this full invoice replaces for the same supply. Refused unless the law allows it (make-or-break on issueTaxInvoice)."
+    "description": "A simplified invoice this full invoice replaces for the same supply. Refused unless the law allows it (make-or-break on issueTaxInvoice). **Not sent in r8** (decided 20 October 2026, Chinmay, R8 blocker cause ORDERS-MONEY-C06, option C; CHG-R8SPN-026): until the client's written answer to CF-133, the server refuses any value `422 supersede-not-allowed`, and \"Get a tax invoice\" is not offered for an order already on an invoice: that order answers `409 order-already-invoiced` and the screen shows the invoice it has."
    },
    "deliverToEmail": {
     "type": "string",
@@ -2298,7 +2305,8 @@
    "address": {
     "type": "string",
     "maxLength": 1000,
-    "nullable": true
+    "nullable": true,
+    "description": "The recipient's postal address. **Required, not null and not empty, on a `full` or `consolidated` invoice** (Executive Regulation Article 59; R8 blocker cause ORDERS-MONEY-C06, CHG-R8SPN-026): without it `issueTaxInvoice` refuses `422 recipient-required`, so the guest form that asks for a full invoice (GST-019) collects it. Null on a `simplified` invoice."
    },
    "countryCode": {
     "type": "string",
@@ -2469,6 +2477,12 @@
     "format": "date",
     "nullable": true,
     "description": "The date the guest asked for on `requestGroupBooking` — what its `409 dateUnavailable` is checked against. Null for a group a member of staff built from an order."
+   },
+   "performanceId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**The session, for a timed or session package** (DEC-121, Chinmay, 2 October 2026: a date and, for session products, a session; R8 blocker ORDERS-MONEY-C41, CHG-R8MIG-017): a `catalogue.performance` on `preferredDate`. Null for an open-dated package; written from the request."
    },
    "orderId": {
     "type": "string",
@@ -3076,6 +3090,13 @@
     "type": "string",
     "format": "uuid",
     "description": "The client UUIDv7 from `CreateOrderRequest.id`."
+   },
+   "orderAccessToken": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "**What lets the device that just checked out read the order it paid for** (decided 20 October 2026, Chinmay, R8 blocker cause IDENTITY-C52, option A; CHG-R8SPN-025). Returned only in `checkoutCart`'s answer, null everywhere else: a signed token bound to this order and to the cart's device, valid 24 hours, never stored. `getOrder` accepts it in `X-Order-Access-Token` in place of a session, so a guest who checked out with no account, or whose session ended, still sees the confirmation (WEB-013 keeps it in its navigation state). It reads this order only and grants nothing else."
    },
    "orderNumber": {
     "x-ticvai-unique": "tenant",
@@ -3794,6 +3815,11 @@
  },
  "Payment": {
   "x-ticvai-persistence": "orders.payment",
+  "x-ticvai-index": [
+   [
+    "providerReference"
+   ]
+  ],
   "type": "object",
   "required": [
    "id",
@@ -5135,9 +5161,10 @@
        "enum": [
         "open",
         "close",
-        "variance"
+        "variance",
+        "reopen"
        ],
-       "description": "`open` from `approveShiftOpen`, `close` from `approveShiftClose`, `variance` from `acceptShiftVariance`.\n"
+       "description": "`open` from `approveShiftOpen`, `close` from `approveShiftClose`, `variance` from `acceptShiftVariance`, `reopen` from `reopenShift` (the supervisor who signed it, the time and the `reason`).\n"
       },
       "principalId": {
        "type": "string",
@@ -5305,16 +5332,20 @@
  },
  "SupervisorStepUp": {
   "type": "object",
-  "description": "**A supervisor signs the act in place, on the device making the call** (decided 28 September, audit R144). Used where the decision is a same-device step-up rather than an approval request: reopening a shift, recounting a stock count, a retail return above the venue threshold, and (proposed by the coordinator, client to confirm) closing a stock transfer short and cancelling a performance.\n\n**The verification rule, the same on every operation that takes it:** the server checks `credential` against `principalId`; that principal must hold the operation's `x-ticvai-permission` at the operation's scope, must be active at that venue, and must not be the person whose act is being reversed where the operation says so. Any failure is a `403` (`supervisor-step-up-refused`) and nothing is written. **No approval request is raised**, and the operation declares `x-ticvai-step-up: pin`.\n",
+  "description": "**A supervisor signs the act in place, on the device making the call** (decided 28 September, audit R144). Used where the decision is a same-device step-up rather than an approval request: reopening a shift, recounting a stock count, a retail return above the venue threshold, and (proposed by the coordinator, client to confirm) closing a stock transfer short and cancelling a performance.\n\n**The verification rule, the same on every operation that takes it:** the server checks `credential` against `principalId`; that principal must hold the operation's `x-ticvai-permission` at the operation's scope, must be active at that venue, and must not be the person whose act is being reversed where the operation says so. Any failure is a `403` (`supervisor-step-up-refused`) and nothing is written. **No approval request is raised**, and the operation declares `x-ticvai-step-up: pin`.\n\n**Where `principalId` comes from, on every operation that takes this** (decided 20 October 2026, Chinmay, R8 blocker cause GPS-C31, option A; CHG-R8SPN-035). The PIN prompt shows a picker filled by `identity.listStepUpSupervisors` with the operation's permission: the active principals who hold it at the caller's venue, by display name. The supervisor picks their own name and types their PIN; the prompt sends the picked `principalId` (or, where the prompt asks for an employee number instead, `supervisorUsername`). **Nobody signs their own act**: a `principalId` (or resolved `supervisorUsername`) equal to the caller's own principal is refused `403 supervisor-step-up-refused`, even when the caller holds the permission, and the picker leaves the caller out.\n",
   "required": [
-   "principalId",
    "credential"
   ],
   "properties": {
    "principalId": {
     "type": "string",
     "format": "uuid",
-    "description": "The supervisor signing. Recorded against the act."
+    "description": "The supervisor signing. Recorded against the act. **Exactly one of `principalId` or `supervisorUsername`** is sent (neither, or both, is `400`; not in the schema as a oneOf, so an r1 client still validates)."
+   },
+   "supervisorUsername": {
+    "type": "string",
+    "maxLength": 200,
+    "description": "**The supervisor's employee number**, which is what the step-up prompt asks for (R8 blocker fix, IDENTITY-C44). The server resolves it to the principal (`identity.principal.username`, within the tenant) before it checks the PIN; an unknown one is refused exactly as a wrong PIN, `403 supervisor-step-up-refused`, so the prompt does not reveal which employee numbers exist. The act is recorded against the resolved principal. Exactly one of this or `principalId`."
    },
    "credential": {
     "type": "string",
@@ -5569,7 +5600,8 @@
    },
    "saleBoard": {
     "type": "object",
-    "description": "Determines which front end loads. Bound to the workstation, not the role — the F&B terminal opens the F&B board. What the operator may then DO within it is governed by their permissions.\n**The effective board** since 2 October 2026 (DEC-183; CHG-CSP-006): the till's own when it overrides the outlet, otherwise the outlet's (`saleBoardSource`).\n",
+    "x-ticvai-column-nullable": true,
+    "description": "Determines which front end loads. Bound to the workstation, not the role — the F&B terminal opens the F&B board. What the operator may then DO within it is governed by their permissions.\n**The effective board** since 2 October 2026 (DEC-183; CHG-CSP-006): the till's own when it overrides the outlet, otherwise the outlet's (`saleBoardSource`).\n**Resolved on read, never copied** (decided 20 October 2026, Chinmay, R8 blocker cause APPROVALS-TENANCY-C39, option A; CHG-R8SPN-013). `platform.workstation.sale_board` holds only this till's own override and is null when `saleBoardSource` is `outlet`. `getWorkstation`, `listWorkstations` and `configureWorkstation`'s answer build `saleBoard` from the override when there is one, otherwise from the outlet's `platform.outlet.sale_board_id` and that `platform.sale_board` row (its id, kind and name). So `updateOutlet` and `updateSaleBoard` change what every inheriting till shows with no write to `platform.workstation`, and no stored copy can go stale.\n",
     "required": [
      "id",
      "kind"
@@ -5685,7 +5717,15 @@
     "type": "string",
     "format": "uuid",
     "nullable": true,
+    "x-ticvai-references": "platform.configuration_profile",
+    "x-ticvai-references-version": "configurationProfileVersion",
     "description": "Which profile this workstation runs, and at which version. **The client's board shows a fleet split four ways — 72% latest, 18.8% one behind, 6.1% outdated** — and the package had a firmware version field and no profile.\n**A profile is what a venue changes; a version is what it deploys.** Conflating them means a venue cannot say *roll the ticketing counters back and leave the kiosks*.\n"
+   },
+   "configurationProfileVersion": {
+    "type": "integer",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The version of `configurationProfileId` this workstation runs, written when a deployment reaches it; null with no profile (R8 blocker APPROVALS-TENANCY-C08, CHG-R8MIG-019)."
    },
    "catalogueState": {
     "$ref": "#/components/schemas/CatalogueState"

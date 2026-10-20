@@ -30,6 +30,16 @@ from pathlib import Path
 
 import yaml
 
+
+def _yload(src):
+    """YAML with the C loader, the pure one where a file defeats it (20 October 2026, CHG-R8GEN-016): the screen files
+    are 25 MB and the pure loader took most of each refresh step's minute; the loaded data is the same."""
+    text = src.read() if hasattr(src, "read") else src
+    try:
+        return yaml.load(text, Loader=getattr(yaml, "CSafeLoader", yaml.SafeLoader))
+    except Exception:
+        return yaml.safe_load(text)
+
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import frontend_repos as fr  # noqa: E402
 
@@ -52,7 +62,7 @@ def main() -> int:
 
     apps: dict[str, dict] = {}
     for f in sorted(SCREENS.glob("P*.yaml")):
-        doc = yaml.safe_load(f.read_text(encoding="utf-8"))
+        doc = _yload(f.read_text(encoding="utf-8"))
         p = doc["platform"]
         app = p.get("app")
         if not app:
@@ -111,7 +121,7 @@ def main() -> int:
         # choice is preserved; a new app gets the three every app needs. Guessing which packages
         # a team will split out is not something a screen file can answer.
         path = FRONTEND / f"{app}.yaml"
-        existing = yaml.safe_load(path.read_text(encoding="utf-8")) if path.exists() else {}
+        existing = _yload(path.read_text(encoding="utf-8")) if path.exists() else {}
         e["packages"] = existing.get("packages") or ["design-tokens", "ui", "api-client"]
         for k, v in existing.items():
             e.setdefault(k, v)

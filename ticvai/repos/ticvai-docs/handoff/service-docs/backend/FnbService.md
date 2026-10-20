@@ -680,8 +680,8 @@ Amending or cancelling a booking from the staff app (EMP-055) is a later-block g
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `fnb.reservation_table`, `fnb.table_reservation` |
-| Writes | `fnb.reservation_table`, `fnb.table_reservation` |
+| Reads | `cache:idempotency`, `fnb.reservation_table`, `fnb.table_reservation` |
+| Writes | `cache:idempotency`, `fnb.reservation_table`, `fnb.table_reservation` |
 | Called by | EMP-055, POS-028 |
 | State model | Table reservation ([states/table-reservation.yaml](../../../states/table-reservation.yaml)): created as `booked` or `awaitingDeposit` |
 
@@ -1201,8 +1201,8 @@ BL-130. **Distinct from `queue`, which is for rides.** A restaurant waitlist has
 | Offline | no |
 | Conflict policy | serverWins |
 | Guest callable | True |
-| Reads | `fnb.waitlist_entry` |
-| Writes | `fnb.waitlist_entry` |
+| Reads | `cache:idempotency`, `fnb.waitlist_entry` |
+| Writes | `cache:idempotency`, `fnb.waitlist_entry` |
 | Called by | EMP-056, GST-070, WEB-036 |
 | State model | Restaurant waitlist entry ([states/restaurant-waitlist.yaml](../../../states/restaurant-waitlist.yaml)): moves `waiting` -> `cancelled`, `notified` -> `cancelled` |
 
@@ -1887,8 +1887,8 @@ A label that omits an allergen on a sealed bag is the failure mode this exists t
 | Wave | 1 |
 | Offline | yes |
 | Conflict policy | serverWins |
-| Reads | `fnb.kitchen_ticket` |
-| Writes | - |
+| Reads | `cache:idempotency`, `fnb.kitchen_ticket` |
+| Writes | `cache:idempotency` |
 | Called by | KIT-006 |
 
 **Parameters**
@@ -3268,6 +3268,8 @@ location's codes bumps its `codeGeneration`, which retires every code printed be
 | kind | DeliveryLocationKind: enum (table, seat, cabana, sunbed, poolside, box, suite, lawn, …) | yes | 4.6.26. |
 | label | string | yes | What a runner is told. |
 | zone | string |  | (nullable) |
+| opensAt | string (time) |  | When a collection point opens, local to the venue (r8 walk of ticket 27820). (nullable) |
+| closesAt | string (time) |  | When a collection point closes, local to the venue; retail collectBy defaults to this on the day. (nullable) |
 | tableId | string (uuid) |  | Set where the location is a restaurant table, so it shares table state. (nullable) |
 | seatId | string |  | Set where the seat is the address. (nullable) |
 | servingOutletIds | array of string (uuid) |  | Which outlets deliver here. |
@@ -3729,6 +3731,8 @@ They are one concept because a runner needs one instruction, and a guest needs o
 | items[].kind | DeliveryLocationKind: enum (table, seat, cabana, sunbed, poolside, box, suite, lawn, …) | yes | 4.6.26. |
 | items[].label | string | yes | What a runner is told. |
 | items[].zone | string |  | (nullable) |
+| items[].opensAt | string (time) |  | When a collection point opens, local to the venue (r8 walk of ticket 27820). (nullable) |
+| items[].closesAt | string (time) |  | When a collection point closes, local to the venue; retail collectBy defaults to this on the day. (nullable) |
 | items[].tableId | string (uuid) |  | Set where the location is a restaurant table, so it shares table state. (nullable) |
 | items[].seatId | string |  | Set where the seat is the address. (nullable) |
 | items[].servingOutletIds | array of string (uuid) |  | Which outlets deliver here. |
@@ -3981,8 +3985,8 @@ Offline-capable. A runner crossing a venue loses signal, and an order that canno
 | Offline | no |
 | Config scope | venue |
 | Conflict policy | serverWins |
-| Reads | `fnb.delivery_policy` |
-| Writes | `fnb.delivery_policy` |
+| Reads | `cache:idempotency`, `fnb.delivery_policy` |
+| Writes | `cache:idempotency`, `fnb.delivery_policy` |
 | Called by | BO-044 |
 
 **Parameters**
@@ -4107,6 +4111,8 @@ Offline-capable. A runner crossing a venue loses signal, and an order that canno
 | kind | DeliveryLocationKind: enum (table, seat, cabana, sunbed, poolside, box, suite, lawn, …) | yes | 4.6.26. |
 | label | string | yes | What a runner is told. |
 | zone | string |  | (nullable) |
+| opensAt | string (time) |  | When a collection point opens, local to the venue (r8 walk of ticket 27820). (nullable) |
+| closesAt | string (time) |  | When a collection point closes, local to the venue; retail collectBy defaults to this on the day. (nullable) |
 | tableId | string (uuid) |  | Set where the location is a restaurant table, so it shares table state. (nullable) |
 | seatId | string |  | Set where the seat is the address. (nullable) |
 | servingOutletIds | array of string (uuid) |  | Which outlets deliver here. |
@@ -4861,8 +4867,8 @@ Offline behaviour depends on the items: an order containing only untracked items
 | Wave | 1 |
 | Offline | yes |
 | Conflict policy | append |
-| Reads | `fnb.kitchen_station`, `fnb.kitchen_ticket`, `fnb.kitchen_ticket_line`, `fnb.menu_item`, `fnb.service_order`, `fnb.service_order_line` |
-| Writes | `fnb.kitchen_ticket`, `fnb.kitchen_ticket_line`, `fnb.service_order`, `fnb.service_order_line`, `platform.idempotency_record`, `platform.outbox` |
+| Reads | `cache:idempotency`, `fnb.kitchen_station`, `fnb.kitchen_ticket`, `fnb.kitchen_ticket_line`, `fnb.menu_item`, `fnb.service_order`, `fnb.service_order_line` |
+| Writes | `cache:idempotency`, `fnb.kitchen_ticket`, `fnb.kitchen_ticket_line`, `fnb.service_order`, `fnb.service_order_line`, `platform.idempotency_record`, `platform.outbox` |
 | Called by | EMP-058, EMP-059, POS-022 |
 | State model | F&B order ([states/fnb-order.yaml](../../../states/fnb-order.yaml)): created as `ordered`<br/>Table ([states/table.yaml](../../../states/table.yaml)): moves `seated` -> `ordered` |
 
@@ -5899,9 +5905,9 @@ covers, is refused with 409 `tableHasOpenVisit` (an `FnbProblem` reason), read f
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| tables | array of TableDefinition | yes |  |
+| tables | array of TableLayoutItem | yes |  |
 | tables[].scopePath | string | yes | Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. (read-only) |
-| tables[].id | string (uuid) | yes | (read-only) |
+| tables[].id | string (uuid) | yes | The table this item updates, or the id of the table it adds (a UUIDv7 the client makes). |
 | tables[].label | string | yes | The table code, unique per venue (decided 28 September, audit R108). (max length 32) |
 | tables[].capacity | integer | yes | (min 1) |
 | tables[].zone | string |  | (nullable) |
@@ -6154,6 +6160,8 @@ Every table this service owns that the slice reads or writes, with its columns a
 | kind | text | yes |  |
 | label | text | yes | What a runner is told. |
 | zone | text | no |  |
+| opens_at | time | no | When a collection point opens, local to the venue (r8 walk of ticket 27820). |
+| closes_at | time | no | When a collection point closes, local to the venue; retail collectBy defaults to this on the day. |
 | table_id | uuid | no | Set where the location is a restaurant table, so it shares table state. |
 | seat_id | uuid | no | Set where the seat is the address. |
 | serving_outlet_ids | text[] | no | Which outlets deliver here. |

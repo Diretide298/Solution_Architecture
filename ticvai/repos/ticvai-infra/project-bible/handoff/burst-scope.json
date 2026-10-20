@@ -6,9 +6,9 @@
   "services": 17,
   "deployed": 3,
   "operations": 32,
-  "ofTotalOperations": 2804,
+  "ofTotalOperations": 2844,
   "tables": 63,
-  "ofTotalTables": 1129
+  "ofTotalTables": 1149
  },
  "routing": {
   "note": "**Normal traffic and sale traffic are separate systems running concurrently.** The burst environment carries the on-sale and nothing else; everything a venue does that day continues in the shared cell. **They meet once, afterwards, at reconciliation.**",
@@ -17,8 +17,8 @@
     "name": "normal",
     "target": "shared cell",
     "services": 17,
-    "operations": 2772,
-    "tables": 1129,
+    "operations": 2812,
+    "tables": 1149,
     "exampleLoad": "stadium, routine Saturday: 60,000 guests x 14 requests = 48.5 RPS",
     "description": "**Everything except the sale.** Admission, food, retail, stock, staff back-office, reporting. Runs whether or not a sale is happening."
    },
@@ -271,7 +271,7 @@
   {
    "table": "platform.outbox",
    "schema": "platform",
-   "columns": 15,
+   "columns": 16,
    "burstOperations": 5,
    "written": true,
    "contention": null,
@@ -398,7 +398,7 @@
   {
    "table": "seating.seat_reservation",
    "schema": "seating",
-   "columns": 12,
+   "columns": 13,
    "burstOperations": 3,
    "written": true,
    "contention": {
@@ -494,7 +494,7 @@
   {
    "table": "identity.delegated_access",
    "schema": "identity",
-   "columns": 21,
+   "columns": 23,
    "burstOperations": 2,
    "written": false,
    "contention": null,
@@ -505,7 +505,7 @@
   {
    "table": "ledger.journal_entry",
    "schema": "ledger",
-   "columns": 21,
+   "columns": 22,
    "burstOperations": 2,
    "written": true,
    "contention": null,
@@ -549,7 +549,7 @@
   {
    "table": "orders.cart",
    "schema": "orders",
-   "columns": 18,
+   "columns": 20,
    "burstOperations": 2,
    "written": true,
    "contention": null,
@@ -648,7 +648,7 @@
   {
    "table": "approvals.decision",
    "schema": "approvals",
-   "columns": 13,
+   "columns": 15,
    "burstOperations": 1,
    "written": false,
    "contention": null,
@@ -670,7 +670,7 @@
   {
    "table": "approvals.request",
    "schema": "approvals",
-   "columns": 30,
+   "columns": 35,
    "burstOperations": 1,
    "written": true,
    "contention": null,
@@ -725,7 +725,7 @@
   {
    "table": "identity.session",
    "schema": "identity",
-   "columns": 12,
+   "columns": 16,
    "burstOperations": 1,
    "written": true,
    "contention": null,
@@ -813,7 +813,7 @@
   {
    "table": "payments.provider_connection",
    "schema": "payments",
-   "columns": 12,
+   "columns": 13,
    "burstOperations": 1,
    "written": false,
    "contention": null,
@@ -835,7 +835,7 @@
   {
    "table": "platform.workstation",
    "schema": "platform",
-   "columns": 21,
+   "columns": 22,
    "burstOperations": 1,
    "written": false,
    "contention": null,
@@ -879,7 +879,7 @@
   {
    "table": "retail.sale",
    "schema": "retail",
-   "columns": 13,
+   "columns": 15,
    "burstOperations": 1,
    "written": false,
    "contention": null,
@@ -890,7 +890,7 @@
   {
    "table": "retail.sale_line",
    "schema": "retail",
-   "columns": 13,
+   "columns": 14,
    "burstOperations": 1,
    "written": false,
    "contention": null,
@@ -989,14 +989,14 @@
    "contract": "catalogue",
    "callsPerBuyer": 3,
    "reads": [
-    "catalogue.channel_envelope",
     "catalogue.channel_capacity",
+    "catalogue.channel_envelope",
     "catalogue.inventory_reservation",
     "platform.workstation"
    ],
    "writes": [
-    "catalogue.channel_envelope",
     "catalogue.channel_capacity",
+    "catalogue.channel_envelope",
     "catalogue.inventory_reservation"
    ],
    "lock": "FOR UPDATE SKIP LOCKED"

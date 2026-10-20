@@ -499,6 +499,11 @@
   "scopeLevel": "venue",
   "parameters": [
    {
+    "name": "venueId",
+    "in": "query",
+    "required": false
+   },
+   {
     "name": null,
     "in": null,
     "required": null
@@ -652,7 +657,18 @@
   "offlineCapable": true,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "kind",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": false
+   }
+  ],
   "requestBody": null,
   "responds": "ProductCategoryNode"
  },
@@ -738,6 +754,19 @@
   ],
   "requestBody": null,
   "responds": "Page"
+ },
+ "previewGuidedChoice": {
+  "method": "POST",
+  "path": "/venues/{venueId}/guided-choice-previews",
+  "contract": "white-label",
+  "summary": "What a draft Help me choose leaves, combination by combination",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": "GuidedChoicePreviewRequest",
+  "responds": "GuidedChoicePreview"
  },
  "proposeTranslations": {
   "method": "POST",

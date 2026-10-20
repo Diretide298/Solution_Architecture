@@ -15,7 +15,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/tenants-licensing/usage-license-command-center-adm-449",
-   "component": "apps/ticvai-web/src/routes/tenants-licensing/UsageLicenseCommandCenter.tsx",
+   "component": "src/routes/tenants-licensing/UsageLicenseCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -191,7 +191,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/tenants-licensing/entitlement-license-inventory-adm-450",
-   "component": "apps/ticvai-web/src/routes/tenants-licensing/EntitlementLicenseInventory.tsx",
+   "component": "src/routes/tenants-licensing/EntitlementLicenseInventory.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -313,7 +313,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/tenants-licensing/commercial-consumption-billable-event-metering-adm-451",
-   "component": "apps/ticvai-web/src/routes/tenants-licensing/CommercialConsumptionBillableEventMetering.tsx",
+   "component": "src/routes/tenants-licensing/CommercialConsumptionBillableEventMetering.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -435,7 +435,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/tenants-licensing/operational-usage-threshold-monitor-adm-452",
-   "component": "apps/ticvai-web/src/routes/tenants-licensing/OperationalUsageThresholdMonitor.tsx",
+   "component": "src/routes/tenants-licensing/OperationalUsageThresholdMonitor.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -541,7 +541,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/tenants-licensing/license-enforcement-decision-engine-adm-453",
-   "component": "apps/ticvai-web/src/routes/tenants-licensing/LicenseEnforcementDecisionEngine.tsx",
+   "component": "src/routes/tenants-licensing/LicenseEnforcementDecisionEngine.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -697,7 +697,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/tenants-licensing/minimum-guarantee-variable-consumption-monitor-adm-454",
-   "component": "apps/ticvai-web/src/routes/tenants-licensing/MinimumGuaranteeVariableConsumptionMonitor.tsx",
+   "component": "src/routes/tenants-licensing/MinimumGuaranteeVariableConsumptionMonitor.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -835,7 +835,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/tenants-licensing/overage-capacity-temporary-exception-management-adm-455",
-   "component": "apps/ticvai-web/src/routes/tenants-licensing/OverageCapacityTemporaryExceptionManagement.tsx",
+   "component": "src/routes/tenants-licensing/OverageCapacityTemporaryExceptionManagement.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -989,7 +989,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/tenants-licensing/usage-alerts-reconciliation-exception-center-adm-456",
-   "component": "apps/ticvai-web/src/routes/tenants-licensing/UsageAlertsReconciliationExceptionCenter.tsx",
+   "component": "src/routes/tenants-licensing/UsageAlertsReconciliationExceptionCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1110,7 +1110,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/tenants-licensing/ai-usage-forecast-commercial-optimization-adm-457",
-   "component": "apps/ticvai-web/src/routes/tenants-licensing/AiUsageForecastCommercialOptimization.tsx",
+   "component": "src/routes/tenants-licensing/AiUsageForecastCommercialOptimization.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1232,7 +1232,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/tenants-licensing/license-metering-commercial-synchronization-audit-adm-458",
-   "component": "apps/ticvai-web/src/routes/tenants-licensing/LicenseMeteringCommercialSynchronizationAudit.tsx",
+   "component": "src/routes/tenants-licensing/LicenseMeteringCommercialSynchronizationAudit.tsx",
    "status": "notStarted"
   },
   "navigation": {

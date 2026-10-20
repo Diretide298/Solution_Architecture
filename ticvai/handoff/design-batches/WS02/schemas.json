@@ -646,9 +646,14 @@
  "ApprovalDecision": {
   "type": "object",
   "x-ticvai-persistence": "approvals.decision",
+  "x-ticvai-exactly-one-of": [
+   [
+    "principalId",
+    "externalApproverRef"
+   ]
+  ],
   "required": [
    "level",
-   "principalId",
    "decision",
    "decidedAt"
   ],
@@ -664,7 +669,20 @@
    },
    "principalId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "nullable": true,
+    "description": "The approver; null when an external workflow system decided (`externalApproverRef` set)."
+   },
+   "externalApproverRef": {
+    "type": "string",
+    "nullable": true,
+    "description": "Who decided in the external provider's system, as it named them (`recordExternalApprovalDecision`); null for an internal approver (CHG-R8MIG-009)."
+   },
+   "externalApproverName": {
+    "type": "string",
+    "maxLength": 200,
+    "nullable": true,
+    "description": "The external approver's display name, where the provider sent one (CHG-R8MIG-009)."
    },
    "displayName": {
     "type": "string"
@@ -681,8 +699,11 @@
     "type": "string",
     "enum": [
      "approve",
-     "reject"
-    ]
+     "reject",
+     "return",
+     "requestInformation"
+    ],
+    "description": "`return` and `requestInformation` are stored as decisions too, their comment in `comment` (`decideApprovalRequest`; CHG-R8MIG-009)."
    },
    "comment": {
     "type": "string",
@@ -707,7 +728,7 @@
  },
  "ApprovalKind": {
   "type": "string",
-  "description": "11.1.7 and 11.1.30–11.1.37. **The first four already exist as bespoke implementations** and this contract is what they collapse into.\n**Which actions route here — decided 28 September, audit R144.** Finance and procurement acts go through this engine to a **finance approver**: closing a fiscal period (`periodClose`), reopening one (`periodReopen`), cancelling a purchase order (`purchaseOrderCancel`) and closing one short (`purchaseOrderShortClose`). The tenant default matrix for each of these names the finance approver role; a venue may tighten it and never loosen it. Starting a release rollout routes through `releasePromotion` to the platform release manager (a holder of `PLATFORM_RELEASE_PROMOTE`). **Not every `requiresApproval` goes here:** reopening a shift, recounting a stock count and a retail return above the venue threshold take a supervisor's step-up on the same device instead, and never raise a request.\n**Catalogue change requests route through `productChange` and `pricingChange`** (decided 29 September, writers pass): a product change and a price or pricing change raised in `catalogue` ask for approval under these two kinds, so a venue can route product edits and price edits to different approvers.\n\n**Optional review steps a venue switches on, decided 2 October 2026** (Chinmay; CHG-CSP-036, CHG-CSP-028, CHG-CSP-031). Each is an existing kind narrowed by the rule's `subjectTypes`, so no kind is added (a new value here would be a breaking change against r1) and each is off until the venue saves an active matrix for it:\n- **A purchase order** (`requisition`, subject `purchaseOrder`; Chinmay, 3 October 2026, Block A business rules; CHG-RUL-004): the PO approval matrix. Blanket and RFQ-award orders are raised without a requisition and are approved here instead; `inventory.createPurchaseOrder` asks for every order, by kind and value. - **Publishing white-label content** (`configurationChange`, subject `whiteLabelPublication`): simulate, then a single publish by a holder of the permission; a review step only where the venue sets one up (batch 1, CMS-014; DEC-156). - **Recording F&B waste above a value** (`stockWriteOff`, subject `fnbWaste`): the venue's waste-approval policy, value bands as `minAmount` and `maxAmount`, photo evidence above a value held by fnb (batch 6 #192, BO-139; DEC-192; R144). - **Publishing an access topology** (`configurationChange`, subject `topologyPublication`): second-person approval when the venue switches it on (batch 6 #230, BO-153; DEC-230). - **A permanent identity lock, a whitelist entry, or releasing a full-identity or permanent lock** (`accessPermissionChange`, subjects `identityLock`, `whitelistEntry`, `identityLockRelease`): always a second approver, never for an until-end-of-day lock (critical set 1, BO-229 and BO-247; DEC-254, DEC-260); the tenant default matrix names the security approver role and a venue may tighten it, never remove it.\n\n**A rota shift swap** (4 October 2026, CHG-FXC-008; Sprint 1-2 judging: `workforce.requestShiftSwap` raised a request\nwith no kind that fits). `configurationChange`, subject `shiftSwap`, `subjectContract` `workforce`, `subjectId` the\nShiftSwap id: an existing kind narrowed by `subjectTypes`, as the optional review steps above, so no kind is added.",
+  "description": "11.1.7 and 11.1.30–11.1.37. **The first four already exist as bespoke implementations** and this contract is what they collapse into.\n**Which actions route here — decided 28 September, audit R144.** Finance and procurement acts go through this engine to a **finance approver**: closing a fiscal period (`periodClose`), reopening one (`periodReopen`), cancelling a purchase order (`purchaseOrderCancel`) and closing one short (`purchaseOrderShortClose`). The tenant default matrix for each of these names the finance approver role; a venue may tighten it and never loosen it. Starting a release rollout routes through `releasePromotion` to the platform release manager (a holder of `PLATFORM_RELEASE_PROMOTE`). **Not every `requiresApproval` goes here:** reopening a shift, recounting a stock count and a retail return above the venue threshold take a supervisor's step-up on the same device instead, and never raise a request.\n**Catalogue change requests route through `productChange` and `pricingChange`** (decided 29 September, writers pass): a product change and a price or pricing change raised in `catalogue` ask for approval under these two kinds, so a venue can route product edits and price edits to different approvers.\n\n**Optional review steps a venue switches on, decided 2 October 2026** (Chinmay; CHG-CSP-036, CHG-CSP-028, CHG-CSP-031). Each is an existing kind narrowed by the rule's `subjectTypes`, so no kind is added (a new value here would be a breaking change against r1) and each is off until the venue saves an active matrix for it:\n- **A platform suspension or reactivation of a tenant** (`configurationChange`, subject `tenant`, `subjectContract` `subscription`; ADAM CR-172; lead''s ruling on lane H review 3 N-1, 20 October 2026; CHG-R8SPN-015): decided by the platform, never by the tenant''s own approvers. It is routed only by the **platform rule**, held in the control plane and seeded when the platform is provisioned, whose approvers hold `PLATFORM_TENANT_MANAGE`, with four eyes (the operator who raised it cannot decide it). It is not off by default like the review steps below: the platform rule always exists, and without it `createApprovalRequest` refuses `422 no-approval-route`.\n- **A purchase order** (`requisition`, subject `purchaseOrder`; Chinmay, 3 October 2026, Block A business rules; CHG-RUL-004): the PO approval matrix. Blanket and RFQ-award orders are raised without a requisition and are approved here instead; `inventory.createPurchaseOrder` asks for every order, by kind and value. - **Publishing white-label content** (`configurationChange`, subject `whiteLabelPublication`): simulate, then a single publish by a holder of the permission; a review step only where the venue sets one up (batch 1, CMS-014; DEC-156). - **Recording F&B waste above a value** (`stockWriteOff`, subject `fnbWaste`): the venue's waste-approval policy, value bands as `minAmount` and `maxAmount`, photo evidence above a value held by fnb (batch 6 #192, BO-139; DEC-192; R144). - **Publishing an access topology** (`configurationChange`, subject `topologyPublication`): second-person approval when the venue switches it on (batch 6 #230, BO-153; DEC-230). - **A permanent identity lock, a whitelist entry, or releasing a full-identity or permanent lock** (`accessPermissionChange`, subjects `identityLock`, `whitelistEntry`, `identityLockRelease`): always a second approver, never for an until-end-of-day lock (critical set 1, BO-229 and BO-247; DEC-254, DEC-260); the tenant default matrix names the security approver role and a venue may tighten it, never remove it.\n\n**A rota shift swap** (4 October 2026, CHG-FXC-008; Sprint 1-2 judging: `workforce.requestShiftSwap` raised a request\nwith no kind that fits). `configurationChange`, subject `shiftSwap`, `subjectContract` `workforce`, `subjectId` the\nShiftSwap id: an existing kind narrowed by `subjectTypes`, as the optional review steps above, so no kind is added.",
   "enum": [
    "refund",
    "priceOverride",
@@ -798,6 +819,13 @@
    },
    "amount": {
     "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "attributes": {
+    "type": "object",
+    "nullable": true,
+    "readOnly": true,
+    "additionalProperties": true,
+    "description": "**The attributes the raising contract sent** (`CreateApprovalRequest.attributes`), stored as given (ADAM CR-172, fix round 3; CHG-CRA-005). The rules match on them (`matchAttributes`), also when a draft is submitted later, and the contract that applies the decision reads them back with the request (`approvals#requestRecords`): Subscription's `approval.granted` consumer takes a tenant suspension's `action`, mode, reason, `effectiveAt` and notice from here. Null where none were sent."
    },
    "justification": {
     "type": "string",
@@ -930,6 +958,36 @@
     "format": "date-time",
     "nullable": true,
     "readOnly": true
+   },
+   "assignmentNote": {
+    "type": "string",
+    "maxLength": 500,
+    "nullable": true,
+    "readOnly": true,
+    "description": "The note `assignApprovalRequest` was given, kept with the assignment (R8 blocker APPROVALS-TENANCY-C02, CHG-R8MIG-009)."
+   },
+   "approvalMatrixId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-references": "approvals.matrix",
+    "description": "The matrix routing chose at submit (with `matrixVersion`), so a decision is checked against the matrix the request was routed by (CHG-R8MIG-009)."
+   },
+   "ruleId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-references": "approvals.rule",
+    "description": "The matrix rule that matched on kind, scope, amount and `attributes` (CHG-R8MIG-009)."
+   },
+   "cancelReason": {
+    "type": "string",
+    "maxLength": 500,
+    "nullable": true,
+    "readOnly": true,
+    "description": "Why the request was cancelled, as `cancelApprovalRequest` was given it (CHG-R8MIG-009)."
    },
    "requestedAt": {
     "type": "string",

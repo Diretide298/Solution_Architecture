@@ -15,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/policy/waiver-operations-command-center-cms-051",
-   "component": "apps/venue-management-web/src/routes/policy/WaiverOperationsCommandCenter.tsx",
+   "component": "src/routes/policy/WaiverOperationsCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -324,7 +324,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/policy/participant-waiver-status-tracking-cms-052",
-   "component": "apps/venue-management-web/src/routes/policy/ParticipantWaiverStatusTracking.tsx",
+   "component": "src/routes/policy/ParticipantWaiverStatusTracking.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -508,7 +508,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/policy/digital-signing-collection-operations-cms-053",
-   "component": "apps/venue-management-web/src/routes/policy/DigitalSigningCollectionOperations.tsx",
+   "component": "src/routes/policy/DigitalSigningCollectionOperations.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -697,7 +697,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/policy/minor-guardian-group-consent-management-cms-054",
-   "component": "apps/venue-management-web/src/routes/policy/MinorGuardianGroupConsentManagement.tsx",
+   "component": "src/routes/policy/MinorGuardianGroupConsentManagement.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -865,7 +865,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/policy/waiver-verification-validation-workspace-cms-055",
-   "component": "apps/venue-management-web/src/routes/policy/WaiverVerificationValidationWorkspace.tsx",
+   "component": "src/routes/policy/WaiverVerificationValidationWorkspace.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1049,7 +1049,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/policy/missing-expired-invalid-waiver-management-cms-056",
-   "component": "apps/venue-management-web/src/routes/policy/MissingExpiredInvalidWaiverManagement.tsx",
+   "component": "src/routes/policy/MissingExpiredInvalidWaiverManagement.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1201,7 +1201,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/policy/on-site-waiver-exception-handling-cms-057",
-   "component": "apps/venue-management-web/src/routes/policy/OnSiteWaiverExceptionHandling.tsx",
+   "component": "src/routes/policy/OnSiteWaiverExceptionHandling.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1340,7 +1340,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/policy/compliance-evidence-audit-waiver-repository-cms-058",
-   "component": "apps/venue-management-web/src/routes/policy/ComplianceEvidenceAuditWaiverRepository.tsx",
+   "component": "src/routes/policy/ComplianceEvidenceAuditWaiverRepository.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1468,7 +1468,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/policy/waiver-analytics-compliance-operational-insights-cms-059",
-   "component": "apps/venue-management-web/src/routes/policy/WaiverAnalyticsComplianceOperationalInsights.tsx",
+   "component": "src/routes/policy/WaiverAnalyticsComplianceOperationalInsights.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1654,7 +1654,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/policy/ai-waiver-compliance-risk-intelligence-center-cms-060",
-   "component": "apps/venue-management-web/src/routes/policy/AiWaiverComplianceRiskIntelligenceCenter.tsx",
+   "component": "src/routes/policy/AiWaiverComplianceRiskIntelligenceCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {

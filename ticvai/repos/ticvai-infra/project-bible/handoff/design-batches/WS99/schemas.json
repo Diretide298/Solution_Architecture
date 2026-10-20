@@ -100,7 +100,7 @@
  },
  "ModuleListing": {
   "type": "object",
-  "x-ticvai-persistence": "subscription.module_listing",
+  "x-ticvai-persistence": "control.module_listing",
   "description": "Board 4.6. **A marketplace without a dependency graph sells combinations that cannot be provisioned.**\n**TICVAI configures each module's price here, and tenants are billed per module (decided 29 September, Chinmay).** A usage-priced module (the AI module's tokens) has `pricingBasis` `metered`: `price` is then per `meteredUnitSize` units of `meteredMetric`, and the invoice carries it as a `metered` line.\n",
   "required": [
    "moduleCode"
@@ -365,8 +365,8 @@
  },
  "VsiAssessment": {
   "type": "object",
-  "x-ticvai-persistence": "subscription.vsi_assessment",
-  "description": "Board 2 — the ten-screen questionnaire, as data.",
+  "x-ticvai-persistence": "control.vsi_assessment",
+  "description": "Board 2 — the ten-screen questionnaire, as data. **In the control database** (ADAM CR-150, 18 October 2026; CHG-CRA-003): a prospect's sign-up answers are about a tenant to be, not inside one. It holds an organisation name and a contact email, so **which control database holds it is ADR-0043's decision** (personal data stays in its region); the lead records it before rows are written.",
   "properties": {
    "id": {
     "type": "string",

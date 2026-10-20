@@ -284,8 +284,99 @@ def load_operation_facts() -> dict:
                         "contract": f.stem,
                         "permission": op.get("x-ticvai-permission"),
                         "consumedBy": op.get("x-ticvai-consumed-by"),
+                        "security": op.get("security", doc.get("security")),
                     }
     return out
+
+
+def admits_prospect(facts: dict) -> bool:
+    """An operation a prospect can call: one security alternative is `prospectAuth` (or open, `{}`)."""
+    sec = facts.get("security")
+    if sec is None:
+        return False
+    return any(not req or "prospectAuth" in req for req in sec if isinstance(req, dict))
+
+
+COPIED = ("purpose", "pattern", "patternReason", "layout", "states", "gaps", "overlays",
+          "apis", "apisNote", "entryState")
+
+
+def twin_drift(code: str, sc: dict, twin: dict, facts: dict) -> list:
+    """The keys in which a `source.sameAs` copy differs from its original (the "a copy stays a copy" rule).
+
+    **A P17 copy may bind fewer operations than its P09 twin** (r8 integration, CHG-R8INT-006; the surface lane's
+    request, APPROVALS-TENANCY-C16): the sign-up half of a Subscription screen is the prospect's, so an operation of
+    the twin that admits no prospect (no `prospectAuth` and no open alternative in its security) is left out of
+    both `apis` lists before the comparison, and a twin component bound to it (`operation` or `impliedBy`) is compared
+    without that binding and without its `notes`, where the copy's component carries no binding of its own. Anything
+    else the copy binds or draws differently is still drift, and so is a prospect operation the copy dropped."""
+    staff_only = set()
+    if code == "P17":
+        staff_only = {a.get("operationId") for a in (twin.get("apis") or []) if isinstance(a, dict)
+                      and a.get("operationId") and not admits_prospect(facts.get(a["operationId"]) or {})}
+
+    def strip(t, c):
+        # walk the twin and the copy together; drop a staff-only binding the copy does not carry
+        if isinstance(t, dict) and isinstance(c, dict):
+            t, c = dict(t), dict(c)
+            gone = [k for k in ("operation", "impliedBy") if t.get(k) in staff_only and k not in c]
+            if gone:
+                for k in gone:
+                    t.pop(k)
+                t.pop("notes", None)
+                c.pop("notes", None)
+            pairs = {k: strip(t[k], c[k]) for k in t if k in c}
+            return ({k: (pairs[k][0] if k in pairs else v) for k, v in t.items()},
+                    {k: (pairs[k][1] if k in pairs else v) for k, v in c.items()})
+        if isinstance(t, list) and isinstance(c, list) and len(t) == len(c):
+            pairs = [strip(x, y) for x, y in zip(t, c)]
+            return [p[0] for p in pairs], [p[1] for p in pairs]
+        return t, c
+
+    drift = []
+    for k in COPIED:
+        a, b = sc.get(k), twin.get(k)
+        if k == "states":
+            skip = {"P06": "offline", "P17": "emptyNoAccess"}.get(code)
+            a = {x: y for x, y in (a or {}).items() if x != skip}
+            b = {x: y for x, y in (b or {}).items() if x != skip}
+        if staff_only and k == "apis":
+            b = [x for x in (b or []) if not (isinstance(x, dict) and x.get("operationId") in staff_only)]
+            a = [x for x in (a or []) if not (isinstance(x, dict) and x.get("operationId") in staff_only)]
+        elif staff_only and k == "layout":
+            b, a = strip(b, a)
+        if json.dumps(a, sort_keys=True, default=str) != json.dumps(b, sort_keys=True, default=str):
+            drift.append(k)
+    return drift
+
+
+def self_test() -> list:
+    """twin_drift on made-up screens: a P17 copy without the twin's staff-only operation passes; a copy that
+    drops a prospect operation, binds another, or draws a component differently drifts; P06 is unchanged."""
+    facts = {"setSub": {"security": [{"bearerAuth": []}]},
+             "getPlans": {"security": [{"bearerAuth": []}, {"prospectAuth": []}]}}
+    btn = {"kind": "primaryButton", "label": "Save", "impliedBy": "setSub", "notes": "The act."}
+    twin = {"apis": [{"operationId": "setSub"}, {"operationId": "getPlans"}],
+            "layout": {"regions": [{"components": [btn]}]}}
+    copy = {"apis": [{"operationId": "getPlans"}],
+            "layout": {"regions": [{"components": [{"kind": "primaryButton", "label": "Save",
+                                                    "notes": "Calls nothing; see the build note."}]}]}}
+    bad = []
+    cases = [
+        ("a P17 copy without the staff-only operation", "P17", copy, []),
+        ("a P17 copy that dropped a prospect operation", "P17", dict(copy, apis=[]), ["apis"]),
+        ("a P17 copy that binds another operation", "P17",
+         dict(copy, apis=[{"operationId": "getPlans"}, {"operationId": "other"}]), ["apis"]),
+        ("a P17 copy whose button is relabelled", "P17", dict(copy, layout={"regions": [{"components": [
+            {"kind": "primaryButton", "label": "Store", "notes": "x"}]}]}), ["layout"]),
+        ("a P06 copy may not drop it", "P06", copy, ["layout", "apis"]),
+        ("a P17 copy identical to its twin", "P17", twin, []),
+    ]
+    for name, code, sc, want in cases:
+        got = twin_drift(code, sc, twin, facts)
+        if got != want:
+            bad.append(f"twin_drift: {name}: expected {want}, got {got}")
+    return bad
 
 
 def check_role_permissions() -> None:
@@ -1086,6 +1177,15 @@ def check_reachability(files) -> None:
 def main() -> int:
     global STAFF_OPS, PERMISSION_KEYS, NAV_KEYS, TR_KEYS, TR_REQUIRED
     global PERMISSION_ENUM, ROLE_KEY_PERMS, OP_FACTS
+    _tests = self_test()
+    for _x in _tests:
+        print(f"  SELF-TEST  {_x}")
+    if _tests:
+        print(f"FAIL {len(_tests)} self-test(s)")
+        return 1
+    if "--self-test" in sys.argv:
+        print("PASS - the twin-drift self-tests")
+        return 0
     STAFF_OPS = load_staff_operations()
     PERMISSION_KEYS = load_permission_keys()
     PERMISSION_ENUM = load_permission_enum()
@@ -1485,8 +1585,6 @@ def main() -> int:
         _d = yaml.safe_load(f.read_text(encoding="utf-8"))
         for sc in _d.get("screens") or []:
             _all[sc["id"]] = (_d["platform"]["code"], sc)
-    _copied = ("purpose", "pattern", "patternReason", "layout", "states", "gaps", "overlays",
-               "apis", "apisNote", "entryState")
     _tool = {"P06": "apply-rental-staff-app.py", "P17": "apply-subscription-placement.py"}
     for _sid, (_code, sc) in sorted(_all.items()):
         _twin_id = (sc.get("source") or {}).get("sameAs")
@@ -1496,15 +1594,8 @@ def main() -> int:
             ERRORS.append(f"{_sid}: source.sameAs names {_twin_id}, which does not exist")
             continue
         _twin = _all[_twin_id][1]
-        _drift = []
-        for _k in _copied:
-            _a, _b = sc.get(_k), _twin.get(_k)
-            if _k == "states":
-                _skip = {"P06": "offline", "P17": "emptyNoAccess"}.get(_code)
-                _a = {x: y for x, y in (_a or {}).items() if x != _skip}
-                _b = {x: y for x, y in (_b or {}).items() if x != _skip}
-            if json.dumps(_a, sort_keys=True, default=str) != json.dumps(_b, sort_keys=True, default=str):
-                _drift.append(_k)
+        # The two sanctioned differences, and a P17 copy's narrower binding (CHG-R8INT-006): twin_drift.
+        _drift = twin_drift(_code, sc, _twin, OP_FACTS)
         if _drift:
             ERRORS.append(
                 f"{_sid}: has drifted from {_twin_id} in {', '.join(_drift)} — re-run "

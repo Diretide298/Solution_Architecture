@@ -1,6 +1,6 @@
 # P17-purchase-activation-01 — P17 · Purchase & Activation
 
-**7 screens · 5 operations · 14 schemas · 4 permissions**
+**7 screens · 4 operations · 13 schemas · 3 permissions**
 
 Platform P17 TICVAI Sign-up · ships as **ticvai-control** ·
 public audience · web ·
@@ -48,8 +48,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 4 permissions apply here:
-  `PLATFORM_CELL_MANAGE, PLATFORM_TENANT_MANAGE, PLATFORM_TENANT_VIEW, TENANT_CONFIGURE`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 3 permissions apply here:
+  `PLATFORM_CELL_MANAGE, PLATFORM_TENANT_VIEW, TENANT_CONFIGURE`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -149,12 +149,12 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `SGN-018` | Purchase / Trial Journey Selection | B | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
-| `SGN-019` | Contract & Billing Cycle Selection | B | 0 | 0 | 6 | 2 | 1 | 0 | — | notStarted (—) |
+| `SGN-019` | Contract & Billing Cycle Selection | B | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `SGN-020` | Billing & Legal Entity Information | B | 27 | 2 | 5 | 0 | 1 | 0 | — | notStarted (—) |
 | `SGN-021` | Payment Method & Settlement Setup | C | 34 | 0 | 6 | 17 | 1 | 0 | — | notStarted (—) |
 | `SGN-022` | Order & Commercial Pricing Review | B | 0 | 10 | 6 | 2 | 1 | 0 | — | notStarted (—) |
 | `SGN-023` | Commercial Agreement, Billable Definition & Customer Acceptance | B | 0 | 16 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `SGN-024` | Subscription Confirmation & Commercial Activation | B | 0 | 0 | 6 | 2 | 0 | 0 | — | notStarted (—) |
+| `SGN-024` | Subscription Confirmation & Commercial Activation | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

@@ -1,30 +1,32 @@
 #!/usr/bin/env python3
-"""Fill `handoff/api-data-lineage.json` from the contracts, for operations it does not have.
+"""Derive `handoff/api-data-lineage.json` from the contracts and a short list of overrides.
 
-**Twenty-plus tools read this file as authoritative and nothing in the package wrote it.** It
-arrived with the dump. So an operation added to a contract was invisible to `check-package`,
-`check-screens`, `derive-relationships`, `build-status`, the workbooks and the viewer until the
-next drop — and `check-package` rule 32 failed the whole package for the gap, correctly, with no
-tool able to close it. Sixteen operations drafted on 4 September hit exactly that.
+**Since 20 October 2026 the lineage is derived, not hand-kept** (the lead: "contracts are the single source;
+generators derive everything and never write back"; CHG-R8GEN-001). Until then this tool only added operations the
+file did not have and left every existing entry alone, on the reasoning that the 1,032 entries of the dump carried
+judgements a derivation could not reproduce. The cost of that was a file nobody could correct by changing a contract:
+178 entries named a permission the contract no longer required, 36 a readVia the contract had changed, six operations
+were missing, and every r8 lineage cause had to be a hand edit that the next rename would leave behind.
 
-**This is additive on purpose.** The 1,032 entries that came with the dump carry judgements a
-derivation cannot reproduce — an `audience` narrowed by hand, a `service` assignment that is a
-deployment decision rather than a contract fact. Rewriting them from the contracts would silently
-replace considered values with inferred ones, so an entry that already exists is left exactly as
-it is and only missing operations are added.
+So every run now writes, for every operation a contract declares:
 
-**`--audit` says where the two disagree** without changing anything, which is the honest way to
-find out whether a full rebuild would be safe. It is not run by `refresh.sh`; somebody should read
-it before anyone writes the rebuild this file eventually needs.
+  `reads`   the tables behind the schemas it returns, `cache:idempotency` when it takes the Idempotency-Key header
+  `writes`  the tables behind the schema it accepts (and the line table its body's lines land in, `child_writes`),
+            what a 201 creates, what a write with no stored body returns, `platform.outbox` for an emitter, the
+            change-log table `x-ticvai-config-change-log` names, `cache:idempotency` as for reads, the audit row for
+            `x-ticvai-audits-itself`, and the tables `x-ticvai-reads` / `x-ticvai-writes` name (`{table, for}`)
+  `readVia`, `writeVia`, `contract`, `verb`, `path`, `routing`, `scope`, `perm`, `offline`, `summary`, `audience`
+            straight off the operation
+  plus and minus `handoff/api-data-lineage-overrides.json`: what no contract fact can state, each entry with its
+  reason. The entries carried from the hand-kept file on 20 October are marked `carried` and may only fall
+  (check-lineage LN-OVERRIDE); a new one is added by hand with its own reason. `service` comes from
+  service-decomposition.json; notes, `pure`, `storageUndecided` and `readColumns` (derive-read-columns) are kept.
 
-What is derived, and from where:
+An operation no contract declares leaves the lineage. The output depends only on the contracts and the override
+list, so a second run changes nothing (check-lineage LN-DERIVED compares the file with this derivation).
 
-  `reads`   tables behind the schemas an operation RETURNS
-  `writes`  tables behind the schema it ACCEPTS in a request body, plus the line table its
-            body's non-persisted `lines`-style arrays land in (`child_writes`)
-  the rest  read straight off `x-ticvai-*` on the operation
-
-Run: `python3 tools/derive-lineage.py [--apply] [--audit]`
+Run: `python3 tools/derive-lineage.py [--apply] [--audit]`; `--seed-overrides` wrote the carried list once and
+refuses to run again.
 """
 from __future__ import annotations
 
@@ -43,14 +45,33 @@ LINEAGE = ROOT / "handoff" / "api-data-lineage.json"
 SERVICE_OF = {}
 
 
+_DOCS = None
+
+
+def contract_docs() -> list:
+    """Every contract, parsed once: `(path, document)` in file order.
+
+    **Parsed once, with the C loader where it exists** (20 October 2026, CHG-R8GEN-001). The four passes below each
+    parsed all 40 contracts with the pure-Python loader, about seventy seconds a run; check-lineage now runs this
+    derivation to compare against it (LN-DERIVED), so it has to be cheap enough to run twice.
+    """
+    global _DOCS
+    if _DOCS is None:
+        loader = getattr(yaml, "CSafeLoader", yaml.SafeLoader)
+        _DOCS = []
+        for c in sorted((ROOT / "contracts").rglob("*.yaml")):
+            try:
+                doc = yaml.load(c.read_text(encoding="utf-8"), Loader=loader) or {}
+            except yaml.YAMLError:
+                continue
+            _DOCS.append((c, doc))
+    return _DOCS
+
+
 def schema_defs() -> dict:
     """Schema name -> its definition, across every contract, so a `$ref` can be followed."""
     out = {}
-    for c in sorted((ROOT / "contracts").rglob("*.yaml")):
-        try:
-            doc = yaml.safe_load(c.read_text(encoding="utf-8")) or {}
-        except yaml.YAMLError:
-            continue
+    for c, doc in contract_docs():
         for n, sch in ((doc.get("components") or {}).get("schemas") or {}).items():
             out.setdefault(n, sch)
     return out
@@ -59,11 +80,7 @@ def schema_defs() -> dict:
 def persistence_map() -> dict:
     """Schema name -> the table(s) it persists to, across every contract."""
     out = {}
-    for c in sorted((ROOT / "contracts").rglob("*.yaml")):
-        try:
-            doc = yaml.safe_load(c.read_text(encoding="utf-8")) or {}
-        except yaml.YAMLError:
-            continue
+    for c, doc in contract_docs():
         for n, sch in ((doc.get("components") or {}).get("schemas") or {}).items():
             t = (sch or {}).get("x-ticvai-persistence")
             if not t:
@@ -342,11 +359,7 @@ def derive(stored: dict) -> dict:
     sto = stores_by_contract(stored)
     known = {t for ts in persist.values() for t in ts}
     out = {}
-    for c in sorted((ROOT / "contracts").rglob("*.yaml")):
-        try:
-            doc = yaml.safe_load(c.read_text(encoding="utf-8")) or {}
-        except yaml.YAMLError:
-            continue
+    for c, doc in contract_docs():
         contract = c.stem
         for path, item in (doc.get("paths") or {}).items():
             for verb, op in (item or {}).items():
@@ -373,16 +386,45 @@ def derive(stored: dict) -> dict:
                 # (directly, not through refs into neighbours) are writes, for new and existing entries alike.
                 created = (set(tables_in({c: r for c, r in (op.get("responses") or {}).items() if str(c) == "201"},
                                          persist)) if verb != "get" else set())
+                # **Two writes every operation of a kind makes, read off the contract** (20 October 2026, CHG-R8GEN-001).
+                # A write that takes the shared `Idempotency-Key` header dedups on `cache:idempotency` (common.yaml: a
+                # replay gets the stored first answer), unless it says `x-ticvai-idempotency-exempt`; an operation with
+                # `x-ticvai-config-change-log` appends the change-log row that extension names. Both were kept by hand
+                # in the lineage (1,110 and 84 entries) and missing from about 430 operations that take the header.
+                ruled_r, ruled_w = set(), set()
+                if _idempotent(op, item):
+                    ruled_r.add("cache:idempotency")
+                    ruled_w.add("cache:idempotency")
+                ruled_w |= {x for x in _TABLE_TEXT.findall(str(op.get("x-ticvai-config-change-log") or ""))
+                            if x in known}
+                # An operation that writes its own audit row says so (x-ticvai-audits-itself, r8 cause
+                # FOUNDATION-AI-C49, CHG-R8GEN-012); the kernel interceptor skips it, and the row is its write.
+                if op.get("x-ticvai-audits-itself") and verb != "get":
+                    ruled_w.add("platform.audit_record")
+                # **A table the operation reads or writes that no schema it takes or returns persists to** (20 October
+                # 2026, CHG-R8GEN-014): `x-ticvai-reads` / `x-ticvai-writes`, a list of `{table, for}` (or bare table
+                # names) in the operation's own module. It is how a carried override becomes a contract fact: once the
+                # contract says it, derive-lineage --audit lists the override as redundant and it is removed. A read of
+                # another module's table is never this: it is an x-ticvai-read-via to the owner's query.
+                for key, into in (("x-ticvai-reads", ruled_r), ("x-ticvai-writes", ruled_w)):
+                    for x in op.get(key) or []:
+                        tb = str(x.get("table") if isinstance(x, dict) else x).strip()
+                        if tb in known:
+                            into.add(tb)
                 out[op["operationId"]] = {
                     "contract": contract,
                     "verb": verb.upper(),
                     "path": path,
-                    "reads": tables_in(op.get("responses"), persist, defs),
-                    "writes": sorted(body_writes | created
+                    "reads": sorted(set(tables_in(op.get("responses"), persist, defs)) | ruled_r),
+                    "writes": sorted(body_writes | created | ruled_w
                                      | ({"platform.outbox"} if (op["operationId"] in emitting
                                         or op.get("x-ticvai-emits")) and contract != "ai" else set())),
                     # Kept only long enough for the repair below to tell which tables are new
                     # *because refs are now followed*, and stripped before anything is written.
+                    "_old_reads": tables_in(op.get("responses"), persist, defs),
+                    "_old_writes": sorted(body_writes | created
+                                          | ({"platform.outbox"} if (op["operationId"] in emitting
+                                             or op.get("x-ticvai-emits")) and contract != "ai" else set())),
                     "_direct_reads": tables_in(op.get("responses"), persist),
                     "_direct_writes": tables_in(op.get("requestBody"), persist),
                     "_response_writes": response_writes,
@@ -414,6 +456,21 @@ def derive(stored: dict) -> dict:
     return out
 
 
+_TABLE_TEXT = re.compile(r"\b([a-z][a-z0-9_]*\.[a-z][a-z0-9_]*)\b")
+
+
+def _idempotent(op: dict, item: dict) -> bool:
+    """The operation takes the shared `Idempotency-Key` header and does not say it is exempt."""
+    if op.get("x-ticvai-idempotency-exempt"):
+        return False
+    for p in list(op.get("parameters") or []) + list((item or {}).get("parameters") or []):
+        if not isinstance(p, dict):
+            continue
+        if str(p.get("$ref") or "").endswith("/IdempotencyKey") or str(p.get("name") or "") == "Idempotency-Key":
+            return True
+    return False
+
+
 def read_via(op: dict) -> list:
     """`x-ticvai-read-via` as the lineage records it: one `{query, route, for}` per question asked of another module."""
     out = []
@@ -432,11 +489,156 @@ def write_via(op: dict) -> list:
     return sorted(out, key=lambda w: w["table"])
 
 
+OVERRIDES = ROOT / "handoff" / "api-data-lineage-overrides.json"
+
+# The fields of an entry that are contract facts: re-read from the contract on every run (CHG-R8GEN-001). `audience` and
+# `perm` were left alone as "judgements" until r8, and 178 entries named a permission the contract no longer required.
+CONTRACT_FIELDS = ("contract", "verb", "path", "routing", "scope", "perm", "offline", "summary", "audience")
+
+CARRIED_REASON = ("hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, "
+                  "CHG-R8GEN-001)")
+
+
+def load_overrides(path: Path = OVERRIDES) -> dict:
+    """`handoff/api-data-lineage-overrides.json`: what the contracts cannot state, one entry per operation.
+
+    `reads`/`writes` add tables, `notReads`/`notWrites` remove ones the contract derives, `stores` replaces the
+    entry's datastores (a generated file, say), `reason` says why. An entry
+    with `carried: true` was copied from the hand-kept lineage when it became derived (20 October 2026); their number
+    may only fall (`carriedCeiling`, check-lineage LN-OVERRIDE). Authored by hand; nothing in the refresh writes it."""
+    if not path.exists():
+        return {"operations": {}}
+    doc = json.loads(path.read_text(encoding="utf-8"))
+    doc.setdefault("operations", {})
+    return doc
+
+
+def _same(a, b) -> bool:
+    if isinstance(a, list) or isinstance(b, list):
+        return sorted(a or []) == sorted(b or [])
+    return (a if a not in ("", None) else None) == (b if b not in ("", None) else None)
+
+
+def expected(stored: dict, fresh: dict, overrides: dict, stale: list = None) -> dict:
+    """The lineage the contracts and the override list give, keeping each stored entry's annotations.
+
+    **The contract is the source** (the lead, 20 October 2026: "contracts are the single source; generators derive
+    everything and never write back"). For every operation a contract declares: the contract facts
+    (`CONTRACT_FIELDS`, `readVia`, `writeVia`) are read off it; `reads` and `writes` are the tables its schemas persist
+    to and the rule-derived ones (`derive`), plus and minus the override list; `cache` is the resolution-cache rule.
+    `service` is the decomposition's (a deployment decision), `stores` is kept where set. What only a person can say
+    (notes, `pure`, `storageUndecided`, `readColumns`, which derive-read-columns refreshes next) is carried as it is.
+    An operation no contract declares is not in the result. The result depends on the contracts and the overrides
+    only, so a second run over its own output gives the same file.
+    """
+    ops = overrides.get("operations") or {}
+    svc = service_by_contract(stored)
+    order = [o for o in stored if o in fresh] + [o for o in fresh if o not in stored]
+    out = {}
+    for o in order:
+        f = fresh[o]
+        new = o not in stored
+        e = {k: v for k, v in f.items() if not k.startswith("_")} if new else json.loads(json.dumps(stored[o]))
+        for k in CONTRACT_FIELDS:
+            if not _same(e.get(k), f.get(k)):
+                e[k] = f.get(k)
+        want = svc.get(f.get("contract"))
+        if want:
+            e["service"] = want
+        elif not e.get("service"):
+            e["service"] = f.get("service")
+        if not e.get("stores"):
+            e["stores"] = f.get("stores") or ["postgres"]
+        ov = ops.get(o) or {}
+        if ov.get("stores"):
+            e["stores"] = list(ov["stores"])     # where the operation's data lives, when no table says it
+        reads = set(f.get("reads") or [])
+        writes = set(f.get("writes") or []) | set(f.get("_response_writes") or [])
+        if e.get("pure"):
+            # A `pure` entry writes nothing, whatever its body refs (CHG-FXC-004); a cache it fills is not a table.
+            writes = {t for t in writes if ":" in t}
+        reads = (reads | set(ov.get("reads") or [])) - set(ov.get("notReads") or [])
+        writes = (writes | set(ov.get("writes") or [])) - set(ov.get("notWrites") or [])
+        # A name that is not `<schema>.<table>` is not a table (SD-007).
+        e["reads"] = sorted(t for t in reads if ":" in t or _VALID_TABLE.match(t))
+        e["writes"] = sorted(t for t in writes if ":" in t or _VALID_TABLE.match(t))
+        for key in ("writeVia", "readVia"):
+            if f.get(key):
+                e[key] = f[key]
+            else:
+                e.pop(key, None)
+        out[o] = e
+    import importlib.util as _ilu
+    _spec = _ilu.spec_from_file_location("resolution_cache", ROOT / "tools" / "resolution_cache.py")
+    _rc = _ilu.module_from_spec(_spec)
+    _spec.loader.exec_module(_rc)
+    for o in out:
+        want = _rc.resolution_cache(o, out[o], out)
+        if want:
+            out[o]["cache"] = want
+        else:
+            out[o].pop("cache", None)
+    if stale is not None:
+        stale.extend(sorted(set(ops) - set(fresh)))
+    return out
+
+
+def seed_overrides(stored: dict, fresh: dict) -> dict:
+    """The override list that reproduces today's hand-kept reads and writes: run once, when the lineage became
+    derived (20 October 2026). Each entry's reason is the entry's own note where it has one."""
+    ops = {}
+    for o in stored:
+        if o not in fresh:
+            continue
+        f = fresh[o]
+        base_w = set(f.get("writes") or []) | set(f.get("_response_writes") or [])
+        if stored[o].get("pure"):
+            base_w = {t for t in base_w if ":" in t}
+        add_r = sorted(set(stored[o].get("reads") or []) - set(f.get("reads") or []))
+        add_w = sorted(set(stored[o].get("writes") or []) - base_w)
+        # Only a removal of what the old derivation gave: the two rules added on 20 October (idempotency, change
+        # log) are contract facts the hand-kept file had missed, so they are applied, not seeded away.
+        old_r = set(f.get("_old_reads") or [])
+        old_w = set(f.get("_old_writes") or []) | set(f.get("_response_writes") or [])
+        if stored[o].get("pure"):
+            old_w = {t for t in old_w if ":" in t}
+        not_r = sorted(old_r - set(stored[o].get("reads") or []))
+        not_w = sorted(old_w - set(stored[o].get("writes") or []))
+        if not (add_r or add_w or not_r or not_w):
+            continue
+        notes = [str(stored[o][k]) for k in ("lineageNote", "writesNote", "fixNote", "note") if stored[o].get(k)]
+        e = {}
+        for k, v in (("reads", add_r), ("writes", add_w), ("notReads", not_r), ("notWrites", not_w)):
+            if v:
+                e[k] = v
+        e["reason"] = ("; ".join(notes) + " (" + CARRIED_REASON + ")") if notes else CARRIED_REASON
+        e["carried"] = True
+        ops[o] = e
+    return {
+        "about": "What the contracts cannot state about an operation's tables, one entry per operation, each with "
+                 "its reason. tools/derive-lineage.py adds `reads`/`writes` to what the contract derives and takes "
+                 "`notReads`/`notWrites` away. Authored by hand: nothing in the refresh writes it. An entry marked "
+                 "`carried` was copied from the hand-kept lineage when it became derived (20 October 2026, "
+                 "CHG-R8GEN-001); their number may only fall (carriedCeiling, check-lineage LN-OVERRIDE). To change "
+                 "an operation's tables, change its contract (a persisted schema, x-ticvai-read-via, "
+                 "x-ticvai-write-via, x-ticvai-config-change-log); add an override only for what no contract fact "
+                 "can say, with a reason, and without `carried`.",
+        "carriedCeiling": len(ops),
+        "operations": {o: ops[o] for o in sorted(ops)},
+    }
+
+
+def write_json(path: Path, doc) -> None:
+    path.write_text(json.dumps(doc, indent=1, ensure_ascii=False), encoding="utf-8")
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--apply", action="store_true")
+    ap.add_argument("--apply", action="store_true", help="write handoff/api-data-lineage.json")
     ap.add_argument("--audit", action="store_true",
-                    help="report where the stored entries and the contracts disagree")
+                    help="report what the override list holds and what it no longer needs")
+    ap.add_argument("--seed-overrides", action="store_true",
+                    help="once: write the override list that reproduces the hand-kept lineage (refuses if it exists)")
     a = ap.parse_args()
     try:
         sys.stdout.reconfigure(encoding="utf-8", errors="replace")
@@ -445,229 +647,68 @@ def main() -> int:
 
     stored = json.loads(LINEAGE.read_text(encoding="utf-8")) if LINEAGE.exists() else {}
     fresh = derive(stored)
-    missing = sorted(set(fresh) - set(stored))
-    orphan = sorted(set(stored) - set(fresh))
-
-    print("%d operations in the contracts · %d in the lineage" % (len(fresh), len(stored)))
+    if a.seed_overrides:
+        if OVERRIDES.exists():
+            print("FAIL - %s exists; it is authored now, edit it by hand" % OVERRIDES.relative_to(ROOT))
+            return 1
+        doc = seed_overrides(stored, fresh)
+        write_json(OVERRIDES, doc)
+        print("  seeded %d override entr(ies) -> %s" % (len(doc["operations"]), OVERRIDES.relative_to(ROOT)))
+        return 0
+    overrides = load_overrides()
+    stale = []
+    want = expected(stored, fresh, overrides, stale)
+    missing = sorted(set(want) - set(stored))
+    orphan = sorted(set(stored) - set(want))
+    changed = sorted(o for o in set(want) & set(stored) if want[o] != stored[o])
+    print("%d operations in the contracts · %d in the lineage · %d override entries"
+          % (len(fresh), len(stored), len(overrides.get("operations") or {})))
     print("  in the contracts and not the lineage   %4d" % len(missing))
-    print("  in the lineage and not the contracts   %4d" % len(orphan))
+    print("  in the lineage and not the contracts   %4d (removed)" % len(orphan))
+    print("  entries the contracts now change        %4d" % len(changed))
     for o in missing[:12]:
         print("     + %-32s %s" % (o, fresh[o]["contract"]))
-    for o in orphan[:8]:
+    for o in orphan[:12]:
         print("     - %-32s %s" % (o, stored[o].get("contract")))
+    by_field = {}
+    for o in changed:
+        for k in set(want[o]) | set(stored[o]):
+            if want[o].get(k) != stored[o].get(k):
+                by_field[k] = by_field.get(k, 0) + 1
+    for k, n in sorted(by_field.items(), key=lambda x: -x[1]):
+        print("     ~ %-12s %4d entr(ies)" % (k, n))
+    for o in stale:
+        print("  WARN override for %s, which no contract declares" % o)
 
     if a.audit:
-        # **Only reported, never applied.** A disagreement here is as likely to be a judgement the
-        # dump made and the contract does not carry as it is to be staleness.
-        fields = ("contract", "verb", "path", "routing", "scope", "perm", "reads", "writes")
-        diffs = 0
-        for o in sorted(set(stored) & set(fresh)):
-            bad = [f for f in fields if stored[o].get(f) != fresh[o].get(f)]
-            if bad:
-                diffs += 1
-                if diffs <= 15:
-                    print("     ~ %-30s %s" % (o, ", ".join(bad)))
-        print("  entries whose stored value differs from the contract  %d" % diffs)
-
-    # **`--apply` adds and never updates, which is right and has one sharp edge.** An operation
-    # written once with a null `service` keeps it forever: the next run sees the key present and
-    # leaves it alone. On 19 September that happened to 133 operations across four new contracts,
-    # and `derive-diagrams.py` then sorted a set containing `None` and stopped the whole refresh —
-    # twice, because re-running the pipeline could not repair what re-running does not touch.
-    #
-    # So a null `service` or empty `stores` is repairable in place. Nothing else is: a stored value
-    # that disagrees with the contract is a judgement somebody made, and `--audit` reports it
-    # rather than overwriting it.
-    #
-    # **One more thing is a fact rather than a judgement: which contract defines an operation.**
-    # On 19 September 15 operations moved from `retail.yaml` and `games.yaml` into `wallet.yaml`
-    # — the wallet runtime, which had been living apart from the wallet rules. Their stored
-    # entries still said `retail`, and therefore still said `RetailService`, and no amount of
-    # re-running would have changed either: the key was present, so `--apply` left it. An
-    # operation's owning contract is read straight off the file that declares it, so when the
-    # two disagree the stored one is simply out of date, and the service inferred from it with
-    # it. A hand-narrowed `audience` or a deliberate service override is still left alone.
-    repaired = moved = rehomed = followed = rerouted = 0
-    svc = service_by_contract(stored)
-    if a.apply:
-        # **The one repair to an existing entry's reads and writes, and it is narrow on purpose.**
-        # Until 20 September `tables_in` looked one level deep, so an operation returning a
-        # composed schema recorded the wrapper's tables and not the ones underneath. The repair
-        # adds ONLY the tables that appear because refs are now followed — the difference between
-        # the transitive walk and the old direct one.
-        #
-        # **Nothing is ever removed and no other difference is touched.** A stored set that
-        # disagrees with the contract for any other reason is a judgement somebody made, and
-        # `--audit` reports it rather than overwriting it. This fixes a derivation that was
-        # incomplete, not a decision that was wrong.
-        for o in sorted(set(stored) & set(fresh)):
-            for key, direct_key in (("reads", "_direct_reads"), ("writes", "_direct_writes")):
-                # **Widened on 20 September from "transitive gains" to "anything the contract
-                # demonstrably refs".** The narrow version missed 82 tables, because a
-                # hand-mapped entry can be short for reasons that have nothing to do with
-                # composed schemas: `listBurstEnvironments` returns `BurstEnvironment` and its
-                # 31 August entry lists `catalogue.performance` and not
-                # `control.burst_environment`.
-                #
-                # **A short lineage entry is indistinguishable from a missing API**, and the
-                # unwired audit reported four operations' worth of burst-environment API as a
-                # gap on exactly that basis. Reads and writes derived from a `$ref` are a
-                # derivation, not a judgement — so a missing one is filled. Nothing is ever
-                # removed; a narrowing IS a judgement and `--audit` reports it instead.
-                add = sorted(set(fresh[o].get(key) or []) - set(stored[o].get(key) or []))
-                # **A `pure` entry writes nothing, whatever its body refs** (4 October 2026, CHG-FXC-004).
-                # `previewSegmentDraft` takes a draft segment and counts it; its body refs the criterion schema,
-                # so the repair kept writing `marketing.segment_criterion` back into an operation whose contract
-                # says it stores nothing, and the Sprint 1-2 judge found the two disagreeing.
-                if key == "writes" and stored[o].get("pure"):
-                    add = [t for t in add if ":" in t]
-                if add:
-                    stored[o][key] = sorted(set(stored[o].get(key) or []) | set(add))
-                    followed += len(add)
-        for o in sorted(set(stored) & set(fresh)):
-            if not stored[o].get("service") and fresh[o].get("service"):
-                stored[o]["service"] = fresh[o]["service"]
-                repaired += 1
-            if not stored[o].get("stores") and fresh[o].get("stores"):
-                stored[o]["stores"] = fresh[o]["stores"]
-            # **A service named in the decomposition is a decision, not a guess.** An operation
-            # whose contract has not moved can still change service, because the service it
-            # deploys to is recorded in `service-decomposition.json` and that file is edited by
-            # a person. When the two disagree, the file wins — otherwise the 33 configuration
-            # operations already in `wallet.yaml` would keep reporting `RetailService` while
-            # the 15 that moved into it reported `WalletService`, and one contract would be
-            # split across two services in the diagrams.
-            want = svc.get(fresh[o].get("contract") or stored[o].get("contract"))
-            if want and stored[o].get("service") not in (None, want):
-                stored[o]["service"] = want
-                rehomed += 1
-            # **Where an operation is served is a fact too** (14 October 2026, CHG-SHP-003). 123 writes moved from a
-            # collection path to an item path (`PUT /badges` -> `PUT /badges/{badgeId}`); the stored entry kept the old
-            # route, and every reader of the lineage (service docs, the API list) would have printed a path no
-            # server answers. Verb and path are read straight off the contract, like the owning contract below.
-            for k in ("verb", "path"):
-                if fresh[o].get(k) and stored[o].get(k) != fresh[o][k]:
-                    stored[o][k] = fresh[o][k]
-                    rerouted += 1
-            if fresh[o].get("contract") and stored[o].get("contract") != fresh[o]["contract"]:
-                print("     moved %-28s %s -> %s" % (o, stored[o].get("contract"),
-                                                     fresh[o]["contract"]))
-                stored[o]["contract"] = fresh[o]["contract"]
-                if fresh[o].get("service"):
-                    stored[o]["service"] = fresh[o]["service"]
-                moved += 1
-    if followed:
-        print("  %d table mention(s) added to existing entries by following refs into composed "
-              "schemas" % followed)
-    if repaired:
-        print("  repaired %d entry(s) that had no service" % repaired)
-    if rerouted:
-        print("  %d verb/path value(s) re-read from the contract" % rerouted)
-    if moved:
-        print("  re-attributed %d operation(s) that changed contract" % moved)
-    if rehomed:
-        print("  moved %d operation(s) to the service the decomposition names" % rehomed)
+        ops = overrides.get("operations") or {}
+        carried = sum(1 for v in ops.values() if v.get("carried"))
+        redundant = []
+        for o, v in ops.items():
+            if o not in fresh:
+                continue
+            base_r, base_w = set(fresh[o].get("reads") or []), set(fresh[o].get("writes") or [])
+            red = sorted(set(v.get("reads") or []) & base_r) + sorted(set(v.get("writes") or []) & base_w)
+            if red:
+                redundant.append((o, red))
+        print("  override entries %d (carried %d, ceiling %s); tables they add: reads %d, writes %d"
+              % (len(ops), carried, overrides.get("carriedCeiling"),
+                 sum(len(v.get("reads") or []) for v in ops.values()),
+                 sum(len(v.get("writes") or []) for v in ops.values())))
+        print("  overrides the contracts now derive (remove them): %d" % len(redundant))
+        for o, red in redundant[:15]:
+            print("     = %-32s %s" % (o, ", ".join(red)))
 
     if not a.apply:
         print("\n  nothing written - pass --apply")
         return 0
-    _bad = sum(1 for v in stored.values() for k in ("reads", "writes") for t in (v.get(k) or [])
-               if ":" not in t and not _VALID_TABLE.match(t))
-    # **An operation an approved breaking change removed leaves the lineage** (2 October 2026, CHG-CLN-001). The rule
-    # "nothing is ever removed" protects judgements about an operation's reads and writes; an operation that no contract
-    # declares any more, and that docs/active/breaking-changes.yaml names, is no judgement. Kept, it stayed a writer
-    # in every derivation downstream: derive-delivery-slice pulled the 13 retired duplicate writers back into the
-    # first-release slice as setup. Only orphans the breaking-changes file names are removed; any other orphan is
-    # still reported above and left alone.
-    retired = sorted(set(orphan) & approved_removals())
-    for o in retired:
-        del stored[o]
-        print("     retired %-26s (approved breaking change)" % o)
-    # **Which `cache:resolution` entry an operation fills or evicts is recorded on the entry** (4 October 2026,
-    # CHG-FXC-001, root class R141). The lineage named the store and not the key, and the service documents said a
-    # writer could not be built from the package; 18 Sprint 1-2 tickets stopped on it. The key and the bump are a
-    # rule (tools/resolution_cache.py), so they are a derivation: filled where missing or out of date with the
-    # entry's tables, on new and existing entries alike, after the new entries are added below.
-    import importlib.util as _ilu
-    _spec = _ilu.spec_from_file_location("resolution_cache", ROOT / "tools" / "resolution_cache.py")
-    _rc = _ilu.module_from_spec(_spec)
-    _spec.loader.exec_module(_rc)
-    keyed = 0
-    _view = dict(stored)
-    _view.update({o: fresh[o] for o in missing})
-    for o, e in _view.items():
-        want = _rc.resolution_cache(o, e, _view)
-        if want and stored.get(o, {}).get("cache") != want:
-            keyed += 1
-    if keyed:
-        print("  %d entry(s) given the cache:resolution key they fill or evict" % keyed)
-    # `writeVia` (CHG-R6-020) is the contract's `x-ticvai-write-via`, so it is refreshed in place, and removed from an
-    # entry whose operation no longer routes a write.
-    routed = 0
-    for o in sorted(set(stored) & set(fresh)):
-        want = fresh[o].get("writeVia")
-        if want and stored[o].get("writeVia") != want:
-            stored[o]["writeVia"] = want
-            routed += 1
-        elif not want and "writeVia" in stored[o]:
-            del stored[o]["writeVia"]
-            routed += 1
-    if routed:
-        print("  %d entry(s) given the route their cross-deployable writes take (writeVia)" % routed)
-    # `readVia` (CHG-GEN-009) is the contract's `x-ticvai-read-via`, refreshed the same way.
-    asked = 0
-    for o in sorted(set(stored) & set(fresh)):
-        want = fresh[o].get("readVia")
-        if want and stored[o].get("readVia") != want:
-            stored[o]["readVia"] = want
-            asked += 1
-        elif not want and "readVia" in stored[o]:
-            del stored[o]["readVia"]
-            asked += 1
-    if asked:
-        print("  %d entry(s) given the declared queries their cross-module reads ask (readVia)" % asked)
-    if not missing and not repaired and not moved and not rehomed and not followed and not _bad and not retired \
-            and not keyed and not routed and not asked and not rerouted:
-        print("  nothing to add")
+    if not (missing or orphan or changed) and list(want) == list(stored):
+        print("  nothing to change")
         return 0
-    for o in missing:
-        stored[o] = {k: v for k, v in fresh[o].items() if not k.startswith("_")}
-        stored[o]["writes"] = sorted(set(stored[o]["writes"]) | set(fresh[o].get("_response_writes") or []))
-    for o in stored:
-        want = _rc.resolution_cache(o, stored[o], stored)
-        if want:
-            stored[o]["cache"] = want
-        else:
-            stored[o].pop("cache", None)
-    # **A name that is not `<schema>.<table>` is not a table, and is removed** (SD-007, 29
-    # September). The one exception to "never removed": authored entries carried the prose after
-    # `none —` (`embedded as attributes (jsonb) on orders.cart_line ...`) and table names with a
-    # parenthetical, and every derivation downstream turned them into schemas, tables and keys.
-    for o in stored:
-        for key in ("reads", "writes"):
-            vals = stored[o].get(key) or []
-            keep = [t for t in vals if ":" in t or _VALID_TABLE.match(t)]
-            if len(keep) != len(vals):
-                stored[o][key] = keep
-    LINEAGE.write_text(json.dumps(stored, indent=1, ensure_ascii=False), encoding="utf-8")
-    print("  added %d · %d operations total -> handoff/%s" % (len(missing), len(stored),
-                                                              LINEAGE.name))
+    write_json(LINEAGE, want)
+    print("  %d operations -> handoff/%s" % (len(want), LINEAGE.name))
     return 0
 
-
-def approved_removals() -> set:
-    """The operations docs/active/breaking-changes.yaml names: the approved breaking changes (CHG-CLN-001)."""
-    path = ROOT / "docs" / "active" / "breaking-changes.yaml"
-    if not path.exists():
-        return set()
-    import yaml
-    doc = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
-    out = set()
-    for e in doc.get("changes") or []:
-        if isinstance(e, dict) and e.get("operation"):
-            # `operations` groups several operations of one contract under one reason (CHG-SHP-003).
-            out |= {str(e["operation"])} | {str(x) for x in e.get("operations") or [] if x}
-    return out
 
 
 if __name__ == "__main__":

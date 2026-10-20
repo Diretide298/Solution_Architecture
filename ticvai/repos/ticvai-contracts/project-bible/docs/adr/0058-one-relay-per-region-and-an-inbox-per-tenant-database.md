@@ -338,3 +338,25 @@ Actions 1–5 stand. Action 4's KERNEL-RELAY takes the drain loop and the batch 
     `cancelled`), `cursorAt` (date-time, how far it has got), `rowsPublished` (integer), `lastError`,
     `requestedBy` (the principal), `requestedAt`, `startedAt`, `finishedAt`. Both permissions exist in
     `shared/permissions.yaml`; they are the ones `listDeadLetters` and `replayDeadLetter` use.
+
+## Amendment — the control database's outbox, and a sequence that survives partitions, 18 October 2026
+
+**Decided by Chinmay in the published answers to ADAM CR-152 and CR-166 (18 October 2026; CHG-CRA-005).**
+
+1. **The control database has an outbox too** (CR-152, option 1a). `control.outbox` has the tenant outbox's
+   columns without `scope_path` and with no row security (the control database has no scope tree, ADR-0039), and
+   the regional relay in the workers host drains it with the tenant databases' outboxes, under its own lease. A
+   control-plane change that must reach a tenant writes its event there in the same transaction (ADR-0033):
+   `tenant.suspended` is written with the status change, by Subscription's `approval.granted` consumer that applies
+   the suspension `suspendTenant` asked for (CR-172, 19 October 2026) or, for a future `effectiveAt`, by the
+   workers job that applies the suspension at `control.tenant.suspension_effective_at`; its `tenantId` is the
+   suspended tenant and its scope path the tenant's root (`control.cell_tenant.root_scope_path`, CR-163).
+2. **The sequence is a counter, not the highest row plus one** (CR-166). Published outbox rows leave with their
+   monthly partition (Outbox housekeeping, above), so `max(sequence) + 1` restarts. `platform.outbox_sequence`
+   (`aggregate_id` key, `last_sequence bigint`) is updated with `INSERT ... ON CONFLICT DO UPDATE ... RETURNING` in
+   the writing transaction; every host role holds SELECT, INSERT and UPDATE on it. `platform.outbox` stores the
+   envelope's `occurred_at`, and `(aggregate_id, sequence)` is indexed.
+3. **Dead letters** are written by the consumer wrapper straight to `platform.dead_letter` (ADR-0057 as amended the
+   same day).
+
+**Amended 20 October 2026 (r8 cause FOUNDATION-AI-C41): the relay also drains `ai.outbox`.** The AI module writes its events (for example `pauseAiCapability`'s) to `ai.outbox` and `ai.outbox_sequence`, with `platform.outbox`'s columns, monthly partitions and its `(aggregate_id, sequence)` index, in the tenant transaction; the regional relay reads it exactly as it reads `platform.outbox`, and the log-database record of the act is written after commit, retried.

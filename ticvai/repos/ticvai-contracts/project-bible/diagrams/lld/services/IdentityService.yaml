@@ -1,5 +1,5 @@
 id: LLD-IdentityService
-title: IdentityService — 98 operations, 41 tables
+title: IdentityService — 101 operations, 44 tables
 generatedBy: tools/derive-diagrams.py
 tier: foundation
 deployable: commerce
@@ -10,26 +10,26 @@ why: '**Twelve contracts read it and it reads almost nothing.** The one service 
 scale: Read-heavy, latency-critical, cached hard. Every request resolves a principal.
 ifDown: '**A restart is an outage everywhere.** Deploys go out first and alone.'
 coverage:
-  operations: 98
+  operations: 101
   inAFlow: 21
   percent: 21%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
 - schema: identity
-  tables: 36
+  tables: 38
   stores:
   - postgres
   - redis
   largestTable: identity.delegated_access
 - schema: pii
-  tables: 5
+  tables: 6
   stores:
   - postgres
   largestTable: pii.subject_biometric
 operationsByContract:
 - contract: identity
-  count: 98
+  count: 101
   operations:
   - operation: changeOwnCredential
     verb: POST
@@ -45,8 +45,8 @@ operationsByContract:
     scope: tenant
     permission: null
     offline: false
-    reads: 7
-    writes: 5
+    reads: 10
+    writes: 7
   - operation: createAccessReviewCampaign
     verb: POST
     path: /access-review-campaigns
@@ -61,8 +61,8 @@ operationsByContract:
     scope: tenant
     permission: PERMISSION_MANAGE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: createDelegatedAccess
     verb: POST
     path: /delegated-access
@@ -77,8 +77,8 @@ operationsByContract:
     scope: venue
     permission: PERMISSION_MANAGE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: createMfaChallenge
     verb: POST
     path: /auth/mfa/challenge
@@ -141,16 +141,16 @@ operationsByContract:
     scope: subject
     permission: null
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: endOwnSession
     verb: POST
     path: /auth/sessions/mine/{sessionId}/end
     scope: tenant
     permission: null
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: enrolMfaMethod
     verb: POST
     path: /auth/mfa/methods
@@ -165,8 +165,8 @@ operationsByContract:
     scope: venue
     permission: PERMISSION_VIEW
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: exportSubjectData
     verb: POST
     path: /guests/{subjectId}/data-export
@@ -181,7 +181,7 @@ operationsByContract:
     scope: venue
     permission: SESSION_FORCE_LOGOUT
     offline: false
-    reads: 7
+    reads: 8
     writes: 3
   - operation: getAuthorisationPolicy
     verb: GET
@@ -202,10 +202,10 @@ operationsByContract:
   - operation: getCurrentSession
     verb: GET
     path: /auth/session
-    scope: workstation
+    scope: tenant
     permission: null
     offline: true
-    reads: 5
+    reads: 7
     writes: 1
   - operation: getGuestSession
     verb: GET
@@ -263,6 +263,14 @@ operationsByContract:
     offline: false
     reads: 1
     writes: 0
+  - operation: getSessionVenue
+    verb: GET
+    path: /auth/session/venue
+    scope: tenant
+    permission: null
+    offline: false
+    reads: 1
+    writes: 0
   - operation: getSsoConfig
     verb: GET
     path: /tenants/sso-config
@@ -285,32 +293,32 @@ operationsByContract:
     scope: tenant
     permission: null
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: guestPasswordLogin
     verb: POST
     path: /auth/guest/password
     scope: tenant
     permission: null
     offline: false
-    reads: 4
-    writes: 3
+    reads: 5
+    writes: 4
   - operation: guestSocialLogin
     verb: POST
     path: /auth/guest/social
     scope: tenant
     permission: null
     offline: false
-    reads: 3
-    writes: 4
+    reads: 4
+    writes: 5
   - operation: guestUaePassLogin
     verb: POST
     path: /auth/guest/uae-pass
     scope: tenant
     permission: null
     offline: false
-    reads: 3
-    writes: 5
+    reads: 4
+    writes: 6
   - operation: linkGuestCheckout
     verb: POST
     path: /auth/guest/link-checkout
@@ -349,7 +357,7 @@ operationsByContract:
     scope: venue
     permission: SESSION_FORCE_LOGOUT
     offline: false
-    reads: 2
+    reads: 3
     writes: 0
   - operation: listAuthorisationPolicies
     verb: GET
@@ -527,13 +535,21 @@ operationsByContract:
     offline: false
     reads: 1
     writes: 0
+  - operation: listStepUpSupervisors
+    verb: GET
+    path: /auth/step-up-supervisors
+    scope: venue
+    permission: null
+    offline: false
+    reads: 0
+    writes: 0
   - operation: login
     verb: POST
     path: /auth/login
     scope: tenant
     permission: null
     offline: false
-    reads: 7
+    reads: 8
     writes: 5
   - operation: logout
     verb: POST
@@ -549,24 +565,24 @@ operationsByContract:
     scope: tenant
     permission: PLATFORM_TENANT_ACCESS
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: recordBenefitUsage
     verb: POST
     path: /memberships/{membershipId}/benefit-usage
     scope: venue
     permission: GUEST_MANAGE
     offline: true
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: recordConsentIdentifier
     verb: POST
     path: /internal/consent-identifiers
     scope: venue
     permission: null
     offline: false
-    reads: 0
-    writes: 1
+    reads: 1
+    writes: 2
   - operation: refreshToken
     verb: POST
     path: /auth/refresh
@@ -582,7 +598,7 @@ operationsByContract:
     permission: null
     offline: false
     reads: 3
-    writes: 6
+    writes: 7
   - operation: removeMfaMethod
     verb: DELETE
     path: /auth/mfa/methods/{methodId}
@@ -637,7 +653,7 @@ operationsByContract:
     scope: tenant
     permission: null
     offline: false
-    reads: 4
+    reads: 6
     writes: 2
   - operation: setAuthorisationPolicyState
     verb: POST
@@ -645,16 +661,16 @@ operationsByContract:
     scope: tenant
     permission: PERMISSION_MANAGE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setCapabilityTemplate
     verb: PUT
     path: /capability-templates/{capabilityTemplateId}
     scope: tenant
     permission: ROLE_MANAGE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setGuestVerificationPolicy
     verb: PUT
     path: /guest-verification-policy
@@ -677,8 +693,8 @@ operationsByContract:
     scope: venue
     permission: PERMISSION_GRANT
     offline: false
-    reads: 4
-    writes: 1
+    reads: 5
+    writes: 2
   - operation: setSegregationRules
     verb: PUT
     path: /segregation-rules
@@ -686,6 +702,14 @@ operationsByContract:
     permission: ROLE_MANAGE
     offline: false
     reads: 3
+    writes: 2
+  - operation: setSessionVenue
+    verb: PUT
+    path: /auth/session/venue
+    scope: tenant
+    permission: null
+    offline: false
+    reads: 2
     writes: 2
   - operation: setSsoConfig
     verb: PUT
@@ -701,16 +725,16 @@ operationsByContract:
     scope: venue
     permission: PERMISSION_VIEW
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: startProspectSignup
     verb: POST
     path: /auth/prospect/signup
     scope: platform
     permission: null
     offline: false
-    reads: 0
-    writes: 0
+    reads: 1
+    writes: 1
   - operation: startSsoAuthorization
     verb: GET
     path: /auth/sso/{providerId}/authorize
@@ -741,39 +765,39 @@ operationsByContract:
     scope: tenant
     permission: PERMISSION_MANAGE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: updateGuestSubjectDetails
     verb: PATCH
     path: /internal/guest-subjects/{subjectId}/details
     scope: subject
     permission: null
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: updatePrincipal
     verb: PATCH
     path: /principals/{principalId}
     scope: venue
     permission: USER_MANAGE
     offline: false
-    reads: 2
-    writes: 2
+    reads: 4
+    writes: 4
   - operation: updateRole
     verb: PATCH
     path: /roles/{roleId}
     scope: tenant
     permission: ROLE_MANAGE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: verifyGuestEmail
     verb: POST
     path: /auth/guest/verify-email
     scope: tenant
-    permission: GUEST_VIEW
+    permission: null
     offline: false
-    reads: 3
+    reads: 4
     writes: 4
   - operation: verifyGuestOtp
     verb: POST
@@ -789,7 +813,7 @@ operationsByContract:
     scope: tenant
     permission: null
     offline: false
-    reads: 4
+    reads: 6
     writes: 5
   - operation: verifyMfaEnrolment
     verb: POST
@@ -805,16 +829,16 @@ operationsByContract:
     scope: platform
     permission: null
     offline: false
-    reads: 0
-    writes: 0
+    reads: 1
+    writes: 1
   - operation: verifySupervisorStepUp
     verb: POST
     path: /internal/step-up/verify
     scope: venue
     permission: null
     offline: false
-    reads: 5
-    writes: 1
+    reads: 6
+    writes: 2
 tables:
 - store: cache:idempotency
   kind: cache
@@ -831,7 +855,9 @@ tables:
   - changeOwnCredential
   - completeSsoAuthorization
   - createAccessReviewCampaign
+  - createAuthorisationPolicy
   - createDelegatedAccess
+  - createEmergencyAccessOverride
   - createMfaChallenge
   - createPrincipal
   - createRole
@@ -839,15 +865,23 @@ tables:
   - decideGuestIdentityVerification
   - deleteDelegatedAccess
   - deleteGuestAccount
+  - endGuestDeviceSessions
+  - endOwnSession
   - enrolMfaMethod
+  - evaluateAccess
   - exportSubjectData
   - forceLogout
   - grantDelegation
+  - guestLogout
+  - guestPasswordLogin
   - guestSocialLogin
   - guestUaePassLogin
   - linkGuestCheckout
   - login
   - logout
+  - openPlatformStaffGrant
+  - recordBenefitUsage
+  - recordConsentIdentifier
   - refreshToken
   - registerGuest
   - removeMfaMethod
@@ -857,21 +891,34 @@ tables:
   - restoreAuthorisationPolicyVersion
   - revokeAllSessions
   - selectRole
+  - setAuthorisationPolicyState
+  - setCapabilityTemplate
   - setGuestVerificationPolicy
   - setPasswordPolicy
+  - setPrincipalModuleAccess
   - setSegregationRules
+  - setSessionVenue
   - setSsoConfig
+  - simulateAuthorisationPolicy
+  - startProspectSignup
   - submitGuestIdentityDocument
+  - updateAuthorisationPolicy
+  - updateGuestSubjectDetails
   - updatePrincipal
+  - updateRole
   - verifyGuestEmail
   - verifyGuestOtp
   - verifyMfaChallenge
   - verifyMfaEnrolment
+  - verifyProspectSignupCode
+  - verifySupervisorStepUp
   readBy:
   - changeOwnCredential
   - completeSsoAuthorization
   - createAccessReviewCampaign
+  - createAuthorisationPolicy
   - createDelegatedAccess
+  - createEmergencyAccessOverride
   - createMfaChallenge
   - createPrincipal
   - createRole
@@ -879,15 +926,23 @@ tables:
   - decideGuestIdentityVerification
   - deleteDelegatedAccess
   - deleteGuestAccount
+  - endGuestDeviceSessions
+  - endOwnSession
   - enrolMfaMethod
+  - evaluateAccess
   - exportSubjectData
   - forceLogout
   - grantDelegation
+  - guestLogout
+  - guestPasswordLogin
   - guestSocialLogin
   - guestUaePassLogin
   - linkGuestCheckout
   - login
   - logout
+  - openPlatformStaffGrant
+  - recordBenefitUsage
+  - recordConsentIdentifier
   - refreshToken
   - registerGuest
   - removeMfaMethod
@@ -897,16 +952,27 @@ tables:
   - restoreAuthorisationPolicyVersion
   - revokeAllSessions
   - selectRole
+  - setAuthorisationPolicyState
+  - setCapabilityTemplate
   - setGuestVerificationPolicy
   - setPasswordPolicy
+  - setPrincipalModuleAccess
   - setSegregationRules
+  - setSessionVenue
   - setSsoConfig
+  - simulateAuthorisationPolicy
+  - startProspectSignup
   - submitGuestIdentityDocument
+  - updateAuthorisationPolicy
+  - updateGuestSubjectDetails
   - updatePrincipal
+  - updateRole
   - verifyGuestEmail
   - verifyGuestOtp
   - verifyMfaChallenge
   - verifyMfaEnrolment
+  - verifyProspectSignupCode
+  - verifySupervisorStepUp
   keys:
     createDelegatedAccess:
       role: evicts
@@ -1094,7 +1160,7 @@ tables:
   writtenBy: []
   foreignWriters: null
 - table: identity.delegated_access
-  columns: 21
+  columns: 23
   store: postgres
   parent: null
   writtenBy:
@@ -1110,7 +1176,7 @@ tables:
   - identity
   foreignWriters: null
 - table: identity.guest_identity_verification
-  columns: 13
+  columns: 14
   store: postgres
   parent: null
   writtenBy:
@@ -1139,21 +1205,21 @@ tables:
   writtenBy: []
   foreignWriters: null
 - table: identity.mfa_challenge
-  columns: 12
+  columns: 13
   store: postgres
   parent: null
   writtenBy:
   - identity
   foreignWriters: null
 - table: identity.mfa_method
-  columns: 9
+  columns: 13
   store: postgres
   parent: null
   writtenBy:
   - identity
   foreignWriters: null
 - table: identity.mfa_recovery_code
-  columns: 5
+  columns: 6
   store: postgres
   parent: identity.principal
   writtenBy:
@@ -1172,6 +1238,12 @@ tables:
   writtenBy:
   - identity
   foreignWriters: null
+- table: identity.open_shift_marker
+  columns: 6
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
 - table: identity.otp_challenge
   columns: 12
   store: postgres
@@ -1180,7 +1252,7 @@ tables:
   - identity
   foreignWriters: null
 - table: identity.password_policy
-  columns: 16
+  columns: 19
   store: postgres
   parent: null
   writtenBy:
@@ -1220,6 +1292,13 @@ tables:
   writtenBy:
   - identity
   foreignWriters: null
+- table: identity.principal_external_identity
+  columns: 5
+  store: postgres
+  parent: identity.principal
+  writtenBy:
+  - identity
+  foreignWriters: null
 - table: identity.refresh_token
   columns: 10
   store: postgres
@@ -1251,7 +1330,7 @@ tables:
   - identity
   foreignWriters: null
 - table: identity.session
-  columns: 12
+  columns: 16
   store: postgres
   parent: null
   writtenBy:
@@ -1265,7 +1344,7 @@ tables:
   - identity
   foreignWriters: null
 - table: identity.sso_provider
-  columns: 12
+  columns: 17
   store: postgres
   parent: null
   writtenBy:
@@ -1312,6 +1391,13 @@ tables:
   foreignWriters: null
 - table: pii.subject_document
   columns: 10
+  store: postgres
+  parent: pii.subject
+  writtenBy:
+  - identity
+  foreignWriters: null
+- table: pii.subject_identity
+  columns: 6
   store: postgres
   parent: pii.subject
   writtenBy:

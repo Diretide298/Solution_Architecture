@@ -630,6 +630,7 @@
     "description": "**Three standard packages, and custom ones allowed** (decided 29 September, Chinmay)."
    },
    "offeredToTenantId": {
+    "x-ticvai-references": "control.tenant",
     "type": "string",
     "format": "uuid",
     "nullable": true,
@@ -763,7 +764,7 @@
     "type": "integer",
     "nullable": true,
     "x-ticvai-column": "limit_value",
-    "description": "Null means unlimited. Stored as `limit_value` — `limit` is a reserved word, and `subscription.tier_allowance` already names the same figure `limit_value`."
+    "description": "Null means unlimited. Stored as `limit_value` — `limit` is a reserved word, and `control.tier_allowance` already names the same figure `limit_value`."
    },
    "overageAllowed": {
     "type": "boolean",
@@ -777,6 +778,7 @@
  "EntitlementUsage": {
   "x-ticvai-persistence": "none — aggregated from usage_record",
   "type": "object",
+  "description": "**How each figure is worked out** (R8 blocker APPROVALS-TENANCY-C14; the lead's answer of 20 October 2026: proposed, client to correct). `current`: for a stock metric (`venues`, `workstations`, `activeUsers`, `devices`, `brandedApps`, `guestProfiles`, `storageGb`) the latest `control.usage_record` per venue, summed over the tenant's venues; for a flow metric (`aiTokens`, `apiCalls`, `transactions`) the sum of the records in the contract's current billing period. Rounded up to a whole number. `limit`: the plan's `control.plan_limit` for the metric (`aiTokens`: the plan's `includedAiTokens`), plus every add-on limit in force today (`validFrom` <= today <= `validTo` or no `validTo`), plus every unexpired capacity pack; null when any of them is unlimited, and then `percentUsed`, `isNearLimit` and `isExceeded` are null, false and false. `percentUsed` = current / limit x 100. `isNearLimit`: `percentUsed` at or above the lowest `atPercentOfAllowance` of the enforcement policy's `notify` thresholds, or 80 when it has none. `isExceeded`: current above limit and the plan limit does not allow overage. `asAt`: the latest `recordedAt` read.",
   "required": [
    "tenantId",
    "metrics"
@@ -855,7 +857,8 @@
     "description": "The tenant the add-on was sold to — the `tenantId` in the path, never the body."
    },
    "moduleKey": {
-    "type": "string"
+    "$ref": "#/components/schemas/subscription::ModuleKey",
+    "description": "**The licence vocabulary, not the white-label one** (the lead, 20 October 2026, r8 cause APPROVALS-TENANCY-C17, option B): an add-on licenses a shared `ModuleKey` (`ticketing`, `fnb`, `retail`, ...), or the add-on key `poweredByRemoval` that lets a tenant switch \"Powered by TICVAI\" off. White label's feature keys (`ticketsAndBooking`, `diningAndFnb`, `shop`, ...) are mapped to these once, on `ModuleKey` in common.yaml and `x-ticvai-licence-module` in white-label.yaml, and never stored here."
    },
    "limitOverrides": {
     "type": "array",
@@ -883,7 +886,7 @@
   }
  },
  "LicencePosition": {
-  "x-ticvai-persistence": "none — union of the tenant's plan (control.tenant.plan_id -> subscription.plan_module, subscription.plan_limit) and its add-ons (control.licence_add_on, control.licence_add_on_limit by tenant_id)",
+  "x-ticvai-persistence": "none — union of the tenant's plan (control.tenant.plan_id -> control.plan_module, control.plan_limit) and its add-ons (control.licence_add_on, control.licence_add_on_limit by tenant_id)",
   "type": "object",
   "required": [
    "tenantId",
@@ -908,7 +911,7 @@
    },
    "licensedModules": {
     "type": "array",
-    "description": "Union of plan modules and add-ons. The White Label Builder reads this and cannot enable anything absent from it.\n\n**`moduleKey` values are `ModuleKey`s** (4 October 2026, CHG-FXC-010; ADM-424), the vocabulary of\n`white-label.ModuleEnablement.moduleKey`.",
+    "description": "Union of plan modules and add-ons. The White Label Builder reads this and cannot enable anything absent from it.\n\n**`moduleKey` values are the licence modules of `ModuleKey` in common.yaml** (R8 blocker fix, IDENTITY-C31).\nThey are **not** the white-label app features of `white-label.ModuleEnablement.moduleKey`, a finer list;\ncommon.yaml maps each feature to the licence module that licenses it, and a feature key is never listed here.",
     "items": {
      "type": "object",
      "required": [
@@ -1140,6 +1143,8 @@
    "LOYALTY_ACCRUE",
    "LOYALTY_REDEEM",
    "LOYALTY_ADJUST",
+   "MEMBERSHIP_VIEW",
+   "MEMBERSHIP_MANAGE",
    "MARKETING_VIEW",
    "MARKETING_MANAGE",
    "MARKETING_SEND",
@@ -1222,8 +1227,13 @@
   ]
  },
  "Plan": {
-  "x-ticvai-persistence": "subscription.plan + subscription.plan_module + subscription.plan_limit",
-  "description": "**A plan's modules and limits are rows, keyed on `plan_id`.** `licensedModules` and `limits` are required on every plan, and `subscription.plan` alone had no column for either — so the licence position, the downgrade check and every module gate had nothing to read. `plan_module` holds one row per licensed `ModuleKey`; `plan_limit` one row per `EntitlementLimit`. Both belong to the plan version the row is, so a subscriber on an earlier version keeps the modules and limits they were sold.",
+  "x-ticvai-persistence": "control.plan + control.plan_module + control.plan_limit",
+  "x-ticvai-version-key": "version",
+  "x-ticvai-primary-key": [
+   "id",
+   "version"
+  ],
+  "description": "**A plan's modules and limits are rows, keyed on `plan_id`.** `licensedModules` and `limits` are required on every plan, and `control.plan` alone had no column for either — so the licence position, the downgrade check and every module gate had nothing to read. `plan_module` holds one row per licensed `ModuleKey`; `plan_limit` one row per `EntitlementLimit`. Both belong to the plan version the row is, so a subscriber on an earlier version keeps the modules and limits they were sold.",
   "allOf": [
    {
     "$ref": "#/components/schemas/CreatePlanRequest"
@@ -1262,7 +1272,7 @@
  "PlanRequestLimits": {
   "type": "object",
   "nullable": true,
-  "x-ticvai-persistence": "none — embedded in subscription.plan as its request_limits jsonb column",
+  "x-ticvai-persistence": "none — embedded in control.plan as its request_limits jsonb column",
   "description": "**The limits section of a plan: every tenant has a request budget** (ADR-0064, accepted 1 October; it decides the per-tenant limit ADR-0032 deferred). A token bucket per tenant and audience in the kernel middleware of `commerce`, `access` and `operations`, counted in Azure Managed Redis so every replica agrees; a guest browse never spends a till's budget. Over budget, the call is refused `429` with `Retry-After` and the `RateLimit-*` headers (every operation declares it).\n\n**Null takes the platform default**, which starts at twice the tenant's expected peak from its sizing tier (`handoff/sizing.json` venue tiers) and is recalibrated after the benchmark and after four weeks of production. **A tenant may use the whole platform when others are quiet**: the per-replica share (`replicaSharePercent`) is enforced only above `shareEnforcedAbovePercent` of the replica's limit. If Redis is unavailable each replica falls back to its own buckets (the limit divided by the replica count); the request path never fails because the limiter's store did.",
   "properties": {
    "guest": {
@@ -1311,11 +1321,11 @@
     "format": "uuid"
    },
    "operatorPrincipalId": {
-    "x-ticvai-references": "identity.principal",
+    "x-ticvai-references": "none",
     "type": "string",
     "format": "uuid",
     "readOnly": true,
-    "description": "The platform operator, from the Control Plane token. Set by the server."
+    "description": "The platform operator, from the Control Plane token (its subject). Set by the server. **Not a row in this tenant's `identity.principal`** (R8 blocker IDENTITY-C20, CHG-R8MIG-006; the lead's answer, option A): an operator is the Control Plane's, so this is a plain uuid with no foreign key, and the key V0107 adds is dropped by the next forward migration."
    },
    "operatorDisplayName": {
     "type": "string",
@@ -1599,6 +1609,39 @@
     "default": false,
     "description": "Create a principal on first successful sign-in."
    },
+   "usernameClaim": {
+    "type": "string",
+    "maxLength": 100,
+    "nullable": true,
+    "description": "The claim (OIDC) or attribute (SAML) a provisioned principal's username is taken from; null means `preferred_username`, else the email (R8 blocker IDENTITY-C57, CHG-R8MIG-015)."
+   },
+   "displayNameClaim": {
+    "type": "string",
+    "maxLength": 100,
+    "nullable": true,
+    "description": "The claim a provisioned principal's display name is taken from; null means `name`."
+   },
+   "groupsClaim": {
+    "type": "string",
+    "maxLength": 100,
+    "nullable": true,
+    "description": "The claim that lists the user's groups, matched against `groupMappings`; null means `groups`."
+   },
+   "defaultHomeScopeId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "x-ticvai-references": "platform.scope",
+    "description": "The home scope a provisioned principal gets when its mapped groups name none; null means the scope of the first mapped group."
+   },
+   "allowedRedirectUris": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "maxLength": 2000
+    },
+    "description": "**The only redirect URIs a start may name** (R8 blocker IDENTITY-C58, CHG-R8MIG-015): `startSsoAuthorization` refuses 400 a `redirectUri` not on this list."
+   },
    "isEnforced": {
     "type": "boolean",
     "default": false
@@ -1609,7 +1652,7 @@
   }
  },
  "Subscription": {
-  "x-ticvai-persistence": "subscription.contract",
+  "x-ticvai-persistence": "control.contract",
   "type": "object",
   "required": [
    "tenantId",
@@ -1620,10 +1663,13 @@
   ],
   "properties": {
    "tenantId": {
+    "x-ticvai-references": "control.tenant",
     "type": "string",
     "format": "uuid"
    },
    "planId": {
+    "x-ticvai-references": "control.plan",
+    "x-ticvai-references-version": "planVersion",
     "type": "string",
     "format": "uuid"
    },
@@ -1875,6 +1921,18 @@
  },
  "Tenant": {
   "x-ticvai-persistence": "control.tenant",
+  "x-ticvai-required-when": {
+   "planVersion": {
+    "planId": {
+     "not": null
+    }
+   },
+   "planId": {
+    "planVersion": {
+     "not": null
+    }
+   }
+  },
   "type": "object",
   "required": [
    "id",
@@ -1938,9 +1996,17 @@
     "nullable": true
    },
    "planId": {
+    "x-ticvai-references": "control.plan",
+    "x-ticvai-references-version": "planVersion",
     "type": "string",
     "format": "uuid",
     "nullable": true
+   },
+   "planVersion": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The version of the plan the tenant is on (with `planId`, the key of the plan row; R8 blocker APPROVALS-TENANCY-C15, CHG-R8INT-023). Null when `planId` is."
    },
    "planName": {
     "type": "string",
@@ -1951,6 +2017,46 @@
    },
    "venueCount": {
     "type": "integer"
+   },
+   "cellHost": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "x-ticvai-derived": "onRead",
+    "description": "The host of the tenant's home cell (the host part of `Cell.apiEndpoint` of the cell that holds the tenant in its home region), derived on read through `control.cell_tenant`. Added for ADM-018 (r8 walk of ticket 27886): the console reaches the cell's grant and language operations at this host without holding `PLATFORM_CELL_VIEW`, which `listTenantCells` needs. Null while the tenant has no cell.\n"
+   },
+   "cellHosts": {
+    "type": "array",
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "x-ticvai-derived": "onRead",
+    "description": "One entry per region the tenant is in, for a multi-region tenant; the entry with `isHome` true is `cellHost`. The screen uses the home cell for language and grant operations.\n",
+    "items": {
+     "type": "object",
+     "required": [
+      "regionId",
+      "cellId",
+      "host",
+      "isHome"
+     ],
+     "properties": {
+      "regionId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "cellId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "host": {
+       "type": "string"
+      },
+      "isHome": {
+       "type": "boolean"
+      }
+     }
+    }
    },
    "regionId": {
     "type": "string",
@@ -1986,6 +2092,18 @@
  },
  "TenantDetail": {
   "x-ticvai-persistence": "control.tenant",
+  "x-ticvai-required-when": {
+   "planVersion": {
+    "planId": {
+     "not": null
+    }
+   },
+   "planId": {
+    "planVersion": {
+     "not": null
+    }
+   }
+  },
   "allOf": [
    {
     "$ref": "#/components/schemas/Tenant"

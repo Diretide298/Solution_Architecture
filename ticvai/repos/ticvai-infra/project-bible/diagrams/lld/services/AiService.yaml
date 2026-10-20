@@ -1,5 +1,5 @@
 id: LLD-AiService
-title: AiService — 144 operations, 75 tables
+title: AiService — 146 operations, 79 tables
 generatedBy: tools/derive-diagrams.py
 tier: engagement
 deployable: ticvai-ai
@@ -11,14 +11,14 @@ why: '**Separate at any size, and not because of size.** ADR-0020 makes it a har
 scale: Latency-tolerant, cost-sensitive, token-metered. Different hardware from everything else.
 ifDown: Down degrades suggestions and the concierge. **Nothing that takes money depends on it.**
 coverage:
-  operations: 144
+  operations: 146
   inAFlow: 19
   percent: 13%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
 - schema: ai
-  tables: 75
+  tables: 79
   stores:
   - postgres
   - postgres-analytical
@@ -29,7 +29,7 @@ schemas:
   largestTable: —
 operationsByContract:
 - contract: ai
-  count: 144
+  count: 146
   operations:
   - operation: addRiskCaseEvidence
     verb: POST
@@ -235,7 +235,7 @@ operationsByContract:
     verb: POST
     path: /proposed-actions/{actionId}/decide
     scope: venue
-    permission: AI_APPROVE
+    permission: AI_USE
     offline: false
     reads: 3
     writes: 5
@@ -255,6 +255,14 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 4
+  - operation: eraseSubject
+    verb: POST
+    path: /internal/subjects/{subjectId}/ai-erasure
+    scope: tenant
+    permission: null
+    offline: false
+    reads: 1
+    writes: 3
   - operation: evaluateAiGovernance
     verb: POST
     path: /governance/evaluate
@@ -346,7 +354,7 @@ operationsByContract:
   - operation: getAiPolicy
     verb: GET
     path: /policy
-    scope: tenant
+    scope: venue
     permission: AI_CONFIGURE
     offline: false
     reads: 1
@@ -429,7 +437,7 @@ operationsByContract:
     scope: venue
     permission: AI_USE
     offline: false
-    reads: 1
+    reads: 2
     writes: 0
   - operation: getGuidedChoiceSuggestion
     verb: GET
@@ -470,7 +478,7 @@ operationsByContract:
     permission: AI_CONFIGURE
     offline: false
     reads: 3
-    writes: 3
+    writes: 4
   - operation: ingestKnowledgeDocument
     verb: POST
     path: /collections/{collectionId}/documents
@@ -578,7 +586,7 @@ operationsByContract:
   - operation: listAiProviders
     verb: GET
     path: /providers
-    scope: region
+    scope: tenant
     permission: AI_CONFIGURE
     offline: false
     reads: 1
@@ -661,7 +669,7 @@ operationsByContract:
     scope: venue
     permission: AI_USE
     offline: false
-    reads: 1
+    reads: 2
     writes: 0
   - operation: listIndexFailures
     verb: GET
@@ -731,7 +739,7 @@ operationsByContract:
     verb: GET
     path: /proposed-actions
     scope: venue
-    permission: AI_APPROVE
+    permission: AI_USE
     offline: false
     reads: 1
     writes: 0
@@ -781,13 +789,13 @@ operationsByContract:
     scope: tenant
     permission: AI_CONFIGURE
     offline: false
-    reads: 2
-    writes: 5
+    reads: 3
+    writes: 6
   - operation: promoteAiRelease
     verb: POST
     path: /releases/{releaseId}/promote
     scope: tenant
-    permission: AI_APPROVE
+    permission: AI_USE
     offline: false
     reads: 4
     writes: 6
@@ -805,7 +813,7 @@ operationsByContract:
     scope: venue
     permission: AI_USE
     offline: false
-    reads: 16
+    reads: 15
     writes: 4
   - operation: proposeRiskAction
     verb: POST
@@ -829,8 +837,8 @@ operationsByContract:
     scope: tenant
     permission: TENANT_CONFIGURE
     offline: false
-    reads: 6
-    writes: 3
+    reads: 5
+    writes: 4
   - operation: proposeVenueLabels
     verb: POST
     path: /ai/venue-map/{mapId}/propose-labels
@@ -859,7 +867,7 @@ operationsByContract:
     verb: POST
     path: /forecast-versions/{versionId}/publish
     scope: venue
-    permission: AI_APPROVE
+    permission: AI_USE
     offline: false
     reads: 3
     writes: 4
@@ -999,6 +1007,14 @@ operationsByContract:
     offline: false
     reads: 5
     writes: 3
+  - operation: runGuidedChoiceSuggestionJob
+    verb: POST
+    path: /venues/{venueId}/guided-choice-suggestion-jobs
+    scope: venue
+    permission: null
+    offline: false
+    reads: 2
+    writes: 2
   - operation: scoreApprovalRequest
     verb: POST
     path: /approval-requests/{approvalRequestId}/score
@@ -1051,7 +1067,7 @@ operationsByContract:
     verb: PUT
     path: /ai-providers/{providerId}/credential
     scope: tenant
-    permission: AI_CONFIGURE
+    permission: PLATFORM_TENANT_MANAGE
     offline: false
     reads: 3
     writes: 2
@@ -1066,7 +1082,7 @@ operationsByContract:
   - operation: setAiPolicy
     verb: PUT
     path: /policy
-    scope: tenant
+    scope: venue
     permission: AI_CONFIGURE
     offline: false
     reads: 2
@@ -1074,8 +1090,8 @@ operationsByContract:
   - operation: setAiProvider
     verb: PUT
     path: /providers/{providerId}
-    scope: region
-    permission: AI_CONFIGURE
+    scope: tenant
+    permission: PLATFORM_TENANT_MANAGE
     offline: false
     reads: 4
     writes: 2
@@ -1093,8 +1109,8 @@ operationsByContract:
     scope: venue
     permission: AI_CONFIGURE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setAiTool
     verb: PUT
     path: /tools/{toolKey}
@@ -1181,7 +1197,7 @@ operationsByContract:
     scope: tenant
     permission: AI_CONFIGURE
     offline: false
-    reads: 2
+    reads: 4
     writes: 3
 tables:
 - store: cache:ai-breaker
@@ -1287,6 +1303,7 @@ tables:
   - decideProposedAction
   - decideRecommendations
   - decideRiskAlert
+  - eraseSubject
   - evaluateAiGovernance
   - explainMetricChange
   - exportAiEvidencePackage
@@ -1326,6 +1343,7 @@ tables:
   - runAiControlTest
   - runAiEvaluation
   - runForecast
+  - runGuidedChoiceSuggestionJob
   - scoreApprovalRequest
   - scoreTransactionRisk
   - semanticSearch
@@ -1336,6 +1354,7 @@ tables:
   - setAiPolicy
   - setAiProvider
   - setAiRiskRegisterEntry
+  - setAiSpendCeiling
   - setAiTool
   - setAiVenueSettings
   - setForecastDefinition
@@ -1376,6 +1395,7 @@ tables:
   - decideProposedAction
   - decideRecommendations
   - decideRiskAlert
+  - eraseSubject
   - evaluateAiGovernance
   - explainMetricChange
   - exportAiEvidencePackage
@@ -1415,6 +1435,7 @@ tables:
   - runAiControlTest
   - runAiEvaluation
   - runForecast
+  - runGuidedChoiceSuggestionJob
   - scoreApprovalRequest
   - scoreTransactionRisk
   - semanticSearch
@@ -1425,6 +1446,7 @@ tables:
   - setAiPolicy
   - setAiProvider
   - setAiRiskRegisterEntry
+  - setAiSpendCeiling
   - setAiTool
   - setAiVenueSettings
   - setForecastDefinition
@@ -1613,7 +1635,8 @@ tables:
   columns: 9
   store: postgres
   parent: null
-  writtenBy: []
+  writtenBy:
+  - ai
   foreignWriters: null
 - table: ai.case_action
   columns: 11
@@ -1630,7 +1653,7 @@ tables:
   - ai
   foreignWriters: null
 - table: ai.chunk_embedding
-  columns: 12
+  columns: 13
   store: postgres
   parent: null
   writtenBy:
@@ -1665,14 +1688,14 @@ tables:
   - ai
   foreignWriters: null
 - table: ai.conversation
-  columns: 8
+  columns: 10
   store: postgres-analytical
   parent: null
   writtenBy:
   - ai
   foreignWriters: null
 - table: ai.decision_record
-  columns: 26
+  columns: 27
   store: postgres
   parent: null
   writtenBy:
@@ -1822,7 +1845,7 @@ tables:
   - ai
   foreignWriters: null
 - table: ai.index_source
-  columns: 15
+  columns: 16
   store: postgres
   parent: null
   writtenBy:
@@ -1891,8 +1914,21 @@ tables:
   writtenBy:
   - ai
   foreignWriters: null
+- table: ai.outbox
+  columns: 16
+  store: postgres
+  parent: null
+  writtenBy:
+  - ai
+  foreignWriters: null
+- table: ai.outbox_sequence
+  columns: 3
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
 - table: ai.policy
-  columns: 32
+  columns: 33
   store: postgres
   parent: null
   writtenBy:
@@ -1913,7 +1949,7 @@ tables:
   - ai
   foreignWriters: null
 - table: ai.proposed_action
-  columns: 19
+  columns: 24
   store: postgres
   parent: null
   writtenBy:
@@ -2042,6 +2078,19 @@ tables:
   parent: null
   writtenBy: []
   foreignWriters: null
+- table: ai.translation_job
+  columns: 10
+  store: postgres
+  parent: null
+  writtenBy:
+  - ai
+  foreignWriters: null
+- table: ai.vector_store
+  columns: 11
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
 - table: ai.venue_settings
   columns: 15
   store: postgres
@@ -2059,8 +2108,6 @@ readsFrom:
 - service: FnbService
   operations: 2
 - service: OrderService
-  operations: 2
-- service: PlatformService
   operations: 2
 - service: TenancyService
   operations: 2

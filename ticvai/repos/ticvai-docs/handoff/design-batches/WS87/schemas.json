@@ -1129,9 +1129,10 @@
      "event",
      "externalUrl",
      "appSection",
+     "bookingFlow",
      "none"
     ],
-    "description": "`appSection` points at a section of the guest mobile app (decided 29 September, MOB-1), so the bottom navigation can hold Home, Explore, Plan and Tickets."
+    "description": "`appSection` points at a section of the guest mobile app (decided 29 September, MOB-1), so the bottom navigation can hold Home, Explore, Plan and Tickets. `bookingFlow` (r8 walk of ticket 27905) opens the booking flow of one product, optionally on a date: `productId` is required, `date` optional; the link is `/book/{productId}?date=YYYY-MM-DD` (see `DeepLinkScheme`), and the flow shown is the one that product resolves to."
    },
    "moduleKey": {
     "$ref": "#/components/schemas/white-label::ModuleKey"
@@ -1160,6 +1161,12 @@
    "eventId": {
     "type": "string",
     "format": "uuid"
+   },
+   "date": {
+    "type": "string",
+    "format": "date",
+    "nullable": true,
+    "description": "Used when `kind` is `bookingFlow`, the date the flow opens on. Absent opens it on today or the first date with availability, as the product page does."
    },
    "url": {
     "type": "string"
@@ -1299,6 +1306,30 @@
     "type": "string",
     "format": "uuid"
    },
+   "transferRules": {
+    "type": "object",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "x-ticvai-derived": "onRead",
+    "description": "What the venue allows this guest to do with a transfer, read from the venue's `WalletTransferRules` so a guest screen can hide or limit the action (r8 walk of tickets 28310 and 28345). Worked out on read.",
+    "properties": {
+     "peerToPeerAllowed": {
+      "type": "boolean"
+     },
+     "withinSharedWalletOnly": {
+      "type": "boolean"
+     },
+     "maximumPerTransfer": {
+      "allOf": [
+       {
+        "$ref": "../shared/common.yaml#/components/schemas/Money"
+       }
+      ],
+      "nullable": true
+     }
+    }
+   },
    "balance": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
     "x-ticvai-column": "balance_amount"
@@ -1322,7 +1353,7 @@
         "refund",
         "goodwill"
        ],
-       "description": "**`cash` is money the guest paid and the others are not.** That distinction decides what is refundable, what expires, and what shows as a liability.\n",
+       "description": "**`cash` is money the guest paid and the others are not.** That distinction decides what is refundable, what expires, and what shows as a liability. Worked out from the lot's credit type `category` (proposed, client to correct): `cash` -> cash; `bonus`, `promotional`, `loyalty`, `membership`, `giftCard` -> bonus; `redemption`, `ride`, `attraction`, `fnb`, `retail`, `parking`, `event` -> redemption; `refund` -> refund; `other` -> bonus. `goodwill` comes only from a lot whose `sourceKind` is `adjustment` and whose adjustment (`sourceReference`) is of kind `goodwill`, whatever the category (R8 blocker APPROVALS-TENANCY-C32).\n",
        "x-ticvai-persisted": false
       },
       "amount": {

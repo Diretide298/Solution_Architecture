@@ -205,6 +205,11 @@
     "name": null,
     "in": null,
     "required": null
+   },
+   {
+    "name": "X-Order-Access-Token",
+    "in": "header",
+    "required": false
    }
   ],
   "requestBody": null,
@@ -538,6 +543,11 @@
     "name": null,
     "in": null,
     "required": null
+   },
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": false
    }
   ],
   "requestBody": null,
@@ -601,6 +611,35 @@
     "name": "since",
     "in": "query",
     "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listOwnRefundRequests": {
+  "method": "GET",
+  "path": "/refund-requests",
+  "contract": "orders",
+  "summary": "The caller's own refund requests",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "orderId",
+    "in": "query",
+    "required": null
    },
    {
     "name": null,
@@ -880,7 +919,7 @@
   "path": "/auth/guest/verify-email",
   "contract": "identity",
   "summary": "Send a verification link, or consume one",
-  "permission": "GUEST_VIEW",
+  "permission": null,
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",

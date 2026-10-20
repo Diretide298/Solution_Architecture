@@ -95,3 +95,11 @@ replica floors (ADR-0061) already size for the morning sign-in burst.
 `MfaRecoveryCode`, `OtpChallenge`, `MfaChallenge`, CHG-CRD-001 and CHG-CRD-005) and derived into the DDL;
 the pepper is a Key Vault secret per tenant beside the others of ADR-0063; the prevention is
 `tools/check-stored-request-fields.py`.
+
+**A second factor's secret is not a credential hash** (R8 blocker IDENTITY-C34, CHG-R8MIG-007; r8 integration,
+CHG-R8INT-024). A `totp` shared secret has to be read back to compute the expected code, and an `smsOtp` or `emailOtp`
+destination has to be read to send it, so neither can be a one-way Argon2id hash: `MfaMethod.secret` and
+`MfaMethod.destination` are stored encrypted with the tenant's field key (`x-ticvai-secret: field-encrypted`,
+ADR-0063), write-only and never returned (`maskedTarget` is the only form of a destination a client sees). The one-time
+codes themselves stay hashes under this ADR: an enrolment code is an `identity.mfa_challenge` row with `action` `enrol`
+and its `codeHash`, so `identity.mfa_method` holds no code.

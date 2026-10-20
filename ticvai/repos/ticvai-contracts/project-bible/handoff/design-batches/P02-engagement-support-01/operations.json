@@ -244,6 +244,19 @@
   "requestBody": null,
   "responds": "VisitPlan"
  },
+ "getVisitPlannerOptions": {
+  "method": "GET",
+  "path": "/venues/{venueId}/visit-planner-options",
+  "contract": "venue-map",
+  "summary": "What a guest can choose from when planning a visit",
+  "permission": "VENUE_MAP_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "VisitPlannerOptions"
+ },
  "getWaitTimes": {
   "method": "GET",
   "path": "/queues/wait-times",
@@ -310,19 +323,6 @@
   ],
   "requestBody": null,
   "responds": "Page"
- },
- "listCatalogueBundles": {
-  "method": "GET",
-  "path": "/catalogue/bundles",
-  "contract": "catalogue",
-  "summary": "List published catalogue bundles",
-  "permission": "PRODUCT_VIEW",
-  "offlineCapable": true,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "BundleSummary"
  },
  "listMyCases": {
   "method": "GET",

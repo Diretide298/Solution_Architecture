@@ -10,7 +10,7 @@
 # This file holds the two things that are not routed:
 #
 #   kernel       the shared-kernel tables every host needs, granted to every deployable role directly. Exactly
-#                these four; tools/check-cross-deployable-writes.py fails on any other entry or privilege.
+#                these five; tools/check-cross-deployable-writes.py fails on any other entry or privilege.
 #   exceptions   writes that cannot route yet, each with its reason, the date it was added and the release that
 #                removes it. The check fails on an unrouted write that is not here, on an entry here for a write
 #                that is not cross-deployable or that is also routed, and on an entry whose removal release has
@@ -44,6 +44,12 @@ kernel:
 - table: platform.idempotency_record
   privileges: [SELECT, INSERT, UPDATE]
   why: 'Every host claims, completes and replays an Idempotency-Key in the transaction of the write it guards.'
+- table: platform.outbox_sequence
+  privileges: [SELECT, INSERT, UPDATE]
+  why: 'Every host allocates the next sequence of the aggregate it changes, in the transaction that writes the outbox
+    row (INSERT ... ON CONFLICT DO UPDATE ... RETURNING), so a sequence survives the outbox''s monthly partitions
+    leaving (ADAM CR-166, 18 October 2026; CHG-CRA-005; ADR-0057 and ADR-0058 as amended). DB-ROLES grants it to
+    commerce, access, operations and workers.'
 
 
 # The 17 exceptions CR-002 dated for removal at r5 (XDW-001 to XDW-017) were removed on 14 October 2026, in r6, when

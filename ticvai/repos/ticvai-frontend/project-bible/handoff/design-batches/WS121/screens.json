@@ -15,7 +15,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/platform/ai-governance-command-center-adm-519",
-   "component": "apps/ticvai-web/src/routes/platform/AiGovernanceCommandCenter.tsx",
+   "component": "src/routes/platform/AiGovernanceCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -379,7 +379,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/platform/ai-capability-registry-ownership-adm-520",
-   "component": "apps/ticvai-web/src/routes/platform/AiCapabilityRegistryOwnership.tsx",
+   "component": "src/routes/platform/AiCapabilityRegistryOwnership.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -669,7 +669,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/platform/ai-risk-classification-assessment-adm-521",
-   "component": "apps/ticvai-web/src/routes/platform/AiRiskClassificationAssessment.tsx",
+   "component": "src/routes/platform/AiRiskClassificationAssessment.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -902,7 +902,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/platform/ai-autonomy-level-configuration-adm-522",
-   "component": "apps/ticvai-web/src/routes/platform/AiAutonomyLevelConfiguration.tsx",
+   "component": "src/routes/platform/AiAutonomyLevelConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1156,7 +1156,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/platform/ai-action-permission-policy-builder-adm-523",
-   "component": "apps/ticvai-web/src/routes/platform/AiActionPermissionPolicyBuilder.tsx",
+   "component": "src/routes/platform/AiActionPermissionPolicyBuilder.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1502,7 +1502,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/platform/ai-data-access-usage-policy-adm-524",
-   "component": "apps/ticvai-web/src/routes/platform/AiDataAccessUsagePolicy.tsx",
+   "component": "src/routes/platform/AiDataAccessUsagePolicy.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1737,7 +1737,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/platform/environment-tenant-scope-governance-adm-525",
-   "component": "apps/ticvai-web/src/routes/platform/EnvironmentTenantScopeGovernance.tsx",
+   "component": "src/routes/platform/EnvironmentTenantScopeGovernance.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1963,7 +1963,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/platform/ai-policy-conflict-exception-override-management-adm-526",
-   "component": "apps/ticvai-web/src/routes/platform/AiPolicyConflictExceptionOverrideManagement.tsx",
+   "component": "src/routes/platform/AiPolicyConflictExceptionOverrideManagement.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -2266,7 +2266,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/platform/ai-policy-testing-governance-simulation-adm-527",
-   "component": "apps/ticvai-web/src/routes/platform/AiPolicyTestingGovernanceSimulation.tsx",
+   "component": "src/routes/platform/AiPolicyTestingGovernanceSimulation.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -2514,7 +2514,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/platform/ai-governance-policy-publication-effective-policy-map-adm-528",
-   "component": "apps/ticvai-web/src/routes/platform/AiGovernancePolicyPublicationEffectivePolicyMap.tsx",
+   "component": "src/routes/platform/AiGovernancePolicyPublicationEffectivePolicyMap.tsx",
    "status": "notStarted"
   },
   "navigation": {

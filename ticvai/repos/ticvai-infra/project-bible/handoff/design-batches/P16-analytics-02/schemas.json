@@ -202,7 +202,7 @@
  "AiMaturity": {
   "type": "object",
   "x-ticvai-persistence": "none — embedded as jsonb on ai.suggestion and ai.forecast_version",
-  "description": "**Where an answer stands, on every answer** (29 September, AI functions review; baseline then learn). The customer sees a stage badge and a \"Based on\" chip, never a bare percentage (design 5.6), and \"Limited historical data\" while the starting pattern carries more than half the weight.",
+  "description": "**Where an answer stands, on every answer** (29 September, AI functions review; baseline then learn). The customer sees a stage badge and a \"Based on\" chip, never a bare percentage (design 5.6), and \"Limited historical data\" while the starting pattern carries more than half the weight.\n\n**The stage rule per kind** (r8 walk of ticket 27723; lead decision of 20 October 2026, option A). The stage of an answer is decided by the days of the tenant's own data behind its kind, against that kind's `Minimum` in `SuggestionKind`: `starting` below the minimum, `learning` from the minimum, `established` from three times the minimum, `learned` only by promotion (AI-D16). For the Block A kinds that is:\n| kind | minimum | learning from | established from |\n|---|---|---|---|\n| queueBalancing | 14 days | day 14 | day 42 |\n| prepPlan | 28 days (4 weeks) | day 28 | day 84 |\n| upsell | 90 days | day 90 | day 270 |\nThe 28-day seeded run of AI-ENGINE-BASELINE therefore proves `learning` for `queueBalancing` and `prepPlan`. `upsell` cannot read `learning` at day 28 and is checked at day 90 with a seeded fixture of 90 days of orders. Other kinds follow the same rule with their own minimum.",
   "required": [
    "stage",
    "basedOn"
@@ -394,7 +394,7 @@
    "startingPatternKey": {
     "type": "string",
     "readOnly": true,
-    "description": "The pattern and version in use, e.g. `waterPark@3`."
+    "description": "**The starting pattern and version in use**, e.g. `waterPark@3` (R8 blocker FOUNDATION-AI-C54, the lead's answer B of 20 October 2026). The packs are read-only files shipped in the ticvai-ai image, versioned with it, one per venue type as `<venueType>@<n>` (a month curve and staff productivity per role, with their source); no table holds them. `setAiVenueSettings` sets the key from the venue's type to the newest pack the image carries; a venue type with no pack gets `other@<n>`, a flat curve with wide intervals. Block A ships packs for the venue types of the first client's tenants plus `other`, for the Block A kinds (queue balancing, prep plan, upsell); their figures are written by TICVAI from published sources and are proposed, client to correct."
    },
    "updatedAt": {
     "type": "string",

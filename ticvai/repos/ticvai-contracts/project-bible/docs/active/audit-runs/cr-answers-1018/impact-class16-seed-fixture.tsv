@@ -1,0 +1,30 @@
+group	ticket	plan_key	status	type	assignee	subject	links
+started	27686	TEST-AM-FOUNDATION-DATABASE	On hold	Task	Pranay Shinde	[Test] Module test: Foundation · Database migrations	table:platform.denomination
+finished	27665	MIG-PLATFORM	Ready for QA	Task	Hrushikant Patkar	[DB] Migration V0017__platform.sql: platform (17 tables)	table:platform.denomination
+finished	30328	MIG-PLATFORM#platform.denomination	Ready for QA	Sub Task	Hrushikant Patkar	[DB] platform.denomination	table:platform.denomination
+new	27645	AM-FOUNDATION-DATABASE	New	Feature	Hrushikant Patkar	Foundation · Database migrations	table:platform.denomination
+new	27684	SETUP-SEED	New	Task	Pranay Shinde	[DevOps] Seed data: the reference fixture (two brands, three regions, AED and OMR) every t	file:docs/active/seed-data-proposal.md, raised the CR
+new	28526	AM-FOOD-BEVERAGE-P04	New	Feature	Pradnya Yeram	Food & Beverage · POS	operation:shift#listDenominations
+new	28528	SVC-ORDER-SHIFT-3	New	Task	Pranay Shinde	[BE] OrderService: giveShiftVarianceReason, listDenominations, listDepositBoxes, listShift	operation:shift#listDenominations, table:platform.denomination
+new	28529	SVC-ORDER-SHIFT-5	New	Task	Pranay Shinde	[BE] OrderService: resumeShift, setDenominations, setTillShiftPolicy, submitShiftCount	operation:shift#setDenominations, table:platform.denomination
+new	28536	APP-POS-POS-001	New	Task	Pradnya Yeram	[FE] POS-001 Begin Shift	operation:shift#listDenominations
+new	28537	APP-POS-POS-007	New	Task	Pradnya Yeram	[FE] POS-007 Close Shift	operation:shift#listDenominations
+new	28722	AM-SETUP-FOOD-BEVERAGE-RETAIL-P08	New	Feature	Pallavi Sawant	Food, Beverage & Retail · Venue Management (setup)	operation:shift#setDenominations
+new	28729	APP-SETUP-BO-1065	New	Task	Surendra Loke	[FE] BO-1065 Currency, Timezone & Channels (setup: 2 of its 4 operations)	operation:shift#setDenominations
+new	28754	TEST-AM-FOOD-BEVERAGE-P04	New	Task	Pranay Shinde	[Test] Module test: Food & Beverage · POS	operation:shift#listDenominations, table:platform.denomination
+new	28769	AM-SETUP-FOOD-BEVERAGE-RETAIL-P08-REST	New	Feature	Narayan Gaonkar	Food, Beverage & Retail · Venue Management (setup, the rest of the screens)	operation:shift#listDenominations
+new	28777	APP-SETUP-BO-1065-REST	New	Task	Sanket Keluskar	[FE] BO-1065 Currency, Timezone & Channels (the rest of the screen: 2 of its 4 operations)	operation:shift#listDenominations
+new	32643	SVC-ORDER-SHIFT-3#listDenominations	New	Sub Task	Pranay Shinde	[BE] listDenominations: GET /denominations	operation:shift#listDenominations, table:platform.denomination
+new	32647	SVC-ORDER-SHIFT-5#setDenominations	New	Sub Task	Pranay Shinde	[BE] setDenominations: PUT /denominations	operation:shift#setDenominations, table:platform.denomination
+new	32668	APP-POS-POS-001#build	New	Sub Task	Pradnya Yeram	[FE] POS-001 Begin Shift: build with all states	operation:shift#listDenominations
+new	32669	APP-POS-POS-001#wire	New	Sub Task	Pradnya Yeram	[FE] POS-001 Begin Shift: connect to API	operation:shift#listDenominations
+new	32670	APP-POS-POS-001#test	New	Sub Task	Pradnya Yeram	[FE] POS-001 Begin Shift: tests	operation:shift#listDenominations
+new	32671	APP-POS-POS-007#build	New	Sub Task	Pradnya Yeram	[FE] POS-007 Close Shift: build with all states	operation:shift#listDenominations
+new	32672	APP-POS-POS-007#wire	New	Sub Task	Pradnya Yeram	[FE] POS-007 Close Shift: connect to API	operation:shift#listDenominations
+new	32673	APP-POS-POS-007#test	New	Sub Task	Pradnya Yeram	[FE] POS-007 Close Shift: tests	operation:shift#listDenominations
+new	33081	APP-SETUP-BO-1065#build	New	Sub Task	Surendra Loke	[FE] BO-1065 Currency, Timezone & Channels (setup: 2 of its 4 operations): build with all 	operation:shift#setDenominations
+new	33082	APP-SETUP-BO-1065#wire	New	Sub Task	Surendra Loke	[FE] BO-1065 Currency, Timezone & Channels (setup: 2 of its 4 operations): connect to API	operation:shift#setDenominations
+new	33083	APP-SETUP-BO-1065#test	New	Sub Task	Surendra Loke	[FE] BO-1065 Currency, Timezone & Channels (setup: 2 of its 4 operations): tests	operation:shift#setDenominations
+new	33190	APP-SETUP-BO-1065-REST#build	New	Sub Task	Sanket Keluskar	[FE] BO-1065 Currency, Timezone & Channels (the rest of the screen: 2 of its 4 operations)	operation:shift#listDenominations
+new	33191	APP-SETUP-BO-1065-REST#wire	New	Sub Task	Sanket Keluskar	[FE] BO-1065 Currency, Timezone & Channels (the rest of the screen: 2 of its 4 operations)	operation:shift#listDenominations
+new	33192	APP-SETUP-BO-1065-REST#test	New	Sub Task	Sanket Keluskar	[FE] BO-1065 Currency, Timezone & Channels (the rest of the screen: 2 of its 4 operations)	operation:shift#listDenominations

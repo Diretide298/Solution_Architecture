@@ -5,16 +5,16 @@
 | | |
 |---|---|
 | Screens | 1663 |
-| Operations | 1892 |
+| Operations | 1894 |
 | Contracts | 31 |
 | Modules | 19 |
 | Undrawn | 0 |
-| Operations with no screen | 185 |
+| Operations with no screen | 206 |
 | Waves | wave1 141 · wave2 58 · wave3 1464 |
 
 ## Gaps
 
-### 185 operations with no screen here
+### 206 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -36,7 +36,7 @@
 | `removeIndexEntry` | ai | DELETE | Remove one record from the index |
 | `setAiTool` | ai | PUT | Register or change a tool (platform) |
 | `setIndexSource` | ai | PUT | Declare a source indexed |
-| `setSuggestionProvider` | ai | PUT |  |
+| `setSuggestionProvider` | ai | PUT | Point a question at a rule, a model, or both |
 | `approveMatrixMultiLevel` | approvals | PUT | Approval Matrix & Multi-Level Approval Configuration |
 | `approveRoleAuthorityDelegation` | approvals | PUT | Roles, Authority, Delegation & Approval Limits |
 | `approveUnifiedDecision` | approvals | PUT | Unified Approval Inbox & Decision Workspace |
@@ -46,21 +46,21 @@
 | `listAccreditationBadges` | approvals | GET | Badges issued and their state |
 | `listAutomationExecutions` | approvals | GET | What automations ran, when, on whose rule, and the outcome |
 | `reopenApprovalRequest` | approvals | POST | Reopen an expired or cancelled request as a new one |
-| `submitApprovalRequest` | approvals | POST | Send a saved draft for approval |
+| `submitApprovalRequest` | approvals | POST | Send a saved draft, or a returned request, for approval |
+| `acquireInventoryHold` | catalogue | POST | Acquire an inventory hold |
+| `checkProductSalePermission` | catalogue | POST | Would this seller, here, be allowed to sell these products |
+| `getBundleSigningKeys` | catalogue | GET | The public keys a till verifies catalogue bundles with |
 | `getEventChangeTreatmentPolicy` | catalogue | GET | What happens to tickets, reservations and guests when an event changes, by default |
 | `getPlanBenefits` | catalogue | GET | Which benefits a plan grants, and how much of each |
+| `getProductChannelTexts` | catalogue | GET | The product's texts per sales channel, in each of the tenant's languages |
+| `getProductDashboard` | catalogue | GET | The products dashboard's counts |
+| `getProductOwnerForms` | catalogue | GET | Which form a sale of this product asks the buyer, and which it asks each ticket owner |
+| `getProductSalePermissionRules` | catalogue | GET | Who can sell this product |
 | `getWaitingRoomStatus` | catalogue | GET | A performance's waiting room, its setting and how it is moving |
 | `listGuestMemberships` | catalogue | GET | A guest's memberships, benefits and history |
 | `listMembershipBenefits` | catalogue | GET | Benefits a plan can grant |
 | `listMembershipProgrammes` | catalogue | GET | Membership schemes, the level above a plan |
-| `listProductApprovalWorkflows` | catalogue | GET | The product approval workflows `approveWorkflow` saved |
-| `listSeatPricingRules` | catalogue | GET | Seat-level dynamic pricing rules |
-| `listTaxProfiles` | catalogue | GET | The tax profiles |
-| `relinquishInventoryHold` | catalogue | DELETE | Return unsold units |
-| `renewInventoryHold` | catalogue | POST | Extend a lease TTL |
-| `setEventChangeTreatmentPolicy` | catalogue | PUT | Set the default treatment per kind of event change |
-| `setSeatPricingRule` | catalogue | PUT | Create or replace a seat-level dynamic pricing rule |
-| … | | | 145 more |
+| … | | | 166 more |
 
 ### 14 modules split across waves
 
@@ -481,7 +481,7 @@
 | `ADM-600` | Mixed Tender Rule & Combination Builder | Commercial | 3 | 2 | yes |
 | `ADM-601` | Split Payment & Tender Allocation Manager | Commercial | 3 | 3 | yes |
 | `ADM-602` | B2B Credit Account & Limit Manager | Commercial | 3 | 2 | yes |
-| `ADM-603` | B2B Invoice, On-Account & Payment Terms Configuration | Commercial | 1 | 4 | yes |
+| `ADM-603` | B2B Invoice, On-Account & Payment Terms Configuration | Commercial | 1 | 5 | yes |
 | `ADM-604` | Stored Value, Gift Card & Voucher Tender Controls | Commercial | 3 | 2 | yes |
 | `ADM-605` | Advanced Payment Eligibility, Sequence & Restriction Rules | Commercial | 3 | 2 | yes |
 | `ADM-606` | Partial Payment, Failure & Recovery Manager | Commercial | 3 | 5 | yes |
@@ -590,7 +590,7 @@
 | `BO-012` | Membership Products | Sell | 1 | 13 | yes |
 | `BO-013` | Channel & Distribution | Sell | 1 | 10 | yes |
 | `BO-014` | Catalogue Publishing | Sell | 1 | 5 | yes |
-| `BO-015` | Performance Calendar | Sell | 1 | 11 | yes |
+| `BO-015` | Performance Calendar | Sell | 1 | 12 | yes |
 | `BO-016` | Performance Template | Sell | 1 | 2 | yes |
 | `BO-017` | Capacity Management | Sell | 1 | 8 | yes |
 | `BO-018` | Allocation & Holds | Sell | 2 | 2 | yes |
@@ -1058,7 +1058,7 @@
 | `BO-288` | Membership Entitlement & Admission Benefit Builder | Sell | 3 | 5 | yes |
 | `BO-289` | Membership Usage, Visit & Consumption Rules | Sell | 3 | 4 | yes |
 | `BO-290` | Family, Household & Dependent Membership Configuration | Sell | 3 | 1 | yes |
-| `BO-291` | Membership Commercial, Pricing & Channel Association | Sell | 3 | 5 | yes |
+| `BO-291` | Membership Commercial, Pricing & Channel Association | Sell | 3 | 7 | yes |
 | `BO-292` | Renewal, Auto-Renewal & Membership Continuity Configuration | Sell | 3 | 1 | yes |
 | `BO-293` | Membership Product Validation, Approval, Publication & Versioning | Sell | 3 | 4 | yes |
 | `BO-294` | Member Operations Command Center | Sell | 3 | 1 | yes |

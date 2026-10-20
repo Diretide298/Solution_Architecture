@@ -115,7 +115,7 @@
     "required": null
    }
   ],
-  "requestBody": "ProfileDeployment",
+  "requestBody": "DeployConfigurationProfileRequest",
   "responds": null
  },
  "getOrgUnit": {

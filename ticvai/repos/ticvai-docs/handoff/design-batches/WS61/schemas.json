@@ -958,6 +958,33 @@
     "type": "string",
     "format": "uuid"
    },
+   "productName": {
+    "type": "string",
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "**Read with the entitlement, not stored on it** (R8 blocker ORDERS-MONEY-C20, CHG-R8MIG-009), as `TicketStatus.productName`: the product's name from `catalogue.product` (catalogue#productRecords), in the caller's language. The ticket card shows it."
+   },
+   "venueName": {
+    "type": "string",
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "The venue's name, read from `platform.scope` by `venueId`; not stored."
+   },
+   "imageUrl": {
+    "type": "string",
+    "format": "uri",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "The product's primary image (`catalogue.product_media`), read with the entitlement; null when the product has none. Not stored."
+   },
+   "guestCategory": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "The guest category of the order line it was issued for (adult, child, ...), from the line's variant (catalogue#productRecords); null for an entitlement no order line issued. Not stored."
+   },
    "orderId": {
     "type": "string",
     "format": "uuid",
@@ -966,7 +993,8 @@
    },
    "orderLineId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "description": "The order line it was issued for; the ticket list groups cards by it (CHG-R8MIG-009)."
    },
    "subjectId": {
     "type": "string",

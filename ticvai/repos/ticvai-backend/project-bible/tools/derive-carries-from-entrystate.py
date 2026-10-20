@@ -83,6 +83,16 @@ import sys
 
 import yaml
 
+
+def _yload(src):
+    """YAML with the C loader, the pure one where a file defeats it (20 October 2026, CHG-R8GEN-016): the screen files
+    are 25 MB and the pure loader took most of each refresh step's minute; the loaded data is the same."""
+    text = src.read() if hasattr(src, "read") else src
+    try:
+        return yaml.load(text, Loader=getattr(yaml, "CSafeLoader", yaml.SafeLoader))
+    except Exception:
+        return yaml.safe_load(text)
+
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 MINE = "derived — "
 MINE_MARK = "declares entryState.params"
@@ -143,7 +153,7 @@ class Contracts:
         self.ops: dict[str, tuple[pathlib.Path, dict, dict]] = {}
         self.route: dict[str, tuple[str, str]] = {}
         for f in sorted((ROOT / "contracts").rglob("*.yaml")):
-            doc = yaml.safe_load(open(f, encoding="utf-8")) or {}
+            doc = _yload(open(f, encoding="utf-8")) or {}
             self.files[f.resolve()] = doc
             for path, path_item in (doc.get("paths") or {}).items():
                 if not isinstance(path_item, dict):
@@ -439,7 +449,7 @@ def main() -> int:
         pass
     apply = "--apply" in sys.argv
     verbose = "--verbose" in sys.argv
-    docs = {f: yaml.safe_load(open(f, encoding="utf-8"))
+    docs = {f: _yload(open(f, encoding="utf-8"))
             for f in sorted(glob.glob(str(ROOT / "screens" / "P*.yaml")))}
     screens = {s["id"]: s for d in docs.values() for s in d["screens"]}
     platform = {s["id"]: f for f, d in docs.items() for s in d["screens"]}

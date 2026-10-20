@@ -263,7 +263,16 @@
   "x-ticvai-persistence": "none — computed",
   "properties": {
    "kind": {
-    "type": "string"
+    "type": "string",
+    "enum": [
+     "product",
+     "entitlement",
+     "knowledge",
+     "faq",
+     "report",
+     "media"
+    ],
+    "description": "The search kind of the index source the result came from (`IndexSource.kind`)."
    },
    "id": {
     "type": "string"

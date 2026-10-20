@@ -22,7 +22,7 @@
    ],
    "notes": "**Reached from WEB-001** — a top-level section of the site. Stated on 4 September: this screen exited somewhere and nothing exited to it, so it was outside the navigation graph entirely."
   },
-  "notes": "Added 17 August for parity with GST-037. **Not on the wireframe board** — needs drawing. CF-93. **`evaluatePromotions` removed 27 September 2026 (audit root R292).** It evaluates promotions against a cart — `EvaluatePromotionsRequest` requires `venueId`, `channel` and at least one line with a variant, quantity and unit price — and this screen has no cart: it arrives with `promotionId` alone. Offers apply where the cart is, on WEB-005 and WEB-010, which keep the call.",
+  "notes": "Added 17 August for parity with GST-037. **Not on the wireframe board** — needs drawing. CF-93. **`evaluatePromotions` removed 27 September 2026 (audit root R292).** It evaluates promotions against a cart — `EvaluatePromotionsRequest` requires `venueId`, `channel` and at least one line with a variant, quantity and unit price — and this screen has no cart: it arrives with `promotionId` alone. Offers apply where the cart is, on WEB-005 and WEB-010, which keep the call.\n\nBuild note (r8 second round, ORDERS-MONEY-C11): **Use this offer** on a promotion with a code applies it to the guest's cart with `applyCartPromoCode` and that code; an automatic promotion needs nothing applied, so it goes back to the list. The button is not drawn on this client-approved screen's definition yet; adding it and its binding waits for the client (pending entry ORDERS-MONEY-C11).",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listPromotions` reads the population and `getPromotion` reads one of them — list, select, act",
@@ -107,7 +107,7 @@
      "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listPromotions` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ],
-   "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened three weeks late all land here, and the person holding the link did nothing wrong. **The screen names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.** Arrives with `promotionId`.",
+   "coldEntry": "**A dead promotion link says \"This offer is no longer available\" and shows the list it came from** (the offers active now), with no name and no reason (r8, ORDERS-MONEY-C01; ADR-0030 as relaxed for promotions). Never a 404 page. Arrives with `promotionId`.",
    "preloaded": [
     "Promotion.code",
     "Promotion.name",

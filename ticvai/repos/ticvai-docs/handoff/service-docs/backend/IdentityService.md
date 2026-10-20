@@ -7,7 +7,7 @@
 | Tier | foundation: Read by everything, reads nothing above. Deploys first and alone. |
 | Contracts | `identity` |
 | Schemas owned | `identity`, `pii` |
-| Operations in the slice | 36 of 98 |
+| Operations in the slice | 36 of 101 |
 | Scale | Read-heavy, latency-critical, cached hard. Every request resolves a principal. |
 | If it is down | A restart is an outage everywhere. Deploys go out first and alone. |
 
@@ -57,10 +57,10 @@
 | identity | [`setPasswordPolicy`](#setpasswordpolicy) | PUT | `/password-policy` | setup | 1 | ADM-342, ADM-422 |
 | identity | [`setSegregationRules`](#setsegregationrules) | PUT | `/segregation-rules` | setup | 1 | ADM-340 |
 | identity | [`verifyGuestEmail`](#verifyguestemail) | POST | `/auth/guest/verify-email` | core | 1 | GST-010, GST-073, WEB-013, WEB-020 |
-| mfa | [`createMfaChallenge`](#createmfachallenge) | POST | `/auth/mfa/challenge` | core | 1 | ADM-001, ADM-247, ADM-699, ADM-700, BO-053, BO-284 … |
+| mfa | [`createMfaChallenge`](#createmfachallenge) | POST | `/auth/mfa/challenge` | core | 1 | ADM-001, ADM-018, ADM-247, ADM-699, ADM-700, BO-053 … |
 | mfa | [`enrolMfaMethod`](#enrolmfamethod) | POST | `/auth/mfa/methods` | core | 1 | ADM-001, ADM-699, EMP-042, GST-073, PTR-001, SUP-001 |
 | mfa | [`listMfaMethods`](#listmfamethods) | GET | `/auth/mfa/methods` | core | 1 | ADM-342, ADM-699, EMP-042, GST-073, WEB-024 |
-| mfa | [`verifyMfaChallenge`](#verifymfachallenge) | POST | `/auth/mfa/challenge/{challengeId}/verify` | core | 1 | ADM-001, ADM-247, ADM-699, ADM-700, BO-053, BO-284 … |
+| mfa | [`verifyMfaChallenge`](#verifymfachallenge) | POST | `/auth/mfa/challenge/{challengeId}/verify` | core | 1 | ADM-001, ADM-018, ADM-247, ADM-699, ADM-700, BO-053 … |
 | mfa | [`verifyMfaEnrolment`](#verifymfaenrolment) | POST | `/auth/mfa/methods/{methodId}` | core | 1 | ADM-001, ADM-699, EMP-042, GST-073, PTR-001, SUP-001 |
 | session | [`listActiveSessions`](#listactivesessions) | GET | `/auth/sessions` | core | 1 | BO-053, POS-000 |
 
@@ -151,6 +151,7 @@
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
+| X-Tenant-Id | header |  | string (uuid) | Which tenant a call acts in, where one cell holds many tenant databases (ADR-0038; R8 blocker fix, APPROVALS-TENANCY-C44). |
 | activeOnly | query |  | boolean | True returns only grants whose window is open now. |
 | pageSize | query |  | integer |  |
 | cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
@@ -161,7 +162,7 @@
 |---|---|---|---|
 | items | array of PlatformStaffGrant | yes |  |
 | items[].id | string (uuid) | yes |  |
-| items[].operatorPrincipalId | string (uuid) | yes | The platform operator, from the Control Plane token. (read-only) |
+| items[].operatorPrincipalId | string (uuid) | yes | The platform operator, from the Control Plane token (its subject). (read-only) |
 | items[].operatorDisplayName | string |  | (read-only) |
 | items[].permissions | array of Permission: enum (SESSION_FORCE_LOGOUT, USER_MANAGE, ROLE_MANAGE, PERMISSION_GRANT, PERMISSION_VIEW, PERMISSION_MANAGE, PLATFORM_TENANT_VIEW, PLATFORM_TENANT_MANAGE, …) | yes |  |
 | items[].reason | string | yes |  |
@@ -229,6 +230,8 @@
 | items[].roles[].code | string | yes |  |
 | items[].roles[].name | string | yes |  |
 | items[].roles[].isPrimary | boolean |  | True for the role that is the principal's primaryRoleId (identity.principal.primary_role_id); false for the others (14 October 2026, ADAM CR-077; CHG-IDR-002). |
+| items[].roles[].grantId | string (uuid) |  | The grant this card stands for (identity.delegated_access.id; IDENTITY-C45, CHG-R8SPN-032). |
+| items[].roles[].scope | object |  | The scope node the grant is held at (platform.scope), with its name, so the card can say which venue (IDENTITY-C45). |
 | items[].lastLoginAt | string (date-time) |  | (nullable) |
 | items[].mustChangeCredential | boolean |  | The principal must replace their credential before the session is usable (14 October 2026, CHG-CRD-001, ADAM CR-078; createPrincipal took it and nothing stored it). (default True) |
 | items[].ssoProviderId | string (uuid) |  | Set when single sign-on provisioned this principal (completeSsoAuthorization, from the tenant's identity.sso_provider; 14 October 2026, CHG-CRD-001). (read-only; nullable) |
@@ -313,6 +316,7 @@ A role is a grouping for permission management — code, name, description and t
 **`PLATFORM_*` permissions never ride in a grant; they are read from the platform token** (decided 28 September, audit R203). A cell honours one only on the few operations that name it: this one (`PLATFORM_TENANT_ACCESS`), `listOwnPlatformStaffGrants`, and `ai.setAiProvider` (`PLATFORM_TENANT_MANAGE`), which in addition requires a grant into the tenant to be open so the change is audited against it.
 **Time-boxed at opening and never open-ended**: `expiresAt` is at most 8 hours ahead (proposed, client to correct). **Every action under the grant is audited** with the grant's id (`AuditRecord.platformStaffGrantId`) and **the grant itself is listed to the tenant** (`listPlatformStaffGrants`). A tenant never has to grant a support role for this, and cannot see a platform action that is not tied to a grant.
 Requires step-up: the operator holds `PLATFORM_*` permissions, which require MFA (audit R135).
+**How the cell admits the operator here and in `listOwnPlatformStaffGrants`** (R8 blocker IDENTITY-C20, CHG-R8MIG-006; the lead's answer, option A). The operator is not a principal of this tenant: the cell validates the Control Plane token, takes its subject as `operatorPrincipalId` (a plain uuid, no foreign key) and reads the MFA step-up from the token's `amr` claim, never from a tenant session. The transaction runs with `ticvai.scope_paths` set to the tenant root and the operator as the audited actor (`AuditRecord.platformStaffGrantId` once the grant exists).
 
 |  |  |
 |---|---|
@@ -323,14 +327,15 @@ Requires step-up: the operator holds `PLATFORM_*` permissions, which require MFA
 | Offline | no |
 | Conflict policy | serverWins |
 | Step-up auth | mfa |
-| Reads | `identity.platform_staff_grant` |
-| Writes | `identity.platform_staff_grant` |
+| Reads | `cache:idempotency`, `identity.platform_staff_grant` |
+| Writes | `cache:idempotency`, `identity.platform_staff_grant` |
 | Called by | ADM-004, ADM-005, ADM-006, ADM-015, ADM-016, ADM-017, ADM-018, ADM-019, ADM-020, ADM-021, ADM-026, ADM-031, ADM-037, ADM-068, ADM-411, ADM-412, ADM-420, ADM-421, ADM-422, ADM-424, ADM-425, ADM-426, ADM-469, ADM-470, ADM-471, ADM-472, ADM-473, ADM-474, ADM-475, ADM-476, ADM-477, ADM-478, ADM-479, ADM-480, ADM-481, ADM-482, ADM-483, ADM-484, ADM-485, ADM-486, ADM-487, ADM-488, ADM-489, ADM-490, ADM-491, ADM-492, ADM-493, ADM-494, ADM-495, ADM-496, ADM-497, ADM-498, ADM-499, ADM-500, ADM-501, ADM-502, ADM-503, ADM-504, ADM-505, ADM-506, ADM-507, ADM-508, ADM-509, ADM-510, ADM-511, ADM-512, ADM-513, ADM-514, ADM-515, ADM-516, ADM-517, ADM-518, ADM-519, ADM-520, ADM-521, ADM-522, ADM-523, ADM-524, ADM-525, ADM-526, ADM-527, ADM-528, ADM-529, ADM-530, ADM-531, ADM-532, ADM-533, ADM-534, ADM-535, ADM-536, ADM-537, ADM-538, ADM-539, ADM-540, ADM-541, ADM-542, ADM-543, ADM-544, ADM-545, ADM-546, ADM-547, ADM-548, ADM-549, ADM-550, ADM-551, ADM-552, ADM-553, ADM-554, ADM-555, ADM-556, ADM-557, ADM-558, ADM-619 |
 
 **Parameters**
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
+| X-Tenant-Id | header |  | string (uuid) | Which tenant a call acts in, where one cell holds many tenant databases (ADR-0038; R8 blocker fix, APPROVALS-TENANCY-C44). |
 | Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
@@ -348,7 +353,7 @@ Requires step-up: the operator holds `PLATFORM_*` permissions, which require MFA
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | id | string (uuid) | yes |  |
-| operatorPrincipalId | string (uuid) | yes | The platform operator, from the Control Plane token. (read-only) |
+| operatorPrincipalId | string (uuid) | yes | The platform operator, from the Control Plane token (its subject). (read-only) |
 | operatorDisplayName | string |  | (read-only) |
 | permissions | array of Permission: enum (SESSION_FORCE_LOGOUT, USER_MANAGE, ROLE_MANAGE, PERMISSION_GRANT, PERMISSION_VIEW, PERMISSION_MANAGE, PLATFORM_TENANT_VIEW, PLATFORM_TENANT_MANAGE, …) | yes |  |
 | reason | string | yes |  |
@@ -379,8 +384,8 @@ Requires step-up: the operator holds `PLATFORM_*` permissions, which require MFA
 | Offline | no |
 | Config scope | tenant |
 | Conflict policy | serverWins |
-| Reads | `identity.capability_template` |
-| Writes | `identity.capability_template` |
+| Reads | `cache:idempotency`, `identity.capability_template` |
+| Writes | `cache:idempotency`, `identity.capability_template` |
 | Called by | BO-054 |
 
 **Parameters**
@@ -431,6 +436,8 @@ Requires step-up: the operator holds `PLATFORM_*` permissions, which require MFA
 
 Deactivation invalidates any live session immediately. **A change to `validTo`, to `primaryRoleId` or to the principal's permissions ends every live session of the principal at once** (decided 28 September, audit R126 (1)): the person signs in again and is resolved afresh. A change to `displayName` alone ends nothing.
 
+**It never grants or removes a role** (decided 20 October 2026, Chinmay, R8 blocker cause IDENTITY-C15, option A; CHG-R8SPN-024). A role held at a scope is a grant: `createDelegatedAccess` gives one (role, scope, validity) and `deleteDelegatedAccess` takes one away. CMS-019's Change access calls those two for the roles it adds and removes, and this operation only for the display name, active flag and validity.
+
 |  |  |
 |---|---|
 | Permission | `USER_MANAGE` |
@@ -439,8 +446,8 @@ Deactivation invalidates any live session immediately. **A change to `validTo`, 
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `identity.principal` |
-| Writes | `cache:idempotency`, `identity.principal` |
+| Reads | `cache:idempotency`, `identity.delegated_access`, `identity.principal`, `identity.role` |
+| Writes | `cache:idempotency`, `identity.principal`, `identity.refresh_token`, `identity.session` |
 | Called by | ADM-020, BO-053, BO-054, CMS-019, PTR-003 |
 
 **Parameters**
@@ -475,6 +482,13 @@ Deactivation invalidates any live session immediately. **A change to `validTo`, 
 | roles[].code | string | yes |  |
 | roles[].name | string | yes |  |
 | roles[].isPrimary | boolean |  | True for the role that is the principal's primaryRoleId (identity.principal.primary_role_id); false for the others (14 October 2026, ADAM CR-077; CHG-IDR-002). |
+| roles[].grantId | string (uuid) |  | The grant this card stands for (identity.delegated_access.id; IDENTITY-C45, CHG-R8SPN-032). |
+| roles[].scope | object |  | The scope node the grant is held at (platform.scope), with its name, so the card can say which venue (IDENTITY-C45). |
+| roles[].scope.id | string (uuid) | yes |  |
+| roles[].scope.level | ScopeLevel: enum (tenant, brand, region, venue, department, subDepartment, workstation, outlet, …) | yes | The eight organisational levels, plus subject. |
+| roles[].scope.path | string | yes | Materialised ltree path. |
+| roles[].scope.code | string |  | (nullable) |
+| roles[].scope.name | string |  | (nullable) |
 | lastLoginAt | string (date-time) |  | (nullable) |
 | mustChangeCredential | boolean |  | The principal must replace their credential before the session is usable (14 October 2026, CHG-CRD-001, ADAM CR-078; createPrincipal took it and nothing stored it). (default True) |
 | ssoProviderId | string (uuid) |  | Set when single sign-on provisioned this principal (completeSsoAuthorization, from the tenant's identity.sso_provider; 14 October 2026, CHG-CRD-001). (read-only; nullable) |
@@ -502,8 +516,8 @@ Deactivation invalidates any live session immediately. **A change to `validTo`, 
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `identity.role` |
-| Writes | `identity.role` |
+| Reads | `cache:idempotency`, `identity.role` |
+| Writes | `cache:idempotency`, `identity.role` |
 | Called by | **no screen**: no screen lists it in its apis, so it is reachable only by API or import until one does (README, Known gaps) |
 
 **Parameters**
@@ -557,6 +571,8 @@ Raises an erasure request rather than deleting immediately. PII is removed from 
 **The request is an Approvals request.** `requestId` is the `approvals.request` id, raised in the same transaction through Approvals' in-process `createApprovalRequest` (Approvals is in the Tenancy module, in `commerce` with Identity; ADR-0055 rule 3). A guest's own erasure needs no human approval step (ADR-0047 section 7); the tenant's approval matrix may add one, and then the erasure job waits for the decision.
 
 **Every guest is erased locally; only a linked guest fans out.** The job tombstones the guest's `pii.subject` row (`is_erased`, `erased_at`, and `erasure_request_id` = `requestId`; ADR-0047), for every guest. Only where the guest is linked across cells (the session's `GuestSession.guestLinkId` is set; ADR-0010) does it also call cross-region `createDsarRequest` (`kind: erasure`, `serviceAuth`), which raises the cross-cell sync.dsar_request and fans out. A guest who never transacted across regions has no link (cross-region.yaml) and raises no DSAR record.
+
+**The same job erases the guest's AI index, and the tombstone keeps it owed until it is done** (CHG-R8ERA-002, which replaces the later-release catch-up of CHG-R8RES-003; ADR-0047, ADR-0049). After it tombstones the guest, the job calls `ai.eraseSubject` for the subject (cell-internal, `serviceAuth`), which deletes the guest's index rows and search points and answers with the counts removed and left. The AI erasure is done when a call answers `rowsLeft` 0 and `pointsLeft` 0. Until then the tombstone (`is_erased`, `erased_at`, `erasure_request_id`) is the record that it is owed: a failed call (`502 provider-connection-failed`, no answer, or anything left) undoes nothing, and **the retry** is the job's own: it calls `eraseSubject` again for that subject with backoff, and its daily sweep calls it for every tombstoned subject, so a retry lost with a stopped job is made by the next sweep. `eraseSubject` answers zeros for a subject with nothing left, so a retry or a sweep only repeats what is safe. Neither this request nor its `202` waits for the AI erasure.
 
 |  |  |
 |---|---|
@@ -617,13 +633,18 @@ Raises an erasure request rather than deleting immediately. PII is removed from 
 | tokens | TokenPair | yes |  |
 | tokens.accessToken | string | yes | JWT carrying sid, validated per request against the session registry. |
 | tokens.refreshToken | string | yes |  |
-| tokens.expiresIn | integer | yes | Seconds |
+| tokens.expiresIn | integer | yes | Seconds until the access token expires: PasswordPolicy.accessTokenMinutes x 60, 900 by default (15 minutes; proposed, client to correct). |
 | isVerified | boolean | yes | False until an OTP or a verified provider identity confirms ownership. |
 | identityProviders | array of enum (password, otp, apple, google, uaePass) |  | Linked providers. |
 | guestLinkId | string |  | Present where the guest is linked across cells (ADR-0010). (nullable) |
 | requiresMfa | boolean |  | True only where the sign-in venue enabled guest two-step verification (VenueSettings.identity.guestTwoStep, in tenancy) and this guest has an active method (decided 29 September, rev 3 GAP-B1, per ve… (default False) |
 | mfaMethods | array of MfaMethod |  | The guest's active methods, so the client can offer the right one. |
 | mfaMethods[].id | string (uuid) | yes |  |
+| mfaMethods[].principalId | string (uuid) |  | The principal who enrolled it; null for a guest. (read-only; nullable) |
+| mfaMethods[].subjectId | string (uuid) |  | The guest who enrolled it; null for a principal. (read-only; nullable) |
+| mfaMethods[].secret | string |  | The totp shared secret, encrypted with the tenant's field key (ADR-0063); null for other kinds. (nullable) |
+| mfaMethods[].destination | string |  | The full phone number (smsOtp) or email (emailOtp) the code goes to, encrypted with the tenant's field key (ADR-0063); null for other kinds. (nullable) |
+| mfaMethods[].pendingExpiresAt | string (date-time) |  | While isActive is false, when the unconfirmed enrolment lapses; null once verified. (nullable) |
 | mfaMethods[].kind | MfaKind: enum (totp, smsOtp, emailOtp, biometric, hardwareToken) | yes |  |
 | mfaMethods[].label | string |  | (nullable) |
 | mfaMethods[].maskedTarget | string |  | Partially masked destination, so a person can tell two methods apart. (nullable) |
@@ -657,8 +678,8 @@ Ends this device's session. `allDevices` revokes every session for the subject, 
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `identity.guest_session` |
-| Writes | `identity.guest_session` |
+| Reads | `cache:idempotency`, `identity.guest_session` |
+| Writes | `cache:idempotency`, `identity.guest_session` |
 | Called by | GST-042, GST-073, WEB-016 |
 
 **Parameters**
@@ -692,8 +713,8 @@ An unverified account signs in and may browse and fill a cart; the checkout gate
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `identity.guest_credential`, `identity.mfa_method`, `identity.password_policy`, `pii.subject_contact` |
-| Writes | `identity.guest_credential`, `identity.guest_session`, `platform.outbox` |
+| Reads | `cache:idempotency`, `identity.guest_credential`, `identity.mfa_method`, `identity.password_policy`, `pii.subject_contact` |
+| Writes | `cache:idempotency`, `identity.guest_credential`, `identity.guest_session`, `platform.outbox` |
 | Called by | GST-042, WEB-016 |
 
 **Parameters**
@@ -720,13 +741,18 @@ An unverified account signs in and may browse and fill a cart; the checkout gate
 | tokens | TokenPair | yes |  |
 | tokens.accessToken | string | yes | JWT carrying sid, validated per request against the session registry. |
 | tokens.refreshToken | string | yes |  |
-| tokens.expiresIn | integer | yes | Seconds |
+| tokens.expiresIn | integer | yes | Seconds until the access token expires: PasswordPolicy.accessTokenMinutes x 60, 900 by default (15 minutes; proposed, client to correct). |
 | isVerified | boolean | yes | False until an OTP or a verified provider identity confirms ownership. |
 | identityProviders | array of enum (password, otp, apple, google, uaePass) |  | Linked providers. |
 | guestLinkId | string |  | Present where the guest is linked across cells (ADR-0010). (nullable) |
 | requiresMfa | boolean |  | True only where the sign-in venue enabled guest two-step verification (VenueSettings.identity.guestTwoStep, in tenancy) and this guest has an active method (decided 29 September, rev 3 GAP-B1, per ve… (default False) |
 | mfaMethods | array of MfaMethod |  | The guest's active methods, so the client can offer the right one. |
 | mfaMethods[].id | string (uuid) | yes |  |
+| mfaMethods[].principalId | string (uuid) |  | The principal who enrolled it; null for a guest. (read-only; nullable) |
+| mfaMethods[].subjectId | string (uuid) |  | The guest who enrolled it; null for a principal. (read-only; nullable) |
+| mfaMethods[].secret | string |  | The totp shared secret, encrypted with the tenant's field key (ADR-0063); null for other kinds. (nullable) |
+| mfaMethods[].destination | string |  | The full phone number (smsOtp) or email (emailOtp) the code goes to, encrypted with the tenant's field key (ADR-0063); null for other kinds. (nullable) |
+| mfaMethods[].pendingExpiresAt | string (date-time) |  | While isActive is false, when the unconfirmed enrolment lapses; null once verified. (nullable) |
 | mfaMethods[].kind | MfaKind: enum (totp, smsOtp, emailOtp, biometric, hardwareToken) | yes |  |
 | mfaMethods[].label | string |  | (nullable) |
 | mfaMethods[].maskedTarget | string |  | Partially masked destination, so a person can tell two methods apart. (nullable) |
@@ -751,7 +777,10 @@ An unverified account signs in and may browse and fill a cart; the checkout gate
 
 **`POST /auth/guest/social`**: Sign in with Apple or Google
 
+**Where the app gets what it needs to start this sign-in** (decided 20 October 2026, Chinmay, R8 blocker cause IDENTITY-C21, option A; CHG-R8SPN-025): white-label's published tenant config, which the app shell loads before sign-in, carries a read-only `guestSignIn` block with the public values only (Apple and Google client ids; the UAE Pass authorize URL and client id), derived on read from the tenant's provider rows. The client secret and the audience checks stay here, server-side, in the provider row (`identity.sso_provider.client_secret_ref`). The app mints `state`; this operation checks the redirect URI against the one registered (`DomainReadiness.uaePassRedirect`).
 Where the provider's verified email matches an existing account, the identities are linked rather than a duplicate created. Where it does not, a new account is created — an unverified email from a provider is not proof of ownership.
+
+**The link is stored** (R8 blocker IDENTITY-C54, CHG-R8MIG-015): one `pii.subject_identity` row (`SubjectIdentity`) per provider and provider subject (`sub`), unique on the pair, so a returning Apple user whose email is a private-relay address still resolves to the same account. A new account also writes the provider's email to `pii.subject_contact`.
 
 |  |  |
 |---|---|
@@ -761,8 +790,8 @@ Where the provider's verified email matches an existing account, the identities 
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `identity.mfa_method`, `pii.subject_contact` |
-| Writes | `cache:idempotency`, `identity.guest_session`, `pii.subject`, `platform.outbox` |
+| Reads | `cache:idempotency`, `identity.mfa_method`, `pii.subject_contact`, `pii.subject_identity` |
+| Writes | `cache:idempotency`, `identity.guest_session`, `pii.subject`, `pii.subject_identity`, `platform.outbox` |
 | Called by | GST-042, WEB-016 |
 
 **Parameters**
@@ -789,13 +818,18 @@ Where the provider's verified email matches an existing account, the identities 
 | tokens | TokenPair | yes |  |
 | tokens.accessToken | string | yes | JWT carrying sid, validated per request against the session registry. |
 | tokens.refreshToken | string | yes |  |
-| tokens.expiresIn | integer | yes | Seconds |
+| tokens.expiresIn | integer | yes | Seconds until the access token expires: PasswordPolicy.accessTokenMinutes x 60, 900 by default (15 minutes; proposed, client to correct). |
 | isVerified | boolean | yes | False until an OTP or a verified provider identity confirms ownership. |
 | identityProviders | array of enum (password, otp, apple, google, uaePass) |  | Linked providers. |
 | guestLinkId | string |  | Present where the guest is linked across cells (ADR-0010). (nullable) |
 | requiresMfa | boolean |  | True only where the sign-in venue enabled guest two-step verification (VenueSettings.identity.guestTwoStep, in tenancy) and this guest has an active method (decided 29 September, rev 3 GAP-B1, per ve… (default False) |
 | mfaMethods | array of MfaMethod |  | The guest's active methods, so the client can offer the right one. |
 | mfaMethods[].id | string (uuid) | yes |  |
+| mfaMethods[].principalId | string (uuid) |  | The principal who enrolled it; null for a guest. (read-only; nullable) |
+| mfaMethods[].subjectId | string (uuid) |  | The guest who enrolled it; null for a principal. (read-only; nullable) |
+| mfaMethods[].secret | string |  | The totp shared secret, encrypted with the tenant's field key (ADR-0063); null for other kinds. (nullable) |
+| mfaMethods[].destination | string |  | The full phone number (smsOtp) or email (emailOtp) the code goes to, encrypted with the tenant's field key (ADR-0063); null for other kinds. (nullable) |
+| mfaMethods[].pendingExpiresAt | string (date-time) |  | While isActive is false, when the unconfirmed enrolment lapses; null once verified. (nullable) |
 | mfaMethods[].kind | MfaKind: enum (totp, smsOtp, emailOtp, biometric, hardwareToken) | yes |  |
 | mfaMethods[].label | string |  | (nullable) |
 | mfaMethods[].maskedTarget | string |  | Partially masked destination, so a person can tell two methods apart. (nullable) |
@@ -819,10 +853,13 @@ Where the provider's verified email matches an existing account, the identities 
 
 **`POST /auth/guest/uae-pass`**: Sign in with a national identity provider
 
+**Where the app gets what it needs to start this sign-in** (decided 20 October 2026, Chinmay, R8 blocker cause IDENTITY-C21, option A; CHG-R8SPN-025): white-label's published tenant config, which the app shell loads before sign-in, carries a read-only `guestSignIn` block with the public values only (Apple and Google client ids; the UAE Pass authorize URL and client id), derived on read from the tenant's provider rows. The client secret and the audience checks stay here, server-side, in the provider row (`identity.sso_provider.client_secret_ref`). The app mints `state`; this operation checks the redirect URI against the one registered (`DomainReadiness.uaePassRedirect`).
 OAuth authorisation-code exchange. Returns a verified identity, so an account created this way needs no further verification.
 Government onboarding has lead time and should be started before it becomes the critical path.
 
 **UAE Pass is integrated in release 1, and so is the ICP identity check** (decided 2 October 2026, Chinmay, critical set 2, BO-627; DEC-457; CHG-CSP-034). Both need the client's access to the providers (UAE Pass onboarding and an ICP service agreement), which is an external dependency the client owns. A UAE Pass identity counts as ID-verified (`IdentityGuestVerificationPolicy.uaePassSatisfiesIdDocument`); the ICP check is a document verification, not a sign-in (`IdentityGuestVerificationPolicy.verificationProvider` `icp`). Each venue's own redirect URI is part of its domain setup (white-label `CustomDomain`; DEC-547).
+
+**What it stores** (R8 blocker IDENTITY-C54, CHG-R8MIG-015): a `pii.subject_identity` row (`provider` `uaePass`, the UAE Pass user id as `providerSubject`), and on a new account a `pii.subject_document` of kind `emiratesId` with the number from the UAE Pass identity-number claim (the claim's name to be confirmed with the client's UAE Pass sandbox).
 
 |  |  |
 |---|---|
@@ -832,8 +869,8 @@ Government onboarding has lead time and should be started before it becomes the 
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `identity.mfa_method`, `pii.subject_contact` |
-| Writes | `cache:idempotency`, `identity.guest_session`, `pii.subject`, `pii.subject_document`, `platform.outbox` |
+| Reads | `cache:idempotency`, `identity.mfa_method`, `pii.subject_contact`, `pii.subject_identity` |
+| Writes | `cache:idempotency`, `identity.guest_session`, `pii.subject`, `pii.subject_document`, `pii.subject_identity`, `platform.outbox` |
 | Called by | GST-042, WEB-016 |
 
 **Parameters**
@@ -861,13 +898,18 @@ Government onboarding has lead time and should be started before it becomes the 
 | tokens | TokenPair | yes |  |
 | tokens.accessToken | string | yes | JWT carrying sid, validated per request against the session registry. |
 | tokens.refreshToken | string | yes |  |
-| tokens.expiresIn | integer | yes | Seconds |
+| tokens.expiresIn | integer | yes | Seconds until the access token expires: PasswordPolicy.accessTokenMinutes x 60, 900 by default (15 minutes; proposed, client to correct). |
 | isVerified | boolean | yes | False until an OTP or a verified provider identity confirms ownership. |
 | identityProviders | array of enum (password, otp, apple, google, uaePass) |  | Linked providers. |
 | guestLinkId | string |  | Present where the guest is linked across cells (ADR-0010). (nullable) |
 | requiresMfa | boolean |  | True only where the sign-in venue enabled guest two-step verification (VenueSettings.identity.guestTwoStep, in tenancy) and this guest has an active method (decided 29 September, rev 3 GAP-B1, per ve… (default False) |
 | mfaMethods | array of MfaMethod |  | The guest's active methods, so the client can offer the right one. |
 | mfaMethods[].id | string (uuid) | yes |  |
+| mfaMethods[].principalId | string (uuid) |  | The principal who enrolled it; null for a guest. (read-only; nullable) |
+| mfaMethods[].subjectId | string (uuid) |  | The guest who enrolled it; null for a principal. (read-only; nullable) |
+| mfaMethods[].secret | string |  | The totp shared secret, encrypted with the tenant's field key (ADR-0063); null for other kinds. (nullable) |
+| mfaMethods[].destination | string |  | The full phone number (smsOtp) or email (emailOtp) the code goes to, encrypted with the tenant's field key (ADR-0063); null for other kinds. (nullable) |
+| mfaMethods[].pendingExpiresAt | string (date-time) |  | While isActive is false, when the unconfirmed enrolment lapses; null once verified. (nullable) |
 | mfaMethods[].kind | MfaKind: enum (totp, smsOtp, emailOtp, biometric, hardwareToken) | yes |  |
 | mfaMethods[].label | string |  | (nullable) |
 | mfaMethods[].maskedTarget | string |  | Partially masked destination, so a person can tell two methods apart. (nullable) |
@@ -940,6 +982,8 @@ A guest who bought without an account, then registered. **The guest names one bo
 **`POST /auth/guest/register`**: Create a guest account
 
 Email or mobile. Verification follows via OTP; the account exists but is unverified until then, and an unverified account may browse and fill a cart but not transact — the gate is the checkout page (`WEB-011`, `GST-041`), not the cart, and `checkoutCart` refuses until the guest is verified or has proved the contact by code. The full rule, including per-site guest checkout, is on `verifyGuestEmail` (decided 17 September 2026; gate moved to checkout by ADR-0045, 18 September 2026).
+**With `channel` `email` it sends the six-digit code** the approved screens ask for (R8 blocker fix, IDENTITY-C38): an `identity.otp_challenge` row with purpose `emailVerification`, channel `email`, and the venue's attempt limit, which the guest enters through `verifyGuestEmail` with `mode` `code`. The `GuestSession` returned here is the session the guest continues in; it becomes verified when the code is confirmed, and `linkGuestCheckout` then runs under that same session.
+**The consents given at registration are recorded by Marketing, which owns consent** (20 October 2026, R8 blocker cause IDENTITY-C55; CHG-R8SPN-029). Identity stores none of them: in the same transaction as the account it writes `identity.guestRegistered` to the outbox carrying the new `subjectId`, the channel and each `consents[]` item (purpose, granted, noticeVersion), and Marketing's consumer records one consent per item through its own `recordConsent` rules (source `registration`, idempotent on the event id and purpose). A registration with no `consents` still emits the event, with an empty list. Later changes of mind go through `recordConsent` directly (F56 step 5).
 
 |  |  |
 |---|---|
@@ -950,7 +994,7 @@ Email or mobile. Verification follows via OTP; the account exists but is unverif
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `identity.mfa_method`, `pii.subject` |
-| Writes | `cache:idempotency`, `identity.guest_credential`, `identity.guest_session`, `pii.subject`, `pii.subject_contact`, `platform.outbox` |
+| Writes | `cache:idempotency`, `identity.guest_credential`, `identity.guest_session`, `identity.otp_challenge`, `pii.subject`, `pii.subject_contact`, `platform.outbox` |
 | Called by | GST-010, GST-042, WEB-013, WEB-016 |
 
 **Parameters**
@@ -982,13 +1026,18 @@ Email or mobile. Verification follows via OTP; the account exists but is unverif
 | tokens | TokenPair | yes |  |
 | tokens.accessToken | string | yes | JWT carrying sid, validated per request against the session registry. |
 | tokens.refreshToken | string | yes |  |
-| tokens.expiresIn | integer | yes | Seconds |
+| tokens.expiresIn | integer | yes | Seconds until the access token expires: PasswordPolicy.accessTokenMinutes x 60, 900 by default (15 minutes; proposed, client to correct). |
 | isVerified | boolean | yes | False until an OTP or a verified provider identity confirms ownership. |
 | identityProviders | array of enum (password, otp, apple, google, uaePass) |  | Linked providers. |
 | guestLinkId | string |  | Present where the guest is linked across cells (ADR-0010). (nullable) |
 | requiresMfa | boolean |  | True only where the sign-in venue enabled guest two-step verification (VenueSettings.identity.guestTwoStep, in tenancy) and this guest has an active method (decided 29 September, rev 3 GAP-B1, per ve… (default False) |
 | mfaMethods | array of MfaMethod |  | The guest's active methods, so the client can offer the right one. |
 | mfaMethods[].id | string (uuid) | yes |  |
+| mfaMethods[].principalId | string (uuid) |  | The principal who enrolled it; null for a guest. (read-only; nullable) |
+| mfaMethods[].subjectId | string (uuid) |  | The guest who enrolled it; null for a principal. (read-only; nullable) |
+| mfaMethods[].secret | string |  | The totp shared secret, encrypted with the tenant's field key (ADR-0063); null for other kinds. (nullable) |
+| mfaMethods[].destination | string |  | The full phone number (smsOtp) or email (emailOtp) the code goes to, encrypted with the tenant's field key (ADR-0063); null for other kinds. (nullable) |
+| mfaMethods[].pendingExpiresAt | string (date-time) |  | While isActive is false, when the unconfirmed enrolment lapses; null once verified. (nullable) |
 | mfaMethods[].kind | MfaKind: enum (totp, smsOtp, emailOtp, biometric, hardwareToken) | yes |  |
 | mfaMethods[].label | string |  | (nullable) |
 | mfaMethods[].maskedTarget | string |  | Partially masked destination, so a person can tell two methods apart. (nullable) |
@@ -1096,13 +1145,18 @@ Delivered by WhatsApp, SMS or email. Rate-limited per identifier and per source 
 | tokens | TokenPair | yes |  |
 | tokens.accessToken | string | yes | JWT carrying sid, validated per request against the session registry. |
 | tokens.refreshToken | string | yes |  |
-| tokens.expiresIn | integer | yes | Seconds |
+| tokens.expiresIn | integer | yes | Seconds until the access token expires: PasswordPolicy.accessTokenMinutes x 60, 900 by default (15 minutes; proposed, client to correct). |
 | isVerified | boolean | yes | False until an OTP or a verified provider identity confirms ownership. |
 | identityProviders | array of enum (password, otp, apple, google, uaePass) |  | Linked providers. |
 | guestLinkId | string |  | Present where the guest is linked across cells (ADR-0010). (nullable) |
 | requiresMfa | boolean |  | True only where the sign-in venue enabled guest two-step verification (VenueSettings.identity.guestTwoStep, in tenancy) and this guest has an active method (decided 29 September, rev 3 GAP-B1, per ve… (default False) |
 | mfaMethods | array of MfaMethod |  | The guest's active methods, so the client can offer the right one. |
 | mfaMethods[].id | string (uuid) | yes |  |
+| mfaMethods[].principalId | string (uuid) |  | The principal who enrolled it; null for a guest. (read-only; nullable) |
+| mfaMethods[].subjectId | string (uuid) |  | The guest who enrolled it; null for a principal. (read-only; nullable) |
+| mfaMethods[].secret | string |  | The totp shared secret, encrypted with the tenant's field key (ADR-0063); null for other kinds. (nullable) |
+| mfaMethods[].destination | string |  | The full phone number (smsOtp) or email (emailOtp) the code goes to, encrypted with the tenant's field key (ADR-0063); null for other kinds. (nullable) |
+| mfaMethods[].pendingExpiresAt | string (date-time) |  | While isActive is false, when the unconfirmed enrolment lapses; null once verified. (nullable) |
 | mfaMethods[].kind | MfaKind: enum (totp, smsOtp, emailOtp, biometric, hardwareToken) | yes |  |
 | mfaMethods[].label | string |  | (nullable) |
 | mfaMethods[].maskedTarget | string |  | Partially masked destination, so a person can tell two methods apart. (nullable) |
@@ -1231,6 +1285,8 @@ Includes what is held and where it came from. **Excludes another guest's data ev
 Requires SESSION_FORCE_LOGOUT. Exists because §3.1.3 rejects rather than displaces a second login — an operator who went home still logged in would otherwise be locked out until token expiry.
 **Callable on the POS-000 door with no session, under a supervisor's PIN step-up** (Chinmay, 3 October 2026, Block A business rules: "POS-000: session management stays on the door"; CHG-RUL-015, which reverses CHG-DOOR-003 for this). Somebody else is signed in to the till, so nobody at it has a session: the till calls this with no token (`security` admits `{}`), names itself (`workstationId`), and carries the supervisor's own principal and PIN (`supervisorStepUp` in the body). The PIN is verified against the principal as `common.yaml` `SupervisorStepUp` says; that principal must hold `SESSION_FORCE_LOGOUT` at the till's venue, and the call reaches only a session at a workstation of that venue. Anything else is `403 supervisor-step-up-refused` and nothing is read or written. **No session is opened** by the step-up: it authorises this one call. With a session (BO-053 Staff Directory) the caller's own `SESSION_FORCE_LOGOUT` applies as before and no step-up is asked.
 
+**What it writes** (R8 blocker IDENTITY-C46, CHG-R8MIG-015): the session's `status` `terminated`, `endedAt`, `endedByPrincipalId` (the caller, or the supervisor of the step-up) and `endReason` (the body's `reason`), and one `identity.authz_audit` row for the decision.
+
 |  |  |
 |---|---|
 | Permission | `SESSION_FORCE_LOGOUT` |
@@ -1240,7 +1296,7 @@ Requires SESSION_FORCE_LOGOUT. Exists because §3.1.3 rejects rather than displa
 | Offline | no |
 | Conflict policy | append |
 | Step-up auth | pin |
-| Reads | `cache:idempotency`, `identity.delegated_access`, `identity.password_policy`, `identity.principal`, `identity.principal_credential`, `identity.session`, `platform.workstation` |
+| Reads | `cache:idempotency`, `identity.delegated_access`, `identity.password_policy`, `identity.principal`, `identity.principal_credential`, `identity.role_permission`, `identity.session`, `platform.workstation` |
 | Writes | `cache:idempotency`, `identity.principal_credential`, `identity.session` |
 | Called by | BO-053, POS-000 |
 | State model | Operator session ([states/operator-session.yaml](../../../states/operator-session.yaml)): moves `active` -> `terminated` |
@@ -1250,16 +1306,17 @@ Requires SESSION_FORCE_LOGOUT. Exists because §3.1.3 rejects rather than displa
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
-| sessionId | path | yes | string (uuid) |  |
+| sessionId | path | yes | string (uuid) | The sessionId of an ActiveSession from listActiveSessions (the session's identity.session.id). |
 
 **Request body**
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| reason | string | yes | (min length 3; max length 500) |
+| reason | string |  | Why the session is ended. (min length 3; max length 500; default supervisor-takeover) |
 | workstationId | string (uuid) |  | The till making the call. (nullable) |
 | supervisorStepUp | object |  | The supervisor ending the session, signing on this device. |
-| supervisorStepUp.principalId | string (uuid) | yes | The supervisor signing. |
+| supervisorStepUp.principalId | string (uuid) |  | The supervisor signing. |
+| supervisorStepUp.supervisorUsername | string |  | The supervisor's employee number, which is what the step-up prompt asks for (R8 blocker fix, IDENTITY-C44). (max length 200) |
 | supervisorStepUp.credential | string | yes | The supervisor's staff PIN, as they sign in at a till with it. (max length 512) |
 
 **Responses**
@@ -1275,6 +1332,8 @@ Requires SESSION_FORCE_LOGOUT. Exists because §3.1.3 rejects rather than displa
 
 **`GET /auth/session`**: Current session and effective permissions
 
+**A session that is not yet usable answers `409 session-pending`** (R8 blocker fix, IDENTITY-C04, lead answer A of 20 October 2026). While a role has not been chosen, a credential change is required, or a second factor is required, there is no `Session` to return (`roleId` and the permissions do not exist yet), so the answer is a `409` problem with `pending`, a list of the steps still to do, in order, from `credentialChange`, `mfa`, `roleSelection`. `Session.roleId` stays required: no schema change. EMP-002's context panel and POS-000's background read treat the `409` as "not yet" and render once `selectRole` returns its `Session`. `LoginResponse.session` is present only when no step is pending.
+
 |  |  |
 |---|---|
 | Permission | `None` |
@@ -1284,7 +1343,7 @@ Requires SESSION_FORCE_LOGOUT. Exists because §3.1.3 rejects rather than displa
 | Offline | yes |
 | Conflict policy | serverWins |
 | Read routing | primary |
-| Reads | `cache:resolution`, `identity.delegated_access`, `identity.principal`, `identity.role`, `identity.session` |
+| Reads | `cache:resolution`, `identity.delegated_access`, `identity.password_policy`, `identity.principal`, `identity.role`, `identity.role_permission`, `identity.session` |
 | Writes | `cache:resolution` |
 | Called by | ADM-001, EMP-001, EMP-002, EMP-042, POS-000, PTR-001, SCN-001, SUP-001 |
 
@@ -1323,14 +1382,27 @@ Requires SESSION_FORCE_LOGOUT. Exists because §3.1.3 rejects rather than displa
 | workstation.cellName | string |  | The cell this workstation's region is served from, which is the cell the commerce host answering this request is deployed in (one cell per tenant per region, ADR-0014): the host fills it from its own… |
 | workstation.deploymentProfile | enum (terminalLocal, venueEdge, thin) |  | Whether this surface reads catalogue locally (ADR-0013). |
 | workstation.pinLength | enum (4, 6, 8) |  | The tenant's PasswordPolicy.pinLength, carried to the device (14 October 2026, CHG-CRD-002, ADAM CR-078). (read-only) |
+| availableRoles | array of RoleSummary |  | The roles the principal may choose, one per grant (IDENTITY-C45, CHG-R8SPN-032), resolved on read as LoginResponse.availableRoles is, so EMP-002 can list them on a cold open or after a relaunch (getC… (read-only) |
+| availableRoles[].id | string (uuid) | yes |  |
+| availableRoles[].code | string | yes |  |
+| availableRoles[].name | string | yes |  |
+| availableRoles[].isPrimary | boolean |  | True for the role that is the principal's primaryRoleId (identity.principal.primary_role_id); false for the others (14 October 2026, ADAM CR-077; CHG-IDR-002). |
+| availableRoles[].grantId | string (uuid) |  | The grant this card stands for (identity.delegated_access.id; IDENTITY-C45, CHG-R8SPN-032). |
+| availableRoles[].scope | object |  | The scope node the grant is held at (platform.scope), with its name, so the card can say which venue (IDENTITY-C45). |
+| availableRoles[].scope.id | string (uuid) | yes |  |
+| availableRoles[].scope.level | ScopeLevel: enum (tenant, brand, region, venue, department, subDepartment, workstation, outlet, …) | yes | The eight organisational levels, plus subject. |
+| availableRoles[].scope.path | string | yes | Materialised ltree path. |
+| availableRoles[].scope.code | string |  | (nullable) |
+| availableRoles[].scope.name | string |  | (nullable) |
 | openedAt | string (date-time) |  |  |
-| expiresAt | string (date-time) |  |  |
+| expiresAt | string (date-time) |  | When the session ends at the latest: openedAt plus PasswordPolicy.sessionMaxHours (12 hours by default; proposed, client to correct). |
 
 **Responses**
 
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Active session |
+| 409 |  | The session is pending (session-pending); pending names the steps left. |
 | 401 | Unauthorized | Missing, expired or superseded session |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
@@ -1344,6 +1416,9 @@ Covers a primary holder assigning entitlements, a group leader holding tickets, 
 **This does not make the work smaller** — extending grants to guest-held, object-scoped authority is real work touching `orders`, `access` and `retail`. **It makes it one piece of work rather than four.**
 
 **Who grants, and the minor rule — decided 28 September, audit R126 (3).** **The account holder grants**: the guest whose account the authority is over (`overSubjectId`), or, where that guest is a minor, the adult account holder the minor is linked to. A guest caller may not grant authority over anybody else's account; staff holding `GUEST_MANAGE` record a grant on the account holder's behalf. **A subject with no date of birth on file is treated as a minor.** The age below which a subject is a minor is an open value that client counsel sets; it is not assumed here.
+
+**Built with a configurable age** (decided 20 October 2026, Chinmay, R8 blocker cause IDENTITY-C19, option A; CHG-R8SPN-024; R205 still open with counsel): a subject is a minor below `tenancy.RegionSettings.minorAgeThreshold` (18 by default, set per country), or with no date of birth. **When the 409 `minor-grants-adult-authority` happens**: the holder the grant is for (the path's `subjectId`) is a minor and `overSubjectId` is an adult, whoever calls, a guest or staff on the guest's behalf. **How the first adult link over a minor is made**: the adult enrols the child from GST-069 (R205), which writes a `familyMember` or `primaryHolder` grant held by the adult over the child, with the adult as grantor; this operation is how later grants are added.
+**What a guest-made grant stores** (R8 blocker IDENTITY-C42, the lead's answer A; CHG-R8MIG-021): `grantedByKind` `subject` and `grantedBySubjectId` the granting guest (no principal); `scopePath` the tenant root (a guest account is tenant-wide); `effect` ALLOW; `permission` one of the guest-delegable list for its `delegationKind` (proposed, client to confirm): `primaryHolder` and `familyMember` ORDER_VIEW, ORDER_CREATE, WALLET_VIEW; `carer` and `attendee` ORDER_VIEW; `groupLeader` ORDER_VIEW, ORDER_CREATE; `corporateAdmin` ORDER_VIEW, ORDER_CREATE, WALLET_VIEW, WALLET_OPERATE; `corporateMember` ORDER_VIEW. Any other permission from a guest is refused 403. A revocation by a guest is recorded the same way. Staff recording a grant on the holder's behalf store `grantedByKind` `principal`; the SSO callback's group-to-role grants store `system`.
 
 |  |  |
 |---|---|
@@ -1381,12 +1456,17 @@ Covers a primary holder assigning entitlements, a group leader holding tickets, 
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
+| grantedByKind | enum (principal, subject, system) |  | Who made the grant (CHG-R8MIG-021). (default principal; read-only) |
+| grantedByPrincipalId | string (uuid) |  | The staff member who made the grant; set when grantedByKind is principal. (read-only; nullable) |
+| grantedBySubjectId | string (uuid) |  | The guest who made the grant (the account holder); set when grantedByKind is subject. (read-only; nullable) |
 | id | string (uuid) | yes |  |
 | principalId | string (uuid) |  | (nullable) |
-| roleId | string (uuid) |  | (nullable) |
-| permission | string | yes | From the permission enum. |
+| roleId | string (uuid) |  | The role this grant gives, with its own and inherited permissions. (nullable) |
+| permission | string | yes | From the permission enum. (nullable) |
 | subjectId | string (uuid) |  | CF-132, CL-05. (nullable) |
 | overSubjectId | string (uuid) |  | Whose behalf. (nullable) |
+| overSubjectName | string |  | The display name of the guest acted for (pii.subject.display_name), read with the grant; null for a staff grant. (read-only; nullable) |
+| overSubjectIsMinor | boolean |  | Whether the guest acted for is under the region's RegionSettings.minorAgeThreshold today, computed from their date of birth, which is never returned; null when no date of birth is held. (read-only; nullable) |
 | overObjectRef | string |  | Where the authority is over a thing rather than a scope — a wallet, an entitlement, a booking. (nullable) |
 | delegationKind | enum (primaryHolder, familyMember, groupLeader, attendee, corporateAdmin, corporateMember, carer) |  | What kind of relationship this expresses, for display and for reporting. (nullable) |
 | quota | integer |  | 2.14.15 and 4.3.11. (nullable) |
@@ -1443,12 +1523,17 @@ CF-132. **Both directions, because a guest is usually in both.** A parent holds 
 |---|---|---|---|
 | items | object | yes |  |
 | items.heldByThisGuest | array of DelegatedAccess |  |  |
+| items.heldByThisGuest[].grantedByKind | enum (principal, subject, system) |  | Who made the grant (CHG-R8MIG-021). (default principal; read-only) |
+| items.heldByThisGuest[].grantedByPrincipalId | string (uuid) |  | The staff member who made the grant; set when grantedByKind is principal. (read-only; nullable) |
+| items.heldByThisGuest[].grantedBySubjectId | string (uuid) |  | The guest who made the grant (the account holder); set when grantedByKind is subject. (read-only; nullable) |
 | items.heldByThisGuest[].id | string (uuid) | yes |  |
 | items.heldByThisGuest[].principalId | string (uuid) |  | (nullable) |
-| items.heldByThisGuest[].roleId | string (uuid) |  | (nullable) |
-| items.heldByThisGuest[].permission | string | yes | From the permission enum. |
+| items.heldByThisGuest[].roleId | string (uuid) |  | The role this grant gives, with its own and inherited permissions. (nullable) |
+| items.heldByThisGuest[].permission | string | yes | From the permission enum. (nullable) |
 | items.heldByThisGuest[].subjectId | string (uuid) |  | CF-132, CL-05. (nullable) |
 | items.heldByThisGuest[].overSubjectId | string (uuid) |  | Whose behalf. (nullable) |
+| items.heldByThisGuest[].overSubjectName | string |  | The display name of the guest acted for (pii.subject.display_name), read with the grant; null for a staff grant. (read-only; nullable) |
+| items.heldByThisGuest[].overSubjectIsMinor | boolean |  | Whether the guest acted for is under the region's RegionSettings.minorAgeThreshold today, computed from their date of birth, which is never returned; null when no date of birth is held. (read-only; nullable) |
 | items.heldByThisGuest[].overObjectRef | string |  | Where the authority is over a thing rather than a scope — a wallet, an entitlement, a booking. (nullable) |
 | items.heldByThisGuest[].delegationKind | enum (primaryHolder, familyMember, groupLeader, attendee, corporateAdmin, corporateMember, carer) |  | What kind of relationship this expresses, for display and for reporting. (nullable) |
 | items.heldByThisGuest[].quota | integer |  | 2.14.15 and 4.3.11. (nullable) |
@@ -1462,12 +1547,17 @@ CF-132. **Both directions, because a guest is usually in both.** A parent holds 
 | items.heldByThisGuest[].createdByPrincipalId | string (uuid) |  |  |
 | items.heldByThisGuest[].createdAt | string (date-time) |  |  |
 | items.heldOverThisGuest | array of DelegatedAccess |  |  |
+| items.heldOverThisGuest[].grantedByKind | enum (principal, subject, system) |  | Who made the grant (CHG-R8MIG-021). (default principal; read-only) |
+| items.heldOverThisGuest[].grantedByPrincipalId | string (uuid) |  | The staff member who made the grant; set when grantedByKind is principal. (read-only; nullable) |
+| items.heldOverThisGuest[].grantedBySubjectId | string (uuid) |  | The guest who made the grant (the account holder); set when grantedByKind is subject. (read-only; nullable) |
 | items.heldOverThisGuest[].id | string (uuid) | yes |  |
 | items.heldOverThisGuest[].principalId | string (uuid) |  | (nullable) |
-| items.heldOverThisGuest[].roleId | string (uuid) |  | (nullable) |
-| items.heldOverThisGuest[].permission | string | yes | From the permission enum. |
+| items.heldOverThisGuest[].roleId | string (uuid) |  | The role this grant gives, with its own and inherited permissions. (nullable) |
+| items.heldOverThisGuest[].permission | string | yes | From the permission enum. (nullable) |
 | items.heldOverThisGuest[].subjectId | string (uuid) |  | CF-132, CL-05. (nullable) |
 | items.heldOverThisGuest[].overSubjectId | string (uuid) |  | Whose behalf. (nullable) |
+| items.heldOverThisGuest[].overSubjectName | string |  | The display name of the guest acted for (pii.subject.display_name), read with the grant; null for a staff grant. (read-only; nullable) |
+| items.heldOverThisGuest[].overSubjectIsMinor | boolean |  | Whether the guest acted for is under the region's RegionSettings.minorAgeThreshold today, computed from their date of birth, which is never returned; null when no date of birth is held. (read-only; nullable) |
 | items.heldOverThisGuest[].overObjectRef | string |  | Where the authority is over a thing rather than a scope — a wallet, an entitlement, a booking. (nullable) |
 | items.heldOverThisGuest[].delegationKind | enum (primaryHolder, familyMember, groupLeader, attendee, corporateAdmin, corporateMember, carer) |  | What kind of relationship this expresses, for display and for reporting. (nullable) |
 | items.heldOverThisGuest[].quota | integer |  | 2.14.15 and 4.3.11. (nullable) |
@@ -1505,7 +1595,8 @@ One sign-in for every staff and partner door. **A browser door sends no `worksta
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `identity.delegated_access`, `identity.mfa_method`, `identity.password_policy`, `identity.principal`, `identity.principal_credential`, `identity.role` |
+| Offline note | Signing in needs the network on every staff device in r8 (decided 20 October 2026, Chinmay, R8 blocker cause IDENTITY-C01; CHG-R8SPN-027). |
+| Reads | `cache:idempotency`, `identity.delegated_access`, `identity.mfa_method`, `identity.password_policy`, `identity.principal`, `identity.principal_credential`, `identity.role`, `identity.role_permission` |
 | Writes | `cache:idempotency`, `identity.principal_credential`, `identity.refresh_token`, `identity.session`, `platform.outbox` |
 | Called by | ADM-001, EMP-001, POS-000, PTR-001, SCN-001, SUP-001 |
 
@@ -1520,7 +1611,7 @@ One sign-in for every staff and partner door. **A browser door sends no `worksta
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | username | string | yes | (max length 256) |
-| credential | string | yes | Password, PIN, card token or RFID token depending on method. (max length 512) |
+| credential | string | yes | The password for password; the PIN for pin, card and rfid. (max length 512) |
 | method | enum (password, pin, card, rfid, sso) |  | pin is how a till is actually used. (default password) |
 | workstationId | string (uuid) |  | Identifies the device. |
 | deviceFingerprint | string |  | (max length 256) |
@@ -1531,13 +1622,18 @@ One sign-in for every staff and partner door. **A browser door sends no `worksta
 |---|---|---|---|
 | accessToken | string | yes | JWT carrying sid, validated per request against the session registry. |
 | refreshToken | string | yes |  |
-| expiresIn | integer | yes | Seconds |
+| expiresIn | integer | yes | Seconds until the access token expires: PasswordPolicy.accessTokenMinutes x 60, 900 by default (15 minutes; proposed, client to correct). |
 | mustChangeCredential | boolean | yes | The credential just used is temporary (14 October 2026, CHG-CRD-001, ADAM CR-078): the principal's Principal.mustChangeCredential, set at creation and by resetPrincipalCredential. |
 | requiresRoleSelection | boolean | yes |  |
 | requiresMfa | boolean | yes | True when the principal holds any permission listed in PasswordPolicy.mfaRequiredForPermissions (decided 28 September, audit R135). |
 | hasMfaMethod | boolean |  | Whether the principal has an active MFA method. |
 | mfaMethods | array of MfaMethod |  | The principal's active methods, so the client can offer the right one for the signIn challenge. |
 | mfaMethods[].id | string (uuid) | yes |  |
+| mfaMethods[].principalId | string (uuid) |  | The principal who enrolled it; null for a guest. (read-only; nullable) |
+| mfaMethods[].subjectId | string (uuid) |  | The guest who enrolled it; null for a principal. (read-only; nullable) |
+| mfaMethods[].secret | string |  | The totp shared secret, encrypted with the tenant's field key (ADR-0063); null for other kinds. (nullable) |
+| mfaMethods[].destination | string |  | The full phone number (smsOtp) or email (emailOtp) the code goes to, encrypted with the tenant's field key (ADR-0063); null for other kinds. (nullable) |
+| mfaMethods[].pendingExpiresAt | string (date-time) |  | While isActive is false, when the unconfirmed enrolment lapses; null once verified. (nullable) |
 | mfaMethods[].kind | MfaKind: enum (totp, smsOtp, emailOtp, biometric, hardwareToken) | yes |  |
 | mfaMethods[].label | string |  | (nullable) |
 | mfaMethods[].maskedTarget | string |  | Partially masked destination, so a person can tell two methods apart. (nullable) |
@@ -1550,6 +1646,13 @@ One sign-in for every staff and partner door. **A browser door sends no `worksta
 | availableRoles[].code | string | yes |  |
 | availableRoles[].name | string | yes |  |
 | availableRoles[].isPrimary | boolean |  | True for the role that is the principal's primaryRoleId (identity.principal.primary_role_id); false for the others (14 October 2026, ADAM CR-077; CHG-IDR-002). |
+| availableRoles[].grantId | string (uuid) |  | The grant this card stands for (identity.delegated_access.id; IDENTITY-C45, CHG-R8SPN-032). |
+| availableRoles[].scope | object |  | The scope node the grant is held at (platform.scope), with its name, so the card can say which venue (IDENTITY-C45). |
+| availableRoles[].scope.id | string (uuid) | yes |  |
+| availableRoles[].scope.level | ScopeLevel: enum (tenant, brand, region, venue, department, subDepartment, workstation, outlet, …) | yes | The eight organisational levels, plus subject. |
+| availableRoles[].scope.path | string | yes | Materialised ltree path. |
+| availableRoles[].scope.code | string |  | (nullable) |
+| availableRoles[].scope.name | string |  | (nullable) |
 | session | Session |  |  |
 | session.sessionId | string (uuid) | yes |  |
 | session.principalId | string (uuid) | yes |  |
@@ -1579,8 +1682,15 @@ One sign-in for every staff and partner door. **A browser door sends no `worksta
 | session.workstation.cellName | string |  | The cell this workstation's region is served from, which is the cell the commerce host answering this request is deployed in (one cell per tenant per region, ADR-0014): the host fills it from its own… |
 | session.workstation.deploymentProfile | enum (terminalLocal, venueEdge, thin) |  | Whether this surface reads catalogue locally (ADR-0013). |
 | session.workstation.pinLength | enum (4, 6, 8) |  | The tenant's PasswordPolicy.pinLength, carried to the device (14 October 2026, CHG-CRD-002, ADAM CR-078). (read-only) |
+| session.availableRoles | array of RoleSummary |  | The roles the principal may choose, one per grant (IDENTITY-C45, CHG-R8SPN-032), resolved on read as LoginResponse.availableRoles is, so EMP-002 can list them on a cold open or after a relaunch (getC… (read-only) |
+| session.availableRoles[].id | string (uuid) | yes |  |
+| session.availableRoles[].code | string | yes |  |
+| session.availableRoles[].name | string | yes |  |
+| session.availableRoles[].isPrimary | boolean |  | True for the role that is the principal's primaryRoleId (identity.principal.primary_role_id); false for the others (14 October 2026, ADAM CR-077; CHG-IDR-002). |
+| session.availableRoles[].grantId | string (uuid) |  | The grant this card stands for (identity.delegated_access.id; IDENTITY-C45, CHG-R8SPN-032). |
+| session.availableRoles[].scope | object |  | The scope node the grant is held at (platform.scope), with its name, so the card can say which venue (IDENTITY-C45). |
 | session.openedAt | string (date-time) |  |  |
-| session.expiresAt | string (date-time) |  |  |
+| session.expiresAt | string (date-time) |  | When the session ends at the latest: openedAt plus PasswordPolicy.sessionMaxHours (12 hours by default; proposed, client to correct). |
 
 **Responses**
 
@@ -1590,11 +1700,13 @@ One sign-in for every staff and partner door. **A browser door sends no `worksta
 | 400 | BadRequest | Validation failed |
 | 401 |  | The username and credential do not match (unauthenticated; one answer for an unknown username and a wrong credential), or the principal signs in only through the tenant's single sign-on (sso-sign-in-… |
 | 409 |  | An active session already exists for this principal on another device. |
-| 429 |  | The request budget is exceeded (rate-limited), or this principal's password or PIN is locked after too many wrong attempts (credential-locked, 14 October 2026, CHG-CRD-001): PrincipalCredential.locke… |
+| 429 |  | The request budget is exceeded (rate-limited), or this principal's password or PIN is locked after too many wrong attempts (credential-locked, 14 October 2026, CHG-CRD-001; an unknown username is loc… |
 
 ### refreshToken
 
 **`POST /auth/refresh`**: Rotate the access token
+
+Exchanges a refresh token for a new access token **and a new refresh token**; the one sent is retired (rotation). A staff refresh token slides: it lives `PasswordPolicy.refreshTokenHours` (12 hours by default, proposed, client to correct) from its last use, and never past the session's `expiresAt`. **A retired refresh token sent again is a reuse**: the server ends the session, revokes every refresh token issued from the same sign-in, and answers 401, so a stolen token works at most once (IDENTITY-C25, FOUNDATION-AI-C27; CHG-R8SPN-014; the rule is written once on `bearerAuth`).
 
 |  |  |
 |---|---|
@@ -1626,7 +1738,7 @@ One sign-in for every staff and partner door. **A browser door sends no `worksta
 |---|---|---|---|
 | accessToken | string | yes | JWT carrying sid, validated per request against the session registry. |
 | refreshToken | string | yes |  |
-| expiresIn | integer | yes | Seconds |
+| expiresIn | integer | yes | Seconds until the access token expires: PasswordPolicy.accessTokenMinutes x 60, 900 by default (15 minutes; proposed, client to correct). |
 
 **Responses**
 
@@ -1646,6 +1758,8 @@ Per 12 Aug 2026 §4 — a user with one role logs in directly; a user with sever
 
 **`Session.saleBoardId` is present only on a till session** (decided 2 October 2026, Chinmay; CHG-CSP-002, breaking change BC-001 to BC-005): a session opened from a browser or a handheld has no workstation and no board, and the field is absent rather than invented.
 
+**The venue is chosen with the role** (decided 20 October 2026, Chinmay, R8 blocker cause IDENTITY-C45, option A; CHG-R8SPN-032). A role is held through a grant, and the grant carries the scope: a steward at AquaCove Abu Dhabi and at AquaCove Dubai holds two grants of one role, and `availableRoles` lists one `RoleSummary` per grant, each naming its venue (`scope`). The client sends the chosen card's `grantId`; the session's venue (`identity.session.venue_id`) and scope are set from that grant's scope. `roleId` alone still works for a role held at one venue; for a role held at several, a body with no `grantId` is refused `422 grant-required`, and a `grantId` that is not the caller's, or not of `roleId`, is `403`.
+
 |  |  |
 |---|---|
 | Permission | `None` |
@@ -1654,7 +1768,7 @@ Per 12 Aug 2026 §4 — a user with one role logs in directly; a user with sever
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `identity.delegated_access`, `identity.role`, `identity.session` |
+| Reads | `cache:idempotency`, `identity.delegated_access`, `identity.password_policy`, `identity.role`, `identity.role_permission`, `identity.session` |
 | Writes | `cache:idempotency`, `identity.session` |
 | Called by | ADM-001, EMP-001, EMP-002, POS-000, POS-001, PTR-001, SCN-001, SUP-001 |
 
@@ -1669,6 +1783,7 @@ Per 12 Aug 2026 §4 — a user with one role logs in directly; a user with sever
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | roleId | string (uuid) | yes |  |
+| grantId | string (uuid) |  | RoleSummary.grantId of the card chosen: which grant of the role, and so which venue (IDENTITY-C45, CHG-R8SPN-032). |
 
 **Response**: `Session`
 
@@ -1705,8 +1820,20 @@ Per 12 Aug 2026 §4 — a user with one role logs in directly; a user with sever
 | workstation.cellName | string |  | The cell this workstation's region is served from, which is the cell the commerce host answering this request is deployed in (one cell per tenant per region, ADR-0014): the host fills it from its own… |
 | workstation.deploymentProfile | enum (terminalLocal, venueEdge, thin) |  | Whether this surface reads catalogue locally (ADR-0013). |
 | workstation.pinLength | enum (4, 6, 8) |  | The tenant's PasswordPolicy.pinLength, carried to the device (14 October 2026, CHG-CRD-002, ADAM CR-078). (read-only) |
+| availableRoles | array of RoleSummary |  | The roles the principal may choose, one per grant (IDENTITY-C45, CHG-R8SPN-032), resolved on read as LoginResponse.availableRoles is, so EMP-002 can list them on a cold open or after a relaunch (getC… (read-only) |
+| availableRoles[].id | string (uuid) | yes |  |
+| availableRoles[].code | string | yes |  |
+| availableRoles[].name | string | yes |  |
+| availableRoles[].isPrimary | boolean |  | True for the role that is the principal's primaryRoleId (identity.principal.primary_role_id); false for the others (14 October 2026, ADAM CR-077; CHG-IDR-002). |
+| availableRoles[].grantId | string (uuid) |  | The grant this card stands for (identity.delegated_access.id; IDENTITY-C45, CHG-R8SPN-032). |
+| availableRoles[].scope | object |  | The scope node the grant is held at (platform.scope), with its name, so the card can say which venue (IDENTITY-C45). |
+| availableRoles[].scope.id | string (uuid) | yes |  |
+| availableRoles[].scope.level | ScopeLevel: enum (tenant, brand, region, venue, department, subDepartment, workstation, outlet, …) | yes | The eight organisational levels, plus subject. |
+| availableRoles[].scope.path | string | yes | Materialised ltree path. |
+| availableRoles[].scope.code | string |  | (nullable) |
+| availableRoles[].scope.name | string |  | (nullable) |
 | openedAt | string (date-time) |  |  |
-| expiresAt | string (date-time) |  |  |
+| expiresAt | string (date-time) |  | When the session ends at the latest: openedAt plus PasswordPolicy.sessionMaxHours (12 hours by default; proposed, client to correct). |
 
 **Responses**
 
@@ -1714,6 +1841,7 @@ Per 12 Aug 2026 §4 — a user with one role logs in directly; a user with sever
 |---|---|---|
 | 200 |  | Role selected, session usable |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
+| 422 |  | The role is held at more than one venue and the body names no grantId (grant-required; IDENTITY-C45, CHG-R8SPN-032). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setPasswordPolicy
@@ -1766,7 +1894,10 @@ BL-144. **Modelled on NIST SP 800-63B rather than on habit.** Length beats compo
 | pinLength | enum (4, 6, 8) |  | How many digits a staff PIN has, chosen by the tenant from a drop-down (decided by Chinmay, 14 October 2026, ADAM CR-078: "Give those as options that they select as a drop down"; CHG-CRD-002). (default 4) |
 | pinReusePrevention | enum (none, last3, last5) |  | Whether a new PIN may repeat an old one, chosen by the tenant from a drop-down (decided by Chinmay, 14 October 2026, ADAM CR-078; CHG-CRD-002): none lets a PIN be reused, last3 and last5 refuse the c… (default last5) |
 | pinLockoutAfterAttempts | enum (3, 5, 10) |  | Wrong PINs before the PIN is locked, chosen by the tenant from a drop-down (decided by Chinmay, 14 October 2026, ADAM CR-078; CHG-CRD-002). (default 5) |
-| mfaRequiredForPermissions | array of Permission: enum (SESSION_FORCE_LOGOUT, USER_MANAGE, ROLE_MANAGE, PERMISSION_GRANT, PERMISSION_VIEW, PERMISSION_MANAGE, PLATFORM_TENANT_VIEW, PLATFORM_TENANT_MANAGE, …) |  | Step-up rather than blanket MFA. (default ['ROLE_MANAGE', 'LEDGER_APPROVE', 'PLATFORM_TENANT_VIEW', 'PLATFORM_TENANT_MANAGE', 'PLATFORM_TENANT_TERMINATE', 'PLATFORM_TENANT_ACCESS', 'PLATFORM_PLAN_MANAGE', 'PLATFORM_CELL_VIEW', 'PLATFORM_CELL_MANAGE', 'PLATFORM_BILLING_VIEW', 'PLATFORM_BILLING_MANAGE', 'PLATFORM_RELEASE_VIEW', 'PLATFORM_RELEASE_MANAGE', 'PLATFORM_RELEASE_PROMOTE', 'PLATFORM_MIGRATION_VIEW', 'PLATFORM_MIGRATION_APPLY']) |
+| mfaRequiredForPermissions | array of Permission: enum (SESSION_FORCE_LOGOUT, USER_MANAGE, ROLE_MANAGE, PERMISSION_GRANT, PERMISSION_VIEW, PERMISSION_MANAGE, PLATFORM_TENANT_VIEW, PLATFORM_TENANT_MANAGE, …) |  | Step-up rather than blanket MFA. (default ['ROLE_MANAGE', 'LEDGER_APPROVE', 'PLATFORM_TENANT_VIEW', 'PLATFORM_TENANT_MANAGE', 'PLATFORM_TENANT_TERMINATE', 'PLATFORM_TENANT_ACCESS', 'PLATFORM_PLAN_MANAGE', 'PLATFORM_CELL_VIEW', 'PLATFORM_CELL_MANAGE', 'PLATFORM_BILLING_VIEW', 'PLATFORM_BILLING_MANAGE', 'PLATFORM_RELEASE_VIEW', 'PLATFORM_RELEASE_MANAGE', 'PLATFORM_RELEASE_PROMOTE', 'PLATFORM_MIGRATION_VIEW', 'PLATFORM_MIGRATION_APPLY', 'PLATFORM_AI_MANAGE']) |
+| accessTokenMinutes | integer |  | How long a staff access token lives (TokenPair.expiresIn). (min 5; max 60; default 15) |
+| refreshTokenHours | integer |  | How long a staff refresh token lives without use. (min 1; max 24; default 12) |
+| sessionMaxHours | integer |  | The longest a staff session lives (Session.expiresAt). (min 1; max 24; default 12) |
 
 **Response**: `PasswordPolicy`
 
@@ -1791,7 +1922,10 @@ BL-144. **Modelled on NIST SP 800-63B rather than on habit.** Length beats compo
 | pinLength | enum (4, 6, 8) |  | How many digits a staff PIN has, chosen by the tenant from a drop-down (decided by Chinmay, 14 October 2026, ADAM CR-078: "Give those as options that they select as a drop down"; CHG-CRD-002). (default 4) |
 | pinReusePrevention | enum (none, last3, last5) |  | Whether a new PIN may repeat an old one, chosen by the tenant from a drop-down (decided by Chinmay, 14 October 2026, ADAM CR-078; CHG-CRD-002): none lets a PIN be reused, last3 and last5 refuse the c… (default last5) |
 | pinLockoutAfterAttempts | enum (3, 5, 10) |  | Wrong PINs before the PIN is locked, chosen by the tenant from a drop-down (decided by Chinmay, 14 October 2026, ADAM CR-078; CHG-CRD-002). (default 5) |
-| mfaRequiredForPermissions | array of Permission: enum (SESSION_FORCE_LOGOUT, USER_MANAGE, ROLE_MANAGE, PERMISSION_GRANT, PERMISSION_VIEW, PERMISSION_MANAGE, PLATFORM_TENANT_VIEW, PLATFORM_TENANT_MANAGE, …) |  | Step-up rather than blanket MFA. (default ['ROLE_MANAGE', 'LEDGER_APPROVE', 'PLATFORM_TENANT_VIEW', 'PLATFORM_TENANT_MANAGE', 'PLATFORM_TENANT_TERMINATE', 'PLATFORM_TENANT_ACCESS', 'PLATFORM_PLAN_MANAGE', 'PLATFORM_CELL_VIEW', 'PLATFORM_CELL_MANAGE', 'PLATFORM_BILLING_VIEW', 'PLATFORM_BILLING_MANAGE', 'PLATFORM_RELEASE_VIEW', 'PLATFORM_RELEASE_MANAGE', 'PLATFORM_RELEASE_PROMOTE', 'PLATFORM_MIGRATION_VIEW', 'PLATFORM_MIGRATION_APPLY']) |
+| mfaRequiredForPermissions | array of Permission: enum (SESSION_FORCE_LOGOUT, USER_MANAGE, ROLE_MANAGE, PERMISSION_GRANT, PERMISSION_VIEW, PERMISSION_MANAGE, PLATFORM_TENANT_VIEW, PLATFORM_TENANT_MANAGE, …) |  | Step-up rather than blanket MFA. (default ['ROLE_MANAGE', 'LEDGER_APPROVE', 'PLATFORM_TENANT_VIEW', 'PLATFORM_TENANT_MANAGE', 'PLATFORM_TENANT_TERMINATE', 'PLATFORM_TENANT_ACCESS', 'PLATFORM_PLAN_MANAGE', 'PLATFORM_CELL_VIEW', 'PLATFORM_CELL_MANAGE', 'PLATFORM_BILLING_VIEW', 'PLATFORM_BILLING_MANAGE', 'PLATFORM_RELEASE_VIEW', 'PLATFORM_RELEASE_MANAGE', 'PLATFORM_RELEASE_PROMOTE', 'PLATFORM_MIGRATION_VIEW', 'PLATFORM_MIGRATION_APPLY', 'PLATFORM_AI_MANAGE']) |
+| accessTokenMinutes | integer |  | How long a staff access token lives (TokenPair.expiresIn). (min 5; max 60; default 15) |
+| refreshTokenHours | integer |  | How long a staff refresh token lives without use. (min 1; max 24; default 12) |
+| sessionMaxHours | integer |  | The longest a staff session lives (Session.expiresAt). (min 1; max 24; default 12) |
 
 **Responses**
 
@@ -1852,6 +1986,7 @@ BL-147, 3.3.31. **Checked at grant time, not at use time** — discovering the c
 
 **`POST /auth/guest/verify-email`**: Send a verification link, or consume one
 
+**Two ways to prove the address, one operation** (R8 blocker fix, IDENTITY-C38). The approved screens (WEB-013, GST-010, GST-073) ask for a **six-digit code**, so `mode` `code` takes it in `code`: checked against the guest's `identity.otp_challenge` row with purpose `emailVerification` and channel `email`, within the venue's attempt limit (`VenueSettings.identity.guestOtpMaxAttempts`); a wrong code is `422 email-code-invalid` with `attemptsRemaining`, as `verifyMfaChallenge` answers, and the last wrong one voids the code (`410 verification-token-expired`; ask for a new `send`). The session is the guest's own (`guestAuth`), so the code needs no address. The link path (`send` an emailed single-use link, `confirm` its `token`) stays for emailed links.
 **Raised in review by Deep.** `registerGuest` creates an account and nothing verifies the address on it — and **a guest account with an unverified email can receive somebody else's tickets**, because a transfer is offered to an address.
 Two modes on one operation: **`send` issues a single-use token; `confirm` consumes it.** One operation because they are one act with two halves, and splitting them invites a `confirm` that works without a `send`.
 **An unverified account does not buy — decided 17 September 2026**, replacing *unverified accounts still buy*, which this description said while `registerGuest` and `GuestSession.isVerified` said the opposite. Tickets go to an address, and an unproven address is how somebody receives a stranger's tickets.
@@ -1865,14 +2000,13 @@ Two modes on one operation: **`send` issues a single-use token; `confirm` consum
 
 |  |  |
 |---|---|
-| Permission | `GUEST_VIEW` |
+| Permission | `None` |
 | Scope level | tenant |
 | Part of slice | core |
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Guest callable | True |
-| Reads | `cache:idempotency`, `identity.otp_challenge`, `pii.subject` |
+| Reads | `cache:idempotency`, `identity.otp_challenge`, `pii.subject`, `pii.subject_contact` |
 | Writes | `cache:idempotency`, `identity.otp_challenge`, `marketing.message_dispatch`, `pii.subject` |
 | Called by | GST-010, GST-073, WEB-013, WEB-020 |
 
@@ -1886,7 +2020,8 @@ Two modes on one operation: **`send` issues a single-use token; `confirm` consum
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| mode | enum (send, confirm) | yes |  |
+| mode | enum (send, confirm, code) | yes |  |
+| code | string |  | For code. (pattern ^[0-9]{6}$; nullable) |
 | token | string |  | For confirm. (nullable) |
 
 **Response**: `object`
@@ -1902,6 +2037,7 @@ Two modes on one operation: **`send` issues a single-use token; `confirm` consum
 |---|---|---|
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 | 200 |  | Sent, or verified |
+| 422 |  | A wrong code (mode code), attempts one up to the limit; attemptsRemaining says how many are left. |
 | 410 |  | The token expired or was already used. |
 
 
@@ -1926,7 +2062,7 @@ A session that authenticated hours ago is not the same as a person present at th
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `identity.mfa_challenge`, `identity.mfa_method`, `identity.session` |
 | Writes | `cache:idempotency`, `identity.mfa_challenge` |
-| Called by | ADM-001, ADM-247, ADM-699, ADM-700, BO-053, BO-284, BO-293, EMP-001, GST-042, POS-000, PTR-001, PTR-029, PTR-030, PTR-035, PTR-036, PTR-040, PTR-048, SCN-001, SUP-001, WEB-016 |
+| Called by | ADM-001, ADM-018, ADM-247, ADM-699, ADM-700, BO-053, BO-284, BO-293, EMP-001, GST-042, POS-000, PTR-001, PTR-029, PTR-030, PTR-035, PTR-036, PTR-040, PTR-048, SCN-001, SUP-001, WEB-016 |
 
 **Parameters**
 
@@ -1954,7 +2090,10 @@ A session that authenticated hours ago is not the same as a person present at th
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Challenge issued |
-| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+| 403 |  | A guest caller while no venue of the tenant has guest two-step verification on (rev 3 GAP-B1, per venue). |
+| 409 |  | A guest who signed in with an email code asks for emailOtp as the second factor, because the same inbox twice is one factor (R8 blocker fix, IDENTITY-C18). |
+| 422 |  | The methodId names a method that is pending or inactive, or the principal has no active method to challenge. |
+| 429 |  | Step-up is locked (audit R126 (6)): five wrong codes voided a challenge, and no new one is issued to this principal until voidedAt plus PasswordPolicy.lockoutMinutes. |
 
 ### enrolMfaMethod
 
@@ -2032,6 +2171,7 @@ Returns a secret or challenge to complete enrolment. **The method is not active 
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Methods |
+| 403 |  | A guest caller while no venue of the tenant has guest two-step verification on (rev 3 GAP-B1, per venue). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### verifyMfaChallenge
@@ -2050,9 +2190,9 @@ For a `signIn` challenge (decided 28 September, audit R135) a correct code compl
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `identity.mfa_challenge`, `identity.mfa_recovery_code`, `identity.password_policy` |
+| Reads | `cache:idempotency`, `identity.mfa_challenge`, `identity.mfa_method`, `identity.mfa_recovery_code`, `identity.password_policy`, `identity.session` |
 | Writes | `cache:idempotency`, `identity.mfa_challenge`, `identity.mfa_recovery_code`, `identity.session`, `platform.outbox` |
-| Called by | ADM-001, ADM-247, ADM-699, ADM-700, BO-053, BO-284, BO-293, EMP-001, GST-042, POS-000, PTR-001, PTR-029, PTR-030, PTR-035, PTR-036, PTR-040, PTR-048, SCN-001, SUP-001, WEB-016 |
+| Called by | ADM-001, ADM-018, ADM-247, ADM-699, ADM-700, BO-053, BO-284, BO-293, EMP-001, GST-042, POS-000, PTR-001, PTR-029, PTR-030, PTR-035, PTR-036, PTR-040, PTR-048, SCN-001, SUP-001, WEB-016 |
 
 **Parameters**
 
@@ -2102,15 +2242,22 @@ For a `signIn` challenge (decided 28 September, audit R135) a correct code compl
 | session.workstation.cellName | string |  | The cell this workstation's region is served from, which is the cell the commerce host answering this request is deployed in (one cell per tenant per region, ADR-0014): the host fills it from its own… |
 | session.workstation.deploymentProfile | enum (terminalLocal, venueEdge, thin) |  | Whether this surface reads catalogue locally (ADR-0013). |
 | session.workstation.pinLength | enum (4, 6, 8) |  | The tenant's PasswordPolicy.pinLength, carried to the device (14 October 2026, CHG-CRD-002, ADAM CR-078). (read-only) |
+| session.availableRoles | array of RoleSummary |  | The roles the principal may choose, one per grant (IDENTITY-C45, CHG-R8SPN-032), resolved on read as LoginResponse.availableRoles is, so EMP-002 can list them on a cold open or after a relaunch (getC… (read-only) |
+| session.availableRoles[].id | string (uuid) | yes |  |
+| session.availableRoles[].code | string | yes |  |
+| session.availableRoles[].name | string | yes |  |
+| session.availableRoles[].isPrimary | boolean |  | True for the role that is the principal's primaryRoleId (identity.principal.primary_role_id); false for the others (14 October 2026, ADAM CR-077; CHG-IDR-002). |
+| session.availableRoles[].grantId | string (uuid) |  | The grant this card stands for (identity.delegated_access.id; IDENTITY-C45, CHG-R8SPN-032). |
+| session.availableRoles[].scope | object |  | The scope node the grant is held at (platform.scope), with its name, so the card can say which venue (IDENTITY-C45). |
 | session.openedAt | string (date-time) |  |  |
-| session.expiresAt | string (date-time) |  |  |
+| session.expiresAt | string (date-time) |  | When the session ends at the latest: openedAt plus PasswordPolicy.sessionMaxHours (12 hours by default; proposed, client to correct). |
 
 **Responses**
 
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Verified. |
-| 401 | Unauthorized | Missing, expired or superseded session |
+| 401 |  | Missing, expired or superseded session (unauthenticated, session-superseded), as the shared answer says. |
 | 410 |  | The challenge has expired or was voided (by a fifth wrong code, or a newer challenge for the same purpose). |
 | 422 |  | A wrong code, attempts one to four (CHG-R1S-025; the r1 gate found only the fifth failure specified). |
 | 409 |  | The challenge was already completed; a challenge is single-use, so ask for a new one. |
@@ -2150,6 +2297,11 @@ For a `signIn` challenge (decided 28 September, audit R135) a correct code compl
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | id | string (uuid) | yes |  |
+| principalId | string (uuid) |  | The principal who enrolled it; null for a guest. (read-only; nullable) |
+| subjectId | string (uuid) |  | The guest who enrolled it; null for a principal. (read-only; nullable) |
+| secret | string |  | The totp shared secret, encrypted with the tenant's field key (ADR-0063); null for other kinds. (nullable) |
+| destination | string |  | The full phone number (smsOtp) or email (emailOtp) the code goes to, encrypted with the tenant's field key (ADR-0063); null for other kinds. (nullable) |
+| pendingExpiresAt | string (date-time) |  | While isActive is false, when the unconfirmed enrolment lapses; null once verified. (nullable) |
 | kind | MfaKind: enum (totp, smsOtp, emailOtp, biometric, hardwareToken) | yes |  |
 | label | string |  | (nullable) |
 | maskedTarget | string |  | Partially masked destination, so a person can tell two methods apart. (nullable) |
@@ -2176,7 +2328,7 @@ For a `signIn` challenge (decided 28 September, audit R135) a correct code compl
 Who is logged in, on which workstation, since when. There was previously no way to see this — only to terminate a session someone already knew about.
 **Callable on the POS-000 door with no session, under a supervisor's PIN step-up** (Chinmay, 3 October 2026, Block A business rules: "POS-000: session management stays on the door"; CHG-RUL-015, which reverses CHG-DOOR-003 for this). Somebody else is signed in to the till, so nobody at it has a session: the till calls this with no token (`security` admits `{}`), names itself (`workstationId`), and carries the supervisor's own principal and PIN (the `X-Supervisor-Principal-Id` and `X-Supervisor-Pin` headers, since a GET has no body). The PIN is verified against the principal as `common.yaml` `SupervisorStepUp` says; that principal must hold `SESSION_FORCE_LOGOUT` at the till's venue, and the call reaches only the sessions at that one till (`workstationId` is required then). Anything else is `403 supervisor-step-up-refused` and nothing is read or written. **No session is opened** by the step-up: it authorises this one call. With a session (BO-053 Staff Directory) the caller's own `SESSION_FORCE_LOGOUT` applies as before and no step-up is asked.
 
-**Ordered by `startedAt` descending, `sessionId` as the tiebreak** (decided 14 October 2026, ADAM CR-077; CHG-IDR-002): the session that began last is first, which on a till is the one somebody is asking about.
+**Ordered by `startedAt` descending, `sessionId` as the tiebreak** (decided 14 October 2026, ADAM CR-077; CHG-IDR-002): the session that began last is first, which on a till is the one somebody is asking about. **Only `active` sessions unless `status` asks for another** (CHG-R8MIG-015).
 
 |  |  |
 |---|---|
@@ -2188,7 +2340,7 @@ Who is logged in, on which workstation, since when. There was previously no way 
 | Conflict policy | serverWins |
 | Read routing | primary |
 | Step-up auth | pin |
-| Reads | `identity.principal`, `identity.session` |
+| Reads | `identity.principal`, `identity.role`, `identity.session` |
 | Writes | - |
 | Called by | BO-053, POS-000 |
 
@@ -2197,10 +2349,12 @@ Who is logged in, on which workstation, since when. There was previously no way 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | X-Supervisor-Principal-Id | header |  | string (uuid) | With no session (POS-000), the supervisor signing the step-up (CHG-RUL-015). |
+| X-Supervisor-Username | header |  | string | With no session (POS-000), the supervisor's employee number, instead of X-Supervisor-Principal-Id (exactly one of the two; R8 blocker fix, IDENTITY-C44). |
 | X-Supervisor-Pin | header |  | string (password) | With no session (POS-000), the supervisor's staff PIN, as SupervisorStepUp.credential (CHG-RUL-015). |
 | venueId | query |  | string (uuid) | Exact match on ActiveSession.venueId. |
 | principalId | query |  | string (uuid) | Exact match on ActiveSession.principalId. |
 | workstationId | query |  | string (uuid) | Exact match on ActiveSession.workstationId — who holds this till, which POS-000 Sign In asks before offering a force-logout, without paging through every session in the venue. |
+| status | query |  | SessionStatus: enum (active, signedOut, terminated, expired) | Which sessions come back (R8 blocker IDENTITY-C46, CHG-R8MIG-015): active when absent, the live holder BO-053 and POS-000 ask about; another value returns the ended sessions of that status, kept with… |
 | pageSize | query |  | integer |  |
 | cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
 
@@ -2210,9 +2364,12 @@ Who is logged in, on which workstation, since when. There was previously no way 
 |---|---|---|---|
 | items | array of ActiveSession | yes |  |
 | items[].status | object | yes | A registry that only holds live sessions cannot answer why one ended. |
-| items[].sessionId | string | yes |  |
+| items[].sessionId | string | yes | The session's identity.session.id, written as text, and the key forceLogout takes in its path (R8 blocker fix, IDENTITY-C02). |
 | items[].principalId | string (uuid) | yes |  |
 | items[].principalName | string |  | Read from identity.principal with the row. |
+| items[].endedAt | string (date-time) |  | When the session ended; null while active (R8 blocker IDENTITY-C46, CHG-R8MIG-015). (read-only; nullable) |
+| items[].endedByPrincipalId | string (uuid) |  | Who ended it (forceLogout's caller or supervisor); null when the principal signed out or it expired. (read-only; nullable) |
+| items[].endReason | string |  | Why it was ended, as forceLogout was given it (or supervisor-takeover from the till door). (min length 3; max length 500; read-only; nullable) |
 | items[].roleId | string (uuid) |  | (nullable) |
 | items[].roleName | string |  | Read from identity.role with the row. (nullable) |
 | items[].workstationId | string (uuid) |  | (nullable) |
@@ -2257,10 +2414,13 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
+| granted_by_kind | text | no | Who made the grant (CHG-R8MIG-021). |
+| granted_by_principal_id | uuid | no | The staff member who made the grant; set when grantedByKind is principal. |
+| granted_by_subject_id | uuid | no | The guest who made the grant (the account holder); set when grantedByKind is subject. |
 | id | uuid | yes |  |
 | principal_id | uuid | no |  |
-| role_id | uuid | no |  |
-| permission | text | yes | From the permission enum. |
+| role_id | uuid | no | The role this grant gives, with its own and inherited permissions. |
+| permission | text | no | From the permission enum. |
 | subject_id | uuid | no | CF-132, CL-05. |
 | over_subject_id | uuid | no | Whose behalf. |
 | over_object_ref | text | no | Where the authority is over a thing rather than a scope — a wallet, an entitlement, a booking. |
@@ -2275,7 +2435,6 @@ Every table this service owns that the slice reads or writes, with its columns a
 | valid_to | timestamptz | no |  |
 | created_by_principal_id | uuid | no |  |
 | created_at | timestamptz | no |  |
-| granted_by_principal_id | uuid | yes | Points at identity.principal. |
 | revoked_by_principal_id | uuid | no | Points at identity.principal. |
 | scope_id | uuid | yes | Points at platform.org_unit. |
 
@@ -2302,11 +2461,12 @@ Every table this service owns that the slice reads or writes, with its columns a
 | Column | Type | Required | Notes |
 |---|---|---|---|
 | id | uuid | yes | The challengeId the client verifies. |
-| principal_id | uuid | yes |  |
+| principal_id | uuid | no | The staff or partner principal challenged; null for a guest. |
+| subject_id | uuid | no | The guest challenged (pii.subject); null for a principal. |
 | method_id | uuid | no | The identity.mfa_method asked; null means the principal's primary method. |
 | action | text | yes | What the step-up is for (signIn at sign-in). |
 | session_id | uuid | no | The session the challenge, and the step-up it proves, are bound to (CHG-RUL-020). |
-| code_hash | text | no | The PHC hash (ADR-0071) of a code the server sent (emailOtp); null for an authenticator (totp), whose code is computed, never sent. |
+| code_hash | text | no | The PHC hash (ADR-0071) of a code the server sent (smsOtp, emailOtp, and the code of an enrol challenge); null for an authenticator (totp), whose code is computed from the method's stored MfaMethod.s… |
 | status | text | yes |  |
 | failed_attempts | integer | yes |  |
 | expires_at | timestamptz | yes |  |
@@ -2319,6 +2479,11 @@ Every table this service owns that the slice reads or writes, with its columns a
 | Column | Type | Required | Notes |
 |---|---|---|---|
 | id | uuid | yes |  |
+| principal_id | uuid | no | The principal who enrolled it; null for a guest. |
+| subject_id | uuid | no | The guest who enrolled it; null for a principal. |
+| secret | text | no | The totp shared secret, encrypted with the tenant's field key (ADR-0063); null for other kinds. |
+| destination | text | no | The full phone number (smsOtp) or email (emailOtp) the code goes to, encrypted with the tenant's field key (ADR-0063); null for other kinds. |
+| pending_expires_at | timestamptz | no | While isActive is false, when the unconfirmed enrolment lapses; null once verified. |
 | kind | text | yes |  |
 | label | text | no |  |
 | masked_target | text | no | Partially masked destination, so a person can tell two methods apart. |
@@ -2326,13 +2491,13 @@ Every table this service owns that the slice reads or writes, with its columns a
 | is_primary | boolean | no |  |
 | enrolled_at | timestamptz | yes |  |
 | last_used_at | timestamptz | no |  |
-| principal_id | uuid | no | Points at identity.principal. |
 
 ### `identity.mfa_recovery_code`
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| principal_id | uuid | yes |  |
+| principal_id | uuid | no | The principal whose code this is; null for a guest. |
+| subject_id | uuid | no | The guest whose code this is; null for a principal. |
 | code_hash | text | yes | The PHC hash of the code (ADR-0071), never the code. |
 | issued_at | timestamptz | yes |  |
 | used_at | timestamptz | no | Set when the code is used; a used code never works again. |
@@ -2375,13 +2540,16 @@ Every table this service owns that the slice reads or writes, with its columns a
 | pin_reuse_prevention | text | no | Whether a new PIN may repeat an old one, chosen by the tenant from a drop-down (decided by Chinmay, 14 October 2026, ADAM CR-078; CHG-CRD-002): none lets a PIN be reused, last3 and last5 refuse the c… |
 | pin_lockout_after_attempts | integer | no | Wrong PINs before the PIN is locked, chosen by the tenant from a drop-down (decided by Chinmay, 14 October 2026, ADAM CR-078; CHG-CRD-002). |
 | mfa_required_for_permissions | text[] | no | Step-up rather than blanket MFA. |
+| access_token_minutes | integer | no | How long a staff access token lives (TokenPair.expiresIn). |
+| refresh_token_hours | integer | no | How long a staff refresh token lives without use. |
+| session_max_hours | integer | no | The longest a staff session lives (Session.expiresAt). |
 
 ### `identity.platform_staff_grant`
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
 | id | uuid | yes |  |
-| operator_principal_id | uuid | yes | The platform operator, from the Control Plane token. |
+| operator_principal_id | uuid | yes | The platform operator, from the Control Plane token (its subject). |
 | operator_display_name | text | no |  |
 | permissions | text[] | yes |  |
 | reason | text | yes |  |
@@ -2484,8 +2652,11 @@ Every table this service owns that the slice reads or writes, with its columns a
 | Column | Type | Required | Notes |
 |---|---|---|---|
 | status | text | yes | A registry that only holds live sessions cannot answer why one ended. |
-| session_id | text | yes |  |
+| session_id | text | yes | The session's identity.session.id, written as text, and the key forceLogout takes in its path (R8 blocker fix, IDENTITY-C02). |
 | principal_id | uuid | yes |  |
+| ended_at | timestamptz | no | When the session ended; null while active (R8 blocker IDENTITY-C46, CHG-R8MIG-015). |
+| ended_by_principal_id | uuid | no | Who ended it (forceLogout's caller or supervisor); null when the principal signed out or it expired. |
+| end_reason | text | no | Why it was ended, as forceLogout was given it (or supervisor-takeover from the till door). |
 | role_id | uuid | no |  |
 | workstation_id | uuid | no |  |
 | venue_id | uuid | no |  |
@@ -2494,6 +2665,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | is_mfa_satisfied | boolean | no |  |
 | started_at | timestamptz | yes |  |
 | last_seen_at | timestamptz | yes |  |
+| working_venue_id | uuid | no | The session's working venue; null while a session that may choose has not chosen. |
 | id | uuid | yes | Synthesised key. |
 
 ### `identity.subject_holding`
@@ -2559,15 +2731,26 @@ Every table this service owns that the slice reads or writes, with its columns a
 | verified_at | timestamptz |  |  |
 | created_at | timestamptz | yes |  |
 
+### `pii.subject_identity`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| subject_id | uuid | yes | The guest account. |
+| provider | text | yes |  |
+| provider_subject | text | yes | The provider's own stable id for the user (sub; the UAE Pass user id), compared exactly. |
+| email_at_link | text | no | The email the provider gave when the identity was linked (may be a private relay). |
+| linked_at | timestamptz | yes |  |
+
 ## Not in the first release
 
-62 operations, added to this service in later releases without changing any of the above.
+65 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
 | administration | `createAccessReviewCampaign`, `createAuthorisationPolicy`, `createDelegatedAccess`, `createEmergencyAccessOverride`, `createPrincipal`, `decideAccessReviewItem`, `deleteDelegatedAccess`, `evaluateAccess`, `getAuthorisationPolicy`, `getAuthorisationPolicyBundle`, `getPrincipal`, `getPrincipalModuleAccess`, `listAccessDecisions`, `listAccessReviewCampaigns`, `listAccessReviewItems`, `listAuthorisationPolicies`, `listAuthorisationPolicyEffectiveness`, `listAuthorisationPolicyHistory`, `listAuthorisationPolicyTemplates`, `listCapabilityTemplates`, `listDelegatedAccess`, `listModuleCapabilities`, `listPermissionFindings`, `listPlatformStaffGrants`, `resetPrincipalCredential`, `resolvePermissions`, `restoreAuthorisationPolicyVersion`, `setAuthorisationPolicyState`, `setPrincipalModuleAccess`, `simulateAuthorisationPolicy`, `suggestRoleAssignment`, `updateAuthorisationPolicy` |
 | guestAuth | `getMyIdentityVerification`, `submitGuestIdentityDocument` |
-| identity | `decideGuestIdentityVerification`, `endGuestDeviceSessions`, `getGuestVerificationPolicy`, `getMembership`, `getPasswordPolicy`, `listCustomerMemberships`, `listGuestIdentityVerifications`, `listModules`, `listPermissions`, `listSegregationRules`, `listSegregationViolations`, `logout`, `recordBenefitUsage`, `recordConsentIdentifier`, `setGuestVerificationPolicy`, `updateGuestSubjectDetails`, `verifySupervisorStepUp` |
+| identity | `decideGuestIdentityVerification`, `endGuestDeviceSessions`, `getGuestVerificationPolicy`, `getMembership`, `getPasswordPolicy`, `getSessionVenue`, `listCustomerMemberships`, `listGuestIdentityVerifications`, `listModules`, `listPermissions`, `listSegregationRules`, `listSegregationViolations`, `listStepUpSupervisors`, `logout`, `recordBenefitUsage`, `recordConsentIdentifier`, `setGuestVerificationPolicy`, `setSessionVenue`, `updateGuestSubjectDetails`, `verifySupervisorStepUp` |
 | mfa | `removeMfaMethod` |
 | prospectAuth | `startProspectSignup`, `verifyProspectSignupCode` |
 | session | `endOwnSession`, `listOwnSessions`, `revokeAllSessions` |

@@ -1203,9 +1203,141 @@
   "sync.cross_region_entitlement": "2026-10-14",
   "sync.dsar_request": "2026-10-14",
   "sync.guest_link": "2026-10-14",
-  "sync.wallet_authorisation": "2026-10-14"
+  "sync.wallet_authorisation": "2026-10-14",
+  "ai.outbox": "2026-10-20",
+  "ai.outbox_sequence": "2026-10-20",
+  "ai.translation_job": "2026-10-20",
+  "ai.vector_store": "2026-10-20",
+  "assets.guest_upload": "2026-10-20",
+  "catalogue.bundle_application": "2026-10-20",
+  "catalogue.product_channel_text": "2026-10-20",
+  "catalogue.product_owner_form": "2026-10-20",
+  "catalogue.product_sale_permission": "2026-10-20",
+  "catalogue.product_tag": "2026-10-20",
+  "control.audit_record": "2026-10-20",
+  "control.capacity_pack": "2026-10-20",
+  "control.cell_endpoint": "2026-10-20",
+  "control.contract": "2026-10-20",
+  "control.enforcement_policy": "2026-10-20",
+  "control.go_live_readiness": "2026-10-20",
+  "control.idempotency_record": "2026-10-20",
+  "control.licensing_model": "2026-10-20",
+  "control.module_listing": "2026-10-20",
+  "control.outbox": "2026-10-20",
+  "control.plan": "2026-10-20",
+  "control.plan_limit": "2026-10-20",
+  "control.plan_module": "2026-10-20",
+  "control.tier_allowance": "2026-10-20",
+  "control.tier_module": "2026-10-20",
+  "control.trial_config": "2026-10-20",
+  "control.vsi_assessment": "2026-10-20",
+  "control.vsi_model": "2026-10-20",
+  "control.webhook_replay": "2026-10-20",
+  "identity.open_shift_marker": "2026-10-20",
+  "identity.principal_external_identity": "2026-10-20",
+  "marketing.form_submission_sale_link": "2026-10-20",
+  "pii.subject_identity": "2026-10-20",
+  "platform.outbox_sequence": "2026-10-20",
+  "venuemap.visit_plan_preset": "2026-10-20",
+  "whitelabel.content_block": "2026-10-20"
  },
  "renames": [
+  {
+   "from": "platform.cell_endpoint",
+   "to": "control.cell_endpoint",
+   "on": "2026-10-20",
+   "why": "APPROVALS-TENANCY-C10: about a cell, not inside a tenant; the control plane writes it at provisioning"
+  },
+  {
+   "from": "control.content_block",
+   "to": "whitelabel.content_block",
+   "on": "2026-10-20",
+   "why": "IDENTITY-C59: a tenant's own content, read and written by White-Label in the tenant database"
+  },
+  {
+   "from": "subscription.plan",
+   "to": "control.plan",
+   "on": "2026-10-18",
+   "why": "CR-150: about a tenant, not inside one; Platform keeps it on its control connection"
+  },
+  {
+   "from": "subscription.plan_limit",
+   "to": "control.plan_limit",
+   "on": "2026-10-18",
+   "why": "CR-150: about a tenant, not inside one; Platform keeps it on its control connection"
+  },
+  {
+   "from": "subscription.plan_module",
+   "to": "control.plan_module",
+   "on": "2026-10-18",
+   "why": "CR-150: about a tenant, not inside one; Platform keeps it on its control connection"
+  },
+  {
+   "from": "subscription.module_listing",
+   "to": "control.module_listing",
+   "on": "2026-10-18",
+   "why": "CR-150: about a tenant, not inside one; Platform keeps it on its control connection"
+  },
+  {
+   "from": "subscription.contract",
+   "to": "control.contract",
+   "on": "2026-10-18",
+   "why": "CR-150: about a tenant, not inside one; Platform keeps it on its control connection"
+  },
+  {
+   "from": "subscription.tier_allowance",
+   "to": "control.tier_allowance",
+   "on": "2026-10-18",
+   "why": "CR-150: about a tenant, not inside one; Platform keeps it on its control connection"
+  },
+  {
+   "from": "subscription.tier_module",
+   "to": "control.tier_module",
+   "on": "2026-10-18",
+   "why": "CR-150: about a tenant, not inside one; Platform keeps it on its control connection"
+  },
+  {
+   "from": "subscription.licensing_model",
+   "to": "control.licensing_model",
+   "on": "2026-10-18",
+   "why": "CR-150: about a tenant, not inside one; Platform keeps it on its control connection"
+  },
+  {
+   "from": "subscription.trial_config",
+   "to": "control.trial_config",
+   "on": "2026-10-18",
+   "why": "CR-150: about a tenant, not inside one; Platform keeps it on its control connection"
+  },
+  {
+   "from": "subscription.capacity_pack",
+   "to": "control.capacity_pack",
+   "on": "2026-10-18",
+   "why": "CR-150: about a tenant, not inside one; Platform keeps it on its control connection"
+  },
+  {
+   "from": "subscription.go_live_readiness",
+   "to": "control.go_live_readiness",
+   "on": "2026-10-18",
+   "why": "CR-150: about a tenant, not inside one; Platform keeps it on its control connection"
+  },
+  {
+   "from": "subscription.enforcement_policy",
+   "to": "control.enforcement_policy",
+   "on": "2026-10-18",
+   "why": "CR-150: about a tenant, not inside one; Platform keeps it on its control connection"
+  },
+  {
+   "from": "subscription.vsi_model",
+   "to": "control.vsi_model",
+   "on": "2026-10-18",
+   "why": "CR-150: about a tenant, not inside one; Platform keeps it on its control connection"
+  },
+  {
+   "from": "subscription.vsi_assessment",
+   "to": "control.vsi_assessment",
+   "on": "2026-10-18",
+   "why": "CR-150: about a tenant, not inside one; Platform keeps it on its control connection"
+  },
   {
    "from": "platform.org_unit",
    "to": "platform.scope",
@@ -1517,5 +1649,5 @@
   "platform.device_heartbeat": "2026-10-14"
  },
  "baseline": "2026-09-19",
- "generated": "2026-10-18"
+ "generated": "2026-10-20"
 }

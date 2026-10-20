@@ -4419,7 +4419,7 @@
    "screen": "WEB-031",
    "process": "Ticketing (guest)",
    "block": "A",
-   "status": "to-apply",
+   "status": "applied",
    "kind": "design-input",
    "decision": "Drawn default accepted: Group requests take a date and, for session products, a session.",
    "by": "Chinmay",

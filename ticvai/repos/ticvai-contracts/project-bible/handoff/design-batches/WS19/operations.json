@@ -41,7 +41,7 @@
   "path": "/api-scopes",
   "contract": "public-api",
   "summary": "The scope catalogue, one read and one write scope per module",
-  "permission": "DEVELOPER_VIEW",
+  "permission": null,
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",

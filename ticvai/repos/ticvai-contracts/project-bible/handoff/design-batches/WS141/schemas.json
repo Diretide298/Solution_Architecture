@@ -1004,47 +1004,57 @@
   ],
   "properties": {
    "id": {
+    "x-ticvai-data-class": "behavioural",
     "type": "string",
     "format": "uuid",
     "readOnly": true,
     "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
    },
    "subjectId": {
+    "x-ticvai-data-class": "behavioural",
     "type": "string",
     "format": "uuid",
     "description": "Opaque reference. Personal data lives in the separately erasable store, which is what makes erasure possible against an append-only ledger.\n"
    },
    "displayName": {
+    "x-ticvai-data-class": "personal",
     "type": "string",
     "nullable": true
    },
    "email": {
+    "x-ticvai-data-class": "personal",
     "type": "string",
     "nullable": true
    },
    "phone": {
+    "x-ticvai-data-class": "personal",
     "type": "string",
     "nullable": true
    },
    "preferredLanguage": {
+    "x-ticvai-data-class": "personal",
     "type": "string",
     "nullable": true
    },
    "preferredChannel": {
+    "x-ticvai-data-class": "personal",
     "$ref": "#/components/schemas/MessageChannel"
    },
    "guestLinkId": {
+    "x-ticvai-data-class": "personal",
     "type": "string",
     "nullable": true,
     "description": "Present where the guest is linked across cells. Marketing acts locally."
    },
    "tags": {
+    "x-ticvai-data-class": "behavioural",
     "type": "array",
     "items": {
      "type": "string"
     }
    },
    "engagementScore": {
+    "x-ticvai-data-class": "behavioural",
     "type": "integer",
     "nullable": true,
     "minimum": 0,
@@ -1052,6 +1062,7 @@
     "description": "22.2.20 and 22.2.21. **`lifetimeValue` and `visitCount` existed, so value was a stored figure and engagement was not.** They are different questions: a guest who spent a lot once and a guest who visits monthly have the same LTV and need opposite treatment.\n**Recency, frequency and breadth, not spend** — spend is already `lifetimeValue`, and folding it in here would make one number twice.\n"
    },
    "engagementTier": {
+    "x-ticvai-data-class": "behavioural",
     "type": "string",
     "nullable": true,
     "enum": [
@@ -1065,20 +1076,26 @@
     "description": "5.3.19. **Automatic classification, computed rather than assigned.** `lapsing` is the tier the whole field exists for — **a guest who has not been for a while and still might is the only one marketing can change**, and lumping them with `lapsed` wastes the window.\n"
    },
    "lifetimeValue": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
+    "x-ticvai-data-class": "behavioural",
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "**Left out of guest reads until a guest's lifetime value has a currency** (ADAM CR-141, 18 October 2026; CHG-CRA-007): an amount above a venue is in the currency recorded on its own row (CR-094's rule, which waits on the client), and this row records none yet."
    },
    "visitCount": {
+    "x-ticvai-data-class": "behavioural",
     "type": "integer"
    },
    "lastVisitAt": {
+    "x-ticvai-data-class": "behavioural",
     "type": "string",
     "format": "date-time",
     "nullable": true
    },
    "isActive": {
+    "x-ticvai-data-class": "behavioural",
     "type": "boolean"
    },
    "mergedIntoSubjectId": {
+    "x-ticvai-data-class": "behavioural",
     "type": "string",
     "format": "uuid",
     "nullable": true,
@@ -1086,6 +1103,7 @@
     "description": "**Set on the absorbed profile by `mergeGuestProfiles` and `mergeGuests`**, which retain it as a redirect rather than deleting it. A read that lands here follows it; a second merge of a profile that has one is refused as `alreadyMerged`.\n"
    },
    "mergedAt": {
+    "x-ticvai-data-class": "behavioural",
     "type": "string",
     "format": "date-time",
     "nullable": true,
@@ -1540,7 +1558,7 @@
    },
    "scopePath": {
     "type": "string",
-    "readOnly": true
+    "description": "**The node the collection belongs to** (R8 blocker ORDERS-MONEY-C36). Optional on create: the scope path of a tenant, region or venue node whose depth matches `scopeLevel` (else 400), inside the caller's grants (else 403); left out, the caller's own node at `scopeLevel`. Set once: an update never moves a collection. Returned on every read."
    },
    "documentCount": {
     "type": "integer",
@@ -1614,6 +1632,14 @@
    "mimeType": {
     "type": "string"
    },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "writeOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "A venue to narrow the document to (R8 blocker ORDERS-MONEY-C36): the document's `scopePath` becomes that venue's path, which must be at or below the collection's node (else 400). Left out, the document takes the collection's own path. Not stored apart from `scopePath`."
+   },
    "reingestDocumentId": {
     "type": "string",
     "format": "uuid",
@@ -1656,7 +1682,7 @@
    "scopePath": {
     "type": "string",
     "readOnly": true,
-    "description": "**Added 29 September (AI design 3.1):** `ai.knowledge_document` had no policy, so neither did its chunks. Copied from the collection at ingestion, narrowed where the document is venue-specific (\"documents carry the scope they may be retrieved at\"). `ai.chunk_embedding` is scoped through this row.\n"
+    "description": "**Added 29 September (AI design 3.1):** `ai.knowledge_document` had no policy, so neither did its chunks. Copied from the collection at ingestion, narrowed where the document is venue-specific (\"documents carry the scope they may be retrieved at\"): the venue the request's `venueId` names. `ai.chunk_embedding` is scoped through this row.\n"
    }
   }
  },
@@ -1814,7 +1840,7 @@
    },
    "url": {
     "type": "string",
-    "description": "Signed and expiring for private assets; stable CDN URL for public ones."
+    "description": "Signed and expiring for private assets; stable CDN URL for public ones. **A public asset that a published white-label version references is served at its stable CDN URL**, and `getPublishedTenantConfig` returns that address (`brandUrls`, `banners[].imageUrl`) so a guest client never needs this read (r8 walk of ticket 28335)."
    },
    "thumbnailUrl": {
     "type": "string",
@@ -1840,6 +1866,27 @@
    "createdAt": {
     "type": "string",
     "format": "date-time"
+   },
+   "extractedText": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**The text pulled out of an uploaded document** (R8 blocker ORDERS-MONEY-C19): written by the upload's processing job once text extraction finishes (PDF, Word and plain-text kinds), replaced when the file is replaced, null for an image, video or audio file or while the asset is still processing. One value per asset, so AI's `ingestKnowledgeDocument` reads it through `mediaAssetRecords`."
+   },
+   "releasedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-references": "identity.principal",
+    "description": "The reviewer who released the asset from `quarantined` (R8 blocker ORDERS-MONEY-C24, CHG-R8MIG-022); null if it never was."
+   },
+   "releasedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "When it was released from `quarantined`."
    }
   }
  },

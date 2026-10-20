@@ -1,11 +1,14 @@
 {
  "AccountMapping": {
   "x-ticvai-persistence": "ledger.account_mapping",
+  "x-ticvai-rls": "read-beneath",
   "type": "object",
+  "description": "**Found by venue, then region** (ADAM CR-168, option A, 18 October 2026; CHG-CRA-007): a posting uses the venue's own row for its event type, else the row for the venue's region, else it is refused. A region's row carries the region's scope path, so the venue's row-level security reads it too.",
   "required": [
    "eventType",
    "debitAccountId",
-   "creditAccountId"
+   "creditAccountId",
+   "scopePath"
   ],
   "properties": {
    "eventType": {
@@ -24,6 +27,11 @@
     "format": "uuid",
     "nullable": true,
     "description": "Null applies the mapping to every venue in the region."
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "Where the row is owned: the venue's path for a venue row, the region's path for a region row (`venueId` null), set by the server from `setAccountMappings`' scope (ADAM CR-168; CHG-CRA-007)."
    }
   }
  },
@@ -495,6 +503,12 @@
  },
  "JournalEntry": {
   "x-ticvai-persistence": "ledger.journal_entry + ledger.journal_line",
+  "x-ticvai-unique-together": [
+   [
+    "legalEntityId",
+    "entryNumber"
+   ]
+  ],
   "type": "object",
   "required": [
    "id",
@@ -514,10 +528,16 @@
     "format": "uuid"
    },
    "entryNumber": {
-    "x-ticvai-unique": "tenant",
     "type": "string",
     "readOnly": true,
-    "description": "Server-assigned, **in sequence per legal entity per fiscal year** (decided 28 September, audit R191), for example `JE-2026-000123`. Gapless within the legal entity and year: a number is taken when the entry reaches the ledger, not when a draft is saved.\n"
+    "description": "Server-assigned, **in sequence per legal entity per fiscal year** (decided 28 September, audit R191), for example `JE-2026-000123`. Gapless within the legal entity and year: a number is taken when the entry reaches the ledger, not when a draft is saved. **Unique per legal entity**, whatever its case (ADAM CR-168, 18 October 2026; CHG-CRA-007). **The year in it is the fiscal year's label, the calendar year the fiscal year starts in**: a proposed default, for the client's finance team to correct.\n"
+   },
+   "legalEntityId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "x-ticvai-references": "ledger.legal_entity",
+    "description": "The legal entity whose ledger the entry is in: its fiscal period's, copied so the entry number is unique per legal entity (ADAM CR-168; CHG-CRA-007)."
    },
    "fiscalPeriodId": {
     "type": "string",
@@ -666,7 +686,8 @@
    "variance",
    "reversal",
    "writeOff",
-   "chargeback"
+   "chargeback",
+   "payment"
   ]
  },
  "JournalStatus": {

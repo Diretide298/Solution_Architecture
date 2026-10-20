@@ -702,7 +702,8 @@
     "TableReservation.outletId",
     "TableReservation.subjectId",
     "TableReservation.guestName",
-    "TableReservation.contactPoint"
+    "TableReservation.contactPoint",
+    "VenueSettings.calendarDayStartHour"
    ]
   },
   "wireframe": {

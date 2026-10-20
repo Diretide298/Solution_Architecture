@@ -88,25 +88,46 @@ screens:
     - SUP-008
     - SUP-009
     - SUP-019
+    notes: '**Landing table** (the lead, 20 October 2026, r8 cause IDENTITY-C07, option A). The door has
+      no launcher: its approved exits are where sign-in lands, chosen by permission, section by section
+      in this order. **Back office**: BO-100 Venue Home (REPORT_VIEW_VENUE), P08''s entry point (isEntryPoint),
+      not BO-001; the drawn edge to BO-001 Queue Directory is taken only by a role that holds QUEUE_VIEW
+      and not REPORT_VIEW_VENUE. **Venue CMS**: CMS-001 Tenant Workspace (TENANT_CONFIGURE). **Analytics**:
+      ANL-001 Executive Command Center (REPORT_VIEW_VENUE). **Support**: SUP-002 Agent Dashboard (CASE_VIEW).
+      The role''s first section in that order is where it lands; the other exits (SUP-003 to SUP-019)
+      are reached from the support console''s own navigation after landing. Someone who may see none of
+      them stays on the door with "Your account has no section here; ask your administrator".'
     transitions:
     - to: SUP-002
       trigger: Agent Dashboard
-      provenance: structural — SUP-001 is P12's home screen and its exits are its launcher
+      provenance: 'landing target (r8, IDENTITY-C07, the lead''s option A): not a control on the sign-in
+        form; after sign-in the door opens the first section of the landing table (navigation.notes) the
+        role may see'
     - to: SUP-003
       trigger: Availability & Routing Settings
-      provenance: structural — SUP-001 is P12's home screen and its exits are its launcher
+      provenance: 'landing target (r8, IDENTITY-C07, the lead''s option A): not a control on the sign-in
+        form; after sign-in the door opens the first section of the landing table (navigation.notes) the
+        role may see'
     - to: SUP-004
       trigger: Conversation Queue
-      provenance: structural — SUP-001 is P12's home screen and its exits are its launcher
+      provenance: 'landing target (r8, IDENTITY-C07, the lead''s option A): not a control on the sign-in
+        form; after sign-in the door opens the first section of the landing table (navigation.notes) the
+        role may see'
     - to: BO-001
       trigger: Queue Directory
-      provenance: structural — SUP-001 is P12's home screen and its exits are its launcher
+      provenance: 'landing target (r8, IDENTITY-C07, the lead''s option A): not a control on the sign-in
+        form; after sign-in the door opens the first section of the landing table (navigation.notes) the
+        role may see'
     - to: CMS-001
       trigger: Tenant Workspace
-      provenance: structural — SUP-001 is P12's home screen and its exits are its launcher
+      provenance: 'landing target (r8, IDENTITY-C07, the lead''s option A): not a control on the sign-in
+        form; after sign-in the door opens the first section of the landing table (navigation.notes) the
+        role may see'
     - to: ANL-001
       trigger: Executive Command Center
-      provenance: structural — SUP-001 is P12's home screen and its exits are its launcher
+      provenance: 'landing target (r8, IDENTITY-C07, the lead''s option A): not a control on the sign-in
+        form; after sign-in the door opens the first section of the landing table (navigation.notes) the
+        role may see'
     - to: SUP-005
       trigger: Live Chat Workspace
       provenance: 'derived — SUP-005 declares entryState.params caseId, conversationId and SUP-001 holds
@@ -123,13 +144,19 @@ screens:
         optional), and SUP-008 opens on its own'
     - to: SUP-007
       trigger: Canned Response Management
-      provenance: structural — SUP-001 is P12's home screen and its exits are its launcher
+      provenance: 'landing target (r8, IDENTITY-C07, the lead''s option A): not a control on the sign-in
+        form; after sign-in the door opens the first section of the landing table (navigation.notes) the
+        role may see'
     - to: SUP-009
       trigger: Customer Service Command Center
-      provenance: structural — SUP-001 is P12's home screen and its exits are its launcher
+      provenance: 'landing target (r8, IDENTITY-C07, the lead''s option A): not a control on the sign-in
+        form; after sign-in the door opens the first section of the landing table (navigation.notes) the
+        role may see'
     - to: SUP-019
       trigger: Contact Center Operations Command Center
-      provenance: structural — SUP-001 is P12's home screen and its exits are its launcher
+      provenance: 'landing target (r8, IDENTITY-C07, the lead''s option A): not a control on the sign-in
+        form; after sign-in the door opens the first section of the landing table (navigation.notes) the
+        role may see'
   notes: '**Rebuilt as a sign-in form on 2 October 2026 (CHG-DOOR-002/003; Chinmay, 2 October 2026: fix
     the Block A blockers now).** It was generated as a list over active sessions, MFA methods and SSO
     providers with Force logout and Revoke all sessions on the door, which a person who is not yet signed
@@ -339,11 +366,16 @@ screens:
     params:
     - name: challengeId
       from: navigation
+      optional: true
+      notes: 'r8 (IDENTITY-C07): made by this form''s own sign-in (`createMfaChallenge`); never needed
+        to open the door.'
     - name: providerId
       from: deepLink
       optional: true
     - name: methodId
       from: navigation
+      optional: true
+      notes: 'r8 (IDENTITY-C07): picked on this form; never needed to open the door.'
     coldEntry: '**Needs nothing; that is what makes it the door.** No workstation travels with a browser
       sign-in (CHG-DOOR-001). `providerId` arrives only on the identity provider''s redirect back, with
       the `code` and `state` that `completeSsoAuthorization` exchanges; an expired or replayed redirect

@@ -196,7 +196,7 @@
  "BrandIdentity": {
   "x-ticvai-persistence": "none — embedded in tenant_config",
   "type": "object",
-  "description": "Every `*AssetRef` here is a `MediaAsset` id from the `assets` library (`createUpload` then `completeUpload`), PNG or SVG and at most 2 MB (decided 28 September, audit R270).\n",
+  "description": "Every `*AssetRef` here is a `MediaAsset` id from the `assets` library (`createUpload` then `completeUpload`). The image fields are PNG or SVG and at most 2 MB (decided 28 September, audit R270); `introVideoAssetRef` is a video asset within the library's limit for kind `video` (`assets.createUpload`).\n",
   "required": [
    "logoAssetRef"
   ],
@@ -293,6 +293,22 @@
  "ConfigVersion": {
   "x-ticvai-rls": "read-beneath",
   "x-ticvai-persistence": "whitelabel.config_version",
+  "x-ticvai-unique-together": [
+   [
+    "scopePath",
+    "version"
+   ]
+  ],
+  "x-ticvai-unique-when": [
+   {
+    "columns": [
+     "scopePath"
+    ],
+    "when": {
+     "isCurrent": true
+    }
+   }
+  ],
   "type": "object",
   "required": [
    "version",
@@ -303,7 +319,9 @@
   ],
   "properties": {
    "version": {
-    "type": "string"
+    "type": "string",
+    "readOnly": true,
+    "description": "**Named by the server** (ADAM CR-154; CHG-CRA-004): the next integer for the tenant, `1`, `2`, ..., taken in the publish transaction. Unique per tenant; a racing publish fails on the index and retries."
    },
    "publishedAt": {
     "type": "string",
@@ -344,6 +362,20 @@
     "type": "string",
     "format": "date-time",
     "nullable": true
+   },
+   "activationFailedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "When the scheduled activation of this version failed its validation again; null when it has not failed (R8 blocker IDENTITY-C63). A failed version is not tried again; publish a new one."
+   },
+   "activationFailure": {
+    "type": "string",
+    "maxLength": 2000,
+    "nullable": true,
+    "readOnly": true,
+    "description": "Why the scheduled activation failed, in the validation's words (R8 blocker IDENTITY-C63)."
    },
    "contentHash": {
     "type": "string"
@@ -391,7 +423,7 @@
  },
  "ContentBlock": {
   "type": "object",
-  "x-ticvai-persistence": "control.content_block",
+  "x-ticvai-persistence": "whitelabel.content_block",
   "description": "BL-172. **`white-label` is excellent as a configuration model and is not an authoring surface.** `HomepageLayout` with ordered sections, `Banner`, `PromoBlock` and `ContentPage` describe what a venue has chosen; **none of them lets a marketer write something new without a developer.**\nA block is a piece of authored content with a type, a body and a schedule. **The page builder is a frontend over this**, the same way the venue map's canvas is a frontend over its graph.\n",
   "required": [
    "id",
@@ -431,7 +463,7 @@
    "body": {
     "type": "object",
     "additionalProperties": true,
-    "description": "Typed by `kind`, and validated against the block's own schema at save."
+    "description": "Typed by `kind`, and validated against the block's own schema at save. **The text a translation may fill** (R8 blocker FOUNDATION-AI-C40; the keys a body of each kind uses for its words, and the `fieldPath` a translation draft names, under `localeVariants.<locale>.`): richText `text`; image `altText`, `caption`; video `title`, `caption`; gallery `items[].altText`, `items[].caption`; cta `heading`, `text`, `label`; faq `items[].question`, `items[].answer`; form `title`, `fields[].label`, `submitLabel`; embed `title`; productGrid `heading`; countdown `heading`, `endedText`; testimonial `quote`, `author`. Every other key (links, ids, numbers, media references) is not translated."
    },
    "localeVariants": {
     "type": "object",
@@ -472,6 +504,18 @@
     "format": "uuid",
     "nullable": true,
     "readOnly": true
+   },
+   "reviewStatus": {
+    "type": "string",
+    "readOnly": true,
+    "enum": [
+     "notRequired",
+     "pending",
+     "approved",
+     "rejected"
+    ],
+    "default": "notRequired",
+    "description": "The review step of `publishContentBlock`, where the tenant's publish-review policy is on (r8 walk of ticket 27919). `pending` from the 202 until the approval is decided; `status` does not change meanwhile."
    },
    "scopePath": {
     "type": "string",
@@ -849,7 +893,7 @@
  "FooterConfig": {
   "type": "object",
   "x-ticvai-persistence": "whitelabel.footer_config + whitelabel.footer_config_column + whitelabel.footer_config_social_link",
-  "description": "BL-002. **`setHeader` and `HeaderConfig` exist and the footer does not**, which looked like symmetry until you notice it is not: **a header is chrome and a footer is a link surface.**\nA footer carries the legal links — terms, privacy, accessibility statement, cookie preferences — and **those are the ones a regulator checks.** Treating it as a mirror of the header would have given it a logo and no way to reach a privacy notice.\n**Where it is stored.** `legalLinks` and `copyrightText` are columns of `whitelabel.footer_config`; each entry of `columns` is a `whitelabel.footer_config_column` row and each entry of `socialLinks` a `whitelabel.footer_config_social_link` row. Part of the working draft (see the header). **In the tenant's own database, not the control plane (decided 28 September, audit R163)**: it moved from `control.footer_config` (renamed `whitelabel.footer_config`) and its two child tables.\n",
+  "description": "BL-002. **`setHeader` and `HeaderConfig` exist and the footer does not**, which looked like symmetry until you notice it is not: **a header is chrome and a footer is a link surface.**\nA footer carries the legal links — terms, privacy, accessibility statement, cookie preferences — and **those are the ones a regulator checks.** Treating it as a mirror of the header would have given it a logo and no way to reach a privacy notice.\n**Where it is stored.** `legalLinks` and `copyrightText` are columns of `whitelabel.footer_config`; each entry of `columns` is a `whitelabel.footer_config_column` row and each entry of `socialLinks` a `whitelabel.footer_config_social_link` row. Part of the working draft (see the header). **In the tenant's own database, not the control plane (decided 28 September, audit R163)**: it moved from `control.footer_config` (renamed `whitelabel.footer_config`) and its two child tables.\n**Links and order** (R8 blocker WHITE-C24 and IDENTITY-C60): a column's `links` are stored with the column, as one jsonb value in their array order; each column and each social link keeps its `sortOrder`, which `setFooter` writes from its position in the array (0 first), and every read returns `columns` and `socialLinks` ordered by it.\n",
   "required": [
    "id",
    "scopePath"
@@ -873,8 +917,16 @@
       "heading": {
        "type": "string"
       },
+      "sortOrder": {
+       "type": "integer",
+       "readOnly": true,
+       "description": "The column's position, written by `setFooter` from the array order (R8 blocker IDENTITY-C60)."
+      },
       "links": {
        "type": "array",
+       "x-ticvai-persistence-column": "jsonb",
+       "x-ticvai-persistence-kind": "valueObject",
+       "description": "The column's links in display order, stored on the column row as one value (R8 blocker WHITE-C24).",
        "items": {
         "type": "object",
         "properties": {
@@ -927,6 +979,11 @@
       },
       "url": {
        "type": "string"
+      },
+      "sortOrder": {
+       "type": "integer",
+       "readOnly": true,
+       "description": "The link's position, written by `setFooter` from the array order (R8 blocker IDENTITY-C60)."
       }
      }
     }
@@ -1066,7 +1123,7 @@
  },
  "HomepageSectionKind": {
   "type": "string",
-  "description": "**Which module each section needs, proposed, client to correct (decided 28 September, audit R163).** `tickets` needs `ticketsAndBooking`; `whatsOn` needs `events`; `attractions` needs `attractions`; `membership` needs `membership`; `dining` needs `diningAndFnb`; `shop` needs `shop`; `map` needs `map`. `heroBanner`, `quickActions`, `promotions`, `customContent`, `venueOverview` and `spacer` need no module. `venueOverview` (decided 29 September, MOB-3) is the mobile Home's description, opening hours (from `getTenantAppStatus`) and type tiles. `setHomepageLayout` refuses a visible section whose module is not enabled, and `setModuleEnablement` refuses to disable a module a section still needs.\n",
+  "description": "**Which module each section needs, proposed, client to correct (decided 28 September, audit R163).** `tickets` needs `ticketsAndBooking`; `whatsOn` needs `events`; `attractions` needs `attractions`; `membership` needs `membership`; `dining` needs `diningAndFnb`; `shop` needs `shop`; `map` needs `map`. `heroBanner`, `quickActions`, `promotions`, `customContent`, `venueOverview` and `spacer` need no module. `venueOverview` (decided 29 September, MOB-3) is the mobile Home's description, opening hours (from `getTenantAppStatus`) and type tiles. `setHomepageLayout` refuses a visible section whose module is not enabled, and `setModuleEnablement` refuses to disable a module a section still needs.\n\n**Which catalogue slice a type tile shows, and whose card count applies** (r8 walk of tickets 28335 and 28682; lead decision of 20 October 2026, option 1, no schema change; DEC-152 and DEC-153 stand as they are). A Home type tile is a product category, and its highlights are `listProducts(venueId, categoryId, pageSize)` in `displayOrder`, the order `listProducts` documents. The card count (`maxItems`) is that of the section whose kind matches the tile: `attractions`, `dining` or `shop`; **every other category uses the count of the `whatsOn` section**. On GST-038 (At the Venue), Food is kind `fnb` (opens GST-024), Shop is kind `retail` (GST-026), Services opens GST-029, Shows is `listPerformances` of the venue for today, and Map and Waits show in place.\n\n**Where the Home overview, its quick actions and \"Book a trip\" come from in r8** (R8 blocker WHITE-C07, the lead's answer of 20 October 2026: option 3, nothing new stored). The `venueOverview` description is the published content page its section names (`contentPageId`, read with `listPublishedContentPages`); none named, the line is left out. The `quickActions` tiles are a fixed list the app shows, one per enabled module (`enabledModules` of the published configuration), in the order of the approved frame; a venue does not configure them in r8. \"Book a trip\" shows when the venue has a published booking flow of type `transport` (`getPublishedBookingFlow`). Configurable tiles (a section's own actions) come later, when the client asks for them.\n",
   "enum": [
    "heroBanner",
    "quickActions",
@@ -1175,7 +1232,7 @@
   "x-ticvai-persistence": "none — embedded in tenant_config",
   "type": "object",
   "nullable": true,
-  "description": "**The oldest guest app build still allowed to run (decided 28 September, audit R073).** A guest app whose own version is below the one for its platform shows the forced-upgrade screen (GST-047) and nothing else. Null, or a platform left null, forces nothing. Live at once through `setMaintenanceMode`, because an upgrade that must wait for a publish is not forced.\n",
+  "description": "**The oldest guest app build still allowed to run (decided 28 September, audit R073).** A guest app whose own version is below the one for its platform shows the forced-upgrade screen (GST-047) and nothing else. Null, or a platform left null, forces nothing. Live at once through `setMaintenanceMode`, because an upgrade that must wait for a publish is not forced.\n\n**`storeUrl`** (r8 walk of ticket 27893): the store page GST-047's \"Update\" button opens, one per platform, set with `setMaintenanceMode` beside the versions and live at once like them. Optional. A store address cannot be derived from `StoreAccount.appIdentifier`, which is a bundle id. The forced-upgrade screen opens the URL for the platform it runs on; where it is null the screen shows the message without the button and the guest updates from the store by hand.\n",
   "properties": {
    "ios": {
     "type": "string",
@@ -1186,6 +1243,25 @@
     "type": "string",
     "nullable": true,
     "pattern": "^\\d+\\.\\d+\\.\\d+$"
+   },
+   "storeUrl": {
+    "type": "object",
+    "nullable": true,
+    "description": "The store page of the tenant's app for each platform. https only.",
+    "properties": {
+     "ios": {
+      "type": "string",
+      "format": "uri",
+      "pattern": "^https://",
+      "nullable": true
+     },
+     "android": {
+      "type": "string",
+      "format": "uri",
+      "pattern": "^https://",
+      "nullable": true
+     }
+    }
    }
   }
  },

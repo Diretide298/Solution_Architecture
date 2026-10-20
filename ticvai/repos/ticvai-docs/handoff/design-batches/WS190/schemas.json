@@ -53,6 +53,12 @@
    "remainingAmount": {
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
+   "issuedCredits": {
+    "type": "integer",
+    "minimum": 0,
+    "nullable": true,
+    "description": "**Game credits are counted, not priced** (the lead, 20 October 2026, r8 cause APPROVALS-TENANCY-C30, option A): the credits a game-card load put on this lot (credit types `gameCredit` and `gameBonusCredit`); `issuedAmount` is the money paid for them (zero for bonus). Null on every other lot."
+   },
    "issuedAt": {
     "type": "string",
     "format": "date-time"
@@ -100,7 +106,7 @@
   }
  },
  "GiftCard": {
-  "x-ticvai-rls": "grant-holder-read",
+  "x-ticvai-rls": "signed-in-read",
   "x-ticvai-persistence": "wallet.gift_card",
   "type": "object",
   "required": [
@@ -139,6 +145,14 @@
    "blockedReason": {
     "type": "string",
     "nullable": true
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-references": "pii.subject",
+    "description": "**The registered owner, if any** (R8 blocker ORDERS-MONEY-C27): the guest named when the card was issued (the buyer, or the guest whose refund became store credit); null for a card sold to nobody in particular. It does not limit who may read or spend the card. Left out of a guest's response unless it is the caller."
    },
    "issuedAt": {
     "type": "string",
@@ -375,7 +389,13 @@
  "WalletConfigurationVersion": {
   "type": "object",
   "x-ticvai-persistence": "wallet.configuration_version",
-  "description": "Boards 1.10 and 10.8. **Ten boards of configuration that interact.**",
+  "x-ticvai-unique-together": [
+   [
+    "scopePath",
+    "version"
+   ]
+  ],
+  "description": "Boards 1.10 and 10.8. **Ten boards of configuration that interact.** `version` is the highest at the scope plus one; (scope, version) is unique.",
   "properties": {
    "version": {
     "type": "integer"

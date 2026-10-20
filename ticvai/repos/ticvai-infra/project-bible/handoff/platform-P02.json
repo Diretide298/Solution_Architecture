@@ -7,15 +7,15 @@
  "audience": "guest",
  "formFactor": "mobileApp",
  "offlineCapable": true,
- "generated": "2026-10-18",
+ "generated": "2026-10-20",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 77,
-  "operations": 211,
+  "operations": 217,
   "contracts": 19,
   "modules": 17,
   "undrawn": 0,
-  "operationsWithNoScreen": 19
+  "operationsWithNoScreen": 22
  },
  "waves": {
   "wave1": 77
@@ -143,12 +143,12 @@
  ],
  "contracts": [
   {
-   "contract": "marketing-crm",
-   "operations": 37
+   "contract": "orders",
+   "operations": 39
   },
   {
-   "contract": "orders",
-   "operations": 36
+   "contract": "marketing-crm",
+   "operations": 38
   },
   {
    "contract": "identity",
@@ -171,11 +171,11 @@
    "operations": 12
   },
   {
-   "contract": "white-label",
-   "operations": 8
+   "contract": "venue-map",
+   "operations": 10
   },
   {
-   "contract": "venue-map",
+   "contract": "white-label",
    "operations": 8
   },
   {
@@ -183,15 +183,15 @@
    "operations": 7
   },
   {
-   "contract": "resources",
-   "operations": 6
-  },
-  {
    "contract": "finance",
    "operations": 6
   },
   {
    "contract": "wallet",
+   "operations": 6
+  },
+  {
+   "contract": "resources",
    "operations": 6
   },
   {
@@ -203,11 +203,11 @@
    "operations": 4
   },
   {
-   "contract": "seating",
+   "contract": "promotions",
    "operations": 4
   },
   {
-   "contract": "promotions",
+   "contract": "seating",
    "operations": 4
   },
   {
@@ -262,7 +262,7 @@
    "module": "Discovery & Browse",
    "wave": 1,
    "route": "/general/whats-on",
-   "operations": 2,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -289,7 +289,7 @@
    "module": "Booking & Selection",
    "wave": 1,
    "route": "/general/tickets-and-add-ons",
-   "operations": 6,
+   "operations": 7,
    "drawn": true
   },
   {
@@ -649,7 +649,7 @@
    "module": "Booking & Selection",
    "wave": 1,
    "route": "/general/upsell-cross-sell",
-   "operations": 4,
+   "operations": 5,
    "drawn": true
   },
   {
@@ -658,7 +658,7 @@
    "module": "Booking & Selection",
    "wave": 1,
    "route": "/general/interactive-seat-selection",
-   "operations": 5,
+   "operations": 6,
    "drawn": true
   },
   {
@@ -667,7 +667,7 @@
    "module": "Booking & Selection",
    "wave": 1,
    "route": "/general/resource-booking-cabana",
-   "operations": 3,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -676,7 +676,7 @@
    "module": "Engagement & Support",
    "wave": 1,
    "route": "/general/plan-your-adventure-start",
-   "operations": 3,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -685,7 +685,7 @@
    "module": "Engagement & Support",
    "wave": 1,
    "route": "/general/suggested-itineraries",
-   "operations": 3,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -748,7 +748,7 @@
    "module": "Engagement & Support",
    "wave": 1,
    "route": "/general/plan-my-day-in-progress",
-   "operations": 4,
+   "operations": 5,
    "drawn": true
   },
   {
@@ -802,7 +802,7 @@
    "module": "Account & Self-Service",
    "wave": 1,
    "route": "/account/refunds-resale",
-   "operations": 3,
+   "operations": 6,
    "drawn": true
   },
   {
@@ -811,7 +811,7 @@
    "module": "Engagement & Support",
    "wave": 1,
    "route": "/account/help-my-cases",
-   "operations": 4,
+   "operations": 5,
    "drawn": true
   },
   {
@@ -838,7 +838,7 @@
    "module": "Account & Self-Service",
    "wave": 1,
    "route": "/account/payment-methods",
-   "operations": 8,
+   "operations": 10,
    "drawn": true
   },
   {
@@ -874,7 +874,7 @@
    "module": "Booking & Selection",
    "wave": 1,
    "route": "/general/space-by-the-hour",
-   "operations": 4,
+   "operations": 5,
    "drawn": true
   },
   {
@@ -916,12 +916,6 @@
  ],
  "gaps": {
   "operationsWithNoScreen": [
-   {
-    "operation": "createParkingEntitlement",
-    "contract": "access",
-    "verb": "POST",
-    "summary": "A guest bought parking"
-   },
    {
     "operation": "getPlanBenefits",
     "contract": "catalogue",
@@ -1007,10 +1001,34 @@
     "summary": "Store a guest photo, ID or signed document"
    },
    {
+    "operation": "convertToTermProduct",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "Turn a visit into a membership or season pass"
+   },
+   {
     "operation": "revokeEntitlementShare",
     "contract": "orders",
     "verb": "POST",
     "summary": "Take back a share"
+   },
+   {
+    "operation": "revokePaymentToken",
+    "contract": "orders",
+    "verb": "DELETE",
+    "summary": "Remove a saved payment method"
+   },
+   {
+    "operation": "getCouponCode",
+    "contract": "promotions",
+    "verb": "GET",
+    "summary": "Look up a code"
+   },
+   {
+    "operation": "getRecommendations",
+    "contract": "promotions",
+    "verb": "POST",
+    "summary": "What else this guest might want"
    },
    {
     "operation": "getUpsellSuggestions",

@@ -42,16 +42,16 @@ modulesUsed:
 - module: transport
   screens: 1
 servicesCalled:
-- service: MarketingService
-  operationCalls: 57
 - service: OrderService
-  operationCalls: 55
+  operationCalls: 60
+- service: MarketingService
+  operationCalls: 58
 - service: CatalogueService
-  operationCalls: 47
+  operationCalls: 49
 - service: VenueOpsService
-  operationCalls: 39
+  operationCalls: 40
 - service: WhiteLabelService
-  operationCalls: 23
+  operationCalls: 25
 - service: IdentityService
   operationCalls: 20
 - service: FnbService
@@ -203,6 +203,7 @@ screens:
   - getAvailability
   - getProduct
   - getProductEligibilityRule
+  - getPublishedBookingFlow
   - getWaitTimes
   - listPerformances
   states:
@@ -218,6 +219,7 @@ screens:
   entryParams:
   - eventId<-WEB-002
   - productId<-WEB-001
+  - venueId<-session
   goesTo:
   - WEB-001
   - WEB-002
@@ -277,9 +279,11 @@ screens:
   operations:
   - addCartLine
   - checkBookingEligibility
+  - createCart
   - getAvailability
   - getCart
   - getPerformance
+  - getProduct
   - getPublishedBookingFlow
   - joinWaitlist
   - leaveWaitlist
@@ -296,6 +300,7 @@ screens:
   entryParams:
   - performanceId<-navigation
   - cartId<-navigation
+  - productId<-WEB-004
   - eventId<-WEB-004
   - venueId<-session
   - entryId<-navigation
@@ -319,6 +324,7 @@ screens:
   density: compact
   operations:
   - createSeatHold
+  - getPerformance
   - getPublishedBookingFlow
   - getSeatAvailability
   - listPerformances
@@ -335,6 +341,7 @@ screens:
   entryParams:
   - performanceId<-deepLink
   - eventId<-WEB-006
+  - productId<-WEB-004
   - holdId<-navigation
   - venueId<-session
   goesTo:
@@ -357,7 +364,7 @@ screens:
   operations:
   - addCartLine
   - decideRecommendations
-  - getBundle
+  - getGuestBundle
   - getPublishedBookingFlow
   - recordRecommendationEvents
   states:
@@ -422,7 +429,7 @@ screens:
   - evaluatePromotions
   - extendCart
   - getCart
-  - getCouponCode
+  - getGuestCouponCode
   - getPerformance
   - getPublishedBookingFlow
   - getResourceHold
@@ -642,6 +649,8 @@ screens:
   - cartId<-session
   - challengeId<-navigation
   - subjectId<-navigation
+  - returnTo<-navigation
+  - returnParams<-navigation
   goesTo:
   - WEB-001
   - WEB-010
@@ -739,6 +748,7 @@ screens:
   - issueTaxInvoice
   - listCreditMemos
   - listMyOrders
+  - listOwnRefundRequests
   - listTaxInvoices
   states:
   - emptyFirstRun
@@ -802,7 +812,9 @@ screens:
   operations:
   - getGameCard
   - getGiftCard
+  - getPublishedTenantConfig
   - getWallet
+  - listConsentPurposes
   - listPaymentTokens
   - listWalletTransactions
   - storePaymentToken
@@ -817,6 +829,7 @@ screens:
   offlineState: true
   entryParams:
   - cardCode<-deepLink
+  - cardKind<-deepLink
   - subjectId<-session
   - walletId<-navigation
   goesTo:
@@ -1079,6 +1092,7 @@ screens:
   operations:
   - createResaleListing
   - listMyOrders
+  - listOwnResaleListings
   - transferOrderTickets
   states:
   - emptyFirstRun
@@ -1111,9 +1125,10 @@ screens:
   - getGroupBooking
   - getGroupPackageDefinition
   - getReservation
-  - getResourceAvailability
   - listGroupPackages
   - listMyTableReservations
+  - listOwnGroupBookings
+  - listProductStartTimes
   - listReservations
   - requestGroupBooking
   - updateTableReservation
@@ -1606,6 +1621,7 @@ screens:
   density: compact
   operations:
   - addCartLine
+  - createCart
   - listProductStartTimes
   - listProductVariants
   - listProducts
@@ -1676,6 +1692,7 @@ screens:
   - generateVisitPlan
   - getTenantAppStatus
   - getVisitPlan
+  - getVisitPlannerOptions
   - listProducts
   - listVisitPlanAlternatives
   - updateVisitPlan

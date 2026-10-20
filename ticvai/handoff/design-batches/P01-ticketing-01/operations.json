@@ -82,30 +82,6 @@
   "requestBody": null,
   "responds": "Reservation"
  },
- "getResourceAvailability": {
-  "method": "GET",
-  "path": "/resources/{resourceId}/availability",
-  "contract": "resources",
-  "summary": "When it is free, with conflicts already resolved",
-  "permission": "RESOURCE_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "from",
-    "in": "query",
-    "required": true
-   },
-   {
-    "name": "to",
-    "in": "query",
-    "required": true
-   }
-  ],
-  "requestBody": null,
-  "responds": "ResourceAvailability"
- },
  "listFxRates": {
   "method": "GET",
   "path": "/fx-rates",
@@ -160,6 +136,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": false
+   },
    {
     "name": "kind",
     "in": "query",
@@ -230,6 +211,113 @@
    },
    {
     "name": "upcomingOnly",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listOwnGroupBookings": {
+  "method": "GET",
+  "path": "/group-booking-requests",
+  "contract": "orders",
+  "summary": "The group bookings the caller asked for",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listOwnResaleListings": {
+  "method": "GET",
+  "path": "/resale-listings",
+  "contract": "orders",
+  "summary": "The caller's own resale listings",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "entitlementId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listProductStartTimes": {
+  "method": "GET",
+  "path": "/resource-start-times",
+  "contract": "resources",
+  "summary": "Start times a space sold by the hour can be booked at, for one length on one day",
+  "permission": "RESOURCE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "productId",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "variantId",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "date",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "stepMinutes",
     "in": "query",
     "required": null
    },

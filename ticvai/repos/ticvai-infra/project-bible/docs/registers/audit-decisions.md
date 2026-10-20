@@ -294,6 +294,8 @@ contract, state model, screen, table and document it touches says the same thing
 
 ### R117: Integration vendors
 
+**r8 note (20 October 2026, IDENTITY-C06; CHG-R8SPN-019).** The password breach check is decided as a value: a local corpus behind the adapter `checkPasswordBreached(passwordSha1Prefix)`, so no vendor is called. Naming a vendor for it, if one is ever wanted, is still the client's, as for the other vendors above.
+
 **Question.** For each external integration, who is the vendor, and when do we get API documentation and sandbox access? The integrations: payment gateways (Stripe and Network International, CF-131), card tokenisation and hosted checkout, face matching, the parking vendor, a password breach check, the FX rate feed, Apple/Google wallet pass signing, and DNS/certificates for custom domains.
 
 **Why it matters.** The package names these vendors and choices (CF-131 closed, a FxRateSource enum, the parking vendor's endpoint and credential reference, require_breach_check) but specifies no interface for any of them. integration-register.md says of NI 'No trace'. We will write each adapter spec. The vendor details and credentials must come from you.
@@ -341,6 +343,8 @@ contract, state model, screen, table and document it touches says the same thing
 **Client confirms.** Client operations (F&B)
 
 ### R126: Identity rules
+
+**r8 note on (3) (20 October 2026, IDENTITY-C19).** The minor rule now has its trigger and its value: a subject is a minor while younger than `RegionSettings.minorAgeThreshold` (default 18, proposed; counsel may set another per region), computed from the date of birth, and a missing date of birth counts as a minor; the delegation and Face Pass operations read it through their declared read-via.
 
 **Question.** Define these IdentityService rules: (1) which changes to a staff member revoke their sessions at once (end date, primary role, permissions)? (2) guest session lifetime, and one session per device or shared? (3) delegation: who may grant delegated access, the minor age, and what happens when a date of birth is missing? (4) guest email verification: link lifetime and channel; (5) which MFA kinds staff may enrol (authenticator app, SMS, email)? (6) failed step-up: how many tries before lockout? (7) minimum password length floor for the password policy.
 
@@ -683,6 +687,8 @@ contract, state model, screen, table and document it touches says the same thing
 **Client confirms.** Client counsel / client product
 
 ### R205: Minors and Face Pass
+
+**r8 note (20 October 2026, IDENTITY-C19).** The age is `RegionSettings.minorAgeThreshold` (default 18, proposed), as R126 (3). GST-069's first step for a linked child is the guardian link: the signed-in adult picks the child from their linked guests, is recorded as guardian, and only then enrols the face.
 
 **Question.** For a minor's Face Pass enrolment, how does the guardian consent in the app, and what age counts as a minor?
 

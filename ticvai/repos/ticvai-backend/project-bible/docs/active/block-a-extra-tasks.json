@@ -18,6 +18,12 @@
    "subject": "AI engine: Block A (gateway, baseline layer, concierge, Help me choose, translations, planner agent)",
    "detail": "Built by the two AI engineers from 5 October (decided 30 September). Every AI answer works on day one from a baseline and learns from the tenant's own data; a trained model replaces the baseline only when it beats it and an admin approves (AI-D16). The AI endpoints and screens are built by the developers under their own tickets.",
    "area": "backend"
+  },
+  {
+   "key": "PRODUCTS-W1",
+   "subject": "Products module, wave 1: categories, tags, languages, owner forms, sale permissions, back-office frame",
+   "detail": "The first module rebuilt from client-reviewed wireframes (the client rejected the generated back-office screens). Wave 1 is what the 16 October 2026 minutes settle before the products sign-off (sources/mom/TICVAI_MoM_2026-10-16_TicketingConfig_Wireframes_Plan.md, sections 4.1-4.13 and 5); the product form itself is wave 2, after sign-off. People by the lead's ruling of 19 October 2026: Sanket Keluskar, Surendra (Surendra Loke) and Hrushikant Patkar on the migrations (CHG-R8PRD-008).",
+   "area": "backend"
   }
  ],
  "tasks": [
@@ -31,7 +37,7 @@
     "SETUP-AUTH"
    ],
    "subject": "Request kernel: hostname to tenant routing, per-transaction scope, error model and 429",
-   "detail": "In ticvai-backend. Resolve the tenant from the hostname (control-plane routing table, SD-021), open every transaction with the tenant and scope settings the row-level policies read (SD-059), one problem-details error model, and 429 with Retry-After on the hot public operations (SD-043). Done when: two seeded tenants on two hostnames cannot read each other's rows, and a flood test returns 429 instead of 500. Spec (4 October, CHG-FXP-005): the routing table is `control.tenant_domain` (hostname, verified, redirect) in the control database, joined to `control.tenant` and `control.cell_tenant` for the tenant's cell and database (ADR-0038: one database per tenant inside its region's cell; ADR-0039: `control` is a database of its own and `control.cell` has no tenant_id, the relation is `control.cell_tenant`). The row-level policies of backend/tenant/920-row-level-security.sql read two session settings, set with SET LOCAL at the start of every transaction from the resolved session: `ticvai.scope_paths` (the comma-separated ltree scope paths the principal may see; unset or empty means no rows) and `ticvai.subject_id` (the guest's own rows). Venues stay partitions of the tenant database (ADR-0005), not databases.",
+   "detail": "In ticvai-backend. Resolve the tenant from the hostname (control-plane routing table, SD-021), open every transaction with the tenant and scope settings the row-level policies read (SD-059), one problem-details error model, and 429 with Retry-After on the hot public operations (SD-043). Done when: two seeded tenants on two hostnames cannot read each other's rows, and a flood test returns 429 instead of 500. Spec (4 October, CHG-FXP-005): the routing table is `control.tenant_domain` (hostname, verified, redirect) in the control database, joined to `control.tenant` and `control.cell_tenant` for the tenant's cell and database (ADR-0038: one database per tenant inside its region's cell; ADR-0039: `control` is a database of its own and `control.cell` has no tenant_id, the relation is `control.cell_tenant`). The row-level policies of backend/tenant/920-row-level-security.sql read two session settings, set with SET LOCAL at the start of every transaction from the resolved session: `ticvai.scope_paths` (the comma-separated ltree scope paths the principal may see; unset or empty means no rows) and `ticvai.subject_id` (the guest's own rows), and `ticvai.principal_id` (the signed-in principal, for the rows that are its own: credentials and second factors). Venues stay partitions of the tenant database (ADR-0005), not databases. **The context before and without a session** (R8 blocker IDENTITY-C48, the lead's option A, 20 October 2026; CHG-R8MIG-007; backend/MIGRATIONS.md \"The connection context\"): (1) a door or anonymous call (login, the guest sign-ins, listSsoProviders, listActiveSessions with step-up) opens its transaction in an explicit system context (the tenant root path) confined to the identity module's own verification statements, then narrows it with SET LOCAL before any other table is touched: `ticvai.scope_paths` to the resolved principal's paths and `ticvai.principal_id` to the principal, or `ticvai.subject_id` to the guest (scope paths empty); a session-less till call narrows to the till's venue path once the supervisor is verified; (2) a guest reads and writes its own `pii.subject` row and the rows keyed to its subject; (3) a serviceAuth cell-internal call has no user: the tenant comes from the cell token's tid claim, `ticvai.scope_paths` is the tenant root, the calling cell is the audited actor, and its idempotency records are claimed under that context.",
    "builds": [
     "table control.tenant_domain",
     "table control.tenant",
@@ -105,7 +111,7 @@
     "PLATFORM-OUTBOX"
    ],
    "subject": "Order paid to tickets issued: the saga proven end to end",
-   "detail": "order.paid consumed by the entitlement owner, tickets issued, the ledger posting once from the event, and holds converted with capacity decremented (SD-026, SD-023). Done when: a web purchase in the sandbox ends with a ticket, one ledger posting and sold capacity reduced, and a replayed event changes nothing. Spec (4 October, CHG-FXP-005), from events/order-paid.yaml and events/entitlement-issued.yaml (adam_search order.paid): the payment transaction (createPayment, or the provider webhook) converts the inventory holds (`catalogue#convertInventoryHold`: the hold becomes sold capacity), posts the cash receipt to ledger.journal_entry and ledger.journal_line, and writes `order.paid` to the outbox in the same transaction; AccessService consumes it (`access#issueOrderEntitlements`, idempotency key orderId + lineId; on failure retry, then dead-letter, which pages) and publishes `entitlement.issued`; the orders consumer of that completes the order. A dead-lettered issuance is replayed, never compensated by an automatic refund. ADR-0055: modules in different deployables talk by event; ADR-0058: one relay per region and an inbox per tenant database, so a replayed event is a no-op.",
+   "detail": "order.paid consumed by the entitlement owner, tickets issued, the ledger posting once from the event, and holds converted with capacity decremented (SD-026, SD-023). Done when: a web purchase in the sandbox ends with a ticket, one ledger posting and sold capacity reduced, and a replayed event changes nothing. **Until the client's payment sandbox credentials arrive (CLIENT-PAY-SANDBOX)**, 'in the sandbox' is met as PLATFORM-PAYMENTS' module test meets it (CHG-FXP-006): the payment confirmation is a signed webhook built from the provider's documented test payloads with a locally generated signing secret (the lead, 20 October 2026, r8 cause FOUNDATION-AI-C18, option A). The same purchase run against the provider's test mode is a Block A closing check once the credentials arrive, not a condition of this task. Spec (4 October, CHG-FXP-005), from events/order-paid.yaml and events/entitlement-issued.yaml (adam_search order.paid): the payment transaction (createPayment, or the provider webhook) converts the inventory holds (`catalogue#convertInventoryHold`: the hold becomes sold capacity), posts the cash receipt to ledger.journal_entry and ledger.journal_line, and writes `order.paid` to the outbox in the same transaction; AccessService consumes it (`access#issueOrderEntitlements`, idempotency key orderId + lineId; on failure retry, then dead-letter, which pages) and publishes `entitlement.issued`; the orders consumer of that completes the order. A dead-lettered issuance is replayed, never compensated by an automatic refund. ADR-0055: modules in different deployables talk by event; ADR-0058: one relay per region and an inbox per tenant database, so a replayed event is a no-op.",
    "builds": [
     "operation createPayment",
     "operation convertInventoryHold",
@@ -187,7 +193,7 @@
     "SETUP-OBS"
    ],
    "subject": "Observability with tenant and venue on every trace, and the first dashboards",
-   "detail": "OpenTelemetry attributes for tenant, venue and workstation; dashboards for the sale path and sync; alerts on error rate and latency (SD-048). Done when: a failed POS sale can be found by venue and till within a minute. Spec (4 October, CHG-FXP-005), docs/architecture/observability.md: every log, metric and span carries tenant_id, region_id and venue_id (plus cell, correlation and session id on traces, and workstation on POS metrics), set by the kernel from the resolved session and the workstation. The sale path is the operations linked here (createOrder and createPayment in OrderService, validateAccess in AccessService); sync is syncOrders and syncScans. The first alerts are that document's list (outbox backlog per device, replication lag per cell, PgBouncer pool saturation, Redis-Postgres capacity divergence, the venue edge heartbeat) on the stack SETUP-OBS sets up.",
+   "detail": "OpenTelemetry attributes for tenant, venue and workstation; dashboards for the sale path and sync; alerts on error rate and latency (SD-048). Done when: a failed POS sale can be found by venue and till within a minute. Spec (4 October, CHG-FXP-005), docs/architecture/observability.md: every log, metric and span carries tenant_id, region_id and venue_id (plus cell, correlation and session id on traces, and workstation on POS metrics), set by the kernel from the resolved session and the workstation. The sale path is the operations linked here (createOrder and createPayment in OrderService, validateAccess in AccessService); sync is syncOrders and syncScans. The first alerts are that document's table, with the threshold, window and severity each row gives (proposed defaults, client to confirm; r8, FOUNDATION-AI-C25): error rate (5xx above 1 percent for 5 minutes; 402 and 409 refusals do not count), latency (p95 above the operation's x-ticvai-latency-budget-ms for 10 minutes), outbox backlog per device (above 1,000 rows or the oldest older than 5 minutes), replication lag per cell (above 30 seconds for 5 minutes), Redis-Postgres capacity divergence and the venue edge heartbeat (missing for 2 minutes), on the stack SETUP-OBS sets up. PgBouncer pool saturation is in that table too but is built by OBS-TENANT-POOL, not here (FOUNDATION-AI-C53).",
    "builds": [
     "operation createOrder",
     "operation createPayment",
@@ -303,7 +309,7 @@
     "SETUP-HOSTS"
    ],
    "subject": "Monthly partitions: create three months ahead, detach what retention has expired",
-   "detail": "A job in the workers host that keeps monthly range partitions three months ahead on the time-partitioned tables (access.scan_event, platform.outbox, platform.dead_letter, platform.audit_record, ledger.journal_line, marketing.message_dispatch, kernel.inbox; ADR-0056) in every tenant database, and detaches and archives partitions past their retention (ADR-0047). Done when: a new tenant database has partitions three months ahead, a run with the clock moved forward creates the next month, and an expired partition is detached, not deleted row by row.",
+   "detail": "A job in the workers host that keeps monthly range partitions three months ahead on the time-partitioned tables (access.scan_event, platform.outbox, platform.dead_letter, platform.audit_record, ledger.journal_line, marketing.message_dispatch, kernel.inbox; ADR-0056) in every tenant database, and detaches and archives partitions past their retention (ADR-0047). Done when: a new tenant database has partitions three months ahead, a run with the clock moved forward creates the next month, and an expired partition is detached, not deleted row by row. **Order** (R8 blocker FOUNDATION-AI-C31, CHG-R8MIG-020): it needs the first-release migrations of the tables it partitions (MIG-KERNEL, MIG-PLATFORM, MIG-LEDGER, MIG-ACCESS, MIG-MARKETING) applied first, and creates partitions only for the partitioned tables that exist when it runs, so platform.dead_letter, which MIG-PLATFORM-4 creates later, gets its partitions on the first run after that migration; it is a job in the workers host, not a migration file.",
    "builds": [
     "table access.scan_event",
     "table kernel.inbox",
@@ -326,7 +332,7 @@
     "SETUP-ENV"
    ],
    "subject": "Qdrant cluster in dev and staging: 3 nodes, TLS, snapshots, monitoring",
-   "detail": "In **ticvai-infra** (Terraform): a self-hosted 3-node Qdrant cluster in Azure UAE North for dev and staging (ADR-0049), pinned to 1.16 or later, with TLS, JWT RBAC on and the signing key in the cell's Key Vault, snapshot storage in the UAE, and monitoring and alerts on node health, disk and latency. Check Qdrant Hybrid Cloud on our own AKS as an alternative before building. Done when: the cluster survives the loss of one node, a snapshot of a test collection restores into a fresh cluster, and a request without a valid token is refused.",
+   "detail": "In **ticvai-infra** (Terraform): a self-hosted 3-node Qdrant cluster in Azure UAE North for staging (ADR-0049), pinned to 1.16 or later, with TLS, JWT RBAC on and the signing key in the cell's Key Vault, snapshot storage in the UAE, and monitoring and alerts on node health, disk and latency. Check Qdrant Hybrid Cloud on our own AKS as an alternative before building. Done when: the cluster survives the loss of one node, a snapshot of a test collection restores into a fresh cluster, and a request without a valid token is refused. **Where the install lives** (the lead, 20 October 2026, r8 cause FOUNDATION-AI-C22, option A): the cluster bootstrap is a second Terraform stage in ticvai-infra, run after the cell module against its AKS cluster with the helm and kubernetes providers; it installs cert-manager (certificates from Let's Encrypt), the ingress and the official Qdrant chart on the qdrant node pool, with TLS and JWT RBAC on. The providers, the chart and cert-manager are on the approved list (setup/dependencies.md). Dev has no cluster (laptops, docker compose); this ticket's cluster is staging's (FOUNDATION-AI-C52).",
    "linksNothingBecause": "infrastructure (Terraform) only; its text names the cluster's settings",
    "builds": [
     "adr ADR-0049",
@@ -342,7 +348,7 @@
     "SETUP-CLIENTS"
    ],
    "subject": "Offline journal in packages/offline-core: record, replay and the conflict policies",
-   "detail": "In ticvai-frontend packages/offline-core: an append-only journal of sales and scans taken offline, replay on reconnect, and the conflict policies the contracts declare (SD-047). Done when: a POS takes ten cash sales with the network off and all ten reach the server once when it returns. Spec (4 October, CHG-FXP-005): the conflict policies are the `x-ticvai-conflict-policy` of each operation the journal records (linked here): `append` for createOrder, createPayment, createCashMovement and validateAccess (nothing is overwritten, so a replayed entry is a new fact, deduplicated by its idempotency key); `lastWriterWins` only where an operation declares it (holdOrder); `serverWins` for everything else (the server's version stands and the till re-reads). Replay goes through `orders#syncOrders` and `access#syncScans` in journal order, each entry with the idempotency key it was taken with. ADR-0013: the catalogue is read locally on every transaction, online or not, and contended inventory sells only from a lease; ADR-0022: the four policies and why the set is closed.",
+   "detail": "In ticvai-frontend packages/offline-core: an append-only journal of sales and scans taken offline, replay on reconnect, and the conflict policies the contracts declare (SD-047). Done when: a POS takes ten cash sales with the network off and all ten reach the server once when it returns. Spec (4 October, CHG-FXP-005): the conflict policies are the `x-ticvai-conflict-policy` of each operation the journal records (linked here): `append` for createOrder, createPayment, createCashMovement and validateAccess (nothing is overwritten, so a replayed entry is a new fact, deduplicated by its idempotency key); `lastWriterWins` only where an operation declares it (holdOrder); `serverWins` for everything else (the server's version stands and the till re-reads). Replay goes through `orders#syncOrders` and `access#syncScans` in journal order, each entry with the idempotency key it was taken with. ADR-0013: the catalogue is read locally on every transaction, online or not, and contended inventory sells only from a lease; ADR-0022: the four policies and why the set is closed. **A cash movement** (r8, FOUNDATION-AI-C13): it replays through shift.createCashMovement with its Idempotency-Key and recordedAt; a 409 shift-not-open or lift-exceeds-float on replay is quarantined through recordSyncRejection with kind cashMovement, as a refused sale is.",
    "builds": [
     "operation createOrder",
     "operation createPayment",
@@ -363,7 +369,7 @@
     "PLATFORM-KERNEL"
    ],
    "subject": "Signed catalogue and entitlement bundles, and the lease client",
-   "detail": "The signed bundle a till or scanner trades from offline, including entitlements and dynamic access policy for the scanner (SD-052), and the lease each workstation holds (SD-047). Two bundles: the till's signed catalogue bundle (`catalogue#getLatestBundle`, applied whole or not at all and acknowledged with `catalogue#reportBundleApplied`; table catalogue.published_bundle) and the scanner's offline package (`access#getOfflinePackage`). The lease is ADR-0013 section 2: a till holds N units of contended timed capacity for a TTL through `catalogue#acquireInventoryHold` (catalogue.inventory_hold), renewed while the link is up; unsold units return on expiry; seated inventory stays blocked offline (CHG-FXP-005). Done when: a till whose lease has expired refuses the next offline sale of that capacity and the POS-002 sale drawer says why (the offline allowance has expired; reconnect to sell more) instead of selling; a till with a valid lease sells down to zero and then refuses the same way; it never oversells.",
+   "detail": "The signed bundle a till or scanner trades from offline, including entitlements and dynamic access policy for the scanner (SD-052), and the lease each workstation holds (SD-047). Two bundles: the till's signed catalogue bundle (`catalogue#getLatestBundle`, applied whole or not at all and acknowledged with `catalogue#reportBundleApplied`; table catalogue.published_bundle) and the scanner's offline package (`access#getOfflinePackage`). The lease is ADR-0013 section 2: a till holds N units of contended timed capacity for a TTL through `catalogue#acquireInventoryHold` (catalogue.inventory_hold), renewed while the link is up; unsold units return on expiry; seated inventory stays blocked offline (CHG-FXP-005). **Block A takes no standing lease** (ADR-0013 C103; r8, FOUNDATION-AI-C45, GPS-C37): contended timed entry is online-only at the till, and offline the POS-002 sale drawer refuses it and says why (timed entry needs a connection). Done when: offline, a till refuses contended timed entry with that message and sells the rest from its bundle; an offline sale replayed after the hold it relied on expired is accepted and flagged unitsGone for the reconciler, never silently dropped (FOUNDATION-AI-C46); a bundle whose signature does not verify (Ed25519 over contentHash, keys from getBundleSigningKeys with a 7-day grace) is refused whole (FOUNDATION-AI-C14).",
    "builds": [
     "operation getLatestBundle",
     "operation reportBundleApplied",
@@ -398,7 +404,7 @@
     "PLATFORM-OUTBOX"
    ],
    "subject": "A POS sale reaches the kitchen: routing online, and the LAN path decision",
-   "detail": "createFnbOrder from the POS creates the kitchen ticket as the guest order does, routed to the right station (SD-046). The offline LAN path to the Kitchen Display is an ADR decision; this task implements the online path and the stub the decision fills. Done when: a POS sale of a burger and a drink shows on the grill and bar stations. 2 October (Chinmay, DEC-187/189): kitchen printers are in release 1 (print template, printer routing) and routing takes category rules with a default/fallback station per outlet. 8 points (was 5).",
+   "detail": "createFnbOrder from the POS creates the kitchen ticket as the guest order does, routed to the right station (SD-046). The offline LAN path to the Kitchen Display is an ADR decision; this task implements the online path and the stub the decision fills. Done when: a POS sale of a burger and a drink shows on the grill and bar stations. 2 October (Chinmay, DEC-187/189): routing takes category rules with a default/fallback station per outlet; 8 points (was 5). **What prints in Block A** (the lead, 20 October 2026, r8 cause FOUNDATION-AI-C15, option A): DEC-187's kitchen printing is met by prep-sheet printing to the station's printers (printPrepSheet, KitchenStation.printerDeviceIds); the kitchen ticket itself shows on the Kitchen Display and is not printed. Printing each kitchen ticket through a ticket template is a later change, not part of this task.",
    "builds": [
     "operation createFnbOrder",
     "table fnb.kitchen_ticket",
@@ -514,7 +520,7 @@
    "assignee": "Second AI engineer",
    "days": 5,
    "subject": "Qdrant tenancy: a collection and a scoped token per tenant, the retrieval client, erasure and snapshots",
-   "detail": "In ticvai-ai, on SETUP-QDRANT's cluster (ADR-0049, design 5.8). Collection-per-tenant provisioning at tenant onboarding, per embedding model (t_<tenantId>_<model>) behind the alias tenant_<tenantId> (a model change is a shadow collection, an evaluation and an alias swap); per-tenant HS256 JWT issuance and rotation, scoped to the tenant's collections and alias, signed with the admin API key that only the issuer reads from Key Vault (ticvai-ai never does); the single retrieval client with no scope parameter that reads the caller's scope from the request and always adds the venue filter (points carry venue_id and scope_path, indexed); dense and sparse named vectors fused by reciprocal rank; erasure by guest or document payload, checked against the point references in ai.chunk_embedding; offboarding that deletes the collections and alias and revokes the token; per-collection snapshots copied to UAE North storage by a CronJob (azcopy, workload identity) and a restore tested per tenant. About 5 engineer-days. Done when: a token for one tenant cannot read another tenant's collection (the store refuses it); a collection-scoped token works through the alias, or the token names both; a venue-scoped question never returns another venue's chunk; an erased guest's points are gone and the check against ai.chunk_embedding proves it; and one tenant's snapshot restores into a fresh collection.",
+   "detail": "In ticvai-ai, on SETUP-QDRANT's cluster (ADR-0049, design 5.8). Collection-per-tenant provisioning at tenant onboarding, per embedding model (t_<tenantId>_<model>) behind the alias tenant_<tenantId> (a model change is a shadow collection, an evaluation and an alias swap); per-tenant HS256 JWT issuance and rotation, scoped to the tenant's collections and alias, signed with the admin API key that only the issuer reads from Key Vault (ticvai-ai never does). The issuer is the workers host (the .NET background-job deployable), which also runs collection, alias, snapshot and offboarding work; the token is read-write ('rw') on the tenant's own collection and alias only, exp 30 days, reissued weekly to Key Vault, and ticvai-ai reloads it when the secret version changes (ADR-0049; the lead, 20 October 2026, r8 cause FOUNDATION-AI-C10); the single retrieval client with no scope parameter that reads the caller's scope from the request and always adds the venue filter (points carry venue_id and scope_path, indexed); dense and sparse named vectors fused by reciprocal rank; erasure by guest or document payload, checked against the point references in ai.chunk_embedding; offboarding that deletes the collections and alias and revokes the token; per-collection snapshots copied to UAE North storage by a CronJob (azcopy, workload identity) and a restore tested per tenant. About 5 engineer-days. Done when: a token for one tenant cannot read another tenant's collection (the store refuses it); a collection-scoped token works through the alias, or the token names both; a venue-scoped question never returns another venue's chunk; an erased guest's points are gone and the check against ai.chunk_embedding proves it; and one tenant's snapshot restores into a fresh collection.",
    "depends": [
     "SETUP-QDRANT"
    ],
@@ -523,6 +529,26 @@
     "table ai.chunk_embedding",
     "adr ADR-0049",
     "adr ADR-0021"
+   ]
+  },
+  {
+   "key": "AI-ENGINE-ERASE-SUBJECT",
+   "epic": "AI-ENGINE",
+   "assignee": "Second AI engineer",
+   "days": 2,
+   "subject": "Guest AI erasure: eraseSubject removes a deleted guest's index rows and search points, with the counts that prove it",
+   "detail": "In ticvai-ai, beside AI-ENGINE-QDRANT, whose erasure by guest payload it calls. **Built in Block A by the lead's decision** (20 October 2026, \"Accepting both as recommended\", CHG-R8ERA-001): Block A indexes support cases (marketing.case, which carry the guest's subjectId) through reindexSource, so a deleted guest's case text would otherwise stay searchable until a later block. eraseSubject (contracts/satellite/ai.yaml, POST /internal/subjects/{subjectId}/ai-erasure) is an internal operation: serviceAuth over the cell's mTLS, no user permission, called only by Identity's erasure job for a guest whose pii.subject row it has tombstoned (deleteGuestAccount, CHG-R8ERA-002). For the subject, in this order: delete the ai.index_entry rows and the ai.chunk_embedding rows with that subject_id in one transaction, then the Qdrant points whose payload subjectId is the subject, by payload filter (which also catches a point whose row went first); then count what is left in both stores. It answers 200 with subjectId, indexEntriesRemoved, chunksRemoved, pointsRemoved, rowsLeft and pointsLeft; zero left is the proof the erasure keeps. A subject with nothing indexed, or already erased, answers 200 with zeros (never a 404 or 409), so Identity's retry is always safe; the Idempotency-Key replays the first answer. Qdrant unreachable: the rows are still removed in their transaction and the call answers 502 provider-connection-failed, so Identity retries and the retry removes the points. It writes only ai.index_entry and ai.chunk_embedding (their subject_id columns exist: V0104, V0108; no new migration) and logs no guest text. About 2 engineer-days. Done when: a guest with an indexed support case is erased and the call answers rowsLeft 0 and pointsLeft 0 with the removed counts above 0; semanticSearch no longer returns that case's text, and another guest's points and rows are untouched; a second call for the same subject answers 200 with zeros; with Qdrant forced down the call answers 502 provider-connection-failed with the rows gone, and the next call removes the points and answers zero left; and a guest's or a staff member's token cannot call it (serviceAuth only).",
+   "depends": [
+    "AI-ENGINE-QDRANT",
+    "MIG-AI"
+   ],
+   "appModule": "baseline",
+   "operations": [
+    "eraseSubject"
+   ],
+   "builds": [
+    "adr ADR-0047",
+    "adr ADR-0049"
    ]
   },
   {
@@ -632,7 +658,7 @@
     "KERNEL-TENANT-LIMITS"
    ],
    "subject": "Alerts on one tenant's share of its connection pool and on max_connections",
-   "detail": "ADR-0064 item 4: per-tenant pool caps stay, and two alerts watch them: one tenant holding more than 60% of its pool for five minutes, and the instance passing 80% of max_connections; plus a dashboard panel of 429s per tenant and audience from KERNEL-TENANT-LIMITS. Done when: a load run that holds one tenant's pool fires the first alert after five minutes naming the tenant, and opening connections past 80% of max_connections fires the second. Where the numbers come from (4 October, CHG-FXP-005): one tenant's share is PgBouncer's SHOW POOLS for that tenant database (cl_active plus cl_waiting against pool_size); the instance figure is the count of pg_stat_activity against max_connections; both are scraped into the Prometheus-compatible metrics of SETUP-OBS and alert through its Azure Monitor action group, labelled with tenant_id and cell.",
+   "detail": "ADR-0064 item 4: per-tenant pool caps stay, and two alerts watch them: one tenant holding more than 60% of its pool for five minutes, and the instance passing 80% of max_connections; plus a dashboard panel of 429s per tenant and audience from KERNEL-TENANT-LIMITS. Done when: a load run that holds one tenant's pool fires the first alert after five minutes naming the tenant, and opening connections past 80% of max_connections fires the second. Where the numbers come from (4 October, CHG-FXP-005): one tenant's share is the server connections in use for that tenant database, sv_active plus sv_used from PgBouncer's SHOW POOLS, against the database's pool_size from SHOW DATABASES (what ADR-0032 and ADR-0040 say is monitored), with cl_waiting above 0 as a second signal (r8, FOUNDATION-AI-C24); the instance figure is the count of pg_stat_activity against max_connections; both are scraped into the Prometheus-compatible metrics of SETUP-OBS and alert through its Azure Monitor action group, labelled with tenant_id and cell. The pooler is Azure's built-in PgBouncer (r8, FOUNDATION-AI-C53, lead 20 October 2026): Terraform sets pgbouncer.enabled on the Flexible Server (port 6432), and its statistics are read through the admin console on 6432 by a monitoring role with no data access. This alert is the PgBouncer saturation alert of docs/architecture/observability.md: this ticket builds it and its scrape, and PLATFORM-OBSERVE does not build a second one. Thresholds are proposed, client to confirm (that document's alert table).",
    "linksNothingBecause": "alerts on PgBouncer and PostgreSQL statistics; the thresholds and where they come from are in its text",
    "builds": [
     "adr ADR-0032",
@@ -748,6 +774,160 @@
     "Ticket printer"
    ],
    "linksNothingBecause": "a device driver in the device app behind the ticketPrinter port: it builds no operation, table or screen of the package; its spec is ADR-0015 and the integration register"
+  },
+  {
+   "key": "PRD-W1-DB",
+   "epic": "PRODUCTS-W1",
+   "points": 3,
+   "assignee": "Hrushikant Patkar",
+   "depends": [
+    "SETUP-DB"
+   ],
+   "subject": "Products wave 1: forward migration of the new catalogue and marketing tables and the session's working venue",
+   "detail": "Spec: the contracts at the release tag in ADAM (CHG-R8PRD-002 to 011), from the 16 October 2026 minutes (sources/mom/TICVAI_MoM_2026-10-16_TicketingConfig_Wireframes_Plan.md). One forward migration, additive, in the tenant database: catalogue.product_tag, catalogue.product_channel_text, catalogue.product_owner_form, catalogue.product_sale_permission and marketing.form_submission_sale_link, each with the columns, keys and references its contract schema declares (ProductTag, ProductChannelTexts, ProductOwnerForm, ProductSalePermissionRule, FormSubmissionSaleLink: x-ticvai-unique, x-ticvai-unique-together, x-ticvai-unique-nulls, x-ticvai-required-when, x-ticvai-references) and row security on scope_path like every tenant table; and the column identity.session.working_venue_id (SessionVenue.workingVenueId; venue_id is not touched). Seeding of catalogue.product_tag, per venue (CHG-R8PRD-010, -011), so every stored value maps to exactly one tag: (1) take every segment_tags value of the venue's products and every segmentTags value of the venue's Help me choose answer filters (whitelabel.guided_choice_answer), trim it, drop empty values; (2) its key is lower(value); values with one key are one tag; every tag's name is the original value of the first of them (product id order, then answer id order), trimmed and cut to 80 characters; (3) literal codes first: a key matching ^[a-z0-9][a-z0-9-]*(/[a-z0-9][a-z0-9-]*)*$ and at most 64 characters is the tag's code; then derived codes, in key order: every run of characters outside a-z, 0-9 and / becomes one hyphen, hyphens are trimmed at the ends of each /-segment, empty segments are dropped, an empty result becomes tag (the base); the candidate is the base cut to 64 characters; while the candidate is taken in the venue, try suffix n = 2, 3 and so on, the candidate being the base cut to 64 minus the length of -n, followed by -n; after any cut, trailing / and - are trimmed before a suffix is added, so every derived code fits 64 characters and matches the code pattern; (4) each product's segment_tags and each answer filter's segmentTags is rewritten to its tags' codes, in the original order, duplicates removed (the answer rows are WhiteLabel's: its owner reviews that part). A second run finds every value already a code and changes nothing. Done when: applied to a database at the previous state it creates exactly these, a second run changes nothing, and the result matches the package's derived DDL for them at the release tag.",
+   "builds": [
+    "table catalogue.product_tag",
+    "table catalogue.product_channel_text",
+    "table catalogue.product_owner_form",
+    "table catalogue.product_sale_permission",
+    "table marketing.form_submission_sale_link",
+    "table identity.session"
+   ]
+  },
+  {
+   "key": "PRD-W1-CATEGORIES-TAGS",
+   "epic": "PRODUCTS-W1",
+   "points": 5,
+   "assignee": "Sanket Keluskar",
+   "depends": [
+    "PRD-W1-DB"
+   ],
+   "subject": "Products wave 1: categories and tags as master data, back end and screens",
+   "detail": "Spec: the contracts at the release tag in ADAM (CHG-R8PRD-002 to 011), from the 16 October 2026 minutes (sources/mom/TICVAI_MoM_2026-10-16_TicketingConfig_Wireframes_Plan.md). The back-office screens are held: build the screen from the products wireframe Pallavi Sawant shares (board ids below; its 21 October revision applies the minutes), not from a generated P08 screen. Back end in CatalogueService: listProductCategoryUsage, listProductTags, setProductTagDefinition, setProductClassification (listProductCategories and setProductCategories exist). Screens: B1-S05 Category & Hierarchy Manager, the new Tags screen of the Setup Library, the category drop-down and tag picker of B1-S04 Identity & Classification (the rest of B1-S04 is wave 2), the tag line of B11-S04. Every operation answers as its contract says, with a contract test for each status code and problem type it lists; the permission and venue scope are enforced (row security on scope_path); every write records the audit entry its contract names; paged lists keep their stated order; nothing is written outside the tables listed. Done when: the category manager shows each category's product counts (archived counted apart) and refuses dropping a used category; tags are listed, created, replaced and deactivated, with duplicate-code (unique in the venue, ignoring case) and tag-code-in-use (a product or a Help me choose answer carries it) refused; setProductClassification writes category_id and segment_tags, versions the product as updateProduct does, and refuses unknown-category, inactive-category, unknown-tag, inactive-tag and product-archived; listProducts with segmentTag finds the products a tag was given; the venue-scoped reads and the tag write take venueId, else the working venue, refusing venue-required and venue-not-in-grants.",
+   "operations": [
+    "listProductCategoryUsage",
+    "listProductTags",
+    "setProductTagDefinition",
+    "setProductClassification"
+   ],
+   "builds": [
+    "operation listProductCategories",
+    "operation setProductCategories",
+    "table catalogue.product_category",
+    "table catalogue.product_tag",
+    "table catalogue.product"
+   ]
+  },
+  {
+   "key": "PRD-W1-OWNER-FORMS",
+   "epic": "PRODUCTS-W1",
+   "points": 5,
+   "assignee": "Sanket Keluskar",
+   "depends": [
+    "PRD-W1-DB"
+   ],
+   "subject": "Products wave 1: reservation-owner and ticket-owner forms linked to a product, back end and screens",
+   "detail": "Spec: the contracts at the release tag in ADAM (CHG-R8PRD-002 to 011), from the 16 October 2026 minutes (sources/mom/TICVAI_MoM_2026-10-16_TicketingConfig_Wireframes_Plan.md). The back-office screens are held: build the screen from the products wireframe Pallavi Sawant shares (board ids below; its 21 October revision applies the minutes), not from a generated P08 screen. Back end in CatalogueService: getProductOwnerForms, setProductOwnerForms, listOwnerFormCandidates, reading Marketing's forms only through marketing-crm#formDefinitionRecords. In MarketingService, additive and reviewed by its owner: FormField.presentation (dropDown, radio, checkBoxes) through createForm and getForm, and recordSaleOwnerAnswers (the service write the Orders service calls; FormSubmission.saleContext read-only on submitForm). Screens: the owner-form picker of B2-S10 Ownership & Assignment Model only. No Forms screen is built here: the venue draws the data mask (text, drop-down, radio, check box, each field marked personal data or not) and publishes it in Marketing's own form screens, by staff holding MARKETING_VIEW and MARKETING_MANAGE (publishing is Marketing's, with its own second approver); the Setup Library links there, and the product administrator only picks a published form. Every operation answers as its contract says, with a contract test for each status code and problem type it lists; the permission and venue scope are enforced (row security on scope_path); every write records the audit entry its contract names; paged lists keep their stated order; nothing is written outside the tables listed. Done when: a product links at most one reservation-owner and one ticket-owner form, each a published dataCapture or registration form of its venue (unknown-form, form-kind-not-allowed, form-not-published and product-archived refused), versioned as updateProduct does; the picker lists only those forms to a caller holding PRODUCT_CONFIGURE; a select drawn as radio or drop-down and a multiSelect drawn as check boxes store the same answers as before. recordSaleOwnerAnswers takes the order's venue from Orders, checks the order, its buyer, the line and unit, the form's venue and the subject through its declared reads, keeps one submission per owner slot and refuses a second (owner-answers-already-recorded). Asking the forms at sale and calling recordSaleOwnerAnswers is not in this task (orders).",
+   "operations": [
+    "getProductOwnerForms",
+    "setProductOwnerForms",
+    "listOwnerFormCandidates",
+    "recordSaleOwnerAnswers"
+   ],
+   "builds": [
+    "operation createForm",
+    "operation getForm",
+    "operation submitForm",
+    "table catalogue.product_owner_form",
+    "table marketing.form_submission_sale_link"
+   ]
+  },
+  {
+   "key": "PRD-W1-SALE-PERMISSIONS",
+   "epic": "PRODUCTS-W1",
+   "points": 5,
+   "assignee": "Sanket Keluskar",
+   "depends": [
+    "PRD-W1-DB"
+   ],
+   "subject": "Products wave 1: who can sell a product, back end",
+   "detail": "Spec: the contracts at the release tag in ADAM (CHG-R8PRD-002 to 011), from the 16 October 2026 minutes (sources/mom/TICVAI_MoM_2026-10-16_TicketingConfig_Wireframes_Plan.md). Back end in CatalogueService: getProductSalePermissionRules, setProductSalePermissionRules, checkProductSalePermission, listSalePermissionTargets, reading other modules only through their declared queries (tenancy#activeVenues, tenancy#workstationRecords, identity#roleRecords, identity#principalRecords, identity#delegatedAccessRecords). Serves the Who can sell section of B1-S04 and B7-S07 (PRD-W1-SALE-PERMISSIONS-UI). Every operation answers as its contract says, with a contract test for each status code and problem type it lists; the permission and venue scope are enforced (row security on scope_path); every write records the audit entry its contract names; paged lists keep their stated order; nothing is written outside the tables listed. Done when: a rule set saves whole and a rule sent again with its level and target keeps its id; validation, no-allow-rule, global-deny, unknown-sale-permission-target (a new or changed rule naming anything listSalePermissionTargets does not offer for the product; unchanged rules are kept as they are), sale-permission-self-grant (adding an ALLOW for, or lifting a DENY on, the caller or the caller's role) and product-archived are refused; a change takes effect at once in every state but archived, as updateProduct does, versioned and audited; listSalePermissionTargets with productId lists that product's venue; checkProductSalePermission resolves deny over allow (any matching DENY denies, else any matching ALLOW allows, else denied; no rules sells as before), with tests for the contract's example; and a test shows admin rights per venue with the existing grants: a principal granted PRODUCT_CONFIGURE at venue A's scope path (createDelegatedAccess) changes venue A's products and is refused at venue B, while a grant at the tenant's path reaches both. Enforcing the rules at sale is not in this task.",
+   "operations": [
+    "getProductSalePermissionRules",
+    "setProductSalePermissionRules",
+    "checkProductSalePermission",
+    "listSalePermissionTargets"
+   ],
+   "builds": [
+    "table catalogue.product_sale_permission",
+    "table catalogue.sales_channel",
+    "table catalogue.product"
+   ]
+  },
+  {
+   "key": "PRD-W1-FRAME",
+   "epic": "PRODUCTS-W1",
+   "points": 5,
+   "assignee": "Surendra",
+   "depends": [
+    "PRD-W1-DB",
+    "SETUP-AUTH"
+   ],
+   "subject": "Products wave 1: back-office frame (working venue and switcher, navigation, dashboard, All products)",
+   "detail": "Spec: the contracts at the release tag in ADAM (CHG-R8PRD-002 to 011), from the 16 October 2026 minutes (sources/mom/TICVAI_MoM_2026-10-16_TicketingConfig_Wireframes_Plan.md). The back-office screens are held: build the screen from the products wireframe Pallavi Sawant shares (board ids below; its 21 October revision applies the minutes), not from a generated P08 screen. Back end: identity getSessionVenue and setSessionVenue (identity.session.working_venue_id, written with the session registry entry the token's sid names, so services read it from the caller's validated session; sign-in and role selection write it when the session has exactly one venue, fixed by its workstation or the only venue its grants reach), catalogue getProductDashboard and listProductAttentionItems; the screens also use getCurrentSession, listProductLifecycle and listProducts. Screens: the top bar and navigation of every back-office screen, B1-S01 Catalogue Command Center, B1-S02 Ticket Product Directory (All products). Every operation answers as its contract says, with a contract test for each status code and problem type it lists; the permission and venue scope are enforced (row security on scope_path); every write records the audit entry its contract names; paged lists keep their stated order; nothing is written outside the tables listed. Done when: the top bar shows the session's working venue and switches among availableVenues (fixed by a workstation or role: no switcher), refusing venue-not-in-grants, venue-fixed and session-pending, each switch audited, and the back office sends it as venueId on the venue-scoped calls that take one (the wave 1 reads and writes also fall back to it themselves, else venue-required); the navigation is filtered again from permissionsByScope after a switch; the dashboard tiles read countsByLifecycleState and open All products filtered the same way; Products by type reads countsByKind; Needs attention lists listProductAttentionItems in its order (readiness before notice); All products filters by search, status, type, channel, venue and department on listProductLifecycle, paged. The type filter maps the six ticket types of the minutes onto ProductKind (openDated, datedAdmission, timedAdmission, membership, giftCard, addOn) until wave 2.",
+   "operations": [
+    "getSessionVenue",
+    "setSessionVenue",
+    "getProductDashboard",
+    "listProductAttentionItems"
+   ],
+   "builds": [
+    "operation getCurrentSession",
+    "operation listProductLifecycle",
+    "operation listProducts",
+    "table identity.session",
+    "table catalogue.product",
+    "table catalogue.variant",
+    "table catalogue.price",
+    "table catalogue.price_list"
+   ]
+  },
+  {
+   "key": "PRD-W1-LANGUAGES",
+   "epic": "PRODUCTS-W1",
+   "points": 3,
+   "assignee": "Surendra",
+   "depends": [
+    "PRD-W1-DB"
+   ],
+   "subject": "Products wave 1: translatable product texts per channel in the tenant's languages, back end and screens",
+   "detail": "Spec: the contracts at the release tag in ADAM (CHG-R8PRD-002 to 011), from the 16 October 2026 minutes (sources/mom/TICVAI_MoM_2026-10-16_TicketingConfig_Wireframes_Plan.md). The back-office screens are held: build the screen from the products wireframe Pallavi Sawant shares (board ids below; its 21 October revision applies the minutes), not from a generated P08 screen. Back end in CatalogueService: getProductChannelTexts, setProductChannelTexts, reading the tenant's languages only through white-label#tenantLanguageRecords; the product's own name and description per language through getProduct and updateProduct. The languages themselves are the tenant's (white-label setLanguages and getTenantConfig, which exist; the tenant's languages count, published, or the draft before the first publish): no venue list. Screens: the languages entry of the Setup Library, read-only for a venue's product administrator with a link to the tenant's language setting (setLanguages needs TENANT_CONFIGURE at tenant scope), B1-S06 Content & Localization (one block per enabled language and the channel-specific section), the preview of B1-S09. Every operation answers as its contract says, with a contract test for each status code and problem type it lists; the permission and venue scope are enforced (row security on scope_path); every write records the audit entry its contract names; paged lists keep their stated order; nothing is written outside the tables listed. Done when: channel texts save per language within their limits, refuse language-not-enabled and product-archived, and are versioned as updateProduct does; missingTranslations drives the per-language status; the preview shows the POS button label, receipt name and B2B description separately per language.",
+   "operations": [
+    "getProductChannelTexts",
+    "setProductChannelTexts"
+   ],
+   "builds": [
+    "operation getProduct",
+    "operation updateProduct",
+    "operation setLanguages",
+    "operation getTenantConfig",
+    "table catalogue.product_channel_text",
+    "table catalogue.product"
+   ]
+  },
+  {
+   "key": "PRD-W1-SALE-PERMISSIONS-UI",
+   "epic": "PRODUCTS-W1",
+   "points": 3,
+   "assignee": "Surendra",
+   "depends": [
+    "PRD-W1-SALE-PERMISSIONS",
+    "PRD-W1-FRAME"
+   ],
+   "subject": "Products wave 1: who can sell a product, screens",
+   "detail": "Spec: the contracts at the release tag in ADAM (CHG-R8PRD-002 to 011), from the 16 October 2026 minutes (sources/mom/TICVAI_MoM_2026-10-16_TicketingConfig_Wireframes_Plan.md). The back-office screens are held: build the screen from the products wireframe Pallavi Sawant shares (board ids below; its 21 October revision applies the minutes), not from a generated P08 screen. Screens on the operations of PRD-W1-SALE-PERMISSIONS: the Who can sell section of B1-S04 Identity & Classification (it replaces Venue scope) and B7-S07 Channel Restrictions. Done when: the rules table edits level (everyone, venue, sales channel, workstation, role, staff member), target (picked from listSalePermissionTargets), allow or deny and note, saves the whole set and shows its one-line summary and that a deny always wins; Test a sale calls checkProductSalePermission with a venue, channel, workstation, role and staff member and shows the deciding rule; every refusal (self-grant, no allow, a deny for everyone) is shown in plain words. The target pickers call listSalePermissionTargets with the product's id.",
+   "builds": [],
+   "linksNothingBecause": "a back-office UI built from the products wireframe (the back-office screens are held, so no generated screen): the operations it calls are built by PRD-W1-SALE-PERMISSIONS (getProductSalePermissionRules, setProductSalePermissionRules, checkProductSalePermission, listSalePermissionTargets) and PRD-W1-FRAME (getSessionVenue), and its text names them and the screens (CHG-R8INT-025)"
   }
  ],
  "blockA1Operations": {
@@ -808,6 +988,8 @@
  },
  "departures": {
   "table platform.guest_link": "moved to sync.guest_link on 14 October 2026 (CHG-XDW-001): CrossRegionService's four records left platform (TenancyService's schema) for sync, its own, because every operation that reads or writes them is CrossRegionService's. The lead reversed schema-merge decision 10 (20 September: guest_link and dsar_request stay in platform, both or neither), marked superseded in docs/active/schema-merge-decision-log.md. The same table under its new schema, built now by the sync migration task (MIG-SYNC at audit-base, not MIG-PLATFORM as at r5); the move itself is the forward migration handoff/migration-review.md lists (ALTER TABLE platform.guest_link SET SCHEMA sync, a declared rename in derive-schema-history.py RENAMES) for a person to write (CHG-GTE-005).",
+  "table control.content_block": "moved to whitelabel.content_block on 20 October 2026 (R8 blocker IDENTITY-C59, the lead's answer A; CHG-R8STO-004, CHG-R8MIG-011): tenant-authored content blocks live in the tenant database, owned by WhiteLabel, as the footer moved in R163, so the control database no longer holds them and MIG-CONTROL no longer creates the table. The same rows under their new schema are created in the tenant database by the white-label migration that first needs them (MIG-WHITELABEL); the control table is dropped by its migration-review row. Recorded by the storage-core lane (CHG-R8MIG-011) and at the r8 integration (CHG-R8INT-017); one entry since the merge of the integration pass.",
+  "table platform.cell_endpoint": "moved to control.cell_endpoint on 20 October 2026 (CHG-R8MIG-018, R8 blocker APPROVALS-TENANCY-C10, the lead's answer A): a cell's endpoints are a control-plane fact, written by the control plane at cell provisioning; the control database's migration creates it, and listCellEndpoints reads it on the control connection.",
   "table platform.dsar_request": "moved to sync.dsar_request on 14 October 2026 (CHG-XDW-001): CrossRegionService's four records left platform (TenancyService's schema) for sync, its own, because every operation that reads or writes them is CrossRegionService's. The lead reversed schema-merge decision 10 (20 September: guest_link and dsar_request stay in platform, both or neither), marked superseded in docs/active/schema-merge-decision-log.md. The same table under its new schema, built now by the sync migration task (MIG-SYNC-2 at audit-base, not MIG-PLATFORM as at r5); the move itself is the forward migration handoff/migration-review.md lists (ALTER TABLE platform.dsar_request SET SCHEMA sync, a declared rename in derive-schema-history.py RENAMES) for a person to write (CHG-GTE-005).",
   "table platform.cross_region_entitlement": "moved to sync.cross_region_entitlement on 14 October 2026 (CHG-XDW-001): CrossRegionService's four records left platform (TenancyService's schema) for sync, its own, because every operation that reads or writes them is CrossRegionService's. The lead reversed schema-merge decision 10 (20 September: guest_link and dsar_request stay in platform, both or neither), marked superseded in docs/active/schema-merge-decision-log.md. The same table under its new schema, built now by the sync migration task (MIG-SYNC-2 at audit-base, not MIG-PLATFORM-3 as at r5); the move itself is the forward migration handoff/migration-review.md lists (ALTER TABLE platform.cross_region_entitlement SET SCHEMA sync, a declared rename in derive-schema-history.py RENAMES) for a person to write (CHG-GTE-005).",
   "table platform.wallet_authorisation": "moved to sync.wallet_authorisation on 14 October 2026 (CHG-XDW-001): CrossRegionService's four records left platform (TenancyService's schema) for sync, its own, because every operation that reads or writes them is CrossRegionService's. The lead reversed schema-merge decision 10 (20 September: guest_link and dsar_request stay in platform, both or neither), marked superseded in docs/active/schema-merge-decision-log.md. The same table under its new schema, built now by the sync migration task (MIG-SYNC-2 at audit-base, not MIG-PLATFORM-3 as at r5); the move itself is the forward migration handoff/migration-review.md lists (ALTER TABLE platform.wallet_authorisation SET SCHEMA sync, a declared rename in derive-schema-history.py RENAMES) for a person to write (CHG-GTE-005).",

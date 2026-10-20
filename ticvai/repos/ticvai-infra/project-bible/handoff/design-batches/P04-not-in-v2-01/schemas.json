@@ -311,10 +311,31 @@
     "type": "string",
     "format": "uuid"
    },
+   "anonymousSessionToken": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "The `guestAuth` token of the anonymous session `createCart` opened for a visitor with no credential (GPS-C23, CHG-R8SPN-031); null on every other answer. Not stored on the cart."
+   },
    "token": {
     "type": "string",
     "readOnly": true,
     "description": "**How an anonymous guest returns to their cart**, including from a recovery email. Rotated on claim, so a link shared before signing in does not reach the account after.\n"
+   },
+   "sessionId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The staff or partner session that started the cart (a till's cart is its session's own); null for a guest's cart (R8 blocker IDENTITY-C49, CHG-R8MIG-021)."
+   },
+   "workstationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The workstation of that session; null for a guest's cart."
    },
    "venueId": {
     "type": "string",
@@ -741,7 +762,7 @@
     "x-ticvai-references": "catalogue.inventory_reservation",
     "type": "string",
     "nullable": true,
-    "description": "Lease the units were drawn from — a `catalogue.InventoryHold.id`. Absent for uncontended products."
+    "description": "Lease the units were drawn from — a `catalogue.InventoryHold.id`. Absent for uncontended products. **A standing-zone line** (zone-priced general admission at POS-004 and WEB-007; decided 20 October 2026, Chinmay, R8 blocker cause GPS-C38, option A; CHG-R8SPN-040) carries no `seatIds`: it is `quantity` places in one zone, held by `seating.createSeatHold` with `zoneId` and `quantity`, and this names that hold's inventory hold; the zone, its price band and keep-the-party- together come from the hold, and a lapsed one is `409 hold-not-active` as for seats."
    },
    "seatIds": {
     "type": "array",
@@ -1516,6 +1537,13 @@
     "format": "uuid",
     "description": "The client UUIDv7 from `CreateOrderRequest.id`."
    },
+   "orderAccessToken": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "**What lets the device that just checked out read the order it paid for** (decided 20 October 2026, Chinmay, R8 blocker cause IDENTITY-C52, option A; CHG-R8SPN-025). Returned only in `checkoutCart`'s answer, null everywhere else: a signed token bound to this order and to the cart's device, valid 24 hours, never stored. `getOrder` accepts it in `X-Order-Access-Token` in place of a session, so a guest who checked out with no account, or whose session ended, still sees the confirmation (WEB-013 keeps it in its navigation state). It reads this order only and grants nothing else."
+   },
    "orderNumber": {
     "x-ticvai-unique": "tenant",
     "type": "string",
@@ -2150,9 +2178,10 @@
        "enum": [
         "open",
         "close",
-        "variance"
+        "variance",
+        "reopen"
        ],
-       "description": "`open` from `approveShiftOpen`, `close` from `approveShiftClose`, `variance` from `acceptShiftVariance`.\n"
+       "description": "`open` from `approveShiftOpen`, `close` from `approveShiftClose`, `variance` from `acceptShiftVariance`, `reopen` from `reopenShift` (the supervisor who signed it, the time and the `reason`).\n"
       },
       "principalId": {
        "type": "string",
@@ -2185,16 +2214,20 @@
  },
  "SupervisorStepUp": {
   "type": "object",
-  "description": "**A supervisor signs the act in place, on the device making the call** (decided 28 September, audit R144). Used where the decision is a same-device step-up rather than an approval request: reopening a shift, recounting a stock count, a retail return above the venue threshold, and (proposed by the coordinator, client to confirm) closing a stock transfer short and cancelling a performance.\n\n**The verification rule, the same on every operation that takes it:** the server checks `credential` against `principalId`; that principal must hold the operation's `x-ticvai-permission` at the operation's scope, must be active at that venue, and must not be the person whose act is being reversed where the operation says so. Any failure is a `403` (`supervisor-step-up-refused`) and nothing is written. **No approval request is raised**, and the operation declares `x-ticvai-step-up: pin`.\n",
+  "description": "**A supervisor signs the act in place, on the device making the call** (decided 28 September, audit R144). Used where the decision is a same-device step-up rather than an approval request: reopening a shift, recounting a stock count, a retail return above the venue threshold, and (proposed by the coordinator, client to confirm) closing a stock transfer short and cancelling a performance.\n\n**The verification rule, the same on every operation that takes it:** the server checks `credential` against `principalId`; that principal must hold the operation's `x-ticvai-permission` at the operation's scope, must be active at that venue, and must not be the person whose act is being reversed where the operation says so. Any failure is a `403` (`supervisor-step-up-refused`) and nothing is written. **No approval request is raised**, and the operation declares `x-ticvai-step-up: pin`.\n\n**Where `principalId` comes from, on every operation that takes this** (decided 20 October 2026, Chinmay, R8 blocker cause GPS-C31, option A; CHG-R8SPN-035). The PIN prompt shows a picker filled by `identity.listStepUpSupervisors` with the operation's permission: the active principals who hold it at the caller's venue, by display name. The supervisor picks their own name and types their PIN; the prompt sends the picked `principalId` (or, where the prompt asks for an employee number instead, `supervisorUsername`). **Nobody signs their own act**: a `principalId` (or resolved `supervisorUsername`) equal to the caller's own principal is refused `403 supervisor-step-up-refused`, even when the caller holds the permission, and the picker leaves the caller out.\n",
   "required": [
-   "principalId",
    "credential"
   ],
   "properties": {
    "principalId": {
     "type": "string",
     "format": "uuid",
-    "description": "The supervisor signing. Recorded against the act."
+    "description": "The supervisor signing. Recorded against the act. **Exactly one of `principalId` or `supervisorUsername`** is sent (neither, or both, is `400`; not in the schema as a oneOf, so an r1 client still validates)."
+   },
+   "supervisorUsername": {
+    "type": "string",
+    "maxLength": 200,
+    "description": "**The supervisor's employee number**, which is what the step-up prompt asks for (R8 blocker fix, IDENTITY-C44). The server resolves it to the principal (`identity.principal.username`, within the tenant) before it checks the PIN; an unknown one is refused exactly as a wrong PIN, `403 supervisor-step-up-refused`, so the prompt does not reveal which employee numbers exist. The act is recorded against the resolved principal. Exactly one of this or `principalId`."
    },
    "credential": {
     "type": "string",
@@ -2316,6 +2349,28 @@
     "description": "**Which printing of the location's ordering code is current** (4 October 2026, CHG-FXC-009). A code carrying an older generation is refused as `codeExpired` by `claimLocationSession`; raising it retires every code printed before."
    }
   }
+ },
+ "TableLayoutItem": {
+  "x-ticvai-persistence": "none — request only; each item lands as its fnb.dining_table row (TableDefinition)",
+  "description": "**One table of `setTableLayout`'s whole layout, named by its id** (r8 integration, CHG-R8INT-013; check-storage-promises SP-REPLACE-NO-KEY, CR-155). The operation matches each item on `id`: an id already on the outlet updates that table, a new id adds one, so the client sends the id, which `TableDefinition` marks read-only for every other write (createTable mints it). Everything else is the table as `TableDefinition` states it.",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/TableDefinition"
+   },
+   {
+    "type": "object",
+    "required": [
+     "id"
+    ],
+    "properties": {
+     "id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The table this item updates, or the id of the table it adds (a UUIDv7 the client makes)."
+     }
+    }
+   }
+  ]
  },
  "TableMap": {
   "x-ticvai-persistence": "none — projection",

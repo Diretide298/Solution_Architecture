@@ -110,7 +110,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-265` | Group Enquiry & Opportunity Capture | C | 42 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
 | `BO-266` | Group Customer & Organization Profile | C | 15 | 16 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 | `BO-267` | Group Requirements, Availability & Capacity Planner | C | 0 | 14 | 6 | 0 | 0 | 1 | — | notStarted (generated) |
-| `BO-268` | Group Package & Experience Builder | C | 0 | 31 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
+| `BO-268` | Group Package & Experience Builder | C | 0 | 34 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
 | `BO-269` | Group Quotation Builder & Proposal Generation | C | 11 | 0 | 5 | 0 | 2 | 0 | — | notStarted (generated) |
 | `BO-270` | Quote Revision, Negotiation & Version Management | C | 8 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
 | `BO-271` | Group Discount, Exception & Approval Workflow | C | 0 | 0 | 6 | 0 | 1 | 3 | — | notStarted (generated) |

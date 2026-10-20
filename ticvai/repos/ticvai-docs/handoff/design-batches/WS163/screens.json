@@ -363,7 +363,8 @@
     "In Progress",
     "Completed",
     "Changed",
-    "Cancelled"
+    "Cancelled",
+    "VenueSettings.calendarDayStartHour"
    ]
   },
   "wireframe": {

@@ -63,6 +63,16 @@ from pathlib import Path
 
 import yaml
 
+
+def _yload(src):
+    """YAML with the C loader, the pure one where a file defeats it (20 October 2026, CHG-R8GEN-016): the screen files
+    are 25 MB and the pure loader took most of each refresh step's minute; the loaded data is the same."""
+    text = src.read() if hasattr(src, "read") else src
+    try:
+        return yaml.load(text, Loader=getattr(yaml, "CSafeLoader", yaml.SafeLoader))
+    except Exception:
+        return yaml.safe_load(text)
+
 ROOT = Path(__file__).resolve().parents[1]
 LINEAGE = ROOT / "handoff" / "api-data-lineage.json"
 REFERENCE = ROOT / "handoff" / "schema-reference.json"
@@ -124,7 +134,7 @@ class Package:
         self.ops: dict = {}
         for c in sorted((ROOT / "contracts").rglob("*.yaml")):
             try:
-                doc = yaml.safe_load(c.read_text(encoding="utf-8")) or {}
+                doc = _yload(c.read_text(encoding="utf-8")) or {}
             except yaml.YAMLError:
                 continue
             for n, s in ((doc.get("components") or {}).get("schemas") or {}).items():
@@ -344,7 +354,7 @@ def overrides() -> dict:
     """(operation, table) -> (columns, why) from docs/active/read-columns-override.yaml."""
     if not OVERRIDE.exists():
         return {}
-    doc = yaml.safe_load(OVERRIDE.read_text(encoding="utf-8")) or {}
+    doc = _yload(OVERRIDE.read_text(encoding="utf-8")) or {}
     out = {}
     for r in doc.get("reads") or []:
         if isinstance(r, dict) and r.get("operation") and r.get("table"):

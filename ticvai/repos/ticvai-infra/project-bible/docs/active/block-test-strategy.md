@@ -32,9 +32,14 @@
 
 **An app-module is done when:**
 - every ticket in it is done;
-- the module test passed on the integration environment: every screen state, every navigation link, every permission (an allowed and a refused user), every operation's error responses;
+- the module test passed on the integration environment: every screen state, every navigation link, every permission (an allowed and a refused user, as defined below), every operation's error responses;
 - for an offline app, the module's offline behaviour passed with the network cut;
 - no open defect of severity 1 or 2 is left on it.
+
+**An allowed and a refused user, for a screen whose operations are all public or guest-callable** (guest web, guest app, kiosk and the other public screens):
+a guest holds no permission (ADR-0025), so there is no permission to be refused. The pair is the **signed-in guest** (allowed) and the **signed-out visitor** (refused where the screen needs a session).
+The screen's permission state is "not applicable" and is not tested. Its no-access state is reached only by a 401 (the guest is offered sign-in and returns to the screen) or by the neutral 404 for a record that is not theirs.
+A screen with no filter and no count of everything has no first-run versus no-results split to test either. A staff screen keeps the permission pair as written.
 
 **A block is done when:**
 - every app-module in it is done;

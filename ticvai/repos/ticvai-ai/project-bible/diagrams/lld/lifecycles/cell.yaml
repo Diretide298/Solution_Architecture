@@ -1,5 +1,5 @@
 id: LLD-Cell
-title: Cell — 9 transitions
+title: Cell — 10 transitions
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/04-lifecycles.yaml
 source: states/cell.yaml
@@ -27,10 +27,16 @@ transitions:
   operation: applyMigration
   trigger: operation
   guard: Schema migration in flight
+- from: active
+  to: migrating
+  operation: updateCellTier
+  trigger: operation
+  guard: 'A tier change (r8, APPROVALS-TENANCY-C19): the cell job moves the cell''s tenants to the target
+    tier''s instance; the cell stays readable meanwhile and returns to active at the cutover'
 - from: migrating
   to: active
   trigger: job
-  guard: Migration complete and verified
+  guard: Migration complete and verified, or a tier change's cutover done (updateCellTier's job)
 - from: migrating
   to: failed
   trigger: job

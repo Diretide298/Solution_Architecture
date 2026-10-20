@@ -817,12 +817,12 @@ paths:
         schema: { type: string, format: uuid }
     post:
       operationId: replayEvents
-      # The deliveries are written by the workers host's replay job, not by this request (r8 integration, CHG-R8INT-014; check-parameter-columns P-NAMED-TABLE).
-      x-ticvai-names-for-context: [control.webhook_delivery]
       x-ticvai-consumed-by:
         - "P08 BO-1173 Wallet Integration Command Center"
         - "P08 BO-1179 Integration Monitoring & Exception Workbench"
         - "P14 DEV-005 Webhooks"
+      # The deliveries are written by the workers host's replay job, not by this request (r8 integration, CHG-R8INT-014; check-parameter-columns P-NAMED-TABLE).
+      x-ticvai-names-for-context: [control.webhook_delivery]
       summary: Re-deliver events from a point in time
       description: >
         13.3.19. **Recovery, synchronisation and troubleshooting** — an integrator whose server was

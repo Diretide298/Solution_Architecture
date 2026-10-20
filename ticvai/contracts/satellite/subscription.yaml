@@ -1423,11 +1423,11 @@ paths:
         format: uuid
     post:
       operationId: suspendTenant
+      x-ticvai-consumed-by:
+        - "P09 ADM-005 Tenant Directory"
       x-ticvai-writes:
       - table: control.outbox
         for: 'tenant.suspended, written to the control databases outbox when the suspension takes effect (r8 integration, CHG-R8INT-014; check-parameter-columns P-NAMED-TABLE)'
-      x-ticvai-consumed-by:
-        - "P09 ADM-005 Tenant Directory"
       x-ticvai-write-via:
       - table: approvals.request
         operation: createApprovalRequest
@@ -1982,8 +1982,6 @@ paths:
         - "P09 ADM-008 Subscription & Plan Management"
         - "P09 ADM-410 Contract & Billing Cycle Selection"
         - "P09 ADM-417 Subscription Confirmation & Commercial Activation"
-        - "P17 SGN-019 Contract & Billing Cycle Selection"
-        - "P17 SGN-024 Subscription Confirmation & Commercial Activation"
       security:
       - bearerAuth: []
       x-ticvai-audience:

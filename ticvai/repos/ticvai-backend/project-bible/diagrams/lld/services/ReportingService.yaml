@@ -31,7 +31,7 @@ operationsByContract:
     path: /alerts/{alertId}/acknowledge
     scope: venue
     permission: REPORT_VIEW_VENUE
-    offline: false
+    offline: true
     reads: 3
     writes: 2
   - operation: askReportingQuestion
@@ -64,8 +64,8 @@ operationsByContract:
     scope: tenant
     permission: REPORT_MANAGE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: createReport
     verb: POST
     path: /reports
@@ -88,8 +88,8 @@ operationsByContract:
     scope: venue
     permission: REPORT_SCHEDULE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: deleteDashboard
     verb: DELETE
     path: /dashboards/{dashboardId}
@@ -222,7 +222,7 @@ operationsByContract:
     verb: GET
     path: /suppliers/{supplierId}/performance
     scope: venue
-    permission: REPORT_VIEW
+    permission: REPORT_VIEW_VENUE
     offline: false
     reads: 5
     writes: 0
@@ -326,7 +326,7 @@ operationsByContract:
     verb: GET
     path: /reports/seeded
     scope: venue
-    permission: REPORT_VIEW
+    permission: REPORT_VIEW_VENUE
     offline: false
     reads: 1
     writes: 0
@@ -352,7 +352,7 @@ operationsByContract:
     scope: venue
     permission: REPORT_VIEW_VENUE
     offline: false
-    reads: 4
+    reads: 6
     writes: 2
   - operation: runSemanticQuery
     verb: POST
@@ -384,24 +384,24 @@ operationsByContract:
     scope: tenant
     permission: REPORT_GOVERNANCE_MANAGE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setKpiTargets
     verb: PUT
     path: /kpis/{kpiId}/targets
     scope: venue
     permission: REPORT_MANAGE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setSemanticModel
     verb: PUT
     path: /semantic-model
     scope: tenant
     permission: REPORT_MANAGE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setSiteNormalisationBasis
     verb: PUT
     path: /site-normalisation-bases
@@ -451,8 +451,10 @@ tables:
   - askReportingQuestion
   - cancelReportExecution
   - createDashboard
+  - createKpi
   - createReport
   - createReportSchedule
+  - createReportSubscription
   - deleteDashboard
   - deleteReport
   - deleteReportSchedule
@@ -462,6 +464,9 @@ tables:
   - runSemanticQuery
   - saveNaturalLanguageQuery
   - setAlertRule
+  - setAnalyticsGovernancePolicy
+  - setKpiTargets
+  - setSemanticModel
   - setSiteNormalisationBasis
   - updateDashboard
   - updateReport
@@ -471,8 +476,10 @@ tables:
   - askReportingQuestion
   - cancelReportExecution
   - createDashboard
+  - createKpi
   - createReport
   - createReportSchedule
+  - createReportSubscription
   - deleteDashboard
   - deleteReport
   - deleteReportSchedule
@@ -482,6 +489,9 @@ tables:
   - runSemanticQuery
   - saveNaturalLanguageQuery
   - setAlertRule
+  - setAnalyticsGovernancePolicy
+  - setKpiTargets
+  - setSemanticModel
   - setSiteNormalisationBasis
   - updateDashboard
   - updateReport

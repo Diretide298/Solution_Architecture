@@ -159,3 +159,5 @@ because mailbox control today is not proof of ownership of everything that addre
 **Staff review for every join.** Matrix 7.3.7 applied to all matches. Rejected as the default: a
 guest's order would sit detached until someone actioned it. It remains the path for every match that
 is not a verified contact.
+
+**The cart before the contact** (20 October 2026, r8 cause GPS-C23): the visitor's anonymous session holds the cart from the first line (`createCart`, started by the runtime before the first `addCartLine`), and the contact is proven at checkout, not before; nothing in browsing or adding to the cart asks for it.

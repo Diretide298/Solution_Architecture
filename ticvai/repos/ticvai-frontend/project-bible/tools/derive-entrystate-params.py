@@ -42,6 +42,16 @@ import sys
 
 import yaml
 
+
+def _yload(src):
+    """YAML with the C loader, the pure one where a file defeats it (20 October 2026, CHG-R8GEN-016): the screen files
+    are 25 MB and the pure loader took most of each refresh step's minute; the loaded data is the same."""
+    text = src.read() if hasattr(src, "read") else src
+    try:
+        return yaml.load(text, Loader=getattr(yaml, "CSafeLoader", yaml.SafeLoader))
+    except Exception:
+        return yaml.safe_load(text)
+
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tools"))
 import screen_patterns as SP  # noqa: E402
@@ -70,7 +80,7 @@ def op_paths() -> dict:
     out = {}
     for f in pathlib.Path(ROOT / "contracts").rglob("*.yaml"):
         try:
-            doc = yaml.safe_load(f.read_text(encoding="utf-8"))
+            doc = _yload(f.read_text(encoding="utf-8"))
         except Exception:
             continue
         for path, item in (doc.get("paths") or {}).items():
@@ -109,7 +119,7 @@ def main() -> int:
 
     docs, todo, stripped = {}, [], []
     for f in sorted(glob.glob(str(ROOT / "screens" / "P*.yaml"))):
-        doc = yaml.safe_load(open(f, encoding="utf-8"))
+        doc = _yload(open(f, encoding="utf-8"))
         hit = False
         for s in doc["screens"]:
             needed: set = set()

@@ -7,7 +7,7 @@
 | Tier | engagement: Guests and intelligence. Nothing that takes money depends on these. |
 | Contracts | `marketing-crm` |
 | Schemas owned | `marketing` |
-| Operations in the slice | 72 of 278 |
+| Operations in the slice | 73 of 280 |
 | Scale | Bursty on send, read-heavy otherwise. The one to watch for a split. |
 | If it is down | Down stops campaigns and guest lookup. Neither stops trading. |
 
@@ -64,7 +64,7 @@
 | loyalty | [`listCustomerBadges`](#listcustomerbadges) | GET | `/customers/{customerId}/badges` | core | 1 | GST-036, WEB-043 |
 | loyalty | [`listLeaderboard`](#listleaderboard) | GET | `/loyalty/leaderboard` | core | 1 | GST-036, WEB-043 |
 | loyalty | [`listLoyaltyProgrammes`](#listloyaltyprogrammes) | GET | `/loyalty/programmes` | core | 1 | BO-827, BO-828, BO-833, GST-036, WEB-017, WEB-043 |
-| loyalty | [`listRewards`](#listrewards) | GET | `/loyalty/rewards` | core | 1 | BO-828, GST-036, WEB-043 |
+| loyalty | [`listRewards`](#listrewards) | GET | `/loyalty/rewards` | core | 1 | BO-828, GST-036, GST-071, WEB-043 |
 | loyalty | [`setLeaderboardNickname`](#setleaderboardnickname) | PUT | `/loyalty/leaderboard-nickname` | core | 1 | GST-036, WEB-043 |
 | loyalty | [`setLoyaltyRules`](#setloyaltyrules) | PUT | `/loyalty/programmes/{programmeId}/rules` | setup | 1 | BO-827, BO-828 |
 | loyalty | [`setReward`](#setreward) | PUT | `/loyalty/rewards/{rewardId}` | setup | 1 | BO-828 |
@@ -76,8 +76,9 @@
 | marketing | [`createUrlRedirect`](#createurlredirect) | POST | `/seo-redirects` | core | 1 | BO-842, CMS-013 |
 | marketing | [`getForm`](#getform) | GET | `/forms/{formId}` | core | 1 | BO-618, GST-035, WEB-026 |
 | marketing | [`getGuestConversation`](#getguestconversation) | GET | `/my/conversations/{conversationId}` | core | 1 | GST-031, GST-032, WEB-044 |
-| marketing | [`getLoyaltyPosition`](#getloyaltyposition) | GET | `/loyalty/position` | core | 1 | GST-036, WEB-017, WEB-043 |
+| marketing | [`getLoyaltyPosition`](#getloyaltyposition) | GET | `/loyalty/position` | core | 1 | GST-036, GST-071, WEB-017, WEB-043 |
 | marketing | [`getMarketingSubscription`](#getmarketingsubscription) | GET | `/marketing-subscriptions` | core | 1 | GST-065, WEB-027 |
+| marketing | [`getMyCase`](#getmycase) | GET | `/my/cases/{caseId}` | core | 1 | GST-068 |
 | marketing | [`getMyChallenges`](#getmychallenges) | GET | `/guests/me/challenges` | core | 1 | WEB-017 |
 | marketing | [`getMyProfile`](#getmyprofile) | GET | `/guests/me/profile` | core | 1 | GST-001, GST-039, WEB-011, WEB-020 |
 | marketing | [`getSeoMetadata`](#getseometadata) | GET | `/seo-metadata` | core | 1 | CMS-013 |
@@ -593,7 +594,7 @@ Writes one `ConsentRecord` per affected purpose through the `recordConsent` path
 |---|---|---|---|
 | subjectId | string (uuid) | yes |  |
 | purposes | array of object | yes |  |
-| purposes[].purpose | ConsentPurpose: enum (marketing, personalisation, profiling, thirdPartySharing, aiProcessing, transactional) | yes |  |
+| purposes[].purpose | ConsentPurpose: enum (marketing, personalisation, profiling, thirdPartySharing, aiProcessing, transactional, storedPaymentCredential, facePassEnrolment) | yes | storedPaymentCredential (a card saved for later, storePaymentToken) and facePassEnrolment (a face enrolled for entry, enrolFacePass) are purposes of their own (R8 blocker ORDERS-MONEY-C21, CHG-R8MIG-… |
 | purposes[].decision | ConsentDecision: enum (granted, withdrawn, notAsked) | yes |  |
 | purposes[].channels | array of MessageChannel: enum (email, sms, whatsapp, push, inApp, post) |  |  |
 | purposes[].noticeVersion | string |  | (nullable) |
@@ -624,8 +625,8 @@ Writes one `ConsentRecord` per affected purpose through the `recordConsent` path
 | Offline | no |
 | Config scope | venue |
 | Conflict policy | serverWins |
-| Reads | `marketing.consent_question`, `marketing.consent_question_version` |
-| Writes | `marketing.consent_question`, `marketing.consent_question_version` |
+| Reads | `cache:idempotency`, `marketing.consent_question`, `marketing.consent_question_version` |
+| Writes | `cache:idempotency`, `marketing.consent_question`, `marketing.consent_question_version` |
 | Called by | CMS-018 |
 
 **Parameters**
@@ -811,7 +812,7 @@ Current position per purpose and channel, with the version of the notice consent
 |---|---|---|---|
 | subjectId | string (uuid) | yes |  |
 | purposes | array of object | yes |  |
-| purposes[].purpose | ConsentPurpose: enum (marketing, personalisation, profiling, thirdPartySharing, aiProcessing, transactional) | yes |  |
+| purposes[].purpose | ConsentPurpose: enum (marketing, personalisation, profiling, thirdPartySharing, aiProcessing, transactional, storedPaymentCredential, facePassEnrolment) | yes | storedPaymentCredential (a card saved for later, storePaymentToken) and facePassEnrolment (a face enrolled for entry, enrolFacePass) are purposes of their own (R8 blocker ORDERS-MONEY-C21, CHG-R8MIG-… |
 | purposes[].decision | ConsentDecision: enum (granted, withdrawn, notAsked) | yes |  |
 | purposes[].channels | array of MessageChannel: enum (email, sms, whatsapp, push, inApp, post) |  |  |
 | purposes[].noticeVersion | string |  | (nullable) |
@@ -910,7 +911,7 @@ Current position per purpose and channel, with the version of the notice consent
 | Guest callable | True |
 | Reads | `cache:resolution`, `marketing.consent_purpose`, `marketing.consent_purpose_channel` |
 | Writes | `cache:resolution` |
-| Called by | BO-747, CMS-018, CMS-023, GST-039, GST-065, GST-066, GST-071, WEB-011, WEB-020, WEB-024, WEB-027 |
+| Called by | BO-747, CMS-018, CMS-023, GST-039, GST-065, GST-066, GST-071, WEB-011, WEB-020, WEB-021, WEB-024, WEB-027 |
 
 **Parameters**
 
@@ -924,7 +925,8 @@ Current position per purpose and channel, with the version of the notice consent
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | items | array of ConsentPurposeConfig | yes |  |
-| items[].purpose | ConsentPurpose: enum (marketing, personalisation, profiling, thirdPartySharing, aiProcessing, transactional) | yes |  |
+| items[].id | string (uuid) |  | The purpose row's id (marketing.consent_purpose.id), the value consentPurposeId and a consent's purposeId carry (R8 blocker ORDERS-MONEY-C21, CHG-R8MIG-022). (read-only) |
+| items[].purpose | ConsentPurpose: enum (marketing, personalisation, profiling, thirdPartySharing, aiProcessing, transactional, storedPaymentCredential, facePassEnrolment) | yes | storedPaymentCredential (a card saved for later, storePaymentToken) and facePassEnrolment (a face enrolled for entry, enrolFacePass) are purposes of their own (R8 blocker ORDERS-MONEY-C21, CHG-R8MIG-… |
 | items[].displayName | string |  |  |
 | items[].description | string |  |  |
 | items[].channels | array of MessageChannel: enum (email, sms, whatsapp, push, inApp, post) | yes |  |
@@ -1002,6 +1004,7 @@ Current position per purpose and channel, with the version of the notice consent
 
 **Append-only.** A change of mind is a new record, never an edit — the history of what a guest agreed to and when is the evidence that matters if it is ever questioned.
 Every record captures the notice version, the channel, the purpose, the source and the timestamp.
+**A third path, with the same rules** (r8, IDENTITY-C55): the consents a guest gives on the registration form arrive as `identity.guestRegistered`, and Marketing's consumer records each one through these rules with source `registration` (idempotency: the event id and the purpose), so a registration never leaves a consent unrecorded.
 **Two callers, two rules.** A guest recording their own consent uses a guest token and may only act on their own subject. An agent recording on a guest's behalf uses a staff token, requires `GUEST_MANAGE`, and the resulting record names them in `recordedByPrincipalId` — consent captured by proxy has to be attributable. **The staff audience is declared** (contract gap CHG-WIR-007, POS-027; CHG-CSA-045): the till records the consent of a guest enrolled at the counter with source `agentRecorded`. Creating the guest's profile at the till is identity's (`registerGuest`, spine).
 **`GUEST_MANAGE` is declared** (Chinmay, 12 October 2026, approved breaking change BC-040, CHG-R6-044): a staff caller needs it to record a guest's consent, as the rule above always said; a guest caller still records their own with no permission (`x-ticvai-self-scoped: subject`), as `getGuestConsents` reads it.
 
@@ -1030,7 +1033,7 @@ Every record captures the notice version, the channel, the purpose, the source a
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| purpose | ConsentPurpose: enum (marketing, personalisation, profiling, thirdPartySharing, aiProcessing, transactional) | yes |  |
+| purpose | ConsentPurpose: enum (marketing, personalisation, profiling, thirdPartySharing, aiProcessing, transactional, storedPaymentCredential, facePassEnrolment) | yes | storedPaymentCredential (a card saved for later, storePaymentToken) and facePassEnrolment (a face enrolled for entry, enrolFacePass) are purposes of their own (R8 blocker ORDERS-MONEY-C21, CHG-R8MIG-… |
 | decision | ConsentDecision: enum (granted, withdrawn, notAsked) | yes |  |
 | channels | array of MessageChannel: enum (email, sms, whatsapp, push, inApp, post) |  | Omit to apply to every channel the purpose covers. |
 | noticeVersion | string | yes |  |
@@ -1043,7 +1046,7 @@ Every record captures the notice version, the channel, the purpose, the source a
 |---|---|---|---|
 | subjectId | string (uuid) | yes |  |
 | purposes | array of object | yes |  |
-| purposes[].purpose | ConsentPurpose: enum (marketing, personalisation, profiling, thirdPartySharing, aiProcessing, transactional) | yes |  |
+| purposes[].purpose | ConsentPurpose: enum (marketing, personalisation, profiling, thirdPartySharing, aiProcessing, transactional, storedPaymentCredential, facePassEnrolment) | yes | storedPaymentCredential (a card saved for later, storePaymentToken) and facePassEnrolment (a face enrolled for entry, enrolFacePass) are purposes of their own (R8 blocker ORDERS-MONEY-C21, CHG-R8MIG-… |
 | purposes[].decision | ConsentDecision: enum (granted, withdrawn, notAsked) | yes |  |
 | purposes[].channels | array of MessageChannel: enum (email, sms, whatsapp, push, inApp, post) |  |  |
 | purposes[].noticeVersion | string |  | (nullable) |
@@ -1075,8 +1078,8 @@ Every record captures the notice version, the channel, the purpose, the source a
 | Offline | no |
 | Conflict policy | append |
 | Guest callable | True |
-| Reads | `marketing.booking_consent_record` |
-| Writes | `marketing.booking_consent_record` |
+| Reads | `cache:idempotency`, `marketing.booking_consent_record` |
+| Writes | `cache:idempotency`, `marketing.booking_consent_record` |
 | Called by | GST-007, WEB-006, WEB-011 |
 
 **Parameters**
@@ -1166,7 +1169,8 @@ Each purpose names the channels it covers, whether it is required for service, a
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | purposes | array of ConsentPurposeConfig | yes |  |
-| purposes[].purpose | ConsentPurpose: enum (marketing, personalisation, profiling, thirdPartySharing, aiProcessing, transactional) | yes |  |
+| purposes[].id | string (uuid) |  | The purpose row's id (marketing.consent_purpose.id), the value consentPurposeId and a consent's purposeId carry (R8 blocker ORDERS-MONEY-C21, CHG-R8MIG-022). (read-only) |
+| purposes[].purpose | ConsentPurpose: enum (marketing, personalisation, profiling, thirdPartySharing, aiProcessing, transactional, storedPaymentCredential, facePassEnrolment) | yes | storedPaymentCredential (a card saved for later, storePaymentToken) and facePassEnrolment (a face enrolled for entry, enrolFacePass) are purposes of their own (R8 blocker ORDERS-MONEY-C21, CHG-R8MIG-… |
 | purposes[].displayName | string |  |  |
 | purposes[].description | string |  |  |
 | purposes[].channels | array of MessageChannel: enum (email, sms, whatsapp, push, inApp, post) | yes |  |
@@ -1196,8 +1200,8 @@ Each purpose names the channels it covers, whether it is required for service, a
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | primary |
-| Reads | `marketing.cookie_banner_design` |
-| Writes | `marketing.cookie_banner_design` |
+| Reads | `cache:idempotency`, `marketing.cookie_banner_design` |
+| Writes | `cache:idempotency`, `marketing.cookie_banner_design` |
 | Called by | CMS-026 |
 
 **Parameters**
@@ -1297,8 +1301,8 @@ Each purpose names the channels it covers, whether it is required for service, a
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | primary |
-| Reads | `marketing.form_definition_field`, `marketing.waiver_field_rule` |
-| Writes | `marketing.form_definition_field`, `marketing.waiver_field_rule` |
+| Reads | `cache:idempotency`, `marketing.form_definition_field`, `marketing.waiver_field_rule` |
+| Writes | `cache:idempotency`, `marketing.form_definition_field`, `marketing.waiver_field_rule` |
 | Called by | **no screen**: no screen lists it in its apis, so it is reachable only by API or import until one does (README, Known gaps) |
 
 **Parameters**
@@ -1401,8 +1405,8 @@ Each purpose names the channels it covers, whether it is required for service, a
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | primary |
-| Reads | `marketing.tracking_technology` |
-| Writes | `marketing.tracking_technology` |
+| Reads | `cache:idempotency`, `marketing.tracking_technology` |
+| Writes | `cache:idempotency`, `marketing.tracking_technology` |
 | Called by | CMS-025 |
 
 **Parameters**
@@ -1490,8 +1494,8 @@ Each purpose names the channels it covers, whether it is required for service, a
 | Offline | no |
 | Config scope | venue |
 | Conflict policy | serverWins |
-| Reads | `marketing.consent_question`, `marketing.consent_question_version` |
-| Writes | `marketing.consent_question`, `marketing.consent_question_version` |
+| Reads | `cache:idempotency`, `marketing.consent_question`, `marketing.consent_question_version` |
+| Writes | `cache:idempotency`, `marketing.consent_question`, `marketing.consent_question_version` |
 | Called by | CMS-018 |
 
 **Parameters**
@@ -1784,6 +1788,7 @@ Here rather than in tenancy. `platform.device` is staff hardware bound to a work
 | items[].registeredAt | string (date-time) | yes |  |
 | items[].lastSeenAt | string (date-time) |  | (nullable) |
 | items[].revokedAt | string (date-time) |  | (nullable) |
+| items[].pendingSessionEndInstallationId | string (uuid) |  | Set only by the server (a value a client sends is ignored) and never returned (R8 blocker IDENTITY-C23). (nullable) |
 | nextCursor | string |  |  |
 | hasMore | boolean | yes |  |
 
@@ -1857,6 +1862,7 @@ Called on install and again whenever the provider rotates the token — which ha
 | registeredAt | string (date-time) | yes |  |
 | lastSeenAt | string (date-time) |  | (nullable) |
 | revokedAt | string (date-time) |  | (nullable) |
+| pendingSessionEndInstallationId | string (uuid) |  | Set only by the server (a value a client sends is ignored) and never returned (R8 blocker IDENTITY-C23). (nullable) |
 
 **Responses**
 
@@ -1906,6 +1912,7 @@ Sign-out, uninstall, or a guest removing a device they no longer have. Revoked r
 **A revoke is final and keeps no token** (decided 14 October 2026, Chinmay, ADAM CR-086, CHG-MKT-001): `status` `revoked`, `revokedAt` now, and `tokenRef`, `tokenFingerprint` and `installationId` cleared, so nothing can be sent to it and no later registration matches it. The row stays, with its platform, model and dates, as the guest's record of the device. Revoking a revoked device is `204` again.
 
 **A revoke also signs that device out** (decided 14 October 2026, Chinmay, the audit of ticket 27741; CHG-MOD-009). After the row is revoked, and only where it had an `installationId`, this calls Identity's `endGuestDeviceSessions` (serviceAuth, cell-internal: Identity is in `commerce`, this in `operations`, ADR-0055 rule 4) with the guest's `subjectId` and that `installationId`, which the app sent as `deviceId` when it signed in. Identity ends every guest session of this guest on that device and revokes each one's refresh token, so the old phone can neither refresh nor call again; the guest's other devices stay signed in. Revoking the device the guest is using signs it out too, so the app returns to sign-in. If Identity does not answer, the device stays revoked and this answers `502` `device-sessions-not-ended`; the client calls again, which is a `204` revoke that asks Identity again.
+**How the retry still reaches Identity** (R8 blocker IDENTITY-C23): the revoke clears `installationId` as above but first copies it to `pendingSessionEndInstallationId`, which is kept until Identity answers. On `204` from `endGuestDeviceSessions` it is cleared. On a revoked row where it is still set, a call again (or a revoke of an already revoked device) asks Identity again with that value; where it is null, a revoke of a revoked device is `204` with no call. A `502` is never stored as the Idempotency-Key answer, so a retry with the same key runs again.
 
 |  |  |
 |---|---|
@@ -1947,6 +1954,8 @@ Returns profiles the caller's scope permits. Personal fields are returned only t
 
 **Order.** Sorted by `displayName` ascending, then by `id`.
 
+**Decided 18 October 2026** (ADAM CR-141; CHG-CRA-007). **Without `GUEST_VIEW_PII`** the six personal fields (`displayName`, `email`, `phone`, `preferredLanguage`, `preferredChannel`, `guestLinkId`; marked `x-ticvai-data-class: personal` on `GuestProfile`, and Identity's subject record already treats preferred language as personal) are null, and the results are ordered by `id`, not by name, so the order discloses nothing. **`hasConsentFor`**: a guest has consent for a purpose when their `marketing.consent_record` for that purpose with `superseded_at` null has decision `granted`; it is Marketing's own table, so no read route is needed. **`lifetimeValue` is left out** until a guest's lifetime value has a currency (CR-094's rule, waiting on the client).
+
 |  |  |
 |---|---|
 | Permission | `GUEST_VIEW` |
@@ -1956,7 +1965,7 @@ Returns profiles the caller's scope permits. Personal fields are returned only t
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | replica |
-| Reads | `marketing.guest_profile` |
+| Reads | `marketing.consent_record`, `marketing.guest_profile` |
 | Writes | - |
 | Called by | BO-734, BO-735, EMP-026, POS-027, POS-030 |
 
@@ -1966,7 +1975,7 @@ Returns profiles the caller's scope permits. Personal fields are returned only t
 |---|---|---|---|---|
 | search | query |  | string | Name, email, phone or membership number. |
 | segmentId | query |  | string (uuid) |  |
-| hasConsentFor | query |  | ConsentPurpose: enum (marketing, personalisation, profiling, thirdPartySharing, aiProcessing, transactional) |  |
+| hasConsentFor | query |  | ConsentPurpose: enum (marketing, personalisation, profiling, thirdPartySharing, aiProcessing, transactional, storedPaymentCredential, facePassEnrolment) |  |
 | pageSize | query |  | integer |  |
 | cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
 
@@ -2023,8 +2032,8 @@ Returns profiles the caller's scope permits. Personal fields are returned only t
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `marketing.customer_badge` |
-| Writes | `marketing.customer_badge` |
+| Reads | `cache:idempotency`, `marketing.customer_badge` |
+| Writes | `cache:idempotency`, `marketing.customer_badge` |
 | Called by | BO-826 |
 
 **Parameters**
@@ -2042,11 +2051,11 @@ Returns profiles the caller's scope permits. Personal fields are returned only t
 | customerId | string (uuid) | yes |  |
 | badgeId | string (uuid) | yes |  |
 | challengeId | string (uuid) |  | (nullable) |
-| sourceType | string |  | (max length 30; nullable) |
+| sourceType | enum (challenge, purchase, manager) |  | Why the badge was awarded (R8 blocker ORDERS-MONEY-C14): challenge (a completed challenge, challengeId set), purchase (sourceReferenceId the order), manager (awarded by hand, as BO-826 does). (max length 30; nullable) |
 | sourceReferenceId | string (uuid) |  | (nullable) |
 | awardedAt | string (date-time) | yes |  |
 | expiresAt | string (date-time) |  | (nullable) |
-| status | string | yes | (max length 20; read-only) |
+| status | enum (awarded, expired, revoked) | yes | Written by the server, never sent (R8 blocker ORDERS-MONEY-C14). (max length 20; read-only) |
 
 **Response**: `MarketingCustomerBadge`
 
@@ -2056,18 +2065,18 @@ Returns profiles the caller's scope permits. Personal fields are returned only t
 | customerId | string (uuid) | yes |  |
 | badgeId | string (uuid) | yes |  |
 | challengeId | string (uuid) |  | (nullable) |
-| sourceType | string |  | (max length 30; nullable) |
+| sourceType | enum (challenge, purchase, manager) |  | Why the badge was awarded (R8 blocker ORDERS-MONEY-C14): challenge (a completed challenge, challengeId set), purchase (sourceReferenceId the order), manager (awarded by hand, as BO-826 does). (max length 30; nullable) |
 | sourceReferenceId | string (uuid) |  | (nullable) |
 | awardedAt | string (date-time) | yes |  |
 | expiresAt | string (date-time) |  | (nullable) |
-| status | string | yes | (max length 20; read-only) |
+| status | enum (awarded, expired, revoked) | yes | Written by the server, never sent (R8 blocker ORDERS-MONEY-C14). (max length 20; read-only) |
 
 **Responses**
 
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Awarded |
-| 409 |  | Already held and not expired |
+| 409 |  | The customer already holds this badge with status awarded and an expiresAt that is null or in the future (badge-already-held). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### createLoyaltyProgramme
@@ -2252,11 +2261,11 @@ Earn rules and tiers. **What points redeem for is the rewards catalogue** (`setR
 | items[].customerId | string (uuid) | yes |  |
 | items[].badgeId | string (uuid) | yes |  |
 | items[].challengeId | string (uuid) |  | (nullable) |
-| items[].sourceType | string |  | (max length 30; nullable) |
+| items[].sourceType | enum (challenge, purchase, manager) |  | Why the badge was awarded (R8 blocker ORDERS-MONEY-C14): challenge (a completed challenge, challengeId set), purchase (sourceReferenceId the order), manager (awarded by hand, as BO-826 does). (max length 30; nullable) |
 | items[].sourceReferenceId | string (uuid) |  | (nullable) |
 | items[].awardedAt | string (date-time) | yes |  |
 | items[].expiresAt | string (date-time) |  | (nullable) |
-| items[].status | string | yes | (max length 20; read-only) |
+| items[].status | enum (awarded, expired, revoked) | yes | Written by the server, never sent (R8 blocker ORDERS-MONEY-C14). (max length 20; read-only) |
 | nextCursor | string |  |  |
 | hasMore | boolean | yes |  |
 
@@ -2345,6 +2354,7 @@ Earn rules and tiers. **What points redeem for is the rewards catalogue** (`setR
 |---|---|---|---|---|
 | pageSize | query |  | integer |  |
 | cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
+| venueId | query |  | string (uuid) | Whose venue to read, for a caller with no venue (R8 blocker fix, as listProductCategories): a visitor with no credential, or an app before sign-in, must send it (missing is 400 venue-required, an id… |
 
 **Response**: `object`
 
@@ -2404,7 +2414,7 @@ Earn rules and tiers. **What points redeem for is the rewards catalogue** (`setR
 | Guest callable | True |
 | Reads | `marketing.reward` |
 | Writes | - |
-| Called by | BO-828, GST-036, WEB-043 |
+| Called by | BO-828, GST-036, GST-071, WEB-043 |
 
 **Parameters**
 
@@ -2457,8 +2467,8 @@ Earn rules and tiers. **What points redeem for is the rewards catalogue** (`setR
 | Offline | no |
 | Config scope | subject |
 | Conflict policy | serverWins |
-| Reads | `marketing.loyalty_position` |
-| Writes | `marketing.loyalty_position` |
+| Reads | `cache:idempotency`, `marketing.loyalty_position` |
+| Writes | `cache:idempotency`, `marketing.loyalty_position` |
 | Called by | GST-036, WEB-043 |
 
 **Parameters**
@@ -2511,8 +2521,8 @@ Earn rules and tiers. **What points redeem for is the rewards catalogue** (`setR
 | Offline | no |
 | Config scope | venue |
 | Conflict policy | serverWins |
-| Reads | `marketing.loyalty_rule`, `marketing.points_redemption_rule`, `marketing.programme_tier` |
-| Writes | `marketing.loyalty_rule`, `marketing.points_redemption_rule`, `marketing.programme_tier` |
+| Reads | `cache:idempotency`, `marketing.loyalty_rule`, `marketing.points_redemption_rule`, `marketing.programme_tier` |
+| Writes | `cache:idempotency`, `marketing.loyalty_rule`, `marketing.points_redemption_rule`, `marketing.programme_tier` |
 | Called by | BO-827, BO-828 |
 
 **Parameters**
@@ -2629,8 +2639,8 @@ Earn rules and tiers. **What points redeem for is the rewards catalogue** (`setR
 | Offline | no |
 | Config scope | venue |
 | Conflict policy | serverWins |
-| Reads | `marketing.reward` |
-| Writes | `marketing.reward` |
+| Reads | `cache:idempotency`, `marketing.reward` |
+| Writes | `cache:idempotency`, `marketing.reward` |
 | Called by | BO-828 |
 
 **Parameters**
@@ -2891,6 +2901,7 @@ Published as a version. **A change creates a new version and the old one stays r
 | fields[].showWhen | object |  | (nullable) |
 | fields[].showWhen.field | string |  |  |
 | fields[].showWhen.equals | string |  |  |
+| fields[].presentation | enum (dropDown, radio, checkBoxes) |  | How a choice is drawn (products module, 16 October 2026 minutes 4.13: the data mask's field types are text, drop-down, radio and check box; CHG-R8PRD-009). (nullable) |
 | requiresSignature | boolean |  | What makes it a waiver. (default False) |
 | signatureKind | enum (drawn, typed, checkbox, none) |  | (default none) |
 | scoreScale | enum (nps, csat, ces, likert5, likert7, stars) |  | What makes it a survey. (nullable) |
@@ -2924,6 +2935,7 @@ Published as a version. **A change creates a new version and the old one stays r
 | fields[].showWhen | object |  | (nullable) |
 | fields[].showWhen.field | string |  |  |
 | fields[].showWhen.equals | string |  |  |
+| fields[].presentation | enum (dropDown, radio, checkBoxes) |  | How a choice is drawn (products module, 16 October 2026 minutes 4.13: the data mask's field types are text, drop-down, radio and check box; CHG-R8PRD-009). (nullable) |
 | requiresSignature | boolean |  | What makes it a waiver. (default False) |
 | signatureKind | enum (drawn, typed, checkbox, none) |  | (default none) |
 | scoreScale | enum (nps, csat, ces, likert5, likert7, stars) |  | What makes it a survey. (nullable) |
@@ -3180,6 +3192,7 @@ Absent `version` returns the `published` version to a guest and the latest to st
 | fields[].showWhen | object |  | (nullable) |
 | fields[].showWhen.field | string |  |  |
 | fields[].showWhen.equals | string |  |  |
+| fields[].presentation | enum (dropDown, radio, checkBoxes) |  | How a choice is drawn (products module, 16 October 2026 minutes 4.13: the data mask's field types are text, drop-down, radio and check box; CHG-R8PRD-009). (nullable) |
 | requiresSignature | boolean |  | What makes it a waiver. (default False) |
 | signatureKind | enum (drawn, typed, checkbox, none) |  | (default none) |
 | scoreScale | enum (nps, csat, ces, likert5, likert7, stars) |  | What makes it a survey. (nullable) |
@@ -3274,7 +3287,7 @@ Returns the points, the tier, and **how far from the next one** — the last is 
 | Read routing | primary |
 | Reads | `marketing.loyalty_programme` |
 | Writes | - |
-| Called by | GST-036, WEB-017, WEB-043 |
+| Called by | GST-036, GST-071, WEB-017, WEB-043 |
 
 **Parameters**
 
@@ -3329,6 +3342,85 @@ Returns the points, the tier, and **how far from the next one** — the last is 
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Every subscription this guest has — one per channel and list, since a guest may take the newsletter by email and offers by SMS. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
+### getMyCase
+
+**`GET /my/cases/{caseId}`**: One case the guest raised, with its thread
+
+**How a guest opens a case** (r8 walk of ticket 27891). `listMyCases` returns the cases without their messages and `getCase` needs `CASE_VIEW`, so a guest had no way to read the thread they were having. This returns the case as `CaseDetail`: the description, the resolution note, and the messages.
+**Scoped to the caller, not filtered by it** (`x-ticvai-self-scoped: subject`): a case the caller did not raise answers 404, exactly as one that does not exist, as `replyToMyCase` does. **A guest never receives a message with `isInternal: true`**; those are staff notes and are left out of `messages`, oldest first.
+Read from the primary, because a reply the guest has just sent must be in the thread they read next.
+
+|  |  |
+|---|---|
+| Permission | `None` |
+| Scope level | tenant |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | primary |
+| Guest callable | True |
+| Reads | `marketing.case`, `marketing.case_message` |
+| Writes | - |
+| Called by | GST-068 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| caseId | path | yes | string (uuid) |  |
+
+**Response**: `CaseDetail`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) | yes | Created on the device (CreateCaseRequest.id, raiseMyCase), so a UUIDv7. |
+| caseNumber | string | yes | Server-assigned: the venue prefix plus a sequence per venue (decided 28 September, audit R152). (read-only) |
+| subjectId | string (uuid) |  | (nullable) |
+| guestName | string |  | Resolved from pii.subject when the case is read, never stored on the case. (read-only; nullable) |
+| subject | string | yes | The case's one-line title, not a person. |
+| kind | object |  | What the guest said it was about, where the guest raised it. (nullable) |
+| channel | object |  | How the guest reached the venue — CreateCaseRequest.channel, or inApp for a case raised through raiseMyCase. |
+| recordedAt | string (date-time) |  | Device time the case was raised — the start of the SLA clock. |
+| syncedAt | string (date-time) |  | Server time the case arrived. (read-only) |
+| categoryId | string (uuid) |  | (nullable) |
+| queueId | string (uuid) |  | The ServiceQueue the case waits in, set by routing (CaseRoutingRule.queueId). (nullable) |
+| membershipId | string (uuid) |  | The identity membership this case concerns (identity.customer_membership); member case notes are cases with this set. (nullable) |
+| status | CaseStatus: enum (open, inProgress, awaitingGuest, escalated, resolved, closed) | yes |  |
+| priority | CasePriority: enum (low, normal, high, urgent) | yes |  |
+| assignedToPrincipalId | string (uuid) |  | (nullable) |
+| venueId | string (uuid) |  | (nullable) |
+| relatedOrderId | string |  | (nullable) |
+| slaDueAt | string (date-time) |  | (nullable) |
+| isSlaBreached | boolean |  | Computed when read, never stored. (read-only) |
+| slaPausedSeconds | integer |  | Accrued only while awaiting the guest. |
+| escalationCount | integer |  |  |
+| createdAt | string (date-time) | yes |  |
+| resolvedAt | string (date-time) |  | (nullable) |
+| description | string |  |  |
+| resolutionNote | string |  | (nullable) |
+| messages | array of CaseMessage |  |  |
+| messages[].scopePath | string | yes | Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. (read-only) |
+| messages[].resolution | string |  | What was actually done about it. |
+| messages[].id | string | yes |  |
+| messages[].body | string | yes |  |
+| messages[].isInternal | boolean | yes |  |
+| messages[].authorKind | enum (agent, guest, system, ai) | yes |  |
+| messages[].authorPrincipalId | string (uuid) |  | (nullable) |
+| messages[].channel | MessageChannel: enum (email, sms, whatsapp, push, inApp, post) |  |  |
+| messages[].attachmentRefs | array of string |  |  |
+| messages[].recordedAt | string (date-time) | yes | Device time — addCaseMessage is offline-capable. |
+| messages[].syncedAt | string (date-time) |  | Server time the message arrived. (read-only) |
+| messages[].caseId | string (uuid) | yes | The case this message belongs to, from the path of addCaseMessage (the opening one, createCase). (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | The case with its guest-visible thread |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getMyChallenges
@@ -3622,8 +3714,8 @@ Takes a token of any kind: a QR payload, an RFID or NFC serial, a membership car
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `access.blacklist`, `access.entitlement`, `marketing.guest_profile`, `marketing.loyalty_position`, `pii.subject` |
-| Writes | - |
+| Reads | `access.blacklist`, `access.entitlement`, `cache:idempotency`, `marketing.guest_profile`, `marketing.loyalty_position`, `pii.subject` |
+| Writes | `cache:idempotency` |
 | Called by | POS-002, POS-027 |
 
 **Parameters**
@@ -4185,8 +4277,8 @@ written by OrderService (`access.entitlement` with `invitationId`, CHG-FXC-007).
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | append |
-| Reads | - |
-| Writes | `marketing.conversation_message` |
+| Reads | `cache:idempotency` |
+| Writes | `cache:idempotency`, `marketing.conversation_message` |
 | Called by | GST-031, GST-032, WEB-044 |
 
 **Parameters**
@@ -4295,8 +4387,8 @@ An agent who forgets to go offline is an agent conversations queue for. **Availa
 | Conflict policy | serverWins |
 | Read routing | primary |
 | Status | **Stub**: its shape is a proposal; do not build until confirmed |
-| Reads | `marketing.subscription` |
-| Writes | `marketing.subscription` |
+| Reads | `cache:idempotency`, `marketing.subscription` |
+| Writes | `cache:idempotency`, `marketing.subscription` |
 | Called by | GST-065, WEB-027 |
 
 **Parameters**
@@ -4427,8 +4519,8 @@ Where the form has an expiry, a live acceptance means **a returning participant 
 | Offline | no |
 | Conflict policy | serverWins |
 | Guest callable | True |
-| Reads | `cache:idempotency`, `marketing.consent_record`, `marketing.form_definition`, `marketing.form_submission`, `marketing.waiver_requirement`, `pii.subject` |
-| Writes | `cache:idempotency`, `marketing.consent_record`, `marketing.form_submission`, `marketing.waiver_requirement`, `marketing.waiver_requirement_event` |
+| Reads | `cache:idempotency`, `marketing.consent_record`, `marketing.form_definition`, `marketing.form_submission`, `marketing.form_submission_sale_link`, `marketing.waiver_requirement`, `pii.subject` |
+| Writes | `cache:idempotency`, `marketing.consent_record`, `marketing.form_submission`, `marketing.form_submission_sale_link`, `marketing.waiver_requirement`, `marketing.waiver_requirement_event` |
 | Called by | GST-035, WEB-026 |
 | State model | Waiver requirement ([states/waiver-requirement.yaml](../../../states/waiver-requirement.yaml)): moves `assigned` -> `completed`, `sent` -> `completed`, `opened` -> `completed`, `inProgress` -> `completed` |
 
@@ -4454,6 +4546,13 @@ Where the form has an expiry, a live acceptance means **a returning participant 
 | expiresAt | string (date-time) |  | From validForMonths. (read-only; nullable) |
 | capturedAtChannel | SalesChannel: enum (pos, kiosk, guestApp, guestWeb, callCentre, partner, api, backOffice, …) |  | Where a sale came from. |
 | ipAddress | string |  | (nullable) |
+| saleContext | object |  | The sale a capture was made for (products module, 16 October 2026 minutes 4.13; CHG-R8PRD-009, CHG-R8PRD-010): a product's reservation-owner and ticket-owner forms (catalogue getProductOwnerForms) ar… (read-only; nullable) |
+| saleContext.submissionId | string (uuid) |  | (read-only) |
+| saleContext.orderId | string (uuid) | yes | The order (Orders' id; not a database reference). |
+| saleContext.ownerRole | enum (reservationOwner, ticketOwner) | yes |  |
+| saleContext.orderLineId | string (uuid) |  | For a ticket owner, the order line whose credential this owner holds; null for the buyer. (nullable) |
+| saleContext.unitIndex | integer |  | For a ticket owner, which of the line's credentials (1 to the line's quantity); null for the buyer. (min 1; nullable) |
+| saleContext.scopePath | string |  | The partition key (ADR-0005). (read-only) |
 
 **Response**: `FormSubmission`
 
@@ -4471,6 +4570,13 @@ Where the form has an expiry, a live acceptance means **a returning participant 
 | expiresAt | string (date-time) |  | From validForMonths. (read-only; nullable) |
 | capturedAtChannel | SalesChannel: enum (pos, kiosk, guestApp, guestWeb, callCentre, partner, api, backOffice, …) |  | Where a sale came from. |
 | ipAddress | string |  | (nullable) |
+| saleContext | object |  | The sale a capture was made for (products module, 16 October 2026 minutes 4.13; CHG-R8PRD-009, CHG-R8PRD-010): a product's reservation-owner and ticket-owner forms (catalogue getProductOwnerForms) ar… (read-only; nullable) |
+| saleContext.submissionId | string (uuid) |  | (read-only) |
+| saleContext.orderId | string (uuid) | yes | The order (Orders' id; not a database reference). |
+| saleContext.ownerRole | enum (reservationOwner, ticketOwner) | yes |  |
+| saleContext.orderLineId | string (uuid) |  | For a ticket owner, the order line whose credential this owner holds; null for the buyer. (nullable) |
+| saleContext.unitIndex | integer |  | For a ticket owner, which of the line's credentials (1 to the line's quantity); null for the buyer. (min 1; nullable) |
+| saleContext.scopePath | string |  | The partition key (ADR-0005). (read-only) |
 
 **Responses**
 
@@ -5198,13 +5304,13 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
+| id | uuid | yes | The purpose row's id (marketing.consent_purpose.id), the value consentPurposeId and a consent's purposeId carry (R8 blocker ORDERS-MONEY-C21, CHG-R8MIG-022). |
 | purpose | text | yes |  |
 | display_name | text | no |  |
 | description | text | no |  |
 | notice_version | text | yes | Current version of the notice. |
 | is_required_for_service | boolean | yes | True for transactional. |
 | expires_after_months | integer | no |  |
-| id | uuid | yes | Synthesised key. |
 | tenant_id | uuid | yes | Points at platform.tenant. |
 
 ### `marketing.consent_purpose_channel`
@@ -5340,11 +5446,11 @@ Every table this service owns that the slice reads or writes, with its columns a
 | customer_id | uuid | yes |  |
 | badge_id | uuid | yes |  |
 | challenge_id | uuid | no |  |
-| source_type | text | no |  |
+| source_type | text | no | Why the badge was awarded (R8 blocker ORDERS-MONEY-C14): challenge (a completed challenge, challengeId set), purchase (sourceReferenceId the order), manager (awarded by hand, as BO-826 does). |
 | source_reference_id | uuid | no |  |
 | awarded_at | timestamptz | yes |  |
 | expires_at | timestamptz | no |  |
-| status | text | yes |  |
+| status | text | yes | Written by the server, never sent (R8 blocker ORDERS-MONEY-C14). |
 
 ### `marketing.device_consent`
 
@@ -5407,6 +5513,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | is_required | boolean | no |  |
 | consent_purpose_id | uuid | no |  |
 | show_when | jsonb | no |  |
+| presentation | text | no | How a choice is drawn (products module, 16 October 2026 minutes 4.13: the data mask's field types are text, drop-down, radio and check box; CHG-R8PRD-009). |
 | form_definition_id | uuid | yes | The parent row. |
 | form_id | uuid | yes |  |
 | form_version | integer | yes |  |
@@ -5442,6 +5549,18 @@ Every table this service owns that the slice reads or writes, with its columns a
 | captured_at_channel | text | no |  |
 | ip_address | text | no |  |
 
+### `marketing.form_submission_sale_link`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes | Synthesised key. |
+| submission_id | uuid | no |  |
+| order_id | uuid | yes | The order (Orders' id; not a database reference). |
+| owner_role | text | yes |  |
+| order_line_id | uuid | no | For a ticket owner, the order line whose credential this owner holds; null for the buyer. |
+| unit_index | integer | no | For a ticket owner, which of the line's credentials (1 to the line's quantity); null for the buyer. |
+| scope_path | text | no | The partition key (ADR-0005). |
+
 ### `marketing.guest_device`
 
 | Column | Type | Required | Notes |
@@ -5461,6 +5580,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | registered_at | timestamptz | yes |  |
 | last_seen_at | timestamptz | no |  |
 | revoked_at | timestamptz | no |  |
+| pending_session_end_installation_id | uuid | no | Set only by the server (a value a client sends is ignored) and never returned (R8 blocker IDENTITY-C23). |
 
 ### `marketing.guest_document`
 
@@ -5503,7 +5623,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | tags | text[] | no |  |
 | engagement_score | integer | no | 22.2.20 and 22.2.21. |
 | engagement_tier | text | no | 5.3.19. |
-| lifetime_value | numeric(18,4) | no |  |
+| lifetime_value | numeric(18,4) | no | Left out of guest reads until a guest's lifetime value has a currency (ADAM CR-141, 18 October 2026; CHG-CRA-007): an amount above a venue is in the currency recorded on its own row (CR-094's rule, w… |
 | visit_count | integer | no |  |
 | last_visit_at | timestamptz | no |  |
 | is_active | boolean | yes |  |
@@ -5918,7 +6038,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-206 operations, added to this service in later releases without changing any of the above.
+207 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
@@ -5930,6 +6050,6 @@ Every table this service owns that the slice reads or writes, with its columns a
 | guest | `getGuestProfile`, `mergeGuestProfiles`, `updateGuestProfile` |
 | guests | `activateAudience`, `checkGuestCheckoutMatch`, `decideDuplicateCandidate`, `decideGuestCheckoutMatch`, `getAudienceOverlap`, `getGuestAttributeModel`, `getGuestIntelligence`, `getGuestMatchPolicy`, `getGuestRelationships`, `getGuestTimeline`, `getIdentityResolutionRules`, `importAudienceList`, `listAudienceActivations`, `listAudienceLists`, `listDuplicateCandidates`, `runDataRetention`, `setDataRetentionPolicy`, `setGuestAttributeModel`, `setGuestMatchPolicy`, `setGuestRelationships`, `setIdentityResolutionRules` |
 | loyalty | `adjustLoyaltyPoints`, `getLoyaltyRules`, `issueReward`, `listBadges`, `listLoyaltyCampaigns`, `listLoyaltyPointEntries`, `listRewardAssignments`, `setBadge`, `setLoyaltyCampaign` |
-| marketing | `accrueLoyaltyPoints`, `activateChallenge`, `activateJourney`, `addGuestNote`, `claimConversation`, `closeConversation`, `createJourney`, `endKioskAssist`, `getChallenge`, `getConversation`, `getGuestExtraValues`, `getJourneyPerformance`, `getLostItemMatches`, `listChallenges`, `listConversations`, `listForms`, `listGuestExtraFields`, `listJourneys`, `listLostItems`, `listMessageDispatches`, `listMessageTriggers`, `listSlaPolicies`, `listWaiverSignatures`, `matchGuest`, `matchLostItem`, `mergeGuests`, `recordPrivacyIncident`, `recordTouchPoint`, `retryMessageDispatch`, `setCallDisposition`, `setGuestExtraFields`, `setGuestExtraValues`, `setMessageTrigger`, `setSlaPolicy`, `startKioskAssist`, `transferConversation` |
+| marketing | `accrueLoyaltyPoints`, `activateChallenge`, `activateJourney`, `addGuestNote`, `claimConversation`, `closeConversation`, `createJourney`, `endKioskAssist`, `getChallenge`, `getConversation`, `getGuestExtraValues`, `getJourneyPerformance`, `getLostItemMatches`, `listChallenges`, `listConversations`, `listForms`, `listGuestExtraFields`, `listJourneys`, `listLostItems`, `listMessageDispatches`, `listMessageTriggers`, `listSlaPolicies`, `listWaiverSignatures`, `matchGuest`, `matchLostItem`, `mergeGuests`, `recordPrivacyIncident`, `recordSaleOwnerAnswers`, `recordTouchPoint`, `retryMessageDispatch`, `setCallDisposition`, `setGuestExtraFields`, `setGuestExtraValues`, `setMessageTrigger`, `setSlaPolicy`, `startKioskAssist`, `transferConversation` |
 | message | `getMessageStatus`, `listBusinessEventNotification`, `listCommunicationService`, `listDeliveryCommunicationPlatform`, `listDeliveryQueueFailure`, `listMessageTemplates`, `listProviderHealthUsage`, `listRoutingPriorityThrottling`, `listSystemTransactionalTemplate`, `notifyPerformanceHolders`, `sendTransactionalMessage`, `setBusinessEventMapping`, `setChannelProvider`, `setCommunicationRoutingRule`, `setSenderIdentityDomain` |
 | segment | `listSegmentMembers`, `listSegments`, `previewSegment`, `previewSegmentDraft` |

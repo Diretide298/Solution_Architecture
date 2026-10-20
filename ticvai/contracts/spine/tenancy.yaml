@@ -1753,6 +1753,7 @@ paths:
     get:
       operationId: getWorkstation
       x-ticvai-consumed-by:
+        - "P04 POS-016 Till Configuration"
         - "P08 BO-036 Device Registry"
       x-ticvai-read-via:
       - query: catalogue#bundleApplicationRecords
@@ -1794,12 +1795,12 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: configureWorkstation
-      # Named to say custody is a different fact from binding; this PUT neither reads nor writes it (r8 integration, CHG-R8INT-014; check-parameter-columns P-NAMED-TABLE).
-      x-ticvai-names-for-context: [tenancy.device_assignment]
       x-ticvai-consumed-by:
         - "P04 POS-016 Till Configuration"
         - "P08 BO-036 Device Registry"
         - "P08 BO-602 POS, Payment & Access Setup"
+      # Named to say custody is a different fact from binding; this PUT neither reads nor writes it (r8 integration, CHG-R8INT-014; check-parameter-columns P-NAMED-TABLE).
+      x-ticvai-names-for-context: [tenancy.device_assignment]
       x-ticvai-audience: [staff]
       x-ticvai-config-scope: venue
       summary: Configure a workstation
@@ -2103,6 +2104,7 @@ paths:
       operationId: listSaleBoards
       x-ticvai-consumed-by:
         - "P04 POS-002 Sell — Ticket Catalogue"
+        - "P04 POS-016 Till Configuration"
         - "P04 POS-025 Till Home"
         - "P08 BO-109 Menu Builder & POS Layout Designer"
         - "P08 BO-116 Merchandising & Product Presentation"

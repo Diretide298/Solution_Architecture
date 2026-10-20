@@ -44,11 +44,11 @@
     }
    ]
   },
-  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement.\n\n**The guest's saved cards are read with listPaymentTokens (4 October 2026) so the auto top-up and a stored-card exit settlement have a paymentTokenId to send; the walletId is the wallet's own id (Wallet.id, agreed with contracts in the ledger)** (CHG-FXS-003)",
+  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement.\n\n**The guest's saved cards are read with listPaymentTokens (4 October 2026) so the auto top-up has a paymentTokenId to send; the walletId is the wallet's own id (Wallet.id, agreed with contracts in the ledger)** (CHG-FXS-003)\n\nBuild note (r8 second round, ORDERS-MONEY-C07, the lead 20 October 2026, option A): **build to this definition, not to the frame** (wireframes/frames/gst-011.html): no Top up button and no \"Leaving today? Settle\" panel; the client-approved wallet screen shows neither, and `getWalletExitBalance` and `settleWalletAtExit` are gone from this screen. **The game card panel follows the WEB-021 ruling (CR-143, CHG-CRA-008)**: it opens only from a deep link carrying `cardCode` and `cardKind` `gameCard`, and is read with `getGameCard` on open; without the link it stays closed. The card's credits and bonus credits (`GameCard.credits`, `bonusCredits`) are what the panel's balance shows; adding them as drawn fields waits for the client (pending entry ORDERS-MONEY-C07).\n\nBuild note (r8 second round, GPS-C09): **build the no-access state as GFIX-4 says, not as the state text above reads.** A guest holds no permission, so the state never names one (the text above still names staff permissions); signed out, the guest is offered sign-in and brought back here; a record that is not theirs says so without saying whose. The corrected wording waits for the client's approval of the visible text (pending entry GPS-C09).",
   "density": "comfortable",
   "pattern": "listDetail",
   "patternReason": "`listWalletTransactions` reads the population and `getWallet` reads one of them — list, select, act",
-  "purpose": "My wallet: balance, activity and auto top-up, and what is due or refundable at exit.",
+  "purpose": "My wallet: balance, activity and auto top-up.",
   "layout": {
    "template": "split",
    "regions": [
@@ -182,14 +182,14 @@
    {
     "operationId": "getGameCard",
     "contract": "games",
-    "purpose": "Balance on a game card",
-    "trigger": "onAction",
+    "purpose": "Balance on a game card, read when the screen opens from a deep link with `cardCode` and `cardKind` `gameCard` (the WEB-021 ruling, CR-143; r8, ORDERS-MONEY-C07); never called without the link",
+    "trigger": "onLoad",
     "provenance": "flow F18 step 2, 2 October 2026 (CHG-CLN-006)"
    },
    {
     "operationId": "listPaymentTokens",
     "contract": "orders",
-    "purpose": "The guest's saved cards: the auto top-up card and a stored-card exit settlement pick one (paymentTokenId)",
+    "purpose": "The guest's saved cards: the auto top-up card picks one (paymentTokenId)",
     "trigger": "onLoad",
     "provenance": "defined 4 October 2026 (CHG-FXS-003)"
    }
@@ -204,6 +204,12 @@
      "name": "cardCode",
      "from": "deepLink",
      "optional": true
+    },
+    {
+     "name": "cardKind",
+     "from": "deepLink",
+     "optional": true,
+     "notes": "`gameCard` (ADAM CR-143; CHG-CRA-008; r8, ORDERS-MONEY-C07): with `cardCode`, opens the game card panel, read with `getGameCard` (the guest's own cards only). Never shown. Without it, or without `cardCode`, the panel stays closed."
     },
     {
      "name": "walletId",
@@ -222,17 +228,17 @@
    ]
   },
   "wireframe": {
-   "status": "notStarted",
-   "provenance": "designed",
+   "status": "approved",
+   "provenance": "client-verified",
    "board": "wireframes/P02 Guest App.dc.html#gst-011",
    "prototype": {
     "file": "sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html",
     "rev": "Mobile App v4, 29 September 2026",
     "match": "none",
-    "note": "Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the v4 look (the frame on this screen's board, wireframes/frames/gst-011.html, and #GST-011 in handoff/design-batches/apps/1-guest-app/return/TICVAI Guest App.dc.html). NOT client-verified: awaiting the client's design reviewer. Build the layout from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at: Account → All screens → Wave 2 → Wallet overview (exact)."
+    "note": "Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the v4 look (the frame on this screen's board, wireframes/frames/gst-011.html, and #GST-011 in handoff/design-batches/apps/1-guest-app/return/TICVAI Guest App.dc.html). Client-approved 19 October 2026 (confirmed by Chinmay Parab). Build the layout from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at: Account → All screens → Wave 2 → Wallet overview (exact)."
    },
-   "source": "Claude Code, 30 September 2026, drawn in the Mobile App v4 look",
-   "note": "**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified, awaiting the client's design reviewer.** `provenance: designed` because the accepted vocabulary has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md."
+   "source": "client approval, confirmed by Chinmay Parab 19 October 2026",
+   "note": "**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; client-approved 19 October 2026, confirmed by Chinmay Parab.** Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "gaps": [
@@ -552,17 +558,17 @@
    ]
   },
   "wireframe": {
-   "status": "notStarted",
-   "provenance": "designed",
+   "status": "approved",
+   "provenance": "client-verified",
    "board": "wireframes/P02 Guest App.dc.html#gst-015",
    "prototype": {
     "file": "sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html",
     "rev": "Mobile App v4, 29 September 2026",
     "match": "none",
-    "note": "Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the v4 look (the frame on this screen's board, wireframes/frames/gst-015.html, and #GST-015 in handoff/design-batches/apps/1-guest-app/return/TICVAI Guest App.dc.html). NOT client-verified: awaiting the client's design reviewer. Build the layout from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at: Account → All screens → Wave 2 → Memberships; billing in \"Also built, not in the plan\" → Membership billing (#billing) (exact). What v2 did differently: Prototype splits the screen in two (benefits and delegation vs billing statement and dunning retries)."
+    "note": "Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the v4 look (the frame on this screen's board, wireframes/frames/gst-015.html, and #GST-015 in handoff/design-batches/apps/1-guest-app/return/TICVAI Guest App.dc.html). Client-approved 19 October 2026 (confirmed by Chinmay Parab). Build the layout from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at: Account → All screens → Wave 2 → Memberships; billing in \"Also built, not in the plan\" → Membership billing (#billing) (exact). What v2 did differently: Prototype splits the screen in two (benefits and delegation vs billing statement and dunning retries)."
    },
-   "source": "Claude Code, 30 September 2026, drawn in the Mobile App v4 look",
-   "note": "**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified, awaiting the client's design reviewer.** `provenance: designed` because the accepted vocabulary has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md."
+   "source": "client approval, confirmed by Chinmay Parab 19 October 2026",
+   "note": "**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; client-approved 19 October 2026, confirmed by Chinmay Parab.** Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
@@ -880,17 +886,17 @@
    }
   ],
   "wireframe": {
-   "status": "notStarted",
-   "provenance": "designed",
+   "status": "approved",
+   "provenance": "client-verified",
    "board": "wireframes/P02 Guest App.dc.html#gst-036",
    "prototype": {
     "file": "sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html",
     "rev": "Mobile App v4, 29 September 2026",
     "match": "none",
-    "note": "Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the v4 look (the frame on this screen's board, wireframes/frames/gst-036.html, and #GST-036 in handoff/design-batches/apps/1-guest-app/return/TICVAI Guest App.dc.html). NOT client-verified: awaiting the client's design reviewer. Build the layout from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at: Account → All screens → Wave 2 → Loyalty & rewards (exact)."
+    "note": "Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the v4 look (the frame on this screen's board, wireframes/frames/gst-036.html, and #GST-036 in handoff/design-batches/apps/1-guest-app/return/TICVAI Guest App.dc.html). Client-approved 19 October 2026 (confirmed by Chinmay Parab). Build the layout from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at: Account → All screens → Wave 2 → Loyalty & rewards (exact)."
    },
-   "source": "Claude Code, 30 September 2026, drawn in the Mobile App v4 look",
-   "note": "**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified, awaiting the client's design reviewer.** `provenance: designed` because the accepted vocabulary has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md."
+   "source": "client approval, confirmed by Chinmay Parab 19 October 2026",
+   "note": "**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; client-approved 19 October 2026, confirmed by Chinmay Parab.** Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md."
   },
   "apisNote": "Rebuilt 9 September 2026 from the operations this screen declares (4 then; evaluatePromotions removed 27 September), not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "entryState": {

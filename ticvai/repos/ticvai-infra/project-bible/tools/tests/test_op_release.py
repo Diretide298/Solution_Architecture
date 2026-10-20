@@ -122,9 +122,12 @@ def test_pointer_differs_between_releases_only_on_the_release_line():
 
 def test_frontend_pointer_names_its_repository_never_an_apps_folder():
     """CHG-R6-060: a frontend ticket names the GitLab repository of its screen's platform (docs/active/
-    frontend-repos.yaml) and a path relative to it; a platform with no repository says so and names no folder."""
+    frontend-repos.yaml) and a path relative to it; a platform with no repository says so and names no folder.
+    P09 builds in ticvai-web, created by the lead on 20 October 2026 (CHG-R8SCR-007, CHG-R8DEC-003); P10 has none yet."""
     rows = plan() + [row("APP-P09-ADM-001", "Task", "SVC-THING-CORE", track="Frontend", seq="6",
-                         subject="[FE] ADM-001 Platform Login / MFA", area="P09")]
+                         subject="[FE] ADM-001 Platform Login / MFA", area="P09"),
+                     row("APP-P10-PTR-001", "Task", "SVC-THING-CORE", track="Frontend", seq="7",
+                         subject="[FE] PTR-001 Partner Sign In", area="P10")]
     t = by_key(build(rows=rows)[0])
     for key in ("APP-MOB-GST-001", "APP-MOB-GST-001#build"):
         p = t[key]["pointer"]
@@ -132,7 +135,10 @@ def test_frontend_pointer_names_its_repository_never_an_apps_folder():
                 "ticvai-guest-app.git)") in p, p
         assert "suggested location `src/" in p and "apps/" not in p
     p = t["APP-P09-ADM-001"]["pointer"]
-    assert "**No repository yet:** ask the lead" in p and "apps/" not in p and "suggested location" not in p
+    assert "**Repository:** ticvai-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-web.git)" in p, p
+    assert "apps/" not in p
+    p = t["APP-P10-PTR-001"]["pointer"]
+    assert "**No repository yet:** ask the lead" in p and "apps/" not in p and "suggested location" not in p, p
     assert "Repository" not in t["SVC-THING-CORE-1"]["pointer"]
 
 
@@ -315,3 +321,64 @@ def test_old_epics_and_features_are_regrouped_not_unexplained():
                                 structure={"SVC-OLD", "SVC-OLD-GROUP"})
     assert [(k, a) for k, a, _ in retire] == [("SVC-OLD", "regroup"), ("SVC-OLD-GROUP", "regroup")]
     assert unexp == ["SVC-GONE-1"]                                      # a task with no reason stays unexplained
+
+
+# --------------------------------------------------------------------------- held in the plan (CHG-R8DEC-004)
+HOLD = {"APP-MOB-GST-001": {"id": "wireframe", "reason": "The screen waits for its signed wireframe.",
+                            "until": "the module's wireframe is signed",
+                            "decided": {"by": "Chinmay", "date": "2026-10-20", "quote": "Yes."}}}
+
+
+def test_a_held_task_keeps_its_key_and_row_and_carries_the_hold_with_its_sub_tasks():
+    mp = mapped(**{"APP-MOB-GST-001": 400})
+    b, errors = rel.build(plan(), mp, SCHED, LINEAGE, [], [], "r8", HOLD)
+    assert errors == []
+    t = by_key(b)
+    assert "APP-MOB-GST-001" in t and "APP-MOB-GST-001" not in b["create"]       # pushed key kept, never made again
+    assert not {r["key"] for r in b["retire"]} & {"APP-MOB-GST-001"}             # held is not retired
+    for k in ("APP-MOB-GST-001", "APP-MOB-GST-001#build", "APP-MOB-GST-001#wire", "APP-MOB-GST-001#test"):
+        assert t[k]["hold"].startswith(f"**{rel.HOLD_MARKER}** (release r8") and "signed wireframe" in t[k]["hold"]
+    assert t["SVC-THING-CORE-1"]["hold"] is None
+    assert b["hold_marker"] == rel.HOLD_MARKER
+    c = rel.counts(b)
+    assert c["held"] == {"Task": 1, "Sub Task": 3} and c["held_pushed"] == 1
+
+
+def test_a_hold_on_a_key_that_is_not_a_planned_task_is_refused():
+    _, errors = rel.build(plan(), mapped(), SCHED, LINEAGE, [], [], "r8", {"NO-SUCH-TASK": HOLD["APP-MOB-GST-001"],
+                                                                         "SVC-THING": HOLD["APP-MOB-GST-001"]})
+    assert sum("not a task in the plan" in e for e in errors) == 2
+
+
+def test_held_tasks_yaml_needs_reason_until_and_the_lead_s_words(tmp_path):
+    f = tmp_path / "held.yaml"
+    f.write_text("holds:\n  h1:\n    reason: r\n    until: u\n    decided: {by: Chinmay, date: '2026-10-20', quote: q}\n"
+                 "    keys: [A-1, A-2]\n  h2:\n    reason: ''\n    until: u\n    decided: {by: Chinmay}\n    keys: [A-2]\n",
+                 encoding="utf-8")
+    held, problems = rel.load_held(f)
+    assert set(held) == {"A-1", "A-2"}
+    assert any("hold h2: no reason, decided.date, decided.quote" in p for p in problems)
+    assert any("A-2 is in two holds" in p for p in problems)
+    assert rel.load_held(tmp_path / "none.yaml") == ({}, [])
+
+
+def test_a_held_ticket_is_never_reopened_by_the_server_script():
+    """op-release.rb's assign phase puts an On hold plan ticket back to New ("Back in the plan"). The real script leaves
+    a held one out of that and out of the assignment; a version without the guard is refused before a bundle is written."""
+    rb = (TOOLS / "op-release.rb").read_text(encoding="utf-8")
+    assert rel.hold_problems(rb) == []
+    unguarded = rb.replace(' && !held_keys.include?(t["key"])', "")
+    assert unguarded != rb
+    assert any("does not leave out the held ones" in p for p in rel.hold_problems(unguarded))
+    unskipped = rb.replace('next if held_keys.include?(t["key"])', "x = 1")
+    assert any("do not skip held tickets" in p for p in rel.hold_problems(unskipped))
+
+
+@pytest.mark.skipif(not (ROOT / "docs" / "active" / "held-tasks.yaml").exists(), reason="no held-tasks.yaml")
+def test_the_real_holds_are_planned_tasks_and_well_formed():
+    held, problems = rel.load_held()
+    assert problems == []
+    rows = {r["key"]: r for r in csv.DictReader((DOCS / "tasks.csv").open(encoding="utf-8"))}
+    mp = json.loads((DOCS / "pms-map.json").read_text(encoding="utf-8"))
+    assert all(rows.get(k, {}).get("type") == "Task" for k in held)
+    assert all(k in mp for k in held)                                          # every held task is pushed already

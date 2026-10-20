@@ -127,7 +127,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `SUP-001` | Venue Management Sign In | A | 16 | 51 | 10 | 6 | 1 | 0 | — | notStarted (generated) |
+| `SUP-001` | Venue Management Sign In | A | 17 | 56 | 10 | 6 | 1 | 0 | — | notStarted (generated) |
 | `SUP-003` | Availability & Routing Settings | D | 6 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
 
 ## Design inputs from the client meetings

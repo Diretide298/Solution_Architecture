@@ -15,7 +15,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/platform/ai-configuration-build-command-center-adm-479",
-   "component": "apps/ticvai-web/src/routes/platform/AiConfigurationBuildCommandCenter.tsx",
+   "component": "src/routes/platform/AiConfigurationBuildCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -352,7 +352,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/platform/venue-organization-configuration-adm-480",
-   "component": "apps/ticvai-web/src/routes/platform/VenueOrganizationConfiguration.tsx",
+   "component": "src/routes/platform/VenueOrganizationConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -593,7 +593,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/platform/product-configuration-assistant-adm-481",
-   "component": "apps/ticvai-web/src/routes/platform/ProductConfigurationAssistant.tsx",
+   "component": "src/routes/platform/ProductConfigurationAssistant.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -834,7 +834,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/platform/schedule-capacity-availability-configuration-adm-482",
-   "component": "apps/ticvai-web/src/routes/platform/ScheduleCapacityAvailabilityConfiguration.tsx",
+   "component": "src/routes/platform/ScheduleCapacityAvailabilityConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1075,7 +1075,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/platform/pricing-commercial-configuration-adm-483",
-   "component": "apps/ticvai-web/src/routes/platform/PricingCommercialConfiguration.tsx",
+   "component": "src/routes/platform/PricingCommercialConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1339,7 +1339,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/platform/promotion-bundle-upsell-configuration-adm-484",
-   "component": "apps/ticvai-web/src/routes/platform/PromotionBundleUpsellConfiguration.tsx",
+   "component": "src/routes/platform/PromotionBundleUpsellConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1580,7 +1580,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/platform/seating-access-operational-configuration-adm-485",
-   "component": "apps/ticvai-web/src/routes/platform/SeatingAccessOperationalConfiguration.tsx",
+   "component": "src/routes/platform/SeatingAccessOperationalConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1821,7 +1821,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/platform/channel-media-fulfillment-configuration-adm-486",
-   "component": "apps/ticvai-web/src/routes/platform/ChannelMediaFulfillmentConfiguration.tsx",
+   "component": "src/routes/platform/ChannelMediaFulfillmentConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -2062,7 +2062,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/platform/cross-module-conflict-dependency-validation-adm-487",
-   "component": "apps/ticvai-web/src/routes/platform/CrossModuleConflictDependencyValidation.tsx",
+   "component": "src/routes/platform/CrossModuleConflictDependencyValidation.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -2319,7 +2319,7 @@
   "implementation": {
    "app": "ticvai-web",
    "route": "/platform/configuration-preview-impact-analysis-adm-488",
-   "component": "apps/ticvai-web/src/routes/platform/ConfigurationPreviewImpactAnalysis.tsx",
+   "component": "src/routes/platform/ConfigurationPreviewImpactAnalysis.tsx",
    "status": "notStarted"
   },
   "navigation": {

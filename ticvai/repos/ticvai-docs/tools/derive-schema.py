@@ -100,6 +100,14 @@ def describe(spec) -> str:
     return " ".join((spec.get("description") or "").split())
 
 
+def column_nullable(spec) -> bool:
+    """**A column the wire always fills may still be nullable in storage** (CHG-R8MIG-014; R8 blocker
+    APPROVALS-TENANCY-C39): `x-ticvai-column-nullable: true` on a property whose response value is resolved on read
+    (`Workstation.saleBoard`, the till's own board or else its outlet's) keeps the stored column nullable, holding
+    only the override."""
+    return is_nullable(spec) or (isinstance(spec, dict) and spec.get("x-ticvai-column-nullable") is True)
+
+
 def is_nullable(spec) -> bool:
     """Whether a property may legitimately hold null, in any of the forms OpenAPI allows.
 
@@ -959,6 +967,35 @@ def main() -> int:
             "description": f"The parent row. Derived from {parent_schema}.{key}.",
             "table": child, "references": parent_table,
         }]
+        # **A child of a versioned parent names the version too** (r8 integration, CHG-R8INT-023; R8 blocker
+        # APPROVALS-TENANCY-C15). A parent keyed `x-ticvai-primary-key: [id, <version>]` (control.plan) has no key
+        # on `id` alone, so `plan_module.plan_id` could reference nothing and derive-ddl wrote no foreign key at
+        # all. The child carries `<parent>_<version>` beside `<parent>_id`, and derive-ddl keys the pair to the
+        # parent's pair, as `x-ticvai-references-version` does for a declared reference.
+        # **Only where the parent says so** (r8 gate residue, CHG-R8RES-006): `x-ticvai-version-key: <version>` on the
+        # parent, naming the second column of its `[id, <version>]` key, and only for the parent's own table (a child
+        # found through a nested array hangs off the middle table, not the versioned row). A two-column key is not
+        # always a version (`[consumer, eventId]`, or an `[id, <something>]` added later), and a column added to every
+        # child of such a parent by accident would be a key nobody decided. An unmarked [id, x] parent with derived
+        # children is printed, so the missing foreign key is seen rather than silent.
+        _vpk = body.get("x-ticvai-primary-key")
+        _vkey = body.get("x-ticvai-version-key")
+        _own = str(body.get("x-ticvai-persistence") or "").split("+")[0].strip()
+        _keyed = parent_cols and isinstance(_vpk, list) and len(_vpk) == 2 and _vpk[0] == "id"
+        if _keyed and not (_vkey and str(_vkey) == str(_vpk[1]) and parent_table == _own):
+            print(f"  note: {child} is a child of {parent_table}, keyed {_vpk} with no x-ticvai-version-key naming "
+                  f"{_vpk[1]!r}: it keeps a one-column key, and derive-ddl writes no foreign key for it")
+        if _keyed and _vkey and str(_vkey) == str(_vpk[1]) and parent_table == _own:
+            _vprop = str(_vpk[1])
+            _vtype, _ = resolve_type(properties_of(body, all_schemas).get(_vprop) or {}, all_schemas, persisted)
+            _vcol = snake(parent_table.split(".")[-1]) + "_" + snake(_vprop)
+            parent_cols[0]["referencesVersionColumn"] = _vcol
+            parent_cols.append({
+                "column": _vcol, "type": _vtype or "text", "required": "yes",
+                "source": f"{owner.get(child, '')}.{parent_schema}.{_vprop}",
+                "description": f"The parent row's {_vprop}; with {parent_cols[0]['column']}, the key of the parent row.",
+                "table": child,
+            })
         cols = list(parent_cols)
         for prop, pspec in (items.get("properties") or {}).items():
             if isinstance(pspec, dict) and pspec.get("x-ticvai-persisted") is False:
@@ -970,7 +1007,7 @@ def main() -> int:
             cols.append({
                 "column": chosen or conventional_name(snake(prop), ptype, fk),
                 "type": ptype,
-                "required": "yes" if prop in req and not is_nullable(pspec) else "no",
+                "required": "yes" if prop in req and not column_nullable(pspec) else "no",
                 "source": f"{owner.get(child, '')}.{parent_schema}.{key}[].{prop}",
                 "description": describe(pspec),
                 "table": child,
@@ -1086,7 +1123,7 @@ def main() -> int:
                 # Without one, the mechanical parts of the standard apply (`conventional_name`).
                 "column": chosen or conventional_name(snake(prop), ptype, fk),
                 "type": ptype,
-                "required": "yes" if prop in required and not is_nullable(spec) else "no",
+                "required": "yes" if prop in required and not column_nullable(spec) else "no",
                 "source": f"{owner.get(table, '')}.{sname}.{prop}",
                 "description": describe(spec),
                 "table": table,

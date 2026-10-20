@@ -7,7 +7,7 @@
  "audience": "staff",
  "formFactor": "kiosk",
  "offlineCapable": true,
- "generated": "2026-10-18",
+ "generated": "2026-10-20",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 10,
@@ -179,7 +179,7 @@
     "operation": "listAlertRules",
     "contract": "reporting",
     "verb": "GET",
-    "summary": "What raises an alert, and when"
+    "summary": "Thresholds being watched"
    }
   ],
   "modulesSplitAcrossWaves": [],

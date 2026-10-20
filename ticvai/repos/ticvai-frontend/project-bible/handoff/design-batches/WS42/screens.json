@@ -15,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/policy/privacy-operations-command-center-cms-031",
-   "component": "apps/venue-management-web/src/routes/policy/PrivacyOperationsCommandCenter.tsx",
+   "component": "src/routes/policy/PrivacyOperationsCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -277,7 +277,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/policy/customer-privacy-consent-preference-360-cms-032",
-   "component": "apps/venue-management-web/src/routes/policy/CustomerPrivacyConsentPreference360.tsx",
+   "component": "src/routes/policy/CustomerPrivacyConsentPreference360.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -410,7 +410,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/policy/consent-evidence-history-withdrawal-management-cms-033",
-   "component": "apps/venue-management-web/src/routes/policy/ConsentEvidenceHistoryWithdrawalManagement.tsx",
+   "component": "src/routes/policy/ConsentEvidenceHistoryWithdrawalManagement.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -549,7 +549,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/policy/data-subject-customer-privacy-request-management-cms-034",
-   "component": "apps/venue-management-web/src/routes/policy/DataSubjectCustomerPrivacyRequestManagement.tsx",
+   "component": "src/routes/policy/DataSubjectCustomerPrivacyRequestManagement.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -735,7 +735,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/policy/data-discovery-access-export-correction-workspace-cms-035",
-   "component": "apps/venue-management-web/src/routes/policy/DataDiscoveryAccessExportCorrectionWorkspace.tsx",
+   "component": "src/routes/policy/DataDiscoveryAccessExportCorrectionWorkspace.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -875,7 +875,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/policy/deletion-anonymization-restriction-operations-cms-036",
-   "component": "apps/venue-management-web/src/routes/policy/DeletionAnonymizationRestrictionOperations.tsx",
+   "component": "src/routes/policy/DeletionAnonymizationRestrictionOperations.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1040,7 +1040,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/policy/data-retention-expiry-legal-hold-operations-cms-037",
-   "component": "apps/venue-management-web/src/routes/policy/DataRetentionExpiryLegalHoldOperations.tsx",
+   "component": "src/routes/policy/DataRetentionExpiryLegalHoldOperations.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1305,7 +1305,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/policy/privacy-compliance-exception-investigation-workspace-cms-038",
-   "component": "apps/venue-management-web/src/routes/policy/PrivacyComplianceExceptionInvestigationWorkspace.tsx",
+   "component": "src/routes/policy/PrivacyComplianceExceptionInvestigationWorkspace.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1503,7 +1503,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/policy/privacy-audit-evidence-compliance-reporting-cms-039",
-   "component": "apps/venue-management-web/src/routes/policy/PrivacyAuditEvidenceComplianceReporting.tsx",
+   "component": "src/routes/policy/PrivacyAuditEvidenceComplianceReporting.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1677,7 +1677,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/policy/privacy-analytics-ai-compliance-intelligence-cms-040",
-   "component": "apps/venue-management-web/src/routes/policy/PrivacyAnalyticsAiComplianceIntelligence.tsx",
+   "component": "src/routes/policy/PrivacyAnalyticsAiComplianceIntelligence.tsx",
    "status": "notStarted"
   },
   "navigation": {

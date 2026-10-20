@@ -458,6 +458,9 @@ paths:
                     running out, which is almost always a configuration error.
                 imageAssetRef: { type: string, nullable: true }
                 isReturnable: { type: boolean }
+                isDroppable:
+                  type: boolean
+                  description: Whether the item may go to shop-and-drop (R8 blocker APPROVALS-TENANCY-C34).
                 returnWindowDays: { type: integer, minimum: 0 }
                 requiresSerialNumber: { type: boolean }
                 isActive: { type: boolean }
@@ -1318,6 +1321,10 @@ paths:
       operationId: collectShopAndDrop
       x-ticvai-consumed-by:
         - "P04 POS-012 Omnichannel Order & Fulfilment Center"
+      x-ticvai-read-via:
+      - query: fnb#deliveryLocationRecords
+        route: in-process
+        for: 'the collection point''s closing time behind the default collectBy, fnb.delivery_location, F&B''s data (r8 integration, CHG-R8INT-014)'
       x-ticvai-audience: [staff]
       summary: Hand the goods over
       description: >
@@ -1346,6 +1353,19 @@ paths:
                 lineIds:
                   type: array
                   items: { type: string }
+                  description: Lines collected in full. Kept for clients built before `lines`; ignored when `lines` is sent.
+                lines:
+                  type: array
+                  description: '**What is handed over, per line** (R8 blocker APPROVALS-TENANCY-C34): each line''s
+                    `collectedQuantity` grows by `quantity`, never past the line''s `quantity` (a larger one is 400).
+                    Neither `lines` nor `lineIds` sent: every line''s remaining quantity is collected. The drop becomes
+                    `collected` when every line is fully collected, else `partiallyCollected`.'
+                  items:
+                    type: object
+                    required: [lineId, quantity]
+                    properties:
+                      lineId: { type: string }
+                      quantity: { type: integer, minimum: 1 }
                 verifiedBy:
                   type: string
                   enum: [entitlementScan, receipt, dropReference, staffOverride]
@@ -1390,6 +1410,10 @@ paths:
       - query: inventory#stockEarmarkRecords
         route: in-process
         for: 'its read of inventory.stock_earmark, Inventory''s data (CHG-MOD-001)'
+      # Retail and Inventory run in one deployable (operations), so the earmark is an in-process call, not a
+      # cross-deployable route (check-cross-deployable-writes X-STALE; r8 integration, CHG-R8INT-015).
+      x-ticvai-calls:
+      - inventory.createStockReservation
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -1418,6 +1442,11 @@ paths:
         `x-ticvai-guest-callable`): a guest needs no permission and acts only for themselves, on their own
         cart, hold, order or payment in their own session. `ORDER_CREATE` is what a staff caller must hold to
         do it for a guest at a till or in the back office (ADR-0025).
+
+
+        **The stock is set aside by Inventory, not by Retail** (R8 blocker APPROVALS-TENANCY-C34): each line
+        earmarks its merchandise's stock item through Inventory's `createStockReservation`, in process, with
+        `sourceType` `retailReservation` and `sourceId` this reservation's `id`; the earmark expires with it.
       tags: [floor]
       x-ticvai-permission: ORDER_CREATE
       x-ticvai-guest-callable: true
@@ -1785,6 +1814,12 @@ components:
         requiresSerialNumber: { type: boolean, default: false }
         imageAssetRef: { type: string, nullable: true }
         isActive: { type: boolean }
+        isDroppable:
+          type: boolean
+          default: true
+          description: '**Whether the item may be dropped for later collection** (R8 blocker APPROVALS-TENANCY-C34). True
+            unless the venue sets it false for a chilled, fragile or oversized item; `createShopAndDrop` refuses a sale
+            with such a line, 409 `itemNotDroppable`.'
 
     GuestMerchandiseItem:
       x-ticvai-persistence: "none — guest projection of MerchandiseItem"
@@ -1857,6 +1892,11 @@ components:
         returnWindowDays: { type: integer }
         requiresSerialNumber: { type: boolean, default: false }
         imageAssetRef: { type: string }
+        isDroppable:
+          type: boolean
+          default: true
+          description: Whether the item may go to shop-and-drop; the venue sets chilled, fragile or oversized items
+            false (R8 blocker APPROVALS-TENANCY-C34).
 
     PriceCheck:
       x-ticvai-persistence: "none — computed"
@@ -1944,6 +1984,22 @@ components:
             so a sale made offline prints its number at once and the server accepts it on
             sync. **Not gapless**: an unused reserved number is skipped, not reissued. Only
             tax invoices are gapless, per legal entity.
+        receiptBarcode:
+          type: string
+          readOnly: true
+          maxLength: 64
+          x-ticvai-unique-compare: exact
+          description: '**The barcode printed on the receipt** (R8 blocker APPROVALS-TENANCY-C34): the receipt number as
+            printed, encoded as a Code 128 barcode, stored so `lookupRetailSale` finds a sale by `receiptBarcode` with
+            an exact match. Set by the server with `receiptNumber`.'
+        cashierPrincipalId:
+          type: string
+          format: uuid
+          readOnly: true
+          nullable: true
+          x-ticvai-references: identity.principal
+          description: The staff member who rang the sale up, from the session (null for a guest's own sale). R8
+            blocker APPROVALS-TENANCY-C34.
         orderId:
           type: string
           description: The order in the Order & Payment context. Retail does not keep its own ledger.
@@ -1959,6 +2015,12 @@ components:
               merchandiseId: { type: string, format: uuid }
               name: { type: string }
               quantity: { type: integer }
+              overrideReason:
+                type: string
+                maxLength: 200
+                nullable: true
+                description: The reason given with a manual price override (`CreateRetailSaleLine.overrideReason`); null
+                  when the price was not overridden. R8 blocker APPROVALS-TENANCY-C34.
               unitPrice: { $ref: '../shared/common.yaml#/components/schemas/Money', x-ticvai-column: unit_amount }
               discount: { $ref: '../shared/common.yaml#/components/schemas/Money', x-ticvai-column: discount_amount }
               lineTotal: { $ref: '../shared/common.yaml#/components/schemas/Money', x-ticvai-column: gross_amount }
@@ -2282,7 +2344,12 @@ components:
           description: >
             The ticket that claims these goods. The point of 4.4.7 — a guest does not have to
             keep a receipt safe for eight hours in a water park.
-        subjectId: { type: string, format: uuid, nullable: true }
+        subjectId:
+          type: string
+          format: uuid
+          nullable: true
+          description: The guest the goods are for, set at the drop from the sale's `subjectId` or, for an online
+            order, the order's buyer; null when the sale named no guest (R8 blocker APPROVALS-TENANCY-C34).
         collectionPointId: { type: string, format: uuid, x-ticvai-column: collection_location_id, x-ticvai-references: fnb.delivery_location}
         collectionPointName: { type: string }
         status:
