@@ -555,7 +555,7 @@
    "contention": null,
    "contended": false,
    "contentionIndeterminate": false,
-   "note": "A cart holds leases; an order holds money. Retained after expiry so a recovery link lands on something **Hangs off**: reaches `orders.sales_order` through its keys; references `pii.subject`, `platform.scope`. **Reached b"
+   "note": "A cart holds leases; an order holds money. Retained after expiry so a recovery link lands on something **Hangs off**: reaches `orders.sales_order` through its keys; references `identity.session`, `pii.subject`, `platform"
   },
   {
    "table": "orders.cart_line",

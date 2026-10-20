@@ -130,11 +130,11 @@
    "operations": 35
   },
   {
-   "contract": "catalogue",
+   "contract": "identity",
    "operations": 17
   },
   {
-   "contract": "identity",
+   "contract": "catalogue",
    "operations": 17
   },
   {

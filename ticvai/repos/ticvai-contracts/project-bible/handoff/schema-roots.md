@@ -347,17 +347,6 @@ at `role` rather than the reverse. **The direction was the bug, not the data.**
 
   Standalone configuration, or a table whose foreign key is not declared. **Not a defect on its own** — a password policy belongs to a scope rather than to a principal — but it is where an undeclared key hides.
 
-## `subscription` — 9 tables
-
-**Root: `subscription.membership_product`**  ·  own 6 · reach 6 · out 2
-
-- **1 step from the root** — `membership_eligibility_rule`, `membership_entitlement`, `membership_household_policy`, `membership_product_history`, `membership_renewal_policy`, `membership_usage_policy`
-- **2 steps from the root** — `membership_household_policy_role_limit`
-
-- **Reaches the root through nothing** — `partner_quote`
-
-  Standalone configuration, or a table whose foreign key is not declared. **Not a defect on its own** — a password policy belongs to a scope rather than to a principal — but it is where an undeclared key hides.
-
 ## `venuemap` — 9 tables
 
 **Root: `venuemap.map`**  ·  own 5 · reach 7 · out 4
@@ -366,6 +355,17 @@ at `role` rather than the reverse. **The direction was the bug, not the data.**
 - **2 steps from the root** — `visit_plan_item`
 
 - **Reaches the root through nothing** — `visit_plan`, `visit_plan_preset`
+
+  Standalone configuration, or a table whose foreign key is not declared. **Not a defect on its own** — a password policy belongs to a scope rather than to a principal — but it is where an undeclared key hides.
+
+## `subscription` — 9 tables
+
+**Root: `subscription.membership_product`**  ·  own 6 · reach 6 · out 2
+
+- **1 step from the root** — `membership_eligibility_rule`, `membership_entitlement`, `membership_household_policy`, `membership_product_history`, `membership_renewal_policy`, `membership_usage_policy`
+- **2 steps from the root** — `membership_household_policy_role_limit`
+
+- **Reaches the root through nothing** — `partner_quote`
 
   Standalone configuration, or a table whose foreign key is not declared. **Not a defect on its own** — a password policy belongs to a scope rather than to a principal — but it is where an undeclared key hides.
 

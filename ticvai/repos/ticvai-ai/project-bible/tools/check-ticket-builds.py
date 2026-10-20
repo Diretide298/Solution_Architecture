@@ -163,6 +163,8 @@ def main() -> int:
         kind, _, name = b.partition(" ")
         if kind == "operation":
             return name.split("#")[-1] in ops
+        if kind == "file":      # a package file ADAM links and pulls (CHG-R8INT-032's migration files; CHG-R8INT-034)
+            return (g.ROOT / name).is_file()
         return {"screen": name in screens, "table": name in tables, "service": name in services,
                 "adr": name in adrs}.get(kind, False)
 

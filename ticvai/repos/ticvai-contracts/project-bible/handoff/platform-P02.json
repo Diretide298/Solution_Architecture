@@ -187,11 +187,11 @@
    "operations": 6
   },
   {
-   "contract": "resources",
+   "contract": "wallet",
    "operations": 6
   },
   {
-   "contract": "wallet",
+   "contract": "resources",
    "operations": 6
   },
   {
