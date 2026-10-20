@@ -16,7 +16,9 @@ decision:
     Venue Analytics 6, Venue Support 4, Venue CMS 3; all frontend tasks, all pushed). Applied by the mechanism of
     CHG-R8DEC-004 at the r8 push.'
   by: Chinmay
-  date: '2026-10-21'
+  date: '2026-10-20'
+waivers:
+  cooling_off: {by: Chinmay, date: '2026-10-20', quote: 'The tag we can go for now. Waive 24 hour rule for this one'}
 why: 'The lead''s answer of 19 October 2026, about 21:00 IST, to the rebuild assessment
   (sources/audit-19-october/rebuild-assessment-19-october.md, "Decisions for the lead" 2: "Hold new back-office
   frontend work that has no approved wireframe, starting now?"): "Yes but we can start something I dont want idle
@@ -47,10 +49,10 @@ prevention:
   type: generator-rule
   ref: tools/op-release.py::hold_problems
 status: open
-notes: '**Cooling-off, no waiver.** `proposed` is the lead''s decision of 19 October, about 21:00 IST. The decision is
-  recorded at the r8 tag, as CHG-R8PRD-008''s cut was to be: check-changelog needs a date now, so `decision.date` is
-  the planned tag day, Wednesday 21 October 2026 (more than 24 hours after `proposed`), and the lead sets it to the
-  tag''s time when he tags. The hold is not announced or pushed before then. **Dry run** (tools/op-release.py --release r8 on this
+notes: '**Cooling-off waived.** `proposed` is the lead''s decision of 19 October, about 21:00 IST. The decision was to
+  be recorded at the r8 tag on Wednesday 21 October; on 20 October (about 17:00 IST) the lead waived the 24-hour rule so
+  the tag need not wait: "The tag we can go for now. Waive 24 hour rule for this one". The hold is not announced or
+  pushed before the tag. **Dry run** (tools/op-release.py --release r8 on this
   branch, written to a scratch file, nothing sent to OpenProject): 976 held tickets (244 tasks, 732 sub-tasks), all
   pushed; in the schedule before CHG-R8DEC-006 their sprints were 1 (167 tasks), 2 (52), 3 (23), 4 (2); since
   CHG-R8DEC-006 they have none and take no capacity.'
