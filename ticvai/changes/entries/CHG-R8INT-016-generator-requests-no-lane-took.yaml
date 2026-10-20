@@ -1,0 +1,48 @@
+id: CHG-R8INT-016
+date: '2026-10-20'
+source: audit
+kind: contract
+summary: 'Four of the contract requests the generators lane handed to the core and surface lanes, which neither lane
+  took, applied at the integration: listApiScopes says its order (module, then access, the scope as tiebreak) and
+  how licensed is computed (FOUNDATION-AI-C47); withdrawing an approval request emits approval.withdrawn, so the
+  held action is voided (APPROVALS-TENANCY-C38); the kernel middleware reads a tenant''s request limits through
+  subscription#tenantRequestLimits, cached 60 seconds (FOUNDATION-AI-C20, ADR-0064); setModuleEnablement checks the
+  module dependency graph on the server, read through subscription#moduleListingRecords, and refuses 409
+  module-dependency-unmet or module-incompatible (APPROVALS-TENANCY-C41).'
+decision:
+  what: 'contracts/satellite/public-api.yaml listApiScopes text; events/approval-withdrawn.yaml (new, v1) and
+    contracts/spine/approvals.yaml withdrawApprovalRequest text; contracts/satellite/subscription.yaml queries
+    tenantRequestLimits and moduleListingRecords; docs/adr/0064-per-tenant-limits.md item 1;
+    contracts/satellite/white-label.yaml setModuleEnablement read-via, text and 409. handoff/api-data-lineage.json
+    re-derived (the outbox write of withdrawApprovalRequest follows the event''s emittedBy).'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'The r8 integration brief: for each request the lanes handed each other, do it on the merged branch if no lane
+  did. The lead''s answers of 20 October 2026: FOUNDATION-AI-C47 (A), APPROVALS-TENANCY-C38 (A), FOUNDATION-AI-C20,
+  APPROVALS-TENANCY-C41 (A). APPROVALS-TENANCY-C40 needed nothing: neither closeShift nor submitShiftCount says it
+  posts to the ledger. Finding: R8 blocker cause list (FOUNDATION-AI-C47, APPROVALS-TENANCY-C38, FOUNDATION-AI-C20,
+  APPROVALS-TENANCY-C41).'
+keys_touched:
+  operations: [listApiScopes, withdrawApprovalRequest, setModuleEnablement]
+  other: [approval.withdrawn, tenantRequestLimits, moduleListingRecords]
+  files:
+  - contracts/satellite/public-api.yaml
+  - contracts/spine/approvals.yaml
+  - contracts/satellite/subscription.yaml
+  - contracts/satellite/white-label.yaml
+  - events/approval-withdrawn.yaml
+  - docs/adr/0064-per-tenant-limits.md
+root_class: 'a request one lane made of another, applied at the integration'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: r8 integration pass'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-error-sources.py
+status: open
+notes: 'The other contract requests the generators lane handed over are listed in the integration report as left,
+  each with its size; most need several contracts, an event or a plan change.'

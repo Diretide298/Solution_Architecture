@@ -3523,6 +3523,9 @@ paths:
       - query: subscription#planRecords
         route: in-process
         for: 'its read of control.plan, Platform''s data (CHG-MOD-001)'
+      - query: subscription#moduleListingRecords
+        route: in-process
+        for: 'display name, requiresModules and incompatibleWithModules of each module listed (control.module_listing), Platform''s data (APPROVALS-TENANCY-C41; r8 integration, CHG-R8INT-016)'
       x-ticvai-singleton: true
       x-ticvai-singleton-note: 'One set per tenant, the caller''s tenant: a PUT replaces the whole set, and an entry the body leaves out is removed. There is no key in the path.'
       x-ticvai-audience:
@@ -3535,6 +3538,14 @@ paths:
 
         Disabling one that navigation or the homepage references is rejected, with the references named
         so the tenant can clear them first.
+
+
+        **The server checks the dependency graph** (R8 blocker APPROVALS-TENANCY-C41, option A; r8 integration,
+        CHG-R8INT-016): enabling a module whose `requiresModules` are not all enabled in the same set is refused 409
+        `module-dependency-unmet`, and enabling two modules one lists in `incompatibleWithModules` is refused 409
+        `module-incompatible`, both read from the module listing (`subscription#moduleListingRecords`); the screen''s
+        own check stays as a courtesy. The enablement hangs off the tenant''s current draft tenant configuration
+        (created when there is none), and each row''s display name is copied from the listing.
 
         '
       tags:
@@ -3581,6 +3592,14 @@ paths:
                   $ref: '#/components/schemas/ModuleEnablement'
         '400':
           description: Module not licensed, or still referenced by navigation or homepage
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ModuleReferenceProblem'
+        '409':
+          description: A module enabled without a module it requires, or with one it cannot run beside (the listing's
+            requiresModules and incompatibleWithModules; APPROVALS-TENANCY-C41).
+          x-ticvai-problem-types: [module-dependency-unmet, module-incompatible]
           content:
             application/problem+json:
               schema:

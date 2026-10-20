@@ -31599,6 +31599,11 @@
     "for": "its read of control.licence_add_on, Platform's data (CHG-MOD-001)"
    },
    {
+    "query": "subscription#moduleListingRecords",
+    "route": "in-process",
+    "for": "display name, requiresModules and incompatibleWithModules of each module listed (control.module_listing), Platform's data (APPROVALS-TENANCY-C41; r8 integration, CHG-R8INT-016)"
+   },
+   {
     "query": "subscription#planRecords",
     "route": "in-process",
     "for": "its read of control.plan, Platform's data (CHG-MOD-001)"
@@ -32851,7 +32856,8 @@
   ],
   "writes": [
    "approvals.request",
-   "cache:idempotency"
+   "cache:idempotency",
+   "platform.outbox"
   ],
   "routing": "",
   "scope": "venue",

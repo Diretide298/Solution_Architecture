@@ -195,6 +195,38 @@ x-ticvai-queries:
       which asks it, states its own rule (one database that is live, suspended or draining). It is asked from another
       deployable through Platform's service route (serviceAuth).
     served: [service]
+  tenantRequestLimits:
+    module: subscription
+    table: control.plan
+    inputs:
+      tenantId: {type: string, format: uuid, description: 'The tenant whose limits the kernel middleware applies.'}
+    returns:
+      $ref: '#/components/schemas/PlanRequestLimits'
+    rule: >-
+      A rule question (R8 blocker FOUNDATION-AI-C20; the generators lane's request, applied at the r8 integration,
+      CHG-R8INT-016). The limits are `Plan.requestLimits` of the plan on the tenant's current contract (control.contract,
+      in force today), in the control database; a tenant with no current contract gets the platform default. Every
+      host's kernel middleware (ADR-0064) asks it through Platform's service route (serviceAuth), caches the answer
+      per tenant for 60 seconds and asks again when the tenant's contract changes plan, so a plan change reaches the
+      token buckets within a minute.
+    served: [service]
+  moduleListingRecords:
+    module: subscription
+    table: control.module_listing
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The control.module_listing rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as moduleKey); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Platform stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/ModuleListing'}
+    rule: >-
+      A data read, not a rule question (ADR-0055 rule 2 as amended 14 October; APPROVALS-TENANCY-C41, r8 integration,
+      CHG-R8INT-016). Platform answers with its control.module_listing rows as it stores them. It decides nothing:
+      white-label's setModuleEnablement, which asks it, states its own rule (requiresModules met,
+      incompatibleWithModules not both enabled). It is asked in process within operations, through the C# query
+      interface Platform implements.
+    served: [in-process]
 paths:
   /onboarding-applications:
     post:

@@ -674,6 +674,10 @@ paths:
         read it as one. A cashier who realises the discount is wrong should be able to pull the request
         without it counting against the approver''s rejection rate.
 
+        **It emits `approval.withdrawn`** (R8 blocker APPROVALS-TENANCY-C38, option A; r8 integration,
+        CHG-R8INT-016), written to the outbox with the status change, so the holder of the action the request
+        held (an order''s discount, a refund) voids it as it does on `approval.rejected`.
+
         '
       tags:
       - request
