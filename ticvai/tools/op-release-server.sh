@@ -135,6 +135,10 @@ checkout_tag() {
     have=$(git -C "$CHECKOUT" rev-parse -q --verify "refs/tags/$tag:ticvai/handoff/service-docs/$f" || true)
     [ -n "$want" ] && [ "$want" = "$have" ] || die "the bundle at $tag was built from a different $f than the one at $tag: rebuild it (tools/op-release.py --release $tag), commit, re-tag"
   done
+  # the lead's holds (CHG-R8DEC-004): a bundle built with docs/active/held-tasks.yaml names its blob; it must be the tag's
+  want=$(grep -o "\"held-tasks.yaml\": \"[0-9a-f]*\"" "$BUNDLE" | head -1 | cut -d'"' -f4 || true)
+  have=$(git -C "$CHECKOUT" rev-parse -q --verify "refs/tags/$tag:ticvai/docs/active/held-tasks.yaml" || true)
+  [ "$want" = "$have" ] || die "the bundle at $tag was built from a different docs/active/held-tasks.yaml than the one at $tag: rebuild it (tools/op-release.py --release $tag), commit, re-tag"
   echo "== $tag = $(git -C "$CHECKOUT" rev-parse --short "refs/tags/$tag^{commit}"); bundle sha256 $(bundle_sum | cut -c1-12)"
 }
 

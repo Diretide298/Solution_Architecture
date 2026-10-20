@@ -1,0 +1,54 @@
+id: CHG-R8DEC-004
+date: '2026-10-20'
+source: plan
+kind: process
+summary: 'A planned task can carry the lead''s hold, and the release push keeps it held: docs/active/held-tasks.yaml
+  (a plan input) lists held tasks with the reason, until when and the lead''s words; op-release.py marks each held task
+  and its sub-tasks in the bundle with the hold comment; op-release.rb sets a held New ticket On hold, off the board,
+  never puts a held ticket back to New and leaves a started one alone. Until now its assign phase reopened every On
+  hold plan ticket ("Back in the plan"), so a hold made in OpenProject alone was undone by the next push.'
+decision:
+  what: 'tools/op-release.py: load_held() reads docs/active/held-tasks.yaml (holds: id -> reason, until, decided {by,
+    date, quote}, keys); build() refuses a held key that is not a planned task and gives every ticket `hold` (the
+    comment, or null); the bundle carries hold_marker and its inputs the file''s blob; hold_problems() refuses to write
+    a bundle while op-release.rb''s reopen does not leave out held tickets or the assignment does not skip them.
+    tools/op-release.rb assign phase: the reopen leaves out held tickets; a held New ticket goes On hold with one
+    comment and loses assignee and sprint version, as op-retire''s Deferred does (op-retire.py: "lose their Block A week
+    (version) and their assignee, so they leave the developer''s board"); one On hold stays; a started or closed one is
+    listed and left alone; the assignment and the descriptions phase skip held tickets (their text and title stay until
+    the hold lifts). tools/op-release-server.sh refuses a bundle whose held-tasks.yaml blob is not the tag''s.
+    changes/schema.yaml: docs/active/held-tasks.yaml joins plan_files. tools/tests/test_op_release.py: five tests (held
+    tasks keep key and row, a hold on an unplanned key is refused, the file''s fields, a held ticket is never reopened,
+    the real holds are planned and pushed tasks).'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'The lead''s answer of 20 October 2026 (about 12:40 IST) to a sheet of four r8 items, whose item 2 recommended
+  holding the 244 back-office screen tasks in the plan so that the release push sets them On hold and keeps them
+  there: "Yes. to all decision. 1-4". The hold itself follows the client meeting of 19 October (module by module, one
+  signed wireframe per module) and the lead''s ruling that evening, quoted in CHG-R8PRD-008.'
+keys_touched:
+  files:
+  - tools/op-release.py
+  - tools/op-release.rb
+  - tools/op-release-server.sh
+  - tools/tests/test_op_release.py
+  - changes/schema.yaml
+root_class: 'new: a plan decision the release push cannot express (a hold kept only in OpenProject is reopened by the
+  next push)'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none yet: r8 decisions sheet item 2, 20 October 2026; the lead raises the ADAM CR with the batch'
+triage: blocker
+prevention:
+  type: generator-rule
+  ref: tools/op-release.py::hold_problems
+status: open
+notes: '**Which precedent.** Off the board as op-retire''s Deferred: no assignee and no sprint version, with one comment.
+  The plan keeps the task''s assignee and sprint (tasks.csv and block-a-schedule.json are not touched), so the person
+  it returns to is the plan''s at the release that lifts the hold. **Not run here.** op-release.rb runs on the
+  OpenProject server; it was syntax-checked with Ruby 2.6 (the server''s) and its hold lines are held by
+  hold_problems(). The pre-existing failure of test_frontend_pointer_names_its_repository_never_an_apps_folder (P09
+  has a repository since CHG-R8SCR-007) is not this change''s.'
