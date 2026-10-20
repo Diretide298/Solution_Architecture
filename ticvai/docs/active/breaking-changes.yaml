@@ -1323,7 +1323,7 @@ changes:
       for tickets could become wallet credit. A top-up is now sold as the venue''s catalogue product of kind
       walletTopUp, which makes its order kind walletTopUp, and topUpWallet credits only such an order''s payment.
       ProductKind gains the value; a value added to a response enum cannot be additive.'
-    approved-by: 'Chinmay, 20 October 2026: the r8 re-walk rulings (item 1, give Orders an order kind for a wallet top-up)'
+    approved-by: 'Chinmay, 21 October 2026: "Yes approved add to confirmation from client" (BC-460 to BC-463; on the client''s open questions, 21 October, rows 44 and 45)'
     tag: r8
     producer-tickets: [SVC-CATALOGUE-CATALOGUE-1, SVC-CATALOGUE-CATALOGUE-5, SVC-CATALOGUE-DRAFTED-2, SVC-CATALOGUE-DRAFTED-29, SVC-CATALOGUE-DRAFTED-5, SVC-CATALOGUE-PRODUCT-1, SVC-CATALOGUE-PRODUCT-2, SVC-CATALOGUE-PRODUCT-4, SVC-CATALOGUE-PRODUCT-5, VM-CATALOGUE-PRODUCT-1]
     consumer-tickets: [AM-AI-P05-BLOCK-A, AM-APPROVALS-P08-2, AM-FINANCE-TAX-P01, AM-FINANCE-TAX-P02, AM-ORDERS-RESERVATIONS-P02, AM-ORDERS-RESERVATIONS-P04, AM-ORDERS-RESERVATIONS-P06, AM-REPORTING-P16, AM-SEATING-MAPS-P01, AM-SEATING-MAPS-P02, AM-SEATING-MAPS-P08-BLOCK-A, AM-SETUP-FOOD-BEVERAGE-RETAIL-P08-REST, AM-SETUP-TICKETING-GUEST-COMMERCE-P08, AM-SETUP-TICKETING-GUEST-COMMERCE-P08-REST, AM-SETUP-VENUE-OPERATIONS-P08-REST, AM-TENANCY-VENUES-P08, AM-TICKETING-P01, AM-TICKETING-P02, AM-TICKETING-P04, AM-TICKETING-P05, AM-TICKETING-P05-BLOCK-A, AM-TICKETING-P08, AM-TICKETING-P08-2, AM-TICKETING-P08-7, AM-TICKETING-P10, AM-WHITE-LABEL-P01, AM-WHITE-LABEL-P02, AM-WHITE-LABEL-P13, PRD-W1-FRAME, PRD-W1-LANGUAGES, TEST-AM-APPROVALS-P08-2, TEST-AM-SETUP-TICKETING-GUEST-COMMERCE-P08-REST, TEST-AM-TICKETING-P01, TEST-AM-WHITE-LABEL-P01]
@@ -1334,7 +1334,7 @@ changes:
     reason: 'The same ProductKind value as BC-460 (CHG-R8RW-001), returned in overlaps[].productKind. A wallet top-up is a
       liability, never recognised revenue, so no recognition schedule names it; the value can appear only because the
       enum is shared.'
-    approved-by: 'Chinmay, 20 October 2026: the r8 re-walk rulings (item 1, give Orders an order kind for a wallet top-up)'
+    approved-by: 'Chinmay, 21 October 2026: "Yes approved add to confirmation from client" (BC-460 to BC-463; on the client''s open questions, 21 October, rows 44 and 45)'
     tag: r8
     producer-tickets: [VM-LEDGER-FINANCE-1]
     consumer-tickets: [AM-FINANCE-TAX-P08]
@@ -1345,7 +1345,7 @@ changes:
     change: "gained enum value(s) ['walletTopUp']"
     reason: 'The same ProductKind value as BC-460 (CHG-R8RW-001), returned in earnRules[].productKinds. Whether loading a
       wallet earns points is the programme''s choice, as for any product kind.'
-    approved-by: 'Chinmay, 20 October 2026: the r8 re-walk rulings (item 1, give Orders an order kind for a wallet top-up)'
+    approved-by: 'Chinmay, 21 October 2026: "Yes approved add to confirmation from client" (BC-460 to BC-463; on the client''s open questions, 21 October, rows 44 and 45)'
     tag: r8
     producer-tickets: [SVC-MARKETING-LOYALTY-1, SVC-MARKETING-LOYALTY-2, SVC-MARKETING-LOYALTY-3]
     consumer-tickets: [AM-MARKETING-CRM-P01, AM-MARKETING-CRM-P02, AM-REPORTING-P08, AM-SETUP-CUSTOMER-MARKETING-P08, AM-SETUP-CUSTOMER-MARKETING-P08-REST, TEST-AM-MARKETING-CRM-P01, TEST-AM-SETUP-CUSTOMER-MARKETING-P08]
@@ -1357,7 +1357,7 @@ changes:
       one wallet.adjustment row per wallet, and WalletAdjustment.kind (adjustment_kind_chk) allowed none of these acts,
       so the walk fix promised a row the schema refused. The kind gains expiry, forfeiture and extension; a value added
       to a response enum cannot be additive. reverseWalletFunding itself never writes them.'
-    approved-by: 'Chinmay, 20 October 2026: the r8 re-walk rulings (item 5, widen wallet.adjustment.kind, one row per wallet per act)'
+    approved-by: 'Chinmay, 21 October 2026: "Yes approved add to confirmation from client" (BC-460 to BC-463; on the client''s open questions, 21 October, rows 44 and 45)'
     tag: r8
     producer-tickets: [AM-WALLET-CASHLESS-P08-2, VM-WALLET-WALLET-1]
     consumer-tickets: [AM-WALLET-CASHLESS-P08-5]
