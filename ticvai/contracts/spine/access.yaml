@@ -1614,6 +1614,12 @@ paths:
                         type: string
                         format: uuid
                         nullable: true
+                      attributes:
+                        allOf:
+                        - $ref: ../spine/orders.yaml#/components/schemas/OrderLineAttributes
+                        description: 'The line''s attributes as the order line keeps them (R8 blocker ORDERS-MONEY-C22,
+                          CHG-R8MIG-023). A parking line''s `attributes.parking` gives the parking entitlement its plate
+                          (`plate_number`), `validFrom` and `validTo`.'
       responses:
         '200':
           headers:
@@ -1720,7 +1726,8 @@ paths:
         **Added by the r1 gate fix of 3 October 2026 (CHG-R1S-004): the read this write was missing.**
         WEB-041 and GST-027 change a parking entitlement with `updateParkingEntitlement` and never read it,
         so the plate and the dates they edit came from nowhere. Self-scoped, as the update is. Returns what
-        the write stores, in the write's own shape.
+        the write stores, in the write's own shape. **A guest's read only** (R8 blocker ORDERS-MONEY-C22,
+        CHG-R8MIG-023): the audience is guest, so a staff session's token is refused 403.
       x-ticvai-permission: null
       x-ticvai-self-scoped: subject
       x-ticvai-scope-level: venue
@@ -1761,6 +1768,11 @@ paths:
         or `status: revoked` — through `UpdateParkingEntitlementRequest`. Facility, order and validity
         window are fixed at purchase and are not resent.
 
+
+        **When the plate may change** (R8 blocker ORDERS-MONEY-C22, CHG-R8MIG-023): while the entitlement is
+        `pending`, `active`, `pushFailed` or `pushed` (a pushed one is pushed again: back to `pending`); a `used`,
+        `expired` or `revoked` one is `409 plate-change-not-allowed`.
+
         '
       tags:
       - access
@@ -1786,6 +1798,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ParkingEntitlement'
+        '409':
+          description: The plate cannot change in the entitlement's state (`used`, `expired`, `revoked`).
+          x-ticvai-problem-types: [plate-change-not-allowed]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '400':
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '429':

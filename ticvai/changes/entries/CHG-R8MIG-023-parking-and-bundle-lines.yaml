@@ -1,0 +1,48 @@
+id: CHG-R8MIG-023
+date: '2026-10-20'
+source: audit
+kind: contract
+summary: 'Parking and bundle lines carry what they need in the line''s attributes (no new column): attributes.parking
+  (plate, validFrom, validTo), passed to issueOrderEntitlements so the parking entitlement is written with them, and
+  attributes.bundle (the bundle and the option picked per choice group), with each sold bundle naming its catalogue
+  variant (promotions.bundle.variant_id). A plate may change while pending, active, pushFailed or pushed (pushed
+  again), else 409 plate-change-not-allowed; getParkingEntitlement is a guest''s read only. In r8 a bundle''s admission
+  is open-dated.'
+decision:
+  what: 'R8 blocker causes ORDERS-MONEY-C22 (no decision) and ORDERS-MONEY-C43 (the lead''s answer B for r8: open-dated
+    admission only; A, a date per option, afterwards). contracts/spine/orders.yaml OrderLineAttributes;
+    contracts/spine/access.yaml issueOrderEntitlements line attributes, updateParkingEntitlement 409 and text,
+    getParkingEntitlement text; contracts/satellite/promotions.yaml Bundle.variantId (a storage fact in a satellite file).
+    Additive: getParkingEntitlement keeps bearerAuth in its security list (removing it is breaking) and says a staff
+    token is refused.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: R8 blocker cause list (r8b-storage-core), group orders-money; tickets 28329, 28348, 28189 and 28190 and
+  their ADAM gaps: the plate and day of a parking line and a bundle''s picks had no carrier, and addCartLine''s required
+  variantId had no value for a bundle.'
+keys_touched:
+  operations: [issueOrderEntitlements, updateParkingEntitlement, getParkingEntitlement, addCartLine]
+  schemas: [OrderLineAttributes, Bundle]
+  tables:
+  - promotions.bundle
+  files:
+  - contracts/spine/orders.yaml
+  - contracts/spine/access.yaml
+  - contracts/satellite/promotions.yaml
+root_class: 'storage gap: an operation promises a key, column or policy its table does not have'
+tickets:
+  started: []
+  unstarted:
+  - '28329, 28348, 28189, 28190.'
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: R8 blocker walk (r8b-storage-core causes)'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-contract-storage.py
+status: open
+notes: 'Requested of the surface lane: states/parking-entitlement.yaml (plate change from pushed: pushed -> pending),
+  the WEB-041 and GST-027 Change plate control enabled only in the allowed states, the GST-056 overlay binding getBundle
+  and addCartLine with variantId from Bundle.variantId and the picks in attributes.bundle, and the ADR-0019 sentence that
+  the order line carries the bundle.'

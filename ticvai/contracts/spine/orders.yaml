@@ -23421,11 +23421,63 @@ components:
       additionalProperties: true
       x-ticvai-persistence: none — embedded as attributes (jsonb) on orders.cart_line and orders.order_line
       description: >
-        Open attributes of a line, kept from the cart to the order line. **`transport` is the one with a
-        defined shape** (decided 29 September, rev 3 REV3-21); other keys are free.
+        Open attributes of a line, kept from the cart to the order line. **`transport`, `parking` and `bundle` have
+        a defined shape** (decided 29 September, rev 3 REV3-21; R8 blockers ORDERS-MONEY-C22 and C43, CHG-R8MIG-023);
+        other keys are free.
       properties:
         transport:
           $ref: '#/components/schemas/TransportLineAttributes'
+        parking:
+          type: object
+          nullable: true
+          description: '**A parking line''s plate and day** (R8 blocker ORDERS-MONEY-C22, CHG-R8MIG-023): carried from
+            `addCartLine` to the order line and passed to `issueOrderEntitlements`, which writes the parking
+            entitlement''s plate, `validFrom` and `validTo` from it. A sold-out answer (`soldOutForDay`) means the
+            facility''s capacity on the `validFrom` day.'
+          required: [plate, validFrom, validTo]
+          properties:
+            plate:
+              type: object
+              required: [number]
+              properties:
+                number:
+                  type: string
+                  maxLength: 16
+                country:
+                  type: string
+                  maxLength: 3
+                  nullable: true
+                  description: ISO 3166 code of the plate's country; null for the venue's own.
+            validFrom:
+              type: string
+              format: date-time
+            validTo:
+              type: string
+              format: date-time
+        bundle:
+          type: object
+          nullable: true
+          description: '**A bundle line''s picks** (R8 blocker ORDERS-MONEY-C43, the lead''s answer B for r8;
+            CHG-R8MIG-023): the bundle and the option the guest chose in each choice group. The line''s `variantId` is
+            the bundle''s own (`Bundle.variantId`); the server prices it at `Bundle.price` and freezes the allocation at
+            `createOrder` (ADR-0019). In r8 a bundle''s admission is open-dated, so no date or session is asked.'
+          required: [bundleId]
+          properties:
+            bundleId:
+              type: string
+              format: uuid
+            choices:
+              type: array
+              items:
+                type: object
+                required: [choiceGroupId, optionId]
+                properties:
+                  choiceGroupId:
+                    type: string
+                    format: uuid
+                  optionId:
+                    type: string
+                    format: uuid
     TransportLineAttributes:
       type: object
       nullable: true
