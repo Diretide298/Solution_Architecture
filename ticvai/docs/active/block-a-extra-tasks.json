@@ -532,6 +532,26 @@
    ]
   },
   {
+   "key": "AI-ENGINE-ERASE-SUBJECT",
+   "epic": "AI-ENGINE",
+   "assignee": "Second AI engineer",
+   "days": 2,
+   "subject": "Guest AI erasure: eraseSubject removes a deleted guest's index rows and search points, with the counts that prove it",
+   "detail": "In ticvai-ai, beside AI-ENGINE-QDRANT, whose erasure by guest payload it calls. **Built in Block A by the lead's decision** (20 October 2026, \"Accepting both as recommended\", CHG-R8ERA-001): Block A indexes support cases (marketing.case, which carry the guest's subjectId) through reindexSource, so a deleted guest's case text would otherwise stay searchable until a later block. eraseSubject (contracts/satellite/ai.yaml, POST /internal/subjects/{subjectId}/ai-erasure) is an internal operation: serviceAuth over the cell's mTLS, no user permission, called only by Identity's erasure job for a guest whose pii.subject row it has tombstoned (deleteGuestAccount, CHG-R8ERA-002). For the subject, in this order: delete the ai.index_entry rows and the ai.chunk_embedding rows with that subject_id in one transaction, then the Qdrant points whose payload subjectId is the subject, by payload filter (which also catches a point whose row went first); then count what is left in both stores. It answers 200 with subjectId, indexEntriesRemoved, chunksRemoved, pointsRemoved, rowsLeft and pointsLeft; zero left is the proof the erasure keeps. A subject with nothing indexed, or already erased, answers 200 with zeros (never a 404 or 409), so Identity's retry is always safe; the Idempotency-Key replays the first answer. Qdrant unreachable: the rows are still removed in their transaction and the call answers 502 provider-connection-failed, so Identity retries and the retry removes the points. It writes only ai.index_entry and ai.chunk_embedding (their subject_id columns exist: V0104, V0108; no new migration) and logs no guest text. About 2 engineer-days. Done when: a guest with an indexed support case is erased and the call answers rowsLeft 0 and pointsLeft 0 with the removed counts above 0; semanticSearch no longer returns that case's text, and another guest's points and rows are untouched; a second call for the same subject answers 200 with zeros; with Qdrant forced down the call answers 502 provider-connection-failed with the rows gone, and the next call removes the points and answers zero left; and a guest's or a staff member's token cannot call it (serviceAuth only).",
+   "depends": [
+    "AI-ENGINE-QDRANT",
+    "MIG-AI"
+   ],
+   "appModule": "baseline",
+   "operations": [
+    "eraseSubject"
+   ],
+   "builds": [
+    "adr ADR-0047",
+    "adr ADR-0049"
+   ]
+  },
+  {
    "key": "AI-ENGINE-GUIDED",
    "epic": "AI-ENGINE",
    "assignee": "Kalpita Mejari",

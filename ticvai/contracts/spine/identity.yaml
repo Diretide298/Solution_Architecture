@@ -3617,8 +3617,11 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-024 Devices, Wishlist & Consent"
         - "P02 GST-066 Privacy & My Data"
-      # No synchronous call to ai.eraseSubject: the tombstone is the record the AI erasure works from (r8 gate
-      # residue, check-plan-closure C-CALLS; CHG-R8RES-003).
+      # The erasure job calls ai.eraseSubject after the tombstone, which keeps the AI erasure owed until a call answers
+      # zero left. Block A builds eraseSubject (the lead, 20 October 2026; CHG-R8ERA-001), so the call is back
+      # (CHG-R8ERA-002), replacing CHG-R8RES-003's catch-up from a later release.
+      x-ticvai-calls:
+      - ai.eraseSubject
       x-ticvai-singleton: true
       x-ticvai-singleton-note: 'The caller''s own account: one per signed-in guest, so there is no key in the path.'
       x-ticvai-audience:
@@ -3658,11 +3661,17 @@ paths:
         guest who never transacted across regions has no link (cross-region.yaml) and raises no DSAR record.
 
 
-        **The AI index is erased from the tombstone, not inside this request** (r8 gate residue, CHG-R8RES-003;
-        ADR-0047, ADR-0049). The tombstone (`is_erased`, `erased_at`, `erasure_request_id`) is the record of the
-        erasure. Identity's erasure job calls `ai.eraseSubject` for a tombstoned subject from the release that builds
-        that operation, and then once for every subject tombstoned before it; `eraseSubject` answers zeros for a
-        subject with nothing indexed, so the catch-up is safe. Neither this request nor its `202` waits for it.
+        **The same job erases the guest's AI index, and the tombstone keeps it owed until it is done**
+        (CHG-R8ERA-002, which replaces the later-release catch-up of CHG-R8RES-003; ADR-0047, ADR-0049). After it
+        tombstones the guest, the job calls `ai.eraseSubject` for the subject (cell-internal, `serviceAuth`), which
+        deletes the guest's index rows and search points and answers with the counts removed and left. The AI
+        erasure is done when a call answers `rowsLeft` 0 and `pointsLeft` 0. Until then the tombstone (`is_erased`,
+        `erased_at`, `erasure_request_id`) is the record that it is owed: a failed call (`502
+        provider-connection-failed`, no answer, or anything left) undoes nothing, and **the retry** is the job's
+        own: it calls `eraseSubject` again for that subject with backoff, and its daily sweep calls it for every
+        tombstoned subject, so a retry lost with a stopped job is made by the next sweep. `eraseSubject` answers
+        zeros for a subject with nothing left, so a retry or a sweep only repeats what is safe. Neither this
+        request nor its `202` waits for the AI erasure.
 
       x-ticvai-read-via:
       - query: access#liveEntitlementsForSubject

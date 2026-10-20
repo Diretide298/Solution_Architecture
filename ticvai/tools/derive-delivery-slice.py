@@ -58,9 +58,13 @@ PLATFORMS = {
 # writer of it the verbs did not name (recordChargeback, assignChargeback and recordChargebackOutcome are), so it became
 # "setup" and pulled ADM-634, behind a command centre outside Block A, into Block A (check-plan-closure C-REACH).
 # A chargeback arrives from the acquirer: the table is fed elsewhere, as access.scan_event is.
+# **`erase`** (20 October 2026, CHG-R8ERA-001): an erasure empties a table, it never makes one non-empty. Once
+# eraseSubject named its writes (CHG-R8RES-002), the setup walk took it into Block A as a "setup" writer of
+# ai.chunk_embedding beside reindexSource, with no decision behind it. It is built in Block A now because the lead
+# decided it (block-a-extra-tasks.json AI-ENGINE-ERASE-SUBJECT), not because the walk took it.
 TRADING_VERB = re.compile(
     r"^(accept|abandon|acknowledge|activate|assign|begin|block|book|call|cancel|check|close|"
-    r"collect|complete|dispose|override|pause|record|redeem|refire|reopen|report|respond|revoke|settle|"
+    r"collect|complete|dispose|erase|override|pause|record|redeem|refire|reopen|report|respond|revoke|settle|"
     r"submit|sync|validate|void|issue|remove|end|unschedule|preview|test|recordUsage)"
 )
 # Nouns that are an event in a venue's day even when the verb is `create` or `set`: a work order is
