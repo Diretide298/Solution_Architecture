@@ -5295,8 +5295,8 @@ paths:
         - "P05 KSK-002 Language Select"
       x-ticvai-read-via:
       - query: payments#providerConnectionRecords
-        route: in-process
-        for: 'its read of payments.provider_connection, for `paymentTokenisation` (lineage request, r8)'
+        route: service
+        for: 'its read of payments.provider_connection, for `paymentTokenisation`, through the service route: White-label runs in operations, Payments in commerce (lineage request, r8; CHG-R8INT-005)'
       x-ticvai-audience:
       - anonymous
       - guest

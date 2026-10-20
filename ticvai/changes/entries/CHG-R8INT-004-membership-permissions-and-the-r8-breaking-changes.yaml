@@ -1,0 +1,55 @@
+id: CHG-R8INT-004
+date: '2026-10-20'
+source: audit
+kind: contract
+summary: 'Membership has its own permissions, MEMBERSHIP_VIEW and MEMBERSHIP_MANAGE, in the membership module group and
+  the viewer and mid-level presets; the Duty Manager preset reads membership and the Venue Manager manages it. The four
+  breaking changes the surface and storage-sat lanes made on purpose are recorded (BC-393 to BC-396): setSubscription
+  is staff-only, a licence add-on names a ModuleKey, the sixteen membership operations take the new permissions, a
+  media usage names every module''s surface. wallet.credited v2 and tenantDomain.mapped v2 are major versions published
+  beside v1 while their consumers move, and the event schema says so.'
+decision:
+  what: 'contracts/shared/permissions.yaml (Permission enum, membership group, viewer and midLevel presets); roles.yaml
+    (dutyManager membership.view, venueManager membership.manage, proposed); docs/active/breaking-changes.yaml
+    BC-393..BC-396 (tag r8; producer and consumer tickets from handoff/service-docs/tasks.csv by operation name);
+    events/_schema.yaml (the major-version rule), events/wallet-credited.yaml and events/tenantDomain-mapped.yaml
+    (each header says what a v1 reader could not read and how both versions are published).'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'GPS-C33 answer A moved the membership book off Control Plane permissions no tenant role holds, onto two
+  permissions that did not exist, so check-package and check-permission-vocabulary failed; APPROVALS-TENANCY-C16 and
+  C17 (answer B) and ORDERS-MONEY-C29 changed operations already at r1, so check-contract-compat failed on 20
+  breaking changes no entry approved; APPROVALS-TENANCY-C30 and C11 removed or retyped event fields, which the event
+  schema allowed only under a new name. Each change was decided in the lead''s answers of 20 October 2026; recording
+  them is part of the merge he delegated ("all of them are on you", 20 October 2026). Finding: R8 blocker cause list
+  (GPS-C33, APPROVALS-TENANCY-C16, C17, C30, C11, ORDERS-MONEY-C29), r8 integration check-contract-compat run of 20
+  October 2026.'
+keys_touched:
+  operations: [setSubscription, addLicenceAddOn, removeLicenceAddOn, listMembershipAnnualPass, listMembershipUsageVisit,
+    listMembershipCommercialPricing, listMembershipActivationCredential, listMembershipFreezeSuspension,
+    listMembershipUpgradeDowngrade, listMembershipRenewalRetention, getMembershipProductValidation,
+    setMembershipProductTier, setMembershipEligibilityQualification, setMembershipEntitlementAdmission,
+    setRenewalAutoMembership, approveMembershipProductValidation, setMemberMembershipAccount, setMembershipUsagePolicy,
+    setMembershipCommercialConfig, getMediaAsset]
+  schemas: [Permission]
+  files:
+  - contracts/shared/permissions.yaml
+  - roles.yaml
+  - docs/active/breaking-changes.yaml
+  - events/_schema.yaml
+  - events/wallet-credited.yaml
+  - events/tenantDomain-mapped.yaml
+root_class: 'breaking contract change made on purpose: producer and consumers move at one tag'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: r8 integration pass'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-contract-compat.py
+status: open
+notes: 'The role grants are proposed (client to correct), like the other grants roles.yaml marks so. check-contract-compat
+  does not read events; the event rule is in events/_schema.yaml and each v2 file''s header.'

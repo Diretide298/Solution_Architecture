@@ -1,6 +1,10 @@
 # tenantDomain.mapped v2 — published by tenancy
 # v2 (20 October 2026, r8 cause APPROVALS-TENANCY-C11): the payload is the domain row itself, so the control
 # plane's consumer writes it whole; a refused hostname answers with tenantDomain.rejected.
+# Versioning (r8 integration, CHG-R8INT-004; events/_schema.yaml): v2 is a major version (change, target,
+# scopePath and at left the payload; the idempotency key is the eventId). Tenancy writes both versions to the
+# outbox (one envelope each, `version` 1 and 2) until the one consumer (platform-ops) is built to v2, then stops
+# v1. The consumer is built at r8 with its producer, so the side-by-side window is the r8 deployment only.
 # Checked by tools/check-states.py against states/ and the contracts.
 
 name: tenantDomain.mapped

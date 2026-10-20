@@ -74,8 +74,10 @@ x-ticvai-queries:
       scope lets it see them (the table's row-level security, under the caller's connection and transaction). It
       decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
       a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
-      process within commerce, through the C# query interface Orders implements.
-    served: [in-process]
+      process within commerce, through the C# query interface Orders implements, and from another deployable
+      (white-label's getPublishedTenantConfig, for paymentTokenisation) through the service route (serviceAuth; r8
+      integration, CHG-R8INT-005).
+    served: [in-process, service]
   storedForwardRecords:
     module: payments
     table: payments.stored_forward

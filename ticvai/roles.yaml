@@ -181,6 +181,10 @@ roles:
         label: Read venue settings
         permission: TENANT_VIEW
         note: Proposed, client to correct (decided 28 September, audit R091).
+      - key: membership.view
+        label: See membership products, tiers, passes, usage and renewals
+        permission: MEMBERSHIP_VIEW
+        note: Proposed, client to correct (r8, GPS-C33, the lead's answer A of 20 October 2026). Read like the venue settings above.
 
   venueManager:
     label: Venue Manager
@@ -205,6 +209,10 @@ roles:
           Proposed, client to correct (decided 28 September, audit R091). **Roles are cumulative, so a Venue Manager also holds `product.publish`.** That one
           person does not both approve and publish the same product is a segregation rule
           (`setSegregationRules`, PRODUCT_APPROVE with PRODUCT_PUBLISH), not a role split.
+      - key: membership.manage
+        label: Build and change membership products and tiers, approve their validation, change a member's account
+        permission: MEMBERSHIP_MANAGE
+        note: Proposed, client to correct (r8, GPS-C33, the lead's answer A of 20 October 2026). The venue's commercial set-up, like approving a product above.
 
   sysAdmin:
     label: System Administrator
