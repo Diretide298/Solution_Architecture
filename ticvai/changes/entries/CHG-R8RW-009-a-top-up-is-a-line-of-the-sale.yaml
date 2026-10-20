@@ -46,7 +46,8 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-approved-ui.py
-status: open
+status: closed
+closed_by_commit: '593ef7dd'
 notes: 'BO-488 (Self-Service Wallet Top-Up) also binds topUpWallet directly; it is wave 3, outside r8, and needs a
   person before it is built: on the left-out list. Prevention: fix briefs now read the approved prototype of every
   screen a contract fix touches (P-29).'

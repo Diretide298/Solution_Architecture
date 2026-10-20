@@ -2,7 +2,7 @@
 "project": "ticvai",
 "openproject": "https://pms.softlabsgroup.in",
 "cached": true,
-"statusReadAt": "2026-10-20T21:29:11Z",
+"statusReadAt": "2026-10-20T23:02:39Z",
 "links": [
 {
 "key": "27625",
@@ -55308,6 +55308,16 @@
 "key": "27910",
 "kind": "screen",
 "id": "POS-023",
+"url": "https://pms.softlabsgroup.in/work_packages/27910",
+"subject": "[BE] OrderService: abandonCart, addCartLine, applyCartPromoCode, checkoutCart",
+"status": "New",
+"type": "Task",
+"assignee": "Pranay Shinde"
+},
+{
+"key": "27910",
+"kind": "screen",
+"id": "POS-027",
 "url": "https://pms.softlabsgroup.in/work_packages/27910",
 "subject": "[BE] OrderService: abandonCart, addCartLine, applyCartPromoCode, checkoutCart",
 "status": "New",
@@ -162047,6 +162057,16 @@
 {
 "key": "28824",
 "kind": "operation",
+"id": "orders#addCartLine",
+"url": "https://pms.softlabsgroup.in/work_packages/28824",
+"subject": "Marketing & CRM \u00b7 POS",
+"status": "New",
+"type": "Feature",
+"assignee": "Pradnya Yeram"
+},
+{
+"key": "28824",
+"kind": "operation",
 "id": "wallet#topUpWallet",
 "url": "https://pms.softlabsgroup.in/work_packages/28824",
 "subject": "Marketing & CRM \u00b7 POS",
@@ -162098,6 +162118,16 @@
 "key": "28825",
 "kind": "operation",
 "id": "marketing-crm#getGuestLoyalty",
+"url": "https://pms.softlabsgroup.in/work_packages/28825",
+"subject": "[FE] POS-027 Guest Lookup",
+"status": "New",
+"type": "Task",
+"assignee": "Pradnya Yeram"
+},
+{
+"key": "28825",
+"kind": "operation",
+"id": "orders#addCartLine",
 "url": "https://pms.softlabsgroup.in/work_packages/28825",
 "subject": "[FE] POS-027 Guest Lookup",
 "status": "New",
@@ -335647,6 +335677,16 @@
 {
 "key": "31127",
 "kind": "screen",
+"id": "POS-027",
+"url": "https://pms.softlabsgroup.in/work_packages/31127",
+"subject": "[BE] addCartLine: POST /carts/{cartId}/lines",
+"status": "New",
+"type": "Sub Task",
+"assignee": "Pranay Shinde"
+},
+{
+"key": "31127",
+"kind": "screen",
 "id": "POS-030",
 "url": "https://pms.softlabsgroup.in/work_packages/31127",
 "subject": "[BE] addCartLine: POST /carts/{cartId}/lines",
@@ -453497,6 +453537,16 @@
 {
 "key": "33304",
 "kind": "operation",
+"id": "orders#addCartLine",
+"url": "https://pms.softlabsgroup.in/work_packages/33304",
+"subject": "[FE] POS-027 Guest Lookup: build with all states",
+"status": "New",
+"type": "Sub Task",
+"assignee": "Pradnya Yeram"
+},
+{
+"key": "33304",
+"kind": "operation",
 "id": "wallet#topUpWallet",
 "url": "https://pms.softlabsgroup.in/work_packages/33304",
 "subject": "[FE] POS-027 Guest Lookup: build with all states",
@@ -453557,6 +453607,16 @@
 {
 "key": "33305",
 "kind": "operation",
+"id": "orders#addCartLine",
+"url": "https://pms.softlabsgroup.in/work_packages/33305",
+"subject": "[FE] POS-027 Guest Lookup: connect to API",
+"status": "New",
+"type": "Sub Task",
+"assignee": "Pradnya Yeram"
+},
+{
+"key": "33305",
+"kind": "operation",
 "id": "wallet#topUpWallet",
 "url": "https://pms.softlabsgroup.in/work_packages/33305",
 "subject": "[FE] POS-027 Guest Lookup: connect to API",
@@ -453608,6 +453668,16 @@
 "key": "33306",
 "kind": "operation",
 "id": "marketing-crm#getGuestLoyalty",
+"url": "https://pms.softlabsgroup.in/work_packages/33306",
+"subject": "[FE] POS-027 Guest Lookup: tests",
+"status": "New",
+"type": "Sub Task",
+"assignee": "Pradnya Yeram"
+},
+{
+"key": "33306",
+"kind": "operation",
+"id": "orders#addCartLine",
 "url": "https://pms.softlabsgroup.in/work_packages/33306",
 "subject": "[FE] POS-027 Guest Lookup: tests",
 "status": "New",
