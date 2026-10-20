@@ -1226,3 +1226,17 @@ changes:
     tag: r8
     producer-tickets: [KERNEL-TENANT-LIMITS, SVC-PLATFORM-PLAN-1, SVC-PLATFORM-PLAN-2]
     consumer-tickets: [AM-FOUNDATION-PLATFORM, AM-SETUP-PLATFORM-FOUNDATION-P09, AM-SETUP-PLATFORM-FOUNDATION-P09-REST, AM-SUBSCRIPTION-LICENSING-P09-3, AM-SUBSCRIPTION-LICENSING-P09-4, APP-SETUP-ADM-008, APP-SETUP-ADM-008-REST, TEST-AM-FOUNDATION-PLATFORM, TEST-AM-SETUP-PLATFORM-FOUNDATION-P09, TEST-AM-SETUP-PLATFORM-FOUNDATION-P09-REST]
+  - id: BC-402
+    contract: tenancy
+    operation: deployConfigurationProfile
+    operations: [deployConfigurationProfile]
+    change: "request `profileId` removed"
+    reason: 'r8 integration (CHG-R8INT-011; R8 blocker APPROVALS-TENANCY-C07 gave the operation its own request body,
+      CHG-R8SPN-017): the body kept the answer''s fields readOnly so an r1 client''s whole ProfileDeployment stayed
+      valid, profileId among them; it was ignored on input (the path names the profile) and its name uses a word the
+      glossary keeps for Role (check-glossary-terms G-BANNED-NAME). Removing a request field is labelled breaking; a
+      client that still sends it is not refused, since the body does not forbid other properties.'
+    approved-by: 'Chinmay Parab (20 Oct 2026, the r8 integration brief, item 10: fix the glossary finding; recorded under his "all of them are on you")'
+    tag: r8
+    producer-tickets: [VM-TENANCY-TENANCY-1]
+    consumer-tickets: [AM-TENANCY-VENUES-P08, AM-TENANCY-VENUES-P08-BLOCK-A]

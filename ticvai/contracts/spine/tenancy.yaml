@@ -4669,9 +4669,9 @@ components:
               items: { type: string }
         strategy: { type: string, enum: [immediate, staged, onNextIdle], default: onNextIdle }
         # The answer's fields, kept readOnly (ignored on input) so a client built on r1, which sent the whole
-        # ProfileDeployment, still sends a valid body (check-contract-compat).
+        # ProfileDeployment, still sends a valid body (check-contract-compat). Not `profileId`: the path names the
+        # profile, and the glossary keeps 'profile' for Role (r8 integration, CHG-R8INT-011; BC-402).
         id: { type: string, format: uuid, readOnly: true }
-        profileId: { type: string, format: uuid, readOnly: true, description: Taken from the path. }
         status: { type: string, enum: [queued, inProgress, completed, partiallyFailed, rolledBack], readOnly: true }
         succeededCount: { type: integer, readOnly: true }
         failedCount: { type: integer, readOnly: true }

@@ -1,0 +1,39 @@
+id: CHG-R8INT-011
+date: '2026-10-20'
+source: audit
+kind: contract
+summary: 'The three names check-glossary-terms found in the r8 lanes'' contracts: deployConfigurationProfile''s request
+  no longer carries the readOnly profileId it ignored (the path names the profile; BC-402), and the two variantId
+  fields (AiRecommendationItem, the membership commercial view) are baselined, because they keep the field name
+  addCartLine already uses, as the core lane asked.'
+decision:
+  what: 'contracts/spine/tenancy.yaml DeployConfigurationProfileRequest: profileId removed, the comment says why;
+    docs/active/breaking-changes.yaml BC-402; handoff/audit-baseline.json check-glossary-terms G-BANNED-NAME:
+    ai.AiRecommendationItem.variantId and subscription.MembershipCommercialPricingChannelAssociationView.variantId,
+    with this entry as the reason.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'The r8 integration brief (item 10): fix any finding that is not the variantId field addCartLine already uses,
+  and baseline those with the reason. A variant is the catalogue''s word for a sellable SKU and addCartLine takes
+  variantId; naming the AI item''s or the membership view''s field otherwise would make a client map one id under two
+  names (ORDERS-MONEY-C40, GPS-C39). Finding: r8 integration check-glossary-terms run of 20 October 2026, refresh
+  rehearsal of 20 October 2026.'
+keys_touched:
+  operations: [deployConfigurationProfile]
+  schemas: [DeployConfigurationProfileRequest, AiRecommendationItem, MembershipCommercialPricingChannelAssociationView]
+  files:
+  - contracts/spine/tenancy.yaml
+  - docs/active/breaking-changes.yaml
+  - handoff/audit-baseline.json
+root_class: 'a contract name the glossary bans'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: r8 integration pass'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-glossary-terms.py
+status: open
