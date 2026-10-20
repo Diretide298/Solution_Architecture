@@ -59,4 +59,6 @@ notes: 'The local tasks apply the package files with psql, not SqlMigrationRunne
   tasks list it too (same decision and waiver). The upgrade test from r7 (20 October, 22:00) showed the tasks must list every
   migration file since r7: tenant V0103a, V0105a, V0107, V0108, V0109, V0110, V0111 and control V0107, V0108, V0109, V0110
   (V0107 was not in r7; V0110/V0111 came from the final refresh); they now list all eleven and say to apply any file
-  platform.schema_version does not list yet, in name order.'
+  platform.schema_version does not list yet, in name order. The re-walk fixes (CHG-R8RW-001..003, -004) derive tenant and
+  control V0112 (21 October); the tasks list it too, thirteen files in all (same decision and waiver), and
+  check-ticket-builds B-DB-FILES (CHG-R8INT-035) now fails a database task that skips a file new since the last release.'

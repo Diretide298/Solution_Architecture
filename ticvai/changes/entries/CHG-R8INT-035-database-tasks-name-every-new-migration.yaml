@@ -1,0 +1,37 @@
+id: CHG-R8INT-035
+date: '2026-10-21'
+source: audit
+kind: process
+proposed: '2026-10-21T00:05'
+summary: 'check-ticket-builds B-DB-FILES: a database update task (a hand-written task that builds
+  `file backend/<db>/V01xx__*.sql`) must name, in its builds and in its text, every forward migration of that database
+  the last release tag (r<N>) did not have. The r8 database tasks missed V0107, V0110 and V0111 until the upgrade test
+  from r7 found it, and the re-walk fixes then derived V0112; the next derived file now fails the refresh until the
+  tasks list it.'
+decision:
+  what: 'tools/check-ticket-builds.py: rule B-DB-FILES (forward files on disk minus `git ls-tree` of the newest r<N> tag
+    merged into HEAD, against each database task''s `file` builds and detail); the R8-DB-* tasks list tenant and control
+    V0112 (CHG-R8INT-032).'
+  by: Chinmay
+  date: '2026-10-21'
+why: 'Finding: the r8 upgrade test from r7 (20 October, 22:00: V0107, V0110, V0111 not in the tasks) and the re-walk
+  fix lane (21 October: V0112 not in the tasks). Chinmay, 20 October 2026: "Whatever we find we should also fix the
+  source so that next gen can clear those out by default".'
+keys_touched:
+  files:
+  - tools/check-ticket-builds.py
+  - docs/active/block-a-extra-tasks.json
+root_class: 'a hand-written file list with nothing checking it against the derived migrations'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: r8 gate, a release fix'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-ticket-builds.py
+status: open
+notes: 'Proved with a probe file backend/control/V0113 (11 findings, one per task) and removed. Without a release tag
+  merged into HEAD every forward file counts as new, and the run says so.'
