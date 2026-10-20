@@ -1,0 +1,47 @@
+id: CHG-R8MIG-018
+date: '2026-10-20'
+source: audit
+kind: contract
+summary: 'Control-plane facts live in the control database: a cell''s endpoints move from platform.cell_endpoint (every
+  tenant database) to control.cell_endpoint, keyed to control.cell and written by the control plane at provisioning;
+  and the control database gets its own audit trail (control.audit_record) and durable idempotency record
+  (control.idempotency_record), the tenant tables less scope_path, for the operations that run on the control
+  connection.'
+decision:
+  what: 'R8 blocker causes APPROVALS-TENANCY-C10 (the lead''s answer A, as CR-150) and FOUNDATION-AI-C50 (no decision).
+    contracts/spine/tenancy.yaml PlatformCellEndpoint persistence and cellId key, the listCellEndpoints text,
+    ControlAuditRecord and ControlIdempotencyRecord; tools/derive-schema-history.py RENAMES platform.cell_endpoint to
+    control.cell_endpoint (a move between databases: the control forward migration creates it, the tenant review row
+    drops the old table).'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: R8 blocker cause list (r8b-storage-core), groups approvals-tenancy and foundation-ai; tickets 27799, 27804
+  and 27694 (PLATFORM-AUDIT): platform.cell_endpoint had no writer and sat in every tenant database, and control-plane
+  writes had no audit or idempotency table in their own database.'
+keys_touched:
+  operations: [listCellEndpoints]
+  schemas: [PlatformCellEndpoint, ControlAuditRecord, ControlIdempotencyRecord]
+  tables:
+  - control.cell_endpoint
+  - platform.cell_endpoint
+  - control.audit_record
+  - control.idempotency_record
+  files:
+  - contracts/spine/tenancy.yaml
+  - tools/derive-schema-history.py
+root_class: 'storage gap: a table in the wrong database or none'
+tickets:
+  started: []
+  unstarted:
+  - '27799, 27804, 27694.'
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: R8 blocker walk (r8b-storage-core causes)'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-contract-storage.py
+status: open
+notes: 'Applied on PostgreSQL 16 (control and tenant, the forward files twice). The control operations that write the
+  new audit and idempotency rows name them in their lineage when the lineage is derived from the contracts (the
+  generators lane). docs/active/cross-deployable-writes.yaml is the docs owner''s.'

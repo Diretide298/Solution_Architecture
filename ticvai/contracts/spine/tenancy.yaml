@@ -3484,6 +3484,9 @@ paths:
         `contract_version` is on the row because two cells can run different versions of the same
         contract during a rollout, and a caller that assumes otherwise fails in the least debuggable
         way.
+
+        **Served on the control connection** (R8 blocker APPROVALS-TENANCY-C10, CHG-R8MIG-018): the rows are
+        `control.cell_endpoint`, read with `control.cell` in one database, so an unknown cell is `404` by one lookup.
       tags:
       - tenancy
       x-ticvai-permission: SCOPE_VIEW
@@ -4059,10 +4062,104 @@ components:
         scopePath:
           type: string
           description: The partition key (ADR-0005).
+    ControlAuditRecord:
+      type: object
+      x-ticvai-persistence: control.audit_record
+      description: '**The control plane''s audit trail** (R8 blocker FOUNDATION-AI-C50, CHG-R8MIG-018). The control
+        database (ADR-0039) has no platform.audit_record and no scope tree, so an operation that runs on the control
+        connection (tenant, plan, subscription, cell, licence, webhook and API-client operations, `platform-ops` and
+        `subscription`) writes its audit row here, in the same transaction as its change: the tenant table''s fields
+        less `scopePath`, with the tenant it concerns and the operator from the Control Plane token. Append-only, never
+        returned by an operation in r8 (the Platform Audit Log reads it when its read is planned).'
+      required: [id, action, occurredAt]
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        operatorPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+          x-ticvai-references: none
+          description: The platform operator (the Control Plane token's subject); null for a system job.
+        tenantId:
+          type: string
+          format: uuid
+          nullable: true
+          x-ticvai-references: control.tenant
+          description: The tenant the change concerns; null for a platform-wide change (a plan, a cell).
+        action:
+          type: string
+          maxLength: 100
+          description: The operation, as `AuditRecord.action`.
+        subjectRef:
+          type: string
+          maxLength: 200
+          nullable: true
+          description: What it acted on, as `AuditRecord.subjectRef`.
+        details:
+          type: object
+          nullable: true
+          additionalProperties: true
+          description: The before and after of the change, where the operation records them.
+        occurredAt:
+          type: string
+          format: date-time
+    ControlIdempotencyRecord:
+      type: object
+      x-ticvai-persistence: control.idempotency_record
+      x-ticvai-unique-together: [[idempotencyKey, operationId]]
+      description: '**The durable idempotency record of the control database** (R8 blocker FOUNDATION-AI-C50,
+        CHG-R8MIG-018): `PlatformIdempotencyRecord` for the operations that run on the control connection, less
+        `scopePath` (no scope tree there), written in the same transaction as the keyed write and unique on
+        (`idempotencyKey`, `operationId`).'
+      required: [id, idempotencyKey, operationId, requestHash, status, createdAt, expiresAt]
+      properties:
+        id:
+          type: string
+          format: uuid
+        idempotencyKey:
+          type: string
+          format: uuid
+        operationId:
+          type: string
+          maxLength: 100
+        requestHash:
+          type: string
+          maxLength: 64
+          description: SHA-256 of the canonical request, so the same key with a different body is a `409`.
+        status:
+          type: string
+          enum:
+          - inProgress
+          - completed
+        responseStatus:
+          type: integer
+          nullable: true
+        responseBody:
+          type: object
+          nullable: true
+          additionalProperties: true
+        operatorPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+          x-ticvai-references: none
+        createdAt:
+          type: string
+          format: date-time
+        expiresAt:
+          type: string
+          format: date-time
     PlatformCellEndpoint:
       type: object
-      x-ticvai-persistence: platform.cell_endpoint
-      description: '**Taken from the backend workbook, 20 September.** Stores how another Cell/service can securely reach a particular Cell, especially its CrossCell service endpoint.'
+      x-ticvai-persistence: control.cell_endpoint
+      description: '**Taken from the backend workbook, 20 September.** Stores how another Cell/service can securely reach a particular Cell, especially its CrossCell service endpoint.
+        **A control-plane fact, kept in the control database** (R8 blocker APPROVALS-TENANCY-C10, the lead''s answer A,
+        as CR-150 moved the plan catalogue; CHG-R8MIG-018): `control.cell_endpoint`, keyed to `control.cell`. The control
+        plane writes a cell''s rows when it provisions the cell and when its CrossCell service moves; no tenant database
+        holds a copy.'
       required:
       - cellId
       - serviceName
@@ -4076,6 +4173,7 @@ components:
         cellId:
           type: string
           format: uuid
+          x-ticvai-references: control.cell
         serviceName:
           type: string
           maxLength: 100

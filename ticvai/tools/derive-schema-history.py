@@ -86,6 +86,10 @@ RENAMES = [
     # tenant's own content, so they leave the control database for the tenant template. A move between databases the
     # other way: the tenant forward migration creates whitelabel.content_block, and the control review row copies the
     # rows across and drops control.content_block.
+    # CHG-R8MIG-018 (R8 blocker APPROVALS-TENANCY-C10, the lead's answer A): a cell's endpoints are a control-plane fact,
+    # moved to the control database as CR-150 moved the plan catalogue.
+    {"from": "platform.cell_endpoint", "to": "control.cell_endpoint", "on": "2026-10-20",
+     "why": "APPROVALS-TENANCY-C10: about a cell, not inside a tenant; the control plane writes it at provisioning"},
     {"from": "control.content_block", "to": "whitelabel.content_block", "on": "2026-10-20",
      "why": "IDENTITY-C59: a tenant's own content, read and written by White-Label in the tenant database"},
     {"from": "subscription.plan", "to": "control.plan", "on": "2026-10-18",
