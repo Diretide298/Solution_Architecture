@@ -1,0 +1,30 @@
+id: CHG-R8INT-034
+date: '2026-10-20'
+source: audit
+kind: process
+proposed: '2026-10-20T21:45'
+summary: 'check-ticket-builds accepts a `file <path>` entry in a task''s builds when the path is a file of the package,
+  as check-ticket-links and ADAM''s link builder already do. The database update tasks (CHG-R8INT-032) link their
+  migration files this way; the check read every file link as unresolved (B-UNRESOLVED, 66 findings).'
+decision:
+  what: 'tools/check-ticket-builds.py real(): kind `file` resolves when (package root / path) is a file.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: the final r8 refresh of cd646999 (refresh-safe run of 20 October, about 21:40), check-ticket-builds
+  B-UNRESOLVED on the six migration files each R8-DB-* task builds.'
+keys_touched:
+  files:
+  - tools/check-ticket-builds.py
+root_class: 'a check narrower than the link kinds ADAM pulls'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: r8 gate, a release fix'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-ticket-builds.py
+status: open
+notes: 'A file that does not exist still fails B-UNRESOLVED.'
