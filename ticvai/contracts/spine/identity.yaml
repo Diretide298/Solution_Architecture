@@ -563,13 +563,14 @@ paths:
           description: 'The username and credential do not match (`unauthenticated`; one answer for an unknown
             username and a wrong credential), or the principal signs in only through the tenant''s single sign-on
             (`sso-sign-in-required`, 14 October 2026, CHG-CRD-001): `detail` names the provider so the door can offer
-            `startSsoAuthorization`. **Every 401 this answers carries `attemptsRemaining`** (ADAM CR-170, option
-            D, decided 19 October 2026; CHG-CRA-009; "every 401" is every 401 `login` and `verifyMfaChallenge`
-            return, the lead''s reading of 19 October 2026): the wrong attempts left before the lock, **counted per
+            `startSsoAuthorization`. **Every wrong-credentials 401 (`unauthenticated`) carries `attemptsRemaining`**
+            (ADAM CR-170, option D, decided 19 October 2026; CHG-CRA-009; the lead''s reading of 19 October 2026,
+            narrowed and confirmed on 20 October 2026, CHG-R8DEC-001: every wrong-credentials 401 `login` and
+            `verifyMfaChallenge` return, never `sso-sign-in-required`): the wrong attempts left before the lock, **counted per
             submitted username whether or not a principal has it, and per sign-in method** (password, PIN, card,
             RFID), so an unknown username has its own counter and its own lock for each method, as a known one
-            does, and nothing in the answer reveals which usernames exist. `sso-sign-in-required` spends no
-            attempt and carries the count as it stands.'
+            does, and nothing in the answer reveals which usernames exist. `sso-sign-in-required` checks no
+            credential, spends no attempt and does not carry `attemptsRemaining`.'
           x-ticvai-problem-types:
           - unauthenticated
           - sso-sign-in-required
@@ -4497,8 +4498,9 @@ paths:
                     - $ref: '#/components/schemas/Session'
         '401':
           description: 'Missing, expired or superseded session (`unauthenticated`, `session-superseded`), as the
-            shared answer says. **It carries `attemptsRemaining`** (ADAM CR-170; CHG-CRA-009; "every 401" is every
-            401 `login` and `verifyMfaChallenge` return, the lead''s reading of 19 October 2026): the wrong codes
+            shared answer says. **It carries `attemptsRemaining`** (ADAM CR-170; CHG-CRA-009; every wrong-credentials
+            401 `login` and `verifyMfaChallenge` return, the lead''s reading of 19 October 2026 confirmed on 20 October
+            2026, CHG-R8DEC-001; here the credential is the session, and this operation has no SSO answer): the wrong codes
             left on the challenge in the path, which a 401 does not spend, since no code is checked without the
             session.'
           x-ticvai-problem-types:
@@ -10964,18 +10966,20 @@ components:
     LoginDeniedProblem:
       x-ticvai-persistence: none — error shape
       description: '**`login`''s 401** (ADAM CR-170, option D, 19 October 2026; CHG-CRA-009): the shared Problem
-        and, on every 401 `login` returns, the wrong attempts left before the lock (`429 credential-locked` with
-        `Retry-After`), counted per submitted username whether or not a principal has it, and per sign-in method.'
+        and, on every wrong-credentials 401 (`unauthenticated`) `login` returns, the wrong attempts left before the
+        lock (`429 credential-locked` with `Retry-After`), counted per submitted username whether or not a principal
+        has it, and per sign-in method. **Not on `sso-sign-in-required`**, which checks no credential (the lead,
+        20 October 2026, CHG-R8DEC-001).'
       allOf:
       - $ref: ../shared/common.yaml#/components/schemas/Problem
       - type: object
-        required: [attemptsRemaining]
         properties:
           attemptsRemaining:
             type: integer
             minimum: 0
             description: Wrong attempts left for this username and this sign-in method before they are locked.
-              On every 401 `login` returns, for a known and an unknown username alike.
+              Present on every `unauthenticated` 401 `login` returns, for a known and an unknown username alike;
+              absent on `sso-sign-in-required`.
     SessionHeldProblem:
       x-ticvai-persistence: none — error shape
       description: '**`login`''s 409** (ADAM CR-170, CHG-CRA-009): the session that refuses this sign-in, so the

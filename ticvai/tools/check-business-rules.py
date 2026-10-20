@@ -67,9 +67,10 @@ And one rule per decision for the CRs of 18 October 2026 (class 9, "rules nobody
                    per legal entity, the next open period, and createPayment's two settings reads.
   BR-HOLD-LAPSE    (CR-169) a seat reservation names its hold and can be `sold`; `convertInventoryHold` moves the
                    envelope's units and states the lapsed-hold rule (unitsGone, nothing refunded automatically).
-  BR-LOGIN-ATTEMPTS (CR-170, 19 October 2026; CHG-CRA-009) every 401 of login and verifyMfaChallenge carries
-                   attemptsRemaining, counted per submitted username known or not and per sign-in method; login's
-                   409 says since when and on what; verifyMfaChallenge's 422 carries it too.
+  BR-LOGIN-ATTEMPTS (CR-170, 19 October 2026; CHG-CRA-009) every wrong-credentials 401 of login and
+                   verifyMfaChallenge carries attemptsRemaining, counted per submitted username known or not and per
+                   sign-in method, and sso-sign-in-required does not (narrowed, 20 October 2026, CHG-R8DEC-001);
+                   login's 409 says since when and on what; verifyMfaChallenge's 422 carries it too.
   BR-GATE-CANCEL   (CR-171, 19 October 2026; CHG-CRA-010) a cancelled gate mode change records who, when and why in
                    its own columns, leaving the scheduler's untouched.
 
@@ -438,8 +439,15 @@ def main() -> int:
          "login's 401 does not count attempts per submitted username, known or not")
     # Fix round 3 (lane-H review 2 M-5): "every 401" is every 401 login and verifyMfaChallenge return, and the
     # unknown username's counter is per sign-in method as a known one's lock is.
-    need("BR-LOGIN-ATTEMPTS", "attemptsRemaining" in ((ids.get("LoginDeniedProblem") or {}).get("allOf") or [{}, {}])[-1]
-         .get("required", []), "LoginDeniedProblem does not require attemptsRemaining (every 401 login returns)")
+    # Narrowed by the lead on 20 October 2026 (CHG-R8DEC-001): every wrong-credentials 401, never sso-sign-in-required,
+    # which checks no credential. LoginDeniedProblem serves both problem types, so the field is not `required` there and
+    # the contract says where it is present and where it is not.
+    ldp = text(ids.get("LoginDeniedProblem") or {})
+    need("BR-LOGIN-ATTEMPTS", "`unauthenticated`" in ldp and "Not on `sso-sign-in-required`" in ldp,
+         "LoginDeniedProblem does not say attemptsRemaining is on every unauthenticated 401 and not on "
+         "sso-sign-in-required (CHG-R8DEC-001)")
+    need("BR-LOGIN-ATTEMPTS", "does not carry `attemptsRemaining`" in r401 and "carries the count as it stands" not in r401,
+         "login's 401 does not say sso-sign-in-required leaves attemptsRemaining out (CHG-R8DEC-001)")
     need("BR-LOGIN-ATTEMPTS", "per sign-in method" in r401,
          "login's 401 does not count attempts per sign-in method as well as per username")
     need("BR-LOGIN-ATTEMPTS", "SessionHeldProblem" in text((lg.get("responses") or {}).get("409") or {})
