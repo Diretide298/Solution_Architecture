@@ -61,7 +61,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const VERSION = 3; // a template or a kept snapshot from another version is not reused
+const VERSION = 4; // a template or a kept snapshot from another version is not reused
 const IMAGE = 'pgvector/pgvector:pg16';
 const UNUSED_DAYS = 14; // another folder's databases unused this long are dropped
 
@@ -435,15 +435,45 @@ let CONTAINER = DEFAULT_CONTAINER;
 
 /** Server-level state a file can change from inside one database: the roles and their settings. */
 const CLUSTER_SQL = `(SELECT json_build_object(
-  'server roles', coalesce((SELECT string_agg(rolname || CASE WHEN rolsuper THEN ' (superuser)' ELSE '' END
+  'server roles', coalesce((SELECT json_agg(rolname || CASE WHEN rolsuper THEN ' (superuser)' ELSE '' END
       || CASE WHEN rolbypassrls THEN ' (bypassrls)' ELSE '' END || CASE WHEN rolcreaterole THEN ' (createrole)' ELSE '' END
       || CASE WHEN rolcreatedb THEN ' (createdb)' ELSE '' END || CASE WHEN rolreplication THEN ' (replication)' ELSE '' END
-      || CASE WHEN rolcanlogin THEN ' (login)' ELSE '' END, ', ' ORDER BY rolname)
-    FROM pg_roles WHERE rolname !~ '^pg_'), '-'),
-  'server role memberships', coalesce((SELECT string_agg(m.rolname || ' in ' || g.rolname, ', ' ORDER BY 1)
-    FROM pg_auth_members a JOIN pg_roles m ON m.oid = a.member JOIN pg_roles g ON g.oid = a.roleid WHERE m.rolname !~ '^pg_'), '-'),
-  'server role settings', coalesce((SELECT string_agg(coalesce(r.rolname, 'every role') || ': ' || array_to_string(s.setconfig, ','), '; ' ORDER BY 1)
-    FROM pg_db_role_setting s LEFT JOIN pg_roles r ON r.oid = s.setrole WHERE s.setdatabase = 0), '-'))::text)`;
+      || CASE WHEN rolcanlogin THEN ' (login)' ELSE '' END ORDER BY rolname)
+    FROM pg_roles WHERE rolname !~ '^pg_'), '[]'),
+  'server role memberships', coalesce((SELECT json_agg(m.rolname || ' in ' || g.rolname ORDER BY 1)
+    FROM pg_auth_members a JOIN pg_roles m ON m.oid = a.member JOIN pg_roles g ON g.oid = a.roleid WHERE m.rolname !~ '^pg_'), '[]'),
+  'server role settings', coalesce((SELECT json_agg(coalesce(r.rolname, 'every role') || ': ' || array_to_string(s.setconfig, ',') ORDER BY 1)
+    FROM pg_db_role_setting s LEFT JOIN pg_roles r ON r.oid = s.setrole WHERE s.setdatabase = 0), '[]'))::text)`;
+
+/**
+ * What changed on the server between two CLUSTER_SQL answers, item by item: { key: { added, removed } }.
+ * The package's own statements may change it too (r8's platform.visible_parent_ids_setup makes the
+ * role ticvai_parent_visible); a ticket's file may then make the same change and nothing else.
+ */
+export function serverChanges(before, after) {
+  const out = {};
+  for (const key of new Set([...Object.keys(before), ...Object.keys(after)])) {
+    const was = new Set(before[key] ?? []);
+    const now = new Set(after[key] ?? []);
+    const added = [...now].filter((x) => !was.has(x));
+    const removed = [...was].filter((x) => !now.has(x));
+    if (added.length || removed.length) out[key] = { added, removed };
+  }
+  return out;
+}
+
+/** The server changes a ticket's file made that the package's own statements do not make. */
+export function serverDiffs(mine, packages = {}) {
+  const out = [];
+  for (const [key, { added, removed }] of Object.entries(mine)) {
+    const a = added.filter((x) => !(packages[key]?.added ?? []).includes(x));
+    const r = removed.filter((x) => !(packages[key]?.removed ?? []).includes(x));
+    if (!a.length && !r.length) continue;
+    out.push(`this file changed ${key} (${[a.length ? `added ${a.join(', ')}` : '', r.length ? `removed ${r.join(', ')}` : ''].filter(Boolean).join('; ')})`
+      + "; that is the server's, shared by every database here, and stays: run --clean afterwards");
+  }
+  return out;
+}
 /** Role memberships as "member>role", for --clean to compare with those the container started with. */
 const MEMBERS_SQL = `coalesce((SELECT json_agg(m.rolname || '>' || g.rolname ORDER BY 1) FROM pg_auth_members a
   JOIN pg_roles m ON m.oid = a.member JOIN pg_roles g ON g.oid = a.roleid WHERE m.rolname !~ '^pg_')::text, '[]')`;
@@ -764,6 +794,19 @@ async function tidy(id, { unusedDays = UNUSED_DAYS } = {}) {
   return dropped;
 }
 
+/** Adds the roles and memberships the package's own statements made to those --clean keeps. */
+async function notePackageRoles(server) {
+  const roles = (server['server roles']?.added ?? []).map((r) => r.replace(/ \(.*$/, ''));
+  const members = (server['server role memberships']?.added ?? []).map((m) => m.replace(' in ', '>'));
+  if (CONTAINER !== DEFAULT_CONTAINER || (!roles.length && !members.length)) return;
+  const r = session('postgres', tag('SETUP', "coalesce(shobj_description((SELECT oid FROM pg_database WHERE datname = 'postgres'), 'pg_database'), '')"));
+  let marker = {};
+  try { marker = JSON.parse(r.last('SETUP') || '{}'); } catch { marker = {}; }
+  marker.adamRoles = [...new Set([...(marker.adamRoles ?? []), ...roles])];
+  marker.adamMembers = [...new Set([...(marker.adamMembers ?? []), ...members])];
+  session('postgres', `COMMENT ON DATABASE postgres IS ${quote(JSON.stringify(marker))};\n`);
+}
+
 /** Kept snapshots older than a week go, any folder's; with `all`, every one of this folder's. */
 function pruneCache(id, all = false) {
   try {
@@ -839,7 +882,7 @@ async function checkOne(root, id, key, check, args, out, image) {
   const aSql = tag('C0', CLUSTER_SQL) + (cached ? '' : snap('SNAP0')) + time
     + fileSql(file, folder, { record: true, label: 'first run' }) + time + snap('SNAP1')
     + fileSql(file, folder, { record: false, label: 'second run' }) + snap('SNAP2') + tag('C2', CLUSTER_SQL);
-  let b = 'SET check_function_bodies = off;\nBEGIN;\n';
+  let b = `${tag('CB0', CLUSTER_SQL)}SET check_function_bodies = off;\nBEGIN;\n`;
   statements.forEach((s, i) => {
     b += tag('AT', quote(`the package's statements|${s.file}|${i + 1}|-`));
     if (s.guard) {
@@ -851,7 +894,7 @@ async function checkOne(root, id, key, check, args, out, image) {
       b += execute(s.sql);
     }
   });
-  b += `COMMIT;\n${snap('SNAPB')}`;
+  b += `COMMIT;\n${snap('SNAPB')}${tag('CB2', CLUSTER_SQL)}`;
   const [a, e] = await Promise.all([sessionAsync(names.ticket, aSql), cached ? null : sessionAsync(names.expect, b)]);
   if (!a.ok) return { failed: failure(a) };
   const [t0, t1] = (a.tags.T ?? []).map(Number);
@@ -868,17 +911,21 @@ async function checkOne(root, id, key, check, args, out, image) {
         + `with. That is a change request against the package (CLAUDE.md, "When the package is wrong"):\n${failure(e)}`,
     };
   }
-  const known = cached ?? { before: JSON.parse(a.last('SNAP0')), expected: JSON.parse(e.last('SNAPB')), deferred: e.tags.DEFER ?? [] };
+  const known = cached ?? {
+    before: JSON.parse(a.last('SNAP0')), expected: JSON.parse(e.last('SNAPB')), deferred: e.tags.DEFER ?? [],
+    server: serverChanges(JSON.parse(e.last('CB0')), JSON.parse(e.last('CB2'))),
+  };
   if (!cached) {
     try { writeFileSync(cacheFile, JSON.stringify(known)); } catch { /* the next run works it out again */ }
+    // A role the package's own statements make is part of the container from now on: --clean keeps it.
+    await notePackageRoles(known.server);
   }
   const { deferred } = known;
   out(`- the package's statements: ${statements.length} applied to a second copy${cached ? ' (kept from an earlier run)' : ''}`
     + `${deferred.length ? `; ${plural(deferred.length, 'foreign key')} left for a later migration (the table is not created yet)` : ''}`);
   for (const d of deferred) out(`  - ${d}`);
 
-  const server = againDiffs(JSON.parse(a.last('C0')), JSON.parse(a.last('C2')))
-    .map((d) => `${d.replace('the second run', 'this file')}; that is the server's, shared by every database here, and stays: run --clean afterwards`);
+  const server = serverDiffs(serverChanges(JSON.parse(a.last('C0')), JSON.parse(a.last('C2'))), known.server ?? {});
   const diffs = [...dataDiffs(mine, owned, name), ...server, ...again, ...diffSnapshots({ before: known.before, after, expected: known.expected, owned })];
   const gaps = [...(check.notInPackageDdl ?? []), ...(check.keysNotInPackageDdl ?? [])];
   return { diffs, gaps, empty: !statements.length, owned, data: backfills({ after, expected: known.expected, owned }) };

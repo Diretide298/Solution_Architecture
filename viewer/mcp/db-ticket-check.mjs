@@ -175,6 +175,18 @@ section('the snapshot compare');
   const rows = script.backfills({ after: { 'rows a.t': '3', 'rows k.old': '0' }, expected: { 'rows a.t': '0' }, owned: ['a.t'] });
   ok(rows.length === 1 && /a\.t: 3 rows/.test(rows[0]) && script.diffSnapshots({ before: { 'rows a.t': '0' }, after: { 'rows a.t': '3' }, expected: { 'rows a.t': '0' }, owned: ['a.t'] }).length === 0,
     'rows left in the ticket\'s own table are listed as a backfill, not a difference', rows.join(' | '));
+  // r8's package makes a role itself (platform.visible_parent_ids_setup): the same change by the
+  // ticket's file is not a difference; anything more is.
+  const pkg = script.serverChanges({ 'server roles': ['postgres (superuser)'] }, { 'server roles': ['postgres (superuser)', 'ticvai_parent_visible'] });
+  const same = script.serverDiffs(script.serverChanges({ 'server roles': ['postgres (superuser)'] }, { 'server roles': ['postgres (superuser)', 'ticvai_parent_visible'] }), pkg);
+  const more = script.serverDiffs(script.serverChanges({ 'server roles': ['postgres (superuser)'] }, { 'server roles': ['postgres (superuser)', 'probe', 'ticvai_parent_visible'] }), pkg);
+  ok(same.length === 0 && more.length === 1 && /added probe\)/.test(more[0]), 'a role the package\'s own statements make is not a difference; another is', more.join(' | '));
+  const r8 = script.splitSql ? tools.doInner("DO $$ BEGIN IF to_regclass('a.i') IS NOT NULL THEN DROP INDEX a.i; END IF; END $$") : [];
+  ok(r8.length === 1 && /^DROP INDEX a\.i$/.test(r8[0]) && tools.statementTarget("DO $$ BEGIN IF true THEN ALTER TABLE a.t RENAME COLUMN x TO y; END IF; END $$") === 'a.t'
+    && tools.statementTarget('DROP INDEX IF EXISTS a.i', new Map([['i', 'a.t']])) === 'a.t'
+    && tools.statementTarget("SELECT platform.drop_rls_policies('a.t'::regclass)") === 'a.t'
+    && tools.statementTarget("SELECT platform.ensure_month_partitions('a.t'::regclass, 3)") === null,
+  'r8\'s guarded DO statements, index drops by name and drop_rls_policies are picked for their table', JSON.stringify(r8));
 }
 
 // ---- 3. adam_pull writes it ------------------------------------------------------------------------
@@ -609,8 +621,18 @@ if (!PACKAGE_RUN) {
     const model = schemaModel(files);
     const tables = [...model.tables.keys()];
     // What every ticket would be given, put together: the baseline, then each table's statements.
-    const picked = [...ticketStatements(files, { kind: 'baseline', tables: [] }), ...ticketStatements(files, { kind: 'tables', tables })];
-    const ordered = [...picked.filter((s) => /^00[0-2]-/.test(s.file)), ...picked.filter((s) => !/^00[0-2]-/.test(s.file))];
+    // Put together in the package's own order: r8's helpers grant on the functions that exist when
+    // they run, so the order is part of the result.
+    const picked = new Map();
+    for (const s of [...ticketStatements(files, { kind: 'baseline', tables: [] }), ...ticketStatements(files, { kind: 'tables', tables })]) {
+      picked.set(`${s.file}\u0000${s.sql}`, true);
+    }
+    const ordered = [];
+    for (const f of [...files].sort((a, b) => (a.name < b.name ? -1 : 1))) {
+      for (const sql of sqlStatements(f.text)) {
+        if (picked.delete(`${f.name}\u0000${sql}`)) ordered.push({ file: f.name, sql });
+      }
+    }
     const pickedSql = `SET check_function_bodies = off;\n${database === 'tenant' ? types.replace('CREATE TYPE pii.subject_kind', 'CREATE SCHEMA IF NOT EXISTS pii; CREATE TYPE pii.subject_kind') : ''}`
       + ordered.map((s) => `${s.sql};`).join('\n');
     const pr = psql(`picked_${database}`, pickedSql);

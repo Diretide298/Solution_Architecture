@@ -864,6 +864,10 @@ function alterTable(model, stmt, file, notModelled) {
       else if (/^DROP\s+DEFAULT$/i.test(what)) delete col.default;
       else if (/^(SET\s+DATA\s+)?TYPE\s+/i.test(what)) col.type = what.replace(/^(SET\s+DATA\s+)?TYPE\s+/i, '').replace(/\s+USING\s+[\s\S]*$/i, '').trim();
       else notModelled.push({ file, table: name, statement: action.slice(0, 200) });
+    } else if ((m = /^RENAME\s+CONSTRAINT\s+([\w"]+)\s+TO\s+([\w"]+)$/i.exec(action))) {
+      for (const k of [table.primaryKey, ...table.unique, ...table.foreignKeys, ...table.checks]) {
+        if (k && k.name === ident(m[1])) k.name = ident(m[2]);
+      }
     } else if ((m = /^RENAME\s+(?:COLUMN\s+)?([\w"]+)\s+TO\s+([\w"]+)$/i.exec(action))) {
       const col = table.columns.find((c) => c.name === ident(m[1]));
       if (col) col.name = ident(m[2]);
@@ -871,7 +875,7 @@ function alterTable(model, stmt, file, notModelled) {
     else if (/^DISABLE\s+ROW\s+LEVEL\s+SECURITY$/i.test(action)) table.rls.enabled = false;
     else if (/^FORCE\s+ROW\s+LEVEL\s+SECURITY$/i.test(action)) table.rls.forced = true;
     else if (/^NO\s+FORCE\s+ROW\s+LEVEL\s+SECURITY$/i.test(action)) table.rls.forced = false;
-    else if (/^(OWNER\s+TO|SET\s*\(|RESET\s*\(|ATTACH\s+PARTITION|DETACH\s+PARTITION)\b/i.test(action)) { /* not part of the shape */ }
+    else if (/^(OWNER\s+TO|SET\s*\(|RESET\s*\(|ATTACH\s+PARTITION|DETACH\s+PARTITION|VALIDATE\s+CONSTRAINT)\b/i.test(action)) { /* not part of the shape */ }
     else notModelled.push({ file, table: name, statement: action.slice(0, 200) });
   }
 }
@@ -906,6 +910,10 @@ const RLS_MARKER = {
   parent: (args) => ident(String(args[2] ?? '').replace(/::regclass$/i, '').replace(/'/g, '')),
 };
 
+// The r8 helpers that split a table's policy in four (read, append, update, delete), named after the
+// first 55 characters of the table: apply_split_rls and the ones that call it, and append_audit.
+const SPLIT_RLS = new Set(['split', 'read_beneath', 'grant_holder_read', 'grant_holder_subject_read', 'parent_split', 'append_audit']);
+
 function applyRls(model, stmt) {
   const m = /^SELECT\s+platform\.apply_(\w+?)_rls\s*\(([\s\S]*)\)$/i.exec(stmt);
   if (!m) return false;
@@ -913,13 +921,43 @@ function applyRls(model, stmt) {
   const target = ident(args[0].replace(/::regclass$/i, '').replace(/'/g, ''));
   const table = model.get(target);
   if (!table) return true;
-  const policy = `${shortName(target).slice(0, 57)}_scope`;
+  const kind = m[1].toLowerCase();
   table.rls.enabled = true;
   table.rls.forced = true;
+  if (SPLIT_RLS.has(kind)) {
+    const base = shortName(target).slice(0, 55);
+    const four = ['read', 'append', 'update', 'delete'].map((s) => `${base}_${s}`);
+    const keep = kind === 'append_audit'
+      ? table.rls.policies.filter((p) => p.name !== `${shortName(target).slice(0, 57)}_scope` && !four.includes(p.name))
+      : [];
+    table.rls.policies = [...keep, ...four.map((name) => ({ name }))];
+    return true;
+  }
+  const policy = `${shortName(target).slice(0, 57)}_scope`;
   table.rls.policies = table.rls.policies.filter((p) => p.name !== policy && !/^(scope|venue)_isolation$/.test(p.name));
-  const marker = RLS_MARKER[m[1].toLowerCase()];
+  const marker = RLS_MARKER[kind];
   table.rls.policies.push({ name: policy, ...(marker ? { uses: marker(args) } : {}) });
   return true;
+}
+
+/**
+ * The ALTER TABLE and ALTER INDEX statements inside a DO block (r8's guarded renames and keys:
+ * `DO $$ BEGIN IF <the old name is there> THEN ALTER TABLE ... RENAME COLUMN ...; END IF; END $$`).
+ */
+export function doInner(stmt) {
+  const m = /^DO\s+(\$\w*\$)([\s\S]*)\1\s*$/i.exec(String(stmt));
+  if (!m) return [];
+  return m[2].split(';').map((p) => /\b((?:ALTER\s+(?:TABLE|INDEX)|DROP\s+INDEX|CREATE\s+(?:UNIQUE\s+)?INDEX)\b[\s\S]*)$/i.exec(p)?.[1]?.trim()).filter(Boolean);
+}
+
+const INDEX_RENAME = /^ALTER\s+INDEX\s+(?:IF\s+EXISTS\s+)?([\w".]+)\s+RENAME\s+TO\s+([\w"]+)/i;
+
+function renameIndex(model, from, to) {
+  const name = ident(from).split('.').pop();
+  for (const t of model.values()) {
+    const index = t.indexes.find((i) => i.name === name);
+    if (index) index.name = ident(to);
+  }
 }
 
 /**
@@ -933,10 +971,29 @@ export function schemaModel(files) {
   for (const { name: file, text } of ordered) {
     for (const stmt of sqlStatements(text)) {
       let m;
+      if (/^DO\b/i.test(stmt)) {
+        // The block runs its statement only when its condition holds, which this cannot know: renames
+        // and drops are followed (their condition is "the old name is still there"); a key it adds is
+        // left out of the shape, so the shape never claims more than PostgreSQL will have.
+        for (const one of doInner(stmt)) {
+          if (/^ALTER\s+TABLE\b/i.test(one) && !/\bADD\s+CONSTRAINT\b/i.test(one)) alterTable(model, one, file, notModelled);
+          else if ((m = INDEX_RENAME.exec(one))) renameIndex(model, m[1], m[2]);
+          else if ((m = /^DROP\s+INDEX\s+(?:CONCURRENTLY\s+)?(?:IF\s+EXISTS\s+)?([\w".]+)/i.exec(one))) {
+            const index = ident(m[1]).split('.').pop();
+            for (const t of model.values()) t.indexes = t.indexes.filter((i) => i.name !== index);
+          }
+        }
+        continue;
+      }
       if (/^CREATE\s+(?:UNLOGGED\s+)?TABLE\b/i.test(stmt)) createTable(model, stmt, file, notModelled);
       else if (/^ALTER\s+TABLE\b/i.test(stmt)) alterTable(model, stmt, file, notModelled);
+      else if ((m = INDEX_RENAME.exec(stmt))) renameIndex(model, m[1], m[2]);
       else if (/^CREATE\s+(UNIQUE\s+)?INDEX\b/i.test(stmt)) createIndex(model, stmt);
       else if (/^SELECT\s+platform\.apply_\w+_rls\b/i.test(stmt)) applyRls(model, stmt);
+      else if ((m = /^SELECT\s+platform\.drop_rls_policies\s*\(\s*'([\w".]+)'/i.exec(stmt))) {
+        const table = model.get(ident(m[1]));
+        if (table) table.rls.policies = [];
+      }
       else if ((m = /^CREATE\s+POLICY\s+([\w"]+)\s+ON\s+([\w".]+)/i.exec(stmt))) {
         const table = model.get(ident(m[2]));
         if (table && !table.rls.policies.some((p) => p.name === ident(m[1]))) table.rls.policies.push({ name: ident(m[1]) });
@@ -989,10 +1046,24 @@ export function databaseTicket(wp, touches) {
   return { kind: 'tables', migration, tables, database, ...(forward ? { forward: true } : {}) };
 }
 
-/** The table a package statement makes or changes, or null for one that is not about a table. */
-export function statementTarget(stmt) {
+/**
+ * The table a package statement makes or changes, or null for one that is not about a table.
+ * `indexes` (index name -> table) answers for DROP INDEX and ALTER INDEX, which name only the index.
+ */
+export function statementTarget(stmt, indexes = null) {
   const s = String(stmt);
   let m;
+  if (/^DO\b/i.test(s)) {
+    for (const one of doInner(s)) {
+      const target = statementTarget(one, indexes);
+      if (target) return target;
+    }
+    return null;
+  }
+  if ((m = /^DROP\s+INDEX\s+(?:CONCURRENTLY\s+)?(?:IF\s+EXISTS\s+)?([\w".]+)/i.exec(s))) return indexes?.get(ident(m[1]).split('.').pop()) ?? null;
+  if ((m = INDEX_RENAME.exec(s))) return indexes?.get(ident(m[1]).split('.').pop()) ?? null;
+  if (/^SELECT\s+platform\.ensure_month_partitions\b/i.test(s)) return null; // a month: depends on the day
+  if ((m = /^SELECT\s+platform\.\w+\s*\(\s*'([\w".]+)'\s*::\s*regclass/i.exec(s))) return ident(m[1]);
   if ((m = /^CREATE\s+(?:UNLOGGED\s+)?TABLE\s+(?:IF\s+NOT\s+EXISTS\s+)?([\w".]+)\s+PARTITION\s+OF\s+([\w".]+)\s+DEFAULT\b/i.exec(s))) return ident(m[2]);
   if (/^CREATE\s+(?:UNLOGGED\s+)?TABLE\s+(?:IF\s+NOT\s+EXISTS\s+)?[\w".]+\s+PARTITION\s+OF\b/i.test(s)) return null; // a month: depends on the day
   if ((m = /^CREATE\s+(?:UNLOGGED\s+)?TABLE\s+(?:IF\s+NOT\s+EXISTS\s+)?([\w".]+)/i.exec(s))) return ident(m[1]);
@@ -1021,6 +1092,7 @@ export function ticketStatements(files, ticket) {
   const keys = new Set((ticket.constraints ?? []).map(ident));
   const out = [];
   const helpers = []; // after-r1 functions, kept in place until we know whether a picked statement calls one
+  const indexes = new Map();
   for (const { name: file, text } of ordered) {
     for (const sql of sqlStatements(text)) {
       const fn = /^CREATE\s+(?:OR\s+REPLACE\s+)?FUNCTION\s+([\w".]+)/i.exec(sql)?.[1];
@@ -1041,7 +1113,14 @@ export function ticketStatements(files, ticket) {
         out.push(entry);
         continue;
       }
-      const target = statementTarget(sql);
+      const target = statementTarget(sql, indexes);
+      // Which table each index is on, for a later DROP INDEX or ALTER INDEX that names only the index.
+      const made = /^CREATE\s+(?:UNIQUE\s+)?INDEX\s+(?:CONCURRENTLY\s+)?(?:IF\s+NOT\s+EXISTS\s+)?((?!ON\s)[\w"]+)\s+ON\b/i.exec(sql);
+      if (made && target) indexes.set(ident(made[1]), target);
+      for (const one of /^DO\b/i.test(sql) ? doInner(sql) : [sql]) {
+        const renamed = INDEX_RENAME.exec(one);
+        if (renamed && indexes.has(ident(renamed[1]).split('.').pop())) indexes.set(ident(renamed[2]), indexes.get(ident(renamed[1]).split('.').pop()));
+      }
       if (target && want.has(target)) out.push({ file, sql, ...(guard ? { guard } : {}) });
       else if (ticket.forward && guard && want.has(guard.references)) out.push({ file, sql, guard: { ...guard, incoming: true } });
     }
