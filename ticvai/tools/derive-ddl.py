@@ -1361,7 +1361,11 @@ def rls_file(db: str, scoped: list, by_venue: list, by_parent: list, unscoped: l
         for t, col, par, key, *rest in by_parent:
             # a parent in another deployable is asked through platform.visible_parent_ids (CHG-RSF-001, decision D9)
             how = "across_" if t in across else ""
-            if rest:
+            if len(rest) >= 3:
+                # under a parent a guest may read: staff read through it, a guest only its own rows (CHG-R8MIG-026)
+                body.append(f"SELECT platform.apply_split_rls('{qual(t)}'::regclass, {sql_literal(rest[1])}, "
+                            f"{sql_literal(rest[2])});")
+            elif rest:
                 # follows a split parent for reading; written where the parent may be written (CHG-GEN-005)
                 body.append(f"SELECT platform.apply_parent_split_{how}rls('{qual(t)}'::regclass, '{col}', "
                             f"'{qual(par)}'::regclass, '{key}', {sql_literal(rest[0])});")
@@ -2751,6 +2755,7 @@ def main() -> int:
         return f"{q(sch)}.{q(n)}"
 
     split_calls: dict = {}    # table -> (call, why)
+    split_mark: dict = {}     # table -> (its x-ticvai-rls mark, its base rule)
     split_write: dict = {}    # table -> its write check, `{a}` standing for the row's alias
     split_depth: dict = {}
     parent_of = {p[0]: p for p in by_parent}
@@ -2836,6 +2841,12 @@ def main() -> int:
             write = ("platform.own_row(" + ("{a}principal_id" if pc else "NULL::uuid") + ", "
                      + ("{a}subject_id" if sc else "NULL::uuid") + ")")
             base = "its own principal or guest"
+        elif mark == "read-beneath" and base == "venue_id":
+            # **Owned above, read below, for a venue_id table** (CHG-R8MIG-026; the storage-sat lane's request 7,
+            # ORDERS-MONEY-C33 answer A): a row with no venue is the tenant's and is read at every venue; a venue's row
+            # is read and written at that venue, as apply_venue_rls.
+            call = (f"SELECT platform.apply_split_rls('{tq(t)}'::regclass, "
+                    f"'venue_id IS NULL OR platform.venue_in_scope(venue_id)', 'platform.venue_in_scope(venue_id)');")
         elif mark == "read-beneath":
             if base != "scope_path":
                 print(f"  ! {t}: x-ticvai-rls read-beneath needs a scope_path (its rows are owned by {base}); "
@@ -2850,6 +2861,7 @@ def main() -> int:
         else:
             call = (f"SELECT platform.apply_grant_holder_read_rls('{tq(t)}'::regclass, "
                     f"{sql_literal(write.format(a=''))});")
+        split_mark[t] = (mark, base)
         split_calls[t] = (call, f"x-ticvai-rls: {mark}, written by {base} "
                                 f"({(marks.get(t) or {}).get('schema') or 'TABLE_RLS'})")
         split_write[t] = write.format(a="{a}.")
@@ -2871,6 +2883,21 @@ def main() -> int:
             continue
         d = split_depth[par] + 1
         by_parent[i] = (t, col, par, key, split_write[par].format(a="parent_row"))
+        # **A parent a guest may read does not open its children to every guest** (CHG-R8MIG-026; the storage-sat lane's
+        # request 7): marketing.badge is signed-in-read, and marketing.customer_badge followed it for reading, so any
+        # guest would have read every customer's awards. Under such a parent (signed-in-read, or read-beneath on
+        # venue_id) a child is read by staff where the parent is visible, by a guest only for its own subject
+        # (customer_id or subject_id), and written where the parent may be written.
+        pm = split_mark.get(par)
+        if pm and (pm[0] == "signed-in-read" or (pm[0] == "read-beneath" and pm[1] == "venue_id")):
+            ccols = {c_["column"] for c_ in cols.get(t, [])}
+            subj = "customer_id" if "customer_id" in ccols else ("subject_id" if "subject_id" in ccols else None)
+            link = f"pr.{q(key)} = {tq(t)}.{q(col)}"
+            wr = f"EXISTS (SELECT 1 FROM {tq(par)} pr WHERE {link} AND ({split_write[par].format(a='pr')}))"
+            rd = f"(platform.grant_holder() AND EXISTS (SELECT 1 FROM {tq(par)} pr WHERE {link}))"
+            if subj:
+                rd += f" OR platform.own_row(NULL::uuid, {q(subj)})"
+            by_parent[i] = (t, col, par, key, split_write[par].format(a="parent_row"), rd, wr)
         alias = f"p{d}"
         split_write[t] = (f"EXISTS (SELECT 1 FROM {tq(par)} {alias} WHERE {alias}.{q(key)} = {{a}}.{q(col)} AND ("
                           + split_write[par].format(a=alias) + "))")

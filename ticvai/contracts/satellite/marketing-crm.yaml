@@ -26194,6 +26194,9 @@ components:
           description: The case this message belongs to, from the path of `addCaseMessage` (the opening one, `createCase`).
     LoyaltyProgramme:
       x-ticvai-persistence: marketing.loyalty_programme + marketing.points_earning_rule + marketing.programme_tier
+      # A tenant-wide programme (no venue) is read at every venue; a venue's own at that venue (ORDERS-MONEY-C33 answer A;
+      # CHG-R8MIG-026). Positions follow it for staff, and a guest reads only its own.
+      x-ticvai-rls: read-beneath
       type: object
       required:
       - id
