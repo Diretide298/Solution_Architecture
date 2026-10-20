@@ -4013,14 +4013,14 @@ paths:
         '409':
           description: 'The cart is `checkedOut` or `abandoned` (`cart-not-open`), or already belongs to another guest (`cart-already-claimed`). Nothing is attached or merged.'
           x-ticvai-problem-types: [cart-not-open, cart-already-claimed]
-        '403':
-          description: '**The cart''s token was not sent, or does not match** (R8 blocker IDENTITY-C49, the lead''s answer A;
-            CHG-R8MIG-021): only the device that built the anonymous cart holds its `token`, so it is the proof. Nothing
-            is attached.'
           content:
             application/problem+json:
               schema:
                 $ref: '../shared/common.yaml#/components/schemas/Problem'
+        '403':
+          description: '**The cart''s token was not sent, or does not match** (R8 blocker IDENTITY-C49, the lead''s answer A;
+            CHG-R8MIG-021): only the device that built the anonymous cart holds its `token`, so it is the proof. Nothing
+            is attached.'
           content:
             application/problem+json:
               schema:
