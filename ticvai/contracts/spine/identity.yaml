@@ -3432,6 +3432,8 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-024 Devices, Wishlist & Consent"
         - "P02 GST-066 Privacy & My Data"
+      x-ticvai-calls:
+      - ai.eraseSubject
       x-ticvai-singleton: true
       x-ticvai-singleton-note: 'The caller''s own account: one per signed-in guest, so there is no key in the path.'
       x-ticvai-audience:

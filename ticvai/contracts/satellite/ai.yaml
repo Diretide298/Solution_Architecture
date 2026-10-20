@@ -3310,6 +3310,79 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /internal/subjects/{subjectId}/ai-erasure:
+    parameters:
+    - name: subjectId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: eraseSubject
+      security:
+      - serviceAuth: []
+      x-ticvai-audience:
+      - service
+      x-ticvai-auth: service
+      summary: Remove everything the AI index holds about a guest
+      description: '**Erasure reaches the AI data, and can be proven** (R8 blocker FOUNDATION-AI-C42, CHG-R8MIG-025;
+        ADR-0047: nothing cascades). Called by Identity''s erasure job for `deleteGuestAccount`, beside
+        `createDsarRequest`, cell-internal over mTLS. For the subject it deletes, in this order and retried until both
+        are done: the `ai.index_entry` rows with that `subject_id` and the `ai.chunk_embedding` rows with that
+        `subject_id` (one transaction), then the Qdrant points with that subject in their payload (by payload filter on
+        `subjectId`, which also catches a point whose row went first). **The proof the erasure keeps**: zero rows in
+        `ai.index_entry` and `ai.chunk_embedding` with the subject, and a Qdrant count of 0 for the payload key; the
+        response carries the three counts removed and the two counts left (both 0 on success). A call for a subject
+        with nothing indexed answers the same with zeros, so a retry is safe.
+
+        '
+      tags:
+      - retrieval
+      x-ticvai-permission: null
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      responses:
+        '200':
+          description: Erased, with the counts that prove it.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [subjectId, indexEntriesRemoved, chunksRemoved, pointsRemoved, rowsLeft, pointsLeft]
+                properties:
+                  subjectId:
+                    type: string
+                    format: uuid
+                  indexEntriesRemoved:
+                    type: integer
+                    minimum: 0
+                  chunksRemoved:
+                    type: integer
+                    minimum: 0
+                  pointsRemoved:
+                    type: integer
+                    minimum: 0
+                  rowsLeft:
+                    type: integer
+                    minimum: 0
+                    description: ai.index_entry and ai.chunk_embedding rows still naming the subject; 0 on success.
+                  pointsLeft:
+                    type: integer
+                    minimum: 0
+                    description: Qdrant points still carrying the subject; 0 on success.
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+        '502':
+          description: Qdrant could not be reached; the rows are removed and the points are retried.
+          x-ticvai-problem-types: [provider-connection-failed]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
   /index-jobs:
     get:
       operationId: listIndexJobs
@@ -12758,6 +12831,8 @@ components:
     AiChunkEmbedding:
       type: object
       x-ticvai-persistence: ai.chunk_embedding
+      # Erasure finds a subject's chunks by this (R8 blocker FOUNDATION-AI-C42, CHG-R8MIG-025).
+      x-ticvai-index: [[subjectId]]
       x-ticvai-retired-columns:
       - dense
       - sparse
@@ -12796,6 +12871,14 @@ components:
           nullable: true
           x-ticvai-references: ai.chunk_embedding
           description: The parent section's own row, where the source uses `parentChild` chunking.
+        subjectId:
+          type: string
+          format: uuid
+          nullable: true
+          x-ticvai-references: none
+          description: '**The guest the chunk is about, where there is one** (ADR-0049; R8 blocker FOUNDATION-AI-C42,
+            CHG-R8MIG-025), copied from its index entry, so `eraseSubject` finds every chunk of a subject without
+            reading the source tables. A plain value, not a key into `pii`. Null for content about nobody.'
         content:
           type: string
           description: The chunk text. Kept so an answer can cite it.
@@ -18497,6 +18580,8 @@ components:
       # One entry per source record (14 October 2026, CHG-CRD-007).
       x-ticvai-unique-together:
       - [sourceId, recordKey]
+      # Erasure finds a subject's entries by this (R8 blocker FOUNDATION-AI-C42, CHG-R8MIG-025).
+      x-ticvai-index: [[subjectId]]
       description: '**One indexed record of a source, as stored** (14 October 2026, CHG-CRD-007, ADAM CR-078; the table
         held only `id` and `source_id`, so `removeIndexEntry` had nothing to find by the `{entryId}` it is called with
         and erasure could not find a person''s entries). Never returned by an operation. `reindexSource` writes one per
