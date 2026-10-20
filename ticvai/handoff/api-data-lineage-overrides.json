@@ -3487,10 +3487,11 @@
     "platform.workstation"
    ],
    "writes": [
+    "identity.authz_audit",
     "identity.principal_credential",
     "identity.session"
    ],
-   "reason": "14 October 2026 (CHG-CRD-001, ADAM CR-078): a wrong supervisor PIN counts towards the PIN lockout (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
+   "reason": "14 October 2026 (CHG-CRD-001, ADAM CR-078): a wrong supervisor PIN counts towards the PIN lockout (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)). identity.authz_audit added 20 October 2026: the one audit row of the decision the description names (R8 blocker IDENTITY-C46); no schema persists to that table, so no x-ticvai-writes can state it (r8 gate, CHG-R8GT2-003)",
    "carried": true
   },
   "forceReleaseInventoryHold": {

@@ -1916,10 +1916,6 @@ paths:
   /auth/sessions/{sessionId}/force-logout:
     post:
       operationId: forceLogout
-      x-ticvai-writes:
-      - table: identity.authz_audit
-        for: 'the one audit row of the decision (R8 blocker IDENTITY-C46) (r8 gate, CHG-R8GT2-003; check-parameter-columns
-          P-NAMED-TABLE)'
       x-ticvai-consumed-by:
         - "P04 POS-000 Sign In"
         - "P08 BO-053 Staff Directory"

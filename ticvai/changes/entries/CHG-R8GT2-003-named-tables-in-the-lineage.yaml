@@ -9,10 +9,13 @@ summary: 'Six r8 operations whose descriptions name a table they write or read n
   control.cell (it reads the endpoints only), and recordApprovedActionOutcome''s requestId is
   approved_action_execution.approval_request_id.'
 decision:
-  what: 'contracts/spine/catalogue.yaml reportBundleApplied, contracts/spine/identity.yaml forceLogout,
-    guestSocialLogin, guestUaePassLogin, completeSsoAuthorization: `x-ticvai-writes` / `x-ticvai-reads` naming the
-    table and what for. contracts/spine/tenancy.yaml listCellEndpoints: "which Platform keeps with `control.cell`"
-    reworded to the cell''s own rows. contracts/spine/approvals.yaml recordApprovedActionOutcome path parameter
+  what: 'contracts/spine/catalogue.yaml reportBundleApplied, contracts/spine/identity.yaml guestSocialLogin,
+    guestUaePassLogin, completeSsoAuthorization: `x-ticvai-writes` / `x-ticvai-reads` naming the table and what for.
+    forceLogout: identity.authz_audit added to its lineage override in handoff/api-data-lineage-overrides.json, with
+    the reason, because no schema persists to that table and derive-lineage takes x-ticvai-writes only for a table a
+    schema persists to. contracts/spine/tenancy.yaml listCellEndpoints and PlatformCellEndpoint: "with
+    `control.cell`" and "keyed to `control.cell`" reworded to the cell it serves. contracts/spine/approvals.yaml
+    recordApprovedActionOutcome path parameter
     requestId: `x-ticvai-column: approvals.approved_action_execution.approval_request_id`.'
   by: Chinmay
   date: '2026-10-20'
@@ -28,6 +31,7 @@ keys_touched:
   - contracts/spine/identity.yaml
   - contracts/spine/tenancy.yaml
   - contracts/spine/approvals.yaml
+  - handoff/api-data-lineage-overrides.json
 root_class: 'a write stated in words that no contract fact gives the lineage'
 tickets:
   started: []

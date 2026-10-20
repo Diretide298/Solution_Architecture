@@ -4259,7 +4259,7 @@ components:
       x-ticvai-persistence: control.cell_endpoint
       description: '**Taken from the backend workbook, 20 September.** Stores how another Cell/service can securely reach a particular Cell, especially its CrossCell service endpoint.
         **A control-plane fact, kept in the control database** (R8 blocker APPROVALS-TENANCY-C10, the lead''s answer A,
-        as CR-150 moved the plan catalogue; CHG-R8MIG-018): `control.cell_endpoint`, keyed to `control.cell`. The control
+        as CR-150 moved the plan catalogue; CHG-R8MIG-018): `control.cell_endpoint`, keyed to the cell it serves (`cellId`). The control
         plane writes a cell''s rows when it provisions the cell and when its CrossCell service moves; no tenant database
         holds a copy.'
       required:
