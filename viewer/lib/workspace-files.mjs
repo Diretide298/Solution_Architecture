@@ -3,7 +3,8 @@
  *
  * Served at `/connector/workspace?role=backend|frontend|ai` so `/update-adam` can refresh a workspace that was made
  * before a change: setup only ever added files that were missing, so an existing folder kept its old `/ticket` for
- * good. The five command files are ADAM's and are sent whole. CLAUDE.md is the team's, so it is sent whole too and
+ * good. The five command files are ADAM's and are sent whole, and so are ADAM's scripts (the backend's
+ * .claude/scripts/db-ticket.mjs, 20 October 2026). CLAUDE.md is the team's, so it is sent whole too and
  * the receiver takes only the parts between ADAM's markers (`<!-- ADAM:start name -->` ... `<!-- ADAM:end name -->`).
  *
  * The same text as the setup zip's starters, because it is read from them: one place to edit, never a copy.
@@ -20,6 +21,9 @@ export const COMMAND_FILES = ['ticket.md', 'board.md', 'cr.md', 'done.md', 'upda
 
 export const ROLES = ['backend', 'frontend', 'ai'];
 
+/** Scripts ADAM owns under .claude/scripts, per role: the backend's [DB] ticket check (20 October 2026). */
+export const SCRIPT_FILES = { backend: ['db-ticket.mjs'], frontend: [], ai: [] };
+
 /**
  * @param {string} role backend, frontend or ai
  * @param {string} [starters] where the starters are (the viewer's own copy by default)
@@ -33,6 +37,11 @@ export async function workspaceFilesOf(role, starters = STARTERS) {
     const text = await readFile(path.join(starters, role, '.claude', 'commands', name), 'utf8').catch(() => null);
     if (text !== null) commands.push({ name, text });
   }
+  const scripts = [];
+  for (const name of SCRIPT_FILES[role]) {
+    const text = await readFile(path.join(starters, role, '.claude', 'scripts', name), 'utf8').catch(() => null);
+    if (text !== null) scripts.push({ name, text });
+  }
   const claudeMd = await readFile(path.join(starters, role, 'CLAUDE.md'), 'utf8').catch(() => '');
-  return { role, commands, claudeMd };
+  return { role, commands, scripts, claudeMd };
 }

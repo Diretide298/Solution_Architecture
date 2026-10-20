@@ -84,6 +84,7 @@ you can finish or its first open sub-task of yours. Start that one.
    covers; a blocking one is "When the package is wrong", step 4.
 2. Build exactly what the ticket and its linked artefacts describe. Nothing outside the ticket.
 3. Add tests for the success case and each error the contract lists. `dotnet test` must pass.
+   A [DB] ticket is checked another way: see "A [DB] ticket" below.
 4. `adam_propose` the ticket: **Ready for QA**, 100% (see the statuses below; never Closed), and a 2-4 line comment on what was built and
    that the tests pass. Show the proposal and **wait for a yes** before `adam_apply`.
 
@@ -100,11 +101,63 @@ what "built" and "tested" mean:
 | Ticket | Built means | Tested means | Propose |
 |---|---|---|---|
 | **[BE]** (`SVC-*`) | the operations the ticket names, as the contract says | a test for the success case and each listed error; `dotnet test` passes | Ready for QA |
-| **[DB]** (`MIG-*`) | the ticket's numbered SQL file(s) in `db/<database>/`, from the package's `backend/` DDL | `SqlMigrationRunner` applies the folder to an empty PostgreSQL, and a second run applies nothing | Ready for QA |
+| **[DB]** (`MIG-*`) | the ticket's numbered SQL file in `db/<database>/`, from the package's `backend/` DDL | `node .claude/scripts/db-ticket.mjs <ticket>` says MATCH (see "A [DB] ticket") | Ready for QA |
 | **[DevOps]** (`SETUP-*`) | the pipeline, environment or seed the description names, in the repository it names | it runs once end to end; say in the comment what QA can re-run | Ready for QA |
 | **[Onboarding]** | nothing to build: the step is done when the connector answers in this folder | `adam_board` returns your board | Ready for QA with that as evidence |
 
 A setup ticket links no contract or screen; that is normal, not a gap.
+
+<!-- ADAM:start db-ticket -->
+## A [DB] ticket
+
+The ticket is one numbered SQL file in `db/<database>/` (the baseline has one in each database). Its
+folder holds `expected-schema.json`: the end state of its tables and the package statements that make it.
+This replaces the older rule of applying every migration to an empty database for each ticket,
+wherever you meet it (the ticket's Done when, `backend-patterns.md`, an older copy of these files).
+
+1. Write the file the ticket names, from the package statements in `expected-schema.json`. Every
+   statement in it must be safe to run twice: `IF NOT EXISTS`, `CREATE OR REPLACE`, and
+   `DROP ... IF EXISTS` before an `ADD CONSTRAINT`. Do not `BEGIN` or `COMMIT`: the runner wraps each
+   file in one transaction. No GRANT, OWNER, COMMENT or UNLOGGED the package does not have, and no
+   rows written into tables that are not the ticket's. The check refuses these outright: `DISABLE` or
+   `ENABLE REPLICA/ALWAYS TRIGGER`, `ALTER DEFAULT PRIVILEGES`, role membership (`GRANT <role> TO`,
+   `REVOKE <role> FROM`), `GRANT`/`REVOKE` on a database, parameter, tablespace, language, foreign
+   server or data wrapper, or large object, `CREATE RULE`, publications and subscriptions, event
+   triggers, `CREATE/ALTER/DROP ROLE`, `USER` or `GROUP`, `ALTER SYSTEM`, and `SET ROLE`,
+   `SET SESSION AUTHORIZATION` or `session_replication_role` (also through `set_config`). Files
+   already applied stay as they are.
+2. Run `node .claude/scripts/db-ticket.mjs <ticket>`. **The rule: the database must end up exactly as
+   the package says, roles included.** It applies only this file to a copy of the
+   database at the previous state, applies it a second time (which must succeed and change nothing),
+   applies the package statements to a second copy, and compares the two databases whole: the ticket's
+   tables must be what the package makes, and nothing else may change, privileges, owners, the
+   migration register and rows included. The server's roles (their attributes, memberships and
+   settings) must be exactly the ones the package's files make, whoever put any other there: a role
+   left by an earlier run, an earlier file or another folder makes the result DIFFERENT until
+   `--clean`. It needs Docker Desktop running; the first run starts its own
+   PostgreSQL 16 container. **The first run for a folder can take several minutes** (it builds a
+   template of the earlier files): give the command a 10-minute timeout (Bash `timeout: 600000`) or run
+   it in the background. Later runs take seconds.
+3. A difference names the object and what differs: fix the file and run it again. **MATCH is the evidence
+   for done**: quote its result lines in the comment. PARTIAL is not. A foreign key "left for a later
+   migration" is not a difference. Rows the file leaves in the ticket's own tables are listed: right
+   only if the ticket asks for a backfill.
+4. Do not rebuild the other migrations, do not work out the effect by hand, and do not run `dotnet build`
+   or `dotnet test` unless the ticket changes C#.
+5. Before opening the merge request, run `node .claude/scripts/db-ticket.mjs --full <database>` once
+   (the same 10-minute timeout): every migration applied once, in order, to an empty database, as
+   SqlMigrationRunner does. Say the result in the comment. No pipeline runs this yet.
+
+If MATCH cannot be reached because the package itself is wrong (a type no file creates, a policy on a
+table a later migration creates), the check says so; that is a change request, as in "When the package
+is wrong". `node .claude/scripts/db-ticket.mjs --clean` drops this folder's check databases (template,
+copies, the --full database) and its kept snapshots, and in its own container puts the server's roles
+back to exactly what the package makes: any other role goes, and the package's roles, memberships and
+role settings are reset to the package's. Run it when a result names a role, then run the check again.
+Another folder's databases (template, half-built
+template, --full) go by themselves after two weeks unused, or at once when none of them carries a
+date of use (leftovers of an older version), but never while that folder is running.
+<!-- ADAM:end db-ticket -->
 
 ## Searching pulled files
 

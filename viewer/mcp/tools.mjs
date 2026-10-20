@@ -453,7 +453,7 @@ function subtaskSection(subtasks) {
 }
 
 function ticketReadme(wp, files, missing, when, decisions = [], release = null, changes = undefined, blockedBy = [],
-  tree = {}) {
+  tree = {}, db = null) {
   const line = (label, value) => (value || value === 0 ? `- **${label}:** ${value}\n` : '');
   let out = `# #${wp.key} ${wp.subject}\n\n`;
   out += line('Project', wp.project) + line('Type', wp.type) + line('Part of', partOfText(tree.partOf))
@@ -512,6 +512,7 @@ function ticketReadme(wp, files, missing, when, decisions = [], release = null, 
     + 'Report only what survives the check, and keep what you ruled out to one line. A real gap in the '
     + 'contract is a change request (adam_draft_change); a question the contract cannot answer is for '
     + 'whoever owns the ticket.\n';
+  out += databaseSection(db, wp.key);
   out += '\n## When you have finished\n\n'
     + 'Ask Claude to propose the change (adam_propose): the new status, % done, and a comment '
     + 'saying what was done. Check what it shows you, then say yes to apply it (adam_apply). '
@@ -600,6 +601,917 @@ async function changesFor(client, key) {
   return [...(answer.data?.items ?? [])].sort((a, b) => (a.number ?? 0) - (b.number ?? 0));
 }
 
+// ---- a database ticket's expected end state ---------------------------------
+//
+// **Why the connector writes it** (Chinmay, 20 October 2026). A [DB] ticket's agent rebuilt every
+// migration from an empty database, reasoned about the effect by itself and ran the whole dotnet
+// suite, on every ticket. The decided way: apply only the ticket's file to a copy of the database at
+// the previous state, and compare it with the package. expected-schema.json carries two things from
+// the package's derived DDL (backend/<database>/: the 010 file that creates each table, then 900
+// keys, 910 indexes, 920 row-level security, 930 partitions and the V01nn after-r1 files):
+//   - the package statements that make the ticket's tables, in package order. The project's
+//     `.claude/scripts/db-ticket.mjs` applies them to a second copy and lets PostgreSQL compare the
+//     two databases whole (review of 20 October: a parsed shape passed a changed CHECK body, a changed
+//     index WHERE and a weakened policy, and said nothing about other tables);
+//   - the tables' shape as parsed here, for the person and the agent to read.
+//
+// The parser reads the subset of DDL derive-ddl writes and says what it did not understand
+// (`notModelled`) instead of guessing. `db-ticket-check.mjs --package` holds both to the real thing.
+
+/** Statements of a SQL file: comments dropped, strings and dollar-quoted bodies kept whole. */
+export function sqlStatements(text) {
+  const s = String(text ?? '');
+  const out = [];
+  let cur = '';
+  const push = () => { const t = cur.trim(); if (t) out.push(t); cur = ''; };
+  for (let i = 0; i < s.length;) {
+    const ch = s[i];
+    const two = s.slice(i, i + 2);
+    if (two === '--') { const end = s.indexOf('\n', i); i = end < 0 ? s.length : end; if (!cur.endsWith(' ')) cur += ' '; continue; }
+    if (two === '/*') { const end = s.indexOf('*/', i + 2); i = end < 0 ? s.length : end + 2; if (!cur.endsWith(' ')) cur += ' '; continue; }
+    if (ch === "'" || ch === '"') {
+      let j = i + 1;
+      while (j < s.length && !(s[j] === ch && s[j + 1] !== ch)) j += s[j] === ch ? 2 : 1;
+      cur += s.slice(i, j + 1);
+      i = j + 1;
+      continue;
+    }
+    if (ch === '$') {
+      const tag = /^\$(?:[A-Za-z_]\w*)?\$/.exec(s.slice(i, i + 64))?.[0];
+      if (tag) {
+        const end = s.indexOf(tag, i + tag.length);
+        const stop = end < 0 ? s.length : end + tag.length;
+        cur += s.slice(i, stop);
+        i = stop;
+        continue;
+      }
+    }
+    if (ch === ';') { push(); i++; continue; }
+    if (/\s/.test(ch)) { if (cur && !cur.endsWith(' ')) cur += ' '; i++; continue; }
+    cur += ch;
+    i++;
+  }
+  push();
+  return out;
+}
+
+/** Where each top-level separator or keyword starts: outside quotes and parentheses. */
+function topLevel(text, test) {
+  const hits = [];
+  let depth = 0;
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    if (ch === "'" || ch === '"') {
+      let j = i + 1;
+      while (j < text.length && !(text[j] === ch && text[j + 1] !== ch)) j += text[j] === ch ? 2 : 1;
+      i = j;
+      continue;
+    }
+    if (ch === '(') depth++;
+    else if (ch === ')') depth--;
+    else if (depth === 0) {
+      // A keyword test answers with its length, so NULL inside NOT NULL is not a second hit.
+      const hit = test(text, i);
+      if (hit) { hits.push(i); if (typeof hit === 'number') i += hit - 1; }
+    }
+  }
+  return hits;
+}
+
+function splitTop(text, sep = ',') {
+  const at = topLevel(text, (t, i) => t[i] === sep);
+  const out = [];
+  let from = 0;
+  for (const i of at) { out.push(text.slice(from, i)); from = i + 1; }
+  out.push(text.slice(from));
+  return out.map((p) => p.trim()).filter(Boolean);
+}
+
+/** The text inside the parenthesis that opens at or after `from`, and where it ends. */
+function group(text, from = 0) {
+  const open = text.indexOf('(', from);
+  if (open < 0) return null;
+  let depth = 0;
+  for (let i = open; i < text.length; i++) {
+    const ch = text[i];
+    if (ch === "'" || ch === '"') {
+      let j = i + 1;
+      while (j < text.length && !(text[j] === ch && text[j + 1] !== ch)) j += text[j] === ch ? 2 : 1;
+      i = j;
+      continue;
+    }
+    if (ch === '(') depth++;
+    else if (ch === ')' && --depth === 0) return { inner: text.slice(open + 1, i), start: open, end: i + 1 };
+  }
+  return null;
+}
+
+const ident = (name) => String(name ?? '').trim().replace(/"/g, '').toLowerCase();
+const qualified = (name, schema) => (ident(name).includes('.') ? ident(name) : `${schema}.${ident(name)}`);
+const columnsOf = (text) => splitTop(text).map(ident);
+const shortName = (table) => table.split('.').pop();
+
+// The clauses a column definition can carry after its type, in any order.
+const COLUMN_CLAUSE = /^(NOT\s+NULL|NULL|DEFAULT|CONSTRAINT|PRIMARY\s+KEY|UNIQUE|REFERENCES|CHECK|GENERATED|COLLATE)\b/i;
+const atClause = (rx) => (t, i) => ((i === 0 || /[\s)]/.test(t[i - 1])) && rx.exec(t.slice(i))?.[0].length) || 0;
+
+function newTable(name, file) {
+  return {
+    name, file, columns: [], primaryKey: null, unique: [], foreignKeys: [], checks: [], indexes: [],
+    rls: { enabled: false, forced: false, policies: [] }, partitionBy: null, defaultPartition: false,
+  };
+}
+
+/** `REFERENCES t (c) ON DELETE x` from `text`, the clause starting at its first word. */
+function references(text, schema) {
+  const m = /^REFERENCES\s+([\w".]+)\s*/i.exec(text);
+  if (!m) return null;
+  const rest = text.slice(m[0].length);
+  const cols = rest.startsWith('(') ? group(rest) : null;
+  return {
+    references: qualified(m[1], schema),
+    refColumns: cols ? columnsOf(cols.inner) : [],
+    onDelete: (/ON\s+DELETE\s+(SET\s+NULL|SET\s+DEFAULT|NO\s+ACTION|CASCADE|RESTRICT)/i.exec(rest)?.[1] ?? null)
+      ?.toUpperCase().replace(/\s+/g, ' ') ?? null,
+  };
+}
+
+function addConstraint(table, name, body, schema) {
+  const key = /^(PRIMARY\s+KEY|UNIQUE|FOREIGN\s+KEY|CHECK|EXCLUDE)\b/i.exec(body)?.[1]?.toUpperCase().replace(/\s+/g, ' ');
+  if (key === 'PRIMARY KEY') {
+    table.primaryKey = { name, columns: columnsOf(group(body).inner) };
+    for (const c of table.primaryKey.columns) {
+      const col = table.columns.find((x) => x.name === c);
+      if (col) col.notNull = true;
+    }
+  } else if (key === 'UNIQUE') {
+    table.unique.push({ name, columns: columnsOf(group(body).inner) });
+  } else if (key === 'FOREIGN KEY') {
+    const cols = group(body);
+    const ref = references(body.slice(cols.end).trim(), schema);
+    table.foreignKeys.push({ name, columns: columnsOf(cols.inner), ...ref });
+  } else if (key === 'CHECK') {
+    table.checks.push({ name });
+  } else {
+    return false;
+  }
+  return true;
+}
+
+/** One column definition, with the constraints written on it. */
+function parseColumn(table, def, schema) {
+  const m = /^("(?:[^"]|"")+"|[\w]+)\s+([\s\S]*)$/.exec(def.trim());
+  if (!m) return null;
+  const name = ident(m[1]);
+  const rest = m[2];
+  const at = topLevel(rest, atClause(COLUMN_CLAUSE));
+  const column = { name, type: (at.length ? rest.slice(0, at[0]) : rest).trim(), notNull: false };
+  let pending = null;
+  at.forEach((start, n) => {
+    const clause = rest.slice(start, n + 1 < at.length ? at[n + 1] : undefined).trim();
+    const word = COLUMN_CLAUSE.exec(clause)[1].toUpperCase().replace(/\s+/g, ' ');
+    if (word === 'NOT NULL') column.notNull = true;
+    else if (word === 'NULL') column.notNull = false;
+    else if (word === 'DEFAULT') column.default = clause.slice(7).trim();
+    else if (word === 'CONSTRAINT') { pending = ident(clause.split(/\s+/)[1]); return; }
+    else if (word === 'PRIMARY KEY') { table.primaryKey = { name: pending, columns: [name] }; column.notNull = true; }
+    else if (word === 'UNIQUE') table.unique.push({ name: pending, columns: [name] });
+    else if (word === 'REFERENCES') table.foreignKeys.push({ name: pending, columns: [name], ...references(clause, schema) });
+    else if (word === 'CHECK') table.checks.push({ name: pending ?? `${shortName(table.name)}_${name}_check` });
+    else if (word === 'GENERATED') column.generated = true;
+    pending = null;
+  });
+  return column;
+}
+
+function createTable(model, stmt, file, notModelled) {
+  const head = /^CREATE\s+(?:UNLOGGED\s+)?TABLE\s+(?:IF\s+NOT\s+EXISTS\s+)?([\w".]+)\s*/i.exec(stmt);
+  const name = ident(head[1]);
+  const schema = name.split('.')[0];
+  const rest = stmt.slice(head[0].length);
+  const partOf = /^PARTITION\s+OF\s+([\w".]+)\s*([\s\S]*)$/i.exec(rest);
+  if (partOf) {
+    const parent = model.get(qualified(partOf[1], schema));
+    // A month's partition depends on the day it was made; only the default one is a fixed fact.
+    if (parent && /^DEFAULT\b/i.test(partOf[2].trim())) parent.defaultPartition = true;
+    return;
+  }
+  if (model.has(name)) return; // IF NOT EXISTS: the first definition stands
+  const body = group(rest);
+  if (!body) { notModelled.push({ file, statement: stmt.slice(0, 200) }); return; }
+  const table = newTable(name, file);
+  for (const item of splitTop(body.inner)) {
+    const named = /^CONSTRAINT\s+([\w"]+)\s+([\s\S]*)$/i.exec(item);
+    if (named) { addConstraint(table, ident(named[1]), named[2], schema); continue; }
+    if (/^(PRIMARY\s+KEY|UNIQUE|FOREIGN\s+KEY|CHECK|EXCLUDE)\b/i.test(item)) { addConstraint(table, null, item, schema); continue; }
+    if (/^LIKE\b/i.test(item)) { notModelled.push({ file, table: name, statement: item.slice(0, 200) }); continue; }
+    const column = parseColumn(table, item, schema);
+    if (column) table.columns.push(column);
+  }
+  const after = rest.slice(body.end).trim();
+  const part = /^PARTITION\s+BY\s+([\s\S]+)$/i.exec(after);
+  if (part) table.partitionBy = part[1].trim();
+  model.set(name, table);
+}
+
+function alterTable(model, stmt, file, notModelled) {
+  const head = /^ALTER\s+TABLE\s+(?:IF\s+EXISTS\s+)?(?:ONLY\s+)?([\w".]+)\s*/i.exec(stmt);
+  const name = ident(head[1]);
+  const schema = name.split('.')[0];
+  const table = model.get(name);
+  if (!table) return;
+  const rest = stmt.slice(head[0].length);
+  const renamed = /^RENAME\s+TO\s+([\w"]+)$/i.exec(rest);
+  if (renamed) {
+    model.delete(name);
+    table.name = `${schema}.${ident(renamed[1])}`;
+    model.set(table.name, table);
+    return;
+  }
+  for (const action of splitTop(rest)) {
+    let m;
+    if ((m = /^ADD\s+CONSTRAINT\s+([\w"]+)\s+([\s\S]*)$/i.exec(action))) {
+      if (!addConstraint(table, ident(m[1]), m[2], schema)) notModelled.push({ file, table: name, statement: action.slice(0, 200) });
+    } else if (/^ADD\s+(PRIMARY\s+KEY|UNIQUE|FOREIGN\s+KEY|CHECK|EXCLUDE)\b/i.test(action)) {
+      if (!addConstraint(table, null, action.replace(/^ADD\s+/i, ''), schema)) notModelled.push({ file, table: name, statement: action.slice(0, 200) });
+    } else if ((m = /^ADD\s+(?:COLUMN\s+)?(IF\s+NOT\s+EXISTS\s+)?([\s\S]*)$/i.exec(action))) {
+      const before = { pk: table.primaryKey, checks: table.checks.length, unique: table.unique.length, fks: table.foreignKeys.length };
+      const column = parseColumn(table, m[2], schema);
+      if (!column) { notModelled.push({ file, table: name, statement: action.slice(0, 200) }); continue; }
+      if (table.columns.some((c) => c.name === column.name)) {
+        // ADD COLUMN IF NOT EXISTS on a column already there does nothing, constraints included.
+        table.primaryKey = before.pk;
+        table.checks.length = before.checks;
+        table.unique.length = before.unique;
+        table.foreignKeys.length = before.fks;
+        continue;
+      }
+      table.columns.push(column);
+    } else if ((m = /^DROP\s+COLUMN\s+(?:IF\s+EXISTS\s+)?([\w"]+)/i.exec(action))) {
+      const col = ident(m[1]);
+      table.columns = table.columns.filter((c) => c.name !== col);
+    } else if ((m = /^DROP\s+CONSTRAINT\s+(?:IF\s+EXISTS\s+)?([\w"]+)/i.exec(action))) {
+      const con = ident(m[1]);
+      if (table.primaryKey?.name === con) table.primaryKey = null;
+      for (const k of ['unique', 'foreignKeys', 'checks']) table[k] = table[k].filter((c) => c.name !== con);
+    } else if ((m = /^ALTER\s+(?:COLUMN\s+)?([\w"]+)\s+([\s\S]*)$/i.exec(action))) {
+      const col = table.columns.find((c) => c.name === ident(m[1]));
+      const what = m[2];
+      if (!col) continue;
+      if (/^SET\s+NOT\s+NULL$/i.test(what)) col.notNull = true;
+      else if (/^DROP\s+NOT\s+NULL$/i.test(what)) col.notNull = false;
+      else if (/^SET\s+DEFAULT\s+/i.test(what)) col.default = what.replace(/^SET\s+DEFAULT\s+/i, '').trim();
+      else if (/^DROP\s+DEFAULT$/i.test(what)) delete col.default;
+      else if (/^(SET\s+DATA\s+)?TYPE\s+/i.test(what)) col.type = what.replace(/^(SET\s+DATA\s+)?TYPE\s+/i, '').replace(/\s+USING\s+[\s\S]*$/i, '').trim();
+      else notModelled.push({ file, table: name, statement: action.slice(0, 200) });
+    } else if ((m = /^RENAME\s+CONSTRAINT\s+([\w"]+)\s+TO\s+([\w"]+)$/i.exec(action))) {
+      for (const k of [table.primaryKey, ...table.unique, ...table.foreignKeys, ...table.checks]) {
+        if (k && k.name === ident(m[1])) k.name = ident(m[2]);
+      }
+    } else if ((m = /^RENAME\s+(?:COLUMN\s+)?([\w"]+)\s+TO\s+([\w"]+)$/i.exec(action))) {
+      const col = table.columns.find((c) => c.name === ident(m[1]));
+      if (col) col.name = ident(m[2]);
+    } else if (/^ENABLE\s+ROW\s+LEVEL\s+SECURITY$/i.test(action)) table.rls.enabled = true;
+    else if (/^DISABLE\s+ROW\s+LEVEL\s+SECURITY$/i.test(action)) table.rls.enabled = false;
+    else if (/^FORCE\s+ROW\s+LEVEL\s+SECURITY$/i.test(action)) table.rls.forced = true;
+    else if (/^NO\s+FORCE\s+ROW\s+LEVEL\s+SECURITY$/i.test(action)) table.rls.forced = false;
+    else if (/^(OWNER\s+TO|SET\s*\(|RESET\s*\(|ATTACH\s+PARTITION|DETACH\s+PARTITION|VALIDATE\s+CONSTRAINT)\b/i.test(action)) { /* not part of the shape */ }
+    else notModelled.push({ file, table: name, statement: action.slice(0, 200) });
+  }
+}
+
+function createIndex(model, stmt) {
+  const m = /^CREATE\s+(UNIQUE\s+)?INDEX\s+(?:CONCURRENTLY\s+)?(?:IF\s+NOT\s+EXISTS\s+)?(?!ON\s)([\w"]+)?\s*ON\s+(?:ONLY\s+)?([\w".]+)\s*(?:USING\s+(\w+)\s*)?/i.exec(stmt);
+  if (!m) return false;
+  const table = model.get(ident(m[3]));
+  if (!table) return true;
+  const keys = group(stmt, m[0].length - 1);
+  const after = stmt.slice(keys.end);
+  const name = m[2] ? ident(m[2]) : null;
+  if (name && table.indexes.some((i) => i.name === name)) return true; // IF NOT EXISTS
+  table.indexes.push({
+    name,
+    unique: Boolean(m[1]),
+    method: (m[4] ?? 'btree').toLowerCase(),
+    keys: keys.inner.trim(),
+    ...(/\bWHERE\b/i.test(after) ? { where: after.replace(/^[\s\S]*?\bWHERE\s+/i, '').trim() } : {}),
+  });
+  return true;
+}
+
+// What each of 920's helpers puts in the policy's USING expression, so the compare can tell a scope
+// policy from a venue one under the same name. The name is the helper's: platform.rls_policy_name.
+const RLS_MARKER = {
+  scope: () => 'in_scope(scope_path)',
+  shared_scope: () => 'in_scope(scope_path)',
+  venue: () => 'venue_in_scope(venue_id)',
+  tenant: () => 'tenant_root_in_scope()',
+  subject: () => 'subject_in_scope(subject_id)',
+  parent: (args) => ident(String(args[2] ?? '').replace(/::regclass$/i, '').replace(/'/g, '')),
+};
+
+// The r8 helpers that split a table's policy in four (read, append, update, delete), named after the
+// first 55 characters of the table: apply_split_rls and the ones that call it, and append_audit.
+const SPLIT_RLS = new Set(['split', 'read_beneath', 'grant_holder_read', 'grant_holder_subject_read', 'parent_split', 'append_audit']);
+
+function applyRls(model, stmt) {
+  const m = /^SELECT\s+platform\.apply_(\w+?)_rls\s*\(([\s\S]*)\)$/i.exec(stmt);
+  if (!m) return false;
+  const args = splitTop(m[2]);
+  const target = ident(args[0].replace(/::regclass$/i, '').replace(/'/g, ''));
+  const table = model.get(target);
+  if (!table) return true;
+  const kind = m[1].toLowerCase();
+  table.rls.enabled = true;
+  table.rls.forced = true;
+  if (SPLIT_RLS.has(kind)) {
+    const base = shortName(target).slice(0, 55);
+    const four = ['read', 'append', 'update', 'delete'].map((s) => `${base}_${s}`);
+    const keep = kind === 'append_audit'
+      ? table.rls.policies.filter((p) => p.name !== `${shortName(target).slice(0, 57)}_scope` && !four.includes(p.name))
+      : [];
+    table.rls.policies = [...keep, ...four.map((name) => ({ name }))];
+    return true;
+  }
+  const policy = `${shortName(target).slice(0, 57)}_scope`;
+  table.rls.policies = table.rls.policies.filter((p) => p.name !== policy && !/^(scope|venue)_isolation$/.test(p.name));
+  const marker = RLS_MARKER[kind];
+  table.rls.policies.push({ name: policy, ...(marker ? { uses: marker(args) } : {}) });
+  return true;
+}
+
+/**
+ * The ALTER TABLE and ALTER INDEX statements inside a DO block (r8's guarded renames and keys:
+ * `DO $$ BEGIN IF <the old name is there> THEN ALTER TABLE ... RENAME COLUMN ...; END IF; END $$`).
+ */
+export function doInner(stmt) {
+  const m = /^DO\s+(\$\w*\$)([\s\S]*)\1\s*$/i.exec(String(stmt));
+  if (!m) return [];
+  return m[2].split(';').map((p) => /\b((?:ALTER\s+(?:TABLE|INDEX)|DROP\s+INDEX|CREATE\s+(?:UNIQUE\s+)?INDEX)\b[\s\S]*)$/i.exec(p)?.[1]?.trim()).filter(Boolean);
+}
+
+const INDEX_RENAME = /^ALTER\s+INDEX\s+(?:IF\s+EXISTS\s+)?([\w".]+)\s+RENAME\s+TO\s+([\w"]+)/i;
+
+function renameIndex(model, from, to) {
+  const name = ident(from).split('.').pop();
+  for (const t of model.values()) {
+    const index = t.indexes.find((i) => i.name === name);
+    if (index) index.name = ident(to);
+  }
+}
+
+/**
+ * Every table the files create, as it stands after all of them: `files` is [{ name, text }] for
+ * one database, in the order the package applies them. Returns { tables: Map, notModelled }.
+ */
+export function schemaModel(files) {
+  const model = new Map();
+  const notModelled = [];
+  const ordered = [...files].sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0));
+  for (const { name: file, text } of ordered) {
+    for (const stmt of sqlStatements(text)) {
+      let m;
+      if (/^DO\b/i.test(stmt)) {
+        // The block runs its statement only when its condition holds, which this cannot know: renames
+        // and drops are followed (their condition is "the old name is still there"); a key it adds is
+        // left out of the shape, so the shape never claims more than PostgreSQL will have.
+        for (const one of doInner(stmt)) {
+          if (/^ALTER\s+TABLE\b/i.test(one) && !/\bADD\s+CONSTRAINT\b/i.test(one)) alterTable(model, one, file, notModelled);
+          else if ((m = INDEX_RENAME.exec(one))) renameIndex(model, m[1], m[2]);
+          else if ((m = /^DROP\s+INDEX\s+(?:CONCURRENTLY\s+)?(?:IF\s+EXISTS\s+)?([\w".]+)/i.exec(one))) {
+            const index = ident(m[1]).split('.').pop();
+            for (const t of model.values()) t.indexes = t.indexes.filter((i) => i.name !== index);
+          }
+        }
+        continue;
+      }
+      if (/^CREATE\s+(?:UNLOGGED\s+)?TABLE\b/i.test(stmt)) createTable(model, stmt, file, notModelled);
+      else if (/^ALTER\s+TABLE\b/i.test(stmt)) alterTable(model, stmt, file, notModelled);
+      else if ((m = INDEX_RENAME.exec(stmt))) renameIndex(model, m[1], m[2]);
+      else if (/^CREATE\s+(UNIQUE\s+)?INDEX\b/i.test(stmt)) createIndex(model, stmt);
+      else if (/^SELECT\s+platform\.apply_\w+_rls\b/i.test(stmt)) applyRls(model, stmt);
+      else if ((m = /^SELECT\s+platform\.drop_rls_policies\s*\(\s*'([\w".]+)'/i.exec(stmt))) {
+        const table = model.get(ident(m[1]));
+        if (table) table.rls.policies = [];
+      }
+      else if ((m = /^CREATE\s+POLICY\s+([\w"]+)\s+ON\s+([\w".]+)/i.exec(stmt))) {
+        const table = model.get(ident(m[2]));
+        if (table && !table.rls.policies.some((p) => p.name === ident(m[1]))) table.rls.policies.push({ name: ident(m[1]) });
+      } else if ((m = /^DROP\s+POLICY\s+(?:IF\s+EXISTS\s+)?([\w"]+)\s+ON\s+([\w".]+)/i.exec(stmt))) {
+        const table = model.get(ident(m[2]));
+        if (table) table.rls.policies = table.rls.policies.filter((p) => p.name !== ident(m[1]));
+      } else if ((m = /^DROP\s+INDEX\s+(?:CONCURRENTLY\s+)?(?:IF\s+EXISTS\s+)?([\w".]+)/i.exec(stmt))) {
+        const index = ident(m[1]).split('.').pop();
+        for (const t of model.values()) t.indexes = t.indexes.filter((i) => i.name !== index);
+      } else if ((m = /^DROP\s+TABLE\s+(?:IF\s+EXISTS\s+)?([\w".]+)/i.exec(stmt))) {
+        model.delete(ident(m[1]));
+      }
+      // CREATE SCHEMA, EXTENSION, FUNCTION, TYPE, COMMENT ON, INSERT, and SELECT of the partition
+      // helpers: not the shape of a table.
+    }
+  }
+  return { tables: model, notModelled };
+}
+
+
+/**
+ * A [DB] ticket's migration: the numbered file its subject names (`V0027__access.sql`), the
+ * database it is in, the tables it links, and what kind of migration it is:
+ *   tables        creates or changes the tables it links (nearly all of them);
+ *   baseline      V0001: schemas, extensions, the register and the helper functions, in both databases;
+ *   foreign-keys  the cross-schema keys added last; the constraint names come from the description.
+ * Null for a ticket that is not a [DB] migration - a [BE] ticket that only reads tables, or a [DB]
+ * task with no migration file (monthly partitions).
+ */
+export function databaseTicket(wp, touches) {
+  const tables = [...new Set((touches ?? []).filter((t) => t.kind === 'table').map((t) => String(t.id)))];
+  const subject = String(wp?.subject ?? '');
+  const description = String(wp?.description ?? '');
+  const migration = /\b(V\d{4,}[A-Za-z]?__[\w.-]+?\.sql)\b/.exec(subject)?.[1]
+    ?? /\b(V\d{4,}[A-Za-z]?__[\w.-]+?\.sql)\b/.exec(description)?.[1];
+  if (!migration || !/^\s*\[DB\]/i.test(subject)) return null;
+  const database = /\bcontrol database\b/i.test(description) ? 'control'
+    : /\btenant database\b/i.test(description) ? 'tenant' : null;
+  if (/^V0*1__/i.test(migration) || /\bbaseline\b/i.test(migration)) {
+    return { kind: 'baseline', migration, tables, database: null };
+  }
+  if (/foreign.?keys/i.test(migration)) {
+    const constraints = [...new Set([...description.matchAll(/\bas\s+(\w+_fkey)\b/g)].map((m) => m[1]))];
+    return { kind: 'foreign-keys', migration, tables: [], constraints, database: database ?? 'tenant' };
+  }
+  // A forward migration (V1000 and later) also owns the keys that point into its tables from tables
+  // made before it: no cross-schema keys ticket comes after it to add them (promotions.voucher's
+  // voucher_batch_id_fkey: voucher is made in V1017, voucher_batch in V1114).
+  const forward = Number(/^V(\d+)/i.exec(migration)?.[1] ?? 0) >= 1000;
+  return { kind: 'tables', migration, tables, database, ...(forward ? { forward: true } : {}) };
+}
+
+/**
+ * The table a package statement makes or changes, or null for one that is not about a table.
+ * `indexes` (index name -> table) answers for DROP INDEX and ALTER INDEX, which name only the index.
+ */
+export function statementTarget(stmt, indexes = null) {
+  const s = String(stmt);
+  let m;
+  if (/^DO\b/i.test(s)) {
+    for (const one of doInner(s)) {
+      const target = statementTarget(one, indexes);
+      if (target) return target;
+    }
+    return null;
+  }
+  if ((m = /^DROP\s+INDEX\s+(?:CONCURRENTLY\s+)?(?:IF\s+EXISTS\s+)?([\w".]+)/i.exec(s))) return indexes?.get(ident(m[1]).split('.').pop()) ?? null;
+  if ((m = INDEX_RENAME.exec(s))) return indexes?.get(ident(m[1]).split('.').pop()) ?? null;
+  if (/^SELECT\s+platform\.ensure_month_partitions\b/i.test(s)) return null; // a month: depends on the day
+  if ((m = /^SELECT\s+platform\.\w+\s*\(\s*'([\w".]+)'\s*::\s*regclass/i.exec(s))) return ident(m[1]);
+  if ((m = /^CREATE\s+(?:UNLOGGED\s+)?TABLE\s+(?:IF\s+NOT\s+EXISTS\s+)?([\w".]+)\s+PARTITION\s+OF\s+([\w".]+)\s+DEFAULT\b/i.exec(s))) return ident(m[2]);
+  if (/^CREATE\s+(?:UNLOGGED\s+)?TABLE\s+(?:IF\s+NOT\s+EXISTS\s+)?[\w".]+\s+PARTITION\s+OF\b/i.test(s)) return null; // a month: depends on the day
+  if ((m = /^CREATE\s+(?:UNLOGGED\s+)?TABLE\s+(?:IF\s+NOT\s+EXISTS\s+)?([\w".]+)/i.exec(s))) return ident(m[1]);
+  if ((m = /^ALTER\s+TABLE\s+(?:IF\s+EXISTS\s+)?(?:ONLY\s+)?([\w".]+)/i.exec(s))) return ident(m[1]);
+  if ((m = /^CREATE\s+(?:UNIQUE\s+)?INDEX\s+(?:CONCURRENTLY\s+)?(?:IF\s+NOT\s+EXISTS\s+)?(?:(?!ON\s)[\w"]+\s+)?ON\s+(?:ONLY\s+)?([\w".]+)/i.exec(s))) return ident(m[1]);
+  if ((m = /^SELECT\s+platform\.apply_\w+?_rls\s*\(\s*'([\w".]+)'/i.exec(s))) return ident(m[1]);
+  if ((m = /^(?:CREATE|DROP)\s+POLICY\s+(?:IF\s+EXISTS\s+)?[\w"]+\s+ON\s+([\w".]+)/i.exec(s))) return ident(m[1]);
+  return null;
+}
+
+/** A foreign key statement's guard: the script applies it only when both tables exist and the key does not. */
+function keyGuard(stmt) {
+  const m = /^ALTER\s+TABLE\s+(?:IF\s+EXISTS\s+)?(?:ONLY\s+)?([\w".]+)\s+ADD\s+CONSTRAINT\s+([\w"]+)\s+FOREIGN\s+KEY\s*\(([^)]*)\)\s*REFERENCES\s+([\w".]+)/i.exec(stmt);
+  if (!m) return null;
+  return { table: ident(m[1]), constraint: ident(m[2]), columns: m[3].split(',').map(ident), references: ident(m[4]) };
+}
+
+/**
+ * The package statements a ticket's file must reproduce, in the order the package applies them.
+ * `files` is [{ name, text }] for one database. The script applies these to a copy of the previous
+ * state and lets PostgreSQL say what the result is, so nothing here has to normalise SQL.
+ */
+export function ticketStatements(files, ticket) {
+  const ordered = [...files].sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0));
+  const want = new Set(ticket.tables.map(ident));
+  const keys = new Set((ticket.constraints ?? []).map(ident));
+  const out = [];
+  const helpers = []; // after-r1 functions, kept in place until we know whether a picked statement calls one
+  const indexes = new Map();
+  for (const { name: file, text } of ordered) {
+    for (const sql of sqlStatements(text)) {
+      const fn = /^CREATE\s+(?:OR\s+REPLACE\s+)?FUNCTION\s+([\w".]+)/i.exec(sql)?.[1];
+      if (ticket.kind === 'baseline') {
+        // 000-002 whole; the helper functions every later migration calls: those at the top of 920
+        // and 930, and any an after-r1 file adds (V0102 adds platform.apply_append_audit_rls).
+        if (/^00[0-2]-/.test(file) || (fn && /^(9[23]0-|V\d)/.test(file))) out.push({ file, sql });
+        continue;
+      }
+      const guard = keyGuard(sql);
+      if (ticket.kind === 'foreign-keys') {
+        if (guard && keys.has(guard.constraint)) out.push({ file, sql, guard });
+        continue;
+      }
+      if (fn && /^V\d/.test(file)) {
+        const entry = { file, sql, helper: ident(fn) };
+        helpers.push(entry);
+        out.push(entry);
+        continue;
+      }
+      const target = statementTarget(sql, indexes);
+      // Which table each index is on, for a later DROP INDEX or ALTER INDEX that names only the index.
+      const made = /^CREATE\s+(?:UNIQUE\s+)?INDEX\s+(?:CONCURRENTLY\s+)?(?:IF\s+NOT\s+EXISTS\s+)?((?!ON\s)[\w"]+)\s+ON\b/i.exec(sql);
+      if (made && target) indexes.set(ident(made[1]), target);
+      for (const one of /^DO\b/i.test(sql) ? doInner(sql) : [sql]) {
+        const renamed = INDEX_RENAME.exec(one);
+        if (renamed && indexes.has(ident(renamed[1]).split('.').pop())) indexes.set(ident(renamed[2]), indexes.get(ident(renamed[1]).split('.').pop()));
+      }
+      if (target && want.has(target)) out.push({ file, sql, ...(guard ? { guard } : {}) });
+      else if (ticket.forward && guard && want.has(guard.references)) out.push({ file, sql, guard: { ...guard, incoming: true } });
+    }
+  }
+  // An after-r1 helper goes with a table only when one of the table's statements calls it; the
+  // baseline carries it otherwise.
+  const called = (h) => out.some((s) => !s.helper && s.sql.toLowerCase().includes(`${h.helper}(`));
+  return out.filter((s) => !s.helper || called(s)).map(({ helper: _h, ...s }) => s);
+}
+
+/**
+ * SQL text as the server runs it, for reading role statements (review 7, m3). Comments are dropped. A string or a
+ * dollar-quoted body is read as code only where it is code: a DO block or a function body (after DO, DO LANGUAGE x
+ * or AS), and the string EXECUTE runs, format()'s included, whose %I, %s and %L are filled from literal arguments
+ * and current_user (any other argument leaves %?, which no role statement reads). Every other string becomes
+ * '§n', its text kept in `literals[n]`: a comment, a COMMENT ... IS '...' or a function that only returns the words
+ * of a statement is never read as one.
+ */
+export function sqlCode(text, literals = []) {
+  const s = String(text ?? '');
+  let out = '';
+  const quoted = (at) => {
+    // A '...' literal from `at` (E'...' when out ends in E): its value and where it ends.
+    const escapes = /(^|[^\w$])[Ee]$/.test(out);
+    let j = at + 1;
+    let value = '';
+    while (j < s.length) {
+      if (escapes && s[j] === '\\') { value += s[j + 1] ?? ''; j += 2; continue; }
+      if (s[j] === "'") { if (s[j + 1] === "'") { value += "'"; j += 2; continue; } break; }
+      value += s[j++];
+    }
+    if (escapes) out = out.slice(0, -1);
+    return { value, end: j + 1 };
+  };
+  const args = (from) => {
+    // format()'s arguments after its format string, up to its closing parenthesis.
+    const list = [];
+    let cur = '';
+    let depth = 0;
+    for (let j = from; j < s.length; j++) {
+      const ch = s[j];
+      if (ch === "'") {
+        let k = j + 1;
+        while (k < s.length && !(s[k] === "'" && s[k + 1] !== "'")) k += s[k] === "'" ? 2 : 1;
+        cur += s.slice(j, k + 1);
+        j = k;
+        continue;
+      }
+      if (ch === '(') depth++;
+      if (ch === ')' && depth-- === 0) { list.push(cur.trim()); return { list, end: j + 1 }; }
+      if (ch === ',' && depth === 0) { list.push(cur.trim()); cur = ''; continue; }
+      cur += ch;
+    }
+    return { list, end: s.length };
+  };
+  const fill = (format, list) => {
+    let next = 0;
+    return format.replace(/%(?:(\d+)\$)?-?\d*([sIL%])/g, (all, pos, kind) => {
+      if (kind === '%') return '%';
+      const a = String(list[pos ? Number(pos) - 1 : next++] ?? '');
+      if (/^(current_user|session_user|current_role)(\s*\(\s*\))?$/i.test(a)) return kind === 'L' ? "''" : 'CURRENT_USER';
+      const lit = /^'((?:[^']|'')*)'$/.exec(a)?.[1]?.replace(/''/g, "'");
+      if (lit === undefined) return '%?';
+      if (kind === 'L') return `'${lit.replace(/'/g, "''")}'`;
+      return kind === 'I' && !/^[a-z_][a-z0-9_$]*$/.test(lit) ? `"${lit.replace(/"/g, '""')}"` : lit;
+    });
+  };
+  for (let i = 0; i < s.length;) {
+    const two = s.slice(i, i + 2);
+    if (two === '--') { const end = s.indexOf('\n', i); i = end < 0 ? s.length : end; out += ' '; continue; }
+    if (two === '/*') {
+      let depth = 0;
+      let j = i;
+      for (; j < s.length; j++) {
+        if (s.startsWith('/*', j)) { depth++; j++; } else if (s.startsWith('*/', j)) { j++; if (--depth === 0) break; }
+      }
+      i = j + 1;
+      out += ' ';
+      continue;
+    }
+    const ch = s[i];
+    if (ch === '"') {
+      let j = i + 1;
+      while (j < s.length && !(s[j] === '"' && s[j + 1] !== '"')) j += s[j] === '"' ? 2 : 1;
+      out += s.slice(i, j + 1);
+      i = j + 1;
+      continue;
+    }
+    if (ch === "'") {
+      const q = quoted(i);
+      if (/\bEXECUTE\s+format\s*\(\s*$/i.test(out)) {
+        let j = q.end;
+        while (/\s/.test(s[j] ?? '')) j++;
+        const a = s[j] === ',' ? args(j + 1) : { list: [], end: s[j] === ')' ? j + 1 : j };
+        out = `${out.replace(/format\s*\(\s*$/i, '')} ${sqlCode(fill(q.value, a.list), literals)} `;
+        i = a.end;
+      } else if (/\bEXECUTE\s*$/i.test(out)) {
+        out += ` ${sqlCode(q.value, literals)} `;
+        i = q.end;
+      } else {
+        literals.push(q.value);
+        out += `'§${literals.length - 1}'`;
+        i = q.end;
+      }
+      continue;
+    }
+    if (ch === '$' && !/[\w$]$/.test(out)) {
+      const tag = /^\$(?:[A-Za-z_]\w*)?\$/.exec(s.slice(i, i + 64))?.[0];
+      if (tag) {
+        const end = s.indexOf(tag, i + tag.length);
+        const body = s.slice(i + tag.length, end < 0 ? s.length : end);
+        i = end < 0 ? s.length : end + tag.length;
+        if (/\b(DO|AS|EXECUTE)\s*$|\bDO\s+LANGUAGE\s+\w+\s*$/i.test(out)) out += ` ${sqlCode(body, literals)} `;
+        else { literals.push(body); out += `'§${literals.length - 1}'`; }
+        continue;
+      }
+    }
+    out += ch;
+    i++;
+  }
+  return out;
+}
+
+const ROLE_FLAGS = ['superuser', 'createrole', 'createdb', 'replication', 'bypassrls', 'login'];
+
+/**
+ * A role as the script's CLUSTER_SQL prints it: the name, then each attribute that is not CREATE ROLE's default.
+ * The script prints the server's roles the same way, so the two are compared as text.
+ */
+export function roleItem(name, a) {
+  return name + ROLE_FLAGS.filter((f) => a[f]).map((f) => ` (${f})`).join('')
+    + (a.inherit === false ? ' (noinherit)' : '')
+    + (a.connlimit !== undefined && a.connlimit !== -1 ? ` (connection limit ${a.connlimit})` : '')
+    + (a.validUntil ? ` (valid until ${a.validUntil})` : '')
+    + (a.password ? ' (password)' : '');
+}
+
+/** A role membership as CLUSTER_SQL prints it: member in role, with ADMIN, and INHERIT or SET when they are off. */
+export function memberItem(member, role, { admin = false, inherit = true, set = true } = {}) {
+  return `${member} in ${role}${admin ? ' (admin)' : ''}${inherit ? '' : ' (noinherit)'}${set ? '' : ' (noset)'}`;
+}
+
+/**
+ * The server-level state package files make, read from their text (function bodies included); adam_pull reads
+ * every database's files, since roles are the server's (review 8). It gives the
+ * roles they create, with every attribute that matters; the role memberships they grant, with their ADMIN,
+ * INHERIT and SET options; and the role settings they set. Each item is printed the way the script's CLUSTER_SQL
+ * prints the server's, and the script holds the server to exactly these (plus its own bootstrap superuser):
+ * nothing else may be there, however it got there (review 7, 20 October 2026). One parser: the script reads this
+ * from expected-schema.json and parses nothing itself. A role granted to whoever runs the file (`TO CURRENT_USER`,
+ * or `format(... TO %I ..., current_user)` as r8's V0105 does) is `current_user in <role>`. A statement whose role
+ * cannot be read from the text (a name built at run time) gives nothing, so the server's role shows as a difference.
+ */
+export function serverAllowances(files) {
+  const roles = new Map();
+  const members = new Map();
+  const settings = new Map();
+  const NAME = '("(?:[^"]|"")+"|[\\w$]+)';
+  const ONE = '(?:"(?:[^"]|"")+"|[\\w$]+)';
+  const LIST = `(${ONE}(?: ?, ?${ONE})*)`;
+  const nameOf = (n) => (/^"/.test(n) ? n.slice(1, -1).replace(/""/g, '"') : n.toLowerCase());
+  const userOf = (n) => (/^(current_user|session_user|current_role)$/i.test(n) ? 'current_user' : nameOf(n));
+  const listOf = (l) => [...l.matchAll(new RegExp(ONE, 'g'))].map((m) => userOf(m[0]));
+  for (const { text } of files) {
+    const literals = [];
+    const lit = (v) => v.replace(/'§(\d+)'/g, (all, n) => literals[Number(n)] ?? '');
+    const until = (v) => {
+      const t = lit(v).trim();
+      if (/^infinity$/i.test(t)) return 'infinity';
+      const d = new Date(/^\d{4}-\d\d-\d\d$/.test(t) ? `${t}T00:00:00Z` : /(z|[+-]\d\d(:?\d\d)?)$/i.test(t) ? t.replace(' ', 'T') : `${t.replace(' ', 'T')}Z`);
+      return Number.isNaN(d.getTime()) ? t : d.toISOString().slice(0, 19).replace('T', ' ');
+    };
+    const options = (opts, a) => {
+      for (const f of [...ROLE_FLAGS, 'inherit']) {
+        if (new RegExp(`\\bNO${f}\\b`, 'i').test(opts)) a[f] = false;
+        else if (new RegExp(`\\b${f}\\b`, 'i').test(opts)) a[f] = true;
+      }
+      const limit = /\bCONNECTION LIMIT (-?\d+)/i.exec(opts);
+      if (limit) a.connlimit = Number(limit[1]);
+      const password = /\bPASSWORD (NULL|'§\d+')/i.exec(opts);
+      if (password) a.password = !/^NULL$/i.test(password[1]);
+      const valid = /\bVALID UNTIL ('§\d+')/i.exec(opts);
+      if (valid) a.validUntil = until(valid[1]);
+      return a;
+    };
+    const grant = (member, role, o = {}) => {
+      const inherit = o.inherit ?? roles.get(member)?.inherit ?? true;
+      members.set(`${member} in ${role}`, { member, role, admin: Boolean(o.admin), inherit, set: o.set ?? true });
+    };
+    for (const raw of sqlCode(text, literals).split(';')) {
+      const st = raw.replace(/\s+/g, ' ').trim();
+      let m;
+      if ((m = new RegExp(`\\bCREATE (ROLE|USER|GROUP) (?:IF NOT EXISTS )?${NAME}(?: WITH)?(.*)$`, 'i').exec(st))) {
+        const name = nameOf(m[2]);
+        let opts = ` ${m[3]} `;
+        roles.set(name, options(opts, { login: m[1].toUpperCase() === 'USER', inherit: true, connlimit: -1 }));
+        const take = (rx, each) => { opts = opts.replace(rx, (all, l) => { listOf(l).forEach(each); return ' '; }); };
+        take(new RegExp(`\\bIN (?:ROLE|GROUP) ${LIST}`, 'gi'), (r) => grant(name, r));
+        take(new RegExp(`\\bADMIN ${LIST}`, 'gi'), (u) => grant(u, name, { admin: true }));
+        take(new RegExp(`\\b(?:ROLE|USER) ${LIST}`, 'gi'), (u) => grant(u, name));
+      } else if ((m = new RegExp(`\\bALTER (?:ROLE|USER|GROUP) ${NAME}(?: IN DATABASE ${NAME})? (SET|RESET) ([\\w.]+)(?: ?(?:=|TO) ?(.*))?$`, 'i').exec(st))) {
+        const who = /^ALL$/i.test(m[1]) ? 'every role' : userOf(m[1]);
+        const key = `${who}${m[2] ? ` in database ${nameOf(m[2])}` : ''}: ${m[4].toLowerCase()}`;
+        if (/^SET$/i.test(m[3]) && m[5] !== undefined && !/^FROM CURRENT$/i.test(m[5])) settings.set(key, `${key}=${lit(m[5]).trim()}`);
+        else settings.delete(key);
+      } else if ((m = new RegExp(`\\bALTER (?:ROLE|USER|GROUP) ${NAME} RENAME TO ${NAME}`, 'i').exec(st))) {
+        if (roles.has(nameOf(m[1]))) { roles.set(nameOf(m[2]), roles.get(nameOf(m[1]))); roles.delete(nameOf(m[1])); }
+      } else if ((m = new RegExp(`\\bALTER GROUP ${NAME} (ADD|DROP) USER ${LIST}`, 'i').exec(st))) {
+        for (const u of listOf(m[3])) if (/^ADD$/i.test(m[2])) grant(u, nameOf(m[1])); else members.delete(`${u} in ${nameOf(m[1])}`);
+      } else if ((m = new RegExp(`\\bALTER (?:ROLE|USER) ${NAME}(?: WITH)? (.*)$`, 'i').exec(st))) {
+        if (roles.has(userOf(m[1]))) options(` ${m[2]} `, roles.get(userOf(m[1])));
+      } else if ((m = new RegExp(`\\bDROP (?:ROLE|USER|GROUP) (?:IF EXISTS )?${LIST}`, 'i').exec(st))) {
+        for (const r of listOf(m[1])) roles.delete(r);
+      } else if ((m = /\bGRANT (.+?) TO (.+?)(?: WITH (.+?))?(?: GRANTED BY .*)?$/i.exec(st)) && !/\bON\b/i.test(m[1])) {
+        const granted = listOf(m[1]);
+        if (granted.some((r) => /^(all|select|insert|update|delete|usage|execute|create|connect|temp|temporary|truncate|references|trigger|set|alter|maintain)$/.test(r))) continue;
+        if (!new RegExp(`^${LIST}$`).test(m[2].trim())) continue; // a member built at run time (%?): nothing
+        const w = m[3] ?? '';
+        const opt = (word) => (new RegExp(`\\b${word} (TRUE|ON|FALSE|OFF)\\b`, 'i').exec(w)?.[1] ?? '').toUpperCase();
+        const o = { admin: /\bADMIN OPTION\b/i.test(w) || ['TRUE', 'ON'].includes(opt('ADMIN')) };
+        if (opt('INHERIT')) o.inherit = ['TRUE', 'ON'].includes(opt('INHERIT'));
+        if (opt('SET')) o.set = ['TRUE', 'ON'].includes(opt('SET'));
+        for (const r of granted) for (const u of listOf(m[2])) if (u !== 'public') grant(u, r, o);
+      } else if ((m = /\bREVOKE (?:ADMIN OPTION FOR |INHERIT OPTION FOR |SET OPTION FOR )?(.+?) FROM (.+?)(?: GRANTED BY .*?)?(?: CASCADE| RESTRICT)?$/i.exec(st)) && !/\bON\b/i.test(m[1])) {
+        for (const r of listOf(m[1])) for (const u of listOf(m[2])) members.delete(`${u} in ${r}`);
+      }
+    }
+  }
+  return {
+    'server roles': [...roles].map(([name, a]) => roleItem(name, a)).sort(),
+    'server role memberships': [...members.values()].map((x) => memberItem(x.member, x.role, x)).sort(),
+    'server role settings': [...settings.values()].sort(),
+  };
+}
+
+/** One database's check for expected-schema.json: the tables' shape and the statements behind it. */
+export function expectedCheck(model, ticket, statements, { database, sources = [] } = {}) {
+  const out = {};
+  const absent = [];
+  for (const name of ticket.tables) {
+    const t = model.tables.get(ident(name));
+    if (!t) { absent.push(name); continue; }
+    const { name: _n, ...shape } = t;
+    out[t.name] = shape;
+  }
+  const touched = new Set(Object.keys(out));
+  const keysFound = new Set(statements.map((s) => s.guard?.constraint).filter(Boolean));
+  const keysMissing = (ticket.constraints ?? []).filter((c) => !keysFound.has(ident(c)));
+  return {
+    database,
+    migration: ticket.migration,
+    kind: ticket.kind,
+    sources,
+    tables: out,
+    statements,
+    ...(absent.length ? { notInPackageDdl: absent } : {}),
+    ...(keysMissing.length ? { keysNotInPackageDdl: keysMissing } : {}),
+    ...(model.notModelled.some((n) => touched.has(n.table))
+      ? { notModelled: model.notModelled.filter((n) => touched.has(n.table)) } : {}),
+  };
+}
+
+/** Kept for the parser's own check: the shape of `tables` alone, as expected-schema.json had it. */
+export function expectedSchema(model, tables, { database, migration } = {}) {
+  return expectedCheck(model, { kind: 'tables', migration, tables }, [], { database });
+}
+
+// Package files are the same for every ticket in one pull of a whole board; held for a minute.
+const ddlCache = new Map();
+async function packageText(client, file) {
+  const hit = ddlCache.get(file);
+  if (hit && Date.now() - hit.at < 60_000) return hit.text;
+  const answer = await client.file(file);
+  if (!answer.ok) return null; // a failed read is not held: the next pull asks again
+  ddlCache.set(file, { at: Date.now(), text: answer.text });
+  return answer.text;
+}
+
+/** Forget the held package files (for the checks, which change what the stand-in serves). */
+export function forgetPackageFiles() {
+  ddlCache.clear();
+}
+
+/**
+ * Writes expected-schema.json into a [DB] ticket's folder. Returns what README.md says about it,
+ * or null for a ticket that is not a database migration. Never the reason a pull fails: a package
+ * without the DDL, or a file that will not read, is said in README.md instead. The pull has already
+ * removed the previous pull's copy, so a failure here never leaves an old one behind.
+ */
+async function writeExpectedSchema(client, wp, touches, folder, release) {
+  const ticket = databaseTicket(wp, touches);
+  if (!ticket) return null;
+  try {
+    if (ticket.kind === 'tables' && !ticket.tables.length) {
+      throw new Error('the ticket links no tables, so there is nothing to compare');
+    }
+    const backend = await client.layer('backend');
+    const files = (backend?.migrations?.files ?? []).map((f) => f.name);
+    const where = backend?.migrations?.tables ?? {};
+    const dbOf = (t) => String(where[ident(t)]?.file ?? '').split('/')[0] || null;
+    const databases = ticket.kind === 'baseline'
+      ? ['tenant', 'control'].filter((d) => files.some((f) => f.startsWith(`${d}/`)))
+      : [ticket.database ?? ticket.tables.map(dbOf).find(Boolean) ?? 'tenant'];
+    // Roles belong to the server, not to one database (review 8): every check is held to the roles, memberships and
+    // role settings the package files of every database make, the set --clean restores too. One source for both.
+    const everyFile = [];
+    for (const f of files.filter((x) => x.split('/')[1])) {
+      const text = await packageText(client, `backend/${f}`);
+      if (text === null) throw new Error(`backend/${f} would not read`);
+      everyFile.push({ name: f.split('/')[1], text });
+    }
+    const server = serverAllowances(everyFile);
+    const checks = [];
+    for (const database of databases) {
+      const mine = files.filter((f) => f.split('/')[0] === database && f.split('/')[1]);
+      // The baseline reads 000-002 and the helpers in 920, 930 and the V01nn files; the others read every file of their
+      // database, since a table's statements are spread over its 010 file, 900-930 and the V01nn files.
+      const wanted = ticket.kind === 'baseline' ? mine.filter((f) => /^((00[0-2]|9[23]0)-|V\d)/.test(f.split('/')[1])) : mine;
+      const texts = [];
+      for (const f of wanted) {
+        const text = await packageText(client, `backend/${f}`);
+        if (text === null) throw new Error(`backend/${f} would not read`);
+        texts.push({ name: f.split('/')[1], text });
+      }
+      if (!texts.length) throw new Error(`no DDL for ${database} in this package`);
+      const statements = ticketStatements(texts, ticket);
+      const used = [...new Set(statements.map((s) => s.file))].map((f) => `backend/${database}/${f}`);
+      checks.push({ ...expectedCheck(schemaModel(texts), ticket, statements, { database, sources: used }), server });
+    }
+    const body = {
+      about: 'What this ticket\'s migration must leave behind, from the package DDL: the tables\' end state, and '
+        + 'the package statements that make it. node .claude/scripts/db-ticket.mjs <ticket> applies those statements '
+        + 'to a copy of the previous state and compares the result with the ticket\'s file. Written by adam_pull; do not edit.',
+      ...(release?.current ? { release: release.current } : {}),
+      checks,
+    };
+    await writeFile(path.join(folder, 'expected-schema.json'), json(body));
+    return {
+      ...ticket, written: true, databases,
+      tables: Object.keys(checks[0]?.tables ?? {}).length,
+      statements: checks.reduce((n, c) => n + c.statements.length, 0),
+      absent: checks.flatMap((c) => [...(c.notInPackageDdl ?? []), ...(c.keysNotInPackageDdl ?? [])]),
+    };
+  } catch (error) {
+    return { ...ticket, written: false, error: error.message };
+  }
+}
+
+function databaseSection(db, key) {
+  if (!db) return '';
+  let out = '\n## Checking this migration\n\n';
+  if (!db.written) {
+    return `${out}The expected end state could not be written (${db.error}), so \`db-ticket.mjs\` cannot check this `
+      + 'ticket. Check the file by hand against `adam_table` and the package DDL, run '
+      + '`node .claude/scripts/db-ticket.mjs --full <database>` before the merge request, and say both in the comment.\n';
+  }
+  const what = db.kind === 'baseline' ? 'the schemas, extensions, register and helper functions'
+    : db.kind === 'foreign-keys' ? `the ${db.statements} cross-schema keys`
+      : `${db.tables} table${db.tables === 1 ? '' : 's'}`;
+  out += `The file is ${db.databases.map((d) => `\`db/${d}/${db.migration}\``).join(' and ')}. `
+    + `[expected-schema.json](expected-schema.json) holds what it must leave behind (${what}), from the package DDL.\n\n`
+    + '```\n'
+    + `node .claude/scripts/db-ticket.mjs ${key}\n`
+    + '```\n\n'
+    + '**The database must end up exactly as the package says, roles included.** '
+    + 'It applies only this file to a copy of the database at the previous state, then applies it a second time '
+    + '(not recorded), which must succeed and change nothing, so every statement must be safe to run twice. It '
+    + 'applies the package\'s own statements to another copy and compares the two: every table, column, constraint, '
+    + 'index, policy, function, type, privilege, owner and comment must be the same, and nothing outside this ticket '
+    + 'may change, rows included. The server\'s roles, with their attributes, memberships and settings, must be exactly '
+    + 'the ones the package\'s files make: any other, whoever left it (this file, an earlier file, an earlier run, another '
+    + 'folder), is a difference until `node .claude/scripts/db-ticket.mjs --clean` puts them back, so run that when a '
+    + 'result names a role, then the check again. **MATCH is the evidence for done**: quote its result lines in the comment. Anything '
+    + 'else names what differs; fix the file and run it again. A foreign key "left for a later migration" is not a '
+    + 'difference. The first run can take minutes (it builds a template of the earlier files): give the command a '
+    + 'timeout of 10 minutes.\n\n'
+    + '**This replaces older instructions for a [DB] ticket**: the "empty database" or "previous release\'s schema" '
+    + 'line in the ticket\'s Done when, and any local CLAUDE.md, `/ticket`, `/done`, `project-bible/setup/backend-patterns.md` '
+    + 'or `project-bible/setup/quickstart.md` that says to rebuild every migration or run `dotnet build` and `dotnet test`. '
+    + 'Do not rebuild the other migrations, and do not run dotnet unless this ticket changes C#. Before opening the merge '
+    + `request, run ${db.databases.map((d) => `\`node .claude/scripts/db-ticket.mjs --full ${d}\``).join(' and ')} once: `
+    + 'every migration applied once, in order, to an empty database, as SqlMigrationRunner does.\n\n'
+    + 'No `.claude/scripts/db-ticket.mjs` in this folder, or no "A [DB] ticket" in CLAUDE.md? Run `/update-adam` '
+    + 'here: it adds both (running ADAM\'s setup on the folder again does the same).\n';
+  if (db.absent.length) {
+    out += `\nNot in the package DDL, so the check cannot pass until it is (a change request): ${db.absent.map((t) => `\`${t}\``).join(', ')}.\n`;
+  }
+  return out;
+}
+
+
 async function pullOne(client, key, base, when) {
   const answer = await client.service(`/api/work-packages/${encodeURIComponent(key)}?${await scoped(client)}`);
   if (answer.status === 428) return { key, needsSetup: true, error: answer.data?.detail };
@@ -645,8 +1557,9 @@ async function pullOne(client, key, base, when) {
     ...(subtasks !== undefined ? { subtasks } : {}),
     ...(partOf ? { partOf } : {}),
   }));
+  const db = await writeExpectedSchema(client, wp, touches, folder, release);
   await writeFile(path.join(folder, 'README.md'),
-    ticketReadme(wp, files, missing, when, decisions, release, changes, blockedBy, { subtasks, partOf }));
+    ticketReadme(wp, files, missing, when, decisions, release, changes, blockedBy, { subtasks, partOf }, db));
   const notes = path.join(folder, 'notes.md');
   if (!(await stat(notes).catch(() => null))) {
     await writeFile(notes, `# Notes on #${wp.key}\n\nYours. adam_pull never overwrites this file.\n`);
@@ -670,6 +1583,10 @@ async function pullOne(client, key, base, when) {
     ...(Array.isArray(subtasks) && subtasks.length ? { subtasks: subtasks.length } : {}),
     ...(subtasks === null ? { subtasks: 'could not be read' } : {}),
     ...(partOf?.key ? { partOf: partOf.key } : {}),
+    ...(db ? { database: db.written
+      ? { migration: db.databases.map((d) => `db/${d}/${db.migration}`).join(' and '), kind: db.kind,
+        expected: path.join(folder, 'expected-schema.json'), tables: db.tables, statements: db.statements }
+      : { migration: db.migration, error: db.error } } : {}),
     ...(Array.isArray(changes) && changes.length ? { changeRequests: {
       total: changes.length,
       open: changes.filter((c) => c.status === 'open').map((c) => c.id),
@@ -1791,7 +2708,9 @@ export const TOOLS = [
       'Save a ticket and everything it is linked to as files in the working folder, under '
       + '.adam/work/<ticket>/: README.md (the ticket, its milestone and description, and a list of '
       + 'the files, then the comment thread, oldest first), ticket.json, one file per linked screen, journey, contract, table, service, '
-      + 'and module (linked ADRs are listed, not pulled), plus notes.md for your own notes. You are always on '
+      + 'and module (linked ADRs are listed, not pulled), plus notes.md for your own notes. A [DB] ticket whose '
+      + 'subject names its migration file also gets expected-schema.json, the end state of its tables and the statements that make it, from the '
+      + 'package DDL, which `node .claude/scripts/db-ticket.mjs <ticket>` compares a database with. You are always on '
       + 'the latest release: every pull serves the release ADAM serves now (r1, r2, …), and when that release is '
       + 'newer than the ticket\'s previous pull, README.md says what changed and spec-diff.md has the diffs. There '
       + 'is no release to choose and nothing to ask about it. README.md also lists, near the top, every change '
@@ -1857,6 +2776,12 @@ export const TOOLS = [
             + 'Read the "Blocked by" section of README.md. Do not build the blocked part and do not work around it: '
             + 'propose the ticket On hold naming the CR (adam_propose, applied only after the person says yes), then '
             + 'find the next ticket you can finish with adam_board only: "workable". ' + next;
+        }
+        if (one.database?.expected) {
+          next += ` A database ticket: write ${one.database.migration}, then check it with `
+            + `\`node .claude/scripts/db-ticket.mjs ${one.key}\` (README.md, "Checking this migration"). MATCH is the `
+            + 'evidence for done; it replaces older [DB] instructions, and there is no dotnet build or dotnet test '
+            + 'unless the ticket changes C#.';
         }
         if (r?.current) {
           next += ' Older /ticket instructions that mention re-pinning are out of date: there is nothing to re-pin.';

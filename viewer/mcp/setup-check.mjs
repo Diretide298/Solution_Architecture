@@ -415,11 +415,29 @@ ok(onBe.code === 0, 'setup finishes with 0', onBe.text.slice(-800));
 ok(ADAM_ITEMS.every((n) => existsSync(path.join(BE, n))), 'it gets the same additions');
 ok(readFileSync(path.join(BE, 'CLAUDE.md'), 'utf8') === readFileSync(path.join(ZIPPED, 'starters', 'backend', 'CLAUDE.md'), 'utf8')
   && existsSync(path.join(BE, 'project-bible', 'setup', 'backend-patterns.md')), 'the backend ones');
+// A [DB] ticket's quick check (20 October 2026) lives in .claude/, the one folder of ADAM's that
+// reaches a clone of the team's repository, and the permissions let Claude run it.
+const dbScript = path.join(BE, '.claude', 'scripts', 'db-ticket.mjs');
+ok(existsSync(dbScript) && readFileSync(dbScript, 'utf8') === readFileSync(path.join(ZIPPED, 'starters', 'backend', '.claude', 'scripts', 'db-ticket.mjs'), 'utf8')
+  && JSON.parse(readFileSync(path.join(BE, '.claude', 'settings.json'), 'utf8')).permissions.allow.includes('Bash(node .claude/scripts/db-ticket.mjs:*)'),
+  'with the [DB] ticket check, .claude/scripts/db-ticket.mjs, allowed to run');
 ok(sameFiles(beBefore, hashes(BE)).length === 0 && !existsSync(path.join(BE, 'TICVAI-Backend.slnx')) && !existsSync(path.join(BE, 'tests')),
   'no existing file changed and no starter code came along');
 ok(git(['status', '--porcelain', '--untracked-files=all'], BE) === '', 'git status is clean: ADAM\'s files are excluded');
 const beAgain = await setup(['-Role', 'backend', '-Folder', BE]);
 ok(beAgain.code === 0 && /nothing was missing/.test(beAgain.text), 'a second run adds nothing');
+// A backend folder made before the [DB] check: no script and no "A [DB] ticket" in CLAUDE.md. A re-run of setup
+// (and /update-adam, which runs the same refresh) brings both, with the section between ADAM's markers.
+const beMdNow = readFileSync(path.join(BE, 'CLAUDE.md'), 'utf8');
+ok(/<!-- ADAM:start db-ticket -->\r?\n## A \[DB\] ticket[\s\S]*<!-- ADAM:end db-ticket -->/.test(beMdNow), 'its CLAUDE.md marks "A [DB] ticket" as ADAM\'s');
+writeFileSync(path.join(BE, 'CLAUDE.md'), beMdNow.replace(/<!-- ADAM:start db-ticket -->\r?\n[\s\S]*?<!-- ADAM:end db-ticket -->\r?\n/, ''), 'utf8');
+rmSync(dbScript, { force: true });
+const beOld = await setup(['-Role', 'backend', '-Folder', BE]);
+const beOldMd = readFileSync(path.join(BE, 'CLAUDE.md'), 'utf8');
+const beOldGit = git(['status', '--porcelain', '--untracked-files=all'], BE);
+ok(beOld.code === 0 && existsSync(dbScript) && /<!-- ADAM:start db-ticket -->\r?\n## A \[DB\] ticket/.test(beOldMd) && beOldGit === '',
+  '**a re-run on a backend folder from before the [DB] check brings the script and the section back, out of git**',
+  `code ${beOld.code}, script ${existsSync(dbScript)}, section ${/ADAM:start db-ticket/.test(beOldMd)}, git [${beOldGit}]\n${beOld.text.slice(-600)}`);
 
 section('backend, an empty folder: still the team repository, or the starter');
 const BEREPO = teamRepo('ticvai-backend', { 'README.md': '# ticvai-backend\n', 'src/Api.cs': 'class Api {}\n' });

@@ -384,10 +384,17 @@ async function hooksOnly() {
 //   that differs is replaced, the old one kept in `.adam/backup-workspace-<time>/`. One that is missing is not
 //   created here - setup adds missing files and keeps them out of git, and this does not know the repository.
 //
+//   **ADAM's scripts are ADAM's too** (the backend's `.claude/scripts/db-ticket.mjs`, 20 October 2026): one that
+//   differs is replaced (the old one kept), and one that is missing is added, because the [DB] rule in the new
+//   /ticket and /done runs it. In a git repository the added file goes into `.git/info/exclude`, as setup does.
+//
 //   **CLAUDE.md is the team's.** Only a section between ADAM's markers (`<!-- ADAM:start name -->` ...
 //   `<!-- ADAM:end name -->`, in the starters) is replaced, and the text around it is never touched. A CLAUDE.md
-//   that has ADAM's section but no markers (made before them) is left exactly as it is: one line says which
+//   that has ADAM's section but no markers (made before them) keeps that section as it is: one line says which
 //   section to replace, and the new text is written to `.adam/new-claude-sections.md` to copy from.
+//   A section that is new (`add`: "A [DB] ticket") and nowhere in the file yet, marked or not, is added whole with
+//   its markers - after the "Working a ticket (ADAM)" section's end marker when there is one, else at the end -
+//   so nobody copies it by hand; no line of the team's is changed.
 //
 // Where the new text comes from: the same ADAM this connector already reads (`/connector/workspace`), or - setup,
 // which has the starters in the unzipped folder - `--from <starters folder>`. Names are taken only from the lists
@@ -402,7 +409,14 @@ const SECTIONS = {
     title: 'the paragraph that starts "Open Claude Code in this folder"',
     seen: 'Open Claude Code in this folder, not in a repository folder',
   },
+  'db-ticket': {
+    title: 'A [DB] ticket', seen: '## A [DB] ticket', add: true,
+  },
 };
+/** Scripts ADAM owns under .claude/scripts, per role; any other name in an answer is refused. */
+const SCRIPT_NAMES = { backend: ['db-ticket.mjs'], frontend: [], ai: [] };
+/** Whether a script's text is ADAM's (its own header names it), so one of the team's under the same name stays. */
+const isAdamsScript = (name, text) => text.includes(`.claude/scripts/${name}`) && text.includes('expected-schema.json');
 const argAfter = (flag) => {
   const at = process.argv.indexOf(flag);
   return at >= 0 ? process.argv[at + 1] : undefined;
@@ -422,6 +436,32 @@ async function roleOf(folder) {
   if (/dotnet/i.test(claude)) return 'backend';
   if (/workspace|pnpm|package\.json/i.test(claude)) return 'frontend';
   return null;
+}
+
+/**
+ * Keeps a file this added out of git, as setup does: a line in the repository's own `info/exclude`, which is never
+ * committed. Only at the top of a repository; a folder that is not one is left as it is.
+ */
+async function excludeInGit(folder, line) {
+  try {
+    const dotGit = path.join(folder, '.git');
+    let gitDir = dotGit;
+    const asFile = await readOrNull(dotGit);
+    if (asFile !== null) {
+      // A worktree or submodule: `.git` is a file naming the real one, whose common folder holds info/exclude.
+      const named = /^gitdir:\s*(.+)$/m.exec(asFile)?.[1]?.trim();
+      if (!named) return;
+      gitDir = path.resolve(folder, named);
+      const common = (await readOrNull(path.join(gitDir, 'commondir')))?.trim();
+      if (common) gitDir = path.resolve(gitDir, common);
+    }
+    await access(gitDir);
+    const file = path.join(gitDir, 'info', 'exclude');
+    const have = (await readOrNull(file)) ?? '';
+    if (have.split(/\r?\n/).includes(line)) return;
+    await mkdir(path.dirname(file), { recursive: true });
+    await writeFile(file, `${have}${have && !have.endsWith('\n') ? '\n' : ''}${line}\n`, 'utf8');
+  } catch { /* not a repository, or one this cannot write: the file is still there */ }
 }
 
 /** Whether a command file's text is ADAM's: they all call ADAM's tools (adam_*) or its updater (update-adam.md). */
@@ -445,19 +485,29 @@ async function workspaceSource(role, startersDir) {
       const text = await readOrNull(path.join(startersDir, role, '.claude', 'commands', name));
       if (text !== null) commands.push({ name, text });
     }
-    got = { role, commands, claudeMd: await readOrNull(path.join(startersDir, role, 'CLAUDE.md')) ?? '' };
+    const scripts = [];
+    for (const name of SCRIPT_NAMES[role] ?? []) {
+      const text = await readOrNull(path.join(startersDir, role, '.claude', 'scripts', name));
+      if (text !== null) scripts.push({ name, text });
+    }
+    got = { role, commands, scripts, claudeMd: await readOrNull(path.join(startersDir, role, 'CLAUDE.md')) ?? '' };
   } else {
     got = await ask(`/connector/workspace?role=${role}`);
   }
   const commands = Array.isArray(got?.commands) ? got.commands : [];
-  const odd = commands.filter((c) => !COMMAND_NAMES.includes(c?.name) || typeof c.text !== 'string');
+  // An ADAM from before scripts sends none: then there is simply nothing to refresh.
+  const scripts = Array.isArray(got?.scripts) ? got.scripts : [];
+  const odd = [
+    ...commands.filter((c) => !COMMAND_NAMES.includes(c?.name) || typeof c.text !== 'string'),
+    ...scripts.filter((c) => !(SCRIPT_NAMES[role] ?? []).includes(c?.name) || typeof c.text !== 'string'),
+  ];
   if (odd.length || typeof got?.claudeMd !== 'string') {
     const error = new Error('refused: the workspace files name something that is not one of ADAM\'s: '
       + `${odd.map((c) => String(c?.name)).join(', ') || 'CLAUDE.md'}`);
     error.refused = true;
     throw error;
   }
-  return { commands, claudeMd: got.claudeMd };
+  return { commands, scripts, claudeMd: got.claudeMd };
 }
 
 const markedRe = (name) => new RegExp(`(<!-- ADAM:start ${name} -->\\r?\\n)([\\s\\S]*?)(<!-- ADAM:end ${name} -->)`);
@@ -499,6 +549,22 @@ async function refreshWorkspace(folder, source, quiet) {
       + `(the old ones are in ${kept}).`);
   }
 
+  // ADAM's scripts: replaced when they differ, added when missing (the new /ticket and /done run them).
+  const scriptsDone = [];
+  for (const { name, text } of source.scripts ?? []) {
+    const target = path.join(folder, '.claude', 'scripts', name);
+    const have = await readOrNull(target);
+    if (have !== null && (lf(have) === lf(text) || !isAdamsScript(name, have))) continue;
+    if (have !== null) await keep(name, have);
+    await mkdir(path.dirname(target), { recursive: true });
+    await writeFile(target, text, 'utf8');
+    if (have === null) await excludeInGit(folder, `/.claude/scripts/${name}`);
+    scriptsDone.push(have === null ? `added .claude/scripts/${name}`
+      : `refreshed .claude/scripts/${name} (the old one is in ${kept})`);
+    changed.push(name);
+  }
+  if (scriptsDone.length) say(`workspace: ${scriptsDone.join(', ')} in ${folder}.`);
+
   const mdPath = path.join(folder, 'CLAUDE.md');
   const local = await readOrNull(mdPath);
   const unmarked = [];
@@ -506,6 +572,7 @@ async function refreshWorkspace(folder, source, quiet) {
     // The file's own bytes stay as they are: only the text between ADAM's markers is swapped, written with the
     // file's line endings, so a team's lines are never re-ended.
     const crlf = /\r\n/.test(local);
+    const eol = (s) => (crlf ? s.replace(/\n/g, '\r\n') : s);
     let text = local;
     const done = [];
     for (const [name, inner] of Object.entries(sectionsOf(source.claudeMd))) {
@@ -513,19 +580,32 @@ async function refreshWorkspace(folder, source, quiet) {
       const at = text.match(re);
       if (at) {
         if (lf(at[2]) !== inner) {
-          const put = crlf ? inner.replace(/\n/g, '\r\n') : inner;
+          const put = eol(inner);
           text = text.replace(re, (_, a, _old, b) => a + put + b);
           done.push(name);
         }
       } else if (text.includes(SECTIONS[name].seen)) {
         unmarked.push(name);
+      } else if (SECTIONS[name].add) {
+        // A new section the file has never had: added whole, with its markers, so /update-adam keeps it
+        // current from then on. After "Working a ticket (ADAM)" when that is marked, else at the end.
+        const block = eol(`<!-- ADAM:start ${name} -->\n${inner}<!-- ADAM:end ${name} -->\n`);
+        const after = text.match(/<!-- ADAM:end working-a-ticket -->\r?\n/);
+        if (after) {
+          const at2 = after.index + after[0].length;
+          text = `${text.slice(0, at2)}${eol('\n')}${block}${text.slice(at2)}`;
+        } else {
+          text = `${text}${/\n$/.test(text) ? '' : eol('\n')}${eol('\n')}${block}`;
+        }
+        done.push(name);
       }
     }
     if (done.length) {
       await keep('CLAUDE.md', local);
       await writeFile(mdPath, text, 'utf8');
       say(`workspace: CLAUDE.md ${done.map((n) => `"${SECTIONS[n].title}"`).join(' and ')} refreshed between its ADAM `
-        + `markers; the rest of the file is yours and was not touched (the old file is in ${kept}).`);
+        + `markers (a section it did not have yet is added with them); the rest of the file is yours and was not `
+        + `touched (the old file is in ${kept}).`);
       changed.push('CLAUDE.md');
     }
   }
@@ -537,8 +617,12 @@ async function refreshWorkspace(folder, source, quiet) {
       + 'heading here. Keep the ADAM:start and ADAM:end comment lines around it: with them, /update-adam refreshes '
       + 'the section for you from then on.\n\n'
       + unmarked.map((n) => `<!-- section: ${SECTIONS[n].title} -->\n${sections[n]}`).join('\n'), 'utf8');
-    say('workspace: CLAUDE.md has no ADAM markers, so it was left exactly as it is. Replace its '
-      + `${unmarked.map((n) => `"${SECTIONS[n].title}"`).join(' and ')} with the new text in ${fresh}.`);
+    // One wording whether or not another section was added on the same run: it names only what has no markers.
+    const titles = unmarked.map((n) => `"${SECTIONS[n].title}"`).join(' and ');
+    const one = unmarked.length === 1;
+    say(`workspace: CLAUDE.md's ${titles} ${one ? 'section has' : 'sections have'} no ADAM markers, so `
+      + `${one ? 'it was' : 'they were'} left as ${one ? 'it is' : 'they are'}. Replace ${one ? 'it' : 'them'} with the `
+      + `new text in ${fresh}.`);
   }
   if (!changed.length && !unmarked.length && !quiet) {
     say(`workspace: already current - nothing to refresh in ${folder}.`);

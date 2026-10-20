@@ -153,9 +153,15 @@ workspace folder, and a re-run of setup replace ADAM's five command files there
 (`.claude/commands/ticket|board|cr|done|update-adam.md`, the old ones kept in `.adam/backup-workspace-*`), reading
 them from the viewer's `/connector/workspace?role=` (the same starters the zip carries) or, for setup, from the
 unzipped starters. `CLAUDE.md` is the team's: only the part between `<!-- ADAM:start name -->` and
-`<!-- ADAM:end name -->` is replaced; a `CLAUDE.md` made before the markers is left exactly as it is, with one
+`<!-- ADAM:end name -->` is replaced; a section of a `CLAUDE.md` made before the markers is left exactly as it is, with one
 line saying which section to replace and the new text in `.adam/new-claude-sections.md`. Missing files are not
-created here (setup adds them and keeps them out of git). The first `/update-adam` on an older connector brings the
+created here (setup adds them and keeps them out of git). Two exceptions, for the backend's [DB] check (20 October
+2026): ADAM's script `.claude/scripts/db-ticket.mjs` is added or refreshed (kept out of git through
+`.git/info/exclude`, as setup does), and a section a CLAUDE.md never had, `<!-- ADAM:start db-ticket -->`, is added
+whole with its markers after "Working a ticket (ADAM)" (or at the end of a CLAUDE.md without markers), so nobody
+copies it by hand. The project's `.claude/settings.json` is not touched, so an existing folder lacks the permission
+line for the script: Claude asks once before running it (allow it for the folder), or add
+`"Bash(node .claude/scripts/db-ticket.mjs:*)"` to `permissions.allow` by hand. The first `/update-adam` on an older connector brings the
 new updater and cannot use it yet, so run `/update-adam` a second time. `mcp/workspace-check.mjs` holds all of it.
 
 **By hand**, for Git Bash or a machine where the zip is not an option:
@@ -385,6 +391,20 @@ until something broke: `adam_contract('access')` — the 756 KB one — must sta
 **Nothing here skips quietly.** A lookup that finds nothing to test fails rather than skipping: two
 real bugs sat behind a benign-looking `skip` line for a while, and a check that skips quietly is a
 check that lies.
+
+```bash
+node viewer/mcp/db-ticket-check.mjs              # add --package for the whole DDL (about 4 minutes)
+```
+
+A [DB] ticket's quick check (20 October 2026). `adam_pull` writes `expected-schema.json` into a
+[DB] ticket's folder: the tables' end state as parsed by `tools.mjs`, and the package statements
+that make them. The backend starter's `.claude/scripts/db-ticket.mjs` applies only the ticket's file
+to a template copy of the previous state, applies it again (which must succeed and change nothing),
+applies the package statements to a second copy, and compares the two databases whole, in
+PostgreSQL's own words. This checks the statement picking, the compare, the pull (against a stand-in
+ADAM serving `ticvai/`) and, with Docker, the script on a developer folder made from the real DDL,
+including the files that must fail. `--package` requires the statements tickets are given to make
+exactly the database the whole package makes, tenant and control.
 
 ## What is deliberately not here
 
