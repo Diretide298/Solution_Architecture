@@ -63,7 +63,7 @@
 | [POS-024](#pos-024-outlet-setup) | Outlet Setup | Sell | 1 | 6 |
 | [POS-025](#pos-025-till-home) | Till Home | Sell | 1 | 8 |
 | [POS-026](#pos-026-receipt-reprint) | Receipt & Reprint | Sell | 1 | 8 |
-| [POS-027](#pos-027-guest-lookup) | Guest Lookup | Sell | 1 | 5 |
+| [POS-027](#pos-027-guest-lookup) | Guest Lookup | Sell | 1 | 6 |
 | [POS-028](#pos-028-table-service) | Table Service | Sell | 1 | 13 |
 | [POS-029](#pos-029-order-queue) | Order Queue | Sell | 1 | 4 |
 | [POS-030](#pos-030-sales-journal) | Sales Journal | Sell | 1 | 8 |
@@ -2087,6 +2087,7 @@
 |---|---|
 | workstationId | session |
 | subjectId | navigation |
+| cartId | navigation |
 
 **Operations**
 
@@ -2095,7 +2096,8 @@
 | `searchGuests` | [MarketingService](../backend/MarketingService.md#searchguests) | onLoad | Find a guest by name, phone or media | `GUEST_VIEW` |
 | `identifyGuest` | [MarketingService](../backend/MarketingService.md#identifyguest) | onAction | Attach that guest to the sale | `GUEST_VIEW` |
 | `getGuestLoyalty` | [MarketingService](../backend/MarketingService.md#getguestloyalty) | onAction | The identified guest's points and tier | `GUEST_VIEW` |
-| `topUpWallet` | [WalletService](../backend/WalletService.md#topupwallet) | onAction | Top up the guest's wallet (AED 50 to 1 | `WALLET_OPERATE` |
+| `addCartLine` | [OrderService](../backend/OrderService.md#addcartline) | onAction | Add the top-up to the sale: one line of the venue's walletTopUp product at the chosen amount (AED 50 to 1,000), for the identified guest. The approved till's "Add top-up to sale" (prototype confirmTopup; r8 gate, CHG-R8RW-009) | `None` |
+| `topUpWallet` | [WalletService](../backend/WalletService.md#topupwallet) | background | Load the top-up onto the guest's wallet once the sale is paid ("loads on payment"): once per top-up line, with the line's id and the sale's captured payment (CHG-R8RW-009) | `WALLET_OPERATE` |
 | `recordConsent` | [MarketingService](../backend/MarketingService.md#recordconsent) | onAction | Record the consent the guest gives in person at the till, recorded by the agent (GUEST_MANAGE; CHG-CSA-045) | `GUEST_MANAGE` |
 
 **States**

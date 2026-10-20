@@ -1006,8 +1006,8 @@ Boards 7.2 and 7.3. **Peer-to-peer transfer is a money-transmission question bef
 **`POST /wallets/{subjectId}/top-ups`**: Add value to a wallet
 
 Creates a liability, not revenue. Recognition happens when the value is spent, or as breakage if the wallet expires.
-**Paid first, on a top-up order, then credited** (r8 walk fix, CHG-R8WFC-003; r8 re-walk, CHG-R8RW-001). The till or the guest app first makes a top-up order with Orders' `createOrder`: one line for the venue's catalogue product of kind `walletTopUp`, priced at `amount`, which makes the order `kind` `walletTopUp`. It pays that order with `createPayment` (and `capturePayment` where the provider authorises first) and sends the payment's id as `paymentId`. Wallet reads the payment through `orders#paymentRecords` and its order through `orders#salesOrderRecords`, in process.
-**Only a top-up payment can become wallet credit.** The payment must be `captured`; its order must be of kind `walletTopUp`, for this wallet's subject (`subjectId`), with a `grossAmount` equal to `amount`. A payment taken on any other order (tickets, goods, food) is refused `422 payment-not-for-top-up`, as is one whose order's subject or amount differs, and nothing is credited. A payment that is `declined` or `failed`, or not captured, is refused `402 payment-declined`. A payment already used for a top-up is refused `409 payment-already-used`: its id is kept as the new credit lot's `source_reference` (`source_kind` `topUp`), so one payment funds one top-up. `bonusAmount` is not paid for and is not compared. `tender` stays the receipt's label.
+**Sold as a line of a sale, credited once the sale is paid** (r8 walk fix, CHG-R8WFC-003; r8 re-walk, CHG-R8RW-001; r8 gate, CHG-R8RW-009). The till adds a top-up to the current sale, as the client-approved till does ("Add top-up to sale ... loads on payment"); the guest app does the same on its own order. That is one Orders line for the venue's catalogue product of kind `walletTopUp`, priced at `amount`, on an order naming the guest; it may share the order with anything else. When the order is paid (`createPayment`, and `capturePayment` where the provider authorises first), the till or app calls this once per top-up line, with the line's id as `orderLineId` and a captured payment of that order as `paymentId`. Wallet reads the payment, the order, the line and the line's product in process (`x-ticvai-read-via` above).
+**Only a paid top-up line becomes wallet credit, once.** The payment must be `captured` and of the line's order; the order must be for this wallet's subject (`subjectId`) and paid in full; the line must be a `walletTopUp` product line with `quantity` 1 and a `grossAmount` equal to `amount`. Anything else is refused `422 payment-not-for-top-up` and nothing is credited: a payment for tickets, goods or food cannot become wallet credit, because only a top-up line's own amount is ever credited. A payment that is `declined` or `failed`, or not captured, is refused `402 payment-declined`. A line already credited is refused `409 payment-already-used`: the line's id is kept on the new credit lot (`order_line_id`, one lot per line; `source_kind` `topUp`, `source_reference` the payment's id). `bonusAmount` is not paid for and is not compared. `tender` stays the receipt's label.
 
 |  |  |
 |---|---|
@@ -1041,7 +1041,8 @@ Creates a liability, not revenue. Recognition happens when the value is spent, o
 | amount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | amount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | tender | string | yes |  |
-| paymentId | string (uuid) |  | The orders.payment that paid for this top-up (r8 walk fix, CHG-R8WFC-003): a captured payment of an order of kind walletTopUp (r8 re-walk, CHG-R8RW-001). |
+| orderLineId | string (uuid) |  | The top-up line this credits (r8 gate, CHG-R8RW-009): a walletTopUp product line of the paid order, quantity 1, its gross amount amount. |
+| paymentId | string (uuid) |  | A captured payment of the top-up line's order (r8 walk fix, CHG-R8WFC-003; CHG-R8RW-009), kept as the credit lot's source reference. |
 | bonusAmount | object |  | Promotional bonus on top of the paid amount. |
 | bonusAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | bonusAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
@@ -1090,8 +1091,8 @@ Creates a liability, not revenue. Recognition happens when the value is spent, o
 |---|---|---|
 | 201 |  | Topped up |
 | 402 |  | Payment declined, failed or not captured (the body's paymentId) |
-| 422 |  | The body's paymentId did not pay a top-up: its order is not of kind walletTopUp, or is for another subject, or its gross amount is not amount. |
-| 409 |  | The body's paymentId has already funded a top-up (r8 walk fix, CHG-R8WFC-003) |
+| 422 |  | The body's orderLineId and paymentId are not a paid top-up: the payment is not of the line's order, the order is for another subject or not paid in full, or the line is not a walletTopUp line of quan… |
+| 409 |  | The body's orderLineId has already been credited (r8 walk fix, CHG-R8WFC-003; one lot per line, CHG-R8RW-009) |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### updateCreditType
@@ -1285,6 +1286,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | expires_at | timestamptz | no |  |
 | source_kind | text | no |  |
 | source_reference | text | no |  |
+| order_line_id | uuid | no | The paid top-up line this lot credits (source_kind topUp; r8 gate, CHG-R8RW-009). |
 | terms_snapshot | jsonb | no | The credit type's terms as they stood at issue. |
 | status | text | no |  |
 | scope_path | text | no |  |

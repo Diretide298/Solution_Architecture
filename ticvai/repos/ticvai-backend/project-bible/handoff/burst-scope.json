@@ -238,7 +238,7 @@
   {
    "table": "orders.sales_order",
    "schema": "orders",
-   "columns": 27,
+   "columns": 26,
    "burstOperations": 6,
    "written": true,
    "contention": null,

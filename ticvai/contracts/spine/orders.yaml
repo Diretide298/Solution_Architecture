@@ -3631,6 +3631,7 @@ paths:
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-021 Sell — Food & Drink"
         - "P04 POS-023 Sell — Merchandise"
+        - "P04 POS-027 Guest Lookup"
         - "P04 POS-030 Sales Journal"
         - "P05 KSK-005 Choose a performance"
         - "P05 KSK-015 Assistant"

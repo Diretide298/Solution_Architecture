@@ -3032,6 +3032,7 @@
     "marketing-crm#identifyGuest",
     "marketing-crm#recordConsent",
     "marketing-crm#searchGuests",
+    "orders#addCartLine",
     "wallet#topUpWallet"
    ]
   },

@@ -205,7 +205,7 @@ Returns the cart with any conflicts the addition created (2.9.5) — golf at 13:
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `catalogue.channel_capacity`, `catalogue.performance`, `catalogue.product`, `catalogue.variant`, `marketing.consent_question`, `marketing.consent_question_version`, `orders.cart`, `orders.cart_line` |
 | Writes | `cache:idempotency`, `orders.cart`, `orders.cart_line`, `platform.idempotency_record` |
-| Called by | GST-007, GST-008, GST-026, GST-027, GST-032, GST-048, GST-050, GST-056, GST-070, GST-074, GST-075, GST-077, GST-078, KSK-005, KSK-015, KSK-017, POS-002, POS-021, POS-023, POS-030, PTR-010, WEB-005, WEB-006, WEB-008, WEB-010, WEB-033, WEB-036, WEB-041, WEB-042, WEB-047, WEB-048, WEB-049 |
+| Called by | GST-007, GST-008, GST-026, GST-027, GST-032, GST-048, GST-050, GST-056, GST-070, GST-074, GST-075, GST-077, GST-078, KSK-005, KSK-015, KSK-017, POS-002, POS-021, POS-023, POS-027, POS-030, PTR-010, WEB-005, WEB-006, WEB-008, WEB-010, WEB-033, WEB-036, WEB-041, WEB-042, WEB-047, WEB-048, WEB-049 |
 | State model | Cart ([states/cart.yaml](../../../states/cart.yaml)): moves `expiring` -> `active`, `expired` -> `active` |
 
 **Parameters**
@@ -553,7 +553,6 @@ The cart is retained, not deleted — a checkout that fails at payment must be r
 | venueId | string (uuid) | yes |  |
 | scopePath | string | yes |  |
 | status | OrderStatus: enum (pending, held, paid, partiallyPaid, completed, voided, refunded, partiallyRefunded, …) | yes | held is a parked sale — the cashier freed the till and the guest will return. |
-| kind | enum (sale, walletTopUp) |  | What the order is for (r8 re-walk, CHG-R8RW-001). (default sale; read-only) |
 | currency | string | yes | Resolved from the region, not stored (ADR-0018, 24 August). (pattern ^[A-Z]{3}$) |
 | currencyScale | integer | yes | Resolved from the region, not stored (ADR-0018, 24 August). (min 0; max 4) |
 | grossAmount | Money | yes | On the wire this is three fields; in the database it is one column. |
@@ -1893,7 +1892,6 @@ The media is the join, not the order. That is why this operation is keyed on `me
 | order.venueId | string (uuid) | yes |  |
 | order.scopePath | string | yes |  |
 | order.status | OrderStatus: enum (pending, held, paid, partiallyPaid, completed, voided, refunded, partiallyRefunded, …) | yes | held is a parked sale — the cashier freed the till and the guest will return. |
-| order.kind | enum (sale, walletTopUp) |  | What the order is for (r8 re-walk, CHG-R8RW-001). (default sale; read-only) |
 | order.currency | string | yes | Resolved from the region, not stored (ADR-0018, 24 August). (pattern ^[A-Z]{3}$) |
 | order.currencyScale | integer | yes | Resolved from the region, not stored (ADR-0018, 24 August). (min 0; max 4) |
 | order.grossAmount | Money | yes | On the wire this is three fields; in the database it is one column. |
@@ -2072,7 +2070,6 @@ Posts to a discount account, never as a price change. A line sold at a reduced p
 | venueId | string (uuid) | yes |  |
 | scopePath | string | yes |  |
 | status | OrderStatus: enum (pending, held, paid, partiallyPaid, completed, voided, refunded, partiallyRefunded, …) | yes | held is a parked sale — the cashier freed the till and the guest will return. |
-| kind | enum (sale, walletTopUp) |  | What the order is for (r8 re-walk, CHG-R8RW-001). (default sale; read-only) |
 | currency | string | yes | Resolved from the region, not stored (ADR-0018, 24 August). (pattern ^[A-Z]{3}$) |
 | currencyScale | integer | yes | Resolved from the region, not stored (ADR-0018, 24 August). (min 0; max 4) |
 | grossAmount | Money | yes | On the wire this is three fields; in the database it is one column. |
@@ -2288,7 +2285,7 @@ Where they differ the order is still accepted at the quoted price and `priceVari
 **A promotion whose budget cap this order would exceed is not applied** (decided 28 September, audit R101 (8)), as at `checkoutCart`: an order created online is priced without it and names it in `droppedPromotions`. An order replayed from an offline till keeps the price the cashier quoted, as above, and the overrun is recorded against the promotion's budget as a variance.
 **A line carrying `resourceHoldId` converts the hold** (decided 29 September, rev 3 REV3-15). The order service calls `resources` to write a `ResourceBooking` in `reserved` for the hold's resource and window, with `holdId` and this order's id, and sets the hold to `converted`, **without releasing it first**, as seat holds are converted: nobody takes the cabana between the two calls. A hold that is expired, already converted or released, or is not the caller's refuses the order 409 `resourceHoldInvalid`. Not offline: a hold is a live reservation.
 **Seat limits** (decided 29 September, rev 3 REV3-7): on a guest channel the seats of one performance may not exceed `VenueSettings.seating.maxSeatsPerGuestOrder` (default 10, bounds 1 to 50); on staff and POS channels, 10 per sale (audit R080 (c)). Over the limit is 422 `seatLimitExceeded` (problem type `seat-limit-exceeded`, as `seating.createSeatHold`), no longer 400.
-**A wallet top-up is an order of its own** (r8 re-walk, CHG-R8RW-001). A line whose variant is a catalogue product of kind `walletTopUp` makes the order `kind` `walletTopUp`: it must be the order's only line, with `quantity` 1, and it is priced at its `quotedUnitPrice` (the amount being loaded) with no tax and no promotion. Any other mix is refused 422 `top-up-order-mixed` and nothing is written. The till or guest app then pays the order with `createPayment` and sends the payment's id to wallet `topUpWallet`, which credits the wallet.
+**A wallet top-up is a line of a sale** (r8 re-walk, CHG-R8RW-001; r8 gate, 21 October 2026, CHG-R8RW-009: the client-approved till adds it to the current sale, "Add top-up to sale ... loads on payment"). A line whose variant is a catalogue product of kind `walletTopUp` loads the order's guest's wallet: `quantity` 1, priced at its `quotedUnitPrice` (the amount being loaded), no tax and no promotion. It may share the order with any other lines. The order must name its guest (`subjectId`). A `walletTopUp` line with `quantity` above 1, or on an order with no guest, is refused 422 `top-up-line-invalid` and nothing is written. Once the order is paid, the till or guest app sends each top-up line's id to wallet `topUpWallet`, which credits the wallet by that line's amount.
 Offline-capable. The client writes to its local journal, acknowledges the cashier, and replays through `/sync/orders` on reconnect.
 **Appends to `orders.order_event`** (the order and reservation lifecycle log) one row per state change it makes, with the previous and new state, the actor and the correlation id. **When it prices the order it also writes `promotions.promotion_evaluation_trace`**: which promotions were evaluated, which applied and why the others did not, so a disputed discount can be explained later (decided 29 September, writers pass).
 **A guest does this within their own session** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-003; `x-ticvai-guest-callable`): a guest needs no permission and acts only for themselves, on their own cart, hold, order or payment in their own session. `ORDER_CREATE` is what a staff caller must hold to do it for a guest at a till or in the back office (ADR-0025).
@@ -2367,7 +2364,6 @@ Offline-capable. The client writes to its local journal, acknowledges the cashie
 | venueId | string (uuid) | yes |  |
 | scopePath | string | yes |  |
 | status | OrderStatus: enum (pending, held, paid, partiallyPaid, completed, voided, refunded, partiallyRefunded, …) | yes | held is a parked sale — the cashier freed the till and the guest will return. |
-| kind | enum (sale, walletTopUp) |  | What the order is for (r8 re-walk, CHG-R8RW-001). (default sale; read-only) |
 | currency | string | yes | Resolved from the region, not stored (ADR-0018, 24 August). (pattern ^[A-Z]{3}$) |
 | currencyScale | integer | yes | Resolved from the region, not stored (ADR-0018, 24 August). (min 0; max 4) |
 | grossAmount | Money | yes | On the wire this is three fields; in the database it is one column. |
@@ -2720,7 +2716,6 @@ Scanned at a counter before adding something. Shows what the guest holds so a ca
 | venueId | string (uuid) | yes |  |
 | scopePath | string | yes |  |
 | status | OrderStatus: enum (pending, held, paid, partiallyPaid, completed, voided, refunded, partiallyRefunded, …) | yes | held is a parked sale — the cashier freed the till and the guest will return. |
-| kind | enum (sale, walletTopUp) |  | What the order is for (r8 re-walk, CHG-R8RW-001). (default sale; read-only) |
 | currency | string | yes | Resolved from the region, not stored (ADR-0018, 24 August). (pattern ^[A-Z]{3}$) |
 | currencyScale | integer | yes | Resolved from the region, not stored (ADR-0018, 24 August). (min 0; max 4) |
 | grossAmount | Money | yes | On the wire this is three fields; in the database it is one column. |
@@ -3071,7 +3066,6 @@ Held orders expire. A till that accumulates parked sales across a shift cannot b
 | venueId | string (uuid) | yes |  |
 | scopePath | string | yes |  |
 | status | OrderStatus: enum (pending, held, paid, partiallyPaid, completed, voided, refunded, partiallyRefunded, …) | yes | held is a parked sale — the cashier freed the till and the guest will return. |
-| kind | enum (sale, walletTopUp) |  | What the order is for (r8 re-walk, CHG-R8RW-001). (default sale; read-only) |
 | currency | string | yes | Resolved from the region, not stored (ADR-0018, 24 August). (pattern ^[A-Z]{3}$) |
 | currencyScale | integer | yes | Resolved from the region, not stored (ADR-0018, 24 August). (min 0; max 4) |
 | grossAmount | Money | yes | On the wire this is three fields; in the database it is one column. |
@@ -3430,7 +3424,6 @@ Lines whose entitlement has been redeemed cannot be removed. The guest has used 
 | order.venueId | string (uuid) | yes |  |
 | order.scopePath | string | yes |  |
 | order.status | OrderStatus: enum (pending, held, paid, partiallyPaid, completed, voided, refunded, partiallyRefunded, …) | yes | held is a parked sale — the cashier freed the till and the guest will return. |
-| order.kind | enum (sale, walletTopUp) |  | What the order is for (r8 re-walk, CHG-R8RW-001). (default sale; read-only) |
 | order.currency | string | yes | Resolved from the region, not stored (ADR-0018, 24 August). (pattern ^[A-Z]{3}$) |
 | order.currencyScale | integer | yes | Resolved from the region, not stored (ADR-0018, 24 August). (min 0; max 4) |
 | order.grossAmount | Money | yes | On the wire this is three fields; in the database it is one column. |
@@ -3718,7 +3711,6 @@ Prices are re-evaluated. Where a price, a promotion or an availability has moved
 | order.venueId | string (uuid) | yes |  |
 | order.scopePath | string | yes |  |
 | order.status | OrderStatus: enum (pending, held, paid, partiallyPaid, completed, voided, refunded, partiallyRefunded, …) | yes | held is a parked sale — the cashier freed the till and the guest will return. |
-| order.kind | enum (sale, walletTopUp) |  | What the order is for (r8 re-walk, CHG-R8RW-001). (default sale; read-only) |
 | order.currency | string | yes | Resolved from the region, not stored (ADR-0018, 24 August). (pattern ^[A-Z]{3}$) |
 | order.currencyScale | integer | yes | Resolved from the region, not stored (ADR-0018, 24 August). (min 0; max 4) |
 | order.grossAmount | Money | yes | On the wire this is three fields; in the database it is one column. |
@@ -4015,7 +4007,6 @@ Only before settlement and only within the same shift. After that it is a refund
 | venueId | string (uuid) | yes |  |
 | scopePath | string | yes |  |
 | status | OrderStatus: enum (pending, held, paid, partiallyPaid, completed, voided, refunded, partiallyRefunded, …) | yes | held is a parked sale — the cashier freed the till and the guest will return. |
-| kind | enum (sale, walletTopUp) |  | What the order is for (r8 re-walk, CHG-R8RW-001). (default sale; read-only) |
 | currency | string | yes | Resolved from the region, not stored (ADR-0018, 24 August). (pattern ^[A-Z]{3}$) |
 | currencyScale | integer | yes | Resolved from the region, not stored (ADR-0018, 24 August). (min 0; max 4) |
 | grossAmount | Money | yes | On the wire this is three fields; in the database it is one column. |
@@ -4864,7 +4855,6 @@ BL-029. **A wallet pass is a live object, not a download.** Its value over a PDF
 | items[].venueId | string (uuid) | yes |  |
 | items[].scopePath | string | yes |  |
 | items[].status | OrderStatus: enum (pending, held, paid, partiallyPaid, completed, voided, refunded, partiallyRefunded, …) | yes | held is a parked sale — the cashier freed the till and the guest will return. |
-| items[].kind | enum (sale, walletTopUp) |  | What the order is for (r8 re-walk, CHG-R8RW-001). (default sale; read-only) |
 | items[].currency | string | yes | Resolved from the region, not stored (ADR-0018, 24 August). (pattern ^[A-Z]{3}$) |
 | items[].currencyScale | integer | yes | Resolved from the region, not stored (ADR-0018, 24 August). (min 0; max 4) |
 | items[].grossAmount | Money | yes | On the wire this is three fields; in the database it is one column. |
@@ -6778,7 +6768,6 @@ Releases held capacity immediately rather than waiting for expiry. A guest cance
 | venueId | string (uuid) | yes |  |
 | scopePath | string | yes |  |
 | status | OrderStatus: enum (pending, held, paid, partiallyPaid, completed, voided, refunded, partiallyRefunded, …) | yes | held is a parked sale — the cashier freed the till and the guest will return. |
-| kind | enum (sale, walletTopUp) |  | What the order is for (r8 re-walk, CHG-R8RW-001). (default sale; read-only) |
 | currency | string | yes | Resolved from the region, not stored (ADR-0018, 24 August). (pattern ^[A-Z]{3}$) |
 | currencyScale | integer | yes | Resolved from the region, not stored (ADR-0018, 24 August). (min 0; max 4) |
 | grossAmount | Money | yes | On the wire this is three fields; in the database it is one column. |
@@ -10144,7 +10133,6 @@ Every table this service owns that the slice reads or writes, with its columns a
 | venue_id | uuid | yes |  |
 | scope_path | text | yes |  |
 | status | text | yes |  |
-| kind | text | no | What the order is for (r8 re-walk, CHG-R8RW-001). |
 | gross_amount | numeric(18,4) | yes |  |
 | tax_amount | numeric(18,4) | yes |  |
 | net_amount | numeric(18,4) | yes |  |

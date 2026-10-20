@@ -3370,7 +3370,6 @@
     "held_until",
     "hold_label",
     "id",
-    "kind",
     "net_amount",
     "order_number",
     "principal_id",
@@ -3503,7 +3502,6 @@
     "held_until",
     "hold_label",
     "id",
-    "kind",
     "net_amount",
     "order_number",
     "principal_id",
@@ -3637,7 +3635,6 @@
     "held_until",
     "hold_label",
     "id",
-    "kind",
     "net_amount",
     "order_number",
     "principal_id",
@@ -3778,7 +3775,6 @@
     "held_until",
     "hold_label",
     "id",
-    "kind",
     "net_amount",
     "order_number",
     "principal_id",
@@ -3912,7 +3908,6 @@
     "held_until",
     "hold_label",
     "id",
-    "kind",
     "net_amount",
     "order_number",
     "principal_id",
@@ -4047,7 +4042,6 @@
     "held_until",
     "hold_label",
     "id",
-    "kind",
     "net_amount",
     "order_number",
     "principal_id",
@@ -4837,7 +4831,6 @@
     "held_until",
     "hold_label",
     "id",
-    "kind",
     "net_amount",
     "order_number",
     "principal_id",
@@ -5085,7 +5078,6 @@
     "held_until",
     "hold_label",
     "id",
-    "kind",
     "net_amount",
     "order_number",
     "principal_id",
@@ -5285,7 +5277,6 @@
     "held_until",
     "hold_label",
     "id",
-    "kind",
     "net_amount",
     "order_number",
     "principal_id",
@@ -21346,6 +21337,21 @@
   },
   "readVia": [
    {
+    "query": "catalogue#productRecords",
+    "route": "in-process",
+    "for": "that product: its kind must be walletTopUp (422 payment-not-for-top-up) (CHG-R8RW-009)"
+   },
+   {
+    "query": "catalogue#variantRecords",
+    "route": "in-process",
+    "for": "the top-up line's variant, for its product (CHG-R8RW-009)"
+   },
+   {
+    "query": "orders#orderLineRecords",
+    "route": "in-process",
+    "for": "the top-up line (orderLineId): a line of that order, quantity 1, its gross amount this top-up's (422 payment-not-for-top-up) (CHG-R8RW-009)"
+   },
+   {
     "query": "orders#paymentRecords",
     "route": "in-process",
     "for": "the top-up's payment (402 payment-declined) (CHG-MOD-003)"
@@ -21353,7 +21359,7 @@
    {
     "query": "orders#salesOrderRecords",
     "route": "in-process",
-    "for": "the order the payment paid: its kind must be walletTopUp, its subject this wallet's and its gross amount this top-up's (422 payment-not-for-top-up) (r8 re-walk, CHG-R8RW-001)"
+    "for": "the order the payment paid: its subject must be this wallet's, and it is paid in full (422 payment-not-for-top-up) (r8 re-walk, CHG-R8RW-001; CHG-R8RW-009)"
    }
   ]
  },
@@ -35698,7 +35704,6 @@
     "held_until",
     "hold_label",
     "id",
-    "kind",
     "net_amount",
     "order_number",
     "principal_id",
@@ -44446,7 +44451,6 @@
     "held_until",
     "hold_label",
     "id",
-    "kind",
     "net_amount",
     "order_number",
     "principal_id",
@@ -49339,7 +49343,6 @@
     "held_until",
     "hold_label",
     "id",
-    "kind",
     "net_amount",
     "order_number",
     "principal_id",
@@ -74595,6 +74598,7 @@
     "issued_amount",
     "issued_at",
     "issued_credits",
+    "order_line_id",
     "remaining_amount",
     "scope_path",
     "source_kind",
@@ -96335,7 +96339,6 @@
     "held_until",
     "hold_label",
     "id",
-    "kind",
     "net_amount",
     "order_number",
     "principal_id",

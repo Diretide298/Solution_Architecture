@@ -162,16 +162,12 @@
    "operations": 7
   },
   {
-   "contract": "resources",
-   "operations": 6
-  },
-  {
    "contract": "finance",
    "operations": 6
   },
   {
-   "contract": "queue",
-   "operations": 5
+   "contract": "resources",
+   "operations": 6
   },
   {
    "contract": "promotions",
@@ -179,6 +175,10 @@
   },
   {
    "contract": "seating",
+   "operations": 5
+  },
+  {
+   "contract": "queue",
    "operations": 5
   },
   {

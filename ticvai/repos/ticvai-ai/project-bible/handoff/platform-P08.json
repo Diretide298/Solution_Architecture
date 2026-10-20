@@ -202,19 +202,19 @@
    "operations": 77
   },
   {
-   "contract": "finance",
-   "operations": 62
-  },
-  {
    "contract": "wallet",
    "operations": 62
   },
   {
-   "contract": "resources",
-   "operations": 56
+   "contract": "finance",
+   "operations": 62
   },
   {
    "contract": "ai",
+   "operations": 56
+  },
+  {
+   "contract": "resources",
    "operations": 56
   },
   {
@@ -230,11 +230,11 @@
    "operations": 47
   },
   {
-   "contract": "payments",
+   "contract": "tenancy",
    "operations": 46
   },
   {
-   "contract": "tenancy",
+   "contract": "payments",
    "operations": 46
   },
   {
@@ -246,11 +246,11 @@
    "operations": 44
   },
   {
-   "contract": "maintenance",
+   "contract": "workforce",
    "operations": 41
   },
   {
-   "contract": "workforce",
+   "contract": "maintenance",
    "operations": 41
   },
   {

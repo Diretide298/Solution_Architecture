@@ -9,7 +9,7 @@
   "foreignKeys": 815,
   "indexes": 2924,
   "tablesWritten": 1123,
-  "relationships": 3249,
+  "relationships": 3250,
   "states": 208,
   "events": 97,
   "flows": 98,
@@ -87,9 +87,9 @@
   }
  ],
  "boundaries": {
-  "edgesTotal": 3249,
+  "edgesTotal": 3250,
   "insideOneService": 2007,
-  "crossingTwoServices": 1242,
+  "crossingTwoServices": 1243,
   "endpointNotOwned": 0,
   "note": "A reference inside one service is a foreign key the database enforces. A reference across two is a distributed read somebody has to design.",
   "heaviest": [
@@ -221,7 +221,7 @@
    "screens": 101,
    "operationsOnAScreen": 286,
    "edgesOut": 157,
-   "edgesIn": 79
+   "edgesIn": 80
   },
   {
    "service": "VenueOpsService",
@@ -352,7 +352,7 @@
    "tables": 32,
    "screens": null,
    "operationsOnAScreen": 63,
-   "edgesOut": 17,
+   "edgesOut": 18,
    "edgesIn": 6
   },
   {

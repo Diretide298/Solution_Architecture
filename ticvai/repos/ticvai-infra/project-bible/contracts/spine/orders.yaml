@@ -234,7 +234,7 @@ x-ticvai-queries:
     returns:
       type: array
       description: 'The rows found, each as Orders stores it; an id with no visible row is absent.'
-      items: {$ref: '#/components/schemas/Order'}
+      items: {$ref: '#/components/schemas/OrderLine'}
     rule: >-
       A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
       October). Orders answers with its orders.order_line rows, as it stores them and as the caller's scope lets
@@ -3631,6 +3631,7 @@ paths:
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-021 Sell — Food & Drink"
         - "P04 POS-023 Sell — Merchandise"
+        - "P04 POS-027 Guest Lookup"
         - "P04 POS-030 Sales Journal"
         - "P05 KSK-005 Choose a performance"
         - "P05 KSK-015 Assistant"
@@ -4870,12 +4871,14 @@ paths:
         `seatLimitExceeded` (problem type `seat-limit-exceeded`, as `seating.createSeatHold`), no longer
         400.
 
-        **A wallet top-up is an order of its own** (r8 re-walk, CHG-R8RW-001). A line whose variant is a
-        catalogue product of kind `walletTopUp` makes the order `kind` `walletTopUp`: it must be the order''s
-        only line, with `quantity` 1, and it is priced at its `quotedUnitPrice` (the amount being loaded) with
-        no tax and no promotion. Any other mix is refused 422 `top-up-order-mixed` and nothing is written. The
-        till or guest app then pays the order with `createPayment` and sends the payment''s id to wallet
-        `topUpWallet`, which credits the wallet.
+        **A wallet top-up is a line of a sale** (r8 re-walk, CHG-R8RW-001; r8 gate, 21 October 2026,
+        CHG-R8RW-009: the client-approved till adds it to the current sale, "Add top-up to sale ... loads on
+        payment"). A line whose variant is a catalogue product of kind `walletTopUp` loads the order''s guest''s
+        wallet: `quantity` 1, priced at its `quotedUnitPrice` (the amount being loaded), no tax and no
+        promotion. It may share the order with any other lines. The order must name its guest (`subjectId`).
+        A `walletTopUp` line with `quantity` above 1, or on an order with no guest, is refused 422
+        `top-up-line-invalid` and nothing is written. Once the order is paid, the till or guest app sends
+        each top-up line''s id to wallet `topUpWallet`, which credits the wallet by that line''s amount.
 
         Offline-capable. The client writes to its local journal, acknowledges the cashier, and replays
         through `/sync/orders` on reconnect.
@@ -4948,11 +4951,11 @@ paths:
                 $ref: '#/components/schemas/OrderRefusedProblem'
         '422':
           description: More seats for one performance than the channel allows (`seatLimitExceeded`,
-            decided 29 September, rev 3 REV3-7). A `walletTopUp` line with other lines, or with `quantity`
-            above 1 (`top-up-order-mixed`, r8 re-walk, CHG-R8RW-001).
+            decided 29 September, rev 3 REV3-7). A `walletTopUp` line with `quantity` above 1, or on an
+            order with no guest (`top-up-line-invalid`, CHG-R8RW-009).
           x-ticvai-problem-types:
           - seat-limit-exceeded
-          - top-up-order-mixed
+          - top-up-line-invalid
           content:
             application/problem+json:
               schema:
@@ -23943,20 +23946,6 @@ components:
           type: string
         status:
           $ref: '#/components/schemas/OrderStatus'
-        kind:
-          type: string
-          enum:
-          - sale
-          - walletTopUp
-          readOnly: true
-          default: sale
-          description: '**What the order is for** (r8 re-walk, CHG-R8RW-001). Set by the server from the lines,
-            never taken from a body: `walletTopUp` when the order''s one line is a catalogue product of kind
-            `walletTopUp` (money loaded onto a guest''s wallet, priced at the amount loaded), else `sale`
-            (tickets, goods, food, any other catalogue sale; every order made before r8). Wallet `topUpWallet`
-            credits only a captured payment whose order is `walletTopUp`, so a payment taken for tickets or goods
-            can never be turned into wallet credit. New values may be added; a client treats one it does not
-            know as `sale`.'
         currency:
           type: string
           pattern: ^[A-Z]{3}$

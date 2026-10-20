@@ -33,7 +33,7 @@ modulesUsed:
   screens: 1
 servicesCalled:
 - service: OrderService
-  operationCalls: 98
+  operationCalls: 99
 - service: FnbService
   operationCalls: 31
 - service: CatalogueService
@@ -1065,6 +1065,7 @@ screens:
   wave: 1
   density: touchLarge
   operations:
+  - addCartLine
   - getGuestLoyalty
   - identifyGuest
   - recordConsent

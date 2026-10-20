@@ -80,14 +80,6 @@
    "operations": 8
   },
   {
-   "contract": "marketing-crm",
-   "operations": 5
-  },
-  {
-   "contract": "reporting",
-   "operations": 5
-  },
-  {
    "contract": "promotions",
    "operations": 5
   },
@@ -96,12 +88,24 @@
    "operations": 5
   },
   {
-   "contract": "approvals",
-   "operations": 4
+   "contract": "reporting",
+   "operations": 5
+  },
+  {
+   "contract": "marketing-crm",
+   "operations": 5
   },
   {
    "contract": "seating",
    "operations": 4
+  },
+  {
+   "contract": "approvals",
+   "operations": 4
+  },
+  {
+   "contract": "access",
+   "operations": 2
   },
   {
    "contract": "workforce",
@@ -109,10 +113,6 @@
   },
   {
    "contract": "wallet",
-   "operations": 2
-  },
-  {
-   "contract": "access",
    "operations": 2
   },
   {
@@ -374,7 +374,7 @@
    "module": "Sell",
    "wave": 1,
    "route": "/sell/guests",
-   "operations": 5,
+   "operations": 6,
    "drawn": true
   },
   {

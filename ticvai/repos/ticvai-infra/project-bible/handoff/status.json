@@ -10,7 +10,7 @@
   "foreignKeys": 815,
   "indexes": 2924,
   "tablesWritten": 1123,
-  "relationships": 3249,
+  "relationships": 3250,
   "states": 208,
   "events": 97,
   "flows": 98,

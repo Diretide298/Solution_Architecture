@@ -3086,6 +3086,7 @@ wallet.credential,replaced_by_credential_id,wallet.credential,reference,conventi
 wallet.credential,wallet_id,wallet.wallet,reference,declared,,yes
 wallet.credit_eligibility,credit_type_id,wallet.credit_type,reference,convention,,
 wallet.credit_lot,credit_type_id,wallet.credit_type,reference,declared,,yes
+wallet.credit_lot,order_line_id,orders.order_line,reference,declared,yes,
 wallet.credit_lot,wallet_id,wallet.wallet,reference,declared,,yes
 wallet.dispute,adjustment_id,wallet.adjustment,reference,convention,,
 wallet.dispute,escalated_to_role_id,identity.role,reference,convention,yes,

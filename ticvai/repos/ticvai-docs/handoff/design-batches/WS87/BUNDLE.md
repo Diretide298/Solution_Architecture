@@ -1069,7 +1069,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the self-service wallet top-up are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 409 The body's `paymentId` has already funded a top-up (r8 walk fix, CHG-R8WFC-003); 422 The body's `paymentId` did not pay a top-up: its order is not of kind `walletTopUp`, or is for another subject, or its gross amount is not `amount`. |
+| Validation and conflict | the form keeps what was entered and marks the problem: 409 The body's `orderLineId` has already been credited (r8 walk fix, CHG-R8WFC-003; one lot per line, CHG-R8RW-009); 422 The body's `orderLineId` and `paymentId` are not a paid top-up: the payment is not of the line's order, the order is for another subject or not paid in full … |
 
 #### Sample data for the mock-up
 

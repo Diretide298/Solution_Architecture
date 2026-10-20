@@ -15,7 +15,7 @@
 | Stores | 10 |
 | Foreign Keys | 815 |
 | Indexes | 2924 |
-| Relationships | 3249 |
+| Relationships | 3250 |
 | Flows | 98 |
 | Boards | 218 |
 | Adrs | 71 |
@@ -39,9 +39,9 @@
 
 ## What crosses a service boundary
 
-**3249 declared references. 2007 stay inside one service; 1242 cross two.**
+**3250 declared references. 2007 stay inside one service; 1243 cross two.**
 
-**652 of the 1242 crossings land on three tables** -- `identity.principal`, `platform.scope`, `pii.subject`. The crossings concentrate on the foundation tier rather than spreading, which is what the tier is for.
+**652 of the 1243 crossings land on three tables** -- `identity.principal`, `platform.scope`, `pii.subject`. The crossings concentrate on the foundation tier rather than spreading, which is what the tier is for.
 
 | From | To | Edges |
 |---|---|---:|
@@ -76,7 +76,7 @@
 | Service | Tier | Ops | On a screen | Tables | Screens | Out | In |
 |---|---|---:|---:|---:|---:|---:|---:|
 | CatalogueService | commerce | 470 | 429 | 143 | 73 | 161 | 106 |
-| OrderService | commerce | 304 | 286 | 114 | 101 | 157 | 79 |
+| OrderService | commerce | 304 | 286 | 114 | 101 | 157 | 80 |
 | VenueOpsService | operations | 297 | 279 | 127 | 53 | 114 | 39 |
 | MarketingService | engagement | 280 | 233 | 132 | 40 | 148 | 15 |
 | AccessService | commerce | 258 | 248 | 77 | 29 | 144 | 18 |
@@ -87,7 +87,7 @@
 | WhiteLabelService | platform | 110 | 107 | 35 | 25 | 19 | 7 |
 | IdentityService | foundation | 101 | 79 | 44 | 36 | 27 | 476 |
 | LedgerService | commerce | 72 | 62 | 27 | 20 | 48 | 42 |
-| WalletService | commerce | 71 | 63 | 32 | None | 17 | 6 |
+| WalletService | commerce | 71 | 63 | 32 | None | 18 | 6 |
 | InventoryService | operations | 59 | 56 | 23 | 28 | 40 | 22 |
 | ReportingService | platform | 51 | 49 | 25 | 31 | 16 | 0 |
 | RetailService | operations | 25 | 22 | 13 | 19 | 27 | 9 |

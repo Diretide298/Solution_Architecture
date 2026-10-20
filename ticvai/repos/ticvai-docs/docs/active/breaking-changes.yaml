@@ -1321,7 +1321,7 @@ changes:
     reason: 'r8 re-walk (CHG-R8RW-001, SVC-WALLET-WALLET-2): a wallet top-up had no way to be paid, since createPayment
       needs an orderId and no order could be a top-up, and topUpWallet credited any captured payment, so a payment
       for tickets could become wallet credit. A top-up is now sold as the venue''s catalogue product of kind
-      walletTopUp, which makes its order kind walletTopUp, and topUpWallet credits only such an order''s payment.
+      walletTopUp, a line of any sale, and topUpWallet credits only such a line''s amount once the sale is paid (CHG-R8RW-009).
       ProductKind gains the value; a value added to a response enum cannot be additive.'
     approved-by: 'Chinmay, 21 October 2026: "Yes approved add to confirmation from client" (BC-460 to BC-463; on the client''s open questions, 21 October, rows 44 and 45)'
     tag: r8

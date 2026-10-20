@@ -9370,7 +9370,7 @@ screens:
       components:
       - kind: secondaryButton
         label: Top up wallet
-        operation: topUpWallet
+        operation: addCartLine
         provenance: contract wallet.yaml POST /wallets/{subjectId}/top-ups; wiring fix, 2 October 2026
   states:
     loading: The saved guest lookup.
@@ -9394,11 +9394,19 @@ screens:
     purpose: The identified guest's points and tier
     trigger: onAction
     provenance: wiring fix, 2 October 2026 (CHG-WIR-005)
+  - operationId: addCartLine
+    contract: orders
+    purpose: 'Add the top-up to the sale: one line of the venue''s walletTopUp product at the chosen amount
+      (AED 50 to 1,000), for the identified guest. The approved till''s "Add top-up to sale" (prototype
+      confirmTopup; r8 gate, CHG-R8RW-009)'
+    trigger: onAction
+    provenance: client-verified prototype, confirmTopup; r8 gate, 21 October 2026 (CHG-R8RW-009)
   - operationId: topUpWallet
     contract: wallet
-    purpose: Top up the guest's wallet (AED 50 to 1
-    trigger: onAction
-    provenance: wiring fix, 2 October 2026 (CHG-WIR-005)
+    purpose: 'Load the top-up onto the guest''s wallet once the sale is paid ("loads on payment"): once
+      per top-up line, with the line''s id and the sale''s captured payment (CHG-R8RW-009)'
+    trigger: background
+    provenance: wiring fix, 2 October 2026 (CHG-WIR-005); after payment, r8 gate, 21 October 2026 (CHG-R8RW-009)
   - operationId: recordConsent
     contract: marketing-crm
     purpose: Record the consent the guest gives in person at the till, recorded by the agent (GUEST_MANAGE;
@@ -9413,6 +9421,10 @@ screens:
       optional: true
       notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `searchGuests`
         and the user picks one; an edge that holds one may still carry it to open on that record.'
+    - name: cartId
+      from: navigation
+      optional: true
+      notes: 'Optional: only `addCartLine` takes it, from the record the user acts on.'
     coldEntry: '**Resolves from the session, which carries the workstation** — a till is signed into,
       not navigated to.'
   requiresModule: core
@@ -9432,14 +9444,16 @@ screens:
   - id: formTopUpWallet
     component: modal
     trigger: Top up wallet
-    body: '**Collects what `topUpWallet` sends before it is called.** Dismissing sends nothing; the screen
-      behind is unchanged.'
+    body: '**Collects the top-up amount and adds it to the sale.** Confirming adds one walletTopUp line
+      for the identified guest (`addCartLine`); the wallet is loaded by `topUpWallet` once the sale is
+      paid ("loads on payment"). Dismissing sends nothing; the screen behind is unchanged.'
     confirm:
       label: Top up wallet
-      operation: topUpWallet
+      operation: addCartLine
     dismiss:
       label: Cancel
-    provenance: contract wallet.yaml POST /wallets/{subjectId}/top-ups; wiring fix, 2 October 2026
+    provenance: client-verified prototype (confirmTopup, which adds the top-up to the sale); r8 gate,
+      21 October 2026 (CHG-R8RW-009)
   gaps:
   - operation: null
     why: 'Contract gap recorded 2 October 2026 (CHG-WIR-007): No staff operation creates a guest profile

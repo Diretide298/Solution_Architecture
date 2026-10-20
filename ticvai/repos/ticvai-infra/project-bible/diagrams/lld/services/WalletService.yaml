@@ -817,7 +817,7 @@ tables:
   - wallet
   foreignWriters: null
 - table: wallet.credit_lot
-  columns: 13
+  columns: 14
   store: postgres
   parent: null
   writtenBy:

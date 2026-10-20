@@ -113,7 +113,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-1127` | Voucher Eligibility & Redemption Rule Studio | C | 30 | 11 | 6 | 0 | 2 | 2 | — | notStarted (—) |
 | `BO-1128` | Membership Benefits & Entitlement Mapping | C | 22 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-1129` | Benefit Packaging & Digital Wallet Presentation | C | 21 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
-| `BO-1130` | Gift Card & Voucher Expiry Management | C | 10 | 12 | 6 | 0 | 0 | 6 | — | notStarted (—) |
+| `BO-1130` | Gift Card & Voucher Expiry Management | C | 10 | 13 | 6 | 0 | 0 | 6 | — | notStarted (—) |
 | `BO-1131` | Gift Card Balance, Liability & Breakage Control | C | 0 | 20 | 6 | 0 | 0 | 6 | — | notStarted (—) |
 | `BO-1132` | Gift Card & Voucher Simulator, Validation & Publication | C | 2 | 10 | 6 | 0 | 1 | 6 | — | notStarted (—) |
 
