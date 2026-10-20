@@ -22901,8 +22901,9 @@ components:
         **`walletTopUp` added 20 October 2026** (r8 re-walk, CHG-R8RW-001): the product a wallet top-up is sold as,
         so the money for a top-up is taken on an order like any other sale and `createPayment` has its `orderId`.
         A venue has one, with one variant. Orders prices its line at the line''s `quotedUnitPrice` (the amount
-        being loaded; no tax, since stored value is a liability and not a supply) and marks the order `kind`
-        `walletTopUp`; wallet `topUpWallet` credits only a captured payment of such an order. A value added to a
+        being loaded; no tax, since stored value is a liability and not a supply), and the line may share a
+        sale with anything else (the client-approved till's "Add top-up to sale", CHG-R8RW-009); once the order
+        is paid, wallet `topUpWallet` credits that line's amount, once per line. A value added to a
         response enum, so a breaking change under ADR-0026, approved as BC-460 to BC-462; a client that does not
         know it shows the product as a plain product.
 

@@ -1,0 +1,52 @@
+id: CHG-R8RW-009
+date: '2026-10-21'
+source: audit
+kind: contract
+proposed: '2026-10-21T04:10'
+summary: 'A wallet top-up is a line of a sale, as the client-approved till sells it ("Add top-up to sale ... loads on
+  payment"), not an order of its own. createOrder accepts a walletTopUp line beside any other lines (quantity 1, no
+  tax, no promotion, on an order naming its guest; else 422 top-up-line-invalid); Order.kind and 422
+  top-up-order-mixed (CHG-R8RW-001, never released) are gone. topUpWallet takes the line (orderLineId) and a captured
+  payment of its order, and credits only that line''s amount once the order is paid in full, once per line
+  (wallet.credit_lot.order_line_id); a payment for tickets, goods or food still cannot become wallet credit. POS-027
+  binds addCartLine for its top-up ("Add top-up to sale") and topUpWallet after payment. orders#orderLineRecords
+  returns OrderLine, not Order.'
+decision:
+  what: 'contracts/spine/orders.yaml createOrder text and 422, Order.kind removed, orderLineRecords returns OrderLine;
+    contracts/satellite/wallet.yaml topUpWallet (orderLineId, reads of the line and its product, rule, 409/422 text),
+    CreditLot.orderLineId; contracts/spine/catalogue.yaml ProductKind text; screens/P04-point-of-sale.yaml POS-027;
+    docs/active/breaking-changes.yaml BC-460 reason; docs/active/block-a-extra-tasks.json V0112 text.'
+  by: Chinmay
+  date: '2026-10-21'
+why: 'Finding: the r8 final re-walk of 21 October 2026 (its report is kept outside the repository): POS-027 (#28825)
+  called topUpWallet with no order or payment after CHG-R8RW-001, and two fixed tickets read orderLineRecords typed as
+  Order. The client-approved till prototype (sources/designs/TICVAI_POS_Terminal_client_approved.html, confirmTopup)
+  adds the top-up to the current sale, so an approved screen cannot follow a separate top-up order: the contract
+  follows the screen (the lead''s rule that approved screens never change visibly). Ruled at the r8 gate under the
+  lead''s standing "all of them are on you", within his approval of BC-460 to BC-463 ("Yes approved add to
+  confirmation from client"); the client''s open question 44 now says a top-up is a line of the sale.'
+keys_touched:
+  operations: [createOrder, topUpWallet, addCartLine]
+  screens: [POS-027]
+  files:
+  - contracts/spine/orders.yaml
+  - contracts/satellite/wallet.yaml
+  - contracts/spine/catalogue.yaml
+  - screens/P04-point-of-sale.yaml
+  - docs/active/breaking-changes.yaml
+  - docs/active/block-a-extra-tasks.json
+root_class: 'a contract fix that did not read the approved screen it serves'
+tickets:
+  started: []
+  unstarted: [SVC-WALLET-WALLET-2, POS-027]
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: r8 gate, a release fix'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-approved-ui.py
+status: open
+notes: 'BO-488 (Self-Service Wallet Top-Up) also binds topUpWallet directly; it is wave 3, outside r8, and needs a
+  person before it is built: on the left-out list. Prevention: fix briefs now read the approved prototype of every
+  screen a contract fix touches (P-29).'
