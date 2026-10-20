@@ -53,9 +53,14 @@ PLATFORMS = {
 
 # Verbs that move a record through its life rather than define it. An operation named this way is
 # somebody's daily work, whatever table it writes.
+# **`respond`** (r8 gate residue, 20 October 2026, CHG-R8RES-004): answering a dispute is work on a record somebody else
+# raised. When getOrderStatement began reading orders.chargeback (ORDERS-MONEY-C42), `respondToChargeback` was the one
+# writer of it the verbs did not name (recordChargeback, assignChargeback and recordChargebackOutcome are), so it became
+# "setup" and pulled ADM-634, behind a command centre outside Block A, into Block A (check-plan-closure C-REACH).
+# A chargeback arrives from the acquirer: the table is fed elsewhere, as access.scan_event is.
 TRADING_VERB = re.compile(
     r"^(accept|abandon|acknowledge|activate|assign|begin|block|book|call|cancel|check|close|"
-    r"collect|complete|dispose|override|pause|record|redeem|refire|reopen|report|revoke|settle|"
+    r"collect|complete|dispose|override|pause|record|redeem|refire|reopen|report|respond|revoke|settle|"
     r"submit|sync|validate|void|issue|remove|end|unschedule|preview|test|recordUsage)"
 )
 # Nouns that are an event in a venue's day even when the verb is `create` or `set`: a work order is

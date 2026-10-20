@@ -1,0 +1,31 @@
+id: CHG-R8RES-009
+date: '2026-10-20'
+source: audit
+kind: process
+summary: 'check-package rule 30 ("a table needs a key") reads the key a contract declares (x-ticvai-primary-key), as
+  derive-ddl does. identity.open_shift_marker is keyed [shiftId] at its contract and its DDL says shift_id uuid PRIMARY
+  KEY; the rule read only the id conventions and the lineage parent, so CHG-R8INT-022 (principalId and workstationId
+  references none, no enforced foreign key) left it reported as having no key at all.'
+decision:
+  what: 'tools/check-package.py rule 30: a table whose schema declares x-ticvai-primary-key passes. The contract is
+    unchanged: it already declares the key and the index CHG-R8INT-022 kept, and still no foreign key.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: check-package in the refresh rehearsal on 5dc6fe1f (runs/20261020-144054-199): identity.open_shift_marker
+  has no key at all, after CHG-R8INT-022 (commit 215820e4).'
+keys_touched:
+  tables: [identity.open_shift_marker]
+  files:
+  - tools/check-package.py
+root_class: 'a check reading key conventions and not the key the contract declares'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: r8 gate residue, a release fix'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-package.py
+status: open

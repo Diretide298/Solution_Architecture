@@ -118,3 +118,24 @@ def test_a_renamed_tables_policy_under_an_r6_helper_still_waits_for_the_person()
                 "SELECT platform.apply_tenant_rls('a.new'::regclass);\n")
     p = fwd.diff("tenant", old, new, renames={"tables": {"a.old": "a.new"}})
     assert p.statements == []
+
+
+def test_a_scope_path_replacing_the_venue_policy_backfills_the_venue_then_the_tenant_root():
+    # ledger.account_mapping (ADAM CR-168, CHG-CRA-007) moved from apply_venue_rls to read-beneath with a scope_path;
+    # venue_in_scope showed a row at its venue's platform.scope row, and a null venue_id at the tenant root, so the
+    # backfill gives each row that same place before the NOT NULL (r8 gate residue, CHG-R8RES-001).
+    t = ("CREATE TABLE ledger.account_mapping (id uuid PRIMARY KEY, venue_id uuid, event_type text NOT NULL);\n")
+    old = model(t + "SELECT platform.apply_venue_rls('ledger.account_mapping'::regclass);\n")
+    assert fwd.was_venue_rls(old, "ledger.account_mapping") and not fwd.was_tenant_root(old, "ledger.account_mapping")
+    sql = fwd.scope_path_backfill("ledger.account_mapping", {"id": "uuid", "venue_id": "uuid", "scope_path": "ltree"},
+                                  False, True)
+    assert ("UPDATE ledger.account_mapping x SET scope_path = s.path FROM platform.scope s WHERE s.id = x.venue_id "
+            "AND x.scope_path IS NULL") in sql
+    assert "WHERE level = 'tenant') WHERE scope_path IS NULL" in sql and sql.endswith("SET NOT NULL")
+    # without the venue policy, a venue_id alone names no owner: the person decides, as before
+    assert fwd.scope_path_backfill("ledger.account_mapping", {"venue_id": "uuid", "scope_path": "ltree"}) is None
+    # the policy in force is the last call: a table moved off the venue policy earlier is not read as venue-owned
+    later = model(t + "SELECT platform.apply_venue_rls('ledger.account_mapping'::regclass);\n"
+                  "SELECT platform.drop_rls_policies('ledger.account_mapping'::regclass);\n"
+                  "SELECT platform.apply_tenant_rls('ledger.account_mapping'::regclass);\n")
+    assert not fwd.was_venue_rls(later, "ledger.account_mapping")

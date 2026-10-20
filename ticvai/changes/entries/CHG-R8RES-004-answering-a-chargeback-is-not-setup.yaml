@@ -1,0 +1,35 @@
+id: CHG-R8RES-004
+date: '2026-10-20'
+source: audit
+kind: process
+summary: 'The delivery slice treats respondToChargeback as trading, not setup: "respond" joins the trading verbs. When
+  getOrderStatement began reading orders.chargeback (ORDERS-MONEY-C42), respondToChargeback was the one writer of it
+  the verbs did not name, so it became setup and pulled ADM-634 (Chargeback & Dispute Command Center), reached only
+  through ADM-629 outside Block A, into Block A. A chargeback arrives from the acquirer (recordChargeback): the table is
+  fed elsewhere.'
+decision:
+  what: 'tools/derive-delivery-slice.py TRADING_VERB gains respond (respondToInvitation is core by its screen and
+    respondToReview is in no slice, so only respondToChargeback moves). Test: tools/tests/test_delivery_slice_verbs.py.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: check-plan-closure C-REACH ADM-634 (BO-100 > ADM-629 > ADM-634), merge-intpass report item g. ADM-634
+  was not in the r7 plan''s Block A, so nothing it built departs.'
+keys_touched:
+  operations: [respondToChargeback]
+  screens: [ADM-634]
+  files:
+  - tools/derive-delivery-slice.py
+  - tools/tests/test_delivery_slice_verbs.py
+root_class: 'a trading writer read as setup by the slice''s verb list'
+tickets:
+  started: []
+  unstarted:
+  - 'APP-SETUP-ADM-634 and APP-SETUP-ADM-634-REST leave the plan (neither was in r7).'
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: r8 gate residue, a release fix'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-plan-closure.py
+status: open

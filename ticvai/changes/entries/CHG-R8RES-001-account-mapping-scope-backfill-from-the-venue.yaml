@@ -1,0 +1,39 @@
+id: CHG-R8RES-001
+date: '2026-10-20'
+source: audit
+kind: process
+summary: 'A scope_path that replaces the venue row policy is backfilled to the place that policy gave each row: the
+  venue''s own path by venue_id, the tenant root for a null venue_id, then NOT NULL. derive-ddl''s frozen mode now
+  writes that backfill into the migration review for ledger.account_mapping, whose scope_path (required at its
+  contract since CHG-CRA-007) was added nullable with no owner the generator could name, so check-ddl-conventions
+  D-SCOPE-NOTNULL failed.'
+decision:
+  what: 'tools/ddl_forward.py: was_venue_rls(model, table) (the policy in force before the migration is
+    apply_venue_rls) and scope_path_backfill(..., was_venue) taking venue_id as the owning key in that case; both call
+    sites pass it. The contract is unchanged: AccountMapping.scopePath is already required and server-set, and a null
+    scope means nothing there, so no exemption is written. Test: tools/tests/test_forward_rls_helpers.py.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: check-ddl-conventions D-SCOPE-NOTNULL on ledger.account_mapping (merge-intpass report, concern 4; present
+  at 882a7175 too). ADAM CR-168 (CHG-CRA-007) moved the table from apply_venue_rls to read-beneath with a scope_path;
+  platform.venue_in_scope showed a row at its venue''s platform.scope row and a null venue_id at the tenant root, so
+  that is the backfill that moves no row.'
+keys_touched:
+  tables: [ledger.account_mapping]
+  files:
+  - tools/ddl_forward.py
+  - tools/tests/test_forward_rls_helpers.py
+root_class: 'a scope_path added nullable in frozen mode whose owner the generator could not name'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: r8 gate residue, a release fix'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-ddl-conventions.py
+status: open
+notes: 'Proposed by the r8 gate-residue pass. The backfill runs in the person''s forward migration (its migration review
+  row), as the other scope_path backfills do.'
