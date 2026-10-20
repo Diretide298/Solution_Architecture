@@ -3412,9 +3412,9 @@ paths:
         erased, answers 200 with zeros, so a retry or a second call is never refused (CHG-R8RES-007)'
       summary: Remove everything the AI index holds about a guest
       description: '**Erasure reaches the AI data, and can be proven** (R8 blocker FOUNDATION-AI-C42, CHG-R8MIG-025;
-        ADR-0047: nothing cascades). Called by Identity''s erasure job, cell-internal over mTLS, for a subject whose
-        `pii.subject` row is tombstoned (`is_erased`, with its `erasure_request_id`): the tombstone is the record it
-        works from, and `deleteGuestAccount` does not wait for it (r8 gate residue, CHG-R8RES-003). **From the release
+        ADR-0047: nothing cascades). Called by Identity''s erasure job, cell-internal over mTLS, for a subject
+        Identity has tombstoned (`deleteGuestAccount`''s erasure request): Identity''s tombstone is the record the job
+        works from, and `deleteGuestAccount` does not wait for this call (r8 gate residue, CHG-R8RES-003). **From the release
         that builds this operation**, the job calls it for each subject it tombstones, and once for every subject
         tombstoned before then. For the subject it deletes, in this order and retried until both
         are done: the `ai.index_entry` rows with that `subject_id` and the `ai.chunk_embedding` rows with that
