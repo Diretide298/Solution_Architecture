@@ -588,10 +588,20 @@ const MIGRATION_LOCK = `DO $${NONCE}l$ DECLARE holder text; BEGIN
   PERFORM set_config('lock_timeout', '0', true);
 END $${NONCE}l$;\n`;
 
+/**
+ * Who holds the role lock, in words: this run's own other copy (the ticket's file and the package's statements run
+ * side by side, and both take the lock) when the holder's database is one of `own`, otherwise another check.
+ */
+function lockHolder(holder, own = []) {
+  const db = / in database (\S+?),/.exec(holder)?.[1];
+  return own.includes(db) ? `${holder} (this run's own copy of the ${db.endsWith('_expect') ? "package's statements" : "ticket's file"})`
+    : `${holder} (another folder's migration check, template build or --clean)`;
+}
+
 /** The lock waits a session's NOTICEs report: "waited for the server-wide role lock (held by ...)". */
-function lockWaits(result) {
+function lockWaits(result, own = []) {
   return [...String(result?.err ?? '').matchAll(new RegExp(`${NONCE}_WAIT\\|([^\\r\\n]*)`, 'g'))]
-    .map((m) => `- waited for the server-wide role lock, held by ${m[1]} (another folder's migration check, template build or --clean)`);
+    .map((m) => `- waited for the server-wide role lock, held by ${lockHolder(m[1], own)}`);
 }
 
 /** The marker on database `postgres`: the package's server items every run has noted, and --clean's epoch. */
@@ -727,13 +737,14 @@ function statementsOf(file) {
  * SQL that runs one file's statements, as it is or recorded the way SqlMigrationRunner records it.
  * AT lines say which statement was running when one fails.
  */
-function fileSql(file, folder, { record, label: which, server = null }) {
+function fileSql(file, folder, { record, label: which, server = null, timed = false }) {
   const text = readSql(file);
   const name = path.basename(file);
   const statements = statementsOf(file);
   // The server-wide lock first: no other migration transaction, of this folder or another, runs while this one
   // does, so `server` (the roles before and after) is the server as this file leaves it, and what it changed.
-  let out = `BEGIN;\n${MIGRATION_LOCK}${server ? tag(`${server}0`, CLUSTER_SQL) : ''}`;
+  // `timed` starts the clock once the lock is held, so a wait for it is not counted as the file's time.
+  let out = `BEGIN;\n${MIGRATION_LOCK}${server ? tag(`${server}0`, CLUSTER_SQL) : ''}${timed ? tag('T', 'extract(epoch FROM clock_timestamp())') : ''}`;
   statements.forEach((s, i) => { out += tag('AT', quote(`${which}|${name}|${i + 1}|${s.line}`)) + execute(s.sql); });
   if (server) out += tag(`${server}1`, CLUSTER_SQL);
   if (record) {
@@ -1014,8 +1025,8 @@ async function checkOne(root, id, key, check, args, out, image) {
   // The ticket's file on one copy: snapshot, apply (recorded), snapshot, apply again (not recorded),
   // snapshot. The package's statements on the other copy, at the same time.
   const time = tag('T', 'extract(epoch FROM clock_timestamp())');
-  const aSql = (cached ? '' : snap('SNAP0')) + time
-    + fileSql(file, folder, { record: true, label: 'first run', server: 'S' }) + time + snap('SNAP1')
+  const aSql = (cached ? '' : snap('SNAP0'))
+    + fileSql(file, folder, { record: true, label: 'first run', server: 'S', timed: true }) + time + snap('SNAP1')
     + fileSql(file, folder, { record: false, label: 'second run', server: 'R' }) + snap('SNAP2');
   // The package's statements hold the same server-wide lock, so its role-making and the file's never overlap.
   let b = `SET check_function_bodies = off;\nBEGIN;\n${MIGRATION_LOCK}`;
@@ -1032,12 +1043,17 @@ async function checkOne(root, id, key, check, args, out, image) {
   });
   b += `COMMIT;\n${snap('SNAPB')}`;
   const [a, e] = await Promise.all([sessionAsync(names.ticket, aSql), cached ? null : sessionAsync(names.expect, b)]);
-  [...new Set([...lockWaits(a), ...lockWaits(e)])].forEach((w) => out(w));
-  if (!a.ok) return { failed: failure(a) };
+  const own = [names.ticket, names.expect];
+  [...new Set([...lockWaits(a, own), ...lockWaits(e, own)])].forEach((w) => out(w));
+  if (!a.ok) {
+    const why = failure(a);
+    const held = / still held by (process \d+ in database \S+?, [^.]*?)\. Every/.exec(why)?.[1];
+    return { failed: held && own.some((d) => held.includes(`database ${d},`)) ? `${why}\nThe holder was ${lockHolder(held, own)}, which ran longer than the wait.` : why };
+  }
   const [t0, t1] = (a.tags.T ?? []).map(Number);
   out(`- first run: ${plural(mine.length, 'statement')} applied in ${secs((t1 - t0) * 1000)}`);
-  const own = `register ${name}`;
-  const drop = (s) => { const c = { ...s }; delete c[own]; return c; };
+  const register = `register ${name}`;
+  const drop = (s) => { const c = { ...s }; delete c[register]; return c; };
   const after = drop(JSON.parse(a.last('SNAP1')));
   const again = againDiffs(after, drop(JSON.parse(a.last('SNAP2'))));
   if (!again.length) out('- second run: applied again, changed nothing');

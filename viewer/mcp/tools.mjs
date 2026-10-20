@@ -1264,7 +1264,8 @@ export function memberItem(member, role, { admin = false, inherit = true, set = 
 }
 
 /**
- * The server-level state a database's package files make, read from their text (function bodies included): the
+ * The server-level state package files make, read from their text (function bodies included); adam_pull reads
+ * every database's files, since roles are the server's (review 8). It gives the
  * roles they create, with every attribute that matters; the role memberships they grant, with their ADMIN,
  * INHERIT and SET options; and the role settings they set. Each item is printed the way the script's CLUSTER_SQL
  * prints the server's, and the script holds the server to exactly these (plus its own bootstrap superuser):
@@ -1423,6 +1424,15 @@ async function writeExpectedSchema(client, wp, touches, folder, release) {
     const databases = ticket.kind === 'baseline'
       ? ['tenant', 'control'].filter((d) => files.some((f) => f.startsWith(`${d}/`)))
       : [ticket.database ?? ticket.tables.map(dbOf).find(Boolean) ?? 'tenant'];
+    // Roles belong to the server, not to one database (review 8): every check is held to the roles, memberships and
+    // role settings the package files of every database make, the set --clean restores too. One source for both.
+    const everyFile = [];
+    for (const f of files.filter((x) => x.split('/')[1])) {
+      const text = await packageText(client, `backend/${f}`);
+      if (text === null) throw new Error(`backend/${f} would not read`);
+      everyFile.push({ name: f.split('/')[1], text });
+    }
+    const server = serverAllowances(everyFile);
     const checks = [];
     for (const database of databases) {
       const mine = files.filter((f) => f.split('/')[0] === database && f.split('/')[1]);
@@ -1438,7 +1448,7 @@ async function writeExpectedSchema(client, wp, touches, folder, release) {
       if (!texts.length) throw new Error(`no DDL for ${database} in this package`);
       const statements = ticketStatements(texts, ticket);
       const used = [...new Set(statements.map((s) => s.file))].map((f) => `backend/${database}/${f}`);
-      checks.push({ ...expectedCheck(schemaModel(texts), ticket, statements, { database, sources: used }), server: serverAllowances(texts) });
+      checks.push({ ...expectedCheck(schemaModel(texts), ticket, statements, { database, sources: used }), server });
     }
     const body = {
       about: 'What this ticket\'s migration must leave behind, from the package DDL: the tables\' end state, and '
