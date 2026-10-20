@@ -9,7 +9,8 @@ summary: 'eraseSubject and revokePaymentToken declare the tables they write, whe
 decision:
   what: 'contracts/satellite/ai.yaml eraseSubject: x-ticvai-writes ai.index_entry, ai.chunk_embedding.
     contracts/spine/orders.yaml revokePaymentToken: x-ticvai-writes payments.token. Both {table, for}, as the
-    operations'' own descriptions already say.'
+    operations'' own descriptions already say. Being writes, their 2xx responses carry the X-Consistency-Token header
+    (api-conventions section 3; check-package found both once the lineage had their writes).'
   by: Chinmay
   date: '2026-10-20'
 why: 'Finding: check-write-lineage W-NOTABLE on eraseSubject and revokePaymentToken (merge-intpass report, concern 4),
