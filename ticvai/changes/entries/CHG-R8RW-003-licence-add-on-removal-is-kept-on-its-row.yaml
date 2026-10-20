@@ -1,0 +1,38 @@
+id: CHG-R8RW-003
+date: '2026-10-20'
+source: audit
+kind: contract
+proposed: '2026-10-20T23:40'
+summary: 'removeLicenceAddOn''s reason has a home: the add-on row is ended, not deleted (validTo today) and keeps
+  removedAt, removedByPrincipalId and removalReason (new readOnly LicenceAddOn fields, columns on
+  control.licence_add_on); the request reason is x-ticvai-stored-as control.licence_add_on.removal_reason. The
+  promise "recorded on its contract" and the x-ticvai-writes of control.contract are gone: the contract row does not
+  change. A removed add-on counts in no LicencePosition and blocks no new add-on.'
+decision:
+  what: 'contracts/satellite/subscription.yaml removeLicenceAddOn description, x-ticvai-writes, request reason;
+    LicenceAddOn removedAt, removedByPrincipalId, removalReason.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: the r8 re-walk of 20 October 2026, part 2 (audit/ticvai/r8-blockers/rewalk-part2.md, outside git),
+  SVC-PLATFORM-LICENSING-3 #27970, request-field-no-column: CHG-R8WFC-003 said the removal "is recorded on its
+  contract with reason" and declared a write of control.contract, which has no reason column, and nothing said what
+  changed on the contract row.'
+keys_touched:
+  operations: [removeLicenceAddOn]
+  files:
+  - contracts/satellite/subscription.yaml
+root_class: 'a walk fix whose own text promised what the schema cannot hold (CHG-R8WFC-003)'
+tickets:
+  started: []
+  unstarted:
+  - 27970
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: r8 re-walk, a release fix'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-request-fields-stored.py
+status: open
+notes: 'New readOnly response fields only: additive. The next refresh writes three ADD COLUMN lines for
+  control.licence_add_on into the control forward migration (proved on PostgreSQL 16, rewalk-fix-report.md).'

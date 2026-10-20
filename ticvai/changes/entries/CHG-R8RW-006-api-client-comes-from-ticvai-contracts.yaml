@@ -1,0 +1,35 @@
+id: CHG-R8RW-006
+date: '2026-10-20'
+source: audit
+kind: spec
+proposed: '2026-10-20T23:58'
+summary: 'The generated SETUP-CLIENTS text says the typed client @ticvai/api-client is generated and published from
+  ticvai-contracts to the ticvai-frontend group''s GitLab npm registry on each contracts tag, pinned by exact version
+  in each frontend repository, instead of "In ticvai-frontend packages/api-client", a repository and folder that do
+  not exist.'
+decision:
+  what: 'tools/build-service-docs.py, the SETUP-CLIENTS foundation task text.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: the r8 re-walk of 20 October 2026, part 1 (audit/ticvai/r8-blockers/rewalk-part1.md, outside git),
+  SETUP-CLIENTS #27640: no ticvai-frontend repository or packages/api-client exists (docs/active/frontend-repos.yaml);
+  the quickstart says ticvai-contracts holds the generated clients, and the ADR-0007 amendment and the dependencies
+  register say @ticvai/api-client is published to the group''s npm registry.'
+keys_touched:
+  operations: []
+  files:
+  - tools/build-service-docs.py
+root_class: 'foundation task text left behind by a repository layout change (CHG-R8WFC-008)'
+tickets:
+  started: []
+  unstarted:
+  - 27640
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: r8 re-walk, a release fix'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-frontend-repos.py
+status: open
+notes: 'The task text is written into handoff/service-docs by the next refresh (build-service-docs, op-descriptions).'

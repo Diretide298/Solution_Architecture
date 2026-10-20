@@ -634,18 +634,42 @@ paths:
         recorded with a reason and an approver** rather than done by editing a date.
 
 
-        **How finance is told, and who the approver is** (r8 walk fix, CHG-R8WFC-003). In `mode` `apply`, an
-        `expire` or `forfeit` closes each lot, writes one `wallet.wallet_transaction` taking its remaining amount
-        off the balance, and emits `wallet.creditExpired` per lot to the outbox in the same transaction; the
-        ledger consumes it and posts the breakage on the accounts `wallet.accounting_mapping` names. Each act is
-        recorded as one `wallet.adjustment` row: `reason` is required for `extend` and `forfeit` in `apply`
-        (`400 validation` without it), and the approver is the caller, who holds `WALLET_OPERATE`
-        (`performed_by` and `approved_by` are both the caller''s principal; no second person is asked). A
-        `preview` writes and emits nothing.
+        **How finance is told, and who the approver is** (r8 walk fix, CHG-R8WFC-003; r8 re-walk, CHG-R8RW-002).
+        In `mode` `apply`, an `expire` or `forfeit` sets each lot''s `status` to `expired` or `forfeited` and its
+        `remainingAmount` to zero, takes that amount off the wallet''s `wallet.balance` row through the one
+        balance writer (SD-027: the row locked for one guarded statement) with one `wallet.wallet_transaction`
+        per lot, and emits `wallet.creditExpired` per lot to the outbox, all in the same transaction; the ledger
+        consumes it and posts the breakage on the accounts `wallet.accounting_mapping` names. An `extend` sets
+        each lot''s `expiresAt` to `extendToDate` and moves no money.
+
+        **Each act is recorded as one `wallet.adjustment` row per wallet** (`lotIds` may span wallets): `kind`
+        `expiry`, `forfeiture` or `extension`, `walletId` the wallet, `affectedLotIds` that wallet''s lots in
+        the act, `amount` the total taken off its balance (zero for an extension), `reason`, `at`. `reason` is
+        required for `extend` and `forfeit` in `apply` (`400 validation` without it), and the approver is the
+        caller, who holds `WALLET_OPERATE` (`performedBy` and `approvedBy` are both the caller''s principal; no
+        second person is asked). A `preview` writes and emits nothing.
 
         '
       x-ticvai-emits:
       - wallet.creditExpired
+      x-ticvai-reads:
+      - table: wallet.credit_lot
+        for: 'the lots asked for, or those past expiry at asOf (r8 re-walk, CHG-R8RW-002)'
+      - table: wallet.credit_type
+        for: 'each lot''s credit type, for its breakage treatment (r8 re-walk, CHG-R8RW-002)'
+      - table: wallet.accounting_mapping
+        for: 'the breakage accounts wallet.creditExpired carries to the ledger (r8 re-walk, CHG-R8RW-002)'
+      - table: wallet.balance
+        for: 'the wallet''s balance row, locked by the one balance writer (SD-027) (r8 re-walk, CHG-R8RW-002)'
+      x-ticvai-writes:
+      - table: wallet.credit_lot
+        for: 'status expired or forfeited and remaining amount zero, or expiresAt moved for an extension (r8 re-walk, CHG-R8RW-002)'
+      - table: wallet.balance
+        for: 'an expiry or forfeiture takes the lots'' remaining amount off the balance (SD-027) (r8 re-walk, CHG-R8RW-002)'
+      - table: wallet.wallet_transaction
+        for: 'one movement per lot an expiry or forfeiture closes (r8 re-walk, CHG-R8RW-002)'
+      - table: wallet.adjustment
+        for: 'one row per wallet per act, kind expiry, forfeiture or extension (r8 re-walk, CHG-R8RW-002)'
       tags:
       - wallet
       x-ticvai-permission: WALLET_OPERATE
@@ -2281,6 +2305,10 @@ paths:
       - query: orders#paymentRecords
         route: in-process
         for: 'the top-up''s payment (402 payment-declined) (CHG-MOD-003)'
+      - query: orders#salesOrderRecords
+        route: in-process
+        for: 'the order the payment paid: its kind must be walletTopUp, its subject this wallet''s and its gross
+          amount this top-up''s (422 payment-not-for-top-up) (r8 re-walk, CHG-R8RW-001)'
       x-ticvai-note: >-
         **Through the one balance writer** (system-design review SD-027, 29 September): the `wallet.balance` row is
         locked for one guarded statement and every movement is a `wallet.wallet_transaction` with its `walletId`,
@@ -2298,15 +2326,21 @@ paths:
         Creates a liability, not revenue. Recognition happens when the value is spent, or as
         breakage if the wallet expires.
 
-        **Paid first, then credited** (r8 walk fix, CHG-R8WFC-003; the 402 named a payment the body
-        never identified). The till or the guest app takes the money with Orders' payment operations
-        (`createPayment`, and `capturePayment` where the provider authorises first) and sends that
-        payment's id as `paymentId`. Wallet reads it through `orders#paymentRecords` in process: a
-        payment that is `captured` and whose amount covers `amount` is credited, and its id is kept as
-        the new credit lot's `source_reference` (`source_kind` `topUp`), so one payment funds one top-up;
-        a payment that is `declined` or `failed`, or not captured, is refused `402 payment-declined` and
-        nothing is credited; a payment already used for a top-up is refused `409
-        payment-already-used`. `tender` stays the receipt's label.
+        **Paid first, on a top-up order, then credited** (r8 walk fix, CHG-R8WFC-003; r8 re-walk,
+        CHG-R8RW-001). The till or the guest app first makes a top-up order with Orders' `createOrder`: one
+        line for the venue's catalogue product of kind `walletTopUp`, priced at `amount`, which makes the
+        order `kind` `walletTopUp`. It pays that order with `createPayment` (and `capturePayment` where the
+        provider authorises first) and sends the payment's id as `paymentId`. Wallet reads the payment
+        through `orders#paymentRecords` and its order through `orders#salesOrderRecords`, in process.
+
+        **Only a top-up payment can become wallet credit.** The payment must be `captured`; its order must
+        be of kind `walletTopUp`, for this wallet's subject (`subjectId`), with a `grossAmount` equal to
+        `amount`. A payment taken on any other order (tickets, goods, food) is refused `422
+        payment-not-for-top-up`, as is one whose order's subject or amount differs, and nothing is
+        credited. A payment that is `declined` or `failed`, or not captured, is refused `402
+        payment-declined`. A payment already used for a top-up is refused `409 payment-already-used`: its id
+        is kept as the new credit lot's `source_reference` (`source_kind` `topUp`), so one payment funds
+        one top-up. `bonusAmount` is not paid for and is not compared. `tender` stays the receipt's label.
       tags: [wallet]
       x-ticvai-permission: WALLET_OPERATE
       x-ticvai-scope-level: workstation
@@ -2328,7 +2362,8 @@ paths:
                 paymentId:
                   type: string
                   format: uuid
-                  description: 'The orders.payment that paid for this top-up (r8 walk fix, CHG-R8WFC-003). Required in
+                  description: 'The orders.payment that paid for this top-up (r8 walk fix, CHG-R8WFC-003): a captured
+                    payment of an order of kind `walletTopUp` (r8 re-walk, CHG-R8RW-001). Required in
                     fact: a body without it is refused `400 validation`; optional in the schema only so a client built at
                     r1 still validates.'
                   x-ticvai-references: orders.payment
@@ -2352,6 +2387,13 @@ paths:
         '402':
           x-ticvai-problem-types: [payment-declined]
           description: Payment declined, failed or not captured (the body's `paymentId`)
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '422':
+          x-ticvai-problem-types: [payment-not-for-top-up]
+          description: 'The body''s `paymentId` did not pay a top-up: its order is not of kind `walletTopUp`, or is for
+            another subject, or its gross amount is not `amount`. Nothing is credited (r8 re-walk, CHG-R8RW-001).'
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
@@ -5108,12 +5150,17 @@ components:
           format: uuid
         kind:
           type: string
+          description: '`expiry`, `forfeiture` and `extension` (r8 re-walk, CHG-R8RW-002) are `expireCreditLots`''
+            acts, one row per wallet per act; `affectedLotIds` names the lots, and an extension''s `amount` is zero.'
           enum:
           - reversal
           - chargeback
           - goodwill
           - correction
           - writeOff
+          - expiry
+          - forfeiture
+          - extension
         amount:
           x-ticvai-column: adjustment_amount
           $ref: ../shared/common.yaml#/components/schemas/Money
