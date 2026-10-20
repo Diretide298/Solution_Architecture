@@ -169,16 +169,20 @@ platforms:
     app: ticvai-web
     repo: ticvai-web
     assumed: true
-    note: 'A new repository for the platform console, ticvai-web in the ticvai-frontend group (the lead, 20 October
-      2026, r8 causes APPROVALS-TENANCY-C43 and IDENTITY-C05, option A). The lead creates it in GitLab; until it
-      exists a developer asks the lead before building a P09 screen.'
+    note: 'The repository of the platform console, ticvai-web in the ticvai-frontend group (the lead, 20 October
+      2026, r8 causes APPROVALS-TENANCY-C43 and IDENTITY-C05, option A). The lead created it in GitLab on 20 October
+      2026 ("I have 6 adn 7 as well", item 7 "create the ticvai-web repository in GitLab"; CHG-R8DEC-003). Its
+      layout is not known yet, so a P09 ticket gives the default profile as a suggested location.'
     observed:
-      by: the r8 surface lane, for Chinmay
+      by: Chinmay Parab
       date: '2026-10-20'
-      how: the lead's answer of 20 October 2026 (r8 causes APPROVALS-TENANCY-C43, IDENTITY-C05)
+      how: the lead's statement of 20 October 2026 that he created it (CHG-R8DEC-003); nobody on the package team
+        opened it
       reachable: false
-      result: 'Not created yet: the lead creates ticvai-web in the ticvai-frontend group. Nothing inside it can be
-        read, so its profile is the default above (assumed); its owner confirms the real layout once it exists.'
+      result: 'Created by the lead. Whether it can be reached was not checked: GitLab is private and the package
+        team has no login, as this file says above (`reachable: false` means nothing inside it was read). Nothing
+        inside it is known yet, so its profile stays the default above (assumed); its owner confirms the real
+        layout.'
       confirmed: false
   P10:
     name: Partner Web - Reseller Portal
