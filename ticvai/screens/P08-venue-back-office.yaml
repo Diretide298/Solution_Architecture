@@ -157999,6 +157999,8 @@ screens:
       components:
       - kind: selectField
         label: P2P enabled
+        bindsTo: WalletTransferRules.peerToPeerAllowed
+        operation: getWalletTransferRules
         provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 76 §Configure
       - kind: selectField
         label: Eligible wallet types
