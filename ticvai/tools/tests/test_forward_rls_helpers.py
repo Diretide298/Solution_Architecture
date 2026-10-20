@@ -134,8 +134,11 @@ def test_a_scope_path_replacing_the_venue_policy_backfills_the_venue_then_the_te
     assert "WHERE level = 'tenant') WHERE scope_path IS NULL" in sql and sql.endswith("SET NOT NULL")
     # without the venue policy, a venue_id alone names no owner: the person decides, as before
     assert fwd.scope_path_backfill("ledger.account_mapping", {"venue_id": "uuid", "scope_path": "ltree"}) is None
-    # the policy in force is the last call: a table moved off the venue policy earlier is not read as venue-owned
-    later = model(t + "SELECT platform.apply_venue_rls('ledger.account_mapping'::regclass);\n"
-                  "SELECT platform.drop_rls_policies('ledger.account_mapping'::regclass);\n"
-                  "SELECT platform.apply_tenant_rls('ledger.account_mapping'::regclass);\n")
-    assert not fwd.was_venue_rls(later, "ledger.account_mapping")
+    # read as was_tenant_root is, from the first policy: once the forward migration that applies read-beneath is on
+    # the old side, the backfill the review names survives the next derive (the CHG-MOD-007 class)
+    applied = model(t + "SELECT platform.apply_venue_rls('ledger.account_mapping'::regclass);\n"
+                    "SELECT platform.drop_rls_policies('ledger.account_mapping'::regclass);\n"
+                    "SELECT platform.apply_read_beneath_rls('ledger.account_mapping'::regclass);\n")
+    assert fwd.was_venue_rls(applied, "ledger.account_mapping")
+    tenant_first = model(t + "SELECT platform.apply_tenant_rls('ledger.account_mapping'::regclass);\n")
+    assert not fwd.was_venue_rls(tenant_first, "ledger.account_mapping")

@@ -737,14 +737,16 @@ def was_tenant_root(model, t: str) -> bool:
 
 
 def was_venue_rls(model, t: str) -> bool:
-    """The policy in force on `t` in `model` (its last policy call) is `apply_venue_rls`: each row was owned by its
-    `venue_id`, a platform.scope id, and a null one by the tenant root (CHG-R8RES-001)."""
-    last = None
+    """`t`'s first policy in `model`, before any scope policy, was `apply_venue_rls`: each row it held then was owned
+    by its `venue_id`, a platform.scope id, and a null one by the tenant root (CHG-R8RES-001). The first, as
+    was_tenant_root reads it, and not the last: once the forward migration that adds the scope_path is applied, the
+    table's last policy is the new one, and the backfill the review names must survive the next derive (the
+    CHG-MOD-007 class: a review row dropped for a column nobody changed)."""
     for _k, st in model.order:
         rc = rls_call(st)
-        if rc and rc[1] == t:
-            last = rc[0]
-    return last == "apply_venue_rls"
+        if rc and rc[1] == t and rc[0] != "drop_rls_policies":
+            return rc[0] == "apply_venue_rls"
+    return False
 
 
 def tables_named(stmt: str, known: set) -> set:
