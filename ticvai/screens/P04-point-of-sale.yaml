@@ -9444,11 +9444,11 @@ screens:
       identified guest (`addCartLine`); the wallet is loaded by `topUpWallet` once the sale is paid ("loads
       on payment"). Dismissing sends nothing; the screen behind is unchanged.'
     confirm:
-      label: Add top-up to sale
+      label: Top up wallet
       operation: addCartLine
     dismiss:
       label: Cancel
-    provenance: client-verified prototype (confirmTopup, "Add top-up to sale"); r8 gate, 21 October 2026
+    provenance: client-verified prototype (confirmTopup, which adds the top-up to the sale); r8 gate, 21 October 2026
       (CHG-R8RW-009)
   gaps:
   - operation: null
