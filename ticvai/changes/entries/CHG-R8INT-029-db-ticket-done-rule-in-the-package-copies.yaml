@@ -1,0 +1,32 @@
+id: CHG-R8INT-029
+date: '2026-10-20'
+source: audit
+kind: spec
+summary: 'The package''s copies of backend-patterns.md say what a [DB] ticket''s done is, as ADAM''s backend starter now
+  does: `node .claude/scripts/db-ticket.mjs <ticket>` says MATCH (the file applied to a copy of the previous state and
+  then again leaves exactly what the package''s statements leave), and `--full <database>` applies every file once, in
+  order, to an empty database before the merge request.'
+decision:
+  what: 'repos/ticvai-docs/setup/backend-patterns.md and the five project-bible copies (ticvai-ai, ticvai-backend,
+    ticvai-contracts, ticvai-frontend, ticvai-infra): the [DB] sentence replaced by the starter''s.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: check-starter-fit SF-DOCS-MIRROR backend-patterns.md after the merge of adam/faster-db-r8 (923784c4); the
+  ADAM report (audit/adam-faster-db-tickets-report.md, I4 and the checks) leaves the package copy to take the starter''s
+  sentence at the r8 merge.'
+keys_touched:
+  files:
+  - repos/ticvai-docs/setup/backend-patterns.md
+  - repos/ticvai-backend/project-bible/setup/backend-patterns.md
+root_class: 'a starter standards doc changed in ADAM before its package copy'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: r8 integration'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-starter-fit.py
+status: open
