@@ -52,7 +52,9 @@ notes: '**Owner.** The plan''s owner of the Qdrant erasure (AI-ENGINE-QDRANT: "e
   plannedNamesNote keeps the AI tickets with Kalpita Mejari until Mrunali starts. reindexSource itself is a back-end
   task (SVC-AI-RETRIEVAL-1, Hrushikant Patkar), not an AI engineer''s. **Sprint.** Both AI engineers'' Sprint 2 is full
   (the second AI engineer is on AI-ENGINE-BASELINE until day 20.7, Kalpita Mejari on AI-ENGINE-GUIDED and
-  AI-ENGINE-TRANSLATE). tools/derive-block-a-schedule.py places the task by its waits and its owner''s capacity; the
-  sprint it lands in is in the erase-subject report. **No points:** AI engine tasks are sized in engineer-days
+  AI-ENGINE-TRANSLATE). tools/derive-block-a-schedule.py places the task by its waits and its owner''s capacity: on the
+  derive of 691e2b9e it lands in Sprint 4, 17 to 19 November, after AI-ENGINE-EVAL and before the module tests, which
+  move from 23 to 25 November; the A2 AI work (AI-ENGINE-PLANNER, AI-ENGINE-SUGGESTIONS) moves from Sprint 4 to
+  Sprint 5 and ends 10 December, inside A2''s target of 11 December. Block A''s end does not move. **No points:** AI engine tasks are sized in engineer-days
   (block-a-extra-tasks.json note). SVC-AI-RETRIEVAL-3 was never pushed (pms-map.json), so taking eraseSubject off it
   renames no pushed key.'
