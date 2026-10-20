@@ -126,11 +126,15 @@ wherever you meet it (the ticket's Done when, `backend-patterns.md`, an older co
    triggers, `CREATE/ALTER/DROP ROLE`, `USER` or `GROUP`, `ALTER SYSTEM`, and `SET ROLE`,
    `SET SESSION AUTHORIZATION` or `session_replication_role` (also through `set_config`). Files
    already applied stay as they are.
-2. Run `node .claude/scripts/db-ticket.mjs <ticket>`. It applies only this file to a copy of the
+2. Run `node .claude/scripts/db-ticket.mjs <ticket>`. **The rule: the database must end up exactly as
+   the package says, roles included.** It applies only this file to a copy of the
    database at the previous state, applies it a second time (which must succeed and change nothing),
    applies the package statements to a second copy, and compares the two databases whole: the ticket's
    tables must be what the package makes, and nothing else may change, privileges, owners, the
-   migration register and rows included. It needs Docker Desktop running; the first run starts its own
+   migration register and rows included. The server's roles (their attributes, memberships and
+   settings) must be exactly the ones the package's files make, whoever put any other there: a role
+   left by an earlier run, an earlier file or another folder makes the result DIFFERENT until
+   `--clean`. It needs Docker Desktop running; the first run starts its own
    PostgreSQL 16 container. **The first run for a folder can take several minutes** (it builds a
    template of the earlier files): give the command a 10-minute timeout (Bash `timeout: 600000`) or run
    it in the background. Later runs take seconds.
@@ -147,8 +151,10 @@ wherever you meet it (the ticket's Done when, `backend-patterns.md`, an older co
 If MATCH cannot be reached because the package itself is wrong (a type no file creates, a policy on a
 table a later migration creates), the check says so; that is a change request, as in "When the package
 is wrong". `node .claude/scripts/db-ticket.mjs --clean` drops this folder's check databases (template,
-copies, the --full database) and its kept snapshots, and in its own container removes any role or role
-membership a file made and resets role settings. Another folder's databases (template, half-built
+copies, the --full database) and its kept snapshots, and in its own container puts the server's roles
+back to exactly what the package makes: any other role goes, and the package's roles, memberships and
+role settings are reset to the package's. Run it when a result names a role, then run the check again.
+Another folder's databases (template, half-built
 template, --full) go by themselves after two weeks unused, or at once when none of them carries a
 date of use (leftovers of an older version), but never while that folder is running.
 <!-- ADAM:end db-ticket -->
