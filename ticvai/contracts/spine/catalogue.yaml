@@ -25011,10 +25011,12 @@ components:
           type: string
           format: uuid
           description: The reporting workstation, from the caller's session.
+          x-ticvai-references: platform.workstation
         venueId:
           type: string
           format: uuid
           description: The workstation's venue (the bundle's venue).
+          x-ticvai-references: platform.scope
         bundleVersion:
           type: string
           description: The bundle version from the path.

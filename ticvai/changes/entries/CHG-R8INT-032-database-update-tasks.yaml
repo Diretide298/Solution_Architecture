@@ -18,6 +18,8 @@ decision:
     tools/tests/test_block_a_schedule_due.py.'
   by: Chinmay
   date: '2026-10-20'
+waivers:
+  cooling_off: {by: Chinmay, date: '2026-10-20', quote: 'waive the database tasks'}
 why: 'The lead, 20 October 2026 evening: "Currently all the devs are runnning a local db version can we add them to the
   tickets to update them if not than they can close the ticket. hrusikant is also running the live version we can ask
   them in tickets to directly make updates to the db ?" r8 adds forward migrations (tenant V0103a, V0105a, V0108, V0109;

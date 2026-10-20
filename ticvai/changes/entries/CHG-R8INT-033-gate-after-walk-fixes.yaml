@@ -1,0 +1,39 @@
+id: CHG-R8INT-033
+date: '2026-10-20'
+source: audit
+kind: contract
+proposed: '2026-10-20T21:00'
+summary: 'Three gate findings of the refresh after the walk fixes, fixed at the source: (1) orders.yaml voidOrder''s
+  `note` got its description back (the walk fix had left it on `supervisorStepUp`, a duplicate YAML key that kept the
+  wrong text); (2) BundleApplication.workstationId and venueId declare what they reference (platform.workstation,
+  platform.scope); (3) check-contract-storage counts a CHECK the generated forward migrations add as the fix, as it
+  counted a change still listed in migration-review.md.'
+decision:
+  what: 'contracts/spine/orders.yaml (voidOrder request note/supervisorStepUp descriptions); contracts/spine/catalogue.yaml
+    BundleApplication x-ticvai-references on workstationId and venueId; tools/check-contract-storage.py reads
+    backend/*/V01*.sql ADD CONSTRAINT ... CHECK (col IN (...)) as fixed.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: the full refresh of 6e3c07ea (refresh-safe run of 20 October, about 21:00): check-yaml-keys and check-package
+  (duplicate key orders.yaml 5506/5510, from CHG-R8WFC-005), check-storage-promises SP-KEY-UNDECLARED (two keys on
+  catalogue.bundle_application, CHG-R8MIG-015), check-contract-storage ST-ENUM-CHECK on marketing.cookie_scan_policy.frequency
+  (its CHECK moved from migration-review.md into V0108 by CHG-R8WFM-001, which the check did not read).'
+keys_touched:
+  operations: [voidOrder, reportBundleApplied]
+  files:
+  - contracts/spine/orders.yaml
+  - contracts/spine/catalogue.yaml
+  - tools/check-contract-storage.py
+root_class: 'a gate finding introduced by the same night''s fixes'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: r8 gate, a release fix'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-yaml-keys.py
+status: open
+notes: 'The new references add their keys to the derived DDL at the next refresh (a forward migration line).'

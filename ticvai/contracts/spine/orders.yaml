@@ -5499,6 +5499,7 @@ paths:
                   minLength: 3
                   maxLength: 500
                   nullable: true
+                  description: Required when `reason` is `other` (audit R222); optional otherwise.
                   x-ticvai-stored-as: orders.order_event.note
                 supervisorStepUp:
                   allOf:
@@ -5507,7 +5508,6 @@ paths:
                     CHG-R8WFC-005). Absent when the caller holds it. Its principal is stored on the void's
                     order_event row as `approvedByPrincipalId`.
                   x-ticvai-stored-as: orders.order_event.approved_by_principal_id
-                  description: Required when `reason` is `other` (audit R222); optional otherwise.
                 recordedAt:
                   type: string
                   format: date-time

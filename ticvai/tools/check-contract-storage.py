@@ -220,6 +220,13 @@ def main() -> int:
     if review.exists():
         pending = set(re.findall(r"^\| (?:column changed|not null) \| \w+ \| `([a-z_]+\.[a-z_0-9]+\.[a-z_0-9]+)` \|",
                                  review.read_text(encoding="utf-8"), re.M))
+    # A CHECK the generated forward migrations add is the fix itself, no longer waiting on a person (r8 walk fix,
+    # CHG-R8WFM-001 moved the widened CHECKs from migration-review.md into V0108): `ALTER TABLE s.t ADD CONSTRAINT
+    # ... CHECK (col IN (...))` in any backend/*/V01*.sql counts the column as fixed, not as a finding.
+    for mig in sorted((g.ROOT / "backend").glob("*/V01*.sql")):
+        for t, c in re.findall(r"^ALTER TABLE ([a-z_]+\.[a-z_0-9]+) ADD CONSTRAINT \w+ CHECK \((\w+) IN \(",
+                               mig.read_text(encoding="utf-8", errors="replace"), re.M):
+            pending.add(f"{t}.{c}")
 
     def add_or_note(rule, key, msg, col_key):
         if col_key in pending:
