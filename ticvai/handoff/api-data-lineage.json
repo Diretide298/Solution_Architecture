@@ -119411,7 +119411,8 @@
     "display_name",
     "id"
    ]
-  }
+  },
+  "guestCallable": true
  },
  "raiseMyCase": {
   "contract": "marketing-crm",
@@ -119462,7 +119463,8 @@
     "title",
     "venue_id"
    ]
-  }
+  },
+  "guestCallable": true
  },
  "getMyCase": {
   "contract": "marketing-crm",
@@ -119602,7 +119604,8 @@
     "scope_path",
     "synced_at"
    ]
-  }
+  },
+  "guestCallable": true
  },
  "getGuestConversation": {
   "contract": "marketing-crm",
@@ -119647,7 +119650,8 @@
   "service": "MarketingService",
   "stores": [
    "postgres"
-  ]
+  ],
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "getGuestMatchPolicy": {
   "contract": "marketing-crm",
@@ -119745,7 +119749,8 @@
     "route": "service",
     "for": "its read of orders.cart, Orders's data (CHG-MOD-001)"
    }
-  ]
+  ],
+  "pure": "a lookup: resolves and returns, nothing is created or merged"
  },
  "decideGuestCheckoutMatch": {
   "contract": "marketing-crm",
@@ -119836,7 +119841,8 @@
    "pii.subject": [
     "id"
    ]
-  }
+  },
+  "pure": "a lookup: resolves and returns, nothing is created or merged"
  },
  "mergeGuests": {
   "contract": "marketing-crm",
@@ -119924,7 +119930,8 @@
     "synced_at",
     "text"
    ]
-  }
+  },
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "updateGuestPreferences": {
   "contract": "marketing-crm",
@@ -119964,7 +119971,8 @@
     "subject_id",
     "updated_at"
    ]
-  }
+  },
+  "guestCallable": true
  },
  "createInvitationCampaign": {
   "contract": "marketing-crm",
@@ -120069,7 +120077,8 @@
     "subject_id",
     "token"
    ]
-  }
+  },
+  "guestCallable": true
  },
  "recordPrivacyIncident": {
   "contract": "marketing-crm",
@@ -120379,7 +120388,10 @@
    "pii.subject": [
     "id"
    ]
-  }
+  },
+  "lineageNote": "OUTSIDE L3 (amend the existing lineage entry by hand; derive-lineage --apply does not update): a waiver submission completes its waiver_requirement (form_submission_id, completed_at, status completed) and appends signatureSubmitted/markedComplete events",
+  "audienceNote": "Narrowed 31 August: generic form endpoint, called by whatever surface owns the form.",
+  "guestCallable": true
  },
  "getWaiverStatus": {
   "contract": "marketing-crm",
@@ -120418,7 +120430,8 @@
     "route": "service",
     "for": "its read of catalogue.product, Catalogue's data (CHG-MOD-001)"
    }
-  ]
+  ],
+  "guestCallable": true
  },
  "uploadGuestDocument": {
   "contract": "marketing-crm",
@@ -120470,7 +120483,8 @@
    "pii.subject": [
     "id"
    ]
-  }
+  },
+  "guestCallable": true
  },
  "createChallenge": {
   "contract": "marketing-crm",
@@ -120647,7 +120661,8 @@
     "starts_at",
     "status"
    ]
-  }
+  },
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "getMyChallenges": {
   "contract": "marketing-crm",
@@ -120700,7 +120715,8 @@
     "subject_id",
     "target"
    ]
-  }
+  },
+  "guestCallable": true
  },
  "getSeoMetadata": {
   "contract": "marketing-crm",
@@ -120926,7 +120942,9 @@
     "synced_at",
     "venue_id"
    ]
-  }
+  },
+  "audienceNote": "Narrowed 31 August: the register is staff-side; a guest reports and claims.",
+  "guestCallable": true
  },
  "recordLostItem": {
   "contract": "marketing-crm",
@@ -120991,7 +121009,9 @@
    "pii.subject": [
     "id"
    ]
-  }
+  },
+  "audienceNote": "Narrowed 31 August: staff record what was handed in.",
+  "guestCallable": true
  },
  "getLostItemMatches": {
   "contract": "marketing-crm",
@@ -121063,7 +121083,8 @@
     "scope_path",
     "status"
    ]
-  }
+  },
+  "guestCallable": true
  },
  "setCallDisposition": {
   "contract": "marketing-crm",
@@ -121561,8 +121582,7 @@
    "pii.subject"
   ],
   "writes": [
-   "cache:idempotency",
-   "marketing.loyalty_position"
+   "cache:idempotency"
   ],
   "routing": null,
   "scope": "venue",
@@ -121614,7 +121634,8 @@
     "display_name",
     "id"
    ]
-  }
+  },
+  "pure": "a lookup: resolves and returns, nothing is created or merged"
  },
  "getMyProfile": {
   "contract": "marketing-crm",
@@ -121722,7 +121743,8 @@
     "tags",
     "visit_count"
    ]
-  }
+  },
+  "guestCallable": true
  },
  "accrueLoyaltyPoints": {
   "contract": "marketing-crm",
@@ -121824,7 +121846,8 @@
     "tier_id",
     "tier_name"
    ]
-  }
+  },
+  "guestCallable": true
  },
  "listConversations": {
   "contract": "marketing-crm",
@@ -122495,7 +122518,8 @@
   "service": "MarketingService",
   "stores": [
    "postgres"
-  ]
+  ],
+  "lineageNote": "schema persistence: computed from marketing.loyalty_position (leaderboard_nickname, points_balance)"
  },
  "setLeaderboardNickname": {
   "contract": "marketing-crm",
@@ -122537,7 +122561,8 @@
     "tier_id",
     "tier_name"
    ]
-  }
+  },
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "searchGuests": {
   "contract": "marketing-crm",
@@ -122833,7 +122858,8 @@
   "service": "MarketingService",
   "stores": [
    "postgres"
-  ]
+  ],
+  "lineageNote": "OUTSIDE L3 (amend the existing lineage entry by hand; derive-lineage --apply does not update): a withdrawal writes one consent_propagation row per downstream target (the existing entry also misses consent_record)"
  },
  "recordCheckoutConsents": {
   "contract": "marketing-crm",
@@ -122885,7 +122911,8 @@
     "consent_record_id",
     "id"
    ]
-  }
+  },
+  "note": "New (M18-15). The order.created consumer; idempotent on order id + channel + purpose; attaches to marketing.guest_profile on a GuestMatchPolicy match."
  },
  "notifyPerformanceHolders": {
   "contract": "marketing-crm",
@@ -123184,7 +123211,8 @@
     "unavailable_reason",
     "variant_id"
    ]
-  }
+  },
+  "fixNote": "14 October 2026: CHG-MKT-002: through Catalogue's variantListingFacts (x-ticvai-read-via; ADAM CR-087), by Catalogue's service route"
  },
  "addToWishlist": {
   "contract": "marketing-crm",
@@ -123245,7 +123273,8 @@
     "unavailable_reason",
     "variant_id"
    ]
-  }
+  },
+  "fixNote": "14 October 2026: reads catalogue.variant, catalogue.product (CHG-TEN-002: through Catalogue's variantsSellableAt (x-ticvai-read-via; ADAM CR-081), by Catalogue's service route); 14 October 2026: CHG-MKT-002: through Catalogue's variantListingFacts (x-ticvai-read-via; ADAM CR-087), by Catalogue's service route"
  },
  "removeFromWishlist": {
   "contract": "marketing-crm",
@@ -123271,7 +123300,8 @@
   "service": "MarketingService",
   "stores": [
    "postgres"
-  ]
+  ],
+  "fixNote": "14 October 2026: CHG-MKT-002: it deletes the guest's wishlist row, not the guest profile (ADAM CR-087)"
  },
  "listGuestDevices": {
   "contract": "marketing-crm",
@@ -123392,7 +123422,8 @@
     "table": "identity.guest_session",
     "operation": "endGuestDeviceSessions"
    }
-  ]
+  ],
+  "fixNote": "14 October 2026: CHG-MKT-001: it revokes the device row and clears its token, not the guest profile (ADAM CR-086); 14 October 2026: writes identity.guest_session (CHG-MOD-009: ends the device's guest sessions through Identity's endGuestDeviceSessions (x-ticvai-write-via, service route))"
  },
  "listSegments": {
   "contract": "marketing-crm",
@@ -123508,9 +123539,7 @@
    "marketing.segment_criterion",
    "marketing.suppression"
   ],
-  "writes": [
-   "marketing.segment_criterion"
-  ],
+  "writes": [],
   "routing": null,
   "scope": "venue",
   "perm": "MARKETING_VIEW",
@@ -123523,7 +123552,9 @@
   "service": "MarketingService",
   "stores": [
    "postgres"
-  ]
+  ],
+  "pure": "a preview counts and stores nothing (the contract says it writes nothing)",
+  "fixNote": "4 October 2026 (CHG-FXC-004): a preview counts and stores nothing (the contract says it writes nothing)"
  },
  "previewSegment": {
   "contract": "marketing-crm",
@@ -123595,7 +123626,8 @@
     "tags",
     "visit_count"
    ]
-  }
+  },
+  "fixNote": "4 October 2026 (CHG-FXC-004): the definition evaluated live"
  },
  "listCampaigns": {
   "contract": "marketing-crm",
@@ -123941,7 +123973,8 @@
   "service": "MarketingService",
   "stores": [
    "postgres"
-  ]
+  ],
+  "lineageNote": "per-recipient hour from ai.requestSuggestion kind sendTime (a service call, not a table read); dispatch rows carry campaign_variant_id and planned_send_at"
  },
  "pauseCampaign": {
   "contract": "marketing-crm",
@@ -124192,7 +124225,8 @@
     "campaign_id",
     "id"
    ]
-  }
+  },
+  "lineageNote": "per-variant figures from message_dispatch.campaign_variant_id; existing lineage names marketing.message_delivery, which looks stale against CampaignPerformance's own persistence note (marketing.message_dispatch)"
  },
  "listMessageTemplates": {
   "contract": "marketing-crm",
@@ -124271,7 +124305,8 @@
     "provider_template_id",
     "subjects"
    ]
-  }
+  },
+  "lineageNote": "OUTSIDE L3 (amend the existing lineage entry by hand; derive-lineage --apply does not update): a new template writes its first (draft) message_template_version per language"
  },
  "sendTransactionalMessage": {
   "contract": "marketing-crm",
@@ -124322,7 +124357,8 @@
     "template_id",
     "unsubscribed_at"
    ]
-  }
+  },
+  "lineageNote": "EXISTING entry (amend by hand; derive-lineage --apply does not update). The call writes message_dispatch; the dispatch worker and provider webhooks behind it (and behind campaign sends, launchCampaign) write message_dispatch_attempt and communication_policy_decision. Recorded on the operation description and as job notes on MessageDispatchAttempt and ConsentPreferenceCommunicationPolicyEnforcementView (DM6). If the lineage should keep worker writes off the operation, name the worker instead and leave writes as they are."
  },
  "getMessageStatus": {
   "contract": "marketing-crm",
@@ -124735,7 +124771,8 @@
     "title",
     "venue_id"
    ]
-  }
+  },
+  "lineageNote": "OUTSIDE L3 (amend the existing lineage entry by hand; derive-lineage --apply does not update): appends one case_escalation row per call and bumps case.escalation_count/priority/status"
  },
  "listLoyaltyProgrammes": {
   "contract": "marketing-crm",
@@ -125039,7 +125076,8 @@
     "subject_id",
     "venue_id"
    ]
-  }
+  },
+  "fixNote": "4 October 2026 (CHG-FXC-004): a low rating opens a service case"
  },
  "respondToReview": {
   "contract": "marketing-crm",
@@ -125188,7 +125226,8 @@
     "id",
     "provider_name"
    ]
-  }
+  },
+  "lineageNote": "KPIs over message_dispatch; latency, provider availability and retries from message_dispatch_attempt; byModule via message_dispatch.message_trigger_id -> message_trigger.event -> business_event.source_module (campaign sends count as crm)"
  },
  "setChannelProvider": {
   "contract": "marketing-crm",
@@ -125346,7 +125385,8 @@
     "id",
     "template_id"
    ]
-  }
+  },
+  "lineageNote": "one row per message_template_version (language, version, status, content); code/name/channel/brand/ownership from message_template; businessEvent/sourceModule via message_trigger -> business_event"
  },
  "listBusinessEventNotification": {
   "contract": "marketing-crm",
@@ -125392,7 +125432,8 @@
     "priority",
     "template_id"
    ]
-  }
+  },
+  "lineageNote": "business_event registry rows with their message_trigger rows (event = event_type), each trigger's message_trigger_condition rows and template names"
  },
  "setBusinessEventMapping": {
   "contract": "marketing-crm",
@@ -125443,7 +125484,8 @@
     "priority",
     "template_id"
    ]
-  }
+  },
+  "lineageNote": "updates business_event priority/status; upserts/deactivates message_trigger rows per communication and replaces each trigger's message_trigger_condition rows"
  },
  "listRoutingPriorityThrottling": {
   "contract": "marketing-crm",
@@ -125576,7 +125618,8 @@
     "subject_id",
     "suppression_reason"
    ]
-  }
+  },
+  "lineageNote": "persistence: communication_policy_decision (new), message_dispatch; inputs from consent and suppression"
  },
  "listDeliveryQueueFailure": {
   "contract": "marketing-crm",
@@ -125629,7 +125672,8 @@
     "channel",
     "id"
    ]
-  }
+  },
+  "lineageNote": "one row per message_dispatch; attempts, last failure category/message and next attempt from message_dispatch_attempt; source module, event and priority via message_trigger -> business_event"
  },
  "listProviderHealthUsage": {
   "contract": "marketing-crm",
@@ -125668,7 +125712,8 @@
     "cost",
     "id"
    ]
-  }
+  },
+  "lineageNote": "volume, success, latency, retries, fallback and cost per provider from message_dispatch_attempt; provider names and SLA targets from communication_provider"
  },
  "listDeliveryCommunicationPlatform": {
   "contract": "marketing-crm",
@@ -125695,7 +125740,8 @@
   "service": "MarketingService",
   "stores": [
    "postgres"
-  ]
+  ],
+  "lineageNote": "failure groups and incidents from message_dispatch_attempt (failure_category, provider, channel); module via message_trigger -> business_event; AI findings come from the AI service by operation (ai.suggestion not read directly)"
  },
  "listPrivacyConsent": {
   "contract": "marketing-crm",
@@ -125720,7 +125766,8 @@
   "service": "MarketingService",
   "stores": [
    "postgres"
-  ]
+  ],
+  "lineageNote": "persistence: consent_purpose, consent_capture_point, communication_preference_type, cookie categories (tracking_technology); whitelabel.policy comes through listPolicies"
  },
  "listDataProcessingPurpose": {
   "contract": "marketing-crm",
@@ -125875,7 +125922,8 @@
     "updated_at",
     "version"
    ]
-  }
+  },
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "listCookieTrackingDigital": {
   "contract": "marketing-crm",
@@ -126119,7 +126167,8 @@
     "updated_at",
     "version"
    ]
-  }
+  },
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "listPrivacyNoticePolicy": {
   "contract": "marketing-crm",
@@ -126153,7 +126202,8 @@
     "requires_re_acceptance",
     "status"
    ]
-  }
+  },
+  "lineageNote": "documents are whitelabel.policy read through listPolicies; status, change classification, re-acceptance/notification, owner and approval from privacy_notice_governance (one row per policy version); acceptedCount from consent_record.notice_version"
  },
  "setPrivacyNoticePolicyGovernance": {
   "contract": "marketing-crm",
@@ -126205,7 +126255,8 @@
     "status",
     "updated_at"
    ]
-  }
+  },
+  "lineageNote": "upsert keyed on policy_id (one row per policy version); status draft<->review, review raises approvals.createApprovalRequest (approval_request_id stored), approved/approved_by/approved_at stamped only by decideApprovalRequest; server sets the previous published version superseded on publish. Validates policy_id against whitelabel.policy (read through white-label). Cross-service call to approvals, not a direct write."
  },
  "setMinorGuardianAge": {
   "contract": "marketing-crm",
@@ -126250,7 +126301,8 @@
     "updated_at",
     "version"
    ]
-  }
+  },
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "approvePrivacyTesting": {
   "contract": "marketing-crm",
@@ -126289,7 +126341,8 @@
     "status",
     "updated_at"
    ]
-  }
+  },
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "listPrivacy": {
   "contract": "marketing-crm",
@@ -126318,7 +126371,8 @@
   "service": "MarketingService",
   "stores": [
    "postgres"
-  ]
+  ],
+  "lineageNote": "persistence: guest_profile, consent_record, privacy_request, privacy_action, retention_policy, privacy_exception, privacy_incident (+ legal_hold for retention)"
  },
  "setPrivacyRequestTypes": {
   "contract": "marketing-crm",
@@ -126434,7 +126488,8 @@
     "id",
     "preferred_language"
    ]
-  }
+  },
+  "lineageNote": "persistence: guest_profile, consent_record(_channel), consent_purpose, privacy_request, tracking_technology, pii.subject; timeline from privacy_audit_event"
  },
  "listConsentEvidenceWithdrawal": {
   "contract": "marketing-crm",
@@ -126472,7 +126527,8 @@
     "source",
     "subject_id"
    ]
-  }
+  },
+  "lineageNote": "consent_record(_channel), consent_capture_point; propagation per target from consent_propagation (consent_record_id)"
  },
  "listDataSubjectCustomer": {
   "contract": "marketing-crm",
@@ -126986,7 +127042,8 @@
     "id",
     "request_type"
    ]
-  }
+  },
+  "lineageNote": "adds marketing.device_consent and marketing.device_consent_category to the existing reads"
  },
  "listCustomerService": {
   "contract": "marketing-crm",
@@ -127019,7 +127076,8 @@
     "id",
     "venue_id"
    ]
-  }
+  },
+  "lineageNote": "persistence: case, case_message, case_internal_request, case_compensation_request, sla_policy; approvals.request is another service's"
  },
  "listCustomerServiceProfile": {
   "contract": "marketing-crm",
@@ -127103,7 +127161,8 @@
     "subject_id",
     "value"
    ]
-  }
+  },
+  "lineageNote": "persistence names these tables (orders/access already read by marketing neighbours); wallet.balance comes through wallet, not a table read"
  },
  "listUnifiedInteractionCommunication": {
   "contract": "marketing-crm",
@@ -127158,7 +127217,8 @@
     "id",
     "subject_id"
    ]
-  }
+  },
+  "lineageNote": "persistence: case_message, conversation_message, conversation (telephony), message_dispatch, kiosk_assist_session"
  },
  "createCaseClassificationIntelligent": {
   "contract": "marketing-crm",
@@ -127200,7 +127260,9 @@
     "code",
     "id"
    ]
-  }
+  },
+  "lineageNote": "computed from case, sla_policy, agent_availability, agent_service_profile, case_routing_rule, case_category (default priority, subcategory) and service_queue (recommendedQueue code); stores nothing",
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "setCaseInvestigationResolution": {
   "contract": "marketing-crm",
@@ -127662,7 +127724,8 @@
     "id",
     "name"
    ]
-  }
+  },
+  "lineageNote": "case, conversation, agent_availability, sla_policy, form_submission (CSAT); queue health per service_queue via case.queue_id and agent_availability.queue_ids"
  },
  "listIntelligentRoutingSkills": {
   "contract": "marketing-crm",
@@ -127775,7 +127838,8 @@
   "service": "MarketingService",
   "stores": [
    "postgres"
-  ]
+  ],
+  "lineageNote": "persistence: projection over marketing.case and marketing.sla_policy"
  },
  "listAgentWorkloadAvailability": {
   "contract": "marketing-crm",
@@ -127824,7 +127888,8 @@
     "id",
     "name"
    ]
-  }
+  },
+  "lineageNote": "agent_service_profile, agent_availability, case, conversation; queue names from service_queue; workforce.shift is another service's"
  },
  "setAgentServiceProfile": {
   "contract": "marketing-crm",
@@ -127916,7 +127981,8 @@
     "reason",
     "reason_category"
    ]
-  }
+  },
+  "lineageNote": "one row per escalated open case as of its latest case_escalation row (reason, category, escalated by/to, at); case; related order total from orders.sales_order as the neighbours read it"
  },
  "listQualityAgentEvaluation": {
   "contract": "marketing-crm",
@@ -128040,7 +128106,8 @@
   "service": "MarketingService",
   "stores": [
    "postgres"
-  ]
+  ],
+  "lineageNote": "form_submission/form_definition (surveys), review, case; sentiment and topic from feedback_classification (AI-written, one row per feedback item)"
  },
  "listServiceRootCause": {
   "contract": "marketing-crm",
@@ -128073,7 +128140,8 @@
     "route": "service",
     "for": "its read of orders.sales_order, Orders's data (CHG-MOD-001)"
    }
-  ]
+  ],
+  "lineageNote": "case, conversation, form_submission (CSAT), related orders; contact drivers by case_category"
  },
  "listContactAutomation": {
   "contract": "marketing-crm",
@@ -128223,7 +128291,8 @@
     "effective_to",
     "id"
    ]
-  }
+  },
+  "lineageNote": "persistence: form_definition (kind waiver), waiver_master, waiver_version_control, waiver_association"
  },
  "listWaiverTemplateMaster": {
   "contract": "marketing-crm",
@@ -128824,7 +128893,8 @@
     "resign_rule",
     "suspension_reason"
    ]
-  }
+  },
+  "lineageNote": "persistence: form_definition, waiver_version_control, form_submission, waiver_signature"
  },
  "setLocalizationBrandingCustomer": {
   "contract": "marketing-crm",
@@ -128944,7 +129014,8 @@
     "suspension_reason",
     "updated_at"
    ]
-  }
+  },
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "getWaiverTesting": {
   "contract": "marketing-crm",
@@ -129034,7 +129105,8 @@
     "route": "service",
     "for": "its read of orders.order_line, Orders's data (CHG-MOD-001)"
    }
-  ]
+  ],
+  "lineageNote": "rows are waiver_requirement joined to form_definition, form_submission, waiver_signature, waiver_verification, waiver_exception (requirement_id), order_line, group_booking, performance"
  },
  "listParticipantWaiverStatus": {
   "contract": "marketing-crm",
@@ -129112,7 +129184,8 @@
     "display_name",
     "id"
    ]
-  }
+  },
+  "lineageNote": "waiver_requirement per participant and booking with form_definition, form_submission, waiver_verification, waiver_exception, order_line, group_booking, performance; names from pii.subject"
  },
  "actOnWaiverRequirements": {
   "contract": "marketing-crm",
@@ -129150,7 +129223,8 @@
     "route": "service",
     "for": "its read of orders.group_booking, Orders's data (CHG-MOD-001)"
    }
-  ]
+  ],
+  "lineageNote": "updates waiver_requirement (link issued/expiry/use, status, signatory, version, owner) and appends a waiver_requirement_event per action with its reason; sends through sendTransactionalMessage (message_dispatch); guardian authority from guest_relationship"
  },
  "listDigitalSigningCollection": {
   "contract": "marketing-crm",
@@ -129175,7 +129249,8 @@
   "service": "MarketingService",
   "stores": [
    "postgres"
-  ]
+  ],
+  "lineageNote": "sent/opened/started/completed and journey stages from waiver_requirement_event; byMethod from waiver_requirement.delivery_channel; delivery failures from message_dispatch; completions from form_submission"
  },
  "listMinorGuardianGroup": {
   "contract": "marketing-crm",
@@ -129237,7 +129312,8 @@
     "subject_id",
     "value"
    ]
-  }
+  },
+  "lineageNote": "guest_relationship, waiver_requirement (signatory, status), form_submission, group_booking, order_line; names/contacts from pii"
  },
  "listWaiverVerificationQueue": {
   "contract": "marketing-crm",
@@ -129303,7 +129379,8 @@
     "display_name",
     "id"
    ]
-  }
+  },
+  "lineageNote": "form_submission, waiver_signature, form_definition, waiver_verification, waiver_requirement (form_submission_id); names from pii.subject"
  },
  "setWaiverVerificationValidation": {
   "contract": "marketing-crm",
@@ -129346,7 +129423,8 @@
     "reviewed_by",
     "submission_id"
    ]
-  }
+  },
+  "lineageNote": "OUTSIDE L3 (amend the existing lineage entry by hand; derive-lineage --apply does not update): the verification result moves the requirement to verified or rejected and appends a verified/rejected event"
  },
  "listMissingExpiredInvalid": {
   "contract": "marketing-crm",
@@ -129437,7 +129515,8 @@
     "display_name",
     "id"
    ]
-  }
+  },
+  "lineageNote": "not-ready waiver_requirement rows (owner, next_reminder_at) with form_submission, waiver_verification, waiver_exception, message_dispatch; remindersSent counted from waiver_requirement_event; order_line, group_booking, performance; names from pii.subject"
  },
  "listSiteWaiverException": {
   "contract": "marketing-crm",
@@ -129548,7 +129627,8 @@
     "used_at",
     "valid_until"
    ]
-  }
+  },
+  "lineageNote": "OUTSIDE L3 (amend the existing lineage entry by hand; derive-lineage --apply does not update): an exception names its requirement (waiver_exception.requirement_id); approval appends an exceptionApproved event"
  },
  "listComplianceEvidenceWaiver": {
   "contract": "marketing-crm",
@@ -129630,7 +129710,8 @@
     "display_name",
     "id"
    ]
-  }
+  },
+  "lineageNote": "form_submission, waiver_signature, form_definition(+_field), guest_document, waiver_verification; auditEvents from waiver_requirement_event; names from pii.subject"
  },
  "listWaiverComplianceOperational": {
   "contract": "marketing-crm",
@@ -129657,7 +129738,8 @@
   "service": "MarketingService",
   "stores": [
    "postgres"
-  ]
+  ],
+  "lineageNote": "analytics over waiver_requirement and waiver_requirement_event (staff actions, reminders), form_submission, waiver_verification, waiver_exception, message_dispatch; access outcomes come through access"
  },
  "listWaiverComplianceRisk": {
   "contract": "marketing-crm",
@@ -129689,7 +129771,8 @@
   "service": "MarketingService",
   "stores": [
    "postgres"
-  ]
+  ],
+  "lineageNote": "risk over waiver_requirement(_event), form_definition(+_field), form_submission, waiver_verification, waiver_exception; config checks over waiver_version_control, waiver_signatory_rule, waiver_association, waiver_trigger_rule"
  },
  "getGuestAttributeModel": {
   "contract": "marketing-crm",
@@ -129803,7 +129886,8 @@
     "route": "service",
     "for": "its read of orders.sales_order, Orders's data (CHG-MOD-001)"
    }
-  ]
+  ],
+  "lineageNote": "chronology over marketing rows (touches, messages, cases, surveys, waivers, loyalty, reviews, notes) plus orders and entitlements (as getGuestProfile/identifyGuest read); scans/wallet come through their services"
  },
  "getGuestRelationships": {
   "contract": "marketing-crm",
@@ -129912,7 +129996,8 @@
     "route": "service",
     "for": "its read of orders.sales_order, Orders's data (CHG-MOD-001)"
    }
-  ]
+  ],
+  "lineageNote": "inputs: guest_profile (engagement_score, lifetime_value), touches, loyalty, orders; scores with factors/confidence/model version have no table"
  },
  "getIdentityResolutionRules": {
   "contract": "marketing-crm",
@@ -130064,7 +130149,8 @@
     "status",
     "subject_ids"
    ]
-  }
+  },
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "setDataRetentionPolicy": {
   "contract": "marketing-crm",
@@ -130115,7 +130201,8 @@
     "schedule",
     "scope_path"
    ]
-  }
+  },
+  "lineageNote": "reads the tenant's guestProfile period to refuse a longer rule (422)"
  },
  "runDataRetention": {
   "contract": "marketing-crm",
@@ -130159,7 +130246,8 @@
     "policy_id",
     "records_affected"
    ]
-  }
+  },
+  "lineageNote": "applies retention_policy respecting legal_hold; each action recorded in privacy_action (retention_run_id, evidence_asset_id) and privacy_audit_event; the run itself has no table"
  },
  "listAudienceLists": {
   "contract": "marketing-crm",
@@ -130363,7 +130451,8 @@
   "service": "MarketingService",
   "stores": [
    "postgres"
-  ]
+  ],
+  "lineageNote": "members from segment/segment_criterion/guest_profile.segment_id; reachable = consent granted, not suppressed"
  },
  "getLoyaltyRules": {
   "contract": "marketing-crm",
@@ -131447,7 +131536,8 @@
     "source",
     "superseded_at"
    ]
-  }
+  },
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
  },
  "listMyNotifications": {
   "contract": "marketing-crm",
@@ -131469,7 +131559,8 @@
   "service": "MarketingService",
   "stores": [
    "postgres"
-  ]
+  ],
+  "lineageNote": "description: reads marketing.message_dispatch for the caller, channel inApp; read = opened_at"
  },
  "markMyNotificationsRead": {
   "contract": "marketing-crm",
@@ -131495,7 +131586,8 @@
   "service": "MarketingService",
   "stores": [
    "postgres"
-  ]
+  ],
+  "lineageNote": "marks the caller's message_dispatch rows opened (opened_at)"
  },
  "listCaseCategories": {
   "contract": "marketing-crm",
@@ -131569,7 +131661,8 @@
     "scope_path",
     "updated_at"
    ]
-  }
+  },
+  "lineageNote": "upsert keyed on code (unique per venue, immutable); two levels (parent must be top-level, 422); never deleted, retired with is_active=false, refused 409 while active subcategories exist"
  },
  "listServiceQueues": {
   "contract": "marketing-crm",
@@ -131643,7 +131736,8 @@
     "scope_path",
     "updated_at"
    ]
-  }
+  },
+  "lineageNote": "upsert keyed on code; retiring (is_active=false) refused 409 while an active case_routing_rule names it as queue_id/fallback_queue_id or an unresolved case has queue_id = it"
  },
  "recordDeviceConsent": {
   "contract": "marketing-crm",
@@ -131707,7 +131801,8 @@
     "device_consent_id",
     "id"
    ]
-  }
+  },
+  "lineageNote": "RB's lineage + outbox for consent.deviceConsentRecorded"
  },
  "listDeviceConsents": {
   "contract": "marketing-crm",
@@ -131839,7 +131934,8 @@
   "service": "MarketingService",
   "stores": [
    "postgres"
-  ]
+  ],
+  "lineageNote": "RB's lineage + outbox for consent.deviceConsentClaimed"
  },
  "getCookieConsentRuntime": {
   "contract": "marketing-crm",
@@ -131918,7 +132014,8 @@
     "id",
     "technology_type"
    ]
-  }
+  },
+  "lineageNote": "edge-cached per tenant, channel, brand, language and notice version when no key is presented"
  },
  "listPublishedTrackingTechnologies": {
   "contract": "marketing-crm",
@@ -131948,7 +132045,8 @@
     "id",
     "technology_type"
    ]
-  }
+  },
+  "lineageNote": "approved rows only, guest-facing columns"
  },
  "recordCookieScan": {
   "contract": "marketing-crm",
@@ -131995,7 +132093,8 @@
     "scope_path",
     "source"
    ]
-  }
+  },
+  "lineageNote": "upserts detected rows / lastSeenAt; alert recipients from cookie_scan_policy"
  },
  "listCookieScans": {
   "contract": "marketing-crm",
@@ -132286,7 +132385,8 @@
     "provider_template_id",
     "subjects"
    ]
-  }
+  },
+  "fixNote": "4 October 2026 (CHG-FXC-004): every change is a new template version"
  },
  "updateLoyaltyProgramme": {
   "contract": "marketing-crm",
@@ -132347,7 +132447,8 @@
     "retain_lifetime_points",
     "validity_months"
    ]
-  }
+  },
+  "fixNote": "4 October 2026 (CHG-FXC-004): earning rules replaced; tiers are not changed here"
  },
  "recordSaleOwnerAnswers": {
   "contract": "marketing-crm",
