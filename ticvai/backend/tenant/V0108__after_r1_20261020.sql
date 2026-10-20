@@ -4,7 +4,7 @@
 -- The baseline under backend/tenant/ is frozen at r1 (9cec72d), so the change to the schema reference
 -- since then is written here instead: additive only. Changes that are not additive (drops, renames,
 -- type changes) are not generated; they are listed for a person in handoff/migration-review.md.
--- 18 table(s), 87 column(s), 71 index(es), 91 other statement(s), 17 row-level security polic(ies) re-applied.
+-- 18 table(s), 95 column(s), 75 index(es), 96 other statement(s), 24 row-level security polic(ies) re-applied.
 
 ALTER TABLE access.access_point ADD COLUMN IF NOT EXISTS access_area_id uuid;
 
@@ -353,6 +353,12 @@ ALTER TABLE identity.sso_provider ADD COLUMN IF NOT EXISTS default_home_scope_id
 
 ALTER TABLE identity.sso_provider ADD COLUMN IF NOT EXISTS allowed_redirect_uris text[];
 
+ALTER TABLE inventory.stock_earmark DROP CONSTRAINT IF EXISTS stock_earmark_source_type_chk;
+
+ALTER TABLE inventory.stock_earmark ADD CONSTRAINT stock_earmark_source_type_chk CHECK (source_type IN ('workOrder', 'rentalAgreement', 'order', 'transfer', 'retailReservation', 'other')) NOT VALID;
+
+ALTER TABLE inventory.stock_earmark VALIDATE CONSTRAINT stock_earmark_source_type_chk;
+
 ALTER TABLE ledger.account_mapping ADD COLUMN IF NOT EXISTS scope_path ltree;
 
 ALTER TABLE ledger.journal_entry ADD COLUMN IF NOT EXISTS legal_entity_id uuid;
@@ -518,11 +524,29 @@ ALTER TABLE retail.sale ADD COLUMN IF NOT EXISTS cashier_principal_id uuid;
 
 ALTER TABLE retail.sale_line ADD COLUMN IF NOT EXISTS override_reason text;
 
+ALTER TABLE seating.recommendation_rule ADD COLUMN IF NOT EXISTS profiles jsonb;
+
+ALTER TABLE seating.seat_reservation DROP CONSTRAINT IF EXISTS seat_reservation_status_chk;
+
+ALTER TABLE seating.seat_reservation ADD CONSTRAINT seat_reservation_status_chk CHECK (status IN ('held', 'converted', 'released', 'expired', 'sold')) NOT VALID;
+
+ALTER TABLE seating.seat_reservation VALIDATE CONSTRAINT seat_reservation_status_chk;
+
+ALTER TABLE seating.seat_reservation ADD COLUMN IF NOT EXISTS inventory_reservation_id uuid;
+
+ALTER TABLE sync.dsar_request ADD COLUMN IF NOT EXISTS cell_results jsonb;
+
+ALTER TABLE sync.guest_link ADD COLUMN IF NOT EXISTS linked_cells jsonb;
+
+ALTER TABLE sync.guest_link ADD COLUMN IF NOT EXISTS local_subject_id uuid;
+
 ALTER TABLE sync.rejection DROP CONSTRAINT IF EXISTS rejection_kind_chk;
 
 ALTER TABLE sync.rejection ADD CONSTRAINT rejection_kind_chk CHECK (kind IN ('order', 'payment', 'refund', 'void', 'scan', 'cashMovement')) NOT VALID;
 
 ALTER TABLE sync.rejection VALIDATE CONSTRAINT rejection_kind_chk;
+
+ALTER TABLE sync.wallet_authorisation ADD COLUMN IF NOT EXISTS share_percentage numeric(18,4);
 
 CREATE TABLE IF NOT EXISTS venuemap.visit_plan_preset (
     id                                uuid PRIMARY KEY NOT NULL,
@@ -542,6 +566,12 @@ CREATE TABLE IF NOT EXISTS venuemap.visit_plan_preset (
 );
 
 ALTER TABLE wallet.credit_lot ADD COLUMN IF NOT EXISTS issued_credits integer;
+
+DO $$ BEGIN IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = 'wallet' AND table_name = 'fund_reservation' AND column_name = 'wallet_hold_id' AND is_nullable = 'NO') THEN ALTER TABLE wallet.fund_reservation ALTER COLUMN wallet_hold_id DROP NOT NULL; END IF; END $$;
+
+ALTER TABLE wallet.funding_rule ADD COLUMN IF NOT EXISTS preset_amounts numeric(18,4)[];
+
+ALTER TABLE wallet.funding_rule ADD COLUMN IF NOT EXISTS bonus_rules jsonb;
 
 DO $$ BEGIN IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = 'wallet' AND table_name = 'gift_card' AND column_name = 'subject_id' AND is_nullable = 'NO') THEN ALTER TABLE wallet.gift_card ALTER COLUMN subject_id DROP NOT NULL; END IF; END $$;
 
@@ -625,6 +655,10 @@ DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'bundle_v
 
 DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'sale_cashier_principal_id_fkey' AND conrelid = to_regclass('retail.sale')) THEN ALTER TABLE retail.sale ADD CONSTRAINT sale_cashier_principal_id_fkey FOREIGN KEY (cashier_principal_id) REFERENCES identity.principal(id); END IF; END $$;
 
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'seat_reservation_inventory_reservation_id_fkey' AND conrelid = to_regclass('seating.seat_reservation')) THEN ALTER TABLE seating.seat_reservation ADD CONSTRAINT seat_reservation_inventory_reservation_id_fkey FOREIGN KEY (inventory_reservation_id) REFERENCES catalogue.inventory_reservation(id); END IF; END $$;
+
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'guest_link_local_subject_id_fkey' AND conrelid = to_regclass('sync.guest_link')) THEN ALTER TABLE sync.guest_link ADD CONSTRAINT guest_link_local_subject_id_fkey FOREIGN KEY (local_subject_id) REFERENCES pii.subject(id); END IF; END $$;
+
 CREATE INDEX IF NOT EXISTS content_block_approved_by_principal_id_idx ON whitelabel.content_block (approved_by_principal_id);
 
 CREATE INDEX IF NOT EXISTS content_block_audience_segment_id_idx ON whitelabel.content_block (audience_segment_id);
@@ -699,7 +733,13 @@ CREATE INDEX IF NOT EXISTS bundle_variant_id_idx ON promotions.bundle (variant_i
 
 CREATE INDEX IF NOT EXISTS sale_cashier_principal_id_idx ON retail.sale (cashier_principal_id);
 
+CREATE INDEX IF NOT EXISTS seat_reservation_inventory_reservation_id_idx ON seating.seat_reservation (inventory_reservation_id);
+
+CREATE INDEX IF NOT EXISTS guest_link_local_subject_id_idx ON sync.guest_link (local_subject_id);
+
 CREATE UNIQUE INDEX IF NOT EXISTS product_tag_scope_path_code_uniq ON catalogue.product_tag (scope_path, lower(code));
+
+CREATE UNIQUE INDEX IF NOT EXISTS inventory_item_venue_id_sku_uniq ON inventory.inventory_item (venue_id, lower(sku));
 
 CREATE UNIQUE INDEX IF NOT EXISTS index_source_table_name_uniq ON ai.index_source (lower(table_name));
 
@@ -726,6 +766,8 @@ CREATE UNIQUE INDEX IF NOT EXISTS device_assignment_device_id_uniq ON tenancy.de
 CREATE UNIQUE INDEX IF NOT EXISTS visit_plan_preset_scope_path_preset_key_uniq ON venuemap.visit_plan_preset (scope_path, lower(preset_key));
 
 CREATE UNIQUE INDEX IF NOT EXISTS configuration_version_scope_path_version_uniq ON wallet.configuration_version (scope_path, version);
+
+CREATE UNIQUE INDEX IF NOT EXISTS funding_rule_scope_path_wallet_type_id_uniq ON wallet.funding_rule (scope_path, wallet_type_id) NULLS NOT DISTINCT;
 
 CREATE UNIQUE INDEX IF NOT EXISTS analytics_provider_venue_id_provider_uniq ON whitelabel.analytics_provider (venue_id, lower(provider)) NULLS NOT DISTINCT;
 
@@ -873,7 +915,23 @@ SELECT platform.drop_rls_policies('wallet.gift_card'::regclass);
 
 SELECT platform.apply_split_rls('wallet.gift_card'::regclass, 'platform.signed_in()', 'platform.subject_in_scope(subject_id)');
 
+SELECT platform.drop_rls_policies('fnb.ingredient_substitute'::regclass);
+
+SELECT platform.apply_parent_rls('fnb.ingredient_substitute'::regclass, 'from_inventory_item_id', 'inventory.inventory_item'::regclass, 'id');
+
 SELECT platform.apply_parent_rls('identity.principal_external_identity'::regclass, 'sso_provider_id', 'identity.sso_provider'::regclass, 'id');
+
+SELECT platform.drop_rls_policies('inventory.count_line'::regclass);
+
+SELECT platform.apply_parent_rls('inventory.count_line'::regclass, 'item_id', 'inventory.inventory_item'::regclass, 'id');
+
+SELECT platform.drop_rls_policies('inventory.serialised_item'::regclass);
+
+SELECT platform.apply_parent_rls('inventory.serialised_item'::regclass, 'item_id', 'inventory.inventory_item'::regclass, 'id');
+
+SELECT platform.drop_rls_policies('inventory.stock_earmark'::regclass);
+
+SELECT platform.apply_parent_rls('inventory.stock_earmark'::regclass, 'item_id', 'inventory.inventory_item'::regclass, 'id');
 
 SELECT platform.drop_rls_policies('marketing.customer_badge'::regclass);
 
@@ -890,6 +948,18 @@ SELECT platform.apply_split_rls('marketing.points_earning_rule'::regclass, '(pla
 SELECT platform.drop_rls_policies('marketing.programme_tier'::regclass);
 
 SELECT platform.apply_split_rls('marketing.programme_tier'::regclass, '(platform.grant_holder() AND EXISTS (SELECT 1 FROM marketing.loyalty_programme pr WHERE pr.id = marketing.programme_tier.loyalty_programme_id))', 'EXISTS (SELECT 1 FROM marketing.loyalty_programme pr WHERE pr.id = marketing.programme_tier.loyalty_programme_id AND (platform.venue_in_scope(pr.venue_id)))');
+
+SELECT platform.drop_rls_policies('seating.seat_reservation_item'::regclass);
+
+SELECT platform.apply_parent_split_rls('seating.seat_reservation_item'::regclass, 'seat_id', 'seating.seat'::regclass, 'id', 'platform.in_scope(parent_row.scope_path)');
+
+SELECT platform.drop_rls_policies('wallet.risk_rule'::regclass);
+
+SELECT platform.apply_parent_rls('wallet.risk_rule'::regclass, 'risk_rule_set_id', 'wallet.risk_rule_set'::regclass, 'id');
+
+SELECT platform.drop_rls_policies('catalogue.channel_envelope'::regclass);
+
+SELECT platform.apply_parent_rls('catalogue.channel_envelope'::regclass, 'channel_capacity_id', 'catalogue.channel_capacity'::regclass, 'id');
 
 SELECT platform.drop_rls_policies('identity.principal_credential_history'::regclass);
 
@@ -910,7 +980,7 @@ CREATE TABLE IF NOT EXISTS ai.outbox_default PARTITION OF ai.outbox DEFAULT;
 SELECT platform.ensure_month_partitions('ai.outbox'::regclass, 3);
 
 INSERT INTO platform.schema_version (version, description, checksum)
-VALUES ('V0108', 'after r1 (9cec72d): 18 table(s), 87 column(s), 71 index(es), 91 other statement(s), 17 row-level security polic(ies) re-applied', 'bba9d0c2593f1e9dede4dcdb28aaaed9abf862a7442945954e9fec9fc8e17400')
+VALUES ('V0108', 'after r1 (9cec72d): 18 table(s), 95 column(s), 75 index(es), 96 other statement(s), 24 row-level security polic(ies) re-applied', '4b5add83b550e28bfdcb0c748fb19d817903a8a1ea84b6da9afee25ce98032dc')
 ON CONFLICT (version) DO NOTHING;
 
 -- ============================================================================
@@ -921,10 +991,17 @@ ON CONFLICT (version) DO NOTHING;
 -- DROP TABLE IF EXISTS ai.outbox_default;
 -- SELECT platform.drop_rls_policies('platform.audit_read'::regclass); SELECT platform.apply_subject_rls('platform.audit_read'::regclass);
 -- SELECT platform.drop_rls_policies('identity.principal_credential_history'::regclass); SELECT platform.apply_tenant_rls('identity.principal_credential_history'::regclass);
+-- SELECT platform.drop_rls_policies('catalogue.channel_envelope'::regclass); SELECT platform.apply_parent_rls('catalogue.channel_envelope'::regclass, 'channel_capacity_id', 'catalogue.channel_capacity'::regclass, 'id');
+-- SELECT platform.drop_rls_policies('wallet.risk_rule'::regclass); SELECT platform.apply_parent_rls('wallet.risk_rule'::regclass, 'risk_rule_set_id', 'wallet.risk_rule_set'::regclass, 'id');
+-- SELECT platform.drop_rls_policies('seating.seat_reservation_item'::regclass); SELECT platform.apply_tenant_rls('seating.seat_reservation_item'::regclass);
 -- SELECT platform.drop_rls_policies('marketing.programme_tier'::regclass); SELECT platform.apply_parent_rls('marketing.programme_tier'::regclass, 'loyalty_programme_id', 'marketing.loyalty_programme'::regclass, 'id');
 -- SELECT platform.drop_rls_policies('marketing.points_earning_rule'::regclass); SELECT platform.apply_parent_rls('marketing.points_earning_rule'::regclass, 'loyalty_programme_id', 'marketing.loyalty_programme'::regclass, 'id');
 -- SELECT platform.drop_rls_policies('marketing.loyalty_position'::regclass); SELECT platform.apply_parent_rls('marketing.loyalty_position'::regclass, 'programme_id', 'marketing.loyalty_programme'::regclass, 'id');
 -- SELECT platform.drop_rls_policies('marketing.customer_badge'::regclass); SELECT platform.apply_tenant_rls('marketing.customer_badge'::regclass); SELECT platform.apply_parent_split_rls('marketing.customer_badge'::regclass, 'badge_id', 'marketing.badge'::regclass, 'id', 'platform.in_scope(parent_row.scope_path)');
+-- SELECT platform.drop_rls_policies('inventory.stock_earmark'::regclass); SELECT platform.apply_tenant_rls('inventory.stock_earmark'::regclass);
+-- SELECT platform.drop_rls_policies('inventory.serialised_item'::regclass); SELECT platform.apply_tenant_rls('inventory.serialised_item'::regclass);
+-- SELECT platform.drop_rls_policies('inventory.count_line'::regclass); SELECT platform.apply_tenant_rls('inventory.count_line'::regclass);
+-- SELECT platform.drop_rls_policies('fnb.ingredient_substitute'::regclass); SELECT platform.apply_tenant_rls('fnb.ingredient_substitute'::regclass);
 -- SELECT platform.drop_rls_policies('wallet.gift_card'::regclass); SELECT platform.apply_subject_rls('wallet.gift_card'::regclass); SELECT platform.apply_grant_holder_subject_read_rls('wallet.gift_card'::regclass);
 -- SELECT platform.drop_rls_policies('pii.subject'::regclass); SELECT platform.apply_tenant_rls('pii.subject'::regclass); SELECT platform.apply_grant_holder_read_rls('pii.subject'::regclass, 'platform.tenant_root_in_scope()');
 -- SELECT platform.drop_rls_policies('marketing.loyalty_programme'::regclass); SELECT platform.apply_venue_rls('marketing.loyalty_programme'::regclass);
@@ -956,6 +1033,7 @@ ON CONFLICT (version) DO NOTHING;
 -- DROP INDEX IF EXISTS whitelabel.kiosk_config_version_kiosk_config_id_version_number_uniq;
 -- DROP INDEX IF EXISTS whitelabel.config_version_scope_path_version_uniq;
 -- DROP INDEX IF EXISTS whitelabel.analytics_provider_venue_id_provider_uniq;
+-- DROP INDEX IF EXISTS wallet.funding_rule_scope_path_wallet_type_id_uniq;
 -- DROP INDEX IF EXISTS wallet.configuration_version_scope_path_version_uniq;
 -- DROP INDEX IF EXISTS venuemap.visit_plan_preset_scope_path_preset_key_uniq;
 -- DROP INDEX IF EXISTS tenancy.device_assignment_device_id_uniq;
@@ -969,7 +1047,10 @@ ON CONFLICT (version) DO NOTHING;
 -- DROP INDEX IF EXISTS approvals.matrix_kind_scope_path_version_uniq;
 -- DROP INDEX IF EXISTS ai.vector_store_collection_name_uniq;
 -- DROP INDEX IF EXISTS ai.index_source_table_name_uniq;
+-- DROP INDEX IF EXISTS inventory.inventory_item_venue_id_sku_uniq;
 -- DROP INDEX IF EXISTS catalogue.product_tag_scope_path_code_uniq;
+-- DROP INDEX IF EXISTS sync.guest_link_local_subject_id_idx;
+-- DROP INDEX IF EXISTS seating.seat_reservation_inventory_reservation_id_idx;
 -- DROP INDEX IF EXISTS retail.sale_cashier_principal_id_idx;
 -- DROP INDEX IF EXISTS promotions.bundle_variant_id_idx;
 -- DROP INDEX IF EXISTS pii.subject_identity_subject_id_idx;
@@ -1007,6 +1088,8 @@ ON CONFLICT (version) DO NOTHING;
 -- DROP INDEX IF EXISTS whitelabel.content_block_page_id_idx;
 -- DROP INDEX IF EXISTS whitelabel.content_block_audience_segment_id_idx;
 -- DROP INDEX IF EXISTS whitelabel.content_block_approved_by_principal_id_idx;
+-- ALTER TABLE sync.guest_link DROP CONSTRAINT IF EXISTS guest_link_local_subject_id_fkey;
+-- ALTER TABLE seating.seat_reservation DROP CONSTRAINT IF EXISTS seat_reservation_inventory_reservation_id_fkey;
 -- ALTER TABLE retail.sale DROP CONSTRAINT IF EXISTS sale_cashier_principal_id_fkey;
 -- ALTER TABLE promotions.bundle DROP CONSTRAINT IF EXISTS bundle_variant_id_fkey;
 -- ALTER TABLE payments.provider_event DROP CONSTRAINT IF EXISTS provider_event_provider_connection_id_fkey;
@@ -1032,9 +1115,19 @@ ON CONFLICT (version) DO NOTHING;
 -- ALTER TABLE whitelabel.config_version DROP COLUMN IF EXISTS activation_failed_at;
 -- ALTER TABLE whitelabel.booking_flow DROP CONSTRAINT IF EXISTS booking_flow_flow_type_key_chk; ALTER TABLE whitelabel.booking_flow ADD CONSTRAINT booking_flow_flow_type_key_chk CHECK (flow_type_key IN ('datedDayPass', 'timedEntry', 'openDated', 'seatedFixedPerformance', 'seatedDateTimeSeatMap', 'experienceWorkshop', 'surfSession', 'meetingRoomHourly', 'cabanaMap', 'cabanaBySize', 'guidedTourByLanguage', 'transport', 'tableReservation', 'membership', 'giftCard', 'multiLocation')) NOT VALID;
 -- ALTER TABLE wallet.gift_card ALTER COLUMN subject_id SET NOT NULL;
+-- ALTER TABLE wallet.funding_rule DROP COLUMN IF EXISTS bonus_rules;
+-- ALTER TABLE wallet.funding_rule DROP COLUMN IF EXISTS preset_amounts;
+-- ALTER TABLE wallet.fund_reservation ALTER COLUMN wallet_hold_id SET NOT NULL;
 -- ALTER TABLE wallet.credit_lot DROP COLUMN IF EXISTS issued_credits;
 -- DROP TABLE IF EXISTS venuemap.visit_plan_preset;
+-- ALTER TABLE sync.wallet_authorisation DROP COLUMN IF EXISTS share_percentage;
 -- ALTER TABLE sync.rejection DROP CONSTRAINT IF EXISTS rejection_kind_chk; ALTER TABLE sync.rejection ADD CONSTRAINT rejection_kind_chk CHECK (kind IN ('order', 'payment', 'refund', 'void', 'scan')) NOT VALID;
+-- ALTER TABLE sync.guest_link DROP COLUMN IF EXISTS local_subject_id;
+-- ALTER TABLE sync.guest_link DROP COLUMN IF EXISTS linked_cells;
+-- ALTER TABLE sync.dsar_request DROP COLUMN IF EXISTS cell_results;
+-- ALTER TABLE seating.seat_reservation DROP COLUMN IF EXISTS inventory_reservation_id;
+-- ALTER TABLE seating.seat_reservation DROP CONSTRAINT IF EXISTS seat_reservation_status_chk; ALTER TABLE seating.seat_reservation ADD CONSTRAINT seat_reservation_status_chk CHECK (status IN ('held', 'converted', 'released', 'expired')) NOT VALID;
+-- ALTER TABLE seating.recommendation_rule DROP COLUMN IF EXISTS profiles;
 -- ALTER TABLE retail.sale_line DROP COLUMN IF EXISTS override_reason;
 -- ALTER TABLE retail.sale DROP COLUMN IF EXISTS cashier_principal_id;
 -- ALTER TABLE retail.sale DROP COLUMN IF EXISTS receipt_barcode;
@@ -1085,6 +1178,7 @@ ON CONFLICT (version) DO NOTHING;
 -- ALTER TABLE ledger.journal_entry DROP CONSTRAINT IF EXISTS journal_entry_source_chk; ALTER TABLE ledger.journal_entry ADD CONSTRAINT journal_entry_source_chk CHECK (source IN ('manual', 'order', 'refund', 'void', 'shift', 'recognition', 'settlement', 'variance', 'reversal', 'writeOff', 'chargeback')) NOT VALID;
 -- ALTER TABLE ledger.journal_entry DROP COLUMN IF EXISTS legal_entity_id;
 -- ALTER TABLE ledger.account_mapping DROP COLUMN IF EXISTS scope_path;
+-- ALTER TABLE inventory.stock_earmark DROP CONSTRAINT IF EXISTS stock_earmark_source_type_chk; ALTER TABLE inventory.stock_earmark ADD CONSTRAINT stock_earmark_source_type_chk CHECK (source_type IN ('workOrder', 'rentalAgreement', 'order', 'transfer', 'other')) NOT VALID;
 -- ALTER TABLE identity.sso_provider DROP COLUMN IF EXISTS allowed_redirect_uris;
 -- ALTER TABLE identity.sso_provider DROP COLUMN IF EXISTS default_home_scope_id;
 -- ALTER TABLE identity.sso_provider DROP COLUMN IF EXISTS groups_claim;

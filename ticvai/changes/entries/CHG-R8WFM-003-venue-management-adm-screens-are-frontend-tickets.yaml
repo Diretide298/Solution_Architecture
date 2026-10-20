@@ -1,0 +1,31 @@
+id: CHG-R8WFM-003
+date: '2026-10-20'
+source: audit
+kind: spec
+summary: 'A Venue Management screen task is on the frontend track whatever its screen''s prefix: the track rule knew
+  only VM-BO- keys, so every ADM- screen of P08 (184 VM-ADM tasks and APP-SETUP-ADM-603) was a [BE] ticket that builds a
+  screen, with the frontend Done when and no operation of its own. They are [FE] now; no task''s assignee changes.'
+decision:
+  what: 'tools/build-service-docs.py track_of: area VM and a key ending in a screen id (ticket_done.SCREEN) is Frontend.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: the r8 sample walk of 20 October 2026 (sample-walk-part2, outside git), class ticket-builds-wrong-artifact:
+  APP-SETUP-ADM-603, VM-ADM-108, VM-ADM-268.'
+keys_touched:
+  tickets: [APP-SETUP-ADM-603, VM-ADM-108, VM-ADM-268]
+  files:
+  - tools/build-service-docs.py
+root_class: 'a key-prefix rule written before a second screen prefix existed'
+tickets:
+  started: []
+  unstarted: [APP-SETUP-ADM-603, VM-ADM-108, VM-ADM-268]
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: r8 walk fix, a release fix'
+triage: blocker
+prevention:
+  type: generator-rule
+  ref: tools/build-service-docs.py
+status: open
+notes: 'Started tickets keep their subject (op-release.rb); New ones take [FE]. 59 feature leads move with the
+  frontend load; the operations these screens call stay on their SVC tickets, already in each screen ticket''s waits.'

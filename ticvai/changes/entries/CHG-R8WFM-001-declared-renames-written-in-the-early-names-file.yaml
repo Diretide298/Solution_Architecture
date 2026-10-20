@@ -1,0 +1,66 @@
+id: CHG-R8WFM-001
+date: '2026-10-20'
+source: audit
+kind: spec
+summary: 'A rename or move the package declares is written by the generator, not left for a person: the 15 table
+  renames, the four platform -> sync moves and the declared column renames (20, three with a type change) go into the
+  early names file V0103a, with the indexes, keys, checks, implicit primary keys and row-level security policies named
+  for them, all guarded (old name there, new name not); the move of platform.dsar_request, which the frozen V0105 still
+  names, goes into V0105a after it. The additive V0108 and the names file V0109 are then derived against the renamed
+  tables, so the CHECKs that only gain values on them (inventory.stock_earmark.source_type retailReservation,
+  seating.seat_reservation.status sold, BC-372) are dropped and added again there, NOT VALID then VALIDATE, and the
+  columns, keys and policies the renamed tables gained since r1 are written too.'
+decision:
+  what: 'tools/ddl_forward.py (declared_rename_items, place_renames, early_plan, Model.rename_table moves a moved
+    table''s indexes into its schema, apply_forward folds the policy-rename blocks), tools/derive-ddl.py (frozen mode
+    places the early files first and derives everything else after folding them in), tools/ticket_done.py (NAMES_TAG
+    reads rename table, move table and rename policy), tools/build-service-docs.py (read_ddl resolves a renamed table''s
+    new name in a later forward file). Regenerated: backend/tenant/V0103a, V0105a (new), V0108, V0109 and
+    handoff/migration-review.md. Type changes and NOT NULLs with no conversion rule in the package stay review rows;
+    control.content_block -> whitelabel.content_block and the subscription -> control moves cross databases and stay
+    for a person.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: the r8 sample walk of 20 October 2026 (sample-walk-part1 and part2, outside git), classes
+  table-rename-not-in-migrations (SVC-CATALOGUE-LEASE-2, VM-CATALOGUE-CAPACITY-1, VM-CATALOGUE-CAPACITY-2,
+  SVC-INVENTORY-INVENTORY-3, VM-INVENTORY-ITEM-1, MIG-PLATFORM), column-rename-not-in-migrations (MIG-PLATFORM,
+  TEST-AM-TENANCY-VENUES-P04) and spec-ahead-of-migrations (OFFLINE-BUNDLE, OFFLINE-SYNC, PLATFORM-SAGA-PAID,
+  SVC-ORDER-PAYMENT-1, SVC-RETAIL-FLOOR-2, SVC-VENUEOPS-VISITPLAN-1, SVC-WALLET-WALLET-1, SVC-WALLET-WALLET-2,
+  VM-TENANCY-WORKSTATION-1): handoff/migration-review.md held 19 table renames and 3 column renames "for a person" and
+  no V01xx file applied them, while the contracts, ADAM and the tickets used the new names. Ruling: the lead''s
+  WALK-FIX-MIGRATIONS-BRIEF (a declared change is mechanical and the generator writes it).'
+keys_touched:
+  tables: [catalogue.channel_envelope, catalogue.inventory_reservation, inventory.inventory_item, inventory.stock_earmark,
+    orders.group_customer_organisation, orders.group_customer_organisation_contact, resources.resource_reservation,
+    seating.recommendation_rule, seating.seat_reservation, seating.seat_reservation_item, sync.cross_region_entitlement,
+    sync.dsar_request, sync.guest_link, sync.wallet_authorisation, wallet.channel_rule, wallet.fund_reservation,
+    wallet.funding_rule, wallet.risk_rule_set, wallet.transfer_rule, platform.workstation, platform.venue_settings,
+    marketing.wishlist_item]
+  files:
+  - tools/ddl_forward.py
+  - tools/derive-ddl.py
+  - tools/ticket_done.py
+  - tools/build-service-docs.py
+  - tools/tests/test_migration_generator.py
+  - backend/tenant/V0103a__names_early_after_r1_20261020.sql
+  - backend/tenant/V0105a__names_early_after_r1_20261020.sql
+  - backend/tenant/V0108__after_r1_20261020.sql
+  - backend/tenant/V0109__names_after_r1_20261020.sql
+  - handoff/migration-review.md
+root_class: 'a declared, mechanical schema change left on the review list for a person no ticket names'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: r8 walk fix, a release fix'
+triage: blocker
+prevention:
+  type: generator-rule
+  ref: tools/ddl_forward.py
+status: open
+notes: 'Change notice for Hrushikant: apply V0103a (renames 18 tables and 20 columns with their keys, indexes, checks
+  and policies), V0105a (moves platform.dsar_request to sync), V0108 and V0109, in name order, on every database; each
+  block is guarded and the files apply twice. Still for a person: the text -> numeric(18,4) type of
+  platform.workstation/venue_settings.deposit_box_limit_amount and marketing.wishlist_item.list_price (the package
+  gives no conversion rule), the NOT NULLs, and the cross-database moves.'
