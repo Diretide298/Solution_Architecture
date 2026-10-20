@@ -55,4 +55,5 @@ notes: 'The local tasks apply the package files with psql, not SqlMigrationRunne
   platform.schema_version, and setup/backend-patterns.md section 3.4 keeps the package files out of db/tenant. V0108
   alters tables a partial local database may not have; the task says to accept only "does not exist" errors there. The
   walk-fix report names two text columns; handoff/migration-review.md has three (deposit_box_limit_amount on
-  platform.workstation and platform.venue_settings, marketing.wishlist_item.list_price): R8-DB-SHARED converts all three.'
+  platform.workstation and platform.venue_settings, marketing.wishlist_item.list_price): R8-DB-SHARED converts all three. The final refresh of cd646999 generated control V0110 (one index on control.onboarding_application); the
+  tasks list it too (same decision and waiver).'
