@@ -18852,8 +18852,8 @@ paths:
       - name: venueId
         in: query
         required: false
-        description: '**Whose venue** (CHG-R8PRD-010): the venue to read the tags of. Absent, the session''s working venue
-          (identity `getSessionVenue`); with neither, `400 venue-required`. A venue the caller''s grants do not reach is
+        description: '**Whose venue** (CHG-R8PRD-010): the venue to read the tags of. Absent, the working venue of the caller''s session,
+          which travels with the session the access token names (identity `setSessionVenue`); with neither, `400 venue-required`. A venue the caller''s grants do not reach is
           `403 venue-not-in-grants`.'
         schema:
           type: string
@@ -18919,7 +18919,9 @@ paths:
       summary: Create or replace one tag of the venue's list
       description: >-
         **One tag per call, created or replaced whole** (16 October 2026 minutes, 4.6, CHG-R8PRD-002). The path's
-        `productTagId` names it: a new id creates the tag, a known one replaces it.
+        `productTagId` names it: a new id creates the tag in the venue resolved for the write, a known one replaces it and
+        keeps its own venue; a known tag addressed with a different venue is refused (`409 tag-venue-mismatch`), so a
+        replace never moves a tag away from the products that carry it.
 
         **A tag is deactivated, never deleted** (`isActive` false): products that carry it keep it, and a promotion
         that targeted it still reads what it meant, but `setProductClassification` no longer accepts it.
@@ -18945,8 +18947,8 @@ paths:
       - name: venueId
         in: query
         required: false
-        description: '**Whose venue** (CHG-R8PRD-010): the venue to write the tag in. Absent, the session''s working venue
-          (identity `getSessionVenue`); with neither, `400 venue-required`. A venue the caller''s grants do not reach is
+        description: '**Whose venue** (CHG-R8PRD-010): the venue to write the tag in. Absent, the working venue of the caller''s session,
+          which travels with the session the access token names (identity `setSessionVenue`); with neither, `400 venue-required`. A venue the caller''s grants do not reach is
           `403 venue-not-in-grants`.'
         schema:
           type: string
@@ -18976,7 +18978,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ProductTag'
         '400':
-          description: No `venueId` and no working venue (`venue-required`); or The body breaks the schema (`validation`; `errors[]` names the field).
+          description: No `venueId` and no working venue (`venue-required`), or the body breaks the schema (`validation`; `errors[]` names the field).
           x-ticvai-problem-types:
           - validation
           - venue-required
@@ -18995,11 +18997,13 @@ paths:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
-          description: The code is already used by another tag of the venue (`duplicate-code`), or the write changes
-            the code of a tag that products or Help me choose answers carry (`tag-code-in-use`).
+          description: The code is already used by another tag of the venue (`duplicate-code`), the write changes
+            the code of a tag that products or Help me choose answers carry (`tag-code-in-use`), or a known tag is
+            addressed with another venue (`tag-venue-mismatch`).
           x-ticvai-problem-types:
           - duplicate-code
           - tag-code-in-use
+          - tag-venue-mismatch
           content:
             application/problem+json:
               schema:
@@ -19022,8 +19026,10 @@ paths:
         those tags, in the order sent. A tag a product carried before the tag list existed is kept only if it is
         sent again. **The wave 1 migration maps every value already stored to exactly one tag** of its product's
         venue (CHG-R8PRD-010; the rule is PRD-W1-DB's): trimmed, compared ignoring case, a value that fits the code
-        pattern becomes that code, one outside it a derived code with the original kept as the tag's `name`, and
-        each product's `segmentTags` is rewritten to those codes, so none is lost.
+        pattern becomes that code, one outside it a derived code with the original kept as the tag's `name` (literal
+        codes allocated before derived ones, long values truncated before any suffix), and each product's
+        `segmentTags`, and each Help me choose answer filter of the venue that names them, is rewritten to those
+        codes, so no product and no answer loses a tag.
 
         **Only master data is accepted.** A `categoryId` that is not a category of the product's venue with `kind`
         `category` is `422 unknown-category`, an inactive one `422 inactive-category`; a tag id that is not a tag
@@ -19127,8 +19133,8 @@ paths:
       - name: venueId
         in: query
         required: false
-        description: '**Whose venue** (CHG-R8PRD-010): the venue to count. Absent, the session''s working venue
-          (identity `getSessionVenue`); with neither, `400 venue-required`. A venue the caller''s grants do not reach is
+        description: '**Whose venue** (CHG-R8PRD-010): the venue to count. Absent, the working venue of the caller''s session,
+          which travels with the session the access token names (identity `setSessionVenue`); with neither, `400 venue-required`. A venue the caller''s grants do not reach is
           `403 venue-not-in-grants`.'
         schema:
           type: string
@@ -19467,8 +19473,8 @@ paths:
       - name: venueId
         in: query
         required: false
-        description: '**Whose venue** (CHG-R8PRD-010): the venue to list the forms of. Absent, the session''s working venue
-          (identity `getSessionVenue`); with neither, `400 venue-required`. A venue the caller''s grants do not reach is
+        description: '**Whose venue** (CHG-R8PRD-010): the venue to list the forms of. Absent, the working venue of the caller''s session,
+          which travels with the session the access token names (identity `setSessionVenue`); with neither, `400 venue-required`. A venue the caller''s grants do not reach is
           `403 venue-not-in-grants`.'
         schema:
           type: string
@@ -19604,9 +19610,10 @@ paths:
         changed rule whose `targetId` is not one `listSalePermissionTargets` offers for the product at its level
         (`422 unknown-sale-permission-target`); a rule sent unchanged (same `level`, `targetId` and `effect` as a saved
         one) is kept as it is and not checked again, so a rule naming a principal since deactivated, or a venue outside
-        the editor's grants, does not block other changes; an `ALLOW` at level `principal` naming the caller
-        (`403 sale-permission-self-grant`: nobody grants themselves the right to sell, as an approver is never the
-        submitter); an archived product (`409 product-archived`).
+        the editor's grants, does not block other changes; an `ALLOW` at level `principal` naming the caller,
+        or a removed or changed `DENY` whose target is the caller (`principal`) or the caller's selected role (`role`)
+        (`403 sale-permission-self-grant`: nobody grants themselves the right to sell, by adding an allow or lifting a
+        deny, as an approver is never the submitter); an archived product (`409 product-archived`).
 
         **Takes effect at once, as `updateProduct` does** (CHG-R8PRD-010), in every lifecycle state but `archived`,
         and is versioned as `updateProduct` versions the product. Whether a change on a live product should wait for
@@ -19651,8 +19658,8 @@ paths:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '403':
-          description: The caller lacks the permission at this venue (`forbidden`), or an `ALLOW` names the caller
-            (`sale-permission-self-grant`).
+          description: The caller lacks the permission at this venue (`forbidden`), or the set adds an `ALLOW` naming
+            the caller or lifts a `DENY` on the caller or the caller's role (`sale-permission-self-grant`).
           x-ticvai-problem-types:
           - forbidden
           - sale-permission-self-grant
@@ -19786,8 +19793,8 @@ paths:
       - name: venueId
         in: query
         required: false
-        description: '**Whose venue** (CHG-R8PRD-010): the venue to list the targets of, when no `productId` is sent. Absent, the session''s working venue
-          (identity `getSessionVenue`); with neither, `400 venue-required`. A venue the caller''s grants do not reach is
+        description: '**Whose venue** (CHG-R8PRD-010): the venue to list the targets of, when no `productId` is sent. Absent, the working venue of the caller''s session,
+          which travels with the session the access token names (identity `setSessionVenue`); with neither, `400 venue-required`. A venue the caller''s grants do not reach is
           `403 venue-not-in-grants`.'
         schema:
           type: string
@@ -19884,8 +19891,8 @@ paths:
       - name: venueId
         in: query
         required: false
-        description: '**Whose venue** (CHG-R8PRD-010): the venue to count. Absent, the session''s working venue
-          (identity `getSessionVenue`); with neither, `400 venue-required`. A venue the caller''s grants do not reach is
+        description: '**Whose venue** (CHG-R8PRD-010): the venue to count. Absent, the working venue of the caller''s session,
+          which travels with the session the access token names (identity `setSessionVenue`); with neither, `400 venue-required`. A venue the caller''s grants do not reach is
           `403 venue-not-in-grants`.'
         schema:
           type: string
@@ -19943,8 +19950,8 @@ paths:
       - name: venueId
         in: query
         required: false
-        description: '**Whose venue** (CHG-R8PRD-010): the venue to read. Absent, the session''s working venue
-          (identity `getSessionVenue`); with neither, `400 venue-required`. A venue the caller''s grants do not reach is
+        description: '**Whose venue** (CHG-R8PRD-010): the venue to read. Absent, the working venue of the caller''s session,
+          which travels with the session the access token names (identity `setSessionVenue`); with neither, `400 venue-required`. A venue the caller''s grants do not reach is
           `403 venue-not-in-grants`.'
         schema:
           type: string

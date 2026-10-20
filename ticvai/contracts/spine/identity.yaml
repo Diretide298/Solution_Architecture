@@ -7121,8 +7121,11 @@ paths:
         `setSessionVenue`, or at none until one is chosen; `availableVenues` lists the venues it may choose,
         those of `Session.scope` at venue level and every active venue under a wider scope node, in name order.
 
-        **It changes no other operation** (CHG-R8PRD-009): the back office sends it as the `venueId` of the
-        venue-scoped operations that take one, and how an operation resolves the caller's venue otherwise is unchanged.
+        **Which operations use it** (CHG-R8PRD-010): exactly seven, each by its own text, as the venue they act at when
+        no `venueId` is sent: catalogue `listProductTags`, `setProductTagDefinition`, `listProductCategoryUsage`,
+        `listOwnerFormCandidates`, `listSalePermissionTargets`, `getProductDashboard` and `listProductAttentionItems`.
+        Every other operation resolves the caller's venue as before; the back office sends the working venue as their
+        `venueId` where they take one. How it reaches those seven is said once, in `setSessionVenue`.
         It is kept in a column of its own (`identity.session.working_venue_id`), not in `venue_id`, so
         `ActiveSession.venueId` and what `listActiveSessions` and `forceLogout` reach keep their meaning.
 
@@ -7173,6 +7176,14 @@ paths:
         on the session (`identity.session.working_venue_id`) until it ends or is switched again. It changes no grant: what the
         caller may do at the new venue is what `Session.permissionsByScope` already says for it, so the back office
         filters its navigation again after the switch.
+
+        **How it travels: with the caller's session, as the session's scope does** (ADR-0004; permission-resolution R7;
+        `bearerAuth`). The access token carries `sid`, and every service validates that `sid` per request against the
+        session registry, the cache in front of `identity.session` that already carries the session's resolved scope
+        and workstation. This operation writes the new working venue to the session row and to its registry entry in
+        one step, so the very next request made with the same token carries it; no token is reissued. A service that
+        falls back to it (the seven operations `getSessionVenue` lists) reads it from the caller's validated session,
+        as it reads the caller's scope, never from `identity.session` through a query.
 
         **Refused** when the venue is not one of `availableVenues`, that is not an active venue the session's grants
         reach (`403 venue-not-in-grants`), when the session's venue is fixed by its workstation or its role

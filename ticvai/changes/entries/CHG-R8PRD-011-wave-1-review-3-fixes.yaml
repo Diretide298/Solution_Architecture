@@ -1,0 +1,55 @@
+id: CHG-R8PRD-011
+date: '2026-10-20'
+source: audit
+kind: contract
+summary: 'The third fix round of the products wave 1 review: the working venue travels with the caller''s session, as the
+  session''s scope does (the token''s sid, validated per request against the session registry), so the seven operations
+  that fall back to it read it from the caller''s session, not through a query; recordSaleOwnerAnswers takes the order''s
+  venue from Orders and declares the Orders and Identity reads that check it; tag replace keeps the tag''s venue; the
+  self-grant refusal reaches a lifted DENY; the buyer''s owner slot cannot be widened. Additive to the r8 integration head.'
+decision:
+  what: 'contracts/spine/identity.yaml (its wave 1 additions): setSessionVenue states once how the working venue travels:
+    written to the session row and its session-registry entry in one step, read by a service from the caller''s
+    validated session (the token''s sid, ADR-0004, permission-resolution R7), no token reissued, no query;
+    getSessionVenue names the seven operations that use it. contracts/spine/catalogue.yaml (its wave 1 additions): the
+    seven venue-scoped operations refer to it; setProductTagDefinition keeps a known tag''s venue (409
+    tag-venue-mismatch); setProductSalePermissionRules refuses lifting a DENY on the caller or the caller''s role (403
+    sale-permission-self-grant); setProductClassification states the seeding order, truncation and the rewrite of Help me
+    choose filters. contracts/satellite/marketing-crm.yaml (its additions): SaleOwnerAnswers.venueId; recordSaleOwnerAnswers
+    declares orders#salesOrderRecords, orders#orderLineRecords and identity#subjectRecords and refuses unknown-order,
+    order-not-of-venue, not-order-buyer, unknown-order-line, form-not-for-venue and unknown-subject; a retry uses the same
+    Idempotency-Key; a reservationOwner link with a line or unit is 400 validation. contracts/satellite/white-label.yaml
+    (its addition): a tenant that never published answers its draft''s languages.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'The third review of the products wave 1 contracts, 20 October 2026 (R3-1, R3-2, R3-m1 to m6), and the coordinator''s
+  rulings on it. R3-1: the package''s one pattern for the caller''s context is the session the token''s sid names,
+  validated per request against the session registry, which already carries the resolved scope (ADR-0004,
+  docs/architecture/specs/permission-resolution.md R7, common.yaml bearerAuth); so no Identity query is added. R3-2: the
+  link row''s scope and the form check had no source for the order''s venue, and the service writes that act for an
+  order declare their Orders reads (finance postOrderRevenue, access issueOrderEntitlements).'
+keys_touched:
+  operations: [getSessionVenue, setSessionVenue, listProductTags, setProductTagDefinition, listProductCategoryUsage,
+    listOwnerFormCandidates, listSalePermissionTargets, getProductDashboard, listProductAttentionItems,
+    setProductSalePermissionRules, setProductClassification, recordSaleOwnerAnswers]
+  schemas: [SaleOwnerAnswers, FormSubmissionSaleLink]
+  files:
+  - contracts/spine/identity.yaml
+  - contracts/spine/catalogue.yaml
+  - contracts/satellite/marketing-crm.yaml
+  - contracts/satellite/white-label.yaml
+root_class: 'new: mom-decision-without-contract (a client decision with no operation or storage behind it)'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none yet: products module wave 1, 20 October 2026; the lead raises the ADAM CR with the batch'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-contract-shapes.py
+status: open
+notes: 'Batch R8PRD. The session registry entry gaining the working venue is Identity''s implementation (PRD-W1-FRAME);
+  services already read the validated session per request. The seeding''s rewrite of Help me choose answer filters
+  touches WhiteLabel''s rows in the same tenant database; PRD-W1-DB does it, reviewed by WhiteLabel''s owner.'

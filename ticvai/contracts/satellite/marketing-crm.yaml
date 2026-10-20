@@ -18981,6 +18981,16 @@ paths:
       - service
       x-ticvai-auth: service
       x-ticvai-consumed-by: []
+      x-ticvai-read-via:
+      - query: orders#salesOrderRecords
+        route: service
+        for: 'the order must exist, be of the sent venue, and a reservation owner must be its buyer: orders.sales_order, Orders'' data'
+      - query: orders#orderLineRecords
+        route: service
+        for: 'a ticket owner''s order line must be on the order and its unit within the line''s quantity: orders.order_line, Orders'' data'
+      - query: identity#subjectRecords
+        route: service
+        for: 'the owner''s subjectId must be a subject, as submitForm checks: pii.subject, Identity''s data'
       summary: Keep one owner's answers to a product's owner form, for one sale
       description: >-
         **The only write of `FormSubmission.saleContext`** (products module, 16 October 2026 minutes 4.13;
@@ -18989,9 +18999,18 @@ paths:
         catalogue `getProductOwnerForms` links for that role. A guest or staff caller of `submitForm` cannot set a sale
         context: there it is read-only.
 
+        **What Orders sends, and what is checked** (CHG-R8PRD-011): the order's venue (`venueId`) and the sale slot.
+        The order must exist and be of that venue (`422 unknown-order`, `422 order-not-of-venue`); a reservation
+        owner's `subjectId` must be the order's buyer (`422 not-order-buyer`); a ticket owner's order line must be on
+        the order and its unit within the line's quantity (`422 unknown-order-line`); the form must be a published form
+        of that venue (`422 form-not-for-venue`) and the answers must fill its required fields (`422 answer-required`);
+        the `subjectId` must be a subject (`422 unknown-subject`). The link row's `scopePath` is that venue, so the
+        venue that sold the order reads its owners' answers.
+
         **One submission per owner slot**: `(orderId, ownerRole, orderLineId, unitIndex)` is unique
         (`marketing.form_submission_sale_link`), so a second answer for the same slot is refused
-        `409 owner-answers-already-recorded`. The answers are kept as any submission is: bound to the form version
+        `409 owner-answers-already-recorded`. Orders retries a call that timed out with the same `Idempotency-Key`,
+        which answers the first result again; only a different key for an answered slot is the `409`. The answers are kept as any submission is: bound to the form version
         answered, keyed by the form's field keys, the personal-data mark of each field deciding its retention.
       tags:
       - marketing
@@ -19036,11 +19055,20 @@ paths:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
-          description: The form or its version is not a published form of the venue (`unknown-form`), or a required field
-            has no answer (`answer-required`).
+          description: The form or version is unknown (`unknown-form`) or not a published form of the order's venue
+            (`form-not-for-venue`), a required field has no answer (`answer-required`), the order is unknown
+            (`unknown-order`) or of another venue (`order-not-of-venue`), the buyer is not the order's
+            (`not-order-buyer`), the line or unit is not on the order (`unknown-order-line`), or the subject is unknown
+            (`unknown-subject`).
           x-ticvai-problem-types:
           - unknown-form
+          - form-not-for-venue
           - answer-required
+          - unknown-order
+          - order-not-of-venue
+          - not-order-buyer
+          - unknown-order-line
+          - unknown-subject
           content:
             application/problem+json:
               schema:
@@ -38783,12 +38811,17 @@ components:
       x-ticvai-persistence: none — request body of recordSaleOwnerAnswers, kept as marketing.form_submission and marketing.form_submission_sale_link
       description: One owner's answers to an owner form, for one sale (CHG-R8PRD-010).
       required:
+      - venueId
       - formId
       - formVersion
       - subjectId
       - answers
       - sale
       properties:
+        venueId:
+          type: string
+          format: uuid
+          description: The order's venue, sent by Orders; checked against the order and the form, and the link row's scope.
         formId:
           type: string
           format: uuid
@@ -38828,7 +38861,8 @@ components:
       description: >-
         **Which owner slot of which sale a submission answers** (CHG-R8PRD-010). One row per submission made for a
         sale; the unique key allows one answer per slot: the buyer once per order (line and unit null), each ticket
-        owner once per order line and unit.
+        owner once per order line and unit. A `reservationOwner` link with a line or unit set is refused
+        (`400 validation`), so the buyer's slot cannot be widened.
       required:
       - orderId
       - ownerRole
