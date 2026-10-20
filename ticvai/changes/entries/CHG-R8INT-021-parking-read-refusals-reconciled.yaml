@@ -1,0 +1,34 @@
+id: CHG-R8INT-021
+date: '2026-10-20'
+source: audit
+kind: contract
+summary: 'getParkingEntitlement''s two refusal paragraphs read as a contradiction once both lanes'' texts met at the
+  merge ("there is no 403 here" and "a staff session''s token is refused 403"); one sentence says how they fit: a
+  guest never gets 403 (another guest''s entitlement is 404, Pattern 4), and a staff or partner token is refused 403
+  because the operation is guest-only.'
+decision:
+  what: 'contracts/spine/access.yaml getParkingEntitlement description: one reconciling paragraph after the
+    guest-only one. No response, security or audience change.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Concern 1 of the storage-core merge report (audit/ticvai/r8-blockers/merge-storage-core-report.md): core''s
+  Pattern-4 paragraph (CHG-R8SPN-018) and storage-core''s guest-only paragraph (CHG-R8MIG-023) describe different
+  cases, but side by side they read as if they disagree.'
+keys_touched:
+  operations: [getParkingEntitlement]
+  files:
+  - contracts/spine/access.yaml
+root_class: 'two lanes'' texts on one operation merged without a sentence relating them'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: r8 integration'
+triage: blocker
+prevention:
+  type: none
+  ref: 'text only'
+  reason: 'a sentence relating two paragraphs; no check reads description prose for agreement between refusals.'
+status: open
+notes: 'Description text only; the 403 itself comes from the audience, as before.'

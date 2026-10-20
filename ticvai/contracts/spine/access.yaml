@@ -1737,6 +1737,10 @@ paths:
 
         **A guest's read only** (R8 blocker ORDERS-MONEY-C22, CHG-R8MIG-023): the audience is guest, so a staff
         session's token is refused 403.
+
+        **The two refusals do not meet** (r8 integration, CHG-R8INT-021): a guest never gets `403` (another
+        guest's entitlement answers `404`, Pattern 4); a staff or partner token is refused `403` because the
+        operation is guest-only, before any entitlement is looked up.
       x-ticvai-permission: null
       x-ticvai-self-scoped: subject
       x-ticvai-scope-level: venue
