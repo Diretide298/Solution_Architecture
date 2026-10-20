@@ -2,7 +2,7 @@
 "project": "ticvai",
 "openproject": "https://pms.softlabsgroup.in",
 "cached": true,
-"statusReadAt": "2026-10-20T16:43:30Z",
+"statusReadAt": "2026-10-20T21:29:11Z",
 "links": [
 {
 "key": "27625",
@@ -41267,6 +41267,16 @@
 {
 "key": "27824",
 "kind": "table",
+"id": "retail.merchandise",
+"url": "https://pms.softlabsgroup.in/work_packages/27824",
+"subject": "[BE] RetailService: createRetailSale, getRetailSale, listRetailSales, reprintReceipt",
+"status": "New",
+"type": "Task",
+"assignee": "Pranay Shinde"
+},
+{
+"key": "27824",
+"kind": "table",
 "id": "retail.sale",
 "url": "https://pms.softlabsgroup.in/work_packages/27824",
 "subject": "[BE] RetailService: createRetailSale, getRetailSale, listRetailSales, reprintReceipt",
@@ -62586,16 +62596,6 @@
 },
 {
 "key": "27970",
-"kind": "table",
-"id": "control.contract",
-"url": "https://pms.softlabsgroup.in/work_packages/27970",
-"subject": "[BE] PlatformService: removeLicenceAddOn",
-"status": "New",
-"type": "Task",
-"assignee": "Narayan Gaonkar"
-},
-{
-"key": "27970",
 "kind": "screen",
 "id": "ADM-005",
 "url": "https://pms.softlabsgroup.in/work_packages/27970",
@@ -76307,6 +76307,16 @@
 {
 "key": "28081",
 "kind": "screen",
+"id": "BO-1144",
+"url": "https://pms.softlabsgroup.in/work_packages/28081",
+"subject": "Ticketing & Guest Commerce \u00b7 Venue Management (setup, the rest of the screens)",
+"status": "New",
+"type": "Feature",
+"assignee": "Narayan Gaonkar"
+},
+{
+"key": "28081",
+"kind": "screen",
 "id": "BO-1162",
 "url": "https://pms.softlabsgroup.in/work_packages/28081",
 "subject": "Ticketing & Guest Commerce \u00b7 Venue Management (setup, the rest of the screens)",
@@ -76577,6 +76587,26 @@
 {
 "key": "28081",
 "kind": "operation",
+"id": "wallet#getWalletTransferRules",
+"url": "https://pms.softlabsgroup.in/work_packages/28081",
+"subject": "Ticketing & Guest Commerce \u00b7 Venue Management (setup, the rest of the screens)",
+"status": "New",
+"type": "Feature",
+"assignee": "Narayan Gaonkar"
+},
+{
+"key": "28081",
+"kind": "operation",
+"id": "wallet#listCreditTypes",
+"url": "https://pms.softlabsgroup.in/work_packages/28081",
+"subject": "Ticketing & Guest Commerce \u00b7 Venue Management (setup, the rest of the screens)",
+"status": "New",
+"type": "Feature",
+"assignee": "Narayan Gaonkar"
+},
+{
+"key": "28081",
+"kind": "operation",
 "id": "seating#getSeatMap",
 "url": "https://pms.softlabsgroup.in/work_packages/28081",
 "subject": "Ticketing & Guest Commerce \u00b7 Venue Management (setup, the rest of the screens)",
@@ -76628,16 +76658,6 @@
 "key": "28081",
 "kind": "operation",
 "id": "seating#getSeatRecommendationRules",
-"url": "https://pms.softlabsgroup.in/work_packages/28081",
-"subject": "Ticketing & Guest Commerce \u00b7 Venue Management (setup, the rest of the screens)",
-"status": "New",
-"type": "Feature",
-"assignee": "Narayan Gaonkar"
-},
-{
-"key": "28081",
-"kind": "operation",
-"id": "wallet#listCreditTypes",
 "url": "https://pms.softlabsgroup.in/work_packages/28081",
 "subject": "Ticketing & Guest Commerce \u00b7 Venue Management (setup, the rest of the screens)",
 "status": "New",
@@ -100647,6 +100667,16 @@
 {
 "key": "28319",
 "kind": "table",
+"id": "wallet.balance",
+"url": "https://pms.softlabsgroup.in/work_packages/28319",
+"subject": "[BE] WalletService: expireCreditLots, listCreditLots",
+"status": "New",
+"type": "Task",
+"assignee": "Sanket Keluskar"
+},
+{
+"key": "28319",
+"kind": "table",
 "id": "wallet.credit_lot",
 "url": "https://pms.softlabsgroup.in/work_packages/28319",
 "subject": "[BE] WalletService: expireCreditLots, listCreditLots",
@@ -100658,16 +100688,6 @@
 "key": "28319",
 "kind": "table",
 "id": "wallet.credit_type",
-"url": "https://pms.softlabsgroup.in/work_packages/28319",
-"subject": "[BE] WalletService: expireCreditLots, listCreditLots",
-"status": "New",
-"type": "Task",
-"assignee": "Sanket Keluskar"
-},
-{
-"key": "28319",
-"kind": "table",
-"id": "wallet.wallet",
 "url": "https://pms.softlabsgroup.in/work_packages/28319",
 "subject": "[BE] WalletService: expireCreditLots, listCreditLots",
 "status": "New",
@@ -101317,6 +101337,16 @@
 {
 "key": "28326",
 "kind": "table",
+"id": "wallet.balance",
+"url": "https://pms.softlabsgroup.in/work_packages/28326",
+"subject": "[Test] Module test: Wallet & Cashless \u00b7 Venue Management (Block A completion)",
+"status": "New",
+"type": "Task",
+"assignee": "Pallavi Sawant"
+},
+{
+"key": "28326",
+"kind": "table",
 "id": "wallet.credit_lot",
 "url": "https://pms.softlabsgroup.in/work_packages/28326",
 "subject": "[Test] Module test: Wallet & Cashless \u00b7 Venue Management (Block A completion)",
@@ -101328,16 +101358,6 @@
 "key": "28326",
 "kind": "table",
 "id": "wallet.credit_type",
-"url": "https://pms.softlabsgroup.in/work_packages/28326",
-"subject": "[Test] Module test: Wallet & Cashless \u00b7 Venue Management (Block A completion)",
-"status": "New",
-"type": "Task",
-"assignee": "Pallavi Sawant"
-},
-{
-"key": "28326",
-"kind": "table",
-"id": "wallet.wallet",
 "url": "https://pms.softlabsgroup.in/work_packages/28326",
 "subject": "[Test] Module test: Wallet & Cashless \u00b7 Venue Management (Block A completion)",
 "status": "New",
@@ -113187,6 +113207,26 @@
 {
 "key": "28411",
 "kind": "operation",
+"id": "finance#createRecognitionSchedule",
+"url": "https://pms.softlabsgroup.in/work_packages/28411",
+"subject": "Finance & Tax \u00b7 API only (Block A completion)",
+"status": "In progress",
+"type": "Feature",
+"assignee": "Sanket Keluskar"
+},
+{
+"key": "28411",
+"kind": "operation",
+"id": "finance#getDeferredRevenue",
+"url": "https://pms.softlabsgroup.in/work_packages/28411",
+"subject": "Finance & Tax \u00b7 API only (Block A completion)",
+"status": "In progress",
+"type": "Feature",
+"assignee": "Sanket Keluskar"
+},
+{
+"key": "28411",
+"kind": "operation",
 "id": "finance#getUnifiedReconciliation",
 "url": "https://pms.softlabsgroup.in/work_packages/28411",
 "subject": "Finance & Tax \u00b7 API only (Block A completion)",
@@ -113205,6 +113245,26 @@
 "assignee": "Sanket Keluskar"
 },
 {
+"key": "28411",
+"kind": "operation",
+"id": "finance#listRecognitionSchedules",
+"url": "https://pms.softlabsgroup.in/work_packages/28411",
+"subject": "Finance & Tax \u00b7 API only (Block A completion)",
+"status": "In progress",
+"type": "Feature",
+"assignee": "Sanket Keluskar"
+},
+{
+"key": "28411",
+"kind": "operation",
+"id": "finance#runRecognition",
+"url": "https://pms.softlabsgroup.in/work_packages/28411",
+"subject": "Finance & Tax \u00b7 API only (Block A completion)",
+"status": "In progress",
+"type": "Feature",
+"assignee": "Sanket Keluskar"
+},
+{
 "key": "28412",
 "kind": "operation",
 "id": "finance#closeFiscalPeriod",
@@ -113597,7 +113657,27 @@
 {
 "key": "28414",
 "kind": "operation",
-"id": "finance#getUnifiedReconciliation",
+"id": "finance#createRecognitionSchedule",
+"url": "https://pms.softlabsgroup.in/work_packages/28414",
+"subject": "[Test] Module test: Finance & Tax \u00b7 API only (Block A completion)",
+"status": "New",
+"type": "Task",
+"assignee": "Pranay Shinde"
+},
+{
+"key": "28414",
+"kind": "operation",
+"id": "finance#getDeferredRevenue",
+"url": "https://pms.softlabsgroup.in/work_packages/28414",
+"subject": "[Test] Module test: Finance & Tax \u00b7 API only (Block A completion)",
+"status": "New",
+"type": "Task",
+"assignee": "Pranay Shinde"
+},
+{
+"key": "28414",
+"kind": "table",
+"id": "ledger.account",
 "url": "https://pms.softlabsgroup.in/work_packages/28414",
 "subject": "[Test] Module test: Finance & Tax \u00b7 API only (Block A completion)",
 "status": "New",
@@ -113608,6 +113688,26 @@
 "key": "28414",
 "kind": "table",
 "id": "ledger.posting",
+"url": "https://pms.softlabsgroup.in/work_packages/28414",
+"subject": "[Test] Module test: Finance & Tax \u00b7 API only (Block A completion)",
+"status": "New",
+"type": "Task",
+"assignee": "Pranay Shinde"
+},
+{
+"key": "28414",
+"kind": "table",
+"id": "orders.sales_order",
+"url": "https://pms.softlabsgroup.in/work_packages/28414",
+"subject": "[Test] Module test: Finance & Tax \u00b7 API only (Block A completion)",
+"status": "New",
+"type": "Task",
+"assignee": "Pranay Shinde"
+},
+{
+"key": "28414",
+"kind": "operation",
+"id": "finance#getUnifiedReconciliation",
 "url": "https://pms.softlabsgroup.in/work_packages/28414",
 "subject": "[Test] Module test: Finance & Tax \u00b7 API only (Block A completion)",
 "status": "New",
@@ -113638,6 +113738,26 @@
 "key": "28414",
 "kind": "operation",
 "id": "finance#listFiscalPeriods",
+"url": "https://pms.softlabsgroup.in/work_packages/28414",
+"subject": "[Test] Module test: Finance & Tax \u00b7 API only (Block A completion)",
+"status": "New",
+"type": "Task",
+"assignee": "Pranay Shinde"
+},
+{
+"key": "28414",
+"kind": "operation",
+"id": "finance#listRecognitionSchedules",
+"url": "https://pms.softlabsgroup.in/work_packages/28414",
+"subject": "[Test] Module test: Finance & Tax \u00b7 API only (Block A completion)",
+"status": "New",
+"type": "Task",
+"assignee": "Pranay Shinde"
+},
+{
+"key": "28414",
+"kind": "operation",
+"id": "finance#runRecognition",
 "url": "https://pms.softlabsgroup.in/work_packages/28414",
 "subject": "[Test] Module test: Finance & Tax \u00b7 API only (Block A completion)",
 "status": "New",
@@ -150687,6 +150807,16 @@
 {
 "key": "28759",
 "kind": "screen",
+"id": "BO-1144",
+"url": "https://pms.softlabsgroup.in/work_packages/28759",
+"subject": "[Test] Module test: Ticketing & Guest Commerce \u00b7 Venue Management (setup, the rest of the screens)",
+"status": "New",
+"type": "Task",
+"assignee": "Narayan Gaonkar"
+},
+{
+"key": "28759",
+"kind": "screen",
 "id": "BO-1162",
 "url": "https://pms.softlabsgroup.in/work_packages/28759",
 "subject": "[Test] Module test: Ticketing & Guest Commerce \u00b7 Venue Management (setup, the rest of the screens)",
@@ -153218,6 +153348,16 @@
 "key": "28759",
 "kind": "table",
 "id": "wallet.risk_rule",
+"url": "https://pms.softlabsgroup.in/work_packages/28759",
+"subject": "[Test] Module test: Ticketing & Guest Commerce \u00b7 Venue Management (setup, the rest of the screens)",
+"status": "New",
+"type": "Task",
+"assignee": "Narayan Gaonkar"
+},
+{
+"key": "28759",
+"kind": "operation",
+"id": "wallet#getWalletTransferRules",
 "url": "https://pms.softlabsgroup.in/work_packages/28759",
 "subject": "[Test] Module test: Ticketing & Guest Commerce \u00b7 Venue Management (setup, the rest of the screens)",
 "status": "New",
@@ -237887,6 +238027,16 @@
 {
 "key": "29772",
 "kind": "screen",
+"id": "ADM-194",
+"url": "https://pms.softlabsgroup.in/work_packages/29772",
+"subject": "[BE] CatalogueService: listCustomerEligibilityRule, listProductPriceAvailability, listRealTimeAvailability, listRealTimeChannel",
+"status": "New",
+"type": "Task",
+"assignee": "Narayan Gaonkar"
+},
+{
+"key": "29772",
+"kind": "screen",
 "id": "ADM-271",
 "url": "https://pms.softlabsgroup.in/work_packages/29772",
 "subject": "[BE] CatalogueService: listCustomerEligibilityRule, listProductPriceAvailability, listRealTimeAvailability, listRealTimeChannel",
@@ -243988,6 +244138,16 @@
 "key": "29845",
 "kind": "table",
 "id": "promotions.bundle_component",
+"url": "https://pms.softlabsgroup.in/work_packages/29845",
+"subject": "[Test] Module test: Ticketing \u00b7 Venue Management 6 of 8",
+"status": "New",
+"type": "Task",
+"assignee": "Deep Khanvilkar"
+},
+{
+"key": "29845",
+"kind": "screen",
+"id": "ADM-194",
 "url": "https://pms.softlabsgroup.in/work_packages/29845",
 "subject": "[Test] Module test: Ticketing \u00b7 Venue Management 6 of 8",
 "status": "New",
@@ -254837,67 +254997,7 @@
 {
 "key": "29970",
 "kind": "operation",
-"id": "promotions#listRedemptionCodeLookup",
-"url": "https://pms.softlabsgroup.in/work_packages/29970",
-"subject": "Pricing & Promotions \u00b7 Venue Management 2 of 8",
-"status": "New",
-"type": "Feature",
-"assignee": "Pranay Shinde"
-},
-{
-"key": "29970",
-"kind": "operation",
-"id": "promotions#listRedemption",
-"url": "https://pms.softlabsgroup.in/work_packages/29970",
-"subject": "Pricing & Promotions \u00b7 Venue Management 2 of 8",
-"status": "New",
-"type": "Feature",
-"assignee": "Pranay Shinde"
-},
-{
-"key": "29970",
-"kind": "operation",
 "id": "promotions#listBundlePricingCommercial",
-"url": "https://pms.softlabsgroup.in/work_packages/29970",
-"subject": "Pricing & Promotions \u00b7 Venue Management 2 of 8",
-"status": "New",
-"type": "Feature",
-"assignee": "Pranay Shinde"
-},
-{
-"key": "29970",
-"kind": "operation",
-"id": "promotions#listPartnerExternalProduct",
-"url": "https://pms.softlabsgroup.in/work_packages/29970",
-"subject": "Pricing & Promotions \u00b7 Venue Management 2 of 8",
-"status": "New",
-"type": "Feature",
-"assignee": "Pranay Shinde"
-},
-{
-"key": "29970",
-"kind": "operation",
-"id": "promotions#listBundlePartnerProductMappings",
-"url": "https://pms.softlabsgroup.in/work_packages/29970",
-"subject": "Pricing & Promotions \u00b7 Venue Management 2 of 8",
-"status": "New",
-"type": "Feature",
-"assignee": "Pranay Shinde"
-},
-{
-"key": "29970",
-"kind": "operation",
-"id": "promotions#setBundlePartnerProductMappings",
-"url": "https://pms.softlabsgroup.in/work_packages/29970",
-"subject": "Pricing & Promotions \u00b7 Venue Management 2 of 8",
-"status": "New",
-"type": "Feature",
-"assignee": "Pranay Shinde"
-},
-{
-"key": "29970",
-"kind": "operation",
-"id": "promotions#listRevenueAllocationCost",
 "url": "https://pms.softlabsgroup.in/work_packages/29970",
 "subject": "Pricing & Promotions \u00b7 Venue Management 2 of 8",
 "status": "New",
@@ -255088,6 +255188,66 @@
 "key": "29970",
 "kind": "operation",
 "id": "inventory#getInventoryKitDefinition",
+"url": "https://pms.softlabsgroup.in/work_packages/29970",
+"subject": "Pricing & Promotions \u00b7 Venue Management 2 of 8",
+"status": "New",
+"type": "Feature",
+"assignee": "Pranay Shinde"
+},
+{
+"key": "29970",
+"kind": "operation",
+"id": "promotions#listRedemptionCodeLookup",
+"url": "https://pms.softlabsgroup.in/work_packages/29970",
+"subject": "Pricing & Promotions \u00b7 Venue Management 2 of 8",
+"status": "New",
+"type": "Feature",
+"assignee": "Pranay Shinde"
+},
+{
+"key": "29970",
+"kind": "operation",
+"id": "promotions#listRedemption",
+"url": "https://pms.softlabsgroup.in/work_packages/29970",
+"subject": "Pricing & Promotions \u00b7 Venue Management 2 of 8",
+"status": "New",
+"type": "Feature",
+"assignee": "Pranay Shinde"
+},
+{
+"key": "29970",
+"kind": "operation",
+"id": "promotions#listPartnerExternalProduct",
+"url": "https://pms.softlabsgroup.in/work_packages/29970",
+"subject": "Pricing & Promotions \u00b7 Venue Management 2 of 8",
+"status": "New",
+"type": "Feature",
+"assignee": "Pranay Shinde"
+},
+{
+"key": "29970",
+"kind": "operation",
+"id": "promotions#listBundlePartnerProductMappings",
+"url": "https://pms.softlabsgroup.in/work_packages/29970",
+"subject": "Pricing & Promotions \u00b7 Venue Management 2 of 8",
+"status": "New",
+"type": "Feature",
+"assignee": "Pranay Shinde"
+},
+{
+"key": "29970",
+"kind": "operation",
+"id": "promotions#setBundlePartnerProductMappings",
+"url": "https://pms.softlabsgroup.in/work_packages/29970",
+"subject": "Pricing & Promotions \u00b7 Venue Management 2 of 8",
+"status": "New",
+"type": "Feature",
+"assignee": "Pranay Shinde"
+},
+{
+"key": "29970",
+"kind": "operation",
+"id": "promotions#listRevenueAllocationCost",
 "url": "https://pms.softlabsgroup.in/work_packages/29970",
 "subject": "Pricing & Promotions \u00b7 Venue Management 2 of 8",
 "status": "New",
@@ -256585,6 +256745,16 @@
 "assignee": "Sanket Keluskar"
 },
 {
+"key": "29981",
+"kind": "screen",
+"id": "ADM-197",
+"url": "https://pms.softlabsgroup.in/work_packages/29981",
+"subject": "[BE] CatalogueService: listCheapestLowestValue, listCodeSecurityFraud, listComponentInventoryAvailability, listDynamicBundle",
+"status": "New",
+"type": "Task",
+"assignee": "Sanket Keluskar"
+},
+{
 "key": "29982",
 "kind": "operation",
 "id": "promotions#listDynamicBundle2",
@@ -256666,6 +256836,16 @@
 },
 {
 "key": "29982",
+"kind": "screen",
+"id": "ADM-197",
+"url": "https://pms.softlabsgroup.in/work_packages/29982",
+"subject": "[BE] CatalogueService: listDynamicBundle2, listDynamicBundleRule, listMultiBuyQuantity, listOfferBasketTrace",
+"status": "New",
+"type": "Task",
+"assignee": "Deep Khanvilkar"
+},
+{
+"key": "29982",
 "kind": "operation",
 "id": "promotions#listDynamicBundleRule",
 "url": "https://pms.softlabsgroup.in/work_packages/29982",
@@ -256688,6 +256868,16 @@
 "key": "29982",
 "kind": "table",
 "id": "promotions.campaign",
+"url": "https://pms.softlabsgroup.in/work_packages/29982",
+"subject": "[BE] CatalogueService: listDynamicBundle2, listDynamicBundleRule, listMultiBuyQuantity, listOfferBasketTrace",
+"status": "New",
+"type": "Task",
+"assignee": "Deep Khanvilkar"
+},
+{
+"key": "29982",
+"kind": "screen",
+"id": "ADM-193",
 "url": "https://pms.softlabsgroup.in/work_packages/29982",
 "subject": "[BE] CatalogueService: listDynamicBundle2, listDynamicBundleRule, listMultiBuyQuantity, listOfferBasketTrace",
 "status": "New",
@@ -257756,6 +257946,16 @@
 },
 {
 "key": "30002",
+"kind": "screen",
+"id": "ADM-197",
+"url": "https://pms.softlabsgroup.in/work_packages/30002",
+"subject": "[Test] Module test: Pricing & Promotions \u00b7 Venue Management 2 of 8",
+"status": "New",
+"type": "Task",
+"assignee": "Pranay Shinde"
+},
+{
+"key": "30002",
 "kind": "operation",
 "id": "promotions#listDynamicBundle2",
 "url": "https://pms.softlabsgroup.in/work_packages/30002",
@@ -257798,6 +257998,16 @@
 "key": "30002",
 "kind": "table",
 "id": "promotions.campaign",
+"url": "https://pms.softlabsgroup.in/work_packages/30002",
+"subject": "[Test] Module test: Pricing & Promotions \u00b7 Venue Management 2 of 8",
+"status": "New",
+"type": "Task",
+"assignee": "Pranay Shinde"
+},
+{
+"key": "30002",
+"kind": "screen",
+"id": "ADM-193",
 "url": "https://pms.softlabsgroup.in/work_packages/30002",
 "subject": "[Test] Module test: Pricing & Promotions \u00b7 Venue Management 2 of 8",
 "status": "New",
@@ -258227,6 +258437,16 @@
 {
 "key": "30009",
 "kind": "operation",
+"id": "promotions#listTargetingEligibility",
+"url": "https://pms.softlabsgroup.in/work_packages/30009",
+"subject": "Pricing & Promotions \u00b7 Venue Management 3 of 8",
+"status": "New",
+"type": "Feature",
+"assignee": "Pallavi Sawant"
+},
+{
+"key": "30009",
+"kind": "operation",
 "id": "promotions#listCrmCustomerSegment",
 "url": "https://pms.softlabsgroup.in/work_packages/30009",
 "subject": "Pricing & Promotions \u00b7 Venue Management 3 of 8",
@@ -258248,56 +258468,6 @@
 "key": "30009",
 "kind": "operation",
 "id": "promotions#listPartnerPaymentEligibility",
-"url": "https://pms.softlabsgroup.in/work_packages/30009",
-"subject": "Pricing & Promotions \u00b7 Venue Management 3 of 8",
-"status": "New",
-"type": "Feature",
-"assignee": "Pallavi Sawant"
-},
-{
-"key": "30009",
-"kind": "operation",
-"id": "promotions#listDynamicBundleRule",
-"url": "https://pms.softlabsgroup.in/work_packages/30009",
-"subject": "Pricing & Promotions \u00b7 Venue Management 3 of 8",
-"status": "New",
-"type": "Feature",
-"assignee": "Pallavi Sawant"
-},
-{
-"key": "30009",
-"kind": "operation",
-"id": "promotions#listRealTimeAvailability",
-"url": "https://pms.softlabsgroup.in/work_packages/30009",
-"subject": "Pricing & Promotions \u00b7 Venue Management 3 of 8",
-"status": "New",
-"type": "Feature",
-"assignee": "Pallavi Sawant"
-},
-{
-"key": "30009",
-"kind": "operation",
-"id": "promotions#listDynamicBundle2",
-"url": "https://pms.softlabsgroup.in/work_packages/30009",
-"subject": "Pricing & Promotions \u00b7 Venue Management 3 of 8",
-"status": "New",
-"type": "Feature",
-"assignee": "Pallavi Sawant"
-},
-{
-"key": "30009",
-"kind": "operation",
-"id": "promotions#listDynamicBundle",
-"url": "https://pms.softlabsgroup.in/work_packages/30009",
-"subject": "Pricing & Promotions \u00b7 Venue Management 3 of 8",
-"status": "New",
-"type": "Feature",
-"assignee": "Pallavi Sawant"
-},
-{
-"key": "30009",
-"kind": "operation",
-"id": "promotions#listTargetingEligibility",
 "url": "https://pms.softlabsgroup.in/work_packages/30009",
 "subject": "Pricing & Promotions \u00b7 Venue Management 3 of 8",
 "status": "New",
@@ -258377,6 +258547,26 @@
 {
 "key": "30009",
 "kind": "operation",
+"id": "promotions#listDynamicBundleRule",
+"url": "https://pms.softlabsgroup.in/work_packages/30009",
+"subject": "Pricing & Promotions \u00b7 Venue Management 3 of 8",
+"status": "New",
+"type": "Feature",
+"assignee": "Pallavi Sawant"
+},
+{
+"key": "30009",
+"kind": "operation",
+"id": "promotions#listRealTimeAvailability",
+"url": "https://pms.softlabsgroup.in/work_packages/30009",
+"subject": "Pricing & Promotions \u00b7 Venue Management 3 of 8",
+"status": "New",
+"type": "Feature",
+"assignee": "Pallavi Sawant"
+},
+{
+"key": "30009",
+"kind": "operation",
 "id": "promotions#listBundleAvailabilityChannel",
 "url": "https://pms.softlabsgroup.in/work_packages/30009",
 "subject": "Pricing & Promotions \u00b7 Venue Management 3 of 8",
@@ -258388,6 +258578,26 @@
 "key": "30009",
 "kind": "operation",
 "id": "promotions#listBundleAvailabilityForecast",
+"url": "https://pms.softlabsgroup.in/work_packages/30009",
+"subject": "Pricing & Promotions \u00b7 Venue Management 3 of 8",
+"status": "New",
+"type": "Feature",
+"assignee": "Pallavi Sawant"
+},
+{
+"key": "30009",
+"kind": "operation",
+"id": "promotions#listDynamicBundle2",
+"url": "https://pms.softlabsgroup.in/work_packages/30009",
+"subject": "Pricing & Promotions \u00b7 Venue Management 3 of 8",
+"status": "New",
+"type": "Feature",
+"assignee": "Pallavi Sawant"
+},
+{
+"key": "30009",
+"kind": "operation",
+"id": "promotions#listDynamicBundle",
 "url": "https://pms.softlabsgroup.in/work_packages/30009",
 "subject": "Pricing & Promotions \u00b7 Venue Management 3 of 8",
 "status": "New",
@@ -318437,6 +318647,16 @@
 {
 "key": "30881",
 "kind": "table",
+"id": "retail.merchandise",
+"url": "https://pms.softlabsgroup.in/work_packages/30881",
+"subject": "[BE] createRetailSale: POST /retail-sales",
+"status": "New",
+"type": "Sub Task",
+"assignee": "Pranay Shinde"
+},
+{
+"key": "30881",
+"kind": "table",
 "id": "retail.sale",
 "url": "https://pms.softlabsgroup.in/work_packages/30881",
 "subject": "[BE] createRetailSale: POST /retail-sales",
@@ -344928,16 +345148,6 @@
 "key": "31277",
 "kind": "table",
 "id": "control.tenant",
-"url": "https://pms.softlabsgroup.in/work_packages/31277",
-"subject": "[BE] removeLicenceAddOn: DELETE /tenants/{tenantId}/licences/add-ons",
-"status": "New",
-"type": "Sub Task",
-"assignee": "Narayan Gaonkar"
-},
-{
-"key": "31277",
-"kind": "table",
-"id": "control.contract",
 "url": "https://pms.softlabsgroup.in/work_packages/31277",
 "subject": "[BE] removeLicenceAddOn: DELETE /tenants/{tenantId}/licences/add-ons",
 "status": "New",
@@ -389417,6 +389627,16 @@
 {
 "key": "32137",
 "kind": "table",
+"id": "wallet.balance",
+"url": "https://pms.softlabsgroup.in/work_packages/32137",
+"subject": "[BE] expireCreditLots: POST /credit-lots/expire",
+"status": "New",
+"type": "Sub Task",
+"assignee": "Sanket Keluskar"
+},
+{
+"key": "32137",
+"kind": "table",
 "id": "wallet.credit_lot",
 "url": "https://pms.softlabsgroup.in/work_packages/32137",
 "subject": "[BE] expireCreditLots: POST /credit-lots/expire",
@@ -389428,16 +389648,6 @@
 "key": "32137",
 "kind": "table",
 "id": "wallet.credit_type",
-"url": "https://pms.softlabsgroup.in/work_packages/32137",
-"subject": "[BE] expireCreditLots: POST /credit-lots/expire",
-"status": "New",
-"type": "Sub Task",
-"assignee": "Sanket Keluskar"
-},
-{
-"key": "32137",
-"kind": "table",
-"id": "wallet.wallet",
 "url": "https://pms.softlabsgroup.in/work_packages/32137",
 "subject": "[BE] expireCreditLots: POST /credit-lots/expire",
 "status": "New",
@@ -531217,6 +531427,16 @@
 {
 "key": "35253",
 "kind": "screen",
+"id": "ADM-194",
+"url": "https://pms.softlabsgroup.in/work_packages/35253",
+"subject": "[BE] listRealTimeAvailability: GET /real-time-availability",
+"status": "New",
+"type": "Sub Task",
+"assignee": "Narayan Gaonkar"
+},
+{
+"key": "35253",
+"kind": "screen",
 "id": "ADM-271",
 "url": "https://pms.softlabsgroup.in/work_packages/35253",
 "subject": "[BE] listRealTimeAvailability: GET /real-time-availability",
@@ -546545,6 +546765,16 @@
 "assignee": "Sanket Keluskar"
 },
 {
+"key": "35583",
+"kind": "screen",
+"id": "ADM-197",
+"url": "https://pms.softlabsgroup.in/work_packages/35583",
+"subject": "[BE] listDynamicBundle: GET /dynamic-bundle",
+"status": "New",
+"type": "Sub Task",
+"assignee": "Sanket Keluskar"
+},
+{
 "key": "35584",
 "kind": "operation",
 "id": "promotions#listDynamicBundle2",
@@ -546625,6 +546855,16 @@
 "assignee": "Deep Khanvilkar"
 },
 {
+"key": "35584",
+"kind": "screen",
+"id": "ADM-197",
+"url": "https://pms.softlabsgroup.in/work_packages/35584",
+"subject": "[BE] listDynamicBundle2: GET /dynamic-bundle-2",
+"status": "New",
+"type": "Sub Task",
+"assignee": "Deep Khanvilkar"
+},
+{
 "key": "35585",
 "kind": "operation",
 "id": "promotions#listDynamicBundleRule",
@@ -546698,6 +546938,26 @@
 "key": "35585",
 "kind": "screen",
 "id": "ADM-188",
+"url": "https://pms.softlabsgroup.in/work_packages/35585",
+"subject": "[BE] listDynamicBundleRule: GET /dynamic-bundle-rule",
+"status": "New",
+"type": "Sub Task",
+"assignee": "Deep Khanvilkar"
+},
+{
+"key": "35585",
+"kind": "screen",
+"id": "ADM-193",
+"url": "https://pms.softlabsgroup.in/work_packages/35585",
+"subject": "[BE] listDynamicBundleRule: GET /dynamic-bundle-rule",
+"status": "New",
+"type": "Sub Task",
+"assignee": "Deep Khanvilkar"
+},
+{
+"key": "35585",
+"kind": "screen",
+"id": "ADM-197",
 "url": "https://pms.softlabsgroup.in/work_packages/35585",
 "subject": "[BE] listDynamicBundleRule: GET /dynamic-bundle-rule",
 "status": "New",
