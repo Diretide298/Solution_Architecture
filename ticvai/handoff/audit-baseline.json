@@ -6864,8 +6864,10 @@
     "suspendWallet:wallet.wallet:write",
     "topUpWallet:wallet.balance:write",
     "topUpWallet:wallet.wallet:write",
+    "transferWalletBalance:wallet.balance:write",
     "transferWalletBalance:wallet.wallet:write",
     "updatePrincipal:identity.principal:write",
+    "updatePrincipal:identity.refresh_token:write",
     "uploadGuestDocument:marketing.guest_document:write",
     "validateWorkforceCompliance:workforce.employee:read",
     "verifyAllergens:fnb.ingredient_substitute:read"

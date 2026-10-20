@@ -157,6 +157,9 @@ NOT_READ: tuple = tuple(re.compile(p, re.I | re.S) for p in (
     r"rather than a venue setting",             # listDiningOutlets: says what is not a venue setting
     r"introduced later as a venue setting",     # createJournalEntry: a setting that does not exist yet
     r"appears on tax codes, FX rates",          # listProducts, cloneProduct and the product family: a comparison
+    # r8 integration (20 October 2026, CHG-R8INT-017): two sentences that name a table to say Identity does not read it
+    r"never reads\s+`orders\.pos_shift`",      # Session.hasOpenShift (forceLogout, listSessions): fed by events
+    r"`marketing\.device_consent\.scope_path`;\s+Identity\s+may\s+not\s+read\s+that\s+table",  # recordConsentIdentifier
 ))
 TABLE_IN_TEXT = re.compile(r"(?<![\w.])([a-z][a-z0-9_]*)\.([a-z][a-z0-9_]+)\b")
 FIELD_IN_TEXT = re.compile(r"(?<![\w.])(?:([a-z][a-z-]+)\.)?([A-Z][A-Za-z0-9]+)\.([a-z][A-Za-z0-9]+)\b")
