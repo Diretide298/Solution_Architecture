@@ -609,3 +609,121 @@ def _names_ticket(tmp_path):
     assert any(k == "foreign key" for k, _ in ch[(rel, "wallet.owner")])
     text = td.names_sentence(rel, {"wallet.gift_card": ch[(rel, "wallet.gift_card")]})
     assert text.startswith(f"Source DDL after r1: {rel}") and "rename column face_value to face_value_amount" in text
+
+
+# ---- R8 second round: a column the contract makes optional (CHG-R8MIG-004) ----------------------------------------
+
+AR_OLD = ("CREATE TABLE IF NOT EXISTS platform.audit_read (id uuid PRIMARY KEY NOT NULL, principal_id uuid NOT NULL, "
+          "subject_id uuid NOT NULL);\n")
+AR_NEW = ("CREATE TABLE IF NOT EXISTS platform.audit_read (id uuid PRIMARY KEY NOT NULL, principal_id uuid NOT NULL, "
+          "subject_id uuid);\n")
+
+
+def test_a_column_the_contract_makes_optional_loses_not_null_guarded_and_once():
+    p = fwd.diff("tenant", model(AR_OLD), model(AR_NEW))
+    stmt = [s for s in p.statements if "DROP NOT NULL" in s]
+    assert len(stmt) == 1 and "'subject_id'" in stmt[0] and "information_schema.columns" in stmt[0]
+    assert any("SET NOT NULL" in r and "subject_id" in r for r in p.rollback)
+    assert not [r for r in p.review if r[0] == "column changed"], p.review
+    again = fwd.diff("tenant", fold(AR_OLD, p), model(AR_NEW))
+    assert not again.statements and not again.review, (again.statements, again.review)
+
+
+def test_a_type_change_with_the_not_null_dropped_is_still_a_decision():
+    new = AR_NEW.replace("subject_id uuid", "subject_id text")
+    p = fwd.diff("tenant", model(AR_OLD), model(new))
+    assert not [s for s in p.statements if "DROP NOT NULL" in s]
+    assert [r for r in p.review if r[0] == "column changed"]
+
+
+CH_OLD = ("CREATE TABLE IF NOT EXISTS control.tenant_domain (id uuid PRIMARY KEY NOT NULL, channel text CONSTRAINT "
+          "tenant_domain_channel_chk CHECK (channel IN ('guestWeb', 'backOffice')));\n")
+CH_NEW = CH_OLD.replace("'backOffice')", "'backOffice', 'staffApp')")
+
+
+def test_a_column_check_that_only_gains_values_is_written_not_valid_then_validated_once():
+    p = fwd.diff("control", model(CH_OLD), model(CH_NEW))
+    assert any("DROP CONSTRAINT IF EXISTS tenant_domain_channel_chk" in s for s in p.statements), p.statements
+    add = [s for s in p.statements if " ADD CONSTRAINT tenant_domain_channel_chk" in s]
+    assert add and "'staffApp'" in add[0] and add[0].endswith("NOT VALID")
+    assert any("VALIDATE CONSTRAINT tenant_domain_channel_chk" in s for s in p.statements)
+    assert not [r for r in p.review if r[0] == "column changed"], p.review
+    again = fwd.diff("control", fold(CH_OLD, p), model(CH_NEW))
+    assert not again.statements and not again.review, (again.statements, again.review)
+
+
+def test_a_column_check_that_loses_a_value_is_added_not_valid_and_left_to_validate():
+    p = fwd.diff("control", model(CH_NEW), model(CH_OLD))
+    assert not [s for s in p.statements if "VALIDATE CONSTRAINT tenant_domain_channel_chk" in s]
+    assert [r for r in p.review if r[0] == "column changed" and "VALIDATE CONSTRAINT" in r[3]]
+
+
+PSG = ("CREATE TABLE IF NOT EXISTS identity.principal (id uuid PRIMARY KEY NOT NULL);\n"
+       "CREATE TABLE IF NOT EXISTS identity.platform_staff_grant (id uuid PRIMARY KEY NOT NULL, "
+       "operator_principal_id uuid NOT NULL);\n")
+PSG_FK = ("ALTER TABLE identity.platform_staff_grant ADD CONSTRAINT platform_staff_grant_operator_principal_id_fkey "
+          "FOREIGN KEY (operator_principal_id) REFERENCES identity.principal(id);\n")
+
+
+def test_a_foreign_key_the_contract_withdraws_is_dropped_guarded_in_the_names_file():
+    p = fwd.diff("tenant", model(PSG + PSG_FK), model(PSG))
+    drop = [s for s in p.recon if "DROP CONSTRAINT platform_staff_grant_operator_principal_id_fkey" in s]
+    assert drop and "pg_constraint" in drop[0] and "| drop foreign key |" in drop[0]
+    assert any("ADD CONSTRAINT platform_staff_grant_operator_principal_id_fkey" in r for r in p.recon_rollback)
+    assert not [r for r in p.review if r[0] == "constraint dropped"], p.review
+    folded = model(PSG + PSG_FK)
+    folded.apply_forward(";\n".join(s.split("\n", 1)[1] for s in p.recon) + ";\n")
+    again = fwd.diff("tenant", folded, model(PSG))
+    assert not again.recon and not again.review, (again.recon, again.review)
+
+
+AP_OLD = ("CREATE TABLE IF NOT EXISTS access.access_area (id uuid PRIMARY KEY NOT NULL);\n"
+          "CREATE TABLE IF NOT EXISTS access.access_point (id uuid PRIMARY KEY NOT NULL);\n")
+AP_NEW = ("CREATE TABLE IF NOT EXISTS access.access_area (id uuid PRIMARY KEY NOT NULL);\n"
+          "CREATE TABLE IF NOT EXISTS access.access_point (id uuid PRIMARY KEY NOT NULL, zone_id uuid);\n"
+          "ALTER TABLE access.access_point ADD CONSTRAINT access_point_zone_id_fkey FOREIGN KEY (zone_id) "
+          "REFERENCES access.access_area(id);\n")
+
+
+def test_a_key_on_a_new_column_is_added_guarded_so_the_file_applies_twice():
+    p = fwd.diff("tenant", model(AP_OLD), model(AP_NEW))
+    fk = [s for s in p.statements if "access_point_zone_id_fkey" in s]
+    assert len(fk) == 1 and fk[0].startswith("DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_constraint")
+    assert "conname = 'access_point_zone_id_fkey'" in fk[0] and "NOT VALID" not in fk[0]
+    again = fwd.diff("tenant", fold(AP_OLD, p), model(AP_NEW))
+    assert not again.statements and not again.review, (again.statements, again.review)
+
+
+CB_OLD = "CREATE TABLE IF NOT EXISTS marketing.customer_badge (id uuid PRIMARY KEY NOT NULL, status text);\n"
+CB_NEW = ("CREATE TABLE IF NOT EXISTS marketing.customer_badge (id uuid PRIMARY KEY NOT NULL, status text CONSTRAINT "
+          "customer_badge_status_chk CHECK (status IN ('awarded', 'expired', 'revoked')));\n")
+
+
+def test_a_check_added_to_an_existing_column_is_written_not_valid_and_validation_is_a_review_row():
+    p = fwd.diff("tenant", model(CB_OLD), model(CB_NEW))
+    add = [s for s in p.statements if "ADD CONSTRAINT customer_badge_status_chk" in s]
+    assert add and add[0].endswith("NOT VALID")
+    assert not [s for s in p.statements if "VALIDATE" in s]
+    assert [r for r in p.review if r[0] == "column changed" and "VALIDATE CONSTRAINT" in r[3] and "NOT VALID" in r[2]]
+    again = fwd.diff("tenant", fold(CB_OLD, p), model(CB_NEW))
+    assert not again.statements and not again.review, (again.statements, again.review)
+
+
+def test_a_narrowed_check_is_written_not_valid_too():
+    narrow = CB_NEW.replace(", 'revoked'", "")
+    p = fwd.diff("tenant", model(CB_NEW), model(narrow))
+    assert [s for s in p.statements if "ADD CONSTRAINT customer_badge_status_chk" in s and "'revoked'" not in s]
+    assert [r for r in p.review if r[0] == "column changed" and "VALIDATE CONSTRAINT" in r[3]]
+
+
+CP_OLD = ("CREATE TABLE IF NOT EXISTS platform.configuration_profile (id uuid PRIMARY KEY NOT NULL, "
+          "version integer NOT NULL);\n")
+CP_NEW = ("CREATE TABLE IF NOT EXISTS platform.configuration_profile (id uuid NOT NULL, version integer NOT NULL, "
+          "CONSTRAINT configuration_profile_pkey PRIMARY KEY (id, version));\n")
+
+
+def test_a_column_a_new_composite_key_covers_is_not_relaxed():
+    p = fwd.diff("tenant", model(CP_OLD), model(CP_NEW))
+    assert not [s for s in p.statements if "DROP NOT NULL" in s], p.statements
+    assert not [r for r in p.review if r[1] == "platform.configuration_profile.version"], p.review
+    assert [r for r in p.review if r[0] == "constraint added" and "PRIMARY KEY (id, version)" in r[2]]

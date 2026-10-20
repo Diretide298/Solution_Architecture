@@ -101,7 +101,9 @@ or in the generated list that the tickets do not carry.
 and no task names are listed, with that reason, under "Tables no migration creates" in the generated
 `handoff/service-docs/backend/MIGRATIONS.md`; a table there that an operation does reach fails the check.
 The kernel's own tables (`kernel.inbox`, `ai.inbox`, `control.outbox_relay`, ADR-0058) go with the first
-release, and `platform.schema_version` with the baseline.
+release, and `platform.schema_version` with the baseline. So do AI's own outbox and its sequence (`ai.outbox`,
+`ai.outbox_sequence`, FOUNDATION-AI-C41; CHG-R8MIG-011): AI writes no other module's table, so its events leave
+through them as `ai.inbox` takes them in.
 
 `subscription` is a tenant schema with a first-release migration of its own; the Control Plane is the
 `control` database (ADR-0039), migrated as its own series and holding its own `platform.schema_version`.
@@ -116,6 +118,41 @@ security rather than open. ADAM's table view calls this policy `tenant_isolation
 column, and the DDL is right as it stands. A table gets this policy only when it has no `scope_path`,
 no `venue_id`, no subject and no NOT NULL owning reference (the comment beside each call in
 `920-row-level-security.sql` says which).
+
+## The connection context
+
+The policies read three settings, set with `SET LOCAL` at the start of every transaction: `ticvai.scope_paths` (the
+ltree paths the caller's grants reach; unset or empty means no scoped rows), `ticvai.subject_id` (a guest's own rows)
+and `ticvai.principal_id` (the signed-in principal's own rows: its credentials and second factors, CHG-R8MIG-007).
+**Decided 20 October 2026** (the lead, option A of R8 blocker IDENTITY-C48):
+
+1. **Before a session exists** (login, the guest sign-ins, `listSsoProviders`, `listActiveSessions` with step-up) the
+   transaction opens in an explicit system context, the tenant root path, confined to Identity's own verification
+   statements, and is narrowed with `SET LOCAL` before any other table is touched: to the principal's paths and
+   `ticvai.principal_id`, or to `ticvai.subject_id` for a guest (scope paths empty). A session-less till call narrows to
+   the till's venue path once the supervisor is verified.
+2. **A guest** reads and writes its own `pii.subject` row (`x-ticvai-rls: subject-self`) and the rows keyed to its
+   subject (`subject_id`: the subject rule, or `own-row`).
+3. **A cell-internal `serviceAuth` call** has no user: the tenant comes from the cell token's `tid` claim,
+   `ticvai.scope_paths` is the tenant root, the calling cell is the audited actor, and its idempotency records are
+   claimed in that context.
+
+The schema-level marks that build on these (`tools/derive-ddl.py` RLS_MARKS): `own-row` (the row's principal or
+guest, or the tenant root: the MFA tables), `own-or-home-scope` (a principal's credential: the principal, a grant over
+its home scope, or the tenant root), `home-scope-write` (`identity.principal`: any grant reads; the tenant root or a
+grant over the home scope writes) and `subject-self` (`pii.subject`).
+
+## The control database has no row-level security
+
+**Decided 20 October 2026** (the lead, option A of R8 blocker causes IDENTITY-C16, FOUNDATION-AI-C36 and
+APPROVALS-TENANCY-C18; CHG-R8MIG-005). The control database (ADR-0039) holds no scope tree, so there is no
+`scope_path` to write a policy against: `backend/control/920-row-level-security.sql` has policies for none of its
+tables, on purpose. It is guarded instead by **the connection**, since only the control plane's own role is granted
+on it, and by **the operation**, which checks its `PLATFORM_*` permission and, for a client-owned row (a webhook
+subscription or delivery, an API licence), that the caller's tenant is among the API client's `allowedTenantIds`
+(else 404). `api_version` and the other platform-wide tables have no owner at all. A control-database ticket's
+done-when says this instead of "under row-level security" (`tools/ticket_done.py` CONTROL_RULE). A tenant-facing
+read of a control table, when one appears, gets a `tenant_id` policy then (option B, later).
 
 ## Rules
 

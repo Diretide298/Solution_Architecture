@@ -1,0 +1,49 @@
+id: CHG-R8MIG-016
+date: '2026-10-20'
+source: audit
+kind: process
+summary: 'Three more rules for the [DB] ticket text. A hand-written database task (a key ending -DB, or "track":
+  "Database", in docs/active/block-a-extra-tasks.json) is the migration of the tables its `builds` lists: no second
+  migration is planned for them, they are not "Tables no migration creates", and the task carries the migration text
+  and done-when (check-migration-tickets accepts it). Every migration ticket says not to copy the platform.schema_version
+  insert of a package after-r1 file. A key into a table that a later migration creates moves to that migration (both
+  tickets say so), except the first release''s own cross-schema keys, which MIG-FOREIGN-KEYS adds.'
+decision:
+  what: 'The coordinator''s requests of 20 October 2026 (the products wave 1 task PRD-W1-DB, and two findings of ADAM''s
+    database-ticket check: the schema_version insert and promotions.voucher''s key to promotions.voucher_batch, V1017
+    before V1114). tools/ticket_done.py hand_db_tables, built_tables, SCHEMA_VERSION_LINE, foreign_keys, key_moves and
+    key_move_sentences; tools/build-service-docs.py (track, mig_of, assigned, made_by and the migration text loop);
+    tools/check-migration-tickets.py (a hand-written migration names no V-file and its tables are on a ticket). The
+    marker is explicit, because twenty other hand-written tasks list in `builds` tables they work on (PLATFORM-OUTBOX
+    names platform.outbox, which MIG-PLATFORM creates): counting those as migrations took tables from their migration.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: R8 fix round 2, coordinator requests from the products wave 1 plan and ADAM''s database-ticket check
+  (applies each migration twice; a copied file wrote its version row twice; a forward key pointed at a table a later
+  migration creates and no ticket added it).'
+keys_touched:
+  operations: []
+  schemas: []
+  files:
+  - tools/ticket_done.py
+  - tools/build-service-docs.py
+  - tools/check-migration-tickets.py
+  - tools/tests/test_ticket_done_control.py
+root_class: 'ticket text: a migration ticket that cannot apply in the order the plan gives it'
+tickets:
+  started: []
+  unstarted:
+  - 'PRD-W1-DB (products wave 1) and every migration ticket; 37 key sentences on the tickets of the keys that move
+    (VM-MIG-PROMOTIONS and MIG-PROMOTIONS-2 among them): build-service-docs rewrites them at the next refresh.'
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: R8 fix round 2, coordinator requests'
+triage: blocker
+prevention:
+  type: generator-rule
+  ref: tools/ticket_done.py::key_moves
+status: open
+notes: 'tools/tests/test_ticket_done_control.py: a hand-written -DB task claims its tables (and PLATFORM-OUTBOX does not),
+  the key move, the schema_version line. Tried end to end in the lane worktree with a test task claiming
+  ai.signal_observation: it became a [DB] ticket with the migration text and done-when, the table left "Tables no
+  migration creates", and check-migration-tickets, check-migration-wording and check-ticket-text T-MIG-DONE pass.'

@@ -1,0 +1,38 @@
+id: CHG-R8MIG-012
+date: '2026-10-20'
+source: audit
+kind: process
+summary: 'A hand-written task in docs/active/block-a-extra-tasks.json may claim operations through `operations` and its
+  ticket says they are built by this task; only an AI engine task (epic AI-ENGINE) says they are served by ticvai-ai
+  behind the AI gateway. A claimed operation still gets no second back-end task.'
+decision:
+  what: 'The coordinator''s request of 20 October 2026 for the products wave 1 tasks (PRD-W1-*, branch fix/r8b-products,
+    23 operations): tools/ticket_done.py claimed_ops_sentence, used by tools/build-service-docs.py extra_lead with the
+    task''s epic. The operation formula already skips every operation any extra task claims (aiEngineOperations reads
+    every task''s `operations`).'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: R8 fix round 2, coordinator''s request: a non-AI task claiming its operations got "served by ticvai-ai
+  behind the AI gateway" in its text, which is false outside the AI engine.'
+keys_touched:
+  operations: []
+  schemas: []
+  files:
+  - tools/ticket_done.py
+  - tools/build-service-docs.py
+  - tools/tests/test_ticket_done_control.py
+root_class: 'ticket text: generated wording true only for one kind of task'
+tickets:
+  started: []
+  unstarted:
+  - 'PRD-W1-* (products wave 1), at the r8 tag.'
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: R8 fix round 2, coordinator request'
+triage: fix-forward
+prevention:
+  type: generator-rule
+  ref: tools/ticket_done.py::claimed_ops_sentence
+status: open
+notes: 'tools/tests/test_ticket_done_control.py: an AI engine task''s sentence names the gateway, any other task''s does
+  not. The AI engine tasks'' text is unchanged.'

@@ -1,0 +1,47 @@
+id: CHG-R8MIG-028
+date: '2026-10-20'
+source: audit
+kind: process
+summary: 'Three findings a rehearsal of this lane merged onto the integration branch turned up, fixed: a table that left
+  the control database (control.content_block -> whitelabel.content_block) is no longer kept in MIG-CONTROL''s group,
+  where it had formed a second task keyed MIG-CONTROL and taken every control table off the ticket (its departure is
+  recorded); listCellEndpoints reads control.cell_endpoint through a declared query, subscription#cellEndpointRecords,
+  served to commerce by Platform''s service route; and tenancy.device_assignment.device_id is a declared key to
+  platform.device.'
+decision:
+  what: 'tools/build-service-docs.py (moved-table grouping), docs/active/block-a-extra-tasks.json (the control.content_block
+    departure), contracts/satellite/subscription.yaml cellEndpointRecords, contracts/spine/tenancy.yaml listCellEndpoints
+    read-via and DeviceAssignment.deviceId x-ticvai-references.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: this lane''s rehearsal of its branch merged into fix/r8-integration at 1fba7794 (derive-lineage through
+  adam-links, then the gate checks): check-migration-tickets M-TABLE-ASSIGNED and M-FILE-ORDER, check-ddl-conventions
+  D-MIG-TABLES and D-MIG-ORDER, check-plan-closure C-GONE (18 control tables), check-cross-module-reads XR-UNCOVERED
+  (listCellEndpoints), check-storage-promises SP-KEY-UNDECLARED (device_assignment.device_id).'
+keys_touched:
+  operations: [listCellEndpoints]
+  schemas: [DeviceAssignment]
+  tables:
+  - control.content_block
+  - whitelabel.content_block
+  - control.cell_endpoint
+  - tenancy.device_assignment
+  files:
+  - tools/build-service-docs.py
+  - docs/active/block-a-extra-tasks.json
+  - contracts/satellite/subscription.yaml
+  - contracts/spine/tenancy.yaml
+root_class: 'A-DERIVE: a generated key or text that a second step of the plan contradicts'
+tickets:
+  started: []
+  unstarted:
+  - 'MIG-CONTROL (#27650) keeps its tables.'
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: lane rehearsal'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-migration-tickets.py
+status: open
+notes: 'Verified by the same rehearsal after the fix (see the lane report).'

@@ -20548,7 +20548,7 @@ components:
           format: date-time
           nullable: true
     MarketingBadge:
-      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by listBadges, setBadge
+      x-ticvai-rls: signed-in-read   # MOD audit, CHG-MOD-007: read below the tenant by listBadges, setBadge; any signed-in guest too (CHG-R8MIG-011: badge definitions are not personal, ORDERS-MONEY-C33)
       type: object
       x-ticvai-persistence: marketing.badge
       description: '**Taken from the backend workbook, 20 September.** Defines a digital badge that can be awarded to a customer for challenge completion or other engagement achievement.'
@@ -24181,6 +24181,12 @@ components:
       - thirdPartySharing
       - aiProcessing
       - transactional
+      - storedPaymentCredential
+      - facePassEnrolment
+      description: '`storedPaymentCredential` (a card saved for later, `storePaymentToken`) and `facePassEnrolment` (a face
+        enrolled for entry, `enrolFacePass`) are purposes of their own (R8 blocker ORDERS-MONEY-C21, CHG-R8MIG-022), so a
+        screen picks the row by its purpose instead of guessing: each tenant has one `marketing.consent_purpose` row of
+        each, seeded with the tenant''s other purposes.'
     ConsentDecision:
       type: string
       enum:
@@ -24776,6 +24782,12 @@ components:
       - noticeVersion
       - isRequiredForService
       properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+          description: The purpose row's id (`marketing.consent_purpose.id`), the value `consentPurposeId` and a
+            consent's `purposeId` carry (R8 blocker ORDERS-MONEY-C21, CHG-R8MIG-022).
         purpose:
           $ref: '#/components/schemas/ConsentPurpose'
         displayName:
@@ -26371,6 +26383,9 @@ components:
           description: The case this message belongs to, from the path of `addCaseMessage` (the opening one, `createCase`).
     LoyaltyProgramme:
       x-ticvai-persistence: marketing.loyalty_programme + marketing.points_earning_rule + marketing.programme_tier
+      # A tenant-wide programme (no venue) is read at every venue; a venue's own at that venue (ORDERS-MONEY-C33 answer A;
+      # CHG-R8MIG-026). Positions follow it for staff, and a guest reads only its own.
+      x-ticvai-rls: read-beneath
       type: object
       required:
       - id

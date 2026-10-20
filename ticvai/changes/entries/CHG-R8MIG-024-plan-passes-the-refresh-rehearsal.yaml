@@ -1,0 +1,50 @@
+id: CHG-R8MIG-024
+date: '2026-10-20'
+source: audit
+kind: process
+summary: 'The migration plan and its checks pass the refresh rehearsal of 20 October: a Venue Management migration no
+  longer reuses the key of a pushed forward migration the first release kept whole (VM-MIG-APPROVALS kept
+  approvals.escalation; approvals.sla_policy goes under its pushed MIG-APPROVALS-4), so no pushed key is renamed and
+  approvals.escalation is on a ticket again; MIG-BASELINE names its after-r1 source files by path, never a bare
+  V-number; a storage-only table an after-r1 file changes cites that file in "Tables no migration creates"; and
+  check-migration-tickets reads a MIG- task''s "Builds:" list as what it works on, not what it creates.'
+decision:
+  what: 'The coordinator''s priority addendum (refresh rehearsal of fix/r8-integration at 1fba7794, items 1 and 3 to 5).
+    tools/build-service-docs.py (VM migration key, storage-only rows), tools/ticket_done.py (baseline_wording paths,
+    built_tables by key), tools/check-migration-tickets.py, tools/check-migration-wording.py (storage-only rows).
+    Item 2 (check-ticket-links TL-DEAD-LINK, 212) needs no change: every dead link is a CR-150 move (subscription.* to
+    control.*), and tools/adam-links.py, which writes handoff/service-docs/adam-links.json, already follows the moves
+    declared in derive-schema-history RENAMES; the rehearsal checked the r7 file without running it, which the release
+    gate does first (release-runbook section 4).'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: refresh rehearsal of 20 October 2026 (the rehearsal worktree under D:/wt/refresh-rehearsal, run 20261020-053851): check-key-stability 9
+  pushed keys renamed and a failed self-test, check-migration-tickets M-TABLE-ASSIGNED approvals.escalation,
+  check-migration-wording MW-AFTER-R1 (approvals.escalation, ai.translation_job), check-ticket-text T-MIG-DONE
+  MIG-BASELINE.'
+keys_touched:
+  operations: []
+  schemas: []
+  files:
+  - tools/build-service-docs.py
+  - tools/ticket_done.py
+  - tools/check-migration-tickets.py
+  - tools/check-migration-wording.py
+  - tools/tests/test_ticket_done_control.py
+root_class: 'A-DERIVE: a generated key or text that a second step of the plan contradicts'
+tickets:
+  started: []
+  unstarted:
+  - 'VM-MIG-APPROVALS (#27826) and MIG-APPROVALS-4 (#29412) keep their work; MIG-BASELINE text.'
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: refresh rehearsal'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-key-stability.py
+status: open
+notes: 'Verified on a copy of the rehearsal''s refreshed tree (a worktree at 1fba7794 with the rehearsal''s derived files
+  and these tools): build-service-docs, derive-block-a-schedule, op-descriptions and adam-links, then
+  check-key-stability PASS (16 tests), check-migration-tickets PASS, check-migration-wording PASS, check-ticket-text
+  T-MIG-DONE ok and PASS, check-ticket-links PASS.'

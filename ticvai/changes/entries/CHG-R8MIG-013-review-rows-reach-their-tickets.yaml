@@ -1,0 +1,48 @@
+id: CHG-R8MIG-013
+date: '2026-10-20'
+source: audit
+kind: process
+summary: 'Every change derive-ddl leaves for a person reaches a ticket: each row of handoff/migration-review.md (table
+  renames and moves, column renames with a type change, NOT NULL and type changes) is listed on the migration ticket
+  that creates its table, under "Changes no file writes", and check-migration-tickets fails a row the ticket does not
+  carry. Every migration ticket says to write each ADD CONSTRAINT copied from the package guarded, and the [DB]
+  done-when says the migration is safe to run twice.'
+decision:
+  what: 'R8 blocker causes IDENTITY-C43 and FOUNDATION-AI-C38 (no decision), and the coordinator''s request of 20 October
+    2026 (ADAM''s database-ticket check applies each migration twice). tools/ticket_done.py review_rows,
+    review_sentence, GUARDED_KEYS and the Database done-when; tools/build-service-docs.py adds them to the migration
+    tickets; tools/check-migration-tickets.py M-REVIEW-ROW. FOUNDATION-AI-C38 asked for a new [DB] task per database;
+    the rows go on the tickets that create their tables instead, so the plan gains no task (the lead''s delegate ruled
+    out regrouping migration tickets in r8) and the rename is written where the table is built.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: R8 blocker cause list (r8b-storage-core), groups identity and foundation-ai; tickets 27728, 27735 and 27686
+  (TEST-AM-FOUNDATION-DATABASE): renames such as catalogue.inventory_hold to inventory_reservation and the
+  otp_challenge nullability were in migration-review.md and on no ticket. And ADAM''s check applies each migration twice:
+  the package''s 900-foreign-keys.sql lines fail a second run as written.'
+keys_touched:
+  operations: []
+  schemas: []
+  files:
+  - tools/ticket_done.py
+  - tools/build-service-docs.py
+  - tools/check-migration-tickets.py
+  - tools/tests/test_ticket_done_control.py
+root_class: 'ticket text: a change the generator leaves for a person that no ticket carries'
+tickets:
+  started: []
+  unstarted:
+  - 'Every migration ticket whose table has a migration-review row (MIG-CATALOGUE, MIG-IDENTITY, MIG-WALLET and the
+    others), and every [DB] ticket''s done-when: build-service-docs rewrites them at the next refresh.'
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: R8 blocker walk and coordinator request'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-migration-tickets.py
+status: open
+notes: 'Three rows sit on tables no migration ticket creates yet (approvals.accreditation_badge, and the two retired
+  tables orders.payment_tip and platform.device_heartbeat): the check notes them, since the migration that creates such
+  a table later takes it as it is then. Verified by running build-service-docs in the lane worktree: check-migration-tickets
+  and check-migration-wording pass.'

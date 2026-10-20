@@ -1,0 +1,46 @@
+id: CHG-R8MIG-021
+date: '2026-10-20'
+source: audit
+kind: contract
+summary: 'A guest-made delegation and an anonymous or till cart can be stored and proven. identity.delegated_access says
+  who granted it (granted_by_kind principal, subject or system, with the matching column; the principal column loses its
+  NOT NULL), a guest-made grant''s scope, effect and the guest-delegable permissions per delegationKind (proposed,
+  client to confirm), and row-level security lets a guest read the grants it is party to and the account holder write
+  them (scope-or-subject). createCart takes an anonymous guest token or a staff or partner session; orders.cart records
+  the session and workstation; getCart serves a kiosk device; claimCart takes the cart''s token in its body (403
+  otherwise) and rotates it.'
+decision:
+  what: 'R8 blocker causes IDENTITY-C42 (the lead''s answer A: a fixed list per delegationKind, for the client to confirm)
+    and IDENTITY-C49 (answer A: Cart.token is the proof). contracts/spine/identity.yaml DelegatedAccess and grantDelegation
+    text; contracts/spine/orders.yaml createCart, getCart, claimCart and Cart; tools/derive-ddl.py RLS_MARKS
+    scope-or-subject. Additive (a new optional body, a new security alternative and audiences, new columns).'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: R8 blocker cause list (r8b-storage-core), group identity; tickets 27732, 27757 and 27735 and their ADAM
+  gaps: a guest or the SSO callback could not record a grant, nothing created an anonymous or till cart, and claimCart
+  took no proof.'
+keys_touched:
+  operations: [grantDelegation, createCart, getCart, claimCart]
+  schemas: [DelegatedAccess, Cart]
+  tables:
+  - identity.delegated_access
+  - orders.cart
+  files:
+  - contracts/spine/identity.yaml
+  - contracts/spine/orders.yaml
+  - tools/derive-ddl.py
+root_class: 'storage gap: an operation promises a key, column or policy its table does not have'
+tickets:
+  started: []
+  unstarted:
+  - '27732, 27757, 27735.'
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: R8 blocker walk (r8b-storage-core causes)'
+triage: blocker
+prevention:
+  type: generator-rule
+  ref: tools/derive-ddl.py::RLS_MARKS
+status: open
+notes: 'Applied on PostgreSQL 16 (generated files twice). apiKeyAuth for the kiosk (KSK-006) is not added: the scheme is
+  deferred pending the Developer & API workshop (common.yaml); the kiosk reads its cart with its device session.'

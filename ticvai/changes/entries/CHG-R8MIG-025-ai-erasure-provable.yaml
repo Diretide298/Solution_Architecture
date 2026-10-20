@@ -1,0 +1,42 @@
+id: CHG-R8MIG-025
+date: '2026-10-20'
+source: audit
+kind: contract
+summary: 'Erasure reaches the AI data and can be proven: a new service operation ai.eraseSubject removes a guest''s
+  ai.index_entry and ai.chunk_embedding rows, then their Qdrant points by payload, retried to completion, and answers the
+  counts removed and the counts left (0 and 0 is the proof). ai.chunk_embedding records the subject (subject_id) and
+  both tables are indexed on it; deleteGuestAccount''s erasure job calls it.'
+decision:
+  what: 'R8 blocker cause FOUNDATION-AI-C42 (no decision). contracts/satellite/ai.yaml eraseSubject
+    (POST /internal/subjects/{subjectId}/ai-erasure, serviceAuth, audience service), AiChunkEmbedding.subjectId and the
+    x-ticvai-index marks; contracts/spine/identity.yaml deleteGuestAccount x-ticvai-calls ai.eraseSubject. A new
+    operation in a satellite file (the surface lane''s part), made here because the cause is this lane''s; pointIds
+    stays uuid[] as the contract says (the r1 column''s type change is a review row).'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: R8 blocker cause list (r8b-storage-core), group foundation-ai; ticket 27720 (AI-ENGINE-QDRANT) and its ADAM
+  gap: guest erasure could not be triggered on, or proven for, the AI index.'
+keys_touched:
+  operations: [eraseSubject, deleteGuestAccount]
+  schemas: [AiChunkEmbedding, IndexEntry]
+  tables:
+  - ai.chunk_embedding
+  - ai.index_entry
+  files:
+  - contracts/satellite/ai.yaml
+  - contracts/spine/identity.yaml
+root_class: 'storage gap: an operation promises a key, column or policy its table does not have'
+tickets:
+  started: []
+  unstarted:
+  - '27720 AI-ENGINE-QDRANT; the erasure job of deleteGuestAccount.'
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: R8 blocker walk (r8b-storage-core causes)'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-contract-storage.py
+status: open
+notes: 'Requested of the surface lane: ADR-0049 and ai-system-design.md one wording (subject_id on the chunk row), and an
+  optional identity.subjectErased event if the AI side should rather listen than be called.'

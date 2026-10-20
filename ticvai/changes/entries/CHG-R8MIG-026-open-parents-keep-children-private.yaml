@@ -1,0 +1,44 @@
+id: CHG-R8MIG-026
+date: '2026-10-20'
+source: audit
+kind: process
+summary: 'A parent a guest may read no longer opens its children to every guest, and a venue_id table can be read
+  beneath its owner: under a signed-in-read parent (marketing.badge) or a venue read-beneath parent, a child row is read
+  by staff where the parent is visible and by a guest only for its own subject (customer_id or subject_id), and written
+  where the parent may be written; `x-ticvai-rls: read-beneath` on a venue_id table reads a row with no venue at every
+  venue. LoyaltyProgramme carries it (a tenant-wide programme is read at every venue; positions stay each guest''s own).'
+decision:
+  what: 'The storage-sat lane''s request 7 (ORDERS-MONEY-C33, answer A) and a fix to CHG-R8MIG-011''s signed-in-read
+    mark, whose child marketing.customer_badge would otherwise have been readable by every guest. tools/derive-ddl.py
+    (split_mark, the venue read-beneath call, the guarded child call in rls_file); contracts/satellite/marketing-crm.yaml
+    LoyaltyProgramme x-ticvai-rls (the mark line only; storage-sat asked for it).'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: R8 fix round 2, storage-sat lane report (request 7), and this lane''s own review of the forward migration
+  the signed-in-read mark generates.'
+keys_touched:
+  operations: []
+  schemas: [LoyaltyProgramme]
+  tables:
+  - marketing.customer_badge
+  - marketing.loyalty_programme
+  - marketing.loyalty_position
+  - marketing.points_earning_rule
+  - marketing.programme_tier
+  files:
+  - tools/derive-ddl.py
+  - contracts/satellite/marketing-crm.yaml
+root_class: 'A-DERIVE: a row-level rule a generator could not write'
+tickets:
+  started: []
+  unstarted:
+  - 'MIG-MARKETING and its forward migrations take the policies from the next forward migration.'
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: R8 fix round 2'
+triage: blocker
+prevention:
+  type: generator-rule
+  ref: tools/derive-ddl.py::RLS_MARKS
+status: open
+notes: 'Applied on PostgreSQL 16 (the generated files twice; marketing.customer_badge has its four policies).'

@@ -1,0 +1,49 @@
+id: CHG-R8MIG-014
+date: '2026-10-20'
+source: audit
+kind: contract
+summary: 'A field the response always fills can still be stored only when set: `x-ticvai-column-nullable: true` keeps its
+  column nullable, and platform.workstation.sale_board holds only the till''s override (the effective board is resolved
+  on read), so the next forward migration drops its NOT NULL. An added column CHECK''s review row is a "column changed"
+  row on the column, which the storage checks read as pending.'
+decision:
+  what: 'The core lane''s requests 1 and 3 (its r8b report; R8 blocker APPROVALS-TENANCY-C39, and the active-hostname
+    index of APPROVALS-TENANCY-C12, already done by CHG-R8MIG-004). tools/derive-schema.py column_nullable;
+    contracts/spine/tenancy.yaml Workstation.saleBoard; tools/ddl_forward.py review row kind. Request 2
+    (identity.open_shift_marker keyed on shiftId) is written for the lead''s merge: the schema exists only on the core
+    lane''s side. Done at the merge onto fix/r8-integration (20 October 2026): OpenShiftMarker `x-ticvai-primary-key:
+    [shiftId]`, `x-ticvai-index: [[principalId, workstationId]]`, and its three keys declared (shiftId `none`: Identity
+    does not depend on orders.pos_shift; principalId identity.principal; workstationId platform.workstation), so
+    check-storage-promises SP-KEY-UNDECLARED has nothing to name on the table.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: R8 fix round 2, core lane report (requests to storage-core): the contract resolves Workstation.saleBoard on
+  read while the column stayed NOT NULL, so a till that inherits its outlet''s board could not be stored.'
+keys_touched:
+  operations: []
+  schemas: [Workstation, OpenShiftMarker]
+  tables:
+  - platform.workstation
+  - identity.open_shift_marker
+  files:
+  - tools/derive-schema.py
+  - tools/ddl_forward.py
+  - tools/tests/test_migration_generator.py
+  - contracts/spine/tenancy.yaml
+  - contracts/spine/identity.yaml
+root_class: 'storage gap: an operation promises a key, column or policy its table does not have'
+tickets:
+  started: []
+  unstarted:
+  - 'MIG-PLATFORM takes the DROP NOT NULL from the next forward migration.'
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: R8 fix round 2, core lane request'
+triage: blocker
+prevention:
+  type: generator-rule
+  ref: tools/derive-schema.py::column_nullable
+status: open
+notes: 'check-contract-storage passes after the derive. check-contract-storage ST-REQUIRED-MISMATCH skips a field only
+  when readOnly; it does not yet read x-ticvai-column-nullable (no finding today, since a required field in a nullable
+  column is reported only for non-readOnly fields of the origin schema: the generators lane is asked to honour the mark).'

@@ -1,0 +1,59 @@
+id: CHG-R8MIG-011
+date: '2026-10-20'
+source: audit
+kind: process
+summary: 'What the storage-sat lane''s contract changes need from the generators: a column CHECK added or narrowed is
+  written NOT VALID (validating the rows is a review row); a new row-level security mark, signed-in-read (any
+  signed-in staff or guest reads, writes keep the base rule), set on wallet.gift_card and marketing.badge; the move of
+  control.content_block to whitelabel.content_block declared; ai.outbox and ai.outbox_sequence go with the first release
+  as kernel machinery; platform.venue_settings.contact (jsonb) for the venue''s guest contact.'
+decision:
+  what: 'The storage-sat lane''s requests 3, 4, 5, 6 and 10 (its r8b report, for causes ORDERS-MONEY-C27, ORDERS-MONEY-C33,
+    IDENTITY-C59, WHITE-C16 and FOUNDATION-AI-C41). tools/ddl_forward.py changed_check_only; tools/derive-ddl.py
+    RLS_MARKS signed-in-read and platform.signed_in(); tools/derive-schema-history.py RENAMES control.content_block;
+    tools/build-service-docs.py MACHINERY_TABLES; backend/MIGRATIONS.md kernel tables; contracts/spine/tenancy.yaml
+    VenueSettings.contact; x-ticvai-rls on GiftCard (contracts/satellite/wallet.yaml) and MarketingBadge
+    (contracts/satellite/marketing-crm.yaml), which that lane left for this mark.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: R8 blocker fix round 2, storage-sat lane report (requests for storage-core), from the cause list
+  (r8b-storage-sat): a guest could not read a gift card by its code nor a badge definition, the new enums on existing
+  columns were review rows, and nothing retired the control content block.'
+keys_touched:
+  operations: []
+  schemas: [VenueSettings, GiftCard, MarketingBadge]
+  tables:
+  - wallet.gift_card
+  - marketing.badge
+  - control.content_block
+  - whitelabel.content_block
+  - platform.venue_settings
+  - ai.outbox
+  - ai.outbox_sequence
+  files:
+  - tools/ddl_forward.py
+  - tools/derive-ddl.py
+  - tools/derive-schema-history.py
+  - tools/build-service-docs.py
+  - tools/tests/test_migration_generator.py
+  - backend/MIGRATIONS.md
+  - contracts/spine/tenancy.yaml
+  - contracts/satellite/wallet.yaml
+  - contracts/satellite/marketing-crm.yaml
+root_class: 'A-DERIVE: a contract storage fact the generator could not write'
+tickets:
+  started: []
+  unstarted:
+  - 'The MIG tickets of the tables named; MIG-AI (ai.outbox) at the next refresh.'
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: R8 blocker fix round 2'
+triage: blocker
+prevention:
+  type: generator-rule
+  ref: tools/ddl_forward.py::changed_check_only
+status: open
+notes: 'Tests in tools/tests/test_migration_generator.py (an added CHECK and a narrowed one, each written once). Applied on
+  PostgreSQL 16 from empty, the generated V0108/V0109 twice. On this branch alone the content-block move creates
+  whitelabel.content_block from the control table''s columns while the old contract still names control.content_block;
+  with the storage-sat contract merged the table follows the contract and the control table is the move''s review row.'

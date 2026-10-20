@@ -315,6 +315,83 @@ def retire_not_null(t: str, c: str) -> str:
             f"ALTER COLUMN {c} DROP NOT NULL; END IF; END $$")
 
 
+def _inline_check(coldef: str):
+    """(name, the whole `CONSTRAINT <name> CHECK (...)` text, the expression inside) of a column's inline CHECK."""
+    m = re.search(r"CONSTRAINT (\S+) CHECK \(", coldef, re.I)
+    if not m:
+        return None
+    depth, i = 0, m.end() - 1
+    for j in range(i, len(coldef)):
+        depth += {"(": 1, ")": -1}.get(coldef[j], 0)
+        if depth == 0:
+            return m.group(1), coldef[m.start():j + 1], coldef[i + 1:j]
+    return None
+
+
+IN_LIST = re.compile(r"^(\w+) IN \((.*)\)$", re.S)
+
+
+def widened_check(old_def: str, new_def: str):
+    """**A column CHECK that only gained values** (CHG-R8MIG-006): the same column but for an inline
+    `CHECK (col IN (...))` whose new list holds every old value and more. Returns (constraint name, the new
+    `CONSTRAINT ... CHECK (...)` clause), else None. Widening refuses no row that was valid, so it is additive."""
+    o, n = _inline_check(old_def), _inline_check(new_def)
+    if not o or not n or o[0] != n[0]:
+        return None
+    if norm(old_def.replace(o[1], "")) != norm(new_def.replace(n[1], "")):
+        return None
+    mo, mn = IN_LIST.match(o[2].strip()), IN_LIST.match(n[2].strip())
+    if not mo or not mn or mo.group(1) != mn.group(1):
+        return None
+    vals = lambda s: {v.strip() for v in re.findall(r"'(?:[^']|'')*'", s)}
+    old_v, new_v = vals(mo.group(2)), vals(mn.group(2))
+    if not old_v or not old_v < new_v:
+        return None
+    return n[0], n[1]
+
+
+def changed_check_only(old_def: str, new_def: str):
+    """(name, the new `CONSTRAINT ... CHECK (...)` clause) when the column changes only by gaining an inline CHECK or
+    by a CHECK of the same name that is not a widening (CHG-R8MIG-011); else None."""
+    n = _inline_check(new_def)
+    if not n:
+        return None
+    o = _inline_check(old_def)
+    if o and o[0] != n[0]:
+        return None
+    if norm(old_def.replace(o[1], "") if o else old_def) != norm(new_def.replace(n[1], "")):
+        return None
+    return n[0], n[1]
+
+
+def guard_add_constraint(t: str, name: str, stmt: str) -> str:
+    """`stmt` (an ALTER TABLE ... ADD CONSTRAINT) only when the constraint is not there yet (CHG-R8MIG-010)."""
+    return (f"DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = '{name}' AND conrelid = "
+            f"to_regclass('{t}')) THEN {norm(stmt).rstrip(';')}; END IF; END $$")
+
+
+def guard_drop_constraint(t: str, name: str) -> str:
+    return (f"DO $$ BEGIN IF EXISTS (SELECT 1 FROM pg_constraint WHERE conname = '{name}' AND conrelid = "
+            f"to_regclass('{t}')) THEN ALTER TABLE {t} DROP CONSTRAINT {name}; END IF; END $$")
+
+
+def pk_columns(t) -> set:
+    """The columns of a table's PRIMARY KEY (...) constraint: never relaxed, the key keeps them NOT NULL."""
+    out = set()
+    for c in t.constraints:
+        m = re.search(r"PRIMARY KEY\s*\(([^)]*)\)", c, re.I)
+        if m:
+            out |= {unq(x.strip()) for x in m.group(1).split(",")}
+    return out
+
+
+def only_not_null_dropped(old_def: str, new_def: str) -> bool:
+    """`new_def` is `old_def` with its NOT NULL taken off and nothing else changed (not a key column)."""
+    if "PRIMARY KEY" in old_def.upper() or not re.search(r"\bNOT NULL\b", old_def, re.I):
+        return False
+    return norm(re.sub(r"\s+NOT NULL\b", "", old_def, flags=re.I)) == norm(new_def)
+
+
 class Model:
     """Every statement of one database's DDL, keyed so that the same object in two versions pairs up."""
 
@@ -489,7 +566,21 @@ class Model:
                     # constraint, as it is in the generated CREATE TABLE, so the next diff does not write it again.
                     a = re.match(rf"ADD (CONSTRAINT {NAME} CHECK .*?)(?: NOT VALID)?$", action, re.I)
                     if a:
-                        tab.constraints.add(norm(a.group(1)))
+                        # a column CHECK widened in place (CHG-R8MIG-006) replaces the column's inline CHECK
+                        added = norm(a.group(1))
+                        nm = _inline_check(added)
+                        inline = [c_ for c_, d_ in tab.cols.items()
+                                  if nm and (_inline_check(d_) or ("",))[0] == nm[0]]
+                        # a CHECK added to a column that had none (CHG-R8MIG-011): named `<table>_<column>_chk`
+                        bare = [c_ for c_, d_ in tab.cols.items() if nm and not _inline_check(d_)
+                                and nm[0] == f"{t.split('.', 1)[1]}_{c_}_chk"]
+                        if inline:
+                            d_ = tab.cols[inline[0]]
+                            tab.cols[inline[0]] = norm(d_.replace(_inline_check(d_)[1], added))
+                        elif bare:
+                            tab.cols[bare[0]] = norm(tab.cols[bare[0]] + " " + added)
+                        else:
+                            tab.constraints.add(added)
                         handled = True
                         continue
                     if re.match(rf"VALIDATE CONSTRAINT {NAME}$", action, re.I):
@@ -883,6 +974,43 @@ def diff(area: str, old: Model, new: Model, renames: dict | None = None, retired
                     elif a.cols[c] == relaxed(d):
                         review("not null", f"{t}.{c}", "still nullable in the databases; the schema reference "
                                "says NOT NULL", "backfill, then ALTER COLUMN ... SET NOT NULL")
+                    elif widened_check(a.cols[c], d):
+                        # **A column CHECK that only gained values is written** (CHG-R8MIG-006: an enum value the
+                        # contract adds, TenantDomain.channel staffApp): dropped and added again NOT VALID, then
+                        # VALIDATE, as a new table CHECK is; apply_forward folds it into the column, so once.
+                        name, clause = widened_check(a.cols[c], d)
+                        p.statements += [f"ALTER TABLE {t} DROP CONSTRAINT IF EXISTS {name}",
+                                         f"ALTER TABLE {t} ADD {clause} NOT VALID",
+                                         f"ALTER TABLE {t} VALIDATE CONSTRAINT {name}"]
+                        old_clause = _inline_check(a.cols[c])[1]
+                        p.rollback.append(f"ALTER TABLE {t} DROP CONSTRAINT IF EXISTS {name}; "
+                                          f"ALTER TABLE {t} ADD {old_clause} NOT VALID;")
+                        p.counts["other"] += 1
+                    elif changed_check_only(a.cols[c], d):
+                        # **A column CHECK added or narrowed is written NOT VALID** (CHG-R8MIG-011; the storage-sat
+                        # lane's request 3: marketing.customer_badge.source_type and status became enums). It binds
+                        # every new write at once; the rows already there are the migration owner's to check, so
+                        # VALIDATE is a review row, not a statement that could fail the migration.
+                        name, clause = changed_check_only(a.cols[c], d)
+                        p.statements += [f"ALTER TABLE {t} DROP CONSTRAINT IF EXISTS {name}",
+                                         f"ALTER TABLE {t} ADD {clause} NOT VALID"]
+                        old_ic = _inline_check(a.cols[c])
+                        p.rollback.append(f"ALTER TABLE {t} DROP CONSTRAINT IF EXISTS {name};"
+                                          + (f" ALTER TABLE {t} ADD {old_ic[1]} NOT VALID;" if old_ic else ""))
+                        p.counts["other"] += 1
+                        # a "column changed" row on the column, so the checks reading the frozen DDL see it pending
+                        review("column changed", f"{t}.{c}", f"`{clause}` added NOT VALID by the forward migration",
+                               f"check the rows, then ALTER TABLE {t} VALIDATE CONSTRAINT {name}")
+                    elif only_not_null_dropped(a.cols[c], d) and c in pk_columns(b):
+                        pass   # a column the new primary key covers stays NOT NULL through the key
+                    elif only_not_null_dropped(a.cols[c], d) and c not in pk_columns(b):
+                        # **A column the contract makes optional loses its NOT NULL here** (CHG-R8MIG-004, R8 blockers
+                        # APPROVALS-TENANCY-C09, ORDERS-MONEY-C35, IDENTITY-C12): relaxing NOT NULL touches no row and
+                        # no reader, so it is additive. Guarded like a retired column's, and folded back the same way
+                        # (RETIRE_GUARD), so the next run writes nothing.
+                        p.statements.append(retire_not_null(t, c))
+                        p.rollback.append(f"ALTER TABLE {t} ALTER COLUMN {c} SET NOT NULL;")
+                        p.counts["other"] += 1
                     else:
                         review("column changed", f"{t}.{c}", f"`{a.cols[c]}` -> `{d}`",
                                "type, default, nullability or check changed: write the ALTER COLUMN (and any "
@@ -1012,7 +1140,10 @@ def diff(area: str, old: Model, new: Model, renames: dict | None = None, retired
             if k in old.stmts and subst(old.stmts[k]) == new.stmts[k]:
                 continue   # a key to a renamed table: Postgres follows the rename
             if k not in old.stmts and (t in new_tables or (cols and cols <= new_cols.get(t, set()))):
-                p.statements.append(stmt)
+                # **Guarded, so the file applies twice** (CHG-R8MIG-010, the storage-sat lane's request): every other
+                # statement of the file is IF [NOT] EXISTS, and ADD CONSTRAINT has no such form, so a second run
+                # stopped at the first key. Checked, not NOT VALID: the column is new, so no row can break it.
+                p.statements.append(guard_add_constraint(t, name, stmt) if parse_fk(stmt) else stmt)
                 if t not in new_tables:
                     p.rollback.append(f"ALTER TABLE {t} DROP CONSTRAINT IF EXISTS {name};")
                 p.counts["other"] += 1
@@ -1173,6 +1304,17 @@ def diff(area: str, old: Model, new: Model, renames: dict | None = None, retired
                     continue
                 review("index dropped", k[1], "no longer generated", "DROP INDEX by hand if intended")
         elif kind == "constraint":
+            fk_ = parse_fk(old.stmts[k])
+            nt_ = new.tables.get(k[1])
+            if (fk_ and k[1] not in removed_tables and k[1] not in renamed_away and nt_ is not None
+                    and all(c_ in nt_.cols for c_ in fk_[2])):
+                # **A foreign key the contract withdraws is dropped** (CHG-R8MIG-006, R8 blocker IDENTITY-C20:
+                # `x-ticvai-references: none` on PlatformStaffGrant.operatorPrincipalId). Its column stays; dropping a
+                # key refuses no write. Guarded, and the rollback adds it again.
+                recon_drop.append((tag(k[1], "drop foreign key", k[2], guard_drop_constraint(k[1], k[2]), fk_[3]),
+                                   old.stmts[k].rstrip().rstrip(";") + " NOT VALID;"))
+                p.recon_counts["keys"] += 1
+                continue
             if k[1] not in removed_tables:
                 review("constraint dropped", f"{k[1]} {k[2]}", "no longer generated",
                        "ALTER TABLE ... DROP CONSTRAINT by hand if intended")
@@ -1265,7 +1407,7 @@ def render_recon(p: Plan, version: str, baseline: str, stamp: str, before: str =
     body = "\n\n".join(x.rstrip().rstrip(";") + ";" for x in p.recon)
     checksum = _h.sha256(body.encode("utf-8")).hexdigest()
     c = p.recon_counts
-    what = (f"{c['renames']} column rename(s), {c['keys']} key(s) added or renamed, {c['indexes']} index(es) "
+    what = (f"{c['renames']} column rename(s), {c['keys']} key(s) added, renamed or dropped, {c['indexes']} index(es) "
             "renamed or dropped")
     desc = f"after {baseline}, names the contracts use: {what}"
     lines = [

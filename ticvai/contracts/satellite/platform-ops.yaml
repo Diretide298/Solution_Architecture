@@ -3262,6 +3262,35 @@ components:
           type: string
           format: uuid
           description: The row that would not deliver.
+        eventId:
+          x-ticvai-references: none
+          type: string
+          format: uuid
+          nullable: true
+          description: '**The outbox envelope''s event id, copied when the dead letter is written** (R8 blocker
+            APPROVALS-TENANCY-C29, CHG-R8MIG-004). `requeueDeadLetter` writes a new outbox row with this same event
+            id and `sequence`: consumers dedupe on (consumer, event id), so only the consumer that failed handles it
+            again. Null only on a row written before the column existed.'
+        tenantId:
+          x-ticvai-references: none
+          type: string
+          format: uuid
+          nullable: true
+          description: The envelope's tenant, copied from the outbox row, so the requeued row carries it again.
+        aggregateType:
+          type: string
+          nullable: true
+          description: The envelope's aggregate type, copied from the outbox row.
+        aggregateId:
+          x-ticvai-references: none
+          type: string
+          format: uuid
+          nullable: true
+          description: The envelope's aggregate id (the broker ordering key), copied from the outbox row.
+        sequence:
+          type: integer
+          nullable: true
+          description: The envelope's per-aggregate sequence, copied from the outbox row and reused on requeue.
         eventName:
           type: string
         consumer:
@@ -3329,7 +3358,8 @@ components:
           format: uuid
           description: '**The envelope''s event id, which is this row''s `id`** (ADR-0058; UUIDv7, ADR-0056). The
             consumer inbox key, so a redelivery is recognised as the same event. `events/_schema.yaml` defines
-            the envelope.'
+            the envelope. The one exception is a row `requeueDeadLetter` writes: a new `id`, and the dead letter''s
+            event id here, so it is the same event to every consumer (CHG-R8MIG-004).'
         eventName:
           type: string
           description: The `name` of an event in `events/` (`aggregate.pastTenseFact`).

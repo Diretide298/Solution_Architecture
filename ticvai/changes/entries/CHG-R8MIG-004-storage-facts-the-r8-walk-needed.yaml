@@ -1,0 +1,56 @@
+id: CHG-R8MIG-004
+date: '2026-10-20'
+source: audit
+kind: contract
+summary: 'The spine contracts state the storage the r8 walk found missing, so the next derive writes it as a forward
+  migration: control.tenant_domain hostname unique across tenants among active rows; tenancy.device_assignment one row
+  per device; platform.dead_letter keeps the outbox envelope (event id, tenant, aggregate, sequence) so a requeue is the
+  same event; access.access_point.access_area_id (the zone the offline package filters by); platform.audit_read holds every
+  audited read (AuditRead: target, filter, record count, subject optional) and any grant holder appends to it. The
+  generator now writes a guarded DROP NOT NULL when the contract makes a column optional and changes nothing else.'
+decision:
+  what: 'R8 blocker causes APPROVALS-TENANCY-C12, APPROVALS-TENANCY-C26, APPROVALS-TENANCY-C29, FOUNDATION-AI-C12 and
+    APPROVALS-TENANCY-C09 (decision A, the lead 20 October: take the recommendation). Contract storage facts
+    (x-ticvai-unique-when, x-ticvai-unique-together, x-ticvai-references, new columns, the AuditRead schema); the
+    operation text of requeueDeadLetter, validateAccess, getOfflinePackage and listAuditRecords says the rule in one
+    sentence each. tools/derive-ddl.py APPEND_AUDIT adds platform.audit_read; tools/ddl_forward.py
+    only_not_null_dropped. No delivered migration is edited; the lead''s derive writes the next forward file.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: R8 blocker cause list (r8b-storage-core), groups approvals-tenancy and foundation-ai; tickets 27989,
+  27788, 35698, 27706 (OFFLINE-BUNDLE), 27797 and 27800, and their ADAM gaps: the ticket could not reach done because
+  the table had no key, column or policy for what the operation text promised.'
+keys_touched:
+  operations: [requeueDeadLetter, validateAccess, getOfflinePackage, listAuditRecords]
+  schemas: [TenantDomain, DeviceAssignment, DeadLetter, OutboxEntry, AccessPoint, AuditRead]
+  tables:
+  - control.tenant_domain
+  - tenancy.device_assignment
+  - platform.dead_letter
+  - access.access_point
+  - platform.audit_read
+  files:
+  - contracts/spine/tenancy.yaml
+  - contracts/spine/access.yaml
+  - contracts/satellite/platform-ops.yaml
+  - tools/derive-ddl.py
+  - tools/ddl_forward.py
+  - tools/tests/test_migration_generator.py
+root_class: 'storage gap: an operation promises a key, column or policy its table does not have'
+tickets:
+  started: []
+  unstarted:
+  - '27989, 27788, 35698, 27706, 27797, 27800 and the MIG tickets of the tables named (their "Source DDL after r1"
+    sentence names the next forward file once the lead derives it).'
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: R8 blocker walk (r8b-storage-core causes)'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-contract-storage.py
+status: open
+notes: 'check-contract-storage (ST-FIELD-NO-COLUMN, ST-TABLE-MISSING) fails a persisted field with no column; the
+  generator rule only_not_null_dropped has two tests in tools/tests/test_migration_generator.py. The NOT NULL of
+  tenancy.device_assignment.device_id and of the new platform.audit_read columns stay review rows in
+  handoff/migration-review.md (the backfill is the migration owner''s).'

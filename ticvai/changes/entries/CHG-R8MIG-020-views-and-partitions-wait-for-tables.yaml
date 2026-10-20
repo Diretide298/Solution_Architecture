@@ -1,0 +1,39 @@
+id: CHG-R8MIG-020
+date: '2026-10-20'
+source: audit
+kind: process
+summary: 'The partition job says which migrations it needs first and that platform.dead_letter is partitioned on the
+  first run after MIG-PLATFORM-4; the dependsOn of DB-READ-VIEWS and MIG-PARTITIONS is a plan change left to the lead. The generated MIGRATIONS.md
+  says what each published read view is. The move of platform.cell_endpoint (CHG-R8MIG-018) is recorded as a departure.'
+decision:
+  what: 'R8 blocker cause FOUNDATION-AI-C31 (no decision), its text part. docs/active/block-a-extra-tasks.json: the
+    MIG-PARTITIONS order sentence and the platform.cell_endpoint departure; tools/build-service-docs.py
+    the reason line of a published read view. Not done: a V-file number for MIG-PARTITIONS (a job in the workers host,
+    exempt in check-migration-tickets) and for DB-READ-VIEWS (a [BE] task the plan does not number).'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: R8 blocker cause list (r8b-storage-core), group foundation-ai; tickets 27654 (DB-READ-VIEWS) and 27686
+  (TEST-AM-FOUNDATION-DATABASE): the views and the partition job could run before the tables they read.'
+keys_touched:
+  operations: []
+  schemas: []
+  files:
+  - docs/active/block-a-extra-tasks.json
+  - tools/build-service-docs.py
+root_class: 'plan order: a task that runs before the tables it uses'
+tickets:
+  started: []
+  unstarted:
+  - '27654 DB-READ-VIEWS and MIG-PARTITIONS. Their dependsOn (DB-READ-VIEWS on MIG-PLATFORM; MIG-PARTITIONS on MIG-KERNEL,
+    MIG-PLATFORM, MIG-LEDGER, MIG-ACCESS, MIG-MARKETING) is a plan change with a 24-hour cooling-off: requested of the lead
+    in the lane report, not made here.'
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: R8 blocker walk (r8b-storage-core causes)'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-plan-closure.py
+status: open
+notes: 'check-migration-tickets passes on the regenerated plan; check-plan-closure C-GONE no longer reports
+  platform.cell_endpoint once the departure is recorded.'

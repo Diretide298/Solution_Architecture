@@ -1,0 +1,41 @@
+id: CHG-R8MIG-010
+date: '2026-10-20'
+source: audit
+kind: process
+summary: 'The generated forward migration applies twice: a foreign key it adds on a new table or column is written
+  guarded (added only when the constraint is not there), as every other statement of the file already is. Tested on
+  PostgreSQL 16: tenant and control V0108 and V0109 rerun with no error. AccessPoint''s zone key is named accessAreaId
+  (access_area_id), for the table it keys, as the package names every key.'
+decision:
+  what: 'The storage-sat lane''s request 6 (its r8b report): tools/ddl_forward.py guard_add_constraint, folded back by
+    apply_forward through GUARD; tools/ticket_done.py reads the guarded form for the migration tickets'' after-r1 list.
+    contracts/spine/access.yaml AccessPoint.zoneId renamed accessAreaId before anything was built on it
+    (check-ddl-conventions D-FK-TARGET-NAME).'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: R8 blocker fix round 2, storage-sat lane report: the generated V0108 failed on a second run at its first
+  ADD CONSTRAINT, while backend/MIGRATIONS.md asks that a second run applies nothing.'
+keys_touched:
+  operations: []
+  schemas: [AccessPoint]
+  files:
+  - tools/ddl_forward.py
+  - tools/ticket_done.py
+  - tools/tests/test_migration_generator.py
+  - contracts/spine/access.yaml
+root_class: 'A-DERIVE: a generated statement with no IF NOT EXISTS form written unguarded'
+tickets:
+  started: []
+  unstarted:
+  - 'The MIG tickets that copy the next forward migration.'
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: R8 blocker fix round 2'
+triage: fix-forward
+prevention:
+  type: generator-rule
+  ref: tools/ddl_forward.py::guard_add_constraint
+status: open
+notes: 'tools/tests/test_migration_generator.py: the key is guarded, checked (not NOT VALID, the column is new), and a
+  second diff writes nothing. The frozen V0102 and V0104 still stop on a second run (delivered; a runner applies a file
+  once by name).'

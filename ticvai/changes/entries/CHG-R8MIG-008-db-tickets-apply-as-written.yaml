@@ -1,0 +1,56 @@
+id: CHG-R8MIG-008
+date: '2026-10-20'
+source: audit
+kind: process
+summary: 'Every [DB] ticket can be applied as written: MIG-PII says to create pii.subject_kind and pii.contact_kind
+  (with the contracts'' values) before copying the frozen 010-pii.sql, which names them and no file creates (CR-001);
+  MIG-BASELINE says to start with SET check_function_bodies = off, since its helpers read platform.scope before it
+  exists; a policy through a parent row whose parent a later migration creates moves to that migration, both tickets
+  saying so (pii.subject_biometric, sync.rejection, promotions.voucher and six more); and every [DB] done-when is proven
+  on a copy of the previous state, twice, and by ADAM''s db-ticket script, with the full chain from empty daily and in
+  every merge request.'
+decision:
+  what: 'Rulings 1 to 4 of the lead''s delegate on the ADAM faster-db-tickets report (20 October 2026, about 04:00); ruling
+    5 (regrouping the 125 forward migration tickets) is not in r8. tools/ticket_done.py undefined_types and type_sentence,
+    BASELINE_BODIES, parent_policies, parent_policy_moves (reads declared table moves, so 920''s inventory.item and
+    wallet.risk_rules resolve to the tickets that create inventory.inventory_item and wallet.risk_rule_set) and
+    parent_policy_sentences, and the Database done-when; tools/build-service-docs.py adds the sentences to the
+    migration tickets. No frozen file is edited.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: ADAM faster-db-tickets report (audit/adam-faster-db-tickets-report.md in the ADAM workspace, "Request for the
+  package''s ticket generator" item 5 point 6 and "Package problems found on the way" 1 to 3), from applying the package
+  DDL to PostgreSQL ticket by ticket: MIG-PII failed on the undefined types, the baseline helpers did not create on an
+  empty database, and three parent policies pointed at tables a later migration creates. ADAM CR-001.'
+keys_touched:
+  operations: []
+  schemas: []
+  tables:
+  - pii.subject
+  - pii.subject_contact
+  - pii.subject_biometric
+  - sync.rejection
+  - promotions.voucher
+  files:
+  - tools/ticket_done.py
+  - tools/build-service-docs.py
+  - tools/tests/test_ticket_done_control.py
+root_class: 'ticket text: a migration ticket that cannot apply in the order the plan gives it'
+tickets:
+  started: []
+  unstarted:
+  - 'MIG-BASELINE, MIG-PII, MIG-SYNC, MIG-PLATFORM, MIG-ACCESS, MIG-SEATING, MIG-CATALOGUE, MIG-PROMOTIONS, MIG-PROMOTIONS-2,
+    VM-MIG-PROMOTIONS, MIG-MARKETING, MIG-MARKETING-15, MIG-IDENTITY-3, MIG-CATALOGUE-5, MIG-ORDERS-2, and every [DB]
+    ticket''s done-when: build-service-docs.py rewrites them at the next refresh.'
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'CR-001 (the undefined pii types); the rest from the ADAM faster-db-tickets report, no CR'
+triage: blocker
+prevention:
+  type: generator-rule
+  ref: tools/ticket_done.py::parent_policy_moves
+status: open
+notes: 'tools/tests/test_ticket_done_control.py covers the move, the type sentence, the baseline sentence and the
+  done-when. build-service-docs prints a WARNING for a parent policy whose parent no migration ticket creates (none on
+  r8) and for a type on a table no ticket creates. check-migration-wording and check-migration-tickets pass on the
+  regenerated tasks; check-ticket-text T-MIG-DONE passes (no V-number, no "previous release").'

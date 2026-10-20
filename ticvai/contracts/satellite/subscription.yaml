@@ -178,6 +178,21 @@ x-ticvai-queries:
       of its own (open, live, sellable) is declared as a query of its own. It is asked in process within operations,
       through the C# query interface Platform implements.
     served: [in-process]
+  cellEndpointRecords:
+    module: subscription
+    table: control.cell_endpoint
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The control.cell_endpoint rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a cellId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Platform stores it; an id with no visible row is absent.'
+      items: {$ref: '../spine/tenancy.yaml#/components/schemas/PlatformCellEndpoint'}
+    rule: >-
+      A data read, not a rule question (R8 blocker APPROVALS-TENANCY-C10, CHG-R8MIG-018). Platform answers with its
+      control.cell_endpoint rows, which the control plane writes at cell provisioning. Asked from commerce through
+      Platform's service route (serviceAuth) by Tenancy's listCellEndpoints.
+    served: [in-process, service]
 paths:
   /onboarding-applications:
     post:

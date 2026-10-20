@@ -1,0 +1,45 @@
+id: CHG-R8MIG-027
+date: '2026-10-20'
+source: audit
+kind: contract
+summary: 'A guest can produce the documentAssetId and selfieAssetId that submitGuestIdentityDocument requires: two new
+  guest operations, createGuestUpload and completeGuestUpload (assets), store the guest''s own identity-document scan or
+  selfie in assets.guest_upload (row-level security by subject, out of the media library, deleted under the policy''s
+  retention or after 24 hours unused); the verification keeps the selfie''s upload id (selfie_upload_id) and refuses 422
+  selfie-required when the policy asks for one and none is sent.'
+decision:
+  what: 'R8 blocker cause IDENTITY-C66 (no decision). contracts/satellite/assets.yaml createGuestUpload, completeGuestUpload
+    and GuestUpload (new operations in a satellite file: the surface lane''s part, made here because the cause is this
+    lane''s; they pass the new-operation gates: guestAuth, self-scoped by subject with no permission, no list); contracts/
+    spine/identity.yaml IdentityGuestDocumentSubmission text, IdentityGuestVerification.selfieUploadId and the 422.
+    The selfie reference sits on the verification row rather than a new column of pii.subject_document, which has no
+    contract schema (its columns are carried storage facts).'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: R8 blocker cause list (r8b-storage-core), group identity; ticket 27728 and its ADAM gap: the only upload
+  path was the staff media library, so no guest could submit an identity document.'
+keys_touched:
+  operations: [createGuestUpload, completeGuestUpload, submitGuestIdentityDocument]
+  schemas: [GuestUpload, IdentityGuestDocumentSubmission, IdentityGuestVerification]
+  tables:
+  - assets.guest_upload
+  - identity.guest_identity_verification
+  files:
+  - contracts/satellite/assets.yaml
+  - contracts/spine/identity.yaml
+root_class: 'screen-api gap: a required input no operation the caller may call produces'
+tickets:
+  started: []
+  unstarted:
+  - '27728.'
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: R8 blocker walk (r8b-storage-core causes)'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-contract-storage.py
+status: open
+notes: 'The 10 MB limit and the 24-hour unused deletion are proposed, client to confirm. Applied on PostgreSQL 16 (the
+  generated files twice). The guest screens that upload (GST identity verification) bind the two operations: the surface
+  lane''s part, requested in the lane report.'

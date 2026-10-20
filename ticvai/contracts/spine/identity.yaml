@@ -1362,6 +1362,10 @@ paths:
         - "P01 WEB-024 Devices, Wishlist & Consent"
         - "P02 GST-015 Memberships"
         - "P02 GST-069 Face Pass"
+      x-ticvai-read-via:
+      - query: tenancy#regionSettingsRecords
+        route: in-process
+        for: 'minorAgeThreshold, for overSubjectIsMinor (R8 blocker ORDERS-MONEY-C20, CHG-R8MIG-009)'
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -1453,6 +1457,15 @@ paths:
         behalf. **How the first adult link over a minor is made**: the adult enrols the child from GST-069
         (R205), which writes a `familyMember` or `primaryHolder` grant held by the adult over the child, with the
         adult as grantor; this operation is how later grants are added.
+
+        **What a guest-made grant stores** (R8 blocker IDENTITY-C42, the lead''s answer A; CHG-R8MIG-021):
+        `grantedByKind` `subject` and `grantedBySubjectId` the granting guest (no principal); `scopePath` the tenant
+        root (a guest account is tenant-wide); `effect` ALLOW; `permission` one of the guest-delegable list for its
+        `delegationKind` (proposed, client to confirm): `primaryHolder` and `familyMember` ORDER_VIEW, ORDER_CREATE,
+        WALLET_VIEW; `carer` and `attendee` ORDER_VIEW; `groupLeader` ORDER_VIEW, ORDER_CREATE; `corporateAdmin`
+        ORDER_VIEW, ORDER_CREATE, WALLET_VIEW, WALLET_OPERATE; `corporateMember` ORDER_VIEW. Any other permission from a
+        guest is refused 403. A revocation by a guest is recorded the same way. Staff recording a grant on the holder''s
+        behalf store `grantedByKind` `principal`; the SSO callback''s group-to-role grants store `system`.
 
         '
       tags:
@@ -1934,6 +1947,11 @@ paths:
         supervisor-step-up-refused` and nothing is read or written. **No session is opened** by the step-up:
         it authorises this one call. With a session (BO-053 Staff Directory) the caller''s own
         `SESSION_FORCE_LOGOUT` applies as before and no step-up is asked.
+
+
+        **What it writes** (R8 blocker IDENTITY-C46, CHG-R8MIG-015): the session''s `status` `terminated`, `endedAt`,
+        `endedByPrincipalId` (the caller, or the supervisor of the step-up) and `endReason` (the body''s `reason`), and
+        one `identity.authz_audit` row for the decision.
 
         '
       parameters:
@@ -3252,6 +3270,12 @@ paths:
         linked rather than a duplicate created. Where it does not, a new account is created — an unverified
         email from a provider is not proof of ownership.
 
+
+        **The link is stored** (R8 blocker IDENTITY-C54, CHG-R8MIG-015): one `pii.subject_identity` row
+        (`SubjectIdentity`) per provider and provider subject (`sub`), unique on the pair, so a returning Apple user
+        whose email is a private-relay address still resolves to the same account. A new account also writes the
+        provider''s email to `pii.subject_contact`.
+
         '
       tags:
       - guestAuth
@@ -3341,6 +3365,12 @@ paths:
         client owns. A UAE Pass identity counts as ID-verified (`IdentityGuestVerificationPolicy.uaePassSatisfiesIdDocument`);
         the ICP check is a document verification, not a sign-in (`IdentityGuestVerificationPolicy.verificationProvider`
         `icp`). Each venue''s own redirect URI is part of its domain setup (white-label `CustomDomain`; DEC-547).
+
+
+        **What it stores** (R8 blocker IDENTITY-C54, CHG-R8MIG-015): a `pii.subject_identity` row (`provider`
+        `uaePass`, the UAE Pass user id as `providerSubject`), and on a new account a `pii.subject_document` of kind
+        `emiratesId` with the number from the UAE Pass identity-number claim (the claim''s name to be confirmed with the
+        client''s UAE Pass sandbox).
 
         '
       tags:
@@ -3548,6 +3578,8 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-024 Devices, Wishlist & Consent"
         - "P02 GST-066 Privacy & My Data"
+      x-ticvai-calls:
+      - ai.eraseSubject
       x-ticvai-singleton: true
       x-ticvai-singleton-note: 'The caller''s own account: one per signed-in guest, so there is no key in the path.'
       x-ticvai-audience:
@@ -3707,6 +3739,12 @@ paths:
         UAE Pass, each returning a `GuestSession`; this flow maps groups to roles and returns a staff
         session, which a guest surface cannot use.
 
+
+        **The pending sign-in is kept in Redis** (R8 blocker IDENTITY-C58, CHG-R8MIG-015): `cache:sso-state:<state>`
+        holds the provider id, the nonce, the PKCE verifier, the redirect URI and the workstation, for as long as
+        `expiresAt`; `completeSsoAuthorization` takes it once and deletes it. A `redirectUri` that is not on the
+        provider''s `allowedRedirectUris` is refused 400.
+
         '
       tags:
       - sso
@@ -3768,6 +3806,16 @@ paths:
         way to mint access nobody configured.
 
         **Staff and partner sign-in only; guests never use SSO** (decided 28 September, audit R167).
+
+
+        **The state, and who the IdP user is here** (R8 blockers IDENTITY-C57 and IDENTITY-C58, CHG-R8MIG-015). The
+        callback takes the pending sign-in from `cache:sso-state:<state>` once; an unknown, expired or already used
+        state is 401 `sso-state-invalid` (the sign-in page says the link has expired), and the redirect URI used is
+        the stored one, whatever the body sends. The IdP user (`sub`, or the SAML NameID) is looked up in
+        `identity.principal_external_identity` (`PrincipalExternalIdentity`) for this provider. No match: with
+        `autoProvisionPrincipals` a principal is created (username, display name, home scope and primary role from
+        the provider''s claim mapping and `groupMappings`) and linked; without it, 403 `sso-principal-not-provisioned`.
+        A match whose principal is inactive is 403 `forbidden`.
 
         '
       tags:
@@ -4573,7 +4621,7 @@ paths:
 
         **Ordered by `startedAt` descending, `sessionId` as the tiebreak** (decided 14 October 2026, ADAM
         CR-077; CHG-IDR-002): the session that began last is first, which on a till is the one somebody is
-        asking about.
+        asking about. **Only `active` sessions unless `status` asks for another** (CHG-R8MIG-015).
 
         '
       tags:
@@ -4645,6 +4693,13 @@ paths:
         schema:
           type: string
           format: uuid
+      - name: status
+        in: query
+        description: '**Which sessions come back** (R8 blocker IDENTITY-C46, CHG-R8MIG-015): `active` when absent, the live
+          holder BO-053 and POS-000 ask about; another value returns the ended sessions of that status, kept with who
+          ended them and why.'
+        schema:
+          $ref: '#/components/schemas/SessionStatus'
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
       responses:
@@ -5653,6 +5708,13 @@ paths:
 
         Requires step-up: the operator holds `PLATFORM_*` permissions, which require MFA (audit R135).
 
+        **How the cell admits the operator here and in `listOwnPlatformStaffGrants`** (R8 blocker IDENTITY-C20,
+        CHG-R8MIG-006; the lead''s answer, option A). The operator is not a principal of this tenant: the cell
+        validates the Control Plane token, takes its subject as `operatorPrincipalId` (a plain uuid, no foreign
+        key) and reads the MFA step-up from the token''s `amr` claim, never from a tenant session. The transaction
+        runs with `ticvai.scope_paths` set to the tenant root and the operator as the audited actor
+        (`AuditRecord.platformStaffGrantId` once the grant exists).
+
         '
       tags:
       - administration
@@ -5663,7 +5725,7 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       x-ticvai-step-up: mfa
-      x-ticvai-step-up-carrier: session   # the MFA step-up verified on the caller's session (CHG-RUL-020)
+      x-ticvai-step-up-carrier: session   # the MFA step-up on the caller's Control Plane token, its amr claim (CHG-R8MIG-006)
       x-ticvai-step-up-reason: Opens a platform operator's access into a tenant's data.
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/TenantId
@@ -6429,8 +6491,9 @@ paths:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
-          x-ticvai-problem-types: [identity-document-expired, document-kind-not-accepted]
-          description: The document has expired, or its kind is not accepted by the tenant's policy
+          x-ticvai-problem-types: [identity-document-expired, document-kind-not-accepted, selfie-required]
+          description: The document has expired, or its kind is not accepted by the tenant's policy, or the policy
+            asks for a selfie and none was sent (`selfie-required`, CHG-R8MIG-027)
           content:
             application/problem+json:
               schema:
@@ -7975,13 +8038,16 @@ components:
         documentAssetId:
           type: string
           format: uuid
-          description: The uploaded scan or photo of the document.
+          description: The uploaded scan or photo of the document. **A guest makes it** with assets
+            `createGuestUpload` and `completeGuestUpload` (purpose `identityDocument`); this is the completed upload's
+            `uploadId`, which must be the caller's own (R8 blocker IDENTITY-C66, CHG-R8MIG-027).
         selfieAssetId:
           type: string
           format: uuid
           nullable: true
           description: A live photo for the reviewer to compare, where the policy asks for one. Deleted with the
-            scan.
+            scan. The caller's own completed guest upload with purpose `selfie`; required when the policy's
+            `selfieRequired` is true (422 `selfie-required`).
         reason:
           type: string
           enum:
@@ -8077,6 +8143,15 @@ components:
           nullable: true
           readOnly: true
           description: When the scan (and any selfie) was deleted under the policy's retention.
+        selfieUploadId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          x-ticvai-references: none
+          description: '**The selfie sent with the document** (R8 blocker IDENTITY-C66, CHG-R8MIG-027): the
+            `assets.guest_upload` id of the request''s `selfieAssetId`, kept for the reviewer and deleted with the scan
+            (`documentImageDeletedAt`, then null). Null when none was sent.'
     IdentityGuestVerificationPolicy:
       type: object
       x-ticvai-persistence: identity.guest_verification_policy
@@ -8721,6 +8796,10 @@ components:
       # One current credential per principal and method; the replaced ones are the history rows (CHG-CRD-001).
       x-ticvai-unique-together:
       - [principalId, method]
+      # The principal's own rows, a grant over the principal's home scope, and the tenant root (R8 blocker IDENTITY-C37,
+      # CHG-R8MIG-007): changeOwnCredential and the failed-attempt count run as the principal, at any venue;
+      # createPrincipal and resetPrincipalCredential run at the venue the principal is homed in.
+      x-ticvai-rls: own-or-home-scope
       type: object
       description: '**A staff or partner principal''s password or PIN, as stored** (14 October 2026, CHG-CRD-001, ADAM
         CR-078). `identity.principal_credential` held only `id` and a nullable `principal_id`, so `createPrincipal`,
@@ -8799,13 +8878,27 @@ components:
         `action`); `verifyMfaChallenge` reads it, counts wrong codes in `failedAttempts`, voids it at the fifth (audit
         R126 (6)), and on success sets `verifiedAt`; the operation that consumes the step-up sets `consumedAt`, so it is
         single-use (CHG-RUL-020). **Step-up is locked** for `PasswordPolicy.lockoutMinutes` after `voidedAt` of a
-        challenge voided by the fifth wrong code; no column more is needed. A guest''s challenge (rev 3 GAP-B1) has no
-        principal and is not stored here yet: guest second factors are not modelled in storage (`identity.mfa_method`
-        has no subject either).'
-      required: [principalId, action, status, expiresAt, failedAttempts]
+        challenge voided by the fifth wrong code; no column more is needed. **A guest''s challenge is stored here too**
+        (rev 3 GAP-B1; R8 blocker IDENTITY-C12, CHG-R8MIG-007): exactly one of `principalId` and `subjectId` is set,
+        and the row is its owner''s alone (`x-ticvai-rls: own-row`). **An enrolment''s code** (`smsOtp`, `emailOtp`) is a
+        challenge with `action` `enrol` and the pending `methodId`, so `identity.mfa_method` holds no code (IDENTITY-C34).'
+      x-ticvai-exactly-one-of: [[principalId, subjectId]]
+      x-ticvai-rls: own-row
+      required: [action, status, expiresAt, failedAttempts]
       properties:
         id: { type: string, format: uuid, readOnly: true, description: 'The `challengeId` the client verifies.' }
-        principalId: { type: string, format: uuid }
+        principalId:
+          type: string
+          format: uuid
+          nullable: true
+          x-ticvai-references: identity.principal
+          description: The staff or partner principal challenged; null for a guest.
+        subjectId:
+          type: string
+          format: uuid
+          nullable: true
+          x-ticvai-references: pii.subject
+          description: The guest challenged (`pii.subject`); null for a principal.
         methodId:
           type: string
           format: uuid
@@ -8824,8 +8917,9 @@ components:
           type: string
           writeOnly: true
           nullable: true
-          description: The PHC hash (ADR-0071) of a code the server sent (`emailOtp`); null for an authenticator
-            (`totp`), whose code is computed, never sent.
+          description: The PHC hash (ADR-0071) of a code the server sent (`smsOtp`, `emailOtp`, and the code of an
+            `enrol` challenge); null for an authenticator (`totp`), whose code is computed from the method's stored
+            `MfaMethod.secret`, never sent.
         status:
           type: string
           enum: [pending, verified, consumed, voided, expired]
@@ -8848,10 +8942,24 @@ components:
       description: '**One single-use recovery code, as stored** (14 October 2026, CHG-CRD-005, ADAM CR-078). Never
         returned after enrolment: `enrolMfaMethod` returns the codes once (`MfaEnrolment.recoveryCodes`) and writes
         their hashes here, replacing any earlier set; `verifyMfaChallenge` accepts one in place of a code, and sets its
-        `usedAt`. A code that can be re-read is a second password (`handoff/schema-storage-only.md`).'
-      required: [principalId, codeHash, issuedAt]
+        `usedAt`. A code that can be re-read is a second password (`handoff/schema-storage-only.md`). A guest''s codes
+        are stored the same way, against `subjectId` (R8 blocker IDENTITY-C12, CHG-R8MIG-007).'
+      x-ticvai-exactly-one-of: [[principalId, subjectId]]
+      x-ticvai-rls: own-row
+      required: [codeHash, issuedAt]
       properties:
-        principalId: { type: string, format: uuid }
+        principalId:
+          type: string
+          format: uuid
+          nullable: true
+          x-ticvai-references: identity.principal
+          description: The principal whose code this is; null for a guest.
+        subjectId:
+          type: string
+          format: uuid
+          nullable: true
+          x-ticvai-references: pii.subject
+          description: The guest whose code this is; null for a principal.
         codeHash:
           type: string
           writeOnly: true
@@ -8950,6 +9058,9 @@ components:
           description: When the supervisor's PIN unlocks, where `refusal` is `credentialLocked`.
     OpenShiftMarker:
       x-ticvai-persistence: identity.open_shift_marker
+      # Keyed on the shift; read by principal and workstation (storage-core request 2 at the merge, CHG-R8MIG-014).
+      x-ticvai-primary-key: [shiftId]
+      x-ticvai-index: [[principalId, workstationId]]
       type: object
       description: >-
         **Which shifts are open, as Identity knows it** (decided 20 October 2026, Chinmay, R8 blocker cause
@@ -8965,14 +9076,18 @@ components:
         shiftId:
           type: string
           format: uuid
-          description: The shift (`orders.pos_shift.id`, carried by the event); the row's key.
+          x-ticvai-references: none
+          description: The shift (`orders.pos_shift.id`, carried by the event); the row's key; not a foreign key, since
+            Identity does not depend on Orders' table (ADR-0028).
         principalId:
           type: string
           format: uuid
+          x-ticvai-references: identity.principal
           description: The principal whose shift it is.
         workstationId:
           type: string
           format: uuid
+          x-ticvai-references: platform.workstation
         venueId:
           type: string
           format: uuid
@@ -9374,11 +9489,14 @@ components:
           type: string
           format: uuid
         operatorPrincipalId:
-          x-ticvai-references: identity.principal
+          x-ticvai-references: none
           type: string
           format: uuid
           readOnly: true
-          description: The platform operator, from the Control Plane token. Set by the server.
+          description: 'The platform operator, from the Control Plane token (its subject). Set by the server. **Not a
+            row in this tenant''s `identity.principal`** (R8 blocker IDENTITY-C20, CHG-R8MIG-006; the lead''s answer,
+            option A): an operator is the Control Plane''s, so this is a plain uuid with no foreign key, and the key
+            V0107 adds is dropped by the next forward migration.'
         operatorDisplayName:
           type: string
           readOnly: true
@@ -9430,7 +9548,8 @@ components:
             '
         identityProviders:
           type: array
-          description: Linked providers. Several may resolve to one account.
+          description: Linked providers. Several may resolve to one account. Read from `pii.subject_identity`
+            (apple, google, uaePass), `identity.guest_credential` (password) and a verified contact (otp) (CHG-R8MIG-015).
           items:
             type: string
             enum:
@@ -10219,6 +10338,72 @@ components:
         scopePath:
           type: string
           description: Scope the mapped role is granted at.
+    SubjectIdentity:
+      type: object
+      x-ticvai-persistence: pii.subject_identity
+      # One account per provider identity (R8 blocker IDENTITY-C54, CHG-R8MIG-015).
+      x-ticvai-unique-together: [[provider, providerSubject]]
+      description: '**An Apple, Google or UAE Pass identity linked to a guest account** (R8 blocker IDENTITY-C54,
+        CHG-R8MIG-015). Written by `guestSocialLogin` and `guestUaePassLogin` when they link or create an account, read
+        by them to find the account again (a private-relay email changes nothing) and by `GuestSession.identityProviders`.
+        Storage only, never returned.'
+      required: [id, subjectId, provider, providerSubject, linkedAt]
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        subjectId:
+          type: string
+          format: uuid
+          x-ticvai-references: pii.subject
+          description: The guest account.
+        provider:
+          type: string
+          enum: [apple, google, uaePass]
+        providerSubject:
+          type: string
+          maxLength: 255
+          x-ticvai-unique-compare: exact
+          description: The provider's own stable id for the user (`sub`; the UAE Pass user id), compared exactly.
+        emailAtLink:
+          type: string
+          maxLength: 320
+          nullable: true
+          description: The email the provider gave when the identity was linked (may be a private relay).
+        linkedAt:
+          type: string
+          format: date-time
+    PrincipalExternalIdentity:
+      type: object
+      x-ticvai-persistence: identity.principal_external_identity
+      # One principal per IdP identity (R8 blocker IDENTITY-C57, CHG-R8MIG-015).
+      x-ticvai-unique-together: [[ssoProviderId, externalSubject]]
+      description: '**Which principal an SSO user is** (R8 blocker IDENTITY-C57, CHG-R8MIG-015). Written by
+        `completeSsoAuthorization` when it provisions or first links a principal, read by it on every sign-in.
+        Storage only, never returned.'
+      required: [id, principalId, ssoProviderId, externalSubject, linkedAt]
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        principalId:
+          type: string
+          format: uuid
+          x-ticvai-references: identity.principal
+        ssoProviderId:
+          type: string
+          format: uuid
+          x-ticvai-references: identity.sso_provider
+        externalSubject:
+          type: string
+          maxLength: 255
+          x-ticvai-unique-compare: exact
+          description: The IdP's `sub` claim, or the SAML NameID, compared exactly.
+        linkedAt:
+          type: string
+          format: date-time
     SsoProviderConfig:
       x-ticvai-persistence: identity.sso_provider
       type: object
@@ -10262,6 +10447,36 @@ components:
           type: boolean
           default: false
           description: Create a principal on first successful sign-in.
+        usernameClaim:
+          type: string
+          maxLength: 100
+          nullable: true
+          description: 'The claim (OIDC) or attribute (SAML) a provisioned principal''s username is taken from; null
+            means `preferred_username`, else the email (R8 blocker IDENTITY-C57, CHG-R8MIG-015).'
+        displayNameClaim:
+          type: string
+          maxLength: 100
+          nullable: true
+          description: The claim a provisioned principal's display name is taken from; null means `name`.
+        groupsClaim:
+          type: string
+          maxLength: 100
+          nullable: true
+          description: The claim that lists the user's groups, matched against `groupMappings`; null means `groups`.
+        defaultHomeScopeId:
+          type: string
+          format: uuid
+          nullable: true
+          x-ticvai-references: platform.scope
+          description: The home scope a provisioned principal gets when its mapped groups name none; null means the
+            scope of the first mapped group.
+        allowedRedirectUris:
+          type: array
+          items:
+            type: string
+            maxLength: 2000
+          description: '**The only redirect URIs a start may name** (R8 blocker IDENTITY-C58, CHG-R8MIG-015):
+            `startSsoAuthorization` refuses 400 a `redirectUri` not on this list.'
         isEnforced:
           type: boolean
           default: false
@@ -10278,6 +10493,16 @@ components:
     MfaMethod:
       x-ticvai-persistence: identity.mfa_method
       type: object
+      description: '**A second factor a principal or a guest has enrolled** (R8 blockers IDENTITY-C12 and IDENTITY-C34,
+        CHG-R8MIG-007). Exactly one of `principalId` and `subjectId` is set, so a guest''s method is stored like a
+        staff member''s and `GuestSession.requiresMfa` and `mfaMethods` are answered from here; the row is its owner''s
+        alone (`x-ticvai-rls: own-row`). Three fields are storage only and never returned
+        (`handoff/schema-storage-only.md`): `secret` (a `totp` shared secret, which `verifyMfaChallenge` computes the
+        code from), `destination` (the full phone number or email an `smsOtp` or `emailOtp` code is sent to;
+        `maskedTarget` is the only form returned) and `pendingExpiresAt` (set while an enrolment awaits
+        `verifyMfaEnrolment`; an expired pending row is deleted by the next `enrolMfaMethod` of its owner).'
+      x-ticvai-exactly-one-of: [[principalId, subjectId]]
+      x-ticvai-rls: own-row
       required:
       - id
       - kind
@@ -10287,6 +10512,40 @@ components:
         id:
           type: string
           format: uuid
+        principalId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          x-ticvai-references: identity.principal
+          description: The principal who enrolled it; null for a guest.
+        subjectId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          x-ticvai-references: pii.subject
+          description: The guest who enrolled it; null for a principal.
+        secret:
+          type: string
+          nullable: true
+          writeOnly: true
+          x-ticvai-secret: field-encrypted
+          description: The `totp` shared secret, encrypted with the tenant's field key (ADR-0063); null for other
+            kinds. Never returned after `MfaEnrolment.secret`.
+        destination:
+          type: string
+          nullable: true
+          writeOnly: true
+          x-ticvai-secret: field-encrypted
+          description: The full phone number (`smsOtp`) or email (`emailOtp`) the code goes to, encrypted with the
+            tenant's field key (ADR-0063); null for other kinds. Only `maskedTarget` is ever returned.
+        pendingExpiresAt:
+          type: string
+          format: date-time
+          nullable: true
+          writeOnly: true
+          description: While `isActive` is false, when the unconfirmed enrolment lapses; null once verified.
         kind:
           $ref: '#/components/schemas/MfaKind'
         label:
@@ -10405,6 +10664,27 @@ components:
           type: string
           x-ticvai-persisted: false
           description: Read from `identity.principal` with the row.
+        endedAt:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+          description: When the session ended; null while `active` (R8 blocker IDENTITY-C46, CHG-R8MIG-015).
+        endedByPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          x-ticvai-references: identity.principal
+          description: Who ended it (`forceLogout`'s caller or supervisor); null when the principal signed out or it
+            expired.
+        endReason:
+          type: string
+          minLength: 3
+          maxLength: 500
+          nullable: true
+          readOnly: true
+          description: Why it was ended, as `forceLogout` was given it (or `supervisor-takeover` from the till door).
         roleId:
           type: string
           format: uuid
@@ -10453,8 +10733,10 @@ components:
           format: date-time
     Principal:
       x-ticvai-persistence: identity.principal
-      # CHG-GEN-005: any staff grant reads principals; writes stay at the tenant root (CR-076).
-      x-ticvai-rls: grant-holder-read
+      # CHG-GEN-005: any staff grant reads principals. Writes: the tenant root (CR-076) or a grant over the principal's
+      # home scope, so a venue manager creates and updates the principals homed in their venue (R8 blocker IDENTITY-C37,
+      # the lead's option A; CHG-R8MIG-007).
+      x-ticvai-rls: home-scope-write
       type: object
       required:
       - id
@@ -10721,6 +11003,13 @@ components:
       # **A grant names exactly one of a permission or a role** (ADAM CR-158, option A, 18 October 2026;
       # CHG-CRA-002): a table CHECK, `num_nonnulls(permission, role_id) = 1`, NOT VALID then VALIDATE.
       x-ticvai-exactly-one-of: [[permission, roleId]]
+      # Who granted it: a principal, a guest or the system, and the matching column set (R8 blocker IDENTITY-C42,
+      # CHG-R8MIG-021).
+      # A guest reads the grants it is party to and the account holder writes them (CHG-R8MIG-021; IDENTITY-C48).
+      x-ticvai-rls: scope-or-subject
+      x-ticvai-required-when:
+        grantedByPrincipalId: {grantedByKind: principal}
+        grantedBySubjectId: {grantedByKind: subject}
       type: object
       required:
       - id
@@ -10728,6 +11017,26 @@ components:
       - scopePath
       - effect
       properties:
+        grantedByKind:
+          type: string
+          enum: [principal, subject, system]
+          default: principal
+          readOnly: true
+          description: Who made the grant (CHG-R8MIG-021). `system` is the SSO callback's group-to-role grant.
+        grantedByPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          x-ticvai-references: identity.principal
+          description: The staff member who made the grant; set when `grantedByKind` is `principal`.
+        grantedBySubjectId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          x-ticvai-references: pii.subject
+          description: The guest who made the grant (the account holder); set when `grantedByKind` is `subject`.
         id:
           type: string
           format: uuid
@@ -10775,6 +11084,21 @@ components:
             grant written before 18 August means exactly what it meant before.
 
             '
+        overSubjectName:
+          type: string
+          nullable: true
+          readOnly: true
+          x-ticvai-persisted: false
+          description: The display name of the guest acted for (`pii.subject.display_name`), read with the grant;
+            null for a staff grant. Not stored (R8 blocker ORDERS-MONEY-C20, CHG-R8MIG-009).
+        overSubjectIsMinor:
+          type: boolean
+          nullable: true
+          readOnly: true
+          x-ticvai-persisted: false
+          description: Whether the guest acted for is under the region's `RegionSettings.minorAgeThreshold` today,
+            computed from their date of birth, which is never returned; null when no date of birth is held. Not
+            stored (CHG-R8MIG-009).
         overObjectRef:
           type: string
           nullable: true
@@ -10911,8 +11235,9 @@ components:
           maxLength: 256
         credential:
           type: string
-          description: 'Password, PIN, card token or RFID token depending on `method`. Compared with the
-            principal''s `PrincipalCredential.credentialHash` and never stored (ADR-0071, CHG-CRD-003).
+          description: 'The password for `password`; the PIN for `pin`, `card` and `rfid`. Compared with the
+            principal''s `PrincipalCredential.credentialHash` (method `password` or `pin`) and never stored (ADR-0071,
+            CHG-CRD-003). A badge carries no secret: see `method`.
 
             '
           maxLength: 512
@@ -10936,6 +11261,15 @@ components:
 
 
             Added 10 September 2026 for `POS-000 Sign In`.
+
+
+            **`card` and `rfid` say how the username was entered, not a credential of their own** (R8 blocker
+            IDENTITY-C36, CHG-R8MIG-006; the lead''s answer, option C). A badge tap at POS-000 or SCN-001 fills
+            `username` with the employee number the badge carries, and the operator still types the PIN in
+            `credential`, which is checked against the principal''s `pin` credential exactly as for `pin`. No badge
+            token is stored and `PrincipalCredential.method` stays `password` or `pin`. **`sso` is not a login
+            method**: an SSO sign-in goes through `startSsoAuthorization` and `completeSsoAuthorization`, and a
+            `login` with `method` `sso` is refused 400.
 
             '
           enum:

@@ -100,6 +100,14 @@ def describe(spec) -> str:
     return " ".join((spec.get("description") or "").split())
 
 
+def column_nullable(spec) -> bool:
+    """**A column the wire always fills may still be nullable in storage** (CHG-R8MIG-014; R8 blocker
+    APPROVALS-TENANCY-C39): `x-ticvai-column-nullable: true` on a property whose response value is resolved on read
+    (`Workstation.saleBoard`, the till's own board or else its outlet's) keeps the stored column nullable, holding
+    only the override."""
+    return is_nullable(spec) or (isinstance(spec, dict) and spec.get("x-ticvai-column-nullable") is True)
+
+
 def is_nullable(spec) -> bool:
     """Whether a property may legitimately hold null, in any of the forms OpenAPI allows.
 
@@ -970,7 +978,7 @@ def main() -> int:
             cols.append({
                 "column": chosen or conventional_name(snake(prop), ptype, fk),
                 "type": ptype,
-                "required": "yes" if prop in req and not is_nullable(pspec) else "no",
+                "required": "yes" if prop in req and not column_nullable(pspec) else "no",
                 "source": f"{owner.get(child, '')}.{parent_schema}.{key}[].{prop}",
                 "description": describe(pspec),
                 "table": child,
@@ -1086,7 +1094,7 @@ def main() -> int:
                 # Without one, the mechanical parts of the standard apply (`conventional_name`).
                 "column": chosen or conventional_name(snake(prop), ptype, fk),
                 "type": ptype,
-                "required": "yes" if prop in required and not is_nullable(spec) else "no",
+                "required": "yes" if prop in required and not column_nullable(spec) else "no",
                 "source": f"{owner.get(table, '')}.{sname}.{prop}",
                 "description": describe(spec),
                 "table": table,
