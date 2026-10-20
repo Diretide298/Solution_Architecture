@@ -18,6 +18,8 @@ decision:
     counted from `proposed`.'
   by: Chinmay
   date: '2026-10-19'
+waivers:
+  cooling_off: {by: Chinmay, date: '2026-10-20', quote: 'Yes. to all decision. 1-4'}
 why: 'Minutes of 16 October 2026 (sources/mom/TICVAI_MoM_2026-10-16_TicketingConfig_Wireframes_Plan.md, 4.1 to 4.13 and
   section 5) settle the wave 1 items, specified in the contracts by CHG-R8PRD-002 to 007. The lead''s ruling of 19
   October 2026 (evening, after the products module plan): "give the frontend guys tasks to build ... Sanket and Surendra
@@ -44,7 +46,9 @@ prevention:
 status: open
 notes: '**Decision date.** The people and the start of wave 1 are the lead''s ruling of 19 October; this cut into seven
   tasks is proposed now, so check-changelog reports the cooling-off until the lead records his decision of the cut at
-  the r8 tag (a date at least 24 hours after `proposed`) or waives it in writing. **Sprint.** The inputs pin a person
+  the r8 tag (a date at least 24 hours after `proposed`) or waives it in writing. **Cooling-off waived** (20 October 2026, about 12:40 IST): the lead''s "Yes. to
+  all decision. 1-4" answered a sheet of four items whose item 1 was "waive the 24-hour wait for the seven products
+  wave 1 tasks", so the seven tasks ship at the r8 tag without the wait. **Sprint.** The inputs pin a person
   (`assignee`) but not a sprint: tools/derive-block-a-schedule.py places each task by its waits and its owner''s
   capacity, so Sprint 2 (19 to 30 October) is where they land only if Sanket''s and Surendra''s Sprint 2 capacity is
   free (their held back-office tasks stay in the plan). **Operations claimed, not built twice** (coordinator''s ruling, 20 October): a hand-written task''s `operations` take
