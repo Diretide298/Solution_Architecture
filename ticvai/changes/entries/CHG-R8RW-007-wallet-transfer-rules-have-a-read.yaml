@@ -1,0 +1,36 @@
+id: CHG-R8RW-007
+date: '2026-10-21'
+source: audit
+kind: contract
+proposed: '2026-10-21T02:30'
+summary: 'getWalletTransferRules (GET /wallet-transfer-rules, tenant, WALLET_VIEW, ETag for the PUT''s If-Match) reads
+  the rules setWalletTransferRules writes, as getWalletRefundPolicy does for its PUT (CHG-FXC-010). BO-1144 binds it on
+  load and its CHG-WIR-027 gap is closed. BO-1088 and BO-1144, built in Block A since the lead accepted the wallet
+  setup screens (CHG-R8INT-030), say wave 1.'
+decision:
+  what: 'contracts/satellite/wallet.yaml: getWalletTransferRules; screens/P08-venue-back-office.yaml: BO-1144 apis +
+    getWalletTransferRules (onLoad), gap removed; BO-1088 and BO-1144 wave 3 -> 1.'
+  by: Chinmay
+  date: '2026-10-21'
+why: 'Finding: the r8 gate refresh of 41155cde (21 October 2026): check-screen-patterns P8 BO-1088, BO-1144 (Block A
+  screens saying wave 3) and READ BO-1144 (a screen that shows data and binds no read). The lead, 21 October 2026,
+  on adding the read and marking both screens: "Fix now (Recommended)".'
+keys_touched:
+  operations: [getWalletTransferRules]
+  screens: [BO-1088, BO-1144]
+  files:
+  - contracts/satellite/wallet.yaml
+  - screens/P08-venue-back-office.yaml
+root_class: 'a PUT nothing reads (CHG-FXC-010); a screen moved into Block A with its wave left behind (CHG-TKT-008)'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: r8 gate, a release fix'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-screen-patterns.py
+status: open
+notes: 'An added operation is additive (check-contract-compat). The screen binding is not visible content.'

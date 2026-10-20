@@ -1,0 +1,34 @@
+id: CHG-R8RW-008
+date: '2026-10-21'
+source: plan
+kind: plan
+proposed: '2026-10-21T02:30'
+summary: 'getDeferredRevenue is built in Block A: getKpiValues (Block A1) reads its deferredRevenue KPI from it
+  (CHG-R8RW-005), and an operation a Block A operation calls is built in Block A (the lead''s r6 rule, CHG-GT1-009).'
+decision:
+  what: 'docs/active/block-a-extra-tasks.json blockAOperations: getDeferredRevenue.'
+  by: Chinmay
+  date: '2026-10-21'
+waivers:
+  cooling_off: {by: Chinmay, date: '2026-10-21', quote: 'Apply rule, waive 24h (Recommended)'}
+why: 'Finding: the r8 gate refresh of 41155cde (21 October 2026): check-plan-closure C-CALLS, getKpiValues (Block A1)
+  calls getDeferredRevenue, which Block B builds (VM-LEDGER-RECOGNITION-1). The lead chose to apply his rule and
+  waived the cooling-off.'
+keys_touched:
+  operations: [getDeferredRevenue]
+  files:
+  - docs/active/block-a-extra-tasks.json
+root_class: 'a declared call into a later block (CHG-GT1-009)'
+tickets:
+  started: []
+  unstarted: [VM-LEDGER-RECOGNITION-1]
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: a decision of the lead; no ADAM CR is needed'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-plan-closure.py
+status: open
+notes: 'As endGuestDeviceSessions at r6. The task that builds it in Block A is whatever the plan generator gives a
+  blockAOperations entry.'

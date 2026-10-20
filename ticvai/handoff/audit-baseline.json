@@ -8137,14 +8137,13 @@
   }
  },
  "check-rls-scope-fit": {
-  "updated": "2026-10-15",
-  "commit": "378b14c9",
+  "updated": "2026-10-21",
+  "commit": "41155cde",
   "rules": {
    "RF-OWNED-ABOVE": [
     "createResourceCost:resources.venue_assignment",
     "getResourceCostAnalytics:resources.venue_assignment",
-    "getResourceUtilisation:resources.venue_assignment",
-    "setAiProvider:ai.byok_enablement"
+    "getResourceUtilisation:resources.venue_assignment"
    ],
    "RF-TENANT-ROOT": [
     "actOnWaiverRequirements:marketing.message_dispatch:write",
@@ -8157,7 +8156,6 @@
     "blockGiftCard:wallet.gift_card:write",
     "broadcastToGuests:marketing.message_dispatch:write",
     "bulkChangePrices:catalogue.product_version:write",
-    "cancelStockCount:inventory.count_line:read",
     "captureWalletHold:wallet.balance:write",
     "checkoutCart:marketing.consent_record:write",
     "closeWallet:wallet.wallet:write",
@@ -8171,8 +8169,7 @@
     "createSharedWallet:wallet.shared_wallet_member:read",
     "createSharedWallet:wallet.shared_wallet_member:write",
     "enrolFacePass:marketing.consent_record:write",
-    "enterCountLine:inventory.count_line:write",
-    "expireCreditLots:wallet.wallet:write",
+    "expireCreditLots:wallet.balance:write",
     "forceLogout:identity.principal_credential:read",
     "forceLogout:identity.principal_credential:write",
     "getEmployee:workforce.employee:read",
@@ -8186,13 +8183,11 @@
     "issueGiftCard:wallet.gift_card:write",
     "launchCampaign:marketing.message_dispatch:write",
     "listAccessDecisions:identity.authz_audit:read",
-    "listAuditRecords:platform.audit_read:write",
     "listAuditRecords:platform.audit_record:read",
     "listConsentEvidenceWithdrawal:marketing.consent_propagation:read",
     "listConsentPreferenceCommunication:marketing.communication_policy_decision:read",
     "listEmployees:workforce.employee:read",
     "listGuestExtraFields:marketing.guest_extra_field:read",
-    "listIngredientSubstitutes:fnb.ingredient_substitute:read",
     "listJobTitles:workforce.job_title:read",
     "listLeaveBalances:workforce.leave_balance:read",
     "listLeaveTypes:workforce.leave_type:read",
@@ -8203,12 +8198,9 @@
     "listProductTrailChange:catalogue.product_version:read",
     "listProductVersions:catalogue.product_version:read",
     "listRollbackRecovery:catalogue.product_version:read",
-    "listSerialisedItems:inventory.serialised_item:read",
     "listSharedWallets:wallet.shared_wallet_member:read",
     "listShiftPatterns:workforce.shift:read",
     "listStaffConversations:workforce.employee:read",
-    "listStockCountLines:inventory.count_line:read",
-    "listStockCounts:inventory.count_line:read",
     "listSystemTransactionalTemplate:marketing.message_template_version:read",
     "loadGameCredits:wallet.balance:write",
     "loadGameCredits:wallet.wallet:write",
@@ -8217,13 +8209,10 @@
     "notifyWaitlistParty:marketing.message_dispatch:write",
     "openGuestCreditAccount:orders.guest_credit_account:read",
     "openGuestCreditAccount:orders.guest_credit_account:write",
-    "postStockCount:inventory.count_line:read",
     "recordDeposit:ledger.deposit:write",
-    "recountStockCount:inventory.count_line:read",
     "redeemGiftCard:wallet.gift_card:write",
     "reinstateWallet:wallet.wallet:write",
     "releaseWalletHold:wallet.balance:write",
-    "requestRecount:inventory.count_line:write",
     "resendPaymentLink:marketing.message_dispatch:write",
     "resetPrincipalCredential:identity.principal:write",
     "resetPrincipalCredential:identity.principal_credential:read",
@@ -8241,8 +8230,6 @@
     "setDeliveryLocationOutletMapping:fnb.delivery_location_outlet:write",
     "setGuestExtraFields:marketing.guest_extra_field:read",
     "setGuestExtraFields:marketing.guest_extra_field:write",
-    "setIngredientSubstitutes:fnb.ingredient_substitute:read",
-    "setIngredientSubstitutes:fnb.ingredient_substitute:write",
     "setJobTitle:workforce.job_title:read",
     "setJobTitle:workforce.job_title:write",
     "setLeaveType:workforce.leave_type:read",
@@ -8255,11 +8242,7 @@
     "setShiftPattern:workforce.shift:write",
     "settleDeposit:ledger.deposit:write",
     "settleWalletAtExit:wallet.wallet:write",
-    "startStockCount:inventory.count_line:read",
-    "startStockCount:inventory.count_line:write",
-    "storePaymentToken:marketing.consent_record:write",
     "storePaymentToken:payments.token:write",
-    "submitCountLines:inventory.count_line:write",
     "submitForm:marketing.consent_record:write",
     "submitForm:marketing.form_submission:write",
     "suggestRoleAssignment:workforce.employee:read",
@@ -8272,19 +8255,10 @@
     "updatePrincipal:identity.principal:write",
     "updatePrincipal:identity.refresh_token:write",
     "uploadGuestDocument:marketing.guest_document:write",
-    "validateWorkforceCompliance:workforce.employee:read",
-    "verifyAllergens:fnb.ingredient_substitute:read"
+    "validateWorkforceCompliance:workforce.employee:read"
    ]
   },
   "started": {
-   "RF-OWNED-ABOVE|setAiProvider:ai.byok_enablement": {
-    "tickets": [
-     27664,
-     30283
-    ],
-    "why": "CR-095, CR-108: the row security class fix reworks these migrations and operations (fix/row-security)",
-    "on": "2026-10-18"
-   },
    "RF-TENANT-ROOT|actOnWaiverRequirements:marketing.message_dispatch:write": {
     "tickets": [
      27649,
@@ -8440,13 +8414,13 @@
     "why": "CR-095, CR-108: the row security class fix reworks these migrations and operations (fix/row-security)",
     "on": "2026-10-20"
    },
-   "RF-TENANT-ROOT|expireCreditLots:wallet.wallet:write": {
+   "RF-TENANT-ROOT|expireCreditLots:wallet.balance:write": {
     "tickets": [
      27669,
-     30379
+     30363
     ],
-    "why": "CR-095, CR-108: the row security class fix reworks these migrations and operations (fix/row-security)",
-    "on": "2026-10-18"
+    "why": "CR-095, CR-108: the row security class fix reworks these migrations and operations; credit expiry's wallet balance write (r8 re-walk) joins its seven wallet siblings at the r8 gate, the lead, 21 October 2026: \"Yes, add it (Recommended)\"",
+    "on": "2026-10-21"
    },
    "RF-TENANT-ROOT|forceLogout:identity.principal_credential:read": {
     "tickets": [
@@ -8527,13 +8501,6 @@
    "RF-TENANT-ROOT|listAccessDecisions:identity.authz_audit:read": {
     "tickets": [
      27948
-    ],
-    "why": "CR-095, CR-108: the row security class fix reworks these migrations and operations (fix/row-security)",
-    "on": "2026-10-18"
-   },
-   "RF-TENANT-ROOT|listAuditRecords:platform.audit_read:write": {
-    "tickets": [
-     27797
     ],
     "why": "CR-095, CR-108: the row security class fix reworks these migrations and operations (fix/row-security)",
     "on": "2026-10-18"
@@ -8648,14 +8615,6 @@
     "tickets": [
      27671,
      30404
-    ],
-    "why": "CR-095, CR-108: the row security class fix reworks these migrations and operations (fix/row-security)",
-    "on": "2026-10-18"
-   },
-   "RF-TENANT-ROOT|listSerialisedItems:inventory.serialised_item:read": {
-    "tickets": [
-     27673,
-     30433
     ],
     "why": "CR-095, CR-108: the row security class fix reworks these migrations and operations (fix/row-security)",
     "on": "2026-10-18"
@@ -8966,14 +8925,6 @@
     "tickets": [
      27669,
      30379
-    ],
-    "why": "CR-095, CR-108: the row security class fix reworks these migrations and operations (fix/row-security)",
-    "on": "2026-10-18"
-   },
-   "RF-TENANT-ROOT|storePaymentToken:marketing.consent_record:write": {
-    "tickets": [
-     27677,
-     30526
     ],
     "why": "CR-095, CR-108: the row security class fix reworks these migrations and operations (fix/row-security)",
     "on": "2026-10-18"

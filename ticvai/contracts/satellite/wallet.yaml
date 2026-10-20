@@ -1351,6 +1351,39 @@ paths:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /wallet-transfer-rules:
+    get:
+      operationId: getWalletTransferRules
+      x-ticvai-consumed-by:
+        - "P08 BO-1144 Peer-to-Peer Transfer Configuration"
+        - "P08 BO-1145 Transfer Eligibility, Limits & Approval Rules"
+      summary: The peer-to-peer transfer rules in force
+      description: |-
+        **Added 21 October 2026 (r8 gate, CHG-R8RW-007; the contract gap CHG-WIR-027 of 2 October): `setWalletTransferRules`
+        was a PUT nothing read**, so BO-1144 could not show the saved rules. Returns the tenant's rules, the ones
+        `setWalletTransferRules` writes, or before the first save the defaults that set would get. The `ETag` header
+        carries the version the PUT takes as `If-Match`.
+      tags:
+      - wallet
+      x-ticvai-permission: WALLET_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: The rules
+          headers:
+            ETag:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WalletTransferRules'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setWalletTransferRules
       x-ticvai-consumed-by:
