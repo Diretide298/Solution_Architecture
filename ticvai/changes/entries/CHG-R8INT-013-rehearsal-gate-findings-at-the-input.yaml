@@ -1,0 +1,48 @@
+id: CHG-R8INT-013
+date: '2026-10-20'
+source: audit
+kind: contract
+summary: 'Findings the refresh rehearsal of the integration branch failed on, fixed at the authored input: a table
+  layout''s items name their table by id (TableLayoutItem; SP-REPLACE-NO-KEY), a product tag''s 409 says the code is
+  unique in the same venue (SP-DUPLICATE-409), the price ladder''s typed bands are the jsonb value they are stored as
+  (ST-FIELD-NO-COLUMN), two change entries cite in-git sources instead of audit/ and an untracked path
+  (check-cited-sources), and the 25 S-INPUT-SOURCE findings that predate r8 join the baseline (the rule is new in r8;
+  every one is on r7''s package too).'
+decision:
+  what: 'contracts/satellite/fnb.yaml: setTableLayout''s items are TableLayoutItem (TableDefinition with a writable,
+    required id, as the operation''s text already matched on); contracts/spine/catalogue.yaml: setProductTagDefinition
+    409 "another tag of the same venue", PriceLadder.bands x-ticvai-persistence-column jsonb and kind valueObject;
+    changes/entries CHG-R8LIN-001 and CHG-CRA-001 citations; handoff/audit-baseline.json check-screen-wiring
+    S-INPUT-SOURCE (25 keys, with this entry as the reason).'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'The coordinator''s addendum to the r8 integration brief (20 October 2026), from the refresh rehearsal of the
+  integration branch at 1fba7794: fix at the authored input or the check, never in derived files. setTableLayout''s
+  text matched each table on its id while TableDefinition.id is read-only, so no client could name a table; the
+  bands column was always jsonb (backend/tenant/010-catalogue.sql). The surface lane established that the 25
+  S-INPUT-SOURCE findings are all among the 28 the rule gives on r7''s package (r8b surface report). Finding: refresh
+  rehearsal of 20 October 2026 (check-storage-promises, check-contract-storage, check-cited-sources,
+  check-screen-wiring).'
+keys_touched:
+  operations: [setTableLayout, setProductTagDefinition, setPriceLadderMatrix]
+  schemas: [TableLayoutItem, TableDefinition, PriceLadder]
+  files:
+  - contracts/satellite/fnb.yaml
+  - contracts/spine/catalogue.yaml
+  - handoff/audit-baseline.json
+  - changes/entries/CHG-R8LIN-001-lineage-lists-the-tables-the-text-names.yaml
+root_class: 'a gate finding the refresh rehearsal found on the integration branch'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: r8 integration pass'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-storage-promises.py
+status: open
+notes: 'PriceLadder.bands is a storage fact in a spine contract, written here as the addendum allows; the storage-core
+  lane is told through the integration report. Two S-INPUT-SOURCE findings are built on by started tickets: the lead
+  acknowledges them (--acknowledge-started) or fixes them.'

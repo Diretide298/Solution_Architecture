@@ -6719,7 +6719,7 @@ paths:
                 tables:
                   type: array
                   items:
-                    $ref: '#/components/schemas/TableDefinition'
+                    $ref: '#/components/schemas/TableLayoutItem'
       responses:
         '412':
           $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
@@ -12025,6 +12025,22 @@ components:
       - needsClearing
       - reserved
       - outOfService
+    TableLayoutItem:
+      x-ticvai-persistence: none — request only; each item lands as its fnb.dining_table row (TableDefinition)
+      description: '**One table of `setTableLayout`''s whole layout, named by its id** (r8 integration, CHG-R8INT-013;
+        check-storage-promises SP-REPLACE-NO-KEY, CR-155). The operation matches each item on `id`: an id already on
+        the outlet updates that table, a new id adds one, so the client sends the id, which `TableDefinition` marks
+        read-only for every other write (createTable mints it). Everything else is the table as `TableDefinition`
+        states it.'
+      allOf:
+      - $ref: '#/components/schemas/TableDefinition'
+      - type: object
+        required: [id]
+        properties:
+          id:
+            type: string
+            format: uuid
+            description: The table this item updates, or the id of the table it adds (a UUIDv7 the client makes).
     TableDefinition:
       x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by clearTable, createDeliveryLocation, createTable, getTableMap and others
       x-ticvai-persistence: fnb.dining_table

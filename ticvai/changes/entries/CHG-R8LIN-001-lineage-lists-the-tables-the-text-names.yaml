@@ -15,7 +15,7 @@ decision:
     owner''s declared query in the asking contract (XR-UNCOVERED), which is another lane''s file.'
   by: Chinmay
   date: '2026-10-19'
-why: 'Audit finding, r8 blockers walk of Sprint 1 and 2 tickets, 19 October 2026 (audit/ticvai/r8-blockers/lane-lineage.json): the
+why: 'Audit finding, r8 blockers walk of Sprint 1 and 2 tickets, 19 October 2026 (Finding: R8 blocker cause list, causes as listed above): the
   lineage is the build boundary ("reads only the tables its spec lists"), so a table the text needs and the lineage
   omits stops the developer.'
 keys_touched:

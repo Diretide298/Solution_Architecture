@@ -19173,7 +19173,7 @@ paths:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
-          description: The code is already used by another tag of the venue (`duplicate-code`), the write changes
+          description: The code is already used by another tag of the same venue (`duplicate-code`), the write changes
             the code of a tag that products or Help me choose answers carry (`tag-code-in-use`), or a known tag is
             addressed with another venue (`tag-venue-mismatch`).
           x-ticvai-problem-types:
@@ -43704,6 +43704,8 @@ components:
           - continuousRange
         bands:
           type: array
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           description: '**The bands, lowest first** (typed 20 October 2026, R8 blocker cause GPS-C32; CHG-R8SPN-028: it
             was declared an object while every reader and writer used a list, so no valid body could carry it). The
             same shape `DynamicPriceBandsLaddersAdjustmentMatrixView.bands` returns. Stored as the jsonb list it always

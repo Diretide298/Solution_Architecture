@@ -44,7 +44,7 @@ prevention:
   ref: tools/check-starter-fit.py
 status: open
 notes: 'Prevention: check-starter-fit SF-FIXTURE-SEED reads the currencies the reference fixture names (the starter''s
-  docs/quality-gates.md section 8 and db/seed/reference-fixture.md) and fails for one with no "denominations (CCY)"
+  quality gates, repos/ticvai-backend/project-bible/setup/quality-gates.md section 8, and db/seed/reference-fixture.md) and fails for one with no "denominations (CCY)"
   section in seed-data-proposal.md. Shown failing on r6 (OMR, 1 new) and passing after. Sibling query: the same rule;
   AED and OMR are the only currencies the fixture names, so no other seed is missing. Impact (adam-links, r6 cache):
   29 tickets, 1 started (#27686 module test, On hold: no change to what it measures), 2 finished (#27665, #30328 the
