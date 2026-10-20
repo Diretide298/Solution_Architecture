@@ -10776,6 +10776,14 @@ screens:
     contract: orders
     purpose: Add the room type for the booked window, then the add-ons
     trigger: onAction
+  - operationId: createCart
+    contract: orders
+    purpose: 'Started by the runtime the first time a line is added, before the first addCartLine, against the
+      guest or the anonymous cart token (2.1.31); never a button or a form (GFIX-3). With the guest session the
+      device already holds: signed in, or the anonymous cart session a visitor gets with the first line
+      (ADR-0045; r8, GPS-C23), as on its app twin GST-075.'
+    trigger: background
+    provenance: r8 second round, GPS-C23 (the core lane's request)
   entryState:
     params:
     - name: productId
