@@ -2,25 +2,28 @@ id: CHG-R8DEC-005
 date: '2026-10-20'
 source: plan
 kind: plan
-proposed: '2026-10-20T02:19'
+proposed: '2026-10-19T21:00'
 summary: 'The 244 back-office screen tasks are held in the plan until their module''s wireframe is signed: they keep
   their keys and rows, and the r8 push sets their tickets (976 with the sub-tasks) On hold, off the board, and keeps
   them there. The 71 tasks of Pradnya Yeram, Chinmay Patkar and Chitrangi Mestry are not held.'
 decision:
   what: 'docs/active/held-tasks.yaml: hold backoffice-module-wireframe (reason: the back-office frontend waits for the
     client''s signed wireframe of its module, rebuilt module by module after the client meeting of 19 October 2026;
-    until: the module''s wireframe is signed; decided by Chinmay, 20 October 2026, "Yes. to all decision. 1-4") over
+    until: the module''s wireframe is signed; the lead''s words of 19 October 2026, evening: "Yes but we can start
+    something I dont want idle time"; confirmed on 20 October 2026: "Yes. to all decision. 1-4") over
     the 244 tasks of the hold list of 20 October (Pallavi Sawant 97, Sanket Keluskar 69, Surendra 68, Narayan Gaonkar 3,
     Deep Khanvilkar 3, Pranay Shinde 2, the two new full-stack developers 1 each; Venue Management 210, TICVAI Web 21,
     Venue Analytics 6, Venue Support 4, Venue CMS 3; all frontend tasks, all pushed). Applied by the mechanism of
     CHG-R8DEC-004 at the r8 push.'
   by: Chinmay
-  date: '2026-10-20T12:40'
-waivers:
-  cooling_off: {by: Chinmay, date: '2026-10-20', quote: 'Yes. to all decision. 1-4'}
-why: 'The lead''s answer of 20 October 2026 (about 12:40 IST) to a sheet of four r8 items, whose item 2 recommended
-  holding the 244 back-office screen tasks in the plan so that the release push sets them On hold and keeps them
-  there: "Yes. to all decision. 1-4". The hold follows the client meeting of 19 October (the back office rebuilt module
+  date: '2026-10-21'
+why: 'The lead''s answer of 19 October 2026, about 21:00 IST, to the rebuild assessment
+  (sources/audit-19-october/rebuild-assessment-19-october.md, "Decisions for the lead" 2: "Hold new back-office
+  frontend work that has no approved wireframe, starting now?"): "Yes but we can start something I dont want idle
+  time"; the people it frees are in sources/audit-19-october/products-module-plan-19-october.md ("Who is free if
+  back-office frontend is held"). Confirmed by his answer of 20 October 2026 (about 12:40 IST) to the r8 decisions sheet,
+  item 2 (hold them in the plan so the release push sets them On hold and keeps them there): "Yes. to all decision.
+  1-4". The hold follows the client meeting of 19 October (the back office rebuilt module
   by module, each on a signed wireframe) and the lead''s ruling that evening, quoted in CHG-R8PRD-008 ("Sanket Keluskar
   and Surendra Loke are free for new work while the back-office frontend is held"; Pradnya Yeram, Chinmay Patkar and
   Chitrangi Mestry keep and build their tasks).'
@@ -38,19 +41,16 @@ tickets:
     server: the r8 dry run of op-release.rb lists them (a started one is left alone and listed).'
 release_tag: r8
 decision_owner: Chinmay
-adam_cr: 'none yet: r8 decisions sheet item 2, 20 October 2026; the lead raises the ADAM CR with the batch'
+adam_cr: 'none: a decision of the lead; no ADAM CR is needed (the lead, 20 October 2026)'
 triage: blocker
 prevention:
   type: generator-rule
   ref: tools/op-release.py::hold_problems
 status: open
-notes: '**Cooling-off.** `proposed` is when the 244-task hold list was drawn up (20 October, 02:19); the hold itself
-  was first proposed in the 19 October rebuild assessment and ruled on that evening, also less than 24 hours before the
-  decision. The waiver is read from the lead''s "Yes" to item 2, whose wording was that the release push (r8) sets the
-  tasks On hold, as his "Yes, include in r4 (Recommended)" was read for CHG-R6-056. If the lead did not mean the hold
-  to ship at r8, remove the waiver and the hold waits for r9. **Dry run** (tools/op-release.py --release r8 on this
+notes: '**Cooling-off, no waiver.** `proposed` is the lead''s decision of 19 October, about 21:00 IST. The decision is
+  recorded at the r8 tag, as CHG-R8PRD-008''s cut was to be: check-changelog needs a date now, so `decision.date` is
+  the planned tag day, Wednesday 21 October 2026 (more than 24 hours after `proposed`), and the lead sets it to the
+  tag''s time when he tags. The hold is not announced or pushed before then. **Dry run** (tools/op-release.py --release r8 on this
   branch, written to a scratch file, nothing sent to OpenProject): 976 held tickets (244 tasks, 732 sub-tasks), all
-  pushed; their plan sprints 1 (167 tasks), 2 (52), 3 (23), 4 (2). **The schedule still counts them**:
-  derive-block-a-schedule places the held tasks and spends their people''s capacity on them, so work after them (the
-  products wave 1 tasks of Sanket Keluskar and Surendra among it) lands no earlier than before; freeing that capacity is
-  a separate plan change.'
+  pushed; in the schedule before CHG-R8DEC-006 their sprints were 1 (167 tasks), 2 (52), 3 (23), 4 (2); since
+  CHG-R8DEC-006 they have none and take no capacity.'

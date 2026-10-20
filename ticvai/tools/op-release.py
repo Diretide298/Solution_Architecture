@@ -137,7 +137,12 @@ def load_held(path=None):
 def hold_note(h, release):
     """The one comment a held ticket gets when the push sets it On hold."""
     d = h["decided"]
-    return (f"**{HOLD_MARKER}** (release {release}; decided {d.get('date')} by {d.get('by')}: \"{d.get('quote')}\"): "
+    try:
+        day = datetime.strptime(str(d.get("date")), "%Y-%m-%d")
+        when = f"{day.day} {day:%B %Y}"
+    except ValueError:
+        when = str(d.get("date"))
+    return (f"**{HOLD_MARKER}** (release {release}; decided by {d.get('by')} on {when}): "
             f"{h['reason']} The ticket keeps its key and stays in the plan, off the board (no assignee, no sprint) "
             f"until {h['until']}; then a release puts it back to New. Nobody builds it before that.")
 

@@ -8,7 +8,7 @@
 # A hold lifts when its keys leave this file: the next release puts the tickets back to New in the plan's sprint.
 #
 # One hold per decision: reason (the comment the ticket gets), until (what lifts it), decided (who, when, his words,
-# the change entry) and keys (planned tasks only; the comment after each key is its subject and the plan's person).
+# a later confirmation, the change entry) and keys (planned tasks only; the comment after each key is its subject and the plan's person).
 
 holds:
   backoffice-module-wireframe:
@@ -18,8 +18,9 @@ holds:
     until: the module's wireframe is signed
     decided:
       by: Chinmay
-      date: '2026-10-20'
-      quote: 'Yes. to all decision. 1-4'
+      date: '2026-10-19'
+      quote: 'Yes but we can start something I dont want idle time'
+      confirmed: {date: '2026-10-20', quote: 'Yes. to all decision. 1-4'}
       change: CHG-R8DEC-005
     note: 'The 244 back-office screen tasks of the 20 October hold list. The 71 tasks of Pradnya Yeram, Chinmay Patkar
       and Chitrangi Mestry are not here: they keep them and build them (the lead, 19 October 2026, evening).'
