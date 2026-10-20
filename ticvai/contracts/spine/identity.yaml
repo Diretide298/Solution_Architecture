@@ -1437,6 +1437,16 @@ paths:
         behalf. **A subject with no date of birth on file is treated as a minor.** The age below which a
         subject is a minor is an open value that client counsel sets; it is not assumed here.
 
+
+        **What a guest-made grant stores** (R8 blocker IDENTITY-C42, the lead''s answer A; CHG-R8MIG-021):
+        `grantedByKind` `subject` and `grantedBySubjectId` the granting guest (no principal); `scopePath` the tenant
+        root (a guest account is tenant-wide); `effect` ALLOW; `permission` one of the guest-delegable list for its
+        `delegationKind` (proposed, client to confirm): `primaryHolder` and `familyMember` ORDER_VIEW, ORDER_CREATE,
+        WALLET_VIEW; `carer` and `attendee` ORDER_VIEW; `groupLeader` ORDER_VIEW, ORDER_CREATE; `corporateAdmin`
+        ORDER_VIEW, ORDER_CREATE, WALLET_VIEW, WALLET_OPERATE; `corporateMember` ORDER_VIEW. Any other permission from a
+        guest is refused 403. A revocation by a guest is recorded the same way. Staff recording a grant on the holder''s
+        behalf store `grantedByKind` `principal`; the SSO callback''s group-to-role grants store `system`.
+
         '
       tags:
       - identity
@@ -10591,6 +10601,13 @@ components:
       # **A grant names exactly one of a permission or a role** (ADAM CR-158, option A, 18 October 2026;
       # CHG-CRA-002): a table CHECK, `num_nonnulls(permission, role_id) = 1`, NOT VALID then VALIDATE.
       x-ticvai-exactly-one-of: [[permission, roleId]]
+      # Who granted it: a principal, a guest or the system, and the matching column set (R8 blocker IDENTITY-C42,
+      # CHG-R8MIG-021).
+      # A guest reads the grants it is party to and the account holder writes them (CHG-R8MIG-021; IDENTITY-C48).
+      x-ticvai-rls: scope-or-subject
+      x-ticvai-required-when:
+        grantedByPrincipalId: {grantedByKind: principal}
+        grantedBySubjectId: {grantedByKind: subject}
       type: object
       required:
       - id
@@ -10598,6 +10615,26 @@ components:
       - scopePath
       - effect
       properties:
+        grantedByKind:
+          type: string
+          enum: [principal, subject, system]
+          default: principal
+          readOnly: true
+          description: Who made the grant (CHG-R8MIG-021). `system` is the SSO callback's group-to-role grant.
+        grantedByPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          x-ticvai-references: identity.principal
+          description: The staff member who made the grant; set when `grantedByKind` is `principal`.
+        grantedBySubjectId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          x-ticvai-references: pii.subject
+          description: The guest who made the grant (the account holder); set when `grantedByKind` is `subject`.
         id:
           type: string
           format: uuid

@@ -715,8 +715,12 @@ $$;
 #   * `x-ticvai-rls: signed-in-read` (CHG-R8MIG-011; the storage-sat lane's request 6, ORDERS-MONEY-C27 and C33): any
 #     signed-in caller of the tenant, staff or guest, reads every row; writes keep the base rule. For rows that are not
 #     personal or whose secret is the key itself: badge definitions, a gift card read by its code.
+#   * `x-ticvai-rls: scope-or-subject` (CHG-R8MIG-021; R8 blocker IDENTITY-C42 and C48): a scoped row a guest is party
+#     to. Staff read and write by `scope_path`, as the scope rule; a guest reads a row naming its subject in
+#     `subject_id`, `over_subject_id` or `granted_by_subject_id`, and writes one whose `over_subject_id` (else
+#     `subject_id`) is its own: the account holder grants and revokes. identity.delegated_access, guest to guest.
 RLS_MARKS = ("read-beneath", "grant-holder-read", "own-row", "home-scope-write", "subject-self", "own-or-home-scope",
-             "signed-in-read")
+             "signed-in-read", "scope-or-subject")
 
 # **A child that follows a split parent which the parent rule would not otherwise pick** (the parent sits at the tenant
 # root, so it is no owner). `identity.role_permission` is the rows of a role's permission set (CR-076 decision:
@@ -2783,6 +2787,19 @@ def main() -> int:
             call = (f"SELECT platform.apply_grant_holder_read_rls('{tq(t)}'::regclass, "
                     f"{sql_literal(write.format(a=''))});")
             base = "the tenant root or a grant over its home scope"
+        elif mark == "scope-or-subject":
+            subs = [x for x in ("subject_id", "over_subject_id", "granted_by_subject_id") if x in has]
+            holder = "over_subject_id" if "over_subject_id" in has else ("subject_id" if "subject_id" in has else None)
+            if base != "scope_path" or not holder:
+                print(f"  ! {t}: x-ticvai-rls scope-or-subject needs a scope_path and a subject column; the base rule "
+                      "stands")
+                continue
+            read = " OR ".join(["platform.in_scope(scope_path)"]
+                               + [f"platform.own_row(NULL::uuid, {x})" for x in subs])
+            write = "(platform.in_scope({a}scope_path) OR platform.own_row(NULL::uuid, {a}" + holder + "))"
+            call = (f"SELECT platform.apply_split_rls('{tq(t)}'::regclass, {sql_literal(read)}, "
+                    f"{sql_literal(write.format(a=''))});")
+            base = "its scope, or the guest account it is about"
         elif mark == "signed-in-read":
             call = (f"SELECT platform.apply_split_rls('{tq(t)}'::regclass, 'platform.signed_in()', "
                     f"{sql_literal(write.format(a=''))});")

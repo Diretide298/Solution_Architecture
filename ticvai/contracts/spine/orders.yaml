@@ -378,9 +378,12 @@ paths:
         for: 'its read of marketing.consent_question_version, Marketing''s data (CHG-MOD-001)'
       security:
       - guestAuth: []
+      - bearerAuth: []
       x-ticvai-self-scoped: subject
       x-ticvai-audience:
       - guest
+      - staff
+      - partner
       summary: Start a cart
       description: '**A cart holds leases; an order holds money.** Different lifetimes, different failure
         modes, and merging them is why this contract did not exist until 17 August — `createOrder` takes
@@ -391,6 +394,13 @@ paths:
 
         **POS does not use this.** A till builds its sale locally and submits atomically, because it works
         offline and does not need a resumable cart. Same order contract, different channel.
+
+
+        **Who may start one** (R8 blocker IDENTITY-C49, CHG-R8MIG-021): a signed-in guest (the cart is theirs), an
+        anonymous guest token (`guestAuth` with no subject: the cart is anonymous and its `token` brings the guest
+        back), or a staff or partner session, whose cart records the session and its workstation
+        (`orders.cart.session_id`, `workstation_id`) and is that session''s own. A till''s cart is also created
+        implicitly by its first `addCartLine`.
 
         '
       tags:
@@ -3388,6 +3398,7 @@ paths:
       - guest
       - partner
       - staff
+      - device
       summary: The cart, priced and checked, right now
       description: '**A till''s cart is the session''s own** (decided 2 October 2026, CHG-SEED-013). On the till the cart
         belongs to the workstation session that opened it; `x-ticvai-self-scoped: subject` means the caller''s
@@ -3971,6 +3982,11 @@ paths:
         a cart at the moment of signing in is the worst possible time to lose one. Lines that cannot be
         re-leased are reported rather than dropped silently.
 
+
+        **The anonymous cart''s `token` proves it** (R8 blocker IDENTITY-C49, the lead''s answer A; CHG-R8MIG-021): the
+        body''s `cartToken` must equal the cart''s `token` (403 otherwise), and the claim rotates the token, so a link
+        shared before signing in does not reach the account after.
+
         '
       tags:
       - cart
@@ -3980,10 +3996,31 @@ paths:
       x-ticvai-conflict-policy: serverWins
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                cartToken:
+                  type: string
+                  writeOnly: true
+                  x-ticvai-persisted: false
+                  description: The anonymous cart's `token`, as the device that built it holds it (CHG-R8MIG-021).
+                    Without it, or with another, the claim is refused 403.
       responses:
         '409':
           description: 'The cart is `checkedOut` or `abandoned` (`cart-not-open`), or already belongs to another guest (`cart-already-claimed`). Nothing is attached or merged.'
           x-ticvai-problem-types: [cart-not-open, cart-already-claimed]
+        '403':
+          description: '**The cart''s token was not sent, or does not match** (R8 blocker IDENTITY-C49, the lead''s answer A;
+            CHG-R8MIG-021): only the device that built the anonymous cart holds its `token`, so it is the proof. Nothing
+            is attached.'
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
           content:
             application/problem+json:
               schema:
@@ -23145,6 +23182,19 @@ components:
             Rotated on claim, so a link shared before signing in does not reach the account after.
 
             '
+        sessionId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          description: The staff or partner session that started the cart (a till's cart is its session's own); null
+            for a guest's cart (R8 blocker IDENTITY-C49, CHG-R8MIG-021).
+        workstationId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          description: The workstation of that session; null for a guest's cart.
         venueId:
           type: string
           format: uuid
