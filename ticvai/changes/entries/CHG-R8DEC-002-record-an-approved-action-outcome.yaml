@@ -1,0 +1,56 @@
+id: CHG-R8DEC-002
+date: '2026-10-20'
+source: audit
+kind: contract
+summary: 'An approved action''s outcome has a writer: approvals gains recordApprovedActionOutcome, an internal
+  service-to-service operation the requesting contract calls after applying, or not, the action a grant approved
+  (applied, notApplied or noOp, with a reason), writing approvals.approved_action_execution. Subscription''s consumer
+  of approval.granted for suspendTenant and reactivateTenant calls it for every outcome.'
+decision:
+  what: 'contracts/spine/approvals.yaml: POST /internal/approval-requests/{requestId}/action-outcome
+    (recordApprovedActionOutcome; security serviceAuth, x-ticvai-auth service, audience service, x-ticvai-permission
+    null, as the other service-only operations declare them; Idempotency-Key; 200 ApprovedActionExecutionView; 403
+    not-source-module, 404, 409 execution-not-pending, 422 outcome-reason-required), its request schema
+    ApprovedActionOutcomeInput, the serviceAuth security scheme, and ApprovedActionExecutionView''s description naming
+    it. applied and noOp set status succeeded (noOp with a note), notApplied sets failed with failureReason: the
+    status enum is unchanged, so nothing new reaches a response enum. contracts/satellite/subscription.yaml:
+    suspendTenant''s and reactivateTenant''s grant consumers record every outcome through it (text only).
+    handoff/api-data-lineage.json: its entry, as tools/derive-lineage.py derives it, with readColumns as
+    resolveApprovedActionExecution''s. tools/check-business-rules.py BR-APPROVED-OUTCOME holds it (the writer exists,
+    is service-only, takes the three outcomes, writes the table in the lineage, and both grant consumers call it).'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'The lead''s answer of 20 October 2026 (about 12:40 IST) to a sheet of four r8 items, whose item 4 recommended
+  option A (one internal operation that records the outcome on the approval): "Yes. to all decision. 1-4". Finding:
+  approvals.yaml said the execution is "updated by the requesting contract as it executes", and subscription.yaml
+  (CHG-CRA-005, CHG-R8SPN-015; lane H review 3 N-2) said a suspension or reactivation the re-check refuses, or finds
+  already done, is recorded there, but no operation or event could write it.'
+keys_touched:
+  operations: [recordApprovedActionOutcome, suspendTenant, reactivateTenant]
+  schemas: [ApprovedActionOutcomeInput, ApprovedActionExecutionView]
+  tables: [approvals.approved_action_execution]
+  files:
+  - contracts/spine/approvals.yaml
+  - contracts/satellite/subscription.yaml
+  - handoff/api-data-lineage.json
+  - tools/check-business-rules.py
+root_class: 'A-STORAGE-PROMISE: the contract promises a record no operation writes'
+tickets:
+  started: []
+  unstarted:
+  - 'The new operation goes to a TenancyService back-end task at the r8 refresh (the generator places it); the
+    tickets that build suspendTenant and reactivateTenant pick up the call through their pointer bodies. No screen
+    changes: BO-382 already lists the execution, ADM-005 is unchanged.'
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: a decision of the lead; no ADAM CR is needed (the lead, 20 October 2026)'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py
+status: open
+notes: 'Additive for check-contract-compat (approvals: one more additive change, no new breaking one). The lineage
+  entry was copied from the derivation (tools/derive-lineage.py expected()), so the release refresh leaves it as it
+  is; check-lineage and check-write-lineage report nothing new for it. The grant consumers are text, not operations:
+  Subscription''s consumer of approval.granted is not modelled as an operation today, so no x-ticvai-write-via names
+  this call.'

@@ -67,11 +67,17 @@ And one rule per decision for the CRs of 18 October 2026 (class 9, "rules nobody
                    per legal entity, the next open period, and createPayment's two settings reads.
   BR-HOLD-LAPSE    (CR-169) a seat reservation names its hold and can be `sold`; `convertInventoryHold` moves the
                    envelope's units and states the lapsed-hold rule (unitsGone, nothing refunded automatically).
-  BR-LOGIN-ATTEMPTS (CR-170, 19 October 2026; CHG-CRA-009) every 401 of login and verifyMfaChallenge carries
-                   attemptsRemaining, counted per submitted username known or not and per sign-in method; login's
-                   409 says since when and on what; verifyMfaChallenge's 422 carries it too.
+  BR-LOGIN-ATTEMPTS (CR-170, 19 October 2026; CHG-CRA-009) every wrong-credentials 401 of login carries
+                   attemptsRemaining, counted per submitted username known or not and per sign-in method, and
+                   sso-sign-in-required does not; verifyMfaChallenge carries it on its wrong-code 422 and not on its
+                   401, a missing or expired challenge session (narrowed, 20 October 2026, CHG-R8DEC-001); login's 409
+                   says since when and on what.
   BR-GATE-CANCEL   (CR-171, 19 October 2026; CHG-CRA-010) a cancelled gate mode change records who, when and why in
                    its own columns, leaving the scheduler's untouched.
+  BR-APPROVED-OUTCOME (20 October 2026, option A; CHG-R8DEC-002) an approved action's outcome has a writer:
+                   approvals' recordApprovedActionOutcome, service-only, takes applied, notApplied or noOp and returns
+                   the execution; the lineage has it write approvals.approved_action_execution; suspendTenant's and
+                   reactivateTenant's grant consumers call it.
 
 The step-up rule of `rejectShiftVariance` (CHG-RUL-014), and of `closeShift`, `acceptShiftVariance`,
 `withdrawFromDepositBox` and the 20 MFA step-ups (CHG-RUL-019, CHG-RUL-020), is held by `check-step-up.py`
@@ -438,8 +444,15 @@ def main() -> int:
          "login's 401 does not count attempts per submitted username, known or not")
     # Fix round 3 (lane-H review 2 M-5): "every 401" is every 401 login and verifyMfaChallenge return, and the
     # unknown username's counter is per sign-in method as a known one's lock is.
-    need("BR-LOGIN-ATTEMPTS", "attemptsRemaining" in ((ids.get("LoginDeniedProblem") or {}).get("allOf") or [{}, {}])[-1]
-         .get("required", []), "LoginDeniedProblem does not require attemptsRemaining (every 401 login returns)")
+    # Narrowed by the lead on 20 October 2026 (CHG-R8DEC-001): every wrong-credentials 401, never sso-sign-in-required,
+    # which checks no credential. LoginDeniedProblem serves both problem types, so the field is not `required` there and
+    # the contract says where it is present and where it is not.
+    ldp = text(ids.get("LoginDeniedProblem") or {})
+    need("BR-LOGIN-ATTEMPTS", "`unauthenticated`" in ldp and "Not on `sso-sign-in-required`" in ldp,
+         "LoginDeniedProblem does not say attemptsRemaining is on every unauthenticated 401 and not on "
+         "sso-sign-in-required (CHG-R8DEC-001)")
+    need("BR-LOGIN-ATTEMPTS", "does not carry `attemptsRemaining`" in r401 and "carries the count as it stands" not in r401,
+         "login's 401 does not say sso-sign-in-required leaves attemptsRemaining out (CHG-R8DEC-001)")
     need("BR-LOGIN-ATTEMPTS", "per sign-in method" in r401,
          "login's 401 does not count attempts per sign-in method as well as per username")
     need("BR-LOGIN-ATTEMPTS", "SessionHeldProblem" in text((lg.get("responses") or {}).get("409") or {})
@@ -451,8 +464,11 @@ def main() -> int:
     need("BR-LOGIN-ATTEMPTS", "MfaCodeInvalidProblem" in text((vm.get("responses") or {}).get("422") or {})
          and ext("MfaCodeInvalidProblem", "attemptsRemaining"),
          "verifyMfaChallenge's 422 does not carry attemptsRemaining")
-    need("BR-LOGIN-ATTEMPTS", "MfaCodeInvalidProblem" in text((vm.get("responses") or {}).get("401") or {}),
-         "verifyMfaChallenge's 401 does not carry attemptsRemaining (every 401 login and verifyMfaChallenge return)")
+    # Narrowed on 20 October 2026 (CHG-R8DEC-001): a missing or expired challenge session is not a wrong credential.
+    vm401 = text((vm.get("responses") or {}).get("401") or {})
+    need("BR-LOGIN-ATTEMPTS", "MfaCodeInvalidProblem" not in vm401 and "does not carry `attemptsRemaining`" in vm401,
+         "verifyMfaChallenge's 401 carries attemptsRemaining or does not say it does not (a missing or expired challenge "
+         "session is not a wrong credential, CHG-R8DEC-001)")
 
     # -------------------------------------------------------------- BR-GATE-CANCEL (ADAM CR-171; CHG-CRA-010)
     # Decided by Chinmay Parab on 19 October 2026, option B: a cancelled gate mode change records who, when and why
@@ -465,6 +481,31 @@ def main() -> int:
          "AccessGateModeChange.cancelReason is not at most 200 characters")
     need("BR-GATE-CANCEL", "left as they were" in text(op("cancelGateModeChange")[3]),
          "cancelGateModeChange does not leave the scheduler's columns untouched")
+
+    # -------------------------------------------------------------- BR-APPROVED-OUTCOME (CHG-R8DEC-002)
+    # Decided by Chinmay Parab on 20 October 2026, option A: approvals.approved_action_execution was "updated by the
+    # requesting contract as it executes" with no operation or event able to write it. One internal operation is that
+    # writer, and the contracts that apply a grant say they call it.
+    ro = op("recordApprovedActionOutcome")
+    need("BR-APPROVED-OUTCOME", ro[0] is not None and ro[0].stem == "approvals",
+         "approvals has no recordApprovedActionOutcome (the writer of an approved action's outcome)")
+    if ro[0] is not None:
+        o = ro[3]
+        need("BR-APPROVED-OUTCOME", o.get("x-ticvai-audience") == ["service"] and o.get("x-ticvai-auth") == "service"
+             and {"serviceAuth": []} in (o.get("security") or []),
+             "recordApprovedActionOutcome is not service-only (audience service, x-ticvai-auth service, serviceAuth)")
+        oc = props(ro[4], body_schema(o)).get("outcome") or {}
+        need("BR-APPROVED-OUTCOME", set(oc.get("enum") or []) == {"applied", "notApplied", "noOp"},
+             "recordApprovedActionOutcome's outcome is not applied, notApplied or noOp")
+        need("BR-APPROVED-OUTCOME", "ApprovedActionExecutionView" in text((o.get("responses") or {}).get("200") or {}),
+             "recordApprovedActionOutcome does not return the execution (ApprovedActionExecutionView)")
+    lin_ = json.loads((ROOT / "handoff" / "api-data-lineage.json").read_text(encoding="utf-8"))
+    need("BR-APPROVED-OUTCOME", "approvals.approved_action_execution"
+         in ((lin_.get("recordApprovedActionOutcome") or {}).get("writes") or []),
+         "the lineage does not have recordApprovedActionOutcome write approvals.approved_action_execution")
+    for oid in ("suspendTenant", "reactivateTenant"):
+        need("BR-APPROVED-OUTCOME", "recordApprovedActionOutcome" in text(op(oid)[3]),
+             f"{oid}'s grant consumer does not record its outcome through recordApprovedActionOutcome")
 
     # -------------------------------------------------------------- r8 second round (core lane's requests, CHG-R8GEN-013)
     # BR-APPROVAL-ROUTE (CHG-R8SPN-016): a matrix condition the engine cannot evaluate is refused when it is saved, and a
@@ -498,7 +539,8 @@ def main() -> int:
     rules = ["BR-PARSE", "BR-STREAM", "BR-PAIR-REFUSAL", "BR-SPLIT", "BR-VISIT-PLAN", "BR-PO", "BR-PAY-LINK", "BR-REPORT-RUNS",
              "BR-CONTRAST", "BR-WO-CANCEL", "BR-INCIDENT", "BR-FARE", "BR-SESSIONS-DOOR", "BR-ATTENDANCE",
              "BR-AI-CURRENCY", "BR-QR", "BR-NEW-OPS", "BR-GUEST-PII", "BR-HOST-ROUTING", "BR-CASH-RECEIPT",
-             "BR-HOLD-LAPSE", "BR-LOGIN-ATTEMPTS", "BR-GATE-CANCEL", "BR-APPROVAL-ROUTE", "BR-GUEST-SELF-403"]
+             "BR-HOLD-LAPSE", "BR-LOGIN-ATTEMPTS", "BR-GATE-CANCEL", "BR-APPROVAL-ROUTE", "BR-GUEST-SELF-403",
+             "BR-APPROVED-OUTCOME"]
     for r in rules:
         print(f"  {r:18} {len(errors.get(r, [])):3d}")
         for m in errors.get(r, [])[:12]:

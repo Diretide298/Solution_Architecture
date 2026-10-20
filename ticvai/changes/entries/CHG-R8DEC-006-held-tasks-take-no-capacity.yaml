@@ -1,0 +1,44 @@
+id: CHG-R8DEC-006
+date: '2026-10-20'
+source: plan
+kind: process
+summary: 'A task the lead holds takes no capacity in the schedule: tools/derive-block-a-schedule.py gives a task in
+  docs/active/held-tasks.yaml no start, no sprint and no owner and spends none of its owner''s days, and lists it under
+  `held` in block-a-schedule.json.'
+decision:
+  what: 'tools/derive-block-a-schedule.py: held_keys() reads docs/active/held-tasks.yaml; without_held() leaves the held
+    tasks out of the items the scheduler places; the pace is still measured on the whole plan, so a hold does not
+    re-pace the rest; the output gains `held`. A task waiting on a held one is timed as if it were not there.
+    tools/tests/test_block_a_schedule_hold.py: the file is read, a held task gets no week and its owner starts the next
+    task at once, a wait on a held task does not hold the waiting one back.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'The lead''s fix round of 20 October 2026 on the r8 decisions (CHG-R8DEC-005, concern 2): "held tasks must take no
+  capacity in the schedule ... so Sanket''s and Surendra''s products wave 1 tasks can land in Sprint 2".'
+keys_touched:
+  files:
+  - tools/derive-block-a-schedule.py
+  - tools/tests/test_block_a_schedule_hold.py
+root_class: 'new: a plan decision the release push cannot express (a hold kept only in OpenProject is reopened by the
+  next push)'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: a decision of the lead; no ADAM CR is needed (the lead, 20 October 2026)'
+triage: blocker
+prevention:
+  type: generator-rule
+  ref: tools/derive-block-a-schedule.py::without_held
+status: open
+notes: '**Where the seven products wave 1 tasks land** (build-service-docs.py and this script run in a throwaway
+  worktree of this branch, nothing committed): all in Sprint 2, on the same days with and without the holds, because
+  they were already placed in their owners'' free gaps after PRD-W1-DB. PRD-W1-DB: day 10.37 (Hrushikant Patkar);
+  PRD-W1-CATEGORIES-TAGS 10.5, PRD-W1-OWNER-FORMS 10.76, PRD-W1-SALE-PERMISSIONS 11.01 (Sanket Keluskar); PRD-W1-FRAME
+  10.5, PRD-W1-LANGUAGES 10.92, PRD-W1-SALE-PERMISSIONS-UI 11.26 (Surendra). Day 10 is Monday 19 October. What the hold
+  frees: Sanket''s and Surendra''s last day moves from 11 January 2027 (Sprint 8) to 8 January (Sprint 7); Block A''s last
+  work from 30 to 27 November. The 244 held tasks have no sprint. **Not changed:** build-service-docs.py''s own
+  scheduling, which picks owners for unowned tasks and the A1/A2 cut, still counts the held tasks; the held tasks''
+  owners are pinned, and the bundle''s sprint and assignee come from this schedule. block-a-schedule.json itself is
+  regenerated at the release refresh.'

@@ -1,0 +1,40 @@
+id: CHG-R8DEC-003
+date: '2026-10-20'
+source: audit
+kind: spec
+summary: 'The platform console''s repository, ticvai-web in the ticvai-frontend group, exists: the lead created it in
+  GitLab on 20 October 2026. Its layout is still unknown, so P09 stays an assumed mapping on the default profile.'
+decision:
+  what: 'docs/active/frontend-repos.yaml P09: `note` and `observed` say the repository was created by the lead
+    (observed by Chinmay Parab, 2026-10-20, how: his statement; reachable false and the result saying reachability
+    was not checked, because GitLab is private and the package team has no login; nothing inside it known, so the
+    profile stays the default). `assumed: true` and `confirmed: false` are kept.
+    tools/tests/test_op_release.py test_frontend_pointer_names_its_repository_never_an_apps_folder follows the
+    decision: a P09 ticket names ticvai-web, and a P10 ticket (no repository yet) says so (the lead''s fix round, 20
+    October 2026).'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'The lead''s answer of 20 October 2026 to the r8 follow-ups, item 7 "create the ticvai-web repository in GitLab":
+  "I have 6 adn 7 as well". CHG-R8SCR-007 had recorded the repository as one the lead creates, and a P09 developer was
+  told to ask the lead first while it did not exist.'
+keys_touched:
+  files:
+  - docs/active/frontend-repos.yaml
+  - tools/tests/test_op_release.py
+root_class: 'decision-not-recorded: a ticket names no repository to build in'
+tickets:
+  started: []
+  unstarted:
+  - 'The P09 frontend tickets (211 screens on ticvai-web); their text names the repository already (CHG-R8SCR-007) and
+    is regenerated at the lead''s refresh.'
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: a decision of the lead; no ADAM CR is needed (the lead, 20 October 2026)'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-frontend-repos.py
+status: open
+notes: '`reachable` stays the boolean false: tools/frontend_repos.py reads any true value as "the inside was read", so a
+  "not checked" string there would have put the default profile forward as observed. The words "not checked" are in
+  `result`.'

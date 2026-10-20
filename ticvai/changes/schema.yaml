@@ -91,3 +91,5 @@ plan_files:
   - docs/active/team.json
   - docs/active/block-a-extra-tasks.json
   - tools/sprint_plan.py
+  # the lead's holds on planned tasks: the release push sets them On hold and never reopens them (CHG-R8DEC-004)
+  - docs/active/held-tasks.yaml

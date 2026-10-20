@@ -3827,6 +3827,122 @@ paths:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /internal/approval-requests/{requestId}/action-outcome:
+    parameters:
+    - name: requestId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: recordApprovedActionOutcome
+      security:
+      - serviceAuth: []
+      x-ticvai-audience:
+      - service
+      x-ticvai-auth: service
+      x-ticvai-consumed-by: []
+      x-ticvai-agreed: '20 October 2026: the lead''s answer to the r8 decisions sheet, item 4 option A ("Yes. to all
+        decision. 1-4"; CHG-R8DEC-002)'
+      summary: Record whether an approved action was applied
+      description: '**The one write of an approved action''s outcome** (the lead, 20 October 2026, option A;
+        CHG-R8DEC-002). Approval records an authorisation and does not perform the action: the requesting contract
+        applies it when the grant arrives and reports here what happened, so `listApprovedActionExecutions` (BO-382)
+        shows whether it ran. Until this operation, `approvals.approved_action_execution` was "updated by the
+        requesting contract as it executes" with no operation or event able to write it. Called cell-internal over
+        mTLS by the requesting contract''s consumer of `approval.granted` (for example Subscription''s, for
+        `suspendTenant` and `reactivateTenant`), and again after a `retry` from BO-382 has sent the execution back
+        to `queued`. Never called by a screen.
+
+
+        **What it writes** on the execution of the approved request in the path (one per approved request), keeping
+        the `status` values the execution already has:
+
+        - `applied`: the action ran; `status` `succeeded`, `failureReason` cleared.
+
+        - `noOp`: the action was not needed, the subject being already in the state it asked for (a tenant already
+        suspended, or already `active` with nothing pending for a reactivation); `status` `succeeded`, and `note`
+        says it was applied with nothing to do, with the `reason` sent.
+
+        - `notApplied`: the subject''s state no longer allows the action (a tenant no longer `active` when a
+        suspension''s grant arrives: `tenant-not-active`); nothing was changed; `status` `failed` with
+        `failureReason` the `reason` sent, so BO-382 shows it for `investigate` or `escalate`.
+
+        Each call adds one to `attempts` and sets `lastAttemptAt` and `updatedAt`. The approval request itself is
+        never changed: approvals keeps a request immutable once approved.
+
+
+        **Refusals.** No such request, or one with no execution (`404`); an execution that is not waiting for an
+        outcome (`409 execution-not-pending`: only `queued` and `executing` take one, so a recorded outcome is
+        changed only through a `retry` on BO-382); a caller that is not the service of the execution''s
+        `sourceModule` (`403 not-source-module`); `notApplied` or `noOp` without a `reason` (`422
+        outcome-reason-required`). A retried call with the same `Idempotency-Key` answers the first result again.
+        Nothing is emitted.
+
+        '
+      tags:
+      - request
+      x-ticvai-permission: null
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApprovedActionOutcomeInput'
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: ../shared/common.yaml#/components/headers/ConsistencyToken
+          description: Outcome recorded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApprovedActionExecutionView'
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '401':
+          description: The calling workload's token is missing or invalid (`unauthenticated`).
+          x-ticvai-problem-types:
+          - unauthenticated
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '403':
+          description: The calling workload is not the service of the execution's `sourceModule` (`not-source-module`).
+          x-ticvai-problem-types:
+          - not-source-module
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          description: The execution already has its outcome and is not `queued` or `executing` (`execution-not-pending`).
+          x-ticvai-problem-types:
+          - execution-not-pending
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '422':
+          description: '`notApplied` or `noOp` sent without a `reason` (`outcome-reason-required`).'
+          x-ticvai-problem-types:
+          - outcome-reason-required
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: ../shared/common.yaml#/components/responses/TooManyRequests
   /workflow-instances/{instanceId}/actions:
     parameters:
     - name: instanceId
@@ -4275,6 +4391,11 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 components:
   securitySchemes:
+    serviceAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Cell-to-cell workload token over mTLS (common.yaml serviceAuth).
     bearerAuth:
       type: http
       scheme: bearer
@@ -4453,12 +4574,34 @@ components:
         note:
           type: string
           maxLength: 500
+    ApprovedActionOutcomeInput:
+      type: object
+      x-ticvai-persistence: none — request only (CHG-R8DEC-002)
+      description: What the requesting contract reports after applying, or not, an approved action
+        (`recordApprovedActionOutcome`; the lead, 20 October 2026, option A).
+      required:
+      - outcome
+      properties:
+        outcome:
+          type: string
+          enum:
+          - applied
+          - notApplied
+          - noOp
+          description: '`applied`: it ran (`succeeded`). `noOp`: the subject was already in the asked state
+            (`succeeded`, with a note). `notApplied`: the subject''s state no longer allows it, nothing changed
+            (`failed`).'
+        reason:
+          type: string
+          maxLength: 500
+          description: 'Required for `notApplied` and `noOp`: a problem-type style code or a short sentence, e.g.
+            `tenant-not-active`. Becomes `failureReason` (`notApplied`) or part of `note` (`noOp`).'
     ApprovedActionExecutionView:
       type: object
       x-ticvai-persistence: approvals.approved_action_execution
       description: '**One approved action and whether it ran** (decided 29 September, VM close-out). Written when
-        a request is approved and updated by the requesting contract as it executes; the approval request itself
-        stays immutable (11.1.56).'
+        a request is approved and updated by the requesting contract as it executes, through
+        `recordApprovedActionOutcome` (CHG-R8DEC-002); the approval request itself stays immutable (11.1.56).'
       required:
       - id
       - approvalRequestId
