@@ -1308,7 +1308,7 @@ changes:
       and nothing told it. It now emits wallet.creditExpired (new, consumed by the ledger), one per lot an expire or
       forfeit closes. A consumer built at r1 receives an event it did not before; no field of the request or response
       changes.'
-    approved-by: 'Chinmay, by the r8 walk fix brief of 20 October 2026 (breaking changes recorded from BC-450); to confirm at review'
+    approved-by: 'Chinmay, 20 October 2026: "1 ok, 2 keep , 3 yes" (item 1 was this change)'
     tag: r8
     operations: [expireCreditLots]
     producer-tickets: [VM-WALLET-WALLET-1]

@@ -46,4 +46,5 @@ notes: 'A plan change. The lead waived its 24-hour cooling-off on 20 October eve
   SETUP-HOSTS #27643 Ready for QA, ARCH-TESTS #27688 Ready for QA, KERNEL-ID #27689 In progress, PLATFORM-RLS #27698
   Ready for QA, KERNEL-TENANT-LIMITS #27693 New. Started tickets are not rewritten in OpenProject: they learn of it
   through the change notice. SETUP-CI #27626 and SETUP-CLIENTS #27640 (New) say "CI on GitHub Actions": that text is
-  written by tools/build-service-docs.py (lines 1440 and 1472), the migrations lane''s file, so it is not changed here.'
+  written by tools/build-service-docs.py (lines 1440 and 1472), the migrations lane''s file, so it is not changed here. PLATFORM-RLS is not a foundation ticket; the lead kept its
+  text fix under this waiver, verbatim "1 ok, 2 keep , 3 yes" (item 2 was the PLATFORM-RLS text).'
