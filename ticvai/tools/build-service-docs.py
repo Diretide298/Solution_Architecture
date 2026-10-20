@@ -1835,7 +1835,18 @@ def main() -> int:
                 "Why"], [[r[0], f"`{r[1]}`", r[3], r[4], r[5], r[6], r[7], r[9]] for r in tables_rows])
     if not_tables:
         M += ["", "## Used by the release but not a table", ""]
-        M += [f"- `{t}`: " + (ref.get("storage") or {}).get(t, "").replace("**", "")[:160] for t in not_tables]
+        # **A published read view says what it is** (CHG-R8MIG-020; R8 blocker FOUNDATION-AI-C31): the three
+        # platform.sale_board*_for_catalogue names are views DB-READ-VIEWS generates over Tenancy's sale-board tables
+        # for Catalogue's reads, so they come after MIG-PLATFORM, and their line was empty.
+        def not_table_reason(t):
+            why = (ref.get("storage") or {}).get(t, "").replace("**", "")[:160]
+            if not why and t.endswith("_for_" + t.rsplit("_for_", 1)[-1]) and "_for_" in t:
+                base_ = t.rsplit("_for_", 1)[0]
+                why = (f"a published read view over {base_} for {t.rsplit('_for_', 1)[1]}'s reads, created by "
+                       f"DB-READ-VIEWS after the migration that creates {base_} (a regenerated view set ships as a new "
+                       "forward file of CREATE OR REPLACE VIEW)")
+            return why
+        M += [f"- `{t}`: " + not_table_reason(t) for t in not_tables]
     (OUT / "backend" / "MIGRATIONS.md").write_text("\n".join(M) + "\n", encoding="utf-8")
 
     def migs_for(olist):
