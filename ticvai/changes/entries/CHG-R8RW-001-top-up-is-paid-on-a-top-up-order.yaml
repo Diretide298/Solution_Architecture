@@ -1,0 +1,48 @@
+id: CHG-R8RW-001
+date: '2026-10-20'
+source: audit
+kind: contract
+proposed: '2026-10-20T23:00'
+summary: 'topUpWallet credits only a top-up payment, and a top-up has a way to be paid. A wallet top-up is sold as the
+  venue''s catalogue product of the new ProductKind walletTopUp; createOrder sets the new server-set Order.kind
+  (sale | walletTopUp, column orders.sales_order.kind, default sale) from the lines and refuses a top-up line mixed
+  with others (422 top-up-order-mixed), so createPayment has the orderId it requires. topUpWallet reads the payment''s
+  order through orders#salesOrderRecords and refuses a payment whose order is not a walletTopUp order for this
+  wallet''s subject and amount (422 payment-not-for-top-up): a payment taken for tickets or goods can no longer be
+  credited to a wallet.'
+decision:
+  what: 'contracts/spine/catalogue.yaml ProductKind + walletTopUp; contracts/spine/orders.yaml Order.kind, createOrder
+    rule and 422 top-up-order-mixed; contracts/satellite/wallet.yaml topUpWallet x-ticvai-read-via
+    orders#salesOrderRecords, description, paymentId description, 422 payment-not-for-top-up;
+    docs/active/breaking-changes.yaml BC-460 to BC-462 (the ProductKind value in catalogue, finance and marketing-crm
+    responses).'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: the r8 re-walk of 20 October 2026, part 2 (audit/ticvai/r8-blockers/rewalk-part2.md, outside git),
+  SVC-WALLET-WALLET-2 #27817, promise-without-route: createPayment requires orderId and no order could be a top-up,
+  and the rule credited any captured payment whose amount covered the top-up, so a payment for tickets could be
+  reused as wallet credit (the security gap, fixed first).'
+keys_touched:
+  operations: [topUpWallet, createOrder]
+  files:
+  - contracts/spine/catalogue.yaml
+  - contracts/spine/orders.yaml
+  - contracts/satellite/wallet.yaml
+  - docs/active/breaking-changes.yaml
+root_class: 'a walk fix whose own text promised what no route carried (CHG-R8WFC-003)'
+tickets:
+  started: []
+  unstarted:
+  - 27817
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: r8 re-walk, a release fix'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-cross-module-reads.py
+status: open
+notes: 'Order.kind is a new response field and readOnly, so additive; ProductKind gains a response enum value, which
+  check-contract-compat counts as breaking (BC-460 to BC-462). The next refresh writes the forward migration lines:
+  catalogue.product product_kind_chk widened with walletTopUp, and orders.sales_order ADD COLUMN kind text DEFAULT
+  ''sale'' with sales_order_kind_chk (proved on PostgreSQL 16 with every migration, fresh, in rewalk-fix-report.md).'
