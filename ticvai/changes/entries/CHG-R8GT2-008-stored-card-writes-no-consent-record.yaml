@@ -1,0 +1,39 @@
+id: CHG-R8GT2-008
+date: '2026-10-20'
+source: audit
+kind: contract
+summary: 'storePaymentToken no longer writes marketing.consent_record in the lineage: since CHG-R8MIG-022 the guest''s
+  consent to a stored card is recorded first by recordConsent and storePaymentToken only reads it (through
+  marketing-crm#consentRecords). The write was a carried lineage override from before r8 whose event route the same
+  change removed, so check-cross-deployable-writes saw OrderService writing Marketing''s table with its own SQL.
+  handoff/cross-deployable-writes.md is regenerated from the routes.'
+decision:
+  what: 'handoff/api-data-lineage-overrides.json storePaymentToken: the `writes: [marketing.consent_record]` removed,
+    its reason says why. handoff/cross-deployable-writes.md: `python3 tools/check-cross-deployable-writes.py --write`
+    (no refresh step regenerates it).'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: check-cross-deployable-writes X-UNROUTED storePaymentToken and X-DOC at the r8 release rehearsal on
+  5dc6fe1f; the contract says "The paymentToken.stored event no longer creates a consent record" (CHG-R8MIG-022,
+  ORDERS-MONEY-C21).'
+keys_touched:
+  operations: [storePaymentToken]
+  tables: [marketing.consent_record]
+  files:
+  - handoff/api-data-lineage-overrides.json
+  - handoff/cross-deployable-writes.md
+root_class: 'a carried lineage override that outlived the decision it recorded'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: r8 gate, a release fix'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-cross-deployable-writes.py
+status: open
+notes: 'events/paymentToken-stored.yaml still lists the marketing consumer that records the consent, which the contract
+  says no longer happens; CHG-R8MIG-022 asked the surface lane for that edit and for a paymentToken.revoked event file.
+  Neither is on this branch.'
