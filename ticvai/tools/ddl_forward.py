@@ -375,6 +375,16 @@ def guard_drop_constraint(t: str, name: str) -> str:
             f"to_regclass('{t}')) THEN ALTER TABLE {t} DROP CONSTRAINT {name}; END IF; END $$")
 
 
+def pk_columns(t) -> set:
+    """The columns of a table's PRIMARY KEY (...) constraint: never relaxed, the key keeps them NOT NULL."""
+    out = set()
+    for c in t.constraints:
+        m = re.search(r"PRIMARY KEY\s*\(([^)]*)\)", c, re.I)
+        if m:
+            out |= {unq(x.strip()) for x in m.group(1).split(",")}
+    return out
+
+
 def only_not_null_dropped(old_def: str, new_def: str) -> bool:
     """`new_def` is `old_def` with its NOT NULL taken off and nothing else changed (not a key column)."""
     if "PRIMARY KEY" in old_def.upper() or not re.search(r"\bNOT NULL\b", old_def, re.I):
@@ -991,7 +1001,9 @@ def diff(area: str, old: Model, new: Model, renames: dict | None = None, retired
                         # a "column changed" row on the column, so the checks reading the frozen DDL see it pending
                         review("column changed", f"{t}.{c}", f"`{clause}` added NOT VALID by the forward migration",
                                f"check the rows, then ALTER TABLE {t} VALIDATE CONSTRAINT {name}")
-                    elif only_not_null_dropped(a.cols[c], d):
+                    elif only_not_null_dropped(a.cols[c], d) and c in pk_columns(b):
+                        pass   # a column the new primary key covers stays NOT NULL through the key
+                    elif only_not_null_dropped(a.cols[c], d) and c not in pk_columns(b):
                         # **A column the contract makes optional loses its NOT NULL here** (CHG-R8MIG-004, R8 blockers
                         # APPROVALS-TENANCY-C09, ORDERS-MONEY-C35, IDENTITY-C12): relaxing NOT NULL touches no row and
                         # no reader, so it is additive. Guarded like a retired column's, and folded back the same way

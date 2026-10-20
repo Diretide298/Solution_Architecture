@@ -1,0 +1,49 @@
+id: CHG-R8MIG-019
+date: '2026-10-20'
+source: audit
+kind: contract
+summary: 'A configuration profile keeps every version as its own row, keyed (id, version), so an earlier version stays
+  readable; a deployment and a workstation point at the profile row with its version; the workstation''s type is the kind
+  of its effective sale board (values proposed, client to confirm). The generator writes a key that names a version
+  (`x-ticvai-references-version`) as a two-column foreign key and leaves a column a new composite key covers NOT NULL.'
+decision:
+  what: 'R8 blocker cause APPROVALS-TENANCY-C08 (the lead''s answer A for the workstation type). contracts/spine/tenancy.yaml
+    ConfigurationProfile x-ticvai-primary-key [id, version], venueKindScope and version text; ProfileDeployment.profileId
+    and Workstation.configurationProfileId x-ticvai-references with x-ticvai-references-version;
+    Workstation.configurationProfileVersion. tools/derive-ddl.py composite version keys; tools/ddl_forward.py pk_columns.
+    The primary-key change on the existing table is a review row on the migration ticket that creates the table
+    (handoff/migration-review.md, CHG-R8MIG-013); the generated forward files only add what is safe (the column, the
+    indexes, a guarded key that waits for the new unique key).'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: R8 blocker cause list (r8b-storage-core), group approvals-tenancy; tickets 27797, 27800 and 27801:
+  platform.configuration_profile was keyed on id alone, so a new version overwrote the old and "the old one stays
+  readable" could not hold.'
+keys_touched:
+  operations: [setConfigurationProfile, getConfigurationProfile, listConfigurationProfiles, deployConfigurationProfile]
+  schemas: [ConfigurationProfile, ProfileDeployment, Workstation]
+  tables:
+  - platform.configuration_profile
+  - platform.profile_deployment
+  - platform.workstation
+  files:
+  - contracts/spine/tenancy.yaml
+  - tools/derive-ddl.py
+  - tools/ddl_forward.py
+  - tools/tests/test_migration_generator.py
+root_class: 'storage gap: an operation promises a key, column or policy its table does not have'
+tickets:
+  started: []
+  unstarted:
+  - '27797 (VM-MIG-PLATFORM), 27800, 27801.'
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: R8 blocker walk (r8b-storage-core causes)'
+triage: blocker
+prevention:
+  type: generator-rule
+  ref: tools/derive-ddl.py::x-ticvai-references-version
+status: open
+notes: 'Applied on PostgreSQL 16 (generated files, twice). The same marks serve the storage-sat lane''s request 8 (control.plan
+  keyed (id, version)): Plan x-ticvai-primary-key [id, version] and x-ticvai-references-version planVersion on each
+  reference, in contracts/satellite/subscription.yaml.'

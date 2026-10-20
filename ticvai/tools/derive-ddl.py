@@ -2328,7 +2328,26 @@ def main() -> int:
                 if ref and ref in real:
                     tgt_s, tgt_t = ref.split(".", 1)
                     tgt_key = key_of(ref, cols)
-                    if c.get("enforced") == "yes" and tgt_key:
+                    # **A key into a versioned row names its version too** (CHG-R8MIG-019; R8 blocker
+                    # APPROVALS-TENANCY-C08): `x-ticvai-references-version: <sibling property>` on a reference whose
+                    # parent's declared key is (id, version) makes the key (col, version col) -> parent (id, version).
+                    vprop = (contract_props.get(str(c.get("source") or "")) or {}).get("x-ticvai-references-version")
+                    vcol = next((x["column"] for x in cols[t]
+                                 if str(x.get("source") or "").rsplit(".", 1)[-1] == str(vprop)), None) if vprop else None
+                    ppk = DECLARED_PK.get(ref) or []
+                    if (c.get("enforced") == "yes" and vcol and len(ppk) == 2
+                            and area(schema) == area(tgt_s)):
+                        fk_lines.append((schema,
+                            f"ALTER TABLE {q(schema)}.{q(short)} ADD CONSTRAINT "
+                            f"{obj_name(short, col, suffix='fkey')} FOREIGN KEY ({q(col)}, {q(vcol)}) "
+                            f"REFERENCES {q(tgt_s)}.{q(tgt_t)}({q(ppk[0])}, {q(ppk[1])});"))
+                        n_fk += 1
+                        idx_lines.append((schema,
+                            f"-- declared, with its version: {t}.({col}, {vcol}) -> {ref}\n"
+                            f"CREATE INDEX IF NOT EXISTS {obj_name(short, col, vcol, suffix='idx')} "
+                            f"ON {q(schema)}.{q(short)} ({q(col)}, {q(vcol)});"))
+                        n_idx += 1
+                    elif c.get("enforced") == "yes" and tgt_key:
                         stmt = (f"ALTER TABLE {q(schema)}.{q(short)} ADD CONSTRAINT "
                                 f"{obj_name(short, col, suffix='fkey')} FOREIGN KEY ({q(col)}) "
                                 f"REFERENCES {q(tgt_s)}.{q(tgt_t)}({q(tgt_key)});")

@@ -714,3 +714,16 @@ def test_a_narrowed_check_is_written_not_valid_too():
     p = fwd.diff("tenant", model(CB_NEW), model(narrow))
     assert [s for s in p.statements if "ADD CONSTRAINT customer_badge_status_chk" in s and "'revoked'" not in s]
     assert [r for r in p.review if r[0] == "column changed" and "VALIDATE CONSTRAINT" in r[3]]
+
+
+CP_OLD = ("CREATE TABLE IF NOT EXISTS platform.configuration_profile (id uuid PRIMARY KEY NOT NULL, "
+          "version integer NOT NULL);\n")
+CP_NEW = ("CREATE TABLE IF NOT EXISTS platform.configuration_profile (id uuid NOT NULL, version integer NOT NULL, "
+          "CONSTRAINT configuration_profile_pkey PRIMARY KEY (id, version));\n")
+
+
+def test_a_column_a_new_composite_key_covers_is_not_relaxed():
+    p = fwd.diff("tenant", model(CP_OLD), model(CP_NEW))
+    assert not [s for s in p.statements if "DROP NOT NULL" in s], p.statements
+    assert not [r for r in p.review if r[1] == "platform.configuration_profile.version"], p.review
+    assert [r for r in p.review if r[0] == "constraint added" and "PRIMARY KEY (id, version)" in r[2]]
