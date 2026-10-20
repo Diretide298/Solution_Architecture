@@ -1,0 +1,41 @@
+id: CHG-R8INT-025
+date: '2026-10-20'
+source: plan
+kind: plan
+proposed: '2026-10-20T13:50'
+summary: 'PRD-W1-SALE-PERMISSIONS-UI no longer lists in `builds` the five operations it calls: four are built (claimed
+  in `operations`) by PRD-W1-SALE-PERMISSIONS and getSessionVenue by PRD-W1-FRAME, so the derived plan counted each as
+  built twice (check-plan-closure C-DECIDED "also built by"). Its `builds` is empty and `linksNothingBecause` says why
+  (a held back-office UI built from the products wireframe; its text names the operations and the screens). The task''s
+  work, owner, points and waits are unchanged.'
+decision:
+  what: 'docs/active/block-a-extra-tasks.json PRD-W1-SALE-PERMISSIONS-UI: `builds` [] (were operation
+    getProductSalePermissionRules, setProductSalePermissionRules, checkProductSalePermission, listSalePermissionTargets,
+    getSessionVenue) and `linksNothingBecause`.'
+  by: Chinmay
+  date: '2026-10-21T14:00'
+why: 'Finding: the integration pass report (audit/ticvai/r8-blockers/integration-pass-report.md, left 3) and check-plan-closure
+  C-DECIDED on products wave 1. The plan has no field for operations a task calls but does not build: CHG-R8PRD-008 keeps
+  an existing operation a task uses in `builds` ("existing operations a task also uses and the tables stay in
+  `builds`"), and an operation in `builds` is read as built (check-plan-closure built(), the "Builds:" lead). That is
+  harmless for an operation no hand-written task claims, and a double build for one another task claims in its
+  `operations`.'
+keys_touched:
+  tickets: [PRD-W1-SALE-PERMISSIONS-UI]
+  files:
+  - docs/active/block-a-extra-tasks.json
+root_class: 'a hand-written task listing as built the operations another task claims'
+tickets:
+  started: []
+  unstarted: [PRD-W1-SALE-PERMISSIONS-UI]
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none yet: products module wave 1 (with CHG-R8PRD-008)'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-plan-closure.py
+status: open
+notes: 'Part of the products wave 1 cut of CHG-R8PRD-008, whose cooling-off the lead waived on 20 October ("Yes. to all
+  decision. 1-4", for the seven tasks). This correction was proposed after that answer, so it does not borrow the
+  waiver: the decision date is the earliest the 24 hours allow, and the lead sets it (or waives it) at the tag.'
