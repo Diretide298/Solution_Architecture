@@ -1,0 +1,39 @@
+id: CHG-R8RW-005
+date: '2026-10-20'
+source: audit
+kind: contract
+proposed: '2026-10-20T23:55'
+summary: 'Every seeded KPI of getKpiValues has a real source: grossSales and discounts read orders.order_line_discount
+  through orders#orderLineDiscountRecords; noShowRate reads fnb.table_reservation and waitQuoteAccuracy
+  fnb.waitlist_entry (not the non-existent fnb.restaurant_waitlist) through two new fnb queries; deferredRevenue is
+  finance getDeferredRevenue, declared in x-ticvai-calls; the default period''s businessDayCutoff is read through
+  tenancy#venueSettingsRecords. waitQuoteAccuracy is judged at the ready call (notified_at), since the entry keeps no
+  seated time.'
+decision:
+  what: 'contracts/satellite/reporting.yaml getKpiValues x-ticvai-read-via, x-ticvai-calls, description,
+    ReportingSystemKpi rows; contracts/satellite/fnb.yaml x-ticvai-queries tableReservationRecords and
+    waitlistEntryRecords.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: the r8 re-walk of 20 October 2026, part 2 (audit/ticvai/r8-blockers/rewalk-part2.md, outside git),
+  VM-REPORTING-REPORTING-1 #28786, lineage-omits-tables: noShowRate, waitQuoteAccuracy, discounts, grossSales,
+  deferredRevenue and the business-day default had no route.'
+keys_touched:
+  operations: [getKpiValues]
+  files:
+  - contracts/satellite/reporting.yaml
+  - contracts/satellite/fnb.yaml
+root_class: 'a walk fix that routed some of an operation''s sources and not all (CHG-R8WFC-004)'
+tickets:
+  started: []
+  unstarted:
+  - 28786
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: r8 re-walk, a release fix'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-cross-module-reads.py
+status: open
+notes: 'Declared queries and descriptions only: no schema, column or response shape changes.'
