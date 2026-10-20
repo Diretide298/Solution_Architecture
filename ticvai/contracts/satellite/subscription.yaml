@@ -17050,6 +17050,11 @@ components:
           nullable: true
     TenantDetail:
       x-ticvai-persistence: control.tenant
+      # On TenantDetail as well as Tenant: control.tenant's columns are named from TenantDetail, and derive-ddl reads
+      # the table's marks from that schema (r8 gate residue, CHG-R8RES-006).
+      x-ticvai-required-when:
+        planVersion: {planId: {not: null}}
+        planId: {planVersion: {not: null}}
       allOf:
       - $ref: '#/components/schemas/Tenant'
       - type: object

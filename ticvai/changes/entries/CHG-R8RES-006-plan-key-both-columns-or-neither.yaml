@@ -10,8 +10,9 @@ summary: 'The plan version key is both columns or neither. derive-schema''s rule
   derive-ddl writes as a CHECK).'
 decision:
   what: 'contracts/satellite/subscription.yaml: Plan `x-ticvai-version-key: version`; SubscriptionTierAllowance and
-    SubscriptionTierModule `required` gains planVersion; Tenant `x-ticvai-required-when` {planVersion: {planId: {not:
-    null}}, planId: {planVersion: {not: null}}}. tools/derive-schema.py: the version rule needs the marker and the
+    SubscriptionTierModule `required` gains planVersion; Tenant and TenantDetail (whose properties name
+    control.tenant''s columns, so derive-ddl reads the table''s marks from it) `x-ticvai-required-when` {planVersion:
+    {planId: {not: null}}, planId: {planVersion: {not: null}}}. tools/derive-schema.py: the version rule needs the marker and the
     parent''s own table, and prints an unmarked [id, x] parent with derived children. tools/derive-ddl.py:
     x-ticvai-required-when takes {not: null} (required where the other column is set).'
   by: Chinmay
@@ -21,7 +22,7 @@ why: 'Finding: merge-intpass report concerns 2 and 3 (CHG-R8INT-023, commit 8653
   version leaves a two-column foreign key unchecked (MATCH SIMPLE). planVersion is new in r8, so requiring it breaks no
   released contract.'
 keys_touched:
-  schemas: [Plan, SubscriptionTierAllowance, SubscriptionTierModule, Tenant]
+  schemas: [Plan, SubscriptionTierAllowance, SubscriptionTierModule, Tenant, TenantDetail]
   tables: [control.plan, control.plan_module, control.plan_limit, control.tier_allowance, control.tier_module, control.tenant]
   files:
   - contracts/satellite/subscription.yaml
