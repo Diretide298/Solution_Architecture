@@ -10,7 +10,7 @@ summary: 'The last of the refresh rehearsal''s contract findings this pass can c
   publishContentBlock''s lineage writes the approval request its route names.'
 decision:
   what: 'contracts/satellite/subscription.yaml (two 409 texts), contracts/spine/shift.yaml (reopenShift 409 text,
-    AllocateDepositBoxRequest.overDrawerLimit readOnly), contracts/shared/common.yaml and
+    CreateDepositBoxRequest.overDrawerLimit readOnly), contracts/shared/common.yaml and
     contracts/satellite/white-label.yaml (ModuleKey notes), contracts/satellite/retail.yaml (reserveMerchandise
     x-ticvai-calls instead of x-ticvai-write-via), handoff/api-data-lineage-overrides.json (publishContentBlock writes
     approvals.request), handoff/api-data-lineage.json re-derived, handoff/cross-deployable-writes.md rewritten by
@@ -25,7 +25,7 @@ why: 'The coordinator''s addendum to the r8 integration brief (20 October 2026):
 keys_touched:
   operations: [suspendTenant, reactivateTenant, reopenShift, allocateDepositBox, reserveMerchandise,
     publishContentBlock, setModuleEnablement]
-  schemas: [ModuleKey, AllocateDepositBoxRequest]
+  schemas: [ModuleKey, CreateDepositBoxRequest]
   files:
   - contracts/satellite/retail.yaml
   - handoff/api-data-lineage-overrides.json
