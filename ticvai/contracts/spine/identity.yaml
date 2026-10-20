@@ -7247,6 +7247,151 @@ paths:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: ../shared/common.yaml#/components/responses/TooManyRequests
+  /auth/session/venue:
+    get:
+      operationId: getSessionVenue
+      x-ticvai-consumed-by: []
+      x-ticvai-read-via:
+      - query: tenancy#activeVenues
+        route: service
+        for: 'the names of the venues the session may act at, and that each is active: platform.scope, Tenancy''s data'
+      x-ticvai-self-service: true
+      x-ticvai-audience:
+      - staff
+      tags:
+      - identity
+      x-ticvai-read-routing: primary
+      security:
+      - bearerAuth: []
+      x-ticvai-self-scoped: principal
+      x-ticvai-permission: null
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      summary: Which venue this back-office session is working in, and which it may switch to
+      description: >-
+        **The back office shows which venue you are in** (16 October 2026 minutes, 4.8: Allam noted there is nowhere
+        on screen to see which venue the user is working in; CHG-R8PRD-006). This is the session's **working venue**:
+        the venue the back office shows and works in.
+
+        **Where it comes from.** A till or handheld session acts at its workstation's venue; a session whose
+        selected role is granted at one venue works in that venue; both are fixed (`fixedBy`). A session whose grants reach several venues, such as one administrator for
+        every venue of the tenant (4.8: both models must be supported), acts at the venue last chosen with
+        `setSessionVenue`, or at none until one is chosen; `availableVenues` lists the venues it may choose,
+        those of `Session.scope` at venue level and every active venue under a wider scope node, in name order.
+
+        **Which operations use it** (CHG-R8PRD-010, CHG-R8PRD-011): exactly seven, each by its own text, as the venue they act at when
+        no `venueId` is sent: catalogue `listProductTags`, `setProductTagDefinition`, `listProductCategoryUsage`,
+        `listOwnerFormCandidates`, `listSalePermissionTargets`, `getProductDashboard` and `listProductAttentionItems`.
+        Every other operation resolves the caller's venue as before; the back office sends the working venue as their
+        `venueId` where they take one. How it reaches those seven is said once, in `setSessionVenue`.
+        It is kept in a column of its own (`identity.session.working_venue_id`), not in `venue_id`, so
+        `ActiveSession.venueId` and what `listActiveSessions` and `forceLogout` reach keep their meaning.
+
+        A session that is not yet usable answers `409 session-pending`, as `getCurrentSession` does.
+      responses:
+        '200':
+          description: The session's venue
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionVenue'
+        '401':
+          $ref: ../shared/common.yaml#/components/responses/Unauthorized
+        '409':
+          description: The session is pending (`session-pending`); `pending` names the steps left.
+          x-ticvai-problem-types:
+          - session-pending
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/SessionPendingProblem'
+        '429':
+          $ref: ../shared/common.yaml#/components/responses/TooManyRequests
+    put:
+      operationId: setSessionVenue
+      x-ticvai-consumed-by: []
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per session, the caller''s own: a PUT replaces it. There is no key in the path.'
+      x-ticvai-read-via:
+      - query: tenancy#activeVenues
+        route: service
+        for: 'the chosen venue must be an active venue the session''s grants reach: platform.scope, Tenancy''s data'
+      x-ticvai-self-service: true
+      x-ticvai-audience:
+      - staff
+      tags:
+      - identity
+      security:
+      - bearerAuth: []
+      x-ticvai-self-scoped: principal
+      x-ticvai-permission: null
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      summary: Switch the back-office session to another venue it may act at
+      description: >-
+        **The venue switcher of the back office's top bar** (CHG-R8PRD-006). Sets the session's working venue, kept
+        on the session (`identity.session.working_venue_id`) until it ends or is switched again. It changes no grant: what the
+        caller may do at the new venue is what `Session.permissionsByScope` already says for it, so the back office
+        filters its navigation again after the switch.
+
+        **How it travels: with the caller's session, as the session's scope does** (ADR-0004; permission-resolution R7;
+        `bearerAuth`). The access token carries `sid`, and every service validates that `sid` per request against the
+        session registry, the cache in front of `identity.session` that already carries the session's resolved scope
+        and workstation. This operation writes the new working venue to the session row and to its registry entry in
+        one step, so the very next request made with the same token carries it; no token is reissued. A service that
+        falls back to it (the seven operations `getSessionVenue` lists) reads it from the caller's validated session,
+        as it reads the caller's scope, never from `identity.session` through a query. **Sign-in writes it too**
+        (CHG-R8PRD-012): when the session has exactly one venue, fixed by its workstation or the only venue its grants
+        reach, sign-in (and role selection) writes that venue into `working_venue_id` and the registry entry, so a
+        session that cannot call this operation (`409 venue-fixed`) still carries its venue.
+
+        **Refused** when the venue is not one of `availableVenues`, that is not an active venue the session's grants
+        reach (`403 venue-not-in-grants`), when the session's venue is fixed by its workstation or its role
+        (`409 venue-fixed`), and while the session is pending (`409 session-pending`). **Audited:** a switch changes
+        the security context the screens show, so it writes one entry to the security audit log that `listAuditRecords`
+        reads (the session, the venue before and after).
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SetSessionVenueRequest'
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Switched
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionVenue'
+        '401':
+          $ref: ../shared/common.yaml#/components/responses/Unauthorized
+        '403':
+          description: The venue is not one the session's grants reach, or not active (`venue-not-in-grants`).
+          x-ticvai-problem-types:
+          - venue-not-in-grants
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '409':
+          description: The session's venue is fixed by its workstation or its role (`venue-fixed`), or the session is
+            pending (`session-pending`).
+          x-ticvai-problem-types:
+          - venue-fixed
+          - session-pending
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: ../shared/common.yaml#/components/responses/TooManyRequests
 components:
   securitySchemes:
     bearerAuth:
@@ -11129,3 +11274,59 @@ components:
             many digits; the device keeps it with the workstation context of the last session on it, so the door
             needs nothing fetched before sign-in. A device that has never had a session accepts 4 to 8 digits and the
             server decides. Read from `identity.password_policy`, not stored on the workstation.'
+    SessionVenue:
+      type: object
+      x-ticvai-persistence: identity.session
+      description: >-
+        **The venue a staff session acts at, and the venues it may switch to** (16 October 2026 minutes, 4.8,
+        CHG-R8PRD-006, CHG-R8PRD-009). Stored in one column of the session record of its own, `working_venue_id`;
+        the rest is resolved on read.
+      required:
+      - workingVenueId
+      - fixedBy
+      - availableVenues
+      properties:
+        workingVenueId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          x-ticvai-column: working_venue_id
+          description: The session's working venue; null while a session that may choose has not chosen. Set by `setSessionVenue`, or written at sign-in and role selection when the session has exactly one venue (its workstation's, or the only venue its grants reach). Its own column, `working_venue_id`; `venue_id`, which `ActiveSession.venueId` reads, is not touched.
+        venue:
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/ScopeRef
+          nullable: true
+          readOnly: true
+          x-ticvai-persisted: false
+          x-ticvai-derived: onRead
+          description: '`workingVenueId` as a scope node, with its name, for the top bar.'
+        fixedBy:
+          type: string
+          readOnly: true
+          x-ticvai-persisted: false
+          x-ticvai-derived: onRead
+          enum:
+          - workstation
+          - role
+          - none
+          description: '`workstation` or `role` when the venue cannot be switched (see `getSessionVenue`); `none` when it can.'
+        availableVenues:
+          type: array
+          readOnly: true
+          x-ticvai-persisted: false
+          x-ticvai-derived: onRead
+          description: The active venues the session may act at, in name order; one entry when the venue is fixed.
+          items:
+            $ref: ../shared/common.yaml#/components/schemas/ScopeRef
+    SetSessionVenueRequest:
+      type: object
+      x-ticvai-persistence: none — request body of setSessionVenue
+      description: The venue to switch to (CHG-R8PRD-006).
+      required:
+      - venueId
+      properties:
+        venueId:
+          type: string
+          format: uuid
+          description: One of `SessionVenue.availableVenues`.

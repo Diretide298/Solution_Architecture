@@ -1,0 +1,50 @@
+id: CHG-R8PRD-006
+date: '2026-10-20'
+source: mom
+kind: contract
+summary: 'The back-office frame of the products module: a staff session says which venue it works in and switches
+  among the venues its grants reach (getSessionVenue, setSessionVenue), and the products dashboard reads its counts by
+  lifecycle state and by type (getProductDashboard) and its needs-attention list (listProductAttentionItems). The
+  "All products" list with a type filter already exists (listProductLifecycle productType and lifecycleState,
+  listProducts kind). Additive.'
+decision:
+  what: 'contracts/spine/identity.yaml, appended: GET and PUT /auth/session/venue (self-scoped, singleton; 403
+    venue-not-in-scope, 409 venue-fixed, session-pending; read-via tenancy#activeVenues), schemas SessionVenue (one
+    column of identity.session) and SetSessionVenueRequest. contracts/spine/catalogue.yaml, appended: GET
+    /product-dashboard getProductDashboard, GET /product-dashboard/attention listProductAttentionItems (paged; order
+    severity, since, productId); schemas ProductDashboard, ProductAttentionReason, ProductAttentionItem. The tiles map
+    Active to live, Draft to draft, Pending approval to inReview, Approved to approved.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Minutes of 16 October 2026 (sources/mom/TICVAI_MoM_2026-10-16_TicketingConfig_Wireframes_Plan.md), 4.1: the first
+  screen is a dashboard of active, draft, pending-approval and approved products with a needs-attention list; 4.2:
+  "All products" with a filter by type; 4.8: Allam "noted there is nowhere on screen to see which venue the user is
+  working in", and one admin for all venues must be supported. Contracts speak of "the venue the caller acts at", but a session whose grants reach several venues
+  had no way to say or choose its venue, and no read returned the dashboard counts (listProductGovernance counts
+  governance items, not lifecycle states).'
+keys_touched:
+  operations: [getSessionVenue, setSessionVenue, getProductDashboard, listProductAttentionItems]
+  schemas: [SessionVenue, SetSessionVenueRequest, ProductDashboard, ProductAttentionReason, ProductAttentionItem]
+  tables: [identity.session, catalogue.product]
+  files:
+  - contracts/spine/identity.yaml
+  - contracts/spine/catalogue.yaml
+root_class: 'new: mom-decision-without-contract (a client decision with no operation or storage behind it)'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+client_signoff: pending
+decision_owner: Chinmay
+adam_cr: 'none yet: products module wave 1, 20 October 2026; the lead raises the ADAM CR with the batch'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-contract-shapes.py
+status: open
+notes: 'Batch R8PRD. Additive only. The six ticket types of the minutes map onto ProductKind for the type filter
+  (open dated openDated, dated datedAdmission, time slot timedAdmission, pass and membership membership, voucher
+  giftCard, add-on addOn); narrowing ProductKind itself is wave 2 and breaking. A "group products" filter has no
+  parameter yet (listProductLifecycle would need one: existing text, a CR). check-cross-module-reads reports the two
+  dashboard reads as naming access.entitlement: the phrase is in the ProductKind description they reference, as for
+  listProductApprovalWorkflows already. Corrected by CHG-R8PRD-009 (review I5, I7): the session''s working venue has its own column (working_venue_id) and changes no other operation; the attention reasons reuse the lifecycle view''s codes and claim no blocking. An earlier citation of CHG-FXS-003 in the why was removed: it decided nothing about a role''s venue.'

@@ -1,0 +1,87 @@
+id: CHG-R8PRD-009
+date: '2026-10-20'
+source: audit
+kind: contract
+summary: 'The fix round of the products wave 1 contract review: sale permissions resolve deny-overrides-allow as the
+  package''s permission rule does, are governed and audited as product changes and refuse a self-grant; the
+  reservation-owner and ticket-owner capture reuses Marketing''s forms (no second form engine) with each owner''s answers
+  in a form submission of their own; product texts are keyed by the tenant''s languages (no venue language list);
+  classification versions the product; every new write says what it audits; the table keys are declared; the session''s
+  working venue has its own column; glossary names on the wire. Additive to the r8 integration head.'
+decision:
+  what: 'contracts/spine/catalogue.yaml (its wave 1 additions rewritten, still only appended to the file):
+    ProductSalePermissionRuleSet states the evaluation once (collect the matching rules; any DENY denies; else any
+    ALLOW allows; else denied; no rules sells as before) with an example; setProductSalePermissionRules versioned as
+    updateProduct and effective on an approved or live product only once that version is approved and published,
+    refuses an ALLOW naming the caller (403 sale-permission-self-grant), a DENY with no ALLOW (400 no-allow-rule) and an
+    archived product, and accepts exactly the targets listSalePermissionTargets offers; SalePermissionLevel values
+    global, venue, salesChannel, workstation, role, principal; read-via on the GET and the identity grant query;
+    checkProductSalePermission needs PRODUCT_CONFIGURE. Field sets (listFieldSets, getFieldSet, setFieldSetDefinition,
+    getProductOwnerFieldSets, setProductOwnerFieldSets; catalogue.field_set, field_set_field, product_owner_field_set)
+    are removed before any migration and replaced by getProductOwnerForms, setProductOwnerForms and
+    listOwnerFormCandidates over Marketing FormDefinition (kind dataCapture or registration; catalogue.product_owner_form,
+    unique per product and appliesTo). getCatalogueLanguageSettings and setCatalogueLanguageSettings
+    (catalogue.catalogue_language_setting) are removed; channel texts are keyed by the tenant''s enabled languages
+    (white-label#tenantLanguageRecords) as LocalisedText with per-language limits. setProductClassification, the channel
+    texts and the owner forms are versioned as updateProduct and refuse an archived product; every new write names its
+    catalogue.audit_entry category (classification, tags, channelTexts, ownerForms, salePermissions) and setSessionVenue
+    its security audit entry. Tag codes are unique in the tenant, as category codes are, and fixed while a product or a
+    Help me choose answer carries them; the usage read counts archived products. The attention reasons reuse the
+    lifecycle view''s issue codes, whose meaning governs, and claim no blocking (severity readiness or notice).
+    Keys declared: x-ticvai-unique-together on ProductChannelTexts, ProductOwnerForm, ProductSalePermissionRule (nulls
+    not distinct), x-ticvai-required-when on targetId, x-ticvai-references to catalogue.product.
+    contracts/spine/identity.yaml: SessionVenue.workingVenueId in identity.session.working_venue_id, so venue_id and
+    ActiveSession.venueId keep their meaning; no rule for other operations; 403 venue-not-in-grants.
+    contracts/satellite/marketing-crm.yaml, appended: query formDefinitionRecords, FormField.presentation (dropDown,
+    radio, checkBoxes), FormSubmission.saleContext (orderId, ownerRole, orderLineId, unitIndex).
+    contracts/satellite/white-label.yaml, appended: query tenantLanguageRecords.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'The products wave 1 contract review of 20 October 2026 (verdict: fix first; C1, C2, I1 to I10, M1 to M12) and the
+  coordinator''s rulings on it. C1: permissions.yaml resolves deny-overrides-allow with default deny, and an identity
+  DENY is never overridden by a more specific ALLOW; the rule set gave ALLOW/DENY the opposite meaning. C2: Marketing''s
+  FormDefinition is the package''s one form mechanism (the glossary''s Form and Data Mask: "Three implementations would
+  drift"), with personal-data marking and version binding the field sets lacked. I1: white-label setLanguages already
+  makes the tenant''s languages configurable (CHG-CSA-039), and the minutes (sources/mom/
+  TICVAI_MoM_2026-10-16_TicketingConfig_Wireframes_Plan.md, 4.9) ask for languages the admin chooses, not a list per
+  venue. I2: promotions target categories, so a re-file changes what a guest pays, and bulkUpdateCatalogueProducts
+  already versions it. I7: identity.session.venue_id is what listActiveSessions and forceLogout read.'
+keys_touched:
+  operations: [getProductSalePermissionRules, setProductSalePermissionRules, checkProductSalePermission,
+    listSalePermissionTargets, getProductOwnerForms, setProductOwnerForms, listOwnerFormCandidates, getProductChannelTexts,
+    setProductChannelTexts, setProductClassification, setProductTagDefinition, listProductCategoryUsage,
+    getProductDashboard, listProductAttentionItems, getSessionVenue, setSessionVenue, listFieldSets, getFieldSet,
+    setFieldSetDefinition, getProductOwnerFieldSets, setProductOwnerFieldSets, getCatalogueLanguageSettings,
+    setCatalogueLanguageSettings]
+  schemas: [ProductSalePermissionRuleSet, ProductSalePermissionRule, SalePermissionLevel, ProductOwnerForm,
+    ProductOwnerFormSet, OwnerFormCandidate, ProductChannelTexts, ProductTag, ProductCategoryUsage,
+    ProductAttentionReason, ProductAttentionItem, SessionVenue, FormField, FormSubmission]
+  tables: [catalogue.product_sale_permission, catalogue.product_owner_form, catalogue.product_channel_text,
+    catalogue.product_tag, identity.session]
+  files:
+  - contracts/spine/catalogue.yaml
+  - contracts/spine/identity.yaml
+  - contracts/satellite/marketing-crm.yaml
+  - contracts/satellite/white-label.yaml
+root_class: 'new: mom-decision-without-contract (a client decision with no operation or storage behind it)'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none yet: products module wave 1, 20 October 2026; the lead raises the ADAM CR with the batch'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-contract-shapes.py
+status: open
+notes: 'Batch R8PRD. Open for Allam (products review call): whether a specific ALLOW should ever override a wider DENY
+  (not built), and which lifecycle state the dashboard''s Approved tile counts. Change requests left to other owners:
+  the configurationArea enum of ProductAuditTrailChangeHistoryView gains the five categories; the sale path asks the
+  owner forms and writes the submissions with saleContext (orders); MarketingService builds FormField.presentation and
+  FormSubmission.saleContext; variantsSellableAt and the till bundle apply the sale permissions; a transition that
+  enforces the readiness reasons, if wanted. Not fixed, with why: M9 (If-Match on the whole-set PUTs: their neighbours
+  omit it too, a package-wide choice); M12 (no screen binds the new operations until Pallavi''s revision lands, and the
+  per-product PUTs other than setProductSalePermissionRules carry no config scope because the config-scope rule does not
+  reach their names; that one keeps it because the rule reaches "Rule"). The approval gate on who-can-sell changes
+  written here is removed by CHG-R8PRD-010: its premise was wrong.'

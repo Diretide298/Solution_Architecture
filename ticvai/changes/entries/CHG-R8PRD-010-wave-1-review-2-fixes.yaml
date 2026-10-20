@@ -1,0 +1,63 @@
+id: CHG-R8PRD-010
+date: '2026-10-20'
+source: audit
+kind: contract
+summary: 'The second fix round of the products wave 1 review: a who-can-sell change takes effect at once, as updateProduct
+  does (no approval gate the package cannot build); every venue-scoped wave 1 read and write takes the venue the
+  package''s way (venueId, else the working venue, else venue-required; venue-not-in-grants); tag codes are unique per
+  venue and the seeding maps every stored value to one tag; a form submission''s sale context is written only by the
+  Orders service through a new service operation, one per owner slot. Additive to the r8 integration head.'
+decision:
+  what: 'contracts/spine/catalogue.yaml (its wave 1 additions): setProductSalePermissionRules takes effect at once in
+    every state but archived, versioned and audited, the self-grant refusal kept, the approval gate removed and left as
+    an open question for the client; it refuses a global DENY (400 global-deny) and re-checks only new or changed rules.
+    listProductTags, setProductTagDefinition, listProductCategoryUsage, listOwnerFormCandidates,
+    listSalePermissionTargets, getProductDashboard and listProductAttentionItems take an optional venueId, else the
+    session''s working venue, else 400 venue-required, and refuse a venue outside the caller''s grants with 403
+    venue-not-in-grants; listSalePermissionTargets takes productId and lists that product''s venue, as the save checks.
+    ProductTag.code unique per venue (x-ticvai-unique: venue, lower case); setProductClassification states that the
+    wave 1 migration maps every stored segmentTags value to exactly one tag. Owner forms are asked through their
+    catalogue link only, not FormDefinition.appliesToProductIds. Channel texts read the tenant''s published languages.
+    contracts/satellite/marketing-crm.yaml (its wave 1 additions): FormSubmission.saleContext read-only, written only by
+    recordSaleOwnerAnswers (POST /internal/sale-owner-answers, serviceAuth, called by the Orders service; 409
+    owner-answers-already-recorded), stored in marketing.form_submission_sale_link, unique per (orderId, ownerRole,
+    orderLineId, unitIndex) with nulls not distinct; FormField.presentation stores null where it does not fit.
+    contracts/satellite/white-label.yaml (its addition): tenantLanguageRecords reads the current published
+    configuration version, not the working draft.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'The second review of the products wave 1 contracts, 20 October 2026 (verdict: fix first; N1 to N4, m1 to m9), and the
+  coordinator''s rulings on it. N1: updateProduct applies at once in every state and no operation approves a change to a
+  live product, so the gate CHG-R8PRD-009 promised could not be built. N2: the minutes'' one administrator for all venues
+  (sources/mom/TICVAI_MoM_2026-10-16_TicketingConfig_Wireframes_Plan.md, 4.8) is a session with no single venue, and
+  five of the new operations took none. N3: tenant-unique codes made the per-venue seeding collide. N4: saleContext on
+  the guest-callable submitForm body let any guest claim an owner slot of any order.'
+keys_touched:
+  operations: [setProductSalePermissionRules, listSalePermissionTargets, listProductTags, setProductTagDefinition,
+    listProductCategoryUsage, listOwnerFormCandidates, getProductDashboard, listProductAttentionItems,
+    setProductClassification, getProductOwnerForms, getProductChannelTexts, setProductChannelTexts,
+    recordSaleOwnerAnswers, submitForm]
+  schemas: [ProductTag, FormSubmission, FormField, SaleOwnerAnswers, FormSubmissionSaleLink]
+  tables: [catalogue.product_tag, marketing.form_submission_sale_link]
+  files:
+  - contracts/spine/catalogue.yaml
+  - contracts/satellite/marketing-crm.yaml
+  - contracts/satellite/white-label.yaml
+root_class: 'new: mom-decision-without-contract (a client decision with no operation or storage behind it)'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none yet: products module wave 1, 20 October 2026; the lead raises the ADAM CR with the batch'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-contract-shapes.py
+status: open
+notes: 'Batch R8PRD. CHG-R8PRD-009 said who-can-sell changes are approved like other product changes; that premise was
+  wrong (the coordinator''s ruling of 20 October corrects it), and this entry removes the claim. Open for Allam: should a
+  who-can-sell change on a live product need approval (not built). The working venue now resolves the venue of these
+  seven operations by their own text, not by a rule for other operations. submitForm itself is unchanged: saleContext is
+  read-only on its body. Not fixed, with why: m8 (setProductSalePermissionRules keeps x-ticvai-config-scope: the
+  config-scope rule reaches its name, "Rule", and refuses it without one; CHG-R8PRD-009''s note is corrected instead).'

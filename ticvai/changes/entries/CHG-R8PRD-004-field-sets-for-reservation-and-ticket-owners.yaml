@@ -1,0 +1,48 @@
+id: CHG-R8PRD-004
+date: '2026-10-20'
+source: mom
+kind: contract
+summary: 'Field sets (the existing system''s data masks) are configured per venue with text, drop-down, radio and
+  check-box fields (listFieldSets, getFieldSet, setFieldSetDefinition), and a product links the set its sale asks the
+  buyer (reservation owner) and, only where the ticket needs one, each ticket owner (getProductOwnerFieldSets,
+  setProductOwnerFieldSets). Additive.'
+decision:
+  what: 'contracts/spine/catalogue.yaml, appended: GET /field-sets, GET and PUT /field-sets/{fieldSetId} (400
+    validation for options and keys, 409 duplicate-code, field-key-retyped, field-set-in-use), GET and PUT
+    /products/{productId}/owner-field-sets (422 unknown-field-set, inactive-field-set); schemas FieldSet
+    (catalogue.field_set), FieldSetField (catalogue.field_set_field), FieldSetOption, ProductOwnerFieldSets
+    (catalogue.product_owner_field_set). Captured values are stored under each field''s key in the dataMaskValues the
+    order line already carries.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Minutes of 16 October 2026 (sources/mom/TICVAI_MoM_2026-10-16_TicketingConfig_Wireframes_Plan.md), 4.13: Allam
+  asked for "a configurable field set (called a data mask in the existing system): create it in the configuration,
+  design it with custom fields (text, drop-down, radio, check box), and link it to the product so the fields appear
+  automatically at sale"; a ticket owner only for tickets such as memberships and seasonal passes; section 5:
+  "Reservation owner and ticket owner fields come from a configurable field set linked to the product". The package
+  named a "data mask" (Product.dataMaskValues, orders dataMaskValues, the bundle''s "data mask field definitions")
+  with no operation that defines one.'
+keys_touched:
+  operations: [listFieldSets, getFieldSet, setFieldSetDefinition, getProductOwnerFieldSets, setProductOwnerFieldSets]
+  schemas: [FieldSet, FieldSetField, FieldSetOption, ProductOwnerFieldSets]
+  tables: [catalogue.field_set, catalogue.field_set_field, catalogue.product_owner_field_set]
+  files:
+  - contracts/spine/catalogue.yaml
+root_class: 'new: mom-decision-without-contract (a client decision with no operation or storage behind it)'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+client_signoff: pending
+decision_owner: Chinmay
+adam_cr: 'none yet: products module wave 1, 20 October 2026; the lead raises the ADAM CR with the batch'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-contract-shapes.py
+status: open
+notes: 'Batch R8PRD. Additive only. Left for the orders owner (a CR, existing text): the sale paths (addCartLine,
+  createOrder and the till) should ask the linked field sets, validate required fields, store the buyer''s values at
+  order level and each ticket owner''s on the line, and create the ticket owner''s profile (4.13: two profiles); the
+  catalogue bundle should carry the field sets for offline tills. Personal-data handling of captured values follows
+  the order''s guest data and is not restated here. Corrected by CHG-R8PRD-009 (review C2): no second form engine. The field-set operations and the three catalogue.field_set* tables are removed before any migration; a product links Marketing forms (FormDefinition, kind dataCapture or registration) with getProductOwnerForms, setProductOwnerForms and listOwnerFormCandidates, and each owner''s answers are a form submission of their own (FormSubmission.saleContext).'

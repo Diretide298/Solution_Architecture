@@ -18,6 +18,12 @@
    "subject": "AI engine: Block A (gateway, baseline layer, concierge, Help me choose, translations, planner agent)",
    "detail": "Built by the two AI engineers from 5 October (decided 30 September). Every AI answer works on day one from a baseline and learns from the tenant's own data; a trained model replaces the baseline only when it beats it and an admin approves (AI-D16). The AI endpoints and screens are built by the developers under their own tickets.",
    "area": "backend"
+  },
+  {
+   "key": "PRODUCTS-W1",
+   "subject": "Products module, wave 1: categories, tags, languages, owner forms, sale permissions, back-office frame",
+   "detail": "The first module rebuilt from client-reviewed wireframes (the client rejected the generated back-office screens). Wave 1 is what the 16 October 2026 minutes settle before the products sign-off (sources/mom/TICVAI_MoM_2026-10-16_TicketingConfig_Wireframes_Plan.md, sections 4.1-4.13 and 5); the product form itself is wave 2, after sign-off. People by the lead's ruling of 19 October 2026: Sanket Keluskar, Surendra (Surendra Loke) and Hrushikant Patkar on the migrations (CHG-R8PRD-008).",
+   "area": "backend"
   }
  ],
  "tasks": [
@@ -748,6 +754,165 @@
     "Ticket printer"
    ],
    "linksNothingBecause": "a device driver in the device app behind the ticketPrinter port: it builds no operation, table or screen of the package; its spec is ADR-0015 and the integration register"
+  },
+  {
+   "key": "PRD-W1-DB",
+   "epic": "PRODUCTS-W1",
+   "points": 3,
+   "assignee": "Hrushikant Patkar",
+   "depends": [
+    "SETUP-DB"
+   ],
+   "subject": "Products wave 1: forward migration of the new catalogue and marketing tables and the session's working venue",
+   "detail": "Spec: the contracts at the release tag in ADAM (CHG-R8PRD-002 to 011), from the 16 October 2026 minutes (sources/mom/TICVAI_MoM_2026-10-16_TicketingConfig_Wireframes_Plan.md). One forward migration, additive, in the tenant database: catalogue.product_tag, catalogue.product_channel_text, catalogue.product_owner_form, catalogue.product_sale_permission and marketing.form_submission_sale_link, each with the columns, keys and references its contract schema declares (ProductTag, ProductChannelTexts, ProductOwnerForm, ProductSalePermissionRule, FormSubmissionSaleLink: x-ticvai-unique, x-ticvai-unique-together, x-ticvai-unique-nulls, x-ticvai-required-when, x-ticvai-references) and row security on scope_path like every tenant table; and the column identity.session.working_venue_id (SessionVenue.workingVenueId; venue_id is not touched). Seeding of catalogue.product_tag, per venue (CHG-R8PRD-010, -011), so every stored value maps to exactly one tag: (1) take every segment_tags value of the venue's products and every segmentTags value of the venue's Help me choose answer filters (whitelabel.guided_choice_answer), trim it, drop empty values; (2) its key is lower(value); values with one key are one tag; every tag's name is the original value of the first of them (product id order, then answer id order), trimmed and cut to 80 characters; (3) literal codes first: a key matching ^[a-z0-9][a-z0-9-]*(/[a-z0-9][a-z0-9-]*)*$ and at most 64 characters is the tag's code; then derived codes, in key order: every run of characters outside a-z, 0-9 and / becomes one hyphen, hyphens are trimmed at the ends of each /-segment, empty segments are dropped, an empty result becomes tag (the base); the candidate is the base cut to 64 characters; while the candidate is taken in the venue, try suffix n = 2, 3 and so on, the candidate being the base cut to 64 minus the length of -n, followed by -n; after any cut, trailing / and - are trimmed before a suffix is added, so every derived code fits 64 characters and matches the code pattern; (4) each product's segment_tags and each answer filter's segmentTags is rewritten to its tags' codes, in the original order, duplicates removed (the answer rows are WhiteLabel's: its owner reviews that part). A second run finds every value already a code and changes nothing. Done when: applied to a database at the previous state it creates exactly these, a second run changes nothing, and the result matches the package's derived DDL for them at the release tag.",
+   "builds": [
+    "table catalogue.product_tag",
+    "table catalogue.product_channel_text",
+    "table catalogue.product_owner_form",
+    "table catalogue.product_sale_permission",
+    "table marketing.form_submission_sale_link",
+    "table identity.session"
+   ]
+  },
+  {
+   "key": "PRD-W1-CATEGORIES-TAGS",
+   "epic": "PRODUCTS-W1",
+   "points": 5,
+   "assignee": "Sanket Keluskar",
+   "depends": [
+    "PRD-W1-DB"
+   ],
+   "subject": "Products wave 1: categories and tags as master data, back end and screens",
+   "detail": "Spec: the contracts at the release tag in ADAM (CHG-R8PRD-002 to 011), from the 16 October 2026 minutes (sources/mom/TICVAI_MoM_2026-10-16_TicketingConfig_Wireframes_Plan.md). The back-office screens are held: build the screen from the products wireframe Pallavi Sawant shares (board ids below; its 21 October revision applies the minutes), not from a generated P08 screen. Back end in CatalogueService: listProductCategoryUsage, listProductTags, setProductTagDefinition, setProductClassification (listProductCategories and setProductCategories exist). Screens: B1-S05 Category & Hierarchy Manager, the new Tags screen of the Setup Library, the category drop-down and tag picker of B1-S04 Identity & Classification (the rest of B1-S04 is wave 2), the tag line of B11-S04. Every operation answers as its contract says, with a contract test for each status code and problem type it lists; the permission and venue scope are enforced (row security on scope_path); every write records the audit entry its contract names; paged lists keep their stated order; nothing is written outside the tables listed. Done when: the category manager shows each category's product counts (archived counted apart) and refuses dropping a used category; tags are listed, created, replaced and deactivated, with duplicate-code (unique in the venue, ignoring case) and tag-code-in-use (a product or a Help me choose answer carries it) refused; setProductClassification writes category_id and segment_tags, versions the product as updateProduct does, and refuses unknown-category, inactive-category, unknown-tag, inactive-tag and product-archived; listProducts with segmentTag finds the products a tag was given; the venue-scoped reads and the tag write take venueId, else the working venue, refusing venue-required and venue-not-in-grants.",
+   "operations": [
+    "listProductCategoryUsage",
+    "listProductTags",
+    "setProductTagDefinition",
+    "setProductClassification"
+   ],
+   "builds": [
+    "operation listProductCategories",
+    "operation setProductCategories",
+    "table catalogue.product_category",
+    "table catalogue.product_tag",
+    "table catalogue.product"
+   ]
+  },
+  {
+   "key": "PRD-W1-OWNER-FORMS",
+   "epic": "PRODUCTS-W1",
+   "points": 5,
+   "assignee": "Sanket Keluskar",
+   "depends": [
+    "PRD-W1-DB"
+   ],
+   "subject": "Products wave 1: reservation-owner and ticket-owner forms linked to a product, back end and screens",
+   "detail": "Spec: the contracts at the release tag in ADAM (CHG-R8PRD-002 to 011), from the 16 October 2026 minutes (sources/mom/TICVAI_MoM_2026-10-16_TicketingConfig_Wireframes_Plan.md). The back-office screens are held: build the screen from the products wireframe Pallavi Sawant shares (board ids below; its 21 October revision applies the minutes), not from a generated P08 screen. Back end in CatalogueService: getProductOwnerForms, setProductOwnerForms, listOwnerFormCandidates, reading Marketing's forms only through marketing-crm#formDefinitionRecords. In MarketingService, additive and reviewed by its owner: FormField.presentation (dropDown, radio, checkBoxes) through createForm and getForm, and recordSaleOwnerAnswers (the service write the Orders service calls; FormSubmission.saleContext read-only on submitForm). Screens: the owner-form picker of B2-S10 Ownership & Assignment Model only. No Forms screen is built here: the venue draws the data mask (text, drop-down, radio, check box, each field marked personal data or not) and publishes it in Marketing's own form screens, by staff holding MARKETING_VIEW and MARKETING_MANAGE (publishing is Marketing's, with its own second approver); the Setup Library links there, and the product administrator only picks a published form. Every operation answers as its contract says, with a contract test for each status code and problem type it lists; the permission and venue scope are enforced (row security on scope_path); every write records the audit entry its contract names; paged lists keep their stated order; nothing is written outside the tables listed. Done when: a product links at most one reservation-owner and one ticket-owner form, each a published dataCapture or registration form of its venue (unknown-form, form-kind-not-allowed, form-not-published and product-archived refused), versioned as updateProduct does; the picker lists only those forms to a caller holding PRODUCT_CONFIGURE; a select drawn as radio or drop-down and a multiSelect drawn as check boxes store the same answers as before. recordSaleOwnerAnswers takes the order's venue from Orders, checks the order, its buyer, the line and unit, the form's venue and the subject through its declared reads, keeps one submission per owner slot and refuses a second (owner-answers-already-recorded). Asking the forms at sale and calling recordSaleOwnerAnswers is not in this task (orders).",
+   "operations": [
+    "getProductOwnerForms",
+    "setProductOwnerForms",
+    "listOwnerFormCandidates",
+    "recordSaleOwnerAnswers"
+   ],
+   "builds": [
+    "operation createForm",
+    "operation getForm",
+    "operation submitForm",
+    "table catalogue.product_owner_form",
+    "table marketing.form_submission_sale_link"
+   ]
+  },
+  {
+   "key": "PRD-W1-SALE-PERMISSIONS",
+   "epic": "PRODUCTS-W1",
+   "points": 5,
+   "assignee": "Sanket Keluskar",
+   "depends": [
+    "PRD-W1-DB"
+   ],
+   "subject": "Products wave 1: who can sell a product, back end",
+   "detail": "Spec: the contracts at the release tag in ADAM (CHG-R8PRD-002 to 011), from the 16 October 2026 minutes (sources/mom/TICVAI_MoM_2026-10-16_TicketingConfig_Wireframes_Plan.md). Back end in CatalogueService: getProductSalePermissionRules, setProductSalePermissionRules, checkProductSalePermission, listSalePermissionTargets, reading other modules only through their declared queries (tenancy#activeVenues, tenancy#workstationRecords, identity#roleRecords, identity#principalRecords, identity#delegatedAccessRecords). Serves the Who can sell section of B1-S04 and B7-S07 (PRD-W1-SALE-PERMISSIONS-UI). Every operation answers as its contract says, with a contract test for each status code and problem type it lists; the permission and venue scope are enforced (row security on scope_path); every write records the audit entry its contract names; paged lists keep their stated order; nothing is written outside the tables listed. Done when: a rule set saves whole and a rule sent again with its level and target keeps its id; validation, no-allow-rule, global-deny, unknown-sale-permission-target (a new or changed rule naming anything listSalePermissionTargets does not offer for the product; unchanged rules are kept as they are), sale-permission-self-grant (adding an ALLOW for, or lifting a DENY on, the caller or the caller's role) and product-archived are refused; a change takes effect at once in every state but archived, as updateProduct does, versioned and audited; listSalePermissionTargets with productId lists that product's venue; checkProductSalePermission resolves deny over allow (any matching DENY denies, else any matching ALLOW allows, else denied; no rules sells as before), with tests for the contract's example; and a test shows admin rights per venue with the existing grants: a principal granted PRODUCT_CONFIGURE at venue A's scope path (createDelegatedAccess) changes venue A's products and is refused at venue B, while a grant at the tenant's path reaches both. Enforcing the rules at sale is not in this task.",
+   "operations": [
+    "getProductSalePermissionRules",
+    "setProductSalePermissionRules",
+    "checkProductSalePermission",
+    "listSalePermissionTargets"
+   ],
+   "builds": [
+    "table catalogue.product_sale_permission",
+    "table catalogue.sales_channel",
+    "table catalogue.product"
+   ]
+  },
+  {
+   "key": "PRD-W1-FRAME",
+   "epic": "PRODUCTS-W1",
+   "points": 5,
+   "assignee": "Surendra",
+   "depends": [
+    "PRD-W1-DB",
+    "SETUP-AUTH"
+   ],
+   "subject": "Products wave 1: back-office frame (working venue and switcher, navigation, dashboard, All products)",
+   "detail": "Spec: the contracts at the release tag in ADAM (CHG-R8PRD-002 to 011), from the 16 October 2026 minutes (sources/mom/TICVAI_MoM_2026-10-16_TicketingConfig_Wireframes_Plan.md). The back-office screens are held: build the screen from the products wireframe Pallavi Sawant shares (board ids below; its 21 October revision applies the minutes), not from a generated P08 screen. Back end: identity getSessionVenue and setSessionVenue (identity.session.working_venue_id, written with the session registry entry the token's sid names, so services read it from the caller's validated session; sign-in and role selection write it when the session has exactly one venue, fixed by its workstation or the only venue its grants reach), catalogue getProductDashboard and listProductAttentionItems; the screens also use getCurrentSession, listProductLifecycle and listProducts. Screens: the top bar and navigation of every back-office screen, B1-S01 Catalogue Command Center, B1-S02 Ticket Product Directory (All products). Every operation answers as its contract says, with a contract test for each status code and problem type it lists; the permission and venue scope are enforced (row security on scope_path); every write records the audit entry its contract names; paged lists keep their stated order; nothing is written outside the tables listed. Done when: the top bar shows the session's working venue and switches among availableVenues (fixed by a workstation or role: no switcher), refusing venue-not-in-grants, venue-fixed and session-pending, each switch audited, and the back office sends it as venueId on the venue-scoped calls that take one (the wave 1 reads and writes also fall back to it themselves, else venue-required); the navigation is filtered again from permissionsByScope after a switch; the dashboard tiles read countsByLifecycleState and open All products filtered the same way; Products by type reads countsByKind; Needs attention lists listProductAttentionItems in its order (readiness before notice); All products filters by search, status, type, channel, venue and department on listProductLifecycle, paged. The type filter maps the six ticket types of the minutes onto ProductKind (openDated, datedAdmission, timedAdmission, membership, giftCard, addOn) until wave 2.",
+   "operations": [
+    "getSessionVenue",
+    "setSessionVenue",
+    "getProductDashboard",
+    "listProductAttentionItems"
+   ],
+   "builds": [
+    "operation getCurrentSession",
+    "operation listProductLifecycle",
+    "operation listProducts",
+    "table identity.session",
+    "table catalogue.product",
+    "table catalogue.variant",
+    "table catalogue.price",
+    "table catalogue.price_list"
+   ]
+  },
+  {
+   "key": "PRD-W1-LANGUAGES",
+   "epic": "PRODUCTS-W1",
+   "points": 3,
+   "assignee": "Surendra",
+   "depends": [
+    "PRD-W1-DB"
+   ],
+   "subject": "Products wave 1: translatable product texts per channel in the tenant's languages, back end and screens",
+   "detail": "Spec: the contracts at the release tag in ADAM (CHG-R8PRD-002 to 011), from the 16 October 2026 minutes (sources/mom/TICVAI_MoM_2026-10-16_TicketingConfig_Wireframes_Plan.md). The back-office screens are held: build the screen from the products wireframe Pallavi Sawant shares (board ids below; its 21 October revision applies the minutes), not from a generated P08 screen. Back end in CatalogueService: getProductChannelTexts, setProductChannelTexts, reading the tenant's languages only through white-label#tenantLanguageRecords; the product's own name and description per language through getProduct and updateProduct. The languages themselves are the tenant's (white-label setLanguages and getTenantConfig, which exist; the tenant's languages count, published, or the draft before the first publish): no venue list. Screens: the languages entry of the Setup Library, read-only for a venue's product administrator with a link to the tenant's language setting (setLanguages needs TENANT_CONFIGURE at tenant scope), B1-S06 Content & Localization (one block per enabled language and the channel-specific section), the preview of B1-S09. Every operation answers as its contract says, with a contract test for each status code and problem type it lists; the permission and venue scope are enforced (row security on scope_path); every write records the audit entry its contract names; paged lists keep their stated order; nothing is written outside the tables listed. Done when: channel texts save per language within their limits, refuse language-not-enabled and product-archived, and are versioned as updateProduct does; missingTranslations drives the per-language status; the preview shows the POS button label, receipt name and B2B description separately per language.",
+   "operations": [
+    "getProductChannelTexts",
+    "setProductChannelTexts"
+   ],
+   "builds": [
+    "operation getProduct",
+    "operation updateProduct",
+    "operation setLanguages",
+    "operation getTenantConfig",
+    "table catalogue.product_channel_text",
+    "table catalogue.product"
+   ]
+  },
+  {
+   "key": "PRD-W1-SALE-PERMISSIONS-UI",
+   "epic": "PRODUCTS-W1",
+   "points": 3,
+   "assignee": "Surendra",
+   "depends": [
+    "PRD-W1-SALE-PERMISSIONS",
+    "PRD-W1-FRAME"
+   ],
+   "subject": "Products wave 1: who can sell a product, screens",
+   "detail": "Spec: the contracts at the release tag in ADAM (CHG-R8PRD-002 to 011), from the 16 October 2026 minutes (sources/mom/TICVAI_MoM_2026-10-16_TicketingConfig_Wireframes_Plan.md). The back-office screens are held: build the screen from the products wireframe Pallavi Sawant shares (board ids below; its 21 October revision applies the minutes), not from a generated P08 screen. Screens on the operations of PRD-W1-SALE-PERMISSIONS: the Who can sell section of B1-S04 Identity & Classification (it replaces Venue scope) and B7-S07 Channel Restrictions. Done when: the rules table edits level (everyone, venue, sales channel, workstation, role, staff member), target (picked from listSalePermissionTargets), allow or deny and note, saves the whole set and shows its one-line summary and that a deny always wins; Test a sale calls checkProductSalePermission with a venue, channel, workstation, role and staff member and shows the deciding rule; every refusal (self-grant, no allow, a deny for everyone) is shown in plain words. The target pickers call listSalePermissionTargets with the product's id.",
+   "builds": [
+    "operation getProductSalePermissionRules",
+    "operation setProductSalePermissionRules",
+    "operation checkProductSalePermission",
+    "operation listSalePermissionTargets",
+    "operation getSessionVenue"
+   ]
   }
  ],
  "blockA1Operations": {

@@ -1,0 +1,48 @@
+id: CHG-R8PRD-012
+date: '2026-10-20'
+source: audit
+kind: contract
+summary: 'The minors of the fourth products wave 1 review, folded in before the merge: sign-in writes a one-venue session''s
+  working venue; derived tag codes never end in / or -, and every tag name is the original value cut to 80 characters;
+  the self-grant refusal covers an ALLOW for the caller''s own role; an order with no buyer takes no reservation-owner
+  answer; the never-published language fallback is catalogue''s, through a declared draft read. Additive to the r8
+  integration head.'
+decision:
+  what: 'contracts/spine/identity.yaml (its wave 1 additions): setSessionVenue and SessionVenue.workingVenueId say sign-in
+    and role selection write the working venue into the session and its registry entry when the session has exactly one
+    venue. contracts/spine/catalogue.yaml (its additions): the seeding wording (trim trailing / and - after any cut,
+    before a suffix; names cut to 80); ProductTag.scopePath kept on replace; setProductSalePermissionRules refuses an
+    ALLOW for the caller''s role as for the caller; getProductChannelTexts and setProductChannelTexts read the tenant''s
+    languages published, or the draft before the first publish, declaring white-label#tenantConfigRecords.
+    contracts/satellite/marketing-crm.yaml (its additions): recordSaleOwnerAnswers refuses a reservation-owner answer on
+    an order with no buyer (422 order-has-no-buyer) and accepts its ticket-owner answers. contracts/satellite/white-label.yaml
+    (its additions): tenantLanguageRecords is a plain read again; new data read tenantConfigRecords (whitelabel.tenant_config).'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'The fourth review of the products wave 1 contracts, 20 October 2026 (verdict: merge; R4-m1 to R4-m5 and two nits), and
+  the coordinator''s rulings on them. R4-m1: a session fixed by its workstation or role cannot call setSessionVenue, so the
+  seven fallback operations found no working venue. R4-m5: a data-read query must decide nothing (ADR-0055 rule 2 as
+  amended 14 October), so the fallback moves to the operations that use it.'
+keys_touched:
+  operations: [setSessionVenue, getSessionVenue, setProductClassification, setProductSalePermissionRules,
+    getProductChannelTexts, setProductChannelTexts, recordSaleOwnerAnswers]
+  schemas: [SessionVenue, ProductTag]
+  files:
+  - contracts/spine/identity.yaml
+  - contracts/spine/catalogue.yaml
+  - contracts/satellite/marketing-crm.yaml
+  - contracts/satellite/white-label.yaml
+  - docs/active/block-a-extra-tasks.json
+root_class: 'new: mom-decision-without-contract (a client decision with no operation or storage behind it)'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none yet: products module wave 1, 20 October 2026; the lead raises the ADAM CR with the batch'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-contract-shapes.py
+status: open
+notes: 'Batch R8PRD. The PRD-W1-* task texts in docs/active/block-a-extra-tasks.json follow (CHG-R8PRD-008).'

@@ -1,0 +1,49 @@
+id: CHG-R8PRD-002
+date: '2026-10-20'
+source: mom
+kind: contract
+summary: 'Categories and tags are master data a product picks from: the venue keeps a tag list (listProductTags,
+  setProductTagDefinition), a product gets its category and tags from the two lists in one write
+  (setProductClassification, the first single-product write of either), and the category manager reads how many
+  products each category holds (listProductCategoryUsage). Additive.'
+decision:
+  what: 'contracts/spine/catalogue.yaml, appended: GET /product-tags listProductTags (paged, includeInactive, search;
+    order displayOrder, name, id), PUT /product-tags/{productTagId} setProductTagDefinition (409 duplicate-code,
+    tag-code-in-use), PUT /products/{productId}/classification setProductClassification (422 unknown-category,
+    inactive-category, unknown-tag, inactive-tag), GET /product-categories/usage listProductCategoryUsage; schemas
+    ProductTag (catalogue.product_tag), SetProductClassificationRequest, ProductClassification, ProductTagRef,
+    ProductCategoryUsage. A tag''s code is the value Product.segmentTags already carries, so listProducts
+    segmentTag keeps working. Categories themselves already existed (listProductCategories, setProductCategories).'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Minutes of 16 October 2026 (sources/mom/TICVAI_MoM_2026-10-16_TicketingConfig_Wireframes_Plan.md), 4.6 and
+  section 5: "Categories and tags are user-defined master data linked to products from a drop-down, not hard
+  coded"; a tag is different from a category and lets marketing apply a promotion to a whole tag; tags already exist
+  in the POS wireframe. The package had categories as master data but no tag list (Product.segmentTags was free
+  text), and no write that set one product''s categoryId or segmentTags (createProduct and updateProduct take
+  neither; only bulkUpdateCatalogueProducts set a category).'
+keys_touched:
+  operations: [listProductTags, setProductTagDefinition, setProductClassification, listProductCategoryUsage]
+  schemas: [ProductTag, SetProductClassificationRequest, ProductClassification, ProductTagRef, ProductCategoryUsage]
+  tables: [catalogue.product_tag, catalogue.product]
+  files:
+  - contracts/spine/catalogue.yaml
+root_class: 'new: mom-decision-without-contract (a client decision with no operation or storage behind it)'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+client_signoff: pending
+decision_owner: Chinmay
+adam_cr: 'none yet: products module wave 1, 20 October 2026; the lead raises the ADAM CR with the batch'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-contract-shapes.py
+status: open
+notes: 'Batch R8PRD. Additive only, appended after the last path and the last schema of catalogue.yaml; no existing
+  text changed. Left for the catalogue owner (a CR, because it rewords existing text): updateProduct and
+  bulkUpdateCatalogueProducts should refuse a tag or category that is not master data; the catalogue bundle should
+  carry the tag list for the till (POS tags); promotions should target a tag code (promotions.yaml). Derived tables
+  (catalogue.product_tag) and lineage come at the release refresh. The prevention named is the shape check that
+  vetted these additions; a check that every key decision of a filed minute has an operation is still to write. Corrected by CHG-R8PRD-009 (review of 20 October): tag codes are unique in the tenant, as category codes are, and fixed while a product or a Help me choose answer carries them; setProductClassification is versioned as updateProduct and audited; the usage read counts archived products.'

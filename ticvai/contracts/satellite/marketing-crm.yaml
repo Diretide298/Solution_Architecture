@@ -375,6 +375,25 @@ x-ticvai-queries:
       own operation, and a question with a rule of its own (open, live, sellable) is declared as a query of its
       own. It is asked from another deployable through Marketing's service route (serviceAuth).
     served: [service]
+  formDefinitionRecords:
+    module: marketing-crm
+    table: marketing.form_definition
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The marketing.form_definition rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Marketing stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/FormDefinition'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Marketing answers with its marketing.form_definition rows, as it stores them and as the
+      caller's scope lets it see them (the table's row-level security, under the caller's connection and
+      transaction). It decides nothing: an asker that refuses or chooses on these rows states that rule in its
+      own operation, and a question with a rule of its own (open, live, sellable) is declared as a query of its
+      own. It is asked from another deployable through Marketing's service route (serviceAuth). Added for the products
+      module, wave 1 (CHG-R8PRD-009).
+    served: [service]
 paths:
   /my/cases:
     get:
@@ -18966,6 +18985,112 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/NotFound'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /internal/sale-owner-answers:
+    post:
+      operationId: recordSaleOwnerAnswers
+      security:
+      - serviceAuth: []
+      x-ticvai-audience:
+      - service
+      x-ticvai-auth: service
+      x-ticvai-consumed-by: []
+      x-ticvai-read-via:
+      - query: orders#salesOrderRecords
+        route: service
+        for: 'the order must exist, be of the sent venue, and a reservation owner must be its buyer: orders.sales_order, Orders'' data'
+      - query: orders#orderLineRecords
+        route: service
+        for: 'a ticket owner''s order line must be on the order and its unit within the line''s quantity: orders.order_line, Orders'' data'
+      - query: identity#subjectRecords
+        route: service
+        for: 'the owner''s subjectId must be a subject, as submitForm checks: pii.subject, Identity''s data'
+      summary: Keep one owner's answers to a product's owner form, for one sale
+      description: >-
+        **The only write of `FormSubmission.saleContext`** (products module, 16 October 2026 minutes 4.13;
+        CHG-R8PRD-010). The Orders service calls it, cell-internal over mTLS, when a sale records the answers of the
+        reservation owner (once per order) or of a ticket owner (once per credential: order line and unit) to the form
+        catalogue `getProductOwnerForms` links for that role. A guest or staff caller of `submitForm` cannot set a sale
+        context: there it is read-only.
+
+        **What Orders sends, and what is checked** (CHG-R8PRD-011): the order's venue (`venueId`) and the sale slot.
+        The order must exist and be of that venue (`422 unknown-order`, `422 order-not-of-venue`); a reservation
+        owner's `subjectId` must be the order's buyer (`422 not-order-buyer`), and an order with no buyer (an
+        anonymous walk-in till sale) takes no reservation-owner answer (`422 order-has-no-buyer`) while its ticket-owner
+        answers are accepted (CHG-R8PRD-012); a ticket owner's order line must be on
+        the order and its unit within the line's quantity (`422 unknown-order-line`); the form must be a published form
+        of that venue (`422 form-not-for-venue`) and the answers must fill its required fields (`422 answer-required`);
+        the `subjectId` must be a subject (`422 unknown-subject`). The link row's `scopePath` is that venue, so the
+        venue that sold the order reads its owners' answers.
+
+        **One submission per owner slot**: `(orderId, ownerRole, orderLineId, unitIndex)` is unique
+        (`marketing.form_submission_sale_link`), so a second answer for the same slot is refused
+        `409 owner-answers-already-recorded`. Orders retries a call that timed out with the same `Idempotency-Key`,
+        which answers the first result again; only a different key for an answered slot is the `409`. The answers are kept as any submission is: bound to the form version
+        answered, keyed by the form's field keys, the personal-data mark of each field deciding its retention.
+      tags:
+      - marketing
+      x-ticvai-permission: null
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: append
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SaleOwnerAnswers'
+      responses:
+        '201':
+          headers:
+            X-Consistency-Token:
+              $ref: ../shared/common.yaml#/components/headers/ConsistencyToken
+          description: Kept
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FormSubmission'
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '401':
+          description: The calling workload's token is missing or invalid (`unauthenticated`).
+          x-ticvai-problem-types:
+          - unauthenticated
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '409':
+          description: This owner slot of the sale already has its answers (`owner-answers-already-recorded`).
+          x-ticvai-problem-types:
+          - owner-answers-already-recorded
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '422':
+          description: The form or version is unknown (`unknown-form`) or not a published form of the order's venue
+            (`form-not-for-venue`), a required field has no answer (`answer-required`), the order is unknown
+            (`unknown-order`) or of another venue (`order-not-of-venue`), the buyer is not the order's
+            (`not-order-buyer`) or the order has no buyer for a reservation-owner answer (`order-has-no-buyer`), the line or unit is not on the order (`unknown-order-line`), or the subject is unknown
+            (`unknown-subject`).
+          x-ticvai-problem-types:
+          - unknown-form
+          - form-not-for-venue
+          - answer-required
+          - unknown-order
+          - order-not-of-venue
+          - not-order-buyer
+          - order-has-no-buyer
+          - unknown-order-line
+          - unknown-subject
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: ../shared/common.yaml#/components/responses/TooManyRequests
 components:
   schemas:
     CookieCategory:
@@ -22360,6 +22485,19 @@ components:
               type: string
             equals:
               type: string
+        presentation:
+          type: string
+          nullable: true
+          enum:
+          - dropDown
+          - radio
+          - checkBoxes
+          description: >-
+            **How a choice is drawn** (products module, 16 October 2026 minutes 4.13: the data mask's field types are
+            text, drop-down, radio and check box; CHG-R8PRD-009). For `select`, `dropDown` (the default) or `radio`;
+            for `multiSelect`, `checkBoxes`. A single check box is a `boolean`. Null for every other type. It changes
+            how the field is drawn, never what is stored. On any other type, or a value that does not fit the type,
+            the server stores null.
     FormSubmission:
       x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by getGuestTimeline, getWaiverStatus, listComplianceEvidenceWaiver, listContact and others
       type: object
@@ -22443,6 +22581,20 @@ components:
         ipAddress:
           type: string
           nullable: true
+        saleContext:
+          allOf:
+          - $ref: '#/components/schemas/FormSubmissionSaleLink'
+          nullable: true
+          readOnly: true
+          x-ticvai-persisted: false
+          x-ticvai-derived: onRead
+          description: >-
+            **The sale a capture was made for** (products module, 16 October 2026 minutes 4.13; CHG-R8PRD-009,
+            CHG-R8PRD-010): a product's reservation-owner and ticket-owner forms (catalogue `getProductOwnerForms`) are
+            answered as submissions of this form, one for the buyer and one per credential for each ticket owner, so
+            each owner's answers are a record of their own and two owners' keys never collide. **Read-only here**: it
+            is written only by the Orders service through `recordSaleOwnerAnswers` (service-to-service), never by a
+            caller of `submitForm`. Null for a submission made outside a sale.
     GuestDocument:
       x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by listComplianceEvidenceWaiver, uploadGuestDocument
       type: object
@@ -38694,6 +38846,95 @@ components:
           type: string
           readOnly: true
           description: '**The partition key** (ADR-0005), the requirement''s.'
+    SaleOwnerAnswers:
+      type: object
+      x-ticvai-persistence: none — request body of recordSaleOwnerAnswers, kept as marketing.form_submission and marketing.form_submission_sale_link
+      description: One owner's answers to an owner form, for one sale (CHG-R8PRD-010).
+      required:
+      - venueId
+      - formId
+      - formVersion
+      - subjectId
+      - answers
+      - sale
+      properties:
+        venueId:
+          type: string
+          format: uuid
+          description: The order's venue, sent by Orders; checked against the order and the form, and the link row's scope.
+        formId:
+          type: string
+          format: uuid
+        formVersion:
+          type: integer
+          description: The published version the sale asked.
+        subjectId:
+          type: string
+          format: uuid
+          description: The owner's profile (the buyer's, or the ticket owner's, which the sale creates when it has none).
+        answers:
+          type: object
+          description: As `FormSubmission.answers`, keyed by the form's field keys.
+          additionalProperties:
+            oneOf:
+            - type: string
+            - type: number
+            - type: boolean
+            - type: array
+              items:
+                type: string
+        capturedAtChannel:
+          $ref: ../shared/common.yaml#/components/schemas/SalesChannel
+        sale:
+          $ref: '#/components/schemas/FormSubmissionSaleLink'
+    FormSubmissionSaleLink:
+      type: object
+      x-ticvai-persistence: marketing.form_submission_sale_link
+      x-ticvai-unique-together:
+      - [orderId, ownerRole, orderLineId, unitIndex]
+      x-ticvai-unique-nulls: not-distinct
+      x-ticvai-required-when:
+        orderLineId:
+          ownerRole: ticketOwner
+        unitIndex:
+          ownerRole: ticketOwner
+      description: >-
+        **Which owner slot of which sale a submission answers** (CHG-R8PRD-010). One row per submission made for a
+        sale; the unique key allows one answer per slot: the buyer once per order (line and unit null), each ticket
+        owner once per order line and unit. A `reservationOwner` link with a line or unit set is refused
+        (`400 validation`), so the buyer's slot cannot be widened.
+      required:
+      - orderId
+      - ownerRole
+      properties:
+        submissionId:
+          type: string
+          format: uuid
+          readOnly: true
+          x-ticvai-references: marketing.form_submission
+        orderId:
+          type: string
+          format: uuid
+          description: The order (Orders' id; not a database reference).
+        ownerRole:
+          type: string
+          enum:
+          - reservationOwner
+          - ticketOwner
+        orderLineId:
+          type: string
+          format: uuid
+          nullable: true
+          description: For a ticket owner, the order line whose credential this owner holds; null for the buyer.
+        unitIndex:
+          type: integer
+          minimum: 1
+          nullable: true
+          description: For a ticket owner, which of the line's credentials (1 to the line's quantity); null for the buyer.
+        scopePath:
+          type: string
+          readOnly: true
+          description: '**The partition key** (ADR-0005). The order''s venue.'
   securitySchemes:
     apiKeyAuth:
       type: apiKey
