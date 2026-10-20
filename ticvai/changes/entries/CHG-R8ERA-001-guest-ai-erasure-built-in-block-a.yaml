@@ -1,0 +1,58 @@
+id: CHG-R8ERA-001
+date: '2026-10-20'
+source: plan
+kind: plan
+proposed: '2026-10-20T17:00'
+summary: 'The guest AI erasure (ai.eraseSubject) is built in Block A by a new AI engine task, AI-ENGINE-ERASE-SUBJECT,
+  for the second AI engineer, who owns the Qdrant erasure in AI-ENGINE-QDRANT. It sits in the AI engine baseline
+  app-module, so a deleted guest''s support-case text leaves the AI index in the first release. The delivery slice no
+  longer counts an erasure as setup.'
+decision:
+  what: 'docs/active/block-a-extra-tasks.json: task AI-ENGINE-ERASE-SUBJECT (epic AI-ENGINE, assignee Second AI
+    engineer, appModule baseline, 2 engineer-days, depends AI-ENGINE-QDRANT and MIG-AI, with a Done when). Its
+    `operations` claims eraseSubject, so the generator forms no back-end task for it: since CHG-R8RES-002 it had been
+    SVC-AI-RETRIEVAL-3 ([BE] AiService: eraseSubject, Block A, Chinmay Patkar as a helper of Pranay Shinde, never
+    pushed). It was in Block A only because the setup walk took it. tools/derive-delivery-slice.py: TRADING_VERB gains
+    `erase`, because an erasure empties a table and never makes one non-empty. With that, eraseSubject is in Block A
+    by this decision, not by the walk; tools/tests/test_delivery_slice_verbs.py holds it. No new table, column or
+    migration: ai.index_entry.subject_id (V0104) and ai.chunk_embedding.subject_id with both indexes (V0108) exist.'
+  by: Chinmay
+  date: '2026-10-20'
+waivers:
+  cooling_off: {by: Chinmay, date: '2026-10-20', quote: 'Accepting both as recommended'}
+why: 'The lead''s decision of 20 October 2026, "Accepting both as recommended", given to this recommendation: "Option
+  A: build the erasure step in the first release, as an internal operation. It deletes the guest''s index rows and
+  their search entries. It would be a new task for one of the two AI engineers, and it''s a plan change, so it needs
+  your waiver of the 24-hour wait to make Wednesday morning." It answers the risk the notes of CHG-R8RES-003 (commit
+  e52d0038) named: until eraseSubject ships, a deleted guest''s AI index rows and Qdrant points stay, while Block A
+  indexes support cases (marketing.case, with the guest''s subjectId) through reindexSource. Finding: on the derived
+  plan of 1578b46b, eraseSubject was a Block A "setup" operation (handoff/delivery-slice.json: enables
+  ai.chunk_embedding) that nobody had decided. ADR-0047, ADR-0049.'
+keys_touched:
+  operations: [eraseSubject]
+  tickets: [AI-ENGINE-ERASE-SUBJECT, SVC-AI-RETRIEVAL-3, TEST-AM-AI-ENGINE-A-BASELINE, TEST-AM-AI-ENGINE-A]
+  files:
+  - docs/active/block-a-extra-tasks.json
+  - tools/derive-delivery-slice.py
+  - tools/tests/test_delivery_slice_verbs.py
+root_class: 'a Block A operation placed by the setup walk with no decision behind it (a deleter counted as setup)'
+tickets:
+  started: []
+  unstarted: [AI-ENGINE-ERASE-SUBJECT]
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: a decision of the lead; no ADAM CR is needed'
+triage: blocker
+prevention:
+  type: generator-rule
+  ref: tools/derive-delivery-slice.py::TRADING_VERB
+status: open
+notes: '**Owner.** The plan''s owner of the Qdrant erasure (AI-ENGINE-QDRANT: "erasure by guest or document payload")
+  is the second AI engineer (team.json plannedNames: Mrunali, not yet onboarded). The lead''s answer in team.json
+  plannedNamesNote keeps the AI tickets with Kalpita Mejari until Mrunali starts. reindexSource itself is a back-end
+  task (SVC-AI-RETRIEVAL-1, Hrushikant Patkar), not an AI engineer''s. **Sprint.** Both AI engineers'' Sprint 2 is full
+  (the second AI engineer is on AI-ENGINE-BASELINE until day 20.7, Kalpita Mejari on AI-ENGINE-GUIDED and
+  AI-ENGINE-TRANSLATE). tools/derive-block-a-schedule.py places the task by its waits and its owner''s capacity; the
+  sprint it lands in is in the erase-subject report. **No points:** AI engine tasks are sized in engineer-days
+  (block-a-extra-tasks.json note). SVC-AI-RETRIEVAL-3 was never pushed (pms-map.json), so taking eraseSubject off it
+  renames no pushed key.'

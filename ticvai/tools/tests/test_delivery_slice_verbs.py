@@ -17,6 +17,12 @@ def test_answering_a_chargeback_is_trading_not_setup():
         assert not dds.is_setup(op, {"perm": "ORDER_REFUND_APPROVE"}), op
 
 
+def test_an_erasure_is_never_setup():
+    # CHG-R8ERA-001: eraseSubject, once it named its writes (CHG-R8RES-002), was taken into Block A as a "setup" writer
+    # of ai.chunk_embedding; Block A builds it by the lead's decision (AI-ENGINE-ERASE-SUBJECT), not by the setup walk
+    assert not dds.is_setup("eraseSubject", {"perm": None})
+
+
 def test_configuring_writers_stay_setup():
     for op in ("createCreditType", "setWalletTransferRules", "createProduct", "setFxRate"):
         assert dds.is_setup(op, {"perm": "WALLET_CONFIGURE"}), op
