@@ -2,14 +2,14 @@ openapi: 3.1.0
 info:
   title: TICVAI Virtual Queue
   version: 0.1.0
-  x-ticvai-screen-count: 12
+  x-ticvai-screen-count: 16
   x-ticvai-tier: satellite
   x-ticvai-module: "5 — F&B & Guest Management (Virtual Queue)"
   x-ticvai-requirements: 46
   x-ticvai-capabilities: [C82, C99, C100]
   x-ticvai-platforms:
     - "P02 Guest App"
-    - "P06 Staff Ops App"
+    - "P06 Venue Staff App"
     - "Digital signage"
     - "Sensor feeds"
   description: >
@@ -23,7 +23,7 @@ info:
     | **Matrix domain** | 5 — F&B & Guest Management (Virtual Queue) |
     | **Requirements** | ~46 |
     | **Capabilities** | C82, C99, C100 |
-    | **Consumed by** | P02 Guest App · P06 Staff Ops App · Digital signage · Sensor feeds |
+    | **Consumed by** | P02 Guest App · P06 Venue Staff App · Digital signage · Sensor feeds |
 
     ## How to read this file
 
@@ -34,7 +34,7 @@ info:
     **Contracts are split into two tiers.**
 
     - **Spine** — the eight contexts everything else depends on: tenancy, identity,
-      catalogue, orders, shift, access, finance, cross-cell. Frozen first. A change here
+      catalogue, orders, shift, access, finance, cross-region. Frozen first. A change here
       requires a formal change request, because every satellite has pinned against it.
     - **Satellite** — a domain that builds on the spine and can move independently.
       Cheaper to change.
@@ -76,7 +76,9 @@ info:
       buy sensors, and direct integration with a named vendor is bespoke work.
     - **Q1 Virtual Queue and Q2 Virtual Waiting Room are different systems.** This contract is
       Q1 — ride queues. Q2 throttles traffic at on-sale, is infrastructure rather than
-      product, and lives elsewhere.
+      product, and lives elsewhere: **catalogue `enterWaitingRoom` and `getWaitingRoomPosition`**,
+      Redis positions and a signed admission token checked at the cart (ADR-0066, accepted
+      1 October, amending ADR-0012). No waiting-room screen calls `joinQueue`.
     - **Fast Pass is not a queue feature.** It is an entitlement with a consumption counter,
       owned by Product & Entitlement, spanning access control, F&B and queue. This contract
       redeems against it; it does not define it.
@@ -102,21 +104,90 @@ tags:
   - name: feed
   - name: signage
 
+x-ticvai-queries:
+  # Queries other modules ask this module (ADR-0055 amendment, 14 October 2026): module, inputs, returns, rule, served.
+  # **Data reads other modules ask this module for** (MOD audit, 14 October 2026, CHG-MOD-001): one query per
+  # table, instead of a raw read of it (check-cross-module-reads XR-UNCOVERED; ADR-0055 rule 2, amended
+  # 14 October).
+  queueRecords:
+    module: queue
+    table: queue.queue
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The queue.queue rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as VenueOps stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/QueueDetail'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). VenueOps answers with its queue.queue rows, as it stores them and as the caller's scope lets it
+      see them (the table's row-level security, under the caller's connection and transaction). It decides
+      nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and a
+      question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked from
+      another deployable through VenueOps' service route (serviceAuth).
+    served: [service]
+  readingRecords:
+    module: queue
+    table: queue.reading
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The queue.reading rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as VenueOps stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/QueueReading'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). VenueOps answers with its queue.reading rows, as it stores them and as the caller's scope lets
+      it see them (the table's row-level security, under the caller's connection and transaction). It decides
+      nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and a
+      question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked from
+      another deployable through VenueOps' service route (serviceAuth).
+    served: [service]
 paths:
   # ---------------------------------------------------------------- queues
   /queues:
     get:
       operationId: listQueues
       x-ticvai-consumed-by:
+        - "P01 WEB-039 Venue Map & Wait Times"
+        - "P01 WEB-040 Virtual Queue"
+        - "P02 GST-023 Virtual Queue"
+        - "P06 EMP-031 Queue monitor"
         - "P08 BO-001 Queue Directory"
+        - "P08 BO-002 Queue Configuration"
         - "P08 BO-004 Manual Wait Time Entry"
+        - "P08 BO-005 Queue Monitor"
+        - "P08 BO-221 Fast Pass & Attraction Access Journey"
+      # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
+      # or staff token is still accepted. `{}` makes the credential optional.
+      security:
+      - {}
+      - guestAuth: []
+      - bearerAuth: []
+      x-ticvai-audience: [staff, guest]
+      x-ticvai-audience-note: >
+        24 August: widened to include guest. A guest needs to see which queues exist before join
+        ing one. **Reading the list is not managing it** — `createQueue` and `setQueueStatus` st
+        ay staff-only.
       x-ticvai-read-routing: replica
       summary: List queues
       description: >
         Guest-facing when called with a guest token — returns only queues that are open and
         visible.
+
+        **A guest calls this without a permission and sees published data only** (Chinmay, 3 October 2026,
+        Pattern 4; CHG-GCF-001; `x-ticvai-guest-callable`): a guest or a visitor gets queues that are open and
+        visible, and nothing in draft, unpublished or withdrawn; asked for by id, such a record answers as not
+        found. `QUEUE_VIEW` is what a staff caller must hold, and staff also see drafts (ADR-0025).
+
+        **Order.** Sorted by `name` ascending, then by `id`.
+
+        **Statuses.** Every `status` is returned, ended ones included (`closed`); a screen that shows only live rows filters on `status` itself.
       tags: [queue]
       x-ticvai-permission: QUEUE_VIEW
+      x-ticvai-guest-callable: true
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: true
       x-ticvai-conflict-policy: serverWins
@@ -143,11 +214,20 @@ paths:
                         type: array
                         items: { $ref: '#/components/schemas/Queue' }
         '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
     post:
       operationId: createQueue
       x-ticvai-consumed-by:
+        - "P08 BO-001 Queue Directory"
         - "P08 BO-002 Queue Configuration"
+        - "P08 BO-005 Queue Monitor"
+      x-ticvai-read-via:
+      - query: promotions#promotionRecords
+        route: service
+        for: 'what its text calls "live promotion": promotions.promotion, Catalogue''s data (CHG-RTE-001)'
+      x-ticvai-audience: [staff]
       summary: Create a queue
       description: >
         Bound to an attraction and, where one exists, to an asset — so a ride taken out of
@@ -167,11 +247,18 @@ paths:
             schema: { $ref: '#/components/schemas/CreateQueueRequest' }
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Created
           content:
             application/json:
               schema: { $ref: '#/components/schemas/Queue' }
         '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
+        '409':
+          $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /queues/{queueId}:
     parameters:
@@ -181,6 +268,14 @@ paths:
         schema: { type: string, format: uuid }
     get:
       operationId: getQueue
+      x-ticvai-consumed-by:
+        - "P06 EMP-031 Queue monitor"
+        - "P06 EMP-032 Manual wait entry"
+        - "P08 BO-001 Queue Directory"
+        - "P08 BO-002 Queue Configuration"
+        - "P08 BO-004 Manual Wait Time Entry"
+        - "P08 BO-005 Queue Monitor"
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: Read a queue with live position
       tags: [queue]
@@ -195,17 +290,29 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/QueueDetail' }
         '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
     patch:
       operationId: updateQueue
       x-ticvai-consumed-by:
+        - "P08 BO-001 Queue Directory"
         - "P08 BO-002 Queue Configuration"
+        - "P08 BO-005 Queue Monitor"
+        - "P08 BO-221 Fast Pass & Attraction Access Journey"
+      x-ticvai-read-via:
+      - query: promotions#promotionRecords
+        route: service
+        for: 'what its text calls "live promotion": promotions.promotion, Catalogue''s data (CHG-RTE-001)'
+      x-ticvai-audience: [staff]
       summary: Amend queue configuration
       tags: [queue]
       x-ticvai-permission: QUEUE_MANAGE
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
         content:
@@ -214,19 +321,35 @@ paths:
               type: object
               minProperties: 1
               properties:
-                name: { type: string, maxLength: 200 }
+                name:
+                  $ref: '#/components/schemas/LocalisedText'
+                  description: >
+                    The same locale-to-text map `createQueue` takes and `Queue` returns, so an
+                    edit form round-trips the name. Replaces the whole map.
                 capacityPerCycle: { type: integer, minimum: 1 }
                 cycleMinutes: { type: number, minimum: 0 }
                 maxPartySize: { type: integer, minimum: 1 }
                 returnWindowMinutes: { type: integer, minimum: 1 }
                 heightRequirementCm: { type: integer, nullable: true }
                 fastPassAllocationPercent: { type: number, minimum: 0, maximum: 100 }
+                fastPass:
+                  allOf:
+                    - $ref: '#/components/schemas/QueueFastPass'
+                  nullable: true
+                  description: >
+                    The lane's Fast Pass block (decided 29 September, VM close-out). Replaces the whole
+                    block; null removes it.
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Updated
           content:
             application/json:
               schema: { $ref: '#/components/schemas/Queue' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /queues/{queueId}/status:
     parameters:
@@ -236,6 +359,16 @@ paths:
         schema: { type: string, format: uuid }
     put:
       operationId: setQueueStatus
+      x-ticvai-consumed-by:
+        - "P06 EMP-031 Queue monitor"
+        - "P08 BO-001 Queue Directory"
+        - "P08 BO-002 Queue Configuration"
+        - "P08 BO-005 Queue Monitor"
+      x-ticvai-read-via:
+      - query: promotions#promotionRecords
+        route: service
+        for: 'what its text calls "live promotion": promotions.promotion, Catalogue''s data (CHG-RTE-001)'
+      x-ticvai-audience: [staff]
       summary: Open, pause or close a queue
       description: >
         Pausing holds existing positions and stops new joins — the right response to a
@@ -244,6 +377,11 @@ paths:
 
         **Closing without notifying is not offered.** A guest holding a position for a ride
         that will not run should be told, not left to discover it.
+
+        **PUT semantics.** The target is the queue named by `queueId` in the path; this never
+        creates a queue. The body replaces the queue's status as a whole: `statusReason` takes
+        `reason`, and `expectedReopenAt` is cleared when it is omitted. `guestMessage` is sent
+        with the notification and is not stored.
       tags: [queue]
       x-ticvai-permission: QUEUE_MANAGE
       x-ticvai-scope-level: venue
@@ -266,29 +404,113 @@ paths:
                 expectedReopenAt: { type: string, format: date-time }
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Status set, with the effect on waiting guests reported
           content:
             application/json:
               schema: { $ref: '#/components/schemas/QueueStatusResult' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   # ---------------------------------------------------------------- entries
-  /queue-entries:
+  /waiting-guests:
+    get:
+      operationId: listMyWaitingGuests
+      x-ticvai-audience: [guest]
+      x-ticvai-read-routing: primary
+      summary: The caller's own queue entries
+      description: >
+        26 September, pull audit R208. **`joinQueue` was the only source of an entry id.**
+        `getWaitingGuest` and `leaveQueue` take `entryId` in the path, and the only list,
+        `listQueueEntries`, is staff-only and per queue — so a guest who reloaded the app, or
+        came back from Home after walking away, could not find their own place again. Called on
+        load by the four queue screens when no `entryId` arrived with them.
+
+        **Scoped to the caller, not filtered by it.** There is no subject parameter; the entries
+        returned are the ones whose `subjectId` is the calling guest. With no `status` the list
+        holds the active entries — `waiting` and `called` — which is what a returning guest is
+        looking for. Ordered by `estimatedCallAt`, soonest first, then `joinedAt`.
+      tags: [entry]
+      x-ticvai-permission: null   # a guest session. Reads and writes the guest’s own data only
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-self-scoped: subject
+      security:
+        - guestAuth: []
+        - bearerAuth: []
+      parameters:
+        - name: status
+          in: query
+          description: >
+            One entry status. Omitted, the list holds `waiting` and `called` entries only.
+          schema: { $ref: '#/components/schemas/QueueEntryStatus' }
+        - name: queueId
+          in: query
+          schema: { type: string, format: uuid }
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: The caller's entries
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/WaitingGuest' }
+        '401': { $ref: '../shared/common.yaml#/components/responses/Unauthorized' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+
     post:
       operationId: joinQueue
       x-ticvai-consumed-by:
-        - "P02 GST-023 Virtual Queue / Join Queue"
+        - "P01 WEB-040 Virtual Queue"
+        - "P02 GST-023 Virtual Queue"
+      x-ticvai-read-via:
+      - query: marketing-crm#loyaltyPositionRecords
+        route: in-process
+        for: 'its read of marketing.loyalty_position, Marketing''s data (CHG-MOD-001)'
+      - query: promotions#promotionRecords
+        route: service
+        for: 'its read of promotions.promotion, Catalogue''s data (CHG-MOD-001)'
+      x-ticvai-audience: [guest]
       summary: Join a virtual queue
       description: >
         Guest-facing. Returns a position, a party number and a return window.
+
+        **Ride queues (Q1) only** (ADR-0066, 1 October). It writes a `queue.entry` row per guest,
+        which is exactly the load an on-sale waiting room exists to keep away; the on-sale room is
+        catalogue `enterWaitingRoom`. The waiting-room parts of WEB-015 and GST-046 move there.
 
         **One active entry per guest per queue**, and a configurable cap across queues — a
         guest holding positions in every queue at once defeats the purpose of a virtual queue
         for everyone else.
 
+        **The cap is `VenueSettings.queue.crossQueueLimit`**, the number of queues a guest may
+        be waiting in at once in this venue: a venue setting with a tenant default (decided
+        28 September, audit R094). **Proposed default 2, client to correct (audit R094).** The
+        refusal carries the limit in `crossQueueLimit`.
+
         Where the party includes someone below the height requirement, the join is refused
         here rather than at the ride, which is a much better place to find out.
+
+        **Priority is decided here, by the server** (decided 29 September, build pass; 5.6.7,
+        5.6.34). On a lane with a `QueueFastPass` block the party joins as priority when it holds
+        a listed entitlement, is in a listed loyalty tier, qualifies for a listed live promotion
+        (or presents its `promotionCode`), or declares an accessibility need where the lane
+        accepts one; the entry records which as `priorityBasis`. On a `fastPass` lane a party
+        meeting none of them is refused `entitlementRequired`.
       tags: [entry]
-      x-ticvai-permission: null
+      x-ticvai-permission: null   # a guest session. Reads and writes the guest’s own data only
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -305,10 +527,13 @@ paths:
             schema: { $ref: '#/components/schemas/JoinQueueRequest' }
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Joined
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/QueueEntry' }
+              schema: { $ref: '#/components/schemas/WaitingGuest' }
         '409':
           description: >
             Already in this queue, at the cross-queue limit, party exceeds the maximum, queue
@@ -318,22 +543,29 @@ paths:
               schema: { $ref: '#/components/schemas/QueueJoinProblem' }
         '429': { $ref: '../shared/common.yaml#/components/responses/TooManyRequests' }
 
-  /queue-entries/{entryId}:
+  /waiting-guests/{entryId}:
     parameters:
       - name: entryId
         in: path
         required: true
-        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        schema: { type: string, format: uuid }
     get:
-      operationId: getQueueEntry
+      operationId: getWaitingGuest
+      x-ticvai-consumed-by:
+        - "P01 WEB-040 Virtual Queue"
+        - "P02 GST-023 Virtual Queue"
+      x-ticvai-audience: [guest]
       x-ticvai-read-routing: primary
       summary: Read a queue entry
       description: >
         Position, parties ahead, estimated call time. Polled by the guest app, so it is
         cacheable for a few seconds — a thousand guests refreshing a countdown is its own
         load problem.
+
+        **Ride queues (Q1) only** (ADR-0066): the on-sale waiting room's position is catalogue
+        `getWaitingRoomPosition`.
       tags: [entry]
-      x-ticvai-permission: null
+      x-ticvai-permission: null   # a guest session. Reads and writes the guest’s own data only
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -346,46 +578,63 @@ paths:
           description: Entry
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/QueueEntry' }
+              schema: { $ref: '#/components/schemas/WaitingGuest' }
         '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
     delete:
       operationId: leaveQueue
+      x-ticvai-consumed-by:
+        - "P01 WEB-040 Virtual Queue"
+        - "P02 GST-023 Virtual Queue"
+      x-ticvai-audience: [guest]
       summary: Leave a queue
       tags: [entry]
-      x-ticvai-permission: null
+      x-ticvai-permission: null   # a guest session. Reads and writes the guest’s own data only
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       x-ticvai-self-scoped: subject
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       security:
         - guestAuth: []
         - bearerAuth: []
       responses:
-        '204': { description: Left }
+        '204':
+          description: Left
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
         '409':
+          x-ticvai-problem-types: [queue-entry-not-waiting]
           description: Already called or redeemed
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
-  /queue-entries/{entryId}/redeem:
+  /waiting-guests/{entryId}/redeem:
     parameters:
       - name: entryId
         in: path
         required: true
-        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        schema: { type: string, format: uuid }
     post:
-      operationId: redeemQueueEntry
+      operationId: redeemWaitingGuest
+      x-ticvai-audience: [staff]
       summary: Admit a party at the ride
-      description: >
-        Scanned at the attraction. **Offline-capable**, like every other gate operation — a
-        ride entrance loses signal as readily as a turnstile does.
-
-        Where the entry carries a Fast Pass entitlement, redemption decrements its counter
-        through Product & Entitlement. The counter is not maintained here.
-
+      description: |-
+        Scanned at the attraction. **Offline-capable**, like every other gate operation — a ride entrance loses signal as readily as a turnstile does.
+        Where the entry carries a Fast Pass entitlement, redemption decrements its counter through Product & Entitlement. The counter is not maintained here.
         Arriving outside the return window is a denial with a reason, not a silent refusal.
+
+        **A Fast Pass redemption** (4 October 2026, CHG-FXC-004). Where the entry carries an `entitlementId`, redeeming calls
+        `access.validateAccess` for that entitlement at the queue's access point, which decrements its uses in Product &
+        Entitlement; `entitlementRemaining` is the remaining uses that call returns. This operation writes only
+        `queue.entry`.
       tags: [entry]
       x-ticvai-permission: QUEUE_REDEEM
       x-ticvai-scope-level: workstation
@@ -401,7 +650,7 @@ paths:
               type: object
               required: [id, recordedAt]
               properties:
-                id: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+                id: { type: string, format: uuid }
                 admittedCount:
                   type: integer
                   minimum: 1
@@ -409,20 +658,26 @@ paths:
                 recordedAt: { type: string, format: date-time }
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Redemption outcome
           content:
             application/json:
               schema: { $ref: '#/components/schemas/QueueRedemptionResult' }
         '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
-  /queue-entries/{entryId}/override:
+  /waiting-guests/{entryId}/override:
     parameters:
       - name: entryId
         in: path
         required: true
-        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        schema: { type: string, format: uuid }
     post:
-      operationId: overrideQueueEntry
+      operationId: overrideWaitingGuest
+      x-ticvai-audience: [staff]
       summary: Admit against a failed redemption
       description: >
         Late arrival, a guest whose phone died, a genuine system fault. Records the
@@ -447,10 +702,22 @@ paths:
                 recordedAt: { type: string, format: date-time }
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Admitted and recorded
           content:
             application/json:
               schema: { $ref: '#/components/schemas/QueueRedemptionResult' }
+        '409':
+          description: 'The entry was already `redeemed` (`queue-entry-already-redeemed`), or was `cancelled` or `released` from the queue (`queue-entry-cancelled`); there is no failed redemption to override. Nobody is admitted.'
+          x-ticvai-problem-types: [queue-entry-already-redeemed, queue-entry-cancelled]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /queues/{queueId}/call-next:
     parameters:
@@ -461,7 +728,12 @@ paths:
     post:
       operationId: callNextParties
       x-ticvai-consumed-by:
+        - "P06 EMP-031 Queue monitor"
+        - "P08 BO-001 Queue Directory"
+        - "P08 BO-002 Queue Configuration"
+        - "P08 BO-004 Manual Wait Time Entry"
         - "P08 BO-005 Queue Monitor"
+      x-ticvai-audience: [staff]
       summary: Call the next parties forward
       description: >
         Advances the queue by a cycle. Notifies each called party through their app and, where
@@ -489,6 +761,9 @@ paths:
                   description: Defaults to the queue's capacity per cycle.
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Called
           content:
             application/json:
@@ -498,8 +773,17 @@ paths:
                   calledCount: { type: integer }
                   calledEntryIds:
                     type: array
-                    items: { type: string }
+                    items: { type: string, format: uuid }
                   remainingInQueue: { type: integer }
+        '409':
+          description: 'The queue is `paused` or `closed`; parties are called only from an `open` or `atCapacity` queue. Nobody is called.'
+          x-ticvai-problem-types: [queue-not-open]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /queues/{queueId}/entries:
     parameters:
@@ -510,10 +794,16 @@ paths:
     get:
       operationId: listQueueEntries
       x-ticvai-consumed-by:
+        - "P06 EMP-031 Queue monitor"
+        - "P08 BO-001 Queue Directory"
+        - "P08 BO-004 Manual Wait Time Entry"
         - "P08 BO-005 Queue Monitor"
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: primary
       summary: List entries in a queue
       description: Operator view. Position order, with no-shows and expiries visible.
+
+        **Order.** Sorted by `positionInQueue` ascending, then by `joinedAt`.
       tags: [entry]
       x-ticvai-permission: QUEUE_VIEW
       x-ticvai-scope-level: venue
@@ -537,14 +827,35 @@ paths:
                     properties:
                       items:
                         type: array
-                        items: { $ref: '#/components/schemas/QueueEntry' }
+                        items: { $ref: '#/components/schemas/WaitingGuest' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   # ---------------------------------------------------------------- wait times
   /queues/wait-times:
     get:
       operationId: getWaitTimes
       x-ticvai-consumed-by:
+        - "P01 WEB-002 Event & Attraction Listing"
+        - "P01 WEB-004 Attraction Details"
+        - "P01 WEB-039 Venue Map & Wait Times"
+        - "P01 WEB-040 Virtual Queue"
+        - "P02 GST-003 Buy Tickets"
+        - "P02 GST-004 Item Detail"
+        - "P02 GST-021 Interactive Map"
+        - "P02 GST-022 Attraction Wait Times"
+        - "P02 GST-023 Virtual Queue"
+        - "P02 GST-038 At the Venue"
+        - "P02 GST-053 Your Plan"
+        - "P02 GST-054 AI Planner"
+        - "P02 GST-059 Plan in Progress"
+        - "P06 EMP-031 Queue monitor"
+        - "P06 EMP-032 Manual wait entry"
+        - "P08 BO-001 Queue Directory"
+        - "P08 BO-002 Queue Configuration"
+        - "P08 BO-004 Manual Wait Time Entry"
         - "P08 BO-005 Queue Monitor"
+      x-ticvai-audience: [guest, public]
       x-ticvai-read-routing: replica
       summary: Wait times across a venue
       description: >
@@ -555,13 +866,16 @@ paths:
         knew the difference, and an operator needs to know whether a figure came from a
         sensor or from someone's guess.
       tags: [waitTime]
-      x-ticvai-permission: null
+      x-ticvai-permission: null   # a guest session. Reads and writes the guest’s own data only
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: true
       x-ticvai-conflict-policy: serverWins
+      # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
+      # or staff token is still accepted. `{}` makes the credential optional.
       security:
-        - guestAuth: []
-        - bearerAuth: []
+      - {}
+      - guestAuth: []
+      - bearerAuth: []
       parameters:
         - name: venueId
           in: query
@@ -569,7 +883,14 @@ paths:
           schema: { type: string, format: uuid }
         - name: category
           in: query
-          schema: { type: string }
+          description: >
+            A catalogue product category id (`ProductCategory`, catalogue contract). Narrows the
+            list to queues whose attraction product (`attractionProductId`) is filed under that
+            category; each row carries it as `attractionCategoryId`, so a screen can name the
+            active filter. Not free text — the category list is catalogue's, not this contract's.
+            The attraction category is what "category" means here (decided 28 September, audit
+            R106 (2)).
+          schema: { type: string, format: uuid }
       responses:
         '200':
           description: Wait times
@@ -578,6 +899,8 @@ paths:
               schema:
                 type: array
                 items: { $ref: '#/components/schemas/WaitTime' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /queues/{queueId}/wait-time:
     parameters:
@@ -588,12 +911,26 @@ paths:
     put:
       operationId: setWaitTime
       x-ticvai-consumed-by:
+        - "P06 EMP-031 Queue monitor"
+        - "P06 EMP-032 Manual wait entry"
+        - "P08 BO-001 Queue Directory"
+        - "P08 BO-002 Queue Configuration"
         - "P08 BO-004 Manual Wait Time Entry"
+        - "P08 BO-005 Queue Monitor"
+      x-ticvai-audience: [staff]
       summary: Manually set a wait time
       description: >
         Operator override, and the fallback where no sensor feed exists. A manual figure is
-        marked as such and expires after a configured interval rather than persisting
-        indefinitely — a stale manual estimate is worse than none.
+        marked as such and expires after the interval the caller states in `expiresInMinutes`
+        (30 when omitted) rather than persisting indefinitely — a stale manual estimate is worse
+        than none. When it expires the queue reverts to its sensor or throughput estimate, or to
+        `unavailable` where it has neither.
+
+        **PUT semantics.** The target is the queue named by `queueId` in the path; this never
+        creates a queue. Each call replaces the queue's current manual figure whole — minutes,
+        note and expiry — and restarts the expiry from now. An omitted `note` clears the previous
+        one. Stored on the queue as `currentWaitMinutes`, `manualWaitNote`,
+        `manualWaitExpiresAt` and `waitTimeAsOf`.
       tags: [waitTime]
       x-ticvai-permission: QUEUE_MANAGE
       x-ticvai-scope-level: venue
@@ -610,14 +947,24 @@ paths:
               required: [waitMinutes]
               properties:
                 waitMinutes: { type: integer, minimum: 0 }
-                expiresInMinutes: { type: integer, default: 30 }
+                expiresInMinutes:
+                  type: integer
+                  minimum: 1
+                  default: 30
+                  description: How long this manual figure stands before the queue reverts.
                 note: { type: string, maxLength: 200 }
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set
           content:
             application/json:
               schema: { $ref: '#/components/schemas/WaitTime' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   # ---------------------------------------------------------------- feeds
   /queue-feeds:
@@ -625,10 +972,13 @@ paths:
       operationId: listQueueFeeds
       x-ticvai-consumed-by:
         - "P08 BO-001 Queue Directory"
+        - "P08 BO-003 Queue Integration Setup"
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: List configured sensor feeds
       description: >
-        Which third-party system supplies each queue, and whether it is currently reporting.
+        Which third-party system supplies each queue, and whether it is currently reporting
+        (`health` on each row, the same `QueueFeedHealth` that `getQueueFeedHealth` returns).
         A silent feed is the most common cause of a wrong wait time.
       tags: [feed]
       x-ticvai-permission: QUEUE_MANAGE
@@ -643,12 +993,16 @@ paths:
               schema:
                 type: array
                 items: { $ref: '#/components/schemas/QueueFeed' }
-
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /queue-feeds/{feedId}:
     put:
       operationId: configureQueueFeed
-      x-ticvai-config-scope: venue
       x-ticvai-consumed-by:
+        - "P08 BO-001 Queue Directory"
         - "P08 BO-003 Queue Integration Setup"
+      x-ticvai-audience: [staff]
+      x-ticvai-config-scope: venue
       summary: Configure a sensor feed
       description: >
         Enables integration for a venue and selects an adaptor. **TICVAI ships no vendor
@@ -657,12 +1011,25 @@ paths:
 
         `mock` exists so the whole feature can be built and demonstrated with no vendor
         involvement at all.
+
+        **PUT semantics — an upsert keyed on the body's `id`.** There is no id in the path, so
+        the body names its target: where no feed has that `id`, one is created and the answer is
+        `201`; where one does, the body replaces it whole and the answer is `200`. Omitted
+        optional fields take their defaults or null — an omitted `credentialsRef` removes the
+        stored reference, and an omitted `expectedIntervalSeconds` returns to 60. A feed never
+        moves between queues: a body whose `queueId` differs from the stored feed's is refused
+        with `409`. `health` is read-only and ignored on input.
       tags: [feed]
       x-ticvai-permission: QUEUE_MANAGE
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
+        - name: feedId
+          in: path
+          required: true
+          description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+          schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
@@ -671,19 +1038,38 @@ paths:
             schema: { $ref: '#/components/schemas/QueueFeed' }
       responses:
         '200':
-          description: Configured
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Configured — an existing feed with this `id`, replaced
           content:
             application/json:
               schema: { $ref: '#/components/schemas/QueueFeed' }
+        '201':
+          description: Created — no feed had this `id`
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/QueueFeed' }
+        '409':
+          x-ticvai-problem-types: [feed-belongs-to-other-queue]
+          description: The feed with this `id` belongs to a different queue. A feed does not move between queues
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
         '400':
+          x-ticvai-problem-types: [unknown-adaptor, adaptor-credentials-missing]
           description: Unknown adaptor, or credentials missing for the selected adaptor
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+
 
   /queue-feeds/readings:
     post:
       operationId: submitQueueReading
+      x-ticvai-audience: [device]
       summary: Inbound sensor reading
       description: >
         **The integration surface.** A venue's camera or people-counting system posts here,
@@ -694,16 +1080,18 @@ paths:
 
         Readings are batched and idempotent on the reading ID. Out-of-order readings are
         discarded rather than applied — a late reading that lowers a wait time misleads
-        everyone downstream.
+        everyone downstream. A discarded reading is still kept, with its `feedId` and
+        `disposition: discardedOutOfOrder`, so feed health can count it; it never moves an
+        estimate. A duplicate is the same reading ID again, has no row of its own, and is
+        counted only in this response's `duplicates`.
       tags: [feed]
-      x-ticvai-permission: null
+      x-ticvai-permission: null   # a registered device, authenticated by its enrolment rather than a person
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: append
       security:
         - apiKeyAuth: []
         - serviceAuth: []
-      x-ticvai-auth: service
       parameters:
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
@@ -722,6 +1110,9 @@ paths:
                   items: { $ref: '#/components/schemas/QueueReading' }
       responses:
         '202':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Accepted
           content:
             application/json:
@@ -732,6 +1123,8 @@ paths:
                   duplicates: { type: integer }
                   discardedOutOfOrder: { type: integer }
         '401': { $ref: '../shared/common.yaml#/components/responses/Unauthorized' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /queue-feeds/{feedId}/test:
     parameters:
@@ -742,7 +1135,9 @@ paths:
     post:
       operationId: testQueueFeed
       x-ticvai-consumed-by:
+        - "P08 BO-001 Queue Directory"
         - "P08 BO-003 Queue Integration Setup"
+      x-ticvai-audience: [staff]
       summary: Test a feed before trusting it
       description: >
         Attempts one exchange with the configured source and reports what came back — reachable,
@@ -758,13 +1153,20 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Test complete. Check `succeeded` — a reachable source that returns nonsense is a failure
           content:
             application/json:
               schema: { $ref: '#/components/schemas/FeedTestResult' }
         '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /queue-feeds/{feedId}/health:
     parameters:
@@ -775,13 +1177,18 @@ paths:
     get:
       operationId: getQueueFeedHealth
       x-ticvai-consumed-by:
+        - "P08 BO-001 Queue Directory"
         - "P08 BO-003 Queue Integration Setup"
+      x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: Feed health
       description: >
         Last reading, expected interval, and whether the feed has gone quiet. A silent feed
         falls back to throughput-derived estimates and the wait time is marked accordingly —
         it does not simply freeze at the last value.
+
+        **A feed is healthy when its last reading is within its expected interval** (decided
+        28 September, audit R106 (1)).
       tags: [feed]
       x-ticvai-permission: QUEUE_MANAGE
       x-ticvai-scope-level: venue
@@ -793,11 +1200,14 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/QueueFeedHealth' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   # ---------------------------------------------------------------- signage
   /signage/queue-board:
     get:
       operationId: getSignageQueueBoard
+      x-ticvai-audience: [device]
       x-ticvai-read-routing: replica
       summary: Wait-time board for a display
       description: >
@@ -805,7 +1215,7 @@ paths:
         rendering rather than for an application — a signage panel should not need to
         interpret anything.
       tags: [signage]
-      x-ticvai-permission: null
+      x-ticvai-permission: null   # a registered device, authenticated by its enrolment rather than a person
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: true
       x-ticvai-conflict-policy: serverWins
@@ -828,17 +1238,20 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/SignageBoard' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /signage/queue-calls:
     get:
       operationId: getSignageQueueCalls
+      x-ticvai-audience: [device]
       x-ticvai-read-routing: replica
       summary: Currently called party numbers
       description: >
         The now-serving display at a ride entrance. Short-lived and polled frequently, so it
         returns only what changed since the supplied cursor.
       tags: [signage]
-      x-ticvai-permission: null
+      x-ticvai-permission: null   # a registered device, authenticated by its enrolment rather than a person
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: true
       x-ticvai-conflict-policy: serverWins
@@ -870,6 +1283,8 @@ paths:
                         calledAt: { type: string, format: date-time }
                         expiresAt: { type: string, format: date-time }
                   asOf: { type: string, format: date-time }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
 components:
   schemas:
@@ -897,7 +1312,7 @@ components:
       type: object
       required: [code, name, venueId, capacityPerCycle, cycleMinutes]
       properties:
-        code: { type: string, maxLength: 64 }
+        code: { type: string, maxLength: 64, x-ticvai-unique: venue }
         name: { $ref: '#/components/schemas/LocalisedText' }
         venueId: { type: string, format: uuid }
         attractionProductId: { type: string, format: uuid }
@@ -909,6 +1324,73 @@ components:
             The ride. Taking it out of service closes this queue rather than leaving guests
             holding positions for something that is not running.
         accessPointId: { type: string, format: uuid, nullable: true }
+        kind:
+          type: string
+          enum: [standby, singleRider, fastPass, virtual, accessible, groupOnly, staffOnly]
+          default: standby
+          description: >
+            5.6.x. **A ride has several queues and the model had one.** A single-rider line and a
+            standby line at the same attraction draw from one capacity and fill at different rates,
+            and modelling them as one queue makes both wait estimates wrong.
+
+            **`accessible` is not a courtesy lane.** It has its own capacity because a guest who
+            cannot stand in a switchback needs a place to wait, not priority.
+        operatingWindows:
+          type: array
+          description: >
+            **When the queue runs, which is not when the venue is open.** A ride closing an hour
+            early for maintenance leaves a queue accepting guests for a cycle that will not happen.
+
+            Stored one row per window in `queue.queue_operating_window` (see `Queue`), not as a
+            column on the queue.
+          items:
+            type: object
+            required: [day, from, to]
+            properties:
+              day: { type: string, enum: [mon, tue, wed, thu, fri, sat, sun] }
+              from:
+                type: string
+                pattern: '^([01][0-9]|2[0-3]):[0-5][0-9]$'
+                description: Venue local time, 24-hour `HH:MM`, when the queue starts running.
+              to:
+                type: string
+                pattern: '^([01][0-9]|2[0-3]):[0-5][0-9]$'
+                description: Venue local time, 24-hour `HH:MM`, when the queue stops running.
+              lastEntryMinutesBefore:
+                type: integer
+                default: 0
+                description: >
+                  **When the queue stops accepting, which is before it stops running.** A guest
+                  joining two minutes before close waits twenty and is turned away at the front.
+        parentQueueId:
+          x-ticvai-references: queue.queue
+          type: string
+          format: uuid
+          nullable: true
+          description: >
+            Where several queues share one capacity. **The standby and single-rider lines at one
+            ride draw from the same cycles**, and a parent is how that is expressed without either
+            queue owning the other.
+        loadBalanceWithQueueIds:
+          type: array
+          description: >
+            BL-137. **Two rides with the same theme and different waits**, and nothing directed a
+            guest to the shorter one. Load balancing is an offer, not an assignment — **a guest sent
+            to a ride they did not choose is a guest who feels managed.**
+          items: { type: string, format: uuid }
+        inQueueOfferEnabled:
+          type: boolean
+          default: false
+          description: >
+            **A guest with twenty minutes to wait is a guest with twenty minutes to buy something.**
+            Offers surface in the wait screen and are the only reason a virtual queue earns its
+            infrastructure.
+        notifyBeforeCallMinutes:
+          type: integer
+          default: 5
+          description: >
+            BL-017, 19.2.61. **A guest was not told their turn was approaching**, which makes a
+            virtual queue worse than a physical one — at least a line is visible.
         capacityPerCycle: { type: integer, minimum: 1 }
         cycleMinutes: { type: number, minimum: 0 }
         maxPartySize: { type: integer, default: 6 }
@@ -924,9 +1406,94 @@ components:
           default: 0
           description: Share of each cycle reserved for Fast Pass holders.
         zone: { type: string, nullable: true }
+        fastPass:
+          x-ticvai-persisted: false
+          allOf:
+            - $ref: '#/components/schemas/QueueFastPass'
+          nullable: true
+          description: >
+            The lane's Fast Pass block (decided 29 September, VM close-out). Null on a queue that
+            takes no Fast Pass.
+
+    QueueFastPass:
+      x-ticvai-persistence: "queue.queue"
+      type: object
+      description: >
+        **Which Fast Pass entitlements this lane accepts, and how** (decided 29 September, VM
+        close-out; pack 'Access Control Module' p.109, BO-221 Fast Pass & Attraction Access Journey).
+        Fast Pass stays an entitlement owned by Product & Entitlement; this block is the lane's
+        side of it: which products it honours, the return window, a per-guest daily cap and the
+        access points that redeem it. Stored on the queue row. Only meaningful where `kind` is
+        `fastPass` or `fastPassAllocationPercent` is above 0.
+
+        **Four ways into priority, not one** (decided 29 September, build pass; 5.6.7 and 5.6.34).
+        A guest joins this lane as priority when they hold an entitlement from
+        `entitlementProductIds` (VIP, annual pass, premium package), are a member of a tier in
+        `loyaltyTierIds`, qualify for a live promotion in `promotionIds`, or declare an
+        accessibility need where `accessibilityPriority` is on. The first criterion met is
+        recorded on the entry as `WaitingGuest.priorityBasis`. Every criterion is resolved by the
+        server at join time; nothing the request asserts about a tier or a promotion is trusted.
+        All four draw on the same reserved `fastPassAllocationPercent`, so widening who qualifies
+        never widens the share of the ride they take.
+      required: [entitlementProductIds]
+      properties:
+        entitlementProductIds:
+          type: array
+          description: >
+            Catalogue products whose entitlement admits to this lane. May be empty where priority
+            comes only from a tier, a promotion or an accessibility need.
+          items: { type: string, format: uuid }
+        loyaltyTierIds:
+          type: array
+          description: >
+            5.6.7 and 5.6.34 (decided 29 September, build pass). Loyalty programme tiers
+            (`marketing.programme_tier`) whose members join this lane as priority. Read from the
+            guest's own loyalty position at join time, never from the request, so a guest cannot
+            claim a tier they do not hold. Empty: tier grants nothing on this lane.
+          items: { type: string, format: uuid }
+        promotionIds:
+          type: array
+          description: >
+            5.6.34 (decided 29 September, build pass). Promotions that grant queue privilege on
+            this lane while they are live. A guest qualifies when the promotion's conditions hold
+            for them at join (the evaluation `promotions` already makes for a price), or by
+            presenting its code in `JoinQueueRequest.promotionCode`. A paused or expired
+            promotion grants nothing.
+          items: { type: string, format: uuid }
+        accessibilityPriority:
+          type: boolean
+          default: false
+          description: >
+            5.6.7 (decided 29 September, build pass). A party that declares an accessibility need
+            (`JoinQueueRequest.accessibilityNeedDeclared`) joins as priority. **Taken on trust**,
+            because asking for proof at a ride entrance is worse than the occasional abuse; the
+            declaration is on the entry, so the operator at the front sees it
+            (`listQueueEntries`). A venue that wants proof sells or issues an accessibility pass
+            and lists it in `entitlementProductIds` instead. **Not the `accessible` lane**: that
+            is where a guest who cannot stand in a switchback waits; this moves them ahead in the
+            lane they chose.
+        returnWindowMinutes:
+          type: integer
+          minimum: 1
+          maximum: 240
+          default: 60
+          description: >
+            How long after the booked return time a Fast Pass holder may still enter. Proposed,
+            our build plan.
+        maxPerGuestPerDay:
+          type: integer
+          minimum: 1
+          nullable: true
+          description: Fast Pass redemptions one guest may make on this lane per day; null is no cap.
+        allowedAccessPointIds:
+          type: array
+          description: Access points that redeem Fast Pass for this lane; empty is the queue's own.
+          items: { type: string, format: uuid }
 
     Queue:
-      x-ticvai-persistence: "queue.queue"
+      # `operatingWindows` is an array of objects, so its rows are a child table rather than a
+      # column. Pull audit R107 (26 September): the array was on the wire with nowhere to be stored.
+      x-ticvai-persistence: "queue.queue + queue.queue_operating_window"
       allOf:
         - $ref: '#/components/schemas/CreateQueueRequest'
         - type: object
@@ -939,6 +1506,29 @@ components:
             waitingGuestCount: { type: integer }
             currentWaitMinutes: { type: integer, nullable: true }
             waitTimeSource: { $ref: '#/components/schemas/WaitTimeSource' }
+            waitTimeAsOf:
+              type: string
+              format: date-time
+              nullable: true
+              readOnly: true
+              description: >
+                When `currentWaitMinutes` was last set, by whichever source set it. `WaitTime.asOf`
+                reads this.
+            manualWaitExpiresAt:
+              type: string
+              format: date-time
+              nullable: true
+              readOnly: true
+              description: >
+                Set by `setWaitTime` as now plus `expiresInMinutes`. Past it, the manual figure is
+                dropped and the queue reverts to its sensor or throughput estimate. Null when the
+                current figure is not manual.
+            manualWaitNote:
+              type: string
+              maxLength: 200
+              nullable: true
+              readOnly: true
+              description: The `note` given with the current manual figure. Cleared when it expires.
             expectedReopenAt: { type: string, format: date-time, nullable: true }
 
     QueueDetail:
@@ -974,7 +1564,7 @@ components:
       type: object
       required: [id, queueId, partySize, recordedAt]
       properties:
-        id: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        id: { type: string, format: uuid }
         queueId: { type: string, format: uuid }
         partySize: { type: integer, minimum: 1 }
         entitlementId:
@@ -989,6 +1579,21 @@ components:
             Where the queue has a height requirement. Refusing here is far better than
             refusing at the ride, in front of a child who has already waited.
           items: { type: integer }
+        accessibilityNeedDeclared:
+          type: boolean
+          default: false
+          description: >
+            The party declares an accessibility need (5.6.7; decided 29 September, build pass).
+            Grants priority only on a lane whose `QueueFastPass.accessibilityPriority` is on, and
+            is recorded on the entry either way.
+        promotionCode:
+          type: string
+          maxLength: 64
+          nullable: true
+          description: >
+            A promotion code the guest holds, checked against the lane's
+            `QueueFastPass.promotionIds` (5.6.34). A code for a promotion the lane does not list
+            grants nothing and is not an error.
         recordedAt: { type: string, format: date-time }
 
     QueueJoinProblem:
@@ -1009,15 +1614,24 @@ components:
                 - queueAtCapacity
                 - entitlementRequired
             activeQueueCount: { type: integer }
-            crossQueueLimit: { type: integer }
+            crossQueueLimit:
+              type: integer
+              description: >
+                `crossQueueLimitReached`: the venue's `VenueSettings.queue.crossQueueLimit`
+                (proposed default 2, audit R094).
             heightRequirementCm: { type: integer, nullable: true }
 
-    QueueEntry:
+    WaitingGuest:
       x-ticvai-persistence: "queue.entry"
       type: object
       required: [id, queueId, partyNumber, partySize, status, joinedAt]
       properties:
-        id: { type: string }
+        id:
+          type: string
+          format: uuid
+          description: >
+            The client-generated UUIDv7 from `JoinQueueRequest.id`, and the `entryId` every entry
+            path takes. `listMyWaitingGuests` gives it back to a guest who has lost it.
         queueId: { type: string, format: uuid }
         queueName: { $ref: '#/components/schemas/LocalisedText' }
         subjectId: { type: string, format: uuid, nullable: true }
@@ -1030,6 +1644,31 @@ components:
         partiesAhead: { type: integer, nullable: true }
         estimatedCallAt: { type: string, format: date-time, nullable: true }
         isFastPass: { type: boolean }
+        priorityBasis:
+          type: string
+          enum: [none, entitlement, loyaltyTier, promotion, accessibility]
+          default: none
+          description: >
+            Why this party is priority, when it is (decided 29 September, build pass; 5.6.7,
+            5.6.34): the first `QueueFastPass` criterion met at join, in the order entitlement,
+            loyalty tier, promotion, accessibility. `isFastPass` is true whenever this is not
+            `none`. Kept on the entry so a disputed priority can be explained afterwards.
+        priorityTierId:
+          x-ticvai-references: marketing.programme_tier
+          type: string
+          format: uuid
+          nullable: true
+          description: The loyalty tier that granted priority, where `priorityBasis` is `loyaltyTier`.
+        priorityPromotionId:
+          x-ticvai-references: promotions.promotion
+          type: string
+          format: uuid
+          nullable: true
+          description: The promotion that granted priority, where `priorityBasis` is `promotion`.
+        accessibilityNeedDeclared:
+          type: boolean
+          default: false
+          description: What the party declared at join, shown to the operator at the front.
         entitlementId: { type: string, nullable: true }
         calledAt: { type: string, format: date-time, nullable: true }
         returnWindowEndsAt: { type: string, format: date-time, nullable: true }
@@ -1037,13 +1676,30 @@ components:
         admittedCount: { type: integer, nullable: true }
         joinedAt: { type: string, format: date-time }
         syncedAt: { type: string, format: date-time, nullable: true }
+        overriddenByPrincipalId:
+          x-ticvai-references: identity.principal
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          description: '**Who let the party past the queue** (`overrideWaitingGuest`, 4 October 2026, CHG-FXC-003), with
+            `overrideReason` and `overriddenAt`. Null when the entry was never overridden.'
+        overrideReason:
+          type: string
+          nullable: true
+          readOnly: true
+        overriddenAt:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
 
     QueueRedemptionResult:
       x-ticvai-persistence: "none — computed, persisted as entry state"
       type: object
       required: [entryId, outcome, recordedAt]
       properties:
-        entryId: { type: string }
+        entryId: { type: string, format: uuid }
         outcome:
           type: string
           enum: [admitted, denied, overridden]
@@ -1075,6 +1731,13 @@ components:
         queueId: { type: string, format: uuid }
         queueName: { $ref: '#/components/schemas/LocalisedText' }
         attractionProductId: { type: string, format: uuid, nullable: true }
+        attractionCategoryId:
+          type: string
+          format: uuid
+          nullable: true
+          description: >
+            The catalogue `ProductCategory` the attraction product is filed under — the value the
+            `category` filter on `getWaitTimes` matches. Read from catalogue, not stored here.
         status: { $ref: '#/components/schemas/QueueStatus' }
         waitMinutes:
           type: integer
@@ -1085,16 +1748,27 @@ components:
           type: boolean
           description: >
             The underlying feed has gone quiet past its expected interval. The figure is
-            shown with a caveat rather than frozen and presented as current.
+            shown with a caveat rather than frozen and presented as current, and it is not
+            hidden (decided 28 September, audit R080 (b)): the screen shows `waitMinutes` with
+            its `asOf` and a stale marker.
         heightRequirementCm: { type: integer, nullable: true }
         zone: { type: string, nullable: true }
-        asOf: { type: string, format: date-time }
+        asOf:
+          type: string
+          format: date-time
+          description: When the figure was produced — the queue's `waitTimeAsOf`.
 
     QueueFeedAdaptor:
       type: string
       description: >
         Vendor adaptors are bespoke work (ADR-0012). `generic` is the inbound API any system
         can post to; `mock` lets the feature be built and demonstrated with no vendor at all.
+
+        **`manual` is not an adaptor.** A queue with no enabled feed runs on figures an operator
+        sets through `setWaitTime`, and its `WaitTimeSource` reads `manual` — that is the whole of
+        the manual path, and there is no feed row for it. Transports a screen might list (sensor
+        API, webhook, MQTT, turnstile count, camera) all post to the one inbound API, which is
+        `generic`; anything that needs code of its own to fetch or translate is `vendorAdaptor`.
       enum: [generic, mock, vendorAdaptor]
 
     QueueFeed:
@@ -1102,7 +1776,7 @@ components:
       type: object
       required: [id, queueId, adaptor, isEnabled]
       properties:
-        id: { type: string, format: uuid }
+        id: { type: string, format: uuid, readOnly: true }
         queueId: { type: string, format: uuid }
         adaptor: { $ref: '#/components/schemas/QueueFeedAdaptor' }
         adaptorName:
@@ -1118,13 +1792,37 @@ components:
           default: 60
           description: Beyond this without a reading, the feed is considered quiet.
         isEnabled: { type: boolean }
+        health:
+          allOf:
+            - $ref: '#/components/schemas/QueueFeedHealth'
+          readOnly: true
+          x-ticvai-persisted: false
+          description: >
+            Whether the feed is currently reporting, computed on read — what `listQueueFeeds`
+            promises per row. Ignored on input to `configureQueueFeed`.
 
     QueueReading:
       x-ticvai-persistence: "queue.reading"
       type: object
-      required: [id, kind, value, observedAt]
+      # feedId: every reading comes from one feed, named in the submitQueueReading body (CHG-MGN-001).
+      required: [id, feedId, kind, value, observedAt]
       properties:
-        id: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        id: { type: string, format: uuid }
+        feedId:
+          x-ticvai-references: queue.feed
+          type: string
+          format: uuid
+          readOnly: true
+          description: >
+            The feed that sent it, taken from the `submitQueueReading` body. Per-feed health
+            counts by this, not by queue.
+        disposition:
+          type: string
+          readOnly: true
+          enum: [applied, discardedOutOfOrder]
+          description: >
+            Set on receipt. A `discardedOutOfOrder` reading is kept so feed health can count it
+            and never moves an estimate.
         kind:
           type: string
           description: >
@@ -1174,17 +1872,31 @@ components:
       properties:
         feedId: { type: string, format: uuid }
         adaptor: { $ref: '#/components/schemas/QueueFeedAdaptor' }
-        isHealthy: { type: boolean }
+        isHealthy:
+          type: boolean
+          description: >
+            **Healthy means the last reading arrived within the feed's expected interval**
+            (decided 28 September, audit R106 (1)): `lastReadingAt` is no older than
+            `expectedIntervalSeconds`. It is the opposite of `isQuiet`, and nothing else (latency,
+            discards) makes a reporting feed unhealthy.
         isQuiet:
           type: boolean
           description: >
             No reading within the expected interval. The wait time falls back to
             throughput-derived and is marked stale rather than freezing at the last value.
         lastReadingAt: { type: string, format: date-time, nullable: true }
+        expectedIntervalSeconds:
+          type: integer
+          description: >
+            The feed's `expectedIntervalSeconds` — the interval `isQuiet` is judged against,
+            returned here so a health panel does not need the feed row as well.
         readingsLastHour: { type: integer }
         discardedLastHour:
           type: integer
-          description: Out-of-order or duplicate readings rejected.
+          description: >
+            Out-of-order readings rejected in the last hour — rows of `queue.reading` for this feed
+            with `disposition: discardedOutOfOrder`. Duplicates are not counted here: a duplicate
+            has no row, and `submitQueueReading` reports it in its own `duplicates`.
 
     SignageBoard:
       x-ticvai-persistence: "none — projection"

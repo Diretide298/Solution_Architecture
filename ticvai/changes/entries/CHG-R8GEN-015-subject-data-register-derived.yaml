@@ -1,0 +1,27 @@
+id: CHG-R8GEN-015
+date: '2026-10-20'
+source: audit
+kind: process
+summary: 'The tables that hold a guest''s data are listed by the module that owns them, from the schema: tools/derive-subject-data-register.py writes handoff/subject-data-register.json (83 tables with a subject_id column across 12 modules), each module''s subjectDataRecords query if declared, and whether exportSubjectData asks it. A refresh step runs it. Today 11 owners declare no query and none is asked: the list each owner''s query must cover.'
+decision:
+  what: 'r8 cause IDENTITY-C65, the generator part. The owner queries, exportSubjectData''s read-via and Identity''s own pii reads are the core and surface lanes'', requested in the r8 generators report.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: R8 blocker cause list, cause IDENTITY-C65 (ticket 27750; ADAM gaps 27750/4, 27750/5).'
+keys_touched:
+  files:
+  - tools/derive-subject-data-register.py
+  - tools/refresh.sh
+  - handoff/subject-data-register.json
+root_class: 'a hand list of what a generator could derive'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: R8 blocker walk, second round brief (generators lane)'
+triage: blocker
+prevention:
+  type: generator-rule
+  ref: tools/derive-subject-data-register.py
+status: open

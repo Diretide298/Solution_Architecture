@@ -1,0 +1,26 @@
+id: CHG-R8GEN-006
+date: '2026-10-20'
+source: audit
+kind: process
+summary: 'roles-by-app.yaml gives each app its permission set as one list (permissionSet), the predicate the doors'' ''holds no role in this app'' answer needs: a principal holds a role in the app when at least one live grant resolves to a value in that list.'
+decision:
+  what: 'r8 cause IDENTITY-C11, option A (the lead, 20 October 2026), the generator part: tools/derive-app-roles.py emits the per-app permission set as data. The 403 no-role-in-app problem type and its accessContact extension on login and selectRole (contracts/spine/identity.yaml) are the core lane''s, requested in the r8 generators report.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: R8 blocker cause list, cause IDENTITY-C11 (tickets 27758, 27761, 27762, 27767, 27768, 27773, 27786; ADAM gaps 27762/2, 27786/2, 27773/5, 27758/4, 27768/4, 27767/3, 27761/5).'
+keys_touched:
+  files:
+  - tools/derive-app-roles.py
+  - roles-by-app.yaml
+root_class: 'a rule with no data behind it: a state the screens show that no field or list decides'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: R8 blocker walk, second round brief (generators lane)'
+triage: blocker
+prevention:
+  type: generator-rule
+  ref: tools/check-permission-vocabulary.py
+status: open

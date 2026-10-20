@@ -2,103 +2,251 @@ openapi: 3.1.0
 info:
   title: TICVAI Platform Operations
   version: 0.1.0
-  x-ticvai-screen-count: 18
+  x-ticvai-screen-count: 39
   x-ticvai-tier: satellite
-  x-ticvai-module: "Cross-cutting — Control Plane release and environment management"
-  x-ticvai-capabilities: [C96]
+  x-ticvai-module: Cross-cutting — Control Plane release and environment management
+  x-ticvai-capabilities:
+  - C96
   x-ticvai-platforms:
-    - "P09 Platform Admin Console"
-  description: >
-    ## What this contract covers
-
-    **Releases, environments and the migration orchestrator.**
-
-    | | |
-    |---|---|
-    | **Tier** | satellite — Control Plane |
-    | **Matrix domain** | None. This scope arrived in the 30 July workshop and never reached the requirements matrix |
-    | **Capabilities** | C96 |
-    | **Consumed by** | P09 Platform Admin Console |
-
-    ## Why this contract exists
-
-    Thirteen screens in the Platform Admin Console had no contract behind them: release and
-    version management, staging promotion, the upgrade scheduler, end-of-support notices, the
-    deployment monitor, and the **database migration console**.
-
-    All thirteen were raised on 30 July, minuted, and then never written into a requirement.
-    They were consequently absent from the matrix, from the capability register, and from
-    every estimate — which is why the Platform Admin Console was the largest platform nobody
-    had counted.
-
-    This contract closes that gap. **It should be reconciled against the matrix**, because a
-    scope that reaches a contract without passing through a requirement has skipped the step
-    that would have caught it earlier.
-
-    ## How to read this file
-
-    **This file is a contract.** Hand-authored, and the source of truth for one bounded
-    context — code is generated from it, never the reverse.
-
-    **`paths` are operations.** Each declares `x-ticvai-permission`, `x-ticvai-scope-level`,
-    `x-ticvai-offline-capable` and `x-ticvai-conflict-policy`.
-
-    **`components.schemas` are API schemas — the shape of data on the wire.** Not database
-    tables. Where a mapping exists, `x-ticvai-persistence` records it.
-
-    ## Positions this encodes
-
-    - **The orchestrator fans out per region, not per tenant** (ADR-0014). A tenant in three
-      regions is three cells and three applications, and they may legitimately sit at
-      different versions mid-rollout.
-    - **A migration is never applied blind.** Plan, then apply, then verify. The plan reports
-      what will run against which cells and what the rollback costs, and it is computed
-      against the actual cell state rather than assumed.
-    - **Rollback is tested, not asserted.** Every migration carries a rollback that CI runs
-      against a restored snapshot. A rollback nobody has executed is a comment.
-    - **Promotion is a workflow with an approver.** Staging to production is not a button.
-    - **Version skew is expected and visible.** During a rollout cells differ; the console
-      shows which and why, because unexplained skew is a defect and explained skew is Tuesday.
-
+  - P09 TICVAI Web
+  description: "## What this contract covers\n**Releases, environments and the migration orchestrator.**\n\
+    | | | |---|---| | **Tier** | satellite — Control Plane | | **Matrix domain** | None. This scope arrived\
+    \ in the 30 July workshop and never reached the requirements matrix | | **Capabilities** | C96 | |\
+    \ **Consumed by** | P09 TICVAI Web |\n## Why this contract exists\nThirteen screens in the Platform\
+    \ Admin Console had no contract behind them: release and version management, staging promotion, the\
+    \ upgrade scheduler, end-of-support notices, the deployment monitor, and the **database migration\
+    \ console**.\nAll thirteen were raised on 30 July, minuted, and then never written into a requirement.\
+    \ They were consequently absent from the matrix, from the capability register, and from every estimate\
+    \ — which is why the Platform Admin Console was the largest platform nobody had counted.\nThis contract\
+    \ closes that gap. **It should be reconciled against the matrix**, because a scope that reaches a\
+    \ contract without passing through a requirement has skipped the step that would have caught it earlier.\n\
+    ## How to read this file\n**This file is a contract.** Hand-authored, and the source of truth for\
+    \ one bounded context — code is generated from it, never the reverse.\n**`paths` are operations.**\
+    \ Each declares `x-ticvai-permission`, `x-ticvai-scope-level`, `x-ticvai-offline-capable` and `x-ticvai-conflict-policy`.\n\
+    **`components.schemas` are API schemas — the shape of data on the wire.** Not database tables. Where\
+    \ a mapping exists, `x-ticvai-persistence` records it.\n## Positions this encodes\n- **The orchestrator\
+    \ fans out per region, not per tenant** (ADR-0014). A tenant in three\n  regions is three cells and\
+    \ three applications, and they may legitimately sit at\n  different versions mid-rollout.\n- **A migration\
+    \ is never applied blind.** Plan, then apply, then verify. The plan reports\n  what will run against\
+    \ which cells and what the rollback costs, and it is computed\n  against the actual cell state rather\
+    \ than assumed.\n- **Rollback is tested, not asserted.** Every migration carries a rollback that CI\
+    \ runs\n  against a restored snapshot. A rollback nobody has executed is a comment.\n- **Promotion\
+    \ is a workflow with an approver.** Staging to production is not a button. - **Version skew is expected\
+    \ and visible.** During a rollout cells differ; the console\n  shows which and why, because unexplained\
+    \ skew is a defect and explained skew is Tuesday.\n"
 servers:
-  - url: https://{controlPlaneHost}/api/v1
-    variables:
-      controlPlaneHost:
-        default: control.ticvai.local
-
+- url: https://{controlPlaneHost}/api/v1
+  variables:
+    controlPlaneHost:
+      default: control.ticvai.local
 security:
-  - bearerAuth: []
-
+- bearerAuth: []
 tags:
-  - name: release
-  - name: migration
-  - name: environment
-  - name: rollout
-  - name: notice
-
+- name: release
+- name: migration
+- name: environment
+- name: rollout
+- name: notice
+x-ticvai-queries:
+  # Queries other modules ask this module (ADR-0055 amendment, 14 October 2026): module, inputs, returns, rule, served.
+  # **Data reads other modules ask this module for** (MOD audit, 14 October 2026, CHG-MOD-001): one query per
+  # table, instead of a raw read of it (check-cross-module-reads XR-UNCOVERED; ADR-0055 rule 2, amended
+  # 14 October).
+  contentBlockRecords:
+    module: platform-ops
+    table: control.content_block
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The control.content_block rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Platform stores it; an id with no visible row is absent.'
+      items: {type: object, description: 'A control.content_block row: the columns handoff/schema-reference.json lists for it.'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Platform answers with its control.content_block rows, as it stores them and as the caller's
+      scope lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
+      process within operations, through the C# query interface Platform implements, and asked from another
+      deployable through Platform's service route (serviceAuth).
+    served: [in-process, service]
+  seoMetadataRecords:
+    module: platform-ops
+    table: control.seo_metadata
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The control.seo_metadata rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Platform stores it; an id with no visible row is absent.'
+      items: {type: object, description: 'A control.seo_metadata row: the columns handoff/schema-reference.json lists for it.'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Platform answers with its control.seo_metadata rows, as it stores them and as the caller's scope
+      lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
+      process within operations, through the C# query interface Platform implements.
+    served: [in-process]
+  tenantDomainRecords:
+    module: platform-ops
+    table: control.tenant_domain
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The control.tenant_domain rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Platform stores it; an id with no visible row is absent.'
+      items: {type: object, description: 'A control.tenant_domain row: the columns handoff/schema-reference.json lists for it.'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Platform answers with its control.tenant_domain rows, as it stores them and as the caller's scope
+      lets it see them (the table's row-level security, under the caller's connection and transaction). It decides
+      nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and a question
+      with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in process within
+      operations, through the C# query interface Platform implements, and asked from another deployable through
+      Platform's service route (serviceAuth).
+    served: [in-process, service]
+  urlRedirectRecords:
+    module: platform-ops
+    table: control.url_redirect
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The control.url_redirect rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Platform stores it; an id with no visible row is absent.'
+      items: {type: object, description: 'A control.url_redirect row: the columns handoff/schema-reference.json lists for it.'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Platform answers with its control.url_redirect rows, as it stores them and as the caller's scope
+      lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
+      process within operations, through the C# query interface Platform implements.
+    served: [in-process]
+  hostnameHeldByAnotherTenant:
+    module: platform-ops
+    table: control.tenant_domain
+    inputs:
+      hostname: {type: string, description: 'The hostname being claimed.'}
+    returns:
+      type: object
+      required: [held]
+      properties:
+        held: {type: boolean, description: 'True when another tenant holds it; who holds it is never returned.'}
+    rule: >-
+      A rule question (ADAM CR-096, 15 October 2026, CHG-RTE-001). True when a control.tenant_domain row with
+      lower(hostname) equal to the asked hostname's, whose status is active, belongs to a tenant other than the
+      caller's. Platform answers on its control connection, across tenants, and returns nothing about the holder.
+      claimCustomDomain refuses the claim when it is true. It is asked in process within operations, through the C#
+      query interface Platform implements.
+    served: [in-process]
 paths:
-  # ---------------------------------------------------------------- releases
+  /rollouts/{rolloutId}/cells/{cellId}/skip:
+    parameters:
+    - name: rolloutId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    - name: cellId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: skipRolloutCell
+      x-ticvai-audience:
+      - staff
+      summary: Exclude a cell from this wave
+      description: 'An on-premise cell TICVAI cannot reach, a venue in a blackout window, or a tenant
+        who asked to be held back.
+
+        **Recorded, not silent.** A cell skipped and forgotten runs an old version indefinitely, and the
+        drift is discovered when an API it does not have is called.
+
+        '
+      tags:
+      - platform-ops
+      x-ticvai-permission: PLATFORM_CELL_MANAGE
+      x-ticvai-scope-level: platform
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - reason
+              properties:
+                reason:
+                  type: string
+                  enum:
+                  - onPremiseIsolated
+                  - onPremiseConnected
+                  - blackoutWindow
+                  - tenantRequested
+                  - unreachable
+                  - knownIncompatibility
+                note:
+                  type: string
+                  maxLength: 300
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Skipped, and recorded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RolloutCell'
+        '409':
+          description: 'The cell is not `pending` (already `running`, `complete`, `failed`, `skipped` or `rolledBack`); only a cell the wave has not reached can be skipped. Nothing changes.'
+          x-ticvai-problem-types: [rollout-cell-not-pending]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /releases:
     get:
       operationId: listReleases
       x-ticvai-consumed-by:
         - "P09 ADM-022 Release & Version Management"
+        - "P09 ADM-023 Staging Promotion & Approval"
+        - "P09 ADM-024 Release Notification Composer"
+      description: '**Order.** Newest first, by `createdAt` descending, then by `id`.'
+      x-ticvai-audience:
+      - staff
       x-ticvai-read-routing: replica
       summary: List releases
-      tags: [release]
+      tags:
+      - release
       x-ticvai-permission: PLATFORM_RELEASE_VIEW
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
-        - name: status
-          in: query
-          schema: { $ref: '#/components/schemas/ReleaseStatus' }
-        - name: environment
-          in: query
-          schema: { $ref: '#/components/schemas/EnvironmentKind' }
-        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
-        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      - name: status
+        in: query
+        schema:
+          $ref: '#/components/schemas/ReleaseStatus'
+      - name: environment
+        in: query
+        schema:
+          $ref: '#/components/schemas/EnvironmentKind'
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
       responses:
         '200':
           description: Releases
@@ -106,59 +254,88 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - $ref: '../shared/common.yaml#/components/schemas/Page'
-                  - type: object
-                    properties:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
                       items:
-                        type: array
-                        items: { $ref: '#/components/schemas/Release' }
-        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
-
+                        $ref: '#/components/schemas/Release'
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createRelease
+      x-ticvai-consumed-by:
+        - "P09 ADM-022 Release & Version Management"
+      x-ticvai-audience:
+      - staff
       summary: Cut a release
-      description: >
-        A release names the component versions that ship together and the migrations they
+      description: 'A release names the component versions that ship together and the migrations they
         require. Nothing is deployed by creating one — it is a manifest, not an action.
-      tags: [release]
+
+        **It also carries the guest-facing "what''s new"** (decided 29 September, rev 3 GAP-B2):
+        `guestReleaseNotes`, localised, written for guests and public. `note` stays internal. The notes of
+        the releases a tenant''s cell is running are what the guest Help screen reads, through the public
+        guest view of `white-label.getTenantAppStatus`; a release with no guest-visible change leaves them
+        null and shows nothing.
+
+        '
+      tags:
+      - release
       x-ticvai-permission: PLATFORM_RELEASE_MANAGE
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
-        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
         content:
           application/json:
-            schema: { $ref: '#/components/schemas/CreateReleaseRequest' }
+            schema:
+              $ref: '#/components/schemas/CreateReleaseRequest'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Created
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/Release' }
+              schema:
+                $ref: '#/components/schemas/Release'
         '400':
-          description: >
-            A required migration is absent, or a component version does not exist in the
-            registry.
+          x-ticvai-problem-types: [required-migration-missing, unknown-component-version]
+          description: 'A required migration is absent, or a component version does not exist in the registry.
+
+            '
           content:
             application/problem+json:
-              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
-
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /releases/{releaseId}:
     parameters:
-      - name: releaseId
-        in: path
-        required: true
-        schema: { type: string, format: uuid }
+    - name: releaseId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
     get:
       operationId: getRelease
       x-ticvai-consumed-by:
         - "P09 ADM-022 Release & Version Management"
+        - "P09 ADM-023 Staging Promotion & Approval"
+      x-ticvai-audience:
+      - staff
       x-ticvai-read-routing: replica
       summary: Read a release with its rollout state
-      tags: [release]
+      tags:
+      - release
       x-ticvai-permission: PLATFORM_RELEASE_VIEW
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
@@ -168,43 +345,163 @@ paths:
           description: Release
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/ReleaseDetail' }
-        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
-
-  /releases/{releaseId}/promote:
+              schema:
+                $ref: '#/components/schemas/ReleaseDetail'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /releases/{releaseId}/reject:
     parameters:
-      - name: releaseId
-        in: path
-        required: true
-        schema: { type: string, format: uuid }
+    - name: releaseId
+      in: path
+      required: true
+      schema:
+        type: string
     post:
-      operationId: promoteRelease
+      operationId: rejectRelease
       x-ticvai-consumed-by:
+        - "P09 ADM-022 Release & Version Management"
         - "P09 ADM-023 Staging Promotion & Approval"
-      summary: Promote a release to the next environment
-      description: >
-        Dev to staging to production, in order. Skipping an environment is refused.
+      x-ticvai-audience:
+      - staff
+      summary: Reject a release back a stage
+      description: 'Staging promotion is where a bad release is stopped, and stopping it needs to be as
+        easy as promoting it.
 
-        **Promotion to production requires an approver who is not the requester**, and the
-        approval is recorded against the release. Staging to production is a workflow, not a
-        button.
-      tags: [release]
+        '
+      tags:
+      - release
       x-ticvai-permission: PLATFORM_RELEASE_PROMOTE
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
-        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
         content:
           application/json:
             schema:
               type: object
-              required: [targetEnvironment, note]
+              required:
+              - reason
               properties:
-                targetEnvironment: { $ref: '#/components/schemas/EnvironmentKind' }
-                note: { type: string, minLength: 3, maxLength: 1000 }
+                reason:
+                  type: string
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Done
+        '409':
+          x-ticvai-problem-types: [release-not-in-staging]
+          description: Not in a state that permits this
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /releases/{releaseId}/withdraw:
+    parameters:
+    - name: releaseId
+      in: path
+      required: true
+      schema:
+        type: string
+    post:
+      operationId: withdrawRelease
+      x-ticvai-consumed-by:
+        - "P09 ADM-022 Release & Version Management"
+      x-ticvai-audience:
+      - staff
+      summary: Withdraw a release
+      description: 'Distinct from a rollback. The rollout state handles the mechanics of reversing a deployment;
+        this records the decision that the artefact should never ship again.
+
+        '
+      tags:
+      - release
+      x-ticvai-permission: PLATFORM_RELEASE_MANAGE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - reason
+              properties:
+                reason:
+                  type: string
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Done
+        '409':
+          x-ticvai-problem-types: [release-transition-not-allowed]
+          description: Not in a state that permits this
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /releases/{releaseId}/promote:
+    parameters:
+    - name: releaseId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: promoteRelease
+      x-ticvai-consumed-by:
+        - "P09 ADM-022 Release & Version Management"
+        - "P09 ADM-023 Staging Promotion & Approval"
+      x-ticvai-audience:
+      - staff
+      summary: Promote a release to the next environment
+      description: 'Dev to staging to production, in order. Skipping an environment is refused.
+
+        **Promotion to production requires an approver who is not the requester**, and the approval is
+        recorded against the release. Staging to production is a workflow, not a button.
+
+        '
+      tags:
+      - release
+      x-ticvai-permission: PLATFORM_RELEASE_PROMOTE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - targetEnvironment
+              - note
+              properties:
+                targetEnvironment:
+                  $ref: '#/components/schemas/EnvironmentKind'
+                note:
+                  type: string
+                  minLength: 3
+                  maxLength: 1000
                 approverPrincipalId:
                   type: string
                   format: uuid
@@ -214,40 +511,55 @@ paths:
                   description: Required for production. Proves a factor was presented just now.
       responses:
         '202':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Promotion started
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/Rollout' }
+              schema:
+                $ref: '#/components/schemas/Rollout'
         '403':
+          x-ticvai-problem-types: [approver-is-requester, step-up-token-missing, step-up-token-expired]
           description: Approver is the requester, or the step-up token is absent or expired
           content:
             application/problem+json:
-              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
-          description: >
-            Environment skipped, prior environment unhealthy, or the release has unapplied
+          description: 'Environment skipped, prior environment unhealthy, or the release has unapplied
             migrations in the target.
+
+            '
           content:
             application/problem+json:
-              schema: { $ref: '#/components/schemas/PromotionBlockedProblem' }
-
+              schema:
+                $ref: '#/components/schemas/PromotionBlockedProblem'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /releases/{releaseId}/readiness:
     parameters:
-      - name: releaseId
-        in: path
-        required: true
-        schema: { type: string, format: uuid }
+    - name: releaseId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
     get:
       operationId: getReleaseReadiness
       x-ticvai-consumed-by:
         - "P09 ADM-022 Release & Version Management"
         - "P09 ADM-023 Staging Promotion & Approval"
+      x-ticvai-audience:
+      - staff
       x-ticvai-read-routing: replica
       summary: Whether a release can be promoted, and what blocks it
-      description: >
-        Run before promoting. Reports each gate and its state, so a blocked promotion is
-        diagnosed before it is attempted rather than after.
-      tags: [release]
+      description: 'Run before promoting. Reports each gate and its state, so a blocked promotion is diagnosed
+        before it is attempted rather than after.
+
+        '
+      tags:
+      - release
       x-ticvai-permission: PLATFORM_RELEASE_VIEW
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
@@ -257,30 +569,38 @@ paths:
           description: Readiness
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/ReleaseReadiness' }
-
-  # ---------------------------------------------------------------- rollouts
+              schema:
+                $ref: '#/components/schemas/ReleaseReadiness'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /rollouts:
     get:
       operationId: listRollouts
       x-ticvai-consumed-by:
         - "P09 ADM-029 Deployment Monitor"
+      x-ticvai-audience:
+      - staff
       x-ticvai-read-routing: replica
       summary: List rollouts
-      description: >
-        A rollout is one release reaching one environment across many cells. The deployment
+      description: 'A rollout is one release reaching one environment across many cells. The deployment
         monitor reads this.
-      tags: [rollout]
+
+        
+
+        **Order.** Newest first, by `startedAt` descending, then by `id`.'
+      tags:
+      - rollout
       x-ticvai-permission: PLATFORM_RELEASE_VIEW
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
-        - name: status
-          in: query
-          schema: { $ref: '#/components/schemas/RolloutStatus' }
-        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
-        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      - name: status
+        in: query
+        schema:
+          $ref: '#/components/schemas/RolloutStatus'
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
       responses:
         '200':
           description: Rollouts
@@ -288,30 +608,38 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - $ref: '../shared/common.yaml#/components/schemas/Page'
-                  - type: object
-                    properties:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
                       items:
-                        type: array
-                        items: { $ref: '#/components/schemas/Rollout' }
-
+                        $ref: '#/components/schemas/Rollout'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /rollouts/{rolloutId}:
     parameters:
-      - name: rolloutId
-        in: path
-        required: true
-        schema: { type: string, format: uuid }
+    - name: rolloutId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
     get:
       operationId: getRollout
       x-ticvai-consumed-by:
         - "P09 ADM-029 Deployment Monitor"
+      x-ticvai-audience:
+      - staff
       x-ticvai-read-routing: replica
       summary: Rollout progress per cell
-      description: >
-        Cells advance in waves — canary first, then the rest. Per-cell state is the only
-        useful view, because "60% complete" says nothing about whether the failing 40% is one
-        region or forty venues.
-      tags: [rollout]
+      description: 'Cells advance in waves — canary first, then the rest. Per-cell state is the only useful
+        view, because "60% complete" says nothing about whether the failing 40% is one region or forty
+        venues.
+
+        '
+      tags:
+      - rollout
       x-ticvai-permission: PLATFORM_RELEASE_VIEW
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
@@ -321,125 +649,274 @@ paths:
           description: Rollout
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/RolloutDetail' }
-        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+              schema:
+                $ref: '#/components/schemas/RolloutDetail'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /rollouts/{rolloutId}/start:
+    parameters:
+    - name: rolloutId
+      in: path
+      required: true
+      schema:
+        type: string
+    post:
+      operationId: startRollout
+      x-ticvai-consumed-by:
+        - "P09 ADM-029 Deployment Monitor"
+      x-ticvai-audience:
+      - staff
+      summary: Start or continue a rollout
+      description: 'Begins at the canary and continues from it once held. **The canary should be a dedicated
+        cell or the smallest shared one** — a canary that is itself a busy shared cell risks many tenants
+        (ADR-0001 (retired — see ADR-0014 and ADR-0017)).
 
+        **Needs the platform release manager''s approval** (decided 28 September, audit R144). Each start
+        or continuation raises an approval request of kind `releasePromotion`, routed to a holder of
+        `PLATFORM_RELEASE_PROMOTE` other than the requester, and answers `202` with the rollout unchanged
+        and `approvalRequestId` set (the request is `pending`). The rollout moves to the requested stage
+        when the request is approved. A requester may never approve their own promotion.
+
+        '
+      tags:
+      - rollout
+      x-ticvai-permission: PLATFORM_RELEASE_PROMOTE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - stage
+              properties:
+                stage:
+                  type: string
+                  enum:
+                  - canary
+                  - partial
+                  - full
+                  description: >-
+                    The stage to take the rollout to (decided 28 September, audit R096). `canary` is the
+                    first cell only; `partial` is a wave of the remaining cells, and may be sent again to
+                    continue with the next wave; `full` is every remaining cell. A stage behind the one the
+                    rollout has reached is a 409.
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Done
+        '202':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Waiting for the platform release manager (audit R144). Nothing has moved yet.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - rolloutId
+                - approvalRequestId
+                properties:
+                  rolloutId:
+                    type: string
+                  stage:
+                    type: string
+                    enum:
+                    - canary
+                    - partial
+                    - full
+                    description: The stage requested, applied on approval.
+                  approvalRequestId:
+                    type: string
+                    format: uuid
+                    description: The pending `releasePromotion` request.
+        '409':
+          x-ticvai-problem-types: [rollout-transition-not-allowed]
+          description: Not in a state that permits this
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /rollouts/{rolloutId}/pause:
     parameters:
-      - name: rolloutId
-        in: path
-        required: true
-        schema: { type: string, format: uuid }
+    - name: rolloutId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
     post:
       operationId: pauseRollout
       x-ticvai-consumed-by:
         - "P09 ADM-029 Deployment Monitor"
+      x-ticvai-audience:
+      - staff
       summary: Halt a rollout in progress
-      description: >
-        Stops before the next cell. Cells already updated stay updated — this is a pause, not
-        a rollback, and the distinction matters when someone reaches for it at speed.
-      tags: [rollout]
+      description: 'Stops before the next cell. Cells already updated stay updated — this is a pause,
+        not a rollback, and the distinction matters when someone reaches for it at speed.
+
+        '
+      tags:
+      - rollout
       x-ticvai-permission: PLATFORM_RELEASE_PROMOTE
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
-        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
         content:
           application/json:
             schema:
               type: object
-              required: [reason]
+              required:
+              - reason
               properties:
-                reason: { type: string, minLength: 3, maxLength: 500 }
+                reason:
+                  type: string
+                  minLength: 3
+                  maxLength: 500
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Paused, with the cells already updated reported
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/RolloutDetail' }
-
+              schema:
+                $ref: '#/components/schemas/RolloutDetail'
+        '409':
+          description: 'The rollout is already `paused` (`rollout-already-paused`), or is not `rolling` (`queued`, `canary`, or finished as `complete`, `failed` or `rolledBack`; `rollout-not-rolling`). Nothing changes.'
+          x-ticvai-problem-types: [rollout-already-paused, rollout-not-rolling]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /rollouts/{rolloutId}/rollback:
     parameters:
-      - name: rolloutId
-        in: path
-        required: true
-        schema: { type: string, format: uuid }
+    - name: rolloutId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
     post:
       operationId: rollbackRollout
       x-ticvai-consumed-by:
         - "P09 ADM-029 Deployment Monitor"
+      x-ticvai-audience:
+      - staff
       summary: Roll a rollout back
-      description: >
-        Reverts application versions and, where the release carried migrations, runs their
+      description: 'Reverts application versions and, where the release carried migrations, runs their
         rollback sections against each affected cell.
 
-        **Refused where any migration in the release is not reversible.** A destructive
-        migration is a one-way door, and the console says so rather than half-reverting and
-        leaving a cell in a state nobody has a name for.
-      tags: [rollout]
+        **Refused where any migration in the release is not reversible.** A destructive migration is a
+        one-way door, and the console says so rather than half-reverting and leaving a cell in a state
+        nobody has a name for.
+
+        '
+      tags:
+      - rollout
       x-ticvai-permission: PLATFORM_RELEASE_PROMOTE
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
-        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
         content:
           application/json:
             schema:
               type: object
-              required: [reason, stepUpToken]
+              required:
+              - reason
+              - stepUpToken
               properties:
-                reason: { type: string, minLength: 3, maxLength: 1000 }
-                stepUpToken: { type: string }
+                reason:
+                  type: string
+                  minLength: 3
+                  maxLength: 1000
+                stepUpToken:
+                  type: string
                 cellIds:
                   type: array
                   description: Omit to roll back every cell in the rollout.
-                  items: { type: string, format: uuid }
+                  items:
+                    type: string
+                    format: uuid
       responses:
         '202':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Rollback started
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/RolloutDetail' }
+              schema:
+                $ref: '#/components/schemas/RolloutDetail'
         '409':
-          description: >
-            A migration in this release is irreversible. The response names it — a one-way
+          description: 'A migration in this release is irreversible. The response names it — a one-way
             door should be identified, not discovered.
+
+            '
           content:
             application/problem+json:
-              schema: { $ref: '#/components/schemas/IrreversibleProblem' }
-
-  # ---------------------------------------------------------------- migrations
+              schema:
+                $ref: '#/components/schemas/IrreversibleProblem'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /migrations:
     get:
       operationId: listMigrations
       x-ticvai-consumed-by:
         - "P09 ADM-027 Database Migration Console"
+      x-ticvai-audience:
+      - staff
       x-ticvai-read-routing: replica
       summary: The migration register
-      description: >
-        Every migration, its module, whether it is reversible, and which cells have applied
-        it. This is the migration console's landing view.
-      tags: [migration]
+      description: 'Every migration, its module, whether it is reversible, and which cells have applied
+        it. This is the migration console''s landing view.
+
+        
+
+        **Order.** Newest first, by `rollbackTestedAt` descending.'
+      tags:
+      - migration
       x-ticvai-permission: PLATFORM_MIGRATION_VIEW
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
-        - name: appliedTo
-          in: query
-          description: Filter to migrations applied, or not applied, to a given cell.
-          schema: { type: string, format: uuid }
-        - name: pendingOnly
-          in: query
-          schema: { type: boolean, default: false }
-        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
-        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      - name: appliedTo
+        in: query
+        description: Filter to migrations applied, or not applied, to a given cell.
+        schema:
+          type: string
+          format: uuid
+      - name: pendingOnly
+        in: query
+        schema:
+          type: boolean
+          default: false
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
       responses:
         '200':
           description: Migrations
@@ -447,124 +924,374 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - $ref: '../shared/common.yaml#/components/schemas/Page'
-                  - type: object
-                    properties:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
                       items:
-                        type: array
-                        items: { $ref: '#/components/schemas/Migration' }
-
+                        $ref: '#/components/schemas/Migration'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /migrations/plan:
     post:
       operationId: planMigration
       x-ticvai-consumed-by:
         - "P09 ADM-027 Database Migration Console"
+      x-ticvai-audience:
+      - staff
       summary: Plan a migration run without applying it
-      description: >
-        **The safety step.** Computes, against actual cell state rather than assumption: which
-        cells are behind, which migrations each needs, in what order, the estimated lock
-        duration per statement, and whether every migration in the set is reversible.
+      description: '**The safety step.** Computes, against actual cell state rather than assumption: which
+        cells are behind, which migrations each needs, in what order, the estimated lock duration per
+        statement, and whether every migration in the set is reversible.
 
-        A plan that reports a long lock on a partitioned table during trading hours is the
-        output this endpoint exists to produce.
-      tags: [migration]
+        A plan that reports a long lock on a partitioned table during trading hours is the output this
+        endpoint exists to produce.
+
+        '
+      tags:
+      - migration
       x-ticvai-permission: PLATFORM_MIGRATION_VIEW
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
         content:
           application/json:
             schema:
               type: object
-              required: [targetVersion]
+              required:
+              - targetVersion
               properties:
-                targetVersion: { type: string }
+                targetVersion:
+                  type: string
                 cellIds:
                   type: array
                   description: Omit to plan across every cell in scope.
-                  items: { type: string, format: uuid }
-                environment: { $ref: '#/components/schemas/EnvironmentKind' }
+                  items:
+                    type: string
+                    format: uuid
+                environment:
+                  $ref: '#/components/schemas/EnvironmentKind'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Plan
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/MigrationPlan' }
+              schema:
+                $ref: '#/components/schemas/MigrationPlan'
         '400':
+          x-ticvai-problem-types: [unknown-target-version, migration-path-not-contiguous]
           description: Target version unknown, or the path between versions is not contiguous
           content:
             application/problem+json:
-              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
-
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /migrations/apply:
     post:
       operationId: applyMigration
       x-ticvai-consumed-by:
         - "P09 ADM-027 Database Migration Console"
+      x-ticvai-audience:
+      - staff
       summary: Apply a planned migration run
-      description: >
-        Takes a plan id, so what is applied is what was reviewed. A plan computed against
-        cell state that has since changed is rejected rather than applied to a different
-        world than the one it was made for.
+      description: 'Takes a plan id, so what is applied is what was reviewed. A plan computed against
+        cell state that has since changed is rejected rather than applied to a different world than the
+        one it was made for.
 
-        **Fans out per region** (ADR-0014). Cells advance in waves with a canary first, and
-        a failure halts the wave rather than continuing into it.
-      tags: [migration]
+        **Fans out per region** (ADR-0014). Cells advance in waves with a canary first, and a failure
+        halts the wave rather than continuing into it.
+
+        **A failed run is resumed, not restarted** (ADAM CR-160, 18 October 2026; CHG-CRA-006; PLATFORM-MIGRATE''s
+        spec of 4 October). Applying the plan of a run that is `failed`, once the cause is fixed, moves that run back
+        to `running` (states/migration-run.yaml): tenants already `complete` stay complete, and the failed tenant is
+        retried from its `control.migration_run_tenant` row before the wave goes on. Only a run already rolled back
+        cannot be resumed (`409 migration-run-rolled-back`); its plan is planned again.
+
+        '
+      tags:
+      - migration
       x-ticvai-permission: PLATFORM_MIGRATION_APPLY
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
-        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
         content:
           application/json:
             schema:
               type: object
-              required: [planId, stepUpToken]
+              required:
+              - planId
+              - stepUpToken
               properties:
-                planId: { type: string, format: uuid }
-                stepUpToken: { type: string }
+                planId:
+                  type: string
+                  format: uuid
+                stepUpToken:
+                  type: string
                 canaryCellId:
                   type: string
                   format: uuid
-                  description: >
-                    Applied alone and verified before the rest proceed. Defaults to the
-                    smallest cell in the plan.
-                haltOnFirstFailure: { type: boolean, default: true }
+                  description: 'Applied alone and verified before the rest proceed. Defaults to the smallest
+                    cell in the plan.
+
+                    '
+                haltOnFirstFailure:
+                  type: boolean
+                  default: true
                 maintenanceWindow:
                   type: object
                   properties:
-                    startsAt: { type: string, format: date-time }
-                    endsAt: { type: string, format: date-time }
+                    startsAt:
+                      type: string
+                      format: date-time
+                    endsAt:
+                      type: string
+                      format: date-time
       responses:
         '202':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Run started
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/MigrationRun' }
+              schema:
+                $ref: '#/components/schemas/MigrationRun'
         '409':
-          description: >
-            The plan is stale — cell state changed since it was computed. Re-plan and review
-            before applying.
+          x-ticvai-problem-types: [migration-plan-stale, migration-run-rolled-back]
+          description: 'The plan is stale — cell state changed since it was computed. Re-plan and review
+            before applying. Or the plan''s run was rolled back and cannot be resumed
+            (`migration-run-rolled-back`; ADAM CR-160, CHG-CRA-006).
+
+            '
           content:
             application/problem+json:
-              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /config-packages:
+    post:
+      operationId: exportConfigPackage
+      x-ticvai-consumed-by:
+        - "P09 ADM-700 Configuration Promotion"
+      x-ticvai-audience:
+      - staff
+      x-ticvai-agreed: '2 October: Chinmay, workbook Q168 (ADM-122: "industry standard: forward-only migrations; config
+        packages with diff, approval and idempotent upsert"); shape follows planMigration'
+      summary: Export a tenant's configuration as a versioned package
+      description: '**Configuration moves as a versioned package, never as a database** (Chinmay, 2 October, workbook
+        Q168; CHG-CSA-034). Production databases are never merged or reverse-migrated; schema goes forward only
+        through versioned migrations, expand then contract (`planMigration`, `applyMigration`). This exports the
+        configuration of one tenant in one environment (pre-production, say) as a package: every configuration
+        record with its **stable key** (the record''s code or natural key, never a database id), versioned and
+        checksummed. **Secrets and environment settings never travel in it**: credentials, key-vault references,
+        endpoints and anything environment-specific are left out and listed as `excludedKinds`. Then
+        `diffConfigPackage` against the target, approval, and `applyConfigPackage`.
 
+        '
+      tags:
+      - migration
+      x-ticvai-permission: PLATFORM_RELEASE_MANAGE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - sourceEnvironment
+              properties:
+                sourceEnvironment:
+                  $ref: '#/components/schemas/EnvironmentKind'
+                kinds:
+                  type: array
+                  description: The configuration kinds to include (e.g. products, price lists, access profiles,
+                    templates); all where absent.
+                  items:
+                    type: string
+      responses:
+        '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: The package
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConfigPackage'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /config-packages/{packageId}/diff:
+    parameters:
+    - name: packageId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: diffConfigPackage
+      x-ticvai-consumed-by:
+        - "P09 ADM-700 Configuration Promotion"
+      x-ticvai-audience:
+      - staff
+      x-ticvai-agreed: '2 October: Chinmay, workbook Q168; shape follows planMigration'
+      summary: Compare a package with the target environment
+      description: 'Every record the package would add, change or leave, matched on its stable key against the target
+        environment''s configuration (CHG-CSA-034). Writes nothing; the diff is what the approver reviews, and
+        `applyConfigPackage` takes its id, so what is applied is what was reviewed.
+
+        '
+      tags:
+      - migration
+      x-ticvai-permission: PLATFORM_RELEASE_VIEW
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - targetEnvironment
+              properties:
+                targetEnvironment:
+                  $ref: '#/components/schemas/EnvironmentKind'
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: The diff
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConfigPackageDiff'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          description: The package was exported for a different tenant than the target (`package-tenant-mismatch`).
+          x-ticvai-problem-types:
+          - package-tenant-mismatch
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /config-packages/{packageId}/apply:
+    parameters:
+    - name: packageId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: applyConfigPackage
+      x-ticvai-consumed-by:
+        - "P09 ADM-700 Configuration Promotion"
+      x-ticvai-audience:
+      - staff
+      x-ticvai-agreed: '2 October: Chinmay, workbook Q168; shape follows applyMigration'
+      summary: Apply an approved package to the target environment
+      description: '**An idempotent upsert by stable key, approved and audited** (Chinmay, 2 October, workbook Q168;
+        CHG-CSA-034). Takes the reviewed diff''s id: a diff computed against a target that has since changed is
+        refused 409 `diff-stale`. Each record is inserted or updated by its stable key, never by a database id, so
+        applying the same package twice changes nothing the second time. Records in the target that the package
+        does not name are left alone. Needs a step-up and the diff''s approval (an `approvals` request); every
+        record written is audited against the package. **Rollback re-applies the previous package** (the target''s
+        last applied package, kept with its diff); there is no reverse migration.
+
+        '
+      tags:
+      - migration
+      x-ticvai-permission: PLATFORM_MIGRATION_APPLY
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - diffId
+              - stepUpToken
+              properties:
+                diffId:
+                  type: string
+                  format: uuid
+                approvalRequestId:
+                  type: string
+                  format: uuid
+                  description: The approved request for this diff.
+                stepUpToken:
+                  type: string
+      responses:
+        '202':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Applying
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConfigPackageApplication'
+        '409':
+          description: The diff is stale (`diff-stale`), or not approved (`diff-not-approved`).
+          x-ticvai-problem-types:
+          - diff-stale
+          - diff-not-approved
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /migrations/runs/{runId}:
     parameters:
-      - name: runId
-        in: path
-        required: true
-        schema: { type: string, format: uuid }
+    - name: runId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
     get:
       operationId: getMigrationRun
+      x-ticvai-consumed-by:
+        - "P09 ADM-027 Database Migration Console"
+      x-ticvai-audience:
+      - staff
       x-ticvai-read-routing: replica
       summary: Migration run progress per cell
-      tags: [migration]
+      tags:
+      - migration
       x-ticvai-permission: PLATFORM_MIGRATION_VIEW
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
@@ -574,62 +1301,89 @@ paths:
           description: Run
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/MigrationRun' }
-        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
-
+              schema:
+                $ref: '#/components/schemas/MigrationRun'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /migrations/runs/{runId}/rollback:
     parameters:
-      - name: runId
-        in: path
-        required: true
-        schema: { type: string, format: uuid }
+    - name: runId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
     post:
       operationId: rollbackMigrationRun
+      x-ticvai-consumed-by:
+        - "P09 ADM-027 Database Migration Console"
+      x-ticvai-audience:
+      - staff
       summary: Roll a migration run back
-      description: >
-        Runs each migration's rollback section in reverse order against the cells that
-        applied it. **Refused where any migration in the run is irreversible.**
-      tags: [migration]
+      description: 'Runs each migration''s rollback section in reverse order against the cells that applied
+        it. **Refused where any migration in the run is irreversible.**
+
+        '
+      tags:
+      - migration
       x-ticvai-permission: PLATFORM_MIGRATION_APPLY
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
-        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
         content:
           application/json:
             schema:
               type: object
-              required: [reason, stepUpToken]
+              required:
+              - reason
+              - stepUpToken
               properties:
-                reason: { type: string, minLength: 3, maxLength: 1000 }
-                stepUpToken: { type: string }
+                reason:
+                  type: string
+                  minLength: 3
+                  maxLength: 1000
+                stepUpToken:
+                  type: string
       responses:
         '202':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Rollback started
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/MigrationRun' }
+              schema:
+                $ref: '#/components/schemas/MigrationRun'
         '409':
           description: A migration in this run is irreversible
           content:
             application/problem+json:
-              schema: { $ref: '#/components/schemas/IrreversibleProblem' }
-
+              schema:
+                $ref: '#/components/schemas/IrreversibleProblem'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /migrations/version-skew:
     get:
       operationId: getVersionSkew
       x-ticvai-consumed-by:
         - "P09 ADM-027 Database Migration Console"
+      x-ticvai-audience:
+      - staff
       x-ticvai-read-routing: analytical
       summary: Schema and application version across every cell
-      description: >
-        Skew is expected during a rollout and is a defect outside one. This reports both, with
-        the reason where the platform knows it — mid-rollout, paused, failed, or a tenant that
-        deferred an upgrade.
-      tags: [migration]
+      description: 'Skew is expected during a rollout and is a defect outside one. This reports both,
+        with the reason where the platform knows it — mid-rollout, paused, failed, or a tenant that deferred
+        an upgrade.
+
+        '
+      tags:
+      - migration
       x-ticvai-permission: PLATFORM_MIGRATION_VIEW
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
@@ -639,17 +1393,22 @@ paths:
           description: Skew report
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/VersionSkewReport' }
-
-  # ---------------------------------------------------------------- environments
+              schema:
+                $ref: '#/components/schemas/VersionSkewReport'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /environments:
     get:
       operationId: listEnvironments
       x-ticvai-consumed-by:
         - "P09 ADM-028 Environment Registry"
+        - "P09 ADM-700 Configuration Promotion"
+      x-ticvai-audience:
+      - staff
       x-ticvai-read-routing: replica
       summary: The environment registry
-      tags: [environment]
+      tags:
+      - environment
       x-ticvai-permission: PLATFORM_RELEASE_VIEW
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
@@ -661,45 +1420,59 @@ paths:
             application/json:
               schema:
                 type: array
-                items: { $ref: '#/components/schemas/Environment' }
-
+                items:
+                  $ref: '#/components/schemas/Environment'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: registerEnvironment
       x-ticvai-consumed-by:
         - "P09 ADM-028 Environment Registry"
+      x-ticvai-audience:
+      - staff
       summary: Register an environment
-      tags: [environment]
+      tags:
+      - environment
       x-ticvai-permission: PLATFORM_RELEASE_MANAGE
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
-        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
         content:
           application/json:
-            schema: { $ref: '#/components/schemas/Environment' }
+            schema:
+              $ref: '#/components/schemas/Environment'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Registered
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/Environment' }
-
-  # ---------------------------------------------------------------- notices
+              schema:
+                $ref: '#/components/schemas/Environment'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /upgrade-schedules:
     get:
       operationId: listUpgradeSchedules
       x-ticvai-consumed-by:
         - "P09 ADM-025 Tenant Upgrade Scheduler"
+      x-ticvai-audience:
+      - staff
       x-ticvai-read-routing: replica
       summary: Scheduled tenant upgrades
-      description: >
-        A tenant may defer an upgrade within a bounded window — a venue mid-season should not
-        be upgraded on a Saturday. Beyond that window the platform proceeds, because an
-        indefinitely deferred tenant becomes a version nobody supports.
-      tags: [notice]
+      description: 'A tenant may defer an upgrade within a bounded window — a venue mid-season should
+        not be upgraded on a Saturday. Beyond that window the platform proceeds, because an indefinitely
+        deferred tenant becomes a version nobody supports.
+
+        '
+      tags:
+      - notice
       x-ticvai-permission: PLATFORM_RELEASE_VIEW
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
@@ -711,45 +1484,64 @@ paths:
             application/json:
               schema:
                 type: array
-                items: { $ref: '#/components/schemas/UpgradeSchedule' }
-
+                items:
+                  $ref: '#/components/schemas/UpgradeSchedule'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: scheduleTenantUpgrade
       x-ticvai-consumed-by:
         - "P09 ADM-025 Tenant Upgrade Scheduler"
+      x-ticvai-audience:
+      - staff
       summary: Schedule or defer a tenant upgrade
-      tags: [notice]
+      tags:
+      - notice
       x-ticvai-permission: PLATFORM_RELEASE_MANAGE
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
-        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
         content:
           application/json:
-            schema: { $ref: '#/components/schemas/UpgradeSchedule' }
+            schema:
+              $ref: '#/components/schemas/UpgradeSchedule'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Scheduled
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/UpgradeSchedule' }
+              schema:
+                $ref: '#/components/schemas/UpgradeSchedule'
         '400':
+          x-ticvai-problem-types: [deferral-window-exceeded]
           description: Deferral exceeds the maximum permitted window
           content:
             application/problem+json:
-              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
-
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /support-notices:
     get:
       operationId: listSupportNotices
       x-ticvai-consumed-by:
+        - "P09 ADM-024 Release Notification Composer"
         - "P09 ADM-026 End-of-Support Notice Management"
+        - "P09 ADM-035 Support & Escalation Console"
+        - "P09 ADM-036 Platform Notification Broadcast"
+      x-ticvai-audience:
+      - staff
       x-ticvai-read-routing: replica
       summary: End-of-support notices
-      tags: [notice]
+      tags:
+      - notice
       x-ticvai-permission: PLATFORM_RELEASE_VIEW
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
@@ -761,391 +1553,2103 @@ paths:
             application/json:
               schema:
                 type: array
-                items: { $ref: '#/components/schemas/SupportNotice' }
-
+                items:
+                  $ref: '#/components/schemas/SupportNotice'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: publishSupportNotice
       x-ticvai-consumed-by:
         - "P09 ADM-024 Release Notification Composer"
+        - "P09 ADM-026 End-of-Support Notice Management"
+        - "P09 ADM-035 Support & Escalation Console"
+        - "P09 ADM-036 Platform Notification Broadcast"
+      x-ticvai-audience:
+      - staff
       summary: Publish an end-of-support notice
-      description: >
-        Names the version, the date support ends, and which tenants are affected. Affected
-        tenants are computed rather than typed — a notice sent to the wrong list is worse
-        than no notice.
-      tags: [notice]
+      description: 'Names the version, the date support ends, and which tenants are affected. Affected
+        tenants are computed rather than typed — a notice sent to the wrong list is worse than no notice.
+
+        '
+      tags:
+      - notice
       x-ticvai-permission: PLATFORM_RELEASE_MANAGE
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
-        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
         content:
           application/json:
-            schema: { $ref: '#/components/schemas/SupportNotice' }
+            schema:
+              $ref: '#/components/schemas/SupportNotice'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Published
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/SupportNotice' }
+              schema:
+                $ref: '#/components/schemas/SupportNotice'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /dead-letters:
+    get:
+      operationId: listDeadLetters
+      x-ticvai-consumed-by:
+        - "P09 ADM-318 Dead Letters"
+      x-ticvai-read-via:
+      - query: tenancy#deadLetterRecords
+        route: service
+        for: 'its read of platform.dead_letter, Tenancy''s data (CHG-MOD-001)'
+      - query: tenancy#outboxRecords
+        route: service
+        for: 'its read of platform.outbox, Tenancy''s data (CHG-MOD-001)'
+      summary: Undeliverable events
+      description: ADR-0033. **A dead-letter table nobody reads is worse than no table** — it converts
+        a visible outage into an invisible backlog. This is the query behind the screen that stops that.
+      tags:
+      - platform-ops
+      x-ticvai-permission: PLATFORM_CELL_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: platform
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      parameters:
+      - name: consumer
+        in: query
+        schema:
+          type: string
+      - name: since
+        in: query
+        schema:
+          type: string
+          format: date-time
+      responses:
+        '200':
+          description: Undelivered events
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DeadLetter'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /dead-letters/{deadLetterId}/replay:
+    post:
+      operationId: replayDeadLetter
+      x-ticvai-consumed-by:
+        - "P09 ADM-318 Dead Letters"
+      x-ticvai-read-via:
+      - query: tenancy#deadLetterRecords
+        route: service
+        for: 'its read of platform.dead_letter, Tenancy''s data (CHG-MOD-001)'
+      x-ticvai-write-via:
+      - table: platform.dead_letter
+        operation: requeueDeadLetter
+      x-ticvai-calls:
+      - tenancy.requeueDeadLetter
+      summary: Re-enter the delivery path
+      description: '**Records the replay as a new attempt rather than resetting the count** (ADR-0033).
+        An operator retrying the same poison message forty times should be able to see that they did.
 
+        **The owner writes it.** `platform.dead_letter` sits beside the outbox in TenancyService''s
+        schema, in `commerce`; this checks the operator''s permission and calls tenancy `requeueDeadLetter`,
+        which puts the event back on the outbox and counts the replay in one transaction (ADR-0055 rule 4,
+        CHG-XDW-003).'
+      tags:
+      - platform-ops
+      x-ticvai-permission: PLATFORM_CELL_MANAGE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: platform
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: append
+      parameters:
+      - name: deadLetterId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Replay accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeadLetter'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /outbox-republishes:
+    post:
+      operationId: republishOutbox
+      x-ticvai-consumed-by:
+        - "P09 ADM-318 Dead Letters"
+      x-ticvai-read-via:
+      - query: tenancy#outboxRecords
+        route: service
+        for: 'its read of platform.outbox, Tenancy''s data (CHG-MOD-001)'
+      summary: Republish one tenant database's outbox rows for a time range
+      description: '**ADR-0058, amended 1 October (section 3).** When the broker is lost or rebuilt, or a
+        DR failover starts an empty broker in the other region (ADR-0060), every message it held and no
+        consumer had settled is gone. The outbox still has every row. This asks the relay loop holding the
+        tenant''s lease to read that tenant database''s outbox rows with `created_at` in `[from, to)`,
+        optionally only some event names, in `(created_at, id)` order and batches of `Relay:BatchSize`,
+        and publish them through `IBrokerPublisher` **whether or not they were published before**. Every
+        consumer''s inbox skips what it already handled.
+
+
+        - **`published_at` is not touched**: the first publication stays on record.
+
+        - **Live events come first**: the loop alternates one republish batch with each live batch.
+
+        - **`from` must be early enough**: the moment the oldest message still held by the lost broker was
+        published; when unknown, the time of the loss minus one hour, or the start of any consumer halt then
+        in progress, whichever is earlier. Too early costs duplicates the inboxes absorb; too late loses
+        events.
+
+        - **`from` < `to` <= now**, else the shared `400` `validation`; so is an event name that is not in
+        the catalogue.
+
+        - **One republish per tenant at a time** (`409` `republish-in-progress`). A cancelled or failed job
+        keeps its cursor, so a new request can start where it stopped.
+
+        - **Only the hot outbox**: a range reaching into a monthly partition already archived to Blob
+        (ADR-0047, ADR-0056) is refused (`422` `outbox-range-archived`).
+
+        - **Recorded** in `control.outbox_republish` and in the audit trail. Carried out by the relay in the
+        `workers` deployable; this operation only queues the job.
+
+        '
+      tags:
+      - platform-ops
+      x-ticvai-permission: PLATFORM_CELL_MANAGE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: platform
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: append
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OutboxRepublishRequest'
+      responses:
+        '202':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Queued. Follow it with `getOutboxRepublish` until it is `completed`, `failed` or
+            `cancelled`
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OutboxRepublish'
+          links:
+            pollRepublish:
+              operationId: getOutboxRepublish
+              parameters:
+                republishId: $response.body#/id
+              description: Progress of the queued republish.
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '409':
+          description: 'The tenant already has a republish `queued` or `running` (`republish-in-progress`;
+            `detail` names it), or the `Idempotency-Key` was used for a different request
+            (`idempotency-conflict`).
+
+            '
+          x-ticvai-problem-types:
+          - republish-in-progress
+          - idempotency-conflict
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '422':
+          description: '`from` is older than the oldest hot outbox partition: that part of the range is
+            archived to Blob and republishing from the archive is not built (`outbox-range-archived`;
+            `detail` names the oldest `from` that would be accepted).
+
+            '
+          x-ticvai-problem-types:
+          - outbox-range-archived
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+    get:
+      operationId: listOutboxRepublishes
+      x-ticvai-consumed-by:
+        - "P09 ADM-318 Dead Letters"
+      summary: Outbox republishes, newest first
+      description: ADR-0058 (amended 1 October). Every republish asked for, newest first by `requestedAt`
+        with the id as the tiebreak, so an operator after a failover sees each promoted tenant's job and
+        how far it has got.
+      tags:
+      - platform-ops
+      x-ticvai-permission: PLATFORM_CELL_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: platform
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - name: tenantId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: status
+        in: query
+        schema:
+          type: string
+          enum:
+          - queued
+          - running
+          - completed
+          - failed
+          - cancelled
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: Republishes, newest first
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/OutboxRepublish'
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /outbox-republishes/{republishId}:
+    parameters:
+    - name: republishId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    get:
+      operationId: getOutboxRepublish
+      x-ticvai-consumed-by:
+        - "P09 ADM-318 Dead Letters"
+      summary: One republish and its progress
+      description: ADR-0058 (amended 1 October). Progress is `status`, `cursorAt` (the `created_at` of the
+        last row published) and `rowsPublished`.
+      tags:
+      - platform-ops
+      x-ticvai-permission: PLATFORM_CELL_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: platform
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: The republish
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OutboxRepublish'
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /outbox-republishes/{republishId}/cancel:
+    parameters:
+    - name: republishId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: cancelOutboxRepublish
+      x-ticvai-consumed-by:
+        - "P09 ADM-318 Dead Letters"
+      summary: Stop a republish after its current batch
+      description: ADR-0058 (amended 1 October). The relay stops after the batch in flight and **keeps the
+        cursor**, so a new request can start where this one stopped. A queued job is cancelled before it
+        starts.
+      tags:
+      - platform-ops
+      x-ticvai-permission: PLATFORM_CELL_MANAGE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: platform
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Cancelled, or cancelling once the batch in flight is confirmed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OutboxRepublish'
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          description: 'The republish has already `completed`, `failed` or been `cancelled`
+            (`republish-finished`), or the `Idempotency-Key` was used for a different request
+            (`idempotency-conflict`).
+
+            '
+          x-ticvai-problem-types:
+          - republish-finished
+          - idempotency-conflict
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /waf-policies:
+    get:
+      operationId: listWafRules
+      x-ticvai-consumed-by:
+        - "P09 ADM-032 WAF & Security Policy View"
+      x-ticvai-audience:
+      - staff
+      summary: Web application firewall rules in force
+      description: '**Drafted 4 September as a stub.** ADM-032 *WAF & Security Policy View* had no operation of its own and sat on the seven generic cell operations. The screen that needs it existed and this operation did not, so the screen shared a generic set with its neighbours and read as a duplicate of them. **The shape below is a proposal**: the fields are the minimum the screen has to show, and the request and response want confirming before anything is built against them.
+
+        '
+      tags:
+      - platform
+      x-ticvai-permission: PLATFORM_CELL_VIEW
+      x-ticvai-scope-level: region
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: replica
+      responses:
+        '200':
+          description: Web application firewall rules in force
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WafRule'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /waf-policies/{wafRuleId}:
+    put:
+      operationId: setWafPolicy
+      x-ticvai-consumed-by:
+        - "P09 ADM-032 WAF & Security Policy View"
+      x-ticvai-audience:
+      - staff
+      summary: Change the firewall policy
+      description: '**Drafted 4 September as a stub.** **A rule that blocks the wrong thing takes a venue offline**, so this is deliberately region-scoped and separately permissioned from viewing it. The screen that needs it existed and this operation did not, so the screen shared a generic set with its neighbours and read as a duplicate of them. **The shape below is a proposal**: the fields are the minimum the screen has to show, and the request and response want confirming before anything is built against them.
+
+        '
+      tags:
+      - platform
+      x-ticvai-permission: PLATFORM_CELL_MANAGE
+      x-ticvai-scope-level: region
+      x-ticvai-config-scope: region
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: primary
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WafRule'
+      parameters:
+        - name: wafRuleId
+          in: path
+          required: true
+          description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+          schema: { type: string, format: uuid }
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Change the firewall policy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WafRule'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /backup-runs:
+    get:
+      operationId: listBackupRuns
+      x-ticvai-consumed-by:
+        - "P09 ADM-033 Backup & DR Status"
+      x-ticvai-audience:
+      - staff
+      summary: Backups taken and what they cover
+      description: '**Drafted 4 September as a stub.** ADM-033 *Backup & DR Status* answers one question — **is there a restorable copy, and how old is it** — and nothing in the package could answer it. The screen that needs it existed and this operation did not, so the screen shared a generic set with its neighbours and read as a duplicate of them. **The shape below is a proposal**: the fields are the minimum the screen has to show, and the request and response want confirming before anything is built against them.
+
+        '
+      tags:
+      - platform
+      x-ticvai-permission: PLATFORM_CELL_VIEW
+      x-ticvai-scope-level: region
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: replica
+      responses:
+        '200':
+          description: Backups taken and what they cover
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BackupRun'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /archival-jobs:
+    get:
+      operationId: listArchivalJobs
+      x-ticvai-consumed-by:
+        - "P09 ADM-034 Archival Job Monitor"
+      x-ticvai-audience:
+      - staff
+      summary: Archival and retention jobs
+      description: '**Drafted 4 September as a stub.** **Retention is a legal obligation and an archival job that silently stops is a breach nobody is watching.** The screen that needs it existed and this operation did not, so the screen shared a generic set with its neighbours and read as a duplicate of them. **The shape below is a proposal**: the fields are the minimum the screen has to show, and the request and response want confirming before anything is built against them.
+
+        '
+      tags:
+      - platform
+      x-ticvai-permission: PLATFORM_CELL_VIEW
+      x-ticvai-scope-level: region
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: replica
+      responses:
+        '200':
+          description: Archival and retention jobs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ArchivalJob'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /scaling-policies:
+    get:
+      operationId: getScalingPolicy
+      x-ticvai-consumed-by:
+        - "P09 ADM-014 Auto-Scaling Configuration"
+        - "P09 ADM-030 Infrastructure Sizing & Scaling Policy"
+      x-ticvai-audience:
+      - staff
+      summary: The floors, ceilings and target utilisation a cell scales on
+      description: '**Drafted 4 September as a stub.** ADM-014 and ADM-030 both describe scaling and neither could read a policy. **A floor is the size an environment is stood up at and a ceiling is a cap on absorbing a peak nobody predicted** (ADR-0035), so the two are not symmetric and the shape says which is which. The screen that needs it existed and this operation did not, so the screen shared a generic set with its neighbours and read as a duplicate of them. **The shape below is a proposal**: the fields are the minimum the screen has to show, and the request and response want confirming before anything is built against them.
+
+        '
+      tags:
+      - platform
+      x-ticvai-permission: PLATFORM_CELL_VIEW
+      x-ticvai-scope-level: region
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: replica
+      responses:
+        '200':
+          description: The floors, ceilings and target utilisation a cell scales on
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScalingPolicy'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+    put:
+      operationId: setScalingPolicy
+      x-ticvai-consumed-by:
+        - "P09 ADM-030 Infrastructure Sizing & Scaling Policy"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per cell and service, the one the body''s `cellId` names, within the caller''s region: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-audience:
+      - staff
+      summary: Change the scaling policy
+      description: '**Drafted 4 September as a stub.** **A ceiling set from a normal day fails a sale**, which is the Bahrain outage with a config value in front of it. The screen that needs it existed and this operation did not, so the screen shared a generic set with its neighbours and read as a duplicate of them. **The shape below is a proposal**: the fields are the minimum the screen has to show, and the request and response want confirming before anything is built against them.
+
+        '
+      tags:
+      - platform
+      x-ticvai-permission: PLATFORM_CELL_MANAGE
+      x-ticvai-scope-level: region
+      x-ticvai-config-scope: region
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: primary
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ScalingPolicy'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Change the scaling policy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScalingPolicy'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 components:
   schemas:
+    OutboxRelay:
+      type: object
+      x-ticvai-persistence: control.outbox_relay
+      x-ticvai-primary-key:
+      - cellTenantId
+      description: '**Which worker replica relays which tenant database''s outbox** (ADR-0058). One row per tenant
+        database in the region, in the regional control database. A replica holds a lease by renewing it every
+        few seconds; when it dies the lease expires and another replica takes it, so exactly one publisher per
+        tenant database keeps per-tenant order. pgbouncer runs in transaction mode, so this is a row and not a
+        session advisory lock.'
+      required:
+      - cellTenantId
+      - holder
+      - leaseExpiresAt
+      properties:
+        cellTenantId:
+          type: string
+          format: uuid
+          x-ticvai-references: control.cell_tenant
+          description: The tenant database this lease covers (`control.cell_tenant`).
+        holder:
+          type: string
+          maxLength: 200
+          description: The worker replica holding the lease (pod name plus a start nonce).
+        leaseExpiresAt:
+          type: string
+          format: date-time
+          description: Another replica may take the lease after this instant.
+        acquiredAt:
+          type: string
+          format: date-time
+        renewedAt:
+          type: string
+          format: date-time
+        lastPolledAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: The end of the last poll, for the relay-lag dashboard.
+    InboxEntry:
+      type: object
+      x-ticvai-persistence: kernel.inbox
+      x-ticvai-primary-key:
+      - consumer
+      - eventId
+      x-ticvai-append-only: eventId
+      description: '**The consumer''s record of every event it has processed** (ADR-0058). Inserted in the same
+        transaction as the effect, with `ON CONFLICT DO NOTHING`; no row inserted means already processed, so skip
+        and acknowledge. One per tenant database, written by every consumer through the kernel''s inbox wrapper. Kept 30 days, longer than any redelivery window, and dropped a month at a
+        time: partitioned by month on `eventId`, which is a UUIDv7 and so sorts by time (ADR-0056).'
+      required:
+      - consumer
+      - eventId
+      - processedAt
+      properties:
+        consumer:
+          type: string
+          maxLength: 200
+          description: The consumer's stable name (`<service>.<handler>`); one event is processed once per consumer.
+        eventId:
+          x-ticvai-references: none
+          type: string
+          format: uuid
+          description: The envelope's `eventId`, which is the producing outbox row's id (UUIDv7).
+        processedAt:
+          type: string
+          format: date-time
+    ScalingPolicy:
+      type: object
+      x-ticvai-persistence: control.scaling_policy
+      description: '**Drafted 4 September.** What a cell scales on. **A floor and a ceiling are not
+        symmetric** - the floor is the size the environment is stood up at before traffic arrives,
+        and the ceiling is a cap on absorbing a peak nobody predicted (ADR-0035).'
+      required:
+      - id
+      properties:
+        id:
+          readOnly: true
+          type: string
+          format: uuid
+        cellId:
+          type: string
+          format: uuid
+        service:
+          type: string
+        replicaFloor:
+          type: integer
+        replicaCeiling:
+          type: integer
+          description: 'Null means no maximum, which is the correct setting for a burst cell.'
+        targetUtilisationPct:
+          type: integer
+        scaleStepPct:
+          type: integer
+        updatedAt:
+          type: string
+          format: date-time
+    ArchivalJob:
+      type: object
+      x-ticvai-persistence: control.archival_job
+      description: '**Drafted 4 September.** One archival or retention run. Retention is a legal
+        obligation, so a stalled job is a compliance failure rather than a housekeeping one.'
+      required:
+      - id
+      properties:
+        id:
+          type: string
+          format: uuid
+        cellId:
+          type: string
+          format: uuid
+        policyName:
+          type: string
+        targetTable:
+          type: string
+        rowsArchived:
+          type: integer
+        rowsPurged:
+          type: integer
+        state:
+          type: string
+          enum:
+          - scheduled
+          - running
+          - succeeded
+          - failed
+        runAt:
+          type: string
+          format: date-time
+        error:
+          type: string
+    BackupRun:
+      type: object
+      x-ticvai-persistence: control.backup_run
+      description: '**Drafted 4 September.** One backup run. The question this answers is not *did it
+        run* but *how old is the newest restorable copy* - a job that succeeds nightly against an
+        empty database succeeds forever.'
+      required:
+      - id
+      properties:
+        id:
+          type: string
+          format: uuid
+        cellId:
+          type: string
+          format: uuid
+        scope:
+          type: string
+          enum:
+          - cell
+          - tenant
+        startedAt:
+          type: string
+          format: date-time
+        completedAt:
+          type: string
+          format: date-time
+        state:
+          type: string
+          enum:
+          - running
+          - succeeded
+          - failed
+        sizeBytes:
+          type: integer
+        restoreTestedAt:
+          type: string
+          format: date-time
+          description: '**A backup nobody has restored is a hypothesis.**'
+        error:
+          type: string
+    WafRule:
+      type: object
+      x-ticvai-persistence: control.waf_rule
+      description: '**Drafted 4 September.** One firewall rule, and the reason it is a row rather than
+        a config file is that somebody has to be able to say who changed it and when.'
+      required:
+      - id
+      properties:
+        id:
+          readOnly: true
+          type: string
+          format: uuid
+        cellId:
+          type: string
+          format: uuid
+        name:
+          type: string
+        action:
+          type: string
+          enum:
+          - allow
+          - block
+          - rateLimit
+          - challenge
+        matchOn:
+          type: string
+          description: What the rule inspects - a path, a header, a source range.
+        pattern:
+          type: string
+        enabled:
+          type: boolean
+        hitCount24h:
+          type: integer
+          description: '**A rule with no hits is either protecting nothing or blocking everything
+            silently**, and both want looking at.'
+        updatedAt:
+          type: string
+          format: date-time
     EnvironmentKind:
       type: string
-      enum: [dev, staging, production]
-
+      enum:
+      - dev
+      - staging
+      - production
     ReleaseStatus:
       type: string
-      enum: [draft, inDev, inStaging, inProduction, superseded, withdrawn]
-
+      enum:
+      - draft
+      - inDev
+      - inStaging
+      - inProduction
+      - superseded
+      - withdrawn
     RolloutStatus:
       type: string
-      enum: [queued, canary, rolling, paused, complete, failed, rolledBack]
-
+      enum:
+      - queued
+      - canary
+      - rolling
+      - paused
+      - complete
+      - failed
+      - rolledBack
     ComponentVersion:
       type: object
-      required: [component, version]
+      required:
+      - component
+      - version
       properties:
         component:
           type: string
-          enum: [backend, frontend, ai, infra, contracts]
-        version: { type: string }
-        imageDigest: { type: string, nullable: true }
-
+          enum:
+          - backend
+          - frontend
+          - ai
+          - infra
+          - contracts
+        version:
+          type: string
+        imageDigest:
+          type: string
+          nullable: true
     CreateReleaseRequest:
       type: object
-      required: [version, components, note]
+      required:
+      - version
+      - components
+      - note
       properties:
-        version: { type: string }
+        version:
+          type: string
         components:
           type: array
           minItems: 1
-          items: { $ref: '#/components/schemas/ComponentVersion' }
+          items:
+            $ref: '#/components/schemas/ComponentVersion'
         requiredMigrations:
           type: array
           description: Migration versions this release depends on.
-          items: { type: string }
-        note: { type: string, minLength: 3, maxLength: 2000 }
+          items:
+            type: string
+        note:
+          type: string
+          minLength: 3
+          maxLength: 2000
+          description: Internal. Never shown to guests; `guestReleaseNotes` is.
+        guestReleaseNotes:
+          allOf:
+          - $ref: '#/components/schemas/LocalisedText'
+          nullable: true
+          description: >
+            **The public, localised "what's new" for guests** (decided 29 September, rev 3 GAP-B2), one
+            short text per locale, written for a guest and naming no person. Public once the release
+            reaches the tenant's cell; read by the guest Help screen (WEB-025, WEB-045, GST-040) through
+            `white-label.getTenantAppStatus`. Distinct from the staff-only `TenantAppStatus.recentChanges`,
+            which names the principal behind each change and stays staff only.
         breakingChanges:
           type: array
-          items: { type: string }
-
+          items:
+            type: string
+    LocalisedText:
+      x-ticvai-persistence: none — jsonb column
+      type: object
+      description: Text keyed by locale code.
+      additionalProperties:
+        type: string
+        maxLength: 2000
     Release:
       allOf:
-        - $ref: '#/components/schemas/CreateReleaseRequest'
-        - type: object
-          required: [id, status, createdAt]
-          x-ticvai-persistence: "control.release + control.release_component"
-          properties:
-            id: { type: string, format: uuid }
-            status: { $ref: '#/components/schemas/ReleaseStatus' }
-            createdByPrincipalId: { type: string, format: uuid }
-            createdAt: { type: string, format: date-time }
-            promotedToStagingAt: { type: string, format: date-time, nullable: true }
-            promotedToProductionAt: { type: string, format: date-time, nullable: true }
-
+      - $ref: '#/components/schemas/CreateReleaseRequest'
+      - type: object
+        required:
+        - id
+        - status
+        - createdAt
+        x-ticvai-persistence: control.release + control.release_component
+        # `plan_id` was a relationship-graph column pointing at `control.subscription_plan`, renamed to
+        # `subscription.plan` on 20 September. No operation writes or reads it, and a release is a manifest, not a
+        # plan (ADAM CR-145, option B, 18 October 2026; CHG-CRA-002): retired, so the generator stops rebuilding it;
+        # the review gives its drop, and until then its NOT NULL is dropped so an insert never supplies a plan.
+        x-ticvai-retired-columns: [plan_id]
+        properties:
+          id:
+            type: string
+            format: uuid
+          status:
+            $ref: '#/components/schemas/ReleaseStatus'
+          createdByPrincipalId:
+            type: string
+            format: uuid
+          createdAt:
+            type: string
+            format: date-time
+          promotedToStagingAt:
+            type: string
+            format: date-time
+            nullable: true
+          promotedToProductionAt:
+            type: string
+            format: date-time
+            nullable: true
     ReleaseDetail:
       allOf:
-        - $ref: '#/components/schemas/Release'
-        - type: object
-          x-ticvai-persistence: "none — projection"
-          properties:
-            rollouts:
-              type: array
-              items: { $ref: '#/components/schemas/Rollout' }
-            cellsOnThisVersion: { type: integer }
-            cellsTotal: { type: integer }
-
+      - $ref: '#/components/schemas/Release'
+      - type: object
+        x-ticvai-persistence: none — projection
+        properties:
+          rollouts:
+            type: array
+            items:
+              $ref: '#/components/schemas/Rollout'
+          cellsOnThisVersion:
+            type: integer
+          cellsTotal:
+            type: integer
     ReleaseReadiness:
       type: object
-      x-ticvai-persistence: "none — computed"
-      required: [releaseId, canPromote, gates]
+      x-ticvai-persistence: none — computed
+      required:
+      - releaseId
+      - canPromote
+      - gates
       properties:
-        releaseId: { type: string, format: uuid }
-        canPromote: { type: boolean }
-        targetEnvironment: { $ref: '#/components/schemas/EnvironmentKind' }
+        releaseId:
+          type: string
+          format: uuid
+        canPromote:
+          type: boolean
+        targetEnvironment:
+          $ref: '#/components/schemas/EnvironmentKind'
         gates:
           type: array
           items:
             type: object
-            required: [gate, passed]
+            required:
+            - gate
+            - passed
             properties:
               gate:
                 type: string
                 enum:
-                  - priorEnvironmentHealthy
-                  - soakPeriodElapsed
-                  - migrationsReversible
-                  - noOpenIncidents
-                  - approvalRecorded
-                  - contractsCompatible
-              passed: { type: boolean }
-              detail: { type: string }
-
+                - priorEnvironmentHealthy
+                - soakPeriodElapsed
+                - migrationsReversible
+                - noOpenIncidents
+                - approvalRecorded
+                - contractsCompatible
+              passed:
+                type: boolean
+              detail:
+                type: string
     PromotionBlockedProblem:
       allOf:
-        - $ref: '../shared/common.yaml#/components/schemas/Problem'
-        - type: object
-          x-ticvai-persistence: "none — error shape"
-          properties:
-            failedGates:
-              type: array
-              items:
-                type: object
-                properties:
-                  gate: { type: string }
-                  detail: { type: string }
-
+      - $ref: ../shared/common.yaml#/components/schemas/Problem
+      - type: object
+        x-ticvai-persistence: none — error shape
+        properties:
+          failedGates:
+            type: array
+            items:
+              type: object
+              properties:
+                gate:
+                  type: string
+                detail:
+                  type: string
     Rollout:
       type: object
-      x-ticvai-persistence: "control.rollout"
-      required: [id, releaseId, environment, status, startedAt]
+      x-ticvai-persistence: control.rollout
+      required:
+      - id
+      - releaseId
+      - environment
+      - status
+      - startedAt
       properties:
-        id: { type: string, format: uuid }
-        releaseId: { type: string, format: uuid }
-        environment: { $ref: '#/components/schemas/EnvironmentKind' }
-        status: { $ref: '#/components/schemas/RolloutStatus' }
-        cellsTotal: { type: integer }
-        cellsComplete: { type: integer }
-        cellsFailed: { type: integer }
-        startedByPrincipalId: { type: string, format: uuid }
-        approvedByPrincipalId: { type: string, format: uuid, nullable: true }
-        pausedReason: { type: string, nullable: true }
-        startedAt: { type: string, format: date-time }
-        completedAt: { type: string, format: date-time, nullable: true }
-
+        id:
+          type: string
+          format: uuid
+        releaseId:
+          type: string
+          format: uuid
+        environment:
+          $ref: '#/components/schemas/EnvironmentKind'
+        status:
+          $ref: '#/components/schemas/RolloutStatus'
+        cellsTotal:
+          type: integer
+        cellsComplete:
+          type: integer
+        cellsFailed:
+          type: integer
+        startedByPrincipalId:
+          type: string
+          format: uuid
+        approvedByPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+        pausedReason:
+          type: string
+          nullable: true
+        startedAt:
+          type: string
+          format: date-time
+        completedAt:
+          type: string
+          format: date-time
+          nullable: true
     RolloutDetail:
       allOf:
-        - $ref: '#/components/schemas/Rollout'
-        - type: object
-          x-ticvai-persistence: "none — projection over rollout and cell state"
-          properties:
-            cells:
-              type: array
-              description: >
-                Per-cell state. "60% complete" says nothing about whether the failing 40% is
-                one region or forty venues.
-              items: { $ref: '#/components/schemas/RolloutCell' }
+      - $ref: '#/components/schemas/Rollout'
+      - type: object
+        x-ticvai-persistence: none — projection over rollout and cell state
+        properties:
+          cells:
+            type: array
+            description: 'Per-cell state. "60% complete" says nothing about whether the failing 40% is
+              one region or forty venues.
 
-    RolloutCell:
+              '
+            items:
+              $ref: '#/components/schemas/RolloutCell'
+    RolloutTenant:
       type: object
-      x-ticvai-persistence: "control.rollout_cell"
-      required: [cellId, status]
+      x-ticvai-persistence: control.rollout_tenant
+      description: 'What happened to one tenant database during one run. **The same shape as `RolloutCell`
+        one level down**, and it serves the per-tenant rows of both a rollout and a migration run — the
+        arrangement `RolloutCell` had with `rollout_cell` and `migration_run_cell` until `rollout_cell` needed
+        its `rolloutId` parent key and the migration run''s cells moved to `MigrationRunCell`.
+
+
+        **`databaseName` is denormalised on purpose.** After a drop the run record still has to say what it
+        touched, and a join to a row that no longer exists says nothing.
+
+        '
+      required:
+      - tenantId
+      - cellId
+      - status
       properties:
-        cellId: { type: string, format: uuid }
-        cellName: { type: string }
-        regionName: { type: string }
-        countryCode: { type: string }
-        isCanary: { type: boolean }
-        wave: { type: integer }
+        tenantId:
+          x-ticvai-references: control.tenant
+          type: string
+          format: uuid
+        cellId:
+          x-ticvai-references: control.cell
+          type: string
+          format: uuid
+        databaseName:
+          type: string
+        isCanary:
+          type: boolean
+        wave:
+          type: integer
+          description: 'A wave is now a set of tenants and may be a subset of one cell.'
         status:
           type: string
-          enum: [pending, running, complete, failed, skipped, rolledBack]
-        fromVersion: { type: string, nullable: true }
-        toVersion: { type: string, nullable: true }
-        error: { type: string, nullable: true }
-        startedAt: { type: string, format: date-time, nullable: true }
-        completedAt: { type: string, format: date-time, nullable: true }
+          enum:
+          - pending
+          - running
+          - complete
+          - failed
+          - skipped
+          - rolledBack
+        fromVersion:
+          type: string
+          nullable: true
+        toVersion:
+          type: string
+          nullable: true
+        error:
+          type: string
+          nullable: true
+        startedAt:
+          type: string
+          format: date-time
+          nullable: true
+        completedAt:
+          type: string
+          format: date-time
+          nullable: true
+    RolloutCell:
+      type: object
+      x-ticvai-persistence: control.rollout_cell
+      description: 'One cell''s state within one rollout. **`rolloutId` is the row''s parent**: a cell takes part
+        in many rollouts over its life, and `skipRolloutCell` addresses `/rollouts/{rolloutId}/cells/{cellId}`,
+        so a row keyed on the cell alone cannot say which run it belongs to or be found by that path.
 
+
+        A migration run''s per-cell rows are the same fields under a different parent, and use `MigrationRunCell`.
+
+        '
+      required:
+      - rolloutId
+      - cellId
+      - status
+      properties:
+        rolloutId:
+          x-ticvai-references: control.rollout
+          type: string
+          format: uuid
+          description: 'The rollout this row belongs to (`control.rollout`).'
+        cellId:
+          type: string
+          format: uuid
+        cellName:
+          type: string
+        regionName:
+          type: string
+        countryCode:
+          type: string
+        isCanary:
+          type: boolean
+        wave:
+          type: integer
+        status:
+          type: string
+          enum:
+          - pending
+          - running
+          - complete
+          - failed
+          - skipped
+          - rolledBack
+        fromVersion:
+          type: string
+          nullable: true
+        toVersion:
+          type: string
+          nullable: true
+        error:
+          type: string
+          nullable: true
+        startedAt:
+          type: string
+          format: date-time
+          nullable: true
+        completedAt:
+          type: string
+          format: date-time
+          nullable: true
+    MigrationRunCell:
+      type: object
+      x-ticvai-persistence: none — rows of control.migration_run_cell, stored through MigrationRun
+      description: 'One cell''s rollup within one migration run. **The fields of `RolloutCell` without its
+        `rolloutId`**: a migration run is not a rollout, and its parent key `migration_run_id` comes from
+        `MigrationRun.cells`.
+
+        '
+      required:
+      - cellId
+      - status
+      properties:
+        cellId:
+          x-ticvai-references: control.cell
+          type: string
+          format: uuid
+        cellName:
+          type: string
+        regionName:
+          type: string
+        countryCode:
+          type: string
+        isCanary:
+          type: boolean
+        wave:
+          type: integer
+        status:
+          type: string
+          enum:
+          - pending
+          - running
+          - complete
+          - failed
+          - skipped
+          - rolledBack
+        fromVersion:
+          type: string
+          nullable: true
+        toVersion:
+          type: string
+          nullable: true
+        error:
+          type: string
+          nullable: true
+        startedAt:
+          type: string
+          format: date-time
+          nullable: true
+        completedAt:
+          type: string
+          format: date-time
+          nullable: true
     IrreversibleProblem:
       allOf:
-        - $ref: '../shared/common.yaml#/components/schemas/Problem'
-        - type: object
-          x-ticvai-persistence: "none — error shape"
-          properties:
-            irreversibleMigrations:
-              type: array
-              description: >
-                Named, not merely counted. A one-way door should be identified before it is
-                walked through.
-              items:
-                type: object
-                properties:
-                  version: { type: string }
-                  module: { type: string }
-                  reason: { type: string }
+      - $ref: ../shared/common.yaml#/components/schemas/Problem
+      - type: object
+        x-ticvai-persistence: none — error shape
+        properties:
+          irreversibleMigrations:
+            type: array
+            description: 'Named, not merely counted. A one-way door should be identified before it is
+              walked through.
 
+              '
+            items:
+              type: object
+              properties:
+                version:
+                  type: string
+                module:
+                  type: string
+                reason:
+                  type: string
     Migration:
       type: object
-      x-ticvai-persistence: "control.migration"
-      required: [version, module, isReversible, checksum]
+      x-ticvai-persistence: control.migration
+      required:
+      - version
+      - module
+      - isReversible
+      - checksum
       properties:
-        version: { type: string }
-        module: { type: string }
-        description: { type: string }
+        version:
+          type: string
+        module:
+          type: string
+        description:
+          type: string
         isReversible:
           type: boolean
-          description: >
-            A rollback section exists and CI has executed it against a restored snapshot. A
-            rollback nobody has run is a comment, not a rollback.
-        rollbackTestedAt: { type: string, format: date-time, nullable: true }
+          description: 'A rollback section exists and CI has executed it against a restored snapshot.
+            A rollback nobody has run is a comment, not a rollback.
+
+            '
+        rollbackTestedAt:
+          type: string
+          format: date-time
+          nullable: true
         checksum:
           type: string
-          description: >
-            Compared on apply. A migration edited after it was applied somewhere is a defect
+          description: 'Compared on apply. A migration edited after it was applied somewhere is a defect
             the register catches, not a mystery to debug later.
-        estimatedLockMs: { type: integer, nullable: true }
-        touchesPartitionedTable: { type: boolean }
-        appliedCellCount: { type: integer }
-        pendingCellCount: { type: integer }
 
+            '
+        estimatedLockMs:
+          type: integer
+          nullable: true
+        touchesPartitionedTable:
+          type: boolean
+        appliedCellCount:
+          type: integer
+        pendingCellCount:
+          type: integer
     MigrationPlan:
       type: object
-      x-ticvai-persistence: "control.migration_plan"
-      required: [id, targetVersion, computedAt, cells, allReversible]
+      x-ticvai-persistence: control.migration_plan
+      required:
+      - id
+      - targetVersion
+      - computedAt
+      - cells
+      - allReversible
       properties:
-        id: { type: string, format: uuid }
-        targetVersion: { type: string }
-        computedAt: { type: string, format: date-time }
+        id:
+          type: string
+          format: uuid
+        targetVersion:
+          type: string
+        computedAt:
+          type: string
+          format: date-time
         expiresAt:
           type: string
           format: date-time
-          description: >
-            A plan is computed against cell state at a moment. Beyond this it is stale and
+          description: 'A plan is computed against cell state at a moment. Beyond this it is stale and
             apply refuses it rather than applying to a different world than it was made for.
-        allReversible: { type: boolean }
+
+            '
+        allReversible:
+          type: boolean
         irreversible:
           type: array
-          items: { type: string }
-        totalEstimatedLockMs: { type: integer }
+          items:
+            type: string
+        totalEstimatedLockMs:
+          type: integer
         cells:
           type: array
           items:
             type: object
             properties:
-              cellId: { type: string, format: uuid }
-              cellName: { type: string }
-              currentVersion: { type: string }
+              cellId:
+                type: string
+                format: uuid
+              cellName:
+                type: string
+              tenantSelection:
+                type: string
+                description: 'Which of the cell''s tenant databases the plan targets. **A plan that can
+                  only say "this region" cannot express the rollout ADR-0038 makes normal** — a cell is a
+                  region holding many tenants, and a wave may be a subset of one.'
+                enum:
+                - all
+                - named
+              tenantIds:
+                type: array
+                description: 'Present only where `tenantSelection` is `named`. **Named rather than
+                  counted**, for the reason `migration_run_cell` gives about partial failure: a set
+                  recorded as a number cannot be checked against what actually ran.'
+                items:
+                  type: string
+                  format: uuid
+              currentVersion:
+                type: string
               migrationsToApply:
                 type: array
-                items: { type: string }
-              estimatedLockMs: { type: integer }
+                items:
+                  type: string
+              estimatedLockMs:
+                type: integer
               warnings:
                 type: array
-                description: >
-                  A long lock on a partitioned table during trading hours is the output this
+                description: 'A long lock on a partitioned table during trading hours is the output this
                   endpoint exists to produce.
-                items: { type: string }
 
-    MigrationRun:
+                  '
+                items:
+                  type: string
+        scopePath:
+          type: string
+          description: '**The partition key** (ADR-0005). Added 31 August: the operations that write this
+            table declare a scope and the table carried no column for it — **49 tables were in that state**,
+            so a row could be written at venue scope and then read by anything that could reach the table.
+
+
+            **`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains
+            `uae.dubai.marina`, and one index answers every level of the walk.
+
+
+            **Operations write it at `tenant` scope.**'
+    ConfigPackage:
       type: object
-      x-ticvai-persistence: "control.migration_run + control.migration_run_cell"
-      required: [id, planId, status, startedAt]
+      x-ticvai-persistence: control.config_package
+      description: A tenant's configuration exported with stable keys (`exportConfigPackage`, CHG-CSA-034). Immutable.
       properties:
-        id: { type: string, format: uuid }
-        planId: { type: string, format: uuid }
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        tenantId:
+          type: string
+          format: uuid
+        sourceEnvironment:
+          $ref: '#/components/schemas/EnvironmentKind'
+        version:
+          type: integer
+          readOnly: true
+        checksum:
+          type: string
+          readOnly: true
+        recordCounts:
+          type: object
+          additionalProperties:
+            type: integer
+          description: Records per configuration kind.
+        excludedKinds:
+          type: array
+          description: What never travels in a package (secrets, credentials, endpoints, environment settings).
+          items:
+            type: string
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+    ConfigPackageDiff:
+      type: object
+      x-ticvai-persistence: control.config_package_diff
+      description: What applying a package would change in a target environment, by stable key (CHG-CSA-034).
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        packageId:
+          type: string
+          format: uuid
+        targetEnvironment:
+          $ref: '#/components/schemas/EnvironmentKind'
+        computedAt:
+          type: string
+          format: date-time
+        changes:
+          x-ticvai-persistence-kind: valueObject
+          x-ticvai-persistence-column: jsonb
+          type: array
+          items:
+            type: object
+            properties:
+              kind:
+                type: string
+              stableKey:
+                type: string
+              change:
+                type: string
+                enum:
+                - add
+                - update
+                - unchanged
+              fields:
+                type: array
+                items:
+                  type: string
+    ConfigPackageApplication:
+      type: object
+      x-ticvai-persistence: control.config_package_application
+      description: One application of a package to a target (`applyConfigPackage`, CHG-CSA-034), audited.
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        diffId:
+          type: string
+          format: uuid
         status:
           type: string
-          enum: [queued, canary, running, paused, complete, failed, rolledBack]
-        canaryCellId: { type: string, format: uuid, nullable: true }
-        cellsTotal: { type: integer }
-        cellsComplete: { type: integer }
-        cellsFailed: { type: integer }
-        startedByPrincipalId: { type: string, format: uuid }
-        startedAt: { type: string, format: date-time }
-        completedAt: { type: string, format: date-time, nullable: true }
+          enum:
+          - applying
+          - applied
+          - failed
+        appliedCount:
+          type: integer
+        previousPackageId:
+          type: string
+          format: uuid
+          nullable: true
+          description: What a rollback re-applies.
+        startedAt:
+          type: string
+          format: date-time
+    MigrationRun:
+      type: object
+      x-ticvai-persistence: control.migration_run + control.migration_run_cell + control.migration_run_tenant
+      description: 'One run, its per-region rollup, and its per-tenant outcomes. **The third table exists
+        because ADR-0038 made a cell a region holding many tenants**, and `migration_run_cell`''s own note
+        says it is there so *"a partial failure is named rather than counted"* — which is exactly what it
+        stopped doing. A run that fails for twenty of two hundred tenants had one row saying `failed`.
+
+
+        The rollup stays. *"How is the UAE doing"* is a real question and computing it from two hundred rows
+        on every read is not.
+
+        '
+      required:
+      - id
+      - planId
+      - status
+      - startedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        planId:
+          x-ticvai-references: control.migration_plan
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum:
+          - queued
+          - canary
+          - running
+          - paused
+          - complete
+          - failed
+          - rolledBack
+        canaryCellId:
+          type: string
+          format: uuid
+          nullable: true
+          description: 'Which region the canary tenant is in. **The canary itself is a tenant** — a first
+            cell holding two hundred databases is not a cheap failure, and cheap failure is the only thing
+            a canary is for.'
+        canaryTenantId:
+          type: string
+          format: uuid
+          nullable: true
+        tenantsTotal:
+          type: integer
+        tenantsComplete:
+          type: integer
+        tenantsFailed:
+          type: integer
+        cellsTotal:
+          type: integer
+        cellsComplete:
+          type: integer
+        cellsFailed:
+          type: integer
+        startedByPrincipalId:
+          type: string
+          format: uuid
+        startedAt:
+          type: string
+          format: date-time
+        completedAt:
+          type: string
+          format: date-time
+          nullable: true
         cells:
           type: array
-          items: { $ref: '#/components/schemas/RolloutCell' }
-
+          items:
+            $ref: '#/components/schemas/MigrationRunCell'
+        tenants:
+          type: array
+          items:
+            $ref: '#/components/schemas/RolloutTenant'
     VersionSkewReport:
       type: object
-      x-ticvai-persistence: "none — computed from cell state"
-      required: [asAt, cells, hasUnexplainedSkew]
+      x-ticvai-persistence: none — computed from cell state
+      required:
+      - asAt
+      - cells
+      - hasUnexplainedSkew
       properties:
-        asAt: { type: string, format: date-time }
+        asAt:
+          type: string
+          format: date-time
         hasUnexplainedSkew:
           type: boolean
-          description: >
-            Skew during a rollout is expected. Skew outside one is a defect, and separating the
-            two is the entire value of this report.
+          description: 'Skew during a rollout is expected. Skew outside one is a defect, and separating
+            the two is the entire value of this report.
 
-            **An on-premise cell is a third case: legitimately behind, indefinitely**, because
-            the client has not scheduled the window and TICVAI cannot push. It is not counted
-            here and must not appear as a defect (ADR-0017).
+            **An on-premise cell is a third case: legitimately behind, indefinitely**, because the client
+            has not scheduled the window and TICVAI cannot push. It is not counted here and must not appear
+            as a defect (ADR-0017).
+
+            '
         cells:
           type: array
           items:
             type: object
             properties:
-              cellId: { type: string, format: uuid }
-              cellName: { type: string }
-              schemaVersion: { type: string }
-              applicationVersion: { type: string }
-              isBehind: { type: boolean }
-              versionsBehind: { type: integer }
+              cellId:
+                type: string
+                format: uuid
+              cellName:
+                type: string
+              schemaVersion:
+                type: string
+              applicationVersion:
+                type: string
+              isBehind:
+                type: boolean
+              versionsBehind:
+                type: integer
               reason:
                 type: string
                 nullable: true
                 enum:
-                  - midRollout
-                  - rolloutPaused
-                  - rolloutFailed
-                  - tenantDeferred
-                  - onPremiseNotScheduled
-                  - unexplained
-
+                - midRollout
+                - rolloutPaused
+                - rolloutFailed
+                - tenantDeferred
+                - onPremiseNotScheduled
+                - unexplained
     Environment:
       type: object
-      x-ticvai-persistence: "control.environment"
-      required: [id, kind, name]
+      x-ticvai-persistence: control.environment
+      required:
+      - id
+      - kind
+      - name
       properties:
-        id: { type: string, format: uuid }
-        kind: { $ref: '#/components/schemas/EnvironmentKind' }
-        name: { type: string }
+        id:
+          readOnly: true
+          type: string
+          format: uuid
+        kind:
+          $ref: '#/components/schemas/EnvironmentKind'
+        name:
+          type: string
         cellIds:
           type: array
-          items: { type: string, format: uuid }
-        requiresApprovalToPromote: { type: boolean }
+          items:
+            type: string
+            format: uuid
+        requiresApprovalToPromote:
+          type: boolean
         soakHours:
           type: integer
-          description: >
-            How long a release must sit here before it may be promoted. Zero for dev; a real
+          description: 'How long a release must sit here before it may be promoted. Zero for dev; a real
             number for staging, or staging is a formality.
-        currentReleaseVersion: { type: string, nullable: true }
-        isActive: { type: boolean }
 
+            '
+        currentReleaseVersion:
+          type: string
+          nullable: true
+        isActive:
+          type: boolean
     UpgradeSchedule:
       type: object
-      x-ticvai-persistence: "control.upgrade_schedule"
-      required: [tenantId, releaseVersion, scheduledFor]
+      x-ticvai-persistence: control.upgrade_schedule
+      required:
+      - tenantId
+      - releaseVersion
+      - scheduledFor
       properties:
-        tenantId: { type: string, format: uuid }
-        tenantName: { type: string }
-        releaseVersion: { type: string }
-        scheduledFor: { type: string, format: date-time }
-        deferredByTenant: { type: boolean }
-        deferralReason: { type: string, nullable: true }
+        tenantId:
+          readOnly: true
+          x-ticvai-references: control.tenant
+          type: string
+          format: uuid
+        tenantName:
+          type: string
+        releaseVersion:
+          type: string
+        scheduledFor:
+          type: string
+          format: date-time
+        deferredByTenant:
+          type: boolean
+        deferralReason:
+          type: string
+          nullable: true
         maxDeferralUntil:
           type: string
           format: date-time
-          description: >
-            Beyond this the platform proceeds. An indefinitely deferred tenant becomes a
-            version nobody supports.
-        notifiedAt: { type: string, format: date-time, nullable: true }
+          description: 'Beyond this the platform proceeds. An indefinitely deferred tenant becomes a version
+            nobody supports.
 
+            '
+        notifiedAt:
+          type: string
+          format: date-time
+          nullable: true
     SupportNotice:
       type: object
-      x-ticvai-persistence: "control.support_notice"
-      required: [id, version, supportEndsAt, publishedAt]
+      x-ticvai-persistence: control.support_notice
+      required:
+      - id
+      - version
+      - supportEndsAt
+      - publishedAt
       properties:
-        id: { type: string, format: uuid }
-        version: { type: string }
-        supportEndsAt: { type: string, format: date }
+        id:
+          readOnly: true
+          type: string
+          format: uuid
+        version:
+          readOnly: true
+          type: string
+        supportEndsAt:
+          type: string
+          format: date
         message:
           type: object
-          additionalProperties: { type: string }
+          additionalProperties:
+            type: string
         affectedTenantIds:
           type: array
           readOnly: true
-          description: Computed from cell versions, never typed. A notice to the wrong list is worse than none.
-          items: { type: string, format: uuid }
-        publishedByPrincipalId: { type: string, format: uuid }
-        publishedAt: { type: string, format: date-time }
+          description: Computed from cell versions, never typed. A notice to the wrong list is worse than
+            none.
+          items:
+            type: string
+            format: uuid
+        publishedByPrincipalId:
+          type: string
+          format: uuid
+        publishedAt:
+          type: string
+          format: date-time
+        scopePath:
+          type: string
+          description: '**The partition key** (ADR-0005). Added 31 August: the operations that write this
+            table declare a scope and the table carried no column for it — **49 tables were in that state**,
+            so a row could be written at venue scope and then read by anything that could reach the table.
 
+
+            **`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains
+            `uae.dubai.marina`, and one index answers every level of the walk.
+
+
+            **Operations write it at `tenant` scope.**'
+    DeadLetter:
+      x-ticvai-append-only: createdAt
+      type: object
+      x-ticvai-persistence: platform.dead_letter
+      description: 'ADR-0033. **An outbox row whose delivery failed after its retry budget.**
+
+
+        **A financial posting is never dead-lettered** — `ledger.journal_entry` is append-only and a failed
+        posting is an incident. **Nor is a DSAR**: `sync.dsar_request` carries a legal clock, and
+        a dead-lettered erasure nobody works is a regulatory failure with a timestamp on it. Both halt
+        and alert.'
+      required:
+      - id
+      properties:
+        id:
+          type: string
+          format: uuid
+        outboxId:
+          type: string
+          format: uuid
+          description: The row that would not deliver.
+        eventName:
+          type: string
+        consumer:
+          type: string
+          description: Which consumer failed. **A dead letter you cannot attribute is a log entry with
+            a table’s overhead.**
+        payload:
+          type: object
+          description: The event as it was written. **Replay needs the payload, not a reference to a row
+            that may have moved on.**
+        attempts:
+          type: integer
+          description: '**Five, exponential from one second, jittered** (ADR-0033). Jitter because a thousand
+            failures at the same instant retry at the same instant.'
+        lastError:
+          type: string
+        lastAttemptAt:
+          type: string
+          format: date-time
+        replayCount:
+          type: integer
+          default: 0
+          description: '**A replay is a new attempt, not a reset.** An operator retrying the same poison
+            message forty times should be able to see that they did.'
+        scopePath:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+    OutboxEntry:
+      x-ticvai-append-only: createdAt
+      type: object
+      x-ticvai-persistence: platform.outbox
+      # One aggregate's events in order (ADAM CR-166, 18 October 2026; CHG-CRA-005): outbox_aggregate_id_sequence_idx.
+      x-ticvai-index: [[aggregateId, sequence]]
+      description: '**Written in the same transaction as the state change** (ADR-0033). That is what makes
+        it exactly-once — the row and the change commit together or neither does.
+
+
+        **Not a queue write inside a transaction.** A broker acknowledging a publish that then rolls back
+        is the exactly-once problem restated.
+
+
+        **Declared 31 August.** The table was storage-only with no schema and therefore no columns, while
+        20 operations wrote to it and `platform.dead_letter.outbox_id` referenced it — **twenty relationship
+        edges pointing at a table the schema did not have.**'
+      required:
+      - id
+      - eventId
+      - eventName
+      - tenantId
+      - aggregateType
+      - aggregateId
+      - sequence
+      - payload
+      - occurredAt
+      - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        eventId:
+          x-ticvai-references: none
+          type: string
+          format: uuid
+          description: '**The envelope''s event id, which is this row''s `id`** (ADR-0058; UUIDv7, ADR-0056). The
+            consumer inbox key, so a redelivery is recognised as the same event. `events/_schema.yaml` defines
+            the envelope.'
+        eventName:
+          type: string
+          description: The `name` of an event in `events/` (`aggregate.pastTenseFact`).
+        eventVersion:
+          type: integer
+          minimum: 1
+          description: The event's `version`, carried in the envelope so a consumer on an older version can tell.
+        tenantId:
+          x-ticvai-references: none
+          type: string
+          format: uuid
+          description: The tenant the change belongs to (envelope field, SD-030).
+        aggregateType:
+          type: string
+          description: The table the change happened in.
+        aggregateId:
+          type: string
+          format: uuid
+          description: '**Which row changed** (ADR-0056: every id is a uuid, so every aggregate fits). Also the
+            broker ordering key (ADR-0058): a partition key in Kafka, a consistent-hash or single-active-consumer key
+            in RabbitMQ, so one aggregate''s events arrive in `sequence` order.'
+        payload:
+          type: object
+          description: '**The event as it happened, not a reference to a row that may have moved on.**
+            A consumer reading the current state instead would see the third change, not the first.'
+        scopePath:
+          type: string
+          description: The partition key (ADR-0005).
+        sequence:
+          type: integer
+          description: '**Monotonic per aggregate** (SD-030: was *per scope*), allocated in the writing
+            transaction. A consumer that missed one knows it missed one — ordering is the difference between
+            at-least-once and unusable — and ordering is only ever promised within one aggregate. **Allocated from
+            `platform.outbox_sequence`** (ADAM CR-166, 18 October 2026; CHG-CRA-005): `INSERT ... ON CONFLICT
+            (aggregate_id) DO UPDATE SET last_sequence = last_sequence + 1 RETURNING last_sequence` in the writing
+            transaction, never `max(sequence) + 1`, which restarts when a monthly partition leaves (ADR-0058).'
+        occurredAt:
+          type: string
+          format: date-time
+          description: '**The envelope''s `occurredAt`** (ADAM CR-166; CHG-CRA-005): when the change happened, set in
+            the writing transaction. `createdAt` is when the row was written and partitions the table; a consumer
+            reads `occurredAt`.'
+        traceId:
+          type: string
+          maxLength: 64
+          nullable: true
+          description: The W3C trace id of the request that made the change (envelope field, SD-030), so a
+            consumer's work joins the producer's trace.
+        publishedAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: Null until the relay publishes it. **This column is the queue** — unpublished rows
+            in sequence order are the work.
+        attempts:
+          type: integer
+          default: 0
+          description: '**Five, exponential from one second, jittered.** Then `platform.dead_letter`.'
+        lastError:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+    OutboxSequence:
+      type: object
+      x-ticvai-persistence: platform.outbox_sequence
+      x-ticvai-primary-key: [aggregateId]
+      description: '**The last outbox sequence given to each aggregate** (ADAM CR-166, 18 October 2026; CHG-CRA-005).
+        One row per aggregate, updated with `INSERT ... ON CONFLICT (aggregate_id) DO UPDATE ... RETURNING` in the
+        transaction that writes the outbox row, so two writers of one aggregate queue on the row lock and a sequence
+        survives the monthly partitions of `platform.outbox` leaving (ADR-0058). **Every host role holds SELECT,
+        INSERT and UPDATE on it** (a kernel grant in docs/active/cross-deployable-writes.yaml, which DB-ROLES
+        creates), because access and operations allocate like commerce.'
+      required:
+      - aggregateId
+      - lastSequence
+      - scopePath
+      properties:
+        aggregateId:
+          x-ticvai-references: none
+          type: string
+          format: uuid
+          description: The aggregate (any table's row id; ADR-0056), as `OutboxEntry.aggregateId`.
+        lastSequence:
+          type: integer
+          format: int64
+          description: The last sequence given; the next writer gets this plus one.
+        scopePath:
+          type: string
+          readOnly: true
+          description: '**The aggregate''s own scope path**, the one its outbox rows carry, set on the first insert
+            and never changed. Row-level security reads it like any scoped row, so every principal allowed to change
+            the aggregate can allocate its next sequence, from any host, and no other can (CHG-CRA-005).'
+    ControlOutboxEntry:
+      type: object
+      x-ticvai-persistence: control.outbox
+      description: '**The control database''s outbox** (ADAM CR-152, option 1a, 18 October 2026; CHG-CRA-005). The
+        tenant outbox''s columns without `scopePath` and with no row security (the control database has no scope
+        tree, ADR-0039), drained by the workers host''s relay like each tenant''s. A control-plane state change that
+        must reach anything outside its transaction writes its event here in the same transaction (ADR-0033):
+        `tenant.suspended` by Subscription''s `approval.granted` consumer applying the suspension `suspendTenant` asked
+        for (CR-172) or by the suspension job, with `tenantId` the suspended tenant and
+        the event''s scope path its root (`control.cell_tenant.root_scope_path`).'
+      required:
+      - id
+      - eventId
+      - eventName
+      - tenantId
+      - aggregateType
+      - aggregateId
+      - sequence
+      - payload
+      - occurredAt
+      - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        eventId:
+          x-ticvai-references: none
+          type: string
+          format: uuid
+          description: The envelope's event id (ADR-0058; UUIDv7, ADR-0056), the consumer inbox key.
+        eventName:
+          type: string
+          description: The `name` of an event in `events/`.
+        eventVersion:
+          type: integer
+          minimum: 1
+        tenantId:
+          x-ticvai-references: none
+          type: string
+          format: uuid
+          description: The tenant the change is about (`control.tenant`).
+        aggregateType:
+          type: string
+        aggregateId:
+          type: string
+          format: uuid
+        payload:
+          type: object
+          description: The event as it happened.
+        sequence:
+          type: integer
+          description: Monotonic per aggregate, allocated in the writing transaction.
+        traceId:
+          type: string
+          maxLength: 64
+          nullable: true
+        occurredAt:
+          type: string
+          format: date-time
+        publishedAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: Null until the relay publishes it; unpublished rows in sequence order are the work.
+        attempts:
+          type: integer
+          default: 0
+        lastError:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+    OutboxRepublishRequest:
+      type: object
+      x-ticvai-persistence: none — request body
+      description: '**What a person asks to republish** (ADR-0058, amended 1 October). One tenant
+        database, a half-open range of `created_at`, optionally some event names, and why.'
+      required:
+      - tenantId
+      - from
+      - to
+      - reason
+      properties:
+        tenantId:
+          type: string
+          format: uuid
+          description: The tenant whose database's outbox is read (`control.tenant`).
+        from:
+          type: string
+          format: date-time
+          description: 'Inclusive. **Early enough**: when the oldest message still held by the lost broker
+            was published; when unknown, the time of the loss minus one hour, or the start of any consumer
+            halt then in progress, whichever is earlier. Must be before `to`.'
+        to:
+          type: string
+          format: date-time
+          description: Exclusive. No later than now; after a DR failover, the time of the request.
+        eventNames:
+          type: array
+          description: Catalogue event names (`events/`) to republish; absent means every event. An unknown
+            name is the shared `400` `validation`.
+          items:
+            type: string
+        reason:
+          type: string
+          maxLength: 500
+          description: Why, for the audit trail (e.g. "broker rebuilt after DR failover to the secondary
+            region").
+    OutboxRepublish:
+      type: object
+      x-ticvai-persistence: control.outbox_republish
+      description: '**One republish of a tenant database''s outbox** (ADR-0058, amended 1 October). A job
+        row in the regional control database beside the relay lease table `control.outbox_relay`. The relay
+        loop holding the tenant''s lease carries it out, alternating one republish batch with each live
+        batch, and moves `cursorAt` as it goes. **At most one `queued` or `running` per tenant.** A
+        cancelled or failed job keeps its cursor, so a new request can start where it stopped. The rows
+        republished keep their `published_at`.'
+      required:
+      - id
+      - tenantId
+      - from
+      - to
+      - reason
+      - status
+      - rowsPublished
+      - requestedBy
+      - requestedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        tenantId:
+          type: string
+          format: uuid
+          x-ticvai-references: control.tenant
+          description: The tenant whose database's outbox is republished.
+        from:
+          type: string
+          format: date-time
+          x-ticvai-column: range_starts_at
+          description: Inclusive start of the outbox `created_at` range.
+        to:
+          type: string
+          format: date-time
+          x-ticvai-column: range_ends_at
+          description: Exclusive end of the outbox `created_at` range.
+        eventNames:
+          type: array
+          nullable: true
+          description: The event names asked for; null means every event.
+          items:
+            type: string
+        reason:
+          type: string
+          maxLength: 500
+        status:
+          type: string
+          readOnly: true
+          default: queued
+          enum:
+          - queued
+          - running
+          - completed
+          - failed
+          - cancelled
+          description: '`queued` until the lease holder picks it up; `completed` when the cursor reaches
+            `to`; `failed` with `lastError` after the relay''s retry budget; `cancelled` by
+            `cancelOutboxRepublish`.'
+        cursorAt:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+          description: How far it has got, the `created_at` of the last row published (with the row id as
+            the keyset tiebreak, held by the relay). Null until the first batch.
+        rowsPublished:
+          type: integer
+          minimum: 0
+          default: 0
+          readOnly: true
+        lastError:
+          type: string
+          nullable: true
+          readOnly: true
+        requestedBy:
+          type: string
+          format: uuid
+          readOnly: true
+          x-ticvai-column: requested_by_principal_id
+          description: The staff principal who asked.
+        requestedAt:
+          type: string
+          format: date-time
+          readOnly: true
+        startedAt:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+        finishedAt:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+          description: Set on `completed`, `failed` or `cancelled`.
   securitySchemes:
     bearerAuth:
       type: http

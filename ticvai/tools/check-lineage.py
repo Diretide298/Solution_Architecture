@@ -32,6 +32,15 @@ compared an entry against the contract that defines it.
   6. Every table in `reads`/`writes` exists in `schema-reference.json`.
   7. Every postgres table belongs to exactly one service.
 
+  8. LN-TEXT (warning): a table the operation's own text names and its entry does not list.
+  9. LN-DERIVED: the lineage is what `tools/derive-lineage.py` derives from the contracts and the override list
+     (20 October 2026, CHG-R8GEN-001): reads, writes, readVia, writeVia and the contract facts of every entry.
+ 10. LN-OVERRIDE: every entry of `handoff/api-data-lineage-overrides.json` names an operation a contract declares,
+     tables that exist, and a reason; the entries carried from the hand-kept lineage may only fall (carriedCeiling).
+     An override the contract now derives is a warning (remove it).
+
+    python tools/check-lineage.py [--quiet] [--text]    (the self-tests run first, every time)
+
 **Coverage is reported, never failed.** A third of operations reach no table, and most of
 that is correct — a service-to-service call, a computed projection, a health probe. It is
 printed because it is worth watching, not because a number is wrong.
@@ -50,6 +59,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 H = os.path.join(ROOT, "handoff")
 VERBS = ("get", "post", "put", "patch", "delete")
 ERRORS, WARNINGS = [], []
+_LOADER = getattr(yaml, "CSafeLoader", yaml.SafeLoader)
 
 
 def load_json(name, required=True):
@@ -71,7 +81,7 @@ def contract_operations():
     for f in sorted(glob.glob(os.path.join(ROOT, "contracts", "*", "*.yaml"))):
         name = os.path.basename(f)[:-5]
         try:
-            d = yaml.safe_load(io.open(f, encoding="utf-8")) or {}
+            d = yaml.load(io.open(f, encoding="utf-8"), Loader=_LOADER) or {}
         except yaml.YAMLError as e:
             ERRORS.append("%s does not parse: %s" % (name, e))
             continue
@@ -84,7 +94,72 @@ def contract_operations():
     return out
 
 
+def _derive_lineage():
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("derive_lineage", os.path.join(ROOT, "tools", "derive-lineage.py"))
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
+def override_findings(overrides, ops, cols, fresh=None, view=None):
+    """LN-OVERRIDE: (errors, warnings) for the override list. `ops` is operationId -> contract, `cols` the
+    schema reference's tables, `fresh` (optional) operationId -> {reads, writes} as the contracts derive them,
+    `view` (optional) (table, operationId) -> True for a read view the operation may read (rule 6)."""
+    errs, warns = [], []
+    entries = overrides.get("operations") or {}
+    for o, v in sorted(entries.items()):
+        if o not in ops:
+            errs.append("LN-OVERRIDE %s: an override for an operation no contract declares" % o)
+            continue
+        if not str(v.get("reason") or "").strip():
+            errs.append("LN-OVERRIDE %s: an override with no reason" % o)
+        for k in ("reads", "writes", "notReads", "notWrites"):
+            for tb in v.get(k) or []:
+                if ":" not in tb and tb not in cols and not (k == "reads" and view and view(tb, o)):
+                    errs.append("LN-OVERRIDE %s: %s names '%s', which is in no schema" % (o, k, tb))
+        if fresh and o in fresh:
+            red = sorted(set(v.get("reads") or []) & set(fresh[o].get("reads") or [])) +                 sorted(set(v.get("writes") or []) & set(fresh[o].get("writes") or []))
+            if red:
+                warns.append("LN-OVERRIDE %s: the contract now derives %s; remove it from the override"
+                             % (o, ", ".join(red)))
+    carried = sum(1 for v in entries.values() if v.get("carried"))
+    ceiling = overrides.get("carriedCeiling")
+    if ceiling is not None and carried > int(ceiling):
+        errs.append("LN-OVERRIDE %d carried entries against a ceiling of %s: a carried entry is never added; state "
+                    "the read or write in the contract, or add an override with its own reason" % (carried, ceiling))
+    return errs, warns
+
+
+def self_test():
+    """The override rules on a made-up list; a failure here means the check is broken, not the package."""
+    fails = []
+    ops = {"getA": "a", "setA": "a"}
+    cols = {"a.t": [], "a.u": []}
+    good = {"carriedCeiling": 1, "operations": {"getA": {"reads": ["a.u"], "reason": "why", "carried": True}}}
+    if override_findings(good, ops, cols) != ([], []):
+        fails.append("a good override list is reported")
+    bad = {"carriedCeiling": 0, "operations": {
+        "gone": {"reads": ["a.t"], "reason": "x"},
+        "getA": {"reads": ["a.nope"], "reason": "", "carried": True},
+        "setA": {"writes": ["a.t"], "reason": "y"}}}
+    errs, warns = override_findings(bad, ops, cols, {"setA": {"reads": [], "writes": ["a.t"]}})
+    for want in ("gone: an override for an operation", "getA: an override with no reason", "'a.nope'",
+                 "1 carried entries against a ceiling of 0"):
+        if not any(want in e for e in errs):
+            fails.append("not reported: " + want)
+    if not any("setA: the contract now derives a.t" in w for w in warns):
+        fails.append("a redundant override is not reported")
+    return fails
+
+
 def main():
+    fails = self_test()
+    if fails:
+        for f in fails:
+            print("  SELF-TEST FAIL  %s" % f)
+        print("FAIL - %d self-test(s)" % len(fails))
+        return 1
     quiet = "--quiet" in sys.argv
     lin = load_json("api-data-lineage.json")
     ref = load_json("schema-reference.json")
@@ -203,6 +278,31 @@ def main():
         for o, g in text_gaps:
             print("  LN-TEXT  %-36s %s" % (o, ", ".join(g)))
 
+    # 9 + 10 -- LN-DERIVED and LN-OVERRIDE (20 October 2026, CHG-R8GEN-001). The lineage is derived from the contracts
+    # and the override list; a hand edit to the lineage, or a contract changed without the derive, shows here.
+    dl = _derive_lineage()
+    overrides = dl.load_overrides()
+    fresh = dl.derive(lin)
+    oerrs, owarns = override_findings(overrides, ops, cols, fresh,
+                                      lambda tb, o: read_view(tb, (lin.get(o) or {}).get("service")))
+    ERRORS.extend(oerrs)
+    WARNINGS.extend(owarns[:20])
+    if len(owarns) > 20:
+        WARNINGS.append("LN-OVERRIDE %d more redundant override(s)" % (len(owarns) - 20))
+    want = dl.expected(lin, fresh, overrides)
+    drift = 0
+    for o in sorted(set(want) & set(lin)):
+        bad = [k for k in ("reads", "writes") + dl.CONTRACT_FIELDS if not dl._same(want[o].get(k), lin[o].get(k))]
+        bad += [k for k in ("readVia", "writeVia") if want[o].get(k) != lin[o].get(k)]
+        if bad:
+            drift += 1
+            if drift <= 25:
+                ERRORS.append("LN-DERIVED %s: %s differ from what the contract and the override list give -- run "
+                              "tools/derive-lineage.py --apply (never edit the lineage by hand; an override goes in "
+                              "handoff/api-data-lineage-overrides.json with its reason)" % (o, ", ".join(bad)))
+    if drift > 25:
+        ERRORS.append("LN-DERIVED %d more entr(ies) differ" % (drift - 25))
+
     # Coverage — reported, never failed.
     #
     # **An operation with `service` or `device` as its only audience is complete without a
@@ -217,7 +317,7 @@ def main():
     screened = set()
     for f in glob.glob(os.path.join(ROOT, "screens", "P*.yaml")):
         try:
-            d = yaml.safe_load(io.open(f, encoding="utf-8")) or {}
+            d = yaml.load(io.open(f, encoding="utf-8"), Loader=_LOADER) or {}
         except yaml.YAMLError:
             continue
         for s in (d.get("screens") or []):
@@ -227,7 +327,7 @@ def main():
     machine = set()
     for f in sorted(glob.glob(os.path.join(ROOT, "contracts", "*", "*.yaml"))):
         try:
-            d = yaml.safe_load(io.open(f, encoding="utf-8")) or {}
+            d = yaml.load(io.open(f, encoding="utf-8"), Loader=_LOADER) or {}
         except yaml.YAMLError:
             continue
         for _p, m in (d.get("paths") or {}).items():

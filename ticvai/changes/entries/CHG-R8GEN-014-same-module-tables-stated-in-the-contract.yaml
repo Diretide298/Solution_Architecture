@@ -1,0 +1,25 @@
+id: CHG-R8GEN-014
+date: '2026-10-20'
+source: audit
+kind: process
+summary: 'An operation can state the same-module tables it reads or writes beyond its schemas: x-ticvai-reads and x-ticvai-writes, lists of {table, for}. derive-lineage reads them, so a carried lineage override becomes a contract fact (derive-lineage --audit and check-lineage LN-OVERRIDE then name the override as redundant, and it is removed). A read of another module''s table stays an x-ticvai-read-via to the owner''s query.'
+decision:
+  what: 'Generators lane, second r8 fix round, extra item 3 follow-up: the way the 1,698 carried overrides shrink. No contract uses the extensions yet; the contract lanes may move a carried table into its operation when they touch it.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: R8 blocker cause list (second round brief, generators lane extra item 3: keep what the contracts cannot express as a small override list); the carried list is large because no contract fact could state a same-module read.'
+keys_touched:
+  files:
+  - tools/derive-lineage.py
+root_class: 'hand-kept derived file: a value a tool could derive kept by hand, so the source changes and it does not'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: R8 blocker walk, second round brief (generators lane)'
+triage: blocker
+prevention:
+  type: generator-rule
+  ref: tools/check-lineage.py
+status: open

@@ -1,0 +1,25 @@
+id: CHG-R8GEN-005
+date: '2026-10-20'
+source: audit
+kind: process
+summary: 'check-cross-module-reads no longer lets a generated view named for Identity (<table>_for_identity) pass the tier rule: a read of a module above Identity through such a view is an XR-FOUNDATION finding, since ADR-0028 lets Identity read nothing above it but a projection.'
+decision:
+  what: 'r8 cause FOUNDATION-AI-C48, the tool part. The owner queries and Identity''s readVia (orders, marketing-crm, identity contracts) are the core and surface lanes'', requested in the r8 generators report; the five baselined reads clear when they land.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: R8 blocker cause list, cause FOUNDATION-AI-C48 (ticket 27654 DB-READ-VIEWS; ADAM gap 27654/1).'
+keys_touched:
+  files:
+  - tools/check-cross-module-reads.py
+root_class: 'a check branch that skips a rule: the view branch returned before the tier rule ran'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: R8 blocker walk, second round brief (generators lane)'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-cross-module-reads.py
+status: open

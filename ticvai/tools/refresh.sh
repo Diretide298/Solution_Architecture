@@ -38,12 +38,10 @@ cd "$(dirname "$0")/.."
 # was holding nine: seven `relinquish*` operations renamed at some point from `release*`, and the
 # two step-up operations added the same day.
 #
-# **Additive only.** The entries that came with the original dump carry judgements a derivation
-# cannot reproduce -- an audience narrowed by hand, a service assignment that is a deployment
-# decision rather than a contract fact -- so an entry that exists is left exactly as it is. Verified
-# on the run that added those nine: 0 removed, 0 existing entries changed. `--audit` still reports
-# the 1,445 entries that differ, and reads only; the rebuild it argues for is a separate job that
-# somebody has to decide on rather than have happen to them.
+# **Derived since 20 October 2026, no longer additive** (CHG-R8GEN-001). Every entry's reads, writes, routes and
+# contract facts are re-read from the contracts, plus and minus handoff/api-data-lineage-overrides.json (what no
+# contract fact can state, each with its reason). Until then an entry that existed was never corrected, and 178 named
+# a permission the contract had dropped. check-lineage LN-DERIVED holds the file to this derivation.
 python3 tools/derive-lineage.py --apply
 
 # **The first-release slice: what the four platforms call, and the setup that feeds it.** Reads the
@@ -115,13 +113,15 @@ python3 tools/build-merge-workbook.py 2>/dev/null || true
 python3 tools/derive-board-flows.py --apply
 python3 tools/derive-transitions-from-flows.py --apply --adopt   # 94 flows -> triggers, +107 edges
 python3 tools/label-launcher-edges.py --apply            # home screens are launchers
-python3 tools/derive-carries-from-entrystate.py --apply  # carries, from what the destination needs
 # **A screen that calls `getEntitlement(entitlementId)` and declares no `entitlementId`
 # cannot know which ticket it is showing.** This fills that blank from the operation's own
 # path, and it earns its place here because it happened twice on 10 September alone —
 # once for five new P04 screens and once for thirteen when guest web and mobile were
 # brought to parity. It runs before derive-carries, which reads what it writes.
+# **And now it does** (20 October 2026, CHG-R8GEN-017): it sat after derive-carries, so a parameter it added was
+# carried only by the next refresh -- check-regenerate-twice --chain found ADM-018's challengeId that way.
 python3 tools/derive-entrystate-params.py --apply
+python3 tools/derive-carries-from-entrystate.py --apply  # carries, from what the destination needs
 # **135 screens gained components the first time this was run, on 10 September.** It had
 # been sitting in tools/ unrun, which is why check-bindings reports 634 components carrying
 # `Structure from the wireframe board. Components not yet enumerated.` — the enumeration
@@ -169,6 +169,13 @@ python3 tools/derive-app-roles.py
 # `x-ticvai-permission`. Runs here because adding one operation with a permission changes a
 # checklist, and a checklist that lags the contracts grants access to operations that moved.
 python3 tools/derive-capabilities.py --apply
+# **The partner API scope catalogue listApiScopes serves** (20 October 2026, r8 cause FOUNDATION-AI-C47, CHG-R8GEN-008).
+# The contract says it is generated at release from `x-ticvai-api-scope`; until this nothing generated it. Reads the
+# contracts only; the service loads handoff/api-scopes.json at startup.
+python3 tools/derive-api-scopes.py
+# **Where a guest's data lives, by owner** (20 October 2026, r8 cause IDENTITY-C65, CHG-R8GEN-015): every table with a
+# subject_id column, the owner's subjectDataRecords query and whether exportSubjectData asks it. After derive-schema.
+python3 tools/derive-subject-data-register.py
 # **Retired 10 September.** `derive-pack-boards.py` drew every pack screen a second time on
 # its own `WS##` board — 728 screens rendered twice, and a reviewer looking at two drawings
 # of one screen cannot tell it is one screen. The workshop grouping is now a badge and a

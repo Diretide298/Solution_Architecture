@@ -38,6 +38,16 @@ from pathlib import Path
 
 import yaml
 
+
+def _yload(src):
+    """YAML with the C loader, the pure one where a file defeats it (20 October 2026, CHG-R8GEN-016): the screen files
+    are 25 MB and the pure loader took most of each refresh step's minute; the loaded data is the same."""
+    text = src.read() if hasattr(src, "read") else src
+    try:
+        return yaml.load(text, Loader=getattr(yaml, "CSafeLoader", yaml.SafeLoader))
+    except Exception:
+        return yaml.safe_load(text)
+
 try:
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 except Exception:  # noqa: BLE001
@@ -79,7 +89,7 @@ def load_ops() -> dict:
         try:
             doc = yaml.load(text, Loader=LOADER) or {}
         except Exception:  # noqa: BLE001
-            doc = yaml.safe_load(text) or {}
+            doc = _yload(text) or {}
         for path, item in (doc.get("paths") or {}).items():
             if not isinstance(item, dict):
                 continue

@@ -17,6 +17,13 @@ the decision and passes after it. Two rules are general, because the same gap ca
 
 And one rule per decision:
 
+  BR-APPROVAL-ROUTE  (r8, CHG-R8SPN-016, CHG-R8GEN-013) setApprovalMatrix and approveMatrixMultiLevel refuse a
+                   condition the engine cannot evaluate (422 condition-not-supported); submitApprovalRequest's 409
+                   lists approval-no-longer-required and approval-no-approver-available.
+  BR-GUEST-SELF-403  (r8, CHG-R8SPN-018) a guest operation scoped to the caller's subject answers another subject's
+                   record 404, not 403: a ratchet (GUEST_SELF_403_CEILING). BR-ALERT-RECIPIENT (CHG-R8SPN-020) is a
+                   warning until reporting's listAlerts states its recipient filter.
+
   BR-SPLIT         (CHG-RUL-001) Five split methods; `closeTableVisit` takes a payment without `subBillId` (an
                    unsplit bill is one sub-bill); `splitBill` and `closeTableVisit` state the outlet's payment
                    timing (`paymentTiming`, send first or pay first).
@@ -156,6 +163,11 @@ def props(doc, node):
 
 def body_schema(op):
     return (((op.get("requestBody") or {}).get("content") or {}).get("application/json") or {}).get("schema") or {}
+
+
+# BR-GUEST-SELF-403: guest operations scoped to the caller's subject that declared 403 on 20 October 2026 (13 on the
+# generators branch before the core lane's CHG-R8SPN-018 merged). Lower it as they are fixed; never raise it.
+GUEST_SELF_403_CEILING = 13
 
 
 def problem_types(op):
@@ -454,12 +466,39 @@ def main() -> int:
     need("BR-GATE-CANCEL", "left as they were" in text(op("cancelGateModeChange")[3]),
          "cancelGateModeChange does not leave the scheduler's columns untouched")
 
+    # -------------------------------------------------------------- r8 second round (core lane's requests, CHG-R8GEN-013)
+    # BR-APPROVAL-ROUTE (CHG-R8SPN-016): a matrix condition the engine cannot evaluate is refused when it is saved, and a
+    # submission that no longer needs approval, or finds no approver, says so with its own problem type.
+    for oid in ("setApprovalMatrix", "approveMatrixMultiLevel"):
+        need("BR-APPROVAL-ROUTE", "condition-not-supported" in problem_types(op(oid)[3]),
+             f"{oid} does not refuse a condition the engine cannot evaluate (422 condition-not-supported)")
+    sub409 = text(((op("submitApprovalRequest")[3].get("responses") or {}).get("409")) or {})
+    for pt in ("approval-no-longer-required", "approval-no-approver-available"):
+        need("BR-APPROVAL-ROUTE", pt in sub409, f"submitApprovalRequest's 409 does not list {pt}")
+    # BR-ALERT-RECIPIENT (CHG-R8SPN-020): reporting's listAlerts says whose alerts come back (the recipient role; an
+    # over/short alert only to a holder of OVERSHORT_ACCEPT).
+    la = next((o for oid, (f, _p, _m, o, _d) in ops.items() if oid == "listAlerts" and f.stem == "reporting"),
+              op("listAlerts")[3])
+    # Printed, not failed, until the surface lane's listAlerts text lands (r8 cause APPROVALS-TENANCY-C36): then move
+    # it into `need` so the filter cannot be dropped again.
+    if not ("OVERSHORT_ACCEPT" in text(la) and "recipient" in text(la).lower()):
+        print("  WARN  BR-ALERT-RECIPIENT listAlerts does not yet state the recipient-role filter (OVERSHORT_ACCEPT for "
+              "over/short alerts); surface lane, r8 cause APPROVALS-TENANCY-C36")
+    # BR-GUEST-SELF-403 (CHG-R8SPN-018): a guest operation scoped to the caller's own subject answers someone else's
+    # record with 404, never 403 (which would confirm it exists). A ratchet over the operations found on 20 October.
+    self403 = sorted(oid for oid, (_f, _p, _m, o, _d) in ops.items()
+                     if o.get("x-ticvai-self-scoped") == "subject" and "guest" in (o.get("x-ticvai-audience") or [])
+                     and "403" in {str(k) for k in (o.get("responses") or {})})
+    if len(self403) > GUEST_SELF_403_CEILING:
+        need("BR-GUEST-SELF-403", False, f"{len(self403)} guest self-scoped operations declare 403, above the ceiling "
+             f"of {GUEST_SELF_403_CEILING}: answer another subject's record 404 ({', '.join(self403[:8])})")
+
     errors["BR-PARSE"].extend(PARSE_ERRORS)
     total = sum(len(v) for v in errors.values())
     rules = ["BR-PARSE", "BR-STREAM", "BR-PAIR-REFUSAL", "BR-SPLIT", "BR-VISIT-PLAN", "BR-PO", "BR-PAY-LINK", "BR-REPORT-RUNS",
              "BR-CONTRAST", "BR-WO-CANCEL", "BR-INCIDENT", "BR-FARE", "BR-SESSIONS-DOOR", "BR-ATTENDANCE",
              "BR-AI-CURRENCY", "BR-QR", "BR-NEW-OPS", "BR-GUEST-PII", "BR-HOST-ROUTING", "BR-CASH-RECEIPT",
-             "BR-HOLD-LAPSE", "BR-LOGIN-ATTEMPTS", "BR-GATE-CANCEL"]
+             "BR-HOLD-LAPSE", "BR-LOGIN-ATTEMPTS", "BR-GATE-CANCEL", "BR-APPROVAL-ROUTE", "BR-GUEST-SELF-403"]
     for r in rules:
         print(f"  {r:18} {len(errors.get(r, [])):3d}")
         for m in errors.get(r, [])[:12]:

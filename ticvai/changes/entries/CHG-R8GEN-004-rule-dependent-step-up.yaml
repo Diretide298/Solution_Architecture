@@ -1,0 +1,25 @@
+id: CHG-R8GEN-004
+date: '2026-10-20'
+source: audit
+kind: process
+summary: 'check-step-up accepts x-ticvai-step-up: rule-dependent (rule SU-RULE): a step-up the matched approval rule (requires_mfa) or the tenant''s step-up policy demands, not a fixed floor. It still needs its reason, which must name the rule or policy, and its carrier (session or body). This lets approveUnifiedDecision say what the meeting decided (MFA only where the rule requires it) without the check demanding a floor.'
+decision:
+  what: 'r8 cause APPROVALS-TENANCY-C46, option A (the lead, 20 October 2026: a meeting decision wins over the later default). The contract change in contracts/spine/approvals.yaml (approveUnifiedDecision and decideApprovalRequest) is the core lane''s, requested in the r8 generators report.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: R8 blocker cause list, cause APPROVALS-TENANCY-C46 (tickets 27813, 27831; ADAM gaps 27831/1, 27813/3; MoM 10 August section 5.5 ''MFA optional'').'
+keys_touched:
+  files:
+  - tools/check-step-up.py
+root_class: 'a check that knows one meaning: the rule could only express a fixed floor'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: R8 blocker walk, second round brief (generators lane)'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-step-up.py
+status: open

@@ -1,0 +1,3927 @@
+openapi: 3.1.0
+info:
+  title: TICVAI — Venue map
+  version: 1.0.0
+  x-ticvai-screen-count: 22
+  x-ticvai-tier: satellite
+  x-ticvai-module: "21 — Seat Management & Venue Mapping"
+  x-ticvai-platforms:
+    - P01 Guest Web
+    - P02 Guest App
+    - P06 Venue Staff App
+    - P08 Venue Management
+  # Derived from screens/*.yaml on 18 August — every platform with a screen that calls an
+  # operation in this contract. **Six contracts declared none**, which the viewer reports as
+  # missing taxonomy and no package checker tested for.
+  description: >
+    **A venue map is not a seat map, and conflating them is the mistake this contract exists to
+    avoid.**
+
+    A seat map is an auditorium: sections, rows, numbered seats, each one sellable inventory. A
+    venue map is a park: rides, restaurants, shops, toilets, first aid, exits, parking. **Points and
+    paths on a venue map are not sold** — they are what a guest navigates by and what an operator
+    watches.
+
+    **The exception is a placed resource** (decided 29 September, rev 3 REV3-15 and GAP-C2). A venue
+    map can carry cabanas, loungers, tables and other bookable resources, each with a label (B09),
+    a zone (Beach), a capacity (15) and a price band (Large). They arrive the way the stadium's seats
+    do in `seating`: in the drawing and a manifest, through `importVenueGeometry`, checked by
+    `validateVenueMapGraph`, and live at `publishVenueMap`. A guest picks one on the map, holds it
+    with `resources.createResourceHold` (an expiring hold, like a seat hold) and buys it; the whole
+    map's availability for a date is one call, `resources.getMapResourceAvailability`. **This
+    supersedes audit R073 (c)** ("cabanas stay staff-booked", 28 September) and the 26 August minute
+    ("never a specific room by itself") for resources on an ingested map. The object, its bookings
+    and its holds stay in `resources`; this contract holds where it is and what it is labelled.
+
+    `seating` already does the first. This does the second, and they share exactly one thing: both
+    are drawn by an architect and arrive as a file nobody wants to retype.
+
+    ---
+
+    ## The pipeline
+
+        upload ──► extract ──► propose ──► place ──► publish
+        (venue)   (deterministic)  (AI)   (venue)   (venue)
+
+    **The split between extract and propose is deliberate and is the load-bearing decision here.**
+
+    `importVenueGeometry` reads the file and produces shapes with layer names. It is deterministic,
+    it handles the four defects CF-122 found — layer roles as lists, Arabic-Indic digits, UTF-16BE
+    names, native CAD — and **it fails loudly**: a file that yields nothing reports `nothingFound`
+    rather than success.
+
+    `proposeVenueLabels` reads those shapes and suggests what each is: *this polygon by the entrance
+    with the toilet layer is a restroom; this one is a ride.* It writes a proposal and stops.
+
+    **Two failure modes, kept apart.** A mis-parsed layer and a bad suggestion look identical to a
+    user if one operation does both — *"the map is wrong"* with no way to tell whether the file was
+    misread or the labelling was. Separated, the extraction reports which layers it found and the
+    proposal reports its confidence.
+
+    ---
+
+    ## Publishing
+
+    **A map is published, not saved.** Editing a live map under a guest standing in front of it is
+    how a wayfinding route ends at a wall.
+
+    A draft is worked on freely. Publishing makes it the version guests see, and the previous
+    version stays readable — a guest mid-route on version 3 finishes on version 3.
+
+    ---
+
+    ## What it does not do
+
+    **No turn-by-turn routing engine.** 19.2.56 asks for venue navigation, and the map supplies the
+    graph — points, paths, and which paths are step-free. **Routing over that graph is a client
+    concern**, because a phone with the map cached routes offline and a server round-trip per step
+    does not.
+
+    **No indoor positioning.** Where a venue has beacons, `access.setAccessPointGeofence` already
+    carries them (CF-51).
+
+    ---
+
+    ## The visit planner (29 September, MOB-6)
+
+    **The Plan tab is Block A**, decided 29 September: a rules planner with the AI planner agent on
+    top, superseding rev 3 GAP-C3 and audits R187 and R209. It lives here because a plan is laid out
+    on the map: points with a planning duration, interest and cuisine tags, walking times over the
+    published graph. `generateVisitPlan` builds it with no AI, `updateVisitPlan` changes it as a new
+    version (so undo works), `listVisitPlanAlternatives` offers swaps, and `bookVisitPlan` turns it
+    into cart lines through the orders service's `addCartLine`. Plans are the guest's own
+    (`venuemap.visit_plan`, `venuemap.visit_plan_item`), like a cart. The AI planner agent reaches
+    them only as tools called for the guest, so AI still writes nothing outside `ai.*` (ADR-0020).
+
+    **Each day is planned from the amenities of its own venue** (30 September client meeting, MoM
+    4.7, Allam's requirement). In a multi-venue tenant a plan may put each date at a different venue
+    (`VisitPlanRequest.dayVenues`), and a day's rides, dining and **retail (shops and kiosks, added
+    alongside F&B the same day)** come only from that venue's published map. A preference a venue
+    cannot meet is reported (`VisitPlan.unmatchedPreferences`), never filled from another venue;
+    every item carries its `venueId`, and `updateVisitPlan` refuses a point from another venue.
+
+    **A point also carries what Item Detail shows** (MOB-4): a description, a gallery and a featured
+    offer (a product or a bundle, for any kind of point).
+
+    ---
+
+    ## What a venue sends
+
+    **`handoff/venue-map-input-spec.md` is the venue-facing document** and this contract enforces
+    it. Every rule in it exists because its absence produced a named failure, and every failure
+    comes back as a `code` on `VenueMapImportJob.findings` pointing at the section that covers it.
+
+    **The short version.** Native CAD if you have it, PDF if not, raster accepted and degrading
+    gracefully. Layers named for what a thing *is* — `VC-Seats` is right. Western digits in codes,
+    Arabic anywhere else. A manifest of Description, Section, Row, Seat with the header on row 3.
+    Two georeference points far apart. The illustrated map separately, with four alignment points.
+
+    **What the import accepts in r1** (Chinmay, 3 October 2026, r1 additions; ADR-0069 amended the
+    same day): DWG or DXF (preferred: the layer names survive); a vector PDF, read by its layers, and
+    a scanned PDF, read through an **OCR step** whose text becomes label hints for the assistant; SVG;
+    a PNG or JPG, including **a plan with hand-marked paths**, from which `ai.proposeWalkways`
+    proposes the path network and the operator accepts it **segment by segment** with
+    `acceptWalkwayProposals`; and **a GLB model with its navigation (pathway) file** (ADR-0069), whose
+    graph and locations import into this map and whose model becomes the map's 3D layer. A GLB over
+    40 MB is refused; one over 300,000 triangles at LOD0 imports, and its 3D layer does not publish
+    until it is reduced. The 2D map always publishes.
+
+    **Each part is independently useful and none blocks the next**, which is the property that
+    matters: a venue that can only send a manifest still gets sellable seats.
+
+servers:
+  - url: https://api.ticvai.com/v1
+
+security:
+- bearerAuth: []
+x-ticvai-queries:
+  # Queries other modules ask this module (ADR-0055 amendment, 14 October 2026): module, inputs, returns, rule, served.
+  # **Data reads other modules ask this module for** (MOD audit, 14 October 2026, CHG-MOD-001): one query per
+  # table, instead of a raw read of it (check-cross-module-reads XR-UNCOVERED; ADR-0055 rule 2, amended
+  # 14 October).
+  importJobRecords:
+    module: venue-map
+    table: venuemap.import_job
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The venuemap.import_job rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as VenueOps stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/VenueMapImportJob'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). VenueOps answers with its venuemap.import_job rows, as it stores them and as the caller's scope
+      lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked
+      from another deployable through VenueOps' service route (serviceAuth).
+    served: [service]
+  mapRecords:
+    module: venue-map
+    table: venuemap.map
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The venuemap.map rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as VenueOps stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/VenueMap'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). VenueOps answers with its venuemap.map rows, as it stores them and as the caller's scope lets it
+      see them (the table's row-level security, under the caller's connection and transaction). It decides
+      nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and a
+      question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked from
+      another deployable through VenueOps' service route (serviceAuth).
+    served: [service]
+  pointRecords:
+    module: venue-map
+    table: venuemap.point
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The venuemap.point rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as VenueOps stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/VenuePoint'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). VenueOps answers with its venuemap.point rows, as it stores them and as the caller's scope lets
+      it see them (the table's row-level security, under the caller's connection and transaction). It decides
+      nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and a
+      question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
+      process within operations, through the C# query interface VenueOps implements, and asked from another
+      deployable through VenueOps' service route (serviceAuth).
+    served: [in-process, service]
+  visitPlanRecords:
+    module: venue-map
+    table: venuemap.visit_plan
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The venuemap.visit_plan rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as VenueOps stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/VisitPlan'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). VenueOps answers with its venuemap.visit_plan rows, as it stores them and as the caller's scope
+      lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked
+      from another deployable through VenueOps' service route (serviceAuth).
+    served: [service]
+  visitPlanItemRecords:
+    module: venue-map
+    table: venuemap.visit_plan_item
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The venuemap.visit_plan_item rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as VenueOps stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/VisitPlanItem'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). VenueOps answers with its venuemap.visit_plan_item rows, as it stores them and as the caller's
+      scope lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked
+      from another deployable through VenueOps' service route (serviceAuth).
+    served: [service]
+paths:
+  /venue-maps:
+    get:
+      operationId: listVenueMaps
+      x-ticvai-consumed-by:
+        - "P08 BO-092 Venue Maps"
+        - "P08 BO-1061 Platform Command Center"
+      summary: Maps for this venue
+      tags: [venueMap]
+      x-ticvai-permission: VENUE_MAP_VIEW
+      x-ticvai-audience: [staff]
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Maps
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/VenueMap' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+    post:
+      operationId: createVenueMap
+      x-ticvai-consumed-by:
+        - "P08 BO-092 Venue Maps"
+      summary: Start a map
+      description: >
+        A venue may have several — **a park map and a floor plan per building are different maps,
+        not layers of one**, because a guest on the second floor should not be shown the ground
+        floor's toilets.
+
+        **The server owns the id, the status and the scope path.** The map is created as a
+        `draft` with a server-assigned id, and `scopePath` comes from `venueId`. Those fields are
+        `readOnly` on `VenueMap`; a client that sends them has them ignored.
+      tags: [venueMap]
+      x-ticvai-permission: VENUE_MAP_MANAGE
+      x-ticvai-audience: [staff]
+      x-ticvai-scope-level: venue
+      x-ticvai-config-scope: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/VenueMap' }
+      responses:
+        '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Created as a draft
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/VenueMap' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+
+  /venue-maps/{mapId}:
+    parameters:
+      - name: mapId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: getVenueMap
+      x-ticvai-consumed-by:
+        - "P01 WEB-039 Venue Map & Wait Times"
+        - "P01 WEB-047 Map Booking — Cabanas & Spots"
+        - "P02 GST-004 Item Detail"
+        - "P02 GST-021 Interactive Map"
+        - "P02 GST-074 Map Booking — Cabanas & Spots"
+        - "P06 EMP-030 Venue map"
+        - "P08 BO-094 Map Editor & Publish"
+      # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
+      # or staff token is still accepted. `{}` makes the credential optional.
+      security:
+      - {}
+      - guestAuth: []
+      - bearerAuth: []
+      summary: A map with its points and paths
+      description: >
+        19.2.55. **The whole map in one call.** A guest app opening the map should not make one
+        request per category — it caches the map and filters locally, which is also what makes it
+        work with no signal in the middle of a park.
+
+        **Three things it can return, and the caller says which.** With no parameters, the
+        published version guests see. With `version`, that published version, read from its
+        `VenueMapVersion` snapshot. With `draft=true`, the working draft the editor changes, which
+        is what BO-094 loads. `VenueMapDetail.version` says which published version came back,
+        and is null for the draft.
+
+        **Placed resources come back with the map** (decided 29 September, rev 3 REV3-15): each
+        cabana, lounger or table with its label, zone, capacity, price band and shape. What is free
+        on a date is not here, because it changes by the minute and the map by the month; that is
+        `resources.getMapResourceAvailability`, one call for the whole map, keyed by `resourceId`.
+      tags: [venueMap]
+      x-ticvai-permission: VENUE_MAP_VIEW
+      x-ticvai-guest-callable: true
+      x-ticvai-audience: [staff, guest]
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: version
+          in: query
+          schema: { type: integer }
+          description: >
+            Absent means the published version. **A guest mid-route on version 3 finishes on
+            version 3**, so the client sends the version it cached. Ignored when `draft` is true.
+        - name: draft
+          in: query
+          schema: { type: boolean, default: false }
+          description: >
+            **Read the working draft instead of a published version.** Staff only, and it needs
+            `VENUE_MAP_MANAGE`, because the draft is unfinished work that must never reach a guest.
+            A guest session, or a caller with only `VENUE_MAP_VIEW`, gets 403.
+      responses:
+        '200':
+          description: >
+            The published version asked for, or the draft. **A map that has never been published
+            has no published version**, so without `draft=true` it returns 404.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/VenueMapDetail' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+
+  /venue-maps/{mapId}/import:
+    parameters:
+      - name: mapId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: importVenueGeometry
+      x-ticvai-consumed-by:
+        - "P08 BO-093 Map Import & Labelling"
+      summary: Read a drawing into shapes
+      description: >
+        21.2.1 to 21.2.4 and 1.4.24. **Deterministic, and it fails loudly.**
+
+        Accepts what a venue's drawing office actually holds: PDF, SVG, DWG, DXF and raster.
+        **Converting CAD to PDF loses the layer names this depends on**, which is why native
+        formats are accepted rather than requested as exports.
+
+        Carries every lesson CF-122 taught on the seat importer, because it is the same problem:
+        **layer roles are lists** — one real file had two distinct layers both named `Layer 1`;
+        **section codes are digit-normalised** — `A١` and `A1` are one place to a person and two to
+        a comparison; **layer names are decoded before matching** — PDF strings arrive UTF-16BE and
+        read as mojibake taken as bytes.
+
+        **A file that yields no shapes reports `nothingFound`, not success.**
+
+        **The file is uploaded first, through `assets`.** The drawing does not travel in this
+        request: the client calls `assets.createUpload`, sends the file to the signed URL, calls
+        `assets.completeUpload`, and passes the `MediaAsset.id` that returns as `sourceRef` (and the
+        manifest's as `manifestRef`). Uploading needs `ASSET_LIBRARY_MANAGE` as well as this
+        operation's permission.
+
+        **Returns `202` with the job, which is still `parsing`.** Poll `getVenueMapImportJob` until
+        it is `previewReady` or `failed`. The shapes it extracts go into the working draft, never
+        into the published map.
+
+        **The sources accepted in r1** (Chinmay, 3 October 2026, r1 additions; ADR-0069 as amended
+        on 3 October):
+
+        - **`dwgPlan`, `dxfPlan`**: native CAD, preferred, read by layer as above.
+        - **`pdfPlan`**: a vector PDF is read by its layers. **A scanned PDF (a page with no vector
+          geometry) goes through the OCR step** (`ocr`, on by default): the text on the image is read
+          in English and Arabic, each block placed on the plan with its confidence, and returned as
+          `VenueMapImportJob.ocr`. **The text is a hint, never a label**: `ai.proposeVenueLabels`
+          reads the blocks near a shape ("WC", "First Aid", a ride's name) and says which one it used
+          (`VenueLabelProposal.ocrHint`); nothing is named until a person accepts it. The geometry of
+          a scanned page is a raster's (`rasterOnly`), so its paths come from `ai.proposeWalkways`.
+        - **`svgPlan`**: read by its named layers or groups, as CAD.
+        - **`rasterPlan`**: a PNG or JPG. **A plan with paths marked by hand** (a marker line along
+          each walkway) says so in `handMarkedPaths`; the import finds the marks
+          (`VenueMapImportJob.handMarkedPaths`), `ai.proposeWalkways` proposes a segment per marked
+          stretch with its confidence, and the operator accepts or rejects **each segment** with
+          `acceptWalkwayProposals`. A plain raster with no marks still works: the proposal then
+          follows what it can see.
+        - **`glbModel`**: the venue's 3D model (ADR-0069 section 1) as `sourceRef`, **with its
+          navigation file** (section 2, the `VenueNavigationFile` schema) as `navigationFileRef`.
+          The navigation file's nodes, edges and locations import into the working draft as paths and
+          points, exactly as a CAD walkway layer would (codes resolve to outlets and products, an
+          unresolved one is a finding); its anchor becomes `VenueMap.modelTransform`; the model
+          becomes the draft's 3D layer (`VenueMap.modelAssetId`). **The budget is measured here**
+          (`VenueMapImportJob.model`): a GLB over **40 MB** is refused (`422 modelTooLarge`, and
+          `assets.createUpload` refuses it first); over **300,000 triangles** at LOD0 in any zone,
+          uncompressed textures, or an anchor residual over 10 m at a control point is an `error`
+          finding that keeps the 3D layer out of the next publish (the 2D map still publishes); the
+          other budget lines (25 MB, 1.5 million triangles in all, 150 draw calls, 2048 px and
+          128 MB of textures, a 3 m residual) are `warning`s with the number.
+        - **`navigationFile`**: the navigation file alone, as `sourceRef`: its graph and locations
+          import as above, with no 3D layer. The file `getVenueNavigationFile` exports is this format,
+          so a venue (or its 3D studio) starts from the graph the platform already holds.
+      tags: [venueMap]
+      x-ticvai-permission: VENUE_MAP_MANAGE
+      x-ticvai-audience: [staff]
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [format, sourceRef]
+              properties:
+                format:
+                  type: string
+                  enum: [pdfPlan, svgPlan, dwgPlan, dxfPlan, rasterPlan, glbModel, navigationFile]
+                  description: >
+                    `glbModel` and `navigationFile` added 3 October 2026 (r1 additions, ADR-0069): a
+                    GLB with its navigation file, or the navigation file alone. See the list above.
+                sourceRef:
+                  type: string
+                  format: uuid
+                  description: >
+                    **The drawing, as the `MediaAsset.id` from `assets.completeUpload`.** Not a URL
+                    and not a storage path; the file itself is never posted through this API. For
+                    `glbModel` it is the GLB (a `model3d` asset); for `navigationFile` the JSON.
+                  x-ticvai-references: assets.MediaAsset
+                navigationFileRef:
+                  type: string
+                  format: uuid
+                  nullable: true
+                  x-ticvai-references: assets.MediaAsset
+                  description: >
+                    **The navigation (pathway) file that goes with a GLB** (ADR-0069 section 2; the
+                    `VenueNavigationFile` schema), uploaded like `sourceRef` as JSON. Required with
+                    `glbModel` (refused `422 navigationFileMissing` without it) and ignored for every
+                    other format. Added 3 October 2026 (r1 additions).
+                ocr:
+                  nullable: true
+                  description: The OCR step (3 October 2026, r1 additions); `VenueMapOcrOptions`.
+                  allOf:
+                    - $ref: '#/components/schemas/VenueMapOcrOptions'
+                handMarkedPaths:
+                  nullable: true
+                  description: A raster plan with hand-marked paths (3 October 2026, r1 additions); `VenueMapHandMarkedPaths`.
+                  allOf:
+                    - $ref: '#/components/schemas/VenueMapHandMarkedPaths'
+                layerMapping:
+                  type: object
+                  description: >
+                    **Each role takes a list.** A drawing office names layers by habit, not by
+                    convention, and a single string keeps one and drops the rest silently.
+
+                    **Optional.** Absent, the platform matches against the accepted names in
+                    `handoff/venue-map-input-spec.md` — case-insensitive, `VC-` prefix ignored, so
+                    `VC-Seats`, `seats` and `Seating` all resolve. Supply this only to override a
+                    match that went wrong.
+                  properties:
+                    buildingLayer: { type: array, items: { type: string } }
+                    pathLayer:
+                      type: array
+                      items: { type: string }
+                      description: >
+                        **Optional, and the platform derives paths without it.** Where a drawing has
+                        no walkway layer — which is most drawings prepared for ticketing — walkable
+                        space is the **negative space**: the site boundary minus buildings, seating,
+                        water and anything on a `keepOut` layer.
+
+                        **That is geometry, not intelligence, and it is better than intelligence
+                        here.** Subtraction is exact and repeatable; a model asked to guess where
+                        people walk will eventually route somebody into a lake.
+
+                        Supply the layer where you have it — an explicit walkway beats a derived
+                        one, because it knows about a path across a lawn that subtraction would
+                        merge into open ground.
+                    zoneLayer: { type: array, items: { type: string } }
+                    labelLayer: { type: array, items: { type: string } }
+                    boundaryLayer: { type: array, items: { type: string } }
+                    exitLayer: { type: array, items: { type: string } }
+                    emergencyExitLayer:
+                      type: array
+                      items: { type: string }
+                      description: >
+                        **Separate from `exitLayer`, and drawings usually blur them.** An exit is
+                        where a guest leaves; an emergency exit is where they are sent. Merged, a
+                        map routes a normal departure through a fire door.
+                    poiLayers:
+                      type: object
+                      description: >
+                        Where a drawing already marks toilets, first aid and the rest. Keyed by
+                        `VenuePoint.kind`. **Absent is normal** — points are placed on screen after
+                        import, and the assistant proposes most of them.
+                    resourceLayer:
+                      type: array
+                      items: { type: string }
+                      description: >
+                        **The bookable resources drawn on the plan** — cabanas, loungers, tables
+                        (decided 29 September, rev 3 REV3-15). Each shape becomes a draft
+                        `PlacedResource`, its label read from the shape's text or joined from
+                        `resourceManifestRef`. Absent, the platform matches `VC-Resources`,
+                        `Cabanas`, `Loungers` and `Tables`.
+                    keepOutLayer:
+                      type: array
+                      items: { type: string }
+                      description: >
+                        Water, planting, back-of-house, plant rooms. **Subtracted from the walkable
+                        space along with buildings**, and the difference between a usable derived
+                        path network and one that routes across a lake.
+                digitNormalisation:
+                  type: boolean
+                  default: true
+                  description: >
+                    **`A١` and `A1` are one section to a person and two to a computer**, and the
+                    failure is silent — the seats simply do not join, and you get geometry with no
+                    seats or seats with no geometry.
+
+                    Normalised before the join. Arabic in *names* is expected and untouched; only
+                    codes are normalised.
+                georeference:
+                  type: object
+                  nullable: true
+                  description: >
+                    19.2.56. **Two known points turn drawing coordinates into real ones**, and
+                    without it the map is a picture rather than something a guest can be located
+                    on. A venue that cannot supply them still gets a usable map — it just cannot
+                    show a blue dot.
+                  properties:
+                    originLat: { type: number }
+                    originLng: { type: number }
+                    scaleMetresPerUnit: { type: number }
+                    rotationDegrees: { type: number, default: 0 }
+                    anchors:
+                      type: array
+                      minItems: 2
+                      maxItems: 4
+                      description: >
+                        **Two points far apart.** Two close together give an accurate scale and a
+                        rotation that drifts across the site — which reads as a map that is right
+                        near the entrance and wrong at the far end.
+                      items:
+                        type: object
+                        properties:
+                          label: { type: string }
+                          planX: { type: number }
+                          planY: { type: number }
+                          lat: { type: number }
+                          lng: { type: number }
+                manifestRef:
+                  type: string
+                  format: uuid
+                  nullable: true
+                  x-ticvai-references: assets.MediaAsset
+                  description: >
+                    The seating manifest, where this map has seats, as the `MediaAsset.id` from
+                    `assets.completeUpload`, uploaded the same way as `sourceRef`. **One sheet per section, header
+                    on row 3, four columns: Description, Section, Row, Seat** — the shape the sample
+                    file already uses.
+
+                    **`Section` must match the drawing character for character**, which is what §4
+                    of the spec is about.
+                resourceManifestRef:
+                  type: string
+                  format: uuid
+                  nullable: true
+                  x-ticvai-references: assets.MediaAsset
+                  description: >
+                    **The resource manifest, where this map carries bookable resources** (decided
+                    29 September, rev 3 REV3-15), uploaded like `manifestRef`. One sheet, header on
+                    row 3, five columns: **Label, Kind, Zone, Capacity, Price band** (`B09`, `cabana`,
+                    `Beach`, `15`, `Large`). It is the seat manifest's pattern: the drawing gives
+                    where, the manifest gives what, and `Label` must match the drawing character for
+                    character after digit normalisation. `Price band` names a band in
+                    `priceBands` below.
+                priceBands:
+                  type: array
+                  nullable: true
+                  description: >
+                    **What each price band sells as**, so a placed resource can be bought: the band
+                    code the manifest uses and the `catalogue.ProductVariant` that prices it (Family 6,
+                    Medium 10, Large 15, XL 20 on the Coastal Aqua map). The price is the variant's;
+                    the map never holds a price of its own.
+                  items:
+                    type: object
+                    required: [code, variantId]
+                    properties:
+                      code: { type: string, maxLength: 40 }
+                      name: { type: string, nullable: true }
+                      variantId:
+                        type: string
+                        format: uuid
+                        x-ticvai-references: catalogue.ProductVariant
+                createMissingResources:
+                  type: boolean
+                  default: false
+                  description: >
+                    Where a manifest label has no `resources.Resource` with that `code` at this
+                    venue, create one through `resources.createResource` (kind, capacity and zone as
+                    attributes) instead of reporting `resourceCodeUnmatched`. **Off by default**:
+                    a mistyped label must not quietly become a new cabana.
+      responses:
+        '202':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: >
+            Accepted and parsing. The job's `id` is what `getVenueMapImportJob` polls.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/VenueMapImportJob' }
+        '422':
+          description: >
+            **Refused before any parsing** (3 October 2026, r1 additions): `glbModel` with no
+            `navigationFileRef` (`navigationFileMissing`), a `sourceRef` whose asset kind does not
+            fit the format (`formatMismatch`: a GLB sent as `pdfPlan`, a PDF as `glbModel`), or a GLB
+            over 40 MB (`modelTooLarge`, ADR-0069 section 6). The reason names the file.
+          x-ticvai-problem-types: [navigation-file-missing, format-mismatch, model-too-large]
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/VenueMapImportProblem' }
+        '409':
+          description: 'The map is `archived`; an archived map takes no import. No job is started.'
+          x-ticvai-problem-types: [map-archived]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+
+  /venue-maps/{mapId}/import/{jobId}:
+    parameters:
+      - name: mapId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+      - name: jobId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: getVenueMapImportJob
+      x-ticvai-consumed-by:
+        - "P08 BO-093 Map Import & Labelling"
+      summary: Import progress and findings
+      description: >
+        **The read the `202` from `importVenueGeometry` points at**, following
+        `seating.getImportJob`. The screen polls it until `status` leaves `parsing`, then shows
+        `outcome`, `layersFound`, `unmappedLayers` and `findings`, so an operator can tell a
+        misread file from an empty one before any proposal is reviewed.
+
+        Since 3 October 2026 (r1 additions) it also carries what the OCR step read (`ocr`), the
+        hand-marked strokes it found (`handMarkedPaths`) and, for a GLB, the measured budget and the
+        model findings (`model`), each null where the source had none.
+      tags: [venueMap]
+      x-ticvai-permission: VENUE_MAP_VIEW
+      x-ticvai-audience: [staff]
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Job
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/VenueMapImportJob' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+
+  /venue-maps/{mapId}/artwork:
+    parameters:
+      - name: mapId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: setVenueMapArtwork
+      x-ticvai-consumed-by:
+        - "P08 BO-094 Map Editor & Publish"
+      summary: Set the illustrated map guests see, and how it lines up with the plan
+      description: >
+        **The guest map artwork** (`handoff/venue-map-input-spec.md` section 6; the F26 flow brief's open item
+        "no screen is named for the illustrated map upload and its alignment points", closed 3 October 2026 on
+        BO-094). The illustration is uploaded first through `assets.createUpload` and `completeUpload`, like a
+        drawing, and its `MediaAsset.id` sent here as `baseAssetId` with the alignment points that place it on
+        the plan. **Two points at least, four recommended** (spec section 6): without them a point placed on the
+        plan lands in the wrong place on the painting. `baseAssetId: null` removes the artwork, and the map
+        renders as plain geometry.
+
+        **Set on the working draft; guests see it from the next publish**, which records it on the version
+        (`VenueMapVersion.baseAssetId`), so a guest mid-route keeps the artwork they started with. Tiles for a
+        large image (`tileSetRef`) are generated after the call returns.
+      tags: [venueMap]
+      x-ticvai-permission: VENUE_MAP_MANAGE
+      x-ticvai-audience: [staff]
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [baseAssetId]
+              properties:
+                baseAssetId:
+                  type: string
+                  format: uuid
+                  nullable: true
+                  x-ticvai-references: assets.MediaAsset
+                  description: The illustrated map (an `image` asset, PNG or JPG, up to about 12,000 px wide). Null removes it.
+                baseImageAlignment:
+                  type: object
+                  nullable: true
+                  description: Required with an image. Pixel positions on the image matched to plan coordinates.
+                  required: [imageWidthPx, imageHeightPx, anchors]
+                  properties:
+                    imageWidthPx: { type: integer, minimum: 1 }
+                    imageHeightPx: { type: integer, minimum: 1 }
+                    anchors:
+                      type: array
+                      minItems: 2
+                      maxItems: 4
+                      items:
+                        type: object
+                        required: [planX, planY, imageX, imageY]
+                        properties:
+                          planX: { type: number }
+                          planY: { type: number }
+                          imageX: { type: number }
+                          imageY: { type: number }
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Set on the draft
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/VenueMap' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+        '422':
+          description: >
+            An image with no `baseImageAlignment`, an asset that is not an image, or alignment points too
+            close together to place the plan (`artwork-alignment-required`, `artwork-not-image`,
+            `artwork-anchors-too-close`).
+          x-ticvai-problem-types: [artwork-alignment-required, artwork-not-image, artwork-anchors-too-close]
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '409':
+          description: The map is archived (`map-archived`); an archived map takes no new artwork.
+          x-ticvai-problem-types: [map-archived]
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+
+  /venue-maps/{mapId}/navigation-file:
+    parameters:
+      - name: mapId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: getVenueNavigationFile
+      x-ticvai-consumed-by:
+        - "P08 BO-094 Map Editor & Publish"
+      summary: The map's graph and points as a navigation file
+      description: >
+        **ADR-0069 section 8, closed 3 October 2026: the venue does not describe its paths twice.**
+        Exports the working draft's (or, with `version`, a published version's) nodes, edges and
+        points in the navigation-file format (`VenueNavigationFile`, the format `importVenueGeometry`
+        reads as `glbModel` or `navigationFile`), with the map's `modelTransform` as the anchor where
+        it has one. A venue hands it to its 3D studio as the starting point; the studio builds the GLB
+        around it and sends both back.
+
+        Points carry their catalogue codes (product, outlet, facility), never ids, so the file can be
+        edited outside the platform and re-imported. Coordinates are the map's drawing coordinates
+        mapped as ADR-0069 section 3 says (`x = planX`, `z = -planY`).
+      tags: [venueMap]
+      x-ticvai-permission: VENUE_MAP_VIEW
+      x-ticvai-audience: [staff]
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: version
+          in: query
+          required: false
+          description: A published version to export. Absent, the working draft.
+          schema: { type: integer, minimum: 1 }
+      responses:
+        '200':
+          description: The navigation file
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/VenueNavigationFile' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+
+  /venue-maps/{mapId}/proposals:
+    parameters:
+      - name: mapId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: acceptVenueLabelProposals
+      x-ticvai-consumed-by:
+        - "P08 BO-093 Map Import & Labelling"
+      x-ticvai-read-via:
+      - query: ai#proposedActionRecords
+        route: service
+        for: 'its read of ai.proposed_action, AI''s data (CHG-MOD-001)'
+      summary: Accept, edit or reject what the assistant suggested
+      description: >
+        1.4.24. **The human half of the pair.** `ai.proposeVenueLabels` writes proposals and stops;
+        this is what turns an accepted one into a point.
+
+        **The proposing operation lives in `ai` and this one lives here**, because ADR-0020 says
+        only the AI contract writes AI tables — and the boundary caught this contract trying to
+        write `ai.proposed_action` on the day it was drafted.
+
+        **Accepting writes a point and does not touch the proposal.** `ai.decideProposedAction`
+        closes it, because ADR-0020 holds in both directions — this contract may read an AI table and
+        may not write one, and the isolation check caught that on the second attempt as well.
+
+        **Accepted points go into the working draft**, not the published map. Guests see them
+        after `publishVenueMap`. On an `edit`, the `point` sent is the operator's corrected point;
+        its `id` and `mapId` are `readOnly` and the server assigns them.
+
+        Accepting is per proposal, not per map. **An operator who must take all four hundred or
+        none will take all four hundred**, and a map with a mislabelled fire exit is worse than one
+        that took an afternoon.
+      tags: [venueMap]
+      x-ticvai-permission: VENUE_MAP_MANAGE
+      x-ticvai-audience: [staff]
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [decisions]
+              properties:
+                decisions:
+                  type: array
+                  items:
+                    type: object
+                    required: [proposalId, decision]
+                    properties:
+                      proposalId: { type: string, format: uuid }
+                      decision: { type: string, enum: [accept, edit, reject] }
+                      point: { $ref: '#/components/schemas/VenuePoint' }
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Applied
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/VenuePoint' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+
+  /venue-maps/{mapId}/points:
+    parameters:
+      - name: mapId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: setVenuePoint
+      x-ticvai-consumed-by:
+        - "P08 BO-094 Map Editor & Publish"
+      x-ticvai-read-via:
+      - query: access#accessPointRecords
+        route: service
+        for: 'its read of access.access_point, Access''s data (CHG-MOD-001)'
+      - query: catalogue#productRecords
+        route: service
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
+      - query: promotions#bundleRecords
+        route: service
+        for: 'its read of promotions.bundle, Catalogue''s data (CHG-MOD-001)'
+      - query: tenancy#outletRecords
+        route: service
+        for: 'its read of platform.outlet, Tenancy''s data (CHG-MOD-001)'
+      summary: Place or amend a point of interest
+      description: >
+        19.2.57 to 19.2.60. **The screen a venue actually uses** — placing booths, toilets, exits,
+        rides, restaurants, shops, parking, first aid, ATMs, prayer rooms and baby-care rooms on the
+        map.
+
+        **A point may link to the thing it represents.** A restaurant point carries its outlet id,
+        a ride point its product id, a gate its access point. That link is what makes the map
+        useful rather than decorative: **tapping a restaurant on the map should open its menu, and
+        that only works if the map knows which outlet it is.**
+
+        Unlinked points are fine and expected — a toilet is a toilet.
+
+        **Writes the working draft, never the published map.** A point placed or moved here reaches
+        guests at the next `publishVenueMap`; until then the published version keeps serving.
+
+        **Place or amend is decided by `pointId`.** Absent, a new point is placed on this map and
+        the server assigns its id. Present, that point is amended; a `pointId` that is not a point
+        on this map returns 404. `VenuePoint.id` and `mapId` are `readOnly`, so a client never
+        makes up an id.
+      tags: [venueMap]
+      x-ticvai-permission: VENUE_MAP_MANAGE
+      x-ticvai-audience: [staff]
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/SetVenuePointRequest' }
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Placed
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/VenuePoint' }
+        '409':
+          $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+
+  /venue-maps/{mapId}/resources:
+    parameters:
+      - name: mapId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: setPlacedResource
+      x-ticvai-consumed-by:
+        - "P08 BO-094 Map Editor & Publish"
+      summary: Place or amend a bookable resource on the map
+      description: >
+        **The hand correction after an import** (decided 29 September, rev 3 REV3-15 and GAP-C2):
+        place a cabana, lounger or table the drawing missed, move one, or change its label, zone,
+        capacity or price band. Mirrors `setVenuePoint`: writes the working draft only, reaches
+        guests at the next `publishVenueMap`, and `placedResourceId` decides place or amend.
+
+        **The resource must exist in `resources`** at this venue; a `resourceId` that does not
+        returns 404. A label already used on this map returns `409` `duplicate-code`. A price band
+        the map does not know returns 400.
+      tags: [venueMap]
+      x-ticvai-permission: VENUE_MAP_MANAGE
+      x-ticvai-audience: [staff]
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/SetPlacedResourceRequest' }
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Placed
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PlacedResource' }
+        '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+        '409':
+          $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+
+  /venue-maps/{mapId}/walkway-proposals:
+    parameters:
+      - name: mapId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: acceptWalkwayProposals
+      x-ticvai-consumed-by:
+        - "P08 BO-093 Map Import & Labelling"
+      x-ticvai-read-via:
+      - query: ai#proposedActionRecords
+        route: service
+        for: 'its read of ai.proposed_action, AI''s data (CHG-MOD-001)'
+      summary: Accept or reject proposed walkways
+      description: >
+        The human half of `ai.proposeWalkways`, and **a stricter gate than label acceptance.**
+
+        A mislabelled toilet is a cosmetic error somebody notices and fixes. **A wrongly accepted
+        walkway routes a guest into a lake or a service yard**, and they find out by walking there.
+
+        **Accepted segments become paths and run through graph validation immediately**, so a
+        network that leaves something unreachable is caught here rather than at publish.
+
+        **Accepted paths go into the working draft**, and the validation is of the draft's graph.
+        On an `edit`, the `path` sent is the corrected segment; its `id`, `mapId` and the other
+        `readOnly` fields are assigned by the server.
+
+        **Segment by segment** (Chinmay, 3 October 2026, r1 additions: a plan with hand-marked paths,
+        the AI proposes, the operator accepts each segment). Every decision names one proposed
+        segment; there is no "accept all" and no confidence threshold that accepts for the operator.
+        BO-093 sends one decision per action and shows the graph validation that comes back, so the
+        operator sees an unreachable point appear the moment a segment is rejected. A proposal not
+        decided stays open and blocks the publish (`unresolvedProposal`), as a label proposal does.
+      tags: [venueMap]
+      x-ticvai-permission: VENUE_MAP_MANAGE
+      x-ticvai-audience: [staff]
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [decisions]
+              properties:
+                decisions:
+                  type: array
+                  items:
+                    type: object
+                    required: [proposalId, decision]
+                    properties:
+                      proposalId: { type: string, format: uuid }
+                      decision: { type: string, enum: [accept, edit, reject] }
+                      path: { $ref: '#/components/schemas/VenuePath' }
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Applied, with graph validation
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/GraphValidation' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+
+  /venue-maps/{mapId}/graph:
+    parameters:
+      - name: mapId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: getVenueMapGraph
+      x-ticvai-consumed-by:
+        - "P01 WEB-039 Venue Map & Wait Times"
+        - "P02 GST-021 Interactive Map"
+        - "P08 BO-094 Map Editor & Publish"
+      # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
+      # or staff token is still accepted. `{}` makes the credential optional.
+      security:
+      - {}
+      - guestAuth: []
+      - bearerAuth: []
+      summary: The navigation graph, ready to route over
+      description: >
+        19.2.56. **The platform guarantees the graph; the client routes over it.** That division
+        was stated when this contract was written and it left a gap — *"routing is a client
+        concern"* is only true if somebody guarantees the graph is worth routing over.
+
+        Returns nodes, edges, precomputed distances and **the connected components**. A client
+        finding two components knows immediately that half the park is unreachable, without
+        walking the graph itself.
+
+        **Ships in the offline package.** A guest standing in the middle of a park with no signal
+        is the guest who most needs directions, so the graph is small, versioned and cached — and
+        a route computed offline must not silently use a path that closed this morning, which is
+        what `version` is for.
+
+        **The published graph by default**: the current published version's paths, with today's
+        closures applied, and `version` set to the map's `graphVersion`. With `draft=true`, the
+        working draft's graph, which is what the editor on BO-094 checks while it works.
+      tags: [venueMap]
+      x-ticvai-permission: VENUE_MAP_VIEW
+      x-ticvai-guest-callable: true
+      x-ticvai-audience: [staff, guest]
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: draft
+          in: query
+          schema: { type: boolean, default: false }
+          description: >
+            **The working draft's graph instead of the published one.** Staff only, and it needs
+            `VENUE_MAP_MANAGE`, as on `getVenueMap`. A guest session gets 403.
+        - name: stepFreeOnly
+          in: query
+          schema: { type: boolean, default: false }
+          description: >
+            **Returns the step-free subgraph, not a filtered copy of the whole one.** Filtering
+            after the fact produces routes that cross a staircase to reach a ramp.
+      responses:
+        '200':
+          description: Graph
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/VenueMapGraph' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+
+  /venue-maps/{mapId}/validate-graph:
+    parameters:
+      - name: mapId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: validateVenueMapGraph
+      x-ticvai-consumed-by:
+        - "P08 BO-094 Map Editor & Publish"
+      summary: What is unreachable, before anyone publishes it
+      description: >
+        **Run before publishing, and `publishVenueMap` runs it too.** A map that publishes with an
+        unreachable toilet is a map that fails the first guest who needs one.
+
+        Reports four things, and the second is the one venues get wrong:
+
+        **Unreachable points** — no path at all. Usually a point placed after the paths were drawn.
+
+        **Points reachable only by steps** — the map works perfectly until a wheelchair user opens
+        it, and nothing in the drawing makes this visible. **This is why the check exists.**
+
+        **Dead-end paths** — an edge to a node with no other edge, which is normally a mis-drawn
+        line rather than a real cul-de-sac.
+
+        **Orphan components** — two parts of the venue with no route between them. **Never
+        publishable** (decided 28 September, audit R106 (8)): `publishVenueMap` refuses a map with
+        more than one component, so a site of two buildings is mapped as two maps.
+
+        **Placed resources are checked too** (decided 29 September, rev 3 REV3-15), the way
+        `seating.validateSeatMap` checks seats before a seat map publishes: every placed resource
+        has a label unique on the map, a linked `resources.Resource` and a price band with a variant
+        (capacity of at least 1 is enforced on the schema). Each failure is a `resourceFindings` entry naming the label.
+
+        **Validates the working draft**, because that is what the next publish would make live.
+      tags: [venueMap]
+      x-ticvai-permission: VENUE_MAP_MANAGE
+      x-ticvai-audience: [staff]
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Findings
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/GraphValidation' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+
+  /venue-maps/{mapId}/paths/{pathId}/closure:
+    parameters:
+      - name: mapId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+      - name: pathId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: setPathClosure
+      x-ticvai-consumed-by:
+        - "P08 BO-019 Closures & Blackouts"
+        - "P08 BO-094 Map Editor & Publish"
+      summary: Close a route during works or an incident
+      description: >
+        **A closure is an operational act, not a map edit.** Closing a walkway for maintenance must
+        not require republishing the map, and it must take effect in seconds.
+
+        **Bumps the graph version** (`VenueMap.graphVersion`, which is separate from
+        `publishedVersion`), and that is how a cached client learns its route is stale. A guest
+        holding an offline route across a path that closed this morning is the case this exists
+        for.
+
+        **The closure is held on the path, by path id**, so it applies to the published graph at
+        once and to the draft as well. It does not create a map version.
+
+        Refuses a closure that would strand a point, unless forced. **A forced closure that
+        strands a first-aid point warns by name**: the `200` carries `strandedPoints`, with first
+        aid, emergency exits and assembly points flagged `isCritical`. Sometimes an incident makes
+        stranding unavoidable, and the operator should know what they just cut off.
+
+        **Stranded means unreachable from any public entrance** (decided 28 September, audit
+        R106 (7)). A point is stranded when, with the path closed, some point of kind `entrance`
+        no longer has a route to it; reachable from one entrance and not another is still
+        stranded. Junctions are not counted.
+      tags: [venueMap]
+      x-ticvai-permission: VENUE_MAP_MANAGE
+      x-ticvai-audience: [staff]
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [isClosed]
+              properties:
+                isClosed: { type: boolean, x-ticvai-stored-as: venuemap.path.is_closed }
+                reason:
+                  x-ticvai-stored-as: venuemap.path.closed_reason
+                  type: string
+                  enum: [maintenance, incident, event, weather, crowding, other]
+                  description: >
+                    `other` is allowed only with a `note`, which it then requires (decided
+                    28 September, audit R222); refused `400` without one, and the notes are reviewed
+                    quarterly so the common ones become real reasons.
+                note:
+                  x-ticvai-stored-as: venuemap.path.closed_note
+                  type: string
+                  maxLength: 500
+                  nullable: true
+                  description: Free text. Required where the reason is `other` (audit R222).
+                force:
+                  x-ticvai-persisted: false
+                  type: boolean
+                  default: false
+                  description: Close it even though something becomes unreachable.
+                expectedReopenAt: { type: string, format: date-time, nullable: true, x-ticvai-stored-as: venuemap.path.expected_reopen_at }
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Closed or reopened, with what a forced closure cut off
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PathClosureResult' }
+        '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
+        '409':
+          description: >
+            **Closing this strands a point, and the response names which** in `strandedPoints`.
+            *"Cannot close"* on a park with two hundred paths is not actionable.
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/PathClosureProblem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+
+  /venue-maps/{mapId}/publish:
+    parameters:
+      - name: mapId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: publishVenueMap
+      x-ticvai-consumed-by:
+        - "P08 BO-094 Map Editor & Publish"
+      x-ticvai-read-via:
+      - query: tenancy#outletRecords
+        route: service
+        for: 'its read of platform.outlet, Tenancy''s data (CHG-MOD-001)'
+      summary: Make the draft the one guests see
+      description: >
+        21.2.16. **A map is published, not saved.** Editing a live map under a guest standing in
+        front of it is how a wayfinding route ends at a wall.
+
+        Publishing creates a version. **The previous version stays readable** so a guest mid-route
+        finishes on the version they started with.
+
+        **What publishing stores.** The working draft's points and paths are copied into a new
+        `VenueMapVersion` snapshot, `publishedVersion` moves to it and `graphVersion` is bumped.
+        The draft stays as the working copy for the next round of edits. Earlier snapshots are kept,
+        which is what `getVenueMap?version=` reads.
+
+        Refuses a draft with unresolved proposals or a point linked to something that no longer
+        exists — **a restaurant point pointing at a closed outlet is worse than no point**, because
+        a guest walks there.
+
+        **Refuses a draft whose graph is disconnected** (decided 28 September, audit R106 (8)).
+        Where `validateVenueMapGraph` finds more than one component, or a public point with no
+        path to it, the publish is refused with a `disconnectedArea` blocker per unreachable point.
+        A venue made of two sites is two maps.
+
+        **Refuses a draft with a placed resource a guest could not buy** (decided 29 September,
+        rev 3 REV3-15): no linked resource (`resourceUnlinked`), no price band or a band with no
+        variant (`resourcePriceBandMissing`), or a label used twice (`duplicateResourceLabel`).
+        Publishing copies placed resources into the snapshot with the points and paths; from then on
+        a guest can pick them. Holds and bookings on a resource survive a republish because they
+        are keyed by `resourceId`, not by the placement.
+
+        **The 3D layer publishes with the map only when it is `publishable`** (ADR-0069, amended
+        3 October 2026). A draft whose `model3dStatus` is `blocked` publishes its 2D map and graph
+        and carries no model (`VenueMapVersion.model3d` null); the model is never a reason to refuse
+        the map. A `publishable` model is copied into the version with its transform.
+      tags: [venueMap]
+      x-ticvai-permission: VENUE_MAP_PUBLISH
+      x-ticvai-audience: [staff]
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                note: { type: string, maxLength: 300 }
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Published
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/VenueMap' }
+        '409':
+          description: >
+            Unresolved proposals, a broken link, or a disconnected area (audit R106 (8)). **The reason names which point**, in
+            `blockers`, because *"cannot publish"* on a map with four hundred points is not
+            actionable.
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/VenueMapPublishProblem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+
+  /venue-maps/{mapId}/live:
+    parameters:
+      - name: mapId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: getVenueMapLive
+      x-ticvai-consumed-by:
+        - "P06 EMP-030 Venue map"
+      x-ticvai-read-via:
+      - query: access#scanEventRecords
+        route: service
+        for: 'its read of access.scan_event, Access''s data (CHG-MOD-001)'
+      summary: The map with live operational state on it
+      description: >
+        3.2.64. **An access-control map presenting statistics in real time**, and the same view
+        serves wait times, queue lengths and closed rides.
+
+        The map is the published one; only the state is live. **Separated from `getVenueMap` because
+        the map changes monthly and the state changes every few seconds** — caching them together
+        means caching neither.
+      tags: [venueMap]
+      x-ticvai-permission: VENUE_MAP_VIEW
+      x-ticvai-audience: [staff]
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Map with live state
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VenueMapLiveState'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /bookable-venue-maps:
+    get:
+      operationId: listBookableVenueMaps
+      x-ticvai-consumed-by:
+        - "P01 WEB-039 Venue Map & Wait Times"
+        - "P01 WEB-047 Map Booking — Cabanas & Spots"
+        - "P02 GST-021 Interactive Map"
+        - "P02 GST-058 Resource Availability (Cabana)"
+        - "P02 GST-074 Map Booking — Cabanas & Spots"
+      # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
+      # or staff token is still accepted. `{}` makes the credential optional.
+      security:
+      - {}
+      - guestAuth: []
+      - bearerAuth: []
+      summary: The published maps of a venue that carry bookable spots
+      description: >
+        **How a guest finds the map to pick a cabana on** (decided 29 September, readiness
+        close-out, S1 guest screens). `getVenueMap` needs a `mapId` and `listVenueMaps` is staff
+        only, so WEB-047 / GST-074 had nothing to start from unless the screen that opened them
+        handed a map over. This answers it for any venue: the **published** maps of `venueId` whose
+        published version carries at least one placed resource, with how many of each kind.
+
+        **Published only, always.** A draft or archived map never appears here, whoever calls, so
+        unfinished work cannot reach a guest; staff read drafts through `listVenueMaps`.
+
+        **No date filter, by design.** A map changes when it is republished, not by day; what is
+        free on a date is `resources.getMapResourceAvailability` for the chosen `mapId`. With
+        `productId`, only maps carrying a spot sold by one of that product's price-band variants are
+        returned, which is how the product page (WEB-004) opens straight onto the right map.
+        A venue with one bookable map returns one entry and the screen skips the choice.
+
+        A venue with no published bookable map is an empty `maps` list, not a 404.
+
+        **`onlyBookable`** (r8 walk of ticket 28690). The default `true` is the behaviour above, for the booking
+        screens (WEB-047, GST-058, GST-074). The map-viewing screens (WEB-039, GST-021) send `false`: they list
+        every **published** map of the venue whether or not it carries a placed resource, so a guest can open a
+        map of walkways and attractions that has no cabana on it. Published only, still; with `false`,
+        `placedResourceCount` may be 0, and `productId` and `kind` still narrow the list when sent.
+      tags: [venueMap]
+      x-ticvai-permission: VENUE_MAP_VIEW
+      x-ticvai-guest-callable: true
+      x-ticvai-audience: [staff, guest]
+      x-ticvai-agreed: '29 September: readiness close-out, S1 guest screens (WEB-047 / GST-074 had no way to reach a mapId); shape follows getVenueMap, published versions only'
+      x-ticvai-bounded: 'a venue''s published maps with bookable spots: a handful, capped at 50 (BookableVenueMaps.maps maxItems)'
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: venueId
+          in: query
+          required: true
+          schema: { type: string, format: uuid }
+          description: The venue whose bookable maps are wanted.
+        - name: productId
+          in: query
+          required: false
+          schema: { type: string, format: uuid }
+          description: >
+            Only maps with a placed resource sold by this product's price-band variants. Absent
+            returns every bookable map of the venue.
+        - name: kind
+          in: query
+          required: false
+          schema: { type: string, enum: [cabana, lounger, table, pitch, other] }
+          description: Only maps carrying at least one placed resource of this kind (`PlacedResource.kind`).
+        - name: onlyBookable
+          in: query
+          required: false
+          schema: { type: boolean, default: true }
+          description: >
+            `true` (default): only maps whose published version carries at least one placed resource. `false`: every
+            published map of the venue, with or without placed resources (WEB-039, GST-021).
+      responses:
+        '200':
+          description: The venue's published bookable maps, park maps first, then by `name`.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/BookableVenueMaps' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /visit-plans:
+    get:
+      operationId: listMyVisitPlans
+      x-ticvai-consumed-by:
+        - "P02 GST-059 Plan in Progress"
+      security:
+      - guestAuth: []
+      x-ticvai-agreed: 'r8 walk of ticket 28694: GST-059 opened cold, from the home screen or a notification, had no planId; shape follows listVisitPlanAlternatives (paged) and getVisitPlan (owner rule)'
+      summary: The caller's own visit plans, by date or status
+      description: >
+        **How a screen finds today's plan without being handed a `planId`** (r8 walk of ticket 28694).
+        GST-059 (Plan in Progress), opened cold, calls this with `date` set to today and `status=draft`
+        or `booked`; it shows the plan it finds, or offers to make one when the list is empty.
+
+        **Only the caller's own plans**, by the same owner rule as `getVisitPlan`: a signed-in guest's
+        plans (`subjectId`), or the plans of the device session the anonymous guest holds (`sessionRef`).
+        Another guest's plan is never listed. Ordered by `updatedAt`, newest first, then by `id`; paged.
+
+        `date` keeps the plans whose current version has a day on that date (`VisitPlan.days[].date`).
+        `status` keeps one status. With neither, every plan of the caller. An empty page is a 200, not a 404.
+      tags: [visitPlan]
+      x-ticvai-permission: null
+      x-ticvai-guest-callable: true
+      x-ticvai-audience: [guest]
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: primary
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: date
+          in: query
+          required: false
+          schema: { type: string, format: date }
+          description: Only plans with a day on this date.
+        - name: status
+          in: query
+          required: false
+          schema: { type: string, enum: [draft, booked, archived] }
+          description: Only plans in this status.
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: The caller's plans, newest first
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/VisitPlan' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+    post:
+      operationId: generateVisitPlan
+      x-ticvai-consumed-by:
+        - "P01 WEB-050 Plan Your Visit"
+        - "P02 GST-051 Plan"
+        - "P02 GST-052 Suggested Itineraries"
+      x-ticvai-read-via:
+      - query: catalogue#performanceRecords
+        route: service
+        for: 'its read of catalogue.performance, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#productEligibilityRuleRecords
+        route: service
+        for: 'its read of catalogue.product_eligibility_rule, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#productRecords
+        route: service
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#variantRecords
+        route: service
+        for: 'its read of catalogue.variant, Catalogue''s data (CHG-MOD-001)'
+      - query: tenancy#activeVenues
+        route: service
+        for: 'what its text calls "active venues": platform.scope, Tenancy''s data (CHG-RTE-001)'
+      security:
+      - guestAuth: []
+      x-ticvai-agreed: '29 September: MOB-6 and the Block A re-plan (the Plan tab is Block A, rules planner first, AI planner agent on top; supersedes rev 3 GAP-C3 and audits R187, R209); shape follows createCart (guest-owned, permission null)'
+      summary: Build a visit plan from the party, the dates and what they like
+      description: >
+        **The Plan tab's first answer, and it needs no AI** (29 September, MOB-6). The guest gives
+        party size, each person's height or age, the dates, the pace (packed, balanced or relaxed), interests
+        and cuisines; the planner returns one itinerary per day with timed items and add-ons such
+        as Fast Track.
+
+        **Each day is planned from its own venue, never from the tenant as a whole** (30 September
+        client meeting, MoM 4.7, Allam's requirement). In a multi-venue tenant the guest may put
+        each date at a different venue (`dayVenues`; a date not listed is at `venueId`). Every
+        candidate for a day comes from **that day's venue's own published map**: its rides and
+        attractions, its dining points (restaurant, cafe, food kiosk) and its retail points (shop,
+        retail kiosk), and the performances dated at that venue. A preference is matched against
+        the amenities of that venue only: when one park has the only Indian restaurant, a party
+        that asked for `indian` gets it on that park's day and nowhere else, and a day at a park
+        without one says so (`unmatchedPreferences`) rather than placing a restaurant the guest
+        cannot walk to.
+
+        **Rules, in order, per day.** (1) Candidates: the day venue's published map points that
+        are destinations and have a `typicalDurationMinutes`, and the performances dated that day
+        at that venue. **Retail is a candidate as F&B is** (30 September, MoM 4.7; until then only
+        dining points were venue-linked): a `shop`, or a `kiosk` carrying `retailTags`, is placed
+        as a `shop` stop. (2) Eligibility: a ride whose product's
+        `catalogue.ProductEligibilityRule` excludes anyone in the party by height or age is
+        dropped, and the reason is kept on the plan (`excluded`); a `mustIncludePointIds` point
+        that is at none of the plan's venues is kept there with `notAtVenue`. (3) Scoring:
+        interest tags matched, then the venue's featured order. (4) Layout: from opening time, the
+        next item is the best-scoring one reachable by walking time over the published graph
+        (`venuemap.path`), with the typical wait for that hour and its duration; a meal is placed
+        at a dining point of the day's venue whose `cuisineTags` match, around 12:30 and 19:00, and
+        where no dining point of that venue matches, at its best other dining point, with the
+        unmatched cuisine recorded; a retail stop is placed when the party chose `shopping` or a
+        `retailTags` value, at a retail point of the day's venue that matches, late in the day or
+        on the way to the exit; `relaxed` leaves a 30-minute gap after every two items and stops
+        by 18:00, `packed` fills to closing, and `balanced` (DI-1098, agreed 30 September; r8 walk of tickets 28701
+        and 28200) sits between them: a 15-minute gap after every two items, filling to 85% of the venue's opening
+        hours. **The balanced numbers are the planner owner's proposal, to be confirmed by the lead.** (5) Add-ons: where the expected wait on a planned ride
+        exceeds 30 minutes and the venue sells a Fast Track for it, the add-on is suggested on that
+        item, never added.
+
+        **The same inputs give the same plan**, so the guest can trust that a regenerate changes
+        only what they changed. `presetKey` (or the older `preset`) gives the ready-made day
+        plans of GST-052 (the same rules with preset interests and pace). **The AI planner agent refines a plan; it does
+        not make the first one** (ai `requestSuggestion` kind `itinerary`): when AI is off or
+        fails, this answer is the plan.
+
+        **Owned by the guest session**, as a cart is: a signed-in guest's plan is theirs, an
+        anonymous one is bound to the device session and claimed on sign-in. Nothing is held or
+        sold here; `bookVisitPlan` turns the plan into cart lines.
+
+        **Signed out, a guest builds and changes; signed in, they save, share and book** (Chinmay,
+        3 October 2026, Block A business rules; CHG-RUL-003). This operation, `getVisitPlan`,
+        `updateVisitPlan` and `listVisitPlanAlternatives` accept the anonymous guest session a
+        device holds before sign-in (the `guestAuth` token `orders.createCart` uses), so the Plan
+        tab works without an account. The plan is kept against that device session
+        (`VisitPlan.sessionRef`) and is not saved to any account: it lapses with the session.
+        **When the guest signs in on that device, every draft plan of the session moves to the
+        account** (`subjectId` set, `sessionRef` cleared, `ownership` becomes `account`), in the
+        same step as the cart is claimed, with no call from the client and with its versions
+        intact. Booking (`bookVisitPlan`) needs a signed-in guest; sharing a plan is a signed-in
+        act as well (no share operation is contracted yet).
+      tags: [visitPlan]
+      x-ticvai-permission: null
+      x-ticvai-guest-callable: true
+      x-ticvai-audience: [guest]
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/VisitPlanRequest' }
+      responses:
+        '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: The plan, version 1, one day per date asked for.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/VisitPlan' }
+        '404':
+          $ref: '../shared/common.yaml#/components/responses/NotFound'
+        '422':
+          description: >
+            A venue of the plan (`venueId` or a `dayVenues` venue) has no published map, or none
+            of its points carries a planning duration (`venue-not-plannable`), so there is nothing
+            to lay out; or a date is outside its venue's opening calendar (`venue-closed-on-date`);
+            or `presetKey` names no ready-made plan of the venue (`unknown-preset`); or a
+            `dayVenues` entry names a venue that is not an active venue of the caller's tenant, or
+            a date that is not in `dates` (`venue-not-in-tenant`; 30 September, MoM 4.7); or every
+            candidate was excluded by the party's answers (`no-suitable-plan`; r8 walk of ticket 28200). The
+            problem names which, and for which date. For `no-suitable-plan` it carries `excludingAnswer`
+            (`height`, `age`, `interests`, `cuisines` or `pace`) and `excludedBy`, the answer that removed the
+            most candidates (for example the smallest child's height against every ride's minimum), so
+            WEB-050 and GST-052 can say which answer to change; the same plan is never shown empty.
+          x-ticvai-problem-types:
+            - venue-not-plannable
+            - venue-closed-on-date
+            - unknown-preset
+            - venue-not-in-tenant
+            - no-suitable-plan
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+
+  /visit-plans/{planId}:
+    parameters:
+      - name: planId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: getVisitPlan
+      x-ticvai-consumed-by:
+        - "P01 WEB-050 Plan Your Visit"
+        - "P02 GST-053 Your Plan"
+        - "P02 GST-054 AI Planner"
+        - "P02 GST-059 Plan in Progress"
+      security:
+      - guestAuth: []
+      x-ticvai-agreed: '29 September: MOB-6 (Plan tab Block A); shape follows getVenueMap (version query)'
+      summary: A visit plan, at its current version or an earlier one
+      description: >
+        The plan with its days and items (29 September, MOB-6). **`version` reads an earlier
+        version**, which is what lets GST-053 show what undo would restore before the guest
+        commits to it. Only the guest session that owns the plan may read it (404 otherwise,
+        never 403, so a plan id reveals nothing).
+      tags: [visitPlan]
+      x-ticvai-permission: null
+      x-ticvai-guest-callable: true
+      x-ticvai-audience: [guest]
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: primary
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: version
+          in: query
+          schema: { type: integer, minimum: 1 }
+          description: Absent means the current version.
+      responses:
+        '200':
+          description: The plan
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/VisitPlan' }
+        '404':
+          $ref: '../shared/common.yaml#/components/responses/NotFound'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+    put:
+      operationId: updateVisitPlan
+      x-ticvai-consumed-by:
+        - "P01 WEB-050 Plan Your Visit"
+        - "P02 GST-053 Your Plan"
+        - "P02 GST-054 AI Planner"
+        - "P02 GST-059 Plan in Progress"
+      x-ticvai-read-via:
+      - query: catalogue#performanceRecords
+        route: service
+        for: 'its read of catalogue.performance, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#productEligibilityRuleRecords
+        route: service
+        for: 'its read of catalogue.product_eligibility_rule, Catalogue''s data (CHG-MOD-001)'
+      - query: tenancy#activeVenues
+        route: service
+        for: 'what its text calls "active venues": platform.scope, Tenancy''s data (CHG-RTE-001)'
+      security:
+      - guestAuth: []
+      x-ticvai-agreed: '29 September: MOB-6 (swap, remove, add and undo on GST-053); shape follows setVenuePoint (optimistic version)'
+      summary: Swap, remove, add, move or undo, as a new version
+      description: >
+        **Every change is a new version, so undo is a change too** (29 September, MOB-6). The body
+        names the version it was made against (`baseVersion`) and a list of changes: `swap` an
+        item for an alternative from `listVisitPlanAlternatives`, `remove`, `add` a point or a
+        performance, `move` an item to another time, `addAddOn` or `removeAddOn` an add-on on an
+        item, or `revertTo` an earlier version. The server
+        re-lays the affected day with the same rules as `generateVisitPlan`, so the times after a
+        change still add up, and returns the new current version.
+
+        **A stale `baseVersion` is refused 409 `plan-version-conflict`** rather than merged: the
+        AI planner agent and the guest can both change a plan, and a change made against a plan
+        the guest no longer sees is a change they did not choose.
+
+        **The AI planner agent calls this as the guest** (ai `setAiTool`, toolKey
+        `venue-map.updateVisitPlan`): the agent's proposal becomes a version the guest can undo.
+        AI never writes the plan tables itself (ADR-0020).
+
+        **A day keeps to its venue** (30 September client meeting, MoM 4.7). An `add` or `swap`
+        may only name a point on the published map of that day's venue, or a performance dated
+        at that venue; anything else is refused 422 `point-not-at-day-venue`, whoever sends it.
+        This is the backstop for the AI planner agent: a restaurant or shop it names from
+        another park never reaches the plan. Moving a day to another venue is a new plan from
+        changed answers (`generateVisitPlan` with `dayVenues`), not a change here.
+
+        **Add-ons are changes too** (Chinmay, 3 October 2026, Block A business rules, GST-053;
+        CHG-RUL-009). `addAddOn` puts an add-on the venue sells for that stop (`addOnProductId`,
+        e.g. Fast Track on a ride, a photo pass) on an item, whether or not the planner
+        suggested it; `removeAddOn` takes one off. `acceptAddOn` and `declineAddOn` still answer
+        the planner's own suggestion (`addOnSuggestion`). An add-on not sold for that stop's
+        product is refused 422 `add-on-not-offered`. **No price is stored on the plan**: an estimate
+        is computed on read (`VisitPlan.estimate`), and the add-on is priced when the plan is booked (`bookVisitPlan`,
+        by `addCartLine`). Allowed in an
+        anonymous session, like every change here.
+
+        **The waits-changed re-order on GST-059** (r8 walk of ticket 28694; lead decision of 20 October 2026,
+        option A). The server proposes nothing. A stop is **late** when its planned start has passed by more than 15
+        minutes (a proposal, owner to confirm) because the live wait (`getWaitTimes`) exceeds the item's
+        `expectedWaitMinutes`. The app works out the proposed new order from the live waits, shows it, and when the
+        guest taps "Re-order my day" sends the moves as `updateVisitPlan` operations (`move`), which the server lays
+        out and checks like any other change and saves as a new version, so undo works.
+      tags: [visitPlan]
+      x-ticvai-permission: null
+      x-ticvai-guest-callable: true
+      x-ticvai-audience: [guest]
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/VisitPlanUpdate' }
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: The new current version
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/VisitPlan' }
+        '404':
+          $ref: '../shared/common.yaml#/components/responses/NotFound'
+        '409':
+          description: >
+            `baseVersion` is not the current version (`plan-version-conflict`), or the plan is
+            already `booked` (`plan-booked`; a booked plan is read-only, generate a new one).
+          x-ticvai-problem-types:
+            - plan-version-conflict
+            - plan-booked
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '422':
+          description: >
+            A change names an item not on the plan, a `revertTo` version that does not exist, or a
+            point the party is not eligible for (`item-not-eligible`, with the rule that excludes);
+            or an `add` or `swap` names a point or performance that is not at that day's venue
+            (`point-not-at-day-venue`, naming the day's venue; 30 September, MoM 4.7).
+          x-ticvai-problem-types:
+            - item-not-eligible
+            - point-not-at-day-venue
+            - add-on-not-offered
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+
+  /visit-plans/{planId}/items/{itemId}/alternatives:
+    parameters:
+      - name: planId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+      - name: itemId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: listVisitPlanAlternatives
+      x-ticvai-consumed-by:
+        - "P01 WEB-050 Plan Your Visit"
+        - "P02 GST-053 Your Plan"
+        - "P02 GST-059 Plan in Progress"
+      x-ticvai-read-via:
+      - query: catalogue#performanceRecords
+        route: service
+        for: 'its read of catalogue.performance, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#productEligibilityRuleRecords
+        route: service
+        for: 'its read of catalogue.product_eligibility_rule, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#productRecords
+        route: service
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
+      security:
+      - guestAuth: []
+      x-ticvai-agreed: '29 September: MOB-6 (swap on GST-053); shape follows listForecastDefinitions (paged)'
+      summary: What could take this item's place
+      description: >
+        **The swap sheet** (29 September, MOB-6): points and performances the whole party is
+        eligible for that fit the item's slot, best first by interest match, then by the time
+        lost to walking and the expected wait. Each carries why it was offered, so the sheet can
+        say *"Same thrill level, 4 minutes closer"*. Computed on read, never stored; choosing one
+        is an `updateVisitPlan` `swap`.
+
+        **Only from the item's day venue** (30 September client meeting, MoM 4.7): alternatives
+        are points on that venue's published map and performances dated there, never another
+        venue of the tenant, so a swap cannot move a meal or a shop to a park the party is not in
+        that day. `kind=shop` returns the venue's retail points, shops and retail kiosks alike;
+        `kind=meal` its dining points, food kiosks included.
+
+        **Order.** Best first, by `matchedInterests` descending, then by `walkMinutes` ascending.
+      tags: [visitPlan]
+      x-ticvai-permission: null
+      x-ticvai-guest-callable: true
+      x-ticvai-audience: [guest]
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: kind
+          in: query
+          schema: { type: string, enum: [attraction, show, meal, shop, rest] }
+          description: >
+            Only alternatives of this kind. Absent means the item's own kind. `shop` is retail
+            (a shop or a retail kiosk), `meal` is dining (a restaurant, cafe or food kiosk).
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Alternatives, best first
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/VisitPlanAlternative' }
+        '404':
+          $ref: '../shared/common.yaml#/components/responses/NotFound'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+
+  /visit-plans/{planId}/booking:
+    parameters:
+      - name: planId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: bookVisitPlan
+      x-ticvai-consumed-by:
+        - "P01 WEB-050 Plan Your Visit"
+        - "P02 GST-053 Your Plan"
+      x-ticvai-read-via:
+      - query: catalogue#channelCapacityRecords
+        route: service
+        for: 'its read of catalogue.channel_capacity, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#performanceRecords
+        route: service
+        for: 'its read of catalogue.performance, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#productRecords
+        route: service
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#variantRecords
+        route: service
+        for: 'its read of catalogue.variant, Catalogue''s data (CHG-MOD-001)'
+      - query: orders#cartLineRecords
+        route: service
+        for: 'its read of orders.cart_line, Orders''s data (CHG-MOD-001)'
+      - query: orders#cartRecords
+        route: service
+        for: 'its read of orders.cart, Orders''s data (CHG-MOD-001)'
+      - query: promotions#bundleRecords
+        route: service
+        for: 'its read of promotions.bundle, Catalogue''s data (CHG-MOD-001)'
+      x-ticvai-write-via:
+      - table: catalogue.inventory_reservation
+        operation: acquireInventoryHold
+      - table: orders.cart
+        operation: createCart
+      - table: orders.cart_line
+        operation: addCartLine
+      security:
+      - guestAuth: []
+      x-ticvai-agreed: '29 September: MOB-6 ("Book this plan" to GST-041); shape follows addCartLine, whose rules it applies line by line'
+      summary: Book this plan — turn it into cart lines
+      description: >
+        **"Book this plan"** (29 September, MOB-6). For each item that is bought (an admission per
+        day, a timed attraction, a show performance, a meal combo, an accepted Fast Track add-on)
+        the server adds a line to the guest's cart **by the orders service's `addCartLine`, with
+        its rules unchanged**: the 15-minute lease, the capacity refusal, the seat limit, the
+        info-only refusal. Free items (a walk-up ride, a toilet, a photo spot) add nothing.
+        Quantities come from the party: one admission per person by their age band's variant,
+        per day, **for that day's venue** (`VisitPlan.days[].venueId`; 30 September, MoM 4.7), so
+        a two-park plan books each park's own admission.
+
+        **The cart handoff.** With `cartId`, lines are added to that cart; without it a cart is
+        created for the venue and the guest channel (`orders.createCart`), exactly as the Buy
+        tickets button would. The response is the cart id, the lines added and each item that
+        could not be added with the `addCartLine` refusal it met (`soldOutForSession`,
+        `productInfoOnly`, ...). **A partly booked plan is still a success**: the guest goes to
+        GST-041 with what was added and the plan marks the rest, rather than losing the whole
+        plan to one sold-out show. Nothing is paid here; checkout is `orders.checkoutCart`.
+
+        The plan moves to `booked` and keeps `cartId`, so reopening it from Tickets shows what was
+        bought. `baseVersion` must be current (409 as `updateVisitPlan`).
+
+        **Sign in to book** (Chinmay, 3 October 2026, Block A business rules; CHG-RUL-003). An
+        anonymous device session is refused `403 sign-in-required` and nothing is added; the app
+        asks the guest to sign in, the plan moves to the account (`generateVisitPlan`), and the
+        guest books it. Add-ons on the plan (`addOnProductIds`, `addOnAccepted`) are priced here, at
+        booking, by the lines `addCartLine` creates; the plan stores no price, shows only an estimate computed on read
+        (`VisitPlan.estimate`), and the price is fixed when booked.
+      tags: [visitPlan]
+      x-ticvai-permission: null
+      x-ticvai-guest-callable: true
+      x-ticvai-audience: [guest]
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [baseVersion]
+              properties:
+                baseVersion:
+                  type: integer
+                  minimum: 1
+                  description: The version the guest is looking at.
+                cartId:
+                  type: string
+                  format: uuid
+                  nullable: true
+                  description: The guest's open cart. Null creates one.
+                itemIds:
+                  type: array
+                  items: { type: string, format: uuid }
+                  description: Only these items. Empty books every bookable item of every day.
+                includeAddOns:
+                  type: boolean
+                  default: true
+                  description: Also add the add-ons the guest accepted on the plan (`VisitPlanItem.addOnAccepted`).
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Lines added, and what could not be
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/VisitPlanBooking' }
+        '404':
+          $ref: '../shared/common.yaml#/components/responses/NotFound'
+        '409':
+          description: >
+            `baseVersion` is not current (`plan-version-conflict`), or the cart is not the caller's
+            or is no longer open (`cart-not-open`). Refusals of single lines are not a 409; they
+            are listed in `VisitPlanBooking.notAdded`.
+          x-ticvai-problem-types:
+            - plan-version-conflict
+            - cart-not-open
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '422':
+          description: >
+            Nothing on the plan could be added (`nothing-bookable`); the problem lists each item's
+            refusal, so the guest is told why rather than taken to an empty cart.
+          x-ticvai-problem-types:
+            - nothing-bookable
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '403':
+          description: >
+            The caller is an anonymous device session (`sign-in-required`; CHG-RUL-003). Booking
+            is for a signed-in guest; the plan moves to the account on sign-in.
+          x-ticvai-problem-types:
+            - sign-in-required
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Staff session token (common.yaml bearerAuth). Added 29 September (system-design review SD-054).
+    guestAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Guest session token (common.yaml guestAuth). Scoped to the guest's own resources.
+    serviceAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Cell-to-cell workload token over mTLS (common.yaml serviceAuth).
+    apiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-Api-Key
+      description: Partner, developer and device key (common.yaml apiKeyAuth).
+  # **Server-owned fields are `readOnly`.** createVenueMap, setVenuePoint and the two accept
+  # operations take these schemas as their body, and without the marks a client had to invent the
+  # id, the status and the scope path. OpenAPI 3.1: a `readOnly` property listed in `required` is
+  # required in responses only, and a client that sends one has it ignored. Status and versions
+  # move through the operations that own them (publish, closure).
+  #
+  # **Draft and published are stored apart.** `venuemap.point` and `venuemap.path` hold the
+  # working draft; each publish copies them into a `VenueMapVersion` snapshot, and a guest reads a
+  # snapshot. Closures sit on the path row and apply to both.
+  schemas:
+    VisitPlanRequest:
+      type: object
+      x-ticvai-persistence: none — request only; kept as `inputs` on venuemap.visit_plan
+      description: >
+        What `generateVisitPlan` takes (29 September, MOB-6): the Plan tab's form on GST-051 and
+        WEB-050.
+      required: [venueId, dates, party]
+      properties:
+        venueId:
+          type: string
+          format: uuid
+          description: >
+            The venue the guest picked in the app (GST-001 / WEB-001), which scopes the plan. Every
+            date is planned at this venue unless `dayVenues` puts it somewhere else.
+        dayVenues:
+          type: array
+          maxItems: 7
+          description: >
+            **Which venue on which date, in a multi-venue tenant** (30 September client meeting,
+            MoM 4.7, Allam's requirement). One entry per date that is not at `venueId`; each date
+            of `dates` at most once. Each venue must be an active venue of the caller's tenant (the
+            options `getTenantAppStatus.venues` lists), else 422 `venue-not-in-tenant`. **Each day
+            is then planned from that venue's own published map only**: its rides, its dining and
+            its retail points, never another venue's.
+          items:
+            type: object
+            required: [date, venueId]
+            properties:
+              date: { type: string, format: date }
+              venueId: { type: string, format: uuid }
+        dates:
+          type: array
+          minItems: 1
+          maxItems: 7
+          items: { type: string, format: date }
+        party:
+          type: array
+          minItems: 1
+          maxItems: 20
+          description: >
+            One entry per person. **Height where the guest knows it, age otherwise**: height is what
+            ride eligibility rules test, and an age band is the fallback the rule may also state.
+            Nothing here identifies a person.
+          items:
+            type: object
+            properties:
+              heightCm: { type: integer, minimum: 40, maximum: 230, nullable: true }
+              ageYears: { type: integer, minimum: 0, maximum: 120, nullable: true }
+        pace:
+          type: string
+          enum: [packed, balanced, relaxed]
+          default: relaxed
+        interestTags:
+          type: array
+          maxItems: 12
+          description: The same closed list as `VenuePoint.interestTags`.
+          items: { type: string }
+        cuisineTags:
+          type: array
+          maxItems: 8
+          description: >
+            Matched per day against the `cuisineTags` of that day's venue's dining points only
+            (30 September, MoM 4.7). A cuisine no dining point of the day's venue serves is not
+            forced into the day; it is reported in `VisitPlan.unmatchedPreferences`.
+          items: { type: string }
+        retailTags:
+          type: array
+          maxItems: 8
+          description: >
+            **Shops the party would like to visit** (30 September client meeting, MoM 4.7: retail
+            and kiosk shops join F&B as venue-linked planner options), e.g. `souvenirs`, `toys`,
+            `apparel`, `essentials`. Matched per day against `VenuePoint.retailTags` of that day's
+            venue's shops and retail kiosks; an unmatched tag is reported, as a cuisine is.
+          items: { type: string, maxLength: 30 }
+        mustIncludePointIds:
+          type: array
+          maxItems: 10
+          description: >
+            Placed on a day whose venue has the point. A point at none of the plan's venues is
+            listed in `VisitPlan.excluded` with `notAtVenue`, never placed on another venue's day.
+          items: { type: string, format: uuid }
+        preset:
+          type: string
+          nullable: true
+          enum: [highlights, family, thrillSeeker, waterDay, relaxed, showsAndDining]
+          description: >
+            A ready-made day plan (GST-052 Suggested Itineraries): the preset fixes the interests and
+            the pace, and the party still decides eligibility.
+        presetKey:
+          type: string
+          nullable: true
+          maxLength: 64
+          pattern: '^[a-z][a-zA-Z0-9]*$'
+          description: >
+            The ready-made plan the guest took on GST-052 (30 September, second wave of the 29 September pass, MOB-6): one of the
+            built-in `preset` keys above, or a key of a ready-made plan the venue defines. **The same
+            rules planner runs**: the preset only supplies interests, pace and must-include points,
+            and the party still decides eligibility. When both `preset` and `presetKey` are sent they
+            must name the same plan; `presetKey` is the field new clients send. An unknown key is
+            refused 422 `unknown-preset`.
+        startTime:
+          type: string
+          nullable: true
+          pattern: '^([01][0-9]|2[0-3]):[0-5][0-9]$'
+          description: When the party arrives. Null means opening time.
+        locale: { type: string, nullable: true }
+
+    VisitPlan:
+      type: object
+      x-ticvai-persistence: venuemap.visit_plan
+      description: >
+        **A guest's visit plan** (29 September, MOB-6): the Plan tab. One row per plan; its items are
+        `venuemap.visit_plan_item` rows carrying the version they belong to, so every earlier version
+        stays readable and undo is a new version equal to an old one. **Owned by the guest session**,
+        like a cart: `subjectId` when signed in, `sessionRef` for an anonymous device session, claimed
+        on sign-in.
+      required: [id, venueId, status, version, days]
+      properties:
+        id: { type: string, format: uuid, readOnly: true }
+        venueId: { type: string, format: uuid, x-ticvai-references: platform.scope }
+        scopePath:
+          type: string
+          readOnly: true
+          description: Derived from `venueId`.
+        subjectId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          x-ticvai-references: pii.subject
+          description: The signed-in guest. From the session, never from the body.
+        sessionRef:
+          type: string
+          nullable: true
+          readOnly: true
+          description: The anonymous device session that owns the plan until sign-in.
+        ownership:
+          type: string
+          enum: [anonymous, account]
+          readOnly: true
+          description: >
+            `anonymous` while the plan belongs to a device session (built and changed only; it lapses
+            with the session), `account` once the guest signed in and the plan moved to their account,
+            where it is saved and can be shared and booked (CHG-RUL-003).
+        status:
+          type: string
+          enum: [draft, booked, archived]
+          readOnly: true
+          description: '`booked` after `bookVisitPlan`; a booked plan is read-only. `archived` after its last date.'
+        version:
+          type: integer
+          minimum: 1
+          readOnly: true
+          description: The current version. Every `updateVisitPlan` adds one.
+        source:
+          type: string
+          enum: [rules, preset, aiAgent]
+          readOnly: true
+          description: >
+            What produced the current version: the rules planner, a preset, or the AI planner agent
+            acting for the guest. **The guest sees which**, as every AI answer says what it is based on.
+        inputs:
+          $ref: '#/components/schemas/VisitPlanRequest'
+        mapVersion:
+          type: integer
+          readOnly: true
+          description: The published map version the plan was laid out on.
+        cartId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          x-ticvai-references: orders.cart
+          description: The cart `bookVisitPlan` filled.
+        excluded:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
+          type: array
+          readOnly: true
+          description: >
+            **What was left out and why**, e.g. a coaster excluded because one of the party is under
+            its 120 cm minimum. Shown on GST-053, so the planner never looks as if it forgot.
+          items:
+            type: object
+            properties:
+              pointId: { type: string, format: uuid }
+              productId: { type: string, format: uuid, nullable: true }
+              name:
+                type: string
+                nullable: true
+                x-ticvai-persisted: false
+                x-ticvai-derived: onRead
+                description: The point's name, worked out on read for the left-out banner (r8 walk of ticket 28693).
+              limit:
+                type: object
+                nullable: true
+                x-ticvai-persisted: false
+                x-ticvai-derived: onRead
+                description: >
+                  The rule that left it out, worked out on read from the product's eligibility rule: for
+                  `heightRule` a minimum or maximum height in centimetres, for `ageRule` a minimum or maximum age in
+                  years. Null for the other reasons. The banner says "Min height 120 cm" from it.
+                properties:
+                  kind: { type: string, enum: [minHeightCm, maxHeightCm, minAge, maxAge] }
+                  value: { type: integer, minimum: 0 }
+              reason:
+                type: string
+                enum: [heightRule, ageRule, closedOnDate, notInInterests, noTime, notAtVenue]
+                description: >
+                  `notAtVenue` (30 September, MoM 4.7): a must-include point that is at none of the
+                  plan's venues, so no day could hold it.
+        estimate:
+          type: object
+          nullable: true
+          readOnly: true
+          x-ticvai-persisted: false
+          x-ticvai-derived: onRead
+          description: >
+            **An estimated total, computed on read from current catalogue prices and stored nowhere** (r8 walk of
+            tickets 28693 and 28200; lead decision of 20 October 2026, option A; DI-1098, "with associated costing").
+            The 3 October rule stands: no price is stored on the plan and add-ons are priced when booked. This only
+            tells the guest roughly what the plan would cost today, for the group and the days; the price is fixed at
+            booking and may differ. Null when no product on the plan has a current price.
+          required: [total, currency]
+          properties:
+            total: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+            currency: { type: string }
+        unmatchedPreferences:
+          type: array
+          readOnly: true
+          x-ticvai-persisted: false
+          x-ticvai-derived: onRead
+          description: >
+            **A preference a day's venue cannot meet is said, never faked** (30 September client
+            meeting, MoM 4.7, Allam's requirement). One entry per day and preference that no point
+            of that day's venue matches: a cuisine (`cuisineTags`), a shop (`retailTags`) or an
+            interest (`interestTags`). `availableAtVenueIds` names the tenant's other active venues
+            whose published map does match, so GST-053 and WEB-050 can say *Indian food is at
+            the other park (day 2)* instead of quietly placing a restaurant the party cannot reach.
+            Empty when every preference is met on every day. Worked out on read for the version
+            read (a swap can meet or lose a preference), never stored.
+          items:
+            type: object
+            required: [date, venueId, preference, tag]
+            properties:
+              date: { type: string, format: date }
+              venueId:
+                type: string
+                format: uuid
+                description: The day's venue, which has no match.
+              preference: { type: string, enum: [cuisine, retail, interest] }
+              tag: { type: string, maxLength: 30 }
+              availableAtVenueIds:
+                type: array
+                items: { type: string, format: uuid }
+                description: Other active venues of the tenant where the tag is matched. Empty when none is.
+        days:
+          x-ticvai-persisted: false
+          type: array
+          readOnly: true
+          description: One per date, in order. The items of the version read.
+          items:
+            type: object
+            required: [date, venueId, items]
+            properties:
+              date: { type: string, format: date }
+              venueId:
+                type: string
+                format: uuid
+                description: >
+                  **The venue this day is planned at** (30 September, MoM 4.7): `VisitPlanRequest.dayVenues`
+                  for the date, else `venueId`. Every item of the day is at this venue.
+              opensAt: { type: string, nullable: true }
+              closesAt: { type: string, nullable: true }
+              items:
+                type: array
+                items: { $ref: '#/components/schemas/VisitPlanItem' }
+        createdAt: { type: string, format: date-time, readOnly: true }
+        updatedAt: { type: string, format: date-time, readOnly: true }
+
+    VisitPlanItem:
+      type: object
+      x-ticvai-persistence: venuemap.visit_plan_item
+      description: >
+        **One timed stop on a plan day** (29 September, MOB-6). Rows are kept per `planVersion`: a
+        change writes the day's items again under the new version, and an older version's rows are
+        never updated.
+      required: [id, planId, planVersion, date, sequence, kind, startsAt, endsAt]
+      properties:
+        id: { type: string, format: uuid, readOnly: true }
+        planId:
+          type: string
+          format: uuid
+          readOnly: true
+          x-ticvai-references: venuemap.visit_plan
+        planVersion: { type: integer, minimum: 1, readOnly: true }
+        date: { type: string, format: date }
+        sequence: { type: integer, minimum: 1 }
+        kind:
+          type: string
+          enum: [attraction, show, meal, shop, rest, travel]
+          description: >
+            `meal` is a stop at a dining point (restaurant, cafe or food kiosk); `shop` is a retail
+            stop at a shop or a retail kiosk (30 September client meeting, MoM 4.7: retail is
+            placed from the day venue's own points, as dining is).
+        venueId:
+          type: string
+          format: uuid
+          readOnly: true
+          x-ticvai-persisted: false
+          x-ticvai-derived: onRead
+          description: >
+            **The venue of this stop** (30 September client meeting, MoM 4.7): always the day's
+            venue, and the venue whose map `pointId` is on. Carried on the item so the screens,
+            `bookVisitPlan` and the AI planner agent read it rather than infer it. **Worked out
+            on read, not stored**: from the plan's `inputs` (`dayVenues` for the item's date, else
+            `venueId`). A stored `venue_id` would move the item rows from the plan's own row-level
+            policy to a venue policy and hide a second park's items from the guest who owns the plan.
+        pointId:
+          type: string
+          format: uuid
+          nullable: true
+          x-ticvai-references: venuemap.point
+        name:
+          type: string
+          nullable: true
+          readOnly: true
+          x-ticvai-persisted: false
+          x-ticvai-derived: onRead
+          description: 'What the stop is called on the timeline (GST-059, GST-053; r8 walk of ticket 28693): the
+            point''s name, or the performance''s title for a show, in the request language. Worked out on read from
+            `pointId` or `performanceId`, as `VisitPlanAlternative.name` is; nothing is stored. Null for a travel
+            stop.'
+        zoneName:
+          type: string
+          nullable: true
+          readOnly: true
+          x-ticvai-persisted: false
+          x-ticvai-derived: onRead
+          description: The name of the zone the stop is in, from the point's zone on the map the plan was laid out
+            on. Worked out on read; null when the point has no zone.
+        productId:
+          type: string
+          format: uuid
+          nullable: true
+          x-ticvai-references: catalogue.product
+          description: What is bought for this stop, where it is bought. Null for a free stop.
+        bundleId:
+          type: string
+          format: uuid
+          nullable: true
+          x-ticvai-references: promotions.bundle
+          description: A meal combo or package, from the point's `featuredOffer`.
+        performanceId:
+          type: string
+          format: uuid
+          nullable: true
+          x-ticvai-references: catalogue.performance
+        startsAt: { type: string, format: date-time }
+        endsAt: { type: string, format: date-time }
+        walkMinutesBefore: { type: integer, minimum: 0, nullable: true }
+        expectedWaitMinutes:
+          type: integer
+          minimum: 0
+          nullable: true
+          description: The typical wait at that hour when the plan was laid out; GST-059 replaces it with the live one.
+        addOnSuggestion:
+          type: object
+          nullable: true
+          description: A suggested add-on for this stop, e.g. Fast Track where the wait is long. Never added by itself.
+          properties:
+            productId: { type: string, format: uuid }
+            reason: { type: string }
+            pricePerGuest:
+              allOf:
+                - $ref: '../shared/common.yaml#/components/schemas/Money'
+              nullable: true
+              x-ticvai-persisted: false
+              x-ticvai-derived: onRead
+              description: The add-on's current price for one guest, computed on read and stored nowhere (the estimate rule of `VisitPlan.estimate`).
+            minutesSaved:
+              type: integer
+              minimum: 0
+              nullable: true
+              x-ticvai-persisted: false
+              x-ticvai-derived: onRead
+              description: The wait the add-on would save at this stop, worked out on read from the expected wait.
+        addOnAccepted:
+          type: boolean
+          default: false
+        addOnProductIds:
+          type: array
+          readOnly: true
+          description: >
+            Add-ons the guest put on this stop with `addAddOn` (CHG-RUL-009), beside an accepted
+            suggestion, as catalogue product ids. No price: priced at booking.
+          items: { type: string, format: uuid }
+        pinned:
+          type: boolean
+          default: false
+          description: The guest fixed this stop; a re-lay moves other stops around it.
+        note: { type: string, nullable: true, maxLength: 200 }
+
+    VisitPlanUpdate:
+      type: object
+      x-ticvai-persistence: none — request only; lands as a new version of venuemap.visit_plan_item rows
+      description: What `updateVisitPlan` takes (29 September, MOB-6).
+      required: [baseVersion, changes]
+      properties:
+        baseVersion: { type: integer, minimum: 1 }
+        changes:
+          type: array
+          minItems: 1
+          maxItems: 20
+          items:
+            type: object
+            required: [op]
+            properties:
+              op: { type: string, enum: [swap, remove, add, move, pin, acceptAddOn, declineAddOn, addAddOn, removeAddOn, revertTo] }
+              itemId: { type: string, format: uuid, nullable: true }
+              date: { type: string, format: date, nullable: true }
+              pointId: { type: string, format: uuid, nullable: true }
+              performanceId: { type: string, format: uuid, nullable: true }
+              startsAt: { type: string, format: date-time, nullable: true }
+              addOnProductId:
+                type: string
+                format: uuid
+                nullable: true
+                description: >
+                  For `addAddOn` and `removeAddOn` (CHG-RUL-009): the add-on product (a catalogue
+                  product sold for the item's stop, e.g. Fast Track). Priced at booking, not here.
+              version:
+                type: integer
+                nullable: true
+                description: For `revertTo`, the earlier version to restore (undo).
+
+    VisitPlanAlternative:
+      type: object
+      x-ticvai-persistence: none — computed on read
+      description: One candidate for a swap (29 September, MOB-6).
+      required: [kind, venueId, startsAt, reason]
+      properties:
+        kind: { type: string, enum: [attraction, show, meal, shop, rest] }
+        venueId:
+          type: string
+          format: uuid
+          description: The item's day venue; an alternative is never from another venue (30 September, MoM 4.7).
+        pointId: { type: string, format: uuid, nullable: true }
+        productId: { type: string, format: uuid, nullable: true }
+        performanceId: { type: string, format: uuid, nullable: true }
+        name: { type: string }
+        startsAt: { type: string, format: date-time }
+        durationMinutes: { type: integer }
+        walkMinutes: { type: integer, nullable: true }
+        expectedWaitMinutes: { type: integer, nullable: true }
+        matchedInterests: { type: array, items: { type: string } }
+        reason:
+          type: string
+          description: Why it is offered, in words the sheet shows, e.g. *Same thrill level, 4 minutes closer*.
+
+    VisitPlanBooking:
+      type: object
+      x-ticvai-persistence: none — computed; the lines are orders.cart_line rows
+      description: 'What `bookVisitPlan` returns (29 September, MOB-6): the cart handoff.'
+      required: [planId, cartId, added, notAdded]
+      properties:
+        planId: { type: string, format: uuid }
+        cartId: { type: string, format: uuid }
+        added:
+          type: array
+          items:
+            type: object
+            properties:
+              itemId: { type: string, format: uuid }
+              cartLineId: { type: string, format: uuid }
+              leaseExpiresAt: { type: string, format: date-time, nullable: true }
+        notAdded:
+          type: array
+          description: Items that could not be added, with the `addCartLine` refusal each met.
+          items:
+            type: object
+            properties:
+              itemId: { type: string, format: uuid }
+              reason:
+                type: string
+                description: The orders `CartProblem` code, e.g. `soldOutForSession`, `productInfoOnly`, `seatLimitExceeded`.
+        freeItems:
+          type: integer
+          description: Stops that need nothing bought.
+    BookableVenueMaps:
+      type: object
+      description: >
+        What `listBookableVenueMaps` returns: the published maps of one venue that carry bookable
+        spots (decided 29 September, readiness close-out). **Bounded by the venue**: a venue has a
+        handful of maps, so the list is capped at 50 rather than paged.
+      required: [venueId, maps]
+      properties:
+        venueId: { type: string, format: uuid }
+        maps:
+          type: array
+          maxItems: 50
+          items: { $ref: '#/components/schemas/BookableVenueMapRef' }
+    BookableVenueMapRef:
+      type: object
+      description: >
+        One published map with bookable spots on it: enough to pick it and call `getVenueMap`
+        (with `publishedVersion`) and `resources.getMapResourceAvailability`.
+      required: [mapId, name, kind, publishedVersion, placedResourceCount]
+      properties:
+        mapId: { type: string, format: uuid }
+        name: { type: string }
+        kind: { type: string, enum: [park, floor, zone, parking] }
+        floorLevel: { type: integer, nullable: true }
+        publishedVersion:
+          type: integer
+          description: The `VenueMap.publishedVersion` a guest is served; send it to `getVenueMap` as `version`.
+        placedResourceCount:
+          type: integer
+          minimum: 0
+          description: Placed resources on the published version. 0 only when the caller sent `onlyBookable=false`.
+        kinds:
+          type: array
+          description: The kinds of spot on this map, e.g. `[cabana, lounger]`, for the picker's chips.
+          items: { type: string, enum: [cabana, lounger, table, pitch, other] }
+    VenueMap:
+      type: object
+      x-ticvai-persistence: "venuemap.map"
+      description: >
+        A park map, or a floor plan. **Several per venue** — a guest on the second floor should not
+        be shown the ground floor's toilets.
+      required: [id, name, venueId, status]
+      properties:
+        id: { type: string, format: uuid, readOnly: true }
+        name: { type: string }
+        venueId: { type: string, format: uuid }
+        scopePath:
+          type: string
+          readOnly: true
+          description: Derived from `venueId`. Not sent by a client.
+        kind: { type: string, enum: [park, floor, zone, parking] }
+        floorLevel: { type: integer, nullable: true }
+        status:
+          type: string
+          enum: [draft, published, archived]
+          readOnly: true
+          description: >
+            `draft` on create. Moves through `publishVenueMap` (`states/venue-map.yaml`), never by
+            sending a value.
+        publishedVersion:
+          type: integer
+          nullable: true
+          readOnly: true
+          description: >
+            The `VenueMapVersion.version` guests are served. Null until the first publish.
+        graphVersion:
+          type: integer
+          readOnly: true
+          description: >
+            **Bumped by a publish or a closure**, and returned as `VenueMapGraph.version`. Separate
+            from `publishedVersion` because a closure changes the routes without creating a map
+            version, and a closure that looked like a publish would lie about what changed.
+        isGeoreferenced:
+          type: boolean
+          readOnly: true
+          description: >
+            **Whether a guest can be located on it.** Without a georeference the map is a picture —
+            useful, and not navigable.
+        baseAssetId:
+          type: string
+          format: uuid
+          nullable: true
+          description: >
+            **The illustrated map a guest actually sees**, held in `assets` like any other media.
+
+            **This is not the CAD drawing.** The drawing gives geometry — where things are, and how
+            they connect. The base image is a designed illustration with the venue's own styling,
+            and the two are different artefacts that happen to describe the same place. A park hands
+            you an architect's plan and a beautiful painted map, and **the guest wants the second
+            while the platform needs the first.**
+
+            Null is valid. A map with geometry and no illustration renders as shapes — plain, and
+            navigable.
+          x-ticvai-references: assets.MediaAsset
+        baseImageAlignment:
+          type: object
+          nullable: true
+          description: >
+            **How the illustration lines up with the geometry.** They are drawn at different scales
+            by different people, and a point placed on the plan lands in the wrong place on the
+            painting unless something reconciles them.
+
+            Two known points is enough. **Without this the illustration is a picture behind the
+            map rather than the map itself.**
+          properties:
+            imageWidthPx: { type: integer }
+            imageHeightPx: { type: integer }
+            anchors:
+              type: array
+              minItems: 2
+              maxItems: 4
+              items:
+                type: object
+                properties:
+                  planX: { type: number }
+                  planY: { type: number }
+                  imageX: { type: number }
+                  imageY: { type: number }
+        tileSetRef:
+          type: string
+          nullable: true
+          readOnly: true
+          description: >
+            Where a base image is large enough to need zoom levels. **A 12,000-pixel park map is
+            not something a phone downloads on arrival**, and a guest opening the map on venue wifi
+            at the gate is the worst moment to send twenty megabytes.
+
+            Generated from the base asset. Null means the image is small enough to serve whole.
+        boundsGeoJson: { type: string, nullable: true }
+        graphStatus:
+          type: string
+          readOnly: true
+          enum: [notBuilt, connected, disconnected, partial]
+          description: >
+            **Whether every public point can actually be reached.** Computed at publish.
+
+            `disconnected` means a point has no path to it at all — a toilet nobody can walk to is
+            a toilet that does not exist. `partial` means every point is reachable and at least one
+            only by steps, which is a different and quieter failure: **the map works until a
+            wheelchair user opens it.**
+        modelAssetId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          x-ticvai-references: assets.MediaAsset
+          description: >
+            **The 3D layer of the working draft** (ADR-0069, contract item closed 3 October 2026): the
+            GLB (`model3d` asset) the last `glbModel` import brought in. Set by `importVenueGeometry`,
+            never by sending a value. Null for a 2D-only map, which is the default and needs nothing.
+            The 3D model is a rendering of the map, never the source of its truth: routes come from
+            the graph.
+        navigationFileAssetId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          x-ticvai-references: assets.MediaAsset
+          description: The navigation file imported with the model, kept so the import can be re-run and audited.
+        modelTransform:
+          readOnly: true
+          description: >
+            **How the model's local frame sits on the earth** (ADR-0069 section 3): the navigation
+            file's anchor, stored once and used both ways. Null without a model. It maps onto the
+            plan's georeference as the ADR says, so a map with a model is georeferenced.
+          allOf:
+            - $ref: '#/components/schemas/VenueModelTransform'
+        model3dStatus:
+          type: string
+          readOnly: true
+          enum: [none, publishable, blocked]
+          description: >
+            **Whether the next publish carries the 3D layer.** `none`: no model. `publishable`: the
+            last model import had no `error` finding. `blocked`: it had one (over 300,000 triangles at
+            LOD0, uncompressed textures, a control point more than 10 m out, an invalid navigation
+            file), named in that job's `model.findings`; the 2D map still publishes and guests see
+            2D until a corrected model is imported (ADR-0069 sections 3 and 6).
+
+    VenueMapOcrOptions:
+      x-ticvai-persistence: "none — part of the importVenueGeometry request"
+      type: object
+      description: >
+        **The OCR step for a scanned PDF or a raster plan** (3 October 2026, r1 additions).
+        Absent means `auto`: a PDF page with no vector geometry, and every raster, is read
+        for text; a vector page is read by its layers and never OCR'd. The text found is
+        returned on the job (`VenueMapImportJob.ocr`) and offered to
+        `ai.proposeVenueLabels` as hints; it never names a point by itself.
+      properties:
+        mode:
+          type: string
+          enum: [auto, 'off']
+          default: auto
+          description: '`off` skips it, for a plan whose text is noise (a dimensioned drawing).'
+        languages:
+          type: array
+          items: { type: string, enum: [en, ar] }
+          description: The scripts to read. Absent means both.
+
+    VenueMapHandMarkedPaths:
+      x-ticvai-persistence: "none — part of the importVenueGeometry request"
+      type: object
+      description: >
+        **A raster plan (or a scanned PDF) with the walkways marked by hand** (3 October
+        2026, r1 additions). The import finds the marks and reports them
+        (`VenueMapImportJob.handMarkedPaths`); `ai.proposeWalkways` then proposes a path
+        segment per marked stretch, and each segment is accepted or rejected on its own
+        with `acceptWalkwayProposals`. Nothing becomes a path without a person.
+      properties:
+        markColour:
+          type: string
+          nullable: true
+          pattern: '^#[0-9A-Fa-f]{6}$'
+          description: >
+            The marker's colour, where the operator knows it (`#E53935` for a red pen).
+            Absent, the import looks for the strokes that differ from the printed plan.
+        note:
+          type: string
+          nullable: true
+          maxLength: 300
+          description: Anything the marks mean that the image does not say ("dashed = staff only").
+
+    VenueModelTransform:
+      type: object
+      x-ticvai-persistence: "none — jsonb column"
+      description: >
+        ADR-0069 section 3: the navigation file's `anchor`. Local to WGS84: rotate (x, z) by
+        `headingDegrees` into east/north metres, scale, offset from the origin on a local tangent
+        plane; GPS to local is the inverse, done on the phone for every fix.
+      required: [originLat, originLng, headingDegrees]
+      properties:
+        originLat: { type: number, minimum: -90, maximum: 90 }
+        originLng: { type: number, minimum: -180, maximum: 180 }
+        originAltitudeMetres: { type: number, default: 0 }
+        headingDegrees:
+          type: number
+          minimum: 0
+          exclusiveMaximum: 360
+          description: True-north bearing of the model's -Z axis, clockwise.
+        scale:
+          type: number
+          default: 1
+          description: Metres per model unit; 1 for a model in metres.
+        controlPoints:
+          type: array
+          minItems: 2
+          maxItems: 8
+          description: Surveyed checks, far apart. They verify the anchor; they do not define it.
+          items:
+            type: object
+            required: [label, x, z, lat, lng]
+            properties:
+              label: { type: string }
+              x: { type: number }
+              z: { type: number }
+              lat: { type: number }
+              lng: { type: number }
+              residualMetres:
+                type: number
+                nullable: true
+                readOnly: true
+                description: Measured at import. Over 3 m is a warning; over 10 m blocks the 3D layer.
+
+    VenueModel3d:
+      type: object
+      x-ticvai-persistence: "none — jsonb column"
+      description: >
+        **The 3D layer a guest app loads** (ADR-0069): the model and the transform of the version it
+        read. The app downloads the GLB through the asset delivery rules (UAE-hosted for a UAE tenant,
+        ADR-0069 section 7) and caches it with the graph.
+      required: [modelAssetId, transform]
+      properties:
+        modelAssetId:
+          type: string
+          format: uuid
+          x-ticvai-references: assets.MediaAsset
+        sizeBytes: { type: integer, nullable: true }
+        transform: { $ref: '#/components/schemas/VenueModelTransform' }
+
+    VenueNavigationFile:
+      # Not `$id`: in OpenAPI 3.1 a `$id` re-bases the `#/components/...` references inside this schema.
+      x-ticvai-schema-id: 'urn:ticvai:venue-navigation-file:1.0'
+      type: object
+      x-ticvai-persistence: "none — a file format: imported by importVenueGeometry, exported by getVenueNavigationFile"
+      description: >
+        **The navigation (pathway) file of ADR-0069 section 2**, fixed as a contract schema on
+        3 October 2026 (the ADR's `$id` open item: `urn:ticvai:venue-navigation-file:1.0`). JSON,
+        UTF-8, one per venue map, in the model's local frame (metres, +Y up). Codes, not ids:
+        `productCode`, `outletCode` and `facilityCode` resolve at import, and an unresolved code is a
+        finding (`unresolvedCatalogueCode`), never a silent drop. Point names stay unique per venue
+        (audit R108).
+      required: [formatVersion, venueCode, mapName, anchor, nodes, edges, locations]
+      properties:
+        formatVersion: { type: string, enum: ['1.0'] }
+        venueCode: { type: string, description: The venue's code on the platform. }
+        mapName: { type: string, description: Matches VenueMap.name; a floor plan is its own file. }
+        floorLevel: { type: integer, nullable: true }
+        modelFile:
+          type: string
+          nullable: true
+          description: The GLB this file belongs to (park-2026-10.glb). Null in a file exported from a 2D map.
+        anchor: { $ref: '#/components/schemas/VenueModelTransform' }
+        nodes:
+          type: array
+          minItems: 2
+          description: Graph vertices in model coordinates. A junction, or the door of a location.
+          items:
+            type: object
+            required: [id, x, z]
+            properties:
+              id: { type: string, pattern: '^[A-Za-z0-9_-]{1,64}$' }
+              x: { type: number }
+              y: { type: number, default: 0 }
+              z: { type: number }
+              zone: { type: string, nullable: true, description: The GLB zone node it sits in. }
+        edges:
+          type: array
+          minItems: 1
+          description: Walkable connections. Undirected; a one-way passage names the access point that makes it one-way.
+          items:
+            type: object
+            required: [from, to]
+            properties:
+              from: { type: string }
+              to: { type: string }
+              polyline:
+                type: array
+                description: Intermediate [x, z] or [x, y, z] points along the centreline; straight when absent.
+                items:
+                  type: array
+                  minItems: 2
+                  maxItems: 3
+                  items: { type: number }
+              isStepFree: { type: boolean, default: true }
+              isIndoor: { type: boolean, default: false }
+              throughAccessPointCode: { type: string, nullable: true }
+        locations:
+          type: array
+          description: Points of interest. Each becomes a VenuePoint.
+          items:
+            type: object
+            required: [ref, kind, name, nodeId]
+            properties:
+              ref: { type: string, description: Stable key; also the name of the GLB node drawn for it. }
+              kind: { type: string, description: 'One of VenuePoint.kind; junction is not allowed here.' }
+              name: { type: string }
+              nameLocalised:
+                type: object
+                additionalProperties: { type: string }
+              nodeId: { type: string, description: 'The node a guest is routed to: the entrance, not the centre.' }
+              labelPosition:
+                type: array
+                minItems: 3
+                maxItems: 3
+                items: { type: number }
+              catalogue:
+                type: object
+                properties:
+                  productCode: { type: string, nullable: true }
+                  outletCode: { type: string, nullable: true }
+                  facilityCode: { type: string, nullable: true }
+
+    VenueMapImportProblem:
+      x-ticvai-persistence: none — error shape
+      description: The `422` from `importVenueGeometry` (3 October 2026, r1 additions).
+      allOf:
+        - $ref: '../shared/common.yaml#/components/schemas/Problem'
+        - type: object
+          required: [refusedReason]
+          properties:
+            refusedReason:
+              type: string
+              enum: [navigationFileMissing, formatMismatch, modelTooLarge]
+            sizeBytes:
+              type: integer
+              nullable: true
+              description: With `modelTooLarge`, the GLB's size; the limit is 41,943,040 bytes (40 MB).
+
+    VenueMapDetail:
+      type: object
+      description: 19.2.55. **The whole map in one call**, so a client caches it and filters locally.
+      properties:
+        version:
+          type: integer
+          nullable: true
+          readOnly: true
+          description: >
+            **The published version these points and paths belong to**, which is the number a
+            client caches and sends back as `version`. It can differ from `map.publishedVersion`
+            when an older version was asked for. Null when the draft was read.
+        map: { $ref: '#/components/schemas/VenueMap' }
+        points:
+          type: array
+          items: { $ref: '#/components/schemas/VenuePoint' }
+        paths:
+          type: array
+          items: { $ref: '#/components/schemas/VenuePath' }
+        resources:
+          type: array
+          description: >
+            The bookable resources placed on this version of the map (rev 3 REV3-15). Empty on a map
+            that carries none.
+          items: { $ref: '#/components/schemas/PlacedResource' }
+        model3d:
+          nullable: true
+          description: >
+            **The 3D layer of the version read** (ADR-0069; 3 October 2026, r1 additions). Null when
+            that version has none, and then the guest app shows the 2D map with the same route, as it
+            does on a phone that cannot hold 30 fps.
+          allOf:
+            - $ref: '#/components/schemas/VenueModel3d'
+
+    VenuePoint:
+      type: object
+      x-ticvai-persistence: "venuemap.point"
+      description: >
+        19.2.57 to 19.2.60. **What a venue places on the map**, and what a guest taps.
+      required: [id, mapId, kind, name, position]
+      properties:
+        id: { type: string, format: uuid, readOnly: true }
+        mapId:
+          type: string
+          format: uuid
+          readOnly: true
+          description: From the path of the operation that writes the point.
+        kind:
+          type: string
+          enum: [ride, attraction, show, restaurant, cafe, shop, kiosk, toilet, babyCare,
+                 prayerRoom, firstAid, atm, lockers, entrance, exit, emergencyExit, assemblyPoint,
+                 parking, guestServices, smokingArea, waterFountain, chargingPoint, photoSpot,
+                 junction, other]
+          description: >
+            **A closed set, and `emergencyExit` is separate from `exit` on purpose.** An exit is
+            where a guest leaves; an emergency exit is where they are sent, and a map that cannot
+            tell them apart is a map that routes a normal departure through a fire door.
+
+            **`junction` is the one that is not a point of interest.** A path connects two points,
+            so a fork in a walkway with nothing at it still needs a node — otherwise every bend has
+            to be named as a destination, and a guest browsing the map sees forty entries called
+            *Path junction 12*.
+
+            **Junctions are hidden from guests and present in the graph.** Generated by extraction
+            where paths meet; a venue never places one by hand.
+        name:
+          type: string
+          x-ticvai-unique: venue
+          description: >
+            **Unique per venue** (decided 28 September, audit R108). Two points on a venue's maps
+            never share a name, compared without case, so *Toilets North* names one place;
+            `setVenuePoint` refuses a duplicate with `409` `duplicate-code`. Junctions are named by
+            extraction and are exempt.
+        nameLocalised:
+          type: object
+          nullable: true
+          additionalProperties: { type: string }
+        position:
+          type: object
+          required: [x, y]
+          description: >
+            Drawing coordinates. **Latitude and longitude are derived from the georeference**, not
+            stored, so a map that is re-georeferenced does not need every point moved.
+          properties:
+            x: { type: number }
+            y: { type: number }
+        outletId:
+          type: string
+          format: uuid
+          nullable: true
+          description: >
+            For a restaurant, cafe, shop or kiosk. **Tapping it should open the menu**, and that
+            only works if the map knows which outlet it is.
+        productId:
+          type: string
+          format: uuid
+          nullable: true
+          description: >
+            For a ride or show — links to wait times and to booking. **What a guest is offered
+            from any point, including a restaurant or a shop, is `featuredOffer`** (29 September,
+            MOB-4); this link stays for wait times.
+        accessPointId:
+          type: string
+          format: uuid
+          nullable: true
+          description: >
+            For an entrance or exit. **This is what makes 3.2.64 work** — live admission statistics
+            drawn on the point they came from.
+        isStepFree:
+          type: boolean
+          default: true
+          description: >
+            Whether the point itself can be reached without steps. **The same name as
+            `VenuePath.isStepFree`, because it is the same concept** (it was `isAccessible` until the
+            26 September audit). **Placed on the point rather than inferred from the path**, because
+            a step-free route to a building with steps at the door is not a step-free route.
+        openingHours: { type: string, nullable: true }
+        iconRef: { type: string, nullable: true }
+        isActive: { type: boolean, default: true }
+        isNavigable:
+          type: boolean
+          default: true
+          description: >
+            Whether a route may pass through it. **False for a point that marks a place without
+            being reachable** — a stage a guest cannot walk onto, a zone label.
+        isDestination:
+          type: boolean
+          default: true
+          description: >
+            **Whether a guest may be routed *to* it, and whether it appears in a list of places.**
+            False for a `junction`, which exists in the graph and nowhere else.
+
+            Separate from `isNavigable` because the two differ: a junction is navigable and not a
+            destination, and a fenced landmark is a destination you can be shown but not walked
+            into.
+        description:
+          type: object
+          nullable: true
+          additionalProperties: { type: string, maxLength: 1000 }
+          description: >
+            **What the guest reads on Item Detail** (29 September, MOB-4). Keyed by locale, like
+            `nameLocalised`. One screen now serves rides, shows, restaurants and shops (GST-004 and
+            GST-006 merged), and it opens from the map pin, so the point carries the words rather
+            than each kind borrowing them from a different module. Set on BO-094.
+        media:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
+          type: array
+          maxItems: 12
+          description: >
+            **The gallery on Item Detail** (29 September, MOB-4): images and short clips from the
+            asset library, first `isPrimary` shown on the map card. Assets are referenced, never
+            copied, so a replaced photo changes everywhere.
+          items:
+            type: object
+            required: [assetId, kind]
+            properties:
+              assetId:
+                type: string
+                format: uuid
+                x-ticvai-references: assets.media_asset
+              kind: { type: string, enum: [image, video] }
+              isPrimary: { type: boolean, default: false }
+              altText: { type: string, nullable: true, maxLength: 200 }
+        featuredOffer:
+          type: object
+          nullable: true
+          required: [kind, id]
+          description: >
+            **The product card on Item Detail, for every kind of point** (29 September, MOB-4).
+            `productId` above links a ride or show to its wait times; this is what the guest is
+            offered from the point, and it may be a bundle: a restaurant offers *meal combo with
+            admission* (`promotions` bundle with an admission and a meal component), which checks
+            out in about three steps (GST-004 → GST-056 → GST-041). A point with none shows no card.
+            **Referenced, not priced here**: the card reads `catalogue.getProduct` or
+            `promotions.getBundle` for the live price and availability.
+          properties:
+            kind: { type: string, enum: [product, bundle] }
+            id:
+              type: string
+              format: uuid
+              description: The `catalogue.product` id or the `promotions.bundle` id, by `kind`.
+            label:
+              type: string
+              nullable: true
+              maxLength: 40
+              description: The button text, e.g. *Buy meal combo*. Null uses the product's own call to action.
+        typicalDurationMinutes:
+          type: integer
+          nullable: true
+          minimum: 1
+          maximum: 600
+          description: >
+            **How long a visit to this point usually takes**, ride time and queue excluded (29
+            September, MOB-6). The visit planner lays out a day with it; the queue comes from
+            `queue.getWaitTimes` on the day. Null for a point the planner never places (a toilet).
+        interestTags:
+          type: array
+          maxItems: 12
+          description: >
+            **What a guest who says they like this would like here** (29 September, MOB-6): the
+            planner matches the guest's interests against these. A closed list so that the
+            Plan tab's interest chips and the venue's tags are the same words.
+          items:
+            type: string
+            enum: [thrill, family, kids, water, animals, shows, culture, shopping, dining, relaxing,
+                   photo, adventure, sport, nightlife, indoor]
+        cuisineTags:
+          type: array
+          maxItems: 8
+          description: >
+            **For dining points** (restaurant, cafe, kiosk; 29 September, MOB-6). The planner places
+            meals at points whose cuisine the party chose, at meal times. Free text codes such as
+            `arabic`, `indian`, `italian`, `fastFood`, `vegetarian`, `halal` — cuisines are too many
+            to close, and a wrong enum is worse than an unmatched tag. **Read per venue**: the planner
+            matches a guest's cuisine only against the points of the venue that day is at (30
+            September, MoM 4.7).
+          items: { type: string, maxLength: 30 }
+        retailTags:
+          type: array
+          maxItems: 8
+          description: >
+            **For retail points** (shop, and a kiosk that sells goods rather than food; 30 September
+            client meeting, MoM 4.7: retail and kiosk shops join F&B as venue-linked planner options).
+            The planner places a shop stop at points whose tags the party chose, on the day of this
+            point's venue only. Free text codes such as `souvenirs`, `toys`, `apparel`, `photo`,
+            `essentials`, for the same reason as `cuisineTags`. A kiosk may carry both lists.
+          items: { type: string, maxLength: 30 }
+
+    SetVenuePointRequest:
+      description: >
+        What `setVenuePoint` takes: a `VenuePoint` without its server-owned fields, plus the point
+        to amend. **`pointId` absent places a new point; present amends that one**, and it must be a
+        point on the map in the path.
+      allOf:
+        - $ref: '#/components/schemas/VenuePoint'
+        - type: object
+          properties:
+            pointId:
+              type: string
+              format: uuid
+              nullable: true
+              description: The point to amend. Absent or null places a new point.
+
+    PlacedResource:
+      type: object
+      x-ticvai-persistence: "venuemap.placed_resource"
+      description: >
+        **A bookable resource where it stands on the map** (decided 29 September, rev 3 REV3-15 and
+        GAP-C2): cabana B09 on the Beach, 15 guests, Large. The resource itself, its bookings and its
+        holds live in `resources`; this row says where it is drawn and what the guest sees. Written
+        into the working draft by `importVenueGeometry` or `setPlacedResource`, copied into the
+        `VenueMapVersion` snapshot at publish. A guest picks one on the published map, holds it with
+        `resources.createResourceHold` and buys it. **Supersedes audit R073 (c) and the 26 August
+        minute for resources on an ingested map.**
+      required: [id, mapId, resourceId, label, kind, zone, capacity, priceBandCode, position]
+      properties:
+        id: { type: string, format: uuid, readOnly: true }
+        mapId:
+          x-ticvai-references: venuemap.map
+          type: string
+          format: uuid
+          readOnly: true
+          description: From the path of the operation that writes it.
+        resourceId:
+          type: string
+          format: uuid
+          x-ticvai-references: resources.Resource
+          description: >
+            The `resources.Resource` this is. **Availability, holds and bookings are keyed by this**,
+            so a republished map with the cabana moved keeps its bookings.
+        label:
+          type: string
+          maxLength: 40
+          x-ticvai-unique: map
+          description: >
+            What the guest sees and taps, e.g. `B09`. **Unique on the map**, compared without case
+            after digit normalisation; normally the resource's `code`.
+        kind:
+          type: string
+          enum: [cabana, lounger, table, pitch, other]
+          description: A subset of `resources.ResourceKind`, the kinds a guest books from a map. A `table`
+            here is a non-dining spot (a beach or event table) sold like a cabana; restaurant tables stay
+            `fnb` table reservations (decided 29 September, rev 3 GAP-C2).
+        zone:
+          type: string
+          maxLength: 80
+          description: The area the guest reads it by, e.g. `Beach`, `River`, `Terrace`.
+        capacity:
+          type: integer
+          minimum: 1
+          maximum: 500
+          description: Guests it takes, e.g. 15. Shown on the map and checked against the party at hold.
+        priceBandCode:
+          type: string
+          maxLength: 40
+          description: >
+            The band it sells in, e.g. `Large`, one of the `priceBands` given at import. The band's
+            `variantId` prices it; the map holds no price.
+        variantId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          x-ticvai-references: catalogue.ProductVariant
+          description: Resolved from the price band. What a cart line for this resource names.
+        position:
+          type: object
+          required: [x, y]
+          description: Drawing coordinates of its label anchor, as on `VenuePoint`.
+          properties:
+            x: { type: number }
+            y: { type: number }
+        boundary:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
+          type: array
+          nullable: true
+          description: The shape drawn, as a polygon in drawing coordinates. Null for a pin.
+          items:
+            type: object
+            properties:
+              x: { type: number }
+              y: { type: number }
+        isBookable:
+          type: boolean
+          default: true
+          description: >
+            False keeps it on the map and off sale, e.g. a cabana kept for staff use. Shown greyed.
+
+    SetPlacedResourceRequest:
+      description: >
+        What `setPlacedResource` takes: a `PlacedResource` without its server-owned fields.
+        **`placedResourceId` absent places a new one; present amends that one**, as `setVenuePoint`.
+      allOf:
+        - $ref: '#/components/schemas/PlacedResource'
+        - type: object
+          properties:
+            placedResourceId:
+              type: string
+              format: uuid
+              nullable: true
+              description: The placed resource to amend. Absent or null places a new one.
+
+    VenuePath:
+      type: object
+      x-ticvai-persistence: "venuemap.path"
+      description: >
+        19.2.56. **The navigation graph.** The map supplies it; routing over it is a client concern,
+        because a phone with the map cached routes offline and a server round-trip per step does
+        not.
+      required: [id, mapId, fromPointId, toPointId]
+      properties:
+        id: { type: string, format: uuid, readOnly: true }
+        mapId:
+          type: string
+          format: uuid
+          readOnly: true
+          description: From the path of the operation that writes the path.
+        fromPointId: { type: string, format: uuid, x-ticvai-references: venuemap.point }
+        toPointId: { type: string, format: uuid, x-ticvai-references: venuemap.point }
+        geometry:
+          type: string
+          nullable: true
+          description: >
+            The centreline this edge follows, as an encoded polyline. **A walkway in a drawing is a
+            polygon and a route is a line down the middle of it**, so extraction thins the polygon
+            to a centreline and splits it at every fork.
+
+            Null where the path was drawn on screen as a straight connection, which is normal for a
+            venue with no walkway layer.
+        distanceMetres:
+          type: number
+          nullable: true
+          readOnly: true
+          description: >
+            Computed by the server from `geometry` and the georeference. **Along the centreline,
+            not point to point.** A path that curves round a lake is longer
+            than the distance between its ends, and a guest told 80 metres who walks 200 stops
+            trusting the map.
+
+            Requires a georeference for real units; without one, distances are in drawing units and
+            routing still works because **only the ratios matter to a shortest path.**
+        isStepFree:
+          type: boolean
+          default: true
+          description: >
+            **The single most important attribute on this object.** A wheelchair user routed up a
+            staircase has been failed by the map, not by the venue.
+        isIndoor: { type: boolean, default: false }
+        restrictedByPointId:
+          x-ticvai-references: venuemap.point
+          type: string
+          format: uuid
+          nullable: true
+          description: >
+            **Where a path is one-way, it is because of a thing on it — not because of the path.**
+            Removed `isOneWay` on 18 August: a pedestrian walkway has no direction, and the three
+            cases that look one-way are all a gate or a queue.
+
+            A turnstile is one-way and `access.AccessPoint.direction` already says so. A queue line
+            is one-way and `queue` owns it. **Putting the restriction on the path duplicated both
+            and would have drifted from them** — a gate reconfigured to bidirectional would leave a
+            path still marked one-way, and nothing would have noticed.
+
+            Set where a path passes through an access point. The router reads the direction from
+            the point.
+        closedReason:
+          type: string
+          nullable: true
+          readOnly: true
+          description: >
+            Set by `setPathClosure` during works or an incident, never by sending it here. **A closed path removes routes rather than hiding the
+            path**, so a guest sees why rather than wondering where it went.
+        isClosed:
+          type: boolean
+          readOnly: true
+          default: false
+          description: Closed by `setPathClosure`; routing does not use a closed path.
+        expectedReopenAt:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+          description: When a closed path is expected to reopen (`setPathClosure`).
+        closedNote:
+          type: string
+          maxLength: 500
+          nullable: true
+          readOnly: true
+          description: The free text with an `other` closure reason (`setPathClosure`; audit R222).
+
+    PointProposal:
+      type: object
+      description: >
+        1.4.24. **What the assistant suggests, before anyone accepts it.** Written to
+        `ai.proposed_action` under ADR-0020.
+      required: [shapeRef, proposedKind, confidence]
+      properties:
+        shapeRef: { type: string }
+        proposedKind: { type: string }
+        proposedName: { type: string, nullable: true }
+        confidence:
+          type: number
+          description: >
+            **Shown to the operator, and low confidence is not filtered out.** A shape the assistant
+            is unsure about is the one most worth a human looking at.
+        sourceLayer: { type: string, nullable: true }
+        reasoning:
+          type: string
+          nullable: true
+          description: 8.1.5b. Why it thinks so, so an operator can disagree with the reason rather than the answer.
+
+
+    VenueMapGraph:
+      type: object
+      description: >
+        19.2.56. **What a client needs to route, and nothing more.** Small enough to cache, versioned
+        so a stale route is detectable.
+      required: [mapId, version, nodes, edges]
+      properties:
+        mapId: { type: string, format: uuid }
+        version:
+          type: integer
+          description: >
+            **Bumped by a publish or a closure**, and stored as `VenueMap.graphVersion`. A client
+            holding an older version knows its route may cross something that closed, and asking
+            for the graph is cheaper than asking whether the graph changed.
+        generatedAt: { type: string, format: date-time }
+        nodes:
+          type: array
+          items:
+            type: object
+            properties:
+              pointId: { type: string, format: uuid }
+              x: { type: number }
+              y: { type: number }
+              kind: { type: string }
+              isStepFree: { type: boolean }
+        edges:
+          type: array
+          items:
+            type: object
+            properties:
+              from: { type: string, format: uuid }
+              to: { type: string, format: uuid }
+              distanceMetres: { type: number }
+              isStepFree: { type: boolean }
+              throughPointId:
+                type: string
+                nullable: true
+                description: >
+                  Where an access point restricts this edge. **The direction lives on that point**,
+                  not here, so a gate reconfigured to bidirectional changes routing without a map
+                  edit.
+              isClosed: { type: boolean }
+        components:
+          type: integer
+          description: >
+            How many disconnected parts. **One is the answer for a park.** More than one on a map
+            that should be a single site means something is unreachable and the client can say so
+            without walking the graph.
+
+    GraphValidation:
+      type: object
+      description: >
+        **What breaks before a guest finds it.** Run at publish and on demand.
+      required: [isValid, components]
+      properties:
+        isValid: { type: boolean }
+        components: { type: integer }
+        unreachablePoints:
+          type: array
+          description: No path at all. **Usually a point placed after the paths were drawn.**
+          items:
+            type: object
+            properties:
+              pointId: { type: string, format: uuid }
+              name: { type: string }
+              kind: { type: string }
+        stepOnlyPoints:
+          type: array
+          description: >
+            Reachable, and only by steps. **The map works perfectly until a wheelchair user opens
+            it**, and nothing in the drawing makes this visible — which is the whole reason for
+            this list.
+          items:
+            type: object
+            properties:
+              pointId: { type: string, format: uuid }
+              name: { type: string }
+        deadEndPaths:
+          type: array
+          items: { type: string, format: uuid }
+        criticalUnreachable:
+          type: array
+          description: >
+            **First aid, emergency exits and assembly points that cannot be reached.** Separated
+            from the rest because an unreachable gift shop is a defect and an unreachable assembly
+            point is a safety finding, and a single list of two hundred items buries it.
+          items:
+            type: object
+            properties:
+              pointId: { type: string, format: uuid }
+              name: { type: string }
+              kind: { type: string }
+        resourceFindings:
+          type: array
+          description: >
+            **Placed resources a guest could not buy** (rev 3 REV3-15), named by label. Any entry
+            here makes `isValid` false, and `publishVenueMap` refuses with the matching blocker.
+          items:
+            type: object
+            required: [placedResourceId, label, reason]
+            properties:
+              placedResourceId: { type: string, format: uuid }
+              label: { type: string }
+              reason:
+                type: string
+                enum: [resourceUnlinked, resourcePriceBandMissing, duplicateResourceLabel]
+
+    VenueMapImportJob:
+      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by getVenueMapImportJob, importVenueGeometry, proposeVenueLabels, proposeWalkways
+      type: object
+      x-ticvai-persistence: "venuemap.import_job"
+      description: >
+        **Two-phase, following `seating.ImportJob`**, and carrying its lesson: a job that finds
+        nothing is not a successful job.
+      required: [id, status, outcome, scopePath]
+      properties:
+        scopePath:
+          type: string
+          readOnly: true
+          description: 'Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller''s scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007).'
+        id: { type: string, format: uuid }
+        mapId: { type: string, format: uuid }
+        status: { type: string, enum: [parsing, previewReady, committed, failed] }
+        outcome: { type: string, enum: [parsed, parsedWithFindings, nothingFound, noLayersMatched, unreadable] }
+        shapesFound: { type: integer }
+        layersFound:
+          type: array
+          description: >
+            **Every layer name in the source, decoded.** Shown whether or not extraction worked, so
+            an operator maps a role by reading rather than guessing.
+          items: { type: string }
+        unmappedLayers:
+          type: array
+          items: { type: string }
+        manifestRowsRead: { type: integer, nullable: true }
+        resourcesFound:
+          type: integer
+          nullable: true
+          description: >
+            Bookable resource shapes found on the resource layer (rev 3 REV3-15). Null where the map
+            has none.
+        resourceRowsJoined:
+          type: integer
+          nullable: true
+          description: >
+            Resource manifest rows that joined a shape and a `resources.Resource`. **The number to
+            check against your own count**, as `manifestRowsJoined` is for seats: 34 cabanas on the
+            plan and 30 joined is four labels that differ.
+        manifestRowsJoined:
+          type: integer
+          nullable: true
+          description: >
+            **The number to check against your own count.** A manifest of 396 seats that joins 220
+            is the digit problem in §4, or a section code that differs by a space — and both look
+            like success without this figure.
+        findings:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
+          type: array
+          description: >
+            **Named against the spec**, so a finding maps to a section of
+            `handoff/venue-map-input-spec.md` rather than to a stack trace.
+          items:
+            type: object
+            required: [code, severity, message]
+            properties:
+              code:
+                type: string
+                enum: [duplicateLayerName, geometryOnLayerZero, unmappedLayer, mixedLayerContent,
+                       sectionCodeMismatch, digitScriptMismatch, mergedCells, totalRowDetected,
+                       manifestSectionMissingFromPlan, planSectionMissingFromManifest,
+                       exitLayerNotSplit, noGeoreference, layerNameUndecodable, rasterOnly,
+                       resourceLabelMissing, resourceLabelDuplicate, resourceManifestMissingFromPlan,
+                       resourcePlanMissingFromManifest, resourceCodeUnmatched, resourcePriceBandUnknown]
+                description: >
+                  **A closed set, and each one names a rule in the spec.** Free-text findings are
+                  findings a drawing office cannot act on. The six `resource*` codes check placed
+                  resources (rev 3 REV3-15): a shape with no label, two with one label, a manifest
+                  row with no shape or the reverse, a label with no `resources.Resource`, and a
+                  price band not in `priceBands`.
+              severity:
+                type: string
+                enum: [error, warning, info]
+                description: >
+                  **`warning` is the important level here.** `rasterOnly` and `noGeoreference` are
+                  warnings — the map still works, with less — and treating them as errors would
+                  refuse a venue that sent everything it had.
+              message: { type: string }
+              specSection:
+                type: string
+                nullable: true
+                description: Which part of the spec covers it — `§2 Layers`, `§4 Digits`.
+              affected:
+                type: array
+                description: The layers, sections or rows involved. **Named, not counted.**
+                items: { type: string }
+        ocr:
+          type: object
+          nullable: true
+          description: >
+            **What the OCR step read** off a scanned PDF or a raster (3 October 2026, r1 additions).
+            Null for a vector source or with `ocr.mode: off`. Each block sits on the plan, so
+            `ai.proposeVenueLabels` can use the text near a shape as a hint; the text names nothing
+            by itself. Low-confidence blocks are returned, not dropped.
+          properties:
+            pagesRead: { type: integer }
+            meanConfidence: { type: number, minimum: 0, maximum: 1, nullable: true }
+            textBlocks:
+              type: array
+              items:
+                type: object
+                required: [text, confidence]
+                properties:
+                  text: { type: string, maxLength: 500 }
+                  language: { type: string, enum: [en, ar], nullable: true }
+                  confidence: { type: number, minimum: 0, maximum: 1 }
+                  planX: { type: number, nullable: true }
+                  planY: { type: number, nullable: true }
+                  widthUnits: { type: number, nullable: true }
+                  heightUnits: { type: number, nullable: true }
+        handMarkedPaths:
+          type: object
+          nullable: true
+          description: >
+            **The hand-marked strokes the import found** on a raster plan sent with
+            `handMarkedPaths` (3 October 2026, r1 additions). `ai.proposeWalkways` reads them and
+            proposes one segment per marked stretch; nothing is a path until a person accepts it.
+          properties:
+            strokesFound: { type: integer }
+            markColourUsed: { type: string, nullable: true, description: The colour the import matched. }
+            totalLengthUnits: { type: number, nullable: true, description: In drawing units. }
+        model:
+          type: object
+          nullable: true
+          description: >
+            **The GLB and navigation file, measured** (`glbModel` and `navigationFile` imports;
+            ADR-0069 sections 1, 2, 3 and 6; 3 October 2026). Every budget line is a number, so an
+            over-budget model is a finding a 3D studio can act on, not a slow app. Null for any other
+            source.
+          properties:
+            sizeBytes: { type: integer, nullable: true, description: The GLB. Over 41,943,040 (40 MB) is refused before import. }
+            lod0TrianglesMaxZone:
+              type: integer
+              nullable: true
+              description: The most LOD0 triangles any one zone carries, which is what is on screen near the camera. Over 300,000 is an error.
+            trianglesTotal: { type: integer, nullable: true, description: 'Across every zone and LOD. Over 1,500,000 is a warning.' }
+            drawCalls: { type: integer, nullable: true, description: Over 150 is a warning. }
+            textureMemoryBytes: { type: integer, nullable: true, description: After KTX2 transcoding. Over 128 MB is a warning. }
+            maxTexturePx: { type: integer, nullable: true, description: Over 2048 is a warning. }
+            zones: { type: integer, nullable: true }
+            nodes: { type: integer }
+            edges: { type: integer }
+            locations: { type: integer }
+            anchorResidualMaxMetres: { type: number, nullable: true, description: The worst control point. Over 3 m warns; over 10 m is an error. }
+            publishable3d:
+              type: boolean
+              description: >
+                **True when no finding below is an `error`**: the next publish carries the 3D layer.
+                False keeps it out (`VenueMap.model3dStatus` `blocked`); the 2D map still publishes.
+            findings:
+              type: array
+              items:
+                type: object
+                required: [code, severity, message]
+                properties:
+                  code:
+                    type: string
+                    enum: [modelOverDownloadBudget, zoneOverDownloadBudget, triangleBudgetExceeded,
+                           triangleTotalExceeded, drawCallBudgetExceeded, textureBudgetExceeded,
+                           textureTooLarge, uncompressedTextures, missingLevelsOfDetail, notMetres,
+                           anchorResidualHigh, anchorResidualTooHigh, controlPointsTooClose,
+                           unresolvedCatalogueCode, unknownNodeInEdge, locationNodeMissing,
+                           navigationFileInvalid, navigationFileMismatch, nodeRefWithoutLocation]
+                    description: >
+                      **A closed set, separate from `findings`** so the plan importer's codes stay as
+                      they were. Errors (keep the 3D layer out of the publish): `triangleBudgetExceeded`
+                      (over 300,000 at LOD0 in a zone), `uncompressedTextures`, `anchorResidualTooHigh`
+                      (over 10 m), `navigationFileInvalid`, `unknownNodeInEdge`, `locationNodeMissing`.
+                      Warnings: the other budget lines, `anchorResidualHigh` (over 3 m),
+                      `controlPointsTooClose`, `unresolvedCatalogueCode`, `missingLevelsOfDetail`,
+                      `notMetres`, `navigationFileMismatch` (venue, map or model file differ).
+                      Info: `nodeRefWithoutLocation` (a named GLB node with no location is scenery).
+                  severity: { type: string, enum: [error, warning, info] }
+                  message: { type: string }
+                  measured: { type: number, nullable: true, description: The number found. }
+                  limit: { type: number, nullable: true, description: The budget it was measured against. }
+                  affected:
+                    type: array
+                    description: The zones, nodes, locations or codes involved. Named, not counted.
+                    items: { type: string }
+
+    VenueMapVersion:
+      type: object
+      x-ticvai-persistence: "venuemap.map_version"
+      description: >
+        21.2.16. **One published version of a map, kept whole.** `publishVenueMap` writes one per
+        publish by copying the working draft's points and paths into `snapshot`, and
+        `getVenueMap?version=` reads it back. That is how the previous version stays readable while
+        the draft is edited: the draft rows change, the snapshot does not.
+      required: [id, mapId, version, publishedAt, publishedByPrincipalId, snapshot]
+      properties:
+        id: { type: string, format: uuid, readOnly: true }
+        mapId: { type: string, format: uuid, x-ticvai-references: venuemap.map }
+        version:
+          type: integer
+          description: One more than the version before it. `VenueMap.publishedVersion` names the current one.
+        publishedAt: { type: string, format: date-time }
+        publishedByPrincipalId: { type: string, format: uuid, x-ticvai-references: identity.principal }
+        note:
+          type: string
+          nullable: true
+          maxLength: 300
+          description: The `note` sent to `publishVenueMap`.
+        baseAssetId:
+          type: string
+          format: uuid
+          nullable: true
+          x-ticvai-references: assets.MediaAsset
+          description: >
+            The illustrated map this version published with (`setVenueMapArtwork`, 3 October 2026), so a guest
+            mid-route keeps the artwork they started with. Null for plain geometry.
+        baseImageAlignment:
+          type: object
+          nullable: true
+          description: The alignment published with `baseAssetId`, as `VenueMap.baseImageAlignment`.
+          properties:
+            imageWidthPx: { type: integer }
+            imageHeightPx: { type: integer }
+            anchors:
+              type: array
+              items:
+                type: object
+                properties:
+                  planX: { type: number }
+                  planY: { type: number }
+                  imageX: { type: number }
+                  imageY: { type: number }
+        model3d:
+          nullable: true
+          description: >
+            **The 3D layer this version published** (ADR-0069; 3 October 2026): the model and transform
+            checked with this graph, so a published 3D map is always the model and the graph that were
+            checked together. Null when the draft had no model or its model was `blocked`.
+          allOf:
+            - $ref: '#/components/schemas/VenueModel3d'
+        snapshot:
+          type: object
+          description: >
+            **The points and paths as they were published**, stored as one document. Closures are
+            not in it: they sit on the path row and are applied when the graph is served.
+          properties:
+            points:
+              type: array
+              items: { $ref: '#/components/schemas/VenuePoint' }
+            paths:
+              type: array
+              items: { $ref: '#/components/schemas/VenuePath' }
+            resources:
+              type: array
+              description: The placed resources as they were published (rev 3 REV3-15).
+              items: { $ref: '#/components/schemas/PlacedResource' }
+
+    PathClosureResult:
+      description: >
+        What `setPathClosure` returns: the path, and **what a forced closure cut off**, named.
+      allOf:
+        - $ref: '#/components/schemas/VenuePath'
+        - type: object
+          properties:
+            strandedPoints:
+              type: array
+              readOnly: true
+              description: >
+                Points no longer reachable because of this closure. Empty unless `force` was used.
+              items: { $ref: '#/components/schemas/StrandedPoint' }
+
+    StrandedPoint:
+      type: object
+      x-ticvai-persistence: none — computed from the graph
+      required: [pointId, name, kind, isCritical]
+      properties:
+        pointId: { type: string, format: uuid }
+        name: { type: string }
+        kind: { type: string }
+        isCritical:
+          type: boolean
+          description: >
+            First aid, an emergency exit or an assembly point, the same set as
+            `GraphValidation.criticalUnreachable`. **The one the operator must read first.**
+
+    PathClosureProblem:
+      x-ticvai-persistence: none — error shape
+      description: >
+        The `409` from `setPathClosure`. Names every point the closure would strand, so the operator
+        can decide whether to force it.
+      allOf:
+        - $ref: '../shared/common.yaml#/components/schemas/Problem'
+        - type: object
+          required: [refusedReason, strandedPoints]
+          properties:
+            refusedReason:
+              type: string
+              enum: [wouldStrandPoints]
+            strandedPoints:
+              type: array
+              items: { $ref: '#/components/schemas/StrandedPoint' }
+
+    VenueMapPublishProblem:
+      x-ticvai-persistence: none — error shape
+      description: >
+        The `409` from `publishVenueMap`. **One entry per blocker**, each naming the point or the
+        proposal, because *"cannot publish"* on four hundred points is not actionable.
+      allOf:
+        - $ref: '../shared/common.yaml#/components/schemas/Problem'
+        - type: object
+          required: [blockers]
+          properties:
+            blockers:
+              type: array
+              items:
+                type: object
+                required: [reason]
+                properties:
+                  reason:
+                    type: string
+                    enum: [unresolvedProposal, brokenLink, disconnectedArea, resourceUnlinked,
+                           resourcePriceBandMissing, duplicateResourceLabel]
+                    description: >
+                      `disconnectedArea`: the point cannot be reached from the rest of the map
+                      (audit R106 (8)); `pointId` and `name` name it. The three `resource*` and
+                      `duplicateResourceLabel` reasons name a placed resource by `placedResourceId`
+                      and its label in `name` (rev 3 REV3-15).
+                  proposalId:
+                    type: string
+                    format: uuid
+                    nullable: true
+                    description: For `unresolvedProposal`, the `ai.proposed_action` still open.
+                  pointId:
+                    type: string
+                    format: uuid
+                    nullable: true
+                    description: For `brokenLink`, the point whose link no longer resolves.
+                  placedResourceId:
+                    type: string
+                    format: uuid
+                    nullable: true
+                    description: For the resource reasons, the `PlacedResource` that blocks.
+                  name:
+                    type: string
+                    nullable: true
+                    description: The point's name, or the proposed name, as the operator saw it.
+                  linkField:
+                    type: string
+                    nullable: true
+                    enum: [outletId, productId, accessPointId]
+                    description: For `brokenLink`, which link on the point is broken.
+    VenueMapLiveState:
+      type: object
+      x-ticvai-persistence: none — response only; live state over the published map, assembled at read time
+      description: '**The live operational state on the published map** (`getVenueMapLive`): one entry per point that has a live figure. Changes every few seconds, so it is read apart from the map itself (`getVenueMap`).'
+      required: [mapId, asOf, points]
+      properties:
+        mapId: { type: string, format: uuid }
+        asOf: { type: string, format: date-time }
+        points:
+          type: array
+          items:
+            type: object
+            required: [pointId]
+            properties:
+              pointId: { type: string, format: uuid }
+              isOpen: { type: boolean, nullable: true }
+              waitMinutes: { type: integer, minimum: 0, nullable: true }
+              queueLength: { type: integer, minimum: 0, nullable: true }
+              occupancyPercent: { type: number, minimum: 0, nullable: true }

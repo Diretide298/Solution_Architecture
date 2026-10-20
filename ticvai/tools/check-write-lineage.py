@@ -20,6 +20,10 @@ operations writing nothing. Rules:
     W-CACHEKEY  an operation that reads or writes `cache:resolution` records the key it fills or evicts and the
                 resolvers it bumps, as `tools/resolution_cache.py` derives them (CHG-FXC-001, root class R141)
     W-CREATED   a 201 response's persisted tables are among the operation's writes (CHG-FXC-002)
+    W-AUDIT     an operation that writes its own platform.audit_record row says so with
+                `x-ticvai-audits-itself: <reason>`, so the kernel's audit interceptor skips it and a write
+                leaves one audit row (r8 cause FOUNDATION-AI-C49, option A; CHG-R8GEN-012). The 13 found on
+                20 October are AUDIT_KNOWN until their contracts declare it; a new one fails
 
     python tools/check-write-lineage.py [--list]
 """
@@ -34,6 +38,11 @@ import sys
 import yaml
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# The operations whose lineage wrote platform.audit_record on 20 October 2026 with no x-ticvai-audits-itself yet (W-AUDIT,
+# r8 cause FOUNDATION-AI-C49). Each leaves this list when its contract declares the extension; never add one.
+AUDIT_KNOWN = {"assignChargeback", "cancelOutboxRepublish", "createRole", "createSupplierContract", "issueCreditMemo",
+               "issueTaxInvoice", "recordPaymentTerminalCertification", "republishOutbox", "setEInvoicingProvider",
+               "setRolePermissions", "setTaxInvoiceTemplate", "updateSupplier", "updateSupplierContract"}
 
 
 def yl(p):
@@ -143,6 +152,23 @@ def main() -> int:
         if miss:
             bad.append(("W-CREATED", o, "answers 201 with %s and does not write it" % ", ".join(miss)))
 
+    # W-AUDIT (20 October 2026, r8 cause FOUNDATION-AI-C49, CHG-R8GEN-012): PLATFORM-AUDIT's interceptor writes the
+    # generic row for every write; an operation that writes its own, richer row declares x-ticvai-audits-itself and is
+    # skipped, so a write leaves one row. The declaration is a reason, never a bare flag.
+    for o, (v, op) in sorted(ops.items()):
+        mark = op.get("x-ticvai-audits-itself")
+        writes_audit = "platform.audit_record" in ((lin.get(o) or {}).get("writes") or [])
+        if mark is not None and not (isinstance(mark, str) and mark.strip()):
+            bad.append(("W-AUDIT", o, "x-ticvai-audits-itself must be the reason, not a flag"))
+        if mark and v == "get":
+            bad.append(("W-AUDIT", o, "a GET cannot audit itself: the interceptor audits writes"))
+        if writes_audit and not mark and o not in AUDIT_KNOWN:
+            bad.append(("W-AUDIT", o, "writes platform.audit_record and does not declare x-ticvai-audits-itself, so "
+                                      "the interceptor writes a second row"))
+        if writes_audit and not mark and o in AUDIT_KNOWN:
+            exempt.append(("auditKnown", o, "writes its own audit row; x-ticvai-audits-itself requested (r8 "
+                                            "FOUNDATION-AI-C49)"))
+
     sref = json.load(io.open(os.path.join(ROOT, "handoff", "schema-reference.json"), encoding="utf-8"))
     dec = json.load(io.open(os.path.join(ROOT, "handoff", "service-decomposition.json"), encoding="utf-8"))
     owned = {s for v in (dec.get("services") or {}).values() for s in v.get("schemas") or []}
@@ -163,7 +189,7 @@ def main() -> int:
             print(f"  exempt {k:<16} {o:<36} {why}")
     else:
         for k, o, why in exempt:
-            if k in ("storageUndecided", "aiPublishPath"):
+            if k in ("storageUndecided", "aiPublishPath", "auditKnown"):
                 print(f"  exempt {k:<16} {o:<36} {why}")
         print(f"  ({kinds.get('pure', 0)} operation(s) marked pure, each with its reason: --list shows them)")
     for r, o, d in bad[:60]:

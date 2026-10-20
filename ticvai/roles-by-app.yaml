@@ -1,7 +1,6 @@
 $id: ticvai/roles-by-app.yaml
 title: Permissions each shipped app requires
 generatedBy: tools/derive-app-roles.py
-generated: '2026-10-18'
 description: '**Derived from what each app''s screens call, not decided here.** For every app, the permissions
   its operations declare in `x-ticvai-permission`, tiered by what the key permits. Role names, headcounts
   and the approval hierarchy are deliberately absent: who at a venue may configure pricing is the client''s
@@ -9,12 +8,12 @@ description: '**Derived from what each app''s screens call, not decided here.** 
 theTwoVocabularies:
   onOperations: 174
   inRolesYaml: 43
-  shared: 0
-  note: '**Zero shared keys.** The contracts carry 174 permission keys across 2635 operations; `roles.yaml`
-    grants 43, all of them POS. `check-screens` validates a screen''s `guard` against `roles.yaml`, so
-    the only guards anyone could write were POS ones — and that is what the package shows: venue-pos declares
-    every guard in it and the other four apps declare none. **Joining these two is the work; this file
-    is the evidence for what the join has to cover.**'
+  rolesYamlMapsTo: 12
+  shared: 10
+  note: '**One vocabulary: the `Permission` enum in contracts/shared/permissions.yaml.** The contracts
+    require 174 of its values across 2633 operations; `roles.yaml`''s 43 POS action keys are presets,
+    each mapped to the enum values it covers (12 values, 10 of them required by an operation). check-permission-vocabulary
+    holds every place that names a permission to the enum.'
 tiers:
   read: Sees it. The floor of any signed-in session, and the tier a read-only audit or a duty manager
     covering an unfamiliar area sits at.
@@ -30,8 +29,32 @@ apps:
     - P02
     - P05
     screens: 144
-    operations: 219
+    operations: 225
     permissions: 23
+    permissionSet:
+    - AI_USE
+    - CASE_MANAGE
+    - GUEST_MANAGE
+    - GUEST_VIEW
+    - GUEST_VIEW_PII
+    - LEDGER_POST
+    - LEDGER_VIEW
+    - LOYALTY_REDEEM
+    - MARKETING_MANAGE
+    - MARKETING_VIEW
+    - ORDER_CANCEL
+    - ORDER_CREATE
+    - ORDER_MODIFY
+    - ORDER_REPRINT
+    - ORDER_VIEW
+    - PARKING_CONFIGURE
+    - PRICE_VIEW
+    - PRODUCT_VIEW
+    - QUEUE_VIEW
+    - RESOURCE_VIEW
+    - VENUE_MAP_VIEW
+    - WALLET_OPERATE
+    - WALLET_VIEW
     tiers:
       read:
       - GUEST_VIEW
@@ -89,8 +112,10 @@ apps:
     - getGuestConversation
     - getGuestMenu
     - getGuestOrderStatus
+    - getGuestRefundPolicy
     - getGuestSession
     - getLoyaltyPosition
+    - getMyCase
     - getNextTransportDeparture
     - getParkingEntitlement
     - getPublishedBookingFlow
@@ -98,9 +123,7 @@ apps:
     - getPublishedKioskConfig
     - getPublishedTenantConfig
     - getTenantAppStatus
-    - getTransportDeparture
-    - getTransportFareTable
-    operationsWithNoPermissionCount: 106
+    operationsWithNoPermissionCount: 112
   ticvai-control:
     name: TICVAI Control
     platforms:
@@ -112,6 +135,71 @@ apps:
     screens: 294
     operations: 400
     permissions: 64
+    permissionSet:
+    - ACCREDITATION_APPLY
+    - ACCREDITATION_APPROVE
+    - ACCREDITATION_MANAGE
+    - ACCREDITATION_VIEW
+    - AI_APPROVE
+    - AI_AUDIT_VIEW
+    - AI_CONFIGURE
+    - AI_USE
+    - APPROVAL_CONFIGURE
+    - APPROVAL_DECIDE
+    - APPROVAL_REQUEST
+    - APPROVAL_VIEW
+    - ASSET_LIBRARY_MANAGE
+    - ASSET_LIBRARY_VIEW
+    - AUDIT_VIEW
+    - CAPACITY_CONFIGURE
+    - CASE_MANAGE
+    - CASE_VIEW
+    - DEVELOPER_ADMIN
+    - DEVELOPER_MANAGE
+    - DEVELOPER_VIEW
+    - GUEST_VIEW
+    - MARKETING_SEND
+    - ORDER_CREATE
+    - ORDER_EXCHANGE
+    - ORDER_MODIFY
+    - ORDER_REPRINT
+    - ORDER_RESCHEDULE
+    - ORDER_VIEW
+    - PARTNER_MANAGE
+    - PARTNER_VIEW
+    - PAYMENT_VIEW
+    - PERMISSION_GRANT
+    - PERMISSION_VIEW
+    - PLATFORM_AI_MANAGE
+    - PLATFORM_BILLING_MANAGE
+    - PLATFORM_BILLING_VIEW
+    - PLATFORM_CELL_MANAGE
+    - PLATFORM_CELL_VIEW
+    - PLATFORM_MIGRATION_APPLY
+    - PLATFORM_MIGRATION_VIEW
+    - PLATFORM_PLAN_MANAGE
+    - PLATFORM_RELEASE_MANAGE
+    - PLATFORM_RELEASE_PROMOTE
+    - PLATFORM_RELEASE_VIEW
+    - PLATFORM_TENANT_ACCESS
+    - PLATFORM_TENANT_MANAGE
+    - PLATFORM_TENANT_TERMINATE
+    - PLATFORM_TENANT_VIEW
+    - PRICE_VIEW
+    - PRODUCT_VIEW
+    - REGION_CONFIGURE
+    - REPORT_MANAGE
+    - REPORT_VIEW_VENUE
+    - ROLE_MANAGE
+    - SCOPE_MANAGE
+    - SCOPE_VIEW
+    - SETTLEMENT_RECONCILE
+    - SETTLEMENT_VIEW
+    - TENANT_CONFIGURE
+    - TENANT_PUBLISH
+    - TENANT_VIEW
+    - USER_MANAGE
+    - WORKFORCE_VIEW
     tiers:
       read:
       - ACCREDITATION_VIEW
@@ -190,6 +278,8 @@ apps:
     - enrolMfaMethod
     - getCart
     - getCurrentSession
+    - listApiScopes
+    - listApiVersions
     - listMfaMethods
     - listOwnSessions
     - listSsoProviders
@@ -203,7 +293,7 @@ apps:
     - verifyMfaChallenge
     - verifyMfaEnrolment
     - verifyProspectSignupCode
-    operationsWithNoPermissionCount: 22
+    operationsWithNoPermissionCount: 24
   venue-management:
     name: TICVAI Venue Management
     platforms:
@@ -214,6 +304,156 @@ apps:
     screens: 1866
     operations: 2096
     permissions: 149
+    permissionSet:
+    - ACCESS_DIRECTION_SET
+    - ACCESS_OVERRIDE
+    - ACCESS_POINT_CONFIGURE
+    - ACCESS_VALIDATE
+    - ACCOUNT_CONFIGURE
+    - ACCREDITATION_APPLY
+    - ACCREDITATION_APPROVE
+    - ACCREDITATION_CONFIGURE
+    - ACCREDITATION_ISSUE
+    - ACCREDITATION_MANAGE
+    - ACCREDITATION_VIEW
+    - AI_APPROVE
+    - AI_AUDIT_VIEW
+    - AI_CONFIGURE
+    - AI_USE
+    - ANNOUNCEMENT_PUBLISH
+    - APPROVAL_ACT
+    - APPROVAL_CONFIGURE
+    - APPROVAL_DECIDE
+    - APPROVAL_REQUEST
+    - APPROVAL_VIEW
+    - ASSET_LIBRARY_APPROVE
+    - ASSET_LIBRARY_MANAGE
+    - ASSET_LIBRARY_SHARE
+    - ASSET_LIBRARY_VIEW
+    - ASSET_MANAGE
+    - ASSET_VIEW
+    - ATTENDANCE_RECORD
+    - AUDIT_VIEW
+    - BIOMETRIC_IMAGE_VIEW
+    - CAPACITY_CONFIGURE
+    - CASE_MANAGE
+    - CASE_VIEW
+    - CASH_LIFT
+    - CREDIT_MANAGE
+    - DEVELOPER_MANAGE
+    - DEVELOPER_VIEW
+    - DEVICE_CONFIGURE
+    - DEVICE_MANAGE
+    - DEVICE_VIEW
+    - EVENT_CONFIGURE
+    - GUEST_MANAGE
+    - GUEST_VIEW
+    - GUEST_VIEW_PII
+    - INCIDENT_MANAGE
+    - INCIDENT_REPORT
+    - INCIDENT_VIEW
+    - INSPECTION_MANAGE
+    - INSPECTION_SUBMIT
+    - INSPECTION_VIEW
+    - LEDGER_APPROVE
+    - LEDGER_POST
+    - LEDGER_VIEW
+    - MAINTENANCE_APPROVE
+    - MAINTENANCE_EXECUTE
+    - MARKETING_MANAGE
+    - MARKETING_SEND
+    - MARKETING_VIEW
+    - ORDER_CREATE
+    - ORDER_DISCOUNT
+    - ORDER_EXCHANGE
+    - ORDER_MODIFY
+    - ORDER_REFUND
+    - ORDER_REFUND_APPROVE
+    - ORDER_REFUND_BULK
+    - ORDER_REPRINT
+    - ORDER_RESCHEDULE
+    - ORDER_VIEW
+    - ORDER_VOID
+    - OVERSHORT_ACCEPT
+    - PARKING_CONFIGURE
+    - PARTNER_MANAGE
+    - PARTNER_VIEW
+    - PAYMENT_CONFIGURE
+    - PAYMENT_DISPUTE
+    - PAYMENT_PROVIDER_MANAGE
+    - PAYMENT_VIEW
+    - PAYMENT_VOID
+    - PERFORMANCE_CONFIGURE
+    - PERMISSION_GRANT
+    - PERMISSION_MANAGE
+    - PERMISSION_VIEW
+    - PLATFORM_CELL_MANAGE
+    - PLATFORM_TENANT_MANAGE
+    - PLATFORM_TENANT_VIEW
+    - PRICE_CONFIGURE
+    - PRICE_VIEW
+    - PROCUREMENT_MANAGE
+    - PROCUREMENT_RECEIVE
+    - PROCUREMENT_REQUEST
+    - PROCUREMENT_VIEW
+    - PRODUCT_APPROVE
+    - PRODUCT_CONFIGURE
+    - PRODUCT_VIEW
+    - QUEUE_MANAGE
+    - QUEUE_VIEW
+    - REGION_CONFIGURE
+    - RENTAL_APPROVE
+    - RENTAL_BOOK
+    - RENTAL_CONFIGURE
+    - RENTAL_MANAGE
+    - RENTAL_OPERATE
+    - RENTAL_OVERRIDE
+    - RENTAL_PRICE
+    - RENTAL_VIEW
+    - REPORT_EXPORT
+    - REPORT_GOVERNANCE_MANAGE
+    - REPORT_MANAGE
+    - REPORT_SCHEDULE
+    - REPORT_VIEW_OWN
+    - REPORT_VIEW_TENANT
+    - REPORT_VIEW_VENUE
+    - REPORT_VIEW_WORKSTATION
+    - RESOURCE_BOOK
+    - RESOURCE_CONFIGURE
+    - RESOURCE_MANAGE
+    - RESOURCE_VIEW
+    - RISK_INVESTIGATE
+    - RISK_REVIEW
+    - ROLE_MANAGE
+    - SCOPE_MANAGE
+    - SCOPE_VIEW
+    - SESSION_FORCE_LOGOUT
+    - SETTLEMENT_RECONCILE
+    - SETTLEMENT_VIEW
+    - SHIFT_CLOSE
+    - SHIFT_OPEN
+    - TAX_CONFIGURE
+    - TENANT_CONFIGURE
+    - TENANT_PUBLISH
+    - TENANT_VIEW
+    - TICKET_LOOKUP
+    - TRANSPORT_MANAGE
+    - TRANSPORT_PRICE
+    - TRANSPORT_VIEW
+    - TURNSTILE_MODE_SET
+    - USER_MANAGE
+    - VENUE_MAP_MANAGE
+    - VENUE_MAP_PUBLISH
+    - VENUE_MAP_VIEW
+    - WALLET_CONFIGURE
+    - WALLET_OPERATE
+    - WALLET_VIEW
+    - WORKFORCE_MANAGE
+    - WORKFORCE_VIEW
+    - WORKSTATION_CONFIGURE
+    - WORK_ORDER_MANAGE
+    - WORK_ORDER_VERIFY
+    - WORK_ORDER_VIEW
     tiers:
       read:
       - ACCREDITATION_VIEW
@@ -379,6 +619,7 @@ apps:
     - getTransportFareTable
     - getTransportRoute
     - getWaitTimes
+    - listApiScopes
     - listDeliveryLocations
     - listMfaMethods
     - listSsoProviders
@@ -390,7 +631,7 @@ apps:
     - startSsoAuthorization
     - verifyMfaChallenge
     - verifyMfaEnrolment
-    operationsWithNoPermissionCount: 22
+    operationsWithNoPermissionCount: 23
   venue-pos:
     name: TICVAI POS
     platforms:
@@ -399,6 +640,48 @@ apps:
     screens: 42
     operations: 177
     permissions: 41
+    permissionSet:
+    - APPROVAL_DECIDE
+    - APPROVAL_REQUEST
+    - APPROVAL_VIEW
+    - ATTENDANCE_RECORD
+    - CASH_LIFT
+    - CASH_NO_SALE
+    - DEVICE_MANAGE
+    - DEVICE_VIEW
+    - GUEST_MANAGE
+    - GUEST_VIEW
+    - INCIDENT_REPORT
+    - INCIDENT_VIEW
+    - LEDGER_POST
+    - LEDGER_VIEW
+    - LOYALTY_REDEEM
+    - ORDER_CANCEL
+    - ORDER_CREATE
+    - ORDER_DISCOUNT
+    - ORDER_EXCHANGE
+    - ORDER_MODIFY
+    - ORDER_REFUND
+    - ORDER_REPRINT
+    - ORDER_RESCHEDULE
+    - ORDER_VIEW
+    - ORDER_VOID
+    - OVERSHORT_ACCEPT
+    - PRICE_VIEW
+    - PRODUCT_CONFIGURE
+    - PRODUCT_VIEW
+    - REPORT_VIEW_VENUE
+    - REPORT_VIEW_WORKSTATION
+    - SCOPE_VIEW
+    - SESSION_FORCE_LOGOUT
+    - SHIFT_APPROVE_OPEN
+    - SHIFT_CLOSE
+    - SHIFT_OPEN
+    - SHIFT_REOPEN
+    - SHIFT_SUSPEND
+    - WALLET_OPERATE
+    - WORKFORCE_VIEW
+    - WORKSTATION_CONFIGURE
     tiers:
       read:
       - APPROVAL_VIEW
@@ -463,6 +746,64 @@ apps:
     screens: 107
     operations: 231
     permissions: 57
+    permissionSet:
+    - ACCESS_DIRECTION_SET
+    - ACCESS_OVERRIDE
+    - ACCESS_POINT_CONFIGURE
+    - ACCESS_VALIDATE
+    - AI_USE
+    - ANNOUNCEMENT_PUBLISH
+    - APPROVAL_VIEW
+    - ASSET_VIEW
+    - ATTENDANCE_RECORD
+    - CAPACITY_CONFIGURE
+    - CASE_MANAGE
+    - CASE_VIEW
+    - DEVICE_CONFIGURE
+    - DEVICE_VIEW
+    - GUEST_MANAGE
+    - GUEST_VIEW
+    - INCIDENT_MANAGE
+    - INCIDENT_REPORT
+    - INCIDENT_VIEW
+    - INSPECTION_SUBMIT
+    - INSPECTION_VIEW
+    - MAINTENANCE_APPROVE
+    - MAINTENANCE_EXECUTE
+    - ORDER_CREATE
+    - ORDER_DISCOUNT
+    - ORDER_EXCHANGE
+    - ORDER_MODIFY
+    - ORDER_REFUND
+    - ORDER_REPRINT
+    - ORDER_RESCHEDULE
+    - ORDER_VIEW
+    - ORDER_VOID
+    - OVERSHORT_ACCEPT
+    - PAYMENT_VIEW
+    - PROCUREMENT_RECEIVE
+    - PROCUREMENT_REQUEST
+    - PROCUREMENT_VIEW
+    - PRODUCT_CONFIGURE
+    - PRODUCT_VIEW
+    - QUEUE_MANAGE
+    - QUEUE_VIEW
+    - RENTAL_OPERATE
+    - RENTAL_VIEW
+    - REPORT_VIEW_OWN
+    - REPORT_VIEW_VENUE
+    - REPORT_VIEW_WORKSTATION
+    - SCOPE_VIEW
+    - SHIFT_CLOSE
+    - SHIFT_OPEN
+    - SHIFT_SUSPEND
+    - TICKET_LOOKUP
+    - TURNSTILE_MODE_SET
+    - VENUE_MAP_VIEW
+    - WORKFORCE_VIEW
+    - WORK_ORDER_MANAGE
+    - WORK_ORDER_VERIFY
+    - WORK_ORDER_VIEW
     tiers:
       read:
       - APPROVAL_VIEW

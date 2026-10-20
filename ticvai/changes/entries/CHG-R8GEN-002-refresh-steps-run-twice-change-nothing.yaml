@@ -1,0 +1,26 @@
+id: CHG-R8GEN-002
+date: '2026-10-20'
+source: audit
+kind: process
+summary: 'A new check, tools/check-regenerate-twice.py, runs each refresh step that writes into an authored input (the lineage, the service decomposition counts, the frontend files, the flows, the screens, the design-input guides, roles-by-app.yaml, the screen id register, the contracts'' consumed-by lists) twice and fails when the second run changes a file; afterwards it puts every file back as it was. The list of such steps is in the r8 generators report (item 1).'
+decision:
+  what: 'Generators lane, second r8 fix round, extra items 1 and 2. The steps are listed in the tool (WRITE_BACK) beside the report''s list; each step''s files are kept before the first run and restored after the second, and a file the second run changed is a finding (RT-UNSTABLE). Registered in tools/run-checks.py, run alone (SERIAL) because it writes while it runs.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: R8 blocker cause list (second round brief, generators lane extra items 1 and 2; the lead, 20 October 2026: generators derive everything and never write back). refresh.sh asserts the screen tools are idempotent and nothing measured it.'
+keys_touched:
+  files:
+  - tools/check-regenerate-twice.py
+  - tools/run-checks.py
+root_class: 'unmeasured claim: a property a comment asserts and no check holds'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: R8 blocker walk, second round brief (generators lane)'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-regenerate-twice.py
+status: open

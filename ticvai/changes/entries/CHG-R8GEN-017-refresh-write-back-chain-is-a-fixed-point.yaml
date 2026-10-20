@@ -1,0 +1,27 @@
+id: CHG-R8GEN-017
+date: '2026-10-20'
+source: audit
+kind: process
+summary: 'A refresh now reaches its fixed point in one pass: derive-entrystate-params runs before derive-carries-from-entrystate (its own comment said so; refresh.sh ran it after), so a screen parameter it adds is carried in the same refresh instead of the next one (ADM-018 challengeId was). check-regenerate-twice gains --chain, which run-checks runs after the refresh: the write-back steps once more in refresh order, failing on a file the chain leaves changed (RT-CHAIN). Run one step at a time, --once wrongly failed derive-transitions-from-flows, whose edges derive-carries-from-entrystate completes after it.'
+decision:
+  what: 'Generators lane, second r8 fix round, extra item 2. Found by running the write-back steps as a refresh would, then each once more.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: R8 blocker cause list (second round brief, generators lane extra item 2: regenerate twice, no diff).'
+keys_touched:
+  files:
+  - tools/refresh.sh
+  - tools/check-regenerate-twice.py
+  - tools/run-checks.py
+root_class: 'step order: a step that feeds an earlier one is read only at the next refresh'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: R8 blocker walk, second round brief (generators lane)'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-regenerate-twice.py
+status: open

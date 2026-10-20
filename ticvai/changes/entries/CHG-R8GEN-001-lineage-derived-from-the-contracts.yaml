@@ -1,0 +1,53 @@
+id: CHG-R8GEN-001
+date: '2026-10-20'
+source: audit
+kind: process
+summary: 'The API data lineage is derived from the contracts instead of kept by hand. tools/derive-lineage.py now writes
+  every operation''s reads, writes, readVia, writeVia, permission, scope, routing, audience and summary from its
+  contract, plus and minus a new override list (handoff/api-data-lineage-overrides.json) that holds, with a reason per
+  entry, what no contract fact states. The 1,698 entries the hand-kept file held beyond the contracts are carried in
+  that list, marked carried, and may only fall. check-lineage gained LN-DERIVED (the file is what the derivation
+  gives) and LN-OVERRIDE (every override names a real operation and real tables and has a reason; the carried count
+  never grows). Regenerated once: 6 missing operations added, 178 permissions, 36 readVia, 26 offline flags, 20
+  scopes, 65 audiences and 69 summaries re-read from the contracts, and cache:idempotency added to the about 430
+  writes that take the Idempotency-Key header.'
+decision:
+  what: 'Generators lane, second r8 fix round, extra item 3 (lineage from the contracts). Two rules that were kept by
+    hand are now read off the contract: a write taking the shared Idempotency-Key header reads and writes
+    cache:idempotency unless it says x-ticvai-idempotency-exempt; x-ticvai-config-change-log names the change-log
+    table it writes. Everything else the hand-kept file held beyond the contracts (mostly same-module reads made to
+    validate a request, which no contract extension states today) is carried as override entries; their reason is
+    the entry''s own lineage note where it had one. An operation no contract declares leaves the lineage.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: R8 blocker cause list (second round brief, generators lane extra item 3; the lead, 20 October 2026:
+  "contracts are the single source; generators derive everything and never write back"). Twenty-one r8 causes asked
+  for a hand edit of the lineage because derive-lineage only added missing operations, so a contract change could
+  not correct an entry: APPROVALS-TENANCY-C05, C33, C38, C40, C41, C22, IDENTITY-C13, C39, C40, C41, C47, C50, C53,
+  C56, C61, C62, C64, C65, C67, ORDERS-MONEY-C30, C31, C34, C42, FOUNDATION-AI-C20, C32, C35, C47, C49 (ADAM gaps
+  under tickets 27829, 28029, 27792, 27809, 27731, 27885, 27736, 28231 and the others in r8b-generators.json).'
+keys_touched:
+  files:
+  - tools/derive-lineage.py
+  - tools/check-lineage.py
+  - tools/refresh.sh
+  - handoff/api-data-lineage.json
+  - handoff/api-data-lineage-overrides.json
+  other:
+  - 'lineage entries regenerated: 817 changed (readColumns refreshed with them), 6 added'
+root_class: 'hand-kept derived file: a value a tool could derive kept by hand, so the source changes and it does not'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: R8 blocker walk, second round brief (generators lane)'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-lineage.py
+status: open
+notes: 'LN-DERIVED fails on a hand edit of handoff/api-data-lineage.json or a contract changed without the derive;
+  LN-OVERRIDE holds the override list (python tools/derive-lineage.py --audit lists the overrides a contract now
+  derives). To change an operation''s tables, change its contract; an override is for what no contract fact can
+  state, with its reason.'

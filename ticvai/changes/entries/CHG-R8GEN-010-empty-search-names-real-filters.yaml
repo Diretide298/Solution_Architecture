@@ -1,0 +1,26 @@
+id: CHG-R8GEN-010
+date: '2026-10-20'
+source: audit
+kind: process
+summary: 'A new rule EF in check-screen-patterns: a screen''s emptyNoResults text that names the filters a list was searched on may name only parameters of an operation the screen binds. 28 screens fail it today (the 17 August template''s ''venueId, principalId, shiftId, status, createdFrom, createdTo''); the count may only fall (EF_CEILING).'
+decision:
+  what: 'r8 cause ORDERS-MONEY-C04, the check part. Rewriting the state texts of GST-018, GST-014, GST-045, GST-019 and WEB-021 is the surface lane''s (screens/), requested in the r8 generators report; lower EF_CEILING as they land.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: R8 blocker cause list, cause ORDERS-MONEY-C04 (tickets 28234, 28237, 28310, 28340, 28399; ADAM gaps 28234/1, 28237/0, 28340/0, 28310/3, 28399/2).'
+keys_touched:
+  files:
+  - tools/screen_patterns.py
+  - tools/check-screen-patterns.py
+root_class: 'template text copied into screens it does not describe'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: R8 blocker walk, second round brief (generators lane)'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-screen-patterns.py
+status: open
