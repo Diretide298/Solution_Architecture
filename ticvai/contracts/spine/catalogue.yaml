@@ -45152,6 +45152,9 @@ components:
           x-ticvai-references: catalogue.product
           description: From the path.
         posButtonLabel:
+          # The column is named for the Workstation: 'pos' never names DDL (naming-and-style, R156; r8 integration,
+          # CHG-R8INT-026). The wire name is products wave 1's, kept.
+          x-ticvai-column: workstation_button_label
           allOf:
           - $ref: '#/components/schemas/LocalisedText'
           - additionalProperties:

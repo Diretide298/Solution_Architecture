@@ -1,0 +1,30 @@
+id: CHG-R8INT-026
+date: '2026-10-20'
+source: audit
+kind: contract
+summary: 'The till''s sale-button label of a product''s channel texts is stored as
+  catalogue.product_channel_text.workstation_button_label, not pos_button_label: ''pos'' never names a table or column
+  (naming-and-style, R156). The wire field stays posButtonLabel (products wave 1''s, approved with its screens).'
+decision:
+  what: 'contracts/spine/catalogue.yaml ProductChannelTexts.posButtonLabel: `x-ticvai-column: workstation_button_label`.
+    The table is new in r8 (PRD-W1-DB creates it), so nothing is renamed in a database.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: check-ddl-conventions D-BANNED-NAME catalogue.product_channel_text.pos_button_label on the derived copy of
+  the integration pass (audit/ticvai/r8-blockers/integration-pass-report.md, left 4).'
+keys_touched:
+  schemas: [ProductChannelTexts]
+  files:
+  - contracts/spine/catalogue.yaml
+root_class: 'a wire name with a word the DDL bans, stored under its derived name'
+tickets:
+  started: []
+  unstarted: [PRD-W1-DB, PRD-W1-LANGUAGES]
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none yet: products module wave 1'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-ddl-conventions.py
+status: open
