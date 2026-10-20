@@ -1,0 +1,56 @@
+id: CHG-R8INT-032
+date: '2026-10-20'
+source: plan
+kind: plan
+proposed: '2026-10-20T21:30'
+summary: 'Eleven Block A tasks bring the databases to r8 in the sprint running now (Sprint 2): R8-DB-LOCAL-<name>, one
+  per developer with a local database (1 point each: apply the r8 files V0103a, V0105a, V0108, V0109 to tenant and V0108,
+  V0109 to control, check the renamed tables, or close it as not needed when the local database has none of the tables),
+  and R8-DB-SHARED for Hrushikant Patkar (3 points: back up, apply the same files to the shared tenant and control
+  databases, convert the three text money columns to numeric(18,4)). A hand-written task may now say it is `due` on a
+  date: the schedule places it there, holding no slot, so it lands in that sprint and no other task moves.'
+decision:
+  what: 'docs/active/block-a-extra-tasks.json: R8-DB-LOCAL-PRANAY-SHINDE, -NARAYAN-GAONKAR, -DEEP-KHANVILKAR,
+    -PALLAVI-SAWANT, -SANKET-KELUSKAR, -CHINMAY-PATKAR, -CHITRANGI-MESTRY, -PRADNYA-YERAM, -SURENDRA, -KALPITA-MEJARI and
+    R8-DB-SHARED (epic PLATFORM, due 2026-10-21, `builds` the six migration files as `file` links); the `due` field in
+    the note. tools/sprint_plan.py due_of and schedule (a due task sits at its date and holds no slot; pace_model leaves
+    it out), tools/build-service-docs.py (no module test, no load) and tools/derive-block-a-schedule.py read it; test
+    tools/tests/test_block_a_schedule_due.py.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'The lead, 20 October 2026 evening: "Currently all the devs are runnning a local db version can we add them to the
+  tickets to update them if not than they can close the ticket. hrusikant is also running the live version we can ask
+  them in tickets to directly make updates to the db ?" r8 adds forward migrations (tenant V0103a, V0105a, V0108, V0109;
+  control V0108, V0109: 19 tables renamed or moved, 20 column renames, new columns and widened CHECKs; CHG-R8WFM-001,
+  5d82da84) that no developer database has. The schedule had no way to put a hand-written task in the sprint running now: it times every task from
+  5 October in build order, so a new task landed wherever its owner was next free. Holding a slot on 21 October moved 613
+  other tasks'' sprints (a ten-day task crossing it had to start after it); holding none moves 0.'
+keys_touched:
+  tickets: [R8-DB-LOCAL-PRANAY-SHINDE, R8-DB-LOCAL-NARAYAN-GAONKAR, R8-DB-LOCAL-DEEP-KHANVILKAR,
+    R8-DB-LOCAL-PALLAVI-SAWANT, R8-DB-LOCAL-SANKET-KELUSKAR, R8-DB-LOCAL-CHINMAY-PATKAR, R8-DB-LOCAL-CHITRANGI-MESTRY,
+    R8-DB-LOCAL-PRADNYA-YERAM, R8-DB-LOCAL-SURENDRA, R8-DB-LOCAL-KALPITA-MEJARI, R8-DB-SHARED]
+  files:
+  - docs/active/block-a-extra-tasks.json
+  - tools/sprint_plan.py
+  - tools/build-service-docs.py
+  - tools/derive-block-a-schedule.py
+  - tools/tests/test_block_a_schedule_due.py
+root_class: 'a hand-written task with no way to say it is due now'
+tickets:
+  started: []
+  unstarted: [R8-DB-LOCAL-PRANAY-SHINDE, R8-DB-LOCAL-NARAYAN-GAONKAR, R8-DB-LOCAL-DEEP-KHANVILKAR,
+    R8-DB-LOCAL-PALLAVI-SAWANT, R8-DB-LOCAL-SANKET-KELUSKAR, R8-DB-LOCAL-CHINMAY-PATKAR, R8-DB-LOCAL-CHITRANGI-MESTRY,
+    R8-DB-LOCAL-PRADNYA-YERAM, R8-DB-LOCAL-SURENDRA, R8-DB-LOCAL-KALPITA-MEJARI, R8-DB-SHARED]
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: a decision of the lead; no ADAM CR is needed'
+triage: fix-forward
+prevention:
+  type: generator-rule
+  ref: tools/sprint_plan.py::due_of
+status: open
+notes: 'The local tasks apply the package files with psql, not SqlMigrationRunner: each file records itself in
+  platform.schema_version, and setup/backend-patterns.md section 3.4 keeps the package files out of db/tenant. V0108
+  alters tables a partial local database may not have; the task says to accept only "does not exist" errors there. The
+  walk-fix report names two text columns; handoff/migration-review.md has three (deposit_box_limit_amount on
+  platform.workstation and platform.venue_settings, marketing.wishlist_item.list_price): R8-DB-SHARED converts all three.'
