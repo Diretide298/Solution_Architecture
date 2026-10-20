@@ -36,6 +36,10 @@ serves one tag. `/pkg/<project>/release` says which is being served, and
 `/pkg/<project>/release-diff?from=r1&to=r2&touch=kind:id` is what `/ticket` uses to show a developer
 what changed in their ticket's artefacts since their previous pull (`lib/release-diff.mjs`). Every pull is
 at the newest tag: developers and agents are always on the latest release (CHG-ADM-001).
+`/pkg/<project>/ticket-text?id=<OpenProject number>&key=<plan key>` is the ticket's task text at the
+release being served (`lib/ticket-text.mjs`: the release bundle's pointer, else the plan row). A pull shows
+it as the ticket's description, with one line when the OpenProject ticket still has an older text: a
+started ticket keeps the description it started against, so OpenProject alone is not enough.
 
 ## Four layers
 
@@ -402,6 +406,7 @@ above 60 they arrive a page at a time on a button that says how many are left.
 | `lib/domain.mjs` | `states/` and `events/`, cross-checked against each other and the contracts |
 | `lib/releases.mjs` | release tags: which tree to serve, and exporting a tag's tree once |
 | `lib/release-diff.mjs` | what changed in a ticket's artefacts between two tags (its previous pull's and the latest), and which breaking changes touch it |
+| `lib/ticket-text.mjs` | a ticket's task text at the release being served, which a pull shows instead of an older OpenProject description (`mcp/ticket-text-check.mjs`) |
 | `server.mjs` | static server, `/api/index`, `/api/detail`, `/api/journeys`, `/api/domain`, `/api/backend`, `/api/file`, `/api/tree`, SSE — gzipped |
 | `public/graph.js` | canvas node-link renderer — force-directed, or placed and directed for Spine |
 | `public/structure.js` | tree and nested block renderers |

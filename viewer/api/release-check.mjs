@@ -243,6 +243,12 @@ try {
   client = new ViewerClient({ base: VIEWER, project: 'ticvai', email: EMAIL, password: PASSWORD });
   const r1 = await client.packageJson('release');
   check('packageRef r1 serves r1', r1.data?.mode === 'tag' && r1.data?.tag === 'r1', JSON.stringify(r1.data));
+  // A package with no release bundle and no plan answers not found, and the pull keeps OpenProject's text.
+  const text1 = await client.packageJson('ticket-text', { id: '7001' });
+  check('ticket-text answers for the served tag, and a package without a bundle or plan has no text',
+    text1.ok && text1.data?.served === 'r1' && text1.data?.found === false, JSON.stringify(text1.data));
+  const textBad = await client.packageJson('ticket-text', { id: 'x y' });
+  check('ticket-text refuses a number that is none', textBad.status === 400, JSON.stringify(textBad.data));
   const served1 = JSON.parse(await readFile(path.join(RELEASES, 'served.json'), 'utf8'));
   check('and writes served.json, which is how the accounts service knows', served1.tag === 'r1' && served1.mode === 'tag');
   const atR1 = await tool('adam_contract', { name: 'lending', operation: 'borrowBook' });

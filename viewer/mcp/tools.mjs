@@ -452,6 +452,77 @@ function subtaskSection(subtasks) {
   return out;
 }
 
+// What a pointer description says about itself (op-release.py's pointer: "- Key: `X`", "- Written at release `rN`").
+// Here rather than imported, because the connector is a copy of the files in version.mjs FILES and nothing else.
+const WRITTEN_AT = '- Written at release ';
+
+/** The release a pointer was written at, or null. */
+export function writtenAt(text) {
+  const m = /^- Written at release `([^`]+)`\s*$/m.exec(String(text ?? '').replace(/\r\n/g, '\n'));
+  return m ? m[1] : null;
+}
+
+/** The plan key a pointer names, or null. */
+export function keyIn(text) {
+  const m = /^- Key: `([^`]+)`\s*$/m.exec(String(text ?? '').replace(/\r\n/g, '\n'));
+  return m ? m[1] : null;
+}
+
+/** A text without its release line and trailing space (op-release.rb's `norm`). */
+function normText(text) {
+  return String(text ?? '').replace(/\r\n/g, '\n').split('\n')
+    .filter((l) => !l.startsWith(WRITTEN_AT)).map((l) => l.trimEnd()).join('\n').trim();
+}
+
+/** The same task text: differing only in the release line and trailing space. `trimmed`: `a` is the start of a
+ *  description the accounts service cut at its limit, so it is the same when `b` starts with it. */
+export function sameText(a, b, trimmed = false) {
+  return trimmed ? normText(b).startsWith(normText(a)) : normText(a) === normText(b);
+}
+
+/**
+ * The task text of the release ADAM serves for this ticket (viewer/lib/ticket-text.mjs, the package route
+ * `ticket-text`), or null when this ADAM or this package has none: the pull then shows the OpenProject description
+ * as before. A started ticket keeps the description it started against (op-release.rb leaves it alone), so without
+ * this a pull showed an older release's text for as long as the ticket stayed open (r8 re-walk,
+ * `started-ticket-text-fix-not-delivered`). Every ticket, hand-written or generated: the rule is the release's text.
+ */
+export async function releaseTextFor(client, wp) {
+  if (typeof client.packageJson !== 'function') return null;
+  const key = keyIn(wp.description);
+  const answer = await client.packageJson('ticket-text', { id: String(wp.key), ...(key ? { key } : {}) })
+    .catch(() => null);
+  const t = answer?.ok ? answer.data : null;
+  if (!t?.found || typeof t.text !== 'string' || !t.text.trim()) return null;
+  return {
+    release: t.release ?? null, key: t.key ?? key ?? null, source: t.source ?? null, text: t.text,
+    // What OpenProject has, said once: the same text, or an older one (the release its pointer was written at).
+    same: sameText(wp.description, t.text, Boolean(wp.descriptionTrimmed)),
+    openProjectRelease: writtenAt(wp.description),
+  };
+}
+
+/** One line when the release's text and OpenProject's differ; '' when they agree. */
+export function textNotice(text) {
+  if (!text || text.same) return '';
+  const now = text.release ? `${text.release}'s` : "the release ADAM serves";
+  const was = text.openProjectRelease && text.openProjectRelease !== text.release
+    ? `the text from ${text.openProjectRelease}` : 'an older text';
+  return `The text below is ${now}; your OpenProject ticket still has ${was} (it is in ticket.json, `
+    + '`workPackage.description`). Build to the text below.';
+}
+
+/** The README's Description: the release's text when ADAM has it, else OpenProject's. */
+export function descriptionSection(wp, text) {
+  if (text) {
+    const notice = textNotice(text);
+    return `## Description\n\n${notice ? `${notice}\n\n` : ''}${text.text.trim()}\n`;
+  }
+  let out = `## Description\n\n${wp.description || '_No description in OpenProject._'}\n`;
+  if (wp.descriptionTrimmed) out += '\n_Longer in OpenProject - open the link above for the rest._\n';
+  return out;
+}
+
 function ticketReadme(wp, files, missing, when, decisions = [], release = null, changes = undefined, blockedBy = [],
   tree = {}, db = null) {
   const line = (label, value) => (value || value === 0 ? `- **${label}:** ${value}\n` : '');
@@ -474,8 +545,7 @@ function ticketReadme(wp, files, missing, when, decisions = [], release = null, 
   out += releaseSection(release);
   out += subtaskSection(tree.subtasks);
   out += '\n';
-  out += `## Description\n\n${wp.description || '_No description in OpenProject._'}\n`;
-  if (wp.descriptionTrimmed) out += '\n_Longer in OpenProject - open the link above for the rest._\n';
+  out += descriptionSection(wp, tree.text);
   out += commentsSection(wp.comments);
   out += `\n## What this touches (${files.length})\n\n`;
   if (files.length) {
@@ -1529,6 +1599,7 @@ async function pullOne(client, key, base, when) {
   const release = await releaseFor(client, wp.key, touches)
     .catch((error) => ({ available: false, why: error.message }));
   const changes = await changesFor(client, wp.key).catch(() => null);
+  const text = await releaseTextFor(client, wp).catch(() => null);
 
   const folder = path.join(base, 'work', safeName(wp.key));
   await mkdir(folder, { recursive: true });
@@ -1564,10 +1635,13 @@ async function pullOne(client, key, base, when) {
     ...(blockedBy.length ? { blockedBy } : {}),
     ...(subtasks !== undefined ? { subtasks } : {}),
     ...(partOf ? { partOf } : {}),
+    // The text README.md shows: the release's, and whether OpenProject's description still differs from it.
+    ...(text ? { releaseText: { release: text.release, key: text.key, source: text.source,
+      matchesOpenProject: text.same, openProjectRelease: text.openProjectRelease, text: text.text } } : {}),
   }));
   const db = await writeExpectedSchema(client, wp, touches, folder, release);
   await writeFile(path.join(folder, 'README.md'),
-    ticketReadme(wp, files, missing, when, decisions, release, changes, blockedBy, { subtasks, partOf }, db));
+    ticketReadme(wp, files, missing, when, decisions, release, changes, blockedBy, { subtasks, partOf, text }, db));
   const notes = path.join(folder, 'notes.md');
   if (!(await stat(notes).catch(() => null))) {
     await writeFile(notes, `# Notes on #${wp.key}\n\nYours. adam_pull never overwrites this file.\n`);
@@ -2714,7 +2788,8 @@ export const TOOLS = [
     name: 'adam_pull',
     description:
       'Save a ticket and everything it is linked to as files in the working folder, under '
-      + '.adam/work/<ticket>/: README.md (the ticket, its milestone and description, and a list of '
+      + '.adam/work/<ticket>/: README.md (the ticket, its milestone and its text at the latest release, which '
+      + 'replaces an older OpenProject description and says so in one line, and a list of '
       + 'the files, then the comment thread, oldest first), ticket.json, one file per linked screen, journey, contract, table, service, '
       + 'and module (linked ADRs are listed, not pulled), plus notes.md for your own notes. A [DB] ticket whose '
       + 'subject names its migration file also gets expected-schema.json, the end state of its tables and the statements that make it, from the '

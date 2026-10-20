@@ -42,6 +42,7 @@ import { buildSearch } from './lib/search.mjs';
 import { splitDetail } from './lib/detail.mjs';
 import { resolveRelease, writeServed, describeRelease, releaseRoot, TAG as RELEASE_TAG } from './lib/releases.mjs';
 import { buildView, diffTicket } from './lib/release-diff.mjs';
+import { ticketText } from './lib/ticket-text.mjs';
 // The connector's own manifest, so the two sides compute the build the same
 // way rather than agreeing by coincidence.
 import { acceptedOf as connectorAccepted, buildOf as connectorBuild, filesOf as connectorFiles } from './mcp/version.mjs';
@@ -1308,6 +1309,20 @@ const server = http.createServer(async (req, res) => {
       return send(res, 200, JSON.stringify({
         project: pkg.id, from: tagInfo(from), to: tagInfo(to), served: release.tag, ...answer,
       }), MIME['.json']);
+    }
+
+    // One ticket's task text at the release being served (lib/ticket-text.mjs): what a pull shows as its
+    // description, so a started ticket whose OpenProject description is an older release's still reads this one's.
+    // `id` is the OpenProject number, `key` the plan key when the caller has it. Small, never cached by the client.
+    if (route === 'ticket-text') {
+      const id = url.searchParams.get('id') ?? '';
+      const key = url.searchParams.get('key') ?? '';
+      if (!/^#?\d{1,9}$/.test(id) && !/^[A-Za-z0-9][\w.#:-]{0,199}$/.test(key)) {
+        return send(res, 400, JSON.stringify({ error: 'id is an OpenProject number, key a plan key' }), MIME['.json']);
+      }
+      const served = pkg.release?.mode === 'tag' ? pkg.release.tag : null;
+      const answer = await ticketText(pkg.root, { id: /^#?\d+$/.test(id) ? id : '', key, served });
+      return send(res, 200, JSON.stringify({ project: pkg.id, served, ...answer }), MIME['.json']);
     }
 
     if (route === 'index') {
