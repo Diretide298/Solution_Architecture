@@ -1,0 +1,29 @@
+id: CHG-R8WFM-005
+date: '2026-10-20'
+source: audit
+kind: spec
+summary: 'SETUP-CI and SETUP-CLIENTS say CI is GitLab CI (since 20 October 2026), not GitHub Actions.'
+decision:
+  what: 'tools/build-service-docs.py SETUP task text.'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: the r8 sample walk of 20 October 2026 (sample-walk-part2, outside git), class ticket-text-stale-vs-decision
+  (SETUP-CI, SETUP-CLIENTS): the dependencies.md they link says CI is GitLab CI since 20 October 2026.'
+keys_touched:
+  tickets: [SETUP-CI, SETUP-CLIENTS]
+  files:
+  - tools/build-service-docs.py
+root_class: 'generated task text not rewritten after a later decision'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: r8 walk fix, a release fix'
+triage: blocker
+prevention:
+  type: generator-rule
+  ref: tools/build-service-docs.py
+status: open
+notes: 'Only the CI provider. The rest of the walk''s foundation text (ticvai-frontend packages/api-client, the starter
+  paths) is not changed here.'

@@ -1,0 +1,34 @@
+id: CHG-R8WFM-004
+date: '2026-10-20'
+source: audit
+kind: spec
+summary: 'The apply notes CHG-R8MIG-008 wrote into the plan reach the ticket pointer: MIG-BASELINE''s "start the file
+  with SET check_function_bodies = off" and the CREATE TYPE pii.subject_kind / pii.contact_kind notes of the
+  migration creating pii.subject and pii.subject_contact are carried as "Apply note:" lines of the release bundle''s
+  pointer (8 tickets). Chosen over an early type-creating migration: a forward file cannot run before 010-pii.sql.'
+decision:
+  what: 'tools/ticket_done.py (apply_notes), tools/op-release.py (the pointer carries them).'
+  by: Chinmay
+  date: '2026-10-20'
+why: 'Finding: the r8 sample walk of 20 October 2026 (sample-walk-part1, outside git): the two package defects bypassed
+  to apply the DDL (010-pii.sql names types no file creates; the helpers need check_function_bodies off) were in
+  plan-tasks.csv but not in the r8 bundle or the pulled MIG-PII and MIG-BASELINE tickets.'
+keys_touched:
+  tickets: [MIG-BASELINE, MIG-PII]
+  files:
+  - tools/ticket_done.py
+  - tools/op-release.py
+root_class: 'a sentence written into the plan description that the pointer does not carry'
+tickets:
+  started: [MIG-BASELINE, MIG-PII]
+  unstarted: []
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: r8 walk fix, a release fix'
+triage: blocker
+prevention:
+  type: generator-rule
+  ref: tools/ticket_done.py
+status: open
+notes: 'Both tickets are started: op-release.rb does not rewrite a started ticket''s description, so they get the notes
+  only through the release comment or the lead''s acknowledgement.'

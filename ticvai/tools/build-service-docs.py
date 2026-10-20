@@ -40,6 +40,7 @@ Run: python3 tools/build-service-docs.py
 from __future__ import annotations
 
 import csv
+import io
 import datetime as dt
 import json
 import math
@@ -487,13 +488,31 @@ def prior_migration_files() -> dict[str, str]:
     """{task key: migration file} from the plan this run replaces (handoff/service-docs/plan-tasks.csv)."""
     p = OUT / "plan-tasks.csv"
     out = {}
-    if not p.exists():
-        return out
-    with p.open(encoding="utf-8", newline="") as fh:
-        for r in csv.DictReader(fh):
+
+    def read(rows):
+        for r in rows:
             m = MIG_FILE.search(r.get("subject") or "")
-            if m and r.get("track") == "Database" and "#" not in (r.get("key") or ""):
+            if m and r.get("track") == "Database" and "#" not in (r.get("key") or "") and r["key"] not in out:
                 out[r["key"]] = m.group(1)
+    # **The last release's plan first** (CHG-R8WFM-002; r8 sample walk, part 1 concern 1): a planned number is the one a
+    # release handed the developer. The working plan-tasks.csv is this branch's last derive, which at r8 had already
+    # renumbered seven first-release files on delivered tickets (MIG-KERNEL V0003 -> V0004 ...), so reading only it
+    # kept the renumbering.
+    try:
+        import subprocess as _sp
+        tags = _sp.run(["git", "tag", "--merged", "HEAD"], cwd=ROOT, capture_output=True, text=True).stdout.split()
+        rel = max((t for t in tags if re.fullmatch(r"r\d+", t)), key=lambda t: int(t[1:]), default=None)
+        if rel:
+            top = _sp.run(["git", "rev-parse", "--show-prefix"], cwd=ROOT, capture_output=True, text=True).stdout.strip()
+            txt = _sp.run(["git", "show", f"{rel}:{top}handoff/service-docs/plan-tasks.csv"], cwd=ROOT,
+                          capture_output=True, text=True, encoding="utf-8").stdout
+            if txt:
+                read(csv.DictReader(io.StringIO(txt, newline="")))
+    except Exception:          # noqa: BLE001 -- no git or no release: the working plan alone
+        pass
+    if p.exists():
+        with p.open(encoding="utf-8", newline="") as fh:
+            read(csv.DictReader(fh))
     return out
 
 
@@ -1387,7 +1406,12 @@ def main() -> int:
         if key == "VM":
             return "Full stack"
         if area == "VM":
-            return "Frontend" if key.startswith(("VM-BO-", "VM-FE")) else "Backend"
+            # **A Venue Management screen task is a frontend task, whatever its screen's prefix** (CHG-R8WFM-003; r8
+            # sample walk, ticket-builds-wrong-artifact: ADM-603, VM-ADM-108, VM-ADM-268). The rule was written when
+            # every P08 screen was a BO-; the ADM- screens since then fell to "Backend" and were sent as [BE] tickets
+            # that build a screen, with the frontend Done when and no operation of their own.
+            return ("Frontend" if key.startswith(("VM-BO-", "VM-FE")) or ticket_done.SCREEN.search(key)
+                    else "Backend")
         return {"devops": "DevOps", "onboard": "Onboarding", "backend": "Backend",
                 "ai": "AI", "test": "Test"}.get(area, "Frontend")
 
@@ -1442,15 +1466,16 @@ def main() -> int:
     devops = (areas.get("devops") or [""])[0]
     # Each setup task names the repository it lands in and what "done" means (audit R002, R059): a
     # one-line description sent people to guess both. The provider is decided (28 September, audit
-    # R057): Azure in a UAE region, Terraform `azurerm`, CI on GitHub Actions, secrets in Azure Key
+    # R057): Azure in a UAE region, Terraform `azurerm`, CI on GitLab CI since 20 October
+    # 2026 (CHG-R8WFM-005; it was GitHub Actions), secrets in Azure Key
     # Vault per cell, dependencies per setup/dependencies.md -- so the tasks name it rather than
     # leave CF-64 open in the plan. The seed is the reference fixture every test
     # runs against (quality-gates 8), not a single demo venue (R034). The migration runner applies
     # the derived DDL forward and records each file; there is no ROLLBACK section to run (R046).
     SETUP = [
         ("SETUP-CI", "CI pipelines for the backend and frontend repositories", 3, [],
-         "In **ticvai-backend** and **ticvai-frontend** (the repositories the setup zip creates). CI is GitHub "
-         "Actions (decided 28 September, audit R057). Done when: every merge request runs build, tests and lint "
+         "In **ticvai-backend** and **ticvai-frontend** (the repositories the setup zip creates). CI is GitLab "
+         "CI (since 20 October 2026, setup/dependencies.md and ADR-0007; it was GitHub Actions at audit R057). Done when: every merge request runs build, tests and lint "
          "in both, a red run blocks the merge, and a failing test on a branch shows in the MR. Tool versions per "
          "setup/dependencies.md."),
         ("SETUP-ENV", "Dev and staging environments (Terraform, ADR-0007 infra repository)", 5, [],
@@ -1474,7 +1499,7 @@ def main() -> int:
          "the same data."),
         ("SETUP-CLIENTS", "Generate the typed API clients from contracts/ for the frontend workspace", 3, ["SETUP-CI"],
          "In **ticvai-frontend** `packages/api-client`: generated from the package's `contracts/`, re-generated by "
-         "one command and checked in CI on GitHub Actions (audit R057). Done when: every in-release operation has "
+         "one command and checked in GitLab CI (setup/dependencies.md, since 20 October 2026). Done when: every in-release operation has "
          "a typed call, the build fails if the contracts change without a re-generate, and screen tickets stop "
          "stubbing calls."),
         ("SETUP-AUTH", "Sign-in working end to end against IdentityService", 5, ["SETUP-DB"],
@@ -1716,6 +1741,29 @@ def main() -> int:
         mig_order += o_
         deferred.update(d_)
     mig_key = {g: f"MIG-{g[1].upper()}" for g in groups}
+    # **A first-release migration keeps the number it was planned with** (CHG-R8WFM-002; r8 sample walk, part 1 concern
+    # 1). The schema order is recomputed every run, and at r8 it renumbered seven delivered files (MIG-KERNEL V0003 ->
+    # V0004, MIG-SUBSCRIPTION V0005 -> V0003 ...), so the next write of their subjects would have put two files at V0004
+    # and two at V0009. A schema whose task had a file keeps its number; a new schema takes a free one in schema order;
+    # the order is then the numbers, and a key into a schema numbered later waits for MIG-FOREIGN-KEYS, as before.
+    span_ = range(2, len(mig_order) + 2)
+    num_ = {}
+    for g in mig_order:
+        m_ = MIG_FILE.search(prior_files.get(mig_key[g], ""))
+        n_ = int(m_.group(2)) if m_ and m_.group(1) == f"V{int(m_.group(2)):04d}__{g[1]}.sql" else None
+        if n_ in span_ and n_ not in num_.values():
+            num_[g] = n_
+    free_ = [n for n in span_ if n not in num_.values()]
+    for g in mig_order:
+        if g not in num_:
+            num_[g] = free_.pop(0)
+    if [num_[g] for g in mig_order] != list(span_):
+        mig_order = sorted(mig_order, key=lambda g: num_[g])
+        deferred = {}
+        for g in mig_order:
+            late = sum(n for h, n in edges[g].items() if h != g and h[0] == g[0] and num_[h] > num_[g])
+            if late:
+                deferred[g] = late
     table_mig = {t: mig_key[g] for g, ts in groups.items() for t in ts}
     migrations = []
     task("MIG", "", "Epic", f"Database migrations for the first release ({len(rel)} tables, {len(groups)} schemas)",

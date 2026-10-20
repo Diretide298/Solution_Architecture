@@ -731,6 +731,23 @@ def parent_policy_sentences(moved: dict, orphans: dict) -> dict:
     return out
 
 
+# **The apply notes reach the pointer too** (CHG-R8WFM-004; r8 sample walk, part 1: the two package defects bypassed to
+# apply the DDL). CHG-R8MIG-008 wrote them into the plan's description (MIG-BASELINE: function-body checks off;
+# MIG-PII: the two enum types 010-pii.sql names and no file creates), but a pointer carries only `carried` sentences,
+# so the release bundle and the pulled tickets had neither.
+TYPES_NOTE = re.compile(r"\*\*Create the types the copied DDL names first\*\*.*?with the same CHECK\.")
+
+
+def apply_notes(r) -> list:
+    """The apply notes of a migration task's description, for its pointer (CHG-R8WFM-004)."""
+    d = r.get("description") or ""
+    out = []
+    if BASELINE_BODIES in d:
+        out.append("Apply note: " + BASELINE_BODIES)
+    out += ["Apply note: " + m.group(0) for m in TYPES_NOTE.finditer(d)]
+    return out
+
+
 def carried(r) -> list:
     """The sentences of a task's description its pointer must carry: its scope and its wait for a definition."""
     return CARRY.findall(r.get("description") or "")
