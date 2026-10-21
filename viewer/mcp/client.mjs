@@ -359,4 +359,30 @@ export class ViewerClient {
     const text = await answer.text();
     return { ok: answer.ok, status: answer.status, text };
   }
+
+  /**
+   * A package route as bytes, with the headers that say what they are: one file whole (`file`, with
+   * the checksum ADAM computed from its own copy), a frame lifted out of a board (`frame`), or an
+   * image or script a frame names (`wireframes/<path>`).
+   *
+   * **Bytes, not text, because the pull writes files somebody runs** (Sanket, #36194, 21 October 2026).
+   * `text()` decodes as UTF-8 and drops a byte-order mark on the way, so a file written from it can
+   * differ from the package by three bytes and still read the same. A migration has to be the
+   * package's file, and the honest test of that is its checksum.
+   *
+   * Not held, for the reason `file` is not: thousands of small reads, each asked once per pull.
+   */
+  async raw(route, params) {
+    await this.#resolveProject();
+    const answer = await this.#send(this.url(route, params), route.split('/')[0]);
+    const bytes = Buffer.from(await answer.arrayBuffer());
+    return {
+      ok: answer.ok,
+      status: answer.status,
+      type: answer.headers.get('content-type') ?? '',
+      // An ADAM from before 21 October 2026 sends none; the caller says so rather than claim a check.
+      sha256: answer.headers.get('x-ticvai-sha256'),
+      bytes,
+    };
+  }
 }

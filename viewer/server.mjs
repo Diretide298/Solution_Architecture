@@ -1571,12 +1571,31 @@ const server = http.createServer(async (req, res) => {
       // Say what is wrong in the terms of the request. A board, a directory and a typo
       // all came back as 403 "refused", which the connector could only report as a
       // permission problem - "the signed-in account may not read" (audit R013).
+      // A wireframe is asked for as a board and a frame, `wireframes/<board>.dc.html#<anchor>`. The
+      // connector saves that frame as one self-contained file itself (from /frame and the board's own
+      // images), so this only meets the name from a connector older than that, or a board with no
+      // anchor: both are told the one call that works, rather than "open the ADAM viewer", which an
+      // agent cannot do (#31848, 21 October 2026: the agent built the page from the screen's text).
+      const html = /\.html?(#|$)/i.test(rel);
+      const board = html && (/^\.?\/?wireframes\//i.test(rel) || (!rel.includes('/') && /\.dc\.html/i.test(rel)));
+      const frameCall = 'adam_file with path "wireframes/<board>.dc.html#<anchor>" (the screen record\'s '
+        + 'wireframe.board, e.g. "wireframes/P01 Guest Web.dc.html#web-007") saves that frame as one self-contained '
+        + 'HTML file in the ticket folder, and adam_pull writes it for every screen a ticket touches';
+      // A client prototype (sources/designs/) is not a board and is served to nobody, the viewer included; the
+      // frame the record names is, and for a client-verified screen it is that prototype's view, captured.
+      const frameHint = board ? `. A wireframe frame: ${frameCall}. If adam_file does not, run /update-adam (twice) `
+        + 'and restart Claude Code.'
+        : html && /^\.?\/?sources\/designs\//i.test(rel) ? '. A client prototype is not served by ADAM. Its screens\' '
+          + `frames are: ${frameCall}; the pull's README.md names the prototype's views.` : '';
       const kind = await stat(abs).then((st) => (st.isDirectory() ? 'dir' : 'file'), () => null);
+      if (!kind && board && rel.includes('#')) {
+        return send(res, 415, `${rel} is a frame of a wireframe board, not a file${frameHint}`);
+      }
       if (!kind) return send(res, 404, `no file at ${rel}`);
       if (kind === 'dir') return send(res, 400, `${rel} is a folder, not a file`);
       if (!allowed.test(abs)) {
         return send(res, 415, `${rel} is not served here: ${route === 'file' ? '.yaml .md .json .csv .sql' : '.yaml'} only`
-          + (/\.dc\.html$|wireframes\//i.test(rel) ? '. Wireframe boards open in the ADAM viewer, not through adam_file.' : ''));
+          + frameHint);
       }
       // The endpoint list alone does not hold the line here. An ADR is a .md
       // file, so refusing /api/decisions and leaving this open lets a client
@@ -1591,14 +1610,26 @@ const server = http.createServer(async (req, res) => {
       }
       // A file removed between the check above and here is still a 404, never a 500 that
       // names the server's filesystem path (audit R024).
-      let text;
+      let bytes;
       try {
-        text = await readFile(abs, 'utf8');
+        bytes = await readFile(abs);
       } catch {
         return send(res, 404, `no file at ${rel}`);
       }
 
-      if (route === 'file') return send(res, 200, text);
+      // The file's own bytes, and their checksum. A pull writes a ticket's migrations whole from this
+      // answer and checks them against the checksum, so what a developer runs is provably the package's
+      // file at the release served, not a window of it or a re-encoding (Sanket, #36194, 21 October 2026).
+      if (route === 'file') {
+        res.writeHead(200, {
+          'Content-Type': 'text/plain; charset=utf-8',
+          'Cache-Control': 'no-store',
+          'Content-Length': bytes.length,
+          'X-Ticvai-Sha256': createHash('sha256').update(bytes).digest('hex'),
+        });
+        return res.end(bytes);
+      }
+      const text = bytes.toString('utf8');
 
       const structure = buildStructure(text);
       return send(res, 200, JSON.stringify({ file: rel, ...structure }), MIME['.json']);

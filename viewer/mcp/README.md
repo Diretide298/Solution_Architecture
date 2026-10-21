@@ -223,13 +223,13 @@ building.
 | `adam_service` | none, or `name` + `operations` | all 16 services; one in depth |
 | `adam_module` | none, or `name` | all 32 modules; one with its tables |
 | `adam_decisions` | none, or `id` / `q` | the ADRs and registers; one ADR in full |
-| `adam_file` | `path`, optional `from` / `lines` | one file's source, windowed |
+| `adam_file` | `path`, optional `from` / `lines`; for a frame `key` / `dir` | one file's source, windowed, for reading; or, for `wireframes/<board>.dc.html#<anchor>`, **writes** that frame as one self-contained HTML file in the ticket folder |
 | `adam_board` | none, or `only` (`workable` / `blocked`), `subtasks`, `limit` | what is open and assigned to you, what each item touches, and which open blocking CRs affect it (`blocked`; `firstWorkable`) |
 | `adam_team` | none, or `person` (a name, first name or part of one), `days`, `limit` | **read-only**: everybody's in-progress tickets with in progress / awaiting QA / stalled / open / finished-in-14-days counts; or one teammate's open tickets (in progress first) and what they finished lately (closed or moved to Ready for QA, with status and date). Read with your own OpenProject token, so it shows only what you could see there; refused to client accounts |
 | `adam_work` | `key` | one work package, live, plus the artefacts it touches |
 | `adam_links` | `kind`, `id` | what work is scheduled against one artefact |
 | `adam_link` | `kind`, `id`, `key` — or `remove` + `linkId` | **writes**: records that a work package is about an artefact |
-| `adam_pull` | `key` (or nothing, for the whole board), `dir`, `limit` | **writes local files**: `.adam/work/<key>/` and `.adam/board.md`; always at the latest release ADAM serves; when the release moved since the ticket's previous pull, README.md says what changed and `spec-diff.md` has the diffs; README.md lists the change requests raised from the ticket |
+| `adam_pull` | `key` (or nothing, for the whole board), `dir`, `limit` | **writes local files**: `.adam/work/<key>/` and `.adam/board.md`; always at the latest release ADAM serves; when the release moved since the ticket's previous pull, README.md says what changed and `spec-diff.md` has the diffs; README.md lists the change requests raised from the ticket; every screen's wireframe frame as `wireframe-<anchor>.html` (self-contained) and what it must look like; the files the ticket runs whole under `run/`, checked against ADAM's checksum |
 | `adam_repin` | `key`, `dir`, `breaking`, `note` | **not needed** (every pull is at the latest release); kept for older instructions: moves the ticket to the latest release and pulls again. Changes nothing in OpenProject |
 | `adam_propose` | `key`, and `status` / `percentDone` / `comment` | the change that would be made, and a one-use code. **Changes nothing** |
 | `adam_apply` | `key`, `proposal`, `dir` | **changes OpenProject**, as you, with that code — after you said yes |
@@ -306,6 +306,20 @@ only the files it needs. Linked decisions are listed, not pulled; `adam_decision
 them when a build needs one. `.adam/` writes its own `.gitignore` of `*`. Pulling again replaces
 everything except `notes.md` (the developer's) and `log.md` (applied changes). It refuses a
 drive root and a folder that does not exist.
+
+**A screen ticket gets its wireframe, and a ticket that runs files gets them whole** (21 October 2026). For
+every screen a ticket touches, the pull writes the frame the record names (`wireframe.board`,
+`wireframes/P01 Guest Web.dc.html#web-007`) as `wireframe-web-007.html`: the viewer's `/frame` document with
+its images, stylesheets and (for a design component) `support.js` inline, so it opens offline and draws the
+same pixels as the viewer. README.md says the wireframe's status, whether a designer drew it, the
+client-approved prototype and its views (named, not written: a prototype is one interactive file with no view
+to cut out, and ADAM serves none), and that the page is built to match it exactly, every state included.
+#31848's agent had been told "Wireframe boards open in the ADAM viewer" and built WEB-007 from the record's
+text. The frames are read through `/frame` and `/wireframes/` as the developer, so nobody reads a frame they
+cannot open in the viewer. A ticket's forward migrations (`backend/<database>/V01nn__*.sql`) and any file its
+text says to run are written whole under `run/`, byte for byte, each checked against the `X-Ticvai-Sha256`
+ADAM sends for its own copy, with `run/SHA256SUMS`; #36194's agent had held a 341-line window of a 2,736-line
+migration it had to run. `adam_file` keeps its window, for reading. `mcp/pull-files-check.mjs` holds both.
 
 **Changing OpenProject takes two calls and a yes in between.** `adam_propose` reads the work
 package, works out the change (status by name, % done, a comment) and stores it in
@@ -412,6 +426,17 @@ A table's statements belong to the ticket that owns its final name, whatever nam
 `SET SCHEMA sync`, in package order; a rename inside one schema (`catalogue.inventory_hold` to
 `inventory_reservation`) goes the same way. Another ticket's table that the package later renames or
 moves is named by its final name, since its own ticket has made it so by then.
+
+```bash
+node viewer/mcp/pull-files-check.mjs             # add --live for the sign-in, the accounts service and a client account
+```
+
+What a pull writes so the agent builds what was approved (21 October 2026): a frame made self-contained
+(no `<base>`, nothing by address, the board's image inline as the same bytes), README.md's "How <screen> must
+look" for a screen ticket, a ticket's runnable files whole and checked against ADAM's checksum (a mismatch writes
+nothing), the 415 that now names `adam_file` with a frame, and, against its own viewer serving the latest
+release, #31848 and #36194 pulled through the real client, the migrations byte for byte the served export's and
+the frame opened offline in Chrome drawing the same pixels as the viewer's `/frame`. Ports 8894-8897.
 
 ## What is deliberately not here
 
