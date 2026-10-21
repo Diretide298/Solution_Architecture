@@ -1067,6 +1067,40 @@ function dropIndex(model, raw) {
 // prefix takes the new one, cut as the package's own block cuts it (57 characters before _scope, 55 otherwise).
 const POLICY_RENAME = /polrelid\s*=\s*to_regclass\('([\w".]+)'\)\s+AND\s+left\(polname,\s*(\d+)\)\s*=\s*'([^']+)'[\s\S]*?\bALTER\s+POLICY\b[\s\S]*?CASE\s+WHEN\s+substr\(p,\s*(\d+)\)\s*=\s*'([^']+)'\s+THEN\s+left\('([^']+)',\s*(\d+)\)\s+ELSE\s+left\('([^']+)',\s*(\d+)\)\s+END\s*\|\|\s*substr\(p,\s*(\d+)\)/i;
 
+// A column type as pg_attribute.atttypid compares it: no length or precision, PostgreSQL's own name.
+const TYPE_ALIAS = { timestamptz: 'timestamp with time zone', timestamp: 'timestamp without time zone', int: 'integer', int4: 'integer',
+  int8: 'bigint', int2: 'smallint', bool: 'boolean', varchar: 'character varying', decimal: 'numeric' };
+const baseType = (t) => {
+  const s = String(t ?? '').toLowerCase().replace(/\s*\([^)]*\)/g, '').replace(/\s+/g, ' ').trim();
+  return TYPE_ALIAS[s] ?? s;
+};
+
+/**
+ * Whether a DO block's foreign key is made, on the shape so far: both tables there and the key not yet, the
+ * referenced columns unique (PostgreSQL refuses the key otherwise), and, when the block compares atttypid, the
+ * same column types. Null `guard` (not a foreign key) is false.
+ */
+function keyApplies(model, guard, block) {
+  if (!guard) return false;
+  const table = model.get(guard.table);
+  const target = model.get(guard.references);
+  if (!table || !target) return false;
+  if ([table.primaryKey, ...table.unique, ...table.foreignKeys, ...table.checks].some((k) => k?.name === guard.constraint)) return false;
+  const refColumns = /\bREFERENCES\s+[\w".]+\s*\(([^)]*)\)/i.exec(block)?.[1].split(',').map(ident) ?? target.primaryKey?.columns ?? [];
+  const same = (a, b) => a.length === b.length && [...a].sort().join() === [...b].sort().join();
+  const unique = [target.primaryKey, ...target.unique].some((k) => k && same(k.columns, refColumns))
+    || target.indexes.some((i) => i.unique && !i.where && same(splitTop(i.keys).map(ident), refColumns));
+  if (!unique || refColumns.length !== guard.columns.length) return false;
+  if (/\batttypid\b/i.test(block)) {
+    return guard.columns.every((c, i) => {
+      const from = table.columns.find((x) => x.name === c);
+      const to = target.columns.find((x) => x.name === refColumns[i]);
+      return from && to && baseType(from.type) === baseType(to.type);
+    });
+  }
+  return true;
+}
+
 function renamePolicies(model, stmt) {
   const m = POLICY_RENAME.exec(stmt);
   const table = m && model.get(ident(m[1]));
@@ -1091,11 +1125,13 @@ export function schemaModel(files) {
     for (const stmt of sqlStatements(text)) {
       let m;
       if (/^DO\b/i.test(stmt)) {
-        // The block runs its statement only when its condition holds, which this cannot know: renames
-        // and drops are followed (their condition is "the old name is still there"); a key it adds is
-        // left out of the shape, so the shape never claims more than PostgreSQL will have.
+        // The block runs its statement only when its condition holds: renames and drops are followed
+        // (their condition is "the old name is still there"); a foreign key it adds is followed when the
+        // block's own conditions hold on the shape so far (keyApplies). Any other constraint it adds is
+        // left out, so the shape never claims more than PostgreSQL will have.
         for (const one of doInner(stmt)) {
           if (/^ALTER\s+TABLE\b/i.test(one) && !/\bADD\s+CONSTRAINT\b/i.test(one)) alterTable(model, one, file, notModelled);
+          else if (keyApplies(model, keyGuard(one), stmt)) alterTable(model, one, file, notModelled);
           else if ((m = INDEX_RENAME.exec(one))) renameIndex(model, m[1], m[2]);
           else if ((m = /^DROP\s+INDEX\s+(?:CONCURRENTLY\s+)?(?:IF\s+EXISTS\s+)?([\w".]+)/i.exec(one))) dropIndex(model, m[1]);
         }
@@ -1192,9 +1228,22 @@ export function statementTarget(stmt, indexes = null) {
   return null;
 }
 
-/** A foreign key statement's guard: the script applies it only when both tables exist and the key does not. */
+/**
+ * A foreign key statement's guard: the script applies it only when both tables exist and the key does not. A key
+ * the r8 files wrap in a DO block is the same key (V0112's `DO $$ BEGIN IF NOT EXISTS (... pg_constraint ...) THEN
+ * ALTER TABLE wallet.credit_lot ADD CONSTRAINT credit_lot_order_line_id_fkey FOREIGN KEY ... END IF; END $$`, and
+ * V0107's and V0109's blocks that also ask for both tables, the column types and a unique index): it gets the same
+ * guard, so a key into a later migration's table is left for it, as a bare key is (r8 re-walk 4, #27669 MIG-WALLET).
+ */
 function keyGuard(stmt) {
-  const m = /^ALTER\s+TABLE\s+(?:IF\s+EXISTS\s+)?(?:ONLY\s+)?([\w".]+)\s+ADD\s+CONSTRAINT\s+([\w"]+)\s+FOREIGN\s+KEY\s*\(([^)]*)\)\s*REFERENCES\s+([\w".]+)/i.exec(stmt);
+  if (/^DO\b/i.test(String(stmt))) {
+    for (const one of doInner(stmt)) {
+      const guard = keyGuard(one);
+      if (guard) return guard;
+    }
+    return null;
+  }
+  const m =/^ALTER\s+TABLE\s+(?:IF\s+EXISTS\s+)?(?:ONLY\s+)?([\w".]+)\s+ADD\s+CONSTRAINT\s+([\w"]+)\s+FOREIGN\s+KEY\s*\(([^)]*)\)\s*REFERENCES\s+([\w".]+)/i.exec(stmt);
   if (!m) return null;
   return { table: ident(m[1]), constraint: ident(m[2]), columns: m[3].split(',').map(ident), references: ident(m[4]) };
 }

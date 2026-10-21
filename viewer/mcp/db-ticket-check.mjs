@@ -241,6 +241,38 @@ DO $$ BEGIN IF to_regclass('p.reservation_made_idx') IS NOT NULL THEN DROP INDEX
     && hold.some((s) => /ALTER POLICY %I ON catalogue\.inventory_reservation RENAME/.test(s.sql)),
   'the real package\'s renames go the same way: catalogue.inventory_reservation gets catalogue.inventory_hold\'s CREATE, the rename and its policy rename',
   brief(hold).slice(0, 4).join(' | '));
+
+  // r8 re-walk 4, package-ddl-key-into-a-later-migration (#27669 MIG-WALLET): a key the r8 files wrap in a DO block is
+  // the same key as a bare one. It is guarded (so a key into a later migration's table is left for it), a forward
+  // migration gets it as a key into its tables, the cross-schema keys ticket finds it by name, and it is in the shape.
+  const typeCheck = (col, ref) => `(SELECT atttypid FROM pg_attribute WHERE attrelid = to_regclass('w.lot') AND attname = '${col}') = (SELECT atttypid FROM pg_attribute WHERE attrelid = to_regclass('w.lot') AND attname = '${ref}')`;
+  const wrapped = [
+    { name: '010-w.sql', text: `CREATE TABLE IF NOT EXISTS w.lot (id uuid PRIMARY KEY NOT NULL, line_id uuid, parent_id uuid, code text);
+CREATE TABLE IF NOT EXISTS o.line (id uuid PRIMARY KEY NOT NULL);` },
+    { name: 'V0107__names.sql', text: `DO $$ BEGIN IF to_regclass('w.lot') IS NOT NULL AND to_regclass('w.lot') IS NOT NULL AND NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'lot_parent_id_fkey' AND conrelid = to_regclass('w.lot')) AND ${typeCheck('parent_id', 'id')} THEN ALTER TABLE w.lot ADD CONSTRAINT lot_parent_id_fkey FOREIGN KEY (parent_id) REFERENCES w.lot(id) NOT VALID; END IF; END $$;
+DO $$ BEGIN IF to_regclass('w.lot') IS NOT NULL AND to_regclass('w.lot') IS NOT NULL AND NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'lot_code_fkey' AND conrelid = to_regclass('w.lot')) AND ${typeCheck('code', 'id')} THEN ALTER TABLE w.lot ADD CONSTRAINT lot_code_fkey FOREIGN KEY (code) REFERENCES w.lot(id) NOT VALID; END IF; END $$;` },
+    { name: 'V0112__after.sql', text: `DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'lot_line_id_fkey' AND conrelid = to_regclass('w.lot')) THEN ALTER TABLE w.lot ADD CONSTRAINT lot_line_id_fkey FOREIGN KEY (line_id) REFERENCES o.line(id); END IF; END $$;` },
+  ];
+  const lot = ticketStatements(wrapped, { kind: 'tables', tables: ['w.lot'] });
+  const lotKey = lot.find((s) => s.file === 'V0112__after.sql');
+  ok(lot.length === 4 && lotKey?.guard?.table === 'w.lot' && lotKey.guard.references === 'o.line' && lotKey.guard.constraint === 'lot_line_id_fkey'
+    && !lotKey.guard.incoming && lot.filter((s) => s.guard).length === 3,
+  '**a key wrapped in a DO block (V0112\'s credit_lot_order_line_id_fkey) is guarded like a bare one, so a key into a later migration\'s table is left for it**',
+  JSON.stringify(lot.map((s) => s.guard ?? s.sql.slice(0, 40))));
+  const intoLine = ticketStatements(wrapped, { kind: 'tables', tables: ['o.line'], forward: true }).find((s) => s.guard?.constraint === 'lot_line_id_fkey');
+  const byName = ticketStatements(wrapped, { kind: 'foreign-keys', tables: [], constraints: ['lot_line_id_fkey'] });
+  ok(intoLine?.guard.incoming === true && byName.length === 1 && byName[0].guard.constraint === 'lot_line_id_fkey',
+    'and a forward migration gets it as a key into its tables, and the cross-schema keys ticket finds it by name', JSON.stringify({ intoLine, byName }));
+  const lotShape = schemaModel(wrapped).tables.get('w.lot');
+  ok(lotShape?.foreignKeys.map((k) => `${k.name}->${k.references}`).join() === 'lot_parent_id_fkey->w.lot,lot_line_id_fkey->o.line',
+    '**the expected shape has the keys DO blocks add, and not one whose block asks for column types that differ**', JSON.stringify(lotShape?.foreignKeys));
+  const wallet = ticketStatements(tenantFiles, { kind: 'tables', tables: ['wallet.credit_lot'] }).find((s) => /credit_lot_order_line_id_fkey/.test(s.sql));
+  const realShape = schemaModel(tenantFiles).tables;
+  const hasKey = (t, k) => realShape.get(t)?.foreignKeys.some((x) => x.name === k);
+  ok(wallet?.file.startsWith('V0112__') && wallet.guard?.references === 'orders.order_line' && wallet.guard.table === 'wallet.credit_lot'
+    && hasKey('wallet.credit_lot', 'credit_lot_order_line_id_fkey') && hasKey('platform.scope', 'scope_parent_id_fkey') && hasKey('sync.guest_link', 'guest_link_local_subject_id_fkey'),
+  '**the real package: #27669\'s V0112 key into orders.order_line is guarded, and the shape has credit_lot_order_line_id_fkey, scope_parent_id_fkey and guest_link_local_subject_id_fkey**',
+  JSON.stringify(wallet?.guard ?? wallet?.sql?.slice(0, 80)));
 }
 
 // ---- 2. the snapshot compare --------------------------------------------------------------------
