@@ -12,7 +12,9 @@ decision:
     any-grant-no-delete`. tools/derive-ddl.py: DESCOPED (the tables marked `x-ticvai-scope: none`, handed to frozen
     mode) and the RLS mark `any-grant-no-delete` (apply_split_rls on a scope path being set, its `_delete` policy
     dropped: the three policies of migration 240, with no new helper function). tools/ddl_forward.py: descope_block,
-    folded back by apply_forward through unguard. tools/check-ddl-conventions.py D-SCOPE-NONE. Derived:
+    folded back by apply_forward through unguard. tools/check-ddl-conventions.py D-SCOPE-NONE. tools/check-migrations.py
+    lets the DROP COLUMN of that block through (descope_drops: only inside the block guarded on the column, only for a
+    table whose contract says `x-ticvai-scope: none`); every other DROP COLUMN still fails. Derived:
     backend/tenant/V0113__after_r1_20261021.sql. V0108 is not edited: it has shipped.'
   by: Chinmay
   date: '2026-10-21'
@@ -34,6 +36,7 @@ keys_touched:
   - tools/derive-ddl.py
   - tools/ddl_forward.py
   - tools/check-ddl-conventions.py
+  - tools/check-migrations.py
   - tools/tests/test_migration_generator.py
   - backend/tenant/V0113__after_r1_20261021.sql
 root_class: 'new: a table given a scope its contract''s decision does not have (x-ticvai-scope: none)'
