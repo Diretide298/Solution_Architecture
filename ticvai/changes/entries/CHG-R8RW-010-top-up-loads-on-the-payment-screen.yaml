@@ -1,0 +1,37 @@
+id: CHG-R8RW-010
+date: '2026-10-21'
+source: audit
+kind: contract
+proposed: '2026-10-21T06:00'
+summary: 'The till loads a wallet top-up on the Payment screen, where the sale is paid: POS-005 binds topUpWallet
+  (background, once per top-up line once the payment is captured, with orderLineId and paymentId) and takes the
+  sale''s guest (subjectId) from the session; POS-027 no longer binds it, since nothing is paid there and it holds
+  neither id.'
+decision:
+  what: 'screens/P04-point-of-sale.yaml: POS-027 topUpWallet api removed; POS-005 topUpWallet api (background) and
+    entryState subjectId (session, optional).'
+  by: Chinmay
+  date: '2026-10-21'
+why: 'Finding: the r8 last re-walk of 21 October 2026 (its report is kept outside the repository), POS-027 #28825,
+  post-payment-call-bound-to-a-screen-without-its-inputs: topUpWallet was bound on POS-027, which has no order line or
+  payment id, and POS-005 where the sale is paid did not bind it. The lead, 21 October 2026, on the two items left:
+  "Can you do that for the 2 now see how quickly we can fix?"'
+keys_touched:
+  operations: [topUpWallet]
+  screens: [POS-005, POS-027]
+  files:
+  - screens/P04-point-of-sale.yaml
+root_class: 'a call bound to a screen that does not hold its inputs'
+tickets:
+  started: []
+  unstarted: [POS-005, POS-027]
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: r8 gate, a release fix'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screens.py
+status: open
+notes: 'Blast radius worked out before the change: tickets #28621 (POS-005) and #28825 (POS-027) with their sub-tasks,
+  all New; both screens client-approved, bindings only (no visible field).'
