@@ -1,0 +1,97 @@
+{
+ "about": "The client-verified screens whose approved view is in sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html (21 October 2026, CHG-R9UI-004): every one has an entry, so a reference capture exists for the visual check; an entry with `pending` names the view and has no click path yet. The device frame and viewport are guest-mobile-v4.json's, to be confirmed against this prototype when the steps are recorded.",
+ "prototype": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html",
+ "assetRoots": [
+  "sources/designs/guest-rev3-29-september"
+ ],
+ "caption": "Client prototype (approved), TICVAI Guest Booking Mobile v2.dc.html",
+ "imgBase": "frames/img/",
+ "viewport": {
+  "width": 1600,
+  "height": 1000
+ },
+ "frame": {
+  "width": 390,
+  "height": 844,
+  "inset": 1
+ },
+ "maxBytes": 250000,
+ "loadWait": 3000,
+ "stepWait": 1200,
+ "setup": [],
+ "screens": [
+  {"id": "GST-005", "name": "What's On", "view": "Account → All screens → Wave 1 → What’s on", "steps": [], "expect": [], "pending": "the view is named (the screen's wireframe.prototype.view); its click path is not recorded yet"},
+
+  {"id": "GST-010", "name": "Booking Confirmation", "view": "Account → All screens → Wave 1 → Booking confirmation (#confirm)", "steps": [], "expect": [], "pending": "the view is named (the screen's wireframe.prototype.view); its click path is not recorded yet"},
+
+  {"id": "GST-013", "name": "Ticket Details", "view": "Account → All screens → Wave 1 → Ticket details", "steps": [], "expect": [], "pending": "the view is named (the screen's wireframe.prototype.view); its click path is not recorded yet"},
+
+  {"id": "GST-014", "name": "Ticket Transfer", "view": "Account → All screens → Wave 2 → Ticket transfer (also Account → Ticket transfer)", "steps": [], "expect": [], "pending": "the view is named (the screen's wireframe.prototype.view); its click path is not recorded yet"},
+
+  {"id": "GST-016", "name": "My Reservations", "view": "Account → All screens → Wave 2 → My reservations (also Account → Reservations)", "steps": [], "expect": [], "pending": "the view is named (the screen's wireframe.prototype.view); its click path is not recorded yet"},
+
+  {"id": "GST-017", "name": "Reservation Details", "view": "Account → All screens → Wave 2 → Reservation details", "steps": [], "expect": [], "pending": "the view is named (the screen's wireframe.prototype.view); its click path is not recorded yet"},
+
+  {"id": "GST-018", "name": "Add to Calendar / Reminders", "view": "Account → All screens → Wave 3 → Add to calendar / reminders", "steps": [], "expect": [], "pending": "the view is named (the screen's wireframe.prototype.view); its click path is not recorded yet"},
+
+  {"id": "GST-020", "name": "Saved Items / Wishlist", "view": "Account → All screens → Wave 3 → Saved items / wishlist", "steps": [], "expect": [], "pending": "the view is named (the screen's wireframe.prototype.view); its click path is not recorded yet"},
+
+  {"id": "GST-023", "name": "Virtual Queue", "view": "Account → All screens → Wave 3 → Virtual queue; also At-venue card \"Desert Coaster · queued\"", "steps": [], "expect": [], "pending": "the view is named (the screen's wireframe.prototype.view); its click path is not recorded yet"},
+
+  {"id": "GST-024", "name": "F&B – Browse & Order", "view": "Account → All screens → Wave 2 → F&B – browse & order", "steps": [], "expect": [], "pending": "the view is named (the screen's wireframe.prototype.view); its click path is not recorded yet"},
+
+  {"id": "GST-025", "name": "F&B – Order Tracking", "view": "Account → All screens → Wave 2 → F&B – order tracking", "steps": [], "expect": [], "pending": "the view is named (the screen's wireframe.prototype.view); its click path is not recorded yet"},
+
+  {"id": "GST-026", "name": "Retail / Merchandise", "view": "Account → All screens → Wave 2 → Retail / merchandise", "steps": [], "expect": [], "pending": "the view is named (the screen's wireframe.prototype.view); its click path is not recorded yet"},
+
+  {"id": "GST-027", "name": "Parking – Reserve & Pay", "view": "Account → All screens → Wave 3 → Parking – reserve & pay", "steps": [], "expect": [], "pending": "the view is named (the screen's wireframe.prototype.view); its click path is not recorded yet"},
+
+  {"id": "GST-028", "name": "Parking – Reservation Confirmed", "view": "Account → All screens → Wave 3 → Parking – reservation confirmed", "steps": [], "expect": [], "pending": "the view is named (the screen's wireframe.prototype.view); its click path is not recorded yet"},
+
+  {"id": "GST-029", "name": "Venue Info & Services", "view": "Account → All screens → Wave 2 → Venue info & services", "steps": [], "expect": [], "pending": "the view is named (the screen's wireframe.prototype.view); its click path is not recorded yet"},
+
+  {"id": "GST-030", "name": "In-Venue Notifications", "view": "DEFERRED (R242), still in the prototype: Account → All screens → Wave 2 → In-venue notifications; At-venue tab → Alerts", "steps": [], "expect": [], "pending": "the view is named (the screen's wireframe.prototype.view); its click path is not recorded yet"},
+
+  {"id": "GST-033", "name": "AI Concierge – Contextual Help", "view": "Account → All screens → Wave 2 → AI concierge – contextual help", "steps": [], "expect": [], "pending": "the view is named (the screen's wireframe.prototype.view); its click path is not recorded yet"},
+
+  {"id": "GST-034", "name": "Lost & Found", "view": "Account → All screens → Wave 2 → Lost & found (also Account → Lost & found)", "steps": [], "expect": [], "pending": "the view is named (the screen's wireframe.prototype.view); its click path is not recorded yet"},
+
+  {"id": "GST-035", "name": "Feedback & Ratings", "view": "Account → All screens → Wave 3 → Feedback & ratings", "steps": [], "expect": [], "pending": "the view is named (the screen's wireframe.prototype.view); its click path is not recorded yet"},
+
+  {"id": "GST-037", "name": "Offers & Promotions", "view": "Account → All screens → Wave 2 → Offers & promotions", "steps": [], "expect": [], "pending": "the view is named (the screen's wireframe.prototype.view); its click path is not recorded yet"},
+
+  {"id": "GST-040", "name": "Help & Support", "view": "Account → All screens → Wave 2 → Help & support", "steps": [], "expect": [], "pending": "the view is named (the screen's wireframe.prototype.view); its click path is not recorded yet"},
+
+  {"id": "GST-043", "name": "Arabic / RTL Experience", "view": "Account → All screens → Wave 1 → Arabic / RTL experience; language button on home", "steps": [], "expect": [], "pending": "the view is named (the screen's wireframe.prototype.view); its click path is not recorded yet"},
+
+  {"id": "GST-044", "name": "Multi-Currency & Pricing", "view": "Account → All screens → Wave 2 → Multi-currency & pricing", "steps": [], "expect": [], "pending": "the view is named (the screen's wireframe.prototype.view); its click path is not recorded yet"},
+
+  {"id": "GST-045", "name": "Ticket Delivery & Sharing", "view": "Account → All screens → Wave 2 → Ticket delivery & sharing (opens Ticket transfer)", "steps": [], "expect": [], "pending": "the view is named (the screen's wireframe.prototype.view); its click path is not recorded yet"},
+
+  {"id": "GST-046", "name": "Branded Queue / Waiting Room", "view": "Account → All screens → Wave 1 → Branded queue / waiting room", "steps": [], "expect": [], "pending": "the view is named (the screen's wireframe.prototype.view); its click path is not recorded yet"},
+
+  {"id": "GST-047", "name": "Maintenance / Upgrade Page", "view": "Account → All screens → Wave 1 → Maintenance / upgrade", "steps": [], "expect": [], "pending": "the view is named (the screen's wireframe.prototype.view); its click path is not recorded yet"},
+
+  {"id": "GST-055", "name": "Dynamic QR Ticket", "view": "Account → All screens → Wave 1 → Dynamic QR ticket; also the Scan tab overlay", "steps": [], "expect": [], "pending": "the view is named (the screen's wireframe.prototype.view); its click path is not recorded yet"},
+
+  {"id": "GST-057", "name": "Accessibility Information", "view": "Account → All screens → Wave 2 → Accessibility information", "steps": [], "expect": [], "pending": "the view is named (the screen's wireframe.prototype.view); its click path is not recorded yet"},
+
+  {"id": "GST-061", "name": "Menu Item Detail", "view": "Account → All screens → Wave 2 → Menu item detail; Rev 3 feedback → Menu item add-ons & modifiers", "steps": [], "expect": [], "pending": "the view is named (the screen's wireframe.prototype.view); its click path is not recorded yet"},
+
+  {"id": "GST-062", "name": "Shop & Drop Collection", "view": "Account → All screens → Wave 3 → Shop & drop collection", "steps": [], "expect": [], "pending": "the view is named (the screen's wireframe.prototype.view); its click path is not recorded yet"},
+
+  {"id": "GST-065", "name": "Newsletter & Preferences", "view": "Account → All screens → Wave 3 → Newsletter & preferences", "steps": [], "expect": [], "pending": "the view is named (the screen's wireframe.prototype.view); its click path is not recorded yet"},
+
+  {"id": "GST-067", "name": "Refunds & Resale", "view": "Account → All screens → Wave 2 → Refunds & resale", "steps": [], "expect": [], "pending": "the view is named (the screen's wireframe.prototype.view); its click path is not recorded yet"},
+
+  {"id": "GST-068", "name": "Help & My Cases", "view": "Account → All screens → Wave 2 → Help & my cases", "steps": [], "expect": [], "pending": "the view is named (the screen's wireframe.prototype.view); its click path is not recorded yet"},
+
+  {"id": "GST-069", "name": "Face Pass", "view": "Account → All screens → Wave 2 → Face Pass (also Account → Face Pass)", "steps": [], "expect": [], "pending": "the view is named (the screen's wireframe.prototype.view); its click path is not recorded yet"},
+
+  {"id": "GST-070", "name": "Reserve a Table", "view": "Account → All screens → Wave 2 → Reserve a table or cabana; Rev 3 feedback → Book a table (fixed)", "steps": [], "expect": [], "pending": "the view is named (the screen's wireframe.prototype.view); its click path is not recorded yet"},
+
+  {"id": "GST-071", "name": "Payment Methods", "view": "Account → All screens → Wave 2 → Payment methods", "steps": [], "expect": [], "pending": "the view is named (the screen's wireframe.prototype.view); its click path is not recorded yet"},
+
+  {"id": "GST-072", "name": "Share & Group Booking", "view": "Account → All screens → Wave 2 → Share & group booking", "steps": [], "expect": [], "pending": "the view is named (the screen's wireframe.prototype.view); its click path is not recorded yet"}
+ ]
+}

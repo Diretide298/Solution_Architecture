@@ -1,0 +1,71 @@
+id: CHG-R9UI-001
+date: '2026-10-21'
+source: plan
+kind: plan
+proposed: '2026-10-21T18:00'
+summary: 'One app shell and design-tokens ticket per frontend repository (SETUP-SHELL-GUEST-WEB, -GUEST-APP, -POS,
+  -KIOSK, -EMPLOYEE-APP, -VENUE-MANAGEMENT, -WEB): the header, navigation, footer, progress bar, basket where the app has
+  one, loader, status card, empty and offline patterns, and the theme taken from the app''s client-approved prototype
+  CSS (guest web: handoff/design-tokens/guest-web.yaml, the prototype''s CSS variables, Archivo, --brand per venue,
+  applied from getPublishedTenantConfig; guest app: handoff/design-tokens/guest-app.yaml; the till keeps
+  screens/_design-tokens.yaml; an app with no approved design uses the shared tokens and its look is on the left-out
+  list). Each starts at the first slot its owner has from 21 October 2026, is owned by the repository''s main builder,
+  and every not-yet-started screen task of the repository follows it; a started one is told in its text.'
+decision:
+  what: 'docs/active/block-a-extra-tasks.json: the epic FRONTEND-FOUNDATION and seven SETUP-SHELL-* tasks (fields area,
+    repo, ownerRule mainBuilder, notBefore 2026-10-21, blocksScreensOf, short, startedKnown). tools/build-service-docs.py:
+    the extra-task fields (area: a frontend task; notBefore: scheduled from a date; ownerRule mainBuilder: the
+    repository''s main builder among the frontend people, from the pinned owners, held tasks left out), and the pass
+    that makes every not-started screen task of the repository follow its shell (started_plan_keys from
+    adam-links.json statuses, the shell''s startedKnown) and says so in one carried sentence ("App shell and mock API:
+    ..."); the frontend spec pages name each app''s tokens and shell. tools/derive-design-tokens.py writes
+    handoff/design-tokens/guest-web.yaml and guest-app.yaml from the prototypes (a refresh step). tools/ticket_done.py:
+    shell_key, CARRY. docs/active/left-out.yaml LO-R9UI-021 to -024: the four apps with no client-approved design.'
+  by: Chinmay
+  date: '2026-10-21'
+waivers:
+  cooling_off: {by: Chinmay, date: '2026-10-21', quote: 'I wanna get all of those changes out now..'}
+  release_window: {by: Chinmay, date: '2026-10-21', quote: 'I wanna get all of those changes out now..'}
+why: 'Finding of 21 October 2026, the WEB-007 seat page (#31848; sources/audit-21-october/web-007-ui-pull-findings.md,
+  cause 6): no ticket built any frontend app''s shell or design system, so the seat page was built with no header,
+  basket, loader or status card, and screens/_design-tokens.yaml, the only token file, is the till''s (Manrope),
+  while the client-approved guest prototype sets Archivo and a --brand colour per venue. The lead, Chinmay, 21 October
+  2026, on the four UI changes: "I wanna get all of those changes out now.." (the decision, and the waiver of the
+  cooling-off and of the Tuesday/Friday release window).'
+keys_touched:
+  files:
+  - docs/active/block-a-extra-tasks.json
+  - tools/build-service-docs.py
+  - tools/ticket_done.py
+  - tools/derive-design-tokens.py
+  - tools/refresh.sh
+  - handoff/design-tokens/guest-web.yaml
+  - handoff/design-tokens/guest-app.yaml
+  - docs/active/left-out.yaml
+  tickets:
+  - SETUP-SHELL-GUEST-WEB
+  - SETUP-SHELL-GUEST-APP
+  - SETUP-SHELL-POS
+  - SETUP-SHELL-KIOSK
+  - SETUP-SHELL-EMPLOYEE-APP
+  - SETUP-SHELL-VENUE-MANAGEMENT
+  - SETUP-SHELL-WEB
+root_class: 'new: app-shell-unticketed (what every screen of an app renders inside was in no ticket)'
+tickets:
+  started: [APP-WEB-WEB-007, APP-WEB-WEB-029, APP-MOB-GST-040, APP-MOB-GST-042, APP-MOB-GST-073]
+  unstarted: ['every not-started screen task of the seven repositories (2,315 at this change: guest web 47, guest app
+      73, POS 32, kiosk 18, employee app 107, venue management 1,821, console 217), which now follow their shell']
+release_tag: r9
+decision_owner: Chinmay
+adam_cr: 'none: a decision of the lead; no ADAM CR is needed'
+triage: fix-forward
+prevention:
+  type: generator-rule
+  ref: tools/build-service-docs.py::blocksScreensOf
+status: open
+notes: 'Started tickets (a status other than New, On hold or Rejected in adam-links.json, or named in the shell''s
+  startedKnown: WEB-007, built on 21 October after the statuses were read) keep their status and sprint; their text
+  says the shell and the mock come first and to align with them. The new dependencies move most not-started screen
+  tasks out of days already past (the scheduler started them on 5 October before): see the lane report for the sprint
+  moves. The ADAM starter''s packages/design-tokens (viewer/mcp/setup/starters/frontend) still carries the till''s
+  tokens; that is ADAM''s, not this package''s, and is on the lane report for the ADAM lane.'

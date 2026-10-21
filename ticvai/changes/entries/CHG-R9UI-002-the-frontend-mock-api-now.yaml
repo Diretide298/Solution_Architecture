@@ -1,0 +1,48 @@
+id: CHG-R9UI-002
+date: '2026-10-21'
+source: plan
+kind: plan
+proposed: '2026-10-21T18:00'
+summary: 'The frontend mock API is its own task, SETUP-MOCK-API (Pranay Shinde, the owner of SETUP-CLIENTS and
+  SETUP-SEED), scheduled from 21 October 2026: generated from the published contracts (Prism or MSW, published beside
+  @ticvai/api-client as @ticvai/mock-api), each operation switchable to its listed errors, a delay, an empty list and
+  offline, with fixtures that mirror the client-approved prototypes'' sample venues (Summit Peaks, Coastal Aqua, Union
+  Arena, Grand Playhouse, Saffron Table, and the till). Every frontend screen task whose build sub-task runs against
+  the mock API follows it; SETUP-SEED keeps the reference fixture.'
+decision:
+  what: 'docs/active/block-a-extra-tasks.json: SETUP-MOCK-API (blocksScreensOf "*", notBefore 2026-10-21, depends
+    SETUP-CLIENTS). tools/build-service-docs.py: SETUP-SEED no longer ends "and the frontend mock server serves the
+    same data"; it says the mock is SETUP-MOCK-API''s. tools/op-descriptions.py: the build sub-task''s line "Runs
+    against the mock API (SETUP-MOCK-API) from the generated client".'
+  by: Chinmay
+  date: '2026-10-21'
+waivers:
+  cooling_off: {by: Chinmay, date: '2026-10-21', quote: 'I wanna get all of those changes out now..'}
+  release_window: {by: Chinmay, date: '2026-10-21', quote: 'I wanna get all of those changes out now..'}
+why: 'Finding of 21 October 2026, the WEB-007 seat page (sources/audit-21-october/web-007-ui-pull-findings.md, cause
+  7): the frontend mock server was the last clause of SETUP-SEED (#27684), in Block A week 5, while the screens were
+  built from week 2 against "the mock API", so the seat page opened in its error state. The lead, Chinmay, 21 October
+  2026: "I wanna get all of those changes out now.." (the decision, and the waiver of the cooling-off and of the
+  release window).'
+keys_touched:
+  files:
+  - docs/active/block-a-extra-tasks.json
+  - tools/build-service-docs.py
+  - tools/op-descriptions.py
+  tickets:
+  - SETUP-MOCK-API
+  - SETUP-SEED
+root_class: 'new: mock-api-after-its-screens (the screens were planned against a mock the plan built three weeks later)'
+tickets:
+  started: [SETUP-SEED, APP-WEB-WEB-007, APP-WEB-WEB-029, APP-MOB-GST-040, APP-MOB-GST-042, APP-MOB-GST-073, APP-PARTNER-PTR-001]
+  unstarted: ['every not-started frontend screen task (2,512 at this change), which now follows SETUP-MOCK-API']
+release_tag: r9
+decision_owner: Chinmay
+adam_cr: 'none: a decision of the lead; no ADAM CR is needed'
+triage: fix-forward
+prevention:
+  type: generator-rule
+  ref: tools/build-service-docs.py::blocksScreensOf
+status: open
+notes: 'SETUP-SEED (#27684) was Ready for QA on 21 October, so op-release.rb leaves its text; its developer reads the
+  new text through ADAM. SETUP-MOCK-API''s text says to start from whatever mock SETUP-SEED built.'

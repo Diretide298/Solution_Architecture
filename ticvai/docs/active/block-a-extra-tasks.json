@@ -24,6 +24,12 @@
    "subject": "Products module, wave 1: categories, tags, languages, owner forms, sale permissions, back-office frame",
    "detail": "The first module rebuilt from client-reviewed wireframes (the client rejected the generated back-office screens). Wave 1 is what the 16 October 2026 minutes settle before the products sign-off (sources/mom/TICVAI_MoM_2026-10-16_TicketingConfig_Wireframes_Plan.md, sections 4.1-4.13 and 5); the product form itself is wave 2, after sign-off. People by the lead's ruling of 19 October 2026: Sanket Keluskar, Surendra (Surendra Loke) and Hrushikant Patkar on the migrations (CHG-R8PRD-008).",
    "area": "backend"
+  },
+  {
+   "key": "FRONTEND-FOUNDATION",
+   "subject": "Frontend foundation: each app's shell and design tokens, and the mock API",
+   "detail": "What every screen of an app renders inside and builds against, and no screen asks for: the app shell (header, navigation, footer, progress bar, basket where the app has one, loader, status card, empty and offline patterns), its design tokens taken from the app's client-approved prototype, and the frontend mock API generated from the published contracts. Added on 21 October 2026 after the seat page WEB-007 (#31848) was built bare: no shell, no tokens, no mock (the lead, Chinmay, 21 October 2026: \"I wanna get all of those changes out now..\" (CHG-R9UI-001, CHG-R9UI-002)).",
+   "area": "frontend"
   }
  ],
  "tasks": [
@@ -337,6 +343,153 @@
    "builds": [
     "adr ADR-0049",
     "adr ADR-0021"
+   ]
+  },
+  {
+   "key": "SETUP-SHELL-GUEST-WEB",
+   "epic": "FRONTEND-FOUNDATION",
+   "points": 5,
+   "area": "WEB",
+   "repo": "ticvai-guest-web",
+   "ownerRule": "mainBuilder",
+   "notBefore": "2026-10-21",
+   "blocksScreensOf": "ticvai-guest-web",
+   "short": "the shell, design tokens and state patterns of ticvai-guest-web",
+   "startedKnown": {
+    "APP-WEB-WEB-007": "#31848 was built on 21 October 2026, after the statuses in adam-links.json were read (00:31 that day); the lead judged the page against the design that evening"
+   },
+   "depends": [],
+   "subject": "Guest web: app shell and design tokens (header, navigation, footer, loader, status, empty and offline patterns, theme)",
+   "detail": "In **ticvai-guest-web**. Why: the lead, Chinmay, 21 October 2026: \"I wanna get all of those changes out now..\" (CHG-R9UI-001, CHG-R9UI-002); the seat page WEB-007 was built with a bare error page and no shell, because no ticket built the app's shell or its tokens and nothing named the approved look. The shell every guest web screen renders inside, identical to the client-approved prototype (sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html, rev 3, 30 September 2026): the header and navigation (the brand mark, What's on, the language switch, the account button), the footer, the booking progress bar and breadcrumb, the basket panel where a step shows it, and the state patterns the prototype draws: the turnstile loader (lines 4950-4962), the WEB-029 status card for Error, Sold out and Maintenance (lines 4746-4782; the board frame wireframes/P01 Guest Web.dc.html#web-029), the dashed empty card, the Nothing matched card, the dashed Choose first note, the Sign in to see your account card, the paused action button (Offline, booking is paused) and the video poster frame. The theme is the prototype's CSS variables, written down in handoff/design-tokens/guest-web.yaml (--brand per venue, --accent, --bg, --surface, --ink, --line, --r, --btn-*, --font-h Archivo and --font-b IBM Plex Sans, each with its rule from the prototype's theme()), applied on the root from getPublishedTenantConfig's theme and fonts for the tenant and venue, with dir=rtl for Arabic; no screen hard-codes a colour, font or radius. Each state pattern is a shared component with a page that shows it beside the approved drawing; the screens take their state's look from it (screens/_state-patterns.yaml names the pattern of every state, and each client-verified screen's wireframe.stateViews in ADAM). Every not-yet-started screen ticket of this repository follows this one; a started one is told in its text. Not drawn by the approved design, so not built here (no look is invented): the offline banner (LO-R9UI-005 on docs/active/left-out.yaml). The owner is the person who builds most of the repository's screens (ownerRule mainBuilder). Done when: the shell renders the prototype's Union Arena and Summit Peaks views' header, navigation, footer and progress bar identical at 1440x900 and 390x844, LTR and RTL; two venues' published palettes restyle every token with nothing hard-coded; each state pattern's page sits side by side with the prototype; the screenshots are attached to the Ready-for-QA comment.",
+   "builds": [
+    "file handoff/design-tokens/guest-web.yaml",
+    "file screens/_state-patterns.yaml"
+   ]
+  },
+  {
+   "key": "SETUP-SHELL-GUEST-APP",
+   "epic": "FRONTEND-FOUNDATION",
+   "points": 5,
+   "area": "MOB",
+   "repo": "ticvai-guest-app",
+   "ownerRule": "mainBuilder",
+   "notBefore": "2026-10-21",
+   "blocksScreensOf": "ticvai-guest-app",
+   "short": "the shell, design tokens and state patterns of ticvai-guest-app",
+   "depends": [],
+   "subject": "Guest app: app shell and design tokens (header, navigation, footer, loader, status, empty and offline patterns, theme)",
+   "detail": "In **ticvai-guest-app**. Why: the lead, Chinmay, 21 October 2026: \"I wanna get all of those changes out now..\" (CHG-R9UI-001, CHG-R9UI-002); the seat page WEB-007 was built with a bare error page and no shell, because no ticket built the app's shell or its tokens and nothing named the approved look. The React Native shell every guest app screen renders inside, identical to the client-approved prototypes (sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html, 30 September 2026, and sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html, 28 September 2026): the tab bar, the screen header with back and title, the venue loader (the splash, Loading your venue), the intro video overlay, the dashed empty note (with the mascot where the venue's skin has one), the No results for note, the sign-in prompt, the video poster frame and the maintenance page of GST-047. The theme is the prototypes' CSS variables, written down in handoff/design-tokens/guest-app.yaml (v4's --br, --bg, --sf, --ink, --ln, --rk, --fh and --fb with the skins per venue kind; v2's names mapped to the same set), applied from getPublishedTenantConfig's theme and fonts, RTL mirrored for Arabic. Each state pattern is a shared component with a page that shows it beside the approved drawing; the screens take their state's look from it (screens/_state-patterns.yaml names the pattern of every state, and each client-verified screen's wireframe.stateViews in ADAM). Every not-yet-started screen ticket of this repository follows this one; a started one is told in its text. Not drawn by the approved design, so not built here (no look is invented): the error state and the offline state of every guest app screen, GST-047's sold-out, closed and forced-upgrade pages and the other app states on docs/active/left-out.yaml (LO-R9UI-006 to LO-R9UI-014). The owner is the person who builds most of the repository's screens (ownerRule mainBuilder). Done when: the shell renders the prototype's Home and Explore frames' tab bar, header and loader identical at 390x844, LTR and RTL; two venues' skins restyle every token with nothing hard-coded; each state pattern's page sits side by side with the prototype; the screenshots are attached to the Ready-for-QA comment.",
+   "builds": [
+    "file handoff/design-tokens/guest-app.yaml",
+    "file screens/_state-patterns.yaml"
+   ]
+  },
+  {
+   "key": "SETUP-SHELL-POS",
+   "epic": "FRONTEND-FOUNDATION",
+   "points": 3,
+   "area": "POS",
+   "repo": "ticvai-pos",
+   "ownerRule": "mainBuilder",
+   "notBefore": "2026-10-21",
+   "blocksScreensOf": "ticvai-pos",
+   "short": "the shell, design tokens and state patterns of ticvai-pos",
+   "depends": [],
+   "subject": "POS till: app shell and design tokens (header, navigation, footer, loader, status, empty and offline patterns, theme)",
+   "detail": "In **ticvai-pos**. Why: the lead, Chinmay, 21 October 2026: \"I wanna get all of those changes out now..\" (CHG-R9UI-001, CHG-R9UI-002); the seat page WEB-007 was built with a bare error page and no shell, because no ticket built the app's shell or its tokens and nothing named the approved look. The till shell every POS screen renders inside, identical to the client-approved terminals (sources/designs/TICVAI_POS_Terminal_v2.html and TICVAI_POS_Terminal_client_approved.html): the till header with the network pill (Online synced, Syncing, Offline queued locally), the operator and shift, the navigation, the cart panel with its No items yet note, the refusal toast, the supervisor PIN modal, the stock badges and the conflict modal. The theme is the till's, screens/_design-tokens.yaml (Manrope, the till's palette, written down on 9 September 2026 from the client's own POS file), light and dark. Each state pattern is a shared component with a page that shows it beside the approved drawing; the screens take their state's look from it (screens/_state-patterns.yaml names the pattern of every state, and each client-verified screen's wireframe.stateViews in ADAM). Every not-yet-started screen ticket of this repository follows this one; a started one is told in its text. Not drawn by the approved design, so not built here (no look is invented): the till's loading, error, empty-search, no-access, second-factor and struck-out-zone states (LO-R9UI-015 to LO-R9UI-020 on docs/active/left-out.yaml). The owner is the person who builds most of the repository's screens (ownerRule mainBuilder). Done when: the shell renders the terminal's Till Home frame's header, navigation and cart identical at 1620x1080, LTR and RTL, light and dark; each state pattern's page sits side by side with the terminal; the screenshots are attached to the Ready-for-QA comment.",
+   "builds": [
+    "file screens/_design-tokens.yaml",
+    "file screens/_state-patterns.yaml"
+   ]
+  },
+  {
+   "key": "SETUP-SHELL-KIOSK",
+   "epic": "FRONTEND-FOUNDATION",
+   "points": 2,
+   "area": "P05",
+   "repo": "ticvai-kiosk",
+   "ownerRule": "mainBuilder",
+   "notBefore": "2026-10-21",
+   "blocksScreensOf": "ticvai-kiosk",
+   "short": "the shell, design tokens and state patterns of ticvai-kiosk",
+   "depends": [],
+   "subject": "the guest kiosk: app shell and design tokens (header, navigation, footer, loader, status, empty and offline patterns, theme)",
+   "detail": "In **ticvai-kiosk**. Why: the lead, Chinmay, 21 October 2026: \"I wanna get all of those changes out now..\" (CHG-R9UI-001, CHG-R9UI-002); the seat page WEB-007 was built with a bare error page and no shell, because no ticket built the app's shell or its tokens and nothing named the approved look. The shell every the guest kiosk screen renders inside: the header and navigation its screens' YAML gives (the entry screens and their exits), the footer where it has one, the loader, the status card, the empty and offline patterns, as shared components every screen uses for its states. There is no client-approved design for the guest kiosk yet (LO-R9UI-021 on docs/active/left-out.yaml), so no look is invented: the shell applies the shared tokens screens/_design-tokens.yaml through one theme module, and its patterns are structure only until the client approves the app's design; then the tokens and the patterns change, and no screen does. Each state pattern is a shared component with a page that shows it beside the approved drawing; the screens take their state's look from it (screens/_state-patterns.yaml names the pattern of every state, and each client-verified screen's wireframe.stateViews in ADAM). Every not-yet-started screen ticket of this repository follows this one; a started one is told in its text. The owner is the person who builds most of the repository's screens (ownerRule mainBuilder). Done when: the shell and its patterns render on the shared tokens, LTR and RTL; changing a token restyles every screen with no screen edited; the screenshots are attached to the Ready-for-QA comment.",
+   "builds": [
+    "file screens/_design-tokens.yaml",
+    "file screens/_state-patterns.yaml"
+   ]
+  },
+  {
+   "key": "SETUP-SHELL-EMPLOYEE-APP",
+   "epic": "FRONTEND-FOUNDATION",
+   "points": 3,
+   "area": "P06",
+   "repo": "ticvai-employee-app",
+   "ownerRule": "mainBuilder",
+   "notBefore": "2026-10-21",
+   "blocksScreensOf": "ticvai-employee-app",
+   "short": "the shell, design tokens and state patterns of ticvai-employee-app",
+   "depends": [],
+   "subject": "the employee app (staff and scanner): app shell and design tokens (header, navigation, footer, loader, status, empty and offline patterns, theme)",
+   "detail": "In **ticvai-employee-app**. Why: the lead, Chinmay, 21 October 2026: \"I wanna get all of those changes out now..\" (CHG-R9UI-001, CHG-R9UI-002); the seat page WEB-007 was built with a bare error page and no shell, because no ticket built the app's shell or its tokens and nothing named the approved look. The shell every the employee app (staff and scanner) screen renders inside: the header and navigation its screens' YAML gives (the entry screens and their exits), the footer where it has one, the loader, the status card, the empty and offline patterns, as shared components every screen uses for its states. There is no client-approved design for the employee app (staff and scanner) yet (LO-R9UI-022 on docs/active/left-out.yaml), so no look is invented: the shell applies the shared tokens screens/_design-tokens.yaml through one theme module, and its patterns are structure only until the client approves the app's design; then the tokens and the patterns change, and no screen does. Each state pattern is a shared component with a page that shows it beside the approved drawing; the screens take their state's look from it (screens/_state-patterns.yaml names the pattern of every state, and each client-verified screen's wireframe.stateViews in ADAM). Every not-yet-started screen ticket of this repository follows this one; a started one is told in its text. The owner is the person who builds most of the repository's screens (ownerRule mainBuilder). Done when: the shell and its patterns render on the shared tokens, LTR and RTL; changing a token restyles every screen with no screen edited; the screenshots are attached to the Ready-for-QA comment.",
+   "builds": [
+    "file screens/_design-tokens.yaml",
+    "file screens/_state-patterns.yaml"
+   ]
+  },
+  {
+   "key": "SETUP-SHELL-VENUE-MANAGEMENT",
+   "epic": "FRONTEND-FOUNDATION",
+   "points": 3,
+   "area": "SETUP",
+   "repo": "ticvai-venue-management",
+   "ownerRule": "mainBuilder",
+   "notBefore": "2026-10-21",
+   "blocksScreensOf": "ticvai-venue-management",
+   "short": "the shell, design tokens and state patterns of ticvai-venue-management",
+   "depends": [],
+   "subject": "venue management (back office and CMS): app shell and design tokens (header, navigation, footer, loader, status, empty and offline patterns, theme)",
+   "detail": "In **ticvai-venue-management**. Why: the lead, Chinmay, 21 October 2026: \"I wanna get all of those changes out now..\" (CHG-R9UI-001, CHG-R9UI-002); the seat page WEB-007 was built with a bare error page and no shell, because no ticket built the app's shell or its tokens and nothing named the approved look. The shell every venue management (back office and CMS) screen renders inside: the header and navigation its screens' YAML gives (the entry screens and their exits), the footer where it has one, the loader, the status card, the empty and offline patterns, as shared components every screen uses for its states. The products back-office frame (PRD-W1-FRAME, #36199: the working venue and its switcher, the navigation, the dashboard) is built from the products wireframe Pallavi Sawant shares and uses this shell's tokens and patterns. There is no client-approved design for venue management (back office and CMS) yet (LO-R9UI-023 on docs/active/left-out.yaml), so no look is invented: the shell applies the shared tokens screens/_design-tokens.yaml through one theme module, and its patterns are structure only until the client approves the app's design; then the tokens and the patterns change, and no screen does. Each state pattern is a shared component with a page that shows it beside the approved drawing; the screens take their state's look from it (screens/_state-patterns.yaml names the pattern of every state, and each client-verified screen's wireframe.stateViews in ADAM). Every not-yet-started screen ticket of this repository follows this one; a started one is told in its text. The owner is the person who builds most of the repository's screens (ownerRule mainBuilder). Done when: the shell and its patterns render on the shared tokens, LTR and RTL; changing a token restyles every screen with no screen edited; the screenshots are attached to the Ready-for-QA comment.",
+   "builds": [
+    "file screens/_design-tokens.yaml",
+    "file screens/_state-patterns.yaml"
+   ]
+  },
+  {
+   "key": "SETUP-SHELL-WEB",
+   "epic": "FRONTEND-FOUNDATION",
+   "points": 3,
+   "area": "P09",
+   "repo": "ticvai-web",
+   "ownerRule": "mainBuilder",
+   "notBefore": "2026-10-21",
+   "blocksScreensOf": "ticvai-web",
+   "short": "the shell, design tokens and state patterns of ticvai-web",
+   "depends": [],
+   "subject": "the TICVAI console: app shell and design tokens (header, navigation, footer, loader, status, empty and offline patterns, theme)",
+   "detail": "In **ticvai-web**. Why: the lead, Chinmay, 21 October 2026: \"I wanna get all of those changes out now..\" (CHG-R9UI-001, CHG-R9UI-002); the seat page WEB-007 was built with a bare error page and no shell, because no ticket built the app's shell or its tokens and nothing named the approved look. The shell every the TICVAI console screen renders inside: the header and navigation its screens' YAML gives (the entry screens and their exits), the footer where it has one, the loader, the status card, the empty and offline patterns, as shared components every screen uses for its states. There is no client-approved design for the TICVAI console yet (LO-R9UI-024 on docs/active/left-out.yaml), so no look is invented: the shell applies the shared tokens screens/_design-tokens.yaml through one theme module, and its patterns are structure only until the client approves the app's design; then the tokens and the patterns change, and no screen does. Each state pattern is a shared component with a page that shows it beside the approved drawing; the screens take their state's look from it (screens/_state-patterns.yaml names the pattern of every state, and each client-verified screen's wireframe.stateViews in ADAM). Every not-yet-started screen ticket of this repository follows this one; a started one is told in its text. The owner is the person who builds most of the repository's screens (ownerRule mainBuilder). Done when: the shell and its patterns render on the shared tokens, LTR and RTL; changing a token restyles every screen with no screen edited; the screenshots are attached to the Ready-for-QA comment.",
+   "builds": [
+    "file screens/_design-tokens.yaml",
+    "file screens/_state-patterns.yaml"
+   ]
+  },
+  {
+   "key": "SETUP-MOCK-API",
+   "epic": "FRONTEND-FOUNDATION",
+   "points": 3,
+   "area": "devops",
+   "assignee": "Pranay Shinde",
+   "notBefore": "2026-10-21",
+   "blocksScreensOf": "*",
+   "short": "the mock API from the published contracts, with the prototypes' sample data",
+   "depends": [
+    "SETUP-CLIENTS"
+   ],
+   "subject": "Frontend mock API: generated from the published contracts, with the prototypes' sample venues as fixtures",
+   "detail": "In **ticvai-contracts**, published beside @ticvai/api-client. Why: the lead, Chinmay, 21 October 2026: \"I wanna get all of those changes out now..\" (CHG-R9UI-001, CHG-R9UI-002); the mock server was the last clause of SETUP-SEED (#27684, Block A week 5) while the screens it serves were built from week 2, so a screen opened in its error state (WEB-007, 21 October). The mock is generated from the same published contracts as the typed client (Prism from the OpenAPI, or MSW handlers generated from it: one command, checked in GitLab CI, published as @ticvai/mock-api on each contracts tag, so it never drifts from the client), every in-release operation answering with its contract's shapes and its listed errors on request (a header or query switch per operation: an error, a delay for loading, an empty list, offline), and fixtures that mirror the client-approved prototypes' sample data: the venues Summit Peaks (theme park), Coastal Aqua (water park), Union Arena (stadium, its fixture and seat map), Grand Playhouse (theatre) and Saffron Table (dining) with their products, prices, performances and seat availability as the guest prototypes show them, and a till with its operators, catalogue and float as the POS terminal shows it, beside SETUP-SEED's reference fixture (two brands, three regions, AED and OMR; docs/active/seed-data-proposal.md). SETUP-SEED (Ready for QA on 21 October 2026) may already serve a mock: start from what it built and make it this. Every frontend screen task whose build sub-task runs against the mock API follows this one. Done when: each frontend repository runs its screens against @ticvai/mock-api with one command; every in-release operation answers with its contract's shape and can be switched to each listed error, a delay, an empty list and offline; the contracts pipeline fails if a contract changes without a new mock; WEB-007 opens on Union Arena's seat map with the mock and no backend.",
+   "builds": [
+    "file docs/active/seed-data-proposal.md"
    ]
   },
   {

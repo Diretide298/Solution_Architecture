@@ -971,6 +971,36 @@ def stable_chunks(gl, pinned: dict, stem: str, reserved: set, avoid=frozenset(),
     return out
 
 
+def held_task_keys() -> frozenset:
+    """The task keys every hold in docs/active/held-tasks.yaml names (CHG-R8DEC-004); none without the file."""
+    f = ROOT / "docs" / "active" / "held-tasks.yaml"
+    if not f.exists():
+        return frozenset()
+    doc = yaml.safe_load(f.read_text(encoding="utf-8")) or {}
+    return frozenset(k for h in (doc.get("holds") or {}).values() for k in ((h or {}).get("keys") or []))
+
+
+# A ticket has started once OpenProject moves it off these (tools/audit_guard.py NOT_STARTED, CHG-CRF-001).
+NOT_STARTED = ("New", "On hold", "Rejected")
+
+
+def started_plan_keys() -> frozenset:
+    """**Plan task keys whose ticket has started** (CHG-R9UI-001): the task or any of its sub-tasks has a status other
+    than New, On hold or Rejected in handoff/service-docs/adam-links.json (the statuses read at the last release; the
+    same reading as audit_guard.started_tickets), mapped back to plan keys through pms-map.json. Epics and features
+    are not work. A started ticket is never made to wait on a new task (its status and sprint stay as they are); the
+    new dependency is said in its text instead."""
+    sd = ROOT / "handoff" / "service-docs"
+    try:
+        links = json.loads((sd / "adam-links.json").read_text(encoding="utf-8")).get("links") or []
+        mp = json.loads((sd / "pms-map.json").read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return frozenset()
+    started = {str(x.get("key")) for x in links
+               if x.get("status") and x.get("status") not in NOT_STARTED and x.get("type") not in ("Epic", "Feature")}
+    return frozenset(k.split("#", 1)[0] for k, v in mp.items() if isinstance(v, int) and str(v) in started)
+
+
 def closed_keys() -> frozenset:
     """Pushed keys tools/op-retire.py closes as merged into another ticket (Rejected in OpenProject)."""
     try:
@@ -1196,7 +1226,18 @@ def main() -> int:
                               ["Offline", "yes" if pf.get("offlineCapable") else "no"],
                               ["Themes", ", ".join(pf.get("themes") or [])],
                               ["Directions", ", ".join(pf.get("directions") or [])],
-                              ["Packages", ", ".join(pf.get("packages") or [])]] +
+                              ["Packages", ", ".join(pf.get("packages") or [])],
+                              # the tokens the app shell applies (CHG-R9UI-001): the guest apps' from their approved
+                              # prototypes, the till's from screens/_design-tokens.yaml, the rest shared until approved
+                              ["Design tokens", "; ".join(
+                                  f"{c} `{t_['file']}` ({t_['from']})" for c, t_ in sorted(
+                                      {screens[x]['_platform'].get('code'): ((ticket_done.design_frames().get('screens')
+                                                                              or {}).get(x) or {}).get('tokens') or {}
+                                       for x in p['screens']}.items()) if t_.get('file'))],
+                              ["App shell", "; ".join(sorted({f"{fr.where(x).get('repo')}: "
+                                                              f"{ticket_done.shell_key(fr.where(x).get('repo'))}"
+                                                              for x in p['screens'] if fr.where(x).get('repo')}))
+                               or "no repository yet"]] +
                    [[k2, v] for k2, v in dep.items() if isinstance(v, (str, int, bool))])
         if k == "WL":
             L += ["", "White Labelling is a module, not an app. Its screens live in the CMS (P13) and "
@@ -1223,7 +1264,16 @@ def main() -> int:
                                   ["Route", f"`{imp.get('route', '')}`"],
                                   ["Repository", repo_cell],
                                   ["Component", f"`{w['componentName'] or ''}`"]] + loc +
-                                 [["Pattern", s.get("pattern", "")]])
+                                 # the generated layout is structure only, not the look (CHG-R9UI-003)
+                                 [["Layout pattern", f"{s.get('pattern', '')} (structure only, not the look)"]])
+            # **The design it is built to** (CHG-R9UI-004): the approved prototype view, the frame adam_pull writes,
+            # each state's pattern, or that there is none yet (ticket_done.design_sentence, the words the tickets carry)
+            design_ = ticket_done.design_sentence(sid)
+            if design_:
+                head_, _, rest_ = design_.partition(": ")
+                L += ["", f"**{head_}.** {rest_[:1].upper()}{rest_[1:]}"]
+                if ticket_done.design_verified(sid):
+                    L += ["", f"**Done when** {ticket_done.visual_check(sid)}."]
             es = s.get("entryState") or {}
             if es.get("params"):
                 L += ["", "**Entry parameters**", ""]
@@ -1240,7 +1290,10 @@ def main() -> int:
             st = s.get("states") or {}
             if st:
                 L += ["", "**States**", ""]
-                L += table(["State", "Behaviour"], [[n, re.sub(r"\*\*", "", str(v))] for n, v in st.items()])
+                # each state's look, from the approved design or its design gap (CHG-R9UI-003)
+                L += table(["State", "Behaviour", "Look"],
+                           [[n, re.sub(r"\*\*", "", str(v)), ticket_done.state_look(sid, n).replace("look: ", "", 1)]
+                            for n, v in st.items()])
             nav = (s.get("navigation") or {}).get("transitions") or []
             if nav:
                 L += ["", "**Goes to**", ""]
@@ -1494,9 +1547,13 @@ def main() -> int:
          "In **ticvai-backend** `db/seed`: the reference fixture quality-gates 8 requires - two brands, three regions "
          "across two countries, AED and OMR - with products, prices, events, tills, staff, roles and "
          "denominations, so apps can be built before the Back Office setup screens exist. The denominations and "
-         "roles seed from docs/active/seed-data-proposal.md (proposed, client to correct - audit R229). Done when: "
-         "it loads on a migrated database, integration tests run against it, and the frontend mock server serves "
-         "the same data."),
+         "roles seed from docs/active/seed-data-proposal.md (proposed, client to correct - audit R229). "
+         # **The frontend mock API is its own task now** (CHG-R9UI-002; the lead, 21 October 2026: "I wanna get all of
+         # those changes out now.."): it was this task's last done-when clause, in Block A week 5, while the screens it
+         # serves were built from week 2 and opened in their error state. SETUP-MOCK-API builds it now.
+         "The frontend mock API is SETUP-MOCK-API's (since 21 October 2026): it mirrors this fixture's reference data "
+         "beside the prototypes' sample venues. Done when: it loads on a migrated database and integration tests run "
+         "against it."),
         ("SETUP-CLIENTS", "Generate the typed API clients from contracts/ for the frontend workspace", 3, ["SETUP-CI"],
          # **Where the client lives** (r8 re-walk, CHG-R8RW-006): the text said "ticvai-frontend packages/api-client", a
          # repository and folder that do not exist since the frontend became six repositories (ADR-0007 amendment,
@@ -2200,6 +2257,32 @@ def main() -> int:
             x["assignee"] = who
             load[who] += int(x["points"] or 0)
 
+    def screen_sid(t_):
+        """The screen a task builds when it is a screen task (a [FE] screen or a Venue Management screen), else None."""
+        if t_["type"] != "Task" or t_["key"].startswith(("TEST-", "SETUP-")):
+            return None
+        if t_["track"] != "Frontend" and t_.get("area") != "VM":
+            return None
+        sid_ = fr.screen_of_ticket(t_["key"], t_["subject"])
+        return sid_ if sid_ in screens else None
+
+    held_now = held_task_keys()
+
+    fe_people = {p_["name"] for p_ in team.get("people") or [] if set(p_.get("pools") or []) & {"web", "mob", "pos"}}
+
+    def repo_main_builder(repo):
+        """**The frontend owner rule** (CHG-R9UI-001): whoever carries the most points of a frontend repository's
+        screen tasks, every block, not held (held-tasks.yaml), among the people whose team.json pools are frontend
+        (web, mob, pos) -- the main-builder rule the plan already follows for a module test (ticket_done.main_builder).
+        A tie goes to the first by name; "" when the repository has no such task."""
+        pts_ = Counter()
+        for x in tasks:
+            sid_ = screen_sid(x)
+            if (sid_ and x["assignee"] in fe_people and x["key"] not in held_now
+                    and fr.where(sid_).get("repo") == repo):
+                pts_[x["assignee"]] += int(x["points"] or 0)
+        return sorted(pts_.items(), key=lambda kv: (-kv[1], kv[0]))[0][0] if pts_ else ""
+
     def extra_lead(t_):
         """**What a hand-written task builds leads its text** (CHG-RONEP-001, CHG-RONEP-003): the operations an AI engine task
         serves (`operations`) and the artefacts it lists (`builds`: operation, table, screen, service or adr ids), in the
@@ -2240,16 +2323,26 @@ def main() -> int:
                 continue
             is_ai = t_["epic"] == "AI-ENGINE"
             pts = "" if is_ai else int(t_["points"])
-            who = t_.get("assignee") or (min(backend_, key=lambda x: load[x]) if backend_ else "")
+            # **A frontend repository's shell is its main builder's** (`ownerRule: mainBuilder`, CHG-R9UI-001): given
+            # once every block's screen tasks exist (the app shell pass, below), not here, where only Block A's do
+            who = "" if t_.get("ownerRule") == "mainBuilder" else (
+                t_.get("assignee") or (min(backend_, key=lambda x: load[x]) if backend_ else ""))
             # a task due now (`due`, CHG-R8INT-032) is not balanced against anyone's load: it names its owner
             if not is_ai and who and not t_.get("due"):
                 load[who] += pts
             db_tables_ = ticket_done.hand_db_tables(t_)
             for x_ in db_tables_:
                 hand_db.setdefault(x_, t_["key"])
+            # `area` (CHG-R9UI-001): a frontend task names the frontend area it is planned in (WEB, MOB, POS, P05, P06,
+            # SETUP, P09), so it is a [FE] ticket in that stack's pool; a task without one is backend as before
             task(t_["key"], t_["epic"], "Task", t_["subject"], t_["subject"] + ". " + extra_lead(t_) + t_["detail"], 1,
-                 pts=pts, area="ai" if is_ai else ("database" if db_tables_ else "backend"), assignee=who,
-                 depends=t_.get("depends") or ())
+                 pts=pts, area="ai" if is_ai else ("database" if db_tables_ else (t_.get("area") or "backend")),
+                 assignee=who, depends=t_.get("depends") or ())
+            # **Scheduled from a date** (`notBefore`, an ISO date; CHG-R9UI-001, -002, the lead, 21 October 2026: "I
+            # wanna get all of those changes out now.."): the task starts at the first slot its owner has on or after
+            # that day, not in a sprint already past
+            if t_.get("notBefore"):
+                by_key[t_["key"]]["notBefore"] = float(sp.index_of(dt.date.fromisoformat(t_["notBefore"])))
 
     # ================================================================ the rest of the package (1 October)
     # **Every block is planned task by task now**, not only Block A: the PM's replan wants module-wise completion
@@ -3083,6 +3176,50 @@ def main() -> int:
             by_key[k]["description"] = (by_key[k]["description"].rstrip() + " Acceptance of the declined, "
                                         "unknown and reconcile paths waits on the client's payment sandbox "
                                         "credentials: see the client's answer in the Decisions Register.")
+
+    # **The app shell and the mock API come before every screen** (CHG-R9UI-001, CHG-R9UI-002; the lead, 21 October
+    # 2026: "I wanna get all of those changes out now.."). A block-a-extra-tasks.json task with `blocksScreensOf` (a
+    # frontend repository, or "*" for every screen) is waited on by every screen task of that repository whose ticket
+    # has not started; a started one (started_plan_keys, or the task's `startedKnown` with its evidence) is not made to
+    # wait, so its status and sprint stay, and the text says the dependency instead. One sentence per screen task,
+    # "App shell and mock API: ...", which the pointer carries (ticket_done.CARRY).
+    blockers_ = [t_ for t_ in (json.loads(EXTRA.read_text(encoding="utf-8")).get("tasks") or [] if EXTRA.exists() else [])
+                 if t_.get("blocksScreensOf") and t_["key"] in by_key and str(t_.get("block") or "A") == "A"]
+    started_ = started_plan_keys()
+    known_started_ = {k: v for b_ in blockers_ for k, v in (b_.get("startedKnown") or {}).items()}
+    waits_on_, told_ = defaultdict(list), defaultdict(list)
+    for t_ in tasks:
+        sid_ = screen_sid(t_)
+        if not sid_:
+            continue
+        repo_ = fr.where(sid_).get("repo")
+        for b_ in blockers_:
+            if b_["blocksScreensOf"] != "*" and b_["blocksScreensOf"] != repo_:
+                continue
+            if t_["key"] in started_ or t_["key"] in known_started_:
+                told_[t_["key"]].append(b_)
+            else:
+                waits_on_[t_["key"]].append(b_)
+                t_["dependsOn"] = " ".join(sorted(set(t_["dependsOn"].split()) | {b_["key"]}))
+    n_wait_, n_told_ = len(waits_on_), len(told_)
+    for k_ in sorted(set(waits_on_) | set(told_)):
+        t_ = by_key[k_]
+        bs_ = waits_on_.get(k_, []) + told_.get(k_, [])
+        names_ = " and ".join(f"{b_['key']} ({b_.get('short') or b_['subject']})" for b_ in bs_)
+        what_ = "App shell and mock API" if len(bs_) > 1 else (
+            "Mock API" if bs_[0]["blocksScreensOf"] == "*" else "App shell")
+        if k_ in told_:
+            sent_ = (f"{what_}: {names_} come first; this ticket started before they were planned, so it does not "
+                     "wait for them (its status and sprint stay): align the screen with the shell and run it against "
+                     "the mock API when they land.")
+        else:
+            sent_ = f"{what_}: {names_} come first, and this ticket follows them."
+        d_ = (t_["description"] or "").rstrip()
+        m_ = ticket_done.DONE_WHEN.search(d_)          # before its own "Done when", which the pointer reads to the end
+        head_, tail_ = (d_[:m_.start()].rstrip(), " " + d_[m_.start():]) if m_ else (d_, "")
+        t_["description"] = (head_ + ("" if not head_ or head_[-1] in ".!?" else ".") + " " + sent_ + tail_).strip()
+    print(f"app shells and the mock API (CHG-R9UI-001, -002): {n_wait_} screen task(s) wait on them, "
+          f"{n_told_} started one(s) told in their text")
 
     # **Chronology.** Every task gets its place in the order work can happen: block, then app-module (a module on
     # one app, in build-phase order), then build phase, wave, how many tasks stand in front of it, and database
@@ -4016,6 +4153,13 @@ def main() -> int:
             n_moves_ += 1
     if moves_:
         print(f"owner moves: {n_moves_} of {len(moves_)} applied (CHG-R5-003)")
+    # **An app shell goes to its repository's main builder** (`ownerRule: mainBuilder`, CHG-R9UI-001), worked out here,
+    # once the pins and the owner moves have set who builds each screen, and before the schedule gives the rest an owner
+    for b_ in blockers_:
+        if b_.get("ownerRule") == "mainBuilder" and not by_key[b_["key"]]["assignee"]:
+            by_key[b_["key"]]["assignee"] = repo_main_builder(b_.get("repo"))
+            print(f"  app shell {b_['key']}: {by_key[b_['key']]['assignee'] or '(no frontend builder)'}, the main builder "
+                  f"of {b_.get('repo')}")
     leaf = [t_ for t_ in tasks if t_["type"] == "Task"]
     # **Phase 2 of the AI engine has no owner** (CHG-AIPH-001, docs/active/ai-phase-plan.json; CHG-R4-006): its AI units,
     # its module tests and its app-modules stay unassigned until the AI developers join after 2 April.
