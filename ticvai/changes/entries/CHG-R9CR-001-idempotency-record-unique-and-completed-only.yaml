@@ -1,0 +1,57 @@
+id: CHG-R9CR-001
+date: '2026-10-21'
+source: cr
+kind: contract
+summary: 'platform.idempotency_record keeps the guarantee common.yaml promised: a unique index
+  platform.idempotency_record_operation_id_idempotency_key_uniq on (operation_id, idempotency_key), the row written
+  once on completion inside the change''s transaction so status has the one value completed (CHECK), scope_path the
+  tenant root, expires_at created_at plus 24 hours purged by the maintenance job, and the table and its columns
+  described. The next forward migration adds the index and narrows the CHECK on databases already built.'
+decision:
+  what: 'ADAM CR-182, option A, as recommended. contracts/spine/tenancy.yaml PlatformIdempotencyRecord:
+    x-ticvai-unique-together [[operationId, idempotencyKey]] (operationId compared exactly, so the index is on the
+    plain columns and ON CONFLICT can name it), status enum [completed], a description on the schema and every
+    property (the write-once rule, the tenant-root scope path the kernel''s store writes under, the 24-hour window and
+    the purge by the workers host''s maintenance job). contracts/shared/common.yaml IdempotencyKey: the same rule.
+    tools/derive-table-notes.py: the table''s note. tools/check-storage-promises.py SP-UNIQUE-PROMISED. Derived by
+    derive-ddl: the unique index and the narrowed CHECK (NOT VALID) in the r9 forward migration after V0113. The lead,
+    21 October 2026: "1,2,3 all", and "Yes update all CRs check if can push that we current fix and get them out".'
+  by: Chinmay
+  date: '2026-10-21'
+waivers:
+  release_window: {by: Chinmay, date: '2026-10-21', quote: 'Yes update all CRs check if can push that we current fix and get them out'}
+why: 'ADAM CR-182 (Pranay Shinde, #27696 PLATFORM-IDEMPOTENCY), accepted with option A on 21 October 2026. common.yaml
+  said the record is "unique on (key, operation)" and the DDL had no unique index (only principal_id and scope_path
+  indexes, backend/tenant/910-indexes.sql), so two concurrent retries of one key both inserted and both applied the
+  write, the double payment SD-024 exists to prevent. status, scope_path and expires_at had no rule and the table no
+  description. The CR''s evidence: the dev repository''s db/tenant matches the package (no unique index), and
+  IdempotentAnswers.cs guesses a 24-hour window.'
+keys_touched:
+  schemas: [PlatformIdempotencyRecord, IdempotencyKey]
+  tables: [platform.idempotency_record]
+  files:
+  - contracts/spine/tenancy.yaml
+  - contracts/shared/common.yaml
+  - tools/derive-table-notes.py
+  - tools/check-storage-promises.py
+  - backend/tenant/V0114__after_r1_20261021.sql
+root_class: 'new: a uniqueness the contract text promises and no x-ticvai-unique-together keeps'
+tickets:
+  started:
+  - '27696 (PLATFORM-IDEMPOTENCY): through CR-182''s comment, as CHG-ADM-002 says; its text is not rewritten.'
+  unstarted:
+  - 'MIG-PARTITIONS (the workers host''s maintenance job) purges rows past expires_at: the contract says so; the task
+    text is a plan input and is not changed here.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-182
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-storage-promises.py
+status: open
+notes: 'Prevention run on the commit before the fix: check-storage-promises SP-UNIQUE-PROMISED fails on
+  tenancy.PlatformIdempotencyRecord ("unique on (idempotencyKey, operationId) and no x-ticvai-unique-together keeps
+  that set"); with the fix it finds nothing (payments.PaymentProviderEvent passes: its providerEventId is unique on
+  its own). The CHECK is added NOT VALID: a database holding an inProgress row keeps it until a person validates
+  (migration-review). On a repository-built database, which had no CHECK, the forward migration adds one.'

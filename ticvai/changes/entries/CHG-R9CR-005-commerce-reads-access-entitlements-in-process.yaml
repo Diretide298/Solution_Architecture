@@ -1,0 +1,65 @@
+id: CHG-R9CR-005
+date: '2026-10-21'
+source: cr
+kind: contract
+summary: 'getMediaEntitlements (commerce) reads access.entitlement and access.scan_event in process: the commerce role is
+  granted SELECT on the two tables (row-level security still applies), access#entitlementRecords and
+  access#scanEventRecords are served in-process as well as by service, ADR-0055 rule 4 and DB-ROLES are amended for a
+  granted read, and MediaEntitlements says how its kind, validity, reason and canAcceptMore are derived.'
+decision:
+  what: 'ADAM CR-196, option B for (1), and for (2) the derivation its recommendation names. docs/active/
+    cross-deployable-writes.yaml: a new reads list, XDR-001 (commerce SELECT on access.entitlement and access.scan_event).
+    tools/derive-ddl.py writes each granted read as a GRANT guarded on the role and the table; tools/ddl_forward.py
+    carries it into the forward migration (GRANT_READ). tools/check-cross-module-reads.py lets an in-process route
+    cross deployables only for a granted query (XR-ROUTE); tools/check-cross-deployable-writes.py checks the reads
+    (X-READ) and lists them in handoff/cross-deployable-writes.md. contracts/spine/access.yaml: the two queries served
+    [in-process, service]. contracts/spine/orders.yaml getMediaEntitlements: both reads in-process; a code with no
+    visible entitlement is 404. MediaEntitlements: mediaKind from credentialFormat, isValid when one entitlement counts
+    (issued or partiallyConsumed, validTo null or ahead, not suspended), invalidReason expired, used, surrendered or
+    blocked, canAcceptMore equal to isValid. docs/adr/0055: the 21 October amendment and the DB-ROLES line. The lead,
+    21 October 2026: "Yes update all CRs check if can push that we current fix and get them out".'
+  by: Chinmay
+  date: '2026-10-21'
+waivers:
+  release_window: {by: Chinmay, date: '2026-10-21', quote: 'Yes update all CRs check if can push that we current fix and get them out'}
+why: 'ADAM CR-196 (Pranay Shinde, #30686 getMediaEntitlements), accepted with option B on 21 October 2026. Everything the
+  operation answers is Access''s, Orders runs in commerce and Access in access (ADR-0055), the commerce role has no
+  grant on the access schema (db/tenant/004-deployable-roles.sql), and the service route between deployables is not
+  built and has no ticket (CR-174); over serviceAuth the read would run at the tenant root and lose the caller''s
+  scope. The media''s kind, validity and canAcceptMore had no source. The lead chose in-process reads for the same kind
+  of read in CR-167 (the workers host); no change entry in the package carries CR-167 yet, so this one sets the
+  pattern (the reads list, the guarded grant, the XR-ROUTE exception).'
+keys_touched:
+  operations: [getMediaEntitlements]
+  schemas: [MediaEntitlements]
+  tables: [access.entitlement, access.scan_event]
+  files:
+  - contracts/spine/access.yaml
+  - contracts/spine/orders.yaml
+  - docs/active/cross-deployable-writes.yaml
+  - docs/adr/0055-a-modular-monolith-deployed-as-five-units.md
+  - tools/derive-ddl.py
+  - tools/ddl_forward.py
+  - tools/check-cross-module-reads.py
+  - tools/check-cross-deployable-writes.py
+  - handoff/cross-deployable-writes.md
+  - backend/tenant/V0114__after_r1_20261021.sql
+root_class: 'new: a cross-deployable read with no route that is built'
+tickets:
+  started:
+  - '30686 (getMediaEntitlements): through CR-196''s comment, as CHG-ADM-002 says; its text is not rewritten.'
+  unstarted:
+  - 'DB-ROLES: the ticket text is not rewritten; ADR-0055 action item 8 carries the line, and a database already built
+    gets the grant from the forward migration.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-196
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-cross-module-reads.py
+status: open
+notes: 'XR-ROUTE still fails an in-process read across deployables that is not in the reads list, so the exception
+  cannot spread unseen; X-READ fails a granted read with a missing field, more than SELECT, or a table its reader owns.
+  The commerce host composes Access''s query interface for these two reads (the read side only). Proved: the grant
+  exists on both database copies after the forward migration.'

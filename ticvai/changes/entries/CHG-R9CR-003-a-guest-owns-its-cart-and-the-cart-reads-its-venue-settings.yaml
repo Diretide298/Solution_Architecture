@@ -1,0 +1,49 @@
+id: CHG-R9CR-003
+date: '2026-10-21'
+source: cr
+kind: contract
+summary: 'orders.cart gets a split row-security policy (x-ticvai-rls: guest-owns): staff and partners by venue as before,
+  a guest by its own subject, with orders.cart_line following the cart; createCart reads tenancy#venueSettingsRecords
+  in process so a new cart''s expires_at is now plus cartLeaseSeconds and max_extensions is cartMaxExtensions, the
+  venue''s value or else the tenant''s own row of platform.venue_settings.'
+decision:
+  what: 'ADAM CR-184, option A, as recommended. tools/derive-ddl.py: the RLS mark guest-owns (read and write: the base
+    rule OR subject_id = the session''s ticvai.subject_id, compared once per statement). contracts/spine/orders.yaml Cart:
+    x-ticvai-rls guest-owns; expiresAt and maxExtensions say where they come from. createCart: x-ticvai-read-via names
+    tenancy#venueSettingsRecords (in-process); the description gives the window, the cap, the fallback to the tenant
+    default (the tenant''s own row, written by setVenueSettingsDefaults) and then the proposed defaults (900 seconds, 1
+    extension). Derived: the cart and cart_line policies in the r9 forward migration. The lead, 21 October 2026: "1,2,3
+    all", and "Yes update all CRs check if can push that we current fix and get them out".'
+  by: Chinmay
+  date: '2026-10-21'
+waivers:
+  release_window: {by: Chinmay, date: '2026-10-21', quote: 'Yes update all CRs check if can push that we current fix and get them out'}
+why: 'ADAM CR-184 (Pranay Shinde, #30682 createCart), accepted with option A on 21 October 2026. orders.cart''s only
+  policy was by venue (920 apply_venue_rls; dev cart_scope), so a signed-in guest reached its own cart only with a grant
+  on the venue, which would show it every cart there, against guestAuth''s "a guest token can never widen to another
+  subject". A new cart''s expiresAt and maxExtensions come from venue settings createCart had no declared way to read
+  (extendCart does).'
+keys_touched:
+  operations: [createCart]
+  schemas: [Cart]
+  tables: [orders.cart, orders.cart_line]
+  files:
+  - contracts/spine/orders.yaml
+  - tools/derive-ddl.py
+  - backend/tenant/V0114__after_r1_20261021.sql
+root_class: 'new: a guest-owned table under staff-only row security'
+tickets:
+  started:
+  - '30682 (createCart): through CR-184''s comment, as CHG-ADM-002 says; its text is not rewritten.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-184
+triage: blocker
+prevention:
+  type: generator-rule
+  ref: tools/derive-ddl.py::guest-owns
+status: open
+notes: 'Proved on a copy of the live-equivalent repository database and on a package-built one: a guest session
+  (ticvai.subject_id set, no scope paths) sees its own cart only and cannot insert one for another subject; staff at the
+  venue see every cart there, as before. The staff branch is unchanged (platform.venue_in_scope).'

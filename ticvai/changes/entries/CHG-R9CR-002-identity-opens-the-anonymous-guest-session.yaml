@@ -1,0 +1,51 @@
+id: CHG-R9CR-002
+date: '2026-10-21'
+source: cr
+kind: contract
+summary: 'createCart''s anonymous guest session is opened by Identity, not Orders: Identity declares an in-process API
+  (identity#openAnonymousGuestSession, cart id and device id in, { sessionId, token } out, and
+  identity#endAnonymousGuestSession on the same API for claimCart), keeps the session in its guest session registry,
+  and createCart''s body gains deviceId (a client UUIDv7, required with no credential).'
+decision:
+  what: 'ADAM CR-183, option A, as recommended. contracts/spine/identity.yaml x-ticvai-queries openAnonymousGuestSession
+    and endAnonymousGuestSession (served in-process; the session lives where every guest session lives, Identity''s
+    session registry, GuestSession, persistence none: no row in identity.guest_session or identity.session, which need
+    a subject or a principal). contracts/spine/orders.yaml createCart: x-ticvai-read-via names
+    identity#openAnonymousGuestSession; body deviceId (uuid, x-ticvai-persisted false); 400 when it is missing with no
+    credential; the description says who mints what. claimCart: x-ticvai-read-via names
+    identity#endAnonymousGuestSession and its description ends the session. The lead, 21 October 2026: "1,2,3 all",
+    and "Yes update all CRs check if can push that we current fix and get them out".'
+  by: Chinmay
+  date: '2026-10-21'
+waivers:
+  release_window: {by: Chinmay, date: '2026-10-21', quote: 'Yes update all CRs check if can push that we current fix and get them out'}
+why: 'ADAM CR-183 (Pranay Shinde, #30682 createCart), accepted with option A on 21 October 2026. Since CHG-R8SPN-031
+  createCart, called with no credential, opens an anonymous guest session and returns its token, but opening a
+  session is Identity''s write and no Identity API was declared for it (ADR-0055 rule 3), identity.session requires a
+  principal, and nothing named the device the token is bound to. Building it would have meant Orders writing
+  Identity''s session store or holding its signing key.'
+keys_touched:
+  operations: [createCart, claimCart]
+  schemas: [Cart]
+  files:
+  - contracts/spine/identity.yaml
+  - contracts/spine/orders.yaml
+root_class: 'new: a write into another module''s store described in an operation with no declared in-process API'
+tickets:
+  started:
+  - '30682 (createCart): through CR-183''s comment, as CHG-ADM-002 says; its text is not rewritten.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-183
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-cross-module-reads.py
+status: open
+notes: 'The prevention is XR-QUERY and XR-ROUTE: the call is a readVia to a declared query, served in-process within
+  commerce, so naming an undeclared API or asking it across deployables fails. A call under the anonymous token
+  reaches its one cart: once Identity has verified the token and its cart, Orders runs that cart''s statements under
+  the routed tenant''s root grant, as a verified order access token reads its one order (CHG-R9CR-004); this is
+  written on the API''s rule for the lead to confirm. No screen changes: deviceId is a request field the app sends,
+  nothing a screen shows.'

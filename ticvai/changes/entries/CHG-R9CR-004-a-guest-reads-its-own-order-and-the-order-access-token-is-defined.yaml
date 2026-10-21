@@ -1,0 +1,53 @@
+id: CHG-R9CR-004
+date: '2026-10-21'
+source: cr
+kind: contract
+summary: 'A guest reads its own order in the database (x-ticvai-rls: guest-reads-own on orders.sales_order, staff by scope
+  in migration 225''s per-statement shape, a guest by subject; orders.order_line through its order; payment and the line
+  children keep following their parent), and the order access token is defined: HMAC-SHA256 with a Key Vault secret,
+  claims tid, oid, did, exp, jti, minted by checkoutCart from X-Device-Id and checked by getOrder against the same
+  header.'
+decision:
+  what: 'ADAM CR-191, option A, as recommended. tools/derive-ddl.py: the RLS mark guest-reads-own (staff read and write by
+    the base rule; a guest reads, never writes, its own rows by subject, or through the one declared reference to a
+    marked parent). contracts/spine/orders.yaml: Order and OrderLine x-ticvai-rls guest-reads-own; Order.orderAccessToken
+    names its claims, key and minting; getOrder says how the guest rule and the token work, and that a verified token
+    reads that one order under the routed tenant''s root grant (ITenantRootGrant) and nothing else; getOrder and
+    checkoutCart take X-Device-Id. contracts/shared/common.yaml: the DeviceId parameter (X-Device-Id). Derived: the
+    sales_order, order_line and child policies in the r9 forward migration. The lead, 21 October 2026: "Yes update all
+    CRs check if can push that we current fix and get them out".'
+  by: Chinmay
+  date: '2026-10-21'
+waivers:
+  release_window: {by: Chinmay, date: '2026-10-21', quote: 'Yes update all CRs check if can push that we current fix and get them out'}
+why: 'ADAM CR-191 (Pranay Shinde, #30687 getOrder), accepted with option A on 21 October 2026. getOrder answers a guest
+  for its own order (x-ticvai-self-scoped: subject), but orders.sales_order''s only policy was by scope (920; dev 225
+  apply_statement_scope_rls) and order_line''s by venue, so a guest reached its order only with a venue grant that would
+  show it every order there. Order.orderAccessToken had no claims, key or device check, and getOrder''s request named no
+  device.'
+keys_touched:
+  operations: [getOrder, checkoutCart]
+  schemas: [Order, OrderLine]
+  tables: [orders.sales_order, orders.order_line, orders.payment, orders.order_line_discount, orders.order_line_eligibility]
+  files:
+  - contracts/spine/orders.yaml
+  - contracts/shared/common.yaml
+  - tools/derive-ddl.py
+  - backend/tenant/V0114__after_r1_20261021.sql
+root_class: 'new: a guest-owned table under staff-only row security'
+tickets:
+  started:
+  - '30687 (getOrder): through CR-191''s comment, as CHG-ADM-002 says; its text is not rewritten.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-191
+triage: blocker
+prevention:
+  type: generator-rule
+  ref: tools/derive-ddl.py::guest-reads-own
+status: open
+notes: 'The children of orders.sales_order (deposit, discount, group_booking, order_fee, payment, refund,
+  ticket_transfer, upgrade and theirs) follow it for reading only, as the generator does for every split parent: read
+  where the parent is visible, written where the parent may be written. Their staff behaviour is unchanged. Proved on
+  copies: a guest session sees its own order and line only, updates no other order, and cannot write an order line.'

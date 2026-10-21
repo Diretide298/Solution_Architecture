@@ -1,0 +1,51 @@
+id: CHG-R9CR-006
+date: '2026-10-21'
+source: cr
+kind: contract
+summary: 'getOrderCalendarEvent has a source for everything it writes: catalogue#performanceRecords for a performance
+  line''s DTSTART/DTEND (a booked-window line''s own times otherwise, in UTC), the link back to WEB-013 on the tenant''s
+  primary web host (asked of Platform by the service route, as resolveTenantHost does), UID <order line id>@ticvai.app,
+  SEQUENCE the order''s rescheduled order_event rows that rescheduleOrder now writes, and a dated line defined so 409
+  noDatedLine is testable; a guest reads its own order''s events through the order.'
+decision:
+  what: 'ADAM CR-199, option A, as recommended. contracts/spine/orders.yaml getOrderCalendarEvent: x-ticvai-read-via
+    catalogue#performanceRecords (in-process) and platform-ops#tenantDomainRecords (service); the description defines a
+    dated line, DTSTART/DTEND, LOCATION, UID, SEQUENCE and URL (https://<host>/cart-and-checkout/order-confirmation?
+    orderId=<orderId>, WEB-013; without the service route, which CR-174 has not built, the event is written without URL).
+    rescheduleOrder writes one rescheduled order_event row per reschedule. OrderEvent.eventType names it and OrderEvent
+    takes x-ticvai-rls guest-reads-own, so a guest''s SEQUENCE is read through its own order. tools/check-cross-module-
+    reads.py: the fact "session start and end" / "performance''s startsAt" names catalogue.performance. The lead, 21
+    October 2026: "Yes update all CRs check if can push that we current fix and get them out".'
+  by: Chinmay
+  date: '2026-10-21'
+waivers:
+  release_window: {by: Chinmay, date: '2026-10-21', quote: 'Yes update all CRs check if can push that we current fix and get them out'}
+why: 'ADAM CR-199 (Pranay Shinde, #30688 getOrderCalendarEvent), accepted with option A on 21 October 2026. The
+  operation promised the session''s start and end, a link back, and a UID whose sequence rescheduling changes, with no
+  declared read of catalogue.performance, no link form or host, no UID or SEQUENCE rule, no reschedule event type, and
+  no definition of the dated line its 409 depends on. The package names its own domain in resolveTenantHost
+  (<venue>.<cell>.ticvai.app), so the UID takes ticvai.app.'
+keys_touched:
+  operations: [getOrderCalendarEvent, rescheduleOrder]
+  schemas: [OrderEvent]
+  tables: [orders.order_event]
+  files:
+  - contracts/spine/orders.yaml
+  - tools/check-cross-module-reads.py
+  - backend/tenant/V0114__after_r1_20261021.sql
+root_class: 'new: an operation''s text names another module''s data it declares no read of'
+tickets:
+  started:
+  - '30688 (getOrderCalendarEvent): through CR-199''s comment, as CHG-ADM-002 says; its text is not rewritten.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-199
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-cross-module-reads.py
+status: open
+notes: 'Prevention run on the commit before the fix: check-cross-module-reads --list-facts names getOrderCalendarEvent,
+  catalogue.performance, "session start and end"; after the fix it is covered by the read. The URL depends on
+  serviceAuth between deployables (CR-174): until it is built the event has no URL property, which RFC 5545 allows.'

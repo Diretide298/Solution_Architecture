@@ -711,6 +711,10 @@ def guard_drop_index(idx: str) -> str:
 # helper) and a scope removed (descope_block), whose statements belong together and are PERFORM-led.
 PERFORM_BLOCK = re.compile(r"^DO \$\$ BEGIN IF (?P<guard>.*?) THEN (?P<body>PERFORM .*); END IF; END \$\$$", re.I | re.S)
 DROP_POLICY = re.compile(rf"^DROP POLICY IF EXISTS {NAME} ON ({QNAME})$", re.I)
+# derive-ddl's guarded grant of a read across deployables (ADAM CR-196, CHG-R9CR-005): role, table.
+GRANT_READ = re.compile(r"^DO \$\$ BEGIN IF EXISTS \(SELECT 1 FROM pg_roles WHERE rolname = '(\w+)'\) AND "
+                        r"to_regclass\('([\w.]+)'\) IS NOT NULL THEN GRANT SELECT ON [\w.]+ TO \w+; END IF; END \$\$;?$",
+                        re.I)
 
 
 def unguard(stmt: str) -> list:
@@ -1667,6 +1671,15 @@ def diff(area: str, old: Model, new: Model, renames: dict | None = None, retired
             p.rollback.append(f"SELECT platform.drop_rls_policies('{rc_[2]}'::regclass); "
                               + " ".join(w.rstrip(";") + ";" for w in was))
             p.counts["policies"] = p.counts.get("policies", 0) + 1
+            continue
+        g = GRANT_READ.match(s)
+        if g and unq(g.group(2)) in old.tables:
+            # **A read the lead granted across deployables** (ADAM CR-196, CHG-R9CR-005): derive-ddl writes it as a block
+            # guarded on the role and the table (docs/active/cross-deployable-writes.yaml `reads`). A GRANT touches no
+            # row and runs twice, so it is written as it is.
+            p.statements.append(stmt)
+            p.rollback.append(f"REVOKE SELECT ON {unq(g.group(2))} FROM {g.group(1)};")
+            p.counts["other"] += 1
             continue
         m = DROP_POLICY.match(s)
         if m and unq(m.group(1)) in old.tables:
