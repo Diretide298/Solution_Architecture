@@ -937,3 +937,16 @@ def test_a_guarded_policy_call_is_read_where_its_table_is_named():
         got = td.after_r1_changes(root)
     assert got == {("backend/tenant/V0113__after_r1_20261021.sql", "orders.cart"): [
         ("row-level security", "apply_scope_rls")]}
+
+
+def test_check_migrations_lets_only_the_descope_blocks_drop_column_through():
+    """check-migrations refuses DROP COLUMN in a body (the four-step drop), but not the generated descope block of a
+    table whose contract says x-ticvai-scope: none (CHG-R9MIG-001)."""
+    cm = _load("check_migrations_r9", "check-migrations.py")
+    cm._CACHE["_scope_none"] = {"platform.outbox_sequence"}
+    p = fwd.diff("tenant", model(OS_OLD), model(OS_NEW), descoped=OS)
+    code = cm.strip_comments(fwd.render(p, "V0113", "r1", "x").split("-- ROLLBACK")[0])
+    assert cm.descope_drops(code) == {("platform.outbox_sequence", "scope_path")}
+    assert not cm.descope_drops(code.replace("column_name = 'scope_path'", "column_name = 'other'"))
+    cm._CACHE["_scope_none"] = set()
+    assert not cm.descope_drops(code)
