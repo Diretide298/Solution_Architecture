@@ -3196,9 +3196,9 @@ screens:
     provenance: flow F17 step 3, 2 October 2026 (CHG-CLN-006)
   - operationId: topUpWallet
     contract: wallet
-    purpose: 'Once the sale''s payment is captured, load each wallet top-up line of the sale onto the guest''s
-      wallet ("loads on payment"): one call per top-up line, with the line''s id (orderLineId) and the captured
-      payment (paymentId); POS-027 adds the line to the sale (CHG-R8RW-009, CHG-R8RW-010)'
+    purpose: 'Once the sale''s payment is captured, load each wallet top-up line of the sale onto the
+      guest''s wallet ("loads on payment"): one call per top-up line, with the line''s id (orderLineId)
+      and the captured payment (paymentId); POS-027 adds the line to the sale (CHG-R8RW-009, CHG-R8RW-010)'
     trigger: background
     provenance: r8 last re-walk, 21 October 2026 (CHG-R8RW-010; moved from POS-027, where nothing is paid)
   entryState:
@@ -3208,8 +3208,8 @@ screens:
     - name: subjectId
       from: session
       optional: true
-      notes: 'The guest identified for the sale (POS-027 identifyGuest attaches them). Needed only when the sale
-        has a wallet top-up line, for topUpWallet (CHG-R8RW-010).'
+      notes: The guest identified for the sale (POS-027 identifyGuest attaches them). Needed only when
+        the sale has a wallet top-up line, for topUpWallet (CHG-R8RW-010).
     - name: saleId
       from: deepLink
       optional: true

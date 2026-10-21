@@ -58,6 +58,8 @@ RULES = {
     "D-FWD-RETIRED": "a column the contract retires left as 'a rename or a drop: decide' (CHG-MGN-001, CR-157)",
     "D-FWD-OWNER": "a table with two keys to one parent whose owner is not decided in derive-ddl ROW_OWNER "
                    "(CHG-MGN-001, CR-148 CR-149)",
+    "D-SCOPE-NONE": "a table whose contract says x-ticvai-scope: none with a scope_path in the databases, or such a "
+                    "schema with a scopePath (CHG-R9MIG-001, CR-166)",
 }
 
 REVIEW_ROW = re.compile(r"^\| (.+?) \| (\w+) \| `([^`]*)` \| (.*) \| (.*) \|$")
@@ -304,6 +306,32 @@ def effective_tables(backend) -> dict:
         for t, tab in model.tables.items():
             out[t] = list(tab.cols)
     return out
+
+
+def check_scope_none(guard, backend, by: dict) -> None:
+    """D-SCOPE-NONE (CHG-R9MIG-001, ADAM CR-166 as the lead ruled it, 21 October 2026). **A table whose contract says it
+    takes no scope has none in the databases.** V0108 gave platform.outbox_sequence a `scope_path`, its index and the
+    scope policy, while CR-166's decision and our team's repository migration 240 have the key and the last sequence
+    only; on the repository's database two of r8's statements failed. A schema with `x-ticvai-scope: none` must carry
+    no `scopePath` property, and its table, as the baseline and every forward migration leave it (read by ddl_forward
+    the way derive-ddl reads it), no `scope_path`. Any other value of the mark is a finding too."""
+    tables = effective_tables(backend)
+    for (stem, name), s in sorted(by.items()):
+        mark = s.get("x-ticvai-scope")
+        if mark is None:
+            continue
+        key = f"{stem}.{name}"
+        if str(mark).strip() != "none":
+            guard.add("D-SCOPE-NONE", key, f"{key}: x-ticvai-scope {mark!r}; the only value is none")
+            continue
+        if "scopePath" in (s.get("properties") or {}):
+            guard.add("D-SCOPE-NONE", key, f"{key}: x-ticvai-scope: none, and the schema has a scopePath")
+        tag = str(s.get("x-ticvai-persistence") or "")
+        for t in [x.strip() for x in tag.split("+") if re.match(r"^[a-z_]+\.[a-z_0-9]+$", x.strip())]:
+            if "scope_path" in tables.get(t, []):
+                guard.add("D-SCOPE-NONE", t, f"{t}: its contract {key} says x-ticvai-scope: none, and the baseline "
+                          "plus the forward migrations leave it a scope_path (derive before check: ddl_forward "
+                          "descope_block removes it in the next forward migration)")
 
 
 def check_stub_tables(guard, backend) -> None:
@@ -627,6 +655,7 @@ def main() -> int:
 
     # R019: a column description that is its contract field's description, cut.
     by, _ = g.schemas()
+    check_scope_none(guard, backend, by)
     for t, cols in (ref.get("cols") or {}).items():
         for c in cols:
             desc = " ".join(str(c.get("description") or "").split())

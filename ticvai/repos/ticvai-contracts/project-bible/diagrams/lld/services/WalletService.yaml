@@ -1043,7 +1043,7 @@ screens:
 - P02:GST-011 Wallet Overview
 - P02:GST-071 Payment Methods
 - P04:POS-002 Sell — Ticket Catalogue
-- P04:POS-027 Guest Lookup
+- P04:POS-005 Payment
 - P08:ADM-604 Stored Value, Gift Card & Voucher Tender Controls
 - P08:ADM-612 Refund Allocation & Original Tender Manager
 - P08:BO-1083 Wallet Command Center

@@ -112,11 +112,11 @@
    "operations": 8
   },
   {
-   "contract": "public-api",
+   "contract": "marketing-crm",
    "operations": 7
   },
   {
-   "contract": "marketing-crm",
+   "contract": "public-api",
    "operations": 7
   },
   {

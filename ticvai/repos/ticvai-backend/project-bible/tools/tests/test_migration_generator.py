@@ -32,6 +32,11 @@ def rows(plan, kind=None):
     return [r for r in plan.review if kind is None or r[0] == kind]
 
 
+def ran(stmts):
+    """What the forward migration's statements run: a guarded block read as the statement inside it (CHG-R9MIG-002)."""
+    return [x for s in stmts for x in fwd.inner(s)]
+
+
 # ---- 3. every statement whole (CR-148) ----------------------------------------------------------------------------
 
 PARENT = "CREATE TABLE IF NOT EXISTS inventory.inventory_item (id uuid PRIMARY KEY);\n"
@@ -182,7 +187,7 @@ TILE_RENAMES = {"columns": {("platform.sale_board_tile", "page_id"): "sale_board
 
 def test_a_table_check_on_an_existing_table_is_written_not_valid_then_validated():
     p = fwd.diff("tenant", model(TILE_OLD), model(TILE_NEW), TILE_RENAMES)
-    body = [fwd.norm(s) for s in p.statements]
+    body = ran(p.statements)
     name = "sale_board_tile_variant_id_when_chk"
     assert f"ALTER TABLE platform.sale_board_tile DROP CONSTRAINT IF EXISTS {name}" in body
     add = [s for s in body if s.startswith(f"ALTER TABLE platform.sale_board_tile ADD CONSTRAINT {name} CHECK")]
@@ -643,10 +648,11 @@ CH_NEW = CH_OLD.replace("'backOffice')", "'backOffice', 'staffApp')")
 
 def test_a_column_check_that_only_gains_values_is_written_not_valid_then_validated_once():
     p = fwd.diff("control", model(CH_OLD), model(CH_NEW))
-    assert any("DROP CONSTRAINT IF EXISTS tenant_domain_channel_chk" in s for s in p.statements), p.statements
-    add = [s for s in p.statements if " ADD CONSTRAINT tenant_domain_channel_chk" in s]
+    body = ran(p.statements)
+    assert any("DROP CONSTRAINT IF EXISTS tenant_domain_channel_chk" in s for s in body), body
+    add = [s for s in body if " ADD CONSTRAINT tenant_domain_channel_chk" in s]
     assert add and "'staffApp'" in add[0] and add[0].endswith("NOT VALID")
-    assert any("VALIDATE CONSTRAINT tenant_domain_channel_chk" in s for s in p.statements)
+    assert any("VALIDATE CONSTRAINT tenant_domain_channel_chk" in s for s in body)
     assert not [r for r in p.review if r[0] == "column changed"], p.review
     again = fwd.diff("control", fold(CH_OLD, p), model(CH_NEW))
     assert not again.statements and not again.review, (again.statements, again.review)
@@ -688,8 +694,10 @@ AP_NEW = ("CREATE TABLE IF NOT EXISTS access.access_area (id uuid PRIMARY KEY NO
 def test_a_key_on_a_new_column_is_added_guarded_so_the_file_applies_twice():
     p = fwd.diff("tenant", model(AP_OLD), model(AP_NEW))
     fk = [s for s in p.statements if "access_point_zone_id_fkey" in s]
-    assert len(fk) == 1 and fk[0].startswith("DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_constraint")
-    assert "conname = 'access_point_zone_id_fkey'" in fk[0] and "NOT VALID" not in fk[0]
+    # guarded on both tables, the key's column and the key not being there yet (CHG-R8MIG-010, CHG-R9MIG-002)
+    assert len(fk) == 1 and fk[0].startswith("DO $$ BEGIN IF to_regclass(")
+    assert "NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'access_point_zone_id_fkey'" in fk[0]
+    assert "NOT VALID" not in fk[0]
     again = fwd.diff("tenant", fold(AP_OLD, p), model(AP_NEW))
     assert not again.statements and not again.review, (again.statements, again.review)
 
@@ -701,7 +709,7 @@ CB_NEW = ("CREATE TABLE IF NOT EXISTS marketing.customer_badge (id uuid PRIMARY 
 
 def test_a_check_added_to_an_existing_column_is_written_not_valid_and_validation_is_a_review_row():
     p = fwd.diff("tenant", model(CB_OLD), model(CB_NEW))
-    add = [s for s in p.statements if "ADD CONSTRAINT customer_badge_status_chk" in s]
+    add = [s for s in ran(p.statements) if "ADD CONSTRAINT customer_badge_status_chk" in s]
     assert add and add[0].endswith("NOT VALID")
     assert not [s for s in p.statements if "VALIDATE" in s]
     assert [r for r in p.review if r[0] == "column changed" and "VALIDATE CONSTRAINT" in r[3] and "NOT VALID" in r[2]]
@@ -794,3 +802,151 @@ def test_a_rename_both_a_later_and_an_earlier_frozen_file_need_is_not_placed():
               "V0105__b.sql": "SELECT platform.apply_tenant_rls('wallet.hold'::regclass);"}
     placed, unplaced = fwd.place_renames(items, frozen, set())
     assert not placed and unplaced
+
+
+# ---- CHG-R9MIG-001: a table that takes no scope loses the one a forward migration gave it (ADAM CR-166) -------------
+
+OS_OLD = ("CREATE TABLE IF NOT EXISTS platform.outbox_sequence (aggregate_id uuid PRIMARY KEY NOT NULL, "
+          "last_sequence bigint NOT NULL, scope_path ltree NOT NULL);\n"
+          "CREATE INDEX IF NOT EXISTS outbox_sequence_scope_path_idx ON platform.outbox_sequence USING gist "
+          "(scope_path);\n"
+          "SELECT platform.apply_scope_rls('platform.outbox_sequence'::regclass);\n")
+ANY = "'cardinality(platform.current_scope_paths()) > 0'"
+OS_NEW = ("CREATE TABLE IF NOT EXISTS platform.outbox_sequence (aggregate_id uuid PRIMARY KEY NOT NULL, "
+          "last_sequence bigint NOT NULL);\n"
+          f"SELECT platform.apply_split_rls('platform.outbox_sequence'::regclass, {ANY}, {ANY});\n"
+          "DROP POLICY IF EXISTS outbox_sequence_delete ON platform.outbox_sequence;\n")
+OS = {"platform.outbox_sequence"}
+
+
+def test_a_declared_unscoped_table_loses_its_scope_in_one_block_guarded_on_the_column():
+    p = fwd.diff("tenant", model(OS_OLD), model(OS_NEW), descoped=OS)
+    assert len(p.statements) == 1, p.statements
+    block = p.statements[0]
+    assert "| scope removed |" in block
+    assert ("DO $$ BEGIN IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = 'platform' AND "
+            "table_name = 'outbox_sequence' AND column_name = 'scope_path') THEN") in block
+    assert ran(p.statements) == [
+        "SELECT platform.drop_rls_policies('platform.outbox_sequence'::regclass)",
+        "DROP INDEX IF EXISTS platform.outbox_sequence_scope_path_idx",
+        "ALTER TABLE platform.outbox_sequence DROP COLUMN IF EXISTS scope_path",
+        f"SELECT platform.apply_split_rls('platform.outbox_sequence'::regclass, {ANY}, {ANY})",
+        "DROP POLICY IF EXISTS outbox_sequence_delete ON platform.outbox_sequence"]
+    assert not p.review and not p.recon, (p.review, p.recon)
+    assert any("ADD COLUMN IF NOT EXISTS scope_path ltree" in r and "apply_scope_rls" in r for r in p.rollback)
+    # folded, the next run writes nothing and lists nothing (regenerate-twice)
+    again = fwd.diff("tenant", fold(OS_OLD, p), model(OS_NEW), descoped=OS)
+    assert not again.statements and not again.review and not again.recon, (again.statements, again.review)
+
+
+def test_a_scope_path_dropped_without_the_declaration_is_still_a_decision():
+    p = fwd.diff("tenant", model(OS_OLD), model(OS_NEW))
+    assert [r for r in p.review if r[0] == "column dropped" and r[1] == "platform.outbox_sequence.scope_path"]
+    assert not [s for s in p.statements if "DROP COLUMN" in s]
+
+
+def test_the_rendered_descope_file_says_what_it_does_and_is_the_same_every_run():
+    p = fwd.diff("tenant", model(OS_OLD), model(OS_NEW), descoped=OS)
+    q = fwd.diff("tenant", model(OS_OLD), model(OS_NEW), descoped=OS)
+    a, b = fwd.render(p, "V0113", "r1 (x)", "20261021"), fwd.render(q, "V0113", "r1 (x)", "20261021")
+    assert a == b
+    assert "x-ticvai-scope: none" in a and "CHG-R9MIG-002" in a
+
+
+def test_derive_ddl_reads_the_scope_mark_and_the_counter_policy_mark():
+    dd = _load("derive_ddl_r9", "derive-ddl.py")
+    assert "any-grant-no-delete" in dd.RLS_MARKS
+    dd.SCHEMA_MARKS.clear()
+    dd.SCHEMA_MARKS["platform-ops.OutboxSequence"] = {"x-ticvai-scope": "none", "x-ticvai-rls": "any-grant-no-delete"}
+    cols = {"platform.outbox_sequence": [
+        {"column": "aggregate_id", "source": "platform-ops.OutboxSequence.aggregateId"},
+        {"column": "last_sequence", "source": "platform-ops.OutboxSequence.lastSequence"}]}
+    marks = dd.table_marks(cols, ["platform.outbox_sequence"])
+    assert marks["platform.outbox_sequence"]["scope"] == "none"
+    assert marks["platform.outbox_sequence"]["rls"] == "any-grant-no-delete"
+
+
+# ---- CHG-R9MIG-002: every statement guarded, so no file needs a hand retry --------------------------------------------
+
+PE_OLD = ("CREATE TABLE IF NOT EXISTS marketing.privacy_exception (id uuid PRIMARY KEY NOT NULL, system text CONSTRAINT "
+          "privacy_exception_system_chk CHECK (system IN ('core', 'ticketing')));\n"
+          "CREATE TABLE IF NOT EXISTS orders.cart (id uuid PRIMARY KEY NOT NULL, venue_id uuid NOT NULL);\n"
+          "CREATE TABLE IF NOT EXISTS platform.scope (id uuid PRIMARY KEY NOT NULL);\n"
+          "CREATE TABLE IF NOT EXISTS control.onboarding_application (id uuid PRIMARY KEY NOT NULL, status text);\n"
+          "SELECT platform.apply_venue_rls('orders.cart'::regclass);\n")
+PE_NEW = ("CREATE TABLE IF NOT EXISTS marketing.privacy_exception (id uuid PRIMARY KEY NOT NULL, system text CONSTRAINT "
+          "privacy_exception_system_chk CHECK (system IN ('core', 'ticketing', 'access')));\n"
+          "CREATE TABLE IF NOT EXISTS orders.cart (id uuid PRIMARY KEY NOT NULL, venue_id uuid NOT NULL, "
+          "scope_path ltree NOT NULL, session_id uuid);\n"
+          "CREATE TABLE IF NOT EXISTS platform.scope (id uuid PRIMARY KEY NOT NULL);\n"
+          "CREATE TABLE IF NOT EXISTS control.onboarding_application (id uuid PRIMARY KEY NOT NULL, status text);\n"
+          "CREATE INDEX IF NOT EXISTS onboarding_application_status_idx ON control.onboarding_application (status);\n"
+          "ALTER TABLE orders.cart ADD CONSTRAINT cart_session_id_fkey FOREIGN KEY (session_id) REFERENCES "
+          "platform.scope (id);\n"
+          "SELECT platform.apply_scope_rls('orders.cart'::regclass);\n")
+
+
+def test_every_statement_that_needs_a_table_is_guarded_on_it_and_on_the_columns_it_names():
+    p = fwd.diff("tenant", model(PE_OLD), model(PE_NEW))
+    assert p.statements
+    for s in p.statements:
+        assert s.startswith("DO $$ BEGIN IF "), s
+        assert s.count("\n") >= 2, s                     # the statement on a line of its own
+    text = "\n".join(p.statements)
+    # the widened CHECK: its DROP, ADD and VALIDATE all take the table and the column
+    chk = [s for s in p.statements if "privacy_exception_system_chk" in s]
+    assert len(chk) == 3 and all("to_regclass('marketing.privacy_exception') IS NOT NULL" in s
+                                 and "column_name = 'system'" in s for s in chk), chk
+    # the new column: its table
+    add = [s for s in p.statements if "ADD COLUMN IF NOT EXISTS session_id" in s]
+    assert add and "to_regclass('orders.cart') IS NOT NULL" in add[0]
+    # the index on a table a database may not have yet (control V0110's): the table and its column
+    idx = [s for s in p.statements if "onboarding_application_status_idx" in s]
+    assert idx and "to_regclass('control.onboarding_application') IS NOT NULL" in idx[0] \
+        and "column_name = 'status'" in idx[0]
+    # the key: both tables, its column, and the key not there yet
+    fk = [s for s in p.statements if "cart_session_id_fkey" in s]
+    assert fk and "to_regclass('platform.scope') IS NOT NULL" in fk[0] and "column_name = 'session_id'" in fk[0] \
+        and "NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'cart_session_id_fkey'" in fk[0]
+    # the policy change is one block: dropped and applied together, and only where scope_path is there
+    pol = [s for s in p.statements if "drop_rls_policies('orders.cart'" in s]
+    assert len(pol) == 1 and "PERFORM platform.apply_scope_rls('orders.cart'::regclass);" in pol[0] \
+        and "column_name = 'scope_path'" in pol[0], pol
+    assert "SELECT platform." not in text                # a SELECT inside a DO block is written PERFORM
+
+
+def test_guarded_statements_fold_back_so_the_next_run_writes_nothing():
+    p = fwd.diff("tenant", model(PE_OLD), model(PE_NEW))
+    again = fwd.diff("tenant", fold(PE_OLD, p), model(PE_NEW))
+    assert not again.statements, again.statements
+
+
+def test_a_guarded_policy_call_is_read_where_its_table_is_named():
+    """ticket_done reads the call on its own line (PERFORM), so the migration ticket still cites the file; and
+    check-rls-scope-fit reads it through unguard."""
+    import tempfile
+    import ticket_done as td
+    p = fwd.diff("tenant", model(PE_OLD), model(PE_NEW))
+    pol = [s for s in p.statements if "drop_rls_policies('orders.cart'" in s][0]
+    assert [x for x in fwd.unguard(pol) if x.startswith("SELECT platform.apply_scope_rls('orders.cart'")]
+    with tempfile.TemporaryDirectory() as tmp:
+        root = Path(tmp)
+        d = root / "backend" / "tenant"
+        d.mkdir(parents=True)
+        (d / "V0113__after_r1_20261021.sql").write_text(pol + ";\n", encoding="utf-8")
+        got = td.after_r1_changes(root)
+    assert got == {("backend/tenant/V0113__after_r1_20261021.sql", "orders.cart"): [
+        ("row-level security", "apply_scope_rls")]}
+
+
+def test_check_migrations_lets_only_the_descope_blocks_drop_column_through():
+    """check-migrations refuses DROP COLUMN in a body (the four-step drop), but not the generated descope block of a
+    table whose contract says x-ticvai-scope: none (CHG-R9MIG-001)."""
+    cm = _load("check_migrations_r9", "check-migrations.py")
+    cm._CACHE["_scope_none"] = {"platform.outbox_sequence"}
+    p = fwd.diff("tenant", model(OS_OLD), model(OS_NEW), descoped=OS)
+    code = cm.strip_comments(fwd.render(p, "V0113", "r1", "x").split("-- ROLLBACK")[0])
+    assert cm.descope_drops(code) == {("platform.outbox_sequence", "scope_path")}
+    assert not cm.descope_drops(code.replace("column_name = 'scope_path'", "column_name = 'other'"))
+    cm._CACHE["_scope_none"] = set()
+    assert not cm.descope_drops(code)

@@ -85,6 +85,9 @@ root -- except an `APPEND_AUDIT` trail, which any grant appends to and only the 
 (CHG-R6-002). A contract schema marked `x-ticvai-rls: read-beneath` (rows readable by grants beneath their
 `scope_path` too) or `grant-holder-read` (any staff grant reads) keeps its base rule for writes, and a child that
 follows it through the parent rule follows it for reading only (CHG-GEN-005, `RLS_MARKS`, `SPLIT_CHILDREN`).
+**A schema marked `x-ticvai-scope: none` takes no scope** (CHG-R9MIG-001, ADAM CR-166 as the lead ruled it, 21 October
+2026): no `scope_path` and no scope policy. Frozen mode removes what a forward migration gave such a table, guarded
+(`DESCOPED`, ddl_forward.descope_block).
 
 **Frozen once the git tag `r1` exists** (plan item 1C, C3, 1 October). From then on this does not
 rewrite a baseline `.sql` file under `backend/`: databases were built from them. It writes the
@@ -719,8 +722,17 @@ $$;
 #     to. Staff read and write by `scope_path`, as the scope rule; a guest reads a row naming its subject in
 #     `subject_id`, `over_subject_id` or `granted_by_subject_id`, and writes one whose `over_subject_id` (else
 #     `subject_id`) is its own: the account holder grants and revokes. identity.delegated_access, guest to guest.
+#   * `x-ticvai-rls: any-grant-no-delete` (CHG-R9MIG-001; ADAM CR-166 as the lead ruled it, 21 October 2026): any
+#     connection holding a grant (a scope path set) reads, inserts and updates a row, and no policy lets one be deleted.
+#     For a row that belongs to no scope (`x-ticvai-scope: none`): platform.outbox_sequence, the per-aggregate counter
+#     every host allocates from. A deleted counter would start its aggregate's sequence again. The three policies are
+#     our team's repository migration 240's (`_read`, `_append`, `_update`), made with apply_split_rls and its
+#     `_delete` dropped, so no new helper function reaches a database that already has them.
 RLS_MARKS = ("read-beneath", "grant-holder-read", "own-row", "home-scope-write", "subject-self", "own-or-home-scope",
-             "signed-in-read", "scope-or-subject")
+             "signed-in-read", "scope-or-subject", "any-grant-no-delete")
+# The check apply_split_rls gets for `any-grant-no-delete`: a scope path set, the WITH CHECK the append-only trail's
+# INSERT has (CHG-R6-002).
+ANY_GRANT = "cardinality(platform.current_scope_paths()) > 0"
 
 # **A child that follows a split parent which the parent rule would not otherwise pick** (the parent sits at the tenant
 # root, so it is no owner). `identity.role_permission` is the rows of a role's permission set (CR-076 decision:
@@ -1569,6 +1581,11 @@ SCHEMA_MARKS: dict = {}
 ITEM_SCHEMA: dict = {}
 ARRAY_PROPS: set = set()     # `module.Schema.arrayProp`, every array property (a child table's parent key names one)
 RETIRED: dict = {}
+# **The tables whose contract says `x-ticvai-scope: none`** (CHG-R9MIG-001, ADAM CR-166 as the lead ruled it, 21
+# October 2026). Filled by main from table_marks; frozen mode hands it to ddl_forward.diff, which removes a scope_path,
+# its index and its scope policy that a forward migration gave such a table (V0108 gave platform.outbox_sequence all
+# three by the generator's habit, while CR-166's decision and our team's repository migration 240 have none).
+DESCOPED: set = set()
 
 
 # **A key into a partitioned table is indexed, never constrained** (ADR-0056; CHG-MGN-001, ADAM CR-138, 18 October
@@ -1715,6 +1732,10 @@ def table_marks(cols: dict, tables) -> dict:
         rls = marks.get("x-ticvai-rls")
         if rls is not None:
             entry["rls"] = str(rls).strip()
+        # **A table that takes no scope** (CHG-R9MIG-001, CR-166): `x-ticvai-scope: none`; see DESCOPED.
+        sc = marks.get("x-ticvai-scope")
+        if sc is not None:
+            entry["scope"] = str(sc).strip()
         # **A field needed for one kind of row only** (CHG-TEN-001, ADAM CR-080): `x-ticvai-required-when`
         # maps a property to the values that require it, `{variantId: {kind: product}}`, so a product tile
         # with no variant cannot be stored. Becomes `CHECK (<when> IS DISTINCT FROM 'v' OR <col> IS NOT NULL)`.
@@ -1978,7 +1999,7 @@ def frozen_mode(files: dict, tag: str, commit: str, apply: bool) -> None:
                     ddl_forward.early_plan(area_dir, its), ev, baseline, stamp, before=nxt or "", rest="")
     for area_dir in (CONTROL, "tenant"):
         old, _fwd = old_model(area_dir)
-        plans.append(ddl_forward.diff(area_dir, old, news[area_dir], renames, retired=RETIRED))
+        plans.append(ddl_forward.diff(area_dir, old, news[area_dir], renames, retired=RETIRED, descoped=DESCOPED))
     # **Root-level files are documentation of references that are not constraints** (990): nothing
     # applies them, so a change is listed rather than migrated.
     for name in sorted(n for n in files if "/" not in n and n.endswith(".sql")):
@@ -2191,6 +2212,17 @@ def main() -> int:
     # (`x-ticvai-primary-key`) and whether its rows are only ever appended
     # (`x-ticvai-append-only: <time property>`).
     marks = table_marks(cols, real)
+    DESCOPED.clear()
+    for t, m in sorted(marks.items()):
+        if m.get("scope") is None:
+            continue
+        if m["scope"] != "none":
+            print(f"  ! {t}: x-ticvai-scope {m['scope']!r} is not 'none'; nothing else is defined")
+            continue
+        if any(c["column"] == "scope_path" for c in cols.get(t, [])):
+            print(f"  ! {t}: x-ticvai-scope: none, but the schema reference gives it a scope_path; its scope stays")
+            continue
+        DESCOPED.add(t)
     DECLARED_PK.clear()
     DECLARED_PK.update({t: m["primary_key"] for t, m in marks.items()
                         if m.get("primary_key") and not any(c.startswith("?")
@@ -2837,7 +2869,17 @@ def main() -> int:
             base, write = "subject", "platform.subject_in_scope({a}subject_id)"
         else:
             base, write = "tenant root", "platform.tenant_root_in_scope()"
-        if mark == "home-scope-write":
+        if mark == "any-grant-no-delete":
+            if base != "tenant root" or t not in DESCOPED:
+                print(f"  ! {t}: x-ticvai-rls any-grant-no-delete is for a table that takes no scope (x-ticvai-scope: "
+                      "none) and has no venue, subject or owner; the base rule stands")
+                continue
+            write = ANY_GRANT
+            call = (f"SELECT platform.apply_split_rls('{tq(t)}'::regclass, {sql_literal(ANY_GRANT)}, "
+                    f"{sql_literal(ANY_GRANT)});\nDROP POLICY IF EXISTS {q(t.split('.', 1)[1][:55] + '_delete')} "
+                    f"ON {tq(t)};")
+            base = "any grant, never deleted"
+        elif mark == "home-scope-write":
             if "home_scope_id" not in has or base in ("scope_path", "venue_id"):
                 print(f"  ! {t}: x-ticvai-rls home-scope-write needs home_scope_id and no scope_path or venue_id; "
                       "the base rule stands")

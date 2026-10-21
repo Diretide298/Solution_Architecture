@@ -245,7 +245,7 @@ Each migration only references tables created by the ones above it. Keys that wo
 | MIG-PLATFORM | `platform.sale_board_page` | 4 | through its owner |  | 3 | 2 | used by the first release |
 | MIG-PLATFORM | `platform.sale_board_tile` | 10 | through its owner |  | 3 | 2 | used by the first release |
 | MIG-PLATFORM | `platform.scope` | 8 | none |  | 11 | 2 | used by the first release |
-| MIG-PLATFORM | `platform.tenant` | 2 | tenant root (one tenant per database; no tenant_id by design) |  | 0 | 0 | referenced by marketing.consent_purpose |
+| MIG-PLATFORM | `platform.tenant` | 2 | tenant root (one tenant per database; no tenant_id by design) |  | 0 | 0 | referenced by marketing.message_template |
 | MIG-PLATFORM | `platform.venue_settings` | 33 | venue_id |  | 5 | 2 | used by the first release |
 | MIG-PLATFORM | `platform.workstation` | 23 | scope_path |  | 7 | 1 | used by the first release |
 | MIG-PLATFORM | `sync.dsar_request` | 8 | none |  | 0 | 0 | built by MIG-PLATFORM as platform.dsar_request, before a declared move (CHG-TKT-013) |
@@ -333,7 +333,7 @@ Each migration only references tables created by the ones above it. Keys that wo
 | MIG-CATALOGUE | `catalogue.variant` | 9 | through its owner |  | 15 | 3 | used by the first release |
 | MIG-CATALOGUE | `catalogue.waitlist_entry` | 11 | through its owner |  | 2 | 2 | used by the first release |
 | MIG-LEDGER | `ledger.account` | 15 | none |  | 0 | 0 | referenced by inventory.supplier |
-| MIG-LEDGER | `ledger.cost_center` | 6 | venue_id |  | 0 | 0 | referenced by inventory.movement |
+| MIG-LEDGER | `ledger.cost_center` | 6 | venue_id |  | 0 | 0 | referenced by orders.invitation |
 | MIG-LEDGER | `ledger.credit_memo` | 30 | scope_path |  | 5 | 1 | used by the first release |
 | MIG-LEDGER | `ledger.credit_memo_line` | 10 | through its owner |  | 3 | 1 | used by the first release |
 | MIG-LEDGER | `ledger.einvoice_transmission` | 17 | scope_path |  | 3 | 1 | used by the first release |
@@ -354,7 +354,7 @@ Each migration only references tables created by the ones above it. Keys that wo
 | MIG-INVENTORY | `inventory.goods_receipt_line` | 11 | through its owner |  | 2 | 2 | used by the first release |
 | MIG-INVENTORY | `inventory.inventory_item` | 26 | venue_id |  | 6 | 3 | used by the first release |
 | MIG-INVENTORY | `inventory.kit_component` | 6 | scope_path |  | 3 | 1 | used by the first release |
-| MIG-INVENTORY | `inventory.location` | 7 | venue_id |  | 0 | 0 | referenced by platform.outlet |
+| MIG-INVENTORY | `inventory.location` | 7 | venue_id |  | 0 | 0 | referenced by inventory.stock_batch |
 | MIG-INVENTORY | `inventory.movement` | 17 | through its owner |  | 4 | 3 | used by the first release |
 | MIG-INVENTORY | `inventory.purchase_order` | 29 | scope_path |  | 0 | 0 | referenced by inventory.goods_receipt |
 | MIG-INVENTORY | `inventory.requisition` | 20 | venue_id |  | 0 | 0 | referenced by inventory.purchase_order |
@@ -733,7 +733,6 @@ Each migration only references tables created by the ones above it. Keys that wo
 | 1198 | `V1198__resources.sql` | MIG-RESOURCES-5 | tenant | resources | 1 | resources.allocation_policy |
 | 1199 | `V1199__whitelabel.sql` | MIG-WHITELABEL-2 | tenant | whitelabel | 5 | whitelabel.kiosk_assignment, whitelabel.kiosk_config, whitelabel.kiosk_config_attract_slide, whitelabel.kiosk_config_start_tile, whitelabel.kiosk_config_version |
 | 1200 | `V1200__promotions.sql` | MIG-PROMOTIONS-8 | tenant | promotions | 2 | promotions.bundle_capacity_policy, promotions.promotion_conflict |
-| 1201 | `V1201__promotions.sql` | MIG-PROMOTIONS-9 | tenant | promotions | 4 | promotions.product_relationship, promotions.recommendation_experiment, promotions.recommendation_strategy, promotions.recommendation_suppression |
 | 1202 | `V1202__seating.sql` | MIG-SEATING-7 | tenant | seating | 3 | seating.group_request, seating.group_request_participant, seating.reassignment |
 | 1203 | `V1203__seating.sql` | MIG-SEATING-8 | tenant | seating | 3 | seating.import_job, seating.seat_map_template, seating.zone |
 | 1204 | `V1204__orders.sql` | MIG-ORDERS-14 | tenant | orders | 2 | orders.upgrade, orders.upgrade_rule |
@@ -777,6 +776,7 @@ Each migration only references tables created by the ones above it. Keys that wo
 | 1250 | `V1250__access.sql` | MIG-ACCESS-6 | tenant | access | 1 | access.media_binding_rule |
 | 1251 | `V1251__access.sql` | MIG-ACCESS-10 | tenant | access | 10 | access.access_map, access.attraction_access, access.configuration_version, access.consumption_rule, access.gate_lane, access.group_admission_rule, access.hardware_deployment, access.journey_sequence_rule, access.offline_policy, access.operating_calendar_entry |
 | 1252 | `V1252__access.sql` | MIG-ACCESS-13 | tenant | access | 5 | access.fast_pass_profile, access.identity_lock, access.journey_profile, access.reason_code, access.security_investigation |
+| 1253 | `V1253__promotions.sql` | MIG-PROMOTIONS-10 | tenant | promotions | 4 | promotions.product_relationship, promotions.recommendation_experiment, promotions.recommendation_strategy, promotions.recommendation_suppression |
 
 ## Tables no migration creates
 
@@ -799,7 +799,7 @@ Each migration only references tables created by the ones above it. Keys that wo
 | `orders.payment_tip` | tenant | backend/tenant/010-orders.sql | storage only: no operation reads or writes it and no task names it; its forward migration is planned when an operation first reaches it |
 | `platform.cell_endpoint` | tenant | backend/tenant/010-platform.sql | storage only: no operation reads or writes it and no task names it; its forward migration is planned when an operation first reaches it |
 | `platform.device_heartbeat` | tenant | backend/tenant/010-platform.sql | storage only: no operation reads or writes it and no task names it; its forward migration is planned when an operation first reaches it |
-| `platform.outbox_sequence` | tenant | backend/tenant/V0108__after_r1_20261020.sql | storage only: no operation reads or writes it and no task names it; its forward migration is planned when an operation first reaches it |
+| `platform.outbox_sequence` | tenant | backend/tenant/V0108__after_r1_20261020.sql | storage only: no operation reads or writes it and no task names it; its forward migration is planned when an operation first reaches it; Source DDL after r1: backend/tenant/V0113__after_r1_20261021.sql |
 | `retail.store_rule` | tenant | backend/tenant/010-retail.sql | held: only operations not built until their contract is agreed reach it (listStoreRules: stub, setStoreRules: stub); its forward migration is planned with them |
 | `subscription.capacity_pack` | tenant | backend/tenant/010-subscription.sql | storage only: no operation reads or writes it and no task names it; its forward migration is planned when an operation first reaches it |
 | `subscription.contract` | tenant | backend/tenant/010-subscription.sql | storage only: no operation reads or writes it and no task names it; its forward migration is planned when an operation first reaches it |

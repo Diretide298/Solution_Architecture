@@ -80,7 +80,7 @@
    "operations": 8
   },
   {
-   "contract": "promotions",
+   "contract": "reporting",
    "operations": 5
   },
   {
@@ -88,11 +88,11 @@
    "operations": 5
   },
   {
-   "contract": "reporting",
+   "contract": "marketing-crm",
    "operations": 5
   },
   {
-   "contract": "marketing-crm",
+   "contract": "promotions",
    "operations": 5
   },
   {
@@ -108,19 +108,19 @@
    "operations": 2
   },
   {
-   "contract": "workforce",
-   "operations": 2
-  },
-  {
    "contract": "wallet",
    "operations": 2
   },
   {
-   "contract": "inventory",
-   "operations": 1
+   "contract": "workforce",
+   "operations": 2
   },
   {
    "contract": "games",
+   "operations": 1
+  },
+  {
+   "contract": "inventory",
    "operations": 1
   }
  ],
@@ -176,7 +176,7 @@
    "module": "Payment",
    "wave": 1,
    "route": "/payment/payment",
-   "operations": 13,
+   "operations": 14,
    "drawn": true
   },
   {
@@ -374,7 +374,7 @@
    "module": "Sell",
    "wave": 1,
    "route": "/sell/guests",
-   "operations": 6,
+   "operations": 5,
    "drawn": true
   },
   {

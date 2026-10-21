@@ -130,11 +130,11 @@
    "operations": 35
   },
   {
-   "contract": "catalogue",
+   "contract": "identity",
    "operations": 17
   },
   {
-   "contract": "identity",
+   "contract": "catalogue",
    "operations": 17
   },
   {
@@ -162,11 +162,11 @@
    "operations": 7
   },
   {
-   "contract": "finance",
+   "contract": "resources",
    "operations": 6
   },
   {
-   "contract": "resources",
+   "contract": "finance",
    "operations": 6
   },
   {

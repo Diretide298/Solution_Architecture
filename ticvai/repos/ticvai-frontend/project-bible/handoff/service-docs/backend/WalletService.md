@@ -39,7 +39,7 @@
 | wallet | [`restoreWalletConfigurationVersion`](#restorewalletconfigurationversion) | POST | `/wallet-configuration/versions/{version}/restore` | setup | 1 | BO-1162 |
 | wallet | [`setWalletFundingRules`](#setwalletfundingrules) | PUT | `/wallet-funding-rules` | setup | 1 | BO-1094, BO-1095, BO-1096, BO-1097, BO-1098, BO-1099 … |
 | wallet | [`setWalletTransferRules`](#setwallettransferrules) | PUT | `/wallet-transfer-rules` | setup | 1 | BO-1144, BO-1145 |
-| wallet | [`topUpWallet`](#topupwallet) | POST | `/wallets/{subjectId}/top-ups` | core | 1 | BO-488, POS-027 |
+| wallet | [`topUpWallet`](#topupwallet) | POST | `/wallets/{subjectId}/top-ups` | core | 1 | BO-488, POS-005 |
 | wallet | [`updateCreditType`](#updatecredittype) | PUT | `/credit-types/{creditTypeId}` | setup | 1 | BO-1088, BO-1104, BO-1105, BO-1108, BO-420 |
 
 ## Group: card
@@ -1021,7 +1021,7 @@ Creates a liability, not revenue. Recognition happens when the value is spent, o
 | Guest callable | True |
 | Reads | `cache:idempotency`, `wallet.balance`, `wallet.credit_lot`, `wallet.wallet` |
 | Writes | `cache:idempotency`, `platform.outbox`, `wallet.balance`, `wallet.credit_lot`, `wallet.wallet`, `wallet.wallet_transaction` |
-| Called by | BO-488, POS-027 |
+| Called by | BO-488, POS-005 |
 | State model | Guest wallet ([states/wallet.yaml](../../../states/wallet.yaml)): created as `active` |
 
 **Parameters**

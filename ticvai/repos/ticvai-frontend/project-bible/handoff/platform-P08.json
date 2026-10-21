@@ -210,11 +210,11 @@
    "operations": 62
   },
   {
-   "contract": "ai",
+   "contract": "resources",
    "operations": 56
   },
   {
-   "contract": "resources",
+   "contract": "ai",
    "operations": 56
   },
   {
@@ -250,11 +250,11 @@
    "operations": 41
   },
   {
-   "contract": "maintenance",
+   "contract": "identity",
    "operations": 41
   },
   {
-   "contract": "identity",
+   "contract": "maintenance",
    "operations": 41
   },
   {

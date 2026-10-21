@@ -328,6 +328,7 @@ screens:
   - lookupRetailSale
   - redeemLoyaltyPoints
   - reprintReceipt
+  - topUpWallet
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -338,6 +339,7 @@ screens:
   offlineState: true
   entryParams:
   - paymentId<-deepLink
+  - subjectId<-session
   - saleId<-deepLink
   goesTo:
   - POS-001
@@ -1070,7 +1072,6 @@ screens:
   - identifyGuest
   - recordConsent
   - searchGuests
-  - topUpWallet
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -1081,6 +1082,7 @@ screens:
   entryParams:
   - workstationId<-session
   - subjectId<-navigation
+  - cartId<-navigation
   goesTo:
   - POS-002
   - POS-025

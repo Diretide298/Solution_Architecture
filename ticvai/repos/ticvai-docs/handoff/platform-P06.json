@@ -74,11 +74,11 @@
    "operations": 22
   },
   {
-   "contract": "workforce",
+   "contract": "identity",
    "operations": 14
   },
   {
-   "contract": "identity",
+   "contract": "workforce",
    "operations": 14
   },
   {
@@ -110,27 +110,27 @@
    "operations": 6
   },
   {
-   "contract": "retail",
-   "operations": 5
-  },
-  {
    "contract": "reporting",
    "operations": 5
   },
   {
-   "contract": "venue-map",
-   "operations": 2
+   "contract": "retail",
+   "operations": 5
   },
   {
    "contract": "tenancy",
    "operations": 2
   },
   {
-   "contract": "approvals",
-   "operations": 1
+   "contract": "venue-map",
+   "operations": 2
   },
   {
    "contract": "payments",
+   "operations": 1
+  },
+  {
+   "contract": "approvals",
    "operations": 1
   }
  ],

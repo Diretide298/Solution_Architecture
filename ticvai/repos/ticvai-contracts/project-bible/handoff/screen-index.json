@@ -15783,13 +15783,15 @@
    "createOrder",
    "redeemLoyaltyPoints",
    "enrolFaceTag",
-   "createShopAndDrop"
+   "createShopAndDrop",
+   "topUpWallet"
   ],
   "services": [
    "AccessService",
    "MarketingService",
    "OrderService",
-   "RetailService"
+   "RetailService",
+   "WalletService"
   ],
   "stores": [
    "postgres",
@@ -15814,7 +15816,10 @@
    "retail.sale",
    "retail.sale_line",
    "retail.shop_and_drop",
-   "retail.shop_and_drop_line"
+   "retail.shop_and_drop_line",
+   "wallet.balance",
+   "wallet.credit_lot",
+   "wallet.wallet"
   ],
   "writes": [
    "cache:idempotency",
@@ -15837,7 +15842,11 @@
    "retail.sale",
    "retail.sale_line",
    "retail.shop_and_drop",
-   "retail.shop_and_drop_line"
+   "retail.shop_and_drop_line",
+   "wallet.balance",
+   "wallet.credit_lot",
+   "wallet.wallet",
+   "wallet.wallet_transaction"
   ],
   "storedProcedures": [],
   "wave": 1,
@@ -19469,13 +19478,11 @@
    "identifyGuest",
    "getGuestLoyalty",
    "addCartLine",
-   "topUpWallet",
    "recordConsent"
   ],
   "services": [
    "MarketingService",
-   "OrderService",
-   "WalletService"
+   "OrderService"
   ],
   "stores": [
    "postgres",
@@ -19496,10 +19503,7 @@
    "marketing.loyalty_position",
    "orders.cart",
    "orders.cart_line",
-   "pii.subject",
-   "wallet.balance",
-   "wallet.credit_lot",
-   "wallet.wallet"
+   "pii.subject"
   ],
   "writes": [
    "cache:idempotency",
@@ -19508,12 +19512,7 @@
    "marketing.guest_profile",
    "orders.cart",
    "orders.cart_line",
-   "platform.idempotency_record",
-   "platform.outbox",
-   "wallet.balance",
-   "wallet.credit_lot",
-   "wallet.wallet",
-   "wallet.wallet_transaction"
+   "platform.idempotency_record"
   ],
   "storedProcedures": [],
   "wave": 1,

@@ -87,11 +87,13 @@ def sql_files(backend: Path) -> list:
 
 
 def statements(backend: Path):
-    """Every statement of the tenant DDL in apply order, normalized, rollback sections left out."""
+    """Every statement of the tenant DDL in apply order, normalized, rollback sections left out. A guarded block of
+    policy calls (ddl_forward.guard_block, CHG-R9MIG-002) is read as the calls inside it."""
     for f in sql_files(backend):
         text = re.split(r"^-- =+\n-- ROLLBACK\b", f.read_text(encoding="utf-8"), maxsplit=1, flags=re.M)[0]
         for st in fwd.split_statements(text):
-            yield fwd.norm(st)
+            for x in fwd.unguard(st):
+                yield fwd.norm(x)
 
 
 def policies(backend: Path) -> dict:

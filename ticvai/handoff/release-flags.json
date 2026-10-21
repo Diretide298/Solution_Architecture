@@ -3032,8 +3032,7 @@
     "marketing-crm#identifyGuest",
     "marketing-crm#recordConsent",
     "marketing-crm#searchGuests",
-    "orders#addCartLine",
-    "wallet#topUpWallet"
+    "orders#addCartLine"
    ]
   },
   "AM-MARKETING-CRM-P05": {
@@ -5861,7 +5860,8 @@
     "retail#lookupShopAndDrop",
     "retail#reprintReceipt",
     "retail#reserveMerchandise",
-    "shift#getCurrentShift"
+    "shift#getCurrentShift",
+    "wallet#topUpWallet"
    ]
   },
   "AM-RETAIL-P05": {

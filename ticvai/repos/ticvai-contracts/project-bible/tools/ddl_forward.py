@@ -56,6 +56,25 @@ where the column is already gone applies it). A table CHECK added to an existing
 VALIDATE, after dropping one of the same name a person may have added), and a new index on a renamed column is
 listed whole to create after the rename.
 
+**Every statement is guarded** (CHG-R9MIG-002; Hrushikant Patkar's r8 apply, 21 October 2026). The additive file ran
+statement by statement on a database our team's repository built: six statements of r8 failed, each on a table or a
+column that repository had not built yet (three on marketing.privacy_exception, an index and a policy on a scope_path
+platform.outbox_sequence never had, control V0110's index on control.onboarding_application), and the task text had to
+allow a hand retry. Now every statement but CREATE TABLE, CREATE SCHEMA, CREATE EXTENSION and CREATE FUNCTION (each of
+which needs no table) is written inside `DO $$ BEGIN IF <guard> THEN ... END IF; END $$`, the guard naming the tables
+and columns the statement needs (`guard_block`), as the names files already are: on a database without them it does
+nothing, and the migration that later creates them copies the block. A table's policy change is one block, the
+`drop_rls_policies` and the helper together, so a database the helper cannot apply to keeps the policies it has. The
+inner statement keeps a line of its own, so the readers that read these files line by line still find it, and a
+block is read back by `unguard` (and `Model.apply_forward`), so the next run sees the change as made.
+
+**A table the contract says takes no scope loses the scope a forward migration gave it** (CHG-R9MIG-001, ADAM CR-166
+as the lead ruled it, 21 October 2026). `x-ticvai-scope: none` on the schema (derive-ddl DESCOPED): where the old side
+has a scope_path the new side does not, `descope_block` writes one guarded block that drops the table's policies, the
+scope_path index and the column, and applies the table's generated policy. It is guarded on the column: a database
+where the table never had one (our team's repository builds platform.outbox_sequence without it, migration 240) is
+left as it is. Not listed for a person: the decision is the contract's, and the column held only a copy of a path.
+
 This is not a SQL parser. It understands the statements `derive-ddl.py` emits and the handful a
 person writes in a forward migration; anything else it cannot place is listed for review rather than
 guessed at.
@@ -512,8 +531,9 @@ class Model:
         self.order = [(k, s) for k, s in self.order if k in self.stmts]
 
     def apply_forward(self, sql: str) -> None:
-        """A forward migration already written: fold its additions and hand-written drops into the model."""
-        for stmt in split_statements(sql):
+        """A forward migration already written: fold its additions and hand-written drops into the model. A guarded
+        block of PERFORM statements (CHG-R9MIG-001, CHG-R9MIG-002) is folded statement by statement (`unguard`)."""
+        for stmt in [x for st0 in split_statements(sql) for x in unguard(st0)]:
             s = norm(stmt)
             if re.match(r"INSERT INTO platform\.schema_version\b", s, re.I):
                 continue
@@ -683,6 +703,97 @@ def guard_create_index(t: str, stmt: str, cols) -> str:
 
 def guard_drop_index(idx: str) -> str:
     return f"DO $$ BEGIN IF to_regclass('{idx}') IS NOT NULL THEN DROP INDEX {idx}; END IF; END $$"
+
+
+# ---- every statement guarded (CHG-R9MIG-002) ---------------------------------------------------------------------
+# A block of the additive file: `DO $$ BEGIN IF <guard> THEN` on a line, the statement (SELECT written PERFORM) on a
+# line of its own, `END IF; END $$`. One statement to a block, except a policy change (drop_rls_policies and the
+# helper) and a scope removed (descope_block), whose statements belong together and are PERFORM-led.
+PERFORM_BLOCK = re.compile(r"^DO \$\$ BEGIN IF (?P<guard>.*?) THEN (?P<body>PERFORM .*); END IF; END \$\$$", re.I | re.S)
+DROP_POLICY = re.compile(rf"^DROP POLICY IF EXISTS {NAME} ON ({QNAME})$", re.I)
+
+
+def unguard(stmt: str) -> list:
+    """The statements a PERFORM-led guarded block runs, as SELECT statements a model folds (CHG-R9MIG-002); any other
+    statement as it is. The single-statement blocks need no unwrapping here: GUARD reads them."""
+    m = PERFORM_BLOCK.match(norm(stmt))
+    if not m:
+        return [stmt]
+    out = []
+    for x in split_statements(m.group("body")):
+        x = norm(x)
+        out.append("SELECT " + x[8:] if x.upper().startswith("PERFORM ") else x)
+    return out
+
+
+ANY_BLOCK = re.compile(r"^DO \$\$ BEGIN IF (?P<guard>.*?) THEN (?P<body>.*); END IF; END \$\$$", re.I | re.S)
+
+
+def inner(stmt: str) -> list:
+    """What a statement runs, normalized: the statements inside a generated `DO $$ BEGIN IF ... THEN ... END IF; END $$`
+    block (PERFORM read as SELECT), else the statement itself. For a reader and the tests (CHG-R9MIG-002)."""
+    out = []
+    for s in split_statements(stmt):
+        s = norm(s)
+        m = ANY_BLOCK.match(s)
+        if not m:
+            out.append(s)
+            continue
+        for x in split_statements(m.group("body")):
+            x = norm(x)
+            out.append("SELECT " + x[8:] if x.upper().startswith("PERFORM ") else x)
+    return out
+
+
+def exists_guard(tables=(), cols: dict | None = None, extra=()) -> str:
+    """`to_regclass('t') IS NOT NULL` for each table, a column-exists test for each (table, column), then `extra`."""
+    parts = [f"to_regclass('{t}') IS NOT NULL" for t in dict.fromkeys(tables)]
+    for t, cs in sorted((cols or {}).items()):
+        sch, name = _split_t(t)
+        parts += [_col_exists(sch, name, unq(c)) for c in sorted(cs)]
+    return " AND ".join(parts + list(extra))
+
+
+def guard_block(guard: str, stmts) -> str:
+    """`stmts` inside `DO $$ BEGIN IF guard THEN ... END IF; END $$`, one to a line, SELECT written PERFORM."""
+    lines = []
+    for st in stmts:
+        st = norm(st).rstrip(";").rstrip()
+        if re.match(r"SELECT\b", st, re.I):
+            st = "PERFORM " + st[6:].lstrip()
+        lines.append(st + ";")
+    return f"DO $$ BEGIN IF {guard} THEN\n" + "\n".join(lines) + "\nEND IF; END $$"
+
+
+def named_columns(text: str, cols) -> set:
+    """The columns of a table (`cols`) that `text` names as a whole word (not after a dot)."""
+    return {c for c in cols if re.search(r"(?<![\w.\"])" + re.escape(unq(c)) + r"(?![\w\"])", text)}
+
+
+# The columns each row-level security helper's policy reads, beyond those its arguments name.
+RLS_HELPER_COLUMNS = {
+    "apply_scope_rls": ("scope_path",), "apply_read_beneath_rls": ("scope_path",),
+    "apply_shared_scope_rls": ("scope_path",), "apply_venue_rls": ("venue_id",),
+    "apply_subject_rls": ("subject_id",), "apply_grant_holder_subject_read_rls": ("subject_id",),
+}
+
+
+def rls_guard(stmt: str, cols) -> str:
+    """The guard for a policy call on its table: the table, every table its arguments name as `'x'::regclass`, the
+    columns the helper reads and the columns of the table (`cols`) its arguments name."""
+    c = rls_call(stmt)
+    t = c[2]
+    args = norm(stmt).split("::regclass", 1)[1] if "::regclass" in stmt else ""
+    # the tables its arguments name: `'x'::regclass`, and `FROM x` / `JOIN x` inside a split check
+    parents = re.findall(r"'([^']+)'::regclass", args) + re.findall(rf"\b(?:FROM|JOIN) ({QNAME})", args)
+    parents = [p for p in parents if unq(p) != unq(t)]
+    m = re.match(r"\s*,\s*'([^']+)'\s*,\s*'([^']+)'::regclass\s*,\s*'([^']+)'", args)
+    if c[0].startswith("apply_parent") and m:
+        # (target, fk_column, parent, parent_key, ...): the key column on the table, the parent's key on the parent
+        need, more = {m.group(1)}, {m.group(2): {m.group(3)}}
+    else:
+        need, more = set(RLS_HELPER_COLUMNS.get(c[0], ())) | named_columns(args, cols), {}
+    return exists_guard([t] + parents, {**({t: need} if need else {}), **more})
 
 
 FK = re.compile(rf"^ALTER TABLE (?:ONLY )?({QNAME}) ADD CONSTRAINT ({NAME}) FOREIGN KEY \(([^)]*)\) REFERENCES "
@@ -1084,16 +1195,22 @@ def _renamed_name(new_name: str, rc: dict, tables) -> str:
     return out
 
 
-def diff(area: str, old: Model, new: Model, renames: dict | None = None, retired: dict | None = None) -> Plan:
+def diff(area: str, old: Model, new: Model, renames: dict | None = None, retired: dict | None = None,
+         descoped=None) -> Plan:
     """`renames`: {"tables": {old: new}, "columns": {(table as named now, old column): new column}}, the
     declared renames (CHG-R6-010). Only a table that exists on the old side under its old name and on the new
     side under its new one is treated as renamed; likewise a column. `retired`: {table: {column}}, the columns the
-    contracts withdraw (`x-ticvai-retired-columns`, CHG-MGN-001)."""
+    contracts withdraw (`x-ticvai-retired-columns`, CHG-MGN-001). `descoped`: the tables whose contract says
+    `x-ticvai-scope: none` (CHG-R9MIG-001); one the old side gave a scope_path loses it here (`descope_block`).
+    Every statement written is guarded at the end (`guard_statements`, CHG-R9MIG-002)."""
     p = Plan(area)
     recon_cols, recon_names, recon_fk, recon_drop = [], [], [], []   # (statement, rollback), in the order they run
     renames = renames or {}
     retired = retired or {}
     known = set(old.tables) | set(new.tables)
+    # the declared-unscoped tables that still have the scope_path a forward migration gave them (CHG-R9MIG-001)
+    gone_scope = {t for t in (descoped or ()) if t in old.tables and t in new.tables
+                  and "scope_path" in old.tables[t].cols and "scope_path" not in new.tables[t].cols}
     # new name -> old name, for the tables renamed since the old side
     rt = {n: o for o, n in (renames.get("tables") or {}).items()
           if o in old.tables and o not in new.tables and n in new.tables and n not in old.tables}
@@ -1329,6 +1446,8 @@ def diff(area: str, old: Model, new: Model, renames: dict | None = None, retired
                     if c in retired.get(t, ()):
                         retired_row(t, c, t, write=True)
                         continue
+                    if c == "scope_path" and t in gone_scope:
+                        continue   # x-ticvai-scope: none; descope_block drops it (CHG-R9MIG-001)
                     review("column dropped", f"{t}.{c}", "no longer in the schema reference",
                            "a rename or a drop: decide, then RENAME COLUMN or the four-step drop by hand")
             old_names = {re.match(r"CONSTRAINT (\S+) ", x).group(1) for x in a.constraints
@@ -1452,7 +1571,9 @@ def diff(area: str, old: Model, new: Model, renames: dict | None = None, retired
                 # **Guarded, so the file applies twice** (CHG-R8MIG-010, the storage-sat lane's request): every other
                 # statement of the file is IF [NOT] EXISTS, and ADD CONSTRAINT has no such form, so a second run
                 # stopped at the first key. Checked, not NOT VALID: the column is new, so no row can break it.
-                p.statements.append(guard_add_constraint(t, name, stmt) if parse_fk(stmt) else stmt)
+                # (guarded with guard_statements below, CHG-R9MIG-002: the key's tables and columns, and the key not
+                # there yet; guard_add_constraint's form, which tested the key alone, is still read in older files)
+                p.statements.append(stmt)
                 if t not in new_tables:
                     p.rollback.append(f"ALTER TABLE {t} DROP CONSTRAINT IF EXISTS {name};")
                 p.counts["other"] += 1
@@ -1493,6 +1614,8 @@ def diff(area: str, old: Model, new: Model, renames: dict | None = None, retired
             p.counts["other"] += 1
             continue
         refs = tables_named(s, known)
+        if refs & gone_scope and (rls_call(s) or DROP_POLICY.match(s)):
+            continue   # the table's policy goes into its descope_block (CHG-R9MIG-001)
         if refs & set(rt):
             rc_ = rls_call(s)
             for t in refs & set(rt):
@@ -1545,13 +1668,29 @@ def diff(area: str, old: Model, new: Model, renames: dict | None = None, retired
                               + " ".join(w.rstrip(";") + ";" for w in was))
             p.counts["policies"] = p.counts.get("policies", 0) + 1
             continue
+        m = DROP_POLICY.match(s)
+        if m and unq(m.group(1)) in old.tables:
+            # **A policy a generated call makes and the table must not have** (CHG-R9MIG-001): `any-grant-no-delete`
+            # is apply_split_rls without its `_delete`. Dropping a policy touches no row and runs twice; written after
+            # the call it follows, in the same guarded block (guard_statements).
+            p.statements.append(stmt)
+            p.counts["other"] += 1
+            continue
         else:
             review("statement added", ", ".join(sorted(refs)) or "(database)", f"`{s}`",
                    "touches objects that already exist: write it into a forward migration by hand")
 
+    # **A table that takes no scope loses the one a forward migration gave it** (CHG-R9MIG-001): one guarded block each.
+    for t in sorted(gone_scope):
+        block, back = descope_block(t, old, new)
+        p.statements.append(block)
+        p.rollback.append(back)
+        p.counts["other"] += 1
+        p.counts["policies"] = p.counts.get("policies", 0) + 1
+
     # Every table a replaced helper applied its policy to gets it again (CHG-RSF-001), once, after the helpers.
     if replaced_helpers:
-        done = {c[1] for c in (rls_call(s) for s in p.statements) if c and c[0] != "drop_rls_policies"}
+        done = {c[1] for c in (rls_call(s) for s in p.statements) if c and c[0] != "drop_rls_policies"} | gone_scope
         for k, stmt in new.order:
             c = rls_call(stmt) if k[0] == "stmt" else None
             if not c or c[0] not in replaced_helpers or c[1] not in old.tables or c[1] in done:
@@ -1599,6 +1738,8 @@ def diff(area: str, old: Model, new: Model, renames: dict | None = None, retired
                 (k[2] if kind == "constraint" else k[1].split(".", 1)[1]) == o and rt_t in tables_named(old.stmts[k], known)
                 for rt_t, o in retired_objs):
             continue   # named in its retired column's row (CHG-MGN-001)
+        if kind == "index" and _index_table(old.stmts[k]) in gone_scope and "scope_path" in _cols_in_parens(old.stmts[k]):
+            continue   # the scope_path index of a table that takes no scope: its descope_block drops it (CHG-R9MIG-001)
         if kind == "table":
             review("table dropped", k[1], "no longer in the schema reference",
                    "a rename or a drop: decide, then ALTER TABLE ... RENAME or DROP TABLE by hand")
@@ -1638,7 +1779,136 @@ def diff(area: str, old: Model, new: Model, renames: dict | None = None, retired
     for stmt_, back_ in recon_cols + recon_names + recon_fk + recon_drop:
         p.recon.append(stmt_)
         p.recon_rollback.append(back_)
+    p.statements = guard_statements(p.statements, old, new)
     return p
+
+
+def descope_block(t: str, old: "Model", new: "Model") -> tuple:
+    """(the block, its rollback) that takes away the scope a forward migration gave `t`, a table whose contract says
+    `x-ticvai-scope: none` (CHG-R9MIG-001, ADAM CR-166). Guarded on the scope_path column, so a database whose table
+    never had it (our team's repository migration 240 builds platform.outbox_sequence without one) is left as it is:
+    its policies, the scope_path index, then the column go, and the table's generated policy (the new side's calls for
+    `t`, in order) is applied. One block, so the table is never left between the two policies."""
+    sch, name = _split_t(t)
+    idx = sorted((k[1], st) for k, st in old.stmts.items()
+                 if k[0] == "index" and _index_table(st) == t and "scope_path" in _cols_in_parens(st))
+    def mine(s: str) -> bool:
+        c, d = rls_call(s), DROP_POLICY.match(s)
+        return bool((c and c[1] == t and c[0] != "drop_rls_policies") or (d and unq(d.group(1)) == t))
+    pol = [new.stmts[k] for k, _st in new.order if k[0] == "stmt" and mine(new.stmts[k])]
+    body = ([f"SELECT platform.drop_rls_policies('{t}'::regclass)"] + [f"DROP INDEX IF EXISTS {i}" for i, _ in idx]
+            + [f"ALTER TABLE {t} DROP COLUMN IF EXISTS scope_path"] + pol)
+    block = tag(t, "scope removed", "scope_path (x-ticvai-scope: none)",
+                guard_block(_col_exists(sch, name, "scope_path"), body))
+    was = [st for k, st in old.stmts.items() if k[0] == "stmt" and (rls_call(st) or ("", "", ""))[1] == t
+           and rls_call(st)[0] != "drop_rls_policies"]
+    back = (f"ALTER TABLE {t} ADD COLUMN IF NOT EXISTS scope_path ltree; "
+            + " ".join(st.rstrip(";") + ";" for _, st in idx)
+            + f" SELECT platform.drop_rls_policies('{t}'::regclass); " + " ".join(w.rstrip(";") + ";" for w in was)
+            + " (each row's scope_path is gone: backfill it, then ALTER COLUMN scope_path SET NOT NULL)")
+    return block, back
+
+
+def guard_statements(stmts: list, old: "Model", new: "Model") -> list:
+    """Every statement of the additive file inside a guarded block (CHG-R9MIG-002), so it does nothing where its table
+    or a column it names is not there yet. Left as they are: CREATE TABLE, SCHEMA, EXTENSION and FUNCTION (they need no
+    table), a DO block (already guarded: a retired column's DROP NOT NULL, a descope_block) and a lone DROP INDEX IF
+    EXISTS. A policy change (drop_rls_policies, the helper call, and a DROP POLICY that follows it) is one block. A
+    CHECK's DROP CONSTRAINT IF EXISTS and VALIDATE take the guard of its ADD, and a DROP INDEX the guard of the CREATE
+    INDEX after it, so the pair runs together or not at all."""
+    def cols_of(t: str) -> set:
+        """The table's columns on either side: a statement may name one the other side does not have."""
+        return {c for m in (new, old) for c in ((m.tables.get(unq(t)) or Table()).cols)}
+
+    def alter_parts(s: str):
+        m = re.match(rf"ALTER TABLE (?:ONLY )?(?:IF EXISTS )?({QNAME}) (.*)$", s, re.I | re.S)
+        return (m.group(1), m.group(2)) if m else (None, None)
+
+    def no_constraint(t: str, name: str) -> str:
+        return (f"NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = '{unq(name)}' AND conrelid = "
+                f"to_regclass('{t}'))")
+
+    norms = [norm(x).rstrip(";").rstrip() for x in stmts]
+    check_guard = {}    # (table, constraint) -> the guard of its ADD CONSTRAINT ... CHECK
+    for s in norms:
+        t, rest = alter_parts(s)
+        m = re.match(rf"ADD CONSTRAINT ({NAME}) CHECK\b(.*)$", rest or "", re.I | re.S)
+        if t and m:
+            check_guard[(unq(t), unq(m.group(1)))] = exists_guard([t], {t: named_columns(m.group(2), cols_of(t))})
+
+    def index_guard(s: str) -> str | None:
+        m = re.match(rf"CREATE (?:UNIQUE )?INDEX (?:CONCURRENTLY )?(?:IF NOT EXISTS )?({NAME}) ON (?:ONLY )?({QNAME})"
+                     r"(.*)$", s, re.I | re.S)
+        if not m:
+            return None
+        t = m.group(2)
+        # the plain columns of its key list, whatever a model says, and any column of the table its expressions name
+        plain = {x for x in _cols_in_parens(s) if re.fullmatch(r"[a-z_][a-z0-9_]*", x)}
+        need = plain | named_columns(m.group(3), cols_of(t))
+        return exists_guard([t], {t: need} if need else None)
+
+    out, i = [], 0
+    while i < len(norms):
+        s, raw = norms[i], stmts[i]
+        if re.match(r"(CREATE (TABLE|SCHEMA|EXTENSION|(OR REPLACE )?FUNCTION)|DO)\b", s, re.I):
+            out.append(raw)
+            i += 1
+            continue
+        c = rls_call(s)
+        if c:
+            group = [s]
+            j = i + 1
+            if c[0] == "drop_rls_policies" and j < len(norms) and (rls_call(norms[j]) or ("", ""))[1] == c[1] \
+                    and rls_call(norms[j])[0] != "drop_rls_policies":
+                group.append(norms[j])
+                j += 1
+            call = group[-1]
+            while j < len(norms) and DROP_POLICY.match(norms[j]) and unq(DROP_POLICY.match(norms[j]).group(1)) == c[1]:
+                group.append(norms[j])
+                j += 1
+            g = rls_guard(call, cols_of(c[2])) if rls_call(call)[0] != "drop_rls_policies" else exists_guard([c[2]])
+            out.append(guard_block(g, group))
+            i = j
+            continue
+        m = re.match(rf"DROP INDEX (?:CONCURRENTLY )?(?:IF EXISTS )?({QNAME}|{NAME})$", s, re.I)
+        if m:
+            nxt = index_guard(norms[i + 1]) if i + 1 < len(norms) else None
+            same = nxt and unq(m.group(1)).split(".")[-1] == unq(re.match(
+                rf"CREATE (?:UNIQUE )?INDEX (?:CONCURRENTLY )?(?:IF NOT EXISTS )?({NAME})", norms[i + 1], re.I).group(1))
+            out.append(guard_block(nxt, [s]) if same else raw)
+            i += 1
+            continue
+        g = index_guard(s)
+        if g:
+            out.append(guard_block(g, [s]))
+            i += 1
+            continue
+        t, rest = alter_parts(s)
+        if t:
+            fk = parse_fk(s)
+            m = re.match(rf"(?:ADD CONSTRAINT|DROP CONSTRAINT IF EXISTS|VALIDATE CONSTRAINT) ({NAME})", rest, re.I)
+            if fk:
+                g = exists_guard([t, fk[3]], {t: set(fk[2])}, [no_constraint(t, fk[1])])
+            elif m and (unq(t), unq(m.group(1))) in check_guard:
+                g = check_guard[(unq(t), unq(m.group(1)))]
+            elif m and rest.upper().startswith("ADD CONSTRAINT"):
+                g = exists_guard([t], {t: named_columns(rest, cols_of(t))}, [no_constraint(t, m.group(1))])
+            elif re.match(r"ADD COLUMN\b", rest, re.I):
+                g = exists_guard([t])
+            else:
+                need = named_columns(rest, cols_of(t))
+                g = exists_guard([t], {t: need} if need else None)
+            out.append(guard_block(g, [s]))
+            i += 1
+            continue
+        if re.match(r"SELECT\b", s, re.I):
+            named = [x for x in re.findall(r"'([^']+)'::regclass", s)]
+            out.append(guard_block(exists_guard(named), [s]) if named else raw)
+            i += 1
+            continue
+        out.append(raw)
+        i += 1
+    return out
 
 
 def render(p: Plan, version: str, baseline: str, stamp: str) -> str:
@@ -1656,6 +1926,13 @@ def render(p: Plan, version: str, baseline: str, stamp: str) -> str:
         f"-- The baseline under backend/{p.area}/ is frozen at {baseline}, so the change to the schema reference",
         "-- since then is written here instead: additive only. Changes that are not additive (drops, renames,",
         "-- type changes) are not generated; they are listed for a person in handoff/migration-review.md.",
+        "-- Every statement that needs a table is a guarded block (CHG-R9MIG-002): it does nothing where its table",
+        "-- or a column it names is not there yet, so the file applies as one transaction, twice, on any database;",
+        "-- the migration that creates such a table later copies the block. A table's policy change is one block.",
+    ] + ([
+        "-- A table the contract says takes no scope (x-ticvai-scope: none) loses the scope_path, its index and its",
+        "-- scope policy a forward migration gave it, in one block guarded on the column (CHG-R9MIG-001).",
+    ] if any("| scope removed |" in s for s in p.statements) else []) + [
         f"-- {what}.",
         "",
         body,

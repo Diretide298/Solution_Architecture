@@ -177,6 +177,37 @@ def collect_alters(files: list[Path]) -> None:
             DEFAULTS.add(m.group(1).replace('"', ""))
 
 
+def scope_none_tables() -> set:
+    """The tables whose contract schema says `x-ticvai-scope: none` (CHG-R9MIG-001, ADAM CR-166)."""
+    if "_scope_none" not in _CACHE:
+        sys.path.insert(0, str(ROOT / "tools"))
+        import audit_guard as g  # noqa: E402
+        by, _ = g.schemas()
+        _CACHE["_scope_none"] = {
+            t.strip() for s in by.values() if str(s.get("x-ticvai-scope") or "").strip() == "none"
+            for t in str(s.get("x-ticvai-persistence") or "").split("+") if re.match(r"^\s*\w+\.\w+\s*$", t)}
+    return _CACHE["_scope_none"]
+
+
+_CACHE: dict = {}
+
+
+def descope_drops(code: str) -> set:
+    """(table, 'scope_path') for each DROP COLUMN derive-ddl writes in a descope block (ddl_forward.descope_block,
+    CHG-R9MIG-001): inside `DO $$ BEGIN IF EXISTS (... the table's scope_path column ...) THEN ... END IF; END $$`, on
+    a table whose contract says `x-ticvai-scope: none`. The column held only a copy of a path and the contract's
+    decision removes it, so the four-step drop (for data a reader still needs) does not apply; any other DROP COLUMN
+    still fails."""
+    out = set()
+    for m in re.finditer(r"DO \$\$ BEGIN IF EXISTS \(SELECT 1 FROM information_schema\.columns WHERE table_schema = "
+                         r"'(\w+)' AND table_name = '(\w+)' AND column_name = 'scope_path'\) THEN\n(.*?)\nEND IF; END \$\$",
+                         code, re.S):
+        t = f"{m.group(1)}.{m.group(2)}"
+        if f"ALTER TABLE {t} DROP COLUMN IF EXISTS scope_path" in m.group(3) and t in scope_none_tables():
+            out.add((t, "scope_path"))
+    return out
+
+
 def check_file(path: Path, known_schemas: set[str]) -> set[str]:
     name = path.name
     raw = path.read_text()
@@ -205,7 +236,9 @@ def check_file(path: Path, known_schemas: set[str]) -> set[str]:
     # --- destructive statements outside rollback ------------------------------
     for stmt in re.findall(r"^\s*(DROP TABLE|DROP SCHEMA|TRUNCATE)\b", code, re.M):
         fail(name, f"destructive statement in migration body: {stmt}")
-    for col in re.findall(r"ALTER TABLE [\w.]+\s+DROP COLUMN", code):
+    for m in re.finditer(r"ALTER TABLE ([\w.]+)\s+DROP COLUMN (?:IF EXISTS )?(\w+)", code):
+        if (m.group(1), m.group(2)) in descope_drops(code):
+            continue
         fail(name, "DROP COLUMN in body — use the additive four-step instead")
 
     # --- schemas used exist ---------------------------------------------------

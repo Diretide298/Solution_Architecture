@@ -34,7 +34,8 @@ def model(sql):
 
 
 def flat(stmts):
-    return [fwd.norm(s).rstrip(";") for s in stmts]
+    """What the statements run, a guarded block read as the statements inside it (CHG-R9MIG-002)."""
+    return [x.rstrip(";") for s in stmts for x in fwd.inner(s)]
 
 
 def test_a_changed_rls_helper_is_replaced_and_every_table_using_it_reapplied():

@@ -7150,8 +7150,8 @@
   {
    "file": "APP venue-pos.dc.html",
    "provenance": "clientPack",
-   "bytes": 384299,
-   "sha256": "1b7ca13ea6674d19",
+   "bytes": 384324,
+   "sha256": "0e0c6e2f81bdb455",
    "frames": 42,
    "screensFramed": 42,
    "screens": [
@@ -7792,8 +7792,8 @@
   {
    "file": "P04 Venue POS.dc.html",
    "provenance": "generated",
-   "bytes": 338375,
-   "sha256": "fe7355c46f16bb51",
+   "bytes": 338400,
+   "sha256": "01a7bd592d8ea1a1",
    "frames": 32,
    "screensFramed": 32,
    "screens": [

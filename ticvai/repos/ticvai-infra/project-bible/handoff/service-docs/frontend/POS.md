@@ -41,7 +41,7 @@
 | [POS-002](#pos-002-sell-ticket-catalogue) | Sell — Ticket Catalogue | Sell | 1 | 32 |
 | [POS-003](#pos-003-sell-timed-entry) | Sell — Timed Entry | Sell | 1 | 6 |
 | [POS-004](#pos-004-sell-seat-map) | Sell — Seat Map | Sell | 1 | 8 |
-| [POS-005](#pos-005-payment) | Payment | Payment | 1 | 13 |
+| [POS-005](#pos-005-payment) | Payment | Payment | 1 | 14 |
 | [POS-006](#pos-006-held-orders) | Held Orders | Sell | 1 | 14 |
 | [POS-007](#pos-007-close-shift) | Close Shift | Shift | 1 | 10 |
 | [POS-008](#pos-008-reports) | Reports | Reports | 1 | 4 |
@@ -63,7 +63,7 @@
 | [POS-024](#pos-024-outlet-setup) | Outlet Setup | Sell | 1 | 6 |
 | [POS-025](#pos-025-till-home) | Till Home | Sell | 1 | 8 |
 | [POS-026](#pos-026-receipt-reprint) | Receipt & Reprint | Sell | 1 | 8 |
-| [POS-027](#pos-027-guest-lookup) | Guest Lookup | Sell | 1 | 6 |
+| [POS-027](#pos-027-guest-lookup) | Guest Lookup | Sell | 1 | 5 |
 | [POS-028](#pos-028-table-service) | Table Service | Sell | 1 | 13 |
 | [POS-029](#pos-029-order-queue) | Order Queue | Sell | 1 | 4 |
 | [POS-030](#pos-030-sales-journal) | Sales Journal | Sell | 1 | 8 |
@@ -915,6 +915,7 @@
 | Parameter | From |
 |---|---|
 | paymentId | deepLink |
+| subjectId | session |
 | saleId | deepLink |
 
 **Operations**
@@ -934,6 +935,7 @@
 | `redeemLoyaltyPoints` | [MarketingService](../backend/MarketingService.md#redeemloyaltypoints) | onAction | Spend points | `LOYALTY_REDEEM` |
 | `enrolFaceTag` | [AccessService](../backend/AccessService.md#enrolfacetag) | onAction | Capture a same-visit Face Tag for the tickets just sold | `GUEST_MANAGE` |
 | `createShopAndDrop` | [RetailService](../backend/RetailService.md#createshopanddrop) | onAction | Leave the paid goods at a collection point for the way out | `ORDER_CREATE` |
+| `topUpWallet` | [WalletService](../backend/WalletService.md#topupwallet) | background | Once the sale's payment is captured, load each wallet top-up line of the sale onto the guest's wallet ("loads on payment"): one call per top-up line, with the line's id (orderLineId) and the captured payment (paymentId); POS-027 adds the line to the sale (CHG-R8RW-009, CHG-R8RW-010) | `WALLET_OPERATE` |
 
 **States**
 
@@ -2097,7 +2099,6 @@
 | `identifyGuest` | [MarketingService](../backend/MarketingService.md#identifyguest) | onAction | Attach that guest to the sale | `GUEST_VIEW` |
 | `getGuestLoyalty` | [MarketingService](../backend/MarketingService.md#getguestloyalty) | onAction | The identified guest's points and tier | `GUEST_VIEW` |
 | `addCartLine` | [OrderService](../backend/OrderService.md#addcartline) | onAction | Add the top-up to the sale: one line of the venue's walletTopUp product at the chosen amount (AED 50 to 1,000), for the identified guest. The approved till's "Add top-up to sale" (prototype confirmTopup; r8 gate, CHG-R8RW-009) | `None` |
-| `topUpWallet` | [WalletService](../backend/WalletService.md#topupwallet) | background | Load the top-up onto the guest's wallet once the sale is paid ("loads on payment"): once per top-up line, with the line's id and the sale's captured payment (CHG-R8RW-009) | `WALLET_OPERATE` |
 | `recordConsent` | [MarketingService](../backend/MarketingService.md#recordconsent) | onAction | Record the consent the guest gives in person at the till, recorded by the agent (GUEST_MANAGE; CHG-CSA-045) | `GUEST_MANAGE` |
 
 **States**

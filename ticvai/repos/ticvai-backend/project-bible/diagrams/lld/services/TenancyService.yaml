@@ -2678,7 +2678,7 @@ tables:
   - wallet
   - white-label
 - table: platform.outbox_sequence
-  columns: 3
+  columns: 2
   store: postgres
   parent: null
   writtenBy: []

@@ -3428,16 +3428,22 @@ components:
       type: object
       x-ticvai-persistence: platform.outbox_sequence
       x-ticvai-primary-key: [aggregateId]
+      x-ticvai-scope: none
+      x-ticvai-rls: any-grant-no-delete
       description: '**The last outbox sequence given to each aggregate** (ADAM CR-166, 18 October 2026; CHG-CRA-005).
         One row per aggregate, updated with `INSERT ... ON CONFLICT (aggregate_id) DO UPDATE ... RETURNING` in the
         transaction that writes the outbox row, so two writers of one aggregate queue on the row lock and a sequence
         survives the monthly partitions of `platform.outbox` leaving (ADR-0058). **Every host role holds SELECT,
         INSERT and UPDATE on it** (a kernel grant in docs/active/cross-deployable-writes.yaml, which DB-ROLES
-        creates), because access and operations allocate like commerce.'
+        creates), because access and operations allocate like commerce. **It takes no scope** (`x-ticvai-scope:
+        none`; CR-166 as the lead ruled it, 21 October 2026, CHG-R9MIG-001): the key and the last sequence only, as
+        our team''s repository migration 240 builds it. A counter row belongs to no scope, so it carries no
+        `scope_path` and no scope policy: any connection holding a grant reads, inserts and updates a row, and none
+        deletes one (`x-ticvai-rls: any-grant-no-delete`), since a deleted counter would start its aggregate''s
+        sequence again.'
       required:
       - aggregateId
       - lastSequence
-      - scopePath
       properties:
         aggregateId:
           x-ticvai-references: none
@@ -3448,12 +3454,6 @@ components:
           type: integer
           format: int64
           description: The last sequence given; the next writer gets this plus one.
-        scopePath:
-          type: string
-          readOnly: true
-          description: '**The aggregate''s own scope path**, the one its outbox rows carry, set on the first insert
-            and never changed. Row-level security reads it like any scoped row, so every principal allowed to change
-            the aggregate can allocate its next sequence, from any host, and no other can (CHG-CRA-005).'
     ControlOutboxEntry:
       type: object
       x-ticvai-persistence: control.outbox

@@ -80,7 +80,7 @@
 | `POS-002` | Sell — Ticket Catalogue | Sell | 1 | 32 | yes |
 | `POS-003` | Sell — Timed Entry | Sell | 1 | 6 | yes |
 | `POS-004` | Sell — Seat Map | Sell | 1 | 8 | yes |
-| `POS-005` | Payment | Payment | 1 | 13 | yes |
+| `POS-005` | Payment | Payment | 1 | 14 | yes |
 | `POS-006` | Held Orders | Sell | 1 | 14 | yes |
 | `POS-007` | Close Shift | Shift | 1 | 10 | yes |
 | `POS-008` | Reports | Reports | 1 | 4 | yes |
@@ -102,7 +102,7 @@
 | `POS-024` | Outlet Setup | Sell | 1 | 6 | yes |
 | `POS-025` | Till Home | Sell | 1 | 8 | yes |
 | `POS-026` | Receipt & Reprint | Sell | 1 | 8 | yes |
-| `POS-027` | Guest Lookup | Sell | 1 | 6 | yes |
+| `POS-027` | Guest Lookup | Sell | 1 | 5 | yes |
 | `POS-028` | Table Service | Sell | 1 | 13 | yes |
 | `POS-029` | Order Queue | Sell | 1 | 4 | yes |
 | `POS-030` | Sales Journal | Sell | 1 | 8 | yes |
