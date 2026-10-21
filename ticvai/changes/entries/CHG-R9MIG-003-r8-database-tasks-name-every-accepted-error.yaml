@@ -1,0 +1,47 @@
+id: CHG-R9MIG-003
+date: '2026-10-21'
+source: plan
+kind: plan
+proposed: '2026-10-21T17:00'
+summary: 'The R8-DB tasks (R8-DB-LOCAL-* and R8-DB-SHARED) give control V0110 the same retry as tenant V0108, list the
+  exact six errors a database our repository built raises and say any other error means a comment and a stop; the
+  shared database runs our repository''s Migrator to its latest migration first, then r8; both point at the one-command
+  script, tools/db/apply-r8.sh, and both apply V0113 after the r8 files.'
+decision:
+  what: 'docs/active/block-a-extra-tasks.json, the eleven R8-DB task texts and builds (file
+    backend/tenant/V0113__after_r1_20261021.sql added). tools/db/apply-r8.sh: Hrushikant Patkar''s apply.sh with the two
+    retries made exact, as tested on 21 October 2026, unchanged apart from a header line saying where it lives.'
+  by: Chinmay
+  date: '2026-10-21'
+waivers:
+  cooling_off: {by: Chinmay, date: '2026-10-21', quote: 'Can we quickly get the fixes done for hrushikant and raise a quick fix'}
+  release_window: {by: Chinmay, date: '2026-10-21', quote: 'Can we quickly get the fixes done for hrushikant and raise a quick fix'}
+why: 'Finding: Hrushikant Patkar''s r8 apply on a database our repository built (dev 6c52bfa, 21 October 2026): the
+  task text allowed the statement-by-statement retry for V0108 only, so every agent following it stopped at control
+  V0110 (`relation "control.onboarding_application" does not exist`); all ten R8-DB-LOCAL tasks and R8-DB-SHARED
+  were affected. The only errors such a database raises are six (CHG-R9MIG-002), and the live database must run the
+  Migrator before r8. V0113 is new since r8 (CHG-R9MIG-001), so check-ticket-builds B-DB-FILES asks the tasks to name
+  it. The lead''s words, 21 October 2026: "Can we quickly get the fixes done for hrushikant and raise a quick fix".'
+keys_touched:
+  files:
+  - docs/active/block-a-extra-tasks.json
+  - tools/db/apply-r8.sh
+root_class: 'a database task whose retry rule names one file of two that need it'
+tickets:
+  started: []
+  unstarted:
+  - 'R8-DB-LOCAL-PRANAY-SHINDE, R8-DB-LOCAL-NARAYAN-GAONKAR, R8-DB-LOCAL-DEEP-KHANVILKAR, R8-DB-LOCAL-PALLAVI-SAWANT,
+    R8-DB-LOCAL-SANKET-KELUSKAR, R8-DB-LOCAL-CHINMAY-PATKAR, R8-DB-LOCAL-CHITRANGI-MESTRY, R8-DB-LOCAL-PRADNYA-YERAM,
+    R8-DB-LOCAL-SURENDRA, R8-DB-LOCAL-KALPITA-MEJARI (#36186-#36195) and R8-DB-SHARED (#36196): the new text reaches
+    them at the release, as a comment where a task is started (ticvai/CLAUDE.md rule 6).'
+release_tag: r9
+decision_owner: Chinmay
+adam_cr: 'none: a decision of the lead on Hrushikant Patkar''s r8 apply; no ADAM CR is needed'
+triage: blocker
+prevention:
+  type: generator-rule
+  ref: tools/ddl_forward.py::guard_statements
+status: open
+notes: 'From r9 on no generated file needs a retry (CHG-R9MIG-002), so a database task needs no list of accepted
+  errors; this text is for the r8 files, which have shipped. The script is the one tested on 21 October 2026 against
+  Hrushikant Patkar''s before-r8 dump: only the six errors, and his after-r8 schema exactly.'
