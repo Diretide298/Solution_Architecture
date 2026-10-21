@@ -1,0 +1,57 @@
+id: CHG-R9MIG-001
+date: '2026-10-21'
+source: cr
+kind: contract
+summary: 'platform.outbox_sequence takes no scope, as CR-166 decided and our team''s repository migration 240 builds it:
+  OutboxSequence loses scopePath and says `x-ticvai-scope: none`, its policy is `x-ticvai-rls: any-grant-no-delete`
+  (any connection holding a grant reads, inserts and updates a counter, none deletes one), and the next forward
+  migration, V0113, takes away the scope_path, its index and the scope policy V0108 gave the table, in one block guarded
+  on the column, so a database our repository built is left as it is.'
+decision:
+  what: 'contracts/satellite/platform-ops.yaml OutboxSequence: scopePath removed, `x-ticvai-scope: none`, `x-ticvai-rls:
+    any-grant-no-delete`. tools/derive-ddl.py: DESCOPED (the tables marked `x-ticvai-scope: none`, handed to frozen
+    mode) and the RLS mark `any-grant-no-delete` (apply_split_rls on a scope path being set, its `_delete` policy
+    dropped: the three policies of migration 240, with no new helper function). tools/ddl_forward.py: descope_block,
+    folded back by apply_forward through unguard. tools/check-ddl-conventions.py D-SCOPE-NONE. Derived:
+    backend/tenant/V0113__after_r1_20261021.sql. V0108 is not edited: it has shipped.'
+  by: Chinmay
+  date: '2026-10-21'
+waivers:
+  release_window: {by: Chinmay, date: '2026-10-21', quote: 'Can we quickly get the fixes done for hrushikant and raise a quick fix'}
+why: 'ADAM CR-166 (Hrushikant Patkar, #27697), as the lead ruled it on 21 October 2026: platform.outbox_sequence keeps
+  migration 240''s shape (aggregate_id uuid NOT NULL, the key; last_sequence bigint NOT NULL; three policies, read,
+  append and update, each on a scope path being set; no scope_path and no scope policy). Finding: Hrushikant Patkar
+  applied r8 to a database our repository built (dev 6c52bfa, tenant 000-241, control 000-032) on 21 October 2026, and
+  two of V0108''s statements failed with `column "scope_path" does not exist` (the gist index and apply_scope_rls on
+  platform.outbox_sequence). CHG-CRA-005 had given OutboxSequence a scopePath the CR''s decision does not have, and the
+  generator turned it into a column, an index and a scope policy. The lead''s words, 21 October 2026: "Can we quickly
+  get the fixes done for hrushikant and raise a quick fix".'
+keys_touched:
+  schemas: [OutboxSequence]
+  tables: [platform.outbox_sequence]
+  files:
+  - contracts/satellite/platform-ops.yaml
+  - tools/derive-ddl.py
+  - tools/ddl_forward.py
+  - tools/check-ddl-conventions.py
+  - tools/tests/test_migration_generator.py
+  - backend/tenant/V0113__after_r1_20261021.sql
+root_class: 'new: a table given a scope its contract''s decision does not have (x-ticvai-scope: none)'
+tickets:
+  started: []
+  unstarted:
+  - 'The R8-DB tasks (R8-DB-LOCAL-*, R8-DB-SHARED) apply V0113 after the r8 files (CHG-R9MIG-003). The migration
+    ticket that creates platform.outbox_sequence gets V0113 as "Source DDL after r1" at the refresh.'
+release_tag: r9
+decision_owner: Chinmay
+adam_cr: CR-166
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-ddl-conventions.py
+status: open
+notes: 'Prevention run on the commit before the fix: check-ddl-conventions with the new rule and no V0113 fails
+  D-SCOPE-NONE on platform.outbox_sequence; with V0113 it passes. Left as it is, for a person: migration 240 also gives
+  the table CHECK (last_sequence > 0), which the contract does not declare, so a database the package builds has no such
+  CHECK; and 240''s grants (commerce and workers also hold DELETE) are DB-ROLES'' and the repository''s, not the
+  package DDL''s. CR-166 stays open in ADAM until the release carries this.'

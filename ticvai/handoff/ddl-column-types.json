@@ -13086,8 +13086,7 @@
   },
   "platform.outbox_sequence": {
    "aggregate_id": "uuid",
-   "last_sequence": "bigint",
-   "scope_path": "ltree"
+   "last_sequence": "bigint"
   },
   "platform.outlet": {
    "admission_context": "text",

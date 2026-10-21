@@ -1,0 +1,51 @@
+id: CHG-R9MIG-002
+date: '2026-10-21'
+source: audit
+kind: process
+summary: 'Every statement derive-ddl writes into a forward migration from now on does nothing where its table, or a
+  column it names, is not there yet: each sits in a `DO $$ BEGIN IF <guard> THEN ... END IF; END $$` block on a line of
+  its own, the way the names files already are, and a table''s policy change is one block. No file needs the hand
+  retry r8''s V0108 and control V0110 needed. The shipped files are not edited.'
+decision:
+  what: 'tools/ddl_forward.py guard_statements (run at the end of diff), guard_block, exists_guard, rls_guard and
+    unguard/inner (a guarded block read back, so the next run sees the change as made); render says so in the file
+    header. A new key on a new column is guarded on both tables, its columns and the key not being there yet (it was
+    guard_add_constraint, the key alone). tools/ticket_done.py reads a PERFORM-led policy call for the migration
+    tickets; tools/check-rls-scope-fit.py reads the calls inside a block. CREATE TABLE, SCHEMA, EXTENSION and FUNCTION
+    stay unguarded: they need no table.'
+  by: Chinmay
+  date: '2026-10-21'
+waivers:
+  release_window: {by: Chinmay, date: '2026-10-21', quote: 'Can we quickly get the fixes done for hrushikant and raise a quick fix'}
+why: 'Finding: Hrushikant Patkar applied r8 to a database our repository built (dev 6c52bfa) on 21 October 2026 and
+  exactly six statements failed, all `does not exist`: three on marketing.privacy_exception in tenant V0108 (a table the
+  repository has not built yet), two on platform.outbox_sequence''s scope_path in V0108 (CHG-R9MIG-001) and control
+  V0110''s one index on control.onboarding_application. Each failure stopped the file''s transaction, and the task text
+  allowed a statement-by-statement retry for V0108 only, so every agent following it stopped at control V0110
+  (CHG-R9MIG-003). The lead''s words, 21 October 2026: "Can we quickly get the fixes done for hrushikant and raise a
+  quick fix".'
+keys_touched:
+  files:
+  - tools/ddl_forward.py
+  - tools/ticket_done.py
+  - tools/check-rls-scope-fit.py
+  - tools/tests/test_migration_generator.py
+  - tools/tests/test_forward_rls_helpers.py
+root_class: 'A-DERIVE: a generated statement that fails where its table or column is not there yet'
+tickets:
+  started: []
+  unstarted:
+  - 'The MIG tickets that copy the next forward migration: a block is copied as it is.'
+release_tag: r9
+decision_owner: Chinmay
+adam_cr: 'none: Hrushikant Patkar''s r8 apply, 21 October 2026, a release fix'
+triage: fix-forward
+prevention:
+  type: generator-rule
+  ref: tools/ddl_forward.py::guard_statements
+status: open
+notes: 'tools/tests/test_migration_generator.py: the widened CHECK on a table a database may not have (r8''s
+  privacy_exception case), the index on a table it may not have (control V0110''s case), a new column, a new key and a
+  policy change are each guarded on their table and columns, a SELECT is written PERFORM, and a second diff writes
+  nothing. On PostgreSQL 18 (21 October 2026): r8''s tenant V0108 and control V0110 put through guard_statements apply as
+  one transaction each, twice, with no error on a database our repository built before r8.'

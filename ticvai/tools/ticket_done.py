@@ -373,6 +373,8 @@ _AR1 = [
                 r"(\w+\.\w+) ADD CONSTRAINT (\w+)"), "constraint"),
     (re.compile(r"^CREATE (?:UNIQUE )?INDEX (?:IF NOT EXISTS )?(\w+) ON (?:ONLY )?(\w+\.\w+)"), "index"),
     (re.compile(r"^SELECT platform\.(apply_\w+)\('(\w+\.\w+)'"), "row-level security"),
+    # the same call inside a guarded block (ddl_forward.guard_block, CHG-R9MIG-002): the statement keeps its own line
+    (re.compile(r"^PERFORM platform\.(apply_\w+)\('(\w+\.\w+)'"), "row-level security"),
     (re.compile(r"^ALTER TABLE (?:ONLY )?(\w+\.\w+) (.+?);?$"), "change"),
     # a retired column's guarded DROP NOT NULL (ddl_forward.retire_not_null, CHG-MGN-001)
     (re.compile(r"^DO \$\$ BEGIN IF EXISTS \(SELECT 1 FROM information_schema\.columns WHERE .*? THEN ALTER TABLE "
