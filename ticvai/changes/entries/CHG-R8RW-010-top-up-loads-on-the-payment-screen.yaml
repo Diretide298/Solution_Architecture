@@ -25,13 +25,14 @@ root_class: 'a call bound to a screen that does not hold its inputs'
 tickets:
   started: []
   unstarted: [POS-005, POS-027]
-release_tag: r8
+release_tag: r9
 decision_owner: Chinmay
 adam_cr: 'none: r8 gate, a release fix'
 triage: fix-forward
 prevention:
   type: check
   ref: tools/check-screens.py
-status: open
+status: closed
+closed_by_commit: '8ab17ae9'
 notes: 'Blast radius worked out before the change: tickets #28621 (POS-005) and #28825 (POS-027) with their sub-tasks,
   all New; both screens client-approved, bindings only (no visible field).'

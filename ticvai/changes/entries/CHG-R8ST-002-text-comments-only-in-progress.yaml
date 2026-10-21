@@ -22,13 +22,14 @@ root_class: 'a release-wide write sized from a sample (the rehearsal''s Block A 
 tickets:
   started: []
   unstarted: []
-release_tag: r8
+release_tag: r9
 decision_owner: Chinmay
 adam_cr: 'none: r8 apply, a release fix'
 triage: fix-forward
 prevention:
   type: check
   ref: tools/check-ruby-compat.py
-status: open
+status: closed
+closed_by_commit: 'b425f393'
 notes: 'The descriptions phase (1,846 pointer rewrites, 152 retitles and the text comments) runs after this ships:
   op-release-server.sh apply r8 ONLY=descriptions, after a dry run with the same setting.'
