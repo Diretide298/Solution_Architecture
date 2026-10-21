@@ -38,6 +38,12 @@ Work the ticket, following "Working a ticket (ADAM)" in CLAUDE.md:
    affects. Propose the first one and say which CR holds back each ticket you skipped.
 4. Build what the ticket and its contract describe, in the repository for the ticket's platform (the table
    in CLAUDE.md). If that repository is not cloned in this folder, or has no repository yet, stop and say so.
+   **A screen is built to look like its wireframe**: open the `wireframe-<anchor>.html` the pull wrote (README.md,
+   "How <screen> must look") and build the page to match it - and the client-approved prototype view the README
+   names - exactly: layout, components, copy, imagery, and every state (error, empty, loading, offline) in the
+   same visual language. That frame came through ADAM; the screen record gives the behaviour and bindings, the
+   frame the look. A placeholder layout only when no frame was written ("Building a screen to its wireframe" in
+   CLAUDE.md).
 5. Add tests for the success case and each listed error. Run that repository's lint, typecheck and test
    commands inside its folder ("Git, build, test and lint" in CLAUDE.md) until they pass.
 6. `adam_propose` the QA status (**Ready for QA** - `adam_propose` with only the ticket number lists the live statuses; use the one named for QA, and if there is none, stop and ask), 100%, and a 2-4 line comment that says what QA should check. Never **Closed**. If the build or the tests are not

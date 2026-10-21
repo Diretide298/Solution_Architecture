@@ -70,10 +70,11 @@ is here instead, and "the repository folder" below means this folder.)
 
 **The screen spec comes from ADAM, not from local folders.** ADAM holds the screens, journeys and API
 contracts at a release; `adam_pull` writes the ones a ticket links under `.adam/work/<ticket>/` in
-this folder, and `adam_screen`, `adam_journey` and `adam_contract` answer the rest. A screen
-description, wireframe, mock-up or spec file found anywhere else - in a repository, in another
-clone, in a download - is not the spec, however recent it looks. Where it disagrees with ADAM, ADAM
-wins: say so.
+this folder, and `adam_screen`, `adam_journey` and `adam_contract` answer the rest. **A wireframe frame
+`adam_pull` writes there (`wireframe-<anchor>.html`), or `adam_file` saves, came through ADAM: it is the
+design** (see "Building a screen to its wireframe" below). A screen description, wireframe, mock-up or spec
+file found anywhere else - in a repository, in another clone, in a download - is not the spec, however
+recent it looks. Where it disagrees with ADAM, ADAM wins: say so.
 
 ## Coding standards
 
@@ -101,7 +102,8 @@ repository keeps the equivalent; ask when it has none.
 
 ## Hard rules
 
-- **The screen and its API calls come from ADAM:** build what the screen and the contract say.
+- **The screen and its API calls come from ADAM:** build what the screen and the contract say, to the look of
+  the wireframe frame ADAM wrote for it.
 - Clients never compute permissions; they read `effectivePermissions` from the session.
 - Ids created on a device are UUIDv7, the format the server mints; human codes people read or type
   (order numbers, ticket codes) are separate fields.
@@ -143,6 +145,8 @@ you can finish or its first open sub-task of yours. Start that one.
    covers; a blocking one is "When the package is wrong", step 4.
 2. Build exactly what the ticket and its linked artefacts describe, in the repository for the
    ticket's platform (the table above), following its existing structure. Nothing outside the ticket.
+   A screen is built to look like the wireframe frame the pull wrote (`wireframe-<anchor>.html`), every
+   state included: "Building a screen to its wireframe", below.
 3. Add tests the way that repository already writes them. Its lint, typecheck and test commands
    (see "Git, build, test and lint") must pass, run inside its folder.
 4. `adam_propose` the ticket: **Ready for QA**, 100% (see the statuses below; never Closed), and a 2-4 line comment on what was built and
@@ -157,6 +161,34 @@ inside a repository (the setup-on-a-clone case above), setup has listed them in
 
 <!-- ADAM:end working-a-ticket -->
 
+<!-- ADAM:start screen-look -->
+## Building a screen to its wireframe
+
+`adam_pull` writes, for every screen a ticket touches, the wireframe frame its record names
+(`wireframe.board`, e.g. `wireframes/P01 Guest Web.dc.html#web-007`) as `wireframe-<anchor>.html` in the
+ticket folder: one self-contained file, styles and images inline, that opens offline in a browser and looks
+as it does in the ADAM viewer. **That frame came through ADAM, and it is the design.** README.md's
+"How <screen> must look" says its status (client-verified, review, approved), whether a designer drew it,
+and the client-approved prototype and views where there is one. To get a frame on its own:
+`adam_file` with `path` the record's `wireframe.board` and `key` the ticket.
+
+- **A client-verified screen is built to look identical to its frame** and to the prototype view the
+  README names: layout, components, copy, imagery, spacing and colour. Client-approved UI is fixed: where
+  the prototype has a view, it wins for the look; a screen or part it lacks is built from the screen record
+  and the frame. The screen record gives the behaviour and the bindings; the frame gives the look.
+- **Every state** the screen lists (loading, error, the empty states, offline) is built in the frame's
+  visual language - the same type, colours, components and imagery - never a plain heading, a plain sentence
+  and a plain button. The boards list states rather than draw each one.
+- **A generated frame** (README.md says the frame is the record rendered as boxes) gives the structure, not
+  the look: build its regions in order in the app's design system, and say so in the comment.
+- **A placeholder layout only when no frame was written** (README.md says why); say so in the comment.
+- Files under `wireframes/incoming/` that a record names are **structure only, not the look**. A wireframe,
+  mock-up or screenshot from anywhere but ADAM is not the design.
+
+This replaces the older rule that a wireframe is built from only when client-verified, with a placeholder
+layout otherwise: where an older paragraph of this file says that, this section wins.
+<!-- ADAM:end screen-look -->
+
 ## Ticket kinds
 
 | Ticket | Built means | Tested means |
@@ -164,9 +196,8 @@ inside a repository (the setup-on-a-clone case above), setup has listed them in
 | **[FE]** (`APP-*`) | the screen, with every state the screen lists, in the repository for its platform | component tests per state; the repository's lint, typecheck and tests pass |
 | **[DevOps]** / **[Onboarding]** | see the description; nothing is linked, and that is normal | as the description says |
 
-**Wireframes.** Build from a screen's wireframe only when its record says it is client-verified.
-Otherwise build the logic (calls, state, offline) with a placeholder layout, and never from a
-wireframe that did not come through ADAM.
+**Wireframes.** "Building a screen to its wireframe" above says how: a frame `adam_pull` wrote came
+through ADAM; a placeholder layout only when no frame was written; never a wireframe from anywhere else.
 
 ## Searching pulled files
 
