@@ -31,7 +31,8 @@
 #   descriptions  pointer bodies (C7): a New ticket's description becomes its pointer; a started ticket keeps its
 #                 text and gets ONE comment that its spec lives in ADAM (found again by its wording, so never
 #                 twice); New tickets are retitled to the plan (RETITLE=all: started ones too). A started, open ticket
-#                 whose text differs from the release's (its newest text comment, else its description) gets that
+#                 whose text differs from the release's (its newest text comment, else its description) and is still in progress
+#                 (TEXT_STATUSES, default "in progress"; never Ready for QA) gets that
 #                 text as one comment per release ("The text of this ticket changed in release rN.").
 #                 BATCH=n: at most n rewrites, n comments and n text comments this run, earliest build order first
 #   health        read-only summary in the style of op-check.rb
@@ -703,6 +704,7 @@ end
 # per release: what it shows is its newest such comment's text, else its description; the same text (bar the release
 # line) is no comment, and a comment already made for this release is never made twice.
 TEXT_MARKER = "The text of this ticket changed in release"
+TEXT_STATUSES = (ENV["TEXT_STATUSES"] || "in progress").split(",").map { |x| x.strip.downcase }
 text_shown = lambda do |description, notes|
   last = notes.reverse.find { |n| n.to_s.include?(TEXT_MARKER) }
   last ? last.to_s.gsub("\r\n", "\n").split("\n\n", 2)[1].to_s : description.to_s
@@ -754,7 +756,10 @@ if rel_run?("descriptions")
     else
       comment << [id, t["key"], w.status.name, B["comment"].gsub("%ID%", id.to_s).gsub("%KEY%", t["key"])]
     end
-    if w.status_id != NEW_ID && !w.status.is_closed
+    # Only a ticket still being worked on gets the text as a comment (r8 apply, 21 October 2026: the dry run counted
+    # 651 started tickets, most of them Ready for QA, whose work is done; "Build to it" on those would ask for it
+    # again). A Ready for QA ticket's new text reaches its developer through ADAM's pull, or a CR when it matters.
+    if TEXT_STATUSES.include?(w.status.name.to_s.downcase)
       case text_update.call(w.description, text_notes[id], want, RELEASE)
       when :post then texts << [id, t["key"], w.status.name, text_note.call(RELEASE, id, want)]
       when :already then texts_already += 1
