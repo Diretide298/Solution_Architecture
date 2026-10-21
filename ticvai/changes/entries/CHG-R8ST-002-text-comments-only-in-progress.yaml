@@ -1,0 +1,34 @@
+id: CHG-R8ST-002
+date: '2026-10-21'
+source: audit
+kind: process
+proposed: '2026-10-21T06:30'
+summary: 'op-release.rb gives the release''s text as a comment only to a ticket still in progress (TEXT_STATUSES,
+  default "in progress"), never to a Ready for QA one: its work is done, and "Build to it" would ask for it again. A
+  Ready for QA ticket''s new text reaches its developer through ADAM''s pull (CHG-R8ST-001''s 7444c817), or a CR when
+  it matters.'
+decision:
+  what: 'tools/op-release.rb descriptions phase: TEXT_STATUSES; tools/tests/test_op_release_text.py.'
+  by: Chinmay
+  date: '2026-10-21'
+why: 'Finding: the r8 dry run on OpenProject (21 October 2026) counted 651 started tickets to be given r8''s text as
+  a comment, most of them Ready for QA, against about 128 the rehearsal''s Block A pull showed. The lead applied r8 with
+  the descriptions phase left out (ONLY=create,priority,assign,links,retire) until this rule is fixed.'
+keys_touched:
+  files:
+  - tools/op-release.rb
+  - tools/tests/test_op_release_text.py
+root_class: 'a release-wide write sized from a sample (the rehearsal''s Block A pull), not from the dry run'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r8
+decision_owner: Chinmay
+adam_cr: 'none: r8 apply, a release fix'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-ruby-compat.py
+status: open
+notes: 'The descriptions phase (1,846 pointer rewrites, 152 retitles and the text comments) runs after this ships:
+  op-release-server.sh apply r8 ONLY=descriptions, after a dry run with the same setting.'

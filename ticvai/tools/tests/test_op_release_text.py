@@ -91,9 +91,12 @@ def test_the_rule_on_ruby_2_6():
     assert n.split("\n\n", 1)[1] == p8.strip()          # what text_shown reads back is the release's text
 
 
-def test_the_descriptions_phase_uses_the_rule_on_started_open_tickets_only_and_posts_in_apply():
+def test_the_descriptions_phase_uses_the_rule_on_in_progress_tickets_only_and_posts_in_apply():
     phase = RB[RB.index('if rel_run?("descriptions")'):RB.index('if rel_run?("health")')]
-    assert 'if w.status_id != NEW_ID && !w.status.is_closed' in phase
+    # r8 apply, 21 October 2026: only a ticket still in progress gets the text, never Ready for QA (651 in the dry run).
+    assert 'if TEXT_STATUSES.include?(w.status.name.to_s.downcase)' in phase
+    assert 'TEXT_STATUSES = (ENV["TEXT_STATUSES"] || "in progress")' in RB
+    assert 'ready for qa' not in RB[RB.index('TEXT_STATUSES ='):RB.index('TEXT_STATUSES =') + 120].lower()
     assert "text_update.call(w.description, text_notes[id], want, RELEASE)" in phase
     assert re.search(r"tx\.each do \|i, _, _, text\|\s+w = WorkPackage\.find\(i\)\s+w\.add_journal\(author, text\)", phase)
     assert "tx = BATCH ? texts.first(BATCH) : texts" in phase
