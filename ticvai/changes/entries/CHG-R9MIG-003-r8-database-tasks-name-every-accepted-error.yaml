@@ -41,7 +41,8 @@ triage: blocker
 prevention:
   type: generator-rule
   ref: tools/ddl_forward.py::guard_statements
-status: open
+status: closed
+closed_by_commit: '20dc8a9f'
 notes: 'From r9 on no generated file needs a retry (CHG-R9MIG-002), so a database task needs no list of accepted
   errors; this text is for the r8 files, which have shipped. The script is the one tested on 21 October 2026 against
   Hrushikant Patkar''s before-r8 dump: only the six errors, and his after-r8 schema exactly.'

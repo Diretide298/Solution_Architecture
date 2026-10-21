@@ -52,7 +52,8 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-ddl-conventions.py
-status: open
+status: closed
+closed_by_commit: '1fd4b41b'
 notes: 'Prevention run on the commit before the fix: check-ddl-conventions with the new rule and no V0113 fails
   D-SCOPE-NONE on platform.outbox_sequence; with V0113 it passes. Left as it is, for a person: migration 240 also gives
   the table CHECK (last_sequence > 0), which the contract does not declare, so a database the package builds has no such
