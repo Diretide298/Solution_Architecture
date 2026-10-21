@@ -38,6 +38,7 @@ keys_touched:
   - tools/build-service-docs.py
   - tools/ticket_done.py
   - tools/derive-design-tokens.py
+  - tools/sprint_plan.py
   - tools/refresh.sh
   - handoff/design-tokens/guest-web.yaml
   - handoff/design-tokens/guest-app.yaml
@@ -65,7 +66,10 @@ prevention:
 status: open
 notes: 'Started tickets (a status other than New, On hold or Rejected in adam-links.json, or named in the shell''s
   startedKnown: WEB-007, built on 21 October after the statuses were read) keep their status and sprint; their text
-  says the shell and the mock come first and to align with them. The new dependencies move most not-started screen
-  tasks out of days already past (the scheduler started them on 5 October before): see the lane report for the sprint
-  moves. The ADAM starter''s packages/design-tokens (viewer/mcp/setup/starters/frontend) still carries the till''s
+  says the shell and the mock come first and to align with them. In the schedule a screen''s wait on its shell and on
+  the mock holds its finish, not its start (tools/sprint_plan.py is_soft, as for its back end): held hard, the first r9
+  gate (21 October) found every not-started screen moved out of the days already past, A1''s overtime above the
+  accepted 43 hours, and the two-drop rule moving P08''s completion work to A2, which broke the Block A closure
+  (check-plan-closure C-BOUND, C-CALLS, C-REACH); with it, A2 takes nothing and A1 carries 40 hours of overtime (33 at
+  r8). The tickets still follow the shell and the mock in OpenProject. The ADAM starter''s packages/design-tokens (viewer/mcp/setup/starters/frontend) still carries the till''s
   tokens; that is ADAM''s, not this package''s, and is on the lane report for the ADAM lane.'
