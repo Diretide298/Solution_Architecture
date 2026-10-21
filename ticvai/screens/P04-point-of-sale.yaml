@@ -331,6 +331,10 @@ screens:
         ''login''): pick an operator tile, enter any 4-digit PIN). The frame was captured from this view
         on 2026-10-01: wireframes/incoming/P04-pos-v2/img/pos-000.jpg.'
     source: client approval, confirmed by Chinmay Parab 19 October 2026
+    stateViews:
+      emptyFirstRun: P04/empty-note
+      denied: P04/refusal-toast
+      offline: P04/network-pill
 - id: POS-001
   name: Begin Shift
   module: Shift
@@ -811,6 +815,10 @@ screens:
     note: '**Drawn by Claude Design on `TICVAI Boards v2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
+    stateViews:
+      emptyFirstRun: P04/empty-note
+      offline: P04/network-pill
+      denied: P04/refusal-toast
   apisNote: 'Rebuilt 9 September 2026 from the 17 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -2076,6 +2084,10 @@ screens:
     note: '**Drawn by Claude Design on `Retail Board 3.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
+    stateViews:
+      emptyFirstRun: P04/empty-note
+      offline: P04/network-pill
+      denied: P04/refusal-toast
   apisNote: 'Rebuilt 9 September 2026 from the 41 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -2375,6 +2387,10 @@ screens:
         Park · Day Pass'' -> drawer -> DATE & TIME row -> calendar + AVAILABLE TIMES; per-guest variants
         in the same drawer). The frame was captured from this view on 2026-10-01: wireframes/incoming/P04-pos-v2/img/pos-003.jpg.'
     source: client approval, confirmed by Chinmay Parab 19 October 2026
+    stateViews:
+      emptyFirstRun: P04/empty-note
+      offline: P04/network-pill
+      denied: P04/refusal-toast
   apisNote: 'Rebuilt 9 September 2026 from the 10 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -2699,6 +2715,10 @@ screens:
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
     source: client approval, confirmed by Chinmay Parab 19 October 2026
+    stateViews:
+      emptyFirstRun: P04/empty-note
+      offline: P04/network-pill
+      denied: P04/refusal-toast
   apisNote: 'Rebuilt 9 September 2026 from the 11 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -3196,9 +3216,9 @@ screens:
     provenance: flow F17 step 3, 2 October 2026 (CHG-CLN-006)
   - operationId: topUpWallet
     contract: wallet
-    purpose: 'Once the sale''s payment is captured, load each wallet top-up line of the sale onto the guest''s
-      wallet ("loads on payment"): one call per top-up line, with the line''s id (orderLineId) and the captured
-      payment (paymentId); POS-027 adds the line to the sale (CHG-R8RW-009, CHG-R8RW-010)'
+    purpose: 'Once the sale''s payment is captured, load each wallet top-up line of the sale onto the
+      guest''s wallet ("loads on payment"): one call per top-up line, with the line''s id (orderLineId)
+      and the captured payment (paymentId); POS-027 adds the line to the sale (CHG-R8RW-009, CHG-R8RW-010)'
     trigger: background
     provenance: r8 last re-walk, 21 October 2026 (CHG-R8RW-010; moved from POS-027, where nothing is paid)
   entryState:
@@ -3208,8 +3228,8 @@ screens:
     - name: subjectId
       from: session
       optional: true
-      notes: 'The guest identified for the sale (POS-027 identifyGuest attaches them). Needed only when the sale
-        has a wallet top-up line, for topUpWallet (CHG-R8RW-010).'
+      notes: The guest identified for the sale (POS-027 identifyGuest attaches them). Needed only when
+        the sale has a wallet top-up line, for topUpWallet (CHG-R8RW-010).
     - name: saleId
       from: deepLink
       optional: true
@@ -3252,6 +3272,9 @@ screens:
     note: '**Drawn by Claude Design on `Retail Board 3.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
+    stateViews:
+      emptyFirstRun: P04/empty-note
+      offline: P04/network-pill
   apisNote: 'Rebuilt 9 September 2026 from the 11 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -3910,6 +3933,10 @@ screens:
     note: '**Drawn by Claude Design on `Retail Board 3.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
+    stateViews:
+      emptyFirstRun: P04/empty-note
+      offline: P04/network-pill
+      denied: P04/refusal-toast
   apisNote: 'Rebuilt 9 September 2026 from the 14 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -4417,6 +4444,13 @@ screens:
     note: '**Drawn by Claude Design on `TICVAI Boards v2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
+    stateViews:
+      emptyFirstRun: P04/empty-note
+      offline: P04/network-pill
+      denied: P04/refusal-toast
+      pendingVariance: P04/close-shift-variance
+      recountRequested: P04/close-shift-variance
+      reasonRequired: P04/close-shift-variance
   apisNote: 'Rebuilt 9 September 2026 from the 17 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -4733,6 +4767,9 @@ screens:
       differences: The prototype is a fixed cross-venue command dashboard. There is no report list, run-report
         action, natural-language question or saved query (all declared in the YAML). It also shows terminal
         health and cross-outlet data, which is broader than 'from the terminal'.
+    stateViews:
+      emptyFirstRun: P04/empty-note
+      offline: P04/network-pill
   apisNote: 'Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -4951,6 +4988,9 @@ screens:
     note: '**Drawn by Claude Design on `POS Board 3.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
+    stateViews:
+      emptyFirstRun: P04/empty-note
+      offline: P04/network-pill
   apisNote: 'Rebuilt 9 September 2026 from the 16 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -5225,6 +5265,9 @@ screens:
         in the prototype''s style and accepted as its design the same day (the frame on this screen''s
         board): build the layout from that frame.'
     source: client approval, confirmed by Chinmay Parab 19 October 2026
+    stateViews:
+      emptyFirstRun: P04/empty-note
+      offline: P04/network-pill
   apisNote: 'Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -5525,6 +5568,9 @@ screens:
     note: '**Drawn by Claude Design on `POS Frontline Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
+    stateViews:
+      emptyFirstRun: P04/empty-note
+      offline: P04/network-pill
   apisNote: 'Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -5885,6 +5931,9 @@ screens:
     note: '**Drawn by Claude Design on `POS Frontline Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
+    stateViews:
+      emptyFirstRun: P04/empty-note
+      offline: P04/network-pill
   apisNote: 'Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -6172,6 +6221,10 @@ screens:
     note: '**Drawn by Claude Design on `POS Frontline Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
+    stateViews:
+      emptyFirstRun: P04/empty-note
+      offline: P04/network-pill
+      denied: P04/refusal-toast
   apisNote: 'Rebuilt 9 September 2026 from the 8 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -6418,6 +6471,10 @@ screens:
         drawer'' (the no-sale) takes no reason, checks no permission and writes no audit entry; it only
         shows a toast. This is the POS-020 gap C-4/C-5, still present. The approval modal has a reject
         path that the YAML does not model.'
+    stateViews:
+      emptyFirstRun: P04/empty-note
+      offline: P04/network-pill
+      approvalRejected: P04/refusal-toast
   apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -6571,6 +6628,9 @@ screens:
         in the prototype''s style and accepted as its design the same day (the frame on this screen''s
         board): build the layout from that frame.'
     source: client approval, confirmed by Chinmay Parab 19 October 2026
+    stateViews:
+      emptyFirstRun: P04/empty-note
+      offline: P04/network-pill
   apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -6807,6 +6867,9 @@ screens:
     note: '**Drawn by Claude Design on `POS Frontline Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
+    stateViews:
+      emptyFirstRun: P04/empty-note
+      offline: P04/network-pill
   apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -7014,6 +7077,9 @@ screens:
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
     source: client approval, confirmed by Chinmay Parab 19 October 2026
+    stateViews:
+      emptyFirstRun: P04/empty-note
+      offline: P04/network-pill
   apisNote: 'Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
     — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -7193,6 +7259,9 @@ screens:
     note: '**Drawn by Claude Design on `POS Board 3.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
+    stateViews:
+      emptyFirstRun: P04/empty-note
+      offline: P04/network-pill
   apisNote: 'Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -7394,6 +7463,9 @@ screens:
     note: '**Drawn by Claude Design on `POS Board 3.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
+    stateViews:
+      emptyFirstRun: P04/empty-note
+      offline: P04/network-pill
   apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -7672,6 +7744,9 @@ screens:
     note: '**Drawn by Claude Design on `POS Board 3.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
+    stateViews:
+      emptyFirstRun: P04/empty-note
+      offline: P04/network-pill
   apisNote: 'Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -7981,6 +8056,11 @@ screens:
         the earlier approved build (TICVAI_POS_Terminal_client_approved.html, view: Left rail ''F&B''
         or Home launcher ''Food & beverage''). The frame was captured from this view on 2026-10-01: wireframes/incoming/P04-pos-v2/img/pos-021.jpg.'
     source: client approval, confirmed by Chinmay Parab 19 October 2026
+    stateViews:
+      emptyFirstRun: P04/empty-note
+      offline: P04/network-pill
+      denied: P04/refusal-toast
+      soldOutByCount: P04/stock-badge
   apisNote: 'Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -8267,6 +8347,10 @@ screens:
         fires on payment; then Queue -> stage ''Received'' action ''Send to kitchen'' / ''Mark ready''
         / ''Dispatch / hand over''). The frame was captured from this view on 2026-10-01: wireframes/incoming/P04-pos-v2/img/pos-022.png.'
     source: client approval, confirmed by Chinmay Parab 19 October 2026
+    stateViews:
+      emptyFirstRun: P04/empty-note
+      offline: P04/network-pill
+      denied: P04/refusal-toast
   apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -8507,6 +8591,11 @@ screens:
         the earlier approved build (TICVAI_POS_Terminal_client_approved.html, view: Left rail ''Retail''
         or Home launcher ''Retail''). The frame was captured from this view on 2026-10-01: wireframes/incoming/P04-pos-v2/img/pos-023.jpg.'
     source: client approval, confirmed by Chinmay Parab 19 October 2026
+    stateViews:
+      emptyFirstRun: P04/empty-note
+      offline: P04/network-pill
+      denied: P04/refusal-toast
+      stockConflict: P04/conflict-modal
   apisNote: 'Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -8729,6 +8818,9 @@ screens:
         in the prototype''s style and accepted as its design the same day (the frame on this screen''s
         board): build the layout from that frame.'
     source: client approval, confirmed by Chinmay Parab 19 October 2026
+    stateViews:
+      emptyFirstRun: P04/empty-note
+      offline: P04/network-pill
   apisNote: 'Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -9034,6 +9126,10 @@ screens:
         & start selling'', or left rail ''Home'' (startScreen ''home'')). The frame was captured from
         this view on 2026-10-01: wireframes/incoming/P04-pos-v2/img/pos-025.jpg.'
     source: client approval, confirmed by Chinmay Parab 19 October 2026
+    stateViews:
+      emptyFirstRun: P04/empty-note
+      offline: P04/network-pill
+      denied: P04/refusal-toast
   overlays:
   - id: formSuspendShift
     component: modal
@@ -9255,6 +9351,9 @@ screens:
       view: After a successful payment (receipt screen); reprint via Home F4 or cart 'History' -> 'Reprint'
       differences: The post-payment receipt is drawn and answers the POS-005 exitTo gap. Reprint is only
         a toast from the hot key or History, and there is no entitlement reissue (reissueEntitlement).
+    stateViews:
+      emptyFirstRun: P04/empty-note
+      offline: P04/network-pill
   overlays:
   - id: formReprintReceipt
     component: modal
@@ -9446,6 +9545,9 @@ screens:
       view: Left rail 'Guests', or cart guest button (goGuests)
       differences: Adds guest enrolment ('Create & link to sale') and wallet top-up (TOPUPS 50–1000),
         neither declared on this screen. Open reservations are not shown on the guest card.
+    stateViews:
+      emptyFirstRun: P04/empty-note
+      offline: P04/network-pill
   overlays:
   - id: formTopUpWallet
     component: modal
@@ -9722,6 +9824,9 @@ screens:
         -> ''Table service'' | ''Reservations'' toggle). The frame was captured from this view on 2026-10-01:
         wireframes/incoming/P04-pos-v2/img/pos-028.jpg.'
     source: client approval, confirmed by Chinmay Parab 19 October 2026
+    stateViews:
+      emptyFirstRun: P04/empty-note
+      offline: P04/network-pill
   overlays:
   - id: formRequestBill
     component: modal
@@ -9969,6 +10074,9 @@ screens:
         the earlier approved build (TICVAI_POS_Terminal_client_approved.html, view: Left rail ''Queue'').
         The frame was captured from this view on 2026-10-01: wireframes/incoming/P04-pos-v2/img/pos-029.png.'
     source: client approval, confirmed by Chinmay Parab 19 October 2026
+    stateViews:
+      emptyFirstRun: P04/empty-note
+      offline: P04/network-pill
   gaps:
   - operation: getQueue
     removed: true
@@ -10366,6 +10474,10 @@ screens:
         the earlier approved build (TICVAI_POS_Terminal_client_approved.html, view: Cart ''History'' (the
         cart history, with Reprint)). The frame was captured from this view on 2026-10-01: wireframes/incoming/P04-pos-v2/img/v2-journal.png.'
     source: client approval, confirmed by Chinmay Parab 19 October 2026
+    stateViews:
+      emptyFirstRun: P04/empty-note
+      denied: P04/refusal-toast
+      offline: P04/network-pill
 - id: POS-031
   name: Reservations & Group Arrivals
   module: Sell
@@ -10700,3 +10812,7 @@ screens:
       note: 'The client approved this build on 19 October 2026 (confirmed by Chinmay Parab); it replaces
         the earlier approved build. The frame was captured from this view on 2026-10-01: wireframes/incoming/P04-pos-v2/img/v2-groups.jpg.'
     source: client approval, confirmed by Chinmay Parab 19 October 2026
+    stateViews:
+      emptyFirstRun: P04/empty-note
+      denied: P04/refusal-toast
+      offline: P04/network-pill

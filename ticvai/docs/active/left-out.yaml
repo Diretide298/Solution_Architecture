@@ -1,0 +1,316 @@
+# The left-out list: everything a release leaves out or defers, in one place.
+#
+# **The rule** (the council of 20 October 2026, night; accepted by the lead, Chinmay): an item left out of a release
+# or deferred exists only once it is on this one list, with where it came from, why, and the release it is targeted
+# at. A deferral written only in a report, a ledger or a change notice does not count. Settled items that become
+# developer work still go to OpenProject as tickets; this list is what is still left out.
+#
+# This file is the package's copy of that list, in git, so a check can read it (CHG-R9UI-003). It starts with the
+# design gaps of r9: the states a client-verified screen has that its client-approved prototype or board does not
+# draw. tools/check-state-views.py reads the `design-gap` items: a client-verified screen's state with no view
+# (screens/_state-patterns.yaml, written into the screen as wireframe.stateViews) must be named here by platform and
+# state, or the check fails. A design gap is for the client: the look is drawn by the client's designers and comes
+# back as a client-approved change; nobody invents it (the lead, 14 October 2026: "For screens the UI is fixed.
+# approved by client so dont change that").
+#
+# Fields: id (LO-<batch>-<nnn>), kind (design-gap, or deferred for any other left-out item), platform, states
+# (the state names it covers, for a design gap), screens (the client-verified screens that have the state), what,
+# source (where it was found), reason (why it is left out), target (the release or event it waits for), owner,
+# added (date), change (the change entry that added it).
+version: 1
+
+items:
+# ---------------------------------------------------------------- P01 Guest Web (TICVAI Guest Booking v2, 30 September)
+- id: LO-R9UI-001
+  kind: design-gap
+  platform: P01
+  states: [closed]
+  screens: [WEB-029]
+  what: 'The "venue closed" variant of the WEB-029 status card. The card draws three variants (Error, Sold out,
+    Maintenance); closed is not one of them.'
+  source: sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html lines 4746-4782 and 6572-6574 (the three variants)
+  reason: not drawn in the client-approved prototype; inventing a fourth variant would change approved UI
+  target: 'r10: the client draws it (client note with the 4 November wireframe sign-off)'
+  owner: Chinmay, to the client
+  added: '2026-10-21'
+  change: CHG-R9UI-003
+- id: LO-R9UI-002
+  kind: design-gap
+  platform: P01
+  states: [preferenceNotAtVenue]
+  screens: [WEB-050]
+  what: The Visit Planner's "a preference this venue does not offer" message.
+  source: sources/designs/guest-rev3-30-september/TICVAI Visit Planner.dc.html (no such state drawn)
+  reason: not drawn in the client-approved prototype
+  target: 'r10: the client draws it (client note with the 4 November wireframe sign-off)'
+  owner: Chinmay, to the client
+  added: '2026-10-21'
+  change: CHG-R9UI-003
+- id: LO-R9UI-003
+  kind: design-gap
+  platform: P01
+  states: [signInRefused]
+  screens: [WEB-016]
+  what: The sign-in refusal (wrong code, locked) on Login / Register.
+  source: sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html, WEB-016 LOGIN / REGISTER (line 3592 on) draws no refusal
+  reason: not drawn in the client-approved prototype
+  target: 'r10: the client draws it (client note with the 4 November wireframe sign-off)'
+  owner: Chinmay, to the client
+  added: '2026-10-21'
+  change: CHG-R9UI-003
+- id: LO-R9UI-004
+  kind: design-gap
+  platform: P01
+  states: [soldOutForDay]
+  screens: [WEB-041]
+  what: Parking sold out for the chosen day.
+  source: sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html, the parking module (no sold-out drawing; the status card's Sold out variant is for a whole date's tickets)
+  reason: not drawn in the client-approved prototype
+  target: 'r10: the client draws it (client note with the 4 November wireframe sign-off)'
+  owner: Chinmay, to the client
+  added: '2026-10-21'
+  change: CHG-R9UI-003
+- id: LO-R9UI-005
+  kind: design-gap-partial
+  platform: P01
+  states: [offline]
+  what: 'The offline banner. Every P01 offline state says "The offline banner shows"; the prototype draws the paused
+    action buttons ("Offline — booking is paused", the pattern the screens use) and holds the banner''s message in its
+    view model ("You''re offline. Connect to the internet to book, pay, order or join a queue.", line 6522), but no
+    markup draws it.'
+  source: sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html lines 6520-6523 (message, no markup)
+  reason: the banner's look is not drawn; the screens show the drawn part (the paused buttons) until the client draws it
+  target: 'r10: the client draws it (client note with the 4 November wireframe sign-off)'
+  owner: Chinmay, to the client
+  added: '2026-10-21'
+  change: CHG-R9UI-003
+# ---------------------------------------------------------------- P02 Guest App (Mobile App v4, 30 September; Guest Booking Mobile v2, 28 September)
+- id: LO-R9UI-006
+  kind: design-gap
+  platform: P02
+  states: [error]
+  what: 'The guest app''s error state (a read failed). Neither approved app prototype draws an error: no status card,
+    no retry, no message (the web''s WEB-029 card is the web''s design, not the app''s).'
+  source: sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html and sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html (searched for an error drawing; only payment declines are drawn)
+  reason: not drawn in the client-approved prototypes; every client-verified P02 screen has the state (77)
+  target: 'r10: the client draws it (client note with the 4 November wireframe sign-off)'
+  owner: Chinmay, to the client
+  added: '2026-10-21'
+  change: CHG-R9UI-003
+- id: LO-R9UI-007
+  kind: design-gap
+  platform: P02
+  states: [offline]
+  what: 'The guest app''s offline state. The Booking Mobile v2 prototype lists an "Offline banner" switch in its
+    config ("Show cached-ticket state with no signal") but no markup draws it; v4 draws none.'
+  source: sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html line 1979 (the switch, no banner)
+  reason: not drawn in the client-approved prototypes; every client-verified P02 screen has the state (77)
+  target: 'r10: the client draws it (client note with the 4 November wireframe sign-off)'
+  owner: Chinmay, to the client
+  added: '2026-10-21'
+  change: CHG-R9UI-003
+- id: LO-R9UI-008
+  kind: design-gap
+  platform: P02
+  states: [soldOut, closed, forcedUpgrade]
+  screens: [GST-047]
+  what: 'GST-047''s sold-out, venue-closed and forced-upgrade pages. The approved prototype draws its maintenance page
+    only (the "maint" view).'
+  source: sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html line 1175 (maintenance only)
+  reason: not drawn in the client-approved prototype
+  target: 'r10: the client draws it (client note with the 4 November wireframe sign-off)'
+  owner: Chinmay, to the client
+  added: '2026-10-21'
+  change: CHG-R9UI-003
+- id: LO-R9UI-009
+  kind: design-gap
+  platform: P02
+  states: [map3dUnavailable, weakGps]
+  screens: [GST-021, GST-038]
+  what: The map when 3D cannot run on the device and when the GPS fix is weak.
+  source: sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html (the 2D/3D toggle is drawn, neither state)
+  reason: not drawn in the client-approved prototype
+  target: 'r10: the client draws it (client note with the 4 November wireframe sign-off)'
+  owner: Chinmay, to the client
+  added: '2026-10-21'
+  change: CHG-R9UI-003
+- id: LO-R9UI-010
+  kind: design-gap
+  platform: P02
+  states: [preferenceNotAtVenue]
+  screens: [GST-051, GST-053]
+  what: The planner's "a preference this venue does not offer" message.
+  source: sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html (not drawn)
+  reason: not drawn in the client-approved prototype
+  target: 'r10: the client draws it (client note with the 4 November wireframe sign-off)'
+  owner: Chinmay, to the client
+  added: '2026-10-21'
+  change: CHG-R9UI-003
+- id: LO-R9UI-011
+  kind: design-gap
+  platform: P02
+  states: [aiUnavailable]
+  screens: [GST-054]
+  what: The AI planner when the AI is unavailable.
+  source: sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html (not drawn)
+  reason: not drawn in the client-approved prototype
+  target: 'r10: the client draws it (client note with the 4 November wireframe sign-off)'
+  owner: Chinmay, to the client
+  added: '2026-10-21'
+  change: CHG-R9UI-003
+- id: LO-R9UI-012
+  kind: design-gap
+  platform: P02
+  states: [signInRefused]
+  screens: [GST-042]
+  what: The sign-in refusal (wrong code, locked) on Simple Registration & OTP.
+  source: sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html (not drawn)
+  reason: not drawn in the client-approved prototype
+  target: 'r10: the client draws it (client note with the 4 November wireframe sign-off)'
+  owner: Chinmay, to the client
+  added: '2026-10-21'
+  change: CHG-R9UI-003
+- id: LO-R9UI-013
+  kind: design-gap
+  platform: P02
+  states: [subjectNotLinked]
+  screens: [GST-069]
+  what: Face Pass when the guest's subject is not linked yet.
+  source: sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html, the Face Pass view (line 1187; not drawn)
+  reason: not drawn in the client-approved prototype
+  target: 'r10: the client draws it (client note with the 4 November wireframe sign-off)'
+  owner: Chinmay, to the client
+  added: '2026-10-21'
+  change: CHG-R9UI-003
+- id: LO-R9UI-014
+  kind: design-gap
+  platform: P02
+  states: [soldOutForDay]
+  screens: [GST-027]
+  what: Parking sold out for the chosen day.
+  source: sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html, the parking view (not drawn)
+  reason: not drawn in the client-approved prototype
+  target: 'r10: the client draws it (client note with the 4 November wireframe sign-off)'
+  owner: Chinmay, to the client
+  added: '2026-10-21'
+  change: CHG-R9UI-003
+# ---------------------------------------------------------------- P04 Venue POS (POS Terminal v2 and the client-approved terminal)
+- id: LO-R9UI-015
+  kind: design-gap
+  platform: P04
+  states: [loading]
+  what: The till's loading state. Neither approved terminal draws a loader, skeleton or spinner.
+  source: sources/designs/TICVAI_POS_Terminal_v2.html and TICVAI_POS_Terminal_client_approved.html (decoded templates searched)
+  reason: not drawn in the client-approved prototypes; every client-verified P04 screen has the state (32)
+  target: 'r10: the client draws it (client note with the 4 November wireframe sign-off)'
+  owner: Chinmay, to the client
+  added: '2026-10-21'
+  change: CHG-R9UI-003
+- id: LO-R9UI-016
+  kind: design-gap
+  platform: P04
+  states: [error]
+  what: 'The till''s error state (a read failed, Identity unreachable on POS-000). The terminals draw refusals as a
+    toast and the payment network failure, not a failed read.'
+  source: sources/designs/TICVAI_POS_Terminal_v2.html (decoded template searched)
+  reason: not drawn in the client-approved prototypes; every client-verified P04 screen has the state (32)
+  target: 'r10: the client draws it (client note with the 4 November wireframe sign-off)'
+  owner: Chinmay, to the client
+  added: '2026-10-21'
+  change: CHG-R9UI-003
+- id: LO-R9UI-017
+  kind: design-gap
+  platform: P04
+  states: [emptyNoResults]
+  what: A filtered list with nothing matching ("names the active filter and offers to clear it").
+  source: sources/designs/TICVAI_POS_Terminal_v2.html (decoded template searched)
+  reason: not drawn in the client-approved prototypes
+  target: 'r10: the client draws it (client note with the 4 November wireframe sign-off)'
+  owner: Chinmay, to the client
+  added: '2026-10-21'
+  change: CHG-R9UI-003
+- id: LO-R9UI-018
+  kind: design-gap
+  platform: P04
+  states: [emptyNoAccess]
+  what: 'A screen the operator has no permission to see (names the permission). The terminals draw an action refused
+    (the refusal toast), not a screen refused.'
+  source: sources/designs/TICVAI_POS_Terminal_v2.html (decoded template searched)
+  reason: not drawn in the client-approved prototypes
+  target: 'r10: the client draws it (client note with the 4 November wireframe sign-off)'
+  owner: Chinmay, to the client
+  added: '2026-10-21'
+  change: CHG-R9UI-003
+- id: LO-R9UI-019
+  kind: design-gap
+  platform: P04
+  states: [mfaRequired]
+  screens: [POS-000]
+  what: The second-factor code after sign-in on the till.
+  source: sources/designs/TICVAI_POS_Terminal_v2.html (the supervisor PIN is drawn, not an authenticator code)
+  reason: not drawn in the client-approved prototypes
+  target: 'r10: the client draws it (client note with the 4 November wireframe sign-off)'
+  owner: Chinmay, to the client
+  added: '2026-10-21'
+  change: CHG-R9UI-003
+- id: LO-R9UI-020
+  kind: design-gap
+  platform: P04
+  states: [zoneUnavailable]
+  screens: [POS-004]
+  what: The seat map with a zone struck out because it sold out while the cashier was choosing.
+  source: sources/designs/TICVAI_POS_Terminal_v2.html (decoded template searched)
+  reason: not drawn in the client-approved prototypes
+  target: 'r10: the client draws it (client note with the 4 November wireframe sign-off)'
+  owner: Chinmay, to the client
+  added: '2026-10-21'
+  change: CHG-R9UI-003
+# ---------------------------------------------------------------- the apps with no client-approved design (shell tokens)
+- id: LO-R9UI-021
+  kind: design-gap-app
+  platform: P05
+  what: 'The client-approved look of the kiosk (ticvai-kiosk): its tokens and state patterns. No P05 screen is
+    client-verified and no kiosk prototype exists; the kiosk shell (SETUP-SHELL-KIOSK) builds the structure on the
+    shared tokens (screens/_design-tokens.yaml) until the client approves a design.'
+  source: screens/P05-guest-kiosk.yaml (no client-verified screen); CHG-R9UI-001
+  reason: no client-approved design to take the tokens from; inventing one would be a design nobody approved
+  target: 'when the client approves the kiosk design (not yet scheduled; the lead asks at the 4 November sign-off)'
+  owner: Chinmay, to the client
+  added: '2026-10-21'
+  change: CHG-R9UI-001
+- id: LO-R9UI-022
+  kind: design-gap-app
+  platform: P06
+  what: 'The client-approved look of the employee app (ticvai-employee-app, P06 and P07): its tokens and state
+    patterns. No P06 or P07 screen is client-verified; TICVAI_Employee_App_UI_Reference_1.pdf is a reference, not an
+    approved design. The shell (SETUP-SHELL-EMPLOYEE-APP) builds the structure on the shared tokens until then.'
+  source: screens/P06-staff-app.yaml, screens/P07-staff-scanner.yaml (no client-verified screen); CHG-R9UI-001
+  reason: no client-approved design to take the tokens from
+  target: 'when the client approves the employee app design (the lead asks at the 4 November sign-off)'
+  owner: Chinmay, to the client
+  added: '2026-10-21'
+  change: CHG-R9UI-001
+- id: LO-R9UI-023
+  kind: design-gap-app
+  platform: P08
+  what: 'The client-approved look of venue management (ticvai-venue-management, P08 and P13): its tokens and state
+    patterns. The back office is rebuilt module by module from wireframes the client signs (CHG-R8DEC-005); none is
+    signed yet. The shell (SETUP-SHELL-VENUE-MANAGEMENT) builds the structure on the shared tokens until the first
+    signed module wireframe gives the look.'
+  source: docs/active/held-tasks.yaml backoffice-module-wireframe (CHG-R8DEC-005); CHG-R9UI-001
+  reason: no client-approved design to take the tokens from yet
+  target: 'the first signed back-office module wireframe (target 4 November 2026)'
+  owner: Chinmay, to the client
+  added: '2026-10-21'
+  change: CHG-R9UI-001
+- id: LO-R9UI-024
+  kind: design-gap-app
+  platform: P09
+  what: 'The client-approved look of the TICVAI console (ticvai-web, P09): its tokens and state patterns. No P09
+    screen is client-verified. The shell (SETUP-SHELL-WEB) builds the structure on the shared tokens until then.'
+  source: screens/P09-platform-admin-console.yaml (no client-verified screen); CHG-R9UI-001
+  reason: no client-approved design to take the tokens from
+  target: 'when the client approves the console design (the lead asks at the 4 November sign-off)'
+  owner: Chinmay, to the client
+  added: '2026-10-21'
+  change: CHG-R9UI-001

@@ -450,6 +450,13 @@ screens:
         drawer. Prototype adds a resume-booking card, a video 'Tonight in the city' panel, live queue
         times on cards and footer links to Contact / Accessibility / Service status. YAML emptyNoAccess/offline
         states are not drawn on Home (offline exists only as a demo tweak).
+    stateViews:
+      loading: P01/turnstile-loader
+      error: P01/status-card
+      emptyFirstRun: P01/dashed-empty
+      emptyNoResults: P01/filter-empty
+      emptyNoAccess: P01/sign-in-card
+      offline: P01/offline-paused
   apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -676,6 +683,13 @@ screens:
       verified: '2026-09-29'
       match: exact
       view: Header 'What's on'
+    stateViews:
+      loading: P01/turnstile-loader
+      error: P01/status-card
+      emptyFirstRun: P01/dashed-empty
+      emptyNoResults: P01/filter-empty
+      emptyNoAccess: P01/sign-in-card
+      offline: P01/offline-paused
   apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -806,6 +820,13 @@ screens:
       differences: 'No separate results page: results render as a type-ahead overlay and then in the WEB-002
         listing with the query applied. Recent and popular searches are prototype additions not in the
         YAML.'
+    stateViews:
+      loading: P01/turnstile-loader
+      error: P01/status-card
+      emptyFirstRun: P01/dashed-empty
+      emptyNoResults: P01/filter-empty
+      emptyNoAccess: P01/sign-in-card
+      offline: P01/offline-paused
   apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -1114,6 +1135,15 @@ screens:
         rule display (getProductEligibilityRule) appears only as tags. Prototype labels it WEB-003b, not
         WEB-004. **Handoff: the screen id is WEB-004**; the prototype''s "WEB-003b" label is not an id
         (CHG-SGU-020).'
+    stateViews:
+      loading: P01/turnstile-loader
+      videoBuffering: P01/video-poster
+      videoUnavailable: P01/video-poster
+      error: P01/status-card
+      emptyFirstRun: P01/dashed-empty
+      emptyNoResults: P01/filter-empty
+      emptyNoAccess: P01/sign-in-card
+      offline: P01/offline-paused
   apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -1362,6 +1392,13 @@ screens:
         the counters on the page are the reference. **Do not copy the Read more panel''s prices on the
         multi-park flow** (Adult AED 325, Infant AED 475 are single-park rates): a prototype defect; the
         counters on the page are the reference (CHG-SGU-020).'
+    stateViews:
+      loading: P01/turnstile-loader
+      error: P01/status-card
+      emptyFirstRun: P01/dashed-empty
+      emptyNoResults: P01/filter-empty
+      emptyNoAccess: P01/sign-in-card
+      offline: P01/offline-paused
   apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -1738,6 +1775,13 @@ screens:
         able to swim?'' pop-up. YAML''s separate hold call (addCartLine / inventory hold) is implicit.
         30 September: a session''s tickets (Surfer, Junior surfer, Spectator) appear once the session
         is chosen, and choosing it adds nothing to the cart.'
+    stateViews:
+      loading: P01/turnstile-loader
+      error: P01/status-card
+      emptyFirstRun: P01/dashed-empty
+      emptyNoAccess: P01/sign-in-card
+      offline: P01/offline-paused
+      emptyNoResults: P01/filter-empty
   apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -2069,6 +2113,13 @@ screens:
     note: '**Drawn by Claude Design on `Seat Board 3.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
+    stateViews:
+      loading: P01/turnstile-loader
+      error: P01/status-card
+      emptyFirstRun: P01/choose-first-note
+      emptyNoAccess: P01/sign-in-card
+      offline: P01/offline-paused
+      emptyNoResults: P01/filter-empty
   apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -2309,6 +2360,12 @@ screens:
       differences: 'Sign-in is asked when leaving Add-ons (Config ''Ask to sign in: After add-ons'', Rev
         3 item 3), so WEB-008 → WEB-016 is a transition YAML does not have. Add-ons also appear on the
         payment step (combo) and confirmation (upsells). 28 Sep flow review: all add-ons live here only.'
+    stateViews:
+      loading: P01/turnstile-loader
+      error: P01/status-card
+      emptyFirstRun: P01/dashed-empty
+      emptyNoAccess: P01/sign-in-card
+      offline: P01/offline-paused
   apisNote: 'Rebuilt 9 September 2026 from the operations this screen then declared (six since the rev
     3 build of 29 September), not from a workshop pack — it has none. Columns narrowed on 3 October 2026
     to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and
@@ -2482,6 +2539,12 @@ screens:
       view: Discover → 'Wishlist' link (discoverLinks)
       differences: No 'withdrawn product stays marked unavailable' state (YAML note). Prototype adds 'Restore
         removed' and live queue times.
+    stateViews:
+      loading: P01/turnstile-loader
+      error: P01/status-card
+      emptyFirstRun: P01/dashed-empty
+      emptyNoAccess: P01/sign-in-card
+      offline: P01/offline-paused
   apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -2797,6 +2860,12 @@ screens:
         the seat step. Exit-intent dialog (exit.open) is a prototype addition. **Draw the countdown with
         More time (`extendCart`) on the basket**, although the prototype has no extend action and times
         only the seat step (CHG-SGU-020).'
+    stateViews:
+      loading: P01/turnstile-loader
+      error: P01/status-card
+      emptyFirstRun: P01/dashed-empty
+      emptyNoAccess: P01/sign-in-card
+      offline: P01/offline-paused
   apisNote: 'Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -3083,6 +3152,13 @@ screens:
       differences: Sections are driven by the flow's requires list; prototype adds a signature, diving
         certification and vehicle plate fields. Wishlist/device operations listed in the YAML apis have
         no counterpart here. Saved guests prefill is described in Account but not shown on this step.
+    stateViews:
+      loading: P01/turnstile-loader
+      error: P01/status-card
+      emptyFirstRun: P01/dashed-empty
+      emptyNoResults: P01/filter-empty
+      emptyNoAccess: P01/sign-in-card
+      offline: P01/offline-paused
   apisNote: 'Rebuilt 9 September 2026 from the 10 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -3361,6 +3437,12 @@ screens:
         inquiry state matches the YAML (''We couldn''t confirm this payment yet… you won''t be charged
         twice''). **Draw card, Apple Pay, Google Pay and wallet only** (R080, 28 September); Tabby split-in-4,
         pay on arrival and invoice/PO are not in the first release (CHG-SGU-020).'
+    stateViews:
+      loading: P01/turnstile-loader
+      error: P01/status-card
+      emptyFirstRun: P01/dashed-empty
+      emptyNoAccess: P01/sign-in-card
+      offline: P01/offline-paused
   apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -3576,6 +3658,12 @@ screens:
       differences: 'Prototype adds editing attendee details after purchase (''Change your details'', signed-in
         only) and Reissue QR. No ''unpaid — pay now'' route to WEB-014. **Leave out** editing attendee
         details after purchase and Reissue QR: no operation on this screen declares them (CHG-SGU-020).'
+    stateViews:
+      loading: P01/turnstile-loader
+      error: P01/status-card
+      emptyFirstRun: P01/dashed-empty
+      emptyNoAccess: P01/sign-in-card
+      offline: P01/offline-paused
   apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -3864,6 +3952,12 @@ screens:
         `enterWaitingRoom` returns the same entry for the same `Idempotency-Key` (ADR-0066). **The copy
         must not say "refreshing puts you at the back"**: the room keeps the place across a refresh (same
         entry for the same Idempotency-Key, ADR-0066) (CHG-SGU-020).'
+    stateViews:
+      loading: P01/turnstile-loader
+      error: P01/status-card
+      emptyFirstRun: P01/dashed-empty
+      emptyNoAccess: P01/sign-in-card
+      offline: P01/offline-paused
   apisNote: Rebuilt 1 October 2026 on the two waiting-room operations (ADR-0066). Columns are the entry's
     guest-facing fields; `pollAfterSeconds` and `admission` are plumbing the page acts on rather than
     shows.
@@ -4285,6 +4379,12 @@ screens:
         or mobile number'); it is a modal, not a page. Account → Security still shows 'Two-step verification'
         and passkeys, which the YAML ruled out for guests (R167). Guest checkout route belongs to WEB-012
         in the prototype.
+    stateViews:
+      loading: P01/turnstile-loader
+      error: P01/status-card
+      emptyFirstRun: P01/dashed-empty
+      emptyNoAccess: P01/sign-in-card
+      offline: P01/offline-paused
   apisNote: 'Rebuilt 9 September 2026 from the 19 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -4519,6 +4619,13 @@ screens:
     note: '**Drawn by Claude Design on `Dashboards Board.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
+    stateViews:
+      loading: P01/turnstile-loader
+      error: P01/status-card
+      emptyFirstRun: P01/dashed-empty
+      emptyNoResults: P01/filter-empty
+      emptyNoAccess: P01/sign-in-card
+      offline: P01/offline-paused
   apisNote: 'Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -4770,6 +4877,13 @@ screens:
       differences: QR is static — no rotating code with a visible countdown (YAML R230). Prototype adds
         reschedule, add guests, refund, resale and cancel on the ticket sheet (YAML routes refunds to
         WEB-019 and transfers to WEB-030).
+    stateViews:
+      loading: P01/turnstile-loader
+      error: P01/status-card
+      emptyFirstRun: P01/dashed-empty
+      emptyNoResults: P01/filter-empty
+      emptyNoAccess: P01/sign-in-card
+      offline: P01/offline-paused
   apisNote: 'Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -5054,6 +5168,13 @@ screens:
       view: Account → 'Order history'
       differences: A list pane with toast-only actions; no order detail view. Refund request and transfer
         are rows, not flows.
+    stateViews:
+      loading: P01/turnstile-loader
+      error: P01/status-card
+      emptyFirstRun: P01/dashed-empty
+      emptyNoResults: P01/filter-empty
+      emptyNoAccess: P01/sign-in-card
+      offline: P01/offline-paused
   apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -5278,6 +5399,13 @@ screens:
       differences: Split over three panes; fields are read-only with a 'Save changes' toast. No 'which
         level the current value came from' (YAML purpose). Consent purposes appear as two marketing toggles
         rather than the configured purpose list.
+    stateViews:
+      loading: P01/turnstile-loader
+      error: P01/status-card
+      emptyFirstRun: P01/dashed-empty
+      emptyNoResults: P01/filter-empty
+      emptyNoAccess: P01/sign-in-card
+      offline: P01/offline-paused
   apisNote: 'Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -5592,6 +5720,13 @@ screens:
       view: Account → 'Wallet & gift cards' (and 'Payment methods')
       differences: Rows with toast actions; no transaction list, no gift-card balance lookup. Auto top-up
         is a prototype addition with no YAML operation. Saved payment tokens are a separate pane.
+    stateViews:
+      loading: P01/turnstile-loader
+      error: P01/status-card
+      emptyFirstRun: P01/dashed-empty
+      emptyNoResults: P01/filter-empty
+      emptyNoAccess: P01/sign-in-card
+      offline: P01/offline-paused
   apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -5797,6 +5932,13 @@ screens:
         → 'Other plans — Compare'
       differences: Plans are sold as a booking flow, not a plans page; the account 'Compare' action is
         a toast.
+    stateViews:
+      loading: P01/turnstile-loader
+      error: P01/status-card
+      emptyFirstRun: P01/dashed-empty
+      emptyNoResults: P01/filter-empty
+      emptyNoAccess: P01/sign-in-card
+      offline: P01/offline-paused
   apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -6010,6 +6152,13 @@ screens:
       view: Account → 'Membership' → 'Billing statement — View'
       differences: Billing and dunning retry are well covered. Prototype adds membership transfer to a
         family member and guest passes; YAML's transferOrderTickets on this screen has no visible use.
+    stateViews:
+      loading: P01/turnstile-loader
+      error: P01/status-card
+      emptyFirstRun: P01/dashed-empty
+      emptyNoResults: P01/filter-empty
+      emptyNoAccess: P01/sign-in-card
+      offline: P01/offline-paused
   apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -6445,6 +6594,13 @@ screens:
       differences: Spread across four panes rather than one screen; wishlist is its own view (WEB-009).
         Security pane includes passkeys and two-step verification, which the YAML does not have for guests.
         YAML purpose text still says 'See loyalty & rewards' (stale).
+    stateViews:
+      loading: P01/turnstile-loader
+      error: P01/status-card
+      emptyFirstRun: P01/dashed-empty
+      emptyNoResults: P01/filter-empty
+      emptyNoAccess: P01/sign-in-card
+      offline: P01/offline-paused
   apisNote: 'Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -6631,6 +6787,12 @@ screens:
       view: Header 'Help'
       differences: Also carries policies and the accessibility statement (YAML WEB-045) and the case list
         (YAML WEB-034's listMyCases) on the same page.
+    stateViews:
+      loading: P01/turnstile-loader
+      error: P01/status-card
+      emptyFirstRun: P01/dashed-empty
+      emptyNoAccess: P01/sign-in-card
+      offline: P01/offline-paused
   apisNote: 'Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
     — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -6804,6 +6966,12 @@ screens:
       match: partial
       view: Account → 'Reviews & feedback'
       differences: List of visits to rate with toast actions; no rating form or survey questions are drawn.
+    stateViews:
+      loading: P01/turnstile-loader
+      error: P01/status-card
+      emptyFirstRun: P01/dashed-empty
+      emptyNoAccess: P01/sign-in-card
+      offline: P01/offline-paused
   apisNote: 'Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
     — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -6976,6 +7144,13 @@ screens:
       view: Account → 'Newsletters'; Contact page → 'Choose newsletters'
       differences: Per-venue and channel toggles only for signed-in guests; no signed-out email sign-up
         form.
+    stateViews:
+      loading: P01/turnstile-loader
+      error: P01/status-card
+      emptyFirstRun: P01/dashed-empty
+      emptyNoResults: P01/filter-empty
+      emptyNoAccess: P01/sign-in-card
+      offline: P01/offline-paused
   apisNote: 'Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -7066,6 +7241,12 @@ screens:
       match: exact
       view: Footer 'Contact', or Discover → 'Contact & venue info'
       differences: Links to parking and accessibility from the contact cards; otherwise matches.
+    stateViews:
+      loading: P01/turnstile-loader
+      error: P01/status-card
+      emptyFirstRun: P01/dashed-empty
+      emptyNoAccess: P01/sign-in-card
+      offline: P01/offline-paused
   apisNote: 'Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
     — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -7175,6 +7356,14 @@ screens:
         waitlist'' (holds a returned place for 15 minutes), which the YAML screen (getTenantAppStatus
         only) cannot call. **Do not draw "Join the waitlist" on the sold-out page**: this screen calls
         no waitlist operation; a sold-out performance waitlist belongs to the event booking screens (CHG-SGU-022).'
+    stateViews:
+      loading: P01/turnstile-loader
+      error: P01/status-card
+      emptyFirstRun: P01/dashed-empty
+      emptyNoAccess: P01/sign-in-card
+      offline: P01/offline-paused
+      soldOut: P01/status-card
+      maintenance: P01/status-card
   apisNote: 'Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
     — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -7321,6 +7510,13 @@ screens:
         tickets'
       differences: List pane with toast actions; no recipient form. Prototype adds cancel transfer and
         withdraw resale listing.
+    stateViews:
+      loading: P01/turnstile-loader
+      error: P01/status-card
+      emptyFirstRun: P01/dashed-empty
+      emptyNoResults: P01/filter-empty
+      emptyNoAccess: P01/sign-in-card
+      offline: P01/offline-paused
   apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -7726,6 +7922,13 @@ screens:
         / invoice quote) inside Kids Club → 'Birthday party / group' and 'School trip', which the YAML
         covers only through requestGroupBooking. 'Pay now' on a held reservation has no YAML route (WEB-014
         is pay-by-link).
+    stateViews:
+      loading: P01/turnstile-loader
+      error: P01/status-card
+      emptyFirstRun: P01/dashed-empty
+      emptyNoResults: P01/filter-empty
+      emptyNoAccess: P01/sign-in-card
+      offline: P01/offline-paused
   apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -7853,6 +8056,13 @@ screens:
       match: exact
       view: Discover → 'Offers & promotions'
       differences: '''Use this offer'' returns to the listing; no personalised ''applies to you'' filter.'
+    stateViews:
+      loading: P01/turnstile-loader
+      error: P01/status-card
+      emptyFirstRun: P01/dashed-empty
+      emptyNoResults: P01/filter-empty
+      emptyNoAccess: P01/sign-in-card
+      offline: P01/offline-paused
   apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -8026,6 +8236,13 @@ screens:
         squares) and in At the venue → 'Shop & drop'
       differences: No browsable merchandise catalogue before arrival; the nearest is in-venue Shop & drop
         (WEB-042).
+    stateViews:
+      loading: P01/turnstile-loader
+      error: P01/status-card
+      emptyFirstRun: P01/dashed-empty
+      emptyNoResults: P01/filter-empty
+      emptyNoAccess: P01/sign-in-card
+      offline: P01/offline-paused
   apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -8192,6 +8409,13 @@ screens:
       differences: 'No lost-item report form (item, where, when, photo); reported via the generic case
         form. The prototype has no lost-item form; it uses the generic case form. A prototype gap: the
         build follows this screen (kind, colour, brand, where last seen, photos), not the prototype (CHG-SGU-017).'
+    stateViews:
+      loading: P01/turnstile-loader
+      error: P01/status-card
+      emptyFirstRun: P01/dashed-empty
+      emptyNoResults: P01/filter-empty
+      emptyNoAccess: P01/sign-in-card
+      offline: P01/offline-paused
   apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -8396,6 +8620,13 @@ screens:
         whole storefront currency, which contradicts 'always charged in AED'. **Resolved 2 October 2026
         (CHG-FIN-001):** the guest may pay in the selected currency, so a storefront currency switch is
         right where the venue charges that currency.
+    stateViews:
+      loading: P01/turnstile-loader
+      error: P01/status-card
+      emptyFirstRun: P01/dashed-empty
+      emptyNoResults: P01/filter-empty
+      emptyNoAccess: P01/sign-in-card
+      offline: P01/offline-paused
   apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -8708,6 +8939,13 @@ screens:
         and no payment step: wrong here.** The contract takes payment before the kitchen sees a guest
         order unless the outlet runs a tab, and F11 puts the pay step (4) before the kitchen (5); the
         design shows the pay step (CHG-SGU-018).'
+    stateViews:
+      loading: P01/turnstile-loader
+      error: P01/status-card
+      emptyFirstRun: P01/dashed-empty
+      emptyNoResults: P01/filter-empty
+      emptyNoAccess: P01/sign-in-card
+      offline: P01/offline-paused
   apisNote: 'Rebuilt 9 September 2026 from the 8 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -8843,6 +9081,12 @@ screens:
       view: At the venue → Order food → tap a dish; Takeaway/Delivery → 'Add' opens the modifier side
         panel
       differences: Two renderings of the same thing (dialog in-venue, side panel in takeaway/delivery).
+    stateViews:
+      loading: P01/turnstile-loader
+      error: P01/status-card
+      emptyFirstRun: P01/dashed-empty
+      emptyNoAccess: P01/sign-in-card
+      offline: P01/offline-paused
   apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -8977,6 +9221,12 @@ screens:
       match: exact
       view: At the venue → Order food → 'Send to the kitchen'
       differences: No bill or settle-the-bill view (YAML getGuestBill, 'settle the bill').
+    stateViews:
+      loading: P01/turnstile-loader
+      error: P01/status-card
+      emptyFirstRun: P01/dashed-empty
+      emptyNoAccess: P01/sign-in-card
+      offline: P01/offline-paused
   apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -9159,6 +9409,13 @@ screens:
     note: '**Drawn by Claude Design on `Seat Board 3.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
+    stateViews:
+      loading: P01/turnstile-loader
+      error: P01/status-card
+      emptyFirstRun: P01/dashed-empty
+      emptyNoResults: P01/filter-empty
+      emptyNoAccess: P01/sign-in-card
+      offline: P01/offline-paused
   apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -9300,6 +9557,13 @@ screens:
       verified: '2026-10-01'
       match: exact
       view: Summit Peaks → header 'At the venue' → Virtual queue
+    stateViews:
+      loading: P01/turnstile-loader
+      error: P01/status-card
+      emptyFirstRun: P01/dashed-empty
+      emptyNoResults: P01/filter-empty
+      emptyNoAccess: P01/sign-in-card
+      offline: P01/offline-paused
   apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -9503,6 +9767,13 @@ screens:
         full = soldOutForDay). Pays directly with ''Reserve and pay'' rather than through cart and checkout
         (R166). Also a plate field in the cabana/party flows. **Do not draw live free-bay counts or "Reserve
         and pay"**: no live count in the first release, and parking goes through the basket (R166) (CHG-SGU-020).'
+    stateViews:
+      loading: P01/turnstile-loader
+      error: P01/status-card
+      emptyFirstRun: P01/dashed-empty
+      emptyNoResults: P01/filter-empty
+      emptyNoAccess: P01/sign-in-card
+      offline: P01/offline-paused
   apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -9694,6 +9965,13 @@ screens:
         delivered home)
       differences: 'Pays in one tap on the page, not through the cart and checkout (YAML R236). 29 September:
         collect at the gate, at the car park kiosk, or delivered home, with a collection code after paying.'
+    stateViews:
+      loading: P01/turnstile-loader
+      error: P01/status-card
+      emptyFirstRun: P01/dashed-empty
+      emptyNoResults: P01/filter-empty
+      emptyNoAccess: P01/sign-in-card
+      offline: P01/offline-paused
   apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -9908,6 +10186,13 @@ screens:
       view: Summit Peaks → header 'At the venue' → Loyalty
       differences: Placed inside the in-venue section; referral code appears under Account → Groups &
         invitations (YAML createReferral is here).
+    stateViews:
+      loading: P01/turnstile-loader
+      error: P01/status-card
+      emptyFirstRun: P01/dashed-empty
+      emptyNoResults: P01/filter-empty
+      emptyNoAccess: P01/sign-in-card
+      offline: P01/offline-paused
   apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -10146,6 +10431,13 @@ screens:
       match: exact
       view: Floating 'Ask Sahli' button on every page
       differences: A floating chat panel rather than a home screen; no conversation history list (listAiConversations).
+    stateViews:
+      loading: P01/turnstile-loader
+      error: P01/status-card
+      emptyFirstRun: P01/dashed-empty
+      emptyNoResults: P01/filter-empty
+      emptyNoAccess: P01/sign-in-card
+      offline: P01/offline-paused
   apisNote: 'Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -10294,6 +10586,13 @@ screens:
       match: partial
       view: Header 'Help' → 'Policies and accessibility'; footer 'Accessibility'
       differences: 'Not a separate screen: part of the WEB-025 Help centre page.'
+    stateViews:
+      loading: P01/turnstile-loader
+      error: P01/status-card
+      emptyFirstRun: P01/dashed-empty
+      emptyNoResults: P01/filter-empty
+      emptyNoAccess: P01/sign-in-card
+      offline: P01/offline-paused
   apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -10412,6 +10711,13 @@ screens:
       differences: 'Deferred in the YAML (release later, R242: no in-app feed in the first release), but
         the prototype draws it as a live section, so the client will expect it. **Superseded 29 September
         (rev 3 GAP-C1, DI-1075): the screen is in the first release** (CHG-SGU-017).'
+    stateViews:
+      loading: P01/turnstile-loader
+      error: P01/status-card
+      emptyFirstRun: P01/dashed-empty
+      emptyNoAccess: P01/sign-in-card
+      offline: P01/offline-paused
+      emptyNoResults: P01/filter-empty
   apisNote: 'Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
     — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -10643,6 +10949,13 @@ screens:
       verified: 2026-09-28
       match: exact
       view: Coastal Aqua → 'Cabana & locker rentals' → cabana map ('Remaining time' counter)
+    stateViews:
+      loading: P01/turnstile-loader
+      error: P01/status-card
+      emptyFirstRun: P01/dashed-empty
+      emptyNoResults: P01/filter-empty
+      emptyNoAccess: P01/sign-in-card
+      offline: P01/offline-paused
   apisNote: Authored 29 September 2026 from the rev 3 decisions and the client prototype view named in
     `wireframe.prototype`; every operation exists in the contracts (decided 29 September, rev 3).
   overlays:
@@ -10818,6 +11131,13 @@ screens:
       verified: 2026-09-28
       match: exact
       view: House of Pages → 'Meeting room by the hour'
+    stateViews:
+      loading: P01/turnstile-loader
+      error: P01/status-card
+      emptyFirstRun: P01/dashed-empty
+      emptyNoResults: P01/filter-empty
+      emptyNoAccess: P01/sign-in-card
+      offline: P01/offline-paused
   apisNote: Authored 29 September 2026 from the rev 3 decisions and the client prototype view named in
     `wireframe.prototype`; every operation exists in the contracts (decided 29 September, rev 3).
 - id: WEB-049
@@ -11118,6 +11438,13 @@ screens:
         without a search; the time-period buttons filter them. The engine''s other transport flow, Popular
         routes (card view), is route cards with a from-fare and Book, then the date, the departures and
         the passengers. The route map needs a street-map tile provider (audit R038).'
+    stateViews:
+      loading: P01/turnstile-loader
+      error: P01/status-card
+      emptyFirstRun: P01/dashed-empty
+      emptyNoResults: P01/filter-empty
+      emptyNoAccess: P01/sign-in-card
+      offline: P01/offline-paused
   apisNote: Authored 29 September 2026 from the rev 3 decisions and the client prototype view named in
     `wireframe.prototype`; every operation exists in the contracts (decided 29 September, rev 3).
   overlays:
@@ -11392,3 +11719,10 @@ screens:
       differences: 'Single-park planner: no "Which park each day?" step, no shops or kiosks as plan stops
         and no preferenceNotAtVenue (MoM 4.7, 30 September); these are pending in design: specified, and
         built from the definition until the design shows it (handoff/design-batches/apps/1-guest-app/README.md).'
+    stateViews:
+      loading: P01/turnstile-loader
+      error: P01/status-card
+      emptyFirstRun: P01/dashed-empty
+      emptyNoResults: P01/filter-empty
+      emptyNoAccess: P01/sign-in-card
+      offline: P01/offline-paused

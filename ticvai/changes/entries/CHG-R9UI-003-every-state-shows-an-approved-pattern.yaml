@@ -1,0 +1,78 @@
+id: CHG-R9UI-003
+date: '2026-10-21'
+source: audit
+kind: spec
+summary: 'Every state of a client-verified screen names the look its client-approved prototype or board draws for it
+  (wireframe.stateViews, written from screens/_state-patterns.yaml: guest web''s error is the WEB-029 status card,
+  loading the turnstile loader, WEB-007''s waiting step the dashed "Choose ... to see the seats" note, and so on per
+  platform), or is a design gap for the client on the one left-out list (docs/active/left-out.yaml); a check fails a
+  state with neither. The generated layout and the generated frames under wireframes/incoming/ are labelled structure
+  only, not the look, wherever they are handed out.'
+decision:
+  what: 'screens/_state-patterns.yaml (new, authored: the patterns of P01, P02 and P04, each proved by texts its
+    prototype holds, and which pattern each state shows); tools/derive-state-views.py (new refresh step: writes
+    wireframe.stateViews into the 158 client-verified screens, handoff/design-frames.json and
+    wireframes/incoming/README.md); screens/_schema.yaml wireframe.stateViews; docs/active/left-out.yaml (new: the
+    package''s copy of the one left-out list; LO-R9UI-001 to -020 are the design gaps of P01, P02 and P04);
+    tools/check-state-views.py (new, registered in run-checks.py, strict); tools/check-regenerate-twice.py
+    (derive-state-views in WRITE_BACK). The spec pages call the layout pattern "structure only, not the look".'
+  by: Chinmay
+  date: '2026-10-21'
+why: 'Finding of 21 October 2026, the WEB-007 seat page (#31848; sources/audit-21-october/web-007-ui-pull-findings.md,
+  causes 4 and 5): a screen''s states were one line of generator text (tools/generate-screens-from-contracts.py), so
+  nothing mapped an error to the WEB-029 card, loading to the turnstile loader or the waiting step to the dashed note,
+  and the page was built with a bare error page; a third, generated frame styled like the till was attached to the
+  screen as if it were the design. The lead, Chinmay, 21 October 2026: "I wanna get all of those changes out now..".
+  Standing rules: the client-approved UI is fixed (the lead, 14 October 2026) and a state the approved design does not
+  draw is not invented: it goes to the client as a design gap, on the left-out list (the council of 20 October 2026).'
+keys_touched:
+  screens: [WEB-001, WEB-002, WEB-003, WEB-004, WEB-005, WEB-006, WEB-007, WEB-008, WEB-009, WEB-010, WEB-011,
+    WEB-012, WEB-013, WEB-015, WEB-016, WEB-017, WEB-018, WEB-019, WEB-020, WEB-021, WEB-022, WEB-023, WEB-024,
+    WEB-025, WEB-026, WEB-027, WEB-028, WEB-029, WEB-030, WEB-031, WEB-032, WEB-033, WEB-034, WEB-035, WEB-036,
+    WEB-037, WEB-038, WEB-039, WEB-040, WEB-041, WEB-042, WEB-043, WEB-044, WEB-045, WEB-046, WEB-047, WEB-048,
+    WEB-049, WEB-050, GST-001, GST-002, GST-003, GST-004, GST-005, GST-006, GST-007, GST-008, GST-009, GST-010,
+    GST-011, GST-012, GST-013, GST-014, GST-015, GST-016, GST-017, GST-018, GST-019, GST-020, GST-021, GST-022,
+    GST-023, GST-024, GST-025, GST-026, GST-027, GST-028, GST-029, GST-030, GST-031, GST-032, GST-033, GST-034,
+    GST-035, GST-036, GST-037, GST-038, GST-039, GST-040, GST-041, GST-042, GST-043, GST-044, GST-045, GST-046,
+    GST-047, GST-048, GST-049, GST-050, GST-051, GST-052, GST-053, GST-054, GST-055, GST-056, GST-057, GST-058,
+    GST-059, GST-061, GST-062, GST-063, GST-065, GST-066, GST-067, GST-068, GST-069, GST-070, GST-071, GST-072,
+    GST-073, GST-074, GST-075, GST-076, GST-077, GST-078, GST-079, POS-000, POS-001, POS-002, POS-003, POS-004,
+    POS-005, POS-006, POS-007, POS-008, POS-009, POS-010, POS-011, POS-012, POS-013, POS-014, POS-015, POS-016,
+    POS-017, POS-018, POS-019, POS-020, POS-021, POS-022, POS-023, POS-024, POS-025, POS-026, POS-027, POS-028,
+    POS-029, POS-030, POS-031]
+  files:
+  - screens/_state-patterns.yaml
+  - screens/_schema.yaml
+  - screens/P01-guest-web-storefront.yaml
+  - screens/P02-guest-mobile-app.yaml
+  - screens/P04-point-of-sale.yaml
+  - docs/active/left-out.yaml
+  - tools/derive-state-views.py
+  - tools/check-state-views.py
+  - tools/run-checks.py
+  - tools/check-regenerate-twice.py
+  - tools/refresh.sh
+  - handoff/design-frames.json
+  - wireframes/incoming/README.md
+  - sources/audit-21-october/web-007-ui-pull-findings.md
+  - tools/tests/test_state_views.py
+root_class: 'new: state-look-unnamed (a screen state with no approved look named, so the developer invents one)'
+tickets:
+  started: [APP-WEB-WEB-007, APP-WEB-WEB-029, APP-MOB-GST-040, APP-MOB-GST-042, APP-MOB-GST-073]
+  unstarted: ['the screen tickets of the 158 client-verified screens, which pick the looks up through their pointer
+      bodies and ADAM at r9']
+release_tag: r9
+decision_owner: Chinmay
+adam_cr: 'none: a decision of the lead; no ADAM CR is needed'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-state-views.py
+status: open
+notes: 'Counts at this change: of the 936 states of the 158 client-verified screens, 646 show an approved pattern
+  (P01 285 of 289, P02 277 of 444, P04 84 of 203) and 290 are design gaps, on 19 design-gap lines of the left-out list
+  (LO-R9UI-001 to -004 and -006 to -020; LO-R9UI-005 is P01''s undrawn offline banner, the partial gap). The
+  check was shown failing on a probe (WEB-007''s error with no view and no left-out line: SV-NO-VIEW) and passing on
+  the tree (python3 tools/check-state-views.py --probe). wireframe.stateViews is invisible metadata: check-approved-ui
+  passes (no visible field changed). P04-point-of-sale.yaml was out of the derivers'' form after a hand edit
+  (CHG-R8RW-010) and is written back in it, the same data.'
