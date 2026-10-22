@@ -1,0 +1,83 @@
+id: CHG-R9KEY-001
+date: '2026-10-22'
+source: audit
+kind: process
+summary: 'A foreign key whose referenced table or columns the schema reference has changed since a forward migration
+  added it is now generated, not listed for a person: the names file drops the constraint of that name and adds it
+  again as the reference has it, NOT VALID, in one guarded ALTER TABLE that does nothing where the key is already the
+  reference''s; a primary key the reference widens (platform.configuration_profile, (id) to (id, version)) is replaced
+  first, guarded, with the keys that point at it. The next names file puts rental.booking''s deposit key on
+  orders.payment, profile_deployment''s on (profile_id, version) and visit_plan''s on pii.subject in every database.
+  The shipped files V0103a to V0113 are not edited.'
+decision:
+  what: 'tools/ddl_forward.py: diff() writes a "constraint changed" foreign key whose table, columns, referenced table
+    or referenced columns differ (and that has no ON DELETE or other tail) as guard_change_foreign_key: `ALTER TABLE t
+    DROP CONSTRAINT IF EXISTS k, ADD CONSTRAINT k FOREIGN KEY (...) REFERENCES p(...) NOT VALID`, guarded on both tables,
+    the columns having the parent''s types, the parent''s columns being a unique key, and the constraint not already
+    being this key (fk_is: its table, referenced table and both column lists, in order). A primary key the reference
+    widens to a superset of its columns, where every key onto the old one is pointed at the new one, is written as
+    guard_widen_primary_key (the keys onto it dropped, then DROP CONSTRAINT / ADD CONSTRAINT PRIMARY KEY), guarded on
+    the old key being there on exactly the old columns, the new columns NOT NULL and no other key depending on it; its
+    "column changed" and "constraint added" rows go. It runs before the changed keys, and a key onto the new primary
+    key an earlier names file added guarded while the key was missing is added again, guarded. Model.apply_forward
+    folds both blocks back, so the next run writes nothing. VALIDATE stays the owner''s, as for every key the names
+    files add. tools/ticket_done.py reads the two new tags (change foreign key, widen primary key) for the migration
+    tickets.'
+  by: Chinmay
+  date: '2026-10-22'
+  quote: 'tes ti all 3'
+waivers:
+  release_window: {by: Chinmay, date: '2026-10-22', quote: 'tes ti all 3'}
+why: 'Finding, 22 October 2026, on a copy of the live database: r8''s names file backend/tenant/V0107__names_after_r1_20261019.sql
+  (written by tools/derive-ddl.py and ddl_forward.py) added rental.booking booking_deposit_authorisation_id_fkey onto
+  orders.stored_value_authorisation, so every rental card-deposit checkout on live is refused; ADAM CR-146 (CHG-CRA-002,
+  18 October) points it at orders.payment. V0107 was derived from a schema reference that did not have CR-146 yet, and
+  once a shipped file carries a key, the generator only ever listed a later change to it ("constraint changed ... drop
+  and re-add by hand" in handoff/migration-review.md), which no ticket carried. The same class held
+  platform.profile_deployment profile_deployment_profile_id_fkey on profile_id alone (CHG-R8MIG-019 keys a
+  configuration profile (id, version)) and venuemap.visit_plan visit_plan_subject_id_fkey on marketing.guest_profile
+  (the reference: pii.subject). Our team''s repository fixes live with its migration 242 (the deposit key re-pointed,
+  same name), so the package''s block must do nothing where the key is already the reference''s. The lead''s words, 22
+  October 2026, his yes to applying 242 to live, holding r9 for this fix, and the 12 recommendations: "tes ti all 3".'
+keys_touched:
+  tables:
+  - rental.booking
+  - platform.profile_deployment
+  - platform.configuration_profile
+  - platform.workstation
+  - venuemap.visit_plan
+  files:
+  - tools/ddl_forward.py
+  - tools/ticket_done.py
+  - tools/tests/test_migration_generator.py
+root_class: 'A-DERIVE: a generated statement that leaves a key in a superseded form'
+tickets:
+  started: []
+  unstarted:
+  - 'The MIG tickets of rental.booking, platform.profile_deployment, platform.configuration_profile, platform.workstation
+    and venuemap.visit_plan: they copy the blocks of the next names file that name their tables.'
+release_tag: r9
+decision_owner: Chinmay
+adam_cr: CR-146
+triage: blocker
+prevention:
+  type: generator-rule
+  ref: tools/ddl_forward.py::guard_change_foreign_key
+status: open
+notes: 'Superseded keys found, every "constraint changed" row of handoff/migration-review.md at cf6e1379 (all three are
+  foreign keys whose target or columns changed): rental.booking booking_deposit_authorisation_id_fkey
+  (orders.stored_value_authorisation -> orders.payment, CR-146), platform.profile_deployment
+  profile_deployment_profile_id_fkey ((profile_id) -> configuration_profile(id) to (profile_id, version) ->
+  configuration_profile(id, version), CHG-R8MIG-019), venuemap.visit_plan visit_plan_subject_id_fkey
+  (marketing.guest_profile -> pii.subject). resources.booking booking_deposit_authorisation_id_fkey is not superseded:
+  its contract still says orders.stored_value_authorisation. The widened primary key also takes the review''s
+  "column changed platform.configuration_profile.id" and "constraint added configuration_profile_pkey PRIMARY KEY (id,
+  version)" rows, which CHG-R8MIG-019 had left for a person: the composite key cannot exist without it.
+  tools/tests/test_migration_generator.py: the superseded deposit key is generated in its current form as one guarded
+  drop and re-add, never with the old target, and a second diff writes nothing; an unchanged key writes nothing and a
+  changed ON DELETE stays a decision; the widened primary key runs before the composite key onto it, and a primary key
+  a kept key still needs stays a decision; the names file header and the migration ticket name the changed key. On
+  PostgreSQL 18 (22 October 2026), psql -1 ON_ERROR_STOP, each file twice, 0 errors, schema unchanged by the second
+  run: a copy of t_live with V0113 then the names file (deposit key on orders.payment, profile_deployment on
+  (profile_id, version)); a copy of t_live with migration 242 simulated (the deposit key keeps its oid and stays
+  validated); a fresh package-built database (every key the reference''s).'

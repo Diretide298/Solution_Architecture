@@ -495,9 +495,11 @@ def baseline_functions(root) -> dict:
 
 
 AFTER_R1_FILE = re.compile(r"^V0[1-9]\d\d[a-z]?__(?:names_(?:early_)?)?after_r1_\d{8}\.sql$")
-# A block of the names file (ddl_forward.tag): `-- <table> | <kind> | <detail> [| <other table>]` (R8-MIG-001)
+# A block of the names file (ddl_forward.tag): `-- <table> | <kind> | <detail> [| <other table>]` (R8-MIG-001); a key
+# put in the reference's form and a widened primary key (CHG-R9KEY-001) are on the tickets of the tables they name too
 NAMES_TAG = re.compile(r"^-- (\w+\.\w+) \| (rename table|move table|rename policy|rename column|rename constraint|"
-                       r"rename index|create index|drop index|drop foreign key|foreign key) \| (\S+(?: to \S+)?)"
+                       r"rename index|create index|drop index|drop foreign key|foreign key|change foreign key|"
+                       r"widen primary key) \| (\S+(?: to \S+)?)"
                        r"(?: \| (\w+\.\w+))?$")
 _AR1 = [
     (re.compile(r"^CREATE TABLE IF NOT EXISTS (\w+\.\w+)"), None),
