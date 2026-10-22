@@ -519,11 +519,15 @@ createServer(async (req, res) => {
   if (path === '/_created') return json(res, 200, { created });
   // A work package made on the server, the way tools/op-create.rb makes one: ADAM never sees
   // the create. Kept out of `created`, which is what ADAM sent (CHG-ADM-003).
+  // `id` and `description` make a ticket under its live number and text (mcp/pull-files-check.mjs pulls
+  // #31848 and #36194 as they are on the instance); without them, the next number and no description.
   if (path === '/_make') {
-    const id = nextId++;
+    const id = Number(url.searchParams.get('id')) || nextId++;
     const parent = url.searchParams.get('parent');
+    const description = url.searchParams.get('description');
     packages.set(String(id), {
       id, subject: url.searchParams.get('subject') ?? `Made on the server ${id}`, lockVersion: 1, percentageDone: 0,
+      ...(description !== null ? { description: { raw: description } } : {}),
       createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(),
       _links: {
         project: { href: `/api/v3/projects/${url.searchParams.get('project') ?? PROJECT.id}`, title: PROJECT.name },

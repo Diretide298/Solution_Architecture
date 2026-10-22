@@ -249,6 +249,22 @@ try {
     /CLAUDE\.md's "Working a ticket \(ADAM\)" section has no ADAM markers, so it was left as it is/.test(bareRun.text)
       && !/left exactly as it is/.test(bareRun.text) && /"A \[DB\] ticket" refreshed between its ADAM markers/.test(bareRun.text), bareRun.text);
 
+  // ── 5c. the frontend's "Building a screen to its wireframe" reaches a workspace made before it (21 October 2026) ──
+  const LOOK_RE = /<!-- ADAM:start screen-look -->\r?\n[\s\S]*?<!-- ADAM:end screen-look -->\r?\n/;
+  const lookInner = lf(starter('frontend', 'CLAUDE.md')).match(/<!-- ADAM:start screen-look -->\n([\s\S]*?)<!-- ADAM:end screen-look -->/)?.[1];
+  check('the frontend starter CLAUDE.md marks "Building a screen to its wireframe" as ADAM\'s, and a frame the pull wrote '
+    + 'came through ADAM', Boolean(lookInner) && lookInner.startsWith('## Building a screen to its wireframe')
+      && /That frame came through ADAM, and it is the design/.test(lookInner) && /placeholder layout only when no frame was written/i.test(lookInner));
+  const noLook = oldWorkspace('fe-no-look', 'frontend', { markers: true });
+  writeFileSync(path.join(noLook, 'CLAUDE.md'), read(noLook, 'CLAUDE.md').replace(LOOK_RE, ''));
+  const noLookMd = read(noLook, 'CLAUDE.md');
+  const lk = updater(noLook, ['--refresh-workspace', noLook, '--from', STARTERS]);
+  const withLook = read(noLook, 'CLAUDE.md');
+  check('**a frontend CLAUDE.md that never had it gets it, with its markers, after "Working a ticket (ADAM)"**',
+    withLook.includes(`<!-- ADAM:end working-a-ticket -->\n\n<!-- ADAM:start screen-look -->\n${lookInner}<!-- ADAM:end screen-look -->\n`)
+      && withLook.replace(LOOK_RE, '').split('<!-- ADAM:end working-a-ticket -->\n\n')[1] === noLookMd.split('<!-- ADAM:end working-a-ticket -->\n')[1]
+      && /"Building a screen to its wireframe"/.test(lk.text), lk.text);
+
   // ── 6. a folder that is not an ADAM workspace is not written to ────
   const empty = path.join(T, 'empty');
   mkdirSync(empty, { recursive: true });

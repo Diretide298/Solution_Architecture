@@ -14,7 +14,7 @@
  * | adam_module    | /api/backend .modules + .tables                          |
  * | adam_service   | /api/diagrams .services, deepened by diagrams/detail      |
  * | adam_decisions | /api/decisions .adrs + .documents                        |
- * | adam_file      | /api/file, windowed by line                              |
+ * | adam_file      | /api/file, windowed by line; a frame from /frame          |
  * | adam_search    | /api/search .entries                                     |
  *
  * **Five are about scheduled work**, and they go to the accounts service rather
@@ -34,6 +34,9 @@
  * chooses a release. `adam_repin` stays for older instructions and is never
  * needed. README.md also lists the change requests raised from the ticket and
  * what was decided on them (CHG-ADM-002).
+ * It also writes, for every screen, the wireframe frame the record names as one
+ * self-contained file, and the files the ticket runs whole, checked against
+ * ADAM's checksum (#31848, #36194; 21 October 2026).
  * `adam_propose` works out a change to a work package — status, % done, a
  * comment — and sends nothing; `adam_apply` sends it, with the code the proposal
  * returned, after the person has said yes. The change is made as the person,
@@ -66,6 +69,7 @@
  */
 
 import { execFile } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import { appendFile, mkdir, readdir, rm, stat, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { promisify } from 'node:util';
@@ -524,7 +528,7 @@ export function descriptionSection(wp, text) {
 }
 
 function ticketReadme(wp, files, missing, when, decisions = [], release = null, changes = undefined, blockedBy = [],
-  tree = {}, db = null) {
+  tree = {}, db = null, { looks = [], runs = [] } = {}) {
   const line = (label, value) => (value || value === 0 ? `- **${label}:** ${value}\n` : '');
   let out = `# #${wp.key} ${wp.subject}\n\n`;
   out += line('Project', wp.project) + line('Type', wp.type) + line('Part of', partOfText(tree.partOf))
@@ -560,6 +564,8 @@ function ticketReadme(wp, files, missing, when, decisions = [], release = null, 
   if (missing.length) {
     out += `\nLinked but not found in the package: ${missing.map((m) => `${m.kind} \`${m.id}\``).join(', ')}.\n`;
   }
+  out += runSection(runs, release);
+  out += lookSection(looks);
   // The files above are summaries. On #20354 (24 September) an agent read them as the whole truth and
   // reported three gaps that were not there - parameters, the item schema and row-level security - and
   // proposed a change request for them. A gap is only a gap once the source says so.
@@ -1749,6 +1755,449 @@ function databaseSection(db, key) {
   return out;
 }
 
+// ---- a screen's wireframe, as one file the agent can open -------------------
+//
+// **Why the pull writes it** (#31848, 21 October 2026). A developer pulled WEB-007, guest seat selection:
+// README, ticket.json, the screen record and seven operations, and no wireframe. The agent asked adam_file
+// for the board and was told 415, "Wireframe boards open in the ADAM viewer", which an agent cannot do. So it
+// built the page from the screen record's text, and the page looked nothing like the design the client
+// verified: a plain heading, a plain sentence and a plain button for the error state.
+//
+// The record names its frame (`wireframe.board`: `wireframes/P01 Guest Web.dc.html#web-007`), and the viewer
+// already lifts one frame out of a board as a document of its own (`/frame`, lib/wireframes.mjs
+// frameDocument). That document leans on the viewer: `<base href="wireframes/">` for its images and
+// `<script src="support.js">`. Saved to disk as it is, it loses both. So the connector asks for the frame and
+// for every image and script it names, through the same signed-in client as everything else, and writes one
+// file with all of it inline: opened from the ticket folder, offline, it looks as it does in the viewer.
+//
+// **What a role may read does not change.** /frame and /wireframes/ are package routes behind the same gate
+// as the viewer's own pages, and the uiux layer they belong to is open to every role (lib/audience.mjs); the
+// connector reads them as the developer, so it sees exactly the frames the developer sees in the viewer.
+//
+// **Only the frame the record names is the design.** A board draws one frame per screen and lists the
+// screen's states on its STATES line rather than drawing each (no board in wireframes/ has a separate state
+// frame, 21 October 2026). The other names a record can carry are not the look: `boardFrames` are archived
+// boards, and files under `wireframes/incoming/` are generated working copies (21 October 2026:
+// labelled "structure only, not the look", never presented as the design). The client's prototype is named, not written: it is one
+// interactive file whose views are reached by clicking through it, so there is no view to cut out, and ADAM
+// serves no prototype file to anybody.
+
+/** `wireframes/P01 Guest Web.dc.html#web-007` -> { board: 'P01 Guest Web.dc.html', anchor: 'web-007' }, else null. */
+export function boardRef(ref) {
+  const m = /^\s*(?:\.?\/)?(?:wireframes\/)?([^#]+?\.html?)#([A-Za-z0-9-]{2,24})\s*$/i.exec(String(ref ?? ''));
+  return m ? { board: m[1], anchor: m[2].toLowerCase() } : null;
+}
+
+const ASSET_TYPES = {
+  '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.gif': 'image/gif', '.webp': 'image/webp',
+  '.svg': 'image/svg+xml', '.avif': 'image/avif', '.ico': 'image/x-icon', '.js': 'text/javascript',
+  '.css': 'text/css', '.woff2': 'font/woff2', '.woff': 'font/woff', '.ttf': 'font/ttf', '.otf': 'font/otf',
+  '.mp4': 'video/mp4', '.webm': 'video/webm', '.html': 'text/html', '.htm': 'text/html',
+};
+const ENTITY = { '&amp;': '&', '&quot;': '"', '&#39;': "'", '&apos;': "'", '&lt;': '<', '&gt;': '>' };
+const unescapeAttr = (v) => String(v).replace(/&(amp|quot|#39|apos|lt|gt);/g, (e) => ENTITY[e]);
+const inlineRef = (u) => /^\s*(data:|#|javascript:|mailto:|tel:|about:|blob:)/i.test(u) || !String(u).trim();
+const externalUrl = (u) => /^\s*([a-z][a-z0-9+.-]*:|\/\/)/i.test(u) && !inlineRef(u);
+
+/**
+ * Where a reference in a frame document points, as a package path, or null when it leaves the package.
+ * The document's base is `wireframes/`, so `frames/img/web-007.png` is `wireframes/frames/img/web-007.png`.
+ */
+function packagePath(ref, base = 'wireframes/') {
+  let raw = unescapeAttr(ref).trim().replace(/[?#].*$/, '');
+  try { raw = decodeURIComponent(raw); } catch { /* a literal % stays as it is */ }
+  const parts = [];
+  for (const seg of (raw.startsWith('/') ? raw.slice(1) : base + raw).split('/')) {
+    if (seg === '' || seg === '.') continue;
+    if (seg === '..') { if (!parts.length) return null; parts.pop(); } else parts.push(seg);
+  }
+  // The viewer serves a frame's assets from wireframes/ only; a path out of it is broken there too.
+  return parts[0] === 'wireframes' && parts.length > 1 ? parts.join('/') : null;
+}
+
+/** Every match of `re` in `text`, replaced by what `fn` resolves to (in order, one at a time). */
+async function replaceAsync(text, re, fn) {
+  const out = [];
+  let at = 0;
+  for (const m of text.matchAll(re)) {
+    out.push(text.slice(at, m.index), await fn(...m));
+    at = m.index + m[0].length;
+  }
+  out.push(text.slice(at));
+  return out.join('');
+}
+
+/**
+ * The references a document still makes to anything outside itself: a `<base>`, a script, stylesheet,
+ * image or font by address, a link to another file. Empty for a document that opens offline whole.
+ * Fragment links (`#web-001`) and `data:` URIs are inside it.
+ */
+export function externalRefs(html) {
+  const found = [];
+  const s = String(html);
+  for (const m of s.matchAll(/<base\b[^>]*>/gi)) found.push(m[0]);
+  for (const m of s.matchAll(/<link\b[^>]*\bhref\s*=\s*(["'])(.*?)\1[^>]*>/gi)) if (!inlineRef(m[2])) found.push(m[0]);
+  for (const m of s.matchAll(/(?<![\w:-])(src|href|poster|xlink:href|action|background)\s*=\s*(["'])(.*?)\2/gi)) {
+    if (!inlineRef(m[3])) found.push(m[0]);
+  }
+  // Candidates split on a comma and a space: a data: URI holds a comma of its own.
+  for (const m of s.matchAll(/(?<![\w-])srcset\s*=\s*(["'])(.*?)\1/gi)) {
+    if (m[2].split(/,\s+/).some((c) => !inlineRef(c.trim().split(/\s+/)[0]))) found.push(m[0]);
+  }
+  for (const m of s.matchAll(/url\(\s*(["']?)([^"')]*)\1\s*\)/gi)) if (!inlineRef(m[2])) found.push(m[0]);
+  for (const m of s.matchAll(/@import\s+[^;]+;/gi)) found.push(m[0]);
+  return found;
+}
+
+/**
+ * A frame document as `/frame` serves it, made to stand on its own: every image, stylesheet and script
+ * it names by a path under wireframes/ inline (images and fonts as data: URIs), the `<base>` gone, and a
+ * link to another board kept as `data-adam-href` (a frame is a picture of a screen, not a site to browse).
+ *
+ * `fetchAsset(packagePath)` answers `{ ok, bytes, type }`. What could not be inlined is returned in `left`
+ * (and dropped from the document, so nothing reaches for the network when the file is opened).
+ *
+ * support.js is the board runtime: it boots an `<x-dc>` design component and, to do it, loads React from
+ * a CDN. A frame with no `<x-dc>` gets nothing from it (no board in wireframes/ has one, 21 October 2026)
+ * and the viewer draws such a frame exactly as it would without it, so it is left out of those; a frame
+ * with one gets it inline, and `needsNetwork` says that React still comes from the CDN when it is opened.
+ */
+export async function selfContainedFrame(doc, fetchAsset, { maxAsset = 25 * 1024 * 1024 } = {}) {
+  const inlined = [];
+  const left = [];
+  const held = new Map();
+  const component = /<x-dc[\s>]/i.test(doc);
+  // `base` is the folder a reference is relative to: wireframes/ for the document, a stylesheet's own
+  // folder for the url()s inside it.
+  const get = async (ref, base = 'wireframes/') => {
+    const rel = packagePath(ref, base);
+    if (!rel) return { ref, error: 'outside wireframes/ (broken in the viewer too)' };
+    if (!held.has(rel)) {
+      held.set(rel, (async () => {
+        const answer = await fetchAsset(rel).catch((error) => ({ ok: false, error: error.message }));
+        if (!answer?.ok) return { ref, rel, error: answer?.error ?? `HTTP ${answer?.status}` };
+        if (answer.bytes.length > maxAsset) return { ref, rel, error: `${answer.bytes.length} bytes, over the limit` };
+        const ext = path.posix.extname(rel).toLowerCase();
+        const type = ASSET_TYPES[ext] ?? (String(answer.type).split(';')[0].trim() || 'application/octet-stream');
+        inlined.push(rel);
+        return { ref, rel, type, bytes: answer.bytes };
+      })());
+    }
+    return held.get(rel);
+  };
+  const dataUri = async (ref, base) => {
+    if (inlineRef(ref)) return ref;
+    if (externalUrl(ref)) { left.push({ ref, why: 'an address outside ADAM' }); return ''; }
+    const got = await get(ref, base);
+    if (got.error) { left.push({ ref, why: got.error }); return ''; }
+    return `data:${got.type};base64,${got.bytes.toString('base64')}`;
+  };
+  const cssUrls = (css, base) => replaceAsync(css, /url\(\s*(["']?)([^"')]*)\1\s*\)/gi,
+    async (whole, q, ref) => (inlineRef(ref) ? whole : `url("${await dataUri(ref, base)}")`));
+
+  // The base goes first: every path below is resolved against wireframes/ here instead.
+  let html = String(doc).replace(/<base\b[^>]*>/gi, '');
+
+  html = await replaceAsync(html, /<script\b([^>]*?)\bsrc\s*=\s*(["'])(.*?)\2([^>]*)>\s*<\/script\s*>/gi,
+    async (whole, a, q, ref, b) => {
+      if (/(^|\/)support\.js$/i.test(unescapeAttr(ref).replace(/[?#].*$/, '')) && !component) {
+        return '<!-- support.js (the board runtime) left out: it only boots <x-dc> design components, and this frame has none. -->';
+      }
+      if (externalUrl(ref)) { left.push({ ref, why: 'a script from outside ADAM' }); return ''; }
+      const got = await get(ref);
+      if (got.error) { left.push({ ref, why: got.error }); return ''; }
+      return `<script${a}${b}>${got.bytes.toString('utf8').replace(/<\/script/gi, '<\\/script')}</script>`;
+    });
+
+  html = await replaceAsync(html, /<link\b[^>]*>/gi, async (tag) => {
+    const href = /\bhref\s*=\s*(["'])(.*?)\1/i.exec(tag)?.[2];
+    if (!href || inlineRef(href)) return tag;
+    if (!/\brel\s*=\s*(["'])[^"']*stylesheet/i.test(tag) || externalUrl(href)) {
+      left.push({ ref: href, why: externalUrl(href) ? 'a stylesheet from outside ADAM (the viewer\'s frame has none either)' : 'not a stylesheet' });
+      return '';
+    }
+    const got = await get(href);
+    if (got.error) { left.push({ ref: href, why: got.error }); return ''; }
+    return `<style>${await cssUrls(got.bytes.toString('utf8'), `${path.posix.dirname(got.rel)}/`)}</style>`;
+  });
+
+  html = await replaceAsync(html, /(<style\b[^>]*>)([\s\S]*?)(<\/style>)/gi,
+    async (whole, open, css, close) => `${open}${(await cssUrls(css)).replace(/@import\s+[^;]+;/gi, (imp) => {
+      left.push({ ref: imp, why: 'an @import (not followed)' });
+      return '';
+    })}${close}`);
+
+  html = await replaceAsync(html, /(?<![\w:-])style\s*=\s*(["'])(.*?)\1/gi,
+    async (whole, q, css) => (/url\(/i.test(css) ? `style=${q}${await cssUrls(css)}${q}` : whole));
+
+  html = await replaceAsync(html, /(?<![\w:-])(src|poster|xlink:href|background)\s*=\s*(["'])(.*?)\2/gi,
+    async (whole, name, q, ref) => (inlineRef(ref) ? whole : `${name}=${q}${await dataUri(ref)}${q}`));
+  html = await replaceAsync(html, /(?<![\w-])srcset\s*=\s*(["'])(.*?)\1/gi, async (whole, q, set) => {
+    const parts = [];
+    for (const c of set.split(/,\s+/)) {
+      const [ref, ...rest] = c.trim().split(/\s+/);
+      if (ref) parts.push([await dataUri(ref), ...rest].join(' '));
+    }
+    return `srcset=${q}${parts.join(', ')}${q}`;
+  });
+  // An SVG <image href> or <use href> is a resource; an <a href> to another file is a link to follow.
+  html = await replaceAsync(html, /(<(?:image|use|feImage)\b[^>]*?)(?<![\w:-])href\s*=\s*(["'])(.*?)\2/gi,
+    async (whole, head, q, ref) => (inlineRef(ref) ? whole : `${head}href=${q}${await dataUri(ref)}${q}`));
+  html = html.replace(/(?<![\w:-])href\s*=\s*(["'])(.*?)\1/gi,
+    (whole, q, ref) => (inlineRef(ref) ? whole : `data-adam-href=${q}${ref}${q}`));
+  html = html.replace(/(?<![\w:-])action\s*=\s*(["'])(.*?)\1/gi,
+    (whole, q, ref) => (inlineRef(ref) ? whole : `data-adam-action=${q}${ref}${q}`));
+
+  return { html, inlined: [...new Set(inlined)], left, needsNetwork: component };
+}
+
+/** The text of a frame's line headed `<b>NAME</b>` (STATES, OPERATIONS), tags dropped; null without one. */
+function frameLine(doc, name) {
+  const m = new RegExp(`<b>${name}</b>([\\s\\S]*?)</div>`, 'i').exec(doc);
+  if (!m) return null;
+  return unescapeAttr(m[1].replace(/<[^>]+>/g, ' ').replace(/&middot;/g, '·')).replace(/\s+/g, ' ')
+    .replace(/^[\s·]+|[\s·]+$/g, '') || null;
+}
+
+/**
+ * Saves one frame, self-contained, at `target`. Returns what README.md says about it. Throws when the
+ * frame cannot be read at all (no such board or anchor, or a connector client that reads no bytes).
+ */
+export async function saveFrame(client, ref, target) {
+  if (typeof client.raw !== 'function') throw new Error('this ADAM client reads no bytes, so no frame can be saved');
+  const answer = await client.raw('frame', { board: ref.board, anchor: ref.anchor });
+  if (!answer.ok) {
+    throw new Error(`ADAM answered ${answer.status} for frame #${ref.anchor} of ${ref.board}: `
+      + `${answer.bytes.toString('utf8').slice(0, 200)}`);
+  }
+  const doc = answer.bytes.toString('utf8');
+  const route = (rel) => rel.split('/').map(encodeURIComponent).join('/');
+  const made = await selfContainedFrame(doc, (rel) => client.raw(route(rel)));
+  const header = `<!-- Frame #${ref.anchor} of wireframes/${ref.board}, written by adam_pull from ADAM's /frame `
+    + 'with its images inline: it opens on its own, offline. Do not edit; pull again for the current one. -->\n';
+  const html = made.html.replace(/^(<!doctype html>)?/i, (d) => `${d || '<!doctype html>'}\n${header}`);
+  await writeFile(target, html);
+  const caption = /<section\b[^>]*class="[^"]*\bproto-frame\b[^"]*"[\s\S]*?<p\b[^>]*>([\s\S]*?)<\/p>/i.exec(doc)?.[1];
+  return {
+    bytes: Buffer.byteLength(html),
+    inlined: made.inlined,
+    left: made.left,
+    needsNetwork: made.needsNetwork,
+    remaining: externalRefs(html).length,
+    // `frame drawn` on the board: a designer drew it (or it is the client's prototype, captured);
+    // without it the frame is the screen record rendered as boxes, structure and not a look.
+    drawn: /class="[^"]*\bframe\b[^"]*\bdrawn\b/i.test(doc),
+    capture: caption ? unescapeAttr(caption.replace(/<[^>]+>/g, '')).replace(/\s+/g, ' ').trim() : null,
+    states: frameLine(doc, 'STATES'),
+  };
+}
+
+/** What the pull writes and says for one screen's look. Never throws: a failure is said in README.md. */
+async function screenLook(client, screen, folder) {
+  const w = screen?.wireframe ?? {};
+  const look = {
+    id: screen.id, name: screen.name ?? null, status: w.status ?? null, provenance: w.provenance ?? null,
+    board: w.board ?? null, prototype: w.prototype ?? null, frames: [],
+    // Named in the record but not the design: said as structure only (21 October 2026).
+    structureOnly: [...new Set(JSON.stringify(w).match(/wireframes\/incoming\/[^\s"'`),;]+/g) ?? [])],
+    states: screen.states && typeof screen.states === 'object' ? Object.keys(screen.states) : [],
+  };
+  const ref = boardRef(w.board);
+  if (!ref) return look;
+  const file = `wireframe-${safeName(ref.anchor)}.html`;
+  try {
+    look.frames.push({ ...ref, file, ...(await saveFrame(client, ref, path.join(folder, file))) });
+  } catch (error) {
+    look.frames.push({ ...ref, error: error.message });
+  }
+  return look;
+}
+
+/**
+ * adam_file's answer for `wireframes/<board>.dc.html#<anchor>`: the frame saved as one file, in the
+ * ticket's folder when `key` is given (where adam_pull writes it too), else in .adam/wireframes/.
+ */
+async function saveFrameFor(client, ref, { key, dir } = {}) {
+  const base = await workFolder(dir);
+  const folder = key ? path.join(base, 'work', safeName(String(key).replace(/^#/, ''))) : path.join(base, 'wireframes');
+  await mkdir(folder, { recursive: true });
+  const file = `wireframe-${safeName(ref.anchor)}.html`;
+  const target = path.join(folder, file);
+  try {
+    const saved = await saveFrame(client, ref, target);
+    return {
+      found: true,
+      frame: `wireframes/${ref.board}#${ref.anchor}`,
+      saved: target,
+      bytes: saved.bytes,
+      inlined: saved.inlined.length,
+      ...(saved.left.length ? { notInlined: saved.left } : {}),
+      selfContained: saved.remaining === 0,
+      drawn: saved.drawn,
+      ...(saved.capture ? { capture: saved.capture } : {}),
+      ...(saved.states ? { states: saved.states } : {}),
+      next: `Open ${target} in a browser (it needs nothing else) and read it as the design: `
+        + (saved.drawn ? 'build the screen to look exactly like it, ' : 'it is generated from the screen record, so it gives the structure and not the look; build ')
+        + 'every state included, in the same visual language. The screen record gives the behaviour and bindings.',
+    };
+  } catch (error) {
+    return { found: false, frame: `wireframes/${ref.board}#${ref.anchor}`, error: error.message };
+  }
+}
+
+function lookSection(looks) {
+  if (!looks.length) return '';
+  let out = '';
+  for (const look of looks) {
+    const frame = look.frames[0];
+    const verified = look.provenance === 'client-verified';
+    out += `\n## How ${look.id}${look.name ? ` ${look.name}` : ''} must look\n\n`;
+    out += `- **Wireframe status:** ${[look.provenance, look.status].filter(Boolean).join(', ') || 'not recorded'}`
+      + `${verified ? ' - the client verified this design; it is fixed' : ''}.\n`;
+    if (frame && !frame.error) {
+      out += `- **Wireframe:** [${frame.file}](${frame.file}), frame \`#${frame.anchor}\` of \`wireframes/${frame.board}\`, `
+        + 'as one self-contained file: open it in a browser, offline'
+        + `${frame.needsNetwork ? ' (it loads React from the internet to draw its design component)' : ''}. `
+        + (frame.drawn
+          ? (frame.capture ? `This frame is the client's prototype, captured as an image: ${frame.capture}.`
+            : 'A designer drew this frame.')
+          : 'This frame is the screen record rendered as boxes by the package\'s generator, not a drawing: it gives '
+            + 'the structure (regions, components, order), not the look.')
+        + '\n';
+      if (frame.left.length || frame.remaining) {
+        out += `  Not inlined, so missing from the file: ${frame.left.map((l) => `\`${l.ref}\` (${l.why})`).join(', ') || `${frame.remaining} reference(s)`}.\n`;
+      }
+    } else if (frame?.error) {
+      out += `- **Wireframe:** \`wireframes/${frame.board}#${frame.anchor}\` could not be written (${frame.error}). `
+        + `Ask for it with adam_file, path \`wireframes/${frame.board}#${frame.anchor}\`; if that fails too, say so and `
+        + 'do not build the look from the screen record\'s text alone.\n';
+    } else if (look.board) {
+      out += `- **Wireframe:** \`${look.board}\` names a board and no frame, so none was written.\n`;
+    } else {
+      out += '- **Wireframe:** none recorded for this screen.\n';
+    }
+    const p = look.prototype;
+    if (p?.file) {
+      out += `- **Client-approved prototype:** \`${p.file}\`${p.rev ? `, ${p.rev}` : ''}${p.verified ? `, verified ${p.verified}` : ''}`
+        + `${p.match ? `, match: ${p.match}` : ''}.`
+        + `${p.view ? ` **Views:** ${p.view}.` : ''}`
+        + `${p.differences ? ` Differences from the screen record: ${p.differences}` : ''}\n`
+        + '  Not written here: the prototype is one interactive file whose views are reached by clicking through it, '
+        + 'so no view can be cut out of it, and ADAM serves prototype files neither to the connector nor in the viewer. '
+        + `${frame?.capture ? 'The wireframe above is that prototype, captured at the view it names. ' : ''}`
+        + 'For a view the wireframe does not show, ask the person to open that file at the views named; do not guess it.\n';
+    }
+    for (const f of look.structureOnly) {
+      out += `- \`${f}\` (named in the record): **structure only, not the look**. Never build the look from it.\n`;
+    }
+    const states = frame?.states || (look.states.length ? look.states.join(' · ') : null);
+    out += '\n**Build the page to match the wireframe';
+    out += p?.file ? ' and the prototype view' : '';
+    out += ' exactly**: layout, components, copy, imagery, and every state';
+    out += states ? ` (${states})` : ', including error, empty and loading';
+    out += '. The screen record ([the screen file](' + `screen-${safeName(look.id)}.json)) gives the behaviour and the `
+      + 'bindings; the wireframe gives the look. ';
+    if (p?.file) {
+      out += 'Client-approved UI is fixed: where the prototype has a view, the prototype wins for the look; a screen '
+        + 'or part it lacks is built from the screen record and the wireframe. ';
+    }
+    out += 'The board draws one frame per screen and lists the states rather than drawing each, so build every '
+      + 'state in the same visual language as the frame - the same type, colours, spacing, imagery and components - '
+      + 'never a plain heading, a plain sentence and a plain button. Where the wireframe and the record disagree on '
+      + 'what the screen does, the record wins and you say so; on how it looks, the wireframe wins. '
+      + 'A placeholder layout is only for a screen with no frame written here.\n';
+    if (frame && !frame.error && !frame.drawn) {
+      out += '\nThis screen\'s frame is generated, not drawn: build its regions and components in the order the frame '
+        + 'shows, in the app\'s existing design system, and say in the comment that no drawn design exists yet.\n';
+    }
+  }
+  return out;
+}
+
+// ---- files a ticket runs, whole ---------------------------------------------
+//
+// **Why** (Sanket, #36194, 21 October 2026). "Bring your local database to r8" links thirteen migrations to
+// run. adam_file serves 400 lines at a time, which is right for reading and wrong for running: tenant V0107
+// alone is 2,736 lines, so the agent held a 341-line window of a file it had to run. The pull now writes a
+// ticket's runnable files whole into `run/` in the ticket folder, from the bytes ADAM serves at the release in
+// force, and checks each against the checksum ADAM computes from its own copy. adam_file keeps its window.
+
+/** A forward migration of the package: run as it is, never rewritten (backend/<database>/V01nn__*.sql). */
+const FORWARD_MIGRATION = /^backend\/(tenant|control)\/V01\d\d[A-Za-z]?__[^/]+\.sql$/i;
+const RUN_VERB = /\b(run|runs|apply|applies|applied|execute|executes)\b/i;
+const RUNNABLE_EXT = /\.(sql|sh|ps1|py|mjs|cmd)$/i;
+
+/**
+ * The package files a ticket runs: every linked forward migration, and any package path the ticket's text
+ * names in a sentence that says to run, apply or execute it. In order: the links first, as linked.
+ */
+export function runnableFiles(touches, text) {
+  const out = [];
+  const add = (p) => { if (!out.includes(p)) out.push(p); };
+  for (const t of touches ?? []) {
+    if (t.kind === 'file' && FORWARD_MIGRATION.test(String(t.id))) add(String(t.id));
+  }
+  for (const sentence of String(text ?? '').split(/(?<=[.;:!?])\s+|\n+/)) {
+    if (!RUN_VERB.test(sentence)) continue;
+    for (const m of sentence.matchAll(/`?((?:[\w.-]+\/)+[\w.-]+)`?/g)) {
+      const p = m[1].replace(/^\.\//, '').replace(/[.,]+$/, '');
+      if (RUNNABLE_EXT.test(p) && !/^(https?:|\/)/.test(p) && !p.includes('..')) add(p);
+    }
+  }
+  return out;
+}
+
+/**
+ * One package file, written whole at `run/<path>` in the ticket folder. The checksum is of the bytes written
+ * and is compared with the one ADAM sends for its own copy: `match`, or `unchecked` for an ADAM from before
+ * that header (said in README.md, never passed off as checked). A mismatch writes nothing.
+ */
+export async function writeWhole(client, rel, folder) {
+  const target = path.join(folder, 'run', ...rel.split('/'));
+  let bytes;
+  let served = null;
+  if (typeof client.raw === 'function') {
+    const answer = await client.raw('file', { path: rel });
+    if (!answer.ok) return { path: rel, error: `ADAM answered ${answer.status}: ${answer.bytes.toString('utf8').slice(0, 200)}` };
+    bytes = answer.bytes;
+    served = answer.sha256 || null;
+  } else {
+    const answer = await client.file(rel);
+    if (!answer.ok) return { path: rel, error: `ADAM answered ${answer.status}: ${String(answer.text).slice(0, 200)}` };
+    bytes = Buffer.from(answer.text, 'utf8');
+  }
+  const sha256 = createHash('sha256').update(bytes).digest('hex');
+  if (served && served !== sha256) {
+    return { path: rel, error: `the bytes received do not match ADAM's checksum (${served} expected, ${sha256} received); nothing written` };
+  }
+  await mkdir(path.dirname(target), { recursive: true });
+  await writeFile(target, bytes);
+  const lines = bytes.length ? bytes.toString('utf8').split(/\r?\n/).length - (/\r?\n$/.test(bytes.toString('utf8')) ? 1 : 0) : 0;
+  return { path: rel, file: `run/${rel}`, bytes: bytes.length, lines, sha256, checked: served ? 'match' : 'unchecked' };
+}
+
+function runSection(runs, release) {
+  if (!runs.length) return '';
+  const written = runs.filter((r) => !r.error);
+  let out = `\n## Files to run, whole (${written.length} of ${runs.length})\n\n`
+    + `Written under [run/](run/) byte for byte as ADAM serves them${release?.current ? ` at ${release.current}` : ''}, `
+    + 'each checked against the checksum ADAM computes from its own copy. **Run these files, as they are, in the order '
+    + 'the ticket gives.** adam_file shows any file 400 lines at a time, which is for reading: never run, copy or '
+    + 'rebuild a file from its window. `run/SHA256SUMS` lists every checksum; `sha256sum -c SHA256SUMS` in `run/` '
+    + 'checks them again.\n\n'
+    + '| File | Lines | Bytes | sha256 | Checked |\n|---|---|---|---|---|\n';
+  for (const r of runs) {
+    out += r.error
+      ? `| \`${r.path}\` | | | | **not written**: ${r.error.replace(/\|/g, '/')} |\n`
+      : `| [${r.file}](${r.file.split('/').map(encodeURIComponent).join('/')}) | ${r.lines} | ${r.bytes} | \`${r.sha256}\` | ${r.checked === 'match'
+        ? 'matches ADAM\'s copy' : 'not checked: this ADAM sends no checksum yet, so compare it with the package before running'} |\n`;
+  }
+  if (runs.some((r) => r.error)) {
+    out += '\nA file not written is not run from a window instead: say which, and stop until it is pulled whole.\n';
+  }
+  return out;
+}
+
 
 async function pullOne(client, key, base, when) {
   const answer = await client.service(`/api/work-packages/${encodeURIComponent(key)}?${await scoped(client)}`);
@@ -1773,8 +2222,21 @@ async function pullOne(client, key, base, when) {
   // Decisions are not pulled: building a ticket needs the contracts and tables
   // it touches, and an ADR is background that adam_decisions answers on demand.
   const decisions = touches.filter((t) => t.kind === 'adr').map((t) => t.id);
+  // The files the ticket runs are written whole (#36194); the rest of its linked files stay windows for reading.
+  const runnable = runnableFiles(touches, [text?.text, wp.description].filter(Boolean).join('\n'));
+  const runs = [];
+  const screens = [];
   for (const { kind, id } of touches) {
     if (kind === 'adr') continue;
+    if (kind === 'file' && runnable.includes(String(id))) {
+      const whole = await writeWhole(client, String(id), folder).catch((error) => ({ path: String(id), error: error.message }));
+      runs.push(whole);
+      if (!whole.error) {
+        files.push({ kind, id, file: whole.file });
+        continue;
+      }
+      // Not written whole: its window is still listed below for reading, and README.md says it is not to be run.
+    }
     const file = `${safeName(kind)}-${safeName(id)}.json`;
     // Always the latest release: what ADAM serves now.
     const [toolName, args] = lookupFor(kind, id);
@@ -1783,7 +2245,19 @@ async function pullOne(client, key, base, when) {
     await writeFile(path.join(folder, file), json(trimForPull(record)));
     if (record.found === false) missing.push({ kind, id });
     files.push({ kind, id, file });
+    if (kind === 'screen' && record.found !== false && record.screen) screens.push(record.screen);
   }
+  // A file the ticket's text says to run without linking it is written whole too.
+  for (const rel of runnable.filter((r) => !runs.some((x) => x.path === r))) {
+    runs.push(await writeWhole(client, rel, folder).catch((error) => ({ path: rel, error: error.message })));
+  }
+  if (runs.some((r) => !r.error)) {
+    await writeFile(path.join(folder, 'run', 'SHA256SUMS'),
+      runs.filter((r) => !r.error).map((r) => `${r.sha256}  ${r.path}\n`).join(''));
+  }
+  // Every screen the ticket touches: the wireframe frame its record names, self-contained (#31848).
+  const looks = [];
+  for (const screen of screens) looks.push(await screenLook(client, screen, folder));
 
   if (release.previous && release.diff) {
     await writeFile(path.join(folder, 'spec-diff.md'), specDiff(wp, release, when));
@@ -1801,7 +2275,8 @@ async function pullOne(client, key, base, when) {
   }));
   const db = await writeExpectedSchema(client, wp, touches, folder, release);
   await writeFile(path.join(folder, 'README.md'),
-    ticketReadme(wp, files, missing, when, decisions, release, changes, blockedBy, { subtasks, partOf, text }, db));
+    ticketReadme(wp, files, missing, when, decisions, release, changes, blockedBy, { subtasks, partOf, text }, db,
+      { looks, runs }));
   const notes = path.join(folder, 'notes.md');
   if (!(await stat(notes).catch(() => null))) {
     await writeFile(notes, `# Notes on #${wp.key}\n\nYours. adam_pull never overwrites this file.\n`);
@@ -1834,6 +2309,14 @@ async function pullOne(client, key, base, when) {
       open: changes.filter((c) => c.status === 'open').map((c) => c.id),
       settled: settled.map((c) => `${c.id} ${c.status}`),
     } } : {}),
+    ...(looks.length ? { wireframes: looks.map((l) => ({
+      screen: l.id, status: [l.provenance, l.status].filter(Boolean).join(', ') || null,
+      ...(l.frames[0]?.file ? { file: path.join(folder, l.frames[0].file), drawn: l.frames[0].drawn } : {}),
+      ...(l.frames[0]?.error ? { error: l.frames[0].error } : {}),
+      ...(l.prototype?.file ? { prototype: l.prototype.file } : {}),
+    })) } : {}),
+    ...(runs.length ? { run: runs.map((r) => (r.error ? { path: r.path, error: r.error }
+      : { path: r.path, file: path.join(folder, ...r.file.split('/')), sha256: r.sha256, checked: r.checked })) } : {}),
   };
 }
 
@@ -2860,14 +3343,22 @@ export const TOOLS = [
       'One file from the package as source — a contract YAML, an ADR, a register, a handoff note. '
       + 'Use when you want what was written rather than what was derived from it: the argument in '
       + 'an ADR, or the exact YAML behind a contract. Paths come from the other tools, which return '
-      + 'a `file` on nearly every record.',
+      + 'a `file` on nearly every record. A text file comes back as a window of 400 lines, for reading: '
+      + 'a file a ticket runs (a migration) is written whole by adam_pull under run/ in the ticket folder. '
+      + '**A wireframe frame** - the path a screen record gives as wireframe.board, '
+      + '"wireframes/<board>.dc.html#<anchor>" - is saved as one self-contained HTML file (styles and images '
+      + 'inline, opens offline) in the ticket folder when `key` is given (else .adam/wireframes/), and the '
+      + 'answer gives its path: open it and build the screen to look like it.',
     inputSchema: {
       type: 'object',
       properties: {
         path: {
           type: 'string',
-          description: 'Path within the package, e.g. docs/adr/0038-....md or contracts/spine/access.yaml',
+          description: 'Path within the package, e.g. docs/adr/0038-....md or contracts/spine/access.yaml, '
+            + 'or a wireframe frame, e.g. "wireframes/P01 Guest Web.dc.html#web-007"',
         },
+        key: { type: 'string', description: 'A wireframe frame only: the ticket whose folder it is saved in' },
+        dir: { type: 'string', description: 'A wireframe frame only: absolute path of the folder you are working in' },
         from: { type: 'integer', description: 'First line to return, 1-based. Default 1.' },
         lines: { type: 'integer', description: 'How many lines. Default 400.' },
         find: {
@@ -2885,7 +3376,10 @@ export const TOOLS = [
      * first 400 lines with a note saying how many there are lets the caller ask
      * for the part it wants.
      */
-    async run(client, { path, from = 1, lines = 400, find }) {
+    async run(client, { path, from = 1, lines = 400, find, key, dir }) {
+      // A frame of a board: saved whole as one file, never a window of HTML (#31848, 21 October 2026).
+      const frameRef = /\.html?#/i.test(String(path)) ? boardRef(path) : null;
+      if (frameRef) return saveFrameFor(client, frameRef, { key, dir });
       const answer = await client.file(path);
       if (!answer.ok) {
         return {
@@ -2937,7 +3431,10 @@ export const TOOLS = [
         showing: `${start}-${end}`,
         ...(matches && matches.length > 1 ? { otherMatches: matches.slice(1, 50) } : {}),
         ...(end < all.length
-          ? { more: `${all.length - end} lines below — call again with from: ${end + 1}` }
+          ? { more: `${all.length - end} lines below — call again with from: ${end + 1}`
+            // A window is for reading. A migration somebody has to run arrives whole from adam_pull (#36194).
+            + (/\.sql$/i.test(String(path)) ? '. This is a window for reading: never run or copy a file from it. '
+              + 'A ticket that runs this file gets it whole from adam_pull, under run/ in the ticket folder.' : '') }
           : {}),
         text: slice.join('\n'),
       };
@@ -2953,7 +3450,11 @@ export const TOOLS = [
       + 'the files, then the comment thread, oldest first), ticket.json, one file per linked screen, journey, contract, table, service, '
       + 'and module (linked ADRs are listed, not pulled), plus notes.md for your own notes. A [DB] ticket whose '
       + 'subject names its migration file also gets expected-schema.json, the end state of its tables and the statements that make it, from the '
-      + 'package DDL, which `node .claude/scripts/db-ticket.mjs <ticket>` compares a database with. You are always on '
+      + 'package DDL, which `node .claude/scripts/db-ticket.mjs <ticket>` compares a database with. For every screen '
+      + 'it touches, the wireframe frame the screen record names is written as wireframe-<anchor>.html, one '
+      + 'self-contained file that opens offline: build the screen to look exactly like it (README.md, "How <screen> '
+      + 'must look"). The files a ticket runs (its migrations) are written whole under run/, checked against ADAM\'s '
+      + 'checksum: run those, never a window from adam_file. You are always on '
       + 'the latest release: every pull serves the release ADAM serves now (r1, r2, …), and when that release is '
       + 'newer than the ticket\'s previous pull, README.md says what changed and spec-diff.md has the diffs. There '
       + 'is no release to choose and nothing to ask about it. README.md also lists, near the top, every change '
@@ -3025,6 +3526,21 @@ export const TOOLS = [
             + `\`node .claude/scripts/db-ticket.mjs ${one.key}\` (README.md, "Checking this migration"). MATCH is the `
             + 'evidence for done; it replaces older [DB] instructions, and there is no dotnet build or dotnet test '
             + 'unless the ticket changes C#.';
+        }
+        for (const w of one.wireframes ?? []) {
+          next += w.file
+            ? ` Screen ${w.screen} (wireframe ${w.status ?? 'status not recorded'}): open ${w.file} and build the page to `
+              + `${w.drawn ? 'look exactly like it' : 'its structure (the frame is generated, not drawn)'}, every state included, `
+              + `in the same visual language (README.md, "How ${w.screen} ... must look")`
+              + `${w.prototype ? `; the client-approved prototype ${w.prototype} wins for the look where it has a view` : ''}.`
+            : ` Screen ${w.screen}: its wireframe could not be written (${w.error ?? 'no frame recorded'}); say so in one line.`;
+        }
+        if (one.run?.length) {
+          const bad = one.run.filter((x) => x.error);
+          next += ` It runs ${one.run.length} file${one.run.length === 1 ? '' : 's'}, written whole under `
+            + `${path.join(one.folder, 'run')} and checked against ADAM's checksum (README.md, "Files to run, whole"): `
+            + 'run those, never a window from adam_file.'
+            + `${bad.length ? ` ${bad.length} could not be written (${bad.map((x) => x.path).join(', ')}): say so and do not run them from a window.` : ''}`;
         }
         if (r?.current) {
           next += ' Older /ticket instructions that mention re-pinning are out of date: there is nothing to re-pin.';

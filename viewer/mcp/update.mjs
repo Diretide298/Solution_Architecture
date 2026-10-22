@@ -392,7 +392,8 @@ async function hooksOnly() {
 //   `<!-- ADAM:end name -->`, in the starters) is replaced, and the text around it is never touched. A CLAUDE.md
 //   that has ADAM's section but no markers (made before them) keeps that section as it is: one line says which
 //   section to replace, and the new text is written to `.adam/new-claude-sections.md` to copy from.
-//   A section that is new (`add`: "A [DB] ticket") and nowhere in the file yet, marked or not, is added whole with
+//   A section that is new (`add`: the backend's "A [DB] ticket", the frontend's "Building a screen to its
+//   wireframe") and nowhere in the file yet, marked or not, is added whole with
 //   its markers - after the "Working a ticket (ADAM)" section's end marker when there is one, else at the end -
 //   so nobody copies it by hand; no line of the team's is changed.
 //
@@ -411,6 +412,10 @@ const SECTIONS = {
   },
   'db-ticket': {
     title: 'A [DB] ticket', seen: '## A [DB] ticket', add: true,
+  },
+  // The frontend's (21 October 2026, #31848): a frame adam_pull writes is the design, every state in its look.
+  'screen-look': {
+    title: 'Building a screen to its wireframe', seen: '## Building a screen to its wireframe', add: true,
   },
 };
 /** Scripts ADAM owns under .claude/scripts, per role; any other name in an answer is refused. */
@@ -586,9 +591,11 @@ async function refreshWorkspace(folder, source, quiet) {
         }
       } else if (text.includes(SECTIONS[name].seen)) {
         unmarked.push(name);
-      } else if (SECTIONS[name].add) {
+      } else if (SECTIONS[name].add && (markedRe('working-a-ticket').test(text) || text.includes(SECTIONS['working-a-ticket'].seen))) {
         // A new section the file has never had: added whole, with its markers, so /update-adam keeps it
         // current from then on. After "Working a ticket (ADAM)" when that is marked, else at the end.
+        // Only to a CLAUDE.md that is ADAM's (it has "Working a ticket (ADAM)", marked or not): a team's own
+        // CLAUDE.md that never had ADAM's text is not written into.
         const block = eol(`<!-- ADAM:start ${name} -->\n${inner}<!-- ADAM:end ${name} -->\n`);
         const after = text.match(/<!-- ADAM:end working-a-ticket -->\r?\n/);
         if (after) {
