@@ -54,8 +54,10 @@ const LIVE = process.argv.includes('--live');
 const KEEP = process.argv.includes('--keep');
 const PORTS = { viewer: 8894, pms: 8895, api: 8896, gated: 8897, r9: 8898 };
 // A package with each state's look (r9: wireframe.stateViews, handoff/design-frames.json), served from its working
-// tree in 6. The r9 UI lane's worktree by default; skipped, by name, where there is none.
-const R9 = process.env.R9_PACKAGE ?? 'D:/wt/r9-ui/ticvai';
+// tree in 6. This repository's ticvai/ once it carries handoff/design-frames.json (r9 and later), else the r9 UI
+// lane's worktree; skipped, by name, where there is none.
+const R9 = process.env.R9_PACKAGE
+  ?? (existsSync(path.join(PACKAGE, 'handoff', 'design-frames.json')) ? PACKAGE : 'D:/wt/r9-ui/ticvai');
 const CHROME = 'C:/Program Files/Google/Chrome/Application/chrome.exe';
 
 const tools = await import(pathToFileURL(path.join(HERE, 'tools.mjs')).href);
@@ -102,6 +104,8 @@ function standIn(tickets, { checksum = 'right', screens = {}, bytes = true, file
       return route === 'journeys' ? { screens: [...SCREENS.values(), ...Object.values(screens)], flows: [] } : {};
     },
     async file(p) {
+      // null: a file the stand-in package does not have (2: an r8-shaped package, whatever this tree carries).
+      if (files[p] === null) return { ok: false, status: 404, text: '' };
       if (files[p] !== undefined) return { ok: true, status: 200, text: files[p] };
       const full = path.join(PACKAGE, p);
       return existsSync(full) ? { ok: true, status: 200, text: readFileSync(full, 'utf8') } : { ok: false, status: 404, text: '' };
@@ -219,7 +223,10 @@ try {
     };
     const screens = { 'XX-001': { id: 'XX-001', name: 'Gone', wireframe: { status: 'review', provenance: 'client-verified',
       board: 'wireframes/P01 Guest Web.dc.html#web-999' } } };
-    const client = standIn(tickets, { screens });
+    // Section 2 is the pull over a package without each state's look (r8's shape): from r9 this repository's
+    // ticvai/ has handoff/design-frames.json, which 2b and 6 cover, so the stand-in answers 404 for it here.
+    tools.forgetPackageFiles();
+    const client = standIn(tickets, { screens, files: { 'handoff/design-frames.json': null } });
     const pull = BY_NAME.get('adam_pull');
     const one = await pull.run(client, { key: '31848', dir: dir2 });
     const readme = read(dir2, '31848', 'README.md');
@@ -246,7 +253,11 @@ try {
       look.includes('gives the behaviour and the bindings; the wireframe gives the look')
         && look.includes('where the prototype has a view, the prototype wins for the look'));
     check('**every state in the frame\'s visual language, never a plain heading, sentence and button**',
-      look.includes('build every state in the same visual language as the frame') && look.includes('never a plain heading, a plain sentence and a plain button'));
+      // r8's records list the states ("build every state ..."); from r9 a record with wireframe.stateViews says
+      // "Build each state as 'Each state's look' says ..." - the same rule, the look per state (2b and 6).
+      (look.includes('build every state in the same visual language as the frame')
+        || (look.includes('Build each state as "Each state\'s look" says') && look.includes('in the same visual language as the frame')))
+        && look.includes('never a plain heading, a plain sentence and a plain button'));
     check('the answer points at the file and the look', one.wireframes?.[0]?.drawn === true
       && /wireframe-web-007\.html and build the page to look exactly like it/.test(one.next), one.next);
 
@@ -297,6 +308,7 @@ try {
     };
     const tickets = { 9201: { workPackage: { key: '9201', subject: '[FE] XX-002', status: 'New', description: '' },
       touches: [{ kind: 'screen', id: 'XX-002' }] } };
+    tools.forgetPackageFiles(); // the connector holds package files for a minute: this stand-in's, not the last one's
     const one = await BY_NAME.get('adam_pull').run(standIn(tickets, { screens, files: { 'handoff/design-frames.json': JSON.stringify(frames) } }),
       { key: '9201', dir });
     const folder = path.join(dir, '.adam', 'work', '9201');
