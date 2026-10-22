@@ -1,0 +1,42 @@
+id: CHG-R9INT-003
+date: '2026-10-22'
+source: audit
+kind: process
+summary: 'refresh-safe copies the gitignored inputs the checks read (_dump/, sources/, design-r1/) from the main checkout
+  as well as from the tree the run starts in, so a gate run from a lane''s own worktree sees the archived boards; and
+  audit-links says, when _dump/ is missing, that an archived board cannot be told from a missing one.'
+decision:
+  what: 'tools/refresh-safe.sh helper: main_worktree() (the first `git worktree list` entry) and cmd_hydrate copying
+    the gitignored inputs of the run''s tree first and then of the main checkout, for what the first lacks.
+    tools/audit-links.py: one line when _dump/ is absent and links are broken.'
+  by: Chinmay
+  date: '2026-10-22'
+waivers:
+  release_window: {by: Chinmay, date: '2026-10-21', quote: 'Yes update all CRs check if can push that we current fix and get them out'}
+why: 'Finding: the combined r9 gate (refresh-safe run 20261022-134945-1394), audit-links, 262 "screen -> board anchor"
+  (GST-005 claims Guest Mobile Board 1.dc.html#gm-1b, no such board; KSK-001 to -009 claim Kiosk Board 1.dc.html#KSK-00n;
+  and so on). r9 changed none of them: the same 262 boardFrames claims point into the boards archived under _dump/ on 9
+  September, and the r8 gate, run from D:/wt/r8-integration, which has _dump/, read them as archived board frames and
+  passed (audit-links there, read only: 262 archived, 0 broken). _dump/ is gitignored; the r9 gates ran from
+  D:/wt/r9-int, a linked worktree with no _dump/, so hydration had nothing to copy. The other two totals are the same
+  in r8: 2453 anchor collisions (a hazard, never a failure) and "screens drawn 0 of 2453" (no screen has wireframe
+  status designed). The lead, Chinmay, 21 October 2026: "Yes update all CRs check if can push that we current fix and
+  get them out".'
+keys_touched:
+  files:
+  - tools/refresh-safe.sh
+  - tools/audit-links.py
+root_class: 'a check whose input is gitignored, run in a tree that never had it'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r9
+decision_owner: Chinmay
+adam_cr: 'none: the combined r9 gate, a release fix'
+triage: blocker
+prevention:
+  type: generator-rule
+  ref: tools/refresh-safe.sh::cmd_hydrate
+status: open
+notes: 'Proved in the gate''s kept worktree: the new hydrate copied 278 files from D:/Chinmay/adam (257 under _dump/),
+  and audit-links then reads 262 archived board frames and 0 broken links, as in r8.'
