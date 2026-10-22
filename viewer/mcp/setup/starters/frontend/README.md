@@ -25,7 +25,7 @@ Nx 20, pnpm, TypeScript (strict). Import a package as `@ticvai/<name>` (see `tsc
 | Path | What it is |
 |---|---|
 | `packages/api-client` | the typed client for the API contracts: the transport now, the generated operations from SETUP-CLIENTS |
-| `packages/design-tokens` | colours, type, spacing, density, from the package's `screens/_design-tokens.yaml` - depends on nothing |
+| `packages/design-tokens` | the shared colours, type, spacing, density, from the package's `screens/_design-tokens.yaml` - depends on nothing. Not a guest app's theme: that is its own tokens file (`handoff/design-tokens/guest-web.yaml`, `guest-app.yaml`), applied by its SETUP-SHELL-<APP> ticket's shell |
 | `packages/ui` | shared components; for now their props and the token-to-style mapping (`buttonStyle`, `badgeStyle`) |
 | `packages/offline-core` | the one offline store: SQLite adapter, outbox, sync, ids (UUIDv7) |
 

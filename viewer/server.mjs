@@ -1710,7 +1710,9 @@ const server = http.createServer(async (req, res) => {
     if (rest === '/frame') {
       const boardName = url.searchParams.get('board') ?? '';
       const anchor = (url.searchParams.get('anchor') ?? '').toLowerCase();
-      if (!/^[a-z0-9-]{2,24}$/.test(anchor)) return send(res, 400, 'bad anchor');
+      // Up to 64: r9's state frames are named for the state (`web-state-preference-not-at-venue`, 32). Still
+      // only letters, digits and hyphens, because frameDocument builds a pattern around it.
+      if (!/^[a-z0-9-]{2,64}$/.test(anchor)) return send(res, 400, 'bad anchor');
 
       const wireframeRoot = path.join(pkg.root, 'wireframes');
       const target = path.resolve(wireframeRoot, boardName);

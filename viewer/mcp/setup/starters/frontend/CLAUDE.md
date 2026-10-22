@@ -176,13 +176,25 @@ and the client-approved prototype and views where there is one. To get a frame o
   README names: layout, components, copy, imagery, spacing and colour. Client-approved UI is fixed: where
   the prototype has a view, it wins for the look; a screen or part it lacks is built from the screen record
   and the frame. The screen record gives the behaviour and the bindings; the frame gives the look.
-- **Every state** the screen lists (loading, error, the empty states, offline) is built in the frame's
-  visual language - the same type, colours, components and imagery - never a plain heading, a plain sentence
-  and a plain button. The boards list states rather than draw each one.
+- **Every state** the screen lists (loading, error, the empty states, offline) is built as README.md's
+  "Each state's look" says: the state's own frame where the pull wrote one (`wireframe-<anchor>.html`, e.g.
+  the WEB-029 status card for guest web's error), else the pattern the approved prototype draws, which it
+  names and describes; a design gap (on the left-out list) in the frame's visual language. Never a plain
+  heading, a plain sentence and a plain button.
+- **The theme is the app's, never your own.** Colours, fonts, radii and spacing come from the app's design
+  tokens, which its app shell applies: the repository's `SETUP-SHELL-<APP>` ticket (one per repository from
+  r9: SETUP-SHELL-GUEST-WEB, -GUEST-APP, -POS, -KIOSK, -EMPLOYEE-APP, -VENUE-MANAGEMENT, -WEB) builds the
+  shell and loads the tokens file README.md's **Theme** line names: the guest apps' from their approved
+  prototypes (`handoff/design-tokens/guest-web.yaml`, `guest-app.yaml`, applied per tenant from
+  `getPublishedTenantConfig`'s theme), every other app the shared `screens/_design-tokens.yaml`. A screen
+  reads the tokens; it never invents or hard-codes a colour, font, radius or shadow. If the shell is not built
+  yet, say so and build against the tokens file's names. The starter's `packages/design-tokens` holds the
+  shared tokens only, not a guest app's.
 - **A generated frame** (README.md says the frame is the record rendered as boxes) gives the structure, not
   the look: build its regions in order in the app's design system, and say so in the comment.
 - **A placeholder layout only when no frame was written** (README.md says why); say so in the comment.
-- Files under `wireframes/incoming/` that a record names are **structure only, not the look**. A wireframe,
+- Files under `wireframes/incoming/` that a record names are **structure only, not the look**, unless
+  README.md says one is a capture of the prototype view (then it is the same look as the frame). A wireframe,
   mock-up or screenshot from anywhere but ADAM is not the design.
 
 This replaces the older rule that a wireframe is built from only when client-verified, with a placeholder
