@@ -5181,9 +5181,10 @@ paths:
 
         - **URL**, the link back, is the tenant''s guest web order page: `https://<host>/cart-and-checkout/order-confirmation?orderId=<orderId>`
         (WEB-013 Booking Confirmation, the guest web screen that reads one order; a visitor with no session there sees
-        its no-access state). `<host>` is the tenant''s primary active host for the `web` channel
-        (`control.tenant_domain` with `isPrimary`), control data commerce cannot read, so it is asked of Platform with
-        `platform-ops#tenantDomainRecords` over the service route, as Tenancy''s `resolveTenantHost` asks it. Until
+        its no-access state). `<host>` is the tenant''s primary active host for the `web` channel (its domain marked
+        `isPrimary`). Platform keeps the tenant''s domains in the control database, which commerce has no connection to,
+        so this operation reads no table for the host: it asks Platform with `platform-ops#tenantDomainRecords` over
+        the service route, as Tenancy''s `resolveTenantHost` asks it, and Platform reads its own rows. Until
         serviceAuth between deployables is built (ADAM CR-174), the event is written without URL; nothing else
         changes.
 
@@ -6275,6 +6276,9 @@ paths:
       - query: tenancy#venueSettingsRecords
         route: in-process
         for: 'the venue''s refund settings the policy is told from, Tenancy''s data (r8 integration, CHG-R8INT-014)'
+      x-ticvai-reads:
+      - table: orders.refund_policy
+        for: 'the venue''s refund policy row the guest''s part is cut from, the row getRefundPolicy returns to staff (r9 integration, CHG-R9INT-001)'
       x-ticvai-audience:
       - guest
       security:

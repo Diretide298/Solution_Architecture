@@ -32,7 +32,7 @@ keys_touched:
   files:
   - contracts/spine/orders.yaml
   - tools/check-cross-module-reads.py
-  - backend/tenant/V0114__after_r1_20261021.sql
+  - backend/tenant/V0114__after_r1_20261022.sql
 root_class: 'new: an operation''s text names another module''s data it declares no read of'
 tickets:
   started:
@@ -48,4 +48,10 @@ prevention:
 status: open
 notes: 'Prevention run on the commit before the fix: check-cross-module-reads --list-facts names getOrderCalendarEvent,
   catalogue.performance, "session start and end"; after the fix it is covered by the read. The URL depends on
-  serviceAuth between deployables (CR-174): until it is built the event has no URL property, which RFC 5545 allows.'
+  serviceAuth between deployables (CR-174): until it is built the event has no URL property, which RFC 5545 allows.
+  Integration gate of 22 October 2026 (CHG-R9INT-002): the forward migration is cited by the name it is committed
+  under, backend/tenant/V0114__after_r1_20261022.sql; this lane had cited the name its own run of 21 October wrote and
+  never committed (check-cited-sources CS-MISSING). The description no longer names control.tenant_domain, a table the
+  operation does not read: Platform keeps the tenant''s domains in the control database and is asked over the service
+  route; catalogue.performance, read in process, is in the lineage (check-parameter-columns P-NAMED-TABLE,
+  CHG-R9INT-001).'

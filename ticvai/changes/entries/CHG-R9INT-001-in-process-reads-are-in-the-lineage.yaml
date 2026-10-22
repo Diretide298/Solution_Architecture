@@ -1,0 +1,64 @@
+id: CHG-R9INT-001
+date: '2026-10-22'
+source: audit
+kind: process
+summary: 'derive-lineage writes, for every operation, `readsInProcess`: the table of each x-ticvai-read-via query it
+  asks in process (an in-process query runs on the caller''s connection, in the caller''s transaction, so the operation
+  reads the owner''s table). 139 declared in-process reads of 105 operations had reached the lineage only where a hand
+  override listed them. check-parameter-columns counts them, so createCart''s platform.venue_settings (CR-184) and
+  getOrderCalendarEvent''s catalogue.performance (CR-199) are read. getOrderCalendarEvent''s description says where the
+  link''s host comes from without naming control.tenant_domain, which it does not read; getGuestRefundPolicy and
+  listSalePermissionTargets declare the own-module tables their descriptions name.'
+decision:
+  what: 'tools/derive-lineage.py derive(): the x-ticvai-queries of every contract, `<contract>#<name>` to its `table`;
+    an operation''s x-ticvai-read-via entry with route in-process adds that table to `readsInProcess`, apart from
+    `reads`. tools/check-parameter-columns.py: `readsInProcess` counts as tables the operation reads.
+    contracts/spine/orders.yaml getOrderCalendarEvent: the URL bullet says Platform keeps the tenant''s domains in the
+    control database, which commerce has no connection to, so the operation reads no table for the host and asks
+    platform-ops#tenantDomainRecords over the service route (CHG-R9CR-006, extended); getGuestRefundPolicy
+    x-ticvai-reads orders.refund_policy. contracts/spine/catalogue.yaml listSalePermissionTargets x-ticvai-reads
+    catalogue.sales_channel and catalogue.product.'
+  by: Chinmay
+  date: '2026-10-22'
+waivers:
+  release_window: {by: Chinmay, date: '2026-10-21', quote: 'Yes update all CRs check if can push that we current fix and get them out'}
+why: 'Finding: the combined r9 gate (refresh-safe run 20261022-134945-1394), check-parameter-columns P-NAMED-TABLE, 3
+  new: createCart''s description names platform.venue_settings, getOrderCalendarEvent''s catalogue.performance and
+  control.tenant_domain, and their lineage listed none. The first two are read in process through queries the contract
+  declares (tenancy#venueSettingsRecords, catalogue#performanceRecords), and derive-lineage never carried a declared
+  read into the lineage: until r9 only a hand override did (getKpiValues, CHG-R8WFC-004), against the overrides file''s
+  own rule that an operation''s tables change through its contract. The third is a service-route read of control data
+  commerce cannot read: the description named a table the operation never reads. First tried as `reads`: the regenerated
+  tree then failed check-plan-closure C-UNTICKETED (32 drafted catalogue operations moved from Block B to Block C,
+  because `reads` places an operation in the plan), a plan change nobody decided, so the in-process reads are a field
+  of their own. Counting them also showed two operations the check had skipped for having no table at all:
+  getGuestRefundPolicy (orders.refund_policy, its own module''s, named and not read) and listSalePermissionTargets
+  (catalogue.sales_channel named, productId with no product table). The lead, Chinmay, 21 October 2026: "Yes update
+  all CRs check if can push that we current fix and get them out" and "I wanna get all of those changes out now.." (r9).'
+keys_touched:
+  operations: [createCart, getOrderCalendarEvent, getGuestRefundPolicy, listSalePermissionTargets]
+  files:
+  - tools/derive-lineage.py
+  - tools/check-parameter-columns.py
+  - contracts/spine/orders.yaml
+  - contracts/spine/catalogue.yaml
+  - handoff/api-data-lineage.json
+root_class: 'a declared read the derivation did not carry into the lineage'
+tickets:
+  started:
+  - '30688 (getOrderCalendarEvent): through CR-199''s comment, as CHG-ADM-002 says; its text is not rewritten.'
+  unstarted:
+  - 'getGuestRefundPolicy and listSalePermissionTargets: their unstarted tickets pick the reads up at the next tag,
+    through their pointer bodies.'
+release_tag: r9
+decision_owner: Chinmay
+adam_cr: 'none: the combined r9 gate, a release fix'
+triage: blocker
+prevention:
+  type: generator-rule
+  ref: tools/derive-lineage.py::derive
+status: open
+notes: 'check-parameter-columns P-NAMED-TABLE is the check that caught it. The one baseline entry it reports gone
+  (getKpiValues.access.scan_event) went with the r8 walk fix CHG-R8WFC-004 and is left for a --update-baseline at the
+  release, which tightens the baselines at once. Whether an in-process read should also place an operation in the plan
+  (the 32 Block B operations) is a plan question for the lead, not decided here.'
