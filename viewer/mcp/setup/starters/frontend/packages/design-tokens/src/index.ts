@@ -1,7 +1,16 @@
 /**
- * TICVAI design tokens, from the package's `screens/_design-tokens.yaml` (extracted 9 September
+ * TICVAI's **shared** design tokens, from the package's `screens/_design-tokens.yaml` (extracted 9 September
  * 2026 from Claude Design's boards and the client's own POS design, which agree). Regenerate from
  * that file; do not edit values here by hand.
+ *
+ * **Not every app's theme** (r9, CHG-R9UI-001). These are the till's tokens and the ones an app with no
+ * client-approved design uses. An app with one takes its theme from its own tokens file, which its
+ * SETUP-SHELL-<APP> ticket (one per repository) applies in the app shell: guest web
+ * `handoff/design-tokens/guest-web.yaml` and the guest app `handoff/design-tokens/guest-app.yaml`, both from
+ * the approved prototypes' CSS variables (Archivo, `--brand` per venue), applied per tenant from
+ * `getPublishedTenantConfig`'s theme. A pulled screen's README.md names its app's file on the **Theme** line.
+ * Never copy these values into a guest app, and never invent a colour or a font in a screen: read the
+ * shell's tokens.
  *
  * Colour is named by role, never by hex. The semantic pairs are a background and the text that
  * sits on it, chosen together: keep them paired. A tenant may override only `whiteLabel.overridable`.

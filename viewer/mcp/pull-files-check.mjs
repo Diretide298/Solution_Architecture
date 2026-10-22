@@ -19,6 +19,9 @@
 //   2. README.md for a screen ticket (a stand-in client over this repository's ticvai/): the wireframe's status, the
 //      file, the prototype and its views, "build the page to match ... exactly", every state, "structure only, not
 //      the look" for wireframes/incoming/, a frame that cannot be written, and a generated frame;
+//   2b. each state's look (r9: wireframe.stateViews and handoff/design-frames.json, here a stand-in over the r8
+//      boards): one file per distinct frame beside the screen's own, a state with no frame naming the prototype's
+//      lines, a frame that cannot be written, a design gap, the theme line, captures and structure-only copies;
 //   3. files a ticket runs: which are runnable, written whole with ADAM's checksum, a mismatch writes nothing, an
 //      ADAM without the checksum is said as "not checked", an older client without bytes still pulls;
 //   4. its own viewer on 8894 serving the latest release tag, no sign-in (TICVAI_NO_GATE=1; the accounts service's
@@ -26,9 +29,13 @@
 //      #31848 and #36194 through the real ViewerClient, the files byte for byte the served export's, and, with
 //      Chrome, the pulled frame opened offline drawing the same pixels as the viewer's /frame;
 //   5. (--live) the same pulls through the sign-in, and a client account: the frame it can see in the viewer, and
-//      still not a decision file.
+//      still not a decision file;
+//   6. its own viewer on 8898 serving a package with each state's look from its working tree (R9_PACKAGE, by
+//      default the r9 UI lane's D:/wt/r9-ui/ticvai; skipped by name without one): #31848, and for each other
+//      platform the screen with the most state frames, each held to what design-frames.json says at the time
+//      (the lane is still drawing state frames, so no list is written here).
 //
-// Ports 8894-8897; never 4173, 8787 or 8798. Nothing leaves 127.0.0.1: the browser in 4 is offline for the
+// Ports 8894-8898; never 4173, 8787 or 8798. Nothing leaves 127.0.0.1: the browser in 4 is offline for the
 // pulled file and blocks everything but 127.0.0.1 for the viewer's frame.
 
 import { spawn, spawnSync } from 'node:child_process';
@@ -45,7 +52,10 @@ const PACKAGE = path.resolve(VIEWER_DIR, '..', 'ticvai');
 const LIVE = process.argv.includes('--live');
 // --keep leaves the temporary folder (the pulled .adam/ folders) for a look, and says where.
 const KEEP = process.argv.includes('--keep');
-const PORTS = { viewer: 8894, pms: 8895, api: 8896, gated: 8897 };
+const PORTS = { viewer: 8894, pms: 8895, api: 8896, gated: 8897, r9: 8898 };
+// A package with each state's look (r9: wireframe.stateViews, handoff/design-frames.json), served from its working
+// tree in 6. The r9 UI lane's worktree by default; skipped, by name, where there is none.
+const R9 = process.env.R9_PACKAGE ?? 'D:/wt/r9-ui/ticvai';
 const CHROME = 'C:/Program Files/Google/Chrome/Application/chrome.exe';
 
 const tools = await import(pathToFileURL(path.join(HERE, 'tools.mjs')).href);
@@ -85,13 +95,14 @@ for (const f of readdirSync(path.join(PACKAGE, 'screens')).filter((n) => /^P\d.*
  * A client over this repository's ticvai/ with the connector's `raw`: /frame from frameDocument, wireframes/ and
  * files from disk. `checksum` decides the file answer's header: 'right', 'wrong' or 'none' (an older ADAM).
  */
-function standIn(tickets, { checksum = 'right', screens = {}, bytes = true } = {}) {
+function standIn(tickets, { checksum = 'right', screens = {}, bytes = true, files = {} } = {}) {
   const client = {
     async projectId() { return 'ticvai'; },
     async layer(route) {
       return route === 'journeys' ? { screens: [...SCREENS.values(), ...Object.values(screens)], flows: [] } : {};
     },
     async file(p) {
+      if (files[p] !== undefined) return { ok: true, status: 200, text: files[p] };
       const full = path.join(PACKAGE, p);
       return existsSync(full) ? { ok: true, status: 200, text: readFileSync(full, 'utf8') } : { ok: false, status: 404, text: '' };
     },
@@ -183,6 +194,13 @@ try {
       JSON.stringify(boardRef('wireframes/P01 Guest Web.dc.html#web-007')) === '{"board":"P01 Guest Web.dc.html","anchor":"web-007"}'
         && JSON.stringify(boardRef('P08 Venue Management.dc.html#BO-100')) === '{"board":"P08 Venue Management.dc.html","anchor":"bo-100"}'
         && boardRef('wireframes/P01 Guest Web.dc.html') === null && boardRef('contracts/x.yaml') === null);
+    check('r9: a state board in a folder of its own, and an anchor named for the state (up to 64 characters)',
+      JSON.stringify(boardRef('wireframes/states/P01 Guest Web states.dc.html#web-state-preference-not-at-venue'))
+        === '{"board":"states/P01 Guest Web states.dc.html","anchor":"web-state-preference-not-at-venue"}');
+    const inFolder = await selfContainedFrame('<img src="img/x.png">', async (rel) => (rel === 'wireframes/states/img/x.png'
+      ? { ok: true, bytes: Buffer.from('png') } : { ok: false, status: 404 }), { base: 'wireframes/states/' });
+    check('and its images resolve from its own folder', inFolder.inlined.join() === 'wireframes/states/img/x.png'
+      && externalRefs(inFolder.html).length === 0, JSON.stringify(inFolder));
   }
 
   // ── 2. README.md for a screen ticket ───────────────────────────────
@@ -252,6 +270,68 @@ try {
     await pull.run(client, { key: '9100', dir: dir2 });
     const be = read(dir2, '9100', 'README.md');
     check('a ticket with no screen and nothing to run has neither section', !/must look|Files to run/.test(be));
+  }
+
+  // ── 2b. each state's look (r9) ─────────────────────────────────────
+  section('2b. each state\'s look: wireframe.stateViews and handoff/design-frames.json (a stand-in over the r8 boards)');
+  {
+    const dir = path.join(T, 'two-b');
+    mkdirSync(dir, { recursive: true });
+    const BOARD = 'wireframes/P01 Guest Web.dc.html';
+    const screens = { 'XX-002': { id: 'XX-002', name: 'Seat test', platform: 'P01',
+      states: { loading: 'x', error: 'x', maintenance: 'x', emptyFirstRun: 'x', offline: 'x', broken: 'x', signInRefused: 'x' },
+      wireframe: { status: 'review', provenance: 'client-verified', board: `${BOARD}#web-007`,
+        stateViews: { loading: 'P01/self', error: 'P01/status-card', maintenance: 'P01/status-card',
+          emptyFirstRun: 'P01/choose-first-note', offline: `${BOARD}#web-030`, broken: `${BOARD}#web-998` } } } };
+    const frames = {
+      patterns: {
+        'P01/status-card': { name: 'the status card of WEB-029', frame: `${BOARD}#web-029`, draws: 'A centred card.',
+          prototypeFile: 'sources/designs/guest.dc.html', where: 'lines 4746-4782' },
+        'P01/choose-first-note': { name: 'the dashed note', frame: null, draws: 'A dashed note.',
+          prototypeFile: 'sources/designs/guest.dc.html', where: 'lines 1718-1720' },
+        'P01/self': { name: 'the seat map itself', frame: `${BOARD}#web-007` },
+      },
+      screens: { 'XX-002': { tokens: { file: 'handoff/design-tokens/guest-web.yaml', from: 'the prototype\'s CSS variables', approved: true },
+        structureOnly: ['wireframes/incoming/P01-x/xx-002.html'], captures: ['wireframes/incoming/P01-web-v2/xx-002.html'],
+        gaps: { signInRefused: 'LO-R9UI-003' } } },
+    };
+    const tickets = { 9201: { workPackage: { key: '9201', subject: '[FE] XX-002', status: 'New', description: '' },
+      touches: [{ kind: 'screen', id: 'XX-002' }] } };
+    const one = await BY_NAME.get('adam_pull').run(standIn(tickets, { screens, files: { 'handoff/design-frames.json': JSON.stringify(frames) } }),
+      { key: '9201', dir });
+    const folder = path.join(dir, '.adam', 'work', '9201');
+    const made = readdirSync(folder).filter((f) => f.startsWith('wireframe-')).sort();
+    check('**one file per distinct frame: the screen\'s own, and each state frame beside it** (web-029 once for error and '
+      + 'maintenance; web-030 from a frame ref in stateViews; the own frame reused; nothing for a missing anchor)',
+    JSON.stringify(made) === JSON.stringify(['wireframe-web-007.html', 'wireframe-web-029.html', 'wireframe-web-030.html']), made.join(', '));
+    check('**every state frame is self-contained**', made.every((f) => externalRefs(readFileSync(path.join(folder, f), 'utf8')).length === 0));
+    const readme = read(dir, '9201', 'README.md');
+    const look = readme.split('**Each state\'s look**')[1]?.split('**Build the page')[0] ?? '';
+    check('**README.md lists each state with its file**',
+      look.includes('- `error`: the status card of WEB-029 - [wireframe-web-029.html](wireframe-web-029.html), frame `#web-029` of `wireframes/P01 Guest Web.dc.html`. Draws: A centred card.')
+        && look.includes('- `maintenance`: the status card of WEB-029 - [wireframe-web-029.html](wireframe-web-029.html)')
+        && look.includes('- `offline`: a frame - [wireframe-web-030.html](wireframe-web-030.html)')
+        && look.includes('- `loading`: the seat map itself - [wireframe-web-007.html](wireframe-web-007.html), frame `#web-007` of `wireframes/P01 Guest Web.dc.html` (this screen\'s own frame).'),
+      look);
+    check('a state with no frame yet names the prototype lines and what they draw',
+      look.includes('- `emptyFirstRun`: the dashed note - no frame drawn for it yet; the prototype draws it: `sources/designs/guest.dc.html`, lines 1718-1720')
+        && look.includes('Draws: A dashed note.'), look);
+    check('a state frame that cannot be written is said, with adam_file', /- `broken`: a frame - frame `wireframes\/P01 Guest Web\.dc\.html#web-998` could not be written \(ADAM answered 404/.test(look), look);
+    check('**a design gap is said as one, with its left-out id**',
+      look.includes('- `signInRefused`: **not drawn by the approved design** (a design gap for the client, LO-R9UI-003 on the left-out list)'), look);
+    check('**the theme line names the app\'s tokens file and the SETUP-SHELL ticket; never a colour of your own**',
+      readme.includes('- **Theme:** the app\'s design tokens, `handoff/design-tokens/guest-web.yaml` (the prototype\'s CSS variables), applied by '
+        + 'the app shell (SETUP-SHELL-GUEST-WEB). Every colour, font, radius and spacing comes from them: never one of your own.'));
+    check('a capture is said as the prototype\'s look; a generated copy as structure only',
+      readme.includes('`wireframes/incoming/P01-web-v2/xx-002.html`: a capture of the client\'s prototype view')
+        && readme.includes('`wireframes/incoming/P01-x/xx-002.html` (named in the record): **structure only, not the look**'));
+    check('"Build each state as \'Each state\'s look\' says", not "the board lists the states"',
+      readme.includes('Build each state as "Each state\'s look" says') && !readme.includes('lists the states rather than drawing each'));
+    const w = one.wireframes?.[0];
+    check('the answer names each state\'s file or pattern, and the design gaps',
+      w?.states?.error?.endsWith('wireframe-web-029.html') && w.states.emptyFirstRun === 'the dashed note'
+        && w.designGaps?.signInRefused === 'LO-R9UI-003' && /error wireframe-web-029\.html/.test(one.next) && /design gaps\): signInRefused/.test(one.next),
+      JSON.stringify(w) + one.next);
   }
 
   // ── 3. files a ticket runs ─────────────────────────────────────────
@@ -337,6 +417,9 @@ try {
     const frameSaid = await frameAsked.text();
     check('a board#anchor from an older connector is a 415 naming the same call and /update-adam',
       frameAsked.status === 415 && /is a frame of a wireframe board, not a file/.test(frameSaid) && /\/update-adam/.test(frameSaid), frameSaid);
+    const long = await fetch(`${base}/pkg/ticvai/frame?board=${encodeURIComponent('P01 Guest Web.dc.html')}&anchor=web-state-preference-not-at-venue`);
+    check('/frame takes an anchor named for a state (32 characters): "no such frame" on r8, not "bad anchor"',
+      long.status === 404 && /has no frame #web-state-preference-not-at-venue/.test(await long.text()), String(long.status));
     const proto = await fetch(`${base}/pkg/ticvai/file?path=${encodeURIComponent('sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html')}`);
     const protoSaid = await proto.text();
     check('a client prototype is a 415 that says ADAM serves none and names the frame call instead',
@@ -423,6 +506,68 @@ try {
     }
     await stop(viewer);
     if (fail) console.log(log.slice(-1500));
+  }
+
+  // ── 6. a package with each state's look, end to end ─────────────────
+  if (!existsSync(path.join(R9, 'handoff', 'design-frames.json'))) {
+    skip('6. a package with each state\'s look', `no handoff/design-frames.json under ${R9} (set R9_PACKAGE)`);
+  } else {
+    section(`6. its own viewer on ${PORTS.r9} serving ${R9} (working tree, no sign-in): #31848 and a screen of each other platform, with each state's look`);
+    const registry = path.join(T, 'projects-r9.json');
+    writeFileSync(registry, JSON.stringify({ default: 'ticvai', projects: [{ id: 'ticvai', name: 'TICVAI r9', root: R9,
+      contracts: 'contracts', active: true, packageRef: 'working', releases: path.join(T, 'releases-r9') }] }));
+    const viewer = spawn(process.execPath, ['server.mjs', '--port', String(PORTS.r9), '--host', '127.0.0.1'],
+      { cwd: VIEWER_DIR, env: { ...process.env, TICVAI_NO_GATE: '1', TICVAI_PROJECTS: registry }, windowsHide: true });
+    children.push(viewer);
+    const base = `http://127.0.0.1:${PORTS.r9}`;
+    await waitFor(`${base}/pkg/ticvai/summary`);
+    // The connector holds package files for a minute; 2b's stand-in design-frames.json is not this package's.
+    tools.forgetPackageFiles();
+    const client = new ViewerClient({ base, project: 'ticvai', email: 'nobody', password: 'nothing' });
+    client.login = async () => 'no sign-in on this viewer';
+    const dir = path.join(T, 'six');
+    mkdirSync(dir, { recursive: true });
+    // What the package says, read now: the UI lane is still drawing state frames, so nothing here names today's list.
+    const DF = JSON.parse(readFileSync(path.join(R9, 'handoff', 'design-frames.json'), 'utf8'));
+    /** Pulls `key` touching screen `id` and holds the folder to what design-frames.json says for that screen. */
+    const holds = async (key, id, touches) => {
+      client.service = async (route) => standIn({ [key]: { workPackage: { key, subject: `[FE] ${id}`, status: 'New', description: '' },
+        touches } }).service(route);
+      const one = await BY_NAME.get('adam_pull').run(client, { key, dir });
+      const folder = path.join(dir, '.adam', 'work', key);
+      const df = DF.screens[id];
+      const wanted = [...new Set([df.pulled, ...Object.values(df.states).map((x) => x.pulled)].filter(Boolean))].sort();
+      const made = readdirSync(folder).filter((f) => f.startsWith('wireframe-')).sort();
+      check(`**${id}: its own frame and every state frame the package names, one file each (${wanted.join(', ')})**`,
+        JSON.stringify(made) === JSON.stringify(wanted), `${made.join(', ')} vs ${wanted.join(', ')}`);
+      check(`${id}: each is self-contained`, made.every((f) => externalRefs(readFileSync(path.join(folder, f), 'utf8')).length === 0),
+        made.map((f) => `${f}: ${externalRefs(readFileSync(path.join(folder, f), 'utf8')).length}`).join(', '));
+      const readme = read(dir, key, 'README.md');
+      const lines = Object.entries(df.states).map(([state, x]) => [state, x.pulled
+        ? readme.includes(`- \`${state}\`: ${x.name}${x.status ? ` (${x.status})` : ''} - [${x.pulled}](${x.pulled})`)
+        : readme.includes(`- \`${state}\`: ${x.name}${x.status ? ` (${x.status})` : ''} - no frame drawn for it yet; the prototype draws it: \`${x.prototype}\`, ${x.where}`)]);
+      check(`${id}: README.md lists all ${lines.length} states with their file or the prototype lines`, lines.every(([, ok]) => ok),
+        JSON.stringify(lines.filter(([, ok]) => !ok)));
+      const app = /^handoff\/design-tokens\/([a-z0-9-]+)\.ya?ml$/.exec(df.tokens?.file ?? '')?.[1];
+      check(`${id}: the theme line names ${df.tokens?.file}${app ? ` and SETUP-SHELL-${app.toUpperCase()}` : ''}`,
+        readme.includes(`\`${df.tokens?.file}\``) && (!app || readme.includes(`applied by the app shell (SETUP-SHELL-${app.toUpperCase()})`)));
+      for (const [state, id2] of Object.entries(df.gaps ?? {})) {
+        check(`${id}: design gap ${state} (${id2}) is said`, readme.includes(`- \`${state}\`: **not drawn by the approved design** (a design gap for the client, ${id2}`));
+      }
+      return { one, df };
+    };
+    const r9links = JSON.parse(readFileSync(path.join(R9, 'handoff', 'service-docs', 'adam-links.json'), 'utf8')).links;
+    const { one, df } = await holds('31848', 'WEB-007', r9links.filter((l) => String(l.key) === '31848').map((l) => ({ kind: l.kind, id: l.id })));
+    check('#31848: the answer names the error state\'s frame', one.wireframes?.[0]?.states?.error?.endsWith(df.states.error.pulled ?? '-'),
+      JSON.stringify(one.wireframes));
+    // One screen of each other platform whose states have frames, the one with the most, chosen from the package.
+    for (const platform of [...new Set(Object.values(DF.screens).map((s) => s.platform))].filter((p) => p !== 'P01').sort()) {
+      const best = Object.entries(DF.screens).filter(([, s]) => s.platform === platform)
+        .map(([id, s]) => [id, new Set(Object.values(s.states ?? {}).map((x) => x.pulled).filter(Boolean)).size])
+        .filter(([, n]) => n > 0).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))[0];
+      if (best) await holds(`99${platform.slice(1)}`, best[0], [{ kind: 'screen', id: best[0] }]);
+    }
+    await stop(viewer);
   }
 
   // ── 5. --live: the sign-in, the accounts service, a client account ─

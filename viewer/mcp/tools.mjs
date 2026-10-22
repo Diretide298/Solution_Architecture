@@ -1784,7 +1784,7 @@ function databaseSection(db, key) {
 
 /** `wireframes/P01 Guest Web.dc.html#web-007` -> { board: 'P01 Guest Web.dc.html', anchor: 'web-007' }, else null. */
 export function boardRef(ref) {
-  const m = /^\s*(?:\.?\/)?(?:wireframes\/)?([^#]+?\.html?)#([A-Za-z0-9-]{2,24})\s*$/i.exec(String(ref ?? ''));
+  const m = /^\s*(?:\.?\/)?(?:wireframes\/)?([^#]+?\.html?)#([A-Za-z0-9-]{2,64})\s*$/i.exec(String(ref ?? ''));
   return m ? { board: m[1], anchor: m[2].toLowerCase() } : null;
 }
 
@@ -1862,14 +1862,14 @@ export function externalRefs(html) {
  * and the viewer draws such a frame exactly as it would without it, so it is left out of those; a frame
  * with one gets it inline, and `needsNetwork` says that React still comes from the CDN when it is opened.
  */
-export async function selfContainedFrame(doc, fetchAsset, { maxAsset = 25 * 1024 * 1024 } = {}) {
+export async function selfContainedFrame(doc, fetchAsset, { maxAsset = 25 * 1024 * 1024, base: docBase = 'wireframes/' } = {}) {
   const inlined = [];
   const left = [];
   const held = new Map();
   const component = /<x-dc[\s>]/i.test(doc);
   // `base` is the folder a reference is relative to: wireframes/ for the document, a stylesheet's own
   // folder for the url()s inside it.
-  const get = async (ref, base = 'wireframes/') => {
+  const get = async (ref, base = docBase) => {
     const rel = packagePath(ref, base);
     if (!rel) return { ref, error: 'outside wireframes/ (broken in the viewer too)' };
     if (!held.has(rel)) {
@@ -1972,7 +1972,10 @@ export async function saveFrame(client, ref, target) {
   }
   const doc = answer.bytes.toString('utf8');
   const route = (rel) => rel.split('/').map(encodeURIComponent).join('/');
-  const made = await selfContainedFrame(doc, (rel) => client.raw(route(rel)));
+  // A board in a folder of its own (r9's wireframes/states/) names its images from that folder.
+  const folder = path.posix.dirname(ref.board.replace(/\\/g, '/'));
+  const made = await selfContainedFrame(doc, (rel) => client.raw(route(rel)),
+    { base: folder && folder !== '.' ? `wireframes/${folder}/` : 'wireframes/' });
   const header = `<!-- Frame #${ref.anchor} of wireframes/${ref.board}, written by adam_pull from ADAM's /frame `
     + 'with its images inline: it opens on its own, offline. Do not edit; pull again for the current one. -->\n';
   const html = made.html.replace(/^(<!doctype html>)?/i, (d) => `${d || '<!doctype html>'}\n${header}`);
@@ -1992,23 +1995,80 @@ export async function saveFrame(client, ref, target) {
   };
 }
 
+// ---- each state's look ------------------------------------------------------
+//
+// **Why** (r9, CHG-R9UI-003; the lead approved the pull's half on 21 October 2026). A board lists a screen's
+// states and draws none, so WEB-007's error was built as a bare page while the approved guest prototype draws its
+// errors as the WEB-029 status card. From r9 the package says, per client-verified screen, which pattern each state
+// shows (`wireframe.stateViews`: state -> `<platform>/<pattern>`, from screens/_state-patterns.yaml), and
+// handoff/design-frames.json resolves each pattern to what draws it: a board frame (`frame`,
+// `wireframes/<board>.dc.html#<anchor>`) where one is drawn, else the prototype's lines. The pull writes every
+// distinct state frame beside the screen's own, self-contained the same way and named as the package's ticket text
+// names it (`wireframe-<anchor>.html`), and README.md lists each state with its file or its prototype lines. The
+// file also carries the screen's design gaps (states the approved design does not draw, on the left-out list), the
+// app's tokens, and which `wireframes/incoming/` files are captures of the prototype and which are structure only.
+//
+// A package without design-frames.json (r8) answers 404 and the pull says nothing more than before. A stateViews
+// value that is itself a frame ref is taken as one, so a state frame drawn later needs no new pattern to be pulled.
+
+const DESIGN_FRAMES = 'handoff/design-frames.json';
+
+/** handoff/design-frames.json, parsed, or null for a package without it (held with the DDL, for a minute). */
+async function designFrames(client) {
+  const text = await packageText(client, DESIGN_FRAMES).catch(() => null);
+  if (!text) return null;
+  try { return JSON.parse(text); } catch { return null; }
+}
+
+/** One state's look: the pattern and what draws it, from the record's stateViews and design-frames.json. */
+function stateView(state, view, frames, resolved) {
+  const direct = boardRef(view);
+  if (direct) return { state, frame: direct };
+  const pattern = frames?.patterns?.[view] ?? {};
+  const known = resolved?.pattern === view ? resolved : {};
+  const frame = boardRef(known.frame ?? pattern.frame);
+  return {
+    state, pattern: view, name: known.name ?? pattern.name ?? null, where: known.where ?? pattern.where ?? null,
+    prototype: known.prototype ?? pattern.prototypeFile ?? null, draws: pattern.draws ?? null, ...(frame ? { frame } : {}),
+    // r9: a frame the package drew in the approved look, which the client has not seen yet, says so.
+    status: known.status ?? pattern.status ?? null,
+  };
+}
+
 /** What the pull writes and says for one screen's look. Never throws: a failure is said in README.md. */
-async function screenLook(client, screen, folder) {
+async function screenLook(client, screen, folder, frames = null, written = new Map()) {
   const w = screen?.wireframe ?? {};
+  const entry = frames?.screens?.[screen.id] ?? null;
   const look = {
     id: screen.id, name: screen.name ?? null, status: w.status ?? null, provenance: w.provenance ?? null,
     board: w.board ?? null, prototype: w.prototype ?? null, frames: [],
-    // Named in the record but not the design: said as structure only (21 October 2026).
-    structureOnly: [...new Set(JSON.stringify(w).match(/wireframes\/incoming\/[^\s"'`),;]+/g) ?? [])],
+    // Named in the record but not the design: said as structure only (21 October 2026). From r9 the package says
+    // which incoming files are captures of the prototype and which are generated structure.
+    structureOnly: entry ? [...(entry.structureOnly ?? [])]
+      : [...new Set(JSON.stringify(w).match(/wireframes\/incoming\/[^\s"'`),;]+/g) ?? [])],
+    captures: entry ? [...(entry.captures ?? [])] : [],
     states: screen.states && typeof screen.states === 'object' ? Object.keys(screen.states) : [],
+    stateViews: Object.entries(w.stateViews ?? {}).map(([state, view]) => stateView(state, String(view), frames, entry?.states?.[state])),
+    gaps: entry?.gaps && typeof entry.gaps === 'object' ? entry.gaps : {},
+    tokens: entry?.tokens?.file ? entry.tokens : null,
+  };
+  // One file per distinct frame, named by its anchor (`wireframe-web-029.html`, as the package's ticket text names
+  // it); the same anchor on another board gets the board's name too, so neither overwrites the other.
+  const save = async (ref) => {
+    const key = `${ref.board.toLowerCase()}#${ref.anchor}`;
+    if (!written.has(key)) {
+      const taken = [...written.values()].some((x) => x.file === `wireframe-${safeName(ref.anchor)}.html`);
+      const file = taken ? `wireframe-${safeName(ref.anchor)}-${safeName(ref.board.replace(/\.dc\.html?$|\.html?$/i, ''))}.html`
+        : `wireframe-${safeName(ref.anchor)}.html`;
+      written.set(key, await saveFrame(client, ref, path.join(folder, file))
+        .then((saved) => ({ ...ref, file, ...saved }), (error) => ({ ...ref, error: error.message })));
+    }
+    return written.get(key);
   };
   const ref = boardRef(w.board);
-  if (!ref) return look;
-  const file = `wireframe-${safeName(ref.anchor)}.html`;
-  try {
-    look.frames.push({ ...ref, file, ...(await saveFrame(client, ref, path.join(folder, file))) });
-  } catch (error) {
-    look.frames.push({ ...ref, error: error.message });
+  if (ref) look.frames.push(await save(ref));
+  for (const view of look.stateViews) {
+    if (view.frame) view.saved = await save(view.frame);
   }
   return look;
 }
@@ -2090,6 +2150,40 @@ function lookSection(looks) {
     for (const f of look.structureOnly) {
       out += `- \`${f}\` (named in the record): **structure only, not the look**. Never build the look from it.\n`;
     }
+    for (const f of look.captures) {
+      out += `- \`${f}\`: a capture of the client's prototype view, the same look as the wireframe above; not written here.\n`;
+    }
+    if (look.tokens) {
+      // An app's own tokens file is named for it (handoff/design-tokens/guest-web.yaml), as its shell ticket is
+      // (SETUP-SHELL-GUEST-WEB); the shared file names no app, and the README names no ticket for it.
+      const app = /^handoff\/design-tokens\/([a-z0-9-]+)\.ya?ml$/i.exec(look.tokens.file)?.[1];
+      const shell = app ? `SETUP-SHELL-${app.toUpperCase()}` : 'the repository\'s SETUP-SHELL-<APP> ticket';
+      out += `- **Theme:** ${look.tokens.approved ? 'the app\'s design tokens' : 'the shared design tokens'}, \`${look.tokens.file}\``
+        + `${look.tokens.from ? ` (${look.tokens.from})` : ''}, applied by the app shell (${shell}). `
+        + 'Every colour, font, radius and spacing comes from them: never one of your own.\n';
+    }
+    const viewed = look.stateViews.length > 0 || Object.keys(look.gaps).length > 0;
+    if (viewed) {
+      out += '\n**Each state\'s look**, from the client-approved design:\n\n';
+      for (const v of look.stateViews) {
+        const s = v.saved;
+        out += `- \`${v.state}\`: ${v.name ?? v.pattern ?? 'a frame'}${v.status ? ` (${v.status})` : ''}`;
+        if (s && !s.error) {
+          out += ` - [${s.file}](${s.file}), frame \`#${s.anchor}\` of \`wireframes/${s.board}\`${s.file === frame?.file ? ' (this screen\'s own frame)' : ''}.`;
+        } else if (s?.error) {
+          out += ` - frame \`wireframes/${s.board}#${s.anchor}\` could not be written (${s.error}); ask adam_file for it.`;
+        } else {
+          out += ` - no frame drawn for it yet; the prototype draws it: ${v.prototype ? `\`${v.prototype}\`` : 'the prototype'}`
+            + `${v.where ? `, ${v.where}` : ''} (ADAM does not serve the prototype: build from what it draws, below, and ask `
+            + 'the person to open those lines if that is not enough).';
+        }
+        out += `${v.draws ? ` Draws: ${v.draws}` : ''}\n`;
+      }
+      for (const [state, id] of Object.entries(look.gaps)) {
+        out += `- \`${state}\`: **not drawn by the approved design** (a design gap for the client, ${id} on the left-out list). `
+          + 'Build it in the visual language of the frames above and say so in the comment.\n';
+      }
+    }
     const states = frame?.states || (look.states.length ? look.states.join(' · ') : null);
     out += '\n**Build the page to match the wireframe';
     out += p?.file ? ' and the prototype view' : '';
@@ -2101,10 +2195,14 @@ function lookSection(looks) {
       out += 'Client-approved UI is fixed: where the prototype has a view, the prototype wins for the look; a screen '
         + 'or part it lacks is built from the screen record and the wireframe. ';
     }
-    out += 'The board draws one frame per screen and lists the states rather than drawing each, so build every '
-      + 'state in the same visual language as the frame - the same type, colours, spacing, imagery and components - '
-      + 'never a plain heading, a plain sentence and a plain button. Where the wireframe and the record disagree on '
-      + 'what the screen does, the record wins and you say so; on how it looks, the wireframe wins. '
+    out += (viewed
+      ? 'Build each state as "Each state\'s look" says: its frame where one is written, else what the prototype draws '
+        + 'there, in the same visual language as the frame - the same type, colours, spacing, imagery and components - '
+        + 'never a plain heading, a plain sentence and a plain button. '
+      : 'The board draws one frame per screen and lists the states rather than drawing each, so build every '
+        + 'state in the same visual language as the frame - the same type, colours, spacing, imagery and components - '
+        + 'never a plain heading, a plain sentence and a plain button. ')
+      + 'Where the wireframe and the record disagree on what the screen does, the record wins and you say so; on how it looks, the wireframe wins. '
       + 'A placeholder layout is only for a screen with no frame written here.\n';
     if (frame && !frame.error && !frame.drawn) {
       out += '\nThis screen\'s frame is generated, not drawn: build its regions and components in the order the frame '
@@ -2257,7 +2355,9 @@ async function pullOne(client, key, base, when) {
   }
   // Every screen the ticket touches: the wireframe frame its record names, self-contained (#31848).
   const looks = [];
-  for (const screen of screens) looks.push(await screenLook(client, screen, folder));
+  const frames = screens.length ? await designFrames(client) : null;
+  const written = new Map();
+  for (const screen of screens) looks.push(await screenLook(client, screen, folder, frames, written));
 
   if (release.previous && release.diff) {
     await writeFile(path.join(folder, 'spec-diff.md'), specDiff(wp, release, when));
@@ -2314,6 +2414,10 @@ async function pullOne(client, key, base, when) {
       ...(l.frames[0]?.file ? { file: path.join(folder, l.frames[0].file), drawn: l.frames[0].drawn } : {}),
       ...(l.frames[0]?.error ? { error: l.frames[0].error } : {}),
       ...(l.prototype?.file ? { prototype: l.prototype.file } : {}),
+      // r9: each state's look; the frames written for them (beside the screen's own) and the states with none.
+      ...(l.stateViews.length ? { states: Object.fromEntries(l.stateViews.map((v) => [v.state,
+        v.saved?.file ? path.join(folder, v.saved.file) : v.saved?.error ? `not written: ${v.saved.error}` : (v.name ?? v.pattern)])) } : {}),
+      ...(Object.keys(l.gaps).length ? { designGaps: l.gaps } : {}),
     })) } : {}),
     ...(runs.length ? { run: runs.map((r) => (r.error ? { path: r.path, error: r.error }
       : { path: r.path, file: path.join(folder, ...r.file.split('/')), sha256: r.sha256, checked: r.checked })) } : {}),
@@ -3533,6 +3637,9 @@ export const TOOLS = [
               + `${w.drawn ? 'look exactly like it' : 'its structure (the frame is generated, not drawn)'}, every state included, `
               + `in the same visual language (README.md, "How ${w.screen} ... must look")`
               + `${w.prototype ? `; the client-approved prototype ${w.prototype} wins for the look where it has a view` : ''}.`
+              + (w.states ? ` Each state has its look in README.md ("Each state's look"): ${Object.entries(w.states)
+                .map(([st, x]) => `${st} ${/\.html$/i.test(x) ? path.basename(x) : `= ${x}`}`).join('; ')}.` : '')
+              + (w.designGaps ? ` Not drawn by the approved design (design gaps): ${Object.keys(w.designGaps).join(', ')}.` : '')
             : ` Screen ${w.screen}: its wireframe could not be written (${w.error ?? 'no frame recorded'}); say so in one line.`;
         }
         if (one.run?.length) {

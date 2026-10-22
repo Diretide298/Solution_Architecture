@@ -316,7 +316,12 @@ client-approved prototype and its views (named, not written: a prototype is one 
 to cut out, and ADAM serves none), and that the page is built to match it exactly, every state included.
 #31848's agent had been told "Wireframe boards open in the ADAM viewer" and built WEB-007 from the record's
 text. The frames are read through `/frame` and `/wireframes/` as the developer, so nobody reads a frame they
-cannot open in the viewer. A ticket's forward migrations (`backend/<database>/V01nn__*.sql`) and any file its
+cannot open in the viewer. From r9 a client-verified screen says each state's look (`wireframe.stateViews`,
+resolved by `handoff/design-frames.json` to a board frame or the prototype's lines): the pull writes every distinct
+state frame beside the screen's own, as `wireframe-<anchor>.html` the same way (r9's state frames sit in
+`wireframes/states/`), and README.md lists each state with its file, the prototype lines that draw it, or the design
+gap it is, plus the app's tokens file and its SETUP-SHELL-<APP> ticket. A package without design-frames.json gets
+what it got before. A ticket's forward migrations (`backend/<database>/V01nn__*.sql`) and any file its
 text says to run are written whole under `run/`, byte for byte, each checked against the `X-Ticvai-Sha256`
 ADAM sends for its own copy, with `run/SHA256SUMS`; #36194's agent had held a 341-line window of a 2,736-line
 migration it had to run. `adam_file` keeps its window, for reading. `mcp/pull-files-check.mjs` holds both.

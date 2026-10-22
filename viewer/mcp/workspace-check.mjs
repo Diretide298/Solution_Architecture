@@ -255,6 +255,13 @@ try {
   check('the frontend starter CLAUDE.md marks "Building a screen to its wireframe" as ADAM\'s, and a frame the pull wrote '
     + 'came through ADAM', Boolean(lookInner) && lookInner.startsWith('## Building a screen to its wireframe')
       && /That frame came through ADAM, and it is the design/.test(lookInner) && /placeholder layout only when no frame was written/i.test(lookInner));
+  check('and the theme is the app\'s: SETUP-SHELL-<APP> and its tokens file, never a colour or font of the screen\'s own '
+    + '(and the starter\'s design-tokens package says it holds the shared tokens only)',
+  /`SETUP-SHELL-<APP>` ticket/.test(lookInner) && /handoff\/design-tokens\/guest-web\.yaml/.test(lookInner)
+      && /never invents or hard-codes a colour, font, radius or shadow/.test(lookInner)
+      && /Each state's look/.test(lookInner)
+      && /\*\*shared\*\* design tokens/.test(starter('frontend', 'packages', 'design-tokens', 'src', 'index.ts'))
+      && /SETUP-SHELL-<APP>/.test(starter('frontend', 'packages', 'design-tokens', 'src', 'index.ts')));
   const noLook = oldWorkspace('fe-no-look', 'frontend', { markers: true });
   writeFileSync(path.join(noLook, 'CLAUDE.md'), read(noLook, 'CLAUDE.md').replace(LOOK_RE, ''));
   const noLookMd = read(noLook, 'CLAUDE.md');
