@@ -18,6 +18,12 @@
 # A pattern is added only with `find` texts the check finds in the prototype (a bundled prototype is read from its
 # decoded template), so a pattern cannot point at nothing.
 #
+# **Drawn by the package** (r9, CHG-R9UI-005; the lead, 21 October 2026: "290 of them were ingested and never built we
+# need to built them for r9"). The 20 state classes the prototypes never drew are drawn by tools/draw-state-frames.py in
+# each app's approved look, one frame per class on a companion board under wireframes/states/. Such a pattern names
+# `board` (its companion board), `frame` (the anchor), `status` (drawn by the package from the approved design (r9),
+# not yet seen by the client) and `prototype` (whose look it is drawn in); its `find` texts are read from the board.
+#
 # Fields
 #   platforms.<code>.prototypes      the client-approved prototype files of the platform (relative to ticvai/)
 #   platforms.<code>.board           the platform's wireframe board; frames are <board>#<anchor>
@@ -116,6 +122,51 @@ platforms:
         draws: >-
           The video's poster image fills the video area until the first frames arrive and stays there when the clip
           stalls or cannot play: no spinner, no overlay, no error; the details beside it stay usable.
+      state-closed:
+        name: 'the status card, its closed variant'
+        prototype: web
+        board: 'wireframes/states/P01 Guest Web states.dc.html'
+        frame: web-state-closed
+        status: 'drawn by the package from the approved design (r9), not yet seen by the client'
+        where: 'drawn by the package (r9, tools/draw-state-frames.py) in the look of the approved prototype, wireframes/states/P01 Guest Web states.dc.html#web-state-closed'
+        find: ['Summit Peaks is closed today']
+        draws: 'WEB-029''s status card with the clock icon, the CLOSED kicker, the tenant''s message, the opening hours in the advice row, See opening times and Back to home'
+      state-preference-not-at-venue:
+        name: 'the Not at this park notice'
+        prototype: web
+        board: 'wireframes/states/P01 Guest Web states.dc.html'
+        frame: web-state-preference-not-at-venue
+        status: 'drawn by the package from the approved design (r9), not yet seen by the client'
+        where: 'drawn by the package (r9, tools/draw-state-frames.py) in the look of the approved prototype, wireframes/states/P01 Guest Web states.dc.html#web-state-preference-not-at-venue'
+        find: ['Not at this park']
+        draws: 'the Visit Planner''s day card with the tinted Not at this park notice naming the park that has the preference, and the chip marked Not at the parks you chose'
+      state-sign-in-refused:
+        name: 'the sign-in refusal notice'
+        prototype: web
+        board: 'wireframes/states/P01 Guest Web states.dc.html'
+        frame: web-state-sign-in-refused
+        status: 'drawn by the package from the approved design (r9), not yet seen by the client'
+        where: 'drawn by the package (r9, tools/draw-state-frames.py) in the look of the approved prototype, wireframes/states/P01 Guest Web states.dc.html#web-state-sign-in-refused'
+        find: ['Too many attempts']
+        draws: 'one refusal message above the fields (the ! glyph on the declined colour); too many attempts says to try later and leads with Send me a code'
+      state-sold-out-for-day:
+        name: 'the parking-full notice'
+        prototype: web
+        board: 'wireframes/states/P01 Guest Web states.dc.html'
+        frame: web-state-sold-out-for-day
+        status: 'drawn by the package from the approved design (r9), not yet seen by the client'
+        where: 'drawn by the package (r9, tools/draw-state-frames.py) in the look of the approved prototype, wireframes/states/P01 Guest Web states.dc.html#web-state-sold-out-for-day'
+        find: ['The car park is full on Sat 3 Oct.']
+        draws: 'the day chip marked Full, the refusal notice (The car park is full on ...), Reserve and pay disabled, Choose another day'
+      state-offline:
+        name: 'the offline banner and the paused actions'
+        prototype: web
+        board: 'wireframes/states/P01 Guest Web states.dc.html'
+        frame: web-state-offline
+        status: 'drawn by the package from the approved design (r9), not yet seen by the client'
+        where: 'drawn by the package (r9, tools/draw-state-frames.py) in the look of the approved prototype, wireframes/states/P01 Guest Web states.dc.html#web-state-offline'
+        find: ['Showing what loaded at 10:42']
+        draws: 'a dark bar under the header with the prototype''s own offline message and the age of what is shown; the paused action button'
     states:
       loading: turnstile-loader
       error: status-card
@@ -124,9 +175,13 @@ platforms:
       emptyFirstRun: dashed-empty
       emptyNoResults: filter-empty
       emptyNoAccess: sign-in-card
-      offline: offline-paused
+      offline: state-offline
       videoBuffering: video-poster
       videoUnavailable: video-poster
+      closed: state-closed
+      preferenceNotAtVenue: state-preference-not-at-venue
+      signInRefused: state-sign-in-refused
+      soldOutForDay: state-sold-out-for-day
     screens:
       WEB-007:
         emptyFirstRun: choose-first-note
@@ -198,6 +253,87 @@ platforms:
         draws: >-
           The poster image fills the video area until the first frames arrive and stays when the clip cannot play: no
           spinner, overlay or blocking screen; the details beside it stay usable.
+      state-error:
+        name: 'the error note with the mascot'
+        prototype: app
+        board: 'wireframes/states/P02 Guest App states.dc.html'
+        frame: gst-state-error
+        status: 'drawn by the package from the approved design (r9), not yet seen by the client'
+        where: 'drawn by the package (r9, tools/draw-state-frames.py) in the look of the approved prototype, wireframes/states/P02 Guest App states.dc.html#gst-state-error'
+        find: ['We couldn''t load what']
+        draws: 'the dashed note with the mascot''s sad pose naming the read that failed, Try again, the reference'
+      state-offline:
+        name: 'the offline bar and the paused actions'
+        prototype: app
+        board: 'wireframes/states/P02 Guest App states.dc.html'
+        frame: gst-state-offline
+        status: 'drawn by the package from the approved design (r9), not yet seen by the client'
+        where: 'drawn by the package (r9, tools/draw-state-frames.py) in the look of the approved prototype, wireframes/states/P02 Guest App states.dc.html#gst-state-offline'
+        find: ['showing what was saved at 10:42']
+        draws: 'a bar in the deep colour above the header (You''re offline, showing what was saved at ...), ages on what is shown, the paused button'
+      state-unavailable:
+        name: 'the unavailable page (sold out, closed, update required)'
+        prototype: app
+        board: 'wireframes/states/P02 Guest App states.dc.html'
+        frame: gst-state-unavailable
+        status: 'drawn by the package from the approved design (r9), not yet seen by the client'
+        where: 'drawn by the package (r9, tools/draw-state-frames.py) in the look of the approved prototype, wireframes/states/P02 Guest App states.dc.html#gst-state-unavailable'
+        find: ['Update TICVAI to keep booking']
+        draws: 'GST-047''s hero block for each: Sold out today with Choose another day, Closed today with the opening hours, Update required with only the store link'
+      state-map-fallback:
+        name: 'the 2D map and the approximate position'
+        prototype: app
+        board: 'wireframes/states/P02 Guest App states.dc.html'
+        frame: gst-state-map-fallback
+        status: 'drawn by the package from the approved design (r9), not yet seen by the client'
+        where: 'drawn by the package (r9, tools/draw-state-frames.py) in the look of the approved prototype, wireframes/states/P02 Guest App states.dc.html#gst-state-map-fallback'
+        find: ['Position approximate']
+        draws: 'the same route on the 2D map with no message; for weak GPS the dimmed dot, the ring labelled Position approximate and I am at...'
+      state-preference-not-at-venue:
+        name: 'the Not at the parks you chose chip'
+        prototype: app
+        board: 'wireframes/states/P02 Guest App states.dc.html'
+        frame: gst-state-preference-not-at-venue
+        status: 'drawn by the package from the approved design (r9), not yet seen by the client'
+        where: 'drawn by the package (r9, tools/draw-state-frames.py) in the look of the approved prototype, wireframes/states/P02 Guest App states.dc.html#gst-state-preference-not-at-venue'
+        find: ['Not at the parks you chose']
+        draws: 'the chip marked Not at the parks you chose naming the park that has it, and the note under the chips'
+      state-ai-unavailable:
+        name: 'the planner''s fallback note'
+        prototype: app
+        board: 'wireframes/states/P02 Guest App states.dc.html'
+        frame: gst-state-ai-unavailable
+        status: 'drawn by the package from the approved design (r9), not yet seen by the client'
+        where: 'drawn by the package (r9, tools/draw-state-frames.py) in the look of the approved prototype, wireframes/states/P02 Guest App states.dc.html#gst-state-ai-unavailable'
+        find: ['help with the plan right now']
+        draws: 'the rules plan with a short note and the mascot''s thinking pose; editing carries on'
+      state-sign-in-refused:
+        name: 'the sign-in refusal notice'
+        prototype: app
+        board: 'wireframes/states/P02 Guest App states.dc.html'
+        frame: gst-state-sign-in-refused
+        status: 'drawn by the package from the approved design (r9), not yet seen by the client'
+        where: 'drawn by the package (r9, tools/draw-state-frames.py) in the look of the approved prototype, wireframes/states/P02 Guest App states.dc.html#gst-state-sign-in-refused'
+        find: ['Too many attempts']
+        draws: 'one refusal message above the fields; too many attempts leads with Send me a code'
+      state-face-pass-not-linked:
+        name: 'the not-linked notice'
+        prototype: app
+        board: 'wireframes/states/P02 Guest App states.dc.html'
+        frame: gst-state-face-pass-not-linked
+        status: 'drawn by the package from the approved design (r9), not yet seen by the client'
+        where: 'drawn by the package (r9, tools/draw-state-frames.py) in the look of the approved prototype, wireframes/states/P02 Guest App states.dc.html#gst-state-face-pass-not-linked'
+        find: ['is not linked to your account']
+        draws: 'the refusal notice (not linked to your account) over a refreshed Who is this for list'
+      state-sold-out-for-day:
+        name: 'the parking-full notice'
+        prototype: app
+        board: 'wireframes/states/P02 Guest App states.dc.html'
+        frame: gst-state-sold-out-for-day
+        status: 'drawn by the package from the approved design (r9), not yet seen by the client'
+        where: 'drawn by the package (r9, tools/draw-state-frames.py) in the look of the approved prototype, wireframes/states/P02 Guest App states.dc.html#gst-state-sold-out-for-day'
+        find: ['The car park is full on Sat 3 Oct.']
+        draws: 'the day chip marked Full, the refusal notice, Reserve and pay disabled'
     states:
       loading: venue-loader
       emptyFirstRun: dashed-note
@@ -206,6 +342,18 @@ platforms:
       introVideo: intro-video
       videoBuffering: video-poster
       videoUnavailable: video-poster
+      error: state-error
+      offline: state-offline
+      soldOut: state-unavailable
+      closed: state-unavailable
+      forcedUpgrade: state-unavailable
+      map3dUnavailable: state-map-fallback
+      weakGps: state-map-fallback
+      preferenceNotAtVenue: state-preference-not-at-venue
+      aiUnavailable: state-ai-unavailable
+      signInRefused: state-sign-in-refused
+      subjectNotLinked: state-face-pass-not-linked
+      soldOutForDay: state-sold-out-for-day
     screens:
       GST-047:
         maintenance: maintenance-page
@@ -268,6 +416,60 @@ platforms:
         draws: >-
           A modal over the till naming the line that went out of stock between scan and charge, with keep (and correct
           the stock) or void, the supervisor approving; the rest of the sale stands.
+      state-loading:
+        name: 'the shimmer tiles'
+        prototype: v2
+        board: 'wireframes/states/P04 Venue POS states.dc.html'
+        frame: pos-state-loading
+        status: 'drawn by the package from the approved design (r9), not yet seen by the client'
+        where: 'drawn by the package (r9, tools/draw-state-frames.py) in the look of the approved prototype, wireframes/states/P04 Venue POS states.dc.html#pos-state-loading'
+        find: ['@keyframes shimmer']
+        draws: 'the catalogue''s tiles held in place with the terminal''s shimmer; header, rail and cart as they are'
+      state-error:
+        name: 'the could-not-load panel'
+        prototype: v2
+        board: 'wireframes/states/P04 Venue POS states.dc.html'
+        frame: pos-state-error
+        status: 'drawn by the package from the approved design (r9), not yet seen by the client'
+        where: 'drawn by the package (r9, tools/draw-state-frames.py) in the look of the approved prototype, wireframes/states/P04 Venue POS states.dc.html#pos-state-error'
+        find: ['The ticket catalogue did not load']
+        draws: 'the hardware alert panel''s shape naming the read that failed, with Retry and Report; at sign-in, that the network failed and the PIN was not checked'
+      state-no-results:
+        name: 'the nothing-matches panel'
+        prototype: v2
+        board: 'wireframes/states/P04 Venue POS states.dc.html'
+        frame: pos-state-no-results
+        status: 'drawn by the package from the approved design (r9), not yet seen by the client'
+        where: 'drawn by the package (r9, tools/draw-state-frames.py) in the look of the approved prototype, wireframes/states/P04 Venue POS states.dc.html#pos-state-no-results'
+        find: ['the filter is what narrowed it']
+        draws: 'a panel naming the filter and the list (Nothing matches ... in Tickets) with Clear filter'
+      state-no-access:
+        name: 'the no-access panel'
+        prototype: v2
+        board: 'wireframes/states/P04 Venue POS states.dc.html'
+        frame: pos-state-no-access
+        status: 'drawn by the package from the approved design (r9), not yet seen by the client'
+        where: 'drawn by the package (r9, tools/draw-state-frames.py) in the look of the approved prototype, wireframes/states/P04 Venue POS states.dc.html#pos-state-no-access'
+        find: ['open the ticket catalogue']
+        draws: 'a panel naming the permission the screen needs, with Switch user'
+      state-mfa:
+        name: 'the second-factor modal'
+        prototype: v2
+        board: 'wireframes/states/P04 Venue POS states.dc.html'
+        frame: pos-state-mfa
+        status: 'drawn by the package from the approved design (r9), not yet seen by the client'
+        where: 'drawn by the package (r9, tools/draw-state-frames.py) in the look of the approved prototype, wireframes/states/P04 Venue POS states.dc.html#pos-state-mfa'
+        find: ['Enter the code from your authenticator app']
+        draws: 'the supervisor PIN modal''s shape for the six-digit authenticator code, Verify, Email me a code instead, the lockout line'
+      state-zone-unavailable:
+        name: 'the struck-out zone and the warning toast'
+        prototype: v2
+        board: 'wireframes/states/P04 Venue POS states.dc.html'
+        frame: pos-state-zone-unavailable
+        status: 'drawn by the package from the approved design (r9), not yet seen by the client'
+        where: 'drawn by the package (r9, tools/draw-state-frames.py) in the look of the approved prototype, wireframes/states/P04 Venue POS states.dc.html#pos-state-zone-unavailable'
+        find: ['Lower Tier sold out while you were choosing']
+        draws: 'the zone struck out with its Sold out badge and the warn toast (the cart is unchanged)'
     states:
       offline: network-pill
       denied: refusal-toast
@@ -275,6 +477,12 @@ platforms:
       emptyFirstRun: empty-note
       soldOutByCount: stock-badge
       stockConflict: conflict-modal
+      loading: state-loading
+      error: state-error
+      emptyNoResults: state-no-results
+      emptyNoAccess: state-no-access
+      mfaRequired: state-mfa
+      zoneUnavailable: state-zone-unavailable
     screens:
       POS-007:
         pendingVariance: close-shift-variance

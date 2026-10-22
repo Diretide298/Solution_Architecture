@@ -1,0 +1,67 @@
+id: CHG-R9UI-005
+date: '2026-10-21'
+source: audit
+kind: spec
+summary: 'The 290 states of the client-verified screens that the approved prototypes never drew are drawn by the package
+  in r9: one frame per platform and state class (P01 Guest Web 5, P02 Guest App 9, P04 POS 6; 20 frames) in each app''s
+  approved look, on companion boards under wireframes/states/, each marked "drawn by the package from the approved
+  design (r9), not yet seen by the client". Every state of the 158 client-verified screens now has a look (936 of
+  936); the design-gap lines LO-R9UI-001 to -020 leave the left-out list, and showing the frames to the client is
+  LO-R9UI-025.'
+decision:
+  what: 'tools/draw-state-frames.py (new; draws wireframes/states/P01 Guest Web states.dc.html, P02 Guest App
+    states.dc.html and P04 Venue POS states.dc.html: self-contained, the prototypes'' CSS variables from
+    handoff/design-tokens/ and the till''s root variables, the prototypes'' own components and copy reused, mascots
+    embedded, logical properties for right to left; run by hand and excused in refresh.sh like render-screens).
+    screens/_state-patterns.yaml: 20 patterns with `board`, `frame`, `status`, and the states pointed at them.
+    tools/derive-state-views.py: a drawn frame''s board and status in handoff/design-frames.json (fields added, none
+    changed). tools/check-state-views.py: a drawn frame proves itself on its board, names the approved prototype
+    whose look it is in, and the board carries the status. tools/ticket_done.py: the ticket names a drawn look as
+    drawn by the package, not yet seen by the client. docs/active/left-out.yaml: LO-R9UI-001 to -020 removed,
+    LO-R9UI-025 added.'
+  by: Chinmay
+  date: '2026-10-21'
+why: 'The lead, 21 October 2026, on the r9 UI lane''s report of 290 states the approved prototypes never drew (put on the
+  left-out list as client questions by CHG-R9UI-003): "290 of them were ingested and never built we need to built them
+  for r9." and "all if them get going". Finding behind it: the WEB-007 seat page (sources/audit-21-october/web-007-ui-pull-findings.md).
+  The frames do not change any approved screen: they are states those screens never showed (check-approved-ui passes);
+  the client still reviews them (LO-R9UI-025).'
+keys_touched:
+  screens: ['the 158 client-verified screens of P01, P02 and P04 (wireframe.stateViews; listed in CHG-R9UI-003)']
+  files:
+  - tools/draw-state-frames.py
+  - wireframes/states/P01 Guest Web states.dc.html
+  - wireframes/states/P02 Guest App states.dc.html
+  - wireframes/states/P04 Venue POS states.dc.html
+  - screens/_state-patterns.yaml
+  - screens/P01-guest-web-storefront.yaml
+  - screens/P02-guest-mobile-app.yaml
+  - screens/P04-point-of-sale.yaml
+  - tools/derive-state-views.py
+  - tools/check-state-views.py
+  - tools/ticket_done.py
+  - tools/refresh.sh
+  - tools/tests/test_state_views.py
+  - docs/active/left-out.yaml
+  - handoff/design-frames.json
+root_class: 'new: state-look-unnamed (CHG-R9UI-003); a state the approved design never drew'
+tickets:
+  started: [APP-WEB-WEB-007, APP-WEB-WEB-029, APP-MOB-GST-040, APP-MOB-GST-042, APP-MOB-GST-073]
+  unstarted: ['the screen tickets of the 158 client-verified screens, through their pointer bodies and ADAM at r9']
+release_tag: r9
+decision_owner: Chinmay
+adam_cr: 'none: a decision of the lead; no ADAM CR is needed'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-state-views.py
+status: open
+notes: 'Frames (anchors): P01 web-state-closed, web-state-preference-not-at-venue, web-state-sign-in-refused,
+  web-state-sold-out-for-day, web-state-offline; P02 gst-state-error, gst-state-offline, gst-state-unavailable (sold out,
+  closed, update required), gst-state-map-fallback (no 3D, weak GPS), gst-state-preference-not-at-venue,
+  gst-state-ai-unavailable, gst-state-sign-in-refused, gst-state-face-pass-not-linked, gst-state-sold-out-for-day; P04
+  pos-state-loading, pos-state-error, pos-state-no-results, pos-state-no-access, pos-state-mfa,
+  pos-state-zone-unavailable. The till''s frames use the approved terminal''s own root variables (Inter and Inter Tight,
+  teal #0E7C86), which differ from screens/_design-tokens.yaml (Manrope), the file SETUP-SHELL-POS names: raised with
+  the lead in the lane report. viewer/lib/wireframes.mjs frameDocument lifts each frame whole (checked for one frame
+  per board).'

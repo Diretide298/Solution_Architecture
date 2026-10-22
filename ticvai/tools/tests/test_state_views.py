@@ -90,4 +90,29 @@ def test_the_build_done_when_is_the_visual_check_only_where_a_design_is_approved
     assert "the visual check passes for every state" in approved and "1440×900 and 390×844" in approved
     unapproved = td.done_when(dict(fe, key="VM-BO-085"), "build", ["screen BO-085"])
     assert "visual check" not in unapproved and "structure only" in unapproved
-    assert td.state_look("GST-003", "offline").startswith("look: not drawn by the approved design (LO-R9UI-")
+    drawn = td.state_look("GST-003", "offline")          # drawn by the package in r9 (CHG-R9UI-005)
+    assert "gst-state-offline" in drawn and "not yet seen by the client" in drawn
+
+
+def test_the_drawn_frames_lift_whole_and_need_no_network():
+    """Every frame the package drew (wireframes/states/) is one balanced <section> with its anchor, carries its status,
+    and the boards load nothing from the network (CHG-R9UI-005)."""
+    import re
+    boards = sorted((TOOLS.parent / "wireframes" / "states").glob("*.dc.html"))
+    assert len(boards) == 3
+    anchors = []
+    for b in boards:
+        text = b.read_text(encoding="utf-8")
+        assert not re.search(r"(?:src|href)=\"https?://|@import|url\(https?:", text)
+        for m in re.finditer(r'<section id="([a-z0-9-]+)" class="state-frame"', text):
+            rest = text[m.start():]
+            depth, end = 0, None
+            for t in re.finditer(r"<section[^>]*>|</section>", rest):
+                depth += -1 if t.group(0).startswith("</") else 1
+                if depth == 0:
+                    end = t.end()
+                    break
+            assert end, m.group(1)
+            assert "not yet seen by the client" in rest[:end]
+            anchors.append(m.group(1))
+    assert len(anchors) == 20 and len(set(anchors)) == 20
