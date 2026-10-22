@@ -1,0 +1,38 @@
+{
+ "about": "The client-verified screens whose approved view is in sources/designs/TICVAI_POS_Terminal_client_approved.html (21 October 2026, CHG-R9UI-004): every one has an entry, so a reference capture exists for the visual check; an entry with `pending` names the view and has no click path yet. The device frame and viewport are pos-v2.json's, to be confirmed against this prototype when the steps are recorded.",
+ "prototype": "sources/designs/TICVAI_POS_Terminal_client_approved.html",
+ "caption": "Client prototype (approved), TICVAI_POS_Terminal_client_approved.html",
+ "imgBase": "frames/img/",
+ "viewport": {
+  "width": 2200,
+  "height": 1400
+ },
+ "frame": {
+  "width": 1620,
+  "height": 1080,
+  "inset": 0
+ },
+ "maxBytes": 250000,
+ "loadWait": 6000,
+ "stepWait": 700,
+ "setup": [],
+ "screens": [
+  {"id": "POS-007", "name": "Close Shift", "view": "Left rail 'Close' (goClose) or palette 'Shift close & Z-report'", "steps": [], "expect": [], "pending": "the view is named (the screen's wireframe.prototype.view); its click path is not recorded yet"},
+
+  {"id": "POS-008", "name": "Reports", "view": "Left rail 'Reports' or Home launcher 'Venue command'", "steps": [], "expect": [], "pending": "the view is named (the screen's wireframe.prototype.view); its click path is not recorded yet"},
+
+  {"id": "POS-011", "name": "Returns, Refunds & Exchanges", "view": "Left rail 'Refunds' (or tap a Recent transaction on Home)", "steps": [], "expect": [], "pending": "the view is named (the screen's wireframe.prototype.view); its click path is not recorded yet"},
+
+  {"id": "POS-013", "name": "Mobile POS, Event Sales & Offline Operations", "view": "Left rail 'Sync' (or the network pill in the top bar)", "steps": [], "expect": [], "pending": "the view is named (the screen's wireframe.prototype.view); its click path is not recorded yet"},
+
+  {"id": "POS-014", "name": "Sales Exceptions, Controls & Operational Actions", "view": "Spread across: cart 'Discount' modal; Refunds 'Void'; Home hot key F3 'Open drawer'; 'AUTHORISATION REQUIRED' PIN modal", "steps": [], "expect": [], "pending": "the view is named (the screen's wireframe.prototype.view); its click path is not recorded yet"},
+
+  {"id": "POS-016", "name": "Till Configuration", "view": "Left rail 'Setup'; hardware status also from the top-bar device icon (openHw)", "steps": [], "expect": [], "pending": "the view is named (the screen's wireframe.prototype.view); its click path is not recorded yet"},
+
+  {"id": "POS-020", "name": "Shift Exceptions & Alerts", "view": "Top-bar bell -> 'Notifications' panel; Reports -> 'Needs attention'", "steps": [], "expect": [], "pending": "the view is named (the screen's wireframe.prototype.view); its click path is not recorded yet"},
+
+  {"id": "POS-026", "name": "Receipt & Reprint", "view": "After a successful payment (receipt screen); reprint via Home F4 or cart 'History' -> 'Reprint'", "steps": [], "expect": [], "pending": "the view is named (the screen's wireframe.prototype.view); its click path is not recorded yet"},
+
+  {"id": "POS-027", "name": "Guest Lookup", "view": "Left rail 'Guests', or cart guest button (goGuests)", "steps": [], "expect": [], "pending": "the view is named (the screen's wireframe.prototype.view); its click path is not recorded yet"}
+ ]
+}

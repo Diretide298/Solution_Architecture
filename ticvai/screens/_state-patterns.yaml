@@ -1,0 +1,282 @@
+# The look of every screen state, from what the client-approved prototypes actually draw.
+#
+# **Why** (CHG-R9UI-003; the lead, 21 October 2026: "I wanna get all of those changes out now.."). A screen's
+# `states` are one line of text written by the screen generator (tools/generate-screens-from-contracts.py), and
+# nothing said what a state looks like. WEB-007 (#31848) was built with a bare error page while the approved guest
+# web prototype draws its errors as the WEB-029 status card, its loading as the turnstile loader and its waiting
+# step as a dashed "Choose ... to see the seats" note (audit finding of 21 October 2026, the WEB-007 seat page).
+#
+# **What this file is.** Per platform with a client-approved design: the patterns its approved prototype or board
+# draws (each with where it is drawn and the text that proves it is there), and which pattern each state shows.
+# `tools/derive-state-views.py --apply` writes the result into every client-verified screen as
+# `wireframe.stateViews` (state -> pattern id) and into handoff/design-frames.json, which the ticket text and the
+# frontend spec pages read. `tools/check-state-views.py` fails when a client-verified screen has a state with no
+# view and the gap is not on the one left-out list (docs/active/left-out.yaml).
+#
+# **Never invent a pattern.** A state the approved design does not draw has no entry under `states` here: it is a
+# design gap for the client, one line per platform and state on docs/active/left-out.yaml (`kind: design-gap`).
+# A pattern is added only with `find` texts the check finds in the prototype (a bundled prototype is read from its
+# decoded template), so a pattern cannot point at nothing.
+#
+# Fields
+#   platforms.<code>.prototypes      the client-approved prototype files of the platform (relative to ticvai/)
+#   platforms.<code>.board           the platform's wireframe board; frames are <board>#<anchor>
+#   platforms.<code>.viewports       the sizes the visual check compares at, from the approved prototype's frame
+#   platforms.<code>.tokens          the design-token file the app's shell applies (a platform not listed here has
+#                                    no client-approved design: its shell uses the shared screens/_design-tokens.yaml
+#                                    and its look is on the left-out list)
+#   patterns.<id>.name               what the pattern is called in the ticket text
+#   patterns.<id>.prototype          which file of `prototypes` draws it
+#   patterns.<id>.where              where in that file (the lines or the marker), for a person to open it
+#   patterns.<id>.find               texts that are in the file (the check reads them), proving the drawing exists
+#   patterns.<id>.frame              the board anchor whose frame draws this pattern (not merely the screen it sits
+#                                    on), pulled by ADAM as wireframe-<anchor>.html in the ticket folder
+#   patterns.<id>.draws              what a developer must reproduce
+#   states.<state>                   the pattern every client-verified screen of the platform shows in that state
+#   screens.<id>.<state>             a screen whose own approved view draws that state differently
+version: 1
+
+platforms:
+  P01:
+    name: Guest Web
+    prototypes:
+      web: sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html
+    board: wireframes/P01 Guest Web.dc.html
+    viewports: ['1440x900', '390x844']
+    tokens: handoff/design-tokens/guest-web.yaml
+    tokensFrom: the CSS variables of the approved prototype's theme() (tools/derive-design-tokens.py), applied per tenant from getPublishedTenantConfig's theme
+    patterns:
+      status-card:
+        name: the status card of WEB-029 (Error / Sold out / Maintenance)
+        prototype: web
+        where: lines 4746-4782, the block marked "WEB ERROR / SOLD OUT / MAINTENANCE" (data-screen-label "WEB Error / Sold out / Maintenance")
+        find: ['WEB Error / Sold out / Maintenance', 'Something went wrong on our side']
+        frame: web-029
+        draws: >-
+          A centred card on the page under the full header and footer: a tinted circle with the state's icon, the
+          kicker (ERROR, SOLD OUT or MAINTENANCE), the title ("Something went wrong on our side"), the body ("Your
+          basket is safe and nothing was charged..."), an advice row with a pill ("Wait a minute"), the primary and
+          secondary buttons (Try again, Back to home) and the reference number in monospace. One card, three
+          variants by kicker and icon.
+      turnstile-loader:
+        name: the turnstile loader
+        prototype: web
+        where: lines 4950-4962, the block marked "TURNSTILE LOADER" (and flash() at 6984-6994, which opens it for 820 ms)
+        find: ['TURNSTILE LOADER', 'tvMascotBob']
+        draws: >-
+          A blurred dark overlay over the page with a centred surface card: the Sahli mascot bobbing, the label (what
+          is happening, in the heading font), a muted sub-line and a thin progress bar in the brand colour.
+      dashed-empty:
+        name: the dashed empty card
+        prototype: web
+        where: lines 3228-3235 (My tickets, "{{ tickets.emptyText }}") and 4640-4644 (Wishlist, "Nothing saved.")
+        find: ['{{ tickets.emptyText }}', 'Nothing saved. Anything you tap the heart on while browsing lands here']
+        draws: >-
+          A surface card with a dashed line border and the radius token, centred: a round muted icon (where the
+          screen has one) over one line of muted text saying what will appear here and how it gets there.
+      filter-empty:
+        name: the "Nothing matched" card
+        prototype: web
+        where: lines 3084-3090 (Listing and search, "Nothing matched {{ list.filterText }}")
+        find: ['Nothing matched {{ list.filterText }}']
+        draws: >-
+          A dashed surface card, centred: "Nothing matched <the filter>" in the heading font, the line "Everything is
+          still on sale — the filter is what narrowed it." and a primary button that clears the filter.
+      choose-first-note:
+        name: the dashed "Choose ... to see the seats" note
+        prototype: web
+        where: lines 1718-1720 (the seat step, "{{ aud.waitText }}"), under "Choose your seats"
+        find: ['{{ aud.waitText }}', 'Choose your seats']
+        draws: >-
+          Under the step heading, a full-width note with a dashed line border and the radius token, muted text saying
+          what to choose first before the seats can show.
+      sign-in-card:
+        name: the "Sign in to see your account" card
+        prototype: web
+        where: lines 3314-3322 (My account, signed out)
+        find: ['Sign in to see your account']
+        draws: >-
+          A centred surface card with a shadow: the heading "Sign in to see your account", one muted paragraph of what
+          signing in shows, and two buttons (Sign in, primary; Register, outline). The guest comes back to the screen
+          after signing in.
+      offline-paused:
+        name: the paused action button
+        prototype: web
+        where: lines 6227, 6341, 6388 and 6407 (the In-venue actions while offline)
+        find: ['Offline — booking is paused', 'Offline — ordering is paused', 'Offline — payment is paused']
+        draws: >-
+          The screen stays as loaded; the button of anything that spends money, holds capacity or changes the account
+          reads "Offline — <the action> is paused" instead of its label and does nothing. The prototype draws no
+          offline banner (docs/active/left-out.yaml).
+      video-poster:
+        name: the poster frame in the video's place
+        prototype: web
+        where: lines 473-475 (the event hero, "{{ evt.poster }}" under the video) and 841 (an attraction's media, data-poster with onError and onStalled ending the clip)
+        find: ['data-src="{{ evt.poster }}"', 'onStalled="{{ i.mediaEnd }}" data-poster="{{ i.posterImg }}"']
+        draws: >-
+          The video's poster image fills the video area until the first frames arrive and stays there when the clip
+          stalls or cannot play: no spinner, no overlay, no error; the details beside it stay usable.
+    states:
+      loading: turnstile-loader
+      error: status-card
+      soldOut: status-card
+      maintenance: status-card
+      emptyFirstRun: dashed-empty
+      emptyNoResults: filter-empty
+      emptyNoAccess: sign-in-card
+      offline: offline-paused
+      videoBuffering: video-poster
+      videoUnavailable: video-poster
+    screens:
+      WEB-007:
+        emptyFirstRun: choose-first-note
+
+  P02:
+    name: Guest App
+    prototypes:
+      app: sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html
+      booking: sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html
+    board: wireframes/P02 Guest App.dc.html
+    viewports: ['390x844']
+    tokens: handoff/design-tokens/guest-app.yaml
+    tokensFrom: the CSS variables the approved app prototypes set on their root (tools/derive-design-tokens.py), applied per tenant from getPublishedTenantConfig's theme
+    patterns:
+      venue-loader:
+        name: the venue loader (splash)
+        prototype: app
+        where: lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...")
+        find: ['{{ splash.msg }}', 'Loading your venue']
+        draws: >-
+          The whole phone frame in the brand colour with the venue's hero image faint behind: the venue's initial in a
+          white rounded tile, the venue name, the mascot when the skin has one, and the message line.
+      dashed-note:
+        name: the dashed empty note
+        prototype: app
+        where: lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}")
+        find: ['{{ st.favEmpty }}', '{{ res.swap.empty }}']
+        draws: >-
+          A rounded note (the radius scale token) with a dashed line border on the surface colour, one or two lines of
+          muted text saying what will appear and how; where the skin has a mascot, the mascot over the note ("Nothing
+          saved yet", line 2604).
+      no-results-note:
+        name: the "No results for ..." note
+        prototype: app
+        where: line 2632 (Explore search)
+        find: ['No results for']
+        draws: A note in the list's place, "No results for “<the search>”.", with the suggestion chips under it.
+      sign-in-prompt:
+        name: the sign-in prompt
+        prototype: app
+        where: lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out)
+        find: ['{{ id.toSignin }}', '{{ acct.signIn }}']
+        draws: >-
+          A full-width dark button row (the deep colour) with the sign-in label, under the account header; Apple and
+          Google buttons under it at checkout. The guest comes back to the screen after signing in.
+      maintenance-page:
+        name: the maintenance page (GST-047)
+        prototype: booking
+        where: line 1175 (the "maint" view, "Booking is paused")
+        find: ['Back at 04:00 GST', 'Booking is paused']
+        frame: gst-047
+        draws: >-
+          A hero block ("Back at 04:00 GST", "Booking is paused", what is being updated) over a note ("Your tickets
+          still work": QR codes, Face Pass and wallet passes open the gates as normal).
+      intro-video:
+        name: the intro video overlay (first launch)
+        prototype: app
+        where: lines 1594-1606 ("{{ introOn }}"), with its own buffering ring ("{{ vidLoading }}") and Skip introduction
+        find: ['{{ introOn }}', 'onEnded="{{ skipIntro }}"', '{{ vidLoading }}']
+        draws: >-
+          A full-frame dark overlay playing the venue's intro video over Home (Home loads behind it): a gradient from
+          the bottom, a ring while the clip buffers, Skip at the top right, "Welcome to" and the venue name at the
+          bottom.
+      video-poster:
+        name: the poster frame in the video's place
+        prototype: app
+        where: line 805 (an item's video, data-poster) and 331-349 (the hero video, poster ven.hero)
+        find: ['data-src="{{ c.video }}" data-poster="{{ c.img }}"']
+        draws: >-
+          The poster image fills the video area until the first frames arrive and stays when the clip cannot play: no
+          spinner, overlay or blocking screen; the details beside it stay usable.
+    states:
+      loading: venue-loader
+      emptyFirstRun: dashed-note
+      emptyNoResults: no-results-note
+      emptyNoAccess: sign-in-prompt
+      introVideo: intro-video
+      videoBuffering: video-poster
+      videoUnavailable: video-poster
+    screens:
+      GST-047:
+        maintenance: maintenance-page
+
+  P04:
+    name: Venue POS
+    prototypes:
+      v2: sources/designs/TICVAI_POS_Terminal_v2.html
+      approved: sources/designs/TICVAI_POS_Terminal_client_approved.html
+    board: wireframes/P04 Venue POS.dc.html
+    viewports: ['1620x1080']
+    tokens: screens/_design-tokens.yaml
+    tokensFrom: the till's tokens, written down on 9 September 2026 from the client's own POS file and the boards (Manrope)
+    patterns:
+      network-pill:
+        name: the network pill and the connection toast
+        prototype: v2
+        where: the header's network pill ("{{ netLabel }}", "Offline · queued locally") and the toast "Connection lost — sales continue and queue locally." (decoded template of the bundle)
+        find: ['Offline · queued locally', 'Connection lost — sales continue and queue locally.']
+        draws: >-
+          In the till header, a pill with a pulsing dot: amber "Offline · queued locally" while the link is down,
+          "Syncing…" while the queue drains, green "Online · synced" after; when the link drops, the dark toast
+          "Connection lost — sales continue and queue locally." Selling continues; what cannot be done offline is
+          marked "Unavailable offline".
+      refusal-toast:
+        name: the refusal toast
+        prototype: v2
+        where: the toast ("{{ toastMsg }}", flash(..., 'warn')), e.g. "Opening the drawer without a sale needs a Supervisor role or above" and "Approval declined." (decoded template)
+        find: ['{{ toastMsg }}', 'needs a Supervisor role or above', 'Approval declined.']
+        draws: >-
+          A dark toast low in the till for about three seconds naming what was refused and why (the role it needs, or
+          that the supervisor declined); the sale and the cart stay as they were.
+      empty-note:
+        name: the empty panel note
+        prototype: v2
+        where: the cart ("No items yet", "Tap a product, scan a barcode, or recall a held sale to begin.") and the order board ("No orders waiting") (decoded template)
+        find: ['No items yet', 'No orders waiting']
+        draws: >-
+          In the panel's place, centred: a muted icon tile, a one-line title ("No items yet") and a muted line saying
+          how to begin.
+      close-shift-variance:
+        name: the close-shift variance step (POS-007)
+        prototype: v2
+        where: the close-shift steps ("STEP 2 OF 3 · VARIANCE RESOLUTION") and the supervisor answer ("Rejected — recount the drawer.") (decoded template)
+        find: ['VARIANCE RESOLUTION', 'Rejected — recount the drawer.']
+        draws: >-
+          Close shift's step 2: the variance line in its colour (over, short or balanced), the reason picker, the
+          supervisor verification; a rejected variance sends the cashier back to the blind count.
+      stock-badge:
+        name: the stock badge
+        prototype: v2
+        where: the product tile badges (OUT_OF_STOCK "Sold out"/"Out of stock", OFFLINE_STOCK "Unavailable offline") (decoded template)
+        find: ['OUT_OF_STOCK', 'Unavailable offline']
+        draws: A coloured badge on the product tile; a sold-out tile cannot be added to the sale.
+      conflict-modal:
+        name: the stock conflict modal
+        prototype: v2
+        where: the conflict modal ("{{ closeConflict }}"; "Conflict resolution — stock corrected") (decoded template)
+        find: ['{{ closeConflict }}', 'Conflict resolution — stock corrected']
+        draws: >-
+          A modal over the till naming the line that went out of stock between scan and charge, with keep (and correct
+          the stock) or void, the supervisor approving; the rest of the sale stands.
+    states:
+      offline: network-pill
+      denied: refusal-toast
+      approvalRejected: refusal-toast
+      emptyFirstRun: empty-note
+      soldOutByCount: stock-badge
+      stockConflict: conflict-modal
+    screens:
+      POS-007:
+        pendingVariance: close-shift-variance
+        recountRequested: close-shift-variance
+        reasonRequired: close-shift-variance

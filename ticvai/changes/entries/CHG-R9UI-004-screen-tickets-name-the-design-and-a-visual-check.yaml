@@ -1,0 +1,56 @@
+id: CHG-R9UI-004
+date: '2026-10-21'
+source: audit
+kind: process
+summary: 'Every screen ticket and its build sub-task carry "Design (client-approved, build identical)": the prototype
+  file and view, the board frame adam_pull writes into the ticket folder (wireframe-<anchor>.html), each state''s
+  pattern and the design gaps; "Matches the design" is replaced by the visual check of every state (screenshots side by
+  side with the prototype view per state at the app''s viewports, 1440x900 and 390x844 for guest web, LTR and RTL,
+  attached to the Ready-for-QA comment); the state checklist names each state whole with its look. A screen with no
+  approved design says so and is built on its app''s shell. The capture plans cover every client-verified screen with
+  a prototype view (WEB-007''s flows and states and WEB-029''s three variants with steps; the rest pending).'
+decision:
+  what: 'tools/ticket_done.py (design_sentence, state_look, visual_check, the frontend done-when); tools/op-descriptions.py
+    (the Design section in the screen block, the build checks, whole state lines with their look, the visual check);
+    tools/op-release.py (the Design section carried on the screen ticket and its build sub-task);
+    tools/build-service-docs.py (the frontend spec pages: the Design paragraph, the visual check, a Look column);
+    tools/check-ticket-text.py (T-DESIGN); tools/capture-plans/guest-web-v2.json and pos-v2.json extended,
+    guest-booking-mobile-v2.json and pos-client-approved.json new; tools/capture-prototype.mjs lists `pending` entries.'
+  by: Chinmay
+  date: '2026-10-21'
+why: 'Finding of 21 October 2026, the WEB-007 seat page (#31848; sources/audit-21-october/web-007-ui-pull-findings.md,
+  causes 1, 3 and section 4): the build sub-task said only "Matches the design" and named none, the state checklist was
+  cut to "State error: Could not load.", the frontend spec page named no prototype, view or tokens, and only 22 of
+  8,443 descriptions mentioned a prototype or a wireframe. The lead, Chinmay, 21 October 2026: "I wanna get all of
+  those changes out now..".'
+keys_touched:
+  files:
+  - tools/ticket_done.py
+  - tools/op-descriptions.py
+  - tools/op-release.py
+  - tools/build-service-docs.py
+  - tools/check-ticket-text.py
+  - tools/capture-plans/guest-web-v2.json
+  - tools/capture-plans/pos-v2.json
+  - tools/capture-plans/guest-booking-mobile-v2.json
+  - tools/capture-plans/pos-client-approved.json
+  - tools/capture-prototype.mjs
+  - tools/tests/test_state_views.py
+root_class: 'new: design-unnamed-in-ticket (a screen ticket that asks for the design and names none)'
+tickets:
+  started: [APP-WEB-WEB-007, APP-WEB-WEB-029, APP-MOB-GST-040, APP-MOB-GST-042, APP-MOB-GST-073]
+  unstarted: ['every screen ticket and build sub-task, through its pointer body at r9 (the count of pointers rewritten is
+      in the lane report)']
+release_tag: r9
+decision_owner: Chinmay
+adam_cr: 'none: a decision of the lead; no ADAM CR is needed'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-ticket-text.py
+status: open
+notes: 'The reference captures for the new plan entries were not taken: tools/capture-prototype.mjs loads the
+  prototypes'' fonts and libraries (Google Fonts, unpkg Leaflet, jsdelivr three.js) from the network, and this lane ran
+  offline; the new steps are marked verified: false, the other new entries pending. The starter CLAUDE.md and /ticket
+  of ADAM (viewer/mcp/setup) still tell an agent to use a placeholder layout unless a wireframe came through ADAM; that
+  is the ADAM lane''s (fix/adam-whole-files), which writes the frames into the pull.'

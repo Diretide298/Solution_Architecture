@@ -722,6 +722,12 @@ screens:
       view: Home tab (Summit Peaks, after the intro)
       differences: The v4 home shows no ticket strip; `listMyEntitlements` feeds the visit-day venue suggestion
         only.
+    stateViews:
+      loading: P02/venue-loader
+      emptyFirstRun: P02/dashed-note
+      emptyNoResults: P02/no-results-note
+      emptyNoAccess: P02/sign-in-prompt
+      introVideo: P02/intro-video
   apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -924,6 +930,11 @@ screens:
       verified: '2026-10-01'
       match: exact
       view: Explore tab
+    stateViews:
+      loading: P02/venue-loader
+      emptyFirstRun: P02/dashed-note
+      emptyNoResults: P02/no-results-note
+      emptyNoAccess: P02/sign-in-prompt
   apisNote: 'Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
     — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -1170,6 +1181,11 @@ screens:
       verified: '2026-10-01'
       match: exact
       view: Buy tickets (the centre tab)
+    stateViews:
+      loading: P02/venue-loader
+      emptyFirstRun: P02/dashed-note
+      emptyNoResults: P02/no-results-note
+      emptyNoAccess: P02/sign-in-prompt
   apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -1476,6 +1492,13 @@ screens:
       verified: '2026-10-01'
       match: exact
       view: Explore → Summit Coaster (Item detail)
+    stateViews:
+      loading: P02/venue-loader
+      videoBuffering: P02/video-poster
+      videoUnavailable: P02/video-poster
+      emptyFirstRun: P02/dashed-note
+      emptyNoResults: P02/no-results-note
+      emptyNoAccess: P02/sign-in-prompt
   apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -1645,6 +1668,11 @@ screens:
     note: '**Drawn by Claude Design on `Guest Mobile Board 1.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
+    stateViews:
+      loading: P02/venue-loader
+      emptyFirstRun: P02/dashed-note
+      emptyNoResults: P02/no-results-note
+      emptyNoAccess: P02/sign-in-prompt
   apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -1774,6 +1802,10 @@ screens:
       verified: '2026-10-01'
       match: exact
       view: Explore → Shows → Night of Nine → More info (Item detail, an event)
+    stateViews:
+      loading: P02/venue-loader
+      emptyFirstRun: P02/dashed-note
+      emptyNoAccess: P02/sign-in-prompt
   apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -2067,6 +2099,11 @@ screens:
       match: partial
       view: 'Buy tickets → Timed entry → Book now (step 1: date, then entry window)'
       differences: Booking in the app runs the website booking engine; per-flow step order.
+    stateViews:
+      loading: P02/venue-loader
+      emptyFirstRun: P02/dashed-note
+      emptyNoResults: P02/no-results-note
+      emptyNoAccess: P02/sign-in-prompt
   apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -2360,6 +2397,11 @@ screens:
       match: partial
       view: 'Buy tickets → Dated day pass → Book now → Fri 2 Oct (step 2: tickets; add-ons are step 3)'
       differences: Booking in the app runs the website booking engine.
+    stateViews:
+      loading: P02/venue-loader
+      emptyFirstRun: P02/dashed-note
+      emptyNoAccess: P02/sign-in-prompt
+      emptyNoResults: P02/no-results-note
   apisNote: 'Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
     — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -2662,6 +2704,10 @@ screens:
     source: client approval, confirmed by Chinmay Parab 19 October 2026
     note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; client-approved 19 October
       2026, confirmed by Chinmay Parab.** Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
+    stateViews:
+      loading: P02/venue-loader
+      emptyFirstRun: P02/dashed-note
+      emptyNoAccess: P02/sign-in-prompt
   apisNote: 'Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -2844,6 +2890,10 @@ screens:
       differences: Prototype offers "Set a password" to turn a guest-checkout profile into an account;
         the screen offers "Create an account" instead (passwordless, with an emailed code, then linkGuestCheckout;
         CHG-FXS-003, CHG-R11-002, CHG-R4-007).
+    stateViews:
+      loading: P02/venue-loader
+      emptyFirstRun: P02/dashed-note
+      emptyNoAccess: P02/sign-in-prompt
   apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -3124,6 +3174,11 @@ screens:
     source: client approval, confirmed by Chinmay Parab 19 October 2026
     note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; client-approved 19 October
       2026, confirmed by Chinmay Parab.** Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
+    stateViews:
+      loading: P02/venue-loader
+      emptyFirstRun: P02/dashed-note
+      emptyNoResults: P02/no-results-note
+      emptyNoAccess: P02/sign-in-prompt
   apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -3366,6 +3421,11 @@ screens:
       verified: '2026-10-01'
       match: exact
       view: Tickets tab
+    stateViews:
+      loading: P02/venue-loader
+      emptyFirstRun: P02/dashed-note
+      emptyNoResults: P02/no-results-note
+      emptyNoAccess: P02/sign-in-prompt
   apisNote: 'Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -3555,6 +3615,10 @@ screens:
       view: Account → All screens → Wave 1 → Ticket details
       differences: The YAML states come from an availability template ("Sold out is a real answer") and
         do not fit a ticket-detail screen.
+    stateViews:
+      loading: P02/venue-loader
+      emptyFirstRun: P02/dashed-note
+      emptyNoAccess: P02/sign-in-prompt
   apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -3719,6 +3783,11 @@ screens:
       verified: 2026-09-28
       match: exact
       view: Account → All screens → Wave 2 → Ticket transfer (also Account → Ticket transfer)
+    stateViews:
+      loading: P02/venue-loader
+      emptyFirstRun: P02/dashed-note
+      emptyNoResults: P02/no-results-note
+      emptyNoAccess: P02/sign-in-prompt
   apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -4007,6 +4076,11 @@ screens:
     source: client approval, confirmed by Chinmay Parab 19 October 2026
     note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; client-approved 19 October
       2026, confirmed by Chinmay Parab.** Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
+    stateViews:
+      loading: P02/venue-loader
+      emptyFirstRun: P02/dashed-note
+      emptyNoResults: P02/no-results-note
+      emptyNoAccess: P02/sign-in-prompt
   apisNote: 'Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -4210,6 +4284,11 @@ screens:
       view: Account → All screens → Wave 2 → My reservations (also Account → Reservations)
       differences: Prototype lists cabana reservations and "Book a table or cabana"; YAML GST-070 says
         cabanas are booked by staff.
+    stateViews:
+      loading: P02/venue-loader
+      emptyFirstRun: P02/dashed-note
+      emptyNoResults: P02/no-results-note
+      emptyNoAccess: P02/sign-in-prompt
   apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -4326,6 +4405,10 @@ screens:
       differences: Prototype shows a deposit that is kept on late cancellation; the YAML (audit R077a)
         says no deposit and no no-show fee. **Stale note:** REV3-8b (29 September) superseded R077 (a);
         the deposit kept on a late cancellation is a venue option, as the frame shows (CHG-SGU-020).
+    stateViews:
+      loading: P02/venue-loader
+      emptyFirstRun: P02/dashed-note
+      emptyNoAccess: P02/sign-in-prompt
   apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -4464,6 +4547,11 @@ screens:
       verified: 2026-09-28
       match: exact
       view: Account → All screens → Wave 3 → Add to calendar / reminders
+    stateViews:
+      loading: P02/venue-loader
+      emptyFirstRun: P02/dashed-note
+      emptyNoResults: P02/no-results-note
+      emptyNoAccess: P02/sign-in-prompt
   apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -4714,6 +4802,11 @@ screens:
     source: client approval, confirmed by Chinmay Parab 19 October 2026
     note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; client-approved 19 October
       2026, confirmed by Chinmay Parab.** Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
+    stateViews:
+      loading: P02/venue-loader
+      emptyFirstRun: P02/dashed-note
+      emptyNoResults: P02/no-results-note
+      emptyNoAccess: P02/sign-in-prompt
   apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -4858,6 +4951,9 @@ screens:
       verified: 2026-09-28
       match: exact
       view: Account → All screens → Wave 3 → Saved items / wishlist
+    stateViews:
+      loading: P02/venue-loader
+      emptyFirstRun: P02/dashed-note
   apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -5081,6 +5177,11 @@ screens:
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing. Drawn frame: wireframes/incoming/P02-mobile-v4/gst-021.html, captured from the prototype
       view below (wireframes/incoming/P02-mobile-v4/manifest.json).'
+    stateViews:
+      loading: P02/venue-loader
+      emptyFirstRun: P02/dashed-note
+      emptyNoResults: P02/no-results-note
+      emptyNoAccess: P02/sign-in-prompt
   apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -5184,6 +5285,9 @@ screens:
       verified: '2026-10-01'
       match: exact
       view: At the venue → Waits
+    stateViews:
+      loading: P02/venue-loader
+      emptyFirstRun: P02/dashed-note
   apisNote: 'Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
     — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -5342,6 +5446,10 @@ screens:
       match: exact
       view: Account → All screens → Wave 3 → Virtual queue; also At-venue card "Desert Coaster · queued"
       differences: Prototype allows two queues at once; the YAML states no limit.
+    stateViews:
+      loading: P02/venue-loader
+      emptyFirstRun: P02/dashed-note
+      emptyNoAccess: P02/sign-in-prompt
   apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -5601,6 +5709,11 @@ screens:
       verified: 2026-09-28
       match: exact
       view: Account → All screens → Wave 2 → F&B – browse & order
+    stateViews:
+      loading: P02/venue-loader
+      emptyFirstRun: P02/dashed-note
+      emptyNoResults: P02/no-results-note
+      emptyNoAccess: P02/sign-in-prompt
   apisNote: 'Rebuilt 9 September 2026 from the 8 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -5728,6 +5841,9 @@ screens:
       view: Account → All screens → Wave 2 → F&B – order tracking
       differences: The YAML states come from an availability template ("Selection is blocked") and do
         not fit order tracking.
+    stateViews:
+      loading: P02/venue-loader
+      emptyFirstRun: P02/dashed-note
   apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -5911,6 +6027,11 @@ screens:
       differences: Prototype only reserves for collection (reserveMerchandise). The YAML also declares
         addCartLine/checkoutCart/createPayment and getGameCard, and the prototype shows neither a buy-now
         path nor a game card.
+    stateViews:
+      loading: P02/venue-loader
+      emptyFirstRun: P02/dashed-note
+      emptyNoResults: P02/no-results-note
+      emptyNoAccess: P02/sign-in-prompt
   apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -6137,6 +6258,11 @@ screens:
       verified: 2026-09-28
       match: exact
       view: Account → All screens → Wave 3 → Parking – reserve & pay
+    stateViews:
+      loading: P02/venue-loader
+      emptyFirstRun: P02/dashed-note
+      emptyNoResults: P02/no-results-note
+      emptyNoAccess: P02/sign-in-prompt
   apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -6357,6 +6483,11 @@ screens:
       verified: 2026-09-28
       match: exact
       view: Account → All screens → Wave 3 → Parking – reservation confirmed
+    stateViews:
+      loading: P02/venue-loader
+      emptyFirstRun: P02/dashed-note
+      emptyNoResults: P02/no-results-note
+      emptyNoAccess: P02/sign-in-prompt
   apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -6489,6 +6620,10 @@ screens:
       match: exact
       view: Account → All screens → Wave 2 → Venue info & services
       differences: Prototype shows only dining and delivery points, no other venue services.
+    stateViews:
+      loading: P02/venue-loader
+      emptyFirstRun: P02/dashed-note
+      emptyNoResults: P02/no-results-note
   apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -6598,6 +6733,10 @@ screens:
         At-venue tab → Alerts'
       differences: The YAML defers this (no in-app notification feed in the first release), but the prototype
         still shows a feed and an Alerts tab, so the client will expect it.
+    stateViews:
+      loading: P02/venue-loader
+      emptyFirstRun: P02/dashed-note
+      emptyNoResults: P02/no-results-note
   apisNote: 'Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
     — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -6828,6 +6967,10 @@ screens:
     source: client approval, confirmed by Chinmay Parab 19 October 2026
     note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; client-approved 19 October
       2026, confirmed by Chinmay Parab.** Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
+    stateViews:
+      loading: P02/venue-loader
+      emptyFirstRun: P02/dashed-note
+      emptyNoAccess: P02/sign-in-prompt
   apisNote: 'Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -7043,6 +7186,11 @@ screens:
     source: client approval, confirmed by Chinmay Parab 19 October 2026
     note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; client-approved 19 October
       2026, confirmed by Chinmay Parab.** Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
+    stateViews:
+      loading: P02/venue-loader
+      emptyFirstRun: P02/dashed-note
+      emptyNoAccess: P02/sign-in-prompt
+      emptyNoResults: P02/no-results-note
   apisNote: 'Rebuilt 9 September 2026 from the 8 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -7272,6 +7420,10 @@ screens:
       All screens → Wave 2"), not a client-drawn layout, so the frame was treated as designed, not client-verified,
       until the client approved the whole guest app (confirmed by Chinmay Parab, 19 October 2026).'
     source: client approval, confirmed by Chinmay Parab 19 October 2026
+    stateViews:
+      loading: P02/venue-loader
+      emptyFirstRun: P02/dashed-note
+      emptyNoAccess: P02/sign-in-prompt
   apisNote: 'Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
     — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -7437,6 +7589,10 @@ screens:
       verified: 2026-09-28
       match: exact
       view: Account → All screens → Wave 2 → Lost & found (also Account → Lost & found)
+    stateViews:
+      loading: P02/venue-loader
+      emptyFirstRun: P02/dashed-note
+      emptyNoResults: P02/no-results-note
   apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -7600,6 +7756,9 @@ screens:
       verified: 2026-09-28
       match: exact
       view: Account → All screens → Wave 3 → Feedback & ratings
+    stateViews:
+      loading: P02/venue-loader
+      emptyFirstRun: P02/dashed-note
   apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -7823,6 +7982,11 @@ screens:
     source: client approval, confirmed by Chinmay Parab 19 October 2026
     note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; client-approved 19 October
       2026, confirmed by Chinmay Parab.** Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
+    stateViews:
+      loading: P02/venue-loader
+      emptyFirstRun: P02/dashed-note
+      emptyNoResults: P02/no-results-note
+      emptyNoAccess: P02/sign-in-prompt
   apisNote: 'Rebuilt 9 September 2026 from the operations this screen declares (4 then; evaluatePromotions
     removed 27 September), not from a workshop pack — it has none. Columns narrowed on 3 October 2026
     to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and
@@ -8014,6 +8178,11 @@ screens:
       view: Account → All screens → Wave 2 → Offers & promotions
       differences: 'Promo code entry is here in the prototype; the YAML puts applyCartPromoCode on GST-041.
         **Codes are applied in the basket (GST-041), not here**: one place to apply a code (CHG-SGU-020).'
+    stateViews:
+      loading: P02/venue-loader
+      emptyFirstRun: P02/dashed-note
+      emptyNoResults: P02/no-results-note
+      emptyNoAccess: P02/sign-in-prompt
   apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -8189,6 +8358,11 @@ screens:
         the prototype''s Maps setting is 2D). No guest-facing 2D/3D switch, and no map3dUnavailable or
         weakGps state: both pending in design: specified, and built from the definition until the design
         shows it (handoff/design-batches/apps/1-guest-app/README.md).'
+    stateViews:
+      loading: P02/venue-loader
+      emptyFirstRun: P02/dashed-note
+      emptyNoResults: P02/no-results-note
+      emptyNoAccess: P02/sign-in-prompt
   apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -8354,6 +8528,10 @@ screens:
     source: client approval, confirmed by Chinmay Parab 19 October 2026
     note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; client-approved 19 October
       2026, confirmed by Chinmay Parab.** Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
+    stateViews:
+      loading: P02/venue-loader
+      emptyFirstRun: P02/dashed-note
+      emptyNoAccess: P02/sign-in-prompt
   apisNote: 'Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
     — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -8563,6 +8741,11 @@ screens:
       verified: 2026-09-28
       match: exact
       view: Account → All screens → Wave 2 → Help & support
+    stateViews:
+      loading: P02/venue-loader
+      emptyFirstRun: P02/dashed-note
+      emptyNoResults: P02/no-results-note
+      emptyNoAccess: P02/sign-in-prompt
   apisNote: 'Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -8897,6 +9080,11 @@ screens:
       match: partial
       view: Cart (header basket, after a booking is added to the cart)
       differences: Basket as a bottom bar on mobile.
+    stateViews:
+      loading: P02/venue-loader
+      emptyFirstRun: P02/dashed-note
+      emptyNoResults: P02/no-results-note
+      emptyNoAccess: P02/sign-in-prompt
   apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -9298,6 +9486,10 @@ screens:
     source: client approval, confirmed by Chinmay Parab 19 October 2026
     note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; client-approved 19 October
       2026, confirmed by Chinmay Parab.** Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
+    stateViews:
+      loading: P02/venue-loader
+      emptyFirstRun: P02/dashed-note
+      emptyNoAccess: P02/sign-in-prompt
   apisNote: 'Rebuilt 9 September 2026 from the 18 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -9374,6 +9566,9 @@ screens:
       match: exact
       view: Account → All screens → Wave 1 → Arabic / RTL experience; language button on home
       differences: 'Rev 3 decision: the basket stays on the right in Arabic by default (configurable).'
+    stateViews:
+      loading: P02/venue-loader
+      emptyFirstRun: P02/dashed-note
   apisNote: 'Rebuilt 9 September 2026 from the 0 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -9534,6 +9729,11 @@ screens:
       verified: 2026-09-28
       match: exact
       view: Account → All screens → Wave 2 → Multi-currency & pricing
+    stateViews:
+      loading: P02/venue-loader
+      emptyFirstRun: P02/dashed-note
+      emptyNoResults: P02/no-results-note
+      emptyNoAccess: P02/sign-in-prompt
   apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -9671,6 +9871,10 @@ screens:
       match: partial
       view: Account → All screens → Wave 2 → Ticket delivery & sharing (opens Ticket transfer)
       differences: No screen of its own; it shares GST-014’s screen until the client confirms.
+    stateViews:
+      loading: P02/venue-loader
+      emptyFirstRun: P02/dashed-note
+      emptyNoResults: P02/no-results-note
   apisNote: 'Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
     — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -9784,6 +9988,9 @@ screens:
       verified: 2026-09-28
       match: exact
       view: Account → All screens → Wave 1 → Branded queue / waiting room
+    stateViews:
+      loading: P02/venue-loader
+      emptyFirstRun: P02/dashed-note
   apisNote: Rebuilt 1 October 2026 on the two waiting-room operations (ADR-0066). Columns are the entry's
     guest-facing fields; `pollAfterSeconds` and `admission` are plumbing the screen acts on rather than
     shows.
@@ -9905,6 +10112,11 @@ screens:
       verified: 2026-09-28
       match: exact
       view: Account → All screens → Wave 1 → Maintenance / upgrade
+    stateViews:
+      loading: P02/venue-loader
+      emptyFirstRun: P02/dashed-note
+      emptyNoAccess: P02/sign-in-prompt
+      maintenance: P02/maintenance-page
   apisNote: 'Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
     — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -10054,6 +10266,10 @@ screens:
     source: client approval, confirmed by Chinmay Parab 19 October 2026
     note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; client-approved 19 October
       2026, confirmed by Chinmay Parab.** Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
+    stateViews:
+      loading: P02/venue-loader
+      emptyFirstRun: P02/dashed-note
+      emptyNoAccess: P02/sign-in-prompt
   apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -10287,6 +10503,10 @@ screens:
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing. Drawn frame: wireframes/incoming/P02-mobile-v4/gst-049.html, captured from the prototype
       view below (wireframes/incoming/P02-mobile-v4/manifest.json).'
+    stateViews:
+      loading: P02/venue-loader
+      emptyFirstRun: P02/dashed-note
+      emptyNoAccess: P02/sign-in-prompt
   apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -10473,6 +10693,11 @@ screens:
     source: client approval, confirmed by Chinmay Parab 19 October 2026
     note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; client-approved 19 October
       2026, confirmed by Chinmay Parab.** Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
+    stateViews:
+      loading: P02/venue-loader
+      emptyFirstRun: P02/dashed-note
+      emptyNoResults: P02/no-results-note
+      emptyNoAccess: P02/sign-in-prompt
   apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -10710,6 +10935,11 @@ screens:
       verified: '2026-10-01'
       match: exact
       view: Plan tab (Plan your visit · 1 of 6)
+    stateViews:
+      loading: P02/venue-loader
+      emptyFirstRun: P02/dashed-note
+      emptyNoResults: P02/no-results-note
+      emptyNoAccess: P02/sign-in-prompt
   apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -10870,6 +11100,11 @@ screens:
     source: client approval, confirmed by Chinmay Parab 19 October 2026
     note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; client-approved 19 October
       2026, confirmed by Chinmay Parab.** Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
+    stateViews:
+      loading: P02/venue-loader
+      emptyFirstRun: P02/dashed-note
+      emptyNoResults: P02/no-results-note
+      emptyNoAccess: P02/sign-in-prompt
   apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -11134,6 +11369,11 @@ screens:
       verified: '2026-10-01'
       match: exact
       view: Plan tab → the six questions → Make my plan (Your plan)
+    stateViews:
+      loading: P02/venue-loader
+      emptyFirstRun: P02/dashed-note
+      emptyNoResults: P02/no-results-note
+      emptyNoAccess: P02/sign-in-prompt
   apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -11350,6 +11590,11 @@ screens:
       view: Ask Sahli (the assistant chat; v4 has no plan-specific chat)
       differences: v4 draws the rules plan and a general assistant chat; it has no plan-specific chat.
         Built from this definition.
+    stateViews:
+      loading: P02/venue-loader
+      emptyFirstRun: P02/dashed-note
+      emptyNoResults: P02/no-results-note
+      emptyNoAccess: P02/sign-in-prompt
   apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -11536,6 +11781,10 @@ screens:
       view: Account → All screens → Wave 1 → Dynamic QR ticket; also the Scan tab overlay
       differences: The Scan overlay also scans table codes and lockers ("Scan a table code or locker with
         the same button"), which the YAML does not cover.
+    stateViews:
+      loading: P02/venue-loader
+      emptyFirstRun: P02/dashed-note
+      emptyNoAccess: P02/sign-in-prompt
   apisNote: 'Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
     — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -11684,6 +11933,11 @@ screens:
     source: client approval, confirmed by Chinmay Parab 19 October 2026
     note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; client-approved 19 October
       2026, confirmed by Chinmay Parab.** Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
+    stateViews:
+      loading: P02/venue-loader
+      emptyFirstRun: P02/dashed-note
+      emptyNoResults: P02/no-results-note
+      emptyNoAccess: P02/sign-in-prompt
   apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -11816,6 +12070,11 @@ screens:
       verified: 2026-09-28
       match: exact
       view: Account → All screens → Wave 2 → Accessibility information
+    stateViews:
+      loading: P02/venue-loader
+      emptyFirstRun: P02/dashed-note
+      emptyNoResults: P02/no-results-note
+      emptyNoAccess: P02/sign-in-prompt
   apisNote: 'Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
     — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -11964,6 +12223,11 @@ screens:
     source: client approval, confirmed by Chinmay Parab 19 October 2026
     note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; client-approved 19 October
       2026, confirmed by Chinmay Parab.** Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
+    stateViews:
+      loading: P02/venue-loader
+      emptyFirstRun: P02/dashed-note
+      emptyNoResults: P02/no-results-note
+      emptyNoAccess: P02/sign-in-prompt
   apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -12134,6 +12398,11 @@ screens:
     source: client approval, confirmed by Chinmay Parab 19 October 2026
     note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; client-approved 19 October
       2026, confirmed by Chinmay Parab.** Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
+    stateViews:
+      loading: P02/venue-loader
+      emptyFirstRun: P02/dashed-note
+      emptyNoResults: P02/no-results-note
+      emptyNoAccess: P02/sign-in-prompt
   apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -12256,6 +12525,10 @@ screens:
       view: Account → All screens → Wave 2 → Menu item detail; Rev 3 feedback → Menu item add-ons & modifiers
       differences: Rev 3 adds min/max selection rules for each modifier group, priced add-ons, leave-outs
         and a live total.
+    stateViews:
+      loading: P02/venue-loader
+      emptyFirstRun: P02/dashed-note
+      emptyNoAccess: P02/sign-in-prompt
   apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -12384,6 +12657,10 @@ screens:
       match: exact
       view: Account → All screens → Wave 3 → Shop & drop collection
       differences: Prototype uses a separate SD code; the YAML says the guest collects with the ticket.
+    stateViews:
+      loading: P02/venue-loader
+      emptyFirstRun: P02/dashed-note
+      emptyNoAccess: P02/sign-in-prompt
   apisNote: 'Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
     — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -12499,6 +12776,10 @@ screens:
       verified: '2026-10-01'
       match: exact
       view: Explore tab → search ("coaster")
+    stateViews:
+      loading: P02/venue-loader
+      emptyFirstRun: P02/dashed-note
+      emptyNoResults: P02/no-results-note
   apisNote: 'Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
     — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -12645,6 +12926,11 @@ screens:
       verified: 2026-09-28
       match: exact
       view: Account → All screens → Wave 3 → Newsletter & preferences
+    stateViews:
+      loading: P02/venue-loader
+      emptyFirstRun: P02/dashed-note
+      emptyNoResults: P02/no-results-note
+      emptyNoAccess: P02/sign-in-prompt
   apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -12802,6 +13088,11 @@ screens:
     source: client approval, confirmed by Chinmay Parab 19 October 2026
     note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; client-approved 19 October
       2026, confirmed by Chinmay Parab.** Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
+    stateViews:
+      loading: P02/venue-loader
+      emptyFirstRun: P02/dashed-note
+      emptyNoResults: P02/no-results-note
+      emptyNoAccess: P02/sign-in-prompt
   apisNote: 'Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -12963,6 +13254,11 @@ screens:
       verified: 2026-09-28
       match: exact
       view: Account → All screens → Wave 2 → Refunds & resale
+    stateViews:
+      loading: P02/venue-loader
+      emptyFirstRun: P02/dashed-note
+      emptyNoResults: P02/no-results-note
+      emptyNoAccess: P02/sign-in-prompt
   apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -13142,6 +13438,10 @@ screens:
       view: Account → All screens → Wave 2 → Help & my cases
       differences: The YAML lists AI conversations here (listAiConversations); the prototype shows them
         on the concierge home instead.
+    stateViews:
+      loading: P02/venue-loader
+      emptyFirstRun: P02/dashed-note
+      emptyNoAccess: P02/sign-in-prompt
   apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -13379,6 +13679,11 @@ screens:
       verified: 2026-09-28
       match: exact
       view: Account → All screens → Wave 2 → Face Pass (also Account → Face Pass)
+    stateViews:
+      loading: P02/venue-loader
+      emptyFirstRun: P02/dashed-note
+      emptyNoResults: P02/no-results-note
+      emptyNoAccess: P02/sign-in-prompt
   apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -13570,6 +13875,11 @@ screens:
         The prototype also reserves cabanas and shows a deposit on the reservation, and the Rev 3 web
         flow has a deposit-hold variant at AED 100 per guest. **Stale since 29 September: REV3-8b superseded
         R077 (a); the dining deposit is a venue option, off by default** (CHG-SGU-018).'
+    stateViews:
+      loading: P02/venue-loader
+      emptyFirstRun: P02/dashed-note
+      emptyNoResults: P02/no-results-note
+      emptyNoAccess: P02/sign-in-prompt
   apisNote: 'Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -13880,6 +14190,11 @@ screens:
       differences: The Account → "Payment methods" row opens Engine settings instead of this screen. **The
         frame must open this screen** from Account → Payment methods; the prototype's link to Engine settings
         is a wiring slip (CHG-SGU-020).
+    stateViews:
+      loading: P02/venue-loader
+      emptyFirstRun: P02/dashed-note
+      emptyNoResults: P02/no-results-note
+      emptyNoAccess: P02/sign-in-prompt
   apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -14091,6 +14406,11 @@ screens:
       verified: 2026-09-28
       match: exact
       view: Account → All screens → Wave 2 → Share & group booking
+    stateViews:
+      loading: P02/venue-loader
+      emptyFirstRun: P02/dashed-note
+      emptyNoResults: P02/no-results-note
+      emptyNoAccess: P02/sign-in-prompt
   apisNote: 'Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -14345,6 +14665,10 @@ screens:
     source: client approval, confirmed by Chinmay Parab 19 October 2026
     note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; client-approved 19 October
       2026, confirmed by Chinmay Parab.** Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
+    stateViews:
+      loading: P02/venue-loader
+      emptyFirstRun: P02/dashed-note
+      emptyNoAccess: P02/sign-in-prompt
   apisNote: 'Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
     — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -14637,6 +14961,11 @@ screens:
     source: client approval, confirmed by Chinmay Parab 19 October 2026
     note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; client-approved 19 October
       2026, confirmed by Chinmay Parab.** Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
+    stateViews:
+      loading: P02/venue-loader
+      emptyFirstRun: P02/dashed-note
+      emptyNoResults: P02/no-results-note
+      emptyNoAccess: P02/sign-in-prompt
   apisNote: Authored 29 September 2026 from the rev 3 decisions and the client prototype view named in
     `wireframe.prototype`; every operation exists in the contracts (decided 29 September, rev 3).
   overlays:
@@ -14822,6 +15151,11 @@ screens:
     source: client approval, confirmed by Chinmay Parab 19 October 2026
     note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; client-approved 19 October
       2026, confirmed by Chinmay Parab.** Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
+    stateViews:
+      loading: P02/venue-loader
+      emptyFirstRun: P02/dashed-note
+      emptyNoResults: P02/no-results-note
+      emptyNoAccess: P02/sign-in-prompt
   apisNote: Authored 29 September 2026 from the rev 3 decisions and the client prototype view named in
     `wireframe.prototype`; every operation exists in the contracts (decided 29 September, rev 3).
 - id: GST-076
@@ -15010,6 +15344,11 @@ screens:
         The route opens with its stations filled in and the departures listed without a search (30 September);
         Popular routes, the route cards, is the first transport product. The route map needs a street-map
         tile provider (the capture shows the provider's API-key watermark; audit R038).
+    stateViews:
+      loading: P02/venue-loader
+      emptyFirstRun: P02/dashed-note
+      emptyNoResults: P02/no-results-note
+      emptyNoAccess: P02/sign-in-prompt
   apisNote: Authored 29 September 2026 from the rev 3 decisions and the client prototype view named in
     `wireframe.prototype`; every operation exists in the contracts (decided 29 September, rev 3).
 - id: GST-077
@@ -15202,6 +15541,11 @@ screens:
       view: … Plan your trip → departure 07:00 → one adult (the passengers under the chosen departure)
       differences: The chosen departure's stops are the route map above the departures, not a stop list;
         the passengers sit under the departures on the same screen (Plan your trip).
+    stateViews:
+      loading: P02/venue-loader
+      emptyFirstRun: P02/dashed-note
+      emptyNoResults: P02/no-results-note
+      emptyNoAccess: P02/sign-in-prompt
   apisNote: Authored 29 September 2026 from the rev 3 decisions and the client prototype view named in
     `wireframe.prototype`; every operation exists in the contracts (decided 29 September, rev 3).
   gaps:
@@ -15344,6 +15688,11 @@ screens:
       verified: '2026-10-01'
       match: exact
       view: … Plan your trip → Multi-trip (multi-trip cards for this route)
+    stateViews:
+      loading: P02/venue-loader
+      emptyFirstRun: P02/dashed-note
+      emptyNoResults: P02/no-results-note
+      emptyNoAccess: P02/sign-in-prompt
   apisNote: Authored 29 September 2026 from the rev 3 decisions and the client prototype view named in
     `wireframe.prototype`; every operation exists in the contracts (decided 29 September, rev 3).
 - id: GST-079
@@ -15462,6 +15811,11 @@ screens:
       verified: '2026-10-01'
       match: exact
       view: … Plan your trip → Save this route → Favourites (the saved route)
+    stateViews:
+      loading: P02/venue-loader
+      emptyFirstRun: P02/dashed-note
+      emptyNoResults: P02/no-results-note
+      emptyNoAccess: P02/sign-in-prompt
   apisNote: Authored 29 September 2026 from the rev 3 decisions and the client prototype view named in
     `wireframe.prototype`; every operation exists in the contracts (decided 29 September, rev 3).
   overlays:
