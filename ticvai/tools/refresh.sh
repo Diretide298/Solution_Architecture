@@ -425,6 +425,7 @@ retire-answered-questions                                          # never run: 
 retest-gap-rows                                                    # reports review candidates; a verdict is a judgement, not a rebuild
 build-provisional-review                                           # its sheets carry people's decisions; a rebuild would erase them
 bench derive-services render-screens                               # deliberate, not a rebuild
+draw-state-frames                                                  # draws the r9 state frames (wireframes/states/) in each app's approved look: a drawing, run by hand when a frame changes and reviewed like one; derive-state-views reads them (21 October 2026, CHG-R9UI-005)
 refresh-manifest                                                   # traces this script (C13); run by refresh-safe.sh, never inside it
 build-plan-deck                                                    # the presentation plan, run by hand after a refresh
 build-plan-doc                                                     # the Word build plan for the PM, run by hand after build-plan-deck (1 October)

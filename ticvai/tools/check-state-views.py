@@ -16,7 +16,10 @@ when that chain breaks:
                  field edited by hand), or handoff/design-frames.json does not match the screens
   SV-PATTERN     a pattern cites a prototype file that is not there, a `find` text the file does not hold (a bundled
                  prototype is read from its decoded template), or a board frame the board does not have; or a state
-                 maps to a pattern that does not exist. A pattern must point at a real drawing: never an invented one
+                 maps to a pattern that does not exist. A pattern must point at a real drawing: never an invented one.
+                 A frame the package drew (r9, CHG-R9UI-005: `board` on wireframes/states/) proves itself on that board,
+                 names the approved prototype whose look it is drawn in, and its board says it is "drawn by the package
+                 from the approved design (r9), not yet seen by the client"
   SV-LEFT-OUT    a left-out item lacks a field the rule needs (id, kind, platform, what, source, reason, target, added,
                  change), an id is used twice, or a design gap names a state that has a view now (the gap is closed:
                  take the line off the list)
@@ -48,6 +51,7 @@ RULES = {
     "SV-PATTERN": "a state pattern cites a prototype, text or board frame that is not there, or no such pattern",
     "SV-LEFT-OUT": "a left-out item lacks a required field, repeats an id, or names a gap that now has a view",
 }
+STATUS_DRAWN = "drawn by the package from the approved design (r9), not yet seen by the client"
 LEFT_OUT_FIELDS = ("id", "kind", "platform", "what", "source", "reason", "target", "added", "change")
 
 
@@ -90,8 +94,16 @@ def run(guard, screens: list, mapping: dict, items: list, frames: dict | None, c
     for code, p in sorted(plats.items()):
         pats = p.get("patterns") or {}
         for pid, pat in sorted(pats.items()):
-            rel = (p.get("prototypes") or {}).get(pat.get("prototype"))
+            # a frame the package drew (CHG-R9UI-005) proves itself on its companion board, which must say what it is
+            rel = pat.get("board") or (p.get("prototypes") or {}).get(pat.get("prototype"))
             text = prototype_text(rel, cache) if rel else None
+            if pat.get("board"):
+                if not (p.get("prototypes") or {}).get(pat.get("prototype")):
+                    guard.add("SV-PATTERN", f"{code}/{pid}:look", f"{code}/{pid}: drawn by the package, but names no "
+                              "approved prototype whose look it is drawn in", strict=True)
+                if text is not None and STATUS_DRAWN not in text:
+                    guard.add("SV-PATTERN", f"{code}/{pid}:status", f"{code}/{pid}: its board {rel} does not say the "
+                              f"frames are {STATUS_DRAWN!r}", strict=True)
             if text is None:
                 guard.add("SV-PATTERN", f"{code}/{pid}:prototype", f"{code}/{pid}: its prototype "
                           f"{pat.get('prototype')!r} ({rel}) is not a file of the package", strict=True)
@@ -103,8 +115,9 @@ def run(guard, screens: list, mapping: dict, items: list, frames: dict | None, c
                 if t not in text:
                     guard.add("SV-PATTERN", f"{code}/{pid}:{t}", f"{code}/{pid}: {rel} does not hold {t!r}",
                               strict=True)
-            if pat.get("frame") and pat["frame"] not in board_anchors(p.get("board") or "", cache):
-                guard.add("SV-PATTERN", f"{code}/{pid}:frame", f"{code}/{pid}: the board {p.get('board')} has no "
+            bd_ = pat.get("board") or p.get("board") or ""
+            if pat.get("frame") and pat["frame"] not in board_anchors(bd_, cache):
+                guard.add("SV-PATTERN", f"{code}/{pid}:frame", f"{code}/{pid}: the board {bd_} has no "
                           f"frame #{pat['frame']}", strict=True)
         for st, pid in sorted((p.get("states") or {}).items()):
             if pid not in pats:

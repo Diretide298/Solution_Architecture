@@ -230,7 +230,7 @@ def state_look(sid: str, state: str) -> str:
     if v:
         where = (f"`{v['frame']}` (pulled as `{v['pulled']}`)" if v.get("frame")
                  else f"`{v.get('prototype')}`, {v.get('where')}")
-        return f"look: {v['name']}, {where}"
+        return f"look: {v['name']}, {where}" + (f"; {v['status']}" if v.get("status") else "")
     if state in (e.get("gaps") or {}):
         gid = e["gaps"][state]
         return (f"look: not drawn by the approved design ({gid or 'a design gap'} on docs/active/left-out.yaml): build "
@@ -265,7 +265,9 @@ def design_sentence(sid: str) -> str:
         if v.get("prototype") == pr.get("file"):
             return f" (the prototype, {v.get('where')})"
         return f" (`{v.get('prototype')}`, {v.get('where')})"
-    looks = [f"{st}: {v['name']}" + drawn(v) for st, v in (e.get("states") or {}).items()]
+    looks = [f"{st}: {v['name']}" + drawn(v) + (" [drawn by the package from the approved design, r9; not yet seen by the "
+                                                "client]" if v.get("status") else "")
+             for st, v in (e.get("states") or {}).items()]
     if looks:
         out += "Each state's look: " + "; ".join(looks) + ". "
     if e.get("gaps"):

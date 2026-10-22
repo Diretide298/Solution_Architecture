@@ -456,7 +456,7 @@ screens:
       emptyFirstRun: P01/dashed-empty
       emptyNoResults: P01/filter-empty
       emptyNoAccess: P01/sign-in-card
-      offline: P01/offline-paused
+      offline: P01/state-offline
   apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -689,7 +689,7 @@ screens:
       emptyFirstRun: P01/dashed-empty
       emptyNoResults: P01/filter-empty
       emptyNoAccess: P01/sign-in-card
-      offline: P01/offline-paused
+      offline: P01/state-offline
   apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -826,7 +826,7 @@ screens:
       emptyFirstRun: P01/dashed-empty
       emptyNoResults: P01/filter-empty
       emptyNoAccess: P01/sign-in-card
-      offline: P01/offline-paused
+      offline: P01/state-offline
   apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -1143,7 +1143,7 @@ screens:
       emptyFirstRun: P01/dashed-empty
       emptyNoResults: P01/filter-empty
       emptyNoAccess: P01/sign-in-card
-      offline: P01/offline-paused
+      offline: P01/state-offline
   apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -1398,7 +1398,7 @@ screens:
       emptyFirstRun: P01/dashed-empty
       emptyNoResults: P01/filter-empty
       emptyNoAccess: P01/sign-in-card
-      offline: P01/offline-paused
+      offline: P01/state-offline
   apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -1780,7 +1780,7 @@ screens:
       error: P01/status-card
       emptyFirstRun: P01/dashed-empty
       emptyNoAccess: P01/sign-in-card
-      offline: P01/offline-paused
+      offline: P01/state-offline
       emptyNoResults: P01/filter-empty
   apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
@@ -2118,7 +2118,7 @@ screens:
       error: P01/status-card
       emptyFirstRun: P01/choose-first-note
       emptyNoAccess: P01/sign-in-card
-      offline: P01/offline-paused
+      offline: P01/state-offline
       emptyNoResults: P01/filter-empty
   apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
@@ -2365,7 +2365,7 @@ screens:
       error: P01/status-card
       emptyFirstRun: P01/dashed-empty
       emptyNoAccess: P01/sign-in-card
-      offline: P01/offline-paused
+      offline: P01/state-offline
   apisNote: 'Rebuilt 9 September 2026 from the operations this screen then declared (six since the rev
     3 build of 29 September), not from a workshop pack — it has none. Columns narrowed on 3 October 2026
     to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and
@@ -2544,7 +2544,7 @@ screens:
       error: P01/status-card
       emptyFirstRun: P01/dashed-empty
       emptyNoAccess: P01/sign-in-card
-      offline: P01/offline-paused
+      offline: P01/state-offline
   apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -2865,7 +2865,7 @@ screens:
       error: P01/status-card
       emptyFirstRun: P01/dashed-empty
       emptyNoAccess: P01/sign-in-card
-      offline: P01/offline-paused
+      offline: P01/state-offline
   apisNote: 'Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -3158,7 +3158,7 @@ screens:
       emptyFirstRun: P01/dashed-empty
       emptyNoResults: P01/filter-empty
       emptyNoAccess: P01/sign-in-card
-      offline: P01/offline-paused
+      offline: P01/state-offline
   apisNote: 'Rebuilt 9 September 2026 from the 10 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -3442,7 +3442,7 @@ screens:
       error: P01/status-card
       emptyFirstRun: P01/dashed-empty
       emptyNoAccess: P01/sign-in-card
-      offline: P01/offline-paused
+      offline: P01/state-offline
   apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -3663,7 +3663,7 @@ screens:
       error: P01/status-card
       emptyFirstRun: P01/dashed-empty
       emptyNoAccess: P01/sign-in-card
-      offline: P01/offline-paused
+      offline: P01/state-offline
   apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -3957,7 +3957,7 @@ screens:
       error: P01/status-card
       emptyFirstRun: P01/dashed-empty
       emptyNoAccess: P01/sign-in-card
-      offline: P01/offline-paused
+      offline: P01/state-offline
   apisNote: Rebuilt 1 October 2026 on the two waiting-room operations (ADR-0066). Columns are the entry's
     guest-facing fields; `pollAfterSeconds` and `admission` are plumbing the page acts on rather than
     shows.
@@ -4384,7 +4384,8 @@ screens:
       error: P01/status-card
       emptyFirstRun: P01/dashed-empty
       emptyNoAccess: P01/sign-in-card
-      offline: P01/offline-paused
+      signInRefused: P01/state-sign-in-refused
+      offline: P01/state-offline
   apisNote: 'Rebuilt 9 September 2026 from the 19 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -4625,7 +4626,7 @@ screens:
       emptyFirstRun: P01/dashed-empty
       emptyNoResults: P01/filter-empty
       emptyNoAccess: P01/sign-in-card
-      offline: P01/offline-paused
+      offline: P01/state-offline
   apisNote: 'Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -4883,7 +4884,7 @@ screens:
       emptyFirstRun: P01/dashed-empty
       emptyNoResults: P01/filter-empty
       emptyNoAccess: P01/sign-in-card
-      offline: P01/offline-paused
+      offline: P01/state-offline
   apisNote: 'Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -5174,7 +5175,7 @@ screens:
       emptyFirstRun: P01/dashed-empty
       emptyNoResults: P01/filter-empty
       emptyNoAccess: P01/sign-in-card
-      offline: P01/offline-paused
+      offline: P01/state-offline
   apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -5405,7 +5406,7 @@ screens:
       emptyFirstRun: P01/dashed-empty
       emptyNoResults: P01/filter-empty
       emptyNoAccess: P01/sign-in-card
-      offline: P01/offline-paused
+      offline: P01/state-offline
   apisNote: 'Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -5726,7 +5727,7 @@ screens:
       emptyFirstRun: P01/dashed-empty
       emptyNoResults: P01/filter-empty
       emptyNoAccess: P01/sign-in-card
-      offline: P01/offline-paused
+      offline: P01/state-offline
   apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -5938,7 +5939,7 @@ screens:
       emptyFirstRun: P01/dashed-empty
       emptyNoResults: P01/filter-empty
       emptyNoAccess: P01/sign-in-card
-      offline: P01/offline-paused
+      offline: P01/state-offline
   apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -6158,7 +6159,7 @@ screens:
       emptyFirstRun: P01/dashed-empty
       emptyNoResults: P01/filter-empty
       emptyNoAccess: P01/sign-in-card
-      offline: P01/offline-paused
+      offline: P01/state-offline
   apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -6600,7 +6601,7 @@ screens:
       emptyFirstRun: P01/dashed-empty
       emptyNoResults: P01/filter-empty
       emptyNoAccess: P01/sign-in-card
-      offline: P01/offline-paused
+      offline: P01/state-offline
   apisNote: 'Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -6792,7 +6793,7 @@ screens:
       error: P01/status-card
       emptyFirstRun: P01/dashed-empty
       emptyNoAccess: P01/sign-in-card
-      offline: P01/offline-paused
+      offline: P01/state-offline
   apisNote: 'Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
     — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -6971,7 +6972,7 @@ screens:
       error: P01/status-card
       emptyFirstRun: P01/dashed-empty
       emptyNoAccess: P01/sign-in-card
-      offline: P01/offline-paused
+      offline: P01/state-offline
   apisNote: 'Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
     — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -7150,7 +7151,7 @@ screens:
       emptyFirstRun: P01/dashed-empty
       emptyNoResults: P01/filter-empty
       emptyNoAccess: P01/sign-in-card
-      offline: P01/offline-paused
+      offline: P01/state-offline
   apisNote: 'Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -7246,7 +7247,7 @@ screens:
       error: P01/status-card
       emptyFirstRun: P01/dashed-empty
       emptyNoAccess: P01/sign-in-card
-      offline: P01/offline-paused
+      offline: P01/state-offline
   apisNote: 'Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
     — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -7361,8 +7362,9 @@ screens:
       error: P01/status-card
       emptyFirstRun: P01/dashed-empty
       emptyNoAccess: P01/sign-in-card
-      offline: P01/offline-paused
+      offline: P01/state-offline
       soldOut: P01/status-card
+      closed: P01/state-closed
       maintenance: P01/status-card
   apisNote: 'Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
     — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
@@ -7516,7 +7518,7 @@ screens:
       emptyFirstRun: P01/dashed-empty
       emptyNoResults: P01/filter-empty
       emptyNoAccess: P01/sign-in-card
-      offline: P01/offline-paused
+      offline: P01/state-offline
   apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -7928,7 +7930,7 @@ screens:
       emptyFirstRun: P01/dashed-empty
       emptyNoResults: P01/filter-empty
       emptyNoAccess: P01/sign-in-card
-      offline: P01/offline-paused
+      offline: P01/state-offline
   apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -8062,7 +8064,7 @@ screens:
       emptyFirstRun: P01/dashed-empty
       emptyNoResults: P01/filter-empty
       emptyNoAccess: P01/sign-in-card
-      offline: P01/offline-paused
+      offline: P01/state-offline
   apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -8242,7 +8244,7 @@ screens:
       emptyFirstRun: P01/dashed-empty
       emptyNoResults: P01/filter-empty
       emptyNoAccess: P01/sign-in-card
-      offline: P01/offline-paused
+      offline: P01/state-offline
   apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -8415,7 +8417,7 @@ screens:
       emptyFirstRun: P01/dashed-empty
       emptyNoResults: P01/filter-empty
       emptyNoAccess: P01/sign-in-card
-      offline: P01/offline-paused
+      offline: P01/state-offline
   apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -8626,7 +8628,7 @@ screens:
       emptyFirstRun: P01/dashed-empty
       emptyNoResults: P01/filter-empty
       emptyNoAccess: P01/sign-in-card
-      offline: P01/offline-paused
+      offline: P01/state-offline
   apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -8945,7 +8947,7 @@ screens:
       emptyFirstRun: P01/dashed-empty
       emptyNoResults: P01/filter-empty
       emptyNoAccess: P01/sign-in-card
-      offline: P01/offline-paused
+      offline: P01/state-offline
   apisNote: 'Rebuilt 9 September 2026 from the 8 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -9086,7 +9088,7 @@ screens:
       error: P01/status-card
       emptyFirstRun: P01/dashed-empty
       emptyNoAccess: P01/sign-in-card
-      offline: P01/offline-paused
+      offline: P01/state-offline
   apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -9226,7 +9228,7 @@ screens:
       error: P01/status-card
       emptyFirstRun: P01/dashed-empty
       emptyNoAccess: P01/sign-in-card
-      offline: P01/offline-paused
+      offline: P01/state-offline
   apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -9415,7 +9417,7 @@ screens:
       emptyFirstRun: P01/dashed-empty
       emptyNoResults: P01/filter-empty
       emptyNoAccess: P01/sign-in-card
-      offline: P01/offline-paused
+      offline: P01/state-offline
   apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -9563,7 +9565,7 @@ screens:
       emptyFirstRun: P01/dashed-empty
       emptyNoResults: P01/filter-empty
       emptyNoAccess: P01/sign-in-card
-      offline: P01/offline-paused
+      offline: P01/state-offline
   apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -9773,7 +9775,8 @@ screens:
       emptyFirstRun: P01/dashed-empty
       emptyNoResults: P01/filter-empty
       emptyNoAccess: P01/sign-in-card
-      offline: P01/offline-paused
+      offline: P01/state-offline
+      soldOutForDay: P01/state-sold-out-for-day
   apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -9971,7 +9974,7 @@ screens:
       emptyFirstRun: P01/dashed-empty
       emptyNoResults: P01/filter-empty
       emptyNoAccess: P01/sign-in-card
-      offline: P01/offline-paused
+      offline: P01/state-offline
   apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -10192,7 +10195,7 @@ screens:
       emptyFirstRun: P01/dashed-empty
       emptyNoResults: P01/filter-empty
       emptyNoAccess: P01/sign-in-card
-      offline: P01/offline-paused
+      offline: P01/state-offline
   apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -10437,7 +10440,7 @@ screens:
       emptyFirstRun: P01/dashed-empty
       emptyNoResults: P01/filter-empty
       emptyNoAccess: P01/sign-in-card
-      offline: P01/offline-paused
+      offline: P01/state-offline
   apisNote: 'Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -10592,7 +10595,7 @@ screens:
       emptyFirstRun: P01/dashed-empty
       emptyNoResults: P01/filter-empty
       emptyNoAccess: P01/sign-in-card
-      offline: P01/offline-paused
+      offline: P01/state-offline
   apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -10716,7 +10719,7 @@ screens:
       error: P01/status-card
       emptyFirstRun: P01/dashed-empty
       emptyNoAccess: P01/sign-in-card
-      offline: P01/offline-paused
+      offline: P01/state-offline
       emptyNoResults: P01/filter-empty
   apisNote: 'Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
     — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
@@ -10955,7 +10958,7 @@ screens:
       emptyFirstRun: P01/dashed-empty
       emptyNoResults: P01/filter-empty
       emptyNoAccess: P01/sign-in-card
-      offline: P01/offline-paused
+      offline: P01/state-offline
   apisNote: Authored 29 September 2026 from the rev 3 decisions and the client prototype view named in
     `wireframe.prototype`; every operation exists in the contracts (decided 29 September, rev 3).
   overlays:
@@ -11137,7 +11140,7 @@ screens:
       emptyFirstRun: P01/dashed-empty
       emptyNoResults: P01/filter-empty
       emptyNoAccess: P01/sign-in-card
-      offline: P01/offline-paused
+      offline: P01/state-offline
   apisNote: Authored 29 September 2026 from the rev 3 decisions and the client prototype view named in
     `wireframe.prototype`; every operation exists in the contracts (decided 29 September, rev 3).
 - id: WEB-049
@@ -11444,7 +11447,7 @@ screens:
       emptyFirstRun: P01/dashed-empty
       emptyNoResults: P01/filter-empty
       emptyNoAccess: P01/sign-in-card
-      offline: P01/offline-paused
+      offline: P01/state-offline
   apisNote: Authored 29 September 2026 from the rev 3 decisions and the client prototype view named in
     `wireframe.prototype`; every operation exists in the contracts (decided 29 September, rev 3).
   overlays:
@@ -11724,5 +11727,6 @@ screens:
       error: P01/status-card
       emptyFirstRun: P01/dashed-empty
       emptyNoResults: P01/filter-empty
+      preferenceNotAtVenue: P01/state-preference-not-at-venue
       emptyNoAccess: P01/sign-in-card
-      offline: P01/offline-paused
+      offline: P01/state-offline

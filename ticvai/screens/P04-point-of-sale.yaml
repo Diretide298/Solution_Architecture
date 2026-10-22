@@ -332,8 +332,12 @@ screens:
         on 2026-10-01: wireframes/incoming/P04-pos-v2/img/pos-000.jpg.'
     source: client approval, confirmed by Chinmay Parab 19 October 2026
     stateViews:
+      loading: P04/state-loading
       emptyFirstRun: P04/empty-note
+      error: P04/state-error
       denied: P04/refusal-toast
+      emptyNoAccess: P04/state-no-access
+      mfaRequired: P04/state-mfa
       offline: P04/network-pill
 - id: POS-001
   name: Begin Shift
@@ -816,7 +820,11 @@ screens:
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
     stateViews:
+      loading: P04/state-loading
+      error: P04/state-error
       emptyFirstRun: P04/empty-note
+      emptyNoResults: P04/state-no-results
+      emptyNoAccess: P04/state-no-access
       offline: P04/network-pill
       denied: P04/refusal-toast
   apisNote: 'Rebuilt 9 September 2026 from the 17 operations this screen declares, not from a workshop
@@ -2085,7 +2093,11 @@ screens:
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
     stateViews:
+      loading: P04/state-loading
+      error: P04/state-error
       emptyFirstRun: P04/empty-note
+      emptyNoResults: P04/state-no-results
+      emptyNoAccess: P04/state-no-access
       offline: P04/network-pill
       denied: P04/refusal-toast
   apisNote: 'Rebuilt 9 September 2026 from the 41 operations this screen declares, not from a workshop
@@ -2388,7 +2400,11 @@ screens:
         in the same drawer). The frame was captured from this view on 2026-10-01: wireframes/incoming/P04-pos-v2/img/pos-003.jpg.'
     source: client approval, confirmed by Chinmay Parab 19 October 2026
     stateViews:
+      loading: P04/state-loading
+      error: P04/state-error
       emptyFirstRun: P04/empty-note
+      emptyNoResults: P04/state-no-results
+      emptyNoAccess: P04/state-no-access
       offline: P04/network-pill
       denied: P04/refusal-toast
   apisNote: 'Rebuilt 9 September 2026 from the 10 operations this screen declares, not from a workshop
@@ -2716,9 +2732,13 @@ screens:
       from nothing.'
     source: client approval, confirmed by Chinmay Parab 19 October 2026
     stateViews:
+      loading: P04/state-loading
+      error: P04/state-error
       emptyFirstRun: P04/empty-note
+      emptyNoAccess: P04/state-no-access
       offline: P04/network-pill
       denied: P04/refusal-toast
+      zoneUnavailable: P04/state-zone-unavailable
   apisNote: 'Rebuilt 9 September 2026 from the 11 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -3273,7 +3293,11 @@ screens:
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
     stateViews:
+      loading: P04/state-loading
+      error: P04/state-error
       emptyFirstRun: P04/empty-note
+      emptyNoResults: P04/state-no-results
+      emptyNoAccess: P04/state-no-access
       offline: P04/network-pill
   apisNote: 'Rebuilt 9 September 2026 from the 11 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
@@ -3934,7 +3958,11 @@ screens:
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
     stateViews:
+      loading: P04/state-loading
+      error: P04/state-error
       emptyFirstRun: P04/empty-note
+      emptyNoResults: P04/state-no-results
+      emptyNoAccess: P04/state-no-access
       offline: P04/network-pill
       denied: P04/refusal-toast
   apisNote: 'Rebuilt 9 September 2026 from the 14 operations this screen declares, not from a workshop
@@ -4445,7 +4473,11 @@ screens:
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
     stateViews:
+      loading: P04/state-loading
+      error: P04/state-error
       emptyFirstRun: P04/empty-note
+      emptyNoResults: P04/state-no-results
+      emptyNoAccess: P04/state-no-access
       offline: P04/network-pill
       denied: P04/refusal-toast
       pendingVariance: P04/close-shift-variance
@@ -4768,7 +4800,11 @@ screens:
         action, natural-language question or saved query (all declared in the YAML). It also shows terminal
         health and cross-outlet data, which is broader than 'from the terminal'.
     stateViews:
+      loading: P04/state-loading
+      error: P04/state-error
       emptyFirstRun: P04/empty-note
+      emptyNoResults: P04/state-no-results
+      emptyNoAccess: P04/state-no-access
       offline: P04/network-pill
   apisNote: 'Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
@@ -4989,7 +5025,11 @@ screens:
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
     stateViews:
+      loading: P04/state-loading
+      error: P04/state-error
       emptyFirstRun: P04/empty-note
+      emptyNoResults: P04/state-no-results
+      emptyNoAccess: P04/state-no-access
       offline: P04/network-pill
   apisNote: 'Rebuilt 9 September 2026 from the 16 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
@@ -5266,7 +5306,10 @@ screens:
         board): build the layout from that frame.'
     source: client approval, confirmed by Chinmay Parab 19 October 2026
     stateViews:
+      loading: P04/state-loading
+      error: P04/state-error
       emptyFirstRun: P04/empty-note
+      emptyNoAccess: P04/state-no-access
       offline: P04/network-pill
   apisNote: 'Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
@@ -5569,7 +5612,11 @@ screens:
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
     stateViews:
+      loading: P04/state-loading
+      error: P04/state-error
       emptyFirstRun: P04/empty-note
+      emptyNoResults: P04/state-no-results
+      emptyNoAccess: P04/state-no-access
       offline: P04/network-pill
   apisNote: 'Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
@@ -5932,7 +5979,11 @@ screens:
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
     stateViews:
+      loading: P04/state-loading
+      error: P04/state-error
       emptyFirstRun: P04/empty-note
+      emptyNoResults: P04/state-no-results
+      emptyNoAccess: P04/state-no-access
       offline: P04/network-pill
   apisNote: 'Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
@@ -6222,7 +6273,11 @@ screens:
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
     stateViews:
+      loading: P04/state-loading
+      error: P04/state-error
       emptyFirstRun: P04/empty-note
+      emptyNoResults: P04/state-no-results
+      emptyNoAccess: P04/state-no-access
       offline: P04/network-pill
       denied: P04/refusal-toast
   apisNote: 'Rebuilt 9 September 2026 from the 8 operations this screen declares, not from a workshop
@@ -6472,7 +6527,10 @@ screens:
         shows a toast. This is the POS-020 gap C-4/C-5, still present. The approval modal has a reject
         path that the YAML does not model.'
     stateViews:
+      loading: P04/state-loading
+      error: P04/state-error
       emptyFirstRun: P04/empty-note
+      emptyNoAccess: P04/state-no-access
       offline: P04/network-pill
       approvalRejected: P04/refusal-toast
   apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
@@ -6629,7 +6687,11 @@ screens:
         board): build the layout from that frame.'
     source: client approval, confirmed by Chinmay Parab 19 October 2026
     stateViews:
+      loading: P04/state-loading
+      error: P04/state-error
       emptyFirstRun: P04/empty-note
+      emptyNoResults: P04/state-no-results
+      emptyNoAccess: P04/state-no-access
       offline: P04/network-pill
   apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
@@ -6868,7 +6930,10 @@ screens:
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
     stateViews:
+      loading: P04/state-loading
+      error: P04/state-error
       emptyFirstRun: P04/empty-note
+      emptyNoAccess: P04/state-no-access
       offline: P04/network-pill
   apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
@@ -7078,7 +7143,10 @@ screens:
       from nothing.'
     source: client approval, confirmed by Chinmay Parab 19 October 2026
     stateViews:
+      loading: P04/state-loading
+      error: P04/state-error
       emptyFirstRun: P04/empty-note
+      emptyNoAccess: P04/state-no-access
       offline: P04/network-pill
   apisNote: 'Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
     — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
@@ -7260,7 +7328,11 @@ screens:
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
     stateViews:
+      loading: P04/state-loading
+      error: P04/state-error
       emptyFirstRun: P04/empty-note
+      emptyNoResults: P04/state-no-results
+      emptyNoAccess: P04/state-no-access
       offline: P04/network-pill
   apisNote: 'Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
@@ -7464,7 +7536,11 @@ screens:
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
     stateViews:
+      loading: P04/state-loading
+      error: P04/state-error
       emptyFirstRun: P04/empty-note
+      emptyNoResults: P04/state-no-results
+      emptyNoAccess: P04/state-no-access
       offline: P04/network-pill
   apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
@@ -7745,7 +7821,11 @@ screens:
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
     stateViews:
+      loading: P04/state-loading
+      error: P04/state-error
       emptyFirstRun: P04/empty-note
+      emptyNoResults: P04/state-no-results
+      emptyNoAccess: P04/state-no-access
       offline: P04/network-pill
   apisNote: 'Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
@@ -8057,7 +8137,11 @@ screens:
         or Home launcher ''Food & beverage''). The frame was captured from this view on 2026-10-01: wireframes/incoming/P04-pos-v2/img/pos-021.jpg.'
     source: client approval, confirmed by Chinmay Parab 19 October 2026
     stateViews:
+      loading: P04/state-loading
+      error: P04/state-error
       emptyFirstRun: P04/empty-note
+      emptyNoResults: P04/state-no-results
+      emptyNoAccess: P04/state-no-access
       offline: P04/network-pill
       denied: P04/refusal-toast
       soldOutByCount: P04/stock-badge
@@ -8348,7 +8432,11 @@ screens:
         / ''Dispatch / hand over''). The frame was captured from this view on 2026-10-01: wireframes/incoming/P04-pos-v2/img/pos-022.png.'
     source: client approval, confirmed by Chinmay Parab 19 October 2026
     stateViews:
+      loading: P04/state-loading
+      error: P04/state-error
       emptyFirstRun: P04/empty-note
+      emptyNoResults: P04/state-no-results
+      emptyNoAccess: P04/state-no-access
       offline: P04/network-pill
       denied: P04/refusal-toast
   apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
@@ -8592,7 +8680,11 @@ screens:
         or Home launcher ''Retail''). The frame was captured from this view on 2026-10-01: wireframes/incoming/P04-pos-v2/img/pos-023.jpg.'
     source: client approval, confirmed by Chinmay Parab 19 October 2026
     stateViews:
+      loading: P04/state-loading
+      error: P04/state-error
       emptyFirstRun: P04/empty-note
+      emptyNoResults: P04/state-no-results
+      emptyNoAccess: P04/state-no-access
       offline: P04/network-pill
       denied: P04/refusal-toast
       stockConflict: P04/conflict-modal
@@ -8819,7 +8911,11 @@ screens:
         board): build the layout from that frame.'
     source: client approval, confirmed by Chinmay Parab 19 October 2026
     stateViews:
+      loading: P04/state-loading
+      error: P04/state-error
       emptyFirstRun: P04/empty-note
+      emptyNoResults: P04/state-no-results
+      emptyNoAccess: P04/state-no-access
       offline: P04/network-pill
   apisNote: 'Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
@@ -9127,7 +9223,10 @@ screens:
         this view on 2026-10-01: wireframes/incoming/P04-pos-v2/img/pos-025.jpg.'
     source: client approval, confirmed by Chinmay Parab 19 October 2026
     stateViews:
+      loading: P04/state-loading
+      error: P04/state-error
       emptyFirstRun: P04/empty-note
+      emptyNoAccess: P04/state-no-access
       offline: P04/network-pill
       denied: P04/refusal-toast
   overlays:
@@ -9352,7 +9451,10 @@ screens:
       differences: The post-payment receipt is drawn and answers the POS-005 exitTo gap. Reprint is only
         a toast from the hot key or History, and there is no entitlement reissue (reissueEntitlement).
     stateViews:
+      loading: P04/state-loading
+      error: P04/state-error
       emptyFirstRun: P04/empty-note
+      emptyNoAccess: P04/state-no-access
       offline: P04/network-pill
   overlays:
   - id: formReprintReceipt
@@ -9546,7 +9648,10 @@ screens:
       differences: Adds guest enrolment ('Create & link to sale') and wallet top-up (TOPUPS 50–1000),
         neither declared on this screen. Open reservations are not shown on the guest card.
     stateViews:
+      loading: P04/state-loading
+      error: P04/state-error
       emptyFirstRun: P04/empty-note
+      emptyNoAccess: P04/state-no-access
       offline: P04/network-pill
   overlays:
   - id: formTopUpWallet
@@ -9825,7 +9930,10 @@ screens:
         wireframes/incoming/P04-pos-v2/img/pos-028.jpg.'
     source: client approval, confirmed by Chinmay Parab 19 October 2026
     stateViews:
+      loading: P04/state-loading
+      error: P04/state-error
       emptyFirstRun: P04/empty-note
+      emptyNoAccess: P04/state-no-access
       offline: P04/network-pill
   overlays:
   - id: formRequestBill
@@ -10075,7 +10183,10 @@ screens:
         The frame was captured from this view on 2026-10-01: wireframes/incoming/P04-pos-v2/img/pos-029.png.'
     source: client approval, confirmed by Chinmay Parab 19 October 2026
     stateViews:
+      loading: P04/state-loading
+      error: P04/state-error
       emptyFirstRun: P04/empty-note
+      emptyNoAccess: P04/state-no-access
       offline: P04/network-pill
   gaps:
   - operation: getQueue
@@ -10475,7 +10586,11 @@ screens:
         cart history, with Reprint)). The frame was captured from this view on 2026-10-01: wireframes/incoming/P04-pos-v2/img/v2-journal.png.'
     source: client approval, confirmed by Chinmay Parab 19 October 2026
     stateViews:
+      loading: P04/state-loading
+      error: P04/state-error
       emptyFirstRun: P04/empty-note
+      emptyNoResults: P04/state-no-results
+      emptyNoAccess: P04/state-no-access
       denied: P04/refusal-toast
       offline: P04/network-pill
 - id: POS-031
@@ -10813,6 +10928,10 @@ screens:
         the earlier approved build. The frame was captured from this view on 2026-10-01: wireframes/incoming/P04-pos-v2/img/v2-groups.jpg.'
     source: client approval, confirmed by Chinmay Parab 19 October 2026
     stateViews:
+      loading: P04/state-loading
+      error: P04/state-error
       emptyFirstRun: P04/empty-note
+      emptyNoResults: P04/state-no-results
+      emptyNoAccess: P04/state-no-access
       denied: P04/refusal-toast
       offline: P04/network-pill

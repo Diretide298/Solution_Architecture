@@ -724,9 +724,11 @@ screens:
         only.
     stateViews:
       loading: P02/venue-loader
+      error: P02/state-error
       emptyFirstRun: P02/dashed-note
       emptyNoResults: P02/no-results-note
       emptyNoAccess: P02/sign-in-prompt
+      offline: P02/state-offline
       introVideo: P02/intro-video
   apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
@@ -932,9 +934,11 @@ screens:
       view: Explore tab
     stateViews:
       loading: P02/venue-loader
+      error: P02/state-error
       emptyFirstRun: P02/dashed-note
       emptyNoResults: P02/no-results-note
       emptyNoAccess: P02/sign-in-prompt
+      offline: P02/state-offline
   apisNote: 'Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
     — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -1183,9 +1187,11 @@ screens:
       view: Buy tickets (the centre tab)
     stateViews:
       loading: P02/venue-loader
+      error: P02/state-error
       emptyFirstRun: P02/dashed-note
       emptyNoResults: P02/no-results-note
       emptyNoAccess: P02/sign-in-prompt
+      offline: P02/state-offline
   apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -1496,9 +1502,11 @@ screens:
       loading: P02/venue-loader
       videoBuffering: P02/video-poster
       videoUnavailable: P02/video-poster
+      error: P02/state-error
       emptyFirstRun: P02/dashed-note
       emptyNoResults: P02/no-results-note
       emptyNoAccess: P02/sign-in-prompt
+      offline: P02/state-offline
   apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -1670,9 +1678,11 @@ screens:
       from nothing.'
     stateViews:
       loading: P02/venue-loader
+      error: P02/state-error
       emptyFirstRun: P02/dashed-note
       emptyNoResults: P02/no-results-note
       emptyNoAccess: P02/sign-in-prompt
+      offline: P02/state-offline
   apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -1804,8 +1814,10 @@ screens:
       view: Explore → Shows → Night of Nine → More info (Item detail, an event)
     stateViews:
       loading: P02/venue-loader
+      error: P02/state-error
       emptyFirstRun: P02/dashed-note
       emptyNoAccess: P02/sign-in-prompt
+      offline: P02/state-offline
   apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -2101,9 +2113,11 @@ screens:
       differences: Booking in the app runs the website booking engine; per-flow step order.
     stateViews:
       loading: P02/venue-loader
+      error: P02/state-error
       emptyFirstRun: P02/dashed-note
       emptyNoResults: P02/no-results-note
       emptyNoAccess: P02/sign-in-prompt
+      offline: P02/state-offline
   apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -2399,8 +2413,10 @@ screens:
       differences: Booking in the app runs the website booking engine.
     stateViews:
       loading: P02/venue-loader
+      error: P02/state-error
       emptyFirstRun: P02/dashed-note
       emptyNoAccess: P02/sign-in-prompt
+      offline: P02/state-offline
       emptyNoResults: P02/no-results-note
   apisNote: 'Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
     — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
@@ -2706,8 +2722,10 @@ screens:
       2026, confirmed by Chinmay Parab.** Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
     stateViews:
       loading: P02/venue-loader
+      error: P02/state-error
       emptyFirstRun: P02/dashed-note
       emptyNoAccess: P02/sign-in-prompt
+      offline: P02/state-offline
   apisNote: 'Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -2892,8 +2910,10 @@ screens:
         CHG-FXS-003, CHG-R11-002, CHG-R4-007).
     stateViews:
       loading: P02/venue-loader
+      error: P02/state-error
       emptyFirstRun: P02/dashed-note
       emptyNoAccess: P02/sign-in-prompt
+      offline: P02/state-offline
   apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -3176,9 +3196,11 @@ screens:
       2026, confirmed by Chinmay Parab.** Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
     stateViews:
       loading: P02/venue-loader
+      error: P02/state-error
       emptyFirstRun: P02/dashed-note
       emptyNoResults: P02/no-results-note
       emptyNoAccess: P02/sign-in-prompt
+      offline: P02/state-offline
   apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -3423,9 +3445,11 @@ screens:
       view: Tickets tab
     stateViews:
       loading: P02/venue-loader
+      error: P02/state-error
       emptyFirstRun: P02/dashed-note
       emptyNoResults: P02/no-results-note
       emptyNoAccess: P02/sign-in-prompt
+      offline: P02/state-offline
   apisNote: 'Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -3617,8 +3641,10 @@ screens:
         do not fit a ticket-detail screen.
     stateViews:
       loading: P02/venue-loader
+      error: P02/state-error
       emptyFirstRun: P02/dashed-note
       emptyNoAccess: P02/sign-in-prompt
+      offline: P02/state-offline
   apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -3785,9 +3811,11 @@ screens:
       view: Account → All screens → Wave 2 → Ticket transfer (also Account → Ticket transfer)
     stateViews:
       loading: P02/venue-loader
+      error: P02/state-error
       emptyFirstRun: P02/dashed-note
       emptyNoResults: P02/no-results-note
       emptyNoAccess: P02/sign-in-prompt
+      offline: P02/state-offline
   apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -4078,9 +4106,11 @@ screens:
       2026, confirmed by Chinmay Parab.** Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
     stateViews:
       loading: P02/venue-loader
+      error: P02/state-error
       emptyFirstRun: P02/dashed-note
       emptyNoResults: P02/no-results-note
       emptyNoAccess: P02/sign-in-prompt
+      offline: P02/state-offline
   apisNote: 'Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -4286,9 +4316,11 @@ screens:
         cabanas are booked by staff.
     stateViews:
       loading: P02/venue-loader
+      error: P02/state-error
       emptyFirstRun: P02/dashed-note
       emptyNoResults: P02/no-results-note
       emptyNoAccess: P02/sign-in-prompt
+      offline: P02/state-offline
   apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -4407,8 +4439,10 @@ screens:
         the deposit kept on a late cancellation is a venue option, as the frame shows (CHG-SGU-020).
     stateViews:
       loading: P02/venue-loader
+      error: P02/state-error
       emptyFirstRun: P02/dashed-note
       emptyNoAccess: P02/sign-in-prompt
+      offline: P02/state-offline
   apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -4549,9 +4583,11 @@ screens:
       view: Account → All screens → Wave 3 → Add to calendar / reminders
     stateViews:
       loading: P02/venue-loader
+      error: P02/state-error
       emptyFirstRun: P02/dashed-note
       emptyNoResults: P02/no-results-note
       emptyNoAccess: P02/sign-in-prompt
+      offline: P02/state-offline
   apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -4804,9 +4840,11 @@ screens:
       2026, confirmed by Chinmay Parab.** Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
     stateViews:
       loading: P02/venue-loader
+      error: P02/state-error
       emptyFirstRun: P02/dashed-note
       emptyNoResults: P02/no-results-note
       emptyNoAccess: P02/sign-in-prompt
+      offline: P02/state-offline
   apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -4953,7 +4991,9 @@ screens:
       view: Account → All screens → Wave 3 → Saved items / wishlist
     stateViews:
       loading: P02/venue-loader
+      error: P02/state-error
       emptyFirstRun: P02/dashed-note
+      offline: P02/state-offline
   apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -5179,9 +5219,13 @@ screens:
       view below (wireframes/incoming/P02-mobile-v4/manifest.json).'
     stateViews:
       loading: P02/venue-loader
+      error: P02/state-error
       emptyFirstRun: P02/dashed-note
       emptyNoResults: P02/no-results-note
       emptyNoAccess: P02/sign-in-prompt
+      offline: P02/state-offline
+      map3dUnavailable: P02/state-map-fallback
+      weakGps: P02/state-map-fallback
   apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -5287,7 +5331,9 @@ screens:
       view: At the venue → Waits
     stateViews:
       loading: P02/venue-loader
+      error: P02/state-error
       emptyFirstRun: P02/dashed-note
+      offline: P02/state-offline
   apisNote: 'Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
     — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -5448,8 +5494,10 @@ screens:
       differences: Prototype allows two queues at once; the YAML states no limit.
     stateViews:
       loading: P02/venue-loader
+      error: P02/state-error
       emptyFirstRun: P02/dashed-note
       emptyNoAccess: P02/sign-in-prompt
+      offline: P02/state-offline
   apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -5711,9 +5759,11 @@ screens:
       view: Account → All screens → Wave 2 → F&B – browse & order
     stateViews:
       loading: P02/venue-loader
+      error: P02/state-error
       emptyFirstRun: P02/dashed-note
       emptyNoResults: P02/no-results-note
       emptyNoAccess: P02/sign-in-prompt
+      offline: P02/state-offline
   apisNote: 'Rebuilt 9 September 2026 from the 8 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -5843,7 +5893,9 @@ screens:
         not fit order tracking.
     stateViews:
       loading: P02/venue-loader
+      error: P02/state-error
       emptyFirstRun: P02/dashed-note
+      offline: P02/state-offline
   apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -6029,9 +6081,11 @@ screens:
         path nor a game card.
     stateViews:
       loading: P02/venue-loader
+      error: P02/state-error
       emptyFirstRun: P02/dashed-note
       emptyNoResults: P02/no-results-note
       emptyNoAccess: P02/sign-in-prompt
+      offline: P02/state-offline
   apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -6260,9 +6314,12 @@ screens:
       view: Account → All screens → Wave 3 → Parking – reserve & pay
     stateViews:
       loading: P02/venue-loader
+      error: P02/state-error
       emptyFirstRun: P02/dashed-note
       emptyNoResults: P02/no-results-note
       emptyNoAccess: P02/sign-in-prompt
+      offline: P02/state-offline
+      soldOutForDay: P02/state-sold-out-for-day
   apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -6485,9 +6542,11 @@ screens:
       view: Account → All screens → Wave 3 → Parking – reservation confirmed
     stateViews:
       loading: P02/venue-loader
+      error: P02/state-error
       emptyFirstRun: P02/dashed-note
       emptyNoResults: P02/no-results-note
       emptyNoAccess: P02/sign-in-prompt
+      offline: P02/state-offline
   apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -6622,8 +6681,10 @@ screens:
       differences: Prototype shows only dining and delivery points, no other venue services.
     stateViews:
       loading: P02/venue-loader
+      error: P02/state-error
       emptyFirstRun: P02/dashed-note
       emptyNoResults: P02/no-results-note
+      offline: P02/state-offline
   apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -6735,7 +6796,9 @@ screens:
         still shows a feed and an Alerts tab, so the client will expect it.
     stateViews:
       loading: P02/venue-loader
+      error: P02/state-error
       emptyFirstRun: P02/dashed-note
+      offline: P02/state-offline
       emptyNoResults: P02/no-results-note
   apisNote: 'Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
     — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
@@ -6969,8 +7032,10 @@ screens:
       2026, confirmed by Chinmay Parab.** Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
     stateViews:
       loading: P02/venue-loader
+      error: P02/state-error
       emptyFirstRun: P02/dashed-note
       emptyNoAccess: P02/sign-in-prompt
+      offline: P02/state-offline
   apisNote: 'Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -7188,8 +7253,10 @@ screens:
       2026, confirmed by Chinmay Parab.** Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
     stateViews:
       loading: P02/venue-loader
+      error: P02/state-error
       emptyFirstRun: P02/dashed-note
       emptyNoAccess: P02/sign-in-prompt
+      offline: P02/state-offline
       emptyNoResults: P02/no-results-note
   apisNote: 'Rebuilt 9 September 2026 from the 8 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
@@ -7422,8 +7489,10 @@ screens:
     source: client approval, confirmed by Chinmay Parab 19 October 2026
     stateViews:
       loading: P02/venue-loader
+      error: P02/state-error
       emptyFirstRun: P02/dashed-note
       emptyNoAccess: P02/sign-in-prompt
+      offline: P02/state-offline
   apisNote: 'Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
     — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -7591,8 +7660,10 @@ screens:
       view: Account → All screens → Wave 2 → Lost & found (also Account → Lost & found)
     stateViews:
       loading: P02/venue-loader
+      error: P02/state-error
       emptyFirstRun: P02/dashed-note
       emptyNoResults: P02/no-results-note
+      offline: P02/state-offline
   apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -7758,7 +7829,9 @@ screens:
       view: Account → All screens → Wave 3 → Feedback & ratings
     stateViews:
       loading: P02/venue-loader
+      error: P02/state-error
       emptyFirstRun: P02/dashed-note
+      offline: P02/state-offline
   apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -7984,9 +8057,11 @@ screens:
       2026, confirmed by Chinmay Parab.** Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
     stateViews:
       loading: P02/venue-loader
+      error: P02/state-error
       emptyFirstRun: P02/dashed-note
       emptyNoResults: P02/no-results-note
       emptyNoAccess: P02/sign-in-prompt
+      offline: P02/state-offline
   apisNote: 'Rebuilt 9 September 2026 from the operations this screen declares (4 then; evaluatePromotions
     removed 27 September), not from a workshop pack — it has none. Columns narrowed on 3 October 2026
     to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and
@@ -8180,9 +8255,11 @@ screens:
         **Codes are applied in the basket (GST-041), not here**: one place to apply a code (CHG-SGU-020).'
     stateViews:
       loading: P02/venue-loader
+      error: P02/state-error
       emptyFirstRun: P02/dashed-note
       emptyNoResults: P02/no-results-note
       emptyNoAccess: P02/sign-in-prompt
+      offline: P02/state-offline
   apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -8360,9 +8437,13 @@ screens:
         shows it (handoff/design-batches/apps/1-guest-app/README.md).'
     stateViews:
       loading: P02/venue-loader
+      error: P02/state-error
       emptyFirstRun: P02/dashed-note
       emptyNoResults: P02/no-results-note
       emptyNoAccess: P02/sign-in-prompt
+      offline: P02/state-offline
+      map3dUnavailable: P02/state-map-fallback
+      weakGps: P02/state-map-fallback
   apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -8530,8 +8611,10 @@ screens:
       2026, confirmed by Chinmay Parab.** Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
     stateViews:
       loading: P02/venue-loader
+      error: P02/state-error
       emptyFirstRun: P02/dashed-note
       emptyNoAccess: P02/sign-in-prompt
+      offline: P02/state-offline
   apisNote: 'Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
     — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -8743,9 +8826,11 @@ screens:
       view: Account → All screens → Wave 2 → Help & support
     stateViews:
       loading: P02/venue-loader
+      error: P02/state-error
       emptyFirstRun: P02/dashed-note
       emptyNoResults: P02/no-results-note
       emptyNoAccess: P02/sign-in-prompt
+      offline: P02/state-offline
   apisNote: 'Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -9082,9 +9167,11 @@ screens:
       differences: Basket as a bottom bar on mobile.
     stateViews:
       loading: P02/venue-loader
+      error: P02/state-error
       emptyFirstRun: P02/dashed-note
       emptyNoResults: P02/no-results-note
       emptyNoAccess: P02/sign-in-prompt
+      offline: P02/state-offline
   apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -9488,8 +9575,11 @@ screens:
       2026, confirmed by Chinmay Parab.** Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
     stateViews:
       loading: P02/venue-loader
+      error: P02/state-error
       emptyFirstRun: P02/dashed-note
       emptyNoAccess: P02/sign-in-prompt
+      signInRefused: P02/state-sign-in-refused
+      offline: P02/state-offline
   apisNote: 'Rebuilt 9 September 2026 from the 18 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -9568,7 +9658,9 @@ screens:
       differences: 'Rev 3 decision: the basket stays on the right in Arabic by default (configurable).'
     stateViews:
       loading: P02/venue-loader
+      error: P02/state-error
       emptyFirstRun: P02/dashed-note
+      offline: P02/state-offline
   apisNote: 'Rebuilt 9 September 2026 from the 0 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -9731,9 +9823,11 @@ screens:
       view: Account → All screens → Wave 2 → Multi-currency & pricing
     stateViews:
       loading: P02/venue-loader
+      error: P02/state-error
       emptyFirstRun: P02/dashed-note
       emptyNoResults: P02/no-results-note
       emptyNoAccess: P02/sign-in-prompt
+      offline: P02/state-offline
   apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -9873,7 +9967,9 @@ screens:
       differences: No screen of its own; it shares GST-014’s screen until the client confirms.
     stateViews:
       loading: P02/venue-loader
+      error: P02/state-error
       emptyFirstRun: P02/dashed-note
+      offline: P02/state-offline
       emptyNoResults: P02/no-results-note
   apisNote: 'Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
     — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
@@ -9990,7 +10086,9 @@ screens:
       view: Account → All screens → Wave 1 → Branded queue / waiting room
     stateViews:
       loading: P02/venue-loader
+      error: P02/state-error
       emptyFirstRun: P02/dashed-note
+      offline: P02/state-offline
   apisNote: Rebuilt 1 October 2026 on the two waiting-room operations (ADR-0066). Columns are the entry's
     guest-facing fields; `pollAfterSeconds` and `admission` are plumbing the screen acts on rather than
     shows.
@@ -10114,7 +10212,12 @@ screens:
       view: Account → All screens → Wave 1 → Maintenance / upgrade
     stateViews:
       loading: P02/venue-loader
+      error: P02/state-error
       emptyFirstRun: P02/dashed-note
+      offline: P02/state-offline
+      forcedUpgrade: P02/state-unavailable
+      soldOut: P02/state-unavailable
+      closed: P02/state-unavailable
       emptyNoAccess: P02/sign-in-prompt
       maintenance: P02/maintenance-page
   apisNote: 'Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
@@ -10268,8 +10371,10 @@ screens:
       2026, confirmed by Chinmay Parab.** Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
     stateViews:
       loading: P02/venue-loader
+      error: P02/state-error
       emptyFirstRun: P02/dashed-note
       emptyNoAccess: P02/sign-in-prompt
+      offline: P02/state-offline
   apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -10505,8 +10610,10 @@ screens:
       view below (wireframes/incoming/P02-mobile-v4/manifest.json).'
     stateViews:
       loading: P02/venue-loader
+      error: P02/state-error
       emptyFirstRun: P02/dashed-note
       emptyNoAccess: P02/sign-in-prompt
+      offline: P02/state-offline
   apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -10695,9 +10802,11 @@ screens:
       2026, confirmed by Chinmay Parab.** Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
     stateViews:
       loading: P02/venue-loader
+      error: P02/state-error
       emptyFirstRun: P02/dashed-note
       emptyNoResults: P02/no-results-note
       emptyNoAccess: P02/sign-in-prompt
+      offline: P02/state-offline
   apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -10937,9 +11046,12 @@ screens:
       view: Plan tab (Plan your visit · 1 of 6)
     stateViews:
       loading: P02/venue-loader
+      error: P02/state-error
       emptyFirstRun: P02/dashed-note
       emptyNoResults: P02/no-results-note
+      preferenceNotAtVenue: P02/state-preference-not-at-venue
       emptyNoAccess: P02/sign-in-prompt
+      offline: P02/state-offline
   apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -11102,9 +11214,11 @@ screens:
       2026, confirmed by Chinmay Parab.** Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
     stateViews:
       loading: P02/venue-loader
+      error: P02/state-error
       emptyFirstRun: P02/dashed-note
       emptyNoResults: P02/no-results-note
       emptyNoAccess: P02/sign-in-prompt
+      offline: P02/state-offline
   apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -11371,9 +11485,12 @@ screens:
       view: Plan tab → the six questions → Make my plan (Your plan)
     stateViews:
       loading: P02/venue-loader
+      error: P02/state-error
       emptyFirstRun: P02/dashed-note
       emptyNoResults: P02/no-results-note
+      preferenceNotAtVenue: P02/state-preference-not-at-venue
       emptyNoAccess: P02/sign-in-prompt
+      offline: P02/state-offline
   apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -11592,9 +11709,12 @@ screens:
         Built from this definition.
     stateViews:
       loading: P02/venue-loader
+      error: P02/state-error
       emptyFirstRun: P02/dashed-note
       emptyNoResults: P02/no-results-note
       emptyNoAccess: P02/sign-in-prompt
+      offline: P02/state-offline
+      aiUnavailable: P02/state-ai-unavailable
   apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -11783,8 +11903,10 @@ screens:
         the same button"), which the YAML does not cover.
     stateViews:
       loading: P02/venue-loader
+      error: P02/state-error
       emptyFirstRun: P02/dashed-note
       emptyNoAccess: P02/sign-in-prompt
+      offline: P02/state-offline
   apisNote: 'Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
     — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -11935,9 +12057,11 @@ screens:
       2026, confirmed by Chinmay Parab.** Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
     stateViews:
       loading: P02/venue-loader
+      error: P02/state-error
       emptyFirstRun: P02/dashed-note
       emptyNoResults: P02/no-results-note
       emptyNoAccess: P02/sign-in-prompt
+      offline: P02/state-offline
   apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -12072,9 +12196,11 @@ screens:
       view: Account → All screens → Wave 2 → Accessibility information
     stateViews:
       loading: P02/venue-loader
+      error: P02/state-error
       emptyFirstRun: P02/dashed-note
       emptyNoResults: P02/no-results-note
       emptyNoAccess: P02/sign-in-prompt
+      offline: P02/state-offline
   apisNote: 'Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
     — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -12225,9 +12351,11 @@ screens:
       2026, confirmed by Chinmay Parab.** Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
     stateViews:
       loading: P02/venue-loader
+      error: P02/state-error
       emptyFirstRun: P02/dashed-note
       emptyNoResults: P02/no-results-note
       emptyNoAccess: P02/sign-in-prompt
+      offline: P02/state-offline
   apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -12400,9 +12528,11 @@ screens:
       2026, confirmed by Chinmay Parab.** Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
     stateViews:
       loading: P02/venue-loader
+      error: P02/state-error
       emptyFirstRun: P02/dashed-note
       emptyNoResults: P02/no-results-note
       emptyNoAccess: P02/sign-in-prompt
+      offline: P02/state-offline
   apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -12527,8 +12657,10 @@ screens:
         and a live total.
     stateViews:
       loading: P02/venue-loader
+      error: P02/state-error
       emptyFirstRun: P02/dashed-note
       emptyNoAccess: P02/sign-in-prompt
+      offline: P02/state-offline
   apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -12659,8 +12791,10 @@ screens:
       differences: Prototype uses a separate SD code; the YAML says the guest collects with the ticket.
     stateViews:
       loading: P02/venue-loader
+      error: P02/state-error
       emptyFirstRun: P02/dashed-note
       emptyNoAccess: P02/sign-in-prompt
+      offline: P02/state-offline
   apisNote: 'Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
     — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -12778,8 +12912,10 @@ screens:
       view: Explore tab → search ("coaster")
     stateViews:
       loading: P02/venue-loader
+      error: P02/state-error
       emptyFirstRun: P02/dashed-note
       emptyNoResults: P02/no-results-note
+      offline: P02/state-offline
   apisNote: 'Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
     — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -12928,9 +13064,11 @@ screens:
       view: Account → All screens → Wave 3 → Newsletter & preferences
     stateViews:
       loading: P02/venue-loader
+      error: P02/state-error
       emptyFirstRun: P02/dashed-note
       emptyNoResults: P02/no-results-note
       emptyNoAccess: P02/sign-in-prompt
+      offline: P02/state-offline
   apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -13090,9 +13228,11 @@ screens:
       2026, confirmed by Chinmay Parab.** Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
     stateViews:
       loading: P02/venue-loader
+      error: P02/state-error
       emptyFirstRun: P02/dashed-note
       emptyNoResults: P02/no-results-note
       emptyNoAccess: P02/sign-in-prompt
+      offline: P02/state-offline
   apisNote: 'Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -13256,9 +13396,11 @@ screens:
       view: Account → All screens → Wave 2 → Refunds & resale
     stateViews:
       loading: P02/venue-loader
+      error: P02/state-error
       emptyFirstRun: P02/dashed-note
       emptyNoResults: P02/no-results-note
       emptyNoAccess: P02/sign-in-prompt
+      offline: P02/state-offline
   apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -13440,8 +13582,10 @@ screens:
         on the concierge home instead.
     stateViews:
       loading: P02/venue-loader
+      error: P02/state-error
       emptyFirstRun: P02/dashed-note
       emptyNoAccess: P02/sign-in-prompt
+      offline: P02/state-offline
   apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -13681,9 +13825,12 @@ screens:
       view: Account → All screens → Wave 2 → Face Pass (also Account → Face Pass)
     stateViews:
       loading: P02/venue-loader
+      error: P02/state-error
       emptyFirstRun: P02/dashed-note
       emptyNoResults: P02/no-results-note
       emptyNoAccess: P02/sign-in-prompt
+      offline: P02/state-offline
+      subjectNotLinked: P02/state-face-pass-not-linked
   apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -13877,9 +14024,11 @@ screens:
         R077 (a); the dining deposit is a venue option, off by default** (CHG-SGU-018).'
     stateViews:
       loading: P02/venue-loader
+      error: P02/state-error
       emptyFirstRun: P02/dashed-note
       emptyNoResults: P02/no-results-note
       emptyNoAccess: P02/sign-in-prompt
+      offline: P02/state-offline
   apisNote: 'Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -14192,9 +14341,11 @@ screens:
         is a wiring slip (CHG-SGU-020).
     stateViews:
       loading: P02/venue-loader
+      error: P02/state-error
       emptyFirstRun: P02/dashed-note
       emptyNoResults: P02/no-results-note
       emptyNoAccess: P02/sign-in-prompt
+      offline: P02/state-offline
   apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -14408,9 +14559,11 @@ screens:
       view: Account → All screens → Wave 2 → Share & group booking
     stateViews:
       loading: P02/venue-loader
+      error: P02/state-error
       emptyFirstRun: P02/dashed-note
       emptyNoResults: P02/no-results-note
       emptyNoAccess: P02/sign-in-prompt
+      offline: P02/state-offline
   apisNote: 'Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -14667,8 +14820,10 @@ screens:
       2026, confirmed by Chinmay Parab.** Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
     stateViews:
       loading: P02/venue-loader
+      error: P02/state-error
       emptyFirstRun: P02/dashed-note
       emptyNoAccess: P02/sign-in-prompt
+      offline: P02/state-offline
   apisNote: 'Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
     — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -14963,9 +15118,11 @@ screens:
       2026, confirmed by Chinmay Parab.** Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
     stateViews:
       loading: P02/venue-loader
+      error: P02/state-error
       emptyFirstRun: P02/dashed-note
       emptyNoResults: P02/no-results-note
       emptyNoAccess: P02/sign-in-prompt
+      offline: P02/state-offline
   apisNote: Authored 29 September 2026 from the rev 3 decisions and the client prototype view named in
     `wireframe.prototype`; every operation exists in the contracts (decided 29 September, rev 3).
   overlays:
@@ -15153,9 +15310,11 @@ screens:
       2026, confirmed by Chinmay Parab.** Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
     stateViews:
       loading: P02/venue-loader
+      error: P02/state-error
       emptyFirstRun: P02/dashed-note
       emptyNoResults: P02/no-results-note
       emptyNoAccess: P02/sign-in-prompt
+      offline: P02/state-offline
   apisNote: Authored 29 September 2026 from the rev 3 decisions and the client prototype view named in
     `wireframe.prototype`; every operation exists in the contracts (decided 29 September, rev 3).
 - id: GST-076
@@ -15346,9 +15505,11 @@ screens:
         tile provider (the capture shows the provider's API-key watermark; audit R038).
     stateViews:
       loading: P02/venue-loader
+      error: P02/state-error
       emptyFirstRun: P02/dashed-note
       emptyNoResults: P02/no-results-note
       emptyNoAccess: P02/sign-in-prompt
+      offline: P02/state-offline
   apisNote: Authored 29 September 2026 from the rev 3 decisions and the client prototype view named in
     `wireframe.prototype`; every operation exists in the contracts (decided 29 September, rev 3).
 - id: GST-077
@@ -15543,9 +15704,11 @@ screens:
         the passengers sit under the departures on the same screen (Plan your trip).
     stateViews:
       loading: P02/venue-loader
+      error: P02/state-error
       emptyFirstRun: P02/dashed-note
       emptyNoResults: P02/no-results-note
       emptyNoAccess: P02/sign-in-prompt
+      offline: P02/state-offline
   apisNote: Authored 29 September 2026 from the rev 3 decisions and the client prototype view named in
     `wireframe.prototype`; every operation exists in the contracts (decided 29 September, rev 3).
   gaps:
@@ -15690,9 +15853,11 @@ screens:
       view: … Plan your trip → Multi-trip (multi-trip cards for this route)
     stateViews:
       loading: P02/venue-loader
+      error: P02/state-error
       emptyFirstRun: P02/dashed-note
       emptyNoResults: P02/no-results-note
       emptyNoAccess: P02/sign-in-prompt
+      offline: P02/state-offline
   apisNote: Authored 29 September 2026 from the rev 3 decisions and the client prototype view named in
     `wireframe.prototype`; every operation exists in the contracts (decided 29 September, rev 3).
 - id: GST-079
@@ -15813,9 +15978,11 @@ screens:
       view: … Plan your trip → Save this route → Favourites (the saved route)
     stateViews:
       loading: P02/venue-loader
+      error: P02/state-error
       emptyFirstRun: P02/dashed-note
       emptyNoResults: P02/no-results-note
       emptyNoAccess: P02/sign-in-prompt
+      offline: P02/state-offline
   apisNote: Authored 29 September 2026 from the rev 3 decisions and the client prototype view named in
     `wireframe.prototype`; every operation exists in the contracts (decided 29 September, rev 3).
   overlays:
