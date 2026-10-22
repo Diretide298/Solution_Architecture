@@ -1348,7 +1348,7 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_CONFIGURE
     offline: false
-    reads: 0
+    reads: 2
     writes: 0
   - operation: listScenarioModelingWhat
     verb: GET

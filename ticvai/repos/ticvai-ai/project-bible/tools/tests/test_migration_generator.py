@@ -734,7 +734,127 @@ def test_a_column_a_new_composite_key_covers_is_not_relaxed():
     p = fwd.diff("tenant", model(CP_OLD), model(CP_NEW))
     assert not [s for s in p.statements if "DROP NOT NULL" in s], p.statements
     assert not [r for r in p.review if r[1] == "platform.configuration_profile.version"], p.review
+    # the widened key is written now (CHG-R9KEY-001), no longer a "constraint added" row
+    assert not [r for r in p.review if r[0] == "constraint added"], p.review
+    assert [s for s in p.recon if "| widen primary key | configuration_profile_pkey" in s]
+
+
+# ---- a key the reference changed after a shipped file added it (CHG-R9KEY-001) -------------------------------------
+# r8's names file added rental.booking's deposit key onto orders.stored_value_authorisation; CR-146 points it at
+# orders.payment. The old side (the baseline and the shipped files) has the superseded key; the reference the new one.
+
+DEP = ("CREATE TABLE IF NOT EXISTS orders.stored_value_authorisation (id uuid PRIMARY KEY);\n"
+       "CREATE TABLE IF NOT EXISTS orders.payment (id uuid PRIMARY KEY);\n"
+       "CREATE TABLE IF NOT EXISTS rental.booking (id uuid PRIMARY KEY, deposit_authorisation_id uuid);\n")
+DEP_OLD = DEP + ("ALTER TABLE rental.booking ADD CONSTRAINT booking_deposit_authorisation_id_fkey FOREIGN KEY "
+                 "(deposit_authorisation_id) REFERENCES orders.stored_value_authorisation(id);\n")
+DEP_NEW = DEP + ("ALTER TABLE rental.booking ADD CONSTRAINT booking_deposit_authorisation_id_fkey FOREIGN KEY "
+                 "(deposit_authorisation_id) REFERENCES orders.payment(id);\n")
+
+
+def test_a_superseded_foreign_key_is_generated_in_its_current_form_as_a_guarded_drop_and_re_add():
+    p = fwd.diff("tenant", model(DEP_OLD), model(DEP_NEW))
+    assert not [r for r in p.review if r[0] == "constraint changed"], p.review
+    blk = [s for s in p.recon if "| change foreign key | booking_deposit_authorisation_id_fkey | orders.payment" in s]
+    assert len(blk) == 1, p.recon
+    b = blk[0]
+    # one ALTER TABLE: the constraint of that name dropped, the reference's key added NOT VALID
+    assert ("THEN ALTER TABLE rental.booking DROP CONSTRAINT IF EXISTS booking_deposit_authorisation_id_fkey, ADD "
+            "CONSTRAINT booking_deposit_authorisation_id_fkey FOREIGN KEY (deposit_authorisation_id) REFERENCES "
+            "orders.payment(id) NOT VALID; END IF; END $$") in b
+    assert "stored_value_authorisation" not in b, "never the superseded target"
+    # guarded: both tables, the column types, the parent's unique key, and the key not already the reference's
+    assert "to_regclass('rental.booking') IS NOT NULL AND to_regclass('orders.payment') IS NOT NULL" in b
+    assert "attname = 'deposit_authorisation_id') = (SELECT atttypid" in b
+    assert "i.indrelid = to_regclass('orders.payment') AND i.indisunique" in b
+    assert ("AND NOT EXISTS (SELECT 1 FROM pg_constraint c WHERE c.conname = 'booking_deposit_authorisation_id_fkey' "
+            "AND c.conrelid = to_regclass('rental.booking') AND c.contype = 'f' AND c.confrelid = "
+            "to_regclass('orders.payment')") in b
+    assert "= ARRAY['deposit_authorisation_id']" in b and "= ARRAY['id'])" in b
+    # the rollback puts the old key back; the file applies twice (a block is read back as the change made)
+    assert any("REFERENCES orders.stored_value_authorisation(id) NOT VALID" in r for r in p.recon_rollback)
+    folded = model(DEP_OLD)
+    folded.apply_forward(";\n".join(p.recon) + ";\n")
+    again = fwd.diff("tenant", folded, model(DEP_NEW))
+    assert not again.recon and not again.statements and not again.review, (again.recon, again.review)
+
+
+def test_an_unchanged_key_writes_nothing_and_a_changed_on_delete_stays_a_decision():
+    p = fwd.diff("tenant", model(DEP_OLD), model(DEP_OLD))
+    assert not p.recon and not p.review, "an unchanged key writes nothing"
+    # a key with an ON DELETE clause stays a decision: the guard compares targets and columns only
+    tail = DEP_NEW.replace("REFERENCES orders.payment(id)", "REFERENCES orders.payment(id) ON DELETE CASCADE")
+    p = fwd.diff("tenant", model(DEP_OLD), model(tail))
+    assert not p.recon and [r for r in p.review if r[0] == "constraint changed"]
+
+
+CPK_OLD = ("CREATE TABLE IF NOT EXISTS platform.configuration_profile (id uuid PRIMARY KEY, version integer NOT NULL);\n"
+           "CREATE TABLE IF NOT EXISTS platform.profile_deployment (id uuid PRIMARY KEY, profile_id uuid NOT NULL, "
+           "version integer NOT NULL);\n"
+           "CREATE TABLE IF NOT EXISTS platform.workstation (id uuid PRIMARY KEY, configuration_profile_id uuid, "
+           "configuration_profile_version integer);\n"
+           "ALTER TABLE platform.profile_deployment ADD CONSTRAINT profile_deployment_profile_id_fkey FOREIGN KEY "
+           "(profile_id) REFERENCES platform.configuration_profile(id);\n")
+CPK_WS = ("ALTER TABLE platform.workstation ADD CONSTRAINT workstation_configuration_profile_id_fkey FOREIGN KEY "
+          "(configuration_profile_id, configuration_profile_version) REFERENCES platform.configuration_profile(id, "
+          "version);\n")
+CPK_NEW = (CPK_OLD.replace("(id uuid PRIMARY KEY, version integer NOT NULL)",
+                           "(id uuid, version integer, CONSTRAINT configuration_profile_pkey PRIMARY KEY (id, version))")
+           .replace("FOREIGN KEY (profile_id) REFERENCES platform.configuration_profile(id)",
+                    "FOREIGN KEY (profile_id, version) REFERENCES platform.configuration_profile(id, version)"))
+
+
+def test_a_composite_key_onto_a_widened_primary_key_comes_after_the_widened_key():
+    # the workstation key was added by an earlier names file, guarded, while the unique (id, version) was missing
+    p = fwd.diff("tenant", model(CPK_OLD + CPK_WS), model(CPK_NEW + CPK_WS))
+    assert not p.review, p.review   # no "constraint changed", "constraint added" or "column changed" row
+    kinds = [s.split("\n", 1)[0] for s in p.recon]
+    assert kinds == ["-- platform.configuration_profile | widen primary key | configuration_profile_pkey",
+                     "-- platform.profile_deployment | change foreign key | profile_deployment_profile_id_fkey | "
+                     "platform.configuration_profile",
+                     "-- platform.workstation | foreign key | workstation_configuration_profile_id_fkey | "
+                     "platform.configuration_profile"], kinds
+    pk = p.recon[0]
+    # the keys onto the old primary key are dropped first, then the key is replaced, only while it is still (id)
+    assert ("THEN ALTER TABLE IF EXISTS platform.profile_deployment DROP CONSTRAINT IF EXISTS "
+            "profile_deployment_profile_id_fkey; ALTER TABLE platform.configuration_profile DROP CONSTRAINT "
+            "configuration_profile_pkey, ADD CONSTRAINT configuration_profile_pkey PRIMARY KEY (id, version);") in pk
+    assert "p.contype = 'p' AND (SELECT array_agg(a.attname::text ORDER BY a.attname)" in pk and "= ARRAY['id'])" in pk
+    assert "AND NOT attnotnull)" in pk, "a nullable new key column leaves the table alone"
+    assert "f.conindid = (SELECT p.conindid" in pk and "f.conname = 'profile_deployment_profile_id_fkey'" in pk
+    assert ("ADD CONSTRAINT profile_deployment_profile_id_fkey FOREIGN KEY (profile_id, version) REFERENCES "
+            "platform.configuration_profile(id, version) NOT VALID") in p.recon[1]
+    # folded back, the next run writes nothing
+    folded = model(CPK_OLD + CPK_WS)
+    folded.apply_forward(";\n".join(p.recon) + ";\n")
+    again = fwd.diff("tenant", folded, model(CPK_NEW + CPK_WS))
+    assert not again.recon and not again.statements and not again.review, (again.recon, again.review)
+
+
+def test_a_primary_key_another_key_still_needs_stays_a_decision():
+    # a key the reference keeps on (id) could not survive the widened key: nothing is written for the table
+    keep = ("CREATE TABLE IF NOT EXISTS platform.profile_note (id uuid PRIMARY KEY, profile_id uuid);\n"
+            "ALTER TABLE platform.profile_note ADD CONSTRAINT profile_note_profile_id_fkey FOREIGN KEY (profile_id) "
+            "REFERENCES platform.configuration_profile(id);\n")
+    p = fwd.diff("tenant", model(CPK_OLD + keep), model(CPK_NEW + keep))
+    assert not [s for s in p.recon if "| widen primary key |" in s]
     assert [r for r in p.review if r[0] == "constraint added" and "PRIMARY KEY (id, version)" in r[2]]
+
+
+def test_the_names_file_header_and_the_migration_ticket_name_a_changed_key():
+    import tempfile
+    import ticket_done as td
+    p = fwd.diff("tenant", model(DEP_OLD), model(DEP_NEW))
+    text = fwd.render_recon(p, "V0115", "r1", "20261022")
+    assert "CHG-R9KEY-001" in text and "-- ALTER TABLE rental.booking DROP CONSTRAINT IF EXISTS" in text
+    with tempfile.TemporaryDirectory() as d:
+        (Path(d) / "backend" / "tenant").mkdir(parents=True)
+        f = Path(d) / "backend" / "tenant" / "V0115__names_after_r1_20261022.sql"
+        f.write_text(text, encoding="utf-8")
+        ch = td.after_r1_changes(Path(d))
+    rel = "backend/tenant/V0115__names_after_r1_20261022.sql"
+    assert ("change foreign key", "booking_deposit_authorisation_id_fkey") in ch[(rel, "rental.booking")]
+    assert any(k == "change foreign key" for k, _ in ch[(rel, "orders.payment")])
 
 
 # ---- declared renames written (CHG-R8WFM-001, r8 sample walk) -------------------------------------------------------

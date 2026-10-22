@@ -348,6 +348,14 @@
     "match": "exact",
     "view": "Engine controls → Transport → Route & schedule · one-way, multi-trip, favourites → Book → Fri (stations filled in, departures without a search)",
     "differences": "30 September: the route opens with its stations filled in and the departures listed without a search; the time-period buttons filter them. The engine's other transport flow, Popular routes (card view), is route cards with a from-fare and Book, then the date, the departures and the passengers. The route map needs a street-map tile provider (audit R038)."
+   },
+   "stateViews": {
+    "loading": "P01/turnstile-loader",
+    "error": "P01/status-card",
+    "emptyFirstRun": "P01/dashed-empty",
+    "emptyNoResults": "P01/filter-empty",
+    "emptyNoAccess": "P01/sign-in-card",
+    "offline": "P01/state-offline"
    }
   },
   "apisNote": "Authored 29 September 2026 from the rev 3 decisions and the client prototype view named in `wireframe.prototype`; every operation exists in the contracts (decided 29 September, rev 3).",

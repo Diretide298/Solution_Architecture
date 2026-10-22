@@ -245,7 +245,7 @@ Each migration only references tables created by the ones above it. Keys that wo
 | MIG-PLATFORM | `platform.sale_board_page` | 4 | through its owner |  | 3 | 2 | used by the first release |
 | MIG-PLATFORM | `platform.sale_board_tile` | 10 | through its owner |  | 3 | 2 | used by the first release |
 | MIG-PLATFORM | `platform.scope` | 8 | none |  | 11 | 2 | used by the first release |
-| MIG-PLATFORM | `platform.tenant` | 2 | tenant root (one tenant per database; no tenant_id by design) |  | 0 | 0 | referenced by marketing.message_template |
+| MIG-PLATFORM | `platform.tenant` | 2 | tenant root (one tenant per database; no tenant_id by design) |  | 0 | 0 | referenced by ai.policy |
 | MIG-PLATFORM | `platform.venue_settings` | 33 | venue_id |  | 5 | 2 | used by the first release |
 | MIG-PLATFORM | `platform.workstation` | 23 | scope_path |  | 7 | 1 | used by the first release |
 | MIG-PLATFORM | `sync.dsar_request` | 8 | none |  | 0 | 0 | built by MIG-PLATFORM as platform.dsar_request, before a declared move (CHG-TKT-013) |
@@ -264,7 +264,7 @@ Each migration only references tables created by the ones above it. Keys that wo
 | MIG-SEATING | `seating.seat_reservation` | 13 | through its owner |  | 6 | 4 | used by the first release |
 | MIG-SEATING | `seating.seat_reservation_item` | 5 | tenant root (one tenant per database; no tenant_id by design) |  | 1 | 1 | used by the first release |
 | MIG-SEATING | `seating.section` | 8 | scope_path |  | 0 | 1 | used by the first release |
-| MIG-MAINTENANCE | `maintenance.asset` | 30 | venue_id |  | 0 | 0 | referenced by maintenance.work_order |
+| MIG-MAINTENANCE | `maintenance.asset` | 30 | venue_id |  | 0 | 0 | referenced by queue.queue |
 | MIG-MAINTENANCE | `maintenance.incident` | 28 | venue_id |  | 0 | 0 | referenced by maintenance.work_order |
 | MIG-MAINTENANCE | `maintenance.inspection` | 14 | venue_id |  | 0 | 0 | referenced by maintenance.work_order |
 | MIG-MAINTENANCE | `maintenance.inspection_template` | 9 | venue_id |  | 2 | 1 | used by the first release |
@@ -332,7 +332,7 @@ Each migration only references tables created by the ones above it. Keys that wo
 | MIG-CATALOGUE | `catalogue.sales_channel` | 46 | none |  | 8 | 3 | used by the first release |
 | MIG-CATALOGUE | `catalogue.variant` | 9 | through its owner |  | 15 | 3 | used by the first release |
 | MIG-CATALOGUE | `catalogue.waitlist_entry` | 11 | through its owner |  | 2 | 2 | used by the first release |
-| MIG-LEDGER | `ledger.account` | 15 | none |  | 0 | 0 | referenced by inventory.supplier |
+| MIG-LEDGER | `ledger.account` | 15 | none |  | 0 | 0 | referenced by ledger.tax_code |
 | MIG-LEDGER | `ledger.cost_center` | 6 | venue_id |  | 0 | 0 | referenced by orders.invitation |
 | MIG-LEDGER | `ledger.credit_memo` | 30 | scope_path |  | 5 | 1 | used by the first release |
 | MIG-LEDGER | `ledger.credit_memo_line` | 10 | through its owner |  | 3 | 1 | used by the first release |
@@ -361,7 +361,7 @@ Each migration only references tables created by the ones above it. Keys that wo
 | MIG-INVENTORY | `inventory.serialised_item` | 9 | through its owner |  | 1 | 0 | used by the first release |
 | MIG-INVENTORY | `inventory.stock_batch` | 10 | none |  | 2 | 0 | used by the first release |
 | MIG-INVENTORY | `inventory.stock_earmark` | 10 | tenant root (one tenant per database; no tenant_id by design) |  | 1 | 1 | used by the first release |
-| MIG-INVENTORY | `inventory.supplier` | 17 | none |  | 0 | 0 | referenced by maintenance.asset |
+| MIG-INVENTORY | `inventory.supplier` | 17 | none |  | 0 | 0 | referenced by inventory.purchase_order |
 | MIG-PROMOTIONS | `promotions.allocation_component` | 9 | venue_id |  | 2 | 2 | used by the first release |
 | MIG-PROMOTIONS | `promotions.allocation_split` | 4 | through its owner |  | 0 | 0 | referenced by promotions.allocation_component |
 | MIG-PROMOTIONS | `promotions.bundle` | 21 | venue_id |  | 4 | 2 | used by the first release |
@@ -378,45 +378,45 @@ Each migration only references tables created by the ones above it. Keys that wo
 | MIG-PROMOTIONS | `promotions.promotion_evaluation_trace` | 9 | venue_id |  | 0 | 3 | used by the first release |
 | MIG-PROMOTIONS | `promotions.promotion_rule` | 13 | venue_id |  | 1 | 0 | used by the first release |
 | MIG-PROMOTIONS | `promotions.promotion_variant` | 6 | none |  | 1 | 1 | used by the first release |
-| MIG-ORDERS | `orders.cart` | 20 | venue_id |  | 11 | 8 | used by the first release |
-| MIG-ORDERS | `orders.cart_line` | 21 | through its owner |  | 10 | 6 | used by the first release |
+| MIG-ORDERS | `orders.cart` | 20 | none |  | 11 | 8 | used by the first release |
+| MIG-ORDERS | `orders.cart_line` | 21 | none |  | 10 | 6 | used by the first release |
 | MIG-ORDERS | `orders.cash_count_line` | 11 | through its owner |  | 6 | 4 | used by the first release |
 | MIG-ORDERS | `orders.cash_movement` | 13 | through its owner |  | 5 | 3 | used by the first release |
-| MIG-ORDERS | `orders.chargeback` | 16 | through its owner |  | 1 | 0 | used by the first release |
-| MIG-ORDERS | `orders.deposit` | 16 | through its owner |  | 0 | 1 | used by the first release |
+| MIG-ORDERS | `orders.chargeback` | 16 | none |  | 1 | 0 | used by the first release |
+| MIG-ORDERS | `orders.deposit` | 16 | none |  | 0 | 1 | used by the first release |
 | MIG-ORDERS | `orders.deposit_box` | 16 | venue_id |  | 5 | 3 | used by the first release |
 | MIG-ORDERS | `orders.deposit_box_foreign_holding` | 7 | through its owner |  | 3 | 2 | used by the first release |
 | MIG-ORDERS | `orders.deposit_box_opening_denomination` | 4 | through its owner |  | 3 | 2 | used by the first release |
 | MIG-ORDERS | `orders.fraud_rule` | 12 | none |  | 3 | 0 | used by the first release |
-| MIG-ORDERS | `orders.group_booking` | 22 | through its owner |  | 5 | 1 | used by the first release |
+| MIG-ORDERS | `orders.group_booking` | 22 | none |  | 5 | 1 | used by the first release |
 | MIG-ORDERS | `orders.group_customer_organisation` | 6 | tenant root (one tenant per database; no tenant_id by design) |  | 0 | 0 | referenced by orders.group_customer_organisation_contact |
 | MIG-ORDERS | `orders.group_customer_organisation_contact` | 6 | tenant root (one tenant per database; no tenant_id by design) |  | 0 | 0 | referenced by orders.group_visit_plan |
-| MIG-ORDERS | `orders.group_participant` | 7 | through its owner |  | 1 | 0 | used by the first release |
-| MIG-ORDERS | `orders.group_participant_list` | 5 | through its owner |  | 0 | 0 | referenced by orders.group_participant |
+| MIG-ORDERS | `orders.group_participant` | 7 | none |  | 1 | 0 | used by the first release |
+| MIG-ORDERS | `orders.group_participant_list` | 5 | none |  | 0 | 0 | referenced by orders.group_participant |
 | MIG-ORDERS | `orders.group_visit_plan` | 27 | scope_path |  | 2 | 1 | used by the first release |
 | MIG-ORDERS | `orders.invitation` | 13 | scope_path |  | 1 | 0 | used by the first release |
 | MIG-ORDERS | `orders.no_sale_event` | 9 | through its owner |  | 1 | 1 | used by the first release |
-| MIG-ORDERS | `orders.order_event` | 19 | scope_path |  | 2 | 16 | used by the first release |
-| MIG-ORDERS | `orders.order_fee` | 11 | through its owner |  | 1 | 0 | used by the first release |
-| MIG-ORDERS | `orders.order_line` | 23 | venue_id |  | 19 | 12 | used by the first release |
-| MIG-ORDERS | `orders.order_line_discount` | 6 | through its owner |  | 12 | 3 | used by the first release |
-| MIG-ORDERS | `orders.order_line_eligibility` | 7 | through its owner |  | 12 | 1 | used by the first release |
-| MIG-ORDERS | `orders.payment` | 23 | through its owner |  | 26 | 15 | used by the first release |
+| MIG-ORDERS | `orders.order_event` | 19 | none |  | 2 | 16 | used by the first release |
+| MIG-ORDERS | `orders.order_fee` | 11 | none |  | 1 | 0 | used by the first release |
+| MIG-ORDERS | `orders.order_line` | 23 | none |  | 19 | 12 | used by the first release |
+| MIG-ORDERS | `orders.order_line_discount` | 6 | none |  | 12 | 3 | used by the first release |
+| MIG-ORDERS | `orders.order_line_eligibility` | 7 | none |  | 12 | 1 | used by the first release |
+| MIG-ORDERS | `orders.payment` | 23 | none |  | 26 | 15 | used by the first release |
 | MIG-ORDERS | `orders.payment_link` | 14 | scope_path |  | 2 | 1 | used by the first release |
 | MIG-ORDERS | `orders.pos_shift` | 31 | scope_path |  | 13 | 10 | used by the first release |
 | MIG-ORDERS | `orders.pos_shift_approval` | 6 | through its owner |  | 12 | 3 | used by the first release |
 | MIG-ORDERS | `orders.pos_shift_incident` | 6 | through its owner |  | 12 | 2 | used by the first release |
-| MIG-ORDERS | `orders.refund` | 20 | through its owner |  | 8 | 2 | used by the first release |
-| MIG-ORDERS | `orders.refund_policy` | 8 | venue_id |  | 5 | 1 | used by the first release |
+| MIG-ORDERS | `orders.refund` | 20 | none |  | 8 | 2 | used by the first release |
+| MIG-ORDERS | `orders.refund_policy` | 8 | venue_id |  | 6 | 1 | used by the first release |
 | MIG-ORDERS | `orders.refund_policy_time_band` | 4 | through its owner |  | 1 | 1 | used by the first release |
 | MIG-ORDERS | `orders.resale_listing` | 16 | scope_path |  | 2 | 1 | used by the first release |
 | MIG-ORDERS | `orders.reservation` | 7 | venue_id |  | 7 | 4 | used by the first release |
 | MIG-ORDERS | `orders.reservation_line` | 14 | through its owner |  | 4 | 1 | used by the first release |
-| MIG-ORDERS | `orders.sales_order` | 26 | scope_path |  | 33 | 16 | used by the first release |
+| MIG-ORDERS | `orders.sales_order` | 26 | none |  | 33 | 16 | used by the first release |
 | MIG-ORDERS | `orders.stored_value_authorisation` | 9 | scope_path |  | 0 | 1 | used by the first release |
 | MIG-ORDERS | `orders.ticket_template` | 11 | none |  | 5 | 4 | used by the first release |
 | MIG-ORDERS | `orders.ticket_template_channel` | 3 | none |  | 4 | 3 | used by the first release |
-| MIG-ORDERS | `orders.ticket_transfer` | 12 | through its owner |  | 3 | 2 | used by the first release |
+| MIG-ORDERS | `orders.ticket_transfer` | 12 | none |  | 3 | 2 | used by the first release |
 | MIG-ORDERS | `orders.till_shift_policy` | 11 | scope_path |  | 4 | 1 | used by the first release |
 | MIG-ORDERS | `orders.visit_reminder` | 7 | scope_path |  | 2 | 1 | used by the first release |
 | MIG-ORDERS | `orders.wallet_pass` | 9 | scope_path |  | 1 | 1 | used by the first release |

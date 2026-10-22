@@ -112,6 +112,13 @@
     "match": "exact",
     "view": "DEFERRED (R242), still in the prototype: Account → All screens → Wave 2 → In-venue notifications; At-venue tab → Alerts",
     "differences": "The YAML defers this (no in-app notification feed in the first release), but the prototype still shows a feed and an Alerts tab, so the client will expect it."
+   },
+   "stateViews": {
+    "loading": "P02/venue-loader",
+    "error": "P02/state-error",
+    "emptyFirstRun": "P02/dashed-note",
+    "offline": "P02/state-offline",
+    "emptyNoResults": "P02/no-results-note"
    }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
@@ -387,7 +394,14 @@
     "note": "Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the v4 look (the frame on this screen's board, wireframes/frames/gst-031.html, and #GST-031 in handoff/design-batches/apps/1-guest-app/return/TICVAI Guest App.dc.html). Client-approved 19 October 2026 (confirmed by Chinmay Parab). Build the layout from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at: Account → All screens → Wave 2 → AI concierge – home (exact)."
    },
    "source": "client approval, confirmed by Chinmay Parab 19 October 2026",
-   "note": "**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; client-approved 19 October 2026, confirmed by Chinmay Parab.** Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md."
+   "note": "**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; client-approved 19 October 2026, confirmed by Chinmay Parab.** Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.",
+   "stateViews": {
+    "loading": "P02/venue-loader",
+    "error": "P02/state-error",
+    "emptyFirstRun": "P02/dashed-note",
+    "emptyNoAccess": "P02/sign-in-prompt",
+    "offline": "P02/state-offline"
+   }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "_platform": {
@@ -663,7 +677,15 @@
     "note": "Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the v4 look (the frame on this screen's board, wireframes/frames/gst-032.html, and #GST-032 in handoff/design-batches/apps/1-guest-app/return/TICVAI Guest App.dc.html). Client-approved 19 October 2026 (confirmed by Chinmay Parab). Build the layout from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at: Account → All screens → Wave 2 → AI concierge – chat (exact)."
    },
    "source": "client approval, confirmed by Chinmay Parab 19 October 2026",
-   "note": "**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; client-approved 19 October 2026, confirmed by Chinmay Parab.** Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md."
+   "note": "**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; client-approved 19 October 2026, confirmed by Chinmay Parab.** Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.",
+   "stateViews": {
+    "loading": "P02/venue-loader",
+    "error": "P02/state-error",
+    "emptyFirstRun": "P02/dashed-note",
+    "emptyNoAccess": "P02/sign-in-prompt",
+    "offline": "P02/state-offline",
+    "emptyNoResults": "P02/no-results-note"
+   }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 8 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
@@ -963,7 +985,14 @@
     "view": "Account → All screens → Wave 2 → AI concierge – contextual help"
    },
    "note": "Corrected 2 October 2026 (CHG-SGU-016): the prototype view is a catalogue entry (\"Account → All screens → Wave 2\"), not a client-drawn layout, so the frame was treated as designed, not client-verified, until the client approved the whole guest app (confirmed by Chinmay Parab, 19 October 2026).",
-   "source": "client approval, confirmed by Chinmay Parab 19 October 2026"
+   "source": "client approval, confirmed by Chinmay Parab 19 October 2026",
+   "stateViews": {
+    "loading": "P02/venue-loader",
+    "error": "P02/state-error",
+    "emptyFirstRun": "P02/dashed-note",
+    "emptyNoAccess": "P02/sign-in-prompt",
+    "offline": "P02/state-offline"
+   }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "_platform": {
@@ -1155,6 +1184,12 @@
     "verified": "2026-09-28",
     "match": "exact",
     "view": "Account → All screens → Wave 3 → Feedback & ratings"
+   },
+   "stateViews": {
+    "loading": "P02/venue-loader",
+    "error": "P02/state-error",
+    "emptyFirstRun": "P02/dashed-note",
+    "offline": "P02/state-offline"
    }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
@@ -1436,6 +1471,14 @@
     "verified": "2026-09-28",
     "match": "exact",
     "view": "Account → All screens → Wave 2 → Help & support"
+   },
+   "stateViews": {
+    "loading": "P02/venue-loader",
+    "error": "P02/state-error",
+    "emptyFirstRun": "P02/dashed-note",
+    "emptyNoResults": "P02/no-results-note",
+    "emptyNoAccess": "P02/sign-in-prompt",
+    "offline": "P02/state-offline"
    }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
@@ -1751,6 +1794,15 @@
     "verified": "2026-10-01",
     "match": "exact",
     "view": "Plan tab (Plan your visit · 1 of 6)"
+   },
+   "stateViews": {
+    "loading": "P02/venue-loader",
+    "error": "P02/state-error",
+    "emptyFirstRun": "P02/dashed-note",
+    "emptyNoResults": "P02/no-results-note",
+    "preferenceNotAtVenue": "P02/state-preference-not-at-venue",
+    "emptyNoAccess": "P02/sign-in-prompt",
+    "offline": "P02/state-offline"
    }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
@@ -1938,7 +1990,15 @@
     "note": "Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the v4 look (the frame on this screen's board, wireframes/frames/gst-052.html, and #GST-052 in handoff/design-batches/apps/1-guest-app/return/TICVAI Guest App.dc.html). Client-approved 19 October 2026 (confirmed by Chinmay Parab). Build the layout from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at: Account → All screens → Wave 3 → Suggested itineraries (exact). What v2 did differently: Mobile v4 draws no ready-made plans list: its Plan tab goes straight to the questions. Built from this definition in the v4 style."
    },
    "source": "client approval, confirmed by Chinmay Parab 19 October 2026",
-   "note": "**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; client-approved 19 October 2026, confirmed by Chinmay Parab.** Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md."
+   "note": "**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; client-approved 19 October 2026, confirmed by Chinmay Parab.** Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.",
+   "stateViews": {
+    "loading": "P02/venue-loader",
+    "error": "P02/state-error",
+    "emptyFirstRun": "P02/dashed-note",
+    "emptyNoResults": "P02/no-results-note",
+    "emptyNoAccess": "P02/sign-in-prompt",
+    "offline": "P02/state-offline"
+   }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "_platform": {
@@ -2260,6 +2320,15 @@
     "verified": "2026-10-01",
     "match": "exact",
     "view": "Plan tab → the six questions → Make my plan (Your plan)"
+   },
+   "stateViews": {
+    "loading": "P02/venue-loader",
+    "error": "P02/state-error",
+    "emptyFirstRun": "P02/dashed-note",
+    "emptyNoResults": "P02/no-results-note",
+    "preferenceNotAtVenue": "P02/state-preference-not-at-venue",
+    "emptyNoAccess": "P02/sign-in-prompt",
+    "offline": "P02/state-offline"
    }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
@@ -2509,6 +2578,15 @@
     "match": "partial",
     "view": "Ask Sahli (the assistant chat; v4 has no plan-specific chat)",
     "differences": "v4 draws the rules plan and a general assistant chat; it has no plan-specific chat. Built from this definition."
+   },
+   "stateViews": {
+    "loading": "P02/venue-loader",
+    "error": "P02/state-error",
+    "emptyFirstRun": "P02/dashed-note",
+    "emptyNoResults": "P02/no-results-note",
+    "emptyNoAccess": "P02/sign-in-prompt",
+    "offline": "P02/state-offline",
+    "aiUnavailable": "P02/state-ai-unavailable"
    }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",

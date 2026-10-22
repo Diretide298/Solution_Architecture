@@ -110,6 +110,14 @@ Sorted by the owning deployable, then the table.
 | `askReportingQuestion` | operations / ReportingService | `ai.activity` | ticvai-ai / AiService | event `reporting.questionAnswered` |
 | `saveNaturalLanguageQuery` | operations / ReportingService | `ai.activity` | ticvai-ai / AiService | event `reporting.definitionPublished` |
 
+## Reads granted across deployables
+
+A deployable's role may SELECT these tables although another deployable owns them, and asks the owner's named queries in process (ADAM CR-196, decided by Chinmay on 21 October 2026; ADR-0055 rule 4 and DB-ROLES as amended). Row-level security still applies; the grant reaches existing databases in the forward migration tools/derive-ddl.py writes.
+
+| Id | Reader | Tables | Queries | Operations | Decided | Why |
+|---|---|---|---|---|---|---|
+| XDR-001 | commerce | `access.entitlement`, `access.scan_event` | `access#entitlementRecords`, `access#scanEventRecords` | `getMediaEntitlements` | ADAM CR-196, option B, Chinmay, 21 October 2026 | orders getMediaEntitlements (commerce) answers from Access's entitlements on a media code and their scans. The service route between deployables (serviceAuth inside a cell) is not built and has no ticket (CR-174), and a call on it would run at the tenant root and lose the caller's scope, so a venue cashier would see every venue's entitlements. Read in process instead, as a plain select on the same tenant database under the caller's own connection, so the tables' row-level security scopes it. The lead chose in-process reads for the same kind of cross-module read in CR-167 (the workers host). Removed when the service route is built, if the lead wants the deployables kept apart (CR-196 option A). |
+
 ## The exceptions
 
 | Id | Operation | Table | Kind | Added | Removed by | Reason |

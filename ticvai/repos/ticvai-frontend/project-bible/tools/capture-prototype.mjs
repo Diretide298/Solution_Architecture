@@ -13,6 +13,8 @@
  *
  * A screen whose proof text is missing is not captured, and the tool exits 1 once every other
  * screen is done: a frame of the wrong view counted as client-verified is worse than no frame.
+ * An entry with "pending" (its view named, its click path not recorded yet; CHG-R9UI-004) is listed
+ * in the manifest's `pending` and not run; it does not fail the run.
  *
  *   node tools/capture-prototype.mjs <plan.json> <out-dir> [--only GST-001,GST-002] [--headed]
  *
@@ -141,7 +143,7 @@ async function main() {
   };
   fs.mkdirSync(path.join(out, 'img'), { recursive: true });
   const page = await browser.newPage({ viewport: vp, deviceScaleFactor: 1 });
-  const captured = [], missing = [];
+  const captured = [], missing = [], pending = [];
 
   const frameSel = '[data-capture-frame]';
   async function markFrame() {
@@ -228,6 +230,12 @@ async function main() {
   for (const s of plan.screens) {
     const id = s.id.toUpperCase(), low = id.toLowerCase();
     if (only && !only.has(id)) continue;
+    // An entry whose click path is not recorded yet (`pending`, CHG-R9UI-004) names its view and is listed, not run.
+    if (s.pending) {
+      pending.push({ id, view: s.view, reason: s.pending });
+      console.log(`  pending   ${id}  ${s.view}`);
+      continue;
+    }
     try {
       await page.goto(urlOf(s) + (s.hash || ''), { waitUntil: 'load' });
       await page.waitForTimeout(plan.loadWait ?? 3000);
@@ -284,7 +292,7 @@ async function main() {
     missing.push(...keep(prev.missing)); missing.sort(byPlan);
   }
   const manifest = { prototype: plan.prototype, plan: path.relative(ROOT, planFile).split(path.sep).join('/'),
-                     captured, missing };
+                     captured, missing, ...(pending.length ? { pending } : {}) };
   fs.writeFileSync(path.join(out, 'manifest.json'), JSON.stringify(manifest, null, 1) + '\n', 'utf-8');
   console.log(`\n${captured.length} captured · ${missing.length} missing → ${out}`);
   process.exit(missing.length ? 1 : 0);

@@ -124,6 +124,12 @@
     "verified": "2026-09-28",
     "match": "exact",
     "view": "Account → All screens → Wave 1 → Branded queue / waiting room"
+   },
+   "stateViews": {
+    "loading": "P02/venue-loader",
+    "error": "P02/state-error",
+    "emptyFirstRun": "P02/dashed-note",
+    "offline": "P02/state-offline"
    }
   },
   "apisNote": "Rebuilt 1 October 2026 on the two waiting-room operations (ADR-0066). Columns are the entry's guest-facing fields; `pollAfterSeconds` and `admission` are plumbing the screen acts on rather than shows.",

@@ -35,6 +35,10 @@ the derived database could not keep. Each is a rule here, read against `handoff/
                        SP-KEY-UNDECLARED saw `consent_question_version.question_id` and it was baselined with 391
                        others at CHG-DDL-004, because that rule does not know which undeclared keys cost a policy.
 
+  SP-UNIQUE-PROMISED   (CR-182) a persisted schema's description says it is unique on (`a`, `b`) and carries no
+                       `x-ticvai-unique-together` with that set, so the DDL has no unique index and two concurrent
+                       writes both pass (`PlatformIdempotencyRecord`, SD-024, until CHG-R9CR-001).
+
 Read-only. Exit 1 on a finding not in handoff/audit-baseline.json (tools/audit_guard.py).
 
     python3 tools/check-storage-promises.py [--all] [--update-baseline]
@@ -54,6 +58,8 @@ RULES = {
     "SP-KEY-GUESSED": "a convention key the name rule pointed into another module's table (CR-070, CR-013)",
     "SP-KEY-TENANT-FALLBACK": "an undeclared key left a table written below tenant at the tenant-root policy while "
                               "its parent is scoped (CR-090)",
+    "SP-UNIQUE-PROMISED": "a persisted schema's description says it is unique on (`a`, `b`) and no "
+                          "x-ticvai-unique-together keeps that set (ADAM CR-182, CHG-R9CR-001)",
     "SP-ONE-CURRENT": "a persisted schema with an isCurrent flag and no x-ticvai-unique-when keeping one current row "
                       "(CR-154, CHG-CRA-004)",
     "SP-REPLACE-NO-KEY": "a PUT replaces a list of rows another operation creates one by one, and its items carry no "
@@ -422,6 +428,25 @@ def check_rows_named(guard, by, ops) -> None:
     guests read, and nothing stopped two publishes making two current (CR-154); configureWorkstation's `devices` list
     replaced the workstation's devices, which registerDevice creates one by one, and its items had no id, so the PUT
     could not say which registered device it meant (CR-155)."""
+    # SP-UNIQUE-PROMISED (ADAM CR-182, CHG-R9CR-001): `PlatformIdempotencyRecord` said "unique on (`idempotencyKey`,
+    # `operationId`)" since SD-024 and carried no x-ticvai-unique-together, so the table had no unique index and two
+    # concurrent retries of one key both applied the write.
+    for (stem, name), s in sorted(by.items()):
+        table = persisted_table(s)
+        if not table:
+            continue
+        sets = {frozenset(str(x) for x in grp) for grp in (s.get("x-ticvai-unique-together") or [])
+                if isinstance(grp, list)}
+        props = props_of(s, stem, by)
+        for m in re.finditer(r"unique on \(([^)]*)\)", str(s.get("description") or ""), re.I):
+            names = re.findall(r"`(\w+)`", m.group(1))
+            # kept by a unique set within the promised one, or by one promised field unique on its own
+            kept = any(st <= frozenset(names) for st in sets) or any(
+                (props.get(n) or {}).get("x-ticvai-unique") for n in names)
+            if len(names) > 1 and not kept:
+                guard.add("SP-UNIQUE-PROMISED", f"{stem}.{name}",
+                          f"{stem}.{name} ({table}) says it is unique on ({', '.join(names)}) and no "
+                          "x-ticvai-unique-together keeps that set")
     for (stem, name), s in sorted(by.items()):
         table = persisted_table(s)
         if table and "isCurrent" in props_of(s, stem, by) and not s.get("x-ticvai-unique-when"):

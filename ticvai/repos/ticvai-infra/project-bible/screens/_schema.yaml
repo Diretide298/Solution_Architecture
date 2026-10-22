@@ -604,6 +604,15 @@ properties:
             note: { type: string }
             figmaNodeId: { type: string }
             owner: { type: string }
+            stateViews:
+              type: object
+              additionalProperties: { type: string, pattern: '^P\d{2}/[a-z0-9-]+$' }
+              description: >
+                **The look of each state, from the client-approved design** (21 October 2026, CHG-R9UI-003). Written
+                by tools/derive-state-views.py on every client-verified screen from screens/_state-patterns.yaml:
+                state name -> `<platform>/<pattern>`, the pattern the approved prototype or board draws for it. A
+                state with no entry is not drawn by the approved design: it is a design gap on
+                docs/active/left-out.yaml (tools/check-state-views.py fails otherwise). Derived; never hand-edited.
             prototype:
               type: object
               additionalProperties: false

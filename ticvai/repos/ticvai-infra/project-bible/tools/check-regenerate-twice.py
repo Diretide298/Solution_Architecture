@@ -63,6 +63,8 @@ WRITE_BACK = [
     ("derive-components", ["--apply"], ["screens/P*.yaml"]),
     ("derive-screen-wiring", ["--apply"], ["screens/P*.yaml"]),
     ("derive-board-anchors", ["--apply"], ["screens/P*.yaml"]),
+    # wireframe.stateViews on the client-verified screens (21 October 2026, CHG-R9UI-003)
+    ("derive-state-views", ["--apply"], ["screens/P*.yaml", "handoff/design-frames.json"]),
     ("build-design-inputs", [], ["handoff/design-inputs/README.md", "handoff/design-batches/apps/*/*.md"]),
     ("derive-app-roles", [], ["roles-by-app.yaml"]),
     ("derive-id-register", ["--apply"], ["screens/_id-register.yaml"]),

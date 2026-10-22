@@ -644,6 +644,11 @@ def _gap(slots, ready, dur, forbid=()):
         s = bad[1]
 
 
+def is_frontend_foundation(key) -> bool:
+    """An app shell or the frontend mock API (block-a-extra-tasks.json, epic FRONTEND-FOUNDATION; CHG-R9UI-001, -002)."""
+    return str(key).startswith("SETUP-SHELL-") or key == "SETUP-MOCK-API"
+
+
 def is_soft(item, dep):
     """A wait that holds the finish but not the start (30 September): a screen on its back end (built against the
     mock server); a service on the platform kernel, idempotency and the outbox (written against interfaces published
@@ -651,7 +656,11 @@ def is_soft(item, dep):
     sign-in setup. Setup, migrations and the AI engine's setup stay hard; a test waits for all it tests."""
     tr, k = item["track"], item["key"]
     if tr == "Frontend":
-        return dep["track"] in ("Backend", "Database")
+        # **A screen on its app's shell and on the mock API** (CHG-R9UI-001, -002, 21 October 2026): the ticket follows
+        # them (the OpenProject link), but the plan does not hold its start, as with its back end. Held hard, every
+        # not-started screen left the days already past, A1's overtime passed the accepted 43 hours and the two-drop
+        # rule moved P08's completion work to A2, which broke the Block A closure (the r9 gate of 21 October).
+        return dep["track"] in ("Backend", "Database") or is_frontend_foundation(dep["key"])
     if tr == "Backend":
         if dep["key"] in SOFT_PLATFORM:
             return True

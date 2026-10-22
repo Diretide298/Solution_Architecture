@@ -201,6 +201,11 @@ CHECKS = [
     # (handoff/approved-ui.json, docs/active/approved-ui-changes.yaml; CHG-GRD-002). Both strict: never baselined.
     "check-ticket-links",
     "check-approved-ui",
+    # 21 October (r9, the WEB-007 seat page built bare; CHG-R9UI-003): every state of a client-verified screen shows a
+    # pattern its client-approved prototype or board draws (wireframe.stateViews, screens/_state-patterns.yaml), or is
+    # a design gap on the one left-out list (docs/active/left-out.yaml); every pattern cites a drawing that exists.
+    # Strict: never baselined.
+    "check-state-views",
     # 15 October (the r6 release, tracker F43, CHG-REL-008): the scripts run in OpenProject's container use nothing
     # newer than its Ruby 2.6 (a fix script stopped on Array#tally on the server). Strict: never baselined.
     "check-ruby-compat",

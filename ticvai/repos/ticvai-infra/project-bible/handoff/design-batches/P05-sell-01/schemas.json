@@ -300,6 +300,7 @@
  "Cart": {
   "type": "object",
   "x-ticvai-persistence": "orders.cart",
+  "x-ticvai-rls": "guest-owns",
   "required": [
    "id",
    "venueId",
@@ -431,7 +432,7 @@
    "expiresAt": {
     "type": "string",
     "format": "date-time",
-    "description": "The earliest lease expiry in the cart, or the cart's own window where it holds none."
+    "description": "The earliest lease expiry in the cart, or the cart's own window where it holds none. The window is set at creation to now plus the venue's `cartLeaseSeconds`, else the tenant default (ADAM CR-184, option A; CHG-R9CR-003; see `createCart`)."
    },
    "extensionsUsed": {
     "type": "integer",
@@ -439,7 +440,8 @@
    },
    "maxExtensions": {
     "type": "integer",
-    "readOnly": true
+    "readOnly": true,
+    "description": "The venue's `cartMaxExtensions`, else the tenant default, set when the cart is created (ADAM CR-184, option A; CHG-R9CR-003; see `createCart`)."
    },
    "locale": {
     "type": "string"
@@ -1860,6 +1862,7 @@
  },
  "Order": {
   "x-ticvai-persistence": "orders.sales_order + orders.order_line",
+  "x-ticvai-rls": "guest-reads-own",
   "type": "object",
   "required": [
    "id",
@@ -1887,7 +1890,7 @@
     "nullable": true,
     "readOnly": true,
     "x-ticvai-persisted": false,
-    "description": "**What lets the device that just checked out read the order it paid for** (decided 20 October 2026, Chinmay, R8 blocker cause IDENTITY-C52, option A; CHG-R8SPN-025). Returned only in `checkoutCart`'s answer, null everywhere else: a signed token bound to this order and to the cart's device, valid 24 hours, never stored. `getOrder` accepts it in `X-Order-Access-Token` in place of a session, so a guest who checked out with no account, or whose session ended, still sees the confirmation (WEB-013 keeps it in its navigation state). It reads this order only and grants nothing else."
+    "description": "**What lets the device that just checked out read the order it paid for** (decided 20 October 2026, Chinmay, R8 blocker cause IDENTITY-C52, option A; CHG-R8SPN-025). Returned only in `checkoutCart`'s answer, null everywhere else: a signed token bound to this order and to the cart's device, valid 24 hours, never stored. `getOrder` accepts it in `X-Order-Access-Token` in place of a session, so a guest who checked out with no account, or whose session ended, still sees the confirmation (WEB-013 keeps it in its navigation state). It reads this order only and grants nothing else.\n\n**What it is** (ADAM CR-191, option A, decided 21 October 2026; CHG-R9CR-004; the same treatment as common.yaml `AdmissionToken`): a compact JWS signed **HMAC-SHA256** with a Key Vault secret of the tenant's cell (the order access token key, rotated like the other signing secrets; Orders signs and checks it, it never leaves the server). Its claims: `tid` the tenant, `oid` this order's id, `did` the device id from `checkoutCart`'s `X-Device-Id`, `exp` 24 hours after it is minted, and `jti` a unique id (a UUIDv7). Minted by `checkoutCart` only when `X-Device-Id` was sent; checked by `getOrder`, which also needs the same `X-Device-Id`."
    },
    "orderNumber": {
     "x-ticvai-unique": "tenant",
@@ -2096,6 +2099,7 @@
  },
  "OrderLine": {
   "x-ticvai-persistence": "orders.order_line + orders.order_line_eligibility + orders.order_line_discount",
+  "x-ticvai-rls": "guest-reads-own",
   "x-ticvai-retired-columns": [
    "promotion_id",
    "name",

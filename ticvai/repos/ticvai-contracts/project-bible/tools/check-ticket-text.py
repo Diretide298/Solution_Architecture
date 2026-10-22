@@ -23,6 +23,29 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import audit_guard as g  # noqa: E402
 import frontend_repos as fr  # noqa: E402
+import ticket_done as td  # noqa: E402  the design a screen ticket names (CHG-R9UI-004)
+
+DESIGN_SAID = "Design (client-approved, build identical)"
+VISUAL_SAID = "the visual check passes for every state"
+
+
+def design_findings(sid: str, text: str, where: str) -> list:
+    """**The ticket names the design it is built to** (CHG-R9UI-004; the lead, 21 October 2026). WEB-007's build sub-task
+    said "Matches the design" and named none; its state lines were cut to "State error: Could not load.". For a
+    client-verified screen: the design head, the visual check, and each state's look by its pattern's name."""
+    if not td.design_verified(sid):
+        return []
+    out = []
+    flat = " ".join(text.split())
+    if DESIGN_SAID not in flat:
+        out.append(f"{where}: {sid} is client-verified and the text names no client-approved design")
+    if VISUAL_SAID not in flat:
+        out.append(f"{where}: {sid}'s done-when is not the visual check of every state")
+    e = (td.design_frames().get("screens") or {}).get(sid) or {}
+    missing = sorted(st for st, v in (e.get("states") or {}).items() if v.get("name") and v["name"] not in flat)
+    if missing:
+        out.append(f"{where}: {sid}: the look of {', '.join(missing[:4])} is not named")
+    return out
 
 RULES = {
     "T-DONE-WHEN": "a work ticket has checkable Done-when items (R041 R053 R059)",
@@ -43,6 +66,8 @@ RULES = {
     "T-SPEC-SCREEN": "a frontend spec section's route and wave match the screen record (R274)",
     "T-APP-REPO": "a screen ticket and its spec section name the screen's repository (or none yet), never an "
                   "apps/<app>/ folder of the old single workspace (CHG-R6-060)",
+    "T-DESIGN": "a client-verified screen's ticket, build sub-task and spec section name its client-approved design "
+                "and each state's look, and its done-when is the visual check (CHG-R9UI-004)",
 }
 
 SCREEN_ID = re.compile(r"\b(?:[A-Z]{2,5})-\d{3,4}\b")
@@ -74,7 +99,11 @@ def main() -> int:
                                          f"({', '.join('apps/' + a + '/' for a in old_dirs)}), which no repository has")
         if "#" in key:
             # A sub-task (`KEY#build`, `KEY#<operationId>`) repeats its parent's text; the parent is
-            # checked once.
+            # checked once. The build sub-task carries the design and its own look check (CHG-R9UI-004).
+            sh_ = re.search(r"^### ([A-Z]{2,5}-\d{3,4}) ", text, re.M)
+            if key.endswith("#build") and sh_:
+                for msg in design_findings(sh_.group(1), text, key):
+                    guard.add("T-DESIGN", key, msg)
             continue
         container = "\nUnder this:" in "\n" + text
         lines = text.split("\n")
@@ -173,6 +202,8 @@ def main() -> int:
                 if want not in text:
                     guard.add("T-APP-REPO", key + ":repo", f"{key}: {sid} is built in "
                               f"{w['repo'] or 'no repository yet'} ({w['platform']}); the ticket does not say so")
+                for msg in design_findings(sid, text, key):
+                    guard.add("T-DESIGN", key, msg)
                 purpose = " ".join(str(sc.get("purpose") or "").split())
                 if purpose and purpose not in " ".join(text.split()):
                     guard.add("T-PURPOSE-CUT", key, f"{key}: the ticket does not carry {sid}'s "
@@ -228,6 +259,8 @@ def main() -> int:
             if old_dirs:
                 guard.add("T-APP-REPO", f"{page.name}:{sid}:apps", f"{page.name}: {sid} names "
                           f"{', '.join('apps/' + a + '/' for a in old_dirs)}, a folder of the old single workspace")
+            for msg in design_findings(sid, sec, page.name):
+                guard.add("T-DESIGN", f"{page.name}:{sid}", msg)
             if route and yroute and route.group(1) != yroute:
                 guard.add("T-SPEC-SCREEN", f"{page.name}:{sid}:route",
                           f"{page.name}: {sid} route {route.group(1)}, the screen says {yroute}")

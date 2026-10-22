@@ -13,6 +13,8 @@
 | Themes | light |
 | Directions | ltr, rtl |
 | Packages |  |
+| Design tokens | P02 `handoff/design-tokens/guest-app.yaml` (the CSS variables the approved app prototypes set on their root (tools/derive-design-tokens.py), applied per tenant from getPublishedTenantConfig's theme) |
+| App shell | ticvai-guest-app: SETUP-SHELL-GUEST-APP |
 | target | iOS / Android native |
 | distribution | App Store + Play, tenant developer account |
 | bundleUpdate | over-the-air for JS; store release for native |
@@ -117,7 +119,11 @@
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `HomeDefaultDashboard` |
 | Suggested location | `src/screens/general/HomeDefaultDashboard.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html` (mobile v4 (30 September build)), view: Home tab (Summit Peaks, after the intro). Wireframe frame `wireframes/P02 Guest App.dc.html#gst-001`, which adam_pull writes into the ticket folder as `wireframe-gst-001.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-app.yaml`). Each state's look: loading: the venue loader (splash) (the prototype, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...")); error: the error note with the mascot (`wireframes/states/P02 Guest App states.dc.html#gst-state-error`, pulled as `wireframe-gst-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the dashed empty note (the prototype, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}")); emptyNoResults: the "No results for ..." note (the prototype, line 2632 (Explore search)); emptyNoAccess: the sign-in prompt (the prototype, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out)); offline: the offline bar and the paused actions (`wireframes/states/P02 Guest App states.dc.html#gst-state-offline`, pulled as `wireframe-gst-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; introVideo: the intro video overlay (first launch) (the prototype, lines 1594-1606 ("{{ introOn }}"), with its own buffering ring ("{{ vidLoading }}") and Skip introduction). The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -141,15 +147,15 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The home default list. |
-| error | Could not load. Names which read failed and leaves the home default untouched. |
-| emptyFirstRun | No home default yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
-| emptyNoResults | Nothing is on sale at this venue today. Said in the tenant's voice, with Change venue; the venue overview and the type tiles stay. |
-| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
-| introVideo | First-launch state (MOB-5): the intro video overlay plays over Home while Home loads behind it; Skip introduction reveals Home. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The home default list. | the venue loader (splash), `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...") |
+| error | Could not load. Names which read failed and leaves the home default untouched. | the error note with the mascot, `wireframes/states/P02 Guest App states.dc.html#gst-state-error` (pulled as `wireframe-gst-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | No home default yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. | the dashed empty note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}") |
+| emptyNoResults | Nothing is on sale at this venue today. Said in the tenant's voice, with Change venue; the venue overview and the type tiles stay. | the "No results for ..." note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, line 2632 (Explore search) |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. | the sign-in prompt, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out) |
+| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. | the offline bar and the paused actions, `wireframes/states/P02 Guest App states.dc.html#gst-state-offline` (pulled as `wireframe-gst-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| introVideo | First-launch state (MOB-5): the intro video overlay plays over Home while Home loads behind it; Skip introduction reveals Home. | the intro video overlay (first launch), `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1594-1606 ("{{ introOn }}"), with its own buffering ring ("{{ vidLoading }}") and Skip introduction |
 
 **Goes to**
 
@@ -234,7 +240,11 @@
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `ExploreCategoriesList` |
 | Suggested location | `src/screens/general/ExploreCategoriesList.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html` (mobile v4 (30 September build)), view: Explore tab. Wireframe frame `wireframes/P02 Guest App.dc.html#gst-002`, which adam_pull writes into the ticket folder as `wireframe-gst-002.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-app.yaml`). Each state's look: loading: the venue loader (splash) (the prototype, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...")); error: the error note with the mascot (`wireframes/states/P02 Guest App states.dc.html#gst-state-error`, pulled as `wireframe-gst-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the dashed empty note (the prototype, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}")); emptyNoResults: the "No results for ..." note (the prototype, line 2632 (Explore search)); emptyNoAccess: the sign-in prompt (the prototype, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out)); offline: the offline bar and the paused actions (`wireframes/states/P02 Guest App states.dc.html#gst-state-offline`, pulled as `wireframe-gst-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Operations**
 
@@ -246,14 +256,14 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The explore categories list. |
-| error | Could not load. Names which read failed and leaves the explore categories untouched. |
-| emptyFirstRun | No explore categories yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
-| emptyNoResults | Nothing in the category picked; the other categories are still there. |
-| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The explore categories list. | the venue loader (splash), `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...") |
+| error | Could not load. Names which read failed and leaves the explore categories untouched. | the error note with the mascot, `wireframes/states/P02 Guest App states.dc.html#gst-state-error` (pulled as `wireframe-gst-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | No explore categories yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. | the dashed empty note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}") |
+| emptyNoResults | Nothing in the category picked; the other categories are still there. | the "No results for ..." note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, line 2632 (Explore search) |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. | the sign-in prompt, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out) |
+| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. | the offline bar and the paused actions, `wireframes/states/P02 Guest App states.dc.html#gst-state-offline` (pulled as `wireframe-gst-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 
@@ -277,7 +287,11 @@
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `BuyTicketsList` |
 | Suggested location | `src/screens/general/BuyTicketsList.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html` (mobile v4 (30 September build)), view: Buy tickets (the centre tab). Wireframe frame `wireframes/P02 Guest App.dc.html#gst-003`, which adam_pull writes into the ticket folder as `wireframe-gst-003.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-app.yaml`). Each state's look: loading: the venue loader (splash) (the prototype, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...")); error: the error note with the mascot (`wireframes/states/P02 Guest App states.dc.html#gst-state-error`, pulled as `wireframe-gst-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the dashed empty note (the prototype, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}")); emptyNoResults: the "No results for ..." note (the prototype, line 2632 (Explore search)); emptyNoAccess: the sign-in prompt (the prototype, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out)); offline: the offline bar and the paused actions (`wireframes/states/P02 Guest App states.dc.html#gst-state-offline`, pulled as `wireframe-gst-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -298,14 +312,14 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The event attraction listing list. |
-| error | Could not load. Names which read failed and leaves the event attraction listing untouched. |
-| emptyFirstRun | No event attraction listing yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
-| emptyNoResults | Nothing matches what was typed or picked; the other tickets are still there. Names it and offers to clear it. |
-| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The event attraction listing list. | the venue loader (splash), `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...") |
+| error | Could not load. Names which read failed and leaves the event attraction listing untouched. | the error note with the mascot, `wireframes/states/P02 Guest App states.dc.html#gst-state-error` (pulled as `wireframe-gst-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | No event attraction listing yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. | the dashed empty note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}") |
+| emptyNoResults | Nothing matches what was typed or picked; the other tickets are still there. Names it and offers to clear it. | the "No results for ..." note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, line 2632 (Explore search) |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. | the sign-in prompt, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out) |
+| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. | the offline bar and the paused actions, `wireframes/states/P02 Guest App states.dc.html#gst-state-offline` (pulled as `wireframe-gst-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 
@@ -333,7 +347,11 @@
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `ItemDetail` |
 | Suggested location | `src/screens/general/ItemDetail.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html` (mobile v4 (30 September build)), view: Explore → Summit Coaster (Item detail). Wireframe frame `wireframes/P02 Guest App.dc.html#gst-004`, which adam_pull writes into the ticket folder as `wireframe-gst-004.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-app.yaml`). Each state's look: loading: the venue loader (splash) (the prototype, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...")); videoBuffering: the poster frame in the video's place (the prototype, line 805 (an item's video, data-poster) and 331-349 (the hero video, poster ven.hero)); videoUnavailable: the poster frame in the video's place (the prototype, line 805 (an item's video, data-poster) and 331-349 (the hero video, poster ven.hero)); error: the error note with the mascot (`wireframes/states/P02 Guest App states.dc.html#gst-state-error`, pulled as `wireframe-gst-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the dashed empty note (the prototype, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}")); emptyNoResults: the "No results for ..." note (the prototype, line 2632 (Explore search)); emptyNoAccess: the sign-in prompt (the prototype, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out)); offline: the offline bar and the paused actions (`wireframes/states/P02 Guest App states.dc.html#gst-state-offline`, pulled as `wireframe-gst-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -358,16 +376,16 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The video is not part of loading (client meeting 30 September, MoM 4.8): the attraction renders as it arrives and no loader or loading screen is ever drawn over the video. |
-| videoBuffering | Poster frame, not a loader (client meeting 30 September, MoM 4.8): from the info button until the first frames arrive the ride's poster (primary image, else the video's first frame) fills the video area and playback starts in place as soon as it can; no spinner, overlay or blocking screen. The details beside it stay usable throughout. |
-| videoUnavailable | The video cannot play (no video, a failed stream, data saver on). The poster stays and the details are unaffected; no error screen and no loader. |
-| error | Could not load. Names which read failed and leaves the attraction untouched. |
-| emptyFirstRun | No attraction yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
-| emptyNoResults | No performance in the next days shown; the strip says so and offers the calendar. |
-| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The video is not part of loading (client meeting 30 September, MoM 4.8): the attraction renders as it arrives and no loader or loading screen is ever drawn over the video. | the venue loader (splash), `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...") |
+| videoBuffering | Poster frame, not a loader (client meeting 30 September, MoM 4.8): from the info button until the first frames arrive the ride's poster (primary image, else the video's first frame) fills the video area and playback starts in place as soon as it can; no spinner, overlay or blocking screen. The details beside it stay usable throughout. | the poster frame in the video's place, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, line 805 (an item's video, data-poster) and 331-349 (the hero video, poster ven.hero) |
+| videoUnavailable | The video cannot play (no video, a failed stream, data saver on). The poster stays and the details are unaffected; no error screen and no loader. | the poster frame in the video's place, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, line 805 (an item's video, data-poster) and 331-349 (the hero video, poster ven.hero) |
+| error | Could not load. Names which read failed and leaves the attraction untouched. | the error note with the mascot, `wireframes/states/P02 Guest App states.dc.html#gst-state-error` (pulled as `wireframe-gst-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | No attraction yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. | the dashed empty note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}") |
+| emptyNoResults | No performance in the next days shown; the strip says so and offers the calendar. | the "No results for ..." note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, line 2632 (Explore search) |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. | the sign-in prompt, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out) |
+| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. | the offline bar and the paused actions, `wireframes/states/P02 Guest App states.dc.html#gst-state-offline` (pulled as `wireframe-gst-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 
@@ -396,7 +414,11 @@
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `WhatsOnList` |
 | Suggested location | `src/screens/general/WhatsOnList.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html` (rev 3), view: Account → All screens → Wave 1 → What’s on. Wireframe frame `wireframes/P02 Guest App.dc.html#gst-005`, which adam_pull writes into the ticket folder as `wireframe-gst-005.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-app.yaml`). Each state's look: loading: the venue loader (splash) (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...")); error: the error note with the mascot (`wireframes/states/P02 Guest App states.dc.html#gst-state-error`, pulled as `wireframe-gst-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the dashed empty note (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}")); emptyNoResults: the "No results for ..." note (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, line 2632 (Explore search)); emptyNoAccess: the sign-in prompt (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out)); offline: the offline bar and the paused actions (`wireframes/states/P02 Guest App states.dc.html#gst-state-offline`, pulled as `wireframe-gst-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -414,14 +436,14 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The what's list. |
-| error | Could not load. Names which read failed and leaves the what's untouched. |
-| emptyFirstRun | No what's yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
-| emptyNoResults | Nothing matches the filter on from, to and the what's are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The what's list. | the venue loader (splash), `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...") |
+| error | Could not load. Names which read failed and leaves the what's untouched. | the error note with the mascot, `wireframes/states/P02 Guest App states.dc.html#gst-state-error` (pulled as `wireframe-gst-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | No what's yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. | the dashed empty note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}") |
+| emptyNoResults | Nothing matches the filter on from, to and the what's are still there. Names the active filter and offers to clear it. | the "No results for ..." note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, line 2632 (Explore search) |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. | the sign-in prompt, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out) |
+| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. | the offline bar and the paused actions, `wireframes/states/P02 Guest App states.dc.html#gst-state-offline` (pulled as `wireframe-gst-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 
@@ -444,7 +466,11 @@
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `EventExhibitionDetailsDetail` |
 | Suggested location | `src/screens/general/EventExhibitionDetailsDetail.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
-| Pattern | statusTracker |
+| Layout pattern | statusTracker (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html` (mobile v4 (30 September build)), view: Explore → Shows → Night of Nine → More info (Item detail, an event). Wireframe frame `wireframes/P02 Guest App.dc.html#gst-006`, which adam_pull writes into the ticket folder as `wireframe-gst-006.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-app.yaml`). Each state's look: loading: the venue loader (splash) (the prototype, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...")); error: the error note with the mascot (`wireframes/states/P02 Guest App states.dc.html#gst-state-error`, pulled as `wireframe-gst-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the dashed empty note (the prototype, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}")); emptyNoAccess: the sign-in prompt (the prototype, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out)); offline: the offline bar and the paused actions (`wireframes/states/P02 Guest App states.dc.html#gst-state-offline`, pulled as `wireframe-gst-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -462,13 +488,13 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The event exhibition, read by `getPerformance`. |
-| error | Could not load. Names which read failed and leaves the event exhibition untouched. |
-| emptyFirstRun | No event exhibition yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
-| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The event exhibition, read by `getPerformance`. | the venue loader (splash), `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...") |
+| error | Could not load. Names which read failed and leaves the event exhibition untouched. | the error note with the mascot, `wireframes/states/P02 Guest App states.dc.html#gst-state-error` (pulled as `wireframe-gst-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | No event exhibition yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. | the dashed empty note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}") |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. | the sign-in prompt, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out) |
+| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. | the offline bar and the paused actions, `wireframes/states/P02 Guest App states.dc.html#gst-state-offline` (pulled as `wireframe-gst-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 
@@ -491,7 +517,11 @@
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `SelectDateAndTimeDetail` |
 | Suggested location | `src/screens/general/SelectDateAndTimeDetail.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html` (mobile v4 (30 September build)), view: Buy tickets → Timed entry → Book now (step 1: date, then entry window) (it shows part of this screen: build the rest from the screen spec in the same look). Wireframe frame `wireframes/P02 Guest App.dc.html#gst-007`, which adam_pull writes into the ticket folder as `wireframe-gst-007.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-app.yaml`). Each state's look: loading: the venue loader (splash) (the prototype, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...")); error: the error note with the mascot (`wireframes/states/P02 Guest App states.dc.html#gst-state-error`, pulled as `wireframe-gst-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the dashed empty note (the prototype, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}")); emptyNoResults: the "No results for ..." note (the prototype, line 2632 (Explore search)); emptyNoAccess: the sign-in prompt (the prototype, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out)); offline: the offline bar and the paused actions (`wireframes/states/P02 Guest App states.dc.html#gst-state-offline`, pulled as `wireframe-gst-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -520,14 +550,14 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The select date time list. |
-| error | Could not load. Names which read failed and leaves the select date time untouched. |
-| emptyFirstRun | No select date time yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
-| emptyNoResults | No time matches the part of the day or the language picked, and the other times are still there. Names the filter and offers to clear it. |
-| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The select date time list. | the venue loader (splash), `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...") |
+| error | Could not load. Names which read failed and leaves the select date time untouched. | the error note with the mascot, `wireframes/states/P02 Guest App states.dc.html#gst-state-error` (pulled as `wireframe-gst-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | No select date time yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. | the dashed empty note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}") |
+| emptyNoResults | No time matches the part of the day or the language picked, and the other times are still there. Names the filter and offers to clear it. | the "No results for ..." note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, line 2632 (Explore search) |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. | the sign-in prompt, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out) |
+| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. | the offline bar and the paused actions, `wireframes/states/P02 Guest App states.dc.html#gst-state-offline` (pulled as `wireframe-gst-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 
@@ -553,7 +583,11 @@
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `TicketsAndAddOnsList` |
 | Suggested location | `src/screens/general/TicketsAndAddOnsList.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html` (mobile v4 (30 September build)), view: Buy tickets → Dated day pass → Book now → Fri 2 Oct (step 2: tickets; add-ons are step 3) (it shows part of this screen: build the rest from the screen spec in the same look). Wireframe frame `wireframes/P02 Guest App.dc.html#gst-008`, which adam_pull writes into the ticket folder as `wireframe-gst-008.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-app.yaml`). Each state's look: loading: the venue loader (splash) (the prototype, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...")); error: the error note with the mascot (`wireframes/states/P02 Guest App states.dc.html#gst-state-error`, pulled as `wireframe-gst-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the dashed empty note (the prototype, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}")); emptyNoAccess: the sign-in prompt (the prototype, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out)); offline: the offline bar and the paused actions (`wireframes/states/P02 Guest App states.dc.html#gst-state-offline`, pulled as `wireframe-gst-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyNoResults: the "No results for ..." note (the prototype, line 2632 (Explore search)). The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -578,14 +612,14 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The ticket types of the product, with prices. |
-| error | Could not load. Names which read failed; nothing is added. |
-| emptyFirstRun | This product has no ticket types on sale. Says so and offers the product page. |
-| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
-| emptyNoResults | No ticket in the category picked. Names the category and offers the others. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The ticket types of the product, with prices. | the venue loader (splash), `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...") |
+| error | Could not load. Names which read failed; nothing is added. | the error note with the mascot, `wireframes/states/P02 Guest App states.dc.html#gst-state-error` (pulled as `wireframe-gst-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | This product has no ticket types on sale. Says so and offers the product page. | the dashed empty note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}") |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. | the sign-in prompt, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out) |
+| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. | the offline bar and the paused actions, `wireframes/states/P02 Guest App states.dc.html#gst-state-offline` (pulled as `wireframe-gst-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyNoResults | No ticket in the category picked. Names the category and offers the others. | the "No results for ..." note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, line 2632 (Explore search) |
 
 **Goes to**
 
@@ -611,7 +645,11 @@
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `ReviewAndPaymentForm` |
 | Suggested location | `src/screens/general/ReviewAndPaymentForm.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
-| Pattern | statusTracker |
+| Layout pattern | statusTracker (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html` (Mobile App v4, 29 September 2026) (it does not draw this screen: build it from the screen spec in the look of the frame below). Wireframe frame `wireframes/P02 Guest App.dc.html#gst-009`, which adam_pull writes into the ticket folder as `wireframe-gst-009.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-app.yaml`). Each state's look: loading: the venue loader (splash) (the prototype, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...")); error: the error note with the mascot (`wireframes/states/P02 Guest App states.dc.html#gst-state-error`, pulled as `wireframe-gst-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the dashed empty note (the prototype, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}")); emptyNoAccess: the sign-in prompt (the prototype, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out)); offline: the offline bar and the paused actions (`wireframes/states/P02 Guest App states.dc.html#gst-state-offline`, pulled as `wireframe-gst-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -638,13 +676,13 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The review payment, read by `getCart`. |
-| error | Could not load. Names which read failed and leaves the review payment untouched. |
-| emptyFirstRun | No review payment yet. Offers Create payment (`createPayment`). |
-| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | Not available, and the offline banner says why. A payment needs the gateway, and pretending otherwise takes money nobody can confirm. What was typed stays on screen so nothing is entered twice. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The review payment, read by `getCart`. | the venue loader (splash), `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...") |
+| error | Could not load. Names which read failed and leaves the review payment untouched. | the error note with the mascot, `wireframes/states/P02 Guest App states.dc.html#gst-state-error` (pulled as `wireframe-gst-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | No review payment yet. Offers Create payment (`createPayment`). | the dashed empty note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}") |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. | the sign-in prompt, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out) |
+| offline | Not available, and the offline banner says why. A payment needs the gateway, and pretending otherwise takes money nobody can confirm. What was typed stays on screen so nothing is entered twice. | the offline bar and the paused actions, `wireframes/states/P02 Guest App states.dc.html#gst-state-offline` (pulled as `wireframe-gst-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 
@@ -668,7 +706,11 @@
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `BookingConfirmationDetail` |
 | Suggested location | `src/screens/general/BookingConfirmationDetail.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
-| Pattern | statusTracker |
+| Layout pattern | statusTracker (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html` (rev 3), view: Account → All screens → Wave 1 → Booking confirmation (#confirm). Wireframe frame `wireframes/P02 Guest App.dc.html#gst-010`, which adam_pull writes into the ticket folder as `wireframe-gst-010.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-app.yaml`). Each state's look: loading: the venue loader (splash) (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...")); error: the error note with the mascot (`wireframes/states/P02 Guest App states.dc.html#gst-state-error`, pulled as `wireframe-gst-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the dashed empty note (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}")); emptyNoAccess: the sign-in prompt (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out)); offline: the offline bar and the paused actions (`wireframes/states/P02 Guest App states.dc.html#gst-state-offline`, pulled as `wireframe-gst-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -688,13 +730,13 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The booking confirmation, read by `getOrder`. |
-| error | Could not load. Names which read failed and leaves the booking confirmation untouched. |
-| emptyFirstRun | No booking confirmation yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
-| emptyNoAccess | Shown when the caller lacks `ORDER_VIEW`, which `getOrder` requires to show this screen, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `GUEST_VIEW` for `verifyGuestEmail`; `ORDER_REPRINT` for `reprintOrder`. |
-| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The booking confirmation, read by `getOrder`. | the venue loader (splash), `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...") |
+| error | Could not load. Names which read failed and leaves the booking confirmation untouched. | the error note with the mascot, `wireframes/states/P02 Guest App states.dc.html#gst-state-error` (pulled as `wireframe-gst-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | No booking confirmation yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. | the dashed empty note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}") |
+| emptyNoAccess | Shown when the caller lacks `ORDER_VIEW`, which `getOrder` requires to show this screen, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `GUEST_VIEW` for `verifyGuestEmail`; `ORDER_REPRINT` for `reprintOrder`. | the sign-in prompt, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out) |
+| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. | the offline bar and the paused actions, `wireframes/states/P02 Guest App states.dc.html#gst-state-offline` (pulled as `wireframe-gst-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 
@@ -715,7 +757,11 @@
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `WalletOverviewDashboard` |
 | Suggested location | `src/screens/general/WalletOverviewDashboard.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html` (Mobile App v4, 29 September 2026) (it does not draw this screen: build it from the screen spec in the look of the frame below). Wireframe frame `wireframes/P02 Guest App.dc.html#gst-011`, which adam_pull writes into the ticket folder as `wireframe-gst-011.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-app.yaml`). Each state's look: loading: the venue loader (splash) (the prototype, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...")); error: the error note with the mascot (`wireframes/states/P02 Guest App states.dc.html#gst-state-error`, pulled as `wireframe-gst-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the dashed empty note (the prototype, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}")); emptyNoResults: the "No results for ..." note (the prototype, line 2632 (Explore search)); emptyNoAccess: the sign-in prompt (the prototype, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out)); offline: the offline bar and the paused actions (`wireframes/states/P02 Guest App states.dc.html#gst-state-offline`, pulled as `wireframe-gst-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -739,14 +785,14 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The wallet overview list. |
-| error | Could not load. Names which read failed and leaves the wallet overview untouched. |
-| emptyFirstRun | No wallet overview yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
-| emptyNoResults | Never shown: `listWalletTransactions` takes no filter, so an empty list is always the first-run state above. |
-| emptyNoAccess | Shown when the caller lacks `WALLET_VIEW`, which `getWallet` requires to show this screen, and names that permission (the screen's other reads need `ORDER_VIEW` and say so in their own panels). Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `WALLET_OPERATE` for `setWalletAutoReloadSetting`, `settleWalletAtExit`. |
-| offline | The offline banner shows. Balances and stored cards already loaded stay visible with their age, cards masked. Storing a card and transferring value need the server. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The wallet overview list. | the venue loader (splash), `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...") |
+| error | Could not load. Names which read failed and leaves the wallet overview untouched. | the error note with the mascot, `wireframes/states/P02 Guest App states.dc.html#gst-state-error` (pulled as `wireframe-gst-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | No wallet overview yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. | the dashed empty note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}") |
+| emptyNoResults | Never shown: `listWalletTransactions` takes no filter, so an empty list is always the first-run state above. | the "No results for ..." note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, line 2632 (Explore search) |
+| emptyNoAccess | Shown when the caller lacks `WALLET_VIEW`, which `getWallet` requires to show this screen, and names that permission (the screen's other reads need `ORDER_VIEW` and say so in their own panels). Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `WALLET_OPERATE` for `setWalletAutoReloadSetting`, `settleWalletAtExit`. | the sign-in prompt, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out) |
+| offline | The offline banner shows. Balances and stored cards already loaded stay visible with their age, cards masked. Storing a card and transferring value need the server. | the offline bar and the paused actions, `wireframes/states/P02 Guest App states.dc.html#gst-state-offline` (pulled as `wireframe-gst-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 
@@ -769,7 +815,11 @@
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `MyTicketsList` |
 | Suggested location | `src/screens/general/MyTicketsList.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html` (mobile v4 (30 September build)), view: Tickets tab. Wireframe frame `wireframes/P02 Guest App.dc.html#gst-012`, which adam_pull writes into the ticket folder as `wireframe-gst-012.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-app.yaml`). Each state's look: loading: the venue loader (splash) (the prototype, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...")); error: the error note with the mascot (`wireframes/states/P02 Guest App states.dc.html#gst-state-error`, pulled as `wireframe-gst-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the dashed empty note (the prototype, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}")); emptyNoResults: the "No results for ..." note (the prototype, line 2632 (Explore search)); emptyNoAccess: the sign-in prompt (the prototype, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out)); offline: the offline bar and the paused actions (`wireframes/states/P02 Guest App states.dc.html#gst-state-offline`, pulled as `wireframe-gst-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -793,14 +843,14 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The tickets list. |
-| error | Could not load. Names which read failed and leaves the tickets untouched. |
-| emptyFirstRun | No tickets yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
-| emptyNoResults | Nothing matches the filter on state, includeShared and the tickets are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | The offline banner shows. Tickets already loaded stay visible with their age, and a ticket's rotating code is derived on the device from its seed, so it changes with no signal (decided 28 September, audit R230). Sharing, transferring and adding to a phone wallet need the connection. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The tickets list. | the venue loader (splash), `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...") |
+| error | Could not load. Names which read failed and leaves the tickets untouched. | the error note with the mascot, `wireframes/states/P02 Guest App states.dc.html#gst-state-error` (pulled as `wireframe-gst-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | No tickets yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. | the dashed empty note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}") |
+| emptyNoResults | Nothing matches the filter on state, includeShared and the tickets are still there. Names the active filter and offers to clear it. | the "No results for ..." note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, line 2632 (Explore search) |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. | the sign-in prompt, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out) |
+| offline | The offline banner shows. Tickets already loaded stay visible with their age, and a ticket's rotating code is derived on the device from its seed, so it changes with no signal (decided 28 September, audit R230). Sharing, transferring and adding to a phone wallet need the connection. | the offline bar and the paused actions, `wireframes/states/P02 Guest App states.dc.html#gst-state-offline` (pulled as `wireframe-gst-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 
@@ -822,7 +872,11 @@
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `TicketDetailsDetail` |
 | Suggested location | `src/screens/general/TicketDetailsDetail.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
-| Pattern | statusTracker |
+| Layout pattern | statusTracker (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html` (rev 3), view: Account → All screens → Wave 1 → Ticket details. Wireframe frame `wireframes/P02 Guest App.dc.html#gst-013`, which adam_pull writes into the ticket folder as `wireframe-gst-013.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-app.yaml`). Each state's look: loading: the venue loader (splash) (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...")); error: the error note with the mascot (`wireframes/states/P02 Guest App states.dc.html#gst-state-error`, pulled as `wireframe-gst-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the dashed empty note (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}")); emptyNoAccess: the sign-in prompt (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out)); offline: the offline bar and the paused actions (`wireframes/states/P02 Guest App states.dc.html#gst-state-offline`, pulled as `wireframe-gst-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -846,13 +900,13 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | Availability is live, never cached |
-| error | Availability unavailable. Selection is blocked — overselling is worse than waiting |
-| emptyFirstRun | Sold out is a real answer. Offers the next available rather than a dead end |
-| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | The offline banner shows. Tickets already loaded stay visible with their age, and a ticket's rotating code is derived on the device from its seed, so it changes with no signal (decided 28 September, audit R230). Sharing, transferring and adding to a phone wallet need the connection. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | Availability is live, never cached | the venue loader (splash), `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...") |
+| error | Availability unavailable. Selection is blocked — overselling is worse than waiting | the error note with the mascot, `wireframes/states/P02 Guest App states.dc.html#gst-state-error` (pulled as `wireframe-gst-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | Sold out is a real answer. Offers the next available rather than a dead end | the dashed empty note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}") |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. | the sign-in prompt, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out) |
+| offline | The offline banner shows. Tickets already loaded stay visible with their age, and a ticket's rotating code is derived on the device from its seed, so it changes with no signal (decided 28 September, audit R230). Sharing, transferring and adding to a phone wallet need the connection. | the offline bar and the paused actions, `wireframes/states/P02 Guest App states.dc.html#gst-state-offline` (pulled as `wireframe-gst-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 
@@ -874,7 +928,11 @@
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `TicketTransferDetail` |
 | Suggested location | `src/screens/general/TicketTransferDetail.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html` (rev 3), view: Account → All screens → Wave 2 → Ticket transfer (also Account → Ticket transfer). Wireframe frame `wireframes/P02 Guest App.dc.html#gst-014`, which adam_pull writes into the ticket folder as `wireframe-gst-014.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-app.yaml`). Each state's look: loading: the venue loader (splash) (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...")); error: the error note with the mascot (`wireframes/states/P02 Guest App states.dc.html#gst-state-error`, pulled as `wireframe-gst-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the dashed empty note (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}")); emptyNoResults: the "No results for ..." note (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, line 2632 (Explore search)); emptyNoAccess: the sign-in prompt (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out)); offline: the offline bar and the paused actions (`wireframes/states/P02 Guest App states.dc.html#gst-state-offline`, pulled as `wireframe-gst-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -894,14 +952,14 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | Availability is live, never cached |
-| error | Availability unavailable. Selection is blocked — overselling is worse than waiting |
-| emptyFirstRun | Sold out is a real answer. Offers the next available rather than a dead end |
-| emptyNoResults | Nothing matches the filter on venueId, principalId, shiftId, status, createdFrom, createdTo and the ticket transfer are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | The offline banner shows. Sending, claiming and listing for resale need the connection — a transfer nobody received is a ticket nobody holds. Tickets already loaded stay visible. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | Availability is live, never cached | the venue loader (splash), `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...") |
+| error | Availability unavailable. Selection is blocked — overselling is worse than waiting | the error note with the mascot, `wireframes/states/P02 Guest App states.dc.html#gst-state-error` (pulled as `wireframe-gst-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | Sold out is a real answer. Offers the next available rather than a dead end | the dashed empty note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}") |
+| emptyNoResults | Nothing matches the filter on venueId, principalId, shiftId, status, createdFrom, createdTo and the ticket transfer are still there. Names the active filter and offers to clear it. | the "No results for ..." note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, line 2632 (Explore search) |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. | the sign-in prompt, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out) |
+| offline | The offline banner shows. Sending, claiming and listing for resale need the connection — a transfer nobody received is a ticket nobody holds. Tickets already loaded stay visible. | the offline bar and the paused actions, `wireframes/states/P02 Guest App states.dc.html#gst-state-offline` (pulled as `wireframe-gst-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 
@@ -922,7 +980,11 @@
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `MembershipsDetail` |
 | Suggested location | `src/screens/general/MembershipsDetail.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html` (Mobile App v4, 29 September 2026) (it does not draw this screen: build it from the screen spec in the look of the frame below). Wireframe frame `wireframes/P02 Guest App.dc.html#gst-015`, which adam_pull writes into the ticket folder as `wireframe-gst-015.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-app.yaml`). Each state's look: loading: the venue loader (splash) (the prototype, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...")); error: the error note with the mascot (`wireframes/states/P02 Guest App states.dc.html#gst-state-error`, pulled as `wireframe-gst-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the dashed empty note (the prototype, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}")); emptyNoResults: the "No results for ..." note (the prototype, line 2632 (Explore search)); emptyNoAccess: the sign-in prompt (the prototype, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out)); offline: the offline bar and the paused actions (`wireframes/states/P02 Guest App states.dc.html#gst-state-offline`, pulled as `wireframe-gst-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -948,14 +1010,14 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The memberships list. |
-| error | Could not load. Names which read failed and leaves the memberships untouched. |
-| emptyFirstRun | No memberships yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
-| emptyNoResults | Nothing matches the filter on from, to and the memberships are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The memberships list. | the venue loader (splash), `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...") |
+| error | Could not load. Names which read failed and leaves the memberships untouched. | the error note with the mascot, `wireframes/states/P02 Guest App states.dc.html#gst-state-error` (pulled as `wireframe-gst-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | No memberships yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. | the dashed empty note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}") |
+| emptyNoResults | Nothing matches the filter on from, to and the memberships are still there. Names the active filter and offers to clear it. | the "No results for ..." note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, line 2632 (Explore search) |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. | the sign-in prompt, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out) |
+| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. | the offline bar and the paused actions, `wireframes/states/P02 Guest App states.dc.html#gst-state-offline` (pulled as `wireframe-gst-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 
@@ -977,7 +1039,11 @@
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `MyReservationsDetail` |
 | Suggested location | `src/screens/general/MyReservationsDetail.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html` (rev 3), view: Account → All screens → Wave 2 → My reservations (also Account → Reservations). Wireframe frame `wireframes/P02 Guest App.dc.html#gst-016`, which adam_pull writes into the ticket folder as `wireframe-gst-016.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-app.yaml`). Each state's look: loading: the venue loader (splash) (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...")); error: the error note with the mascot (`wireframes/states/P02 Guest App states.dc.html#gst-state-error`, pulled as `wireframe-gst-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the dashed empty note (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}")); emptyNoResults: the "No results for ..." note (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, line 2632 (Explore search)); emptyNoAccess: the sign-in prompt (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out)); offline: the offline bar and the paused actions (`wireframes/states/P02 Guest App states.dc.html#gst-state-offline`, pulled as `wireframe-gst-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -996,14 +1062,14 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The reservations list. |
-| error | Could not load. Names which read failed and leaves the reservations untouched. |
-| emptyFirstRun | No reservations yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
-| emptyNoResults | Never shown as a filter result: an empty tab says there is nothing upcoming (or past) and offers to book. |
-| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | The offline banner shows. Reservations already loaded stay visible with their age. Booking, changing and cancelling need the connection — a table held offline is a table two people think they have. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The reservations list. | the venue loader (splash), `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...") |
+| error | Could not load. Names which read failed and leaves the reservations untouched. | the error note with the mascot, `wireframes/states/P02 Guest App states.dc.html#gst-state-error` (pulled as `wireframe-gst-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | No reservations yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. | the dashed empty note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}") |
+| emptyNoResults | Never shown as a filter result: an empty tab says there is nothing upcoming (or past) and offers to book. | the "No results for ..." note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, line 2632 (Explore search) |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. | the sign-in prompt, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out) |
+| offline | The offline banner shows. Reservations already loaded stay visible with their age. Booking, changing and cancelling need the connection — a table held offline is a table two people think they have. | the offline bar and the paused actions, `wireframes/states/P02 Guest App states.dc.html#gst-state-offline` (pulled as `wireframe-gst-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 
@@ -1025,7 +1091,11 @@
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `ReservationDetailsDetail` |
 | Suggested location | `src/screens/general/ReservationDetailsDetail.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
-| Pattern | statusTracker |
+| Layout pattern | statusTracker (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html` (rev 3), view: Account → All screens → Wave 2 → Reservation details. Wireframe frame `wireframes/P02 Guest App.dc.html#gst-017`, which adam_pull writes into the ticket folder as `wireframe-gst-017.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-app.yaml`). Each state's look: loading: the venue loader (splash) (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...")); error: the error note with the mascot (`wireframes/states/P02 Guest App states.dc.html#gst-state-error`, pulled as `wireframe-gst-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the dashed empty note (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}")); emptyNoAccess: the sign-in prompt (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out)); offline: the offline bar and the paused actions (`wireframes/states/P02 Guest App states.dc.html#gst-state-offline`, pulled as `wireframe-gst-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -1043,13 +1113,13 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The reservation, read by `getReservation`. |
-| error | Could not load. Names which read failed and leaves the reservation untouched. |
-| emptyFirstRun | No reservation yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
-| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | The offline banner shows. Reservations already loaded stay visible with their age. Booking, changing and cancelling need the connection — a table held offline is a table two people think they have. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The reservation, read by `getReservation`. | the venue loader (splash), `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...") |
+| error | Could not load. Names which read failed and leaves the reservation untouched. | the error note with the mascot, `wireframes/states/P02 Guest App states.dc.html#gst-state-error` (pulled as `wireframe-gst-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | No reservation yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. | the dashed empty note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}") |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. | the sign-in prompt, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out) |
+| offline | The offline banner shows. Reservations already loaded stay visible with their age. Booking, changing and cancelling need the connection — a table held offline is a table two people think they have. | the offline bar and the paused actions, `wireframes/states/P02 Guest App states.dc.html#gst-state-offline` (pulled as `wireframe-gst-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 
@@ -1070,7 +1140,11 @@
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `AddToCalendarRemindersDetail` |
 | Suggested location | `src/screens/general/AddToCalendarRemindersDetail.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html` (rev 3), view: Account → All screens → Wave 3 → Add to calendar / reminders. Wireframe frame `wireframes/P02 Guest App.dc.html#gst-018`, which adam_pull writes into the ticket folder as `wireframe-gst-018.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-app.yaml`). Each state's look: loading: the venue loader (splash) (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...")); error: the error note with the mascot (`wireframes/states/P02 Guest App states.dc.html#gst-state-error`, pulled as `wireframe-gst-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the dashed empty note (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}")); emptyNoResults: the "No results for ..." note (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, line 2632 (Explore search)); emptyNoAccess: the sign-in prompt (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out)); offline: the offline bar and the paused actions (`wireframes/states/P02 Guest App states.dc.html#gst-state-offline`, pulled as `wireframe-gst-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -1090,14 +1164,14 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The add calendar reminders list. |
-| error | Could not load. Names which read failed and leaves the add calendar reminders untouched. |
-| emptyFirstRun | No add calendar reminders yet. Offers Issue wallet pass (`issueWalletPass`); distinct from a filter that matched nothing. |
-| emptyNoResults | Nothing matches the filter on venueId, principalId, shiftId, status, createdFrom, createdTo and the add calendar reminders are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The add calendar reminders list. | the venue loader (splash), `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...") |
+| error | Could not load. Names which read failed and leaves the add calendar reminders untouched. | the error note with the mascot, `wireframes/states/P02 Guest App states.dc.html#gst-state-error` (pulled as `wireframe-gst-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | No add calendar reminders yet. Offers Issue wallet pass (`issueWalletPass`); distinct from a filter that matched nothing. | the dashed empty note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}") |
+| emptyNoResults | Nothing matches the filter on venueId, principalId, shiftId, status, createdFrom, createdTo and the add calendar reminders are still there. Names the active filter and offers to clear it. | the "No results for ..." note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, line 2632 (Explore search) |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. | the sign-in prompt, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out) |
+| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. | the offline bar and the paused actions, `wireframes/states/P02 Guest App states.dc.html#gst-state-offline` (pulled as `wireframe-gst-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 
@@ -1118,7 +1192,11 @@
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `OrderHistoryWalletDashboard` |
 | Suggested location | `src/screens/general/OrderHistoryWalletDashboard.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html` (Mobile App v4, 29 September 2026) (it does not draw this screen: build it from the screen spec in the look of the frame below). Wireframe frame `wireframes/P02 Guest App.dc.html#gst-019`, which adam_pull writes into the ticket folder as `wireframe-gst-019.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-app.yaml`). Each state's look: loading: the venue loader (splash) (the prototype, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...")); error: the error note with the mascot (`wireframes/states/P02 Guest App states.dc.html#gst-state-error`, pulled as `wireframe-gst-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the dashed empty note (the prototype, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}")); emptyNoResults: the "No results for ..." note (the prototype, line 2632 (Explore search)); emptyNoAccess: the sign-in prompt (the prototype, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out)); offline: the offline bar and the paused actions (`wireframes/states/P02 Guest App states.dc.html#gst-state-offline`, pulled as `wireframe-gst-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -1143,14 +1221,14 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The order history list. |
-| error | Could not load. Names which read failed and leaves the order history untouched. |
-| emptyFirstRun | No order history yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
-| emptyNoResults | Nothing matches the filter on venueId, principalId, shiftId, status, createdFrom, createdTo and the order history are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The order history list. | the venue loader (splash), `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...") |
+| error | Could not load. Names which read failed and leaves the order history untouched. | the error note with the mascot, `wireframes/states/P02 Guest App states.dc.html#gst-state-error` (pulled as `wireframe-gst-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | No order history yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. | the dashed empty note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}") |
+| emptyNoResults | Nothing matches the filter on venueId, principalId, shiftId, status, createdFrom, createdTo and the order history are still there. Names the active filter and offers to clear it. | the "No results for ..." note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, line 2632 (Explore search) |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. | the sign-in prompt, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out) |
+| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. | the offline bar and the paused actions, `wireframes/states/P02 Guest App states.dc.html#gst-state-offline` (pulled as `wireframe-gst-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 
@@ -1172,7 +1250,11 @@
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `SavedItemsWishlistList` |
 | Suggested location | `src/screens/general/SavedItemsWishlistList.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
-| Pattern | statusTracker |
+| Layout pattern | statusTracker (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html` (rev 3), view: Account → All screens → Wave 3 → Saved items / wishlist. Wireframe frame `wireframes/P02 Guest App.dc.html#gst-020`, which adam_pull writes into the ticket folder as `wireframe-gst-020.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-app.yaml`). Each state's look: loading: the venue loader (splash) (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...")); error: the error note with the mascot (`wireframes/states/P02 Guest App states.dc.html#gst-state-error`, pulled as `wireframe-gst-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the dashed empty note (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}")); offline: the offline bar and the paused actions (`wireframes/states/P02 Guest App states.dc.html#gst-state-offline`, pulled as `wireframe-gst-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -1191,12 +1273,12 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The saved items wishlist, read by `getWishlist`. |
-| error | Could not load. Names which read failed and leaves the saved items wishlist untouched. |
-| emptyFirstRun | No saved items wishlist yet. Offers Add to wishlist (`addToWishlist`). |
-| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The saved items wishlist, read by `getWishlist`. | the venue loader (splash), `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...") |
+| error | Could not load. Names which read failed and leaves the saved items wishlist untouched. | the error note with the mascot, `wireframes/states/P02 Guest App states.dc.html#gst-state-error` (pulled as `wireframe-gst-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | No saved items wishlist yet. Offers Add to wishlist (`addToWishlist`). | the dashed empty note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}") |
+| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. | the offline bar and the paused actions, `wireframes/states/P02 Guest App states.dc.html#gst-state-offline` (pulled as `wireframe-gst-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 
@@ -1217,7 +1299,11 @@
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `InteractiveMapCanvas` |
 | Suggested location | `src/screens/general/InteractiveMapCanvas.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html` (mobile v4 (30 September build)), view: At the venue → Nearest food → Start (walking navigation: the 3D map follows the route, turn-by-turn above it). Wireframe frame `wireframes/P02 Guest App.dc.html#gst-021`, which adam_pull writes into the ticket folder as `wireframe-gst-021.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-app.yaml`). Each state's look: loading: the venue loader (splash) (the prototype, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...")); error: the error note with the mascot (`wireframes/states/P02 Guest App states.dc.html#gst-state-error`, pulled as `wireframe-gst-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the dashed empty note (the prototype, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}")); emptyNoResults: the "No results for ..." note (the prototype, line 2632 (Explore search)); emptyNoAccess: the sign-in prompt (the prototype, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out)); offline: the offline bar and the paused actions (`wireframes/states/P02 Guest App states.dc.html#gst-state-offline`, pulled as `wireframe-gst-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; map3dUnavailable: the 2D map and the approximate position (`wireframes/states/P02 Guest App states.dc.html#gst-state-map-fallback`, pulled as `wireframe-gst-state-map-fallback.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; weakGps: the 2D map and the approximate position (`wireframes/states/P02 Guest App states.dc.html#gst-state-map-fallback`, pulled as `wireframe-gst-state-map-fallback.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -1238,16 +1324,16 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The interactive map list. |
-| error | Could not load. Names which read failed and leaves the interactive map untouched. |
-| emptyFirstRun | No interactive map yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
-| emptyNoResults | No point of that category on this map; the other categories stay. |
-| emptyNoAccess | Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires to show this screen, and names that permission (the screen's other reads need `VENUE_MAP_VIEW` and say so in their own panels). Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | The offline banner shows. A map and route graph already loaded stay usable, so directions do not need a signal. Wait times show their last reading marked out of date, never as live — a queue length from an hour ago sends a guest to the wrong ride. With no map loaded yet, the screen asks the guest to reconnect. |
-| map3dUnavailable | No 3D model for this map: the 2D map, same route (ADR-0069; client meeting 30 September, MoM 4.8). The venue has not published a GLB model for this map (the default for every venue until it supplies one), the phone fails the 3D capability check, or rendering drops below 20 fps. The 2D map shows the same route from `getVenueMapGraph` and the same live position dot; the 2D/3D toggle is hidden and nothing else is said: no message, no error. |
-| weakGps | Position approximate (ADR-0069, section 4): reported GPS accuracy worse than 30 metres, or the route runs along an indoor path. The dot dims and an approximate-position ring is drawn round the last confident position, labelled *Position approximate*; the turn list and the remaining distance stay, and *I am at…* (tap a nearby location, or scan its QR sign) re-anchors. Routing does not stop, in 3D or in 2D. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The interactive map list. | the venue loader (splash), `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...") |
+| error | Could not load. Names which read failed and leaves the interactive map untouched. | the error note with the mascot, `wireframes/states/P02 Guest App states.dc.html#gst-state-error` (pulled as `wireframe-gst-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | No interactive map yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. | the dashed empty note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}") |
+| emptyNoResults | No point of that category on this map; the other categories stay. | the "No results for ..." note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, line 2632 (Explore search) |
+| emptyNoAccess | Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires to show this screen, and names that permission (the screen's other reads need `VENUE_MAP_VIEW` and say so in their own panels). Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. | the sign-in prompt, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out) |
+| offline | The offline banner shows. A map and route graph already loaded stay usable, so directions do not need a signal. Wait times show their last reading marked out of date, never as live — a queue length from an hour ago sends a guest to the wrong ride. With no map loaded yet, the screen asks the guest to reconnect. | the offline bar and the paused actions, `wireframes/states/P02 Guest App states.dc.html#gst-state-offline` (pulled as `wireframe-gst-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| map3dUnavailable | No 3D model for this map: the 2D map, same route (ADR-0069; client meeting 30 September, MoM 4.8). The venue has not published a GLB model for this map (the default for every venue until it supplies one), the phone fails the 3D capability check, or rendering drops below 20 fps. The 2D map shows the same route from `getVenueMapGraph` and the same live position dot; the 2D/3D toggle is hidden and nothing else is said: no message, no error. | the 2D map and the approximate position, `wireframes/states/P02 Guest App states.dc.html#gst-state-map-fallback` (pulled as `wireframe-gst-state-map-fallback.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| weakGps | Position approximate (ADR-0069, section 4): reported GPS accuracy worse than 30 metres, or the route runs along an indoor path. The dot dims and an approximate-position ring is drawn round the last confident position, labelled *Position approximate*; the turn list and the remaining distance stay, and *I am at…* (tap a nearby location, or scan its QR sign) re-anchors. Routing does not stop, in 3D or in 2D. | the 2D map and the approximate position, `wireframes/states/P02 Guest App states.dc.html#gst-state-map-fallback` (pulled as `wireframe-gst-state-map-fallback.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 
@@ -1270,7 +1356,11 @@
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `AttractionWaitTimesDetail` |
 | Suggested location | `src/screens/general/AttractionWaitTimesDetail.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
-| Pattern | statusTracker |
+| Layout pattern | statusTracker (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html` (mobile v4 (30 September build)), view: At the venue → Waits. Wireframe frame `wireframes/P02 Guest App.dc.html#gst-022`, which adam_pull writes into the ticket folder as `wireframe-gst-022.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-app.yaml`). Each state's look: loading: the venue loader (splash) (the prototype, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...")); error: the error note with the mascot (`wireframes/states/P02 Guest App states.dc.html#gst-state-error`, pulled as `wireframe-gst-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the dashed empty note (the prototype, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}")); offline: the offline bar and the paused actions (`wireframes/states/P02 Guest App states.dc.html#gst-state-offline`, pulled as `wireframe-gst-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Operations**
 
@@ -1280,12 +1370,12 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The attraction wait times, read by `getWaitTimes`. |
-| error | Could not load. Names which read failed and leaves the attraction wait times untouched. |
-| emptyFirstRun | No attraction wait times yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
-| offline | The offline banner shows. A map and route graph already loaded stay usable, so directions do not need a signal. Wait times show their last reading marked out of date, never as live — a queue length from an hour ago sends a guest to the wrong ride. With no map loaded yet, the screen asks the guest to reconnect. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The attraction wait times, read by `getWaitTimes`. | the venue loader (splash), `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...") |
+| error | Could not load. Names which read failed and leaves the attraction wait times untouched. | the error note with the mascot, `wireframes/states/P02 Guest App states.dc.html#gst-state-error` (pulled as `wireframe-gst-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | No attraction wait times yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. | the dashed empty note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}") |
+| offline | The offline banner shows. A map and route graph already loaded stay usable, so directions do not need a signal. Wait times show their last reading marked out of date, never as live — a queue length from an hour ago sends a guest to the wrong ride. With no map loaded yet, the screen asks the guest to reconnect. | the offline bar and the paused actions, `wireframes/states/P02 Guest App states.dc.html#gst-state-offline` (pulled as `wireframe-gst-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 
@@ -1309,7 +1399,11 @@
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `VirtualQueueJoinQueueDetail` |
 | Suggested location | `src/screens/general/VirtualQueueJoinQueueDetail.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
-| Pattern | statusTracker |
+| Layout pattern | statusTracker (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html` (rev 3), view: Account → All screens → Wave 3 → Virtual queue; also At-venue card "Desert Coaster · queued". Wireframe frame `wireframes/P02 Guest App.dc.html#gst-023`, which adam_pull writes into the ticket folder as `wireframe-gst-023.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-app.yaml`). Each state's look: loading: the venue loader (splash) (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...")); error: the error note with the mascot (`wireframes/states/P02 Guest App states.dc.html#gst-state-error`, pulled as `wireframe-gst-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the dashed empty note (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}")); emptyNoAccess: the sign-in prompt (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out)); offline: the offline bar and the paused actions (`wireframes/states/P02 Guest App states.dc.html#gst-state-offline`, pulled as `wireframe-gst-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -1330,13 +1424,13 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The virtual queue, read by `getWaitingGuest`. |
-| error | Could not load. Names which read failed and leaves the virtual queue untouched. |
-| emptyFirstRun | No virtual queue yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
-| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | The offline banner shows. The guest's place stays on screen with its age, so they can see they hold it. Joining and leaving need the connection — a place taken offline is a place nobody else can see. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The virtual queue, read by `getWaitingGuest`. | the venue loader (splash), `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...") |
+| error | Could not load. Names which read failed and leaves the virtual queue untouched. | the error note with the mascot, `wireframes/states/P02 Guest App states.dc.html#gst-state-error` (pulled as `wireframe-gst-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | No virtual queue yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. | the dashed empty note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}") |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. | the sign-in prompt, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out) |
+| offline | The offline banner shows. The guest's place stays on screen with its age, so they can see they hold it. Joining and leaving need the connection — a place taken offline is a place nobody else can see. | the offline bar and the paused actions, `wireframes/states/P02 Guest App states.dc.html#gst-state-offline` (pulled as `wireframe-gst-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 
@@ -1358,7 +1452,11 @@
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `FandbBrowseAndOrderList` |
 | Suggested location | `src/screens/general/FandbBrowseAndOrderList.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html` (rev 3), view: Account → All screens → Wave 2 → F&B – browse & order. Wireframe frame `wireframes/P02 Guest App.dc.html#gst-024`, which adam_pull writes into the ticket folder as `wireframe-gst-024.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-app.yaml`). Each state's look: loading: the venue loader (splash) (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...")); error: the error note with the mascot (`wireframes/states/P02 Guest App states.dc.html#gst-state-error`, pulled as `wireframe-gst-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the dashed empty note (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}")); emptyNoResults: the "No results for ..." note (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, line 2632 (Explore search)); emptyNoAccess: the sign-in prompt (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out)); offline: the offline bar and the paused actions (`wireframes/states/P02 Guest App states.dc.html#gst-state-offline`, pulled as `wireframe-gst-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -1383,14 +1481,14 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The browse order list. |
-| error | Could not load. Names which read failed and leaves the browse order untouched. |
-| emptyFirstRun | No outlet takes orders here now. Names when the next one opens; a counter-only outlet's menu can still be read. |
-| emptyNoResults | No outlet open now matches: says so, with the next opening time. |
-| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | The offline banner shows. The menu already loaded stays with its age. Ordering, claiming a table and booking wait for the connection — an order placed offline is food nobody is making. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The browse order list. | the venue loader (splash), `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...") |
+| error | Could not load. Names which read failed and leaves the browse order untouched. | the error note with the mascot, `wireframes/states/P02 Guest App states.dc.html#gst-state-error` (pulled as `wireframe-gst-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | No outlet takes orders here now. Names when the next one opens; a counter-only outlet's menu can still be read. | the dashed empty note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}") |
+| emptyNoResults | No outlet open now matches: says so, with the next opening time. | the "No results for ..." note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, line 2632 (Explore search) |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. | the sign-in prompt, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out) |
+| offline | The offline banner shows. The menu already loaded stays with its age. Ordering, claiming a table and booking wait for the connection — an order placed offline is food nobody is making. | the offline bar and the paused actions, `wireframes/states/P02 Guest App states.dc.html#gst-state-offline` (pulled as `wireframe-gst-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 
@@ -1414,7 +1512,11 @@
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `FandbOrderTrackingDetail` |
 | Suggested location | `src/screens/general/FandbOrderTrackingDetail.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
-| Pattern | statusTracker |
+| Layout pattern | statusTracker (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html` (rev 3), view: Account → All screens → Wave 2 → F&B – order tracking. Wireframe frame `wireframes/P02 Guest App.dc.html#gst-025`, which adam_pull writes into the ticket folder as `wireframe-gst-025.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-app.yaml`). Each state's look: loading: the venue loader (splash) (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...")); error: the error note with the mascot (`wireframes/states/P02 Guest App states.dc.html#gst-state-error`, pulled as `wireframe-gst-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the dashed empty note (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}")); offline: the offline bar and the paused actions (`wireframes/states/P02 Guest App states.dc.html#gst-state-offline`, pulled as `wireframe-gst-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -1432,12 +1534,12 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | Loading the order. |
-| error | Availability unavailable. Selection is blocked — overselling is worse than waiting |
-| emptyFirstRun | The order is not found or was refunded (a cold link): says which, with the way back to ordering. |
-| offline | The offline banner shows. The last status stays with its age ("Preparing, 2 min ago"); nothing refreshes until the connection returns. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | Loading the order. | the venue loader (splash), `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...") |
+| error | Availability unavailable. Selection is blocked — overselling is worse than waiting | the error note with the mascot, `wireframes/states/P02 Guest App states.dc.html#gst-state-error` (pulled as `wireframe-gst-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | The order is not found or was refunded (a cold link): says which, with the way back to ordering. | the dashed empty note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}") |
+| offline | The offline banner shows. The last status stays with its age ("Preparing, 2 min ago"); nothing refreshes until the connection returns. | the offline bar and the paused actions, `wireframes/states/P02 Guest App states.dc.html#gst-state-offline` (pulled as `wireframe-gst-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 
@@ -1461,7 +1563,11 @@
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `RetailMerchandiseDetail` |
 | Suggested location | `src/screens/general/RetailMerchandiseDetail.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html` (rev 3), view: Account → All screens → Wave 2 → Retail / merchandise (it shows part of this screen: build the rest from the screen spec in the same look). Wireframe frame `wireframes/P02 Guest App.dc.html#gst-026`, which adam_pull writes into the ticket folder as `wireframe-gst-026.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-app.yaml`). Each state's look: loading: the venue loader (splash) (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...")); error: the error note with the mascot (`wireframes/states/P02 Guest App states.dc.html#gst-state-error`, pulled as `wireframe-gst-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the dashed empty note (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}")); emptyNoResults: the "No results for ..." note (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, line 2632 (Explore search)); emptyNoAccess: the sign-in prompt (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out)); offline: the offline bar and the paused actions (`wireframes/states/P02 Guest App states.dc.html#gst-state-offline`, pulled as `wireframe-gst-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -1481,14 +1587,14 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The retail merchandise list. |
-| error | Could not load. Names which read failed and leaves the retail merchandise untouched. |
-| emptyFirstRun | No retail merchandise yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
-| emptyNoResults | Nothing matches the filter on outletId, categoryId, inStockOnly, search and the retail merchandise are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | There is no permission to name: a guest holds none (ADR-0025). The shop is public; buying needs the guest's cart. |
-| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The retail merchandise list. | the venue loader (splash), `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...") |
+| error | Could not load. Names which read failed and leaves the retail merchandise untouched. | the error note with the mascot, `wireframes/states/P02 Guest App states.dc.html#gst-state-error` (pulled as `wireframe-gst-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | No retail merchandise yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. | the dashed empty note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}") |
+| emptyNoResults | Nothing matches the filter on outletId, categoryId, inStockOnly, search and the retail merchandise are still there. Names the active filter and offers to clear it. | the "No results for ..." note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, line 2632 (Explore search) |
+| emptyNoAccess | There is no permission to name: a guest holds none (ADR-0025). The shop is public; buying needs the guest's cart. | the sign-in prompt, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out) |
+| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. | the offline bar and the paused actions, `wireframes/states/P02 Guest App states.dc.html#gst-state-offline` (pulled as `wireframe-gst-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 
@@ -1511,7 +1617,11 @@
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `ParkingReserveAndPayDetail` |
 | Suggested location | `src/screens/general/ParkingReserveAndPayDetail.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html` (rev 3), view: Account → All screens → Wave 3 → Parking – reserve & pay. Wireframe frame `wireframes/P02 Guest App.dc.html#gst-027`, which adam_pull writes into the ticket folder as `wireframe-gst-027.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-app.yaml`). Each state's look: loading: the venue loader (splash) (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...")); error: the error note with the mascot (`wireframes/states/P02 Guest App states.dc.html#gst-state-error`, pulled as `wireframe-gst-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the dashed empty note (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}")); emptyNoResults: the "No results for ..." note (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, line 2632 (Explore search)); emptyNoAccess: the sign-in prompt (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out)); offline: the offline bar and the paused actions (`wireframes/states/P02 Guest App states.dc.html#gst-state-offline`, pulled as `wireframe-gst-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; soldOutForDay: the parking-full notice (`wireframes/states/P02 Guest App states.dc.html#gst-state-sold-out-for-day`, pulled as `wireframe-gst-state-sold-out-for-day.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -1531,15 +1641,15 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | Terminal or gateway state, shown plainly |
-| error | Declined reads differently from unresolved. An unresolved payment inquires rather than retries, and nothing is issued until it resolves |
-| emptyFirstRun | — |
-| emptyNoResults | Never shown: the car parks are the venue's, with no filter a guest sets. |
-| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | The offline banner shows. A reservation already confirmed stays on screen with its plate and car park. Reserving, paying and changing the plate need the connection. |
-| soldOutForDay | The car park is full. `addCartLine` refused the parking line with `soldOutForDay`: issued entitlements have reached the facility's capacity for that day. Shown only then — there is no live space count in the first release, so the screen never promises spaces before the guest tries (decided 28 September, audit R166). |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | Terminal or gateway state, shown plainly | the venue loader (splash), `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...") |
+| error | Declined reads differently from unresolved. An unresolved payment inquires rather than retries, and nothing is issued until it resolves | the error note with the mascot, `wireframes/states/P02 Guest App states.dc.html#gst-state-error` (pulled as `wireframe-gst-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | — | the dashed empty note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}") |
+| emptyNoResults | Never shown: the car parks are the venue's, with no filter a guest sets. | the "No results for ..." note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, line 2632 (Explore search) |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. | the sign-in prompt, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out) |
+| offline | The offline banner shows. A reservation already confirmed stays on screen with its plate and car park. Reserving, paying and changing the plate need the connection. | the offline bar and the paused actions, `wireframes/states/P02 Guest App states.dc.html#gst-state-offline` (pulled as `wireframe-gst-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| soldOutForDay | The car park is full. `addCartLine` refused the parking line with `soldOutForDay`: issued entitlements have reached the facility's capacity for that day. Shown only then — there is no live space count in the first release, so the screen never promises spaces before the guest tries (decided 28 September, audit R166). | the parking-full notice, `wireframes/states/P02 Guest App states.dc.html#gst-state-sold-out-for-day` (pulled as `wireframe-gst-state-sold-out-for-day.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 
@@ -1562,7 +1672,11 @@
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `ParkingReservationConfirmedDetail` |
 | Suggested location | `src/screens/general/ParkingReservationConfirmedDetail.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html` (rev 3), view: Account → All screens → Wave 3 → Parking – reservation confirmed. Wireframe frame `wireframes/P02 Guest App.dc.html#gst-028`, which adam_pull writes into the ticket folder as `wireframe-gst-028.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-app.yaml`). Each state's look: loading: the venue loader (splash) (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...")); error: the error note with the mascot (`wireframes/states/P02 Guest App states.dc.html#gst-state-error`, pulled as `wireframe-gst-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the dashed empty note (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}")); emptyNoResults: the "No results for ..." note (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, line 2632 (Explore search)); emptyNoAccess: the sign-in prompt (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out)); offline: the offline bar and the paused actions (`wireframes/states/P02 Guest App states.dc.html#gst-state-offline`, pulled as `wireframe-gst-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -1583,14 +1697,14 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The parking reservation confirmed list. |
-| error | Could not load. Names which read failed and leaves the parking reservation confirmed untouched. |
-| emptyFirstRun | Paid, entitlement not yet shown. The order is paid and the entitlement is issued at payment; until it appears the screen shows the order and says the car park pass follows (audit R166). |
-| emptyNoResults | Never shown: the confirmation shows one order's parking. |
-| emptyNoAccess | Shown when the caller lacks `ORDER_VIEW`, which `getOrder` requires to show this screen, and names that permission (the screen's other reads need `PARKING_CONFIGURE` and say so in their own panels). Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | The offline banner shows. A reservation already confirmed stays on screen with its plate and car park. Reserving, paying and changing the plate need the connection. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The parking reservation confirmed list. | the venue loader (splash), `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...") |
+| error | Could not load. Names which read failed and leaves the parking reservation confirmed untouched. | the error note with the mascot, `wireframes/states/P02 Guest App states.dc.html#gst-state-error` (pulled as `wireframe-gst-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | Paid, entitlement not yet shown. The order is paid and the entitlement is issued at payment; until it appears the screen shows the order and says the car park pass follows (audit R166). | the dashed empty note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}") |
+| emptyNoResults | Never shown: the confirmation shows one order's parking. | the "No results for ..." note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, line 2632 (Explore search) |
+| emptyNoAccess | Shown when the caller lacks `ORDER_VIEW`, which `getOrder` requires to show this screen, and names that permission (the screen's other reads need `PARKING_CONFIGURE` and say so in their own panels). Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. | the sign-in prompt, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out) |
+| offline | The offline banner shows. A reservation already confirmed stays on screen with its plate and car park. Reserving, paying and changing the plate need the connection. | the offline bar and the paused actions, `wireframes/states/P02 Guest App states.dc.html#gst-state-offline` (pulled as `wireframe-gst-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 
@@ -1612,7 +1726,11 @@
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `VenueInfoAndServicesDetail` |
 | Suggested location | `src/screens/general/VenueInfoAndServicesDetail.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html` (rev 3), view: Account → All screens → Wave 2 → Venue info & services. Wireframe frame `wireframes/P02 Guest App.dc.html#gst-029`, which adam_pull writes into the ticket folder as `wireframe-gst-029.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-app.yaml`). Each state's look: loading: the venue loader (splash) (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...")); error: the error note with the mascot (`wireframes/states/P02 Guest App states.dc.html#gst-state-error`, pulled as `wireframe-gst-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the dashed empty note (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}")); emptyNoResults: the "No results for ..." note (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, line 2632 (Explore search)); offline: the offline bar and the paused actions (`wireframes/states/P02 Guest App states.dc.html#gst-state-offline`, pulled as `wireframe-gst-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -1630,13 +1748,13 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The venue info services list. |
-| error | Could not load. Names which read failed and leaves the venue info services untouched. |
-| emptyFirstRun | No venue info services yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
-| emptyNoResults | Nothing matches the filter on openNow, orderingMethod and the venue info services are still there. Names the active filter and offers to clear it. |
-| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The venue info services list. | the venue loader (splash), `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...") |
+| error | Could not load. Names which read failed and leaves the venue info services untouched. | the error note with the mascot, `wireframes/states/P02 Guest App states.dc.html#gst-state-error` (pulled as `wireframe-gst-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | No venue info services yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. | the dashed empty note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}") |
+| emptyNoResults | Nothing matches the filter on openNow, orderingMethod and the venue info services are still there. Names the active filter and offers to clear it. | the "No results for ..." note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, line 2632 (Explore search) |
+| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. | the offline bar and the paused actions, `wireframes/states/P02 Guest App states.dc.html#gst-state-offline` (pulled as `wireframe-gst-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 
@@ -1657,7 +1775,11 @@
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `InVenueNotificationsDetail` |
 | Suggested location | `src/screens/general/InVenueNotificationsDetail.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
-| Pattern | configEditor |
+| Layout pattern | configEditor (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html` (rev 3), view: DEFERRED (R242), still in the prototype: Account → All screens → Wave 2 → In-venue notifications; At-venue tab → Alerts. Wireframe frame `wireframes/P02 Guest App.dc.html#gst-030`, which adam_pull writes into the ticket folder as `wireframe-gst-030.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-app.yaml`). Each state's look: loading: the venue loader (splash) (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...")); error: the error note with the mascot (`wireframes/states/P02 Guest App states.dc.html#gst-state-error`, pulled as `wireframe-gst-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the dashed empty note (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}")); offline: the offline bar and the paused actions (`wireframes/states/P02 Guest App states.dc.html#gst-state-offline`, pulled as `wireframe-gst-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyNoResults: the "No results for ..." note (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, line 2632 (Explore search)). The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -1674,13 +1796,13 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The notification feed. |
-| error | Could not load. Names which read failed and leaves the in-venue notifications untouched. |
-| emptyFirstRun | No notifications yet. Queue calls, order updates and venue notices appear here as the venue sends them. |
-| offline | The offline banner shows. Notices already received stay listed. New queue calls and order updates arrive once the connection is back, and the banner is the warning that they may be late. |
-| emptyNoResults | No unread notifications. Names the Unread only filter and offers to show all; the read ones are still there. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The notification feed. | the venue loader (splash), `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...") |
+| error | Could not load. Names which read failed and leaves the in-venue notifications untouched. | the error note with the mascot, `wireframes/states/P02 Guest App states.dc.html#gst-state-error` (pulled as `wireframe-gst-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | No notifications yet. Queue calls, order updates and venue notices appear here as the venue sends them. | the dashed empty note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}") |
+| offline | The offline banner shows. Notices already received stay listed. New queue calls and order updates arrive once the connection is back, and the banner is the warning that they may be late. | the offline bar and the paused actions, `wireframes/states/P02 Guest App states.dc.html#gst-state-offline` (pulled as `wireframe-gst-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyNoResults | No unread notifications. Names the Unread only filter and offers to show all; the read ones are still there. | the "No results for ..." note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, line 2632 (Explore search) |
 
 **Goes to**
 
@@ -1702,7 +1824,11 @@
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `AiConciergeHomeDashboard` |
 | Suggested location | `src/screens/general/AiConciergeHomeDashboard.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
-| Pattern | statusTracker |
+| Layout pattern | statusTracker (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html` (Mobile App v4, 29 September 2026) (it does not draw this screen: build it from the screen spec in the look of the frame below). Wireframe frame `wireframes/P02 Guest App.dc.html#gst-031`, which adam_pull writes into the ticket folder as `wireframe-gst-031.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-app.yaml`). Each state's look: loading: the venue loader (splash) (the prototype, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...")); error: the error note with the mascot (`wireframes/states/P02 Guest App states.dc.html#gst-state-error`, pulled as `wireframe-gst-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the dashed empty note (the prototype, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}")); emptyNoAccess: the sign-in prompt (the prototype, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out)); offline: the offline bar and the paused actions (`wireframes/states/P02 Guest App states.dc.html#gst-state-offline`, pulled as `wireframe-gst-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -1728,13 +1854,13 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The concierge home: earlier conversations (`listAiConversations`) and the ask box. |
-| error | Could not load. Names which read failed and leaves the concierge home untouched. |
-| emptyFirstRun | "Ask Sahli anything about your visit": no earlier conversations; the first question opens one. |
-| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | Not available, and the offline banner says why. The assistant needs the connection; conversations already loaded stay readable. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The concierge home: earlier conversations (`listAiConversations`) and the ask box. | the venue loader (splash), `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...") |
+| error | Could not load. Names which read failed and leaves the concierge home untouched. | the error note with the mascot, `wireframes/states/P02 Guest App states.dc.html#gst-state-error` (pulled as `wireframe-gst-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | "Ask Sahli anything about your visit": no earlier conversations; the first question opens one. | the dashed empty note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}") |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. | the sign-in prompt, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out) |
+| offline | Not available, and the offline banner says why. The assistant needs the connection; conversations already loaded stay readable. | the offline bar and the paused actions, `wireframes/states/P02 Guest App states.dc.html#gst-state-offline` (pulled as `wireframe-gst-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 
@@ -1756,7 +1882,11 @@
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `AiConciergeChatDetail` |
 | Suggested location | `src/screens/general/AiConciergeChatDetail.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
-| Pattern | statusTracker |
+| Layout pattern | statusTracker (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html` (Mobile App v4, 29 September 2026) (it does not draw this screen: build it from the screen spec in the look of the frame below). Wireframe frame `wireframes/P02 Guest App.dc.html#gst-032`, which adam_pull writes into the ticket folder as `wireframe-gst-032.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-app.yaml`). Each state's look: loading: the venue loader (splash) (the prototype, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...")); error: the error note with the mascot (`wireframes/states/P02 Guest App states.dc.html#gst-state-error`, pulled as `wireframe-gst-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the dashed empty note (the prototype, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}")); emptyNoAccess: the sign-in prompt (the prototype, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out)); offline: the offline bar and the paused actions (`wireframes/states/P02 Guest App states.dc.html#gst-state-offline`, pulled as `wireframe-gst-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyNoResults: the "No results for ..." note (the prototype, line 2632 (Explore search)). The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -1783,14 +1913,14 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The concierge chat, read by `getGuestOrderStatus`. |
-| error | Could not load. Names which read failed and leaves the concierge chat untouched. |
-| emptyFirstRun | No concierge chat yet. Offers Create guest F&B order (`createGuestFnbOrder`). |
-| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | Not available, and the offline banner says why. The assistant needs the connection; conversations already loaded stay readable. |
-| emptyNoResults | Nothing the concierge found matches the question; it says so in the conversation and offers to hand over to a person. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The concierge chat, read by `getGuestOrderStatus`. | the venue loader (splash), `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...") |
+| error | Could not load. Names which read failed and leaves the concierge chat untouched. | the error note with the mascot, `wireframes/states/P02 Guest App states.dc.html#gst-state-error` (pulled as `wireframe-gst-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | No concierge chat yet. Offers Create guest F&B order (`createGuestFnbOrder`). | the dashed empty note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}") |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. | the sign-in prompt, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out) |
+| offline | Not available, and the offline banner says why. The assistant needs the connection; conversations already loaded stay readable. | the offline bar and the paused actions, `wireframes/states/P02 Guest App states.dc.html#gst-state-offline` (pulled as `wireframe-gst-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyNoResults | Nothing the concierge found matches the question; it says so in the conversation and offers to hand over to a person. | the "No results for ..." note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, line 2632 (Explore search) |
 
 **Goes to**
 
@@ -1812,7 +1942,11 @@
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `AiConciergeContextualHelpDetail` |
 | Suggested location | `src/screens/general/AiConciergeContextualHelpDetail.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
-| Pattern | statusTracker |
+| Layout pattern | statusTracker (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html` (rev 3), view: Account → All screens → Wave 2 → AI concierge – contextual help. Wireframe frame `wireframes/P02 Guest App.dc.html#gst-033`, which adam_pull writes into the ticket folder as `wireframe-gst-033.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-app.yaml`). Each state's look: loading: the venue loader (splash) (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...")); error: the error note with the mascot (`wireframes/states/P02 Guest App states.dc.html#gst-state-error`, pulled as `wireframe-gst-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the dashed empty note (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}")); emptyNoAccess: the sign-in prompt (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out)); offline: the offline bar and the paused actions (`wireframes/states/P02 Guest App states.dc.html#gst-state-offline`, pulled as `wireframe-gst-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -1833,13 +1967,13 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | Sahli is thinking: a typing indicator under the question. |
-| error | Sahli can't answer right now (every provider failed): Hand over to a person and Try again. |
-| emptyFirstRun | No question yet: the sheet opens with the ask box and two starter questions about the screen behind it. |
-| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | Not available, and the offline banner says why. The assistant needs the connection; conversations already loaded stay readable. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | Sahli is thinking: a typing indicator under the question. | the venue loader (splash), `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...") |
+| error | Sahli can't answer right now (every provider failed): Hand over to a person and Try again. | the error note with the mascot, `wireframes/states/P02 Guest App states.dc.html#gst-state-error` (pulled as `wireframe-gst-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | No question yet: the sheet opens with the ask box and two starter questions about the screen behind it. | the dashed empty note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}") |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. | the sign-in prompt, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out) |
+| offline | Not available, and the offline banner says why. The assistant needs the connection; conversations already loaded stay readable. | the offline bar and the paused actions, `wireframes/states/P02 Guest App states.dc.html#gst-state-offline` (pulled as `wireframe-gst-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 
@@ -1860,7 +1994,11 @@
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `LostAndFoundDetail` |
 | Suggested location | `src/screens/general/LostAndFoundDetail.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html` (rev 3), view: Account → All screens → Wave 2 → Lost & found (also Account → Lost & found). Wireframe frame `wireframes/P02 Guest App.dc.html#gst-034`, which adam_pull writes into the ticket folder as `wireframe-gst-034.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-app.yaml`). Each state's look: loading: the venue loader (splash) (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...")); error: the error note with the mascot (`wireframes/states/P02 Guest App states.dc.html#gst-state-error`, pulled as `wireframe-gst-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the dashed empty note (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}")); emptyNoResults: the "No results for ..." note (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, line 2632 (Explore search)); offline: the offline bar and the paused actions (`wireframes/states/P02 Guest App states.dc.html#gst-state-offline`, pulled as `wireframe-gst-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -1880,13 +2018,13 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The lost found list. |
-| error | Could not load. Names which read failed and leaves the lost found untouched. |
-| emptyFirstRun | No lost found yet. Offers Raise my case (`raiseMyCase`). |
-| emptyNoResults | Never shown: `listMyCases` takes no filter, so an empty list is always the first-run state above. |
-| offline | The offline banner shows. Reports already loaded stay read-only with their age. Reporting a loss and replying are disabled offline — both need the connection (decided 28 September, audit R148) — and the screen says how to reach staff in person instead: the guest services desk or lost-property point, or any member of staff. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The lost found list. | the venue loader (splash), `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...") |
+| error | Could not load. Names which read failed and leaves the lost found untouched. | the error note with the mascot, `wireframes/states/P02 Guest App states.dc.html#gst-state-error` (pulled as `wireframe-gst-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | No lost found yet. Offers Raise my case (`raiseMyCase`). | the dashed empty note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}") |
+| emptyNoResults | Never shown: `listMyCases` takes no filter, so an empty list is always the first-run state above. | the "No results for ..." note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, line 2632 (Explore search) |
+| offline | The offline banner shows. Reports already loaded stay read-only with their age. Reporting a loss and replying are disabled offline — both need the connection (decided 28 September, audit R148) — and the screen says how to reach staff in person instead: the guest services desk or lost-property point, or any member of staff. | the offline bar and the paused actions, `wireframes/states/P02 Guest App states.dc.html#gst-state-offline` (pulled as `wireframe-gst-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 
@@ -1907,7 +2045,11 @@
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `FeedbackAndRatingsList` |
 | Suggested location | `src/screens/general/FeedbackAndRatingsList.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
-| Pattern | configEditor |
+| Layout pattern | configEditor (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html` (rev 3), view: Account → All screens → Wave 3 → Feedback & ratings. Wireframe frame `wireframes/P02 Guest App.dc.html#gst-035`, which adam_pull writes into the ticket folder as `wireframe-gst-035.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-app.yaml`). Each state's look: loading: the venue loader (splash) (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...")); error: the error note with the mascot (`wireframes/states/P02 Guest App states.dc.html#gst-state-error`, pulled as `wireframe-gst-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the dashed empty note (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}")); offline: the offline bar and the paused actions (`wireframes/states/P02 Guest App states.dc.html#gst-state-offline`, pulled as `wireframe-gst-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -1927,12 +2069,12 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The saved feedback ratings. |
-| error | Could not load. Names which read failed and leaves the feedback ratings untouched. |
-| emptyFirstRun | No feedback ratings configured. The form opens empty and `submitReview` saves the first one; it says what the platform does in the meantime. |
-| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The saved feedback ratings. | the venue loader (splash), `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...") |
+| error | Could not load. Names which read failed and leaves the feedback ratings untouched. | the error note with the mascot, `wireframes/states/P02 Guest App states.dc.html#gst-state-error` (pulled as `wireframe-gst-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | No feedback ratings configured. The form opens empty and `submitReview` saves the first one; it says what the platform does in the meantime. | the dashed empty note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}") |
+| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. | the offline bar and the paused actions, `wireframes/states/P02 Guest App states.dc.html#gst-state-offline` (pulled as `wireframe-gst-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 
@@ -1953,7 +2095,11 @@
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `LoyaltyRewards` |
 | Suggested location | `src/screens/LoyaltyRewards.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html` (Mobile App v4, 29 September 2026) (it does not draw this screen: build it from the screen spec in the look of the frame below). Wireframe frame `wireframes/P02 Guest App.dc.html#gst-036`, which adam_pull writes into the ticket folder as `wireframe-gst-036.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-app.yaml`). Each state's look: loading: the venue loader (splash) (the prototype, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...")); error: the error note with the mascot (`wireframes/states/P02 Guest App states.dc.html#gst-state-error`, pulled as `wireframe-gst-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the dashed empty note (the prototype, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}")); emptyNoResults: the "No results for ..." note (the prototype, line 2632 (Explore search)); emptyNoAccess: the sign-in prompt (the prototype, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out)); offline: the offline bar and the paused actions (`wireframes/states/P02 Guest App states.dc.html#gst-state-offline`, pulled as `wireframe-gst-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -1978,14 +2124,14 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The loyalty rewards list. |
-| error | Could not load. Names which read failed and leaves the loyalty rewards untouched. |
-| emptyFirstRun | No loyalty rewards yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
-| emptyNoResults | Never shown: `listLoyaltyProgrammes` takes no filter, so an empty list is always the first-run state above. |
-| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | The offline banner shows. The last known balance stays with its age, and points earned since are not shown — and that is said. Redeeming and referring need the connection. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The loyalty rewards list. | the venue loader (splash), `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...") |
+| error | Could not load. Names which read failed and leaves the loyalty rewards untouched. | the error note with the mascot, `wireframes/states/P02 Guest App states.dc.html#gst-state-error` (pulled as `wireframe-gst-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | No loyalty rewards yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. | the dashed empty note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}") |
+| emptyNoResults | Never shown: `listLoyaltyProgrammes` takes no filter, so an empty list is always the first-run state above. | the "No results for ..." note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, line 2632 (Explore search) |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. | the sign-in prompt, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out) |
+| offline | The offline banner shows. The last known balance stays with its age, and points earned since are not shown — and that is said. Redeeming and referring need the connection. | the offline bar and the paused actions, `wireframes/states/P02 Guest App states.dc.html#gst-state-offline` (pulled as `wireframe-gst-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 
@@ -2007,7 +2153,11 @@
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `OffersAndPromotionsDetail` |
 | Suggested location | `src/screens/general/OffersAndPromotionsDetail.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html` (rev 3), view: Account → All screens → Wave 2 → Offers & promotions. Wireframe frame `wireframes/P02 Guest App.dc.html#gst-037`, which adam_pull writes into the ticket folder as `wireframe-gst-037.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-app.yaml`). Each state's look: loading: the venue loader (splash) (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...")); error: the error note with the mascot (`wireframes/states/P02 Guest App states.dc.html#gst-state-error`, pulled as `wireframe-gst-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the dashed empty note (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}")); emptyNoResults: the "No results for ..." note (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, line 2632 (Explore search)); emptyNoAccess: the sign-in prompt (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out)); offline: the offline bar and the paused actions (`wireframes/states/P02 Guest App states.dc.html#gst-state-offline`, pulled as `wireframe-gst-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -2026,14 +2176,14 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The offers promotions list. |
-| error | Could not load. Names which read failed and leaves the offers promotions untouched. |
-| emptyFirstRun | No offers promotions yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
-| emptyNoResults | Never shown as a filter result: no offer is active at this venue now, said plainly. |
-| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The offers promotions list. | the venue loader (splash), `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...") |
+| error | Could not load. Names which read failed and leaves the offers promotions untouched. | the error note with the mascot, `wireframes/states/P02 Guest App states.dc.html#gst-state-error` (pulled as `wireframe-gst-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | No offers promotions yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. | the dashed empty note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}") |
+| emptyNoResults | Never shown as a filter result: no offer is active at this venue now, said plainly. | the "No results for ..." note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, line 2632 (Explore search) |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. | the sign-in prompt, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out) |
+| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. | the offline bar and the paused actions, `wireframes/states/P02 Guest App states.dc.html#gst-state-offline` (pulled as `wireframe-gst-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 
@@ -2055,7 +2205,11 @@
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `AtTheVenueDetail` |
 | Suggested location | `src/screens/general/AtTheVenueDetail.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html` (mobile v4 (30 September build)), view: Home → You're at Summit Peaks (At the venue · live, Map view). Wireframe frame `wireframes/P02 Guest App.dc.html#gst-038`, which adam_pull writes into the ticket folder as `wireframe-gst-038.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-app.yaml`). Each state's look: loading: the venue loader (splash) (the prototype, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...")); error: the error note with the mascot (`wireframes/states/P02 Guest App states.dc.html#gst-state-error`, pulled as `wireframe-gst-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the dashed empty note (the prototype, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}")); emptyNoResults: the "No results for ..." note (the prototype, line 2632 (Explore search)); emptyNoAccess: the sign-in prompt (the prototype, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out)); offline: the offline bar and the paused actions (`wireframes/states/P02 Guest App states.dc.html#gst-state-offline`, pulled as `wireframe-gst-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; map3dUnavailable: the 2D map and the approximate position (`wireframes/states/P02 Guest App states.dc.html#gst-state-map-fallback`, pulled as `wireframe-gst-state-map-fallback.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; weakGps: the 2D map and the approximate position (`wireframes/states/P02 Guest App states.dc.html#gst-state-map-fallback`, pulled as `wireframe-gst-state-map-fallback.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Operations**
 
@@ -2067,16 +2221,16 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The digital companion mode list. |
-| error | Could not load. Names which read failed and leaves the digital companion mode untouched. |
-| emptyFirstRun | No digital companion mode yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
-| emptyNoResults | Nothing under the chosen tab right now; the other tabs stay. |
-| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
-| map3dUnavailable | No 3D model for this map: the 2D map, same route (ADR-0069; client meeting 30 September, MoM 4.8). The Map view of this screen is GST-021's map (one implementation): where the venue has not published a GLB model (the default until it supplies one), the phone fails the 3D capability check or rendering drops below 20 fps, the 2D map shows with the same route and the same live position dot; the 2D/3D toggle is hidden and nothing else is said. |
-| weakGps | Position approximate (ADR-0069, section 4): reported GPS accuracy worse than 30 metres, or indoors. The Map view dims the dot and draws an approximate-position ring round the last confident position, labelled *Position approximate*; directions keep their turn list and remaining distance, and *I am at…* (a nearby location, or its QR sign) re-anchors. Waits, shows and services are unaffected. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The digital companion mode list. | the venue loader (splash), `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...") |
+| error | Could not load. Names which read failed and leaves the digital companion mode untouched. | the error note with the mascot, `wireframes/states/P02 Guest App states.dc.html#gst-state-error` (pulled as `wireframe-gst-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | No digital companion mode yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. | the dashed empty note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}") |
+| emptyNoResults | Nothing under the chosen tab right now; the other tabs stay. | the "No results for ..." note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, line 2632 (Explore search) |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. | the sign-in prompt, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out) |
+| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. | the offline bar and the paused actions, `wireframes/states/P02 Guest App states.dc.html#gst-state-offline` (pulled as `wireframe-gst-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| map3dUnavailable | No 3D model for this map: the 2D map, same route (ADR-0069; client meeting 30 September, MoM 4.8). The Map view of this screen is GST-021's map (one implementation): where the venue has not published a GLB model (the default until it supplies one), the phone fails the 3D capability check or rendering drops below 20 fps, the 2D map shows with the same route and the same live position dot; the 2D/3D toggle is hidden and nothing else is said. | the 2D map and the approximate position, `wireframes/states/P02 Guest App states.dc.html#gst-state-map-fallback` (pulled as `wireframe-gst-state-map-fallback.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| weakGps | Position approximate (ADR-0069, section 4): reported GPS accuracy worse than 30 metres, or indoors. The Map view dims the dot and draws an approximate-position ring round the last confident position, labelled *Position approximate*; directions keep their turn list and remaining distance, and *I am at…* (a nearby location, or its QR sign) re-anchors. Waits, shows and services are unaffected. | the 2D map and the approximate position, `wireframes/states/P02 Guest App states.dc.html#gst-state-map-fallback` (pulled as `wireframe-gst-state-map-fallback.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 
@@ -2103,7 +2257,11 @@
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `ProfileDashboard` |
 | Suggested location | `src/screens/general/ProfileDashboard.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
-| Pattern | configEditor |
+| Layout pattern | configEditor (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html` (Mobile App v4, 29 September 2026) (it does not draw this screen: build it from the screen spec in the look of the frame below). Wireframe frame `wireframes/P02 Guest App.dc.html#gst-039`, which adam_pull writes into the ticket folder as `wireframe-gst-039.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-app.yaml`). Each state's look: loading: the venue loader (splash) (the prototype, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...")); error: the error note with the mascot (`wireframes/states/P02 Guest App states.dc.html#gst-state-error`, pulled as `wireframe-gst-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the dashed empty note (the prototype, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}")); emptyNoAccess: the sign-in prompt (the prototype, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out)); offline: the offline bar and the paused actions (`wireframes/states/P02 Guest App states.dc.html#gst-state-offline`, pulled as `wireframe-gst-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -2123,13 +2281,13 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The saved profile. |
-| error | Could not load. Names which read failed and leaves the profile untouched. |
-| emptyFirstRun | No profile configured. The form opens empty and `recordConsent` saves the first one; it says what the platform does in the meantime. |
-| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The saved profile. | the venue loader (splash), `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...") |
+| error | Could not load. Names which read failed and leaves the profile untouched. | the error note with the mascot, `wireframes/states/P02 Guest App states.dc.html#gst-state-error` (pulled as `wireframe-gst-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | No profile configured. The form opens empty and `recordConsent` saves the first one; it says what the platform does in the meantime. | the dashed empty note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}") |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. | the sign-in prompt, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out) |
+| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. | the offline bar and the paused actions, `wireframes/states/P02 Guest App states.dc.html#gst-state-offline` (pulled as `wireframe-gst-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 
@@ -2154,7 +2312,11 @@
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `HelpAndSupportDetail` |
 | Suggested location | `src/screens/general/HelpAndSupportDetail.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
-| Pattern | commandCentre |
+| Layout pattern | commandCentre (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html` (rev 3), view: Account → All screens → Wave 2 → Help & support. Wireframe frame `wireframes/P02 Guest App.dc.html#gst-040`, which adam_pull writes into the ticket folder as `wireframe-gst-040.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-app.yaml`). Each state's look: loading: the venue loader (splash) (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...")); error: the error note with the mascot (`wireframes/states/P02 Guest App states.dc.html#gst-state-error`, pulled as `wireframe-gst-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the dashed empty note (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}")); emptyNoResults: the "No results for ..." note (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, line 2632 (Explore search)); emptyNoAccess: the sign-in prompt (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out)); offline: the offline bar and the paused actions (`wireframes/states/P02 Guest App states.dc.html#gst-state-offline`, pulled as `wireframe-gst-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -2176,14 +2338,14 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | Questions, pages and policies load in place; each list loads on its own. |
-| error | Could not load. Names which read failed and leaves the help support untouched. |
-| emptyFirstRun | No help support yet. Offers Raise my case (`raiseMyCase`). |
-| emptyNoResults | Never shown: `listPublishedFaqs` takes no filter, so an empty list is always the first-run state above. |
-| emptyNoAccess | Reading help needs no sign-in (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-2)). Raising or reading a case needs a signed-in guest: one who is not signed in is offered sign-in and brought back to this screen; the questions, pages and policies stay readable. |
-| offline | The offline banner shows. Help already loaded stays readable, marked with its age. Raising a case is disabled offline — it needs the connection (decided 28 September, audit R148) — and the screen says how to reach staff in person instead: the guest services desk, or any member of staff. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | Questions, pages and policies load in place; each list loads on its own. | the venue loader (splash), `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...") |
+| error | Could not load. Names which read failed and leaves the help support untouched. | the error note with the mascot, `wireframes/states/P02 Guest App states.dc.html#gst-state-error` (pulled as `wireframe-gst-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | No help support yet. Offers Raise my case (`raiseMyCase`). | the dashed empty note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}") |
+| emptyNoResults | Never shown: `listPublishedFaqs` takes no filter, so an empty list is always the first-run state above. | the "No results for ..." note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, line 2632 (Explore search) |
+| emptyNoAccess | Reading help needs no sign-in (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-2)). Raising or reading a case needs a signed-in guest: one who is not signed in is offered sign-in and brought back to this screen; the questions, pages and policies stay readable. | the sign-in prompt, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out) |
+| offline | The offline banner shows. Help already loaded stays readable, marked with its age. Raising a case is disabled offline — it needs the connection (decided 28 September, audit R148) — and the screen says how to reach staff in person instead: the guest services desk, or any member of staff. | the offline bar and the paused actions, `wireframes/states/P02 Guest App states.dc.html#gst-state-offline` (pulled as `wireframe-gst-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 
@@ -2205,7 +2367,11 @@
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `CheckoutEntryForm` |
 | Suggested location | `src/screens/general/CheckoutEntryForm.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
-| Pattern | statusTracker |
+| Layout pattern | statusTracker (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html` (mobile v4 (30 September build)), view: Cart (header basket, after a booking is added to the cart) (it shows part of this screen: build the rest from the screen spec in the same look). Wireframe frame `wireframes/P02 Guest App.dc.html#gst-041`, which adam_pull writes into the ticket folder as `wireframe-gst-041.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-app.yaml`). Each state's look: loading: the venue loader (splash) (the prototype, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...")); error: the error note with the mascot (`wireframes/states/P02 Guest App states.dc.html#gst-state-error`, pulled as `wireframe-gst-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the dashed empty note (the prototype, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}")); emptyNoResults: the "No results for ..." note (the prototype, line 2632 (Explore search)); emptyNoAccess: the sign-in prompt (the prototype, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out)); offline: the offline bar and the paused actions (`wireframes/states/P02 Guest App states.dc.html#gst-state-offline`, pulled as `wireframe-gst-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -2238,14 +2404,14 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | Terminal or gateway state, shown plainly |
-| error | Declined reads differently from unresolved. An unresolved payment inquires rather than retries, and nothing is issued until it resolves |
-| emptyFirstRun | — |
-| emptyNoResults | Never shown: the basket has no filter; an empty basket is the first-run state. |
-| emptyNoAccess | This is the checkout page, and it is where identity is settled (ADR-0045, 18 September 2026). An unverified or anonymous guest is not turned away — they are offered sign-in or, where the site's `guestCheckout` is on, the one-time code. The cart stays intact either way; `checkoutCart` is what refuses. |
-| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | Terminal or gateway state, shown plainly | the venue loader (splash), `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...") |
+| error | Declined reads differently from unresolved. An unresolved payment inquires rather than retries, and nothing is issued until it resolves | the error note with the mascot, `wireframes/states/P02 Guest App states.dc.html#gst-state-error` (pulled as `wireframe-gst-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | — | the dashed empty note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}") |
+| emptyNoResults | Never shown: the basket has no filter; an empty basket is the first-run state. | the "No results for ..." note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, line 2632 (Explore search) |
+| emptyNoAccess | This is the checkout page, and it is where identity is settled (ADR-0045, 18 September 2026). An unverified or anonymous guest is not turned away — they are offered sign-in or, where the site's `guestCheckout` is on, the one-time code. The cart stays intact either way; `checkoutCart` is what refuses. | the sign-in prompt, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out) |
+| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. | the offline bar and the paused actions, `wireframes/states/P02 Guest App states.dc.html#gst-state-offline` (pulled as `wireframe-gst-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 
@@ -2269,7 +2435,11 @@
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `SimpleRegistrationAndOtpDetail` |
 | Suggested location | `src/screens/general/SimpleRegistrationAndOtpDetail.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
-| Pattern | form |
+| Layout pattern | form (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html` (Mobile App v4, 29 September 2026) (it does not draw this screen: build it from the screen spec in the look of the frame below). Wireframe frame `wireframes/P02 Guest App.dc.html#gst-042`, which adam_pull writes into the ticket folder as `wireframe-gst-042.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-app.yaml`). Each state's look: loading: the venue loader (splash) (the prototype, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...")); error: the error note with the mascot (`wireframes/states/P02 Guest App states.dc.html#gst-state-error`, pulled as `wireframe-gst-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the dashed empty note (the prototype, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}")); emptyNoAccess: the sign-in prompt (the prototype, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out)); signInRefused: the sign-in refusal notice (`wireframes/states/P02 Guest App states.dc.html#gst-state-sign-in-refused`, pulled as `wireframe-gst-state-sign-in-refused.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; offline: the offline bar and the paused actions (`wireframes/states/P02 Guest App states.dc.html#gst-state-offline`, pulled as `wireframe-gst-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -2301,14 +2471,14 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | Checking whether this device already holds a guest session. The sign-in form stays visible. |
-| error | Identity could not be reached. Says so rather than saying the password or code is wrong, and keeps what was typed. |
-| emptyFirstRun | Nobody signed in on this device — the normal state. The form offers a code, a password, Apple or Google and UAE Pass, and Create an account (`registerGuest`). |
-| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025), and this is the screen a guest who is not signed in is sent to, so it has no no-access case of its own. A session that has expired lands here with the screen it came from kept, and returns to it after sign-in. |
-| signInRefused | One message for every refusal of a password sign-in: `guestPasswordLogin` answers 401 alike for a wrong password, an unknown identifier, an account with no password and a locked account, and the screen never says which. Too many attempts (429, or the lockout after `PasswordPolicy.lockoutAfterAttempts`) says to try again later and offers Send me a code instead (decided 28 September, audit R073 (a)). |
-| offline | Not available, and the offline banner says why. Signing in, registering and verifying a code need the server. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | Checking whether this device already holds a guest session. The sign-in form stays visible. | the venue loader (splash), `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...") |
+| error | Identity could not be reached. Says so rather than saying the password or code is wrong, and keeps what was typed. | the error note with the mascot, `wireframes/states/P02 Guest App states.dc.html#gst-state-error` (pulled as `wireframe-gst-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | Nobody signed in on this device — the normal state. The form offers a code, a password, Apple or Google and UAE Pass, and Create an account (`registerGuest`). | the dashed empty note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}") |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025), and this is the screen a guest who is not signed in is sent to, so it has no no-access case of its own. A session that has expired lands here with the screen it came from kept, and returns to it after sign-in. | the sign-in prompt, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out) |
+| signInRefused | One message for every refusal of a password sign-in: `guestPasswordLogin` answers 401 alike for a wrong password, an unknown identifier, an account with no password and a locked account, and the screen never says which. Too many attempts (429, or the lockout after `PasswordPolicy.lockoutAfterAttempts`) says to try again later and offers Send me a code instead (decided 28 September, audit R073 (a)). | the sign-in refusal notice, `wireframes/states/P02 Guest App states.dc.html#gst-state-sign-in-refused` (pulled as `wireframe-gst-state-sign-in-refused.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| offline | Not available, and the offline banner says why. Signing in, registering and verifying a code need the server. | the offline bar and the paused actions, `wireframes/states/P02 Guest App states.dc.html#gst-state-offline` (pulled as `wireframe-gst-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 
@@ -2331,7 +2501,11 @@
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `ArabicRtlExperienceDetail` |
 | Suggested location | `src/screens/general/ArabicRtlExperienceDetail.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
-| Pattern | configEditor |
+| Layout pattern | configEditor (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html` (rev 3), view: Account → All screens → Wave 1 → Arabic / RTL experience; language button on home. Wireframe frame `wireframes/P02 Guest App.dc.html#gst-043`, which adam_pull writes into the ticket folder as `wireframe-gst-043.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-app.yaml`). Each state's look: loading: the venue loader (splash) (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...")); error: the error note with the mascot (`wireframes/states/P02 Guest App states.dc.html#gst-state-error`, pulled as `wireframe-gst-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the dashed empty note (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}")); offline: the offline bar and the paused actions (`wireframes/states/P02 Guest App states.dc.html#gst-state-offline`, pulled as `wireframe-gst-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Operations**
 
@@ -2341,12 +2515,12 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The arabic rtl experience list. |
-| error | Could not load. Names which read failed and leaves the arabic rtl experience untouched. |
-| emptyFirstRun | No arabic rtl experience yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
-| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The arabic rtl experience list. | the venue loader (splash), `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...") |
+| error | Could not load. Names which read failed and leaves the arabic rtl experience untouched. | the error note with the mascot, `wireframes/states/P02 Guest App states.dc.html#gst-state-error` (pulled as `wireframe-gst-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | No arabic rtl experience yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. | the dashed empty note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}") |
+| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. | the offline bar and the paused actions, `wireframes/states/P02 Guest App states.dc.html#gst-state-offline` (pulled as `wireframe-gst-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 
@@ -2367,7 +2541,11 @@
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `MultiCurrencyAndPricingDetail` |
 | Suggested location | `src/screens/general/MultiCurrencyAndPricingDetail.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html` (rev 3), view: Account → All screens → Wave 2 → Multi-currency & pricing. Wireframe frame `wireframes/P02 Guest App.dc.html#gst-044`, which adam_pull writes into the ticket folder as `wireframe-gst-044.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-app.yaml`). Each state's look: loading: the venue loader (splash) (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...")); error: the error note with the mascot (`wireframes/states/P02 Guest App states.dc.html#gst-state-error`, pulled as `wireframe-gst-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the dashed empty note (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}")); emptyNoResults: the "No results for ..." note (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, line 2632 (Explore search)); emptyNoAccess: the sign-in prompt (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out)); offline: the offline bar and the paused actions (`wireframes/states/P02 Guest App states.dc.html#gst-state-offline`, pulled as `wireframe-gst-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Operations**
 
@@ -2378,14 +2556,14 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The multi-currency pricing list. |
-| error | Could not load. Names which read failed and leaves the multi-currency pricing untouched. |
-| emptyFirstRun | Not reachable: with no other currency at the venue the screen is not linked, and prices stay in the venue's currency. |
-| emptyNoResults | Never shown: the screen sends no filter a guest chose. |
-| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | The offline banner shows. Last known rates stay, with their age. A rate is a number a guest may act on, and an undated one they cannot judge. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The multi-currency pricing list. | the venue loader (splash), `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...") |
+| error | Could not load. Names which read failed and leaves the multi-currency pricing untouched. | the error note with the mascot, `wireframes/states/P02 Guest App states.dc.html#gst-state-error` (pulled as `wireframe-gst-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | Not reachable: with no other currency at the venue the screen is not linked, and prices stay in the venue's currency. | the dashed empty note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}") |
+| emptyNoResults | Never shown: the screen sends no filter a guest chose. | the "No results for ..." note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, line 2632 (Explore search) |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. | the sign-in prompt, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out) |
+| offline | The offline banner shows. Last known rates stay, with their age. A rate is a number a guest may act on, and an undated one they cannot judge. | the offline bar and the paused actions, `wireframes/states/P02 Guest App states.dc.html#gst-state-offline` (pulled as `wireframe-gst-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 
@@ -2406,7 +2584,11 @@
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `TicketDeliveryAndSharingDetail` |
 | Suggested location | `src/screens/general/TicketDeliveryAndSharingDetail.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
-| Pattern | configEditor |
+| Layout pattern | configEditor (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html` (rev 3), view: Account → All screens → Wave 2 → Ticket delivery & sharing (opens Ticket transfer) (it shows part of this screen: build the rest from the screen spec in the same look). Wireframe frame `wireframes/P02 Guest App.dc.html#gst-045`, which adam_pull writes into the ticket folder as `wireframe-gst-045.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-app.yaml`). Each state's look: loading: the venue loader (splash) (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...")); error: the error note with the mascot (`wireframes/states/P02 Guest App states.dc.html#gst-state-error`, pulled as `wireframe-gst-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the dashed empty note (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}")); offline: the offline bar and the paused actions (`wireframes/states/P02 Guest App states.dc.html#gst-state-offline`, pulled as `wireframe-gst-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyNoResults: the "No results for ..." note (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, line 2632 (Explore search)). The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -2425,13 +2607,13 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | Availability is live, never cached |
-| error | Availability unavailable. Selection is blocked — overselling is worse than waiting |
-| emptyFirstRun | Sold out is a real answer. Offers the next available rather than a dead end |
-| offline | The offline banner shows. Sending, claiming and listing for resale need the connection — a transfer nobody received is a ticket nobody holds. Tickets already loaded stay visible. |
-| emptyNoResults | No ticket to send: the guest holds none that can be shared. Says so and offers My Tickets. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | Availability is live, never cached | the venue loader (splash), `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...") |
+| error | Availability unavailable. Selection is blocked — overselling is worse than waiting | the error note with the mascot, `wireframes/states/P02 Guest App states.dc.html#gst-state-error` (pulled as `wireframe-gst-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | Sold out is a real answer. Offers the next available rather than a dead end | the dashed empty note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}") |
+| offline | The offline banner shows. Sending, claiming and listing for resale need the connection — a transfer nobody received is a ticket nobody holds. Tickets already loaded stay visible. | the offline bar and the paused actions, `wireframes/states/P02 Guest App states.dc.html#gst-state-offline` (pulled as `wireframe-gst-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyNoResults | No ticket to send: the guest holds none that can be shared. Says so and offers My Tickets. | the "No results for ..." note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, line 2632 (Explore search) |
 
 **Goes to**
 
@@ -2452,7 +2634,11 @@
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `BrandedQueueWaitingRoomDetail` |
 | Suggested location | `src/screens/general/BrandedQueueWaitingRoomDetail.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
-| Pattern | statusTracker |
+| Layout pattern | statusTracker (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html` (rev 3), view: Account → All screens → Wave 1 → Branded queue / waiting room. Wireframe frame `wireframes/P02 Guest App.dc.html#gst-046`, which adam_pull writes into the ticket folder as `wireframe-gst-046.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-app.yaml`). Each state's look: loading: the venue loader (splash) (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...")); error: the error note with the mascot (`wireframes/states/P02 Guest App states.dc.html#gst-state-error`, pulled as `wireframe-gst-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the dashed empty note (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}")); offline: the offline bar and the paused actions (`wireframes/states/P02 Guest App states.dc.html#gst-state-offline`, pulled as `wireframe-gst-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -2470,12 +2656,12 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | Taking a place in the room. *Take my place* (`enterWaitingRoom`) answers with a position, or `notRequired` and the guest goes straight on to the sale |
-| error | Lost the place. A retry sends the same `Idempotency-Key` and gets the same entry back, so the guest is not sent to the back, and the screen says so. `expired` (the admission was not used in time) offers to enter again; `closed` (the room was switched off or the performance stopped selling) says so and goes back to the event |
-| emptyFirstRun | — |
-| offline | The offline banner shows. The last known position stays on screen with its age, and polling resumes with the same entry when the connection is back. Admission needs the connection. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | Taking a place in the room. *Take my place* (`enterWaitingRoom`) answers with a position, or `notRequired` and the guest goes straight on to the sale | the venue loader (splash), `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...") |
+| error | Lost the place. A retry sends the same `Idempotency-Key` and gets the same entry back, so the guest is not sent to the back, and the screen says so. `expired` (the admission was not used in time) offers to enter again; `closed` (the room was switched off or the performance stopped selling) says so and goes back to the event | the error note with the mascot, `wireframes/states/P02 Guest App states.dc.html#gst-state-error` (pulled as `wireframe-gst-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | — | the dashed empty note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}") |
+| offline | The offline banner shows. The last known position stays on screen with its age, and polling resumes with the same entry when the connection is back. Admission needs the connection. | the offline bar and the paused actions, `wireframes/states/P02 Guest App states.dc.html#gst-state-offline` (pulled as `wireframe-gst-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 
@@ -2496,7 +2682,11 @@
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `MaintenancePageDetail` |
 | Suggested location | `src/screens/general/MaintenancePageDetail.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
-| Pattern | statusTracker |
+| Layout pattern | statusTracker (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html` (rev 3), view: Account → All screens → Wave 1 → Maintenance / upgrade. Wireframe frame `wireframes/P02 Guest App.dc.html#gst-047`, which adam_pull writes into the ticket folder as `wireframe-gst-047.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-app.yaml`). Each state's look: loading: the venue loader (splash) (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...")); error: the error note with the mascot (`wireframes/states/P02 Guest App states.dc.html#gst-state-error`, pulled as `wireframe-gst-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the dashed empty note (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}")); offline: the offline bar and the paused actions (`wireframes/states/P02 Guest App states.dc.html#gst-state-offline`, pulled as `wireframe-gst-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; forcedUpgrade: the unavailable page (sold out, closed, update required) (`wireframes/states/P02 Guest App states.dc.html#gst-state-unavailable`, pulled as `wireframe-gst-state-unavailable.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; soldOut: the unavailable page (sold out, closed, update required) (`wireframes/states/P02 Guest App states.dc.html#gst-state-unavailable`, pulled as `wireframe-gst-state-unavailable.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; closed: the unavailable page (sold out, closed, update required) (`wireframes/states/P02 Guest App states.dc.html#gst-state-unavailable`, pulled as `wireframe-gst-state-unavailable.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyNoAccess: the sign-in prompt (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out)); maintenance: the maintenance page (GST-047) (`wireframes/P02 Guest App.dc.html#gst-047`, pulled as `wireframe-gst-047.html`). The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Operations**
 
@@ -2507,17 +2697,17 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The maintenance upgrade, read by `getTenantAppStatus`. |
-| error | Could not load. Names which read failed and leaves the maintenance upgrade untouched. |
-| emptyFirstRun | No maintenance upgrade yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
-| offline | The offline banner shows instead of this page. Being offline is the guest's connection, not the venue's — an error or maintenance page shown for a dropped signal tells a guest the venue is down. |
-| forcedUpgrade | Update required. The app's version is below `getTenantAppStatus.minimumAppVersion` for its platform; the screen offers only the store link, because an app too old to talk to the server cannot be trusted to book or pay (decided 28 September, audit R073 (b)). |
-| soldOut | Sold out today. `getTenantAppStatus.availability` is `soldOut`: the page says so with the tenant's `availabilityMessage` and offers another day, never a generic error (decided 28 September, audit R073 (f)). |
-| closed | Closed. `getTenantAppStatus.availability` is `closed`: the page says the venue is not open, with the tenant's `availabilityMessage` and the opening hours from `contact` (decided 28 September, audit R073 (f)). |
-| emptyNoAccess | Nothing here needs a sign-in (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-2)): the screen reads only what the tenant has published, which is public, so there is no no-access case. A host that belongs to no tenant shows the platform's neutral holding page. |
-| maintenance | The venue's maintenance message and when it expects to be back; one way onward (try again at that time). Set live on CMS-001, never published. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The maintenance upgrade, read by `getTenantAppStatus`. | the venue loader (splash), `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...") |
+| error | Could not load. Names which read failed and leaves the maintenance upgrade untouched. | the error note with the mascot, `wireframes/states/P02 Guest App states.dc.html#gst-state-error` (pulled as `wireframe-gst-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | No maintenance upgrade yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. | the dashed empty note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}") |
+| offline | The offline banner shows instead of this page. Being offline is the guest's connection, not the venue's — an error or maintenance page shown for a dropped signal tells a guest the venue is down. | the offline bar and the paused actions, `wireframes/states/P02 Guest App states.dc.html#gst-state-offline` (pulled as `wireframe-gst-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| forcedUpgrade | Update required. The app's version is below `getTenantAppStatus.minimumAppVersion` for its platform; the screen offers only the store link, because an app too old to talk to the server cannot be trusted to book or pay (decided 28 September, audit R073 (b)). | the unavailable page (sold out, closed, update required), `wireframes/states/P02 Guest App states.dc.html#gst-state-unavailable` (pulled as `wireframe-gst-state-unavailable.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| soldOut | Sold out today. `getTenantAppStatus.availability` is `soldOut`: the page says so with the tenant's `availabilityMessage` and offers another day, never a generic error (decided 28 September, audit R073 (f)). | the unavailable page (sold out, closed, update required), `wireframes/states/P02 Guest App states.dc.html#gst-state-unavailable` (pulled as `wireframe-gst-state-unavailable.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| closed | Closed. `getTenantAppStatus.availability` is `closed`: the page says the venue is not open, with the tenant's `availabilityMessage` and the opening hours from `contact` (decided 28 September, audit R073 (f)). | the unavailable page (sold out, closed, update required), `wireframes/states/P02 Guest App states.dc.html#gst-state-unavailable` (pulled as `wireframe-gst-state-unavailable.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyNoAccess | Nothing here needs a sign-in (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-2)): the screen reads only what the tenant has published, which is public, so there is no no-access case. A host that belongs to no tenant shows the platform's neutral holding page. | the sign-in prompt, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out) |
+| maintenance | The venue's maintenance message and when it expects to be back; one way onward (try again at that time). Set live on CMS-001, never published. | the maintenance page (GST-047), `wireframes/P02 Guest App.dc.html#gst-047` (pulled as `wireframe-gst-047.html`) |
 
 **Goes to**
 
@@ -2538,7 +2728,11 @@
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `UpsellCrossSellDetail` |
 | Suggested location | `src/screens/general/UpsellCrossSellDetail.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
-| Pattern | statusTracker |
+| Layout pattern | statusTracker (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html` (Mobile App v4, 29 September 2026) (it does not draw this screen: build it from the screen spec in the look of the frame below). Wireframe frame `wireframes/P02 Guest App.dc.html#gst-048`, which adam_pull writes into the ticket folder as `wireframe-gst-048.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-app.yaml`). Each state's look: loading: the venue loader (splash) (the prototype, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...")); error: the error note with the mascot (`wireframes/states/P02 Guest App states.dc.html#gst-state-error`, pulled as `wireframe-gst-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the dashed empty note (the prototype, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}")); emptyNoAccess: the sign-in prompt (the prototype, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out)); offline: the offline bar and the paused actions (`wireframes/states/P02 Guest App states.dc.html#gst-state-offline`, pulled as `wireframe-gst-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -2559,13 +2753,13 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The suggestions, read by `decideRecommendations`. |
-| error | Could not load. Names which read failed and leaves the upsell cross-sell untouched. |
-| emptyFirstRun | No offers for this basket: the step is skipped and the guest goes straight on (DI-428). |
-| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The suggestions, read by `decideRecommendations`. | the venue loader (splash), `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...") |
+| error | Could not load. Names which read failed and leaves the upsell cross-sell untouched. | the error note with the mascot, `wireframes/states/P02 Guest App states.dc.html#gst-state-error` (pulled as `wireframe-gst-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | No offers for this basket: the step is skipped and the guest goes straight on (DI-428). | the dashed empty note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}") |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. | the sign-in prompt, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out) |
+| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. | the offline bar and the paused actions, `wireframes/states/P02 Guest App states.dc.html#gst-state-offline` (pulled as `wireframe-gst-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 
@@ -2586,7 +2780,11 @@
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `InteractiveSeatSelectionCanvas` |
 | Suggested location | `src/screens/general/InteractiveSeatSelectionCanvas.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
-| Pattern | statusTracker |
+| Layout pattern | statusTracker (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html` (mobile v4 (30 September build)), view: Union Arena → Buy tickets → Direct seat map → 2D plan → section 104 (← Whole map) (it shows part of this screen: build the rest from the screen spec in the same look). Wireframe frame `wireframes/P02 Guest App.dc.html#gst-049`, which adam_pull writes into the ticket folder as `wireframe-gst-049.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-app.yaml`). Each state's look: loading: the venue loader (splash) (the prototype, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...")); error: the error note with the mascot (`wireframes/states/P02 Guest App states.dc.html#gst-state-error`, pulled as `wireframe-gst-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the dashed empty note (the prototype, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}")); emptyNoAccess: the sign-in prompt (the prototype, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out)); offline: the offline bar and the paused actions (`wireframes/states/P02 Guest App states.dc.html#gst-state-offline`, pulled as `wireframe-gst-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -2609,13 +2807,13 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The interactive seat selection, read by `getSeatAvailability`. |
-| error | Could not load. Names which read failed and leaves the interactive seat selection untouched. |
-| emptyFirstRun | No interactive seat selection yet. Offers Create seat hold (`createSeatHold`). |
-| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The interactive seat selection, read by `getSeatAvailability`. | the venue loader (splash), `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...") |
+| error | Could not load. Names which read failed and leaves the interactive seat selection untouched. | the error note with the mascot, `wireframes/states/P02 Guest App states.dc.html#gst-state-error` (pulled as `wireframe-gst-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | No interactive seat selection yet. Offers Create seat hold (`createSeatHold`). | the dashed empty note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}") |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. | the sign-in prompt, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out) |
+| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. | the offline bar and the paused actions, `wireframes/states/P02 Guest App states.dc.html#gst-state-offline` (pulled as `wireframe-gst-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 
@@ -2638,7 +2836,11 @@
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `ResourceBookingCabanaDetail` |
 | Suggested location | `src/screens/general/ResourceBookingCabanaDetail.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html` (Mobile App v4, 29 September 2026) (it does not draw this screen: build it from the screen spec in the look of the frame below). Wireframe frame `wireframes/P02 Guest App.dc.html#gst-050`, which adam_pull writes into the ticket folder as `wireframe-gst-050.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-app.yaml`). Each state's look: loading: the venue loader (splash) (the prototype, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...")); error: the error note with the mascot (`wireframes/states/P02 Guest App states.dc.html#gst-state-error`, pulled as `wireframe-gst-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the dashed empty note (the prototype, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}")); emptyNoResults: the "No results for ..." note (the prototype, line 2632 (Explore search)); emptyNoAccess: the sign-in prompt (the prototype, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out)); offline: the offline bar and the paused actions (`wireframes/states/P02 Guest App states.dc.html#gst-state-offline`, pulled as `wireframe-gst-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -2657,14 +2859,14 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The resource booking cabana list. |
-| error | Could not load. Names which read failed and leaves the resource booking cabana untouched. |
-| emptyFirstRun | No resource booking cabana yet. Offers Add cart line (`addCartLine`); distinct from a filter that matched nothing. |
-| emptyNoResults | Nothing free on the date picked; offers the next free date. |
-| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The resource booking cabana list. | the venue loader (splash), `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...") |
+| error | Could not load. Names which read failed and leaves the resource booking cabana untouched. | the error note with the mascot, `wireframes/states/P02 Guest App states.dc.html#gst-state-error` (pulled as `wireframe-gst-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | No resource booking cabana yet. Offers Add cart line (`addCartLine`); distinct from a filter that matched nothing. | the dashed empty note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}") |
+| emptyNoResults | Nothing free on the date picked; offers the next free date. | the "No results for ..." note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, line 2632 (Explore search) |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. | the sign-in prompt, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out) |
+| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. | the offline bar and the paused actions, `wireframes/states/P02 Guest App states.dc.html#gst-state-offline` (pulled as `wireframe-gst-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 
@@ -2686,7 +2888,11 @@
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `PlanYourAdventureStartDetail` |
 | Suggested location | `src/screens/general/PlanYourAdventureStartDetail.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
-| Pattern | multiStepForm |
+| Layout pattern | multiStepForm (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html` (mobile v4 (30 September build)), view: Plan tab (Plan your visit · 1 of 6). Wireframe frame `wireframes/P02 Guest App.dc.html#gst-051`, which adam_pull writes into the ticket folder as `wireframe-gst-051.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-app.yaml`). Each state's look: loading: the venue loader (splash) (the prototype, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...")); error: the error note with the mascot (`wireframes/states/P02 Guest App states.dc.html#gst-state-error`, pulled as `wireframe-gst-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the dashed empty note (the prototype, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}")); emptyNoResults: the "No results for ..." note (the prototype, line 2632 (Explore search)); preferenceNotAtVenue: the Not at the parks you chose chip (`wireframes/states/P02 Guest App states.dc.html#gst-state-preference-not-at-venue`, pulled as `wireframe-gst-state-preference-not-at-venue.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyNoAccess: the sign-in prompt (the prototype, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out)); offline: the offline bar and the paused actions (`wireframes/states/P02 Guest App states.dc.html#gst-state-offline`, pulled as `wireframe-gst-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -2705,15 +2911,15 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The plan builds in place; the inputs stay on screen. |
-| error | Could not load the plan. Names what failed; the inputs are kept so trying again costs nothing. |
-| emptyFirstRun | No plan yet: the first question is shown. Nothing is saved until *Make my plan*. |
-| emptyNoResults | Nothing suits the whole party on that day (for example every ride is over a child's height): says so and offers to change the answers. |
-| preferenceNotAtVenue | A preference no chosen park can meet (client meeting 30 September, MoM 4.7): a cuisine or shop tag with no matching point at any park of the plan is marked on its chip (*Not at the parks you chose*) before *Make my plan*; the plan is still made without it, never with a restaurant or shop from a park the party is not visiting. Where another park of the tenant has it, the chip says which, and choosing that park for a day brings it in. |
-| emptyNoAccess | A guest holds no permission. A plan that is not theirs says so without saying whose it is; a signed-out guest can still build a plan and is asked to sign in only to save or book it. |
-| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The plan builds in place; the inputs stay on screen. | the venue loader (splash), `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...") |
+| error | Could not load the plan. Names what failed; the inputs are kept so trying again costs nothing. | the error note with the mascot, `wireframes/states/P02 Guest App states.dc.html#gst-state-error` (pulled as `wireframe-gst-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | No plan yet: the first question is shown. Nothing is saved until *Make my plan*. | the dashed empty note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}") |
+| emptyNoResults | Nothing suits the whole party on that day (for example every ride is over a child's height): says so and offers to change the answers. | the "No results for ..." note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, line 2632 (Explore search) |
+| preferenceNotAtVenue | A preference no chosen park can meet (client meeting 30 September, MoM 4.7): a cuisine or shop tag with no matching point at any park of the plan is marked on its chip (*Not at the parks you chose*) before *Make my plan*; the plan is still made without it, never with a restaurant or shop from a park the party is not visiting. Where another park of the tenant has it, the chip says which, and choosing that park for a day brings it in. | the Not at the parks you chose chip, `wireframes/states/P02 Guest App states.dc.html#gst-state-preference-not-at-venue` (pulled as `wireframe-gst-state-preference-not-at-venue.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyNoAccess | A guest holds no permission. A plan that is not theirs says so without saying whose it is; a signed-out guest can still build a plan and is asked to sign in only to save or book it. | the sign-in prompt, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out) |
+| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. | the offline bar and the paused actions, `wireframes/states/P02 Guest App states.dc.html#gst-state-offline` (pulled as `wireframe-gst-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 
@@ -2736,7 +2942,11 @@
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `SuggestedItinerariesDetail` |
 | Suggested location | `src/screens/general/SuggestedItinerariesDetail.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html` (Mobile App v4, 29 September 2026) (it does not draw this screen: build it from the screen spec in the look of the frame below). Wireframe frame `wireframes/P02 Guest App.dc.html#gst-052`, which adam_pull writes into the ticket folder as `wireframe-gst-052.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-app.yaml`). Each state's look: loading: the venue loader (splash) (the prototype, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...")); error: the error note with the mascot (`wireframes/states/P02 Guest App states.dc.html#gst-state-error`, pulled as `wireframe-gst-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the dashed empty note (the prototype, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}")); emptyNoResults: the "No results for ..." note (the prototype, line 2632 (Explore search)); emptyNoAccess: the sign-in prompt (the prototype, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out)); offline: the offline bar and the paused actions (`wireframes/states/P02 Guest App states.dc.html#gst-state-offline`, pulled as `wireframe-gst-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -2755,14 +2965,14 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The plan builds in place; the inputs stay on screen. |
-| error | Could not load the plan. Names what failed; the inputs are kept so trying again costs nothing. |
-| emptyFirstRun | The venue has no ready-made plans: says so and offers *Make my own* (GST-051). |
-| emptyNoResults | Nothing suits the whole party on that day (for example every ride is over a child's height): says so and offers to change the answers. |
-| emptyNoAccess | A guest holds no permission. A plan that is not theirs says so without saying whose it is; a signed-out guest can still build a plan and is asked to sign in only to save or book it. |
-| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The plan builds in place; the inputs stay on screen. | the venue loader (splash), `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...") |
+| error | Could not load the plan. Names what failed; the inputs are kept so trying again costs nothing. | the error note with the mascot, `wireframes/states/P02 Guest App states.dc.html#gst-state-error` (pulled as `wireframe-gst-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | The venue has no ready-made plans: says so and offers *Make my own* (GST-051). | the dashed empty note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}") |
+| emptyNoResults | Nothing suits the whole party on that day (for example every ride is over a child's height): says so and offers to change the answers. | the "No results for ..." note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, line 2632 (Explore search) |
+| emptyNoAccess | A guest holds no permission. A plan that is not theirs says so without saying whose it is; a signed-out guest can still build a plan and is asked to sign in only to save or book it. | the sign-in prompt, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out) |
+| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. | the offline bar and the paused actions, `wireframes/states/P02 Guest App states.dc.html#gst-state-offline` (pulled as `wireframe-gst-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 
@@ -2785,7 +2995,11 @@
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `YourPlanDetail` |
 | Suggested location | `src/screens/general/YourPlanDetail.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html` (mobile v4 (30 September build)), view: Plan tab → the six questions → Make my plan (Your plan). Wireframe frame `wireframes/P02 Guest App.dc.html#gst-053`, which adam_pull writes into the ticket folder as `wireframe-gst-053.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-app.yaml`). Each state's look: loading: the venue loader (splash) (the prototype, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...")); error: the error note with the mascot (`wireframes/states/P02 Guest App states.dc.html#gst-state-error`, pulled as `wireframe-gst-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the dashed empty note (the prototype, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}")); emptyNoResults: the "No results for ..." note (the prototype, line 2632 (Explore search)); preferenceNotAtVenue: the Not at the parks you chose chip (`wireframes/states/P02 Guest App states.dc.html#gst-state-preference-not-at-venue`, pulled as `wireframe-gst-state-preference-not-at-venue.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyNoAccess: the sign-in prompt (the prototype, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out)); offline: the offline bar and the paused actions (`wireframes/states/P02 Guest App states.dc.html#gst-state-offline`, pulled as `wireframe-gst-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -2808,15 +3022,15 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The plan builds in place; the inputs stay on screen. |
-| error | Could not load the plan. Names what failed; the inputs are kept so trying again costs nothing. |
-| emptyFirstRun | No plan yet: offers the questions (GST-051) or a ready-made plan (GST-052). |
-| emptyNoResults | Nothing suits the whole party on that day (for example every ride is over a child's height): says so and offers to change the answers. |
-| preferenceNotAtVenue | A day whose park cannot meet a preference (client meeting 30 September, MoM 4.7): the day is shown in full with the *Not at this park* banner naming the cuisine or shop and where it is instead; nothing from another park is placed. *Change answers* (GST-051) lets the guest move that day to the park that has it. An empty swap sheet says the day's park has no other option of that kind, not that none exists anywhere. |
-| emptyNoAccess | A guest holds no permission. A plan that is not theirs says so without saying whose it is; a signed-out guest can still build a plan and is asked to sign in only to save or book it. |
-| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The plan builds in place; the inputs stay on screen. | the venue loader (splash), `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...") |
+| error | Could not load the plan. Names what failed; the inputs are kept so trying again costs nothing. | the error note with the mascot, `wireframes/states/P02 Guest App states.dc.html#gst-state-error` (pulled as `wireframe-gst-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | No plan yet: offers the questions (GST-051) or a ready-made plan (GST-052). | the dashed empty note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}") |
+| emptyNoResults | Nothing suits the whole party on that day (for example every ride is over a child's height): says so and offers to change the answers. | the "No results for ..." note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, line 2632 (Explore search) |
+| preferenceNotAtVenue | A day whose park cannot meet a preference (client meeting 30 September, MoM 4.7): the day is shown in full with the *Not at this park* banner naming the cuisine or shop and where it is instead; nothing from another park is placed. *Change answers* (GST-051) lets the guest move that day to the park that has it. An empty swap sheet says the day's park has no other option of that kind, not that none exists anywhere. | the Not at the parks you chose chip, `wireframes/states/P02 Guest App states.dc.html#gst-state-preference-not-at-venue` (pulled as `wireframe-gst-state-preference-not-at-venue.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyNoAccess | A guest holds no permission. A plan that is not theirs says so without saying whose it is; a signed-out guest can still build a plan and is asked to sign in only to save or book it. | the sign-in prompt, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out) |
+| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. | the offline bar and the paused actions, `wireframes/states/P02 Guest App states.dc.html#gst-state-offline` (pulled as `wireframe-gst-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 
@@ -2842,7 +3056,11 @@
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `AIPlannerDetail` |
 | Suggested location | `src/screens/general/AIPlannerDetail.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html` (mobile v4 (30 September build)), view: Ask Sahli (the assistant chat; v4 has no plan-specific chat) (it shows part of this screen: build the rest from the screen spec in the same look). Wireframe frame `wireframes/P02 Guest App.dc.html#gst-054`, which adam_pull writes into the ticket folder as `wireframe-gst-054.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-app.yaml`). Each state's look: loading: the venue loader (splash) (the prototype, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...")); error: the error note with the mascot (`wireframes/states/P02 Guest App states.dc.html#gst-state-error`, pulled as `wireframe-gst-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the dashed empty note (the prototype, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}")); emptyNoResults: the "No results for ..." note (the prototype, line 2632 (Explore search)); emptyNoAccess: the sign-in prompt (the prototype, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out)); offline: the offline bar and the paused actions (`wireframes/states/P02 Guest App states.dc.html#gst-state-offline`, pulled as `wireframe-gst-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; aiUnavailable: the planner's fallback note (`wireframes/states/P02 Guest App states.dc.html#gst-state-ai-unavailable`, pulled as `wireframe-gst-state-ai-unavailable.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -2865,15 +3083,15 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The plan builds in place; the inputs stay on screen. |
-| error | Could not load the plan. Names what failed; the inputs are kept so trying again costs nothing. |
-| emptyFirstRun | No conversation yet: the plan is shown with example requests. |
-| emptyNoResults | Nothing suits the whole party on that day (for example every ride is over a child's height): says so and offers to change the answers. |
-| emptyNoAccess | A guest holds no permission. A plan that is not theirs says so without saying whose it is; a signed-out guest can still build a plan and is asked to sign in only to save or book it. |
-| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
-| aiUnavailable | Falls back to the rules plan, never to an error (MOB-6): the plan from `getVisitPlan` stays on screen with a short note, and the guest carries on editing it on GST-053. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The plan builds in place; the inputs stay on screen. | the venue loader (splash), `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...") |
+| error | Could not load the plan. Names what failed; the inputs are kept so trying again costs nothing. | the error note with the mascot, `wireframes/states/P02 Guest App states.dc.html#gst-state-error` (pulled as `wireframe-gst-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | No conversation yet: the plan is shown with example requests. | the dashed empty note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}") |
+| emptyNoResults | Nothing suits the whole party on that day (for example every ride is over a child's height): says so and offers to change the answers. | the "No results for ..." note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, line 2632 (Explore search) |
+| emptyNoAccess | A guest holds no permission. A plan that is not theirs says so without saying whose it is; a signed-out guest can still build a plan and is asked to sign in only to save or book it. | the sign-in prompt, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out) |
+| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. | the offline bar and the paused actions, `wireframes/states/P02 Guest App states.dc.html#gst-state-offline` (pulled as `wireframe-gst-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| aiUnavailable | Falls back to the rules plan, never to an error (MOB-6): the plan from `getVisitPlan` stays on screen with a short note, and the guest carries on editing it on GST-053. | the planner's fallback note, `wireframes/states/P02 Guest App states.dc.html#gst-state-ai-unavailable` (pulled as `wireframe-gst-state-ai-unavailable.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 
@@ -2896,7 +3114,11 @@
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `DynamicQrTicketCanvas` |
 | Suggested location | `src/screens/general/DynamicQrTicketCanvas.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
-| Pattern | credentialView |
+| Layout pattern | credentialView (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html` (rev 3), view: Account → All screens → Wave 1 → Dynamic QR ticket; also the Scan tab overlay. Wireframe frame `wireframes/P02 Guest App.dc.html#gst-055`, which adam_pull writes into the ticket folder as `wireframe-gst-055.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-app.yaml`). Each state's look: loading: the venue loader (splash) (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...")); error: the error note with the mascot (`wireframes/states/P02 Guest App states.dc.html#gst-state-error`, pulled as `wireframe-gst-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the dashed empty note (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}")); emptyNoAccess: the sign-in prompt (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out)); offline: the offline bar and the paused actions (`wireframes/states/P02 Guest App states.dc.html#gst-state-offline`, pulled as `wireframe-gst-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -2918,13 +3140,13 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | Availability is live, never cached |
-| error | Availability unavailable. Selection is blocked — overselling is worse than waiting |
-| emptyFirstRun | Sold out is a real answer. Offers the next available rather than a dead end |
-| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | The offline banner shows. A ticket already loaded shows its rotating code, derived on the device from its seed, so it changes with no signal (decided 28 September, audit R230). Transferring a ticket needs the connection. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | Availability is live, never cached | the venue loader (splash), `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...") |
+| error | Availability unavailable. Selection is blocked — overselling is worse than waiting | the error note with the mascot, `wireframes/states/P02 Guest App states.dc.html#gst-state-error` (pulled as `wireframe-gst-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | Sold out is a real answer. Offers the next available rather than a dead end | the dashed empty note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}") |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. | the sign-in prompt, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out) |
+| offline | The offline banner shows. A ticket already loaded shows its rotating code, derived on the device from its seed, so it changes with no signal (decided 28 September, audit R230). Transferring a ticket needs the connection. | the offline bar and the paused actions, `wireframes/states/P02 Guest App states.dc.html#gst-state-offline` (pulled as `wireframe-gst-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 
@@ -2945,7 +3167,11 @@
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `BundlePackageDetail` |
 | Suggested location | `src/screens/general/BundlePackageDetail.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html` (Mobile App v4, 29 September 2026) (it does not draw this screen: build it from the screen spec in the look of the frame below). Wireframe frame `wireframes/P02 Guest App.dc.html#gst-056`, which adam_pull writes into the ticket folder as `wireframe-gst-056.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-app.yaml`). Each state's look: loading: the venue loader (splash) (the prototype, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...")); error: the error note with the mascot (`wireframes/states/P02 Guest App states.dc.html#gst-state-error`, pulled as `wireframe-gst-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the dashed empty note (the prototype, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}")); emptyNoResults: the "No results for ..." note (the prototype, line 2632 (Explore search)); emptyNoAccess: the sign-in prompt (the prototype, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out)); offline: the offline bar and the paused actions (`wireframes/states/P02 Guest App states.dc.html#gst-state-offline`, pulled as `wireframe-gst-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -2963,14 +3189,14 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The bundle package list. |
-| error | Could not load. Names which read failed and leaves the bundle package untouched. |
-| emptyFirstRun | No bundle package yet. Offers Add cart line (`addCartLine`). |
-| emptyNoResults | Never shown: the screen opens on one bundle and has no filter. |
-| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The bundle package list. | the venue loader (splash), `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...") |
+| error | Could not load. Names which read failed and leaves the bundle package untouched. | the error note with the mascot, `wireframes/states/P02 Guest App states.dc.html#gst-state-error` (pulled as `wireframe-gst-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | No bundle package yet. Offers Add cart line (`addCartLine`). | the dashed empty note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}") |
+| emptyNoResults | Never shown: the screen opens on one bundle and has no filter. | the "No results for ..." note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, line 2632 (Explore search) |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. | the sign-in prompt, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out) |
+| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. | the offline bar and the paused actions, `wireframes/states/P02 Guest App states.dc.html#gst-state-offline` (pulled as `wireframe-gst-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 
@@ -2992,7 +3218,11 @@
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `AccessibilityInformationForm` |
 | Suggested location | `src/screens/general/AccessibilityInformationForm.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html` (rev 3), view: Account → All screens → Wave 2 → Accessibility information. Wireframe frame `wireframes/P02 Guest App.dc.html#gst-057`, which adam_pull writes into the ticket folder as `wireframe-gst-057.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-app.yaml`). Each state's look: loading: the venue loader (splash) (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...")); error: the error note with the mascot (`wireframes/states/P02 Guest App states.dc.html#gst-state-error`, pulled as `wireframe-gst-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the dashed empty note (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}")); emptyNoResults: the "No results for ..." note (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, line 2632 (Explore search)); emptyNoAccess: the sign-in prompt (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out)); offline: the offline bar and the paused actions (`wireframes/states/P02 Guest App states.dc.html#gst-state-offline`, pulled as `wireframe-gst-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Operations**
 
@@ -3002,14 +3232,14 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The accessibility information list. |
-| error | Could not load. Names which read failed and leaves the accessibility information untouched. |
-| emptyFirstRun | No accessibility information yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
-| emptyNoResults | Never shown: the screen sends no filter a guest chose, so an empty list is the first-run state above. |
-| emptyNoAccess | Nothing here needs a sign-in (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-2)): the screen reads only what the tenant has published, which is public, so there is no no-access case. A host that belongs to no tenant shows the platform's neutral holding page. |
-| offline | The offline banner shows. Help already loaded stays readable, marked with its age. Raising a case is disabled offline — it needs the connection (decided 28 September, audit R148) — and the screen says how to reach staff in person instead: the guest services desk, or any member of staff. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The accessibility information list. | the venue loader (splash), `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...") |
+| error | Could not load. Names which read failed and leaves the accessibility information untouched. | the error note with the mascot, `wireframes/states/P02 Guest App states.dc.html#gst-state-error` (pulled as `wireframe-gst-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | No accessibility information yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. | the dashed empty note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}") |
+| emptyNoResults | Never shown: the screen sends no filter a guest chose, so an empty list is the first-run state above. | the "No results for ..." note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, line 2632 (Explore search) |
+| emptyNoAccess | Nothing here needs a sign-in (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-2)): the screen reads only what the tenant has published, which is public, so there is no no-access case. A host that belongs to no tenant shows the platform's neutral holding page. | the sign-in prompt, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out) |
+| offline | The offline banner shows. Help already loaded stays readable, marked with its age. Raising a case is disabled offline — it needs the connection (decided 28 September, audit R148) — and the screen says how to reach staff in person instead: the guest services desk, or any member of staff. | the offline bar and the paused actions, `wireframes/states/P02 Guest App states.dc.html#gst-state-offline` (pulled as `wireframe-gst-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 
@@ -3031,7 +3261,11 @@
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `ResourceAvailabilityCabanaDetail` |
 | Suggested location | `src/screens/general/ResourceAvailabilityCabanaDetail.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html` (Mobile App v4, 29 September 2026) (it does not draw this screen: build it from the screen spec in the look of the frame below). Wireframe frame `wireframes/P02 Guest App.dc.html#gst-058`, which adam_pull writes into the ticket folder as `wireframe-gst-058.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-app.yaml`). Each state's look: loading: the venue loader (splash) (the prototype, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...")); error: the error note with the mascot (`wireframes/states/P02 Guest App states.dc.html#gst-state-error`, pulled as `wireframe-gst-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the dashed empty note (the prototype, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}")); emptyNoResults: the "No results for ..." note (the prototype, line 2632 (Explore search)); emptyNoAccess: the sign-in prompt (the prototype, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out)); offline: the offline bar and the paused actions (`wireframes/states/P02 Guest App states.dc.html#gst-state-offline`, pulled as `wireframe-gst-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Operations**
 
@@ -3042,14 +3276,14 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The resource availability (cabana) list. |
-| error | Could not load. Names which read failed and leaves the resource availability (cabana) untouched. |
-| emptyFirstRun | No resource availability (cabana) yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
-| emptyNoResults | Nothing free on the date picked; offers the next free date. |
-| emptyNoAccess | Shown when the caller lacks `VENUE_MAP_VIEW`, which `listBookableVenueMaps` requires to show this screen, and names that permission (the screen's other reads need `RESOURCE_VIEW` and say so in their own panels). Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The resource availability (cabana) list. | the venue loader (splash), `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...") |
+| error | Could not load. Names which read failed and leaves the resource availability (cabana) untouched. | the error note with the mascot, `wireframes/states/P02 Guest App states.dc.html#gst-state-error` (pulled as `wireframe-gst-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | No resource availability (cabana) yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. | the dashed empty note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}") |
+| emptyNoResults | Nothing free on the date picked; offers the next free date. | the "No results for ..." note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, line 2632 (Explore search) |
+| emptyNoAccess | Shown when the caller lacks `VENUE_MAP_VIEW`, which `listBookableVenueMaps` requires to show this screen, and names that permission (the screen's other reads need `RESOURCE_VIEW` and say so in their own panels). Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. | the sign-in prompt, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out) |
+| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. | the offline bar and the paused actions, `wireframes/states/P02 Guest App states.dc.html#gst-state-offline` (pulled as `wireframe-gst-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 
@@ -3072,7 +3306,11 @@
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `PlanMyDayInProgressDetail` |
 | Suggested location | `src/screens/general/PlanMyDayInProgressDetail.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html` (Mobile App v4, 29 September 2026) (it does not draw this screen: build it from the screen spec in the look of the frame below). Wireframe frame `wireframes/P02 Guest App.dc.html#gst-059`, which adam_pull writes into the ticket folder as `wireframe-gst-059.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-app.yaml`). Each state's look: loading: the venue loader (splash) (the prototype, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...")); error: the error note with the mascot (`wireframes/states/P02 Guest App states.dc.html#gst-state-error`, pulled as `wireframe-gst-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the dashed empty note (the prototype, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}")); emptyNoResults: the "No results for ..." note (the prototype, line 2632 (Explore search)); emptyNoAccess: the sign-in prompt (the prototype, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out)); offline: the offline bar and the paused actions (`wireframes/states/P02 Guest App states.dc.html#gst-state-offline`, pulled as `wireframe-gst-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -3094,14 +3332,14 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The plan builds in place; the inputs stay on screen. |
-| error | Could not load the plan. Names what failed; the inputs are kept so trying again costs nothing. |
-| emptyFirstRun | No plan for today: offers to make one (GST-051). |
-| emptyNoResults | Nothing suits the whole party on that day (for example every ride is over a child's height): says so and offers to change the answers. |
-| emptyNoAccess | A guest holds no permission. A plan that is not theirs says so without saying whose it is; a signed-out guest can still build a plan and is asked to sign in only to save or book it. |
-| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The plan builds in place; the inputs stay on screen. | the venue loader (splash), `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...") |
+| error | Could not load the plan. Names what failed; the inputs are kept so trying again costs nothing. | the error note with the mascot, `wireframes/states/P02 Guest App states.dc.html#gst-state-error` (pulled as `wireframe-gst-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | No plan for today: offers to make one (GST-051). | the dashed empty note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}") |
+| emptyNoResults | Nothing suits the whole party on that day (for example every ride is over a child's height): says so and offers to change the answers. | the "No results for ..." note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, line 2632 (Explore search) |
+| emptyNoAccess | A guest holds no permission. A plan that is not theirs says so without saying whose it is; a signed-out guest can still build a plan and is asked to sign in only to save or book it. | the sign-in prompt, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out) |
+| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. | the offline bar and the paused actions, `wireframes/states/P02 Guest App states.dc.html#gst-state-offline` (pulled as `wireframe-gst-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 
@@ -3124,7 +3362,11 @@
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `MenuItemDetail` |
 | Suggested location | `src/screens/in-venue-experience/MenuItemDetail.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html` (rev 3), view: Account → All screens → Wave 2 → Menu item detail; Rev 3 feedback → Menu item add-ons & modifiers. Wireframe frame `wireframes/P02 Guest App.dc.html#gst-061`, which adam_pull writes into the ticket folder as `wireframe-gst-061.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-app.yaml`). Each state's look: loading: the venue loader (splash) (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...")); error: the error note with the mascot (`wireframes/states/P02 Guest App states.dc.html#gst-state-error`, pulled as `wireframe-gst-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the dashed empty note (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}")); emptyNoAccess: the sign-in prompt (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out)); offline: the offline bar and the paused actions (`wireframes/states/P02 Guest App states.dc.html#gst-state-offline`, pulled as `wireframe-gst-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -3141,13 +3383,13 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | Item skeleton |
-| error | Item unavailable, with a route back to the menu |
-| emptyFirstRun | Not applicable |
-| emptyNoAccess | Never shown: a menu is public and browsing a dish needs no sign-in. |
-| offline | The offline banner shows. The dish already loaded stays, with a note that it may be out of date and its allergens in full. Ordering is refused — availability changes by the minute. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | Item skeleton | the venue loader (splash), `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...") |
+| error | Item unavailable, with a route back to the menu | the error note with the mascot, `wireframes/states/P02 Guest App states.dc.html#gst-state-error` (pulled as `wireframe-gst-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | Not applicable | the dashed empty note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}") |
+| emptyNoAccess | Never shown: a menu is public and browsing a dish needs no sign-in. | the sign-in prompt, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out) |
+| offline | The offline banner shows. The dish already loaded stays, with a note that it may be out of date and its allergens in full. Ordering is refused — availability changes by the minute. | the offline bar and the paused actions, `wireframes/states/P02 Guest App states.dc.html#gst-state-offline` (pulled as `wireframe-gst-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 
@@ -3170,7 +3412,11 @@
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `ShopAndDropCollectionList` |
 | Suggested location | `src/screens/in-venue-experience/ShopAndDropCollectionList.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
-| Pattern | statusTracker |
+| Layout pattern | statusTracker (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html` (rev 3), view: Account → All screens → Wave 3 → Shop & drop collection. Wireframe frame `wireframes/P02 Guest App.dc.html#gst-062`, which adam_pull writes into the ticket folder as `wireframe-gst-062.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-app.yaml`). Each state's look: loading: the venue loader (splash) (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...")); error: the error note with the mascot (`wireframes/states/P02 Guest App states.dc.html#gst-state-error`, pulled as `wireframe-gst-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the dashed empty note (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}")); emptyNoAccess: the sign-in prompt (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out)); offline: the offline bar and the paused actions (`wireframes/states/P02 Guest App states.dc.html#gst-state-offline`, pulled as `wireframe-gst-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -3187,13 +3433,13 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | Finding what is waiting for you. |
-| error | Could not load. Names which read failed and leaves the shop drop collection untouched. |
-| emptyFirstRun | Nothing waiting: no shop-and-drop for this guest. |
-| emptyNoAccess | Shown when the caller lacks `ORDER_VIEW`, which `listMyEntitlements` requires to show this screen, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | The offline banner shows, and lookup cannot run. A drop reference already on screen stays visible so the guest can quote it at the collection point. Reserving merchandise needs the connection. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | Finding what is waiting for you. | the venue loader (splash), `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...") |
+| error | Could not load. Names which read failed and leaves the shop drop collection untouched. | the error note with the mascot, `wireframes/states/P02 Guest App states.dc.html#gst-state-error` (pulled as `wireframe-gst-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | Nothing waiting: no shop-and-drop for this guest. | the dashed empty note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}") |
+| emptyNoAccess | Shown when the caller lacks `ORDER_VIEW`, which `listMyEntitlements` requires to show this screen, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. | the sign-in prompt, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out) |
+| offline | The offline banner shows, and lookup cannot run. A drop reference already on screen stays visible so the guest can quote it at the collection point. Reserving merchandise needs the connection. | the offline bar and the paused actions, `wireframes/states/P02 Guest App states.dc.html#gst-state-offline` (pulled as `wireframe-gst-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 
@@ -3215,7 +3461,11 @@
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `Search` |
 | Suggested location | `src/screens/Search.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html` (mobile v4 (30 September build)), view: Explore tab → search ("coaster"). Wireframe frame `wireframes/P02 Guest App.dc.html#gst-063`, which adam_pull writes into the ticket folder as `wireframe-gst-063.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-app.yaml`). Each state's look: loading: the venue loader (splash) (the prototype, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...")); error: the error note with the mascot (`wireframes/states/P02 Guest App states.dc.html#gst-state-error`, pulled as `wireframe-gst-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the dashed empty note (the prototype, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}")); emptyNoResults: the "No results for ..." note (the prototype, line 2632 (Explore search)); offline: the offline bar and the paused actions (`wireframes/states/P02 Guest App states.dc.html#gst-state-offline`, pulled as `wireframe-gst-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Operations**
 
@@ -3225,13 +3475,13 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The search list. |
-| error | Could not load. Names which read failed and leaves the search untouched. |
-| emptyFirstRun | No search yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
-| emptyNoResults | Nothing matches what was typed. Names the search, suggests a shorter one and offers to clear it; a sold-out match is shown as sold out, not hidden. |
-| offline | The offline banner shows. Results come only from what was already loaded, with a note that newer items may exist. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The search list. | the venue loader (splash), `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...") |
+| error | Could not load. Names which read failed and leaves the search untouched. | the error note with the mascot, `wireframes/states/P02 Guest App states.dc.html#gst-state-error` (pulled as `wireframe-gst-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | No search yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. | the dashed empty note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}") |
+| emptyNoResults | Nothing matches what was typed. Names the search, suggests a shorter one and offers to clear it; a sold-out match is shown as sold out, not hidden. | the "No results for ..." note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, line 2632 (Explore search) |
+| offline | The offline banner shows. Results come only from what was already loaded, with a note that newer items may exist. | the offline bar and the paused actions, `wireframes/states/P02 Guest App states.dc.html#gst-state-offline` (pulled as `wireframe-gst-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 
@@ -3254,7 +3504,11 @@
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `NewsletterPreferences` |
 | Suggested location | `src/screens/NewsletterPreferences.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html` (rev 3), view: Account → All screens → Wave 3 → Newsletter & preferences. Wireframe frame `wireframes/P02 Guest App.dc.html#gst-065`, which adam_pull writes into the ticket folder as `wireframe-gst-065.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-app.yaml`). Each state's look: loading: the venue loader (splash) (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...")); error: the error note with the mascot (`wireframes/states/P02 Guest App states.dc.html#gst-state-error`, pulled as `wireframe-gst-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the dashed empty note (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}")); emptyNoResults: the "No results for ..." note (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, line 2632 (Explore search)); emptyNoAccess: the sign-in prompt (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out)); offline: the offline bar and the paused actions (`wireframes/states/P02 Guest App states.dc.html#gst-state-offline`, pulled as `wireframe-gst-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -3274,14 +3528,14 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The newsletter preferences list. |
-| error | Could not load. Names which read failed and leaves the newsletter preferences untouched. |
-| emptyFirstRun | No newsletter preferences yet. Offers Record consent (`recordConsent`). |
-| emptyNoResults | Never shown: `listConsentPurposes` takes no filter, so an empty list is always the first-run state above. |
-| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | Not available, and the offline banner says why. A consent change must reach the server to mean anything. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The newsletter preferences list. | the venue loader (splash), `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...") |
+| error | Could not load. Names which read failed and leaves the newsletter preferences untouched. | the error note with the mascot, `wireframes/states/P02 Guest App states.dc.html#gst-state-error` (pulled as `wireframe-gst-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | No newsletter preferences yet. Offers Record consent (`recordConsent`). | the dashed empty note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}") |
+| emptyNoResults | Never shown: `listConsentPurposes` takes no filter, so an empty list is always the first-run state above. | the "No results for ..." note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, line 2632 (Explore search) |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. | the sign-in prompt, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out) |
+| offline | Not available, and the offline banner says why. A consent change must reach the server to mean anything. | the offline bar and the paused actions, `wireframes/states/P02 Guest App states.dc.html#gst-state-offline` (pulled as `wireframe-gst-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 
@@ -3302,7 +3556,11 @@
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `PrivacyMyData` |
 | Suggested location | `src/screens/account/PrivacyMyData.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
-| Pattern | statusTracker |
+| Layout pattern | statusTracker (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html` (Mobile App v4, 29 September 2026) (it does not draw this screen: build it from the screen spec in the look of the frame below). Wireframe frame `wireframes/P02 Guest App.dc.html#gst-066`, which adam_pull writes into the ticket folder as `wireframe-gst-066.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-app.yaml`). Each state's look: loading: the venue loader (splash) (the prototype, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...")); error: the error note with the mascot (`wireframes/states/P02 Guest App states.dc.html#gst-state-error`, pulled as `wireframe-gst-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the dashed empty note (the prototype, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}")); emptyNoResults: the "No results for ..." note (the prototype, line 2632 (Explore search)); emptyNoAccess: the sign-in prompt (the prototype, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out)); offline: the offline bar and the paused actions (`wireframes/states/P02 Guest App states.dc.html#gst-state-offline`, pulled as `wireframe-gst-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -3322,14 +3580,14 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | Content loads. |
-| error | Could not load. Says what failed and offers one way onward, never a bare failure. |
-| emptyFirstRun | Nothing requested yet. No export, no erasure, no document — and that is the ordinary state. The screen explains what each request means before offering it, because an erasure a guest did not understand is one they will phone about. |
-| emptyNoResults | Nothing here yet. The scope is what narrowed it — naming the scope is what stops somebody concluding the record does not exist. |
-| emptyNoAccess | There is no permission to name: a guest holds none (ADR-0025). Not signed in: the guest is offered sign-in and brought back here. The data rights are the guest's own and always available to them. |
-| offline | Nothing here is offered offline, and the banner says so. An erasure request or a device change queued and never sent is worse than one that could not be made — the legal clock starts when the platform receives it, and a device signed out offline is still signed in. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | Content loads. | the venue loader (splash), `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...") |
+| error | Could not load. Says what failed and offers one way onward, never a bare failure. | the error note with the mascot, `wireframes/states/P02 Guest App states.dc.html#gst-state-error` (pulled as `wireframe-gst-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | Nothing requested yet. No export, no erasure, no document — and that is the ordinary state. The screen explains what each request means before offering it, because an erasure a guest did not understand is one they will phone about. | the dashed empty note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}") |
+| emptyNoResults | Nothing here yet. The scope is what narrowed it — naming the scope is what stops somebody concluding the record does not exist. | the "No results for ..." note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, line 2632 (Explore search) |
+| emptyNoAccess | There is no permission to name: a guest holds none (ADR-0025). Not signed in: the guest is offered sign-in and brought back here. The data rights are the guest's own and always available to them. | the sign-in prompt, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out) |
+| offline | Nothing here is offered offline, and the banner says so. An erasure request or a device change queued and never sent is worse than one that could not be made — the legal clock starts when the platform receives it, and a device signed out offline is still signed in. | the offline bar and the paused actions, `wireframes/states/P02 Guest App states.dc.html#gst-state-offline` (pulled as `wireframe-gst-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 
@@ -3350,7 +3608,11 @@
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `RefundsResale` |
 | Suggested location | `src/screens/account/RefundsResale.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
-| Pattern | statusTracker |
+| Layout pattern | statusTracker (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html` (rev 3), view: Account → All screens → Wave 2 → Refunds & resale. Wireframe frame `wireframes/P02 Guest App.dc.html#gst-067`, which adam_pull writes into the ticket folder as `wireframe-gst-067.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-app.yaml`). Each state's look: loading: the venue loader (splash) (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...")); error: the error note with the mascot (`wireframes/states/P02 Guest App states.dc.html#gst-state-error`, pulled as `wireframe-gst-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the dashed empty note (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}")); emptyNoResults: the "No results for ..." note (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, line 2632 (Explore search)); emptyNoAccess: the sign-in prompt (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out)); offline: the offline bar and the paused actions (`wireframes/states/P02 Guest App states.dc.html#gst-state-offline`, pulled as `wireframe-gst-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -3373,14 +3635,14 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | Content loads. |
-| error | Could not load. Says what failed and offers one way onward, never a bare failure. |
-| emptyFirstRun | No refunds or listings yet. The venue's policy is shown regardless, so a guest knows the answer before they need it. |
-| emptyNoResults | Nothing here yet. The scope is what narrowed it — naming the scope is what stops somebody concluding the record does not exist. |
-| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | Not available, and the offline banner says why. Refunds and resale listings need the server — a queued refund request is a promise nobody made. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | Content loads. | the venue loader (splash), `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...") |
+| error | Could not load. Says what failed and offers one way onward, never a bare failure. | the error note with the mascot, `wireframes/states/P02 Guest App states.dc.html#gst-state-error` (pulled as `wireframe-gst-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | No refunds or listings yet. The venue's policy is shown regardless, so a guest knows the answer before they need it. | the dashed empty note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}") |
+| emptyNoResults | Nothing here yet. The scope is what narrowed it — naming the scope is what stops somebody concluding the record does not exist. | the "No results for ..." note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, line 2632 (Explore search) |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. | the sign-in prompt, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out) |
+| offline | Not available, and the offline banner says why. Refunds and resale listings need the server — a queued refund request is a promise nobody made. | the offline bar and the paused actions, `wireframes/states/P02 Guest App states.dc.html#gst-state-offline` (pulled as `wireframe-gst-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 
@@ -3401,7 +3663,11 @@
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `HelpMyCases` |
 | Suggested location | `src/screens/account/HelpMyCases.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html` (rev 3), view: Account → All screens → Wave 2 → Help & my cases. Wireframe frame `wireframes/P02 Guest App.dc.html#gst-068`, which adam_pull writes into the ticket folder as `wireframe-gst-068.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-app.yaml`). Each state's look: loading: the venue loader (splash) (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...")); error: the error note with the mascot (`wireframes/states/P02 Guest App states.dc.html#gst-state-error`, pulled as `wireframe-gst-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the dashed empty note (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}")); emptyNoAccess: the sign-in prompt (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out)); offline: the offline bar and the paused actions (`wireframes/states/P02 Guest App states.dc.html#gst-state-offline`, pulled as `wireframe-gst-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -3422,13 +3688,13 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | Content loads. |
-| error | Could not load. Says what failed and offers one way onward, never a bare failure. |
-| emptyFirstRun | No cases open. The concierge sits here too — most questions never become a case, and that is the intent. |
-| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | The offline banner shows. Cases already loaded stay read-only with their age, so a guest can see what they raised without believing a reply arrived. Raising a case and replying are disabled offline — both need the connection (decided 28 September, audit R148) — and the screen says how to reach staff in person instead: the guest services desk, or any member of staff. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | Content loads. | the venue loader (splash), `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...") |
+| error | Could not load. Says what failed and offers one way onward, never a bare failure. | the error note with the mascot, `wireframes/states/P02 Guest App states.dc.html#gst-state-error` (pulled as `wireframe-gst-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | No cases open. The concierge sits here too — most questions never become a case, and that is the intent. | the dashed empty note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}") |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. | the sign-in prompt, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out) |
+| offline | The offline banner shows. Cases already loaded stay read-only with their age, so a guest can see what they raised without believing a reply arrived. Raising a case and replying are disabled offline — both need the connection (decided 28 September, audit R148) — and the screen says how to reach staff in person instead: the guest services desk, or any member of staff. | the offline bar and the paused actions, `wireframes/states/P02 Guest App states.dc.html#gst-state-offline` (pulled as `wireframe-gst-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 
@@ -3449,7 +3715,11 @@
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `FacePass` |
 | Suggested location | `src/screens/account/FacePass.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
-| Pattern | statusTracker |
+| Layout pattern | statusTracker (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html` (rev 3), view: Account → All screens → Wave 2 → Face Pass (also Account → Face Pass). Wireframe frame `wireframes/P02 Guest App.dc.html#gst-069`, which adam_pull writes into the ticket folder as `wireframe-gst-069.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-app.yaml`). Each state's look: loading: the venue loader (splash) (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...")); error: the error note with the mascot (`wireframes/states/P02 Guest App states.dc.html#gst-state-error`, pulled as `wireframe-gst-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the dashed empty note (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}")); emptyNoResults: the "No results for ..." note (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, line 2632 (Explore search)); emptyNoAccess: the sign-in prompt (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out)); offline: the offline bar and the paused actions (`wireframes/states/P02 Guest App states.dc.html#gst-state-offline`, pulled as `wireframe-gst-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; subjectNotLinked: the not-linked notice (`wireframes/states/P02 Guest App states.dc.html#gst-state-face-pass-not-linked`, pulled as `wireframe-gst-state-face-pass-not-linked.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -3470,15 +3740,15 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | Content loads. |
-| error | Could not load. Says what failed and offers one way onward, never a bare failure. |
-| emptyFirstRun | Not enrolled. What a face pass is for, where it works, and what withdrawing it does — before the camera opens. |
-| emptyNoResults | Nothing here yet. The scope is what narrowed it — naming the scope is what stops somebody concluding the record does not exist. |
-| emptyNoAccess | Shown when the caller lacks `GUEST_VIEW`, which `listDelegations` requires to show this screen, and names that permission (the screen's other reads need `ORDER_VIEW` and say so in their own panels). Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `GUEST_MANAGE` for `enrolFacePass`, `revokeFacePass`. |
-| offline | Not available, and the offline banner says why. Biometric enrolment never happens offline — a face captured and queued is a face the guest cannot withdraw until it uploads. |
-| subjectNotLinked | Refused: that person is not linked to you (403 `subject-not-linked`). A guest may enrol only themselves or a child linked to them by a family-member or primary-holder delegation; the screen says so and returns to Who is this for, which is refreshed in case the link was just removed (decided 28 September, audit R205). |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | Content loads. | the venue loader (splash), `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...") |
+| error | Could not load. Says what failed and offers one way onward, never a bare failure. | the error note with the mascot, `wireframes/states/P02 Guest App states.dc.html#gst-state-error` (pulled as `wireframe-gst-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | Not enrolled. What a face pass is for, where it works, and what withdrawing it does — before the camera opens. | the dashed empty note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}") |
+| emptyNoResults | Nothing here yet. The scope is what narrowed it — naming the scope is what stops somebody concluding the record does not exist. | the "No results for ..." note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, line 2632 (Explore search) |
+| emptyNoAccess | Shown when the caller lacks `GUEST_VIEW`, which `listDelegations` requires to show this screen, and names that permission (the screen's other reads need `ORDER_VIEW` and say so in their own panels). Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `GUEST_MANAGE` for `enrolFacePass`, `revokeFacePass`. | the sign-in prompt, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out) |
+| offline | Not available, and the offline banner says why. Biometric enrolment never happens offline — a face captured and queued is a face the guest cannot withdraw until it uploads. | the offline bar and the paused actions, `wireframes/states/P02 Guest App states.dc.html#gst-state-offline` (pulled as `wireframe-gst-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| subjectNotLinked | Refused: that person is not linked to you (403 `subject-not-linked`). A guest may enrol only themselves or a child linked to them by a family-member or primary-holder delegation; the screen says so and returns to Who is this for, which is refreshed in case the link was just removed (decided 28 September, audit R205). | the not-linked notice, `wireframes/states/P02 Guest App states.dc.html#gst-state-face-pass-not-linked` (pulled as `wireframe-gst-state-face-pass-not-linked.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 
@@ -3499,7 +3769,11 @@
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `ReserveTable` |
 | Suggested location | `src/screens/ReserveTable.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
-| Pattern | form |
+| Layout pattern | form (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html` (rev 3), view: Account → All screens → Wave 2 → Reserve a table or cabana; Rev 3 feedback → Book a table (fixed) (it shows part of this screen: build the rest from the screen spec in the same look). Wireframe frame `wireframes/P02 Guest App.dc.html#gst-070`, which adam_pull writes into the ticket folder as `wireframe-gst-070.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-app.yaml`). Each state's look: loading: the venue loader (splash) (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...")); error: the error note with the mascot (`wireframes/states/P02 Guest App states.dc.html#gst-state-error`, pulled as `wireframe-gst-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the dashed empty note (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}")); emptyNoResults: the "No results for ..." note (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, line 2632 (Explore search)); emptyNoAccess: the sign-in prompt (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out)); offline: the offline bar and the paused actions (`wireframes/states/P02 Guest App states.dc.html#gst-state-offline`, pulled as `wireframe-gst-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -3525,14 +3799,14 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | Content loads. |
-| error | Could not load. Says what failed and offers one way onward, never a bare failure. |
-| emptyFirstRun | Nothing reserved. The booking form is the screen: pick the restaurant, party size and time, and `createTableReservation` says if that time is full. |
-| emptyNoResults | Nothing here yet. The scope is what narrowed it — naming the scope is what stops somebody concluding the record does not exist. |
-| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025). A guest who is not signed in is offered sign-in and brought back here. |
-| offline | The offline banner shows. Availability already loaded stays with its age. Booking is not offered — a table held offline is a table two people think they have. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | Content loads. | the venue loader (splash), `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...") |
+| error | Could not load. Says what failed and offers one way onward, never a bare failure. | the error note with the mascot, `wireframes/states/P02 Guest App states.dc.html#gst-state-error` (pulled as `wireframe-gst-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | Nothing reserved. The booking form is the screen: pick the restaurant, party size and time, and `createTableReservation` says if that time is full. | the dashed empty note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}") |
+| emptyNoResults | Nothing here yet. The scope is what narrowed it — naming the scope is what stops somebody concluding the record does not exist. | the "No results for ..." note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, line 2632 (Explore search) |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025). A guest who is not signed in is offered sign-in and brought back here. | the sign-in prompt, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out) |
+| offline | The offline banner shows. Availability already loaded stays with its age. Booking is not offered — a table held offline is a table two people think they have. | the offline bar and the paused actions, `wireframes/states/P02 Guest App states.dc.html#gst-state-offline` (pulled as `wireframe-gst-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 
@@ -3554,7 +3828,11 @@
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `PaymentMethods` |
 | Suggested location | `src/screens/account/PaymentMethods.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html` (rev 3), view: Account → All screens → Wave 2 → Payment methods. Wireframe frame `wireframes/P02 Guest App.dc.html#gst-071`, which adam_pull writes into the ticket folder as `wireframe-gst-071.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-app.yaml`). Each state's look: loading: the venue loader (splash) (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...")); error: the error note with the mascot (`wireframes/states/P02 Guest App states.dc.html#gst-state-error`, pulled as `wireframe-gst-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the dashed empty note (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}")); emptyNoResults: the "No results for ..." note (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, line 2632 (Explore search)); emptyNoAccess: the sign-in prompt (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out)); offline: the offline bar and the paused actions (`wireframes/states/P02 Guest App states.dc.html#gst-state-offline`, pulled as `wireframe-gst-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -3581,14 +3859,14 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | Content loads. |
-| error | Could not load. Says what failed and offers one way onward, never a bare failure. |
-| emptyFirstRun | No stored cards. A guest arrives here after a first purchase, so the empty state is the common one. |
-| emptyNoResults | Nothing here yet. The scope is what narrowed it — naming the scope is what stops somebody concluding the record does not exist. |
-| emptyNoAccess | Shown when the caller lacks `ORDER_VIEW`, which `listPaymentTokens` requires to show this screen, and names that permission (the screen's other reads need `GUEST_VIEW`, `WALLET_VIEW` and say so in their own panels). Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `LOYALTY_REDEEM` for `redeemLoyaltyPoints`; `ORDER_CREATE` for `storePaymentToken`; `WALLET_OPERATE` for `transferWalletBalance`. |
-| offline | The offline banner shows. Balances and stored cards already loaded stay visible with their age, cards masked. Storing a card and transferring value need the server. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | Content loads. | the venue loader (splash), `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...") |
+| error | Could not load. Says what failed and offers one way onward, never a bare failure. | the error note with the mascot, `wireframes/states/P02 Guest App states.dc.html#gst-state-error` (pulled as `wireframe-gst-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | No stored cards. A guest arrives here after a first purchase, so the empty state is the common one. | the dashed empty note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}") |
+| emptyNoResults | Nothing here yet. The scope is what narrowed it — naming the scope is what stops somebody concluding the record does not exist. | the "No results for ..." note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, line 2632 (Explore search) |
+| emptyNoAccess | Shown when the caller lacks `ORDER_VIEW`, which `listPaymentTokens` requires to show this screen, and names that permission (the screen's other reads need `GUEST_VIEW`, `WALLET_VIEW` and say so in their own panels). Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `LOYALTY_REDEEM` for `redeemLoyaltyPoints`; `ORDER_CREATE` for `storePaymentToken`; `WALLET_OPERATE` for `transferWalletBalance`. | the sign-in prompt, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out) |
+| offline | The offline banner shows. Balances and stored cards already loaded stay visible with their age, cards masked. Storing a card and transferring value need the server. | the offline bar and the paused actions, `wireframes/states/P02 Guest App states.dc.html#gst-state-offline` (pulled as `wireframe-gst-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 
@@ -3609,7 +3887,11 @@
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `ShareGroupBooking` |
 | Suggested location | `src/screens/account/ShareGroupBooking.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
-| Pattern | statusTracker |
+| Layout pattern | statusTracker (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html` (rev 3), view: Account → All screens → Wave 2 → Share & group booking. Wireframe frame `wireframes/P02 Guest App.dc.html#gst-072`, which adam_pull writes into the ticket folder as `wireframe-gst-072.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-app.yaml`). Each state's look: loading: the venue loader (splash) (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...")); error: the error note with the mascot (`wireframes/states/P02 Guest App states.dc.html#gst-state-error`, pulled as `wireframe-gst-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the dashed empty note (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}")); emptyNoResults: the "No results for ..." note (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, line 2632 (Explore search)); emptyNoAccess: the sign-in prompt (`sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out)); offline: the offline bar and the paused actions (`wireframes/states/P02 Guest App states.dc.html#gst-state-offline`, pulled as `wireframe-gst-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -3634,14 +3916,14 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | Content loads. |
-| error | Could not load. Says what failed and offers one way onward, never a bare failure. |
-| emptyFirstRun | Nothing shared. A guest holding eight tickets sees the option here rather than discovering it at the gate. |
-| emptyNoResults | Nothing here yet. The scope is what narrowed it — naming the scope is what stops somebody concluding the record does not exist. |
-| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | The offline banner shows. Tickets already shared stay visible. Sharing, invitations and referrals need the connection — a transfer nobody received is a ticket nobody holds. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | Content loads. | the venue loader (splash), `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...") |
+| error | Could not load. Says what failed and offers one way onward, never a bare failure. | the error note with the mascot, `wireframes/states/P02 Guest App states.dc.html#gst-state-error` (pulled as `wireframe-gst-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | Nothing shared. A guest holding eight tickets sees the option here rather than discovering it at the gate. | the dashed empty note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}") |
+| emptyNoResults | Nothing here yet. The scope is what narrowed it — naming the scope is what stops somebody concluding the record does not exist. | the "No results for ..." note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, line 2632 (Explore search) |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. | the sign-in prompt, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out) |
+| offline | The offline banner shows. Tickets already shared stay visible. Sharing, invitations and referrals need the connection — a transfer nobody received is a ticket nobody holds. | the offline bar and the paused actions, `wireframes/states/P02 Guest App states.dc.html#gst-state-offline` (pulled as `wireframe-gst-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 
@@ -3662,7 +3944,11 @@
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `SecuritySignIn` |
 | Suggested location | `src/screens/account/SecuritySignIn.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
-| Pattern | configEditor |
+| Layout pattern | configEditor (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html` (Mobile App v4, 29 September 2026) (it does not draw this screen: build it from the screen spec in the look of the frame below). Wireframe frame `wireframes/P02 Guest App.dc.html#gst-073`, which adam_pull writes into the ticket folder as `wireframe-gst-073.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-app.yaml`). Each state's look: loading: the venue loader (splash) (the prototype, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...")); error: the error note with the mascot (`wireframes/states/P02 Guest App states.dc.html#gst-state-error`, pulled as `wireframe-gst-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the dashed empty note (the prototype, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}")); emptyNoAccess: the sign-in prompt (the prototype, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out)); offline: the offline bar and the paused actions (`wireframes/states/P02 Guest App states.dc.html#gst-state-offline`, pulled as `wireframe-gst-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -3689,13 +3975,13 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | Content loads. |
-| error | Could not load. Says what failed and offers one way onward, never a bare failure. |
-| emptyFirstRun | Only this device is signed in. The device list holds one row, this one, and the screen says that signing in elsewhere will add a row here. |
-| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | Nothing here is offered offline, and the banner says so. An erasure request or a device change queued and never sent is worse than one that could not be made — the legal clock starts when the platform receives it, and a device signed out offline is still signed in. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | Content loads. | the venue loader (splash), `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...") |
+| error | Could not load. Says what failed and offers one way onward, never a bare failure. | the error note with the mascot, `wireframes/states/P02 Guest App states.dc.html#gst-state-error` (pulled as `wireframe-gst-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | Only this device is signed in. The device list holds one row, this one, and the screen says that signing in elsewhere will add a row here. | the dashed empty note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}") |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. | the sign-in prompt, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out) |
+| offline | Nothing here is offered offline, and the banner says so. An erasure request or a device change queued and never sent is worse than one that could not be made — the legal clock starts when the platform receives it, and a device signed out offline is still signed in. | the offline bar and the paused actions, `wireframes/states/P02 Guest App states.dc.html#gst-state-offline` (pulled as `wireframe-gst-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 
@@ -3716,7 +4002,11 @@
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `MapBookingCanvas` |
 | Suggested location | `src/screens/general/MapBookingCanvas.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html` (Mobile App v4, 29 September 2026) (it does not draw this screen: build it from the screen spec in the look of the frame below). Wireframe frame `wireframes/P02 Guest App.dc.html#gst-074`, which adam_pull writes into the ticket folder as `wireframe-gst-074.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-app.yaml`). Each state's look: loading: the venue loader (splash) (the prototype, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...")); error: the error note with the mascot (`wireframes/states/P02 Guest App states.dc.html#gst-state-error`, pulled as `wireframe-gst-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the dashed empty note (the prototype, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}")); emptyNoResults: the "No results for ..." note (the prototype, line 2632 (Explore search)); emptyNoAccess: the sign-in prompt (the prototype, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out)); offline: the offline bar and the paused actions (`wireframes/states/P02 Guest App states.dc.html#gst-state-offline`, pulled as `wireframe-gst-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -3743,14 +4033,14 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The venue map and the status of every spot for the day, read together. |
-| error | Could not load the map or the spots. Names which read failed; nothing is held. |
-| emptyFirstRun | No bookable spots are placed on this map yet. Says so and offers the venue's other ways to book, rather than an empty map. |
-| emptyNoResults | Every spot in this area is taken for the day. Names the area and offers another area or day. |
-| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | The offline banner shows. The map and the spots already loaded stay on screen with their age, never shown as free now. Holding a spot and adding it to the basket need the connection — a cabana held offline is a cabana two people think they have. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The venue map and the status of every spot for the day, read together. | the venue loader (splash), `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...") |
+| error | Could not load the map or the spots. Names which read failed; nothing is held. | the error note with the mascot, `wireframes/states/P02 Guest App states.dc.html#gst-state-error` (pulled as `wireframe-gst-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | No bookable spots are placed on this map yet. Says so and offers the venue's other ways to book, rather than an empty map. | the dashed empty note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}") |
+| emptyNoResults | Every spot in this area is taken for the day. Names the area and offers another area or day. | the "No results for ..." note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, line 2632 (Explore search) |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. | the sign-in prompt, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out) |
+| offline | The offline banner shows. The map and the spots already loaded stay on screen with their age, never shown as free now. Holding a spot and adding it to the basket need the connection — a cabana held offline is a cabana two people think they have. | the offline bar and the paused actions, `wireframes/states/P02 Guest App states.dc.html#gst-state-offline` (pulled as `wireframe-gst-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 
@@ -3773,7 +4063,11 @@
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `SpaceByTheHourWizard` |
 | Suggested location | `src/screens/general/SpaceByTheHourWizard.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
-| Pattern | multiStepForm |
+| Layout pattern | multiStepForm (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html` (Mobile App v4, 29 September 2026) (it does not draw this screen: build it from the screen spec in the look of the frame below). Wireframe frame `wireframes/P02 Guest App.dc.html#gst-075`, which adam_pull writes into the ticket folder as `wireframe-gst-075.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-app.yaml`). Each state's look: loading: the venue loader (splash) (the prototype, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...")); error: the error note with the mascot (`wireframes/states/P02 Guest App states.dc.html#gst-state-error`, pulled as `wireframe-gst-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the dashed empty note (the prototype, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}")); emptyNoResults: the "No results for ..." note (the prototype, line 2632 (Explore search)); emptyNoAccess: the sign-in prompt (the prototype, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out)); offline: the offline bar and the paused actions (`wireframes/states/P02 Guest App states.dc.html#gst-state-offline`, pulled as `wireframe-gst-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -3794,14 +4088,14 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The room types and their lengths for this venue. |
-| error | Could not load. Names which read failed; nothing is booked. |
-| emptyFirstRun | This venue sells no space by the hour yet. Says so rather than an empty list. |
-| emptyNoResults | No room of the type is free at that time for that length. Offers the next free start time. |
-| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | The offline banner shows. Rooms and times already loaded stay on screen with their age. Picking a start time and adding the booking need the connection — a room held offline is a room two people think they have. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The room types and their lengths for this venue. | the venue loader (splash), `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...") |
+| error | Could not load. Names which read failed; nothing is booked. | the error note with the mascot, `wireframes/states/P02 Guest App states.dc.html#gst-state-error` (pulled as `wireframe-gst-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | This venue sells no space by the hour yet. Says so rather than an empty list. | the dashed empty note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}") |
+| emptyNoResults | No room of the type is free at that time for that length. Offers the next free start time. | the "No results for ..." note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, line 2632 (Explore search) |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. | the sign-in prompt, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out) |
+| offline | The offline banner shows. Rooms and times already loaded stay on screen with their age. Picking a start time and adding the booking need the connection — a room held offline is a room two people think they have. | the offline bar and the paused actions, `wireframes/states/P02 Guest App states.dc.html#gst-state-offline` (pulled as `wireframe-gst-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 
@@ -3823,7 +4117,11 @@
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `RouteAndScheduleList` |
 | Suggested location | `src/screens/transport/RouteAndScheduleList.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html` (mobile v4 (30 September build)), view: Emirates Link → Buy → Sharjah – Dubai – Abu Dhabi → Book now → a date (Plan your trip: stations filled in, the route map and the departures). Wireframe frame `wireframes/P02 Guest App.dc.html#gst-076`, which adam_pull writes into the ticket folder as `wireframe-gst-076.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-app.yaml`). Each state's look: loading: the venue loader (splash) (the prototype, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...")); error: the error note with the mascot (`wireframes/states/P02 Guest App states.dc.html#gst-state-error`, pulled as `wireframe-gst-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the dashed empty note (the prototype, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}")); emptyNoResults: the "No results for ..." note (the prototype, line 2632 (Explore search)); emptyNoAccess: the sign-in prompt (the prototype, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out)); offline: the offline bar and the paused actions (`wireframes/states/P02 Guest App states.dc.html#gst-state-offline`, pulled as `wireframe-gst-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -3843,14 +4141,14 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The stations and routes. |
-| error | Could not load. Names which read failed; nothing is bought. |
-| emptyFirstRun | No routes are published for this venue yet. Says so; the client still owes the real network (stations, fares, timetable). |
-| emptyNoResults | No departure in that period. Names the period and offers Next Available Trip or another period or date. |
-| emptyNoAccess | Searching and buying need no account. Favourites need a signed-in guest: a guest who is not signed in is offered sign-in and brought back, never shown an empty list. |
-| offline | The offline banner shows. A route's stop list and schematic line already loaded stay readable with their age; the street map needs the connection. Searching departures, buying a trip or a pass and saving a favourite route need the connection. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The stations and routes. | the venue loader (splash), `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...") |
+| error | Could not load. Names which read failed; nothing is bought. | the error note with the mascot, `wireframes/states/P02 Guest App states.dc.html#gst-state-error` (pulled as `wireframe-gst-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | No routes are published for this venue yet. Says so; the client still owes the real network (stations, fares, timetable). | the dashed empty note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}") |
+| emptyNoResults | No departure in that period. Names the period and offers Next Available Trip or another period or date. | the "No results for ..." note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, line 2632 (Explore search) |
+| emptyNoAccess | Searching and buying need no account. Favourites need a signed-in guest: a guest who is not signed in is offered sign-in and brought back, never shown an empty list. | the sign-in prompt, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out) |
+| offline | The offline banner shows. A route's stop list and schematic line already loaded stay readable with their age; the street map needs the connection. Searching departures, buying a trip or a pass and saving a favourite route need the connection. | the offline bar and the paused actions, `wireframes/states/P02 Guest App states.dc.html#gst-state-offline` (pulled as `wireframe-gst-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 
@@ -3874,7 +4172,11 @@
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `RouteAndPassengersDetail` |
 | Suggested location | `src/screens/transport/RouteAndPassengersDetail.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
-| Pattern | statusTracker |
+| Layout pattern | statusTracker (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html` (mobile v4 (30 September build)), view: … Plan your trip → departure 07:00 → one adult (the passengers under the chosen departure) (it shows part of this screen: build the rest from the screen spec in the same look). Wireframe frame `wireframes/P02 Guest App.dc.html#gst-077`, which adam_pull writes into the ticket folder as `wireframe-gst-077.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-app.yaml`). Each state's look: loading: the venue loader (splash) (the prototype, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...")); error: the error note with the mascot (`wireframes/states/P02 Guest App states.dc.html#gst-state-error`, pulled as `wireframe-gst-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the dashed empty note (the prototype, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}")); emptyNoResults: the "No results for ..." note (the prototype, line 2632 (Explore search)); emptyNoAccess: the sign-in prompt (the prototype, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out)); offline: the offline bar and the paused actions (`wireframes/states/P02 Guest App states.dc.html#gst-state-offline`, pulled as `wireframe-gst-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -3897,14 +4199,14 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The route of the chosen departure. |
-| error | Could not load. Names which read failed; nothing is bought. |
-| emptyFirstRun | No routes are published for this venue yet. Says so; the client still owes the real network (stations, fares, timetable). |
-| emptyNoResults | Never shown as a list: the screen opens on one departure. If it has gone, says so and offers the next departure on the route. |
-| emptyNoAccess | Searching and buying need no account. Favourites need a signed-in guest: a guest who is not signed in is offered sign-in and brought back, never shown an empty list. |
-| offline | The offline banner shows. A route's stop list and schematic line already loaded stay readable with their age; the street map needs the connection. Searching departures, buying a trip or a pass and saving a favourite route need the connection. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The route of the chosen departure. | the venue loader (splash), `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...") |
+| error | Could not load. Names which read failed; nothing is bought. | the error note with the mascot, `wireframes/states/P02 Guest App states.dc.html#gst-state-error` (pulled as `wireframe-gst-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | No routes are published for this venue yet. Says so; the client still owes the real network (stations, fares, timetable). | the dashed empty note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}") |
+| emptyNoResults | Never shown as a list: the screen opens on one departure. If it has gone, says so and offers the next departure on the route. | the "No results for ..." note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, line 2632 (Explore search) |
+| emptyNoAccess | Searching and buying need no account. Favourites need a signed-in guest: a guest who is not signed in is offered sign-in and brought back, never shown an empty list. | the sign-in prompt, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out) |
+| offline | The offline banner shows. A route's stop list and schematic line already loaded stay readable with their age; the street map needs the connection. Searching departures, buying a trip or a pass and saving a favourite route need the connection. | the offline bar and the paused actions, `wireframes/states/P02 Guest App states.dc.html#gst-state-offline` (pulled as `wireframe-gst-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 
@@ -3928,7 +4230,11 @@
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `MultiTripPassesList` |
 | Suggested location | `src/screens/transport/MultiTripPassesList.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html` (mobile v4 (30 September build)), view: … Plan your trip → Multi-trip (multi-trip cards for this route). Wireframe frame `wireframes/P02 Guest App.dc.html#gst-078`, which adam_pull writes into the ticket folder as `wireframe-gst-078.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-app.yaml`). Each state's look: loading: the venue loader (splash) (the prototype, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...")); error: the error note with the mascot (`wireframes/states/P02 Guest App states.dc.html#gst-state-error`, pulled as `wireframe-gst-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the dashed empty note (the prototype, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}")); emptyNoResults: the "No results for ..." note (the prototype, line 2632 (Explore search)); emptyNoAccess: the sign-in prompt (the prototype, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out)); offline: the offline bar and the paused actions (`wireframes/states/P02 Guest App states.dc.html#gst-state-offline`, pulled as `wireframe-gst-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -3946,14 +4252,14 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The passes for the station pair. |
-| error | Could not load. Names which read failed; nothing is bought. |
-| emptyFirstRun | No routes are published for this venue yet. Says so; the client still owes the real network (stations, fares, timetable). |
-| emptyNoResults | No passes for this route: says so and offers the one-way trip. |
-| emptyNoAccess | Searching and buying need no account. Favourites need a signed-in guest: a guest who is not signed in is offered sign-in and brought back, never shown an empty list. |
-| offline | The offline banner shows. A route's stop list and schematic line already loaded stay readable with their age; the street map needs the connection. Searching departures, buying a trip or a pass and saving a favourite route need the connection. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The passes for the station pair. | the venue loader (splash), `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...") |
+| error | Could not load. Names which read failed; nothing is bought. | the error note with the mascot, `wireframes/states/P02 Guest App states.dc.html#gst-state-error` (pulled as `wireframe-gst-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | No routes are published for this venue yet. Says so; the client still owes the real network (stations, fares, timetable). | the dashed empty note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}") |
+| emptyNoResults | No passes for this route: says so and offers the one-way trip. | the "No results for ..." note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, line 2632 (Explore search) |
+| emptyNoAccess | Searching and buying need no account. Favourites need a signed-in guest: a guest who is not signed in is offered sign-in and brought back, never shown an empty list. | the sign-in prompt, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out) |
+| offline | The offline banner shows. A route's stop list and schematic line already loaded stay readable with their age; the street map needs the connection. Searching departures, buying a trip or a pass and saving a favourite route need the connection. | the offline bar and the paused actions, `wireframes/states/P02 Guest App states.dc.html#gst-state-offline` (pulled as `wireframe-gst-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 
@@ -3975,7 +4281,11 @@
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `FavouriteRoutesList` |
 | Suggested location | `src/screens/transport/FavouriteRoutesList.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html` (mobile v4 (30 September build)), view: … Plan your trip → Save this route → Favourites (the saved route). Wireframe frame `wireframes/P02 Guest App.dc.html#gst-079`, which adam_pull writes into the ticket folder as `wireframe-gst-079.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-app.yaml`). Each state's look: loading: the venue loader (splash) (the prototype, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...")); error: the error note with the mascot (`wireframes/states/P02 Guest App states.dc.html#gst-state-error`, pulled as `wireframe-gst-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the dashed empty note (the prototype, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}")); emptyNoResults: the "No results for ..." note (the prototype, line 2632 (Explore search)); emptyNoAccess: the sign-in prompt (the prototype, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out)); offline: the offline bar and the paused actions (`wireframes/states/P02 Guest App states.dc.html#gst-state-offline`, pulled as `wireframe-gst-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -3993,14 +4303,14 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The saved routes. |
-| error | Could not load. Names which read failed; nothing is bought. |
-| emptyFirstRun | No saved routes yet. Says how to save one (Save this route on a trip) and offers the one-way search. |
-| emptyNoResults | No saved routes yet: save one with Save route on a one-way trip. |
-| emptyNoAccess | Searching and buying need no account. Favourites need a signed-in guest: a guest who is not signed in is offered sign-in and brought back, never shown an empty list. |
-| offline | The offline banner shows. A route's stop list and schematic line already loaded stay readable with their age; the street map needs the connection. Searching departures, buying a trip or a pass and saving a favourite route need the connection. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The saved routes. | the venue loader (splash), `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1582-1590 ("{{ splash.on }}"; the message at 2774, "Loading your venue...") |
+| error | Could not load. Names which read failed; nothing is bought. | the error note with the mascot, `wireframes/states/P02 Guest App states.dc.html#gst-state-error` (pulled as `wireframe-gst-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | No saved routes yet. Says how to save one (Save this route on a trip) and offers the one-way search. | the dashed empty note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 754 ("{{ st.empty }}"), 909 ("{{ st.favEmpty }}") and 1368 ("{{ res.swap.empty }}") |
+| emptyNoResults | No saved routes yet: save one with Save route on a one-way trip. | the "No results for ..." note, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, line 2632 (Explore search) |
+| emptyNoAccess | Searching and buying need no account. Favourites need a signed-in guest: a guest who is not signed in is offered sign-in and brought back, never shown an empty list. | the sign-in prompt, `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, lines 1054 ("{{ id.toSignin }}") and 1458 ("{{ acct.signIn }}", the account signed out) |
+| offline | The offline banner shows. A route's stop list and schematic line already loaded stay readable with their age; the street map needs the connection. Searching departures, buying a trip or a pass and saving a favourite route need the connection. | the offline bar and the paused actions, `wireframes/states/P02 Guest App states.dc.html#gst-state-offline` (pulled as `wireframe-gst-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 

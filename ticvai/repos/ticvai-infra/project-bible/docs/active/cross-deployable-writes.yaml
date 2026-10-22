@@ -7,7 +7,7 @@
 # operation states its route as `x-ticvai-write-via` in its contract, and tools/derive-lineage.py copies it into
 # handoff/api-data-lineage.json as `writeVia` (ADAM CR-002, decided by Chinmay on 12 October 2026, CHG-R6-020).
 #
-# This file holds the two things that are not routed:
+# This file holds the three things that are not routed:
 #
 #   kernel       the shared-kernel tables every host needs, granted to every deployable role directly. Exactly
 #                these five; tools/check-cross-deployable-writes.py fails on any other entry or privilege.
@@ -15,6 +15,13 @@
 #                removes it. The check fails on an unrouted write that is not here, on an entry here for a write
 #                that is not cross-deployable or that is also routed, and on an entry whose removal release has
 #                been tagged.
+#   reads        a table one deployable's role may SELECT although another deployable owns it, decided by the lead
+#                (ADAM CR-196, 21 October 2026, CHG-R9CR-005; ADR-0055 rule 4 and DB-ROLES as amended that day). The
+#                owner serves the named queries in process as well, and only these queries may be asked in process
+#                across the two deployables (tools/check-cross-module-reads.py XR-ROUTE). tools/derive-ddl.py writes
+#                each grant, guarded on the role and the table, into the next forward migration; row-level security
+#                still applies to every row. Fields: id (XDR-nnn, never reused), reader (the deployable role),
+#                tables, privileges (SELECT only), queries, operations, added, decision_ref, why.
 #
 #   id               XDW-001, XDW-002, ... never reused
 #   operation        the operationId that writes
@@ -60,3 +67,20 @@ kernel:
 # (XDW-012), pii.consent_identifier and pii.subject through identity recordConsentIdentifier and
 # updateGuestSubjectDetails (XDW-016, XDW-017). Ids are never reused; a new exception takes XDW-018.
 exceptions: []
+
+reads:
+- id: XDR-001
+  reader: commerce
+  tables: [access.entitlement, access.scan_event]
+  privileges: [SELECT]
+  queries: [access#entitlementRecords, access#scanEventRecords]
+  operations: [getMediaEntitlements]
+  added: '2026-10-21'
+  decision_ref: ADAM CR-196, option B, Chinmay, 21 October 2026
+  why: 'orders getMediaEntitlements (commerce) answers from Access''s entitlements on a media code and their scans. The
+    service route between deployables (serviceAuth inside a cell) is not built and has no ticket (CR-174), and a call
+    on it would run at the tenant root and lose the caller''s scope, so a venue cashier would see every venue''s
+    entitlements. Read in process instead, as a plain select on the same tenant database under the caller''s own
+    connection, so the tables'' row-level security scopes it. The lead chose in-process reads for the same kind of
+    cross-module read in CR-167 (the workers host). Removed when the service route is built, if the lead wants the
+    deployables kept apart (CR-196 option A).'

@@ -8,6 +8,29 @@
 
 ---
 
+## Amended 21 October 2026: a granted read across deployables is asked in process
+
+**Decided by Chinmay, 21 October 2026** (ADAM CR-196, option B, as recommended; change entry CHG-R9CR-005). Orders'
+`getMediaEntitlements` runs in `commerce` and answers from Access's `access.entitlement` and `access.scan_event`, which
+`access` owns. Rule 4 sent that read over Access's service route, and serviceAuth between deployables inside a cell is
+not built and has no ticket (CR-174); a call on it would also run at the tenant root (IDENTITY-C48), so a venue cashier
+would see every venue's entitlements. The lead had already chosen in-process reads for the same kind of read in CR-167
+(the `workers` host).
+
+**Rule 4 gains one exception, by name.** Where the lead grants it, a deployable's role may SELECT a table another
+deployable owns, and asks the owner's declared query **in process**: the owner serves the query `in-process` as well
+as `service`, the asking host composes the owner's query interface (the read side only), and the read runs in the
+asker's transaction under the caller's own connection, so the table's row-level security still scopes every row. It
+is a read, never a write (rule 3 and the cross-deployable write routes stand). Each grant is an entry under `reads` in
+`docs/active/cross-deployable-writes.yaml` (the first: XDR-001, `commerce` reads `access.entitlement` and
+`access.scan_event` through `access#entitlementRecords` and `access#scanEventRecords`, for `getMediaEntitlements`);
+`tools/derive-ddl.py` writes the guarded `GRANT SELECT` into the next forward migration, and
+`tools/check-cross-module-reads.py` allows an in-process route across deployables only for a query so granted
+(XR-ROUTE). The exception is removed when the service route is built, if the lead wants the deployables kept apart
+(CR-196 option A).
+
+---
+
 ## Amended 14 October 2026: a rule question is asked of the owner by a declared query
 
 **Decided by Chinmay, 14 October 2026** (the settlement of ADAM CR-081, CR-083 and CR-084; change entry
@@ -233,4 +256,10 @@ load). It should not share a process with Marketing sends.
      route yet is a dated exception with a removal release. Both lists are `docs/active/cross-deployable-writes.yaml`;
      the readable table per write is `handoff/cross-deployable-writes.md`; `tools/check-cross-deployable-writes.py`
      fails on a write with neither.
+   - **21 October 2026 (ADAM CR-196, option B; CHG-R9CR-005; the amendment at the top).** Beyond its own schemas and
+     the kernel, a deployable's role is granted SELECT on a table another deployable owns only where the lead decided
+     a read (`reads` in `docs/active/cross-deployable-writes.yaml`). The first is XDR-001: `commerce` SELECT on
+     `access.entitlement` and `access.scan_event`, for Orders' `getMediaEntitlements`. A database already built gets
+     the grant from the forward migration (guarded on the role and the table); the ticket text is not rewritten, and
+     the developer reads this line.
 9. [x] The runtime: the starter targeted .NET 8 (`global.json`, `Directory.Build.props`), and Microsoft's support for .NET 8 ends on 10 November 2026, inside Block A. **Decided 30 September: .NET 10 LTS from day one.** The starter now targets `net10.0` with SDK 10.0.100 (`rollForward: latestFeature`); SETUP-HOSTS builds the hosts on it.

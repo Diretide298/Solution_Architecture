@@ -31,6 +31,7 @@ import yaml
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import frontend_repos as fr  # noqa: E402  the repository a screen is built in (CHG-R6-060)
+import ticket_done as td  # noqa: E402  the design a screen is built to and its visual done-check (CHG-R9UI-004)
 
 ROOT = Path(__file__).resolve().parents[1]
 DOCS = ROOT / "handoff" / "service-docs"
@@ -409,9 +410,13 @@ def build(schedule, keys):
         return head + ["- [ ] Creates its tables with their keys, indexes and row-level security",
                        "- [ ] Applies on a database with its Follows migrations applied, and a second run applies nothing",
                        "- [ ] The PR is reviewed"]
-    FE_PART = {"build": ("Build the screen", ["- [ ] Every state is built: loading, empty, error, offline, and the "
-                                             "normal view", "- [ ] Runs against the mock API from the generated client",
-                                             "- [ ] Matches the design and the navigation below"]),
+    # **The build sub-task names the design and checks the look** (CHG-R9UI-004): "Matches the design" named none, and
+    # WEB-007's page was built bare. The look line is written per screen (build_checks, below).
+    FE_PART = {"build": ("Build the screen", ["- [ ] Every state is built in its look (the states and their looks are "
+                                             "listed under the design above): loading, empty, error, offline, and the "
+                                             "normal view",
+                                             "- [ ] Runs against the mock API (SETUP-MOCK-API) from the generated client",
+                                             "- [ ] LOOK", "- [ ] Every link under Leads to (above) works"]),
                "wire": ("Connect the screen to the real API", ["- [ ] Calls the operations below through the "
                                                                "generated client, with its real errors handled",
                                                                "- [ ] Permissions: a user without them sees the "
@@ -430,6 +435,16 @@ def build(schedule, keys):
             m = re.search(r"[.!?](?=\s|$)", notes[len(p):])
             p = notes[:len(p) + m.end()] if m else notes.split("\n\n", 1)[0]
         return p
+
+    def build_checks(sid, checks):
+        """The build sub-task's checks for this screen: the look line from its design (CHG-R9UI-004)."""
+        if td.design_verified(sid):
+            look = ("- [ ] Looks identical to the client-approved design above in every state: "
+                    + td.visual_check(sid))
+        else:
+            look = ("- [ ] Built on the app shell's tokens and state patterns: no client-approved design yet, so the "
+                    "screen spec's layout is structure only")
+        return [look if c == "- [ ] LOOK" else c for c in checks]
 
     def guest_screen(sid):
         return screens.get(sid, {}).get("_operator") == "guest"
@@ -472,6 +487,12 @@ def build(schedule, keys):
         nav = (s.get("navigation") or {}).get("exitTo") or []
         if nav:
             out.append("- **Leads to:** " + ", ".join(nav[:12]))
+        # **The design it is built to** (CHG-R9UI-004): the client-approved prototype view, the frame adam_pull writes
+        # (wireframe-<anchor>.html), each state's pattern; or that there is none yet and the app's shell gives the look.
+        design = td.design_sentence(sid)
+        if design:
+            head, _, rest = design.partition(": ")
+            out += ["", f"#### {head}", "", rest[:1].upper() + rest[1:]]
         return out
 
     def screen_done(sid):
@@ -484,11 +505,16 @@ def build(schedule, keys):
             for name, text in st.items():
                 if name == "emptyNoAccess" and guest_screen(sid):
                     # A guest holds no permission (ADR-0025), so there is none to name (audit R072).
+                    look = td.state_look(sid, name)
                     out.append("- [ ] State **emptyNoAccess**: not reachable on a guest screen - a guest caller holds "
-                               "no permission (ADR-0025)")
+                               "no permission (ADR-0025); a guest who is not signed in is offered sign-in"
+                               + (f" ({look})" if look else ""))
                     continue
-                first = re.split(r"(?<=[.!?])\s", re.sub(r"\*\*", "", str(text)).strip(), maxsplit=1)[0]
-                out.append(f"- [ ] State **{name}**: {first}")
+                # **Whole, with its look** (CHG-R9UI-004): the line was cut to its first sentence ("State error: Could
+                # not load.") and named no look, so the page was built bare.
+                whole = " ".join(re.sub(r"\*\*", "", str(text)).split())
+                look = td.state_look(sid, name)
+                out.append(f"- [ ] State **{name}**: {whole}" + (f" ({look})" if look else ""))
         for t in ((s.get("navigation") or {}).get("transitions") or [])[:8]:
             fails = ", ".join(f"{f.get('when')} -> {f.get('to')}" for f in t.get("onFailure") or [] if isinstance(f, dict))
             out.append(f"- [ ] {t.get('trigger', 'Transition')} leads to {t.get('to')}"
@@ -499,6 +525,8 @@ def build(schedule, keys):
             errs = [str(c) for c in (o.get("responses") or {}) if str(c)[:1] in "45"]
             if errs:
                 out.append(f"- [ ] `{x}`: each of its errors ({', '.join(errs)}) shows the screen's error state, not a crash")
+        if td.design_verified(sid):
+            out.append("- [ ] " + td.visual_check(sid)[0].upper() + td.visual_check(sid)[1:])
         # The build gates of the screen's own repository, from its profile (CHG-RPO-003): #27741's guest app is npm
         # with no typecheck script, so `pnpm typecheck` was a gate nobody could run.
         out.append(fr.gate_line((fr.screen_index().get(sid) or {}).get("platform") or ""))
@@ -545,7 +573,8 @@ def build(schedule, keys):
                               for c in checks]
                 text += [f"{title}: {sid} {screens.get(sid, {}).get('name', '')}. One of three sub-tasks "
                          "(build / connect / tests).", ""]
-                text += screen_block(sid) + ["", "## Done when", ""] + checks
+                text += screen_block(sid) + ["", "## Done when", ""] + (build_checks(sid, checks) if part == "build"
+                                                                        else checks)
             else:
                 text += [r["description"], ""] + screen_block(sid) + [""] + screen_done(sid) + [
                     "", "Sub-tasks: build (every state), connect (the real API), tests."]

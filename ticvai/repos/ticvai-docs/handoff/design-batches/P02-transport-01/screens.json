@@ -200,6 +200,14 @@
     "match": "exact",
     "view": "Emirates Link → Buy → Sharjah – Dubai – Abu Dhabi → Book now → a date (Plan your trip: stations filled in, the route map and the departures)",
     "differences": "Mobile puts stations, date, departures and passengers on one screen (Plan your trip). The route opens with its stations filled in and the departures listed without a search (30 September); Popular routes, the route cards, is the first transport product. The route map needs a street-map tile provider (the capture shows the provider's API-key watermark; audit R038)."
+   },
+   "stateViews": {
+    "loading": "P02/venue-loader",
+    "error": "P02/state-error",
+    "emptyFirstRun": "P02/dashed-note",
+    "emptyNoResults": "P02/no-results-note",
+    "emptyNoAccess": "P02/sign-in-prompt",
+    "offline": "P02/state-offline"
    }
   },
   "apisNote": "Authored 29 September 2026 from the rev 3 decisions and the client prototype view named in `wireframe.prototype`; every operation exists in the contracts (decided 29 September, rev 3).",
@@ -455,6 +463,14 @@
     "match": "partial",
     "view": "… Plan your trip → departure 07:00 → one adult (the passengers under the chosen departure)",
     "differences": "The chosen departure's stops are the route map above the departures, not a stop list; the passengers sit under the departures on the same screen (Plan your trip)."
+   },
+   "stateViews": {
+    "loading": "P02/venue-loader",
+    "error": "P02/state-error",
+    "emptyFirstRun": "P02/dashed-note",
+    "emptyNoResults": "P02/no-results-note",
+    "emptyNoAccess": "P02/sign-in-prompt",
+    "offline": "P02/state-offline"
    }
   },
   "apisNote": "Authored 29 September 2026 from the rev 3 decisions and the client prototype view named in `wireframe.prototype`; every operation exists in the contracts (decided 29 September, rev 3).",
@@ -647,6 +663,14 @@
     "verified": "2026-10-01",
     "match": "exact",
     "view": "… Plan your trip → Multi-trip (multi-trip cards for this route)"
+   },
+   "stateViews": {
+    "loading": "P02/venue-loader",
+    "error": "P02/state-error",
+    "emptyFirstRun": "P02/dashed-note",
+    "emptyNoResults": "P02/no-results-note",
+    "emptyNoAccess": "P02/sign-in-prompt",
+    "offline": "P02/state-offline"
    }
   },
   "apisNote": "Authored 29 September 2026 from the rev 3 decisions and the client prototype view named in `wireframe.prototype`; every operation exists in the contracts (decided 29 September, rev 3).",
@@ -814,6 +838,14 @@
     "verified": "2026-10-01",
     "match": "exact",
     "view": "… Plan your trip → Save this route → Favourites (the saved route)"
+   },
+   "stateViews": {
+    "loading": "P02/venue-loader",
+    "error": "P02/state-error",
+    "emptyFirstRun": "P02/dashed-note",
+    "emptyNoResults": "P02/no-results-note",
+    "emptyNoAccess": "P02/sign-in-prompt",
+    "offline": "P02/state-offline"
    }
   },
   "apisNote": "Authored 29 September 2026 from the rev 3 decisions and the client prototype view named in `wireframe.prototype`; every operation exists in the contracts (decided 29 September, rev 3).",

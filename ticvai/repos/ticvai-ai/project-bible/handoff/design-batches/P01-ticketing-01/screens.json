@@ -168,6 +168,14 @@
     "match": "partial",
     "view": "Account → 'Transfer & resale'; My tickets → Manage → 'Transfer ticket'; Confirmation → 'Transfer tickets'",
     "differences": "List pane with toast actions; no recipient form. Prototype adds cancel transfer and withdraw resale listing."
+   },
+   "stateViews": {
+    "loading": "P01/turnstile-loader",
+    "error": "P01/status-card",
+    "emptyFirstRun": "P01/dashed-empty",
+    "emptyNoResults": "P01/filter-empty",
+    "emptyNoAccess": "P01/sign-in-card",
+    "offline": "P01/state-offline"
    }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
@@ -642,6 +650,14 @@
     "match": "partial",
     "view": "Account → 'Reservations'",
     "differences": "The prototype uses the WEB-031 label for the group booking request dialog (deposit / invoice quote) inside Kids Club → 'Birthday party / group' and 'School trip', which the YAML covers only through requestGroupBooking. 'Pay now' on a held reservation has no YAML route (WEB-014 is pay-by-link)."
+   },
+   "stateViews": {
+    "loading": "P01/turnstile-loader",
+    "error": "P01/status-card",
+    "emptyFirstRun": "P01/dashed-empty",
+    "emptyNoResults": "P01/filter-empty",
+    "emptyNoAccess": "P01/sign-in-card",
+    "offline": "P01/state-offline"
    }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
@@ -830,6 +846,14 @@
     "match": "exact",
     "view": "Discover → 'Prices in your currency'",
     "differences": "Matches the YAML's charged-vs-shown rule. Separately, Config → Currency switches the whole storefront currency, which contradicts 'always charged in AED'. **Resolved 2 October 2026 (CHG-FIN-001):** the guest may pay in the selected currency, so a storefront currency switch is right where the venue charges that currency."
+   },
+   "stateViews": {
+    "loading": "P01/turnstile-loader",
+    "error": "P01/status-card",
+    "emptyFirstRun": "P01/dashed-empty",
+    "emptyNoResults": "P01/filter-empty",
+    "emptyNoAccess": "P01/sign-in-card",
+    "offline": "P01/state-offline"
    }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",

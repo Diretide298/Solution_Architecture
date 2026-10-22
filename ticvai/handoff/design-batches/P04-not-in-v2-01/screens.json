@@ -218,7 +218,15 @@
    },
    "derivedFrom": "wireframes/reference/POS Board 3.dc.html",
    "source": "client approval, confirmed by Chinmay Parab 19 October 2026",
-   "note": "**Drawn by Claude Design on `POS Board 3.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
+   "note": "**Drawn by Claude Design on `POS Board 3.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing.",
+   "stateViews": {
+    "loading": "P04/state-loading",
+    "error": "P04/state-error",
+    "emptyFirstRun": "P04/empty-note",
+    "emptyNoResults": "P04/state-no-results",
+    "emptyNoAccess": "P04/state-no-access",
+    "offline": "P04/network-pill"
+   }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 16 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "gaps": [
@@ -553,7 +561,14 @@
     "match": "none",
     "note": "The prototype has no view for this screen. It was drawn in Claude Design on 29 September in the prototype's style and accepted as its design the same day (the frame on this screen's board): build the layout from that frame."
    },
-   "source": "client approval, confirmed by Chinmay Parab 19 October 2026"
+   "source": "client approval, confirmed by Chinmay Parab 19 October 2026",
+   "stateViews": {
+    "loading": "P04/state-loading",
+    "error": "P04/state-error",
+    "emptyFirstRun": "P04/empty-note",
+    "emptyNoAccess": "P04/state-no-access",
+    "offline": "P04/network-pill"
+   }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
@@ -815,7 +830,15 @@
     "match": "none",
     "note": "The prototype has no view for this screen. It was drawn in Claude Design on 29 September in the prototype's style and accepted as its design the same day (the frame on this screen's board): build the layout from that frame."
    },
-   "source": "client approval, confirmed by Chinmay Parab 19 October 2026"
+   "source": "client approval, confirmed by Chinmay Parab 19 October 2026",
+   "stateViews": {
+    "loading": "P04/state-loading",
+    "error": "P04/state-error",
+    "emptyFirstRun": "P04/empty-note",
+    "emptyNoResults": "P04/state-no-results",
+    "emptyNoAccess": "P04/state-no-access",
+    "offline": "P04/network-pill"
+   }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "purposeNote": "Purpose rewritten 2 October 2026 (CHG-WIR-010): The purpose read \"Cash Operations Dashboard — from the client design board, 20 August\"; the client asked for live cash status per till with expected cash and card totals for supervisors (DI-273, DI-308; design-notes correction fnb-retail POS-015).",
@@ -998,7 +1021,14 @@
    },
    "derivedFrom": "wireframes/reference/POS Frontline Board 2.dc.html",
    "note": "**Drawn by Claude Design on `POS Frontline Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing.",
-   "source": "client approval, confirmed by Chinmay Parab 19 October 2026"
+   "source": "client approval, confirmed by Chinmay Parab 19 October 2026",
+   "stateViews": {
+    "loading": "P04/state-loading",
+    "error": "P04/state-error",
+    "emptyFirstRun": "P04/empty-note",
+    "emptyNoAccess": "P04/state-no-access",
+    "offline": "P04/network-pill"
+   }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "_platform": {
@@ -1232,7 +1262,15 @@
    },
    "derivedFrom": "wireframes/reference/POS Board 3.dc.html",
    "source": "client approval, confirmed by Chinmay Parab 19 October 2026",
-   "note": "**Drawn by Claude Design on `POS Board 3.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
+   "note": "**Drawn by Claude Design on `POS Board 3.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing.",
+   "stateViews": {
+    "loading": "P04/state-loading",
+    "error": "P04/state-error",
+    "emptyFirstRun": "P04/empty-note",
+    "emptyNoResults": "P04/state-no-results",
+    "emptyNoAccess": "P04/state-no-access",
+    "offline": "P04/network-pill"
+   }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "gaps": [
@@ -1484,7 +1522,15 @@
    },
    "derivedFrom": "wireframes/reference/POS Board 3.dc.html",
    "source": "client approval, confirmed by Chinmay Parab 19 October 2026",
-   "note": "**Drawn by Claude Design on `POS Board 3.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
+   "note": "**Drawn by Claude Design on `POS Board 3.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing.",
+   "stateViews": {
+    "loading": "P04/state-loading",
+    "error": "P04/state-error",
+    "emptyFirstRun": "P04/empty-note",
+    "emptyNoResults": "P04/state-no-results",
+    "emptyNoAccess": "P04/state-no-access",
+    "offline": "P04/network-pill"
+   }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "gaps": [
@@ -1745,7 +1791,15 @@
     "match": "none",
     "note": "The prototype has no view for this screen. It was drawn in Claude Design on 29 September in the prototype's style and accepted as its design the same day (the frame on this screen's board): build the layout from that frame."
    },
-   "source": "client approval, confirmed by Chinmay Parab 19 October 2026"
+   "source": "client approval, confirmed by Chinmay Parab 19 October 2026",
+   "stateViews": {
+    "loading": "P04/state-loading",
+    "error": "P04/state-error",
+    "emptyFirstRun": "P04/empty-note",
+    "emptyNoResults": "P04/state-no-results",
+    "emptyNoAccess": "P04/state-no-access",
+    "offline": "P04/network-pill"
+   }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [

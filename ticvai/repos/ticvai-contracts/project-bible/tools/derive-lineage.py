@@ -17,6 +17,8 @@ So every run now writes, for every operation a contract declares:
             `x-ticvai-audits-itself`, and the tables `x-ticvai-reads` / `x-ticvai-writes` name (`{table, for}`)
   `readVia`, `writeVia`, `contract`, `verb`, `path`, `routing`, `scope`, `perm`, `offline`, `summary`, `audience`
             straight off the operation
+  `readsInProcess` the table of each query the operation asks in process (`x-ticvai-read-via` route in-process), kept
+            apart from `reads`, which places the operation in the plan (CHG-R9INT-001)
   plus and minus `handoff/api-data-lineage-overrides.json`: what no contract fact can state, each entry with its
   reason. The entries carried from the hand-kept file on 20 October are marked `carried` and may only fall
   (check-lineage LN-OVERRIDE); a new one is added by hand with its own reason. `service` comes from
@@ -358,6 +360,19 @@ def derive(stored: dict) -> dict:
     svc = service_by_contract(stored)
     sto = stores_by_contract(stored)
     known = {t for ts in persist.values() for t in ts}
+    # **An in-process read of another module's data is in the lineage, as `readsInProcess`** (22 October 2026,
+    # CHG-R9INT-001). An `x-ticvai-read-via` with route `in-process` calls the owner's C# query interface in the caller's
+    # transaction, on the caller's connection (check-cross-module-reads), so the operation reads the owner's table. Until
+    # r9 such a read reached the lineage only through a hand override (getKpiValues, CHG-R8WFC-004), and 139 declared
+    # in-process reads of 105 operations never did: createCart's platform.venue_settings (CR-184) and
+    # getOrderCalendarEvent's catalogue.performance (CR-199) failed check-parameter-columns P-NAMED-TABLE although the
+    # contract declared them. They are kept apart from `reads` on purpose: `reads` places an operation in the plan's
+    # blocks (check-plan-closure), and putting them there moved 32 drafted operations from Block B to Block C, a plan
+    # change nobody decided. A `service` or `projection` read is the owner's operation's or a local copy's, not this
+    # one's, and is not listed.
+    query_table = {f"{c.stem}#{name}": str(q.get("table") or "")
+                   for c, doc in contract_docs() for name, q in (doc.get("x-ticvai-queries") or {}).items()
+                   if isinstance(q, dict)}
     out = {}
     for c, doc in contract_docs():
         contract = c.stem
@@ -411,6 +426,12 @@ def derive(stored: dict) -> dict:
                         tb = str(x.get("table") if isinstance(x, dict) else x).strip()
                         if tb in known:
                             into.add(tb)
+                in_process = set()
+                for r in op.get("x-ticvai-read-via") or []:
+                    if isinstance(r, dict) and str(r.get("route") or "") == "in-process":
+                        tb = query_table.get(str(r.get("query") or ""), "")
+                        if tb in known:
+                            in_process.add(tb)
                 out[op["operationId"]] = {
                     "contract": contract,
                     "verb": verb.upper(),
@@ -435,6 +456,7 @@ def derive(stored: dict) -> dict:
                     "summary": op.get("summary") or op["operationId"],
                     "source": "derived",
                     "_declared": bool(op.get("x-ticvai-reads") or op.get("x-ticvai-writes")),
+                    "_in_process": sorted(in_process),
                     "audience": list(aud) if isinstance(aud, list) else ([aud] if aud else []),
                     "service": svc.get(contract),
                     "stores": sto.get(contract, ["postgres"]),
@@ -568,6 +590,11 @@ def expected(stored: dict, fresh: dict, overrides: dict, stale: list = None) -> 
                 e[key] = f[key]
             else:
                 e.pop(key, None)
+        # the tables read in process through a declared query (CHG-R9INT-001), apart from `reads`
+        if f.get("_in_process"):
+            e["readsInProcess"] = list(f["_in_process"])
+        else:
+            e.pop("readsInProcess", None)
         # **A path-inferred entry stops being one when somebody states its tables** (r8 walk, 20 October 2026,
         # CHG-R8WFC-004). `source` was carried from the hand-kept file, so 86 entries still said "path-inferred" (tables
         # guessed from the URL) after their contract or a reviewed override had stated them, and the developer could

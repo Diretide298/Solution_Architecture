@@ -83,6 +83,9 @@ def main() -> int:
                 # a read through the view named for the reader (`<table>_for_<reader>`, DB-READ-VIEWS) reads its
                 # table (CHG-R6G-007: publishBundle reads the sale boards through Catalogue's views)
                 tables += [b for t in (e.get("reads") or []) for b in [g.viewed_table(t, cols)] if b]
+                # a read in process through the owner's declared query reads the owner's table (`readsInProcess`,
+                # derive-lineage, CHG-R9INT-001: createCart's platform.venue_settings, CR-184)
+                tables += [t for t in (e.get("readsInProcess") or []) if "." in t]
                 if not tables:
                     continue
                 desc = str(op.get("description") or "")

@@ -2258,7 +2258,9 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - catalogue.product
+  - catalogue.sales_channel
   writes: []
 - operation: listScenarioModelingWhat
   verb: GET

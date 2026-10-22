@@ -208,7 +208,17 @@
     "differences": "The walking navigation follows the route in 3D, with turn-by-turn above the map and a live position (ADR-0069). The 2D/3D choice is a demo setting of the prototype (Config, Maps: 3D or 2D), not a switch the guest has, and neither the 3D-unavailable state (map3dUnavailable) nor the weak-GPS state (weakGps, \"Position approximate\") is drawn: both pending in design: specified, and built from the definition until the design shows it (handoff/design-batches/apps/1-guest-app/README.md)."
    },
    "derivedFrom": "wireframes/reference/Seat Board 4.dc.html",
-   "note": "**Drawn by Claude Design on `Seat Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing. Drawn frame: wireframes/incoming/P02-mobile-v4/gst-021.html, captured from the prototype view below (wireframes/incoming/P02-mobile-v4/manifest.json)."
+   "note": "**Drawn by Claude Design on `Seat Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing. Drawn frame: wireframes/incoming/P02-mobile-v4/gst-021.html, captured from the prototype view below (wireframes/incoming/P02-mobile-v4/manifest.json).",
+   "stateViews": {
+    "loading": "P02/venue-loader",
+    "error": "P02/state-error",
+    "emptyFirstRun": "P02/dashed-note",
+    "emptyNoResults": "P02/no-results-note",
+    "emptyNoAccess": "P02/sign-in-prompt",
+    "offline": "P02/state-offline",
+    "map3dUnavailable": "P02/state-map-fallback",
+    "weakGps": "P02/state-map-fallback"
+   }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "_platform": {
@@ -350,6 +360,12 @@
     "verified": "2026-10-01",
     "match": "exact",
     "view": "At the venue → Waits"
+   },
+   "stateViews": {
+    "loading": "P02/venue-loader",
+    "error": "P02/state-error",
+    "emptyFirstRun": "P02/dashed-note",
+    "offline": "P02/state-offline"
    }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
@@ -560,6 +576,13 @@
     "match": "exact",
     "view": "Account → All screens → Wave 3 → Virtual queue; also At-venue card \"Desert Coaster · queued\"",
     "differences": "Prototype allows two queues at once; the YAML states no limit."
+   },
+   "stateViews": {
+    "loading": "P02/venue-loader",
+    "error": "P02/state-error",
+    "emptyFirstRun": "P02/dashed-note",
+    "emptyNoAccess": "P02/sign-in-prompt",
+    "offline": "P02/state-offline"
    }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
@@ -877,6 +900,14 @@
     "verified": "2026-09-28",
     "match": "exact",
     "view": "Account → All screens → Wave 2 → F&B – browse & order"
+   },
+   "stateViews": {
+    "loading": "P02/venue-loader",
+    "error": "P02/state-error",
+    "emptyFirstRun": "P02/dashed-note",
+    "emptyNoResults": "P02/no-results-note",
+    "emptyNoAccess": "P02/sign-in-prompt",
+    "offline": "P02/state-offline"
    }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 8 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
@@ -1055,6 +1086,12 @@
     "match": "exact",
     "view": "Account → All screens → Wave 2 → F&B – order tracking",
     "differences": "The YAML states come from an availability template (\"Selection is blocked\") and do not fit order tracking."
+   },
+   "stateViews": {
+    "loading": "P02/venue-loader",
+    "error": "P02/state-error",
+    "emptyFirstRun": "P02/dashed-note",
+    "offline": "P02/state-offline"
    }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
@@ -1285,6 +1322,15 @@
     "verified": "2026-09-28",
     "match": "exact",
     "view": "Account → All screens → Wave 3 → Parking – reserve & pay"
+   },
+   "stateViews": {
+    "loading": "P02/venue-loader",
+    "error": "P02/state-error",
+    "emptyFirstRun": "P02/dashed-note",
+    "emptyNoResults": "P02/no-results-note",
+    "emptyNoAccess": "P02/sign-in-prompt",
+    "offline": "P02/state-offline",
+    "soldOutForDay": "P02/state-sold-out-for-day"
    }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
@@ -1561,6 +1607,14 @@
     "verified": "2026-09-28",
     "match": "exact",
     "view": "Account → All screens → Wave 3 → Parking – reservation confirmed"
+   },
+   "stateViews": {
+    "loading": "P02/venue-loader",
+    "error": "P02/state-error",
+    "emptyFirstRun": "P02/dashed-note",
+    "emptyNoResults": "P02/no-results-note",
+    "emptyNoAccess": "P02/sign-in-prompt",
+    "offline": "P02/state-offline"
    }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
@@ -1747,6 +1801,13 @@
     "match": "exact",
     "view": "Account → All screens → Wave 2 → Venue info & services",
     "differences": "Prototype shows only dining and delivery points, no other venue services."
+   },
+   "stateViews": {
+    "loading": "P02/venue-loader",
+    "error": "P02/state-error",
+    "emptyFirstRun": "P02/dashed-note",
+    "emptyNoResults": "P02/no-results-note",
+    "offline": "P02/state-offline"
    }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
@@ -1971,6 +2032,16 @@
     "match": "exact",
     "view": "Home → You're at Summit Peaks (At the venue · live, Map view)",
     "differences": "The live Map view renders the park in 3D with the route and the position dot (2D when the prototype's Maps setting is 2D). No guest-facing 2D/3D switch, and no map3dUnavailable or weakGps state: both pending in design: specified, and built from the definition until the design shows it (handoff/design-batches/apps/1-guest-app/README.md)."
+   },
+   "stateViews": {
+    "loading": "P02/venue-loader",
+    "error": "P02/state-error",
+    "emptyFirstRun": "P02/dashed-note",
+    "emptyNoResults": "P02/no-results-note",
+    "emptyNoAccess": "P02/sign-in-prompt",
+    "offline": "P02/state-offline",
+    "map3dUnavailable": "P02/state-map-fallback",
+    "weakGps": "P02/state-map-fallback"
    }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
@@ -2204,6 +2275,14 @@
     "match": "partial",
     "view": "Account → All screens → Wave 2 → Reserve a table or cabana; Rev 3 feedback → Book a table (fixed)",
     "differences": "The YAML covers tables only (cabanas are staff-booked, R073c) and has no deposit (R077a). The prototype also reserves cabanas and shows a deposit on the reservation, and the Rev 3 web flow has a deposit-hold variant at AED 100 per guest. **Stale since 29 September: REV3-8b superseded R077 (a); the dining deposit is a venue option, off by default** (CHG-SGU-018)."
+   },
+   "stateViews": {
+    "loading": "P02/venue-loader",
+    "error": "P02/state-error",
+    "emptyFirstRun": "P02/dashed-note",
+    "emptyNoResults": "P02/no-results-note",
+    "emptyNoAccess": "P02/sign-in-prompt",
+    "offline": "P02/state-offline"
    }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",

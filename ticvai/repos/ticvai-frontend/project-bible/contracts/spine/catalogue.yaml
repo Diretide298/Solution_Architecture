@@ -20034,6 +20034,11 @@ paths:
       - query: identity#delegatedAccessRecords
         route: in-process
         for: 'which principals hold a grant reaching the venue, and which venues the caller''s own grants reach: identity.delegated_access, Identity''s data'
+      x-ticvai-reads:
+      - table: catalogue.sales_channel
+        for: 'the sales channels a `salesChannel` rule can name at the venue (r9 integration, CHG-R9INT-001)'
+      - table: catalogue.product
+        for: 'the product''s venue, when `productId` is sent (r9 integration, CHG-R9INT-001)'
       summary: What a sale permission rule can name at one level, with names
       description: >-
         **The pickers of the who-can-sell rules** (CHG-R8PRD-007). A person who configures products holds

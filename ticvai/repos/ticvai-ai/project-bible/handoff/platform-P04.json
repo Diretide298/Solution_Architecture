@@ -7,7 +7,7 @@
  "audience": "staff",
  "formFactor": "posTerminal",
  "offlineCapable": true,
- "generated": "2026-10-21",
+ "generated": "2026-10-22",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 32,
@@ -72,19 +72,19 @@
    "operations": 9
   },
   {
-   "contract": "tenancy",
-   "operations": 8
-  },
-  {
    "contract": "identity",
    "operations": 8
   },
   {
-   "contract": "reporting",
+   "contract": "tenancy",
+   "operations": 8
+  },
+  {
+   "contract": "promotions",
    "operations": 5
   },
   {
-   "contract": "finance",
+   "contract": "reporting",
    "operations": 5
   },
   {
@@ -92,15 +92,15 @@
    "operations": 5
   },
   {
-   "contract": "promotions",
+   "contract": "finance",
    "operations": 5
   },
   {
-   "contract": "seating",
+   "contract": "approvals",
    "operations": 4
   },
   {
-   "contract": "approvals",
+   "contract": "seating",
    "operations": 4
   },
   {

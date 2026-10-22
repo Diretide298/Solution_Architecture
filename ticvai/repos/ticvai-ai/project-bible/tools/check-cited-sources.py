@@ -22,6 +22,14 @@ package or repository root (`sources/`, `docs/`, `handoff/`, `tools/`, `contract
 A file the package deleted by a recorded decision (tools/check-migration-freeze.py `RETIRED`, CHG-SQL-001) is
 noted, not failed: the change entry that deleted it has to name it (CHG-R4-009).
 
+**A forward migration's name carries the day the gate first wrote it** (22 October 2026, CHG-R9INT-002).
+tools/derive-ddl.py names a new one `backend/<db>/V<nnnn>__after_<tag>_<yyyymmdd>.sql` with the date of the run that
+writes it, and keeps that name once the file is committed. The r9 CR lane cited the V0114 its own run of 21 October
+wrote and never committed; the integration gate of 22 October wrote it again as `..._20261022.sql`, and five entries
+cited a file that did not exist. A CS-MISSING citation of a forward migration therefore says which file git has under
+that number, or that none is committed yet (bring the gate's file into the branch, as the gate does on PASS, and cite
+that name).
+
 Patterns (`*`, `<id>`, `{...}`) are not citations and are skipped. The findings that were there when the
 check was written are its baseline (`handoff/audit-baseline.json`, `audit_guard.py`): only a new one fails,
 and `--update-baseline` after a fix tightens it.
@@ -102,6 +110,23 @@ def retired_files() -> frozenset:
     return frozenset(getattr(m, "RETIRED", ()))
 
 
+FORWARD = re.compile(r"^(?:ticvai/)?backend/(\w+)/(V\d{4}[a-z]?)__[\w.-]+\.sql$")
+
+
+def forward_hint(path: str, files: set | None) -> str:
+    """For a forward migration git does not track: the file git has under its number, or that none is committed."""
+    m = FORWARD.match(path)
+    if not m or files is None:
+        return ""
+    area, version = m.groups()
+    have = sorted(f[len("ticvai/"):] for f in files
+                  if f.startswith(f"ticvai/backend/{area}/{version}__") and f.endswith(".sql"))
+    if have:
+        return f" (git has {', '.join(have)}: a forward migration keeps the name of the day the gate first wrote it)"
+    return (f" ({version} is not committed: derive-ddl names a new forward migration by the day of the run that writes "
+            "it, so bring the gate's file into the branch and cite that name)")
+
+
 def main() -> int:
     g.force_utf8()
     guard = g.Guard("check-cited-sources", RULES)
@@ -124,7 +149,8 @@ def main() -> int:
             elif p.removeprefix("ticvai/") in retired_files():
                 guard.note(f"{rel}: cites {p}, retired by decision (check-migration-freeze RETIRED, CHG-SQL-001)")
             elif not resolves(p, doc, files):
-                guard.add("CS-MISSING", f"{rel}|{p}", f"{rel}: cites {p}, which git does not track")
+                guard.add("CS-MISSING", f"{rel}|{p}", f"{rel}: cites {p}, which git does not track"
+                          + forward_hint(p, files))
                 per_doc[rel] += 1
     guard.note(f"{len(documents())} document(s), {n_cites} cited path(s)")
     if per_doc:

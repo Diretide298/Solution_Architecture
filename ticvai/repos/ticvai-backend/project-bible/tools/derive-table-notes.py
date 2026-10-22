@@ -57,6 +57,15 @@ WHAT = {
         "it is null far more often than `state` being `completed` suggests. `scope` names what "
         "was taken — a cell, a tenant database — because ADR-0038 makes those different sizes "
         "of loss."),
+    # ADAM CR-182, option A, decided 21 October 2026 (CHG-R9CR-001): the table had no description.
+    "platform.idempotency_record": (
+        "**The durable record of one keyed write** (SD-024): the `Idempotency-Key` a client sent, the "
+        "operation it was used with, a hash of the request and the first answer, written once, when "
+        "the write commits, in the same transaction. **The unique index on (`operation_id`, "
+        "`idempotency_key`) is the guarantee**: a concurrent retry waits on it, then replays the stored "
+        "answer, and the same key with a different body is `409 idempotency-conflict`. `status` is "
+        "always `completed`; `scope_path` is the tenant root, so any retrier finds it; a row lives 24 "
+        "hours (`expires_at`) and the maintenance job purges it after. Redis is only a cache in front."),
     "control.scaling_policy": (
         "**The bounds a service scales within inside one cell**, not the scaling itself. "
         "`replica_floor` and `replica_ceiling` are the decision; `target_utilisation_pct` and "

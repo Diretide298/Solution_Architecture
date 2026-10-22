@@ -194,6 +194,14 @@
     "match": "partial",
     "view": "No pre-arrival shop page; retail items appear as add-ons in the Extras step (images/shop product squares) and in At the venue → 'Shop & drop'",
     "differences": "No browsable merchandise catalogue before arrival; the nearest is in-venue Shop & drop (WEB-042)."
+   },
+   "stateViews": {
+    "loading": "P01/turnstile-loader",
+    "error": "P01/status-card",
+    "emptyFirstRun": "P01/dashed-empty",
+    "emptyNoResults": "P01/filter-empty",
+    "emptyNoAccess": "P01/sign-in-card",
+    "offline": "P01/state-offline"
    }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
@@ -403,6 +411,14 @@
     "match": "exact",
     "view": "Summit Peaks → header 'At the venue' → Shop (collect at the gate, at the car park kiosk, or delivered home)",
     "differences": "Pays in one tap on the page, not through the cart and checkout (YAML R236). 29 September: collect at the gate, at the car park kiosk, or delivered home, with a collection code after paying."
+   },
+   "stateViews": {
+    "loading": "P01/turnstile-loader",
+    "error": "P01/status-card",
+    "emptyFirstRun": "P01/dashed-empty",
+    "emptyNoResults": "P01/filter-empty",
+    "emptyNoAccess": "P01/sign-in-card",
+    "offline": "P01/state-offline"
    }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",

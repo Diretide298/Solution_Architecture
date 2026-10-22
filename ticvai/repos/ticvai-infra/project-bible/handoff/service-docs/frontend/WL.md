@@ -13,6 +13,8 @@
 | Themes |  |
 | Directions | ltr, rtl |
 | Packages | design-tokens, ui, api-client |
+| Design tokens | P09 `screens/_design-tokens.yaml` (the shared tokens (no client-approved design for this app yet)); P13 `screens/_design-tokens.yaml` (the shared tokens (no client-approved design for this app yet)) |
+| App shell | ticvai-venue-management: SETUP-SHELL-VENUE-MANAGEMENT; ticvai-web: SETUP-SHELL-WEB |
 | target | browser, desktop |
 | distribution | served from the cell |
 | bundleUpdate | immediate on deploy |
@@ -69,7 +71,9 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | Repository | ticvai-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-web.git); assumed by the lead, not yet confirmed |
 | Component | `WhiteLabelBrandingManagementForm` |
 | Suggested location | `src/routes/general/WhiteLabelBrandingManagementForm.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (no client-approved design yet).** ADM-016 has no client-approved prototype view or frame. Build its structure from the screen spec, on the app shell's tokens (`screens/_design-tokens.yaml`) and state patterns (SETUP-SHELL-WEB). The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
 
 **Entry parameters**
 
@@ -106,14 +110,14 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The white-label branding list. |
-| error | Could not load. Names which read failed and leaves the white-label branding untouched. |
-| emptyFirstRun | No white-label branding yet. Offers Create preview (`createPreview`). |
-| emptyNoResults | Never shown: `listConfigVersions` takes no filter, so an empty list is always the first-run state above. |
-| emptyNoAccess | Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `listTenants` requires to show this screen, and names that permission (the screen's other reads need `ASSET_LIBRARY_MANAGE`, `ASSET_LIBRARY_VIEW`, `TENANT_CONFIGURE`, `TENANT_PUBLISH` and say so in their own panels). Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_TENANT_ACCESS` for `openPlatformStaffGrant`, `listOwnPlatformStaffGrants`. |
-| grantRequired | No access into this tenant yet. A tenant is picked and no platform-staff grant into it is open, so every tenant action is disabled and the screen offers Open access grant (`openPlatformStaffGrant`: reason, permissions, expiry). The same state returns when the grant reaches `expiresAt` (decided 28 September, audit R098). |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The white-label branding list. |  |
+| error | Could not load. Names which read failed and leaves the white-label branding untouched. |  |
+| emptyFirstRun | No white-label branding yet. Offers Create preview (`createPreview`). |  |
+| emptyNoResults | Never shown: `listConfigVersions` takes no filter, so an empty list is always the first-run state above. |  |
+| emptyNoAccess | Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `listTenants` requires to show this screen, and names that permission (the screen's other reads need `ASSET_LIBRARY_MANAGE`, `ASSET_LIBRARY_VIEW`, `TENANT_CONFIGURE`, `TENANT_PUBLISH` and say so in their own panels). Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_TENANT_ACCESS` for `openPlatformStaffGrant`, `listOwnPlatformStaffGrants`. |  |
+| grantRequired | No access into this tenant yet. A tenant is picked and no platform-staff grant into it is open, so every tenant action is disabled and the screen offers Open access grant (`openPlatformStaffGrant`: reason, permissions, expiry). The same state returns when the grant reaches `expiresAt` (decided 28 September, audit R098). |  |
 
 **Goes to**
 
@@ -135,7 +139,9 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | Repository | ticvai-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-web.git); assumed by the lead, not yet confirmed |
 | Component | `DomainAndCertificateManagementForm` |
 | Suggested location | `src/routes/general/DomainAndCertificateManagementForm.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (no client-approved design yet).** ADM-017 has no client-approved prototype view or frame. Build its structure from the screen spec, on the app shell's tokens (`screens/_design-tokens.yaml`) and state patterns (SETUP-SHELL-WEB). The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
 
 **Entry parameters**
 
@@ -161,14 +167,14 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The domain certificate list. |
-| error | Could not load. Names which read failed and leaves the domain certificate untouched. |
-| emptyFirstRun | No domain certificate yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
-| emptyNoResults | Never shown: `listCustomDomains` takes no filter, so an empty list is always the first-run state above. |
-| emptyNoAccess | Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `listTenants` requires to show this screen, and names that permission (the screen's other reads need `TENANT_CONFIGURE` and say so in their own panels). Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_TENANT_ACCESS` for `openPlatformStaffGrant`, `listOwnPlatformStaffGrants`. |
-| grantRequired | No access into this tenant yet. A tenant is picked and no platform-staff grant into it is open, so every tenant action is disabled and the screen offers Open access grant (`openPlatformStaffGrant`: reason, permissions, expiry). The same state returns when the grant reaches `expiresAt` (decided 28 September, audit R098). |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The domain certificate list. |  |
+| error | Could not load. Names which read failed and leaves the domain certificate untouched. |  |
+| emptyFirstRun | No domain certificate yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |  |
+| emptyNoResults | Never shown: `listCustomDomains` takes no filter, so an empty list is always the first-run state above. |  |
+| emptyNoAccess | Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `listTenants` requires to show this screen, and names that permission (the screen's other reads need `TENANT_CONFIGURE` and say so in their own panels). Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_TENANT_ACCESS` for `openPlatformStaffGrant`, `listOwnPlatformStaffGrants`. |  |
+| grantRequired | No access into this tenant yet. A tenant is picked and no platform-staff grant into it is open, so every tenant action is disabled and the screen offers Open access grant (`openPlatformStaffGrant`: reason, permissions, expiry). The same state returns when the grant reaches `expiresAt` (decided 28 September, audit R098). |  |
 
 **Goes to**
 
@@ -191,7 +197,9 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | Repository | ticvai-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-web.git); assumed by the lead, not yet confirmed |
 | Component | `LocalisationAndLanguagePackDetail` |
 | Suggested location | `src/routes/general/LocalisationAndLanguagePackDetail.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (no client-approved design yet).** ADM-018 has no client-approved prototype view or frame. Build its structure from the screen spec, on the app shell's tokens (`screens/_design-tokens.yaml`) and state patterns (SETUP-SHELL-WEB). The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
 
 **Entry parameters**
 
@@ -218,14 +226,14 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The localisation language pack list. |
-| error | Could not load. Names which read failed and leaves the localisation language pack untouched. |
-| emptyFirstRun | No localisation language pack yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
-| emptyNoResults | Never shown: `listFaqs` takes no filter, so an empty list is always the first-run state above. |
-| emptyNoAccess | Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `listTenants` requires to show this screen, and names that permission (the screen's other reads need `TENANT_CONFIGURE` and say so in their own panels). Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_TENANT_ACCESS` for `openPlatformStaffGrant`, `listOwnPlatformStaffGrants`. |
-| grantRequired | No access into this tenant yet. A tenant is picked and no platform-staff grant into it is open, so every tenant action is disabled and the screen offers Open access grant (`openPlatformStaffGrant`: reason, permissions, expiry). The same state returns when the grant reaches `expiresAt` (decided 28 September, audit R098). |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The localisation language pack list. |  |
+| error | Could not load. Names which read failed and leaves the localisation language pack untouched. |  |
+| emptyFirstRun | No localisation language pack yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |  |
+| emptyNoResults | Never shown: `listFaqs` takes no filter, so an empty list is always the first-run state above. |  |
+| emptyNoAccess | Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `listTenants` requires to show this screen, and names that permission (the screen's other reads need `TENANT_CONFIGURE` and say so in their own panels). Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_TENANT_ACCESS` for `openPlatformStaffGrant`, `listOwnPlatformStaffGrants`. |  |
+| grantRequired | No access into this tenant yet. A tenant is picked and no platform-staff grant into it is open, so every tenant action is disabled and the screen offers Open access grant (`openPlatformStaffGrant`: reason, permissions, expiry). The same state returns when the grant reaches `expiresAt` (decided 28 September, audit R098). |  |
 
 **Goes to**
 
@@ -247,7 +255,9 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | Repository | ticvai-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-web.git); assumed by the lead, not yet confirmed |
 | Component | `ModuleActivationDependencyValidation` |
 | Suggested location | `src/routes/tenants-licensing/ModuleActivationDependencyValidation.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (no client-approved design yet).** ADM-424 has no client-approved prototype view or frame. Build its structure from the screen spec, on the app shell's tokens (`screens/_design-tokens.yaml`) and state patterns (SETUP-SHELL-WEB). The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
 
 **Entry parameters**
 
@@ -269,14 +279,14 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The module activation dependency list. |
-| error | Could not load. Names which read failed and leaves the module activation dependency untouched. |
-| emptyFirstRun | No module activation dependency yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing. |
-| emptyNoResults | The filter narrowed it and the module activation dependency are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| grantRequired | No access into this tenant yet. A tenant is picked and no platform-staff grant into it is open, so every tenant action is disabled and the screen offers Open access grant (`openPlatformStaffGrant`: reason, permissions `TENANT_CONFIGURE`, expiry). The same state returns when the grant reaches `expiresAt` (audit R098; CHG-SBO-001). |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The module activation dependency list. |  |
+| error | Could not load. Names which read failed and leaves the module activation dependency untouched. |  |
+| emptyFirstRun | No module activation dependency yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing. |  |
+| emptyNoResults | The filter narrowed it and the module activation dependency are still there. Names the active filter and offers to clear it. |  |
+| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |  |
+| grantRequired | No access into this tenant yet. A tenant is picked and no platform-staff grant into it is open, so every tenant action is disabled and the screen offers Open access grant (`openPlatformStaffGrant`: reason, permissions `TENANT_CONFIGURE`, expiry). The same state returns when the grant reaches `expiresAt` (audit R098; CHG-SBO-001). |  |
 
 **Goes to**
 
@@ -297,7 +307,9 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | Repository | ticvai-venue-management (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-venue-management.git); assumed by the lead, not yet confirmed |
 | Component | `TenantWorkspaceDetail` |
 | Suggested location | `src/routes/white-label/TenantWorkspaceDetail.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | statusTracker |
+| Layout pattern | statusTracker (structure only, not the look) |
+
+**Design (no client-approved design yet).** CMS-001 has no client-approved prototype view or frame. Build its structure from the screen spec, on the app shell's tokens (`screens/_design-tokens.yaml`) and state patterns (SETUP-SHELL-VENUE-MANAGEMENT). The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
 
 **Operations**
 
@@ -313,12 +325,12 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The tenant, read by `getTenantAppStatus`. |
-| error | Could not load. Names which read failed and leaves the tenant untouched. |
-| emptyFirstRun | Nothing published yet: the status shows "Never published" and the Site Builder card offers to start (CMS-102). A tenant always exists here. |
-| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `getTenantConfig` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The tenant, read by `getTenantAppStatus`. |  |
+| error | Could not load. Names which read failed and leaves the tenant untouched. |  |
+| emptyFirstRun | Nothing published yet: the status shows "Never published" and the Site Builder card offers to start (CMS-102). A tenant always exists here. |  |
+| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `getTenantConfig` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |  |
 
 **Goes to**
 
@@ -359,7 +371,9 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | Repository | ticvai-venue-management (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-venue-management.git); assumed by the lead, not yet confirmed |
 | Component | `BrandKitDetail` |
 | Suggested location | `src/routes/white-label/BrandKitDetail.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | statusTracker |
+| Layout pattern | statusTracker (structure only, not the look) |
+
+**Design (no client-approved design yet).** CMS-002 has no client-approved prototype view or frame. Build its structure from the screen spec, on the app shell's tokens (`screens/_design-tokens.yaml`) and state patterns (SETUP-SHELL-VENUE-MANAGEMENT). The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
 
 **Entry parameters**
 
@@ -378,12 +392,12 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The brand kit, read by `getBrandIdentity`. |
-| error | Could not load. Names which read failed and leaves the brand kit untouched. |
-| emptyFirstRun | No brand kit yet. Offers Create upload (`createUpload`). |
-| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `getBrandIdentity` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The brand kit, read by `getBrandIdentity`. |  |
+| error | Could not load. Names which read failed and leaves the brand kit untouched. |  |
+| emptyFirstRun | No brand kit yet. Offers Create upload (`createUpload`). |  |
+| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `getBrandIdentity` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |  |
 
 **Goes to**
 
@@ -407,7 +421,9 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | Repository | ticvai-venue-management (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-venue-management.git); assumed by the lead, not yet confirmed |
 | Component | `TypographyDetail` |
 | Suggested location | `src/routes/white-label/TypographyDetail.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | statusTracker |
+| Layout pattern | statusTracker (structure only, not the look) |
+
+**Design (no client-approved design yet).** CMS-003 has no client-approved prototype view or frame. Build its structure from the screen spec, on the app shell's tokens (`screens/_design-tokens.yaml`) and state patterns (SETUP-SHELL-VENUE-MANAGEMENT). The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
 
 **Operations**
 
@@ -418,12 +434,12 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The typography, read by `getFonts`. |
-| error | Could not load. Names which read failed and leaves the typography untouched. |
-| emptyFirstRun | No typography yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
-| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `getFonts` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The typography, read by `getFonts`. |  |
+| error | Could not load. Names which read failed and leaves the typography untouched. |  |
+| emptyFirstRun | No typography yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |  |
+| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `getFonts` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |  |
 
 **Goes to**
 
@@ -447,7 +463,9 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | Repository | ticvai-venue-management (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-venue-management.git); assumed by the lead, not yet confirmed |
 | Component | `LogoAssetsDetail` |
 | Suggested location | `src/routes/white-label/LogoAssetsDetail.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | statusTracker |
+| Layout pattern | statusTracker (structure only, not the look) |
+
+**Design (no client-approved design yet).** CMS-004 has no client-approved prototype view or frame. Build its structure from the screen spec, on the app shell's tokens (`screens/_design-tokens.yaml`) and state patterns (SETUP-SHELL-VENUE-MANAGEMENT). The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
 
 **Entry parameters**
 
@@ -469,12 +487,12 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The logo assets, read by `getBrandIdentity`. |
-| error | Could not load. Names which read failed and leaves the logo assets untouched. |
-| emptyFirstRun | No logo assets yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
-| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `getBrandIdentity` requires to show this screen, and names that permission (the screen's other reads need `ASSET_LIBRARY_MANAGE`, `ASSET_LIBRARY_VIEW` and say so in their own panels). Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The logo assets, read by `getBrandIdentity`. |  |
+| error | Could not load. Names which read failed and leaves the logo assets untouched. |  |
+| emptyFirstRun | No logo assets yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |  |
+| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `getBrandIdentity` requires to show this screen, and names that permission (the screen's other reads need `ASSET_LIBRARY_MANAGE`, `ASSET_LIBRARY_VIEW` and say so in their own panels). Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |  |
 
 **Goes to**
 
@@ -497,7 +515,9 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | Repository | ticvai-venue-management (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-venue-management.git); assumed by the lead, not yet confirmed |
 | Component | `ThemeEditorDetail` |
 | Suggested location | `src/routes/white-label/ThemeEditorDetail.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | statusTracker |
+| Layout pattern | statusTracker (structure only, not the look) |
+
+**Design (no client-approved design yet).** CMS-005 has no client-approved prototype view or frame. Build its structure from the screen spec, on the app shell's tokens (`screens/_design-tokens.yaml`) and state patterns (SETUP-SHELL-VENUE-MANAGEMENT). The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
 
 **Operations**
 
@@ -508,12 +528,12 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The theme editor, read by `getTheme`. |
-| error | Could not load. Names which read failed and leaves the theme editor untouched. |
-| emptyFirstRun | Before the first save `getTheme` answers 404 not-configured: the editor opens pre-filled from the preset with Save, and the first `setTheme` creates the part. |
-| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `getTheme` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The theme editor, read by `getTheme`. |  |
+| error | Could not load. Names which read failed and leaves the theme editor untouched. |  |
+| emptyFirstRun | Before the first save `getTheme` answers 404 not-configured: the editor opens pre-filled from the preset with Save, and the first `setTheme` creates the part. |  |
+| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `getTheme` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |  |
 
 **Goes to**
 
@@ -538,7 +558,9 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | Repository | ticvai-venue-management (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-venue-management.git); assumed by the lead, not yet confirmed |
 | Component | `ComponentPreviewDetail` |
 | Suggested location | `src/routes/white-label/ComponentPreviewDetail.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (no client-approved design yet).** CMS-006 has no client-approved prototype view or frame. Build its structure from the screen spec, on the app shell's tokens (`screens/_design-tokens.yaml`) and state patterns (SETUP-SHELL-VENUE-MANAGEMENT). The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
 
 **Entry parameters**
 
@@ -559,13 +581,13 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The component preview list. |
-| error | Could not load. Names which read failed and leaves the component preview untouched. |
-| emptyFirstRun | No component preview yet. Offers Create preview (`createPreview`). |
-| emptyNoResults | Never shown: nothing on this screen filters its list, so an empty list is always the first-run state above. |
-| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `getTheme` requires to show this screen, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRODUCT_VIEW` for `previewProductTickets`. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The component preview list. |  |
+| error | Could not load. Names which read failed and leaves the component preview untouched. |  |
+| emptyFirstRun | No component preview yet. Offers Create preview (`createPreview`). |  |
+| emptyNoResults | Never shown: nothing on this screen filters its list, so an empty list is always the first-run state above. |  |
+| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `getTheme` requires to show this screen, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRODUCT_VIEW` for `previewProductTickets`. |  |
 
 **Goes to**
 
@@ -589,7 +611,9 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | Repository | ticvai-venue-management (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-venue-management.git); assumed by the lead, not yet confirmed |
 | Component | `PageBuilderDetail` |
 | Suggested location | `src/routes/white-label/PageBuilderDetail.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | statusTracker |
+| Layout pattern | statusTracker (structure only, not the look) |
+
+**Design (no client-approved design yet).** CMS-007 has no client-approved prototype view or frame. Build its structure from the screen spec, on the app shell's tokens (`screens/_design-tokens.yaml`) and state patterns (SETUP-SHELL-VENUE-MANAGEMENT). The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
 
 **Entry parameters**
 
@@ -622,12 +646,12 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The record, read by `getHomepageLayout`. |
-| error | Could not load. Names which read failed and leaves the record untouched. |
-| emptyFirstRun | No record yet. Offers Create content page (`createContentPage`). |
-| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `listContentPages` requires to show this screen, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `AI_USE` for `proposeMarketingContent`, `decideProposedAction`; `TENANT_PUBLISH` for `publishContentBlock`. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The record, read by `getHomepageLayout`. |  |
+| error | Could not load. Names which read failed and leaves the record untouched. |  |
+| emptyFirstRun | No record yet. Offers Create content page (`createContentPage`). |  |
+| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `listContentPages` requires to show this screen, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `AI_USE` for `proposeMarketingContent`, `decideProposedAction`; `TENANT_PUBLISH` for `publishContentBlock`. |  |
 
 **Goes to**
 
@@ -651,7 +675,9 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | Repository | ticvai-venue-management (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-venue-management.git); assumed by the lead, not yet confirmed |
 | Component | `ContentBlocksDetail` |
 | Suggested location | `src/routes/white-label/ContentBlocksDetail.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (no client-approved design yet).** CMS-008 has no client-approved prototype view or frame. Build its structure from the screen spec, on the app shell's tokens (`screens/_design-tokens.yaml`) and state patterns (SETUP-SHELL-VENUE-MANAGEMENT). The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
 
 **Entry parameters**
 
@@ -679,13 +705,13 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The content blocks list. |
-| error | Could not load. Names which read failed and leaves the content blocks untouched. |
-| emptyFirstRun | No content blocks yet. Offers Create banner (`createBanner`). |
-| emptyNoResults | Never shown: `listPromoBlocks` takes no filter, so an empty list is always the first-run state above. |
-| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `listPromoBlocks` requires to show this screen, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `AI_USE` for `proposeMarketingContent`, `decideProposedAction`. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The content blocks list. |  |
+| error | Could not load. Names which read failed and leaves the content blocks untouched. |  |
+| emptyFirstRun | No content blocks yet. Offers Create banner (`createBanner`). |  |
+| emptyNoResults | Never shown: `listPromoBlocks` takes no filter, so an empty list is always the first-run state above. |  |
+| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `listPromoBlocks` requires to show this screen, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `AI_USE` for `proposeMarketingContent`, `decideProposedAction`. |  |
 
 **Goes to**
 
@@ -708,7 +734,9 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | Repository | ticvai-venue-management (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-venue-management.git); assumed by the lead, not yet confirmed |
 | Component | `NavigationMenusDetail` |
 | Suggested location | `src/routes/white-label/NavigationMenusDetail.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (no client-approved design yet).** CMS-009 has no client-approved prototype view or frame. Build its structure from the screen spec, on the app shell's tokens (`screens/_design-tokens.yaml`) and state patterns (SETUP-SHELL-VENUE-MANAGEMENT). The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
 
 **Operations**
 
@@ -724,12 +752,12 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The navigation menus list. |
-| error | Could not load. Names which read failed and leaves the navigation menus untouched. |
-| emptyFirstRun | Nothing configured yet: the header, footer and tab bar open with the preset's defaults, each with its own Save. |
-| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `getNavigation` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The navigation menus list. |  |
+| error | Could not load. Names which read failed and leaves the navigation menus untouched. |  |
+| emptyFirstRun | Nothing configured yet: the header, footer and tab bar open with the preset's defaults, each with its own Save. |  |
+| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `getNavigation` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |  |
 
 **Goes to**
 
@@ -752,7 +780,9 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | Repository | ticvai-venue-management (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-venue-management.git); assumed by the lead, not yet confirmed |
 | Component | `MediaLibraryDetail` |
 | Suggested location | `src/routes/white-label/MediaLibraryDetail.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (no client-approved design yet).** CMS-010 has no client-approved prototype view or frame. Build its structure from the screen spec, on the app shell's tokens (`screens/_design-tokens.yaml`) and state patterns (SETUP-SHELL-VENUE-MANAGEMENT). The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
 
 **Entry parameters**
 
@@ -779,13 +809,13 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The media list. |
-| error | Could not load. Names which read failed and leaves the media untouched. |
-| emptyFirstRun | No media yet. Offers Create collection (`createCollection`); distinct from a filter that matched nothing. |
-| emptyNoResults | Nothing matches the filter on kind, tag, collectionId, venueId, search, unusedOnly and the media are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Shown when the caller lacks `ASSET_LIBRARY_VIEW`, which `searchMedia` requires to show this screen, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `AI_USE` for `semanticSearch`; `ASSET_LIBRARY_MANAGE` for `completeUpload`, `createCollection`, `createUpload`, `deleteMediaAsset` and 2 more. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The media list. |  |
+| error | Could not load. Names which read failed and leaves the media untouched. |  |
+| emptyFirstRun | No media yet. Offers Create collection (`createCollection`); distinct from a filter that matched nothing. |  |
+| emptyNoResults | Nothing matches the filter on kind, tag, collectionId, venueId, search, unusedOnly and the media are still there. Names the active filter and offers to clear it. |  |
+| emptyNoAccess | Shown when the caller lacks `ASSET_LIBRARY_VIEW`, which `searchMedia` requires to show this screen, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `AI_USE` for `semanticSearch`; `ASSET_LIBRARY_MANAGE` for `completeUpload`, `createCollection`, `createUpload`, `deleteMediaAsset` and 2 more. |  |
 
 **Goes to**
 
@@ -808,7 +838,9 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | Repository | ticvai-venue-management (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-venue-management.git); assumed by the lead, not yet confirmed |
 | Component | `TranslationsDetail` |
 | Suggested location | `src/routes/white-label/TranslationsDetail.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | configEditor |
+| Layout pattern | configEditor (structure only, not the look) |
+
+**Design (no client-approved design yet).** CMS-011 has no client-approved prototype view or frame. Build its structure from the screen spec, on the app shell's tokens (`screens/_design-tokens.yaml`) and state patterns (SETUP-SHELL-VENUE-MANAGEMENT). The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
 
 **Entry parameters**
 
@@ -827,12 +859,12 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The saved translations. |
-| error | Could not load. Names which read failed and leaves the translations untouched. |
-| emptyFirstRun | No translations configured. The form opens empty and `setLanguages` saves the first one; it says what the platform does in the meantime. |
-| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `getTenantConfig` requires to show this screen, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The saved translations. |  |
+| error | Could not load. Names which read failed and leaves the translations untouched. |  |
+| emptyFirstRun | No translations configured. The form opens empty and `setLanguages` saves the first one; it says what the platform does in the meantime. |  |
+| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `getTenantConfig` requires to show this screen, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |  |
 
 **Goes to**
 
@@ -855,7 +887,9 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | Repository | ticvai-venue-management (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-venue-management.git); assumed by the lead, not yet confirmed |
 | Component | `RtlPreviewDetail` |
 | Suggested location | `src/routes/white-label/RtlPreviewDetail.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | statusTracker |
+| Layout pattern | statusTracker (structure only, not the look) |
+
+**Design (no client-approved design yet).** CMS-012 has no client-approved prototype view or frame. Build its structure from the screen spec, on the app shell's tokens (`screens/_design-tokens.yaml`) and state patterns (SETUP-SHELL-VENUE-MANAGEMENT). The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
 
 **Operations**
 
@@ -866,12 +900,12 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The Arabic preview of the draft. |
-| error | Could not load. Names which read failed and leaves the rtl preview untouched. |
-| emptyFirstRun | No rtl preview yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
-| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `getTenantConfig` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The Arabic preview of the draft. |  |
+| error | Could not load. Names which read failed and leaves the rtl preview untouched. |  |
+| emptyFirstRun | No rtl preview yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |  |
+| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `getTenantConfig` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |  |
 
 **Goes to**
 
@@ -895,7 +929,9 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | Repository | ticvai-venue-management (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-venue-management.git); assumed by the lead, not yet confirmed |
 | Component | `SeoMetadataDetail` |
 | Suggested location | `src/routes/white-label/SeoMetadataDetail.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | configEditor |
+| Layout pattern | configEditor (structure only, not the look) |
+
+**Design (no client-approved design yet).** CMS-013 has no client-approved prototype view or frame. Build its structure from the screen spec, on the app shell's tokens (`screens/_design-tokens.yaml`) and state patterns (SETUP-SHELL-VENUE-MANAGEMENT). The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
 
 **Operations**
 
@@ -907,12 +943,12 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | Detail loads |
-| error | Could not load |
-| emptyFirstRun | No metadata saved for this page yet: the generated title and description are shown with the "Generated" badge. |
-| emptyNoAccess | Shown when the caller lacks `MARKETING_VIEW`, which `getSeoMetadata` requires to show this screen, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `MARKETING_MANAGE` for `setSeoMetadata`, `createUrlRedirect`. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | Detail loads |  |
+| error | Could not load |  |
+| emptyFirstRun | No metadata saved for this page yet: the generated title and description are shown with the "Generated" badge. |  |
+| emptyNoAccess | Shown when the caller lacks `MARKETING_VIEW`, which `getSeoMetadata` requires to show this screen, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `MARKETING_MANAGE` for `setSeoMetadata`, `createUrlRedirect`. |  |
 
 **Goes to**
 
@@ -935,7 +971,9 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | Repository | ticvai-venue-management (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-venue-management.git); assumed by the lead, not yet confirmed |
 | Component | `PublishingWorkflowDetail` |
 | Suggested location | `src/routes/white-label/PublishingWorkflowDetail.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | statusTracker |
+| Layout pattern | statusTracker (structure only, not the look) |
+
+**Design (no client-approved design yet).** CMS-014 has no client-approved prototype view or frame. Build its structure from the screen spec, on the app shell's tokens (`screens/_design-tokens.yaml`) and state patterns (SETUP-SHELL-VENUE-MANAGEMENT). The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
 
 **Entry parameters**
 
@@ -962,12 +1000,12 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The publishing workflow, read by `getTenantAppStatus`. |
-| error | Could not load. Names which read failed and leaves the publishing workflow untouched. |
-| emptyFirstRun | No publishing workflow yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
-| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `listBookingFlows` requires to show this screen, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `TENANT_PUBLISH` for `publishTenantConfig`, `setPublishReviewPolicy`, `exportSitePackage`, `getSitePackage`. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The publishing workflow, read by `getTenantAppStatus`. |  |
+| error | Could not load. Names which read failed and leaves the publishing workflow untouched. |  |
+| emptyFirstRun | No publishing workflow yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |  |
+| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `listBookingFlows` requires to show this screen, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `TENANT_PUBLISH` for `publishTenantConfig`, `setPublishReviewPolicy`, `exportSitePackage`, `getSitePackage`. |  |
 
 **Goes to**
 
@@ -994,7 +1032,9 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | Repository | ticvai-venue-management (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-venue-management.git); assumed by the lead, not yet confirmed |
 | Component | `VersionHistoryDetail` |
 | Suggested location | `src/routes/white-label/VersionHistoryDetail.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (no client-approved design yet).** CMS-015 has no client-approved prototype view or frame. Build its structure from the screen spec, on the app shell's tokens (`screens/_design-tokens.yaml`) and state patterns (SETUP-SHELL-VENUE-MANAGEMENT). The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
 
 **Entry parameters**
 
@@ -1012,13 +1052,13 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The version history list. |
-| error | Could not load. Names which read failed and leaves the version history untouched. |
-| emptyFirstRun | No version history yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
-| emptyNoResults | Never shown: `listConfigVersions` takes no filter, so an empty list is always the first-run state above. |
-| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `listConfigVersions` requires, and names it. A user with `TENANT_CONFIGURE` and not `TENANT_PUBLISH` sees the versions with Restore hidden and the reason named, because `restoreConfigVersion` needs `TENANT_PUBLISH`. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The version history list. |  |
+| error | Could not load. Names which read failed and leaves the version history untouched. |  |
+| emptyFirstRun | No version history yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |  |
+| emptyNoResults | Never shown: `listConfigVersions` takes no filter, so an empty list is always the first-run state above. |  |
+| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `listConfigVersions` requires, and names it. A user with `TENANT_CONFIGURE` and not `TENANT_PUBLISH` sees the versions with Restore hidden and the reason named, because `restoreConfigVersion` needs `TENANT_PUBLISH`. |  |
 
 **Goes to**
 
@@ -1042,7 +1082,9 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | Repository | ticvai-venue-management (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-venue-management.git); assumed by the lead, not yet confirmed |
 | Component | `SiteSettingsDetail` |
 | Suggested location | `src/routes/white-label/SiteSettingsDetail.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | statusTracker |
+| Layout pattern | statusTracker (structure only, not the look) |
+
+**Design (no client-approved design yet).** CMS-016 has no client-approved prototype view or frame. Build its structure from the screen spec, on the app shell's tokens (`screens/_design-tokens.yaml`) and state patterns (SETUP-SHELL-VENUE-MANAGEMENT). The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
 
 **Entry parameters**
 
@@ -1062,13 +1104,13 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The site settings, read by `getTenantConfig`. |
-| error | Could not load. Names which read failed and leaves the site settings untouched. |
-| emptyNoResults | A venue picked in Settings for with no override shows the tenant settings it inherits, labelled as inherited, rather than an empty form (rev 3 CFG-11). |
-| emptyFirstRun | No site settings yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
-| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `getBookingFlowConfig` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The site settings, read by `getTenantConfig`. |  |
+| error | Could not load. Names which read failed and leaves the site settings untouched. |  |
+| emptyNoResults | A venue picked in Settings for with no override shows the tenant settings it inherits, labelled as inherited, rather than an empty form (rev 3 CFG-11). |  |
+| emptyFirstRun | No site settings yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |  |
+| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `getBookingFlowConfig` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |  |
 
 **Goes to**
 
@@ -1095,7 +1137,9 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | Repository | ticvai-venue-management (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-venue-management.git); assumed by the lead, not yet confirmed |
 | Component | `DomainCertificateDetail` |
 | Suggested location | `src/routes/white-label/DomainCertificateDetail.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (no client-approved design yet).** CMS-017 has no client-approved prototype view or frame. Build its structure from the screen spec, on the app shell's tokens (`screens/_design-tokens.yaml`) and state patterns (SETUP-SHELL-VENUE-MANAGEMENT). The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
 
 **Entry parameters**
 
@@ -1117,13 +1161,13 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | Detail loads |
-| error | Could not load |
-| emptyFirstRun | No custom domain yet: "Your site is at venue.<cell>.ticvai.app", with Claim custom domain. |
-| emptyNoResults | Never shown: `listCustomDomains` takes no filter, so an empty list is always the first-run state above. |
-| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `listCustomDomains` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | Detail loads |  |
+| error | Could not load |  |
+| emptyFirstRun | No custom domain yet: "Your site is at venue.<cell>.ticvai.app", with Claim custom domain. |  |
+| emptyNoResults | Never shown: `listCustomDomains` takes no filter, so an empty list is always the first-run state above. |  |
+| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `listCustomDomains` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |  |
 
 **Goes to**
 
@@ -1146,7 +1190,9 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | Repository | ticvai-venue-management (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-venue-management.git); assumed by the lead, not yet confirmed |
 | Component | `ConsentLegalDetail` |
 | Suggested location | `src/routes/white-label/ConsentLegalDetail.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (no client-approved design yet).** CMS-018 has no client-approved prototype view or frame. Build its structure from the screen spec, on the app shell's tokens (`screens/_design-tokens.yaml`) and state patterns (SETUP-SHELL-VENUE-MANAGEMENT). The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
 
 **Entry parameters**
 
@@ -1170,13 +1216,13 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The consent legal list. |
-| error | Could not load. Names which read failed and leaves the consent legal untouched. |
-| emptyFirstRun | No policy, purpose or consent question yet. Offers Save policy (`setPolicy`), Save consent purposes (`setConsentPurposes`) and New consent question (`createConsentQuestion`). |
-| emptyNoResults | `listPolicies` takes no filter. The consent questions (kind, status) and the consent records (order, guest, question) do: an empty result names the active filter and offers to clear it. |
-| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `listPolicies` requires to show this screen, and names that permission (the screen's other reads need `GUEST_VIEW` and say so in their own panels). Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `GUEST_MANAGE` for `setConsentPurposes`, `createConsentQuestion`, `updateConsentQuestion`. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The consent legal list. |  |
+| error | Could not load. Names which read failed and leaves the consent legal untouched. |  |
+| emptyFirstRun | No policy, purpose or consent question yet. Offers Save policy (`setPolicy`), Save consent purposes (`setConsentPurposes`) and New consent question (`createConsentQuestion`). |  |
+| emptyNoResults | `listPolicies` takes no filter. The consent questions (kind, status) and the consent records (order, guest, question) do: an empty result names the active filter and offers to clear it. |  |
+| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `listPolicies` requires to show this screen, and names that permission (the screen's other reads need `GUEST_VIEW` and say so in their own panels). Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `GUEST_MANAGE` for `setConsentPurposes`, `createConsentQuestion`, `updateConsentQuestion`. |  |
 
 **Goes to**
 
@@ -1199,7 +1245,9 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | Repository | ticvai-venue-management (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-venue-management.git); assumed by the lead, not yet confirmed |
 | Component | `UserAccessDetail` |
 | Suggested location | `src/routes/white-label/UserAccessDetail.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (no client-approved design yet).** CMS-019 has no client-approved prototype view or frame. Build its structure from the screen spec, on the app shell's tokens (`screens/_design-tokens.yaml`) and state patterns (SETUP-SHELL-VENUE-MANAGEMENT). The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
 
 **Entry parameters**
 
@@ -1217,13 +1265,13 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The user access list. |
-| error | Could not load. Names which read failed and leaves the user access untouched. |
-| emptyFirstRun | Nobody but the tenant owner has access yet: an empty list here is normal on a new tenant. Change access is offered on each person once they exist; people are invited from the platform's user management, not here. |
-| emptyNoResults | Nothing matches the filter on scopePath, isActive and the user access are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Shown when the caller lacks `USER_MANAGE`, which `listPrincipals` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The user access list. |  |
+| error | Could not load. Names which read failed and leaves the user access untouched. |  |
+| emptyFirstRun | Nobody but the tenant owner has access yet: an empty list here is normal on a new tenant. Change access is offered on each person once they exist; people are invited from the platform's user management, not here. |  |
+| emptyNoResults | Nothing matches the filter on scopePath, isActive and the user access are still there. Names the active filter and offers to clear it. |  |
+| emptyNoAccess | Shown when the caller lacks `USER_MANAGE`, which `listPrincipals` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |  |
 
 **Goes to**
 
@@ -1246,7 +1294,9 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | Repository | ticvai-venue-management (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-venue-management.git); assumed by the lead, not yet confirmed |
 | Component | `HelpMeChoose` |
 | Suggested location | `src/routes/white-label/HelpMeChoose.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (no client-approved design yet).** CMS-101 has no client-approved prototype view or frame. Build its structure from the screen spec, on the app shell's tokens (`screens/_design-tokens.yaml`) and state patterns (SETUP-SHELL-VENUE-MANAGEMENT). The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
 
 **Entry parameters**
 
@@ -1276,13 +1326,13 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The venue's Help me choose set-ups, read by `listGuidedChoices`. |
-| error | Could not load. Names which read failed and leaves the set-ups untouched. |
-| emptyFirstRun | No Help me choose at this venue, so guests see none. Offers New set-up, and says that once the venue's products are uploaded the assistant proposes set-ups here as drafts for review. |
-| emptyNoResults | The source or status filter matched nothing and the venue's other set-ups are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `listGuidedChoices` requires to show this screen, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `AI_USE` for `suggestGuidedChoice`, `getGuidedChoiceSuggestion`; `PRODUCT_VIEW` for `listProducts`, `listProductCategories`, `listEvents`; `TENANT_PUBLISH` for `publishGuidedChoice`, `unpublishGuidedChoice`. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The venue's Help me choose set-ups, read by `listGuidedChoices`. |  |
+| error | Could not load. Names which read failed and leaves the set-ups untouched. |  |
+| emptyFirstRun | No Help me choose at this venue, so guests see none. Offers New set-up, and says that once the venue's products are uploaded the assistant proposes set-ups here as drafts for review. |  |
+| emptyNoResults | The source or status filter matched nothing and the venue's other set-ups are still there. Names the active filter and offers to clear it. |  |
+| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `listGuidedChoices` requires to show this screen, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `AI_USE` for `suggestGuidedChoice`, `getGuidedChoiceSuggestion`; `PRODUCT_VIEW` for `listProducts`, `listProductCategories`, `listEvents`; `TENANT_PUBLISH` for `publishGuidedChoice`, `unpublishGuidedChoice`. |  |
 
 **Goes to**
 
@@ -1304,7 +1354,9 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | Repository | ticvai-venue-management (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-venue-management.git); assumed by the lead, not yet confirmed |
 | Component | `SiteBuilder` |
 | Suggested location | `src/routes/white-label/SiteBuilder.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | multiStepForm |
+| Layout pattern | multiStepForm (structure only, not the look) |
+
+**Design (no client-approved design yet).** CMS-102 has no client-approved prototype view or frame. Build its structure from the screen spec, on the app shell's tokens (`screens/_design-tokens.yaml`) and state patterns (SETUP-SHELL-VENUE-MANAGEMENT). The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
 
 **Entry parameters**
 
@@ -1326,13 +1378,13 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The builder's progress, read by `getSiteSetupProgress`. |
-| error | Could not load. Names which read failed and leaves the progress untouched. |
-| emptyFirstRun | Nothing set up yet. Opens on Start from, with every step not started, and says the minimum path is a logo, four colours, the preset's flows and a publish. |
-| emptyNoResults | The venue has no flow of a type the preset proposes yet; the flow list says so and offers Add these flows rather than showing an empty table. |
-| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `getSiteSetupProgress` requires, and names that permission. Never an empty form — that reads as *there is nothing to set up*. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The builder's progress, read by `getSiteSetupProgress`. |  |
+| error | Could not load. Names which read failed and leaves the progress untouched. |  |
+| emptyFirstRun | Nothing set up yet. Opens on Start from, with every step not started, and says the minimum path is a logo, four colours, the preset's flows and a publish. |  |
+| emptyNoResults | The venue has no flow of a type the preset proposes yet; the flow list says so and offers Add these flows rather than showing an empty table. |  |
+| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `getSiteSetupProgress` requires, and names that permission. Never an empty form — that reads as *there is nothing to set up*. |  |
 
 **Goes to**
 
@@ -1372,7 +1424,9 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | Repository | ticvai-venue-management (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-venue-management.git); assumed by the lead, not yet confirmed |
 | Component | `BookingFlows` |
 | Suggested location | `src/routes/white-label/BookingFlows.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (no client-approved design yet).** CMS-103 has no client-approved prototype view or frame. Build its structure from the screen spec, on the app shell's tokens (`screens/_design-tokens.yaml`) and state patterns (SETUP-SHELL-VENUE-MANAGEMENT). The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
 
 **Entry parameters**
 
@@ -1405,13 +1459,13 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The venue's flows and the flow-type catalogue, read by `listBookingFlows` and `listBookingFlowTypes`. |
-| error | Could not load. Names which read failed and leaves the flows untouched. |
-| emptyFirstRun | No flows at this venue yet. Guests book through each type's default order until one is picked. Offers the flow-type cards and, from the Site Builder, the preset's flows in one step. |
-| emptyNoResults | The flow-type filter matched nothing and the venue's other flows are still there. Names the filter and offers to clear it. |
-| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `listBookingFlows` requires to show this screen, and names that permission (the screen's other reads need `GUEST_VIEW` and say so in their own panels). Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRODUCT_CONFIGURE` for `updateProduct`, `setProductCategories`; `PRODUCT_VIEW` for `listProducts`, `listProductCategories`; `TENANT_PUBLISH` for `publishTenantConfig`. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The venue's flows and the flow-type catalogue, read by `listBookingFlows` and `listBookingFlowTypes`. |  |
+| error | Could not load. Names which read failed and leaves the flows untouched. |  |
+| emptyFirstRun | No flows at this venue yet. Guests book through each type's default order until one is picked. Offers the flow-type cards and, from the Site Builder, the preset's flows in one step. |  |
+| emptyNoResults | The flow-type filter matched nothing and the venue's other flows are still there. Names the filter and offers to clear it. |  |
+| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `listBookingFlows` requires to show this screen, and names that permission (the screen's other reads need `GUEST_VIEW` and say so in their own panels). Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRODUCT_CONFIGURE` for `updateProduct`, `setProductCategories`; `PRODUCT_VIEW` for `listProducts`, `listProductCategories`; `TENANT_PUBLISH` for `publishTenantConfig`. |  |
 
 **Goes to**
 
@@ -1435,7 +1489,9 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | Repository | ticvai-venue-management (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-venue-management.git); assumed by the lead, not yet confirmed |
 | Component | `AppPublishing` |
 | Suggested location | `src/routes/white-label/AppPublishing.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (no client-approved design yet).** CMS-104 has no client-approved prototype view or frame. Build its structure from the screen spec, on the app shell's tokens (`screens/_design-tokens.yaml`) and state patterns (SETUP-SHELL-VENUE-MANAGEMENT). The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
 
 **Entry parameters**
 
@@ -1460,13 +1516,13 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The checklist and the builds, read by `getStoreAccounts` and `listAppBuilds`. |
-| error | Could not load. Names which read failed. |
-| emptyFirstRun | No build yet. Shows the checklist first: nothing can be built until the client's store account for the platform is recorded and a version is published. |
-| emptyNoResults | No build for the platform picked. Names it and offers the other. |
-| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `getStoreAccounts` requires to show this screen, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `AI_USE` for `createAiConversation`, `sendAiMessage`; `TENANT_PUBLISH` for `requestAppBuild`. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The checklist and the builds, read by `getStoreAccounts` and `listAppBuilds`. |  |
+| error | Could not load. Names which read failed. |  |
+| emptyFirstRun | No build yet. Shows the checklist first: nothing can be built until the client's store account for the platform is recorded and a version is published. |  |
+| emptyNoResults | No build for the platform picked. Names it and offers the other. |  |
+| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `getStoreAccounts` requires to show this screen, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `AI_USE` for `createAiConversation`, `sendAiMessage`; `TENANT_PUBLISH` for `requestAppBuild`. |  |
 
 **Goes to**
 

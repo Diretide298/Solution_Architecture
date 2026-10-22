@@ -13,6 +13,8 @@
 | Themes | light |
 | Directions | ltr, rtl |
 | Packages | design-tokens, ui, api-client |
+| Design tokens | P01 `handoff/design-tokens/guest-web.yaml` (the CSS variables of the approved prototype's theme() (tools/derive-design-tokens.py), applied per tenant from getPublishedTenantConfig's theme) |
+| App shell | ticvai-guest-web: SETUP-SHELL-GUEST-WEB |
 | target | browser |
 | distribution | CDN + edge |
 | bundleUpdate | immediate on deploy |
@@ -90,7 +92,11 @@
 | Repository | ticvai-guest-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-web.git) |
 | Component | `HomeLandingDashboard` |
 | Suggested location | `src/routes/discovery-and-browse/HomeLandingDashboard.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html` (rev 3 (pointer moved to the 30 September build, CHG-R1S-015)), view: Header 'Discover' (default view on load) (it shows part of this screen: build the rest from the screen spec in the same look). Wireframe frame `wireframes/P01 Guest Web.dc.html#web-001`, which adam_pull writes into the ticket folder as `wireframe-web-001.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-web.yaml`). Each state's look: loading: the turnstile loader (the prototype, lines 4950-4962, the block marked "TURNSTILE LOADER" (and flash() at 6984-6994, which opens it for 820 ms)); error: the status card of WEB-029 (Error / Sold out / Maintenance) (`wireframes/P01 Guest Web.dc.html#web-029`, pulled as `wireframe-web-029.html`); emptyFirstRun: the dashed empty card (the prototype, lines 3228-3235 (My tickets, "{{ tickets.emptyText }}") and 4640-4644 (Wishlist, "Nothing saved.")); emptyNoResults: the "Nothing matched" card (the prototype, lines 3084-3090 (Listing and search, "Nothing matched {{ list.filterText }}")); emptyNoAccess: the "Sign in to see your account" card (the prototype, lines 3314-3322 (My account, signed out)); offline: the offline banner and the paused actions (`wireframes/states/P01 Guest Web states.dc.html#web-state-offline`, pulled as `wireframe-web-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 1440×900 and 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Operations**
 
@@ -106,14 +112,14 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The home landing list. |
-| error | Could not load. Names which read failed and leaves the home landing untouched. |
-| emptyFirstRun | No home landing yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
-| emptyNoResults | Nothing is on sale at this venue today. Said in the tenant's voice, with Change venue; the homepage sections that do not list products stay. |
-| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The home landing list. | the turnstile loader, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 4950-4962, the block marked "TURNSTILE LOADER" (and flash() at 6984-6994, which opens it for 820 ms) |
+| error | Could not load. Names which read failed and leaves the home landing untouched. | the status card of WEB-029 (Error / Sold out / Maintenance), `wireframes/P01 Guest Web.dc.html#web-029` (pulled as `wireframe-web-029.html`) |
+| emptyFirstRun | No home landing yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. | the dashed empty card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3228-3235 (My tickets, "{{ tickets.emptyText }}") and 4640-4644 (Wishlist, "Nothing saved.") |
+| emptyNoResults | Nothing is on sale at this venue today. Said in the tenant's voice, with Change venue; the homepage sections that do not list products stay. | the "Nothing matched" card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3084-3090 (Listing and search, "Nothing matched {{ list.filterText }}") |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. | the "Sign in to see your account" card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3314-3322 (My account, signed out) |
+| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. | the offline banner and the paused actions, `wireframes/states/P01 Guest Web states.dc.html#web-state-offline` (pulled as `wireframe-web-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 
@@ -168,7 +174,11 @@
 | Repository | ticvai-guest-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-web.git) |
 | Component | `EventAndAttractionListingList` |
 | Suggested location | `src/routes/discovery-and-browse/EventAndAttractionListingList.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html` (rev 3 (30 September build; the view as verified on the 29 September build, CHG-R1S-015)), view: Header 'What's on'. Wireframe frame `wireframes/P01 Guest Web.dc.html#web-002`, which adam_pull writes into the ticket folder as `wireframe-web-002.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-web.yaml`). Each state's look: loading: the turnstile loader (the prototype, lines 4950-4962, the block marked "TURNSTILE LOADER" (and flash() at 6984-6994, which opens it for 820 ms)); error: the status card of WEB-029 (Error / Sold out / Maintenance) (`wireframes/P01 Guest Web.dc.html#web-029`, pulled as `wireframe-web-029.html`); emptyFirstRun: the dashed empty card (the prototype, lines 3228-3235 (My tickets, "{{ tickets.emptyText }}") and 4640-4644 (Wishlist, "Nothing saved.")); emptyNoResults: the "Nothing matched" card (the prototype, lines 3084-3090 (Listing and search, "Nothing matched {{ list.filterText }}")); emptyNoAccess: the "Sign in to see your account" card (the prototype, lines 3314-3322 (My account, signed out)); offline: the offline banner and the paused actions (`wireframes/states/P01 Guest Web states.dc.html#web-state-offline`, pulled as `wireframe-web-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 1440×900 and 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -190,14 +200,14 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The event attraction listing list. |
-| error | Could not load. Names which read failed and leaves the event attraction listing untouched. |
-| emptyFirstRun | No event attraction listing yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
-| emptyNoResults | Nothing matches the search, category or date picked, and the other events are still there. Names what was picked and offers to clear it. |
-| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The event attraction listing list. | the turnstile loader, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 4950-4962, the block marked "TURNSTILE LOADER" (and flash() at 6984-6994, which opens it for 820 ms) |
+| error | Could not load. Names which read failed and leaves the event attraction listing untouched. | the status card of WEB-029 (Error / Sold out / Maintenance), `wireframes/P01 Guest Web.dc.html#web-029` (pulled as `wireframe-web-029.html`) |
+| emptyFirstRun | No event attraction listing yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. | the dashed empty card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3228-3235 (My tickets, "{{ tickets.emptyText }}") and 4640-4644 (Wishlist, "Nothing saved.") |
+| emptyNoResults | Nothing matches the search, category or date picked, and the other events are still there. Names what was picked and offers to clear it. | the "Nothing matched" card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3084-3090 (Listing and search, "Nothing matched {{ list.filterText }}") |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. | the "Sign in to see your account" card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3314-3322 (My account, signed out) |
+| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. | the offline banner and the paused actions, `wireframes/states/P01 Guest Web states.dc.html#web-state-offline` (pulled as `wireframe-web-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 
@@ -219,7 +229,11 @@
 | Repository | ticvai-guest-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-web.git) |
 | Component | `SearchResultsList` |
 | Suggested location | `src/routes/discovery-and-browse/SearchResultsList.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html` (rev 3 (pointer moved to the 30 September build, CHG-R1S-015)), view: Discover → search box in the hero (opens the search panel) → Enter lands on What's on filtered by the query (it shows part of this screen: build the rest from the screen spec in the same look). Wireframe frame `wireframes/P01 Guest Web.dc.html#web-003`, which adam_pull writes into the ticket folder as `wireframe-web-003.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-web.yaml`). Each state's look: loading: the turnstile loader (the prototype, lines 4950-4962, the block marked "TURNSTILE LOADER" (and flash() at 6984-6994, which opens it for 820 ms)); error: the status card of WEB-029 (Error / Sold out / Maintenance) (`wireframes/P01 Guest Web.dc.html#web-029`, pulled as `wireframe-web-029.html`); emptyFirstRun: the dashed empty card (the prototype, lines 3228-3235 (My tickets, "{{ tickets.emptyText }}") and 4640-4644 (Wishlist, "Nothing saved.")); emptyNoResults: the "Nothing matched" card (the prototype, lines 3084-3090 (Listing and search, "Nothing matched {{ list.filterText }}")); emptyNoAccess: the "Sign in to see your account" card (the prototype, lines 3314-3322 (My account, signed out)); offline: the offline banner and the paused actions (`wireframes/states/P01 Guest Web states.dc.html#web-state-offline`, pulled as `wireframe-web-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 1440×900 and 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Operations**
 
@@ -230,14 +244,14 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The search results list. |
-| error | Could not load. Names which read failed and leaves the search results untouched. |
-| emptyFirstRun | No search results yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
-| emptyNoResults | Nothing matches what was typed. Names the search, suggests a shorter one and offers to clear it; a sold-out match is shown as sold out, not hidden. |
-| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | The offline banner shows. Results come only from what was already loaded, with a note that newer items may exist. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The search results list. | the turnstile loader, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 4950-4962, the block marked "TURNSTILE LOADER" (and flash() at 6984-6994, which opens it for 820 ms) |
+| error | Could not load. Names which read failed and leaves the search results untouched. | the status card of WEB-029 (Error / Sold out / Maintenance), `wireframes/P01 Guest Web.dc.html#web-029` (pulled as `wireframe-web-029.html`) |
+| emptyFirstRun | No search results yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. | the dashed empty card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3228-3235 (My tickets, "{{ tickets.emptyText }}") and 4640-4644 (Wishlist, "Nothing saved.") |
+| emptyNoResults | Nothing matches what was typed. Names the search, suggests a shorter one and offers to clear it; a sold-out match is shown as sold out, not hidden. | the "Nothing matched" card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3084-3090 (Listing and search, "Nothing matched {{ list.filterText }}") |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. | the "Sign in to see your account" card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3314-3322 (My account, signed out) |
+| offline | The offline banner shows. Results come only from what was already loaded, with a note that newer items may exist. | the offline banner and the paused actions, `wireframes/states/P01 Guest Web states.dc.html#web-state-offline` (pulled as `wireframe-web-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 
@@ -259,7 +273,11 @@
 | Repository | ticvai-guest-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-web.git) |
 | Component | `EventAttractionDetail` |
 | Suggested location | `src/routes/discovery-and-browse/EventAttractionDetail.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html` (rev 3 (30 September build; the view as verified on the 29 September build, CHG-R1S-015)), view: Config → Marketing layer → 'Single-event page' on, then Book; or any product card → 'Read more' dialog; or a listing card's preview aside (it shows part of this screen: build the rest from the screen spec in the same look). Wireframe frame `wireframes/P01 Guest Web.dc.html#web-004`, which adam_pull writes into the ticket folder as `wireframe-web-004.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-web.yaml`). Each state's look: loading: the turnstile loader (the prototype, lines 4950-4962, the block marked "TURNSTILE LOADER" (and flash() at 6984-6994, which opens it for 820 ms)); videoBuffering: the poster frame in the video's place (the prototype, lines 473-475 (the event hero, "{{ evt.poster }}" under the video) and 841 (an attraction's media, data-poster with onError and onStalled ending the clip)); videoUnavailable: the poster frame in the video's place (the prototype, lines 473-475 (the event hero, "{{ evt.poster }}" under the video) and 841 (an attraction's media, data-poster with onError and onStalled ending the clip)); error: the status card of WEB-029 (Error / Sold out / Maintenance) (`wireframes/P01 Guest Web.dc.html#web-029`, pulled as `wireframe-web-029.html`); emptyFirstRun: the dashed empty card (the prototype, lines 3228-3235 (My tickets, "{{ tickets.emptyText }}") and 4640-4644 (Wishlist, "Nothing saved.")); emptyNoResults: the "Nothing matched" card (the prototype, lines 3084-3090 (Listing and search, "Nothing matched {{ list.filterText }}")); emptyNoAccess: the "Sign in to see your account" card (the prototype, lines 3314-3322 (My account, signed out)); offline: the offline banner and the paused actions (`wireframes/states/P01 Guest Web states.dc.html#web-state-offline`, pulled as `wireframe-web-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 1440×900 and 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -282,16 +300,16 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The video is not part of loading (client meeting 30 September, MoM 4.8): the attraction renders as it arrives and no loader or loading screen is ever drawn over the video. |
-| videoBuffering | Poster frame, not a loader (client meeting 30 September, MoM 4.8): until the first frames arrive the poster (primary image, else the video's first frame) fills the video area and playback starts in place as soon as it can; no spinner, overlay or blocking screen. The details beside it stay usable throughout. |
-| videoUnavailable | The video cannot play (no video, a failed stream, data saver on). The poster stays and the details are unaffected; no error screen and no loader. |
-| error | Could not load. Names which read failed and leaves the attraction untouched. |
-| emptyFirstRun | No attraction yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
-| emptyNoResults | No performance in the next days shown; the strip says so and offers the calendar. |
-| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The video is not part of loading (client meeting 30 September, MoM 4.8): the attraction renders as it arrives and no loader or loading screen is ever drawn over the video. | the turnstile loader, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 4950-4962, the block marked "TURNSTILE LOADER" (and flash() at 6984-6994, which opens it for 820 ms) |
+| videoBuffering | Poster frame, not a loader (client meeting 30 September, MoM 4.8): until the first frames arrive the poster (primary image, else the video's first frame) fills the video area and playback starts in place as soon as it can; no spinner, overlay or blocking screen. The details beside it stay usable throughout. | the poster frame in the video's place, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 473-475 (the event hero, "{{ evt.poster }}" under the video) and 841 (an attraction's media, data-poster with onError and onStalled ending the clip) |
+| videoUnavailable | The video cannot play (no video, a failed stream, data saver on). The poster stays and the details are unaffected; no error screen and no loader. | the poster frame in the video's place, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 473-475 (the event hero, "{{ evt.poster }}" under the video) and 841 (an attraction's media, data-poster with onError and onStalled ending the clip) |
+| error | Could not load. Names which read failed and leaves the attraction untouched. | the status card of WEB-029 (Error / Sold out / Maintenance), `wireframes/P01 Guest Web.dc.html#web-029` (pulled as `wireframe-web-029.html`) |
+| emptyFirstRun | No attraction yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. | the dashed empty card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3228-3235 (My tickets, "{{ tickets.emptyText }}") and 4640-4644 (Wishlist, "Nothing saved.") |
+| emptyNoResults | No performance in the next days shown; the strip says so and offers the calendar. | the "Nothing matched" card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3084-3090 (Listing and search, "Nothing matched {{ list.filterText }}") |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. | the "Sign in to see your account" card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3314-3322 (My account, signed out) |
+| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. | the offline banner and the paused actions, `wireframes/states/P01 Guest Web states.dc.html#web-state-offline` (pulled as `wireframe-web-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 
@@ -317,7 +335,11 @@
 | Repository | ticvai-guest-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-web.git) |
 | Component | `TicketTypeSelectionForm` |
 | Suggested location | `src/routes/booking-and-selection/TicketTypeSelectionForm.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html` (rev 3 (30 September build)), view: Engine controls → Theme park → Multi-park combo → Book → Fri → 2 park ticket → three adults (the counters take the 2 park ticket's price; one cart line) (it shows part of this screen: build the rest from the screen spec in the same look). Wireframe frame `wireframes/P01 Guest Web.dc.html#web-005`, which adam_pull writes into the ticket folder as `wireframe-web-005.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-web.yaml`). Each state's look: loading: the turnstile loader (the prototype, lines 4950-4962, the block marked "TURNSTILE LOADER" (and flash() at 6984-6994, which opens it for 820 ms)); error: the status card of WEB-029 (Error / Sold out / Maintenance) (`wireframes/P01 Guest Web.dc.html#web-029`, pulled as `wireframe-web-029.html`); emptyFirstRun: the dashed empty card (the prototype, lines 3228-3235 (My tickets, "{{ tickets.emptyText }}") and 4640-4644 (Wishlist, "Nothing saved.")); emptyNoResults: the "Nothing matched" card (the prototype, lines 3084-3090 (Listing and search, "Nothing matched {{ list.filterText }}")); emptyNoAccess: the "Sign in to see your account" card (the prototype, lines 3314-3322 (My account, signed out)); offline: the offline banner and the paused actions (`wireframes/states/P01 Guest Web states.dc.html#web-state-offline`, pulled as `wireframe-web-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 1440×900 and 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -341,14 +363,14 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The ticket type selection list. |
-| error | Could not load. Names which read failed and leaves the ticket type selection untouched. |
-| emptyFirstRun | No ticket type selection yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
-| emptyNoResults | Never shown: `listProductVariants` takes no filter, so an empty list is always the first-run state above. |
-| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The ticket type selection list. | the turnstile loader, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 4950-4962, the block marked "TURNSTILE LOADER" (and flash() at 6984-6994, which opens it for 820 ms) |
+| error | Could not load. Names which read failed and leaves the ticket type selection untouched. | the status card of WEB-029 (Error / Sold out / Maintenance), `wireframes/P01 Guest Web.dc.html#web-029` (pulled as `wireframe-web-029.html`) |
+| emptyFirstRun | No ticket type selection yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. | the dashed empty card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3228-3235 (My tickets, "{{ tickets.emptyText }}") and 4640-4644 (Wishlist, "Nothing saved.") |
+| emptyNoResults | Never shown: `listProductVariants` takes no filter, so an empty list is always the first-run state above. | the "Nothing matched" card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3084-3090 (Listing and search, "Nothing matched {{ list.filterText }}") |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. | the "Sign in to see your account" card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3314-3322 (My account, signed out) |
+| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. | the offline banner and the paused actions, `wireframes/states/P01 Guest Web states.dc.html#web-state-offline` (pulled as `wireframe-web-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 
@@ -374,7 +396,11 @@
 | Repository | ticvai-guest-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-web.git) |
 | Component | `DateAndSessionSelectionForm` |
 | Suggested location | `src/routes/booking-and-selection/DateAndSessionSelectionForm.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | statusTracker |
+| Layout pattern | statusTracker (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html` (rev 3 (30 September build)), view: Engine controls → Water park → Surf sessions with filters → Book → Intermediate surf 09:00 → able to swim → one surfer (the session's tickets appear once it is chosen) (it shows part of this screen: build the rest from the screen spec in the same look). Wireframe frame `wireframes/P01 Guest Web.dc.html#web-006`, which adam_pull writes into the ticket folder as `wireframe-web-006.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-web.yaml`). Each state's look: loading: the turnstile loader (the prototype, lines 4950-4962, the block marked "TURNSTILE LOADER" (and flash() at 6984-6994, which opens it for 820 ms)); error: the status card of WEB-029 (Error / Sold out / Maintenance) (`wireframes/P01 Guest Web.dc.html#web-029`, pulled as `wireframe-web-029.html`); emptyFirstRun: the dashed empty card (the prototype, lines 3228-3235 (My tickets, "{{ tickets.emptyText }}") and 4640-4644 (Wishlist, "Nothing saved.")); emptyNoAccess: the "Sign in to see your account" card (the prototype, lines 3314-3322 (My account, signed out)); offline: the offline banner and the paused actions (`wireframes/states/P01 Guest Web states.dc.html#web-state-offline`, pulled as `wireframe-web-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyNoResults: the "Nothing matched" card (the prototype, lines 3084-3090 (Listing and search, "Nothing matched {{ list.filterText }}")). The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 1440×900 and 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -406,14 +432,14 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The date session selection, read by `getPerformance`. |
-| error | Could not load. Names which read failed and leaves the date session selection untouched. |
-| emptyFirstRun | No date session selection yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
-| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
-| emptyNoResults | No time matches the part of the day or the language picked, and the other times are still there. Names the filter and offers to clear it. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The date session selection, read by `getPerformance`. | the turnstile loader, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 4950-4962, the block marked "TURNSTILE LOADER" (and flash() at 6984-6994, which opens it for 820 ms) |
+| error | Could not load. Names which read failed and leaves the date session selection untouched. | the status card of WEB-029 (Error / Sold out / Maintenance), `wireframes/P01 Guest Web.dc.html#web-029` (pulled as `wireframe-web-029.html`) |
+| emptyFirstRun | No date session selection yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. | the dashed empty card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3228-3235 (My tickets, "{{ tickets.emptyText }}") and 4640-4644 (Wishlist, "Nothing saved.") |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. | the "Sign in to see your account" card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3314-3322 (My account, signed out) |
+| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. | the offline banner and the paused actions, `wireframes/states/P01 Guest Web states.dc.html#web-state-offline` (pulled as `wireframe-web-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyNoResults | No time matches the part of the day or the language picked, and the other times are still there. Names the filter and offers to clear it. | the "Nothing matched" card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3084-3090 (Listing and search, "Nothing matched {{ list.filterText }}") |
 
 **Goes to**
 
@@ -438,7 +464,11 @@
 | Repository | ticvai-guest-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-web.git) |
 | Component | `SeatMapSelectionCanvas` |
 | Suggested location | `src/routes/booking-and-selection/SeatMapSelectionCanvas.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | statusTracker |
+| Layout pattern | statusTracker (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html` (rev 3 (30 September build; the view as verified on the 29 September build, CHG-R1S-015)), view: Union Arena → 'Flow 1 · Fixed date → zone → seat map' or 'Flow 2 · Choose date & time → seat map'; Grand Playhouse → Flow 1 / Flow 2. Wireframe frame `wireframes/P01 Guest Web.dc.html#web-007`, which adam_pull writes into the ticket folder as `wireframe-web-007.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-web.yaml`). Each state's look: loading: the turnstile loader (the prototype, lines 4950-4962, the block marked "TURNSTILE LOADER" (and flash() at 6984-6994, which opens it for 820 ms)); error: the status card of WEB-029 (Error / Sold out / Maintenance) (`wireframes/P01 Guest Web.dc.html#web-029`, pulled as `wireframe-web-029.html`); emptyFirstRun: the dashed "Choose ... to see the seats" note (the prototype, lines 1718-1720 (the seat step, "{{ aud.waitText }}"), under "Choose your seats"); emptyNoAccess: the "Sign in to see your account" card (the prototype, lines 3314-3322 (My account, signed out)); offline: the offline banner and the paused actions (`wireframes/states/P01 Guest Web states.dc.html#web-state-offline`, pulled as `wireframe-web-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyNoResults: the "Nothing matched" card (the prototype, lines 3084-3090 (Listing and search, "Nothing matched {{ list.filterText }}")). The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 1440×900 and 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -464,14 +494,14 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The interactive seat selection, read by `getSeatAvailability`. |
-| error | Could not load. Names which read failed and leaves the interactive seat selection untouched. |
-| emptyFirstRun | No interactive seat selection yet. Offers Create seat hold (`createSeatHold`). |
-| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
-| emptyNoResults | The event has no other time to switch to on the time bar; the chosen performance stays. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The interactive seat selection, read by `getSeatAvailability`. | the turnstile loader, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 4950-4962, the block marked "TURNSTILE LOADER" (and flash() at 6984-6994, which opens it for 820 ms) |
+| error | Could not load. Names which read failed and leaves the interactive seat selection untouched. | the status card of WEB-029 (Error / Sold out / Maintenance), `wireframes/P01 Guest Web.dc.html#web-029` (pulled as `wireframe-web-029.html`) |
+| emptyFirstRun | No interactive seat selection yet. Offers Create seat hold (`createSeatHold`). | the dashed "Choose ... to see the seats" note, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 1718-1720 (the seat step, "{{ aud.waitText }}"), under "Choose your seats" |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. | the "Sign in to see your account" card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3314-3322 (My account, signed out) |
+| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. | the offline banner and the paused actions, `wireframes/states/P01 Guest Web states.dc.html#web-state-offline` (pulled as `wireframe-web-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyNoResults | The event has no other time to switch to on the time bar; the chosen performance stays. | the "Nothing matched" card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3084-3090 (Listing and search, "Nothing matched {{ list.filterText }}") |
 
 **Goes to**
 
@@ -495,7 +525,11 @@
 | Repository | ticvai-guest-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-web.git) |
 | Component | `AddOnsAndUpsellDetail` |
 | Suggested location | `src/routes/booking-and-selection/AddOnsAndUpsellDetail.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | statusTracker |
+| Layout pattern | statusTracker (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html` (rev 3 (pointer moved to the 30 September build, CHG-R1S-015)), view: Book → 'Extras' step (e.g. Summit Peaks → Dated day pass → Continue). Wireframe frame `wireframes/P01 Guest Web.dc.html#web-008`, which adam_pull writes into the ticket folder as `wireframe-web-008.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-web.yaml`). Each state's look: loading: the turnstile loader (the prototype, lines 4950-4962, the block marked "TURNSTILE LOADER" (and flash() at 6984-6994, which opens it for 820 ms)); error: the status card of WEB-029 (Error / Sold out / Maintenance) (`wireframes/P01 Guest Web.dc.html#web-029`, pulled as `wireframe-web-029.html`); emptyFirstRun: the dashed empty card (the prototype, lines 3228-3235 (My tickets, "{{ tickets.emptyText }}") and 4640-4644 (Wishlist, "Nothing saved.")); emptyNoAccess: the "Sign in to see your account" card (the prototype, lines 3314-3322 (My account, signed out)); offline: the offline banner and the paused actions (`wireframes/states/P01 Guest Web states.dc.html#web-state-offline`, pulled as `wireframe-web-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 1440×900 and 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -517,13 +551,13 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The add-ons, read by `decideRecommendations`. |
-| error | Could not load. Names which read failed and leaves the add-ons upsell untouched. |
-| emptyFirstRun | No add-ons for this booking: the step is skipped and Continue goes on to sign-in. |
-| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The add-ons, read by `decideRecommendations`. | the turnstile loader, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 4950-4962, the block marked "TURNSTILE LOADER" (and flash() at 6984-6994, which opens it for 820 ms) |
+| error | Could not load. Names which read failed and leaves the add-ons upsell untouched. | the status card of WEB-029 (Error / Sold out / Maintenance), `wireframes/P01 Guest Web.dc.html#web-029` (pulled as `wireframe-web-029.html`) |
+| emptyFirstRun | No add-ons for this booking: the step is skipped and Continue goes on to sign-in. | the dashed empty card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3228-3235 (My tickets, "{{ tickets.emptyText }}") and 4640-4644 (Wishlist, "Nothing saved.") |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. | the "Sign in to see your account" card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3314-3322 (My account, signed out) |
+| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. | the offline banner and the paused actions, `wireframes/states/P01 Guest Web states.dc.html#web-state-offline` (pulled as `wireframe-web-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 
@@ -547,7 +581,11 @@
 | Repository | ticvai-guest-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-web.git) |
 | Component | `WishlistDetail` |
 | Suggested location | `src/routes/booking-and-selection/WishlistDetail.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | statusTracker |
+| Layout pattern | statusTracker (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html` (rev 3 (pointer moved to the 30 September build, CHG-R1S-015)), view: Discover → 'Wishlist' link (discoverLinks). Wireframe frame `wireframes/P01 Guest Web.dc.html#web-009`, which adam_pull writes into the ticket folder as `wireframe-web-009.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-web.yaml`). Each state's look: loading: the turnstile loader (the prototype, lines 4950-4962, the block marked "TURNSTILE LOADER" (and flash() at 6984-6994, which opens it for 820 ms)); error: the status card of WEB-029 (Error / Sold out / Maintenance) (`wireframes/P01 Guest Web.dc.html#web-029`, pulled as `wireframe-web-029.html`); emptyFirstRun: the dashed empty card (the prototype, lines 3228-3235 (My tickets, "{{ tickets.emptyText }}") and 4640-4644 (Wishlist, "Nothing saved.")); emptyNoAccess: the "Sign in to see your account" card (the prototype, lines 3314-3322 (My account, signed out)); offline: the offline banner and the paused actions (`wireframes/states/P01 Guest Web states.dc.html#web-state-offline`, pulled as `wireframe-web-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 1440×900 and 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -566,13 +604,13 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | Saved items load |
-| error | Could not load |
-| emptyFirstRun | Nothing saved — explains what the list is for |
-| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | Saved items load | the turnstile loader, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 4950-4962, the block marked "TURNSTILE LOADER" (and flash() at 6984-6994, which opens it for 820 ms) |
+| error | Could not load | the status card of WEB-029 (Error / Sold out / Maintenance), `wireframes/P01 Guest Web.dc.html#web-029` (pulled as `wireframe-web-029.html`) |
+| emptyFirstRun | Nothing saved — explains what the list is for | the dashed empty card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3228-3235 (My tickets, "{{ tickets.emptyText }}") and 4640-4644 (Wishlist, "Nothing saved.") |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. | the "Sign in to see your account" card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3314-3322 (My account, signed out) |
+| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. | the offline banner and the paused actions, `wireframes/states/P01 Guest Web states.dc.html#web-state-offline` (pulled as `wireframe-web-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 
@@ -594,7 +632,11 @@
 | Repository | ticvai-guest-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-web.git) |
 | Component | `ShoppingCartDetail` |
 | Suggested location | `src/routes/cart-and-checkout/ShoppingCartDetail.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | statusTracker |
+| Layout pattern | statusTracker (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html` (rev 3 (pointer moved to the 30 September build, CHG-R1S-015)), view: Visible on every booking step as the cart sidebar (Config → Layout & locale → 'Cart & summary' changes it to slide-in, bottom sheet, floating icon or single column) (it shows part of this screen: build the rest from the screen spec in the same look). Wireframe frame `wireframes/P01 Guest Web.dc.html#web-010`, which adam_pull writes into the ticket folder as `wireframe-web-010.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-web.yaml`). Each state's look: loading: the turnstile loader (the prototype, lines 4950-4962, the block marked "TURNSTILE LOADER" (and flash() at 6984-6994, which opens it for 820 ms)); error: the status card of WEB-029 (Error / Sold out / Maintenance) (`wireframes/P01 Guest Web.dc.html#web-029`, pulled as `wireframe-web-029.html`); emptyFirstRun: the dashed empty card (the prototype, lines 3228-3235 (My tickets, "{{ tickets.emptyText }}") and 4640-4644 (Wishlist, "Nothing saved.")); emptyNoAccess: the "Sign in to see your account" card (the prototype, lines 3314-3322 (My account, signed out)); offline: the offline banner and the paused actions (`wireframes/states/P01 Guest Web states.dc.html#web-state-offline`, pulled as `wireframe-web-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 1440×900 and 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -628,13 +670,13 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The shopping cart, read by `getCart`. |
-| error | Could not load. Names which read failed and leaves the shopping cart untouched. |
-| emptyFirstRun | No shopping cart yet. Offers Add cart line (`addCartLine`). |
-| emptyNoAccess | The cart is open to anyone — signed in, unverified or anonymous (ADR-0045, 18 September 2026). Nobody is turned away from it. The fork between signing in and continuing as a guest waits on `WEB-011`, and `checkoutCart` is what refuses. |
-| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The shopping cart, read by `getCart`. | the turnstile loader, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 4950-4962, the block marked "TURNSTILE LOADER" (and flash() at 6984-6994, which opens it for 820 ms) |
+| error | Could not load. Names which read failed and leaves the shopping cart untouched. | the status card of WEB-029 (Error / Sold out / Maintenance), `wireframes/P01 Guest Web.dc.html#web-029` (pulled as `wireframe-web-029.html`) |
+| emptyFirstRun | No shopping cart yet. Offers Add cart line (`addCartLine`). | the dashed empty card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3228-3235 (My tickets, "{{ tickets.emptyText }}") and 4640-4644 (Wishlist, "Nothing saved.") |
+| emptyNoAccess | The cart is open to anyone — signed in, unverified or anonymous (ADR-0045, 18 September 2026). Nobody is turned away from it. The fork between signing in and continuing as a guest waits on `WEB-011`, and `checkoutCart` is what refuses. | the "Sign in to see your account" card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3314-3322 (My account, signed out) |
+| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. | the offline banner and the paused actions, `wireframes/states/P01 Guest Web states.dc.html#web-state-offline` (pulled as `wireframe-web-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 
@@ -660,7 +702,11 @@
 | Repository | ticvai-guest-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-web.git) |
 | Component | `GuestDetailsAndAttendeeFormsForm` |
 | Suggested location | `src/routes/cart-and-checkout/GuestDetailsAndAttendeeFormsForm.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html` (rev 3 (pointer moved to the 30 September build, CHG-R1S-015)), view: Book → 'Your details' step (after Extras). Wireframe frame `wireframes/P01 Guest Web.dc.html#web-011`, which adam_pull writes into the ticket folder as `wireframe-web-011.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-web.yaml`). Each state's look: loading: the turnstile loader (the prototype, lines 4950-4962, the block marked "TURNSTILE LOADER" (and flash() at 6984-6994, which opens it for 820 ms)); error: the status card of WEB-029 (Error / Sold out / Maintenance) (`wireframes/P01 Guest Web.dc.html#web-029`, pulled as `wireframe-web-029.html`); emptyFirstRun: the dashed empty card (the prototype, lines 3228-3235 (My tickets, "{{ tickets.emptyText }}") and 4640-4644 (Wishlist, "Nothing saved.")); emptyNoResults: the "Nothing matched" card (the prototype, lines 3084-3090 (Listing and search, "Nothing matched {{ list.filterText }}")); emptyNoAccess: the "Sign in to see your account" card (the prototype, lines 3314-3322 (My account, signed out)); offline: the offline banner and the paused actions (`wireframes/states/P01 Guest Web states.dc.html#web-state-offline`, pulled as `wireframe-web-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 1440×900 and 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -685,14 +731,14 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The guest attendee forms list. |
-| error | Could not load. Names which read failed and leaves the guest attendee forms untouched. |
-| emptyFirstRun | Nothing to fill in: continue to payment. The step is normally skipped when the cart needs no details, holders or consent answers (F01 step 6). |
-| emptyNoResults | Never shown: `listGuestDevices` takes no filter, so an empty list is always the first-run state above. |
-| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | Not available, and the offline banner says why. A payment needs the gateway, and pretending otherwise takes money nobody can confirm. What was typed stays on screen so nothing is entered twice. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The guest attendee forms list. | the turnstile loader, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 4950-4962, the block marked "TURNSTILE LOADER" (and flash() at 6984-6994, which opens it for 820 ms) |
+| error | Could not load. Names which read failed and leaves the guest attendee forms untouched. | the status card of WEB-029 (Error / Sold out / Maintenance), `wireframes/P01 Guest Web.dc.html#web-029` (pulled as `wireframe-web-029.html`) |
+| emptyFirstRun | Nothing to fill in: continue to payment. The step is normally skipped when the cart needs no details, holders or consent answers (F01 step 6). | the dashed empty card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3228-3235 (My tickets, "{{ tickets.emptyText }}") and 4640-4644 (Wishlist, "Nothing saved.") |
+| emptyNoResults | Never shown: `listGuestDevices` takes no filter, so an empty list is always the first-run state above. | the "Nothing matched" card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3084-3090 (Listing and search, "Nothing matched {{ list.filterText }}") |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. | the "Sign in to see your account" card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3314-3322 (My account, signed out) |
+| offline | Not available, and the offline banner says why. A payment needs the gateway, and pretending otherwise takes money nobody can confirm. What was typed stays on screen so nothing is entered twice. | the offline banner and the paused actions, `wireframes/states/P01 Guest Web states.dc.html#web-state-offline` (pulled as `wireframe-web-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 
@@ -716,7 +762,11 @@
 | Repository | ticvai-guest-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-web.git) |
 | Component | `CheckoutPaymentForm` |
 | Suggested location | `src/routes/cart-and-checkout/CheckoutPaymentForm.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | statusTracker |
+| Layout pattern | statusTracker (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html` (rev 3 (pointer moved to the 30 September build, CHG-R1S-015)), view: Book → 'Payment' step; Config → Layout & locale → 'Payment outcome (demo)' = Interrupted / Declined for the failure states; Config → Steps & cards → 'Guest checkout (code proof)' for the guest route (it shows part of this screen: build the rest from the screen spec in the same look). Wireframe frame `wireframes/P01 Guest Web.dc.html#web-012`, which adam_pull writes into the ticket folder as `wireframe-web-012.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-web.yaml`). Each state's look: loading: the turnstile loader (the prototype, lines 4950-4962, the block marked "TURNSTILE LOADER" (and flash() at 6984-6994, which opens it for 820 ms)); error: the status card of WEB-029 (Error / Sold out / Maintenance) (`wireframes/P01 Guest Web.dc.html#web-029`, pulled as `wireframe-web-029.html`); emptyFirstRun: the dashed empty card (the prototype, lines 3228-3235 (My tickets, "{{ tickets.emptyText }}") and 4640-4644 (Wishlist, "Nothing saved.")); emptyNoAccess: the "Sign in to see your account" card (the prototype, lines 3314-3322 (My account, signed out)); offline: the offline banner and the paused actions (`wireframes/states/P01 Guest Web states.dc.html#web-state-offline`, pulled as `wireframe-web-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 1440×900 and 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -740,13 +790,13 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The checkout payment, read by `getOrder`. |
-| error | Could not load. Names which read failed and leaves the checkout payment untouched. |
-| emptyFirstRun | No checkout payment yet. Offers Create order (`createOrder`). |
-| emptyNoAccess | Shown when the caller lacks `ORDER_VIEW`, which `getOrder` requires to show this screen, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_CREATE` for `createPayment`, `inquirePaymentStatus`. |
-| offline | Not available, and the offline banner says why. A payment needs the gateway, and pretending otherwise takes money nobody can confirm. What was typed stays on screen so nothing is entered twice. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The checkout payment, read by `getOrder`. | the turnstile loader, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 4950-4962, the block marked "TURNSTILE LOADER" (and flash() at 6984-6994, which opens it for 820 ms) |
+| error | Could not load. Names which read failed and leaves the checkout payment untouched. | the status card of WEB-029 (Error / Sold out / Maintenance), `wireframes/P01 Guest Web.dc.html#web-029` (pulled as `wireframe-web-029.html`) |
+| emptyFirstRun | No checkout payment yet. Offers Create order (`createOrder`). | the dashed empty card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3228-3235 (My tickets, "{{ tickets.emptyText }}") and 4640-4644 (Wishlist, "Nothing saved.") |
+| emptyNoAccess | Shown when the caller lacks `ORDER_VIEW`, which `getOrder` requires to show this screen, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_CREATE` for `createPayment`, `inquirePaymentStatus`. | the "Sign in to see your account" card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3314-3322 (My account, signed out) |
+| offline | Not available, and the offline banner says why. A payment needs the gateway, and pretending otherwise takes money nobody can confirm. What was typed stays on screen so nothing is entered twice. | the offline banner and the paused actions, `wireframes/states/P01 Guest Web states.dc.html#web-state-offline` (pulled as `wireframe-web-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 
@@ -770,7 +820,11 @@
 | Repository | ticvai-guest-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-web.git) |
 | Component | `OrderConfirmationDetail` |
 | Suggested location | `src/routes/cart-and-checkout/OrderConfirmationDetail.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | statusTracker |
+| Layout pattern | statusTracker (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html` (rev 3 (pointer moved to the 30 September build, CHG-R1S-015)), view: Book → final step 'Confirmed' after paying. Wireframe frame `wireframes/P01 Guest Web.dc.html#web-013`, which adam_pull writes into the ticket folder as `wireframe-web-013.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-web.yaml`). Each state's look: loading: the turnstile loader (the prototype, lines 4950-4962, the block marked "TURNSTILE LOADER" (and flash() at 6984-6994, which opens it for 820 ms)); error: the status card of WEB-029 (Error / Sold out / Maintenance) (`wireframes/P01 Guest Web.dc.html#web-029`, pulled as `wireframe-web-029.html`); emptyFirstRun: the dashed empty card (the prototype, lines 3228-3235 (My tickets, "{{ tickets.emptyText }}") and 4640-4644 (Wishlist, "Nothing saved.")); emptyNoAccess: the "Sign in to see your account" card (the prototype, lines 3314-3322 (My account, signed out)); offline: the offline banner and the paused actions (`wireframes/states/P01 Guest Web states.dc.html#web-state-offline`, pulled as `wireframe-web-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 1440×900 and 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -790,13 +844,13 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The booking confirmation, read by `getOrder`. |
-| error | Could not load. Names which read failed and leaves the booking confirmation untouched. |
-| emptyFirstRun | No booking confirmation yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
-| emptyNoAccess | Shown when the caller lacks `ORDER_VIEW`, which `getOrder` requires to show this screen, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `GUEST_VIEW` for `verifyGuestEmail`; `ORDER_REPRINT` for `reprintOrder`. |
-| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The booking confirmation, read by `getOrder`. | the turnstile loader, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 4950-4962, the block marked "TURNSTILE LOADER" (and flash() at 6984-6994, which opens it for 820 ms) |
+| error | Could not load. Names which read failed and leaves the booking confirmation untouched. | the status card of WEB-029 (Error / Sold out / Maintenance), `wireframes/P01 Guest Web.dc.html#web-029` (pulled as `wireframe-web-029.html`) |
+| emptyFirstRun | No booking confirmation yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. | the dashed empty card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3228-3235 (My tickets, "{{ tickets.emptyText }}") and 4640-4644 (Wishlist, "Nothing saved.") |
+| emptyNoAccess | Shown when the caller lacks `ORDER_VIEW`, which `getOrder` requires to show this screen, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `GUEST_VIEW` for `verifyGuestEmail`; `ORDER_REPRINT` for `reprintOrder`. | the "Sign in to see your account" card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3314-3322 (My account, signed out) |
+| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. | the offline banner and the paused actions, `wireframes/states/P01 Guest Web states.dc.html#web-state-offline` (pulled as `wireframe-web-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 
@@ -821,7 +875,9 @@
 | Repository | ticvai-guest-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-web.git) |
 | Component | `PayByLinkForm` |
 | Suggested location | `src/routes/cart-and-checkout/PayByLinkForm.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | statusTracker |
+| Layout pattern | statusTracker (structure only, not the look) |
+
+**Design (no client-approved design yet).** WEB-014 has no client-approved prototype view or frame. Build its structure from the screen spec, on the app shell's tokens (`handoff/design-tokens/guest-web.yaml`) and state patterns (SETUP-SHELL-GUEST-WEB). The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
 
 **Entry parameters**
 
@@ -838,13 +894,13 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The lines and the total, with the deadline counting down. |
-| error | Could not load the booking. The hold is unaffected — a failed page load must not release inventory. |
-| emptyFirstRun | Not reachable empty — a link always names an order. An empty state here means the token did not resolve, which is the error state. |
-| emptyNoAccess | The token is the credential, so there is no permission case — either it resolves or it has gone. |
-| offline | Not available, and the offline banner says why. A payment needs the gateway, and pretending otherwise takes money nobody can confirm. What was typed stays on screen so nothing is entered twice. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The lines and the total, with the deadline counting down. |  |
+| error | Could not load the booking. The hold is unaffected — a failed page load must not release inventory. |  |
+| emptyFirstRun | Not reachable empty — a link always names an order. An empty state here means the token did not resolve, which is the error state. |  |
+| emptyNoAccess | The token is the credential, so there is no permission case — either it resolves or it has gone. |  |
+| offline | Not available, and the offline banner says why. A payment needs the gateway, and pretending otherwise takes money nobody can confirm. What was typed stays on screen so nothing is entered twice. |  |
 
 **Goes to**
 
@@ -865,7 +921,11 @@
 | Repository | ticvai-guest-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-web.git) |
 | Component | `VirtualWaitingRoomDetail` |
 | Suggested location | `src/routes/high-demand-access/VirtualWaitingRoomDetail.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | statusTracker |
+| Layout pattern | statusTracker (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html` (rev 3 (pointer moved to the 30 September build, CHG-R1S-015)), view: Only when the host tweak 'waitingRoom' is on; it is not in the Config drawer lists, so a reviewer cannot switch it on from the page (it shows part of this screen: build the rest from the screen spec in the same look). Wireframe frame `wireframes/P01 Guest Web.dc.html#web-015`, which adam_pull writes into the ticket folder as `wireframe-web-015.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-web.yaml`). Each state's look: loading: the turnstile loader (the prototype, lines 4950-4962, the block marked "TURNSTILE LOADER" (and flash() at 6984-6994, which opens it for 820 ms)); error: the status card of WEB-029 (Error / Sold out / Maintenance) (`wireframes/P01 Guest Web.dc.html#web-029`, pulled as `wireframe-web-029.html`); emptyFirstRun: the dashed empty card (the prototype, lines 3228-3235 (My tickets, "{{ tickets.emptyText }}") and 4640-4644 (Wishlist, "Nothing saved.")); emptyNoAccess: the "Sign in to see your account" card (the prototype, lines 3314-3322 (My account, signed out)); offline: the offline banner and the paused actions (`wireframes/states/P01 Guest Web states.dc.html#web-state-offline`, pulled as `wireframe-web-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 1440×900 and 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -883,13 +943,13 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | Taking a place in the room. *Take my place* (`enterWaitingRoom`) answers with a position, or `notRequired` and the guest goes straight on to the sale |
-| error | Lost the place. The worst failure on this screen. A retry sends the same `Idempotency-Key` and gets the same entry back, so the guest is not sent to the back, and the screen says so, because a guest who thinks they lost their place will open a second tab and make it worse. `expired` (the admission was not used in time) offers to enter again; `closed` (the room was switched off or the performance stopped selling) says so and goes back to the event |
-| emptyFirstRun | — |
-| emptyNoAccess | There is no access to refuse. The room is anonymous (ADR-0066): no sign-in, no personal data, and the guest may not have an account yet. |
-| offline | The offline banner shows. The last known position stays on screen with its age, and polling resumes with the same entry when the connection is back. Admission needs the connection. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | Taking a place in the room. *Take my place* (`enterWaitingRoom`) answers with a position, or `notRequired` and the guest goes straight on to the sale | the turnstile loader, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 4950-4962, the block marked "TURNSTILE LOADER" (and flash() at 6984-6994, which opens it for 820 ms) |
+| error | Lost the place. The worst failure on this screen. A retry sends the same `Idempotency-Key` and gets the same entry back, so the guest is not sent to the back, and the screen says so, because a guest who thinks they lost their place will open a second tab and make it worse. `expired` (the admission was not used in time) offers to enter again; `closed` (the room was switched off or the performance stopped selling) says so and goes back to the event | the status card of WEB-029 (Error / Sold out / Maintenance), `wireframes/P01 Guest Web.dc.html#web-029` (pulled as `wireframe-web-029.html`) |
+| emptyFirstRun | — | the dashed empty card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3228-3235 (My tickets, "{{ tickets.emptyText }}") and 4640-4644 (Wishlist, "Nothing saved.") |
+| emptyNoAccess | There is no access to refuse. The room is anonymous (ADR-0066): no sign-in, no personal data, and the guest may not have an account yet. | the "Sign in to see your account" card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3314-3322 (My account, signed out) |
+| offline | The offline banner shows. The last known position stays on screen with its age, and polling resumes with the same entry when the connection is back. Admission needs the connection. | the offline banner and the paused actions, `wireframes/states/P01 Guest Web states.dc.html#web-state-offline` (pulled as `wireframe-web-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 
@@ -910,7 +970,11 @@
 | Repository | ticvai-guest-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-web.git) |
 | Component | `LoginRegisterList` |
 | Suggested location | `src/routes/account-and-self-service/LoginRegisterList.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | form |
+| Layout pattern | form (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html` (rev 3 (pointer moved to the 30 September build, CHG-R1S-015)), view: Header profile icon (signed out), or automatically when leaving Add-ons / at payment (it shows part of this screen: build the rest from the screen spec in the same look). Wireframe frame `wireframes/P01 Guest Web.dc.html#web-016`, which adam_pull writes into the ticket folder as `wireframe-web-016.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-web.yaml`). Each state's look: loading: the turnstile loader (the prototype, lines 4950-4962, the block marked "TURNSTILE LOADER" (and flash() at 6984-6994, which opens it for 820 ms)); error: the status card of WEB-029 (Error / Sold out / Maintenance) (`wireframes/P01 Guest Web.dc.html#web-029`, pulled as `wireframe-web-029.html`); emptyFirstRun: the dashed empty card (the prototype, lines 3228-3235 (My tickets, "{{ tickets.emptyText }}") and 4640-4644 (Wishlist, "Nothing saved.")); emptyNoAccess: the "Sign in to see your account" card (the prototype, lines 3314-3322 (My account, signed out)); signInRefused: the sign-in refusal notice (`wireframes/states/P01 Guest Web states.dc.html#web-state-sign-in-refused`, pulled as `wireframe-web-state-sign-in-refused.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; offline: the offline banner and the paused actions (`wireframes/states/P01 Guest Web states.dc.html#web-state-offline`, pulled as `wireframe-web-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 1440×900 and 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -943,14 +1007,14 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | Checking whether this device already holds a guest session. The sign-in form stays visible. |
-| error | Identity could not be reached. Says so rather than saying the password or code is wrong, and keeps what was typed. |
-| emptyFirstRun | Nobody signed in on this device — the normal state. The form offers a code, a password, Apple or Google and UAE Pass, and Create an account (`registerGuest`). |
-| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025), and this is the screen a guest who is not signed in is sent to, so it has no no-access case of its own. A session that has expired lands here with the screen it came from kept, and returns to it after sign-in. |
-| signInRefused | One message for every refusal of a password sign-in: `guestPasswordLogin` answers 401 alike for a wrong password, an unknown identifier, an account with no password and a locked account, and the screen never says which. Too many attempts (429, or the lockout after `PasswordPolicy.lockoutAfterAttempts`) says to try again later and offers Send me a code instead (decided 28 September, audit R073 (a)). |
-| offline | Not available, and the offline banner says why. Signing in, registering and verifying a code need the server. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | Checking whether this device already holds a guest session. The sign-in form stays visible. | the turnstile loader, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 4950-4962, the block marked "TURNSTILE LOADER" (and flash() at 6984-6994, which opens it for 820 ms) |
+| error | Identity could not be reached. Says so rather than saying the password or code is wrong, and keeps what was typed. | the status card of WEB-029 (Error / Sold out / Maintenance), `wireframes/P01 Guest Web.dc.html#web-029` (pulled as `wireframe-web-029.html`) |
+| emptyFirstRun | Nobody signed in on this device — the normal state. The form offers a code, a password, Apple or Google and UAE Pass, and Create an account (`registerGuest`). | the dashed empty card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3228-3235 (My tickets, "{{ tickets.emptyText }}") and 4640-4644 (Wishlist, "Nothing saved.") |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025), and this is the screen a guest who is not signed in is sent to, so it has no no-access case of its own. A session that has expired lands here with the screen it came from kept, and returns to it after sign-in. | the "Sign in to see your account" card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3314-3322 (My account, signed out) |
+| signInRefused | One message for every refusal of a password sign-in: `guestPasswordLogin` answers 401 alike for a wrong password, an unknown identifier, an account with no password and a locked account, and the screen never says which. Too many attempts (429, or the lockout after `PasswordPolicy.lockoutAfterAttempts`) says to try again later and offers Send me a code instead (decided 28 September, audit R073 (a)). | the sign-in refusal notice, `wireframes/states/P01 Guest Web states.dc.html#web-state-sign-in-refused` (pulled as `wireframe-web-state-sign-in-refused.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| offline | Not available, and the offline banner says why. Signing in, registering and verifying a code need the server. | the offline banner and the paused actions, `wireframes/states/P01 Guest Web states.dc.html#web-state-offline` (pulled as `wireframe-web-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 
@@ -977,7 +1041,11 @@
 | Repository | ticvai-guest-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-web.git) |
 | Component | `MyAccountDashboard` |
 | Suggested location | `src/routes/account-and-self-service/MyAccountDashboard.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html` (rev 3 (pointer moved to the 30 September build, CHG-R1S-015)), view: Sign in → avatar menu → 'Account overview'. Wireframe frame `wireframes/P01 Guest Web.dc.html#web-017`, which adam_pull writes into the ticket folder as `wireframe-web-017.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-web.yaml`). Each state's look: loading: the turnstile loader (the prototype, lines 4950-4962, the block marked "TURNSTILE LOADER" (and flash() at 6984-6994, which opens it for 820 ms)); error: the status card of WEB-029 (Error / Sold out / Maintenance) (`wireframes/P01 Guest Web.dc.html#web-029`, pulled as `wireframe-web-029.html`); emptyFirstRun: the dashed empty card (the prototype, lines 3228-3235 (My tickets, "{{ tickets.emptyText }}") and 4640-4644 (Wishlist, "Nothing saved.")); emptyNoResults: the "Nothing matched" card (the prototype, lines 3084-3090 (Listing and search, "Nothing matched {{ list.filterText }}")); emptyNoAccess: the "Sign in to see your account" card (the prototype, lines 3314-3322 (My account, signed out)); offline: the offline banner and the paused actions (`wireframes/states/P01 Guest Web states.dc.html#web-state-offline`, pulled as `wireframe-web-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 1440×900 and 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -1001,14 +1069,14 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | Tiles skeleton |
-| error | Partial. Each tile fails independently |
-| emptyFirstRun | A new account with no orders — offers what to do next |
-| emptyNoResults | Never shown: `listGuestDevices` takes no filter, so an empty list is always the first-run state above. |
-| emptyNoAccess | Shown when the caller lacks `MARKETING_VIEW`, which `getMyChallenges` requires to show this screen, and names that permission (the screen's other reads need `ORDER_VIEW`, `WALLET_VIEW` and say so in their own panels). Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `GUEST_VIEW` for `respondToInvitation`. |
-| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | Tiles skeleton | the turnstile loader, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 4950-4962, the block marked "TURNSTILE LOADER" (and flash() at 6984-6994, which opens it for 820 ms) |
+| error | Partial. Each tile fails independently | the status card of WEB-029 (Error / Sold out / Maintenance), `wireframes/P01 Guest Web.dc.html#web-029` (pulled as `wireframe-web-029.html`) |
+| emptyFirstRun | A new account with no orders — offers what to do next | the dashed empty card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3228-3235 (My tickets, "{{ tickets.emptyText }}") and 4640-4644 (Wishlist, "Nothing saved.") |
+| emptyNoResults | Never shown: `listGuestDevices` takes no filter, so an empty list is always the first-run state above. | the "Nothing matched" card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3084-3090 (Listing and search, "Nothing matched {{ list.filterText }}") |
+| emptyNoAccess | Shown when the caller lacks `MARKETING_VIEW`, which `getMyChallenges` requires to show this screen, and names that permission (the screen's other reads need `ORDER_VIEW`, `WALLET_VIEW` and say so in their own panels). Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `GUEST_VIEW` for `respondToInvitation`. | the "Sign in to see your account" card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3314-3322 (My account, signed out) |
+| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. | the offline banner and the paused actions, `wireframes/states/P01 Guest Web states.dc.html#web-state-offline` (pulled as `wireframe-web-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 
@@ -1031,7 +1099,11 @@
 | Repository | ticvai-guest-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-web.git) |
 | Component | `MyTicketsDetail` |
 | Suggested location | `src/routes/account-and-self-service/MyTicketsDetail.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html` (rev 3 (pointer moved to the 30 September build, CHG-R1S-015)), view: Header 'My tickets' → a ticket → 'Manage' (ticket sheet) (it shows part of this screen: build the rest from the screen spec in the same look). Wireframe frame `wireframes/P01 Guest Web.dc.html#web-018`, which adam_pull writes into the ticket folder as `wireframe-web-018.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-web.yaml`). Each state's look: loading: the turnstile loader (the prototype, lines 4950-4962, the block marked "TURNSTILE LOADER" (and flash() at 6984-6994, which opens it for 820 ms)); error: the status card of WEB-029 (Error / Sold out / Maintenance) (`wireframes/P01 Guest Web.dc.html#web-029`, pulled as `wireframe-web-029.html`); emptyFirstRun: the dashed empty card (the prototype, lines 3228-3235 (My tickets, "{{ tickets.emptyText }}") and 4640-4644 (Wishlist, "Nothing saved.")); emptyNoResults: the "Nothing matched" card (the prototype, lines 3084-3090 (Listing and search, "Nothing matched {{ list.filterText }}")); emptyNoAccess: the "Sign in to see your account" card (the prototype, lines 3314-3322 (My account, signed out)); offline: the offline banner and the paused actions (`wireframes/states/P01 Guest Web states.dc.html#web-state-offline`, pulled as `wireframe-web-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 1440×900 and 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -1057,14 +1129,14 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | Tickets load |
-| error | Could not load |
-| emptyFirstRun | No tickets — distinguishes never bought from all past |
-| emptyNoResults | Nothing matches the current filters. The filters are named and clearable from here — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone. Added 25 August with the derived list component: a screen that lists has to say what it shows when the list is empty, and this screen gained the list before it gained the sentence. |
-| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | The offline banner shows. Tickets already loaded stay visible with their age, and a ticket's rotating code is derived on the device from its seed, so it changes with no signal (decided 28 September, audit R230). Sharing, transferring and adding to a phone wallet need the connection. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | Tickets load | the turnstile loader, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 4950-4962, the block marked "TURNSTILE LOADER" (and flash() at 6984-6994, which opens it for 820 ms) |
+| error | Could not load | the status card of WEB-029 (Error / Sold out / Maintenance), `wireframes/P01 Guest Web.dc.html#web-029` (pulled as `wireframe-web-029.html`) |
+| emptyFirstRun | No tickets — distinguishes never bought from all past | the dashed empty card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3228-3235 (My tickets, "{{ tickets.emptyText }}") and 4640-4644 (Wishlist, "Nothing saved.") |
+| emptyNoResults | Nothing matches the current filters. The filters are named and clearable from here — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone. Added 25 August with the derived list component: a screen that lists has to say what it shows when the list is empty, and this screen gained the list before it gained the sentence. | the "Nothing matched" card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3084-3090 (Listing and search, "Nothing matched {{ list.filterText }}") |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. | the "Sign in to see your account" card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3314-3322 (My account, signed out) |
+| offline | The offline banner shows. Tickets already loaded stay visible with their age, and a ticket's rotating code is derived on the device from its seed, so it changes with no signal (decided 28 September, audit R230). Sharing, transferring and adding to a phone wallet need the connection. | the offline banner and the paused actions, `wireframes/states/P01 Guest Web states.dc.html#web-state-offline` (pulled as `wireframe-web-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 
@@ -1087,7 +1159,11 @@
 | Repository | ticvai-guest-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-web.git) |
 | Component | `OrderHistoryList` |
 | Suggested location | `src/routes/account-and-self-service/OrderHistoryList.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html` (rev 3 (pointer moved to the 30 September build, CHG-R1S-015)), view: Account → 'Order history' (it shows part of this screen: build the rest from the screen spec in the same look). Wireframe frame `wireframes/P01 Guest Web.dc.html#web-019`, which adam_pull writes into the ticket folder as `wireframe-web-019.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-web.yaml`). Each state's look: loading: the turnstile loader (the prototype, lines 4950-4962, the block marked "TURNSTILE LOADER" (and flash() at 6984-6994, which opens it for 820 ms)); error: the status card of WEB-029 (Error / Sold out / Maintenance) (`wireframes/P01 Guest Web.dc.html#web-029`, pulled as `wireframe-web-029.html`); emptyFirstRun: the dashed empty card (the prototype, lines 3228-3235 (My tickets, "{{ tickets.emptyText }}") and 4640-4644 (Wishlist, "Nothing saved.")); emptyNoResults: the "Nothing matched" card (the prototype, lines 3084-3090 (Listing and search, "Nothing matched {{ list.filterText }}")); emptyNoAccess: the "Sign in to see your account" card (the prototype, lines 3314-3322 (My account, signed out)); offline: the offline banner and the paused actions (`wireframes/states/P01 Guest Web states.dc.html#web-state-offline`, pulled as `wireframe-web-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 1440×900 and 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -1114,14 +1190,14 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The order history list. |
-| error | Could not load. Names which read failed and leaves the order history untouched. |
-| emptyFirstRun | No order history yet. Offers Create refund request (`createRefundRequest`); distinct from a filter that matched nothing. |
-| emptyNoResults | Nothing matches the filter on since and the order history are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The order history list. | the turnstile loader, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 4950-4962, the block marked "TURNSTILE LOADER" (and flash() at 6984-6994, which opens it for 820 ms) |
+| error | Could not load. Names which read failed and leaves the order history untouched. | the status card of WEB-029 (Error / Sold out / Maintenance), `wireframes/P01 Guest Web.dc.html#web-029` (pulled as `wireframe-web-029.html`) |
+| emptyFirstRun | No order history yet. Offers Create refund request (`createRefundRequest`); distinct from a filter that matched nothing. | the dashed empty card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3228-3235 (My tickets, "{{ tickets.emptyText }}") and 4640-4644 (Wishlist, "Nothing saved.") |
+| emptyNoResults | Nothing matches the filter on since and the order history are still there. Names the active filter and offers to clear it. | the "Nothing matched" card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3084-3090 (Listing and search, "Nothing matched {{ list.filterText }}") |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. | the "Sign in to see your account" card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3314-3322 (My account, signed out) |
+| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. | the offline banner and the paused actions, `wireframes/states/P01 Guest Web states.dc.html#web-state-offline` (pulled as `wireframe-web-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 
@@ -1144,7 +1220,11 @@
 | Repository | ticvai-guest-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-web.git) |
 | Component | `ProfileAndPreferencesDetail` |
 | Suggested location | `src/routes/account-and-self-service/ProfileAndPreferencesDetail.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html` (rev 3 (pointer moved to the 30 September build, CHG-R1S-015)), view: Account → 'Personal details', 'Notifications', 'Accessibility' (it shows part of this screen: build the rest from the screen spec in the same look). Wireframe frame `wireframes/P01 Guest Web.dc.html#web-020`, which adam_pull writes into the ticket folder as `wireframe-web-020.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-web.yaml`). Each state's look: loading: the turnstile loader (the prototype, lines 4950-4962, the block marked "TURNSTILE LOADER" (and flash() at 6984-6994, which opens it for 820 ms)); error: the status card of WEB-029 (Error / Sold out / Maintenance) (`wireframes/P01 Guest Web.dc.html#web-029`, pulled as `wireframe-web-029.html`); emptyFirstRun: the dashed empty card (the prototype, lines 3228-3235 (My tickets, "{{ tickets.emptyText }}") and 4640-4644 (Wishlist, "Nothing saved.")); emptyNoResults: the "Nothing matched" card (the prototype, lines 3084-3090 (Listing and search, "Nothing matched {{ list.filterText }}")); emptyNoAccess: the "Sign in to see your account" card (the prototype, lines 3314-3322 (My account, signed out)); offline: the offline banner and the paused actions (`wireframes/states/P01 Guest Web states.dc.html#web-state-offline`, pulled as `wireframe-web-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 1440×900 and 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -1166,14 +1246,14 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | Profile and consents |
-| error | Save failed and the form keeps what was typed. A consent change that silently did not save is a compliance failure, so the screen states it rather than showing success |
-| emptyFirstRun | — |
-| emptyNoResults | Nothing matches the current filters. The filters are named and clearable from here — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone. Added 25 August with the derived list component: a screen that lists has to say what it shows when the list is empty, and this screen gained the list before it gained the sentence. |
-| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | Profile and consents | the turnstile loader, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 4950-4962, the block marked "TURNSTILE LOADER" (and flash() at 6984-6994, which opens it for 820 ms) |
+| error | Save failed and the form keeps what was typed. A consent change that silently did not save is a compliance failure, so the screen states it rather than showing success | the status card of WEB-029 (Error / Sold out / Maintenance), `wireframes/P01 Guest Web.dc.html#web-029` (pulled as `wireframe-web-029.html`) |
+| emptyFirstRun | — | the dashed empty card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3228-3235 (My tickets, "{{ tickets.emptyText }}") and 4640-4644 (Wishlist, "Nothing saved.") |
+| emptyNoResults | Nothing matches the current filters. The filters are named and clearable from here — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone. Added 25 August with the derived list component: a screen that lists has to say what it shows when the list is empty, and this screen gained the list before it gained the sentence. | the "Nothing matched" card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3084-3090 (Listing and search, "Nothing matched {{ list.filterText }}") |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. | the "Sign in to see your account" card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3314-3322 (My account, signed out) |
+| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. | the offline banner and the paused actions, `wireframes/states/P01 Guest Web states.dc.html#web-state-offline` (pulled as `wireframe-web-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 
@@ -1196,7 +1276,11 @@
 | Repository | ticvai-guest-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-web.git) |
 | Component | `WalletAndGiftCardsDetail` |
 | Suggested location | `src/routes/membership-loyalty-and-value/WalletAndGiftCardsDetail.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html` (rev 3 (pointer moved to the 30 September build, CHG-R1S-015)), view: Account → 'Wallet & gift cards' (and 'Payment methods') (it shows part of this screen: build the rest from the screen spec in the same look). Wireframe frame `wireframes/P01 Guest Web.dc.html#web-021`, which adam_pull writes into the ticket folder as `wireframe-web-021.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-web.yaml`). Each state's look: loading: the turnstile loader (the prototype, lines 4950-4962, the block marked "TURNSTILE LOADER" (and flash() at 6984-6994, which opens it for 820 ms)); error: the status card of WEB-029 (Error / Sold out / Maintenance) (`wireframes/P01 Guest Web.dc.html#web-029`, pulled as `wireframe-web-029.html`); emptyFirstRun: the dashed empty card (the prototype, lines 3228-3235 (My tickets, "{{ tickets.emptyText }}") and 4640-4644 (Wishlist, "Nothing saved.")); emptyNoResults: the "Nothing matched" card (the prototype, lines 3084-3090 (Listing and search, "Nothing matched {{ list.filterText }}")); emptyNoAccess: the "Sign in to see your account" card (the prototype, lines 3314-3322 (My account, signed out)); offline: the offline banner and the paused actions (`wireframes/states/P01 Guest Web states.dc.html#web-state-offline`, pulled as `wireframe-web-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 1440×900 and 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -1223,14 +1307,14 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The wallet gift cards list. |
-| error | Could not load. Names which read failed and leaves the wallet gift cards untouched. |
-| emptyFirstRun | No wallet gift cards yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
-| emptyNoResults | Never shown: `listWalletTransactions` takes no filter, so an empty list is always the first-run state above. |
-| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | The offline banner shows. Balances and stored cards already loaded stay visible with their age, cards masked. Storing a card and transferring value need the server. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The wallet gift cards list. | the turnstile loader, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 4950-4962, the block marked "TURNSTILE LOADER" (and flash() at 6984-6994, which opens it for 820 ms) |
+| error | Could not load. Names which read failed and leaves the wallet gift cards untouched. | the status card of WEB-029 (Error / Sold out / Maintenance), `wireframes/P01 Guest Web.dc.html#web-029` (pulled as `wireframe-web-029.html`) |
+| emptyFirstRun | No wallet gift cards yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. | the dashed empty card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3228-3235 (My tickets, "{{ tickets.emptyText }}") and 4640-4644 (Wishlist, "Nothing saved.") |
+| emptyNoResults | Never shown: `listWalletTransactions` takes no filter, so an empty list is always the first-run state above. | the "Nothing matched" card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3084-3090 (Listing and search, "Nothing matched {{ list.filterText }}") |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. | the "Sign in to see your account" card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3314-3322 (My account, signed out) |
+| offline | The offline banner shows. Balances and stored cards already loaded stay visible with their age, cards masked. Storing a card and transferring value need the server. | the offline banner and the paused actions, `wireframes/states/P01 Guest Web states.dc.html#web-state-offline` (pulled as `wireframe-web-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 
@@ -1253,7 +1337,11 @@
 | Repository | ticvai-guest-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-web.git) |
 | Component | `MembershipPlansDetail` |
 | Suggested location | `src/routes/membership-loyalty-and-value/MembershipPlansDetail.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html` (rev 3 (pointer moved to the 30 September build, CHG-R1S-015)), view: Summit Peaks → 'Annual pass / membership' flow; Kids Club → 'Membership pass'; Account → Membership → 'Other plans — Compare' (it shows part of this screen: build the rest from the screen spec in the same look). Wireframe frame `wireframes/P01 Guest Web.dc.html#web-022`, which adam_pull writes into the ticket folder as `wireframe-web-022.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-web.yaml`). Each state's look: loading: the turnstile loader (the prototype, lines 4950-4962, the block marked "TURNSTILE LOADER" (and flash() at 6984-6994, which opens it for 820 ms)); error: the status card of WEB-029 (Error / Sold out / Maintenance) (`wireframes/P01 Guest Web.dc.html#web-029`, pulled as `wireframe-web-029.html`); emptyFirstRun: the dashed empty card (the prototype, lines 3228-3235 (My tickets, "{{ tickets.emptyText }}") and 4640-4644 (Wishlist, "Nothing saved.")); emptyNoResults: the "Nothing matched" card (the prototype, lines 3084-3090 (Listing and search, "Nothing matched {{ list.filterText }}")); emptyNoAccess: the "Sign in to see your account" card (the prototype, lines 3314-3322 (My account, signed out)); offline: the offline banner and the paused actions (`wireframes/states/P01 Guest Web states.dc.html#web-state-offline`, pulled as `wireframe-web-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 1440×900 and 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -1271,14 +1359,14 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The membership plans list. |
-| error | Could not load. Names which read failed and leaves the membership plans untouched. |
-| emptyFirstRun | No membership plans yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
-| emptyNoResults | Never shown: the plans are the venue's membership products, with no filter a guest sets. |
-| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The membership plans list. | the turnstile loader, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 4950-4962, the block marked "TURNSTILE LOADER" (and flash() at 6984-6994, which opens it for 820 ms) |
+| error | Could not load. Names which read failed and leaves the membership plans untouched. | the status card of WEB-029 (Error / Sold out / Maintenance), `wireframes/P01 Guest Web.dc.html#web-029` (pulled as `wireframe-web-029.html`) |
+| emptyFirstRun | No membership plans yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. | the dashed empty card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3228-3235 (My tickets, "{{ tickets.emptyText }}") and 4640-4644 (Wishlist, "Nothing saved.") |
+| emptyNoResults | Never shown: the plans are the venue's membership products, with no filter a guest sets. | the "Nothing matched" card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3084-3090 (Listing and search, "Nothing matched {{ list.filterText }}") |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. | the "Sign in to see your account" card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3314-3322 (My account, signed out) |
+| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. | the offline banner and the paused actions, `wireframes/states/P01 Guest Web states.dc.html#web-state-offline` (pulled as `wireframe-web-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 
@@ -1301,7 +1389,11 @@
 | Repository | ticvai-guest-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-web.git) |
 | Component | `MembershipManagementForm` |
 | Suggested location | `src/routes/membership-loyalty-and-value/MembershipManagementForm.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html` (rev 3 (pointer moved to the 30 September build, CHG-R1S-015)), view: Account → 'Membership' → 'Billing statement — View' (it shows part of this screen: build the rest from the screen spec in the same look). Wireframe frame `wireframes/P01 Guest Web.dc.html#web-023`, which adam_pull writes into the ticket folder as `wireframe-web-023.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-web.yaml`). Each state's look: loading: the turnstile loader (the prototype, lines 4950-4962, the block marked "TURNSTILE LOADER" (and flash() at 6984-6994, which opens it for 820 ms)); error: the status card of WEB-029 (Error / Sold out / Maintenance) (`wireframes/P01 Guest Web.dc.html#web-029`, pulled as `wireframe-web-029.html`); emptyFirstRun: the dashed empty card (the prototype, lines 3228-3235 (My tickets, "{{ tickets.emptyText }}") and 4640-4644 (Wishlist, "Nothing saved.")); emptyNoResults: the "Nothing matched" card (the prototype, lines 3084-3090 (Listing and search, "Nothing matched {{ list.filterText }}")); emptyNoAccess: the "Sign in to see your account" card (the prototype, lines 3314-3322 (My account, signed out)); offline: the offline banner and the paused actions (`wireframes/states/P01 Guest Web states.dc.html#web-state-offline`, pulled as `wireframe-web-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 1440×900 and 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -1324,14 +1416,14 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | Membership and its benefits |
-| error | Could not load. Cancellation and renewal are both blocked |
-| emptyFirstRun | — |
-| emptyNoResults | Nothing matches the filter on from, to and the membership are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | Membership and its benefits | the turnstile loader, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 4950-4962, the block marked "TURNSTILE LOADER" (and flash() at 6984-6994, which opens it for 820 ms) |
+| error | Could not load. Cancellation and renewal are both blocked | the status card of WEB-029 (Error / Sold out / Maintenance), `wireframes/P01 Guest Web.dc.html#web-029` (pulled as `wireframe-web-029.html`) |
+| emptyFirstRun | — | the dashed empty card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3228-3235 (My tickets, "{{ tickets.emptyText }}") and 4640-4644 (Wishlist, "Nothing saved.") |
+| emptyNoResults | Nothing matches the filter on from, to and the membership are still there. Names the active filter and offers to clear it. | the "Nothing matched" card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3084-3090 (Listing and search, "Nothing matched {{ list.filterText }}") |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. | the "Sign in to see your account" card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3314-3322 (My account, signed out) |
+| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. | the offline banner and the paused actions, `wireframes/states/P01 Guest Web states.dc.html#web-state-offline` (pulled as `wireframe-web-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 
@@ -1354,7 +1446,11 @@
 | Repository | ticvai-guest-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-web.git) |
 | Component | `DevicesWishlistConsentDetail` |
 | Suggested location | `src/routes/membership-loyalty-and-value/DevicesWishlistConsentDetail.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html` (rev 3 (pointer moved to the 30 September build, CHG-R1S-015)), view: Account → 'Security' (devices), 'Face Pass', 'Data & privacy', 'Newsletters' (devices that get notifications) (it shows part of this screen: build the rest from the screen spec in the same look). Wireframe frame `wireframes/P01 Guest Web.dc.html#web-024`, which adam_pull writes into the ticket folder as `wireframe-web-024.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-web.yaml`). Each state's look: loading: the turnstile loader (the prototype, lines 4950-4962, the block marked "TURNSTILE LOADER" (and flash() at 6984-6994, which opens it for 820 ms)); error: the status card of WEB-029 (Error / Sold out / Maintenance) (`wireframes/P01 Guest Web.dc.html#web-029`, pulled as `wireframe-web-029.html`); emptyFirstRun: the dashed empty card (the prototype, lines 3228-3235 (My tickets, "{{ tickets.emptyText }}") and 4640-4644 (Wishlist, "Nothing saved.")); emptyNoResults: the "Nothing matched" card (the prototype, lines 3084-3090 (Listing and search, "Nothing matched {{ list.filterText }}")); emptyNoAccess: the "Sign in to see your account" card (the prototype, lines 3314-3322 (My account, signed out)); offline: the offline banner and the paused actions (`wireframes/states/P01 Guest Web states.dc.html#web-state-offline`, pulled as `wireframe-web-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 1440×900 and 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -1387,14 +1483,14 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | Points and rewards |
-| error | Could not load |
-| emptyFirstRun | No points yet — explains how they accrue |
-| emptyNoResults | Nothing matches the current filters. The filters are named and clearable from here — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone. Added 25 August with the derived list component: a screen that lists has to say what it shows when the list is empty, and this screen gained the list before it gained the sentence. |
-| emptyNoAccess | Shown when the caller lacks `GUEST_VIEW`, which `getGuestConsents` requires to show this screen, and names that permission (the screen's other reads need `ORDER_VIEW` and say so in their own panels). Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `GUEST_MANAGE` for `revokeFacePass`; `GUEST_VIEW_PII` for `exportSubjectData`. |
-| offline | Nothing here is offered offline, and the banner says so. An erasure request or a device change queued and never sent is worse than one that could not be made — the legal clock starts when the platform receives it, and a device signed out offline is still signed in. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | Points and rewards | the turnstile loader, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 4950-4962, the block marked "TURNSTILE LOADER" (and flash() at 6984-6994, which opens it for 820 ms) |
+| error | Could not load | the status card of WEB-029 (Error / Sold out / Maintenance), `wireframes/P01 Guest Web.dc.html#web-029` (pulled as `wireframe-web-029.html`) |
+| emptyFirstRun | No points yet — explains how they accrue | the dashed empty card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3228-3235 (My tickets, "{{ tickets.emptyText }}") and 4640-4644 (Wishlist, "Nothing saved.") |
+| emptyNoResults | Nothing matches the current filters. The filters are named and clearable from here — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone. Added 25 August with the derived list component: a screen that lists has to say what it shows when the list is empty, and this screen gained the list before it gained the sentence. | the "Nothing matched" card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3084-3090 (Listing and search, "Nothing matched {{ list.filterText }}") |
+| emptyNoAccess | Shown when the caller lacks `GUEST_VIEW`, which `getGuestConsents` requires to show this screen, and names that permission (the screen's other reads need `ORDER_VIEW` and say so in their own panels). Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `GUEST_MANAGE` for `revokeFacePass`; `GUEST_VIEW_PII` for `exportSubjectData`. | the "Sign in to see your account" card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3314-3322 (My account, signed out) |
+| offline | Nothing here is offered offline, and the banner says so. An erasure request or a device change queued and never sent is worse than one that could not be made — the legal clock starts when the platform receives it, and a device signed out offline is still signed in. | the offline banner and the paused actions, `wireframes/states/P01 Guest Web states.dc.html#web-state-offline` (pulled as `wireframe-web-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 
@@ -1418,7 +1514,11 @@
 | Repository | ticvai-guest-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-web.git) |
 | Component | `HelpCentreFaqDetail` |
 | Suggested location | `src/routes/engagement-and-support/HelpCentreFaqDetail.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | statusTracker |
+| Layout pattern | statusTracker (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html` (rev 3 (pointer moved to the 30 September build, CHG-R1S-015)), view: Header 'Help'. Wireframe frame `wireframes/P01 Guest Web.dc.html#web-025`, which adam_pull writes into the ticket folder as `wireframe-web-025.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-web.yaml`). Each state's look: loading: the turnstile loader (the prototype, lines 4950-4962, the block marked "TURNSTILE LOADER" (and flash() at 6984-6994, which opens it for 820 ms)); error: the status card of WEB-029 (Error / Sold out / Maintenance) (`wireframes/P01 Guest Web.dc.html#web-029`, pulled as `wireframe-web-029.html`); emptyFirstRun: the dashed empty card (the prototype, lines 3228-3235 (My tickets, "{{ tickets.emptyText }}") and 4640-4644 (Wishlist, "Nothing saved.")); emptyNoAccess: the "Sign in to see your account" card (the prototype, lines 3314-3322 (My account, signed out)); offline: the offline banner and the paused actions (`wireframes/states/P01 Guest Web states.dc.html#web-state-offline`, pulled as `wireframe-web-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 1440×900 and 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -1438,13 +1538,13 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | Articles load |
-| error | Could not load |
-| emptyFirstRun | No articles — offers contact instead of an empty help centre |
-| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | The offline banner shows. Cases already loaded stay read-only with their age, so a guest can see what they raised without believing a reply arrived. Raising a case and replying are disabled offline — both need the connection (decided 28 September, audit R148) — and the screen says how to reach staff in person instead: the guest services desk, or any member of staff. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | Articles load | the turnstile loader, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 4950-4962, the block marked "TURNSTILE LOADER" (and flash() at 6984-6994, which opens it for 820 ms) |
+| error | Could not load | the status card of WEB-029 (Error / Sold out / Maintenance), `wireframes/P01 Guest Web.dc.html#web-029` (pulled as `wireframe-web-029.html`) |
+| emptyFirstRun | No articles — offers contact instead of an empty help centre | the dashed empty card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3228-3235 (My tickets, "{{ tickets.emptyText }}") and 4640-4644 (Wishlist, "Nothing saved.") |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. | the "Sign in to see your account" card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3314-3322 (My account, signed out) |
+| offline | The offline banner shows. Cases already loaded stay read-only with their age, so a guest can see what they raised without believing a reply arrived. Raising a case and replying are disabled offline — both need the connection (decided 28 September, audit R148) — and the screen says how to reach staff in person instead: the guest services desk, or any member of staff. | the offline banner and the paused actions, `wireframes/states/P01 Guest Web states.dc.html#web-state-offline` (pulled as `wireframe-web-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 
@@ -1466,7 +1566,11 @@
 | Repository | ticvai-guest-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-web.git) |
 | Component | `SurveyAndFeedbackDetail` |
 | Suggested location | `src/routes/engagement-and-support/SurveyAndFeedbackDetail.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | configEditor |
+| Layout pattern | configEditor (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html` (rev 3 (pointer moved to the 30 September build, CHG-R1S-015)), view: Account → 'Reviews & feedback' (it shows part of this screen: build the rest from the screen spec in the same look). Wireframe frame `wireframes/P01 Guest Web.dc.html#web-026`, which adam_pull writes into the ticket folder as `wireframe-web-026.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-web.yaml`). Each state's look: loading: the turnstile loader (the prototype, lines 4950-4962, the block marked "TURNSTILE LOADER" (and flash() at 6984-6994, which opens it for 820 ms)); error: the status card of WEB-029 (Error / Sold out / Maintenance) (`wireframes/P01 Guest Web.dc.html#web-029`, pulled as `wireframe-web-029.html`); emptyFirstRun: the dashed empty card (the prototype, lines 3228-3235 (My tickets, "{{ tickets.emptyText }}") and 4640-4644 (Wishlist, "Nothing saved.")); emptyNoAccess: the "Sign in to see your account" card (the prototype, lines 3314-3322 (My account, signed out)); offline: the offline banner and the paused actions (`wireframes/states/P01 Guest Web states.dc.html#web-state-offline`, pulled as `wireframe-web-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 1440×900 and 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -1486,13 +1590,13 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | Survey loads |
-| error | Could not submit. The answers are kept on the form, and the guest retries by pressing Submit again — nothing resends by itself: guest web is online-only (docs/architecture/offline-and-sync.md, *B2C web: None*), so there is no outbox behind this screen. The retry reuses the first attempt's `Idempotency-Key`, so a submit that did reach the server before the failure is not recorded as a second review. |
-| emptyFirstRun | — |
-| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | Survey loads | the turnstile loader, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 4950-4962, the block marked "TURNSTILE LOADER" (and flash() at 6984-6994, which opens it for 820 ms) |
+| error | Could not submit. The answers are kept on the form, and the guest retries by pressing Submit again — nothing resends by itself: guest web is online-only (docs/architecture/offline-and-sync.md, *B2C web: None*), so there is no outbox behind this screen. The retry reuses the first attempt's `Idempotency-Key`, so a submit that did reach the server before the failure is not recorded as a second review. | the status card of WEB-029 (Error / Sold out / Maintenance), `wireframes/P01 Guest Web.dc.html#web-029` (pulled as `wireframe-web-029.html`) |
+| emptyFirstRun | — | the dashed empty card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3228-3235 (My tickets, "{{ tickets.emptyText }}") and 4640-4644 (Wishlist, "Nothing saved.") |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. | the "Sign in to see your account" card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3314-3322 (My account, signed out) |
+| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. | the offline banner and the paused actions, `wireframes/states/P01 Guest Web states.dc.html#web-state-offline` (pulled as `wireframe-web-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 
@@ -1514,7 +1618,11 @@
 | Repository | ticvai-guest-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-web.git) |
 | Component | `NewsletterSubscriptionDetail` |
 | Suggested location | `src/routes/engagement-and-support/NewsletterSubscriptionDetail.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html` (rev 3 (pointer moved to the 30 September build, CHG-R1S-015)), view: Account → 'Newsletters'; Contact page → 'Choose newsletters' (it shows part of this screen: build the rest from the screen spec in the same look). Wireframe frame `wireframes/P01 Guest Web.dc.html#web-027`, which adam_pull writes into the ticket folder as `wireframe-web-027.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-web.yaml`). Each state's look: loading: the turnstile loader (the prototype, lines 4950-4962, the block marked "TURNSTILE LOADER" (and flash() at 6984-6994, which opens it for 820 ms)); error: the status card of WEB-029 (Error / Sold out / Maintenance) (`wireframes/P01 Guest Web.dc.html#web-029`, pulled as `wireframe-web-029.html`); emptyFirstRun: the dashed empty card (the prototype, lines 3228-3235 (My tickets, "{{ tickets.emptyText }}") and 4640-4644 (Wishlist, "Nothing saved.")); emptyNoResults: the "Nothing matched" card (the prototype, lines 3084-3090 (Listing and search, "Nothing matched {{ list.filterText }}")); emptyNoAccess: the "Sign in to see your account" card (the prototype, lines 3314-3322 (My account, signed out)); offline: the offline banner and the paused actions (`wireframes/states/P01 Guest Web states.dc.html#web-state-offline`, pulled as `wireframe-web-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 1440×900 and 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -1535,14 +1643,14 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | — |
-| error | Could not subscribe. Consent is not recorded on a failed request, because a subscription the guest believes happened and did not is worse than a visible failure |
-| emptyFirstRun | — |
-| emptyNoResults | Nothing matches the current filters. The filters are named and clearable from here — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone. Added 25 August with the derived list component: a screen that lists has to say what it shows when the list is empty, and this screen gained the list before it gained the sentence. |
-| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | Not available, and the offline banner says why. A consent change must reach the server to mean anything. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | — | the turnstile loader, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 4950-4962, the block marked "TURNSTILE LOADER" (and flash() at 6984-6994, which opens it for 820 ms) |
+| error | Could not subscribe. Consent is not recorded on a failed request, because a subscription the guest believes happened and did not is worse than a visible failure | the status card of WEB-029 (Error / Sold out / Maintenance), `wireframes/P01 Guest Web.dc.html#web-029` (pulled as `wireframe-web-029.html`) |
+| emptyFirstRun | — | the dashed empty card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3228-3235 (My tickets, "{{ tickets.emptyText }}") and 4640-4644 (Wishlist, "Nothing saved.") |
+| emptyNoResults | Nothing matches the current filters. The filters are named and clearable from here — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone. Added 25 August with the derived list component: a screen that lists has to say what it shows when the list is empty, and this screen gained the list before it gained the sentence. | the "Nothing matched" card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3084-3090 (Listing and search, "Nothing matched {{ list.filterText }}") |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. | the "Sign in to see your account" card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3314-3322 (My account, signed out) |
+| offline | Not available, and the offline banner says why. A consent change must reach the server to mean anything. | the offline banner and the paused actions, `wireframes/states/P01 Guest Web states.dc.html#web-state-offline` (pulled as `wireframe-web-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 
@@ -1564,7 +1672,11 @@
 | Repository | ticvai-guest-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-web.git) |
 | Component | `ContactAndVenueInformationForm` |
 | Suggested location | `src/routes/engagement-and-support/ContactAndVenueInformationForm.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | statusTracker |
+| Layout pattern | statusTracker (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html` (rev 3 (pointer moved to the 30 September build, CHG-R1S-015)), view: Footer 'Contact', or Discover → 'Contact & venue info'. Wireframe frame `wireframes/P01 Guest Web.dc.html#web-028`, which adam_pull writes into the ticket folder as `wireframe-web-028.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-web.yaml`). Each state's look: loading: the turnstile loader (the prototype, lines 4950-4962, the block marked "TURNSTILE LOADER" (and flash() at 6984-6994, which opens it for 820 ms)); error: the status card of WEB-029 (Error / Sold out / Maintenance) (`wireframes/P01 Guest Web.dc.html#web-029`, pulled as `wireframe-web-029.html`); emptyFirstRun: the dashed empty card (the prototype, lines 3228-3235 (My tickets, "{{ tickets.emptyText }}") and 4640-4644 (Wishlist, "Nothing saved.")); emptyNoAccess: the "Sign in to see your account" card (the prototype, lines 3314-3322 (My account, signed out)); offline: the offline banner and the paused actions (`wireframes/states/P01 Guest Web states.dc.html#web-state-offline`, pulled as `wireframe-web-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 1440×900 and 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Operations**
 
@@ -1574,13 +1686,13 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | Venue details |
-| error | Could not load. Falls back to the tenant contact details from the cached config |
-| emptyFirstRun | — |
-| emptyNoAccess | Nothing here needs a sign-in (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-2)): the screen reads only what the tenant has published, which is public, so there is no no-access case. A host that belongs to no tenant shows the platform's neutral holding page. |
-| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | Venue details | the turnstile loader, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 4950-4962, the block marked "TURNSTILE LOADER" (and flash() at 6984-6994, which opens it for 820 ms) |
+| error | Could not load. Falls back to the tenant contact details from the cached config | the status card of WEB-029 (Error / Sold out / Maintenance), `wireframes/P01 Guest Web.dc.html#web-029` (pulled as `wireframe-web-029.html`) |
+| emptyFirstRun | — | the dashed empty card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3228-3235 (My tickets, "{{ tickets.emptyText }}") and 4640-4644 (Wishlist, "Nothing saved.") |
+| emptyNoAccess | Nothing here needs a sign-in (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-2)): the screen reads only what the tenant has published, which is public, so there is no no-access case. A host that belongs to no tenant shows the platform's neutral holding page. | the "Sign in to see your account" card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3314-3322 (My account, signed out) |
+| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. | the offline banner and the paused actions, `wireframes/states/P01 Guest Web states.dc.html#web-state-offline` (pulled as `wireframe-web-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 
@@ -1603,7 +1715,11 @@
 | Repository | ticvai-guest-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-web.git) |
 | Component | `ErrorSoldOutMaintenanceDetail` |
 | Suggested location | `src/routes/system-states/ErrorSoldOutMaintenanceDetail.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | statusTracker |
+| Layout pattern | statusTracker (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html` (rev 3 (pointer moved to the 30 September build, CHG-R1S-015)), view: Footer 'Service status', or Discover → 'Service status'. Wireframe frame `wireframes/P01 Guest Web.dc.html#web-029`, which adam_pull writes into the ticket folder as `wireframe-web-029.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-web.yaml`). Each state's look: loading: the turnstile loader (the prototype, lines 4950-4962, the block marked "TURNSTILE LOADER" (and flash() at 6984-6994, which opens it for 820 ms)); error: the status card of WEB-029 (Error / Sold out / Maintenance) (`wireframes/P01 Guest Web.dc.html#web-029`, pulled as `wireframe-web-029.html`); emptyFirstRun: the dashed empty card (the prototype, lines 3228-3235 (My tickets, "{{ tickets.emptyText }}") and 4640-4644 (Wishlist, "Nothing saved.")); emptyNoAccess: the "Sign in to see your account" card (the prototype, lines 3314-3322 (My account, signed out)); offline: the offline banner and the paused actions (`wireframes/states/P01 Guest Web states.dc.html#web-state-offline`, pulled as `wireframe-web-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; soldOut: the status card of WEB-029 (Error / Sold out / Maintenance) (`wireframes/P01 Guest Web.dc.html#web-029`, pulled as `wireframe-web-029.html`); closed: the status card, its closed variant (`wireframes/states/P01 Guest Web states.dc.html#web-state-closed`, pulled as `wireframe-web-state-closed.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; maintenance: the status card of WEB-029 (Error / Sold out / Maintenance) (`wireframes/P01 Guest Web.dc.html#web-029`, pulled as `wireframe-web-029.html`). The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 1440×900 and 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Operations**
 
@@ -1614,16 +1730,16 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | — |
-| error | This screen is the error state. It distinguishes sold out, closed, and platform unavailable — three different things a guest must not confuse, because only one means come back later |
-| emptyFirstRun | — |
-| emptyNoAccess | Nothing here needs a sign-in (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-2)): the screen reads only what the tenant has published, which is public, so there is no no-access case. A host that belongs to no tenant shows the platform's neutral holding page. |
-| offline | The offline banner shows instead of this page. Being offline is the guest's connection, not the venue's — an error or maintenance page shown for a dropped signal tells a guest the venue is down. |
-| soldOut | Sold out today. `getTenantAppStatus.availability` is `soldOut`: the page says so with the tenant's `availabilityMessage` and offers another day, never a generic error (decided 28 September, audit R073 (f)). |
-| closed | Closed. `getTenantAppStatus.availability` is `closed`: the page says the venue is not open, with the tenant's `availabilityMessage` and the opening hours from `contact` (decided 28 September, audit R073 (f)). |
-| maintenance | The venue's maintenance message and when it expects to be back; one way onward (try again at that time). Set live on CMS-001, never published. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | — | the turnstile loader, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 4950-4962, the block marked "TURNSTILE LOADER" (and flash() at 6984-6994, which opens it for 820 ms) |
+| error | This screen is the error state. It distinguishes sold out, closed, and platform unavailable — three different things a guest must not confuse, because only one means come back later | the status card of WEB-029 (Error / Sold out / Maintenance), `wireframes/P01 Guest Web.dc.html#web-029` (pulled as `wireframe-web-029.html`) |
+| emptyFirstRun | — | the dashed empty card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3228-3235 (My tickets, "{{ tickets.emptyText }}") and 4640-4644 (Wishlist, "Nothing saved.") |
+| emptyNoAccess | Nothing here needs a sign-in (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-2)): the screen reads only what the tenant has published, which is public, so there is no no-access case. A host that belongs to no tenant shows the platform's neutral holding page. | the "Sign in to see your account" card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3314-3322 (My account, signed out) |
+| offline | The offline banner shows instead of this page. Being offline is the guest's connection, not the venue's — an error or maintenance page shown for a dropped signal tells a guest the venue is down. | the offline banner and the paused actions, `wireframes/states/P01 Guest Web states.dc.html#web-state-offline` (pulled as `wireframe-web-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| soldOut | Sold out today. `getTenantAppStatus.availability` is `soldOut`: the page says so with the tenant's `availabilityMessage` and offers another day, never a generic error (decided 28 September, audit R073 (f)). | the status card of WEB-029 (Error / Sold out / Maintenance), `wireframes/P01 Guest Web.dc.html#web-029` (pulled as `wireframe-web-029.html`) |
+| closed | Closed. `getTenantAppStatus.availability` is `closed`: the page says the venue is not open, with the tenant's `availabilityMessage` and the opening hours from `contact` (decided 28 September, audit R073 (f)). | the status card, its closed variant, `wireframes/states/P01 Guest Web states.dc.html#web-state-closed` (pulled as `wireframe-web-state-closed.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| maintenance | The venue's maintenance message and when it expects to be back; one way onward (try again at that time). Set live on CMS-001, never published. | the status card of WEB-029 (Error / Sold out / Maintenance), `wireframes/P01 Guest Web.dc.html#web-029` (pulled as `wireframe-web-029.html`) |
 
 ## WEB-030 Ticket Transfer
 
@@ -1638,7 +1754,11 @@
 | Repository | ticvai-guest-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-web.git) |
 | Component | `TicketTransfer` |
 | Suggested location | `src/routes/TicketTransfer.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html` (rev 3 (pointer moved to the 30 September build, CHG-R1S-015)), view: Account → 'Transfer & resale'; My tickets → Manage → 'Transfer ticket'; Confirmation → 'Transfer tickets' (it shows part of this screen: build the rest from the screen spec in the same look). Wireframe frame `wireframes/P01 Guest Web.dc.html#web-030`, which adam_pull writes into the ticket folder as `wireframe-web-030.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-web.yaml`). Each state's look: loading: the turnstile loader (the prototype, lines 4950-4962, the block marked "TURNSTILE LOADER" (and flash() at 6984-6994, which opens it for 820 ms)); error: the status card of WEB-029 (Error / Sold out / Maintenance) (`wireframes/P01 Guest Web.dc.html#web-029`, pulled as `wireframe-web-029.html`); emptyFirstRun: the dashed empty card (the prototype, lines 3228-3235 (My tickets, "{{ tickets.emptyText }}") and 4640-4644 (Wishlist, "Nothing saved.")); emptyNoResults: the "Nothing matched" card (the prototype, lines 3084-3090 (Listing and search, "Nothing matched {{ list.filterText }}")); emptyNoAccess: the "Sign in to see your account" card (the prototype, lines 3314-3322 (My account, signed out)); offline: the offline banner and the paused actions (`wireframes/states/P01 Guest Web states.dc.html#web-state-offline`, pulled as `wireframe-web-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 1440×900 and 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -1659,14 +1779,14 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The ticket transfer list. |
-| error | Could not load. Names which read failed and leaves the ticket transfer untouched. |
-| emptyFirstRun | No ticket transfer yet. Offers Create resale listing (`createResaleListing`); distinct from a filter that matched nothing. |
-| emptyNoResults | Nothing matches the filter on venueId, principalId, shiftId, status, createdFrom, createdTo and the ticket transfer are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | The offline banner shows. Sending, claiming and listing for resale need the connection — a transfer nobody received is a ticket nobody holds. Tickets already loaded stay visible. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The ticket transfer list. | the turnstile loader, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 4950-4962, the block marked "TURNSTILE LOADER" (and flash() at 6984-6994, which opens it for 820 ms) |
+| error | Could not load. Names which read failed and leaves the ticket transfer untouched. | the status card of WEB-029 (Error / Sold out / Maintenance), `wireframes/P01 Guest Web.dc.html#web-029` (pulled as `wireframe-web-029.html`) |
+| emptyFirstRun | No ticket transfer yet. Offers Create resale listing (`createResaleListing`); distinct from a filter that matched nothing. | the dashed empty card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3228-3235 (My tickets, "{{ tickets.emptyText }}") and 4640-4644 (Wishlist, "Nothing saved.") |
+| emptyNoResults | Nothing matches the filter on venueId, principalId, shiftId, status, createdFrom, createdTo and the ticket transfer are still there. Names the active filter and offers to clear it. | the "Nothing matched" card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3084-3090 (Listing and search, "Nothing matched {{ list.filterText }}") |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. | the "Sign in to see your account" card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3314-3322 (My account, signed out) |
+| offline | The offline banner shows. Sending, claiming and listing for resale need the connection — a transfer nobody received is a ticket nobody holds. Tickets already loaded stay visible. | the offline banner and the paused actions, `wireframes/states/P01 Guest Web states.dc.html#web-state-offline` (pulled as `wireframe-web-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 
@@ -1688,7 +1808,11 @@
 | Repository | ticvai-guest-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-web.git) |
 | Component | `MyReservations` |
 | Suggested location | `src/routes/MyReservations.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html` (rev 3 (pointer moved to the 30 September build, CHG-R1S-015)), view: Account → 'Reservations' (it shows part of this screen: build the rest from the screen spec in the same look). Wireframe frame `wireframes/P01 Guest Web.dc.html#web-031`, which adam_pull writes into the ticket folder as `wireframe-web-031.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-web.yaml`). Each state's look: loading: the turnstile loader (the prototype, lines 4950-4962, the block marked "TURNSTILE LOADER" (and flash() at 6984-6994, which opens it for 820 ms)); error: the status card of WEB-029 (Error / Sold out / Maintenance) (`wireframes/P01 Guest Web.dc.html#web-029`, pulled as `wireframe-web-029.html`); emptyFirstRun: the dashed empty card (the prototype, lines 3228-3235 (My tickets, "{{ tickets.emptyText }}") and 4640-4644 (Wishlist, "Nothing saved.")); emptyNoResults: the "Nothing matched" card (the prototype, lines 3084-3090 (Listing and search, "Nothing matched {{ list.filterText }}")); emptyNoAccess: the "Sign in to see your account" card (the prototype, lines 3314-3322 (My account, signed out)); offline: the offline banner and the paused actions (`wireframes/states/P01 Guest Web states.dc.html#web-state-offline`, pulled as `wireframe-web-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 1440×900 and 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -1718,14 +1842,14 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The reservations list. |
-| error | Could not load. Names which read failed and leaves the reservations untouched. |
-| emptyFirstRun | No reservations yet. Offers Request group booking (`requestGroupBooking`); distinct from a filter that matched nothing. |
-| emptyNoResults | Nothing matches the filter on kind and the reservations are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | The offline banner shows. Reservations already loaded stay visible with their age. Booking, changing and cancelling need the connection — a table held offline is a table two people think they have. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The reservations list. | the turnstile loader, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 4950-4962, the block marked "TURNSTILE LOADER" (and flash() at 6984-6994, which opens it for 820 ms) |
+| error | Could not load. Names which read failed and leaves the reservations untouched. | the status card of WEB-029 (Error / Sold out / Maintenance), `wireframes/P01 Guest Web.dc.html#web-029` (pulled as `wireframe-web-029.html`) |
+| emptyFirstRun | No reservations yet. Offers Request group booking (`requestGroupBooking`); distinct from a filter that matched nothing. | the dashed empty card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3228-3235 (My tickets, "{{ tickets.emptyText }}") and 4640-4644 (Wishlist, "Nothing saved.") |
+| emptyNoResults | Nothing matches the filter on kind and the reservations are still there. Names the active filter and offers to clear it. | the "Nothing matched" card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3084-3090 (Listing and search, "Nothing matched {{ list.filterText }}") |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. | the "Sign in to see your account" card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3314-3322 (My account, signed out) |
+| offline | The offline banner shows. Reservations already loaded stay visible with their age. Booking, changing and cancelling need the connection — a table held offline is a table two people think they have. | the offline banner and the paused actions, `wireframes/states/P01 Guest Web states.dc.html#web-state-offline` (pulled as `wireframe-web-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 
@@ -1746,7 +1870,11 @@
 | Repository | ticvai-guest-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-web.git) |
 | Component | `OffersPromotions` |
 | Suggested location | `src/routes/OffersPromotions.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html` (rev 3 (pointer moved to the 30 September build, CHG-R1S-015)), view: Discover → 'Offers & promotions'. Wireframe frame `wireframes/P01 Guest Web.dc.html#web-032`, which adam_pull writes into the ticket folder as `wireframe-web-032.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-web.yaml`). Each state's look: loading: the turnstile loader (the prototype, lines 4950-4962, the block marked "TURNSTILE LOADER" (and flash() at 6984-6994, which opens it for 820 ms)); error: the status card of WEB-029 (Error / Sold out / Maintenance) (`wireframes/P01 Guest Web.dc.html#web-029`, pulled as `wireframe-web-029.html`); emptyFirstRun: the dashed empty card (the prototype, lines 3228-3235 (My tickets, "{{ tickets.emptyText }}") and 4640-4644 (Wishlist, "Nothing saved.")); emptyNoResults: the "Nothing matched" card (the prototype, lines 3084-3090 (Listing and search, "Nothing matched {{ list.filterText }}")); emptyNoAccess: the "Sign in to see your account" card (the prototype, lines 3314-3322 (My account, signed out)); offline: the offline banner and the paused actions (`wireframes/states/P01 Guest Web states.dc.html#web-state-offline`, pulled as `wireframe-web-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 1440×900 and 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -1763,14 +1891,14 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The offers promotions list. |
-| error | Could not load. Names which read failed and leaves the offers promotions untouched. |
-| emptyFirstRun | No offers promotions yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
-| emptyNoResults | Never shown as a filter result: no offer is active at this venue now, said plainly. |
-| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The offers promotions list. | the turnstile loader, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 4950-4962, the block marked "TURNSTILE LOADER" (and flash() at 6984-6994, which opens it for 820 ms) |
+| error | Could not load. Names which read failed and leaves the offers promotions untouched. | the status card of WEB-029 (Error / Sold out / Maintenance), `wireframes/P01 Guest Web.dc.html#web-029` (pulled as `wireframe-web-029.html`) |
+| emptyFirstRun | No offers promotions yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. | the dashed empty card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3228-3235 (My tickets, "{{ tickets.emptyText }}") and 4640-4644 (Wishlist, "Nothing saved.") |
+| emptyNoResults | Never shown as a filter result: no offer is active at this venue now, said plainly. | the "Nothing matched" card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3084-3090 (Listing and search, "Nothing matched {{ list.filterText }}") |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. | the "Sign in to see your account" card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3314-3322 (My account, signed out) |
+| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. | the offline banner and the paused actions, `wireframes/states/P01 Guest Web states.dc.html#web-state-offline` (pulled as `wireframe-web-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 ## WEB-033 Shop
 
@@ -1785,7 +1913,11 @@
 | Repository | ticvai-guest-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-web.git) |
 | Component | `Shop` |
 | Suggested location | `src/routes/Shop.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html` (rev 3 (pointer moved to the 30 September build, CHG-R1S-015)), view: No pre-arrival shop page; retail items appear as add-ons in the Extras step (images/shop product squares) and in At the venue → 'Shop & drop' (it shows part of this screen: build the rest from the screen spec in the same look). Wireframe frame `wireframes/P01 Guest Web.dc.html#web-033`, which adam_pull writes into the ticket folder as `wireframe-web-033.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-web.yaml`). Each state's look: loading: the turnstile loader (the prototype, lines 4950-4962, the block marked "TURNSTILE LOADER" (and flash() at 6984-6994, which opens it for 820 ms)); error: the status card of WEB-029 (Error / Sold out / Maintenance) (`wireframes/P01 Guest Web.dc.html#web-029`, pulled as `wireframe-web-029.html`); emptyFirstRun: the dashed empty card (the prototype, lines 3228-3235 (My tickets, "{{ tickets.emptyText }}") and 4640-4644 (Wishlist, "Nothing saved.")); emptyNoResults: the "Nothing matched" card (the prototype, lines 3084-3090 (Listing and search, "Nothing matched {{ list.filterText }}")); emptyNoAccess: the "Sign in to see your account" card (the prototype, lines 3314-3322 (My account, signed out)); offline: the offline banner and the paused actions (`wireframes/states/P01 Guest Web states.dc.html#web-state-offline`, pulled as `wireframe-web-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 1440×900 and 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -1806,14 +1938,14 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The shop list. |
-| error | Could not load. Names which read failed and leaves the shop untouched. |
-| emptyFirstRun | No shop yet. Offers Add cart line (`addCartLine`); distinct from a filter that matched nothing. |
-| emptyNoResults | Nothing matches the shop, category or search picked; the other products are still there. Names it and offers to clear it. |
-| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The shop list. | the turnstile loader, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 4950-4962, the block marked "TURNSTILE LOADER" (and flash() at 6984-6994, which opens it for 820 ms) |
+| error | Could not load. Names which read failed and leaves the shop untouched. | the status card of WEB-029 (Error / Sold out / Maintenance), `wireframes/P01 Guest Web.dc.html#web-029` (pulled as `wireframe-web-029.html`) |
+| emptyFirstRun | No shop yet. Offers Add cart line (`addCartLine`); distinct from a filter that matched nothing. | the dashed empty card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3228-3235 (My tickets, "{{ tickets.emptyText }}") and 4640-4644 (Wishlist, "Nothing saved.") |
+| emptyNoResults | Nothing matches the shop, category or search picked; the other products are still there. Names it and offers to clear it. | the "Nothing matched" card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3084-3090 (Listing and search, "Nothing matched {{ list.filterText }}") |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. | the "Sign in to see your account" card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3314-3322 (My account, signed out) |
+| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. | the offline banner and the paused actions, `wireframes/states/P01 Guest Web states.dc.html#web-state-offline` (pulled as `wireframe-web-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 
@@ -1834,7 +1966,11 @@
 | Repository | ticvai-guest-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-web.git) |
 | Component | `LostFound` |
 | Suggested location | `src/routes/LostFound.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html` (rev 3 (pointer moved to the 30 September build, CHG-R1S-015)), view: Account → 'Lost & found, reports'; Help → 'Your cases' → Raise a case → topic 'Lost property' (it shows part of this screen: build the rest from the screen spec in the same look). Wireframe frame `wireframes/P01 Guest Web.dc.html#web-034`, which adam_pull writes into the ticket folder as `wireframe-web-034.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-web.yaml`). Each state's look: loading: the turnstile loader (the prototype, lines 4950-4962, the block marked "TURNSTILE LOADER" (and flash() at 6984-6994, which opens it for 820 ms)); error: the status card of WEB-029 (Error / Sold out / Maintenance) (`wireframes/P01 Guest Web.dc.html#web-029`, pulled as `wireframe-web-029.html`); emptyFirstRun: the dashed empty card (the prototype, lines 3228-3235 (My tickets, "{{ tickets.emptyText }}") and 4640-4644 (Wishlist, "Nothing saved.")); emptyNoResults: the "Nothing matched" card (the prototype, lines 3084-3090 (Listing and search, "Nothing matched {{ list.filterText }}")); emptyNoAccess: the "Sign in to see your account" card (the prototype, lines 3314-3322 (My account, signed out)); offline: the offline banner and the paused actions (`wireframes/states/P01 Guest Web states.dc.html#web-state-offline`, pulled as `wireframe-web-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 1440×900 and 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -1854,14 +1990,14 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The lost found list. |
-| error | Could not load. Names which read failed and leaves the lost found untouched. |
-| emptyFirstRun | No lost found yet. Offers Raise my case (`raiseMyCase`). |
-| emptyNoResults | Never shown: `listMyCases` takes no filter, so an empty list is always the first-run state above. |
-| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | The offline banner shows. Reports already loaded stay read-only with their age. Reporting a loss and replying are disabled offline — both need the connection (decided 28 September, audit R148) — and the screen says how to reach staff in person instead: the guest services desk or lost-property point, or any member of staff. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The lost found list. | the turnstile loader, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 4950-4962, the block marked "TURNSTILE LOADER" (and flash() at 6984-6994, which opens it for 820 ms) |
+| error | Could not load. Names which read failed and leaves the lost found untouched. | the status card of WEB-029 (Error / Sold out / Maintenance), `wireframes/P01 Guest Web.dc.html#web-029` (pulled as `wireframe-web-029.html`) |
+| emptyFirstRun | No lost found yet. Offers Raise my case (`raiseMyCase`). | the dashed empty card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3228-3235 (My tickets, "{{ tickets.emptyText }}") and 4640-4644 (Wishlist, "Nothing saved.") |
+| emptyNoResults | Never shown: `listMyCases` takes no filter, so an empty list is always the first-run state above. | the "Nothing matched" card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3084-3090 (Listing and search, "Nothing matched {{ list.filterText }}") |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. | the "Sign in to see your account" card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3314-3322 (My account, signed out) |
+| offline | The offline banner shows. Reports already loaded stay read-only with their age. Reporting a loss and replying are disabled offline — both need the connection (decided 28 September, audit R148) — and the screen says how to reach staff in person instead: the guest services desk or lost-property point, or any member of staff. | the offline banner and the paused actions, `wireframes/states/P01 Guest Web states.dc.html#web-state-offline` (pulled as `wireframe-web-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 
@@ -1882,7 +2018,11 @@
 | Repository | ticvai-guest-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-web.git) |
 | Component | `MulticurrencyPricing` |
 | Suggested location | `src/routes/MulticurrencyPricing.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html` (rev 3 (pointer moved to the 30 September build, CHG-R1S-015)), view: Discover → 'Prices in your currency'. Wireframe frame `wireframes/P01 Guest Web.dc.html#web-035`, which adam_pull writes into the ticket folder as `wireframe-web-035.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-web.yaml`). Each state's look: loading: the turnstile loader (the prototype, lines 4950-4962, the block marked "TURNSTILE LOADER" (and flash() at 6984-6994, which opens it for 820 ms)); error: the status card of WEB-029 (Error / Sold out / Maintenance) (`wireframes/P01 Guest Web.dc.html#web-029`, pulled as `wireframe-web-029.html`); emptyFirstRun: the dashed empty card (the prototype, lines 3228-3235 (My tickets, "{{ tickets.emptyText }}") and 4640-4644 (Wishlist, "Nothing saved.")); emptyNoResults: the "Nothing matched" card (the prototype, lines 3084-3090 (Listing and search, "Nothing matched {{ list.filterText }}")); emptyNoAccess: the "Sign in to see your account" card (the prototype, lines 3314-3322 (My account, signed out)); offline: the offline banner and the paused actions (`wireframes/states/P01 Guest Web states.dc.html#web-state-offline`, pulled as `wireframe-web-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 1440×900 and 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Operations**
 
@@ -1893,14 +2033,14 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The multi-currency pricing list. |
-| error | Could not load. Names which read failed and leaves the multi-currency pricing untouched. |
-| emptyFirstRun | Not reachable: with no other currency at the venue the screen is not linked, and prices stay in the venue's currency. |
-| emptyNoResults | Never shown: the screen sends no filter a guest chose. |
-| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | The offline banner shows. Last known rates stay, with their age. A rate is a number a guest may act on, and an undated one they cannot judge. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The multi-currency pricing list. | the turnstile loader, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 4950-4962, the block marked "TURNSTILE LOADER" (and flash() at 6984-6994, which opens it for 820 ms) |
+| error | Could not load. Names which read failed and leaves the multi-currency pricing untouched. | the status card of WEB-029 (Error / Sold out / Maintenance), `wireframes/P01 Guest Web.dc.html#web-029` (pulled as `wireframe-web-029.html`) |
+| emptyFirstRun | Not reachable: with no other currency at the venue the screen is not linked, and prices stay in the venue's currency. | the dashed empty card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3228-3235 (My tickets, "{{ tickets.emptyText }}") and 4640-4644 (Wishlist, "Nothing saved.") |
+| emptyNoResults | Never shown: the screen sends no filter a guest chose. | the "Nothing matched" card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3084-3090 (Listing and search, "Nothing matched {{ list.filterText }}") |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. | the "Sign in to see your account" card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3314-3322 (My account, signed out) |
+| offline | The offline banner shows. Last known rates stay, with their age. A rate is a number a guest may act on, and an undated one they cannot judge. | the offline banner and the paused actions, `wireframes/states/P01 Guest Web states.dc.html#web-state-offline` (pulled as `wireframe-web-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 
@@ -1922,7 +2062,11 @@
 | Repository | ticvai-guest-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-web.git) |
 | Component | `FBBrowseOrder` |
 | Suggested location | `src/routes/FBBrowseOrder.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html` (rev 3 (30 September build)), view: Summit Peaks → header 'At the venue' → Order food (table ordering). Wireframe frame `wireframes/P01 Guest Web.dc.html#web-036`, which adam_pull writes into the ticket folder as `wireframe-web-036.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-web.yaml`). Each state's look: loading: the turnstile loader (the prototype, lines 4950-4962, the block marked "TURNSTILE LOADER" (and flash() at 6984-6994, which opens it for 820 ms)); error: the status card of WEB-029 (Error / Sold out / Maintenance) (`wireframes/P01 Guest Web.dc.html#web-029`, pulled as `wireframe-web-029.html`); emptyFirstRun: the dashed empty card (the prototype, lines 3228-3235 (My tickets, "{{ tickets.emptyText }}") and 4640-4644 (Wishlist, "Nothing saved.")); emptyNoResults: the "Nothing matched" card (the prototype, lines 3084-3090 (Listing and search, "Nothing matched {{ list.filterText }}")); emptyNoAccess: the "Sign in to see your account" card (the prototype, lines 3314-3322 (My account, signed out)); offline: the offline banner and the paused actions (`wireframes/states/P01 Guest Web states.dc.html#web-state-offline`, pulled as `wireframe-web-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 1440×900 and 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -1956,14 +2100,14 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | Content resolves in place. |
-| error | Could not load. The rest of the site is unaffected. |
-| emptyFirstRun | No outlet takes orders here now. Names when the next one opens; a counter-only outlet's menu can still be read. |
-| emptyNoResults | No outlet open now matches: says so, with the next opening time. |
-| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | The offline banner shows. The menu already loaded stays with its age. Ordering, claiming a table and booking wait for the connection — an order placed offline is food nobody is making. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | Content resolves in place. | the turnstile loader, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 4950-4962, the block marked "TURNSTILE LOADER" (and flash() at 6984-6994, which opens it for 820 ms) |
+| error | Could not load. The rest of the site is unaffected. | the status card of WEB-029 (Error / Sold out / Maintenance), `wireframes/P01 Guest Web.dc.html#web-029` (pulled as `wireframe-web-029.html`) |
+| emptyFirstRun | No outlet takes orders here now. Names when the next one opens; a counter-only outlet's menu can still be read. | the dashed empty card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3228-3235 (My tickets, "{{ tickets.emptyText }}") and 4640-4644 (Wishlist, "Nothing saved.") |
+| emptyNoResults | No outlet open now matches: says so, with the next opening time. | the "Nothing matched" card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3084-3090 (Listing and search, "Nothing matched {{ list.filterText }}") |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. | the "Sign in to see your account" card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3314-3322 (My account, signed out) |
+| offline | The offline banner shows. The menu already loaded stays with its age. Ordering, claiming a table and booking wait for the connection — an order placed offline is food nobody is making. | the offline banner and the paused actions, `wireframes/states/P01 Guest Web states.dc.html#web-state-offline` (pulled as `wireframe-web-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 
@@ -1984,7 +2128,11 @@
 | Repository | ticvai-guest-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-web.git) |
 | Component | `MenuItemDetail` |
 | Suggested location | `src/routes/MenuItemDetail.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html` (rev 3 (pointer moved to the 30 September build, CHG-R1S-015)), view: At the venue → Order food → tap a dish; Takeaway/Delivery → 'Add' opens the modifier side panel. Wireframe frame `wireframes/P01 Guest Web.dc.html#web-037`, which adam_pull writes into the ticket folder as `wireframe-web-037.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-web.yaml`). Each state's look: loading: the turnstile loader (the prototype, lines 4950-4962, the block marked "TURNSTILE LOADER" (and flash() at 6984-6994, which opens it for 820 ms)); error: the status card of WEB-029 (Error / Sold out / Maintenance) (`wireframes/P01 Guest Web.dc.html#web-029`, pulled as `wireframe-web-029.html`); emptyFirstRun: the dashed empty card (the prototype, lines 3228-3235 (My tickets, "{{ tickets.emptyText }}") and 4640-4644 (Wishlist, "Nothing saved.")); emptyNoAccess: the "Sign in to see your account" card (the prototype, lines 3314-3322 (My account, signed out)); offline: the offline banner and the paused actions (`wireframes/states/P01 Guest Web states.dc.html#web-state-offline`, pulled as `wireframe-web-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 1440×900 and 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -2001,13 +2149,13 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | Content resolves in place. |
-| error | Could not load. The rest of the site is unaffected. |
-| emptyFirstRun | Nothing here yet for this venue. Names what turns it on rather than showing an empty panel. |
-| emptyNoAccess | Never shown: a menu is public and browsing a dish needs no sign-in. |
-| offline | The offline banner shows. The dish already loaded stays, with a note that it may be out of date and its allergens in full. Ordering is refused — availability changes by the minute. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | Content resolves in place. | the turnstile loader, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 4950-4962, the block marked "TURNSTILE LOADER" (and flash() at 6984-6994, which opens it for 820 ms) |
+| error | Could not load. The rest of the site is unaffected. | the status card of WEB-029 (Error / Sold out / Maintenance), `wireframes/P01 Guest Web.dc.html#web-029` (pulled as `wireframe-web-029.html`) |
+| emptyFirstRun | Nothing here yet for this venue. Names what turns it on rather than showing an empty panel. | the dashed empty card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3228-3235 (My tickets, "{{ tickets.emptyText }}") and 4640-4644 (Wishlist, "Nothing saved.") |
+| emptyNoAccess | Never shown: a menu is public and browsing a dish needs no sign-in. | the "Sign in to see your account" card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3314-3322 (My account, signed out) |
+| offline | The offline banner shows. The dish already loaded stays, with a note that it may be out of date and its allergens in full. Ordering is refused — availability changes by the minute. | the offline banner and the paused actions, `wireframes/states/P01 Guest Web states.dc.html#web-state-offline` (pulled as `wireframe-web-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 ## WEB-038 F&B – Order Tracking
 
@@ -2022,7 +2170,11 @@
 | Repository | ticvai-guest-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-web.git) |
 | Component | `FBOrderTracking` |
 | Suggested location | `src/routes/FBOrderTracking.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | statusTracker |
+| Layout pattern | statusTracker (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html` (rev 3 (pointer moved to the 30 September build, CHG-R1S-015)), view: At the venue → Order food → 'Send to the kitchen'. Wireframe frame `wireframes/P01 Guest Web.dc.html#web-038`, which adam_pull writes into the ticket folder as `wireframe-web-038.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-web.yaml`). Each state's look: loading: the turnstile loader (the prototype, lines 4950-4962, the block marked "TURNSTILE LOADER" (and flash() at 6984-6994, which opens it for 820 ms)); error: the status card of WEB-029 (Error / Sold out / Maintenance) (`wireframes/P01 Guest Web.dc.html#web-029`, pulled as `wireframe-web-029.html`); emptyFirstRun: the dashed empty card (the prototype, lines 3228-3235 (My tickets, "{{ tickets.emptyText }}") and 4640-4644 (Wishlist, "Nothing saved.")); emptyNoAccess: the "Sign in to see your account" card (the prototype, lines 3314-3322 (My account, signed out)); offline: the offline banner and the paused actions (`wireframes/states/P01 Guest Web states.dc.html#web-state-offline`, pulled as `wireframe-web-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 1440×900 and 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -2042,13 +2194,13 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | Loading the order. |
-| error | Could not load. The rest of the site is unaffected. |
-| emptyFirstRun | The order is not found or was refunded (a cold link): says which, with the way back to ordering. |
-| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | The offline banner shows. The last status stays with its age ("Preparing, 2 min ago"); nothing refreshes until the connection returns. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | Loading the order. | the turnstile loader, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 4950-4962, the block marked "TURNSTILE LOADER" (and flash() at 6984-6994, which opens it for 820 ms) |
+| error | Could not load. The rest of the site is unaffected. | the status card of WEB-029 (Error / Sold out / Maintenance), `wireframes/P01 Guest Web.dc.html#web-029` (pulled as `wireframe-web-029.html`) |
+| emptyFirstRun | The order is not found or was refunded (a cold link): says which, with the way back to ordering. | the dashed empty card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3228-3235 (My tickets, "{{ tickets.emptyText }}") and 4640-4644 (Wishlist, "Nothing saved.") |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. | the "Sign in to see your account" card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3314-3322 (My account, signed out) |
+| offline | The offline banner shows. The last status stays with its age ("Preparing, 2 min ago"); nothing refreshes until the connection returns. | the offline banner and the paused actions, `wireframes/states/P01 Guest Web states.dc.html#web-state-offline` (pulled as `wireframe-web-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 ## WEB-039 Venue Map & Wait Times
 
@@ -2063,7 +2215,11 @@
 | Repository | ticvai-guest-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-web.git) |
 | Component | `VenueMapWaitTimes` |
 | Suggested location | `src/routes/VenueMapWaitTimes.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html` (rev 3 (30 September build)), view: Summit Peaks → header 'At the venue' → Map & waits (3D view, with the 2D plan one tap away). Wireframe frame `wireframes/P01 Guest Web.dc.html#web-039`, which adam_pull writes into the ticket folder as `wireframe-web-039.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-web.yaml`). Each state's look: loading: the turnstile loader (the prototype, lines 4950-4962, the block marked "TURNSTILE LOADER" (and flash() at 6984-6994, which opens it for 820 ms)); error: the status card of WEB-029 (Error / Sold out / Maintenance) (`wireframes/P01 Guest Web.dc.html#web-029`, pulled as `wireframe-web-029.html`); emptyFirstRun: the dashed empty card (the prototype, lines 3228-3235 (My tickets, "{{ tickets.emptyText }}") and 4640-4644 (Wishlist, "Nothing saved.")); emptyNoResults: the "Nothing matched" card (the prototype, lines 3084-3090 (Listing and search, "Nothing matched {{ list.filterText }}")); emptyNoAccess: the "Sign in to see your account" card (the prototype, lines 3314-3322 (My account, signed out)); offline: the offline banner and the paused actions (`wireframes/states/P01 Guest Web states.dc.html#web-state-offline`, pulled as `wireframe-web-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 1440×900 and 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -2084,14 +2240,14 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | Content resolves in place. |
-| error | Could not load. The rest of the site is unaffected. |
-| emptyFirstRun | Nothing here yet for this venue. Names what turns it on rather than showing an empty panel. |
-| emptyNoResults | No attraction of the category picked; the other categories stay. |
-| emptyNoAccess | Shown when the caller lacks `VENUE_MAP_VIEW`, which `getVenueMap` requires to show this screen, and names that permission (the screen's other reads need `QUEUE_VIEW` and say so in their own panels). Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | The offline banner shows. A map and route graph already loaded stay usable, so directions do not need a signal. Wait times show their last reading marked out of date, never as live — a queue length from an hour ago sends a guest to the wrong ride. With no map loaded yet, the screen asks the guest to reconnect. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | Content resolves in place. | the turnstile loader, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 4950-4962, the block marked "TURNSTILE LOADER" (and flash() at 6984-6994, which opens it for 820 ms) |
+| error | Could not load. The rest of the site is unaffected. | the status card of WEB-029 (Error / Sold out / Maintenance), `wireframes/P01 Guest Web.dc.html#web-029` (pulled as `wireframe-web-029.html`) |
+| emptyFirstRun | Nothing here yet for this venue. Names what turns it on rather than showing an empty panel. | the dashed empty card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3228-3235 (My tickets, "{{ tickets.emptyText }}") and 4640-4644 (Wishlist, "Nothing saved.") |
+| emptyNoResults | No attraction of the category picked; the other categories stay. | the "Nothing matched" card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3084-3090 (Listing and search, "Nothing matched {{ list.filterText }}") |
+| emptyNoAccess | Shown when the caller lacks `VENUE_MAP_VIEW`, which `getVenueMap` requires to show this screen, and names that permission (the screen's other reads need `QUEUE_VIEW` and say so in their own panels). Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. | the "Sign in to see your account" card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3314-3322 (My account, signed out) |
+| offline | The offline banner shows. A map and route graph already loaded stay usable, so directions do not need a signal. Wait times show their last reading marked out of date, never as live — a queue length from an hour ago sends a guest to the wrong ride. With no map loaded yet, the screen asks the guest to reconnect. | the offline banner and the paused actions, `wireframes/states/P01 Guest Web states.dc.html#web-state-offline` (pulled as `wireframe-web-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 ## WEB-040 Virtual Queue
 
@@ -2106,7 +2262,11 @@
 | Repository | ticvai-guest-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-web.git) |
 | Component | `VirtualQueue` |
 | Suggested location | `src/routes/VirtualQueue.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | statusTracker |
+| Layout pattern | statusTracker (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html` (rev 3 (30 September build)), view: Summit Peaks → header 'At the venue' → Virtual queue. Wireframe frame `wireframes/P01 Guest Web.dc.html#web-040`, which adam_pull writes into the ticket folder as `wireframe-web-040.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-web.yaml`). Each state's look: loading: the turnstile loader (the prototype, lines 4950-4962, the block marked "TURNSTILE LOADER" (and flash() at 6984-6994, which opens it for 820 ms)); error: the status card of WEB-029 (Error / Sold out / Maintenance) (`wireframes/P01 Guest Web.dc.html#web-029`, pulled as `wireframe-web-029.html`); emptyFirstRun: the dashed empty card (the prototype, lines 3228-3235 (My tickets, "{{ tickets.emptyText }}") and 4640-4644 (Wishlist, "Nothing saved.")); emptyNoResults: the "Nothing matched" card (the prototype, lines 3084-3090 (Listing and search, "Nothing matched {{ list.filterText }}")); emptyNoAccess: the "Sign in to see your account" card (the prototype, lines 3314-3322 (My account, signed out)); offline: the offline banner and the paused actions (`wireframes/states/P01 Guest Web states.dc.html#web-state-offline`, pulled as `wireframe-web-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 1440×900 and 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -2127,14 +2287,14 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | Content resolves in place. |
-| error | Could not load. The rest of the site is unaffected. |
-| emptyFirstRun | Nothing here yet for this venue. Names what turns it on rather than showing an empty panel. |
-| emptyNoResults | Nothing matches. |
-| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | The offline banner shows. The guest's place stays on screen with its age, so they can see they hold it. Joining and leaving need the connection — a place taken offline is a place nobody else can see. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | Content resolves in place. | the turnstile loader, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 4950-4962, the block marked "TURNSTILE LOADER" (and flash() at 6984-6994, which opens it for 820 ms) |
+| error | Could not load. The rest of the site is unaffected. | the status card of WEB-029 (Error / Sold out / Maintenance), `wireframes/P01 Guest Web.dc.html#web-029` (pulled as `wireframe-web-029.html`) |
+| emptyFirstRun | Nothing here yet for this venue. Names what turns it on rather than showing an empty panel. | the dashed empty card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3228-3235 (My tickets, "{{ tickets.emptyText }}") and 4640-4644 (Wishlist, "Nothing saved.") |
+| emptyNoResults | Nothing matches. | the "Nothing matched" card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3084-3090 (Listing and search, "Nothing matched {{ list.filterText }}") |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. | the "Sign in to see your account" card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3314-3322 (My account, signed out) |
+| offline | The offline banner shows. The guest's place stays on screen with its age, so they can see they hold it. Joining and leaving need the connection — a place taken offline is a place nobody else can see. | the offline banner and the paused actions, `wireframes/states/P01 Guest Web states.dc.html#web-state-offline` (pulled as `wireframe-web-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 ## WEB-041 Parking – Reserve & Pay
 
@@ -2149,7 +2309,11 @@
 | Repository | ticvai-guest-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-web.git) |
 | Component | `ParkingReservePay` |
 | Suggested location | `src/routes/ParkingReservePay.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html` (rev 3 (30 September build)), view: Summit Peaks → header 'At the venue' → Parking (it shows part of this screen: build the rest from the screen spec in the same look). Wireframe frame `wireframes/P01 Guest Web.dc.html#web-041`, which adam_pull writes into the ticket folder as `wireframe-web-041.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-web.yaml`). Each state's look: loading: the turnstile loader (the prototype, lines 4950-4962, the block marked "TURNSTILE LOADER" (and flash() at 6984-6994, which opens it for 820 ms)); error: the status card of WEB-029 (Error / Sold out / Maintenance) (`wireframes/P01 Guest Web.dc.html#web-029`, pulled as `wireframe-web-029.html`); emptyFirstRun: the dashed empty card (the prototype, lines 3228-3235 (My tickets, "{{ tickets.emptyText }}") and 4640-4644 (Wishlist, "Nothing saved.")); emptyNoResults: the "Nothing matched" card (the prototype, lines 3084-3090 (Listing and search, "Nothing matched {{ list.filterText }}")); emptyNoAccess: the "Sign in to see your account" card (the prototype, lines 3314-3322 (My account, signed out)); offline: the offline banner and the paused actions (`wireframes/states/P01 Guest Web states.dc.html#web-state-offline`, pulled as `wireframe-web-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; soldOutForDay: the parking-full notice (`wireframes/states/P01 Guest Web states.dc.html#web-state-sold-out-for-day`, pulled as `wireframe-web-state-sold-out-for-day.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 1440×900 and 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -2170,15 +2334,15 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | Content resolves in place. |
-| error | Could not load. The rest of the site is unaffected. |
-| emptyFirstRun | Nothing here yet for this venue. Names what turns it on rather than showing an empty panel. |
-| emptyNoResults | Never shown: the car parks are the venue's, with no filter a guest sets. |
-| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | The offline banner shows. A reservation already confirmed stays on screen with its plate and car park. Reserving, paying and changing the plate need the connection. |
-| soldOutForDay | The car park is full. `addCartLine` refused the parking line with `soldOutForDay`: issued entitlements have reached the facility's capacity for that day. Shown only then — there is no live space count in the first release, so the screen never promises spaces before the guest tries (decided 28 September, audit R166). |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | Content resolves in place. | the turnstile loader, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 4950-4962, the block marked "TURNSTILE LOADER" (and flash() at 6984-6994, which opens it for 820 ms) |
+| error | Could not load. The rest of the site is unaffected. | the status card of WEB-029 (Error / Sold out / Maintenance), `wireframes/P01 Guest Web.dc.html#web-029` (pulled as `wireframe-web-029.html`) |
+| emptyFirstRun | Nothing here yet for this venue. Names what turns it on rather than showing an empty panel. | the dashed empty card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3228-3235 (My tickets, "{{ tickets.emptyText }}") and 4640-4644 (Wishlist, "Nothing saved.") |
+| emptyNoResults | Never shown: the car parks are the venue's, with no filter a guest sets. | the "Nothing matched" card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3084-3090 (Listing and search, "Nothing matched {{ list.filterText }}") |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. | the "Sign in to see your account" card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3314-3322 (My account, signed out) |
+| offline | The offline banner shows. A reservation already confirmed stays on screen with its plate and car park. Reserving, paying and changing the plate need the connection. | the offline banner and the paused actions, `wireframes/states/P01 Guest Web states.dc.html#web-state-offline` (pulled as `wireframe-web-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| soldOutForDay | The car park is full. `addCartLine` refused the parking line with `soldOutForDay`: issued entitlements have reached the facility's capacity for that day. Shown only then — there is no live space count in the first release, so the screen never promises spaces before the guest tries (decided 28 September, audit R166). | the parking-full notice, `wireframes/states/P01 Guest Web states.dc.html#web-state-sold-out-for-day` (pulled as `wireframe-web-state-sold-out-for-day.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 ## WEB-042 Retail & Shop and Drop
 
@@ -2193,7 +2357,11 @@
 | Repository | ticvai-guest-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-web.git) |
 | Component | `RetailShopAndDrop` |
 | Suggested location | `src/routes/RetailShopAndDrop.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html` (rev 3 (30 September build)), view: Summit Peaks → header 'At the venue' → Shop (collect at the gate, at the car park kiosk, or delivered home). Wireframe frame `wireframes/P01 Guest Web.dc.html#web-042`, which adam_pull writes into the ticket folder as `wireframe-web-042.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-web.yaml`). Each state's look: loading: the turnstile loader (the prototype, lines 4950-4962, the block marked "TURNSTILE LOADER" (and flash() at 6984-6994, which opens it for 820 ms)); error: the status card of WEB-029 (Error / Sold out / Maintenance) (`wireframes/P01 Guest Web.dc.html#web-029`, pulled as `wireframe-web-029.html`); emptyFirstRun: the dashed empty card (the prototype, lines 3228-3235 (My tickets, "{{ tickets.emptyText }}") and 4640-4644 (Wishlist, "Nothing saved.")); emptyNoResults: the "Nothing matched" card (the prototype, lines 3084-3090 (Listing and search, "Nothing matched {{ list.filterText }}")); emptyNoAccess: the "Sign in to see your account" card (the prototype, lines 3314-3322 (My account, signed out)); offline: the offline banner and the paused actions (`wireframes/states/P01 Guest Web states.dc.html#web-state-offline`, pulled as `wireframe-web-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 1440×900 and 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -2212,14 +2380,14 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | Content resolves in place. |
-| error | Could not load. The rest of the site is unaffected. |
-| emptyFirstRun | Nothing here yet for this venue. Names what turns it on rather than showing an empty panel. |
-| emptyNoResults | Nothing matches. |
-| emptyNoAccess | There is no permission to name: a guest holds none (ADR-0025). The shop is public; buying needs the guest's cart. |
-| offline | The offline banner shows, and lookup cannot run. A drop reference already on screen stays visible so the guest can quote it at the collection point. Reserving merchandise needs the connection. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | Content resolves in place. | the turnstile loader, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 4950-4962, the block marked "TURNSTILE LOADER" (and flash() at 6984-6994, which opens it for 820 ms) |
+| error | Could not load. The rest of the site is unaffected. | the status card of WEB-029 (Error / Sold out / Maintenance), `wireframes/P01 Guest Web.dc.html#web-029` (pulled as `wireframe-web-029.html`) |
+| emptyFirstRun | Nothing here yet for this venue. Names what turns it on rather than showing an empty panel. | the dashed empty card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3228-3235 (My tickets, "{{ tickets.emptyText }}") and 4640-4644 (Wishlist, "Nothing saved.") |
+| emptyNoResults | Nothing matches. | the "Nothing matched" card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3084-3090 (Listing and search, "Nothing matched {{ list.filterText }}") |
+| emptyNoAccess | There is no permission to name: a guest holds none (ADR-0025). The shop is public; buying needs the guest's cart. | the "Sign in to see your account" card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3314-3322 (My account, signed out) |
+| offline | The offline banner shows, and lookup cannot run. A drop reference already on screen stays visible so the guest can quote it at the collection point. Reserving merchandise needs the connection. | the offline banner and the paused actions, `wireframes/states/P01 Guest Web states.dc.html#web-state-offline` (pulled as `wireframe-web-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 
@@ -2240,7 +2408,11 @@
 | Repository | ticvai-guest-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-web.git) |
 | Component | `LoyaltyRewards` |
 | Suggested location | `src/routes/LoyaltyRewards.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html` (rev 3 (30 September build)), view: Summit Peaks → header 'At the venue' → Loyalty. Wireframe frame `wireframes/P01 Guest Web.dc.html#web-043`, which adam_pull writes into the ticket folder as `wireframe-web-043.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-web.yaml`). Each state's look: loading: the turnstile loader (the prototype, lines 4950-4962, the block marked "TURNSTILE LOADER" (and flash() at 6984-6994, which opens it for 820 ms)); error: the status card of WEB-029 (Error / Sold out / Maintenance) (`wireframes/P01 Guest Web.dc.html#web-029`, pulled as `wireframe-web-029.html`); emptyFirstRun: the dashed empty card (the prototype, lines 3228-3235 (My tickets, "{{ tickets.emptyText }}") and 4640-4644 (Wishlist, "Nothing saved.")); emptyNoResults: the "Nothing matched" card (the prototype, lines 3084-3090 (Listing and search, "Nothing matched {{ list.filterText }}")); emptyNoAccess: the "Sign in to see your account" card (the prototype, lines 3314-3322 (My account, signed out)); offline: the offline banner and the paused actions (`wireframes/states/P01 Guest Web states.dc.html#web-state-offline`, pulled as `wireframe-web-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 1440×900 and 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -2265,14 +2437,14 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | Content resolves in place. |
-| error | Could not load. The rest of the site is unaffected. |
-| emptyFirstRun | Nothing here yet for this venue. Names what turns it on rather than showing an empty panel. |
-| emptyNoResults | Nothing matches. |
-| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | The offline banner shows. The last known balance stays with its age, and points earned since are not shown — and that is said. Redeeming and referring need the connection. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | Content resolves in place. | the turnstile loader, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 4950-4962, the block marked "TURNSTILE LOADER" (and flash() at 6984-6994, which opens it for 820 ms) |
+| error | Could not load. The rest of the site is unaffected. | the status card of WEB-029 (Error / Sold out / Maintenance), `wireframes/P01 Guest Web.dc.html#web-029` (pulled as `wireframe-web-029.html`) |
+| emptyFirstRun | Nothing here yet for this venue. Names what turns it on rather than showing an empty panel. | the dashed empty card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3228-3235 (My tickets, "{{ tickets.emptyText }}") and 4640-4644 (Wishlist, "Nothing saved.") |
+| emptyNoResults | Nothing matches. | the "Nothing matched" card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3084-3090 (Listing and search, "Nothing matched {{ list.filterText }}") |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. | the "Sign in to see your account" card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3314-3322 (My account, signed out) |
+| offline | The offline banner shows. The last known balance stays with its age, and points earned since are not shown — and that is said. Redeeming and referring need the connection. | the offline banner and the paused actions, `wireframes/states/P01 Guest Web states.dc.html#web-state-offline` (pulled as `wireframe-web-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 ## WEB-044 AI Concierge – Home
 
@@ -2287,7 +2459,11 @@
 | Repository | ticvai-guest-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-web.git) |
 | Component | `AiConcierge` |
 | Suggested location | `src/routes/AiConcierge.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | statusTracker |
+| Layout pattern | statusTracker (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html` (rev 3 (pointer moved to the 30 September build, CHG-R1S-015)), view: Floating 'Ask Sahli' button on every page. Wireframe frame `wireframes/P01 Guest Web.dc.html#web-044`, which adam_pull writes into the ticket folder as `wireframe-web-044.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-web.yaml`). Each state's look: loading: the turnstile loader (the prototype, lines 4950-4962, the block marked "TURNSTILE LOADER" (and flash() at 6984-6994, which opens it for 820 ms)); error: the status card of WEB-029 (Error / Sold out / Maintenance) (`wireframes/P01 Guest Web.dc.html#web-029`, pulled as `wireframe-web-029.html`); emptyFirstRun: the dashed empty card (the prototype, lines 3228-3235 (My tickets, "{{ tickets.emptyText }}") and 4640-4644 (Wishlist, "Nothing saved.")); emptyNoResults: the "Nothing matched" card (the prototype, lines 3084-3090 (Listing and search, "Nothing matched {{ list.filterText }}")); emptyNoAccess: the "Sign in to see your account" card (the prototype, lines 3314-3322 (My account, signed out)); offline: the offline banner and the paused actions (`wireframes/states/P01 Guest Web states.dc.html#web-state-offline`, pulled as `wireframe-web-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 1440×900 and 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -2313,14 +2489,14 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | Content resolves in place. |
-| error | Could not load. The rest of the site is unaffected. |
-| emptyFirstRun | Nothing here yet for this venue. Names what turns it on rather than showing an empty panel. |
-| emptyNoResults | Nothing matches. |
-| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | Not available, and the offline banner says why. The assistant needs the connection; conversations already loaded stay readable. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | Content resolves in place. | the turnstile loader, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 4950-4962, the block marked "TURNSTILE LOADER" (and flash() at 6984-6994, which opens it for 820 ms) |
+| error | Could not load. The rest of the site is unaffected. | the status card of WEB-029 (Error / Sold out / Maintenance), `wireframes/P01 Guest Web.dc.html#web-029` (pulled as `wireframe-web-029.html`) |
+| emptyFirstRun | Nothing here yet for this venue. Names what turns it on rather than showing an empty panel. | the dashed empty card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3228-3235 (My tickets, "{{ tickets.emptyText }}") and 4640-4644 (Wishlist, "Nothing saved.") |
+| emptyNoResults | Nothing matches. | the "Nothing matched" card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3084-3090 (Listing and search, "Nothing matched {{ list.filterText }}") |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. | the "Sign in to see your account" card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3314-3322 (My account, signed out) |
+| offline | Not available, and the offline banner says why. The assistant needs the connection; conversations already loaded stay readable. | the offline banner and the paused actions, `wireframes/states/P01 Guest Web states.dc.html#web-state-offline` (pulled as `wireframe-web-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 ## WEB-045 Help Centre & Accessibility
 
@@ -2335,7 +2511,11 @@
 | Repository | ticvai-guest-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-web.git) |
 | Component | `HelpCentreAccessibility` |
 | Suggested location | `src/routes/HelpCentreAccessibility.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html` (rev 3 (pointer moved to the 30 September build, CHG-R1S-015)), view: Header 'Help' → 'Policies and accessibility'; footer 'Accessibility' (it shows part of this screen: build the rest from the screen spec in the same look). Wireframe frame `wireframes/P01 Guest Web.dc.html#web-045`, which adam_pull writes into the ticket folder as `wireframe-web-045.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-web.yaml`). Each state's look: loading: the turnstile loader (the prototype, lines 4950-4962, the block marked "TURNSTILE LOADER" (and flash() at 6984-6994, which opens it for 820 ms)); error: the status card of WEB-029 (Error / Sold out / Maintenance) (`wireframes/P01 Guest Web.dc.html#web-029`, pulled as `wireframe-web-029.html`); emptyFirstRun: the dashed empty card (the prototype, lines 3228-3235 (My tickets, "{{ tickets.emptyText }}") and 4640-4644 (Wishlist, "Nothing saved.")); emptyNoResults: the "Nothing matched" card (the prototype, lines 3084-3090 (Listing and search, "Nothing matched {{ list.filterText }}")); emptyNoAccess: the "Sign in to see your account" card (the prototype, lines 3314-3322 (My account, signed out)); offline: the offline banner and the paused actions (`wireframes/states/P01 Guest Web states.dc.html#web-state-offline`, pulled as `wireframe-web-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 1440×900 and 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Operations**
 
@@ -2348,14 +2528,14 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | Content resolves in place. |
-| error | Could not load. The rest of the site is unaffected. |
-| emptyFirstRun | Nothing here yet for this venue. Names what turns it on rather than showing an empty panel. |
-| emptyNoResults | No question or page matches what was typed; the categories stay. Names the search and offers to clear it. |
-| emptyNoAccess | Nothing here needs a sign-in (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-2)): the screen reads only what the tenant has published, which is public, so there is no no-access case. A host that belongs to no tenant shows the platform's neutral holding page. |
-| offline | The offline banner shows. Help already loaded stays readable, marked with its age. Raising a case is disabled offline — it needs the connection (decided 28 September, audit R148) — and the screen says how to reach staff in person instead: the guest services desk, or any member of staff. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | Content resolves in place. | the turnstile loader, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 4950-4962, the block marked "TURNSTILE LOADER" (and flash() at 6984-6994, which opens it for 820 ms) |
+| error | Could not load. The rest of the site is unaffected. | the status card of WEB-029 (Error / Sold out / Maintenance), `wireframes/P01 Guest Web.dc.html#web-029` (pulled as `wireframe-web-029.html`) |
+| emptyFirstRun | Nothing here yet for this venue. Names what turns it on rather than showing an empty panel. | the dashed empty card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3228-3235 (My tickets, "{{ tickets.emptyText }}") and 4640-4644 (Wishlist, "Nothing saved.") |
+| emptyNoResults | No question or page matches what was typed; the categories stay. Names the search and offers to clear it. | the "Nothing matched" card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3084-3090 (Listing and search, "Nothing matched {{ list.filterText }}") |
+| emptyNoAccess | Nothing here needs a sign-in (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-2)): the screen reads only what the tenant has published, which is public, so there is no no-access case. A host that belongs to no tenant shows the platform's neutral holding page. | the "Sign in to see your account" card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3314-3322 (My account, signed out) |
+| offline | The offline banner shows. Help already loaded stays readable, marked with its age. Raising a case is disabled offline — it needs the connection (decided 28 September, audit R148) — and the screen says how to reach staff in person instead: the guest services desk, or any member of staff. | the offline banner and the paused actions, `wireframes/states/P01 Guest Web states.dc.html#web-state-offline` (pulled as `wireframe-web-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 ## WEB-046 In-Venue Notifications
 
@@ -2370,7 +2550,11 @@
 | Repository | ticvai-guest-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-web.git) |
 | Component | `InVenueNotifications` |
 | Suggested location | `src/routes/InVenueNotifications.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | configEditor |
+| Layout pattern | configEditor (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html` (rev 3 (30 September build)), view: Summit Peaks → header 'At the venue' → Alerts. Wireframe frame `wireframes/P01 Guest Web.dc.html#web-046`, which adam_pull writes into the ticket folder as `wireframe-web-046.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-web.yaml`). Each state's look: loading: the turnstile loader (the prototype, lines 4950-4962, the block marked "TURNSTILE LOADER" (and flash() at 6984-6994, which opens it for 820 ms)); error: the status card of WEB-029 (Error / Sold out / Maintenance) (`wireframes/P01 Guest Web.dc.html#web-029`, pulled as `wireframe-web-029.html`); emptyFirstRun: the dashed empty card (the prototype, lines 3228-3235 (My tickets, "{{ tickets.emptyText }}") and 4640-4644 (Wishlist, "Nothing saved.")); emptyNoAccess: the "Sign in to see your account" card (the prototype, lines 3314-3322 (My account, signed out)); offline: the offline banner and the paused actions (`wireframes/states/P01 Guest Web states.dc.html#web-state-offline`, pulled as `wireframe-web-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyNoResults: the "Nothing matched" card (the prototype, lines 3084-3090 (Listing and search, "Nothing matched {{ list.filterText }}")). The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 1440×900 and 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -2387,14 +2571,14 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | Content resolves in place. |
-| error | Could not load. The rest of the site is unaffected. |
-| emptyFirstRun | Nothing here yet for this venue. Names what turns it on rather than showing an empty panel. |
-| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | The offline banner shows. Notices already received stay listed. New queue calls and order updates arrive once the connection is back, and the banner is the warning that they may be late. |
-| emptyNoResults | No unread notifications. Names the Unread only filter and offers to show all; the read ones are still there. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | Content resolves in place. | the turnstile loader, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 4950-4962, the block marked "TURNSTILE LOADER" (and flash() at 6984-6994, which opens it for 820 ms) |
+| error | Could not load. The rest of the site is unaffected. | the status card of WEB-029 (Error / Sold out / Maintenance), `wireframes/P01 Guest Web.dc.html#web-029` (pulled as `wireframe-web-029.html`) |
+| emptyFirstRun | Nothing here yet for this venue. Names what turns it on rather than showing an empty panel. | the dashed empty card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3228-3235 (My tickets, "{{ tickets.emptyText }}") and 4640-4644 (Wishlist, "Nothing saved.") |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. | the "Sign in to see your account" card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3314-3322 (My account, signed out) |
+| offline | The offline banner shows. Notices already received stay listed. New queue calls and order updates arrive once the connection is back, and the banner is the warning that they may be late. | the offline banner and the paused actions, `wireframes/states/P01 Guest Web states.dc.html#web-state-offline` (pulled as `wireframe-web-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyNoResults | No unread notifications. Names the Unread only filter and offers to show all; the read ones are still there. | the "Nothing matched" card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3084-3090 (Listing and search, "Nothing matched {{ list.filterText }}") |
 
 ## WEB-047 Map Booking — Cabanas & Spots
 
@@ -2409,7 +2593,11 @@
 | Repository | ticvai-guest-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-web.git) |
 | Component | `MapBookingCanvas` |
 | Suggested location | `src/routes/booking-and-selection/MapBookingCanvas.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html` (rev 3 (pointer moved to the 30 September build, CHG-R1S-015)), view: Coastal Aqua → 'Cabana & locker rentals' → cabana map ('Remaining time' counter). Wireframe frame `wireframes/P01 Guest Web.dc.html#web-047`, which adam_pull writes into the ticket folder as `wireframe-web-047.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-web.yaml`). Each state's look: loading: the turnstile loader (the prototype, lines 4950-4962, the block marked "TURNSTILE LOADER" (and flash() at 6984-6994, which opens it for 820 ms)); error: the status card of WEB-029 (Error / Sold out / Maintenance) (`wireframes/P01 Guest Web.dc.html#web-029`, pulled as `wireframe-web-029.html`); emptyFirstRun: the dashed empty card (the prototype, lines 3228-3235 (My tickets, "{{ tickets.emptyText }}") and 4640-4644 (Wishlist, "Nothing saved.")); emptyNoResults: the "Nothing matched" card (the prototype, lines 3084-3090 (Listing and search, "Nothing matched {{ list.filterText }}")); emptyNoAccess: the "Sign in to see your account" card (the prototype, lines 3314-3322 (My account, signed out)); offline: the offline banner and the paused actions (`wireframes/states/P01 Guest Web states.dc.html#web-state-offline`, pulled as `wireframe-web-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 1440×900 and 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -2436,14 +2624,14 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The venue map and the status of every spot for the day, read together. |
-| error | Could not load the map or the spots. Names which read failed; nothing is held. |
-| emptyFirstRun | No bookable spots are placed on this map yet. Says so and offers the venue's other ways to book, rather than an empty map. |
-| emptyNoResults | Every spot in this area is taken for the day. Names the area and offers another area or day. |
-| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | The offline banner shows. The map and the spots already loaded stay on screen with their age, never shown as free now. Holding a spot and adding it to the basket need the connection — a cabana held offline is a cabana two people think they have. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The venue map and the status of every spot for the day, read together. | the turnstile loader, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 4950-4962, the block marked "TURNSTILE LOADER" (and flash() at 6984-6994, which opens it for 820 ms) |
+| error | Could not load the map or the spots. Names which read failed; nothing is held. | the status card of WEB-029 (Error / Sold out / Maintenance), `wireframes/P01 Guest Web.dc.html#web-029` (pulled as `wireframe-web-029.html`) |
+| emptyFirstRun | No bookable spots are placed on this map yet. Says so and offers the venue's other ways to book, rather than an empty map. | the dashed empty card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3228-3235 (My tickets, "{{ tickets.emptyText }}") and 4640-4644 (Wishlist, "Nothing saved.") |
+| emptyNoResults | Every spot in this area is taken for the day. Names the area and offers another area or day. | the "Nothing matched" card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3084-3090 (Listing and search, "Nothing matched {{ list.filterText }}") |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. | the "Sign in to see your account" card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3314-3322 (My account, signed out) |
+| offline | The offline banner shows. The map and the spots already loaded stay on screen with their age, never shown as free now. Holding a spot and adding it to the basket need the connection — a cabana held offline is a cabana two people think they have. | the offline banner and the paused actions, `wireframes/states/P01 Guest Web states.dc.html#web-state-offline` (pulled as `wireframe-web-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 
@@ -2466,7 +2654,11 @@
 | Repository | ticvai-guest-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-web.git) |
 | Component | `SpaceByTheHourWizard` |
 | Suggested location | `src/routes/booking-and-selection/SpaceByTheHourWizard.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | multiStepForm |
+| Layout pattern | multiStepForm (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html` (rev 3 (pointer moved to the 30 September build, CHG-R1S-015)), view: House of Pages → 'Meeting room by the hour'. Wireframe frame `wireframes/P01 Guest Web.dc.html#web-048`, which adam_pull writes into the ticket folder as `wireframe-web-048.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-web.yaml`). Each state's look: loading: the turnstile loader (the prototype, lines 4950-4962, the block marked "TURNSTILE LOADER" (and flash() at 6984-6994, which opens it for 820 ms)); error: the status card of WEB-029 (Error / Sold out / Maintenance) (`wireframes/P01 Guest Web.dc.html#web-029`, pulled as `wireframe-web-029.html`); emptyFirstRun: the dashed empty card (the prototype, lines 3228-3235 (My tickets, "{{ tickets.emptyText }}") and 4640-4644 (Wishlist, "Nothing saved.")); emptyNoResults: the "Nothing matched" card (the prototype, lines 3084-3090 (Listing and search, "Nothing matched {{ list.filterText }}")); emptyNoAccess: the "Sign in to see your account" card (the prototype, lines 3314-3322 (My account, signed out)); offline: the offline banner and the paused actions (`wireframes/states/P01 Guest Web states.dc.html#web-state-offline`, pulled as `wireframe-web-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 1440×900 and 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -2487,14 +2679,14 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The room types and their lengths for this venue. |
-| error | Could not load. Names which read failed; nothing is booked. |
-| emptyFirstRun | This venue sells no space by the hour yet. Says so rather than an empty list. |
-| emptyNoResults | No room of the type is free at that time for that length. Offers the next free start time. |
-| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | The offline banner shows. Rooms and times already loaded stay on screen with their age. Picking a start time and adding the booking need the connection — a room held offline is a room two people think they have. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The room types and their lengths for this venue. | the turnstile loader, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 4950-4962, the block marked "TURNSTILE LOADER" (and flash() at 6984-6994, which opens it for 820 ms) |
+| error | Could not load. Names which read failed; nothing is booked. | the status card of WEB-029 (Error / Sold out / Maintenance), `wireframes/P01 Guest Web.dc.html#web-029` (pulled as `wireframe-web-029.html`) |
+| emptyFirstRun | This venue sells no space by the hour yet. Says so rather than an empty list. | the dashed empty card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3228-3235 (My tickets, "{{ tickets.emptyText }}") and 4640-4644 (Wishlist, "Nothing saved.") |
+| emptyNoResults | No room of the type is free at that time for that length. Offers the next free start time. | the "Nothing matched" card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3084-3090 (Listing and search, "Nothing matched {{ list.filterText }}") |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. | the "Sign in to see your account" card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3314-3322 (My account, signed out) |
+| offline | The offline banner shows. Rooms and times already loaded stay on screen with their age. Picking a start time and adding the booking need the connection — a room held offline is a room two people think they have. | the offline banner and the paused actions, `wireframes/states/P01 Guest Web states.dc.html#web-state-offline` (pulled as `wireframe-web-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 
@@ -2516,7 +2708,11 @@
 | Repository | ticvai-guest-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-web.git) |
 | Component | `RouteAndScheduleSplit` |
 | Suggested location | `src/routes/transport/RouteAndScheduleSplit.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html` (rev 3 (30 September build)), view: Engine controls → Transport → Route & schedule · one-way, multi-trip, favourites → Book → Fri (stations filled in, departures without a search). Wireframe frame `wireframes/P01 Guest Web.dc.html#web-049`, which adam_pull writes into the ticket folder as `wireframe-web-049.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-web.yaml`). Each state's look: loading: the turnstile loader (the prototype, lines 4950-4962, the block marked "TURNSTILE LOADER" (and flash() at 6984-6994, which opens it for 820 ms)); error: the status card of WEB-029 (Error / Sold out / Maintenance) (`wireframes/P01 Guest Web.dc.html#web-029`, pulled as `wireframe-web-029.html`); emptyFirstRun: the dashed empty card (the prototype, lines 3228-3235 (My tickets, "{{ tickets.emptyText }}") and 4640-4644 (Wishlist, "Nothing saved.")); emptyNoResults: the "Nothing matched" card (the prototype, lines 3084-3090 (Listing and search, "Nothing matched {{ list.filterText }}")); emptyNoAccess: the "Sign in to see your account" card (the prototype, lines 3314-3322 (My account, signed out)); offline: the offline banner and the paused actions (`wireframes/states/P01 Guest Web states.dc.html#web-state-offline`, pulled as `wireframe-web-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 1440×900 and 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -2545,14 +2741,14 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The stations, routes and passenger types. |
-| error | Could not load. Names which read failed; nothing is bought. |
-| emptyFirstRun | No routes are published for this venue yet. Says so; the client still owes the real network (stations, fares, timetable). |
-| emptyNoResults | No departure in that period. Names the period and offers Next Available Trip or another period or date. |
-| emptyNoAccess | Searching and buying need no account. Favourites need a signed-in guest: a guest who is not signed in is offered sign-in and brought back, never shown an empty list. |
-| offline | The offline banner shows. A route's stop list and schematic line already loaded stay readable with their age; the street map needs the connection. Searching departures, buying a trip or a pass and saving a favourite route need the connection. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The stations, routes and passenger types. | the turnstile loader, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 4950-4962, the block marked "TURNSTILE LOADER" (and flash() at 6984-6994, which opens it for 820 ms) |
+| error | Could not load. Names which read failed; nothing is bought. | the status card of WEB-029 (Error / Sold out / Maintenance), `wireframes/P01 Guest Web.dc.html#web-029` (pulled as `wireframe-web-029.html`) |
+| emptyFirstRun | No routes are published for this venue yet. Says so; the client still owes the real network (stations, fares, timetable). | the dashed empty card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3228-3235 (My tickets, "{{ tickets.emptyText }}") and 4640-4644 (Wishlist, "Nothing saved.") |
+| emptyNoResults | No departure in that period. Names the period and offers Next Available Trip or another period or date. | the "Nothing matched" card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3084-3090 (Listing and search, "Nothing matched {{ list.filterText }}") |
+| emptyNoAccess | Searching and buying need no account. Favourites need a signed-in guest: a guest who is not signed in is offered sign-in and brought back, never shown an empty list. | the "Sign in to see your account" card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3314-3322 (My account, signed out) |
+| offline | The offline banner shows. A route's stop list and schematic line already loaded stay readable with their age; the street map needs the connection. Searching departures, buying a trip or a pass and saving a favourite route need the connection. | the offline banner and the paused actions, `wireframes/states/P01 Guest Web states.dc.html#web-state-offline` (pulled as `wireframe-web-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 
@@ -2576,7 +2772,11 @@
 | Repository | ticvai-guest-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-web.git) |
 | Component | `PlanYourVisit` |
 | Suggested location | `src/routes/PlanYourVisit.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | multiStepForm |
+| Layout pattern | multiStepForm (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-30-september/TICVAI Visit Planner.dc.html` (Visit Planner (30 September build)), view: Visit Planner → the six questions (defaults) → Make my plan (Your plan). Wireframe frame `wireframes/P01 Guest Web.dc.html#web-050`, which adam_pull writes into the ticket folder as `wireframe-web-050.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-web.yaml`). Each state's look: loading: the turnstile loader (`sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 4950-4962, the block marked "TURNSTILE LOADER" (and flash() at 6984-6994, which opens it for 820 ms)); error: the status card of WEB-029 (Error / Sold out / Maintenance) (`wireframes/P01 Guest Web.dc.html#web-029`, pulled as `wireframe-web-029.html`); emptyFirstRun: the dashed empty card (`sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3228-3235 (My tickets, "{{ tickets.emptyText }}") and 4640-4644 (Wishlist, "Nothing saved.")); emptyNoResults: the "Nothing matched" card (`sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3084-3090 (Listing and search, "Nothing matched {{ list.filterText }}")); preferenceNotAtVenue: the Not at this park notice (`wireframes/states/P01 Guest Web states.dc.html#web-state-preference-not-at-venue`, pulled as `wireframe-web-state-preference-not-at-venue.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyNoAccess: the "Sign in to see your account" card (`sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3314-3322 (My account, signed out)); offline: the offline banner and the paused actions (`wireframes/states/P01 Guest Web states.dc.html#web-state-offline`, pulled as `wireframe-web-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 1440×900 and 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -2601,15 +2801,15 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The plan builds in place; the answers stay on screen. |
-| error | Could not build or load the plan. Names what failed; the answers are kept. |
-| emptyFirstRun | No plan yet: the first question is shown. |
-| emptyNoResults | Nothing suits the whole group on that day: says which answer ruled everything out and offers to change it. |
-| preferenceNotAtVenue | A preference a day's park cannot meet (client meeting 30 September, MoM 4.7): before *Make my plan* the chip is marked *Not at the parks you chose* (naming a park of the tenant that has it); after it, the day shows the *Not at this park* banner and nothing from another park is placed. *Change answers* lets the guest move that day to the park that has it. |
-| emptyNoAccess | A guest holds no permission. Anyone can build a plan; signing in is asked only to save it, and booking follows the cart's own sign-in gate. |
-| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The plan builds in place; the answers stay on screen. | the turnstile loader, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 4950-4962, the block marked "TURNSTILE LOADER" (and flash() at 6984-6994, which opens it for 820 ms) |
+| error | Could not build or load the plan. Names what failed; the answers are kept. | the status card of WEB-029 (Error / Sold out / Maintenance), `wireframes/P01 Guest Web.dc.html#web-029` (pulled as `wireframe-web-029.html`) |
+| emptyFirstRun | No plan yet: the first question is shown. | the dashed empty card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3228-3235 (My tickets, "{{ tickets.emptyText }}") and 4640-4644 (Wishlist, "Nothing saved.") |
+| emptyNoResults | Nothing suits the whole group on that day: says which answer ruled everything out and offers to change it. | the "Nothing matched" card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3084-3090 (Listing and search, "Nothing matched {{ list.filterText }}") |
+| preferenceNotAtVenue | A preference a day's park cannot meet (client meeting 30 September, MoM 4.7): before *Make my plan* the chip is marked *Not at the parks you chose* (naming a park of the tenant that has it); after it, the day shows the *Not at this park* banner and nothing from another park is placed. *Change answers* lets the guest move that day to the park that has it. | the Not at this park notice, `wireframes/states/P01 Guest Web states.dc.html#web-state-preference-not-at-venue` (pulled as `wireframe-web-state-preference-not-at-venue.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyNoAccess | A guest holds no permission. Anyone can build a plan; signing in is asked only to save it, and booking follows the cart's own sign-in gate. | the "Sign in to see your account" card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3314-3322 (My account, signed out) |
+| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. | the offline banner and the paused actions, `wireframes/states/P01 Guest Web states.dc.html#web-state-offline` (pulled as `wireframe-web-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 

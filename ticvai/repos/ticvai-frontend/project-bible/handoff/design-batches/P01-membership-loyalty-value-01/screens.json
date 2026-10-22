@@ -280,6 +280,14 @@
     "match": "partial",
     "view": "Account → 'Wallet & gift cards' (and 'Payment methods')",
     "differences": "Rows with toast actions; no transaction list, no gift-card balance lookup. Auto top-up is a prototype addition with no YAML operation. Saved payment tokens are a separate pane."
+   },
+   "stateViews": {
+    "loading": "P01/turnstile-loader",
+    "error": "P01/status-card",
+    "emptyFirstRun": "P01/dashed-empty",
+    "emptyNoResults": "P01/filter-empty",
+    "emptyNoAccess": "P01/sign-in-card",
+    "offline": "P01/state-offline"
    }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
@@ -541,6 +549,14 @@
     "match": "partial",
     "view": "Summit Peaks → 'Annual pass / membership' flow; Kids Club → 'Membership pass'; Account → Membership → 'Other plans — Compare'",
     "differences": "Plans are sold as a booking flow, not a plans page; the account 'Compare' action is a toast."
+   },
+   "stateViews": {
+    "loading": "P01/turnstile-loader",
+    "error": "P01/status-card",
+    "emptyFirstRun": "P01/dashed-empty",
+    "emptyNoResults": "P01/filter-empty",
+    "emptyNoAccess": "P01/sign-in-card",
+    "offline": "P01/state-offline"
    }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
@@ -825,6 +841,14 @@
     "match": "partial",
     "view": "Account → 'Membership' → 'Billing statement — View'",
     "differences": "Billing and dunning retry are well covered. Prototype adds membership transfer to a family member and guest passes; YAML's transferOrderTickets on this screen has no visible use."
+   },
+   "stateViews": {
+    "loading": "P01/turnstile-loader",
+    "error": "P01/status-card",
+    "emptyFirstRun": "P01/dashed-empty",
+    "emptyNoResults": "P01/filter-empty",
+    "emptyNoAccess": "P01/sign-in-card",
+    "offline": "P01/state-offline"
    }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
@@ -1347,6 +1371,14 @@
     "match": "partial",
     "view": "Account → 'Security' (devices), 'Face Pass', 'Data & privacy', 'Newsletters' (devices that get notifications)",
     "differences": "Spread across four panes rather than one screen; wishlist is its own view (WEB-009). Security pane includes passkeys and two-step verification, which the YAML does not have for guests. YAML purpose text still says 'See loyalty & rewards' (stale)."
+   },
+   "stateViews": {
+    "loading": "P01/turnstile-loader",
+    "error": "P01/status-card",
+    "emptyFirstRun": "P01/dashed-empty",
+    "emptyNoResults": "P01/filter-empty",
+    "emptyNoAccess": "P01/sign-in-card",
+    "offline": "P01/state-offline"
    }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
@@ -1669,6 +1701,14 @@
     "match": "exact",
     "view": "Summit Peaks → header 'At the venue' → Loyalty",
     "differences": "Placed inside the in-venue section; referral code appears under Account → Groups & invitations (YAML createReferral is here)."
+   },
+   "stateViews": {
+    "loading": "P01/turnstile-loader",
+    "error": "P01/status-card",
+    "emptyFirstRun": "P01/dashed-empty",
+    "emptyNoResults": "P01/filter-empty",
+    "emptyNoAccess": "P01/sign-in-card",
+    "offline": "P01/state-offline"
    }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",

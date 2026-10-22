@@ -27,7 +27,8 @@ Rules:
     XR-QUERY        a readVia that names no declared query, a query declared without module, inputs, returns, rule
                     or served, or a query whose module does not own the contract that declares it
     XR-ROUTE        a route that is not in-process, service or projection, not one the query serves, or in-process
-                    across deployables
+                    across deployables, unless the lead granted that read (docs/active/cross-deployable-writes.yaml
+                    `reads`: the reader's deployable, the query; ADAM CR-196, CHG-R9CR-005)
     XR-FOUNDATION   Identity (the foundation module every request resolves through, ADR-0028 tiers) reads a module
                     above it other than through a projection
     XR-LINEAGE      the lineage's readVia differs from the contract's x-ticvai-read-via (derive-lineage --apply)
@@ -109,6 +110,15 @@ def contract_ops() -> dict:
     return {o: f["op"] for o, f in g.operations().items()}
 
 
+def granted_reads() -> set:
+    """(reader deployable, `<contract>#<query>`) the lead granted in process across deployables (ADAM CR-196,
+    CHG-R9CR-005): the `reads` of docs/active/cross-deployable-writes.yaml."""
+    import yaml
+    p = g.ROOT / "docs" / "active" / "cross-deployable-writes.yaml"
+    doc = yaml.safe_load(p.read_text(encoding="utf-8")) if p.exists() else {}
+    return {(str(r.get("reader")), str(q)) for r in (doc or {}).get("reads") or [] for q in r.get("queries") or []}
+
+
 def declared_queries() -> dict:
     """`<contract>#<queryName>` -> (contract stem, the declaration)."""
     out = {}
@@ -137,6 +147,9 @@ FACTS = {
     r"\bcollection point\b": "fnb.delivery_location",                               # createShopAndDrop (CR-096)
     r"\btax codes?\b": "ledger.tax_code",                                           # publishBundle (CR-110)
     r"\bno rate for\b|\bexchange rates?\b": "ledger.fx_rate",                       # setVenueSettings (CR-096)
+    # getOrderCalendarEvent (ADAM CR-199, CHG-R9CR-006): "the session start and end" of a ticket line are the
+    # performance's, Catalogue's data, and the operation declared no read of them.
+    r"\bsession start and end\b|\bperformance'?s `?(?:startsAt|endsAt|starts_at|ends_at)\b": "catalogue.performance",
 }
 FACT_RES = [(re.compile(p, re.I), t) for p, t in FACTS.items()]
 # Phrases where a fact's words are not a read of it, removed before matching (check-error-sources NOT_ENTITY works
@@ -374,6 +387,7 @@ def main() -> int:
         return None
 
     queries = declared_queries()
+    granted = granted_reads()
     ops = contract_ops()
     if "--list-facts" in sys.argv[1:]:
         for row in fact_findings():
@@ -414,7 +428,7 @@ def main() -> int:
             elif route not in (q.get("served") or []):
                 guard.add("XR-ROUTE", f"{o}:{key}", f"{o} asks {key} by {route}, which the query does not serve "
                           f"({', '.join(q.get('served') or []) or 'none'})")
-            if route == "in-process" and owner and dep_of.get(owner) != rdep:
+            if route == "in-process" and owner and dep_of.get(owner) != rdep and (rdep, key) not in granted:
                 guard.add("XR-ROUTE", f"{o}:{key}", f"{o} ({rdep}) asks {key} in-process, and {owner} is in "
                           f"{dep_of.get(owner)}: across deployables a query is a service call or a projection")
             if reader in FOUNDATION_STRICT and owner and tier_of.get(owner) != "foundation" and route != "projection":

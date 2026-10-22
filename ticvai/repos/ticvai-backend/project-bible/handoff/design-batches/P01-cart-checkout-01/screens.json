@@ -381,6 +381,13 @@
     "match": "partial",
     "view": "Visible on every booking step as the cart sidebar (Config → Layout & locale → 'Cart & summary' changes it to slide-in, bottom sheet, floating icon or single column)",
     "differences": "Not a separate screen: a persistent sidebar/drawer through the stepper, with a Rev 3 option to mirror it in Arabic. No 'extend hold' action (extendCart) — only hold timers on the seat step. Exit-intent dialog (exit.open) is a prototype addition. **Draw the countdown with More time (`extendCart`) on the basket**, although the prototype has no extend action and times only the seat step (CHG-SGU-020)."
+   },
+   "stateViews": {
+    "loading": "P01/turnstile-loader",
+    "error": "P01/status-card",
+    "emptyFirstRun": "P01/dashed-empty",
+    "emptyNoAccess": "P01/sign-in-card",
+    "offline": "P01/state-offline"
    }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
@@ -691,6 +698,14 @@
     "match": "exact",
     "view": "Book → 'Your details' step (after Extras)",
     "differences": "Sections are driven by the flow's requires list; prototype adds a signature, diving certification and vehicle plate fields. Wishlist/device operations listed in the YAML apis have no counterpart here. Saved guests prefill is described in Account but not shown on this step."
+   },
+   "stateViews": {
+    "loading": "P01/turnstile-loader",
+    "error": "P01/status-card",
+    "emptyFirstRun": "P01/dashed-empty",
+    "emptyNoResults": "P01/filter-empty",
+    "emptyNoAccess": "P01/sign-in-card",
+    "offline": "P01/state-offline"
    }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 10 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
@@ -978,6 +993,13 @@
     "match": "partial",
     "view": "Book → 'Payment' step; Config → Layout & locale → 'Payment outcome (demo)' = Interrupted / Declined for the failure states; Config → Steps & cards → 'Guest checkout (code proof)' for the guest route",
     "differences": "Contradicts 28 Sep decisions: YAML allows card or wallet only (R080) — prototype offers Apple Pay, Tabby split-in-4, pay on arrival and invoice/PO; YAML removed the 'is this you?' match at checkout (R120 b) — prototype still asks the guest to link or keep separate. The unknown-outcome inquiry state matches the YAML ('We couldn't confirm this payment yet… you won't be charged twice'). **Draw card, Apple Pay, Google Pay and wallet only** (R080, 28 September); Tabby split-in-4, pay on arrival and invoice/PO are not in the first release (CHG-SGU-020)."
+   },
+   "stateViews": {
+    "loading": "P01/turnstile-loader",
+    "error": "P01/status-card",
+    "emptyFirstRun": "P01/dashed-empty",
+    "emptyNoAccess": "P01/sign-in-card",
+    "offline": "P01/state-offline"
    }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
@@ -1238,6 +1260,13 @@
     "match": "exact",
     "view": "Book → final step 'Confirmed' after paying",
     "differences": "Prototype adds editing attendee details after purchase ('Change your details', signed-in only) and Reissue QR. No 'unpaid — pay now' route to WEB-014. **Leave out** editing attendee details after purchase and Reissue QR: no operation on this screen declares them (CHG-SGU-020)."
+   },
+   "stateViews": {
+    "loading": "P01/turnstile-loader",
+    "error": "P01/status-card",
+    "emptyFirstRun": "P01/dashed-empty",
+    "emptyNoAccess": "P01/sign-in-card",
+    "offline": "P01/state-offline"
    }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",

@@ -411,6 +411,14 @@ paths:
       - query: marketing-crm#consentQuestionVersionRecords
         route: service
         for: 'its read of marketing.consent_question_version, Marketing''s data (CHG-MOD-001)'
+      - query: identity#openAnonymousGuestSession
+        route: in-process
+        for: 'opens the anonymous guest session for a caller with no credential, bound to the new cart and its deviceId,
+          and gets its token for Cart.anonymousSessionToken (ADAM CR-183, option A; CHG-R9CR-002)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the new cart''s window and cap: cartLeaseSeconds and cartMaxExtensions of the venue''s row, else of the
+          tenant''s own row of platform.venue_settings (ADAM CR-184, option A; CHG-R9CR-003)'
       security:
       - guestAuth: []
       - {}
@@ -449,6 +457,29 @@ paths:
         (`orders.cart.session_id`, `workstation_id`) and is that session''s own. A till''s cart is also created
         implicitly by its first `addCartLine`.
 
+
+        **The anonymous session is Identity''s** (ADAM CR-183, option A, decided 21 October 2026; CHG-R9CR-002). Called
+        with no credential, createCart writes the cart and then asks Identity''s in-process API
+        `identity#openAnonymousGuestSession` with the cart''s id and the body''s `deviceId`, in the same transaction;
+        Identity opens the session in its session registry, signs its token and returns `{ sessionId, token }`, and
+        the token is `Cart.anonymousSessionToken`. Orders never writes Identity''s session store and never holds its
+        signing key. `claimCart` ends it through the same API (`identity#endAnonymousGuestSession`). **Without a
+        credential, `deviceId` is required** (`400 validation` otherwise); with one it is ignored.
+
+
+        **Whose cart it is, in the database** (ADAM CR-184, option A; CHG-R9CR-003): `orders.cart` is read and written
+        by staff and partners by its venue, as before, and by a guest by its own subject (`subject_id` = the session''s
+        `ticvai.subject_id`, `x-ticvai-rls: guest-owns`), so a signed-in guest needs no grant on the venue and never
+        sees another guest''s cart; `orders.cart_line` follows its cart.
+
+
+        **The new cart''s window and cap** (ADAM CR-184, option A; CHG-R9CR-003). A new cart holds no lease, so its
+        `expiresAt` is its own window: now plus `cartLeaseSeconds`, and its `maxExtensions` is `cartMaxExtensions`.
+        Both are read with `tenancy#venueSettingsRecords`: the venue''s row first, and where its value is null, the
+        tenant''s default, which is the tenant''s own row of `platform.venue_settings` (the row with no venue that
+        `setVenueSettingsDefaults` writes); where that is null too, the field''s proposed default (900 seconds, 1
+        extension). `extensionsUsed` starts at 0.
+
         '
       tags:
       - cart
@@ -479,7 +510,17 @@ paths:
                   nullable: true
                 locale:
                   type: string
+                deviceId:
+                  type: string
+                  format: uuid
+                  nullable: true
+                  x-ticvai-persisted: false
+                  description: '**The device the anonymous session is bound to** (ADAM CR-183, option A; CHG-R9CR-002): a
+                    client UUIDv7 the app mints once per installation and keeps. Required when the call carries no
+                    credential, ignored otherwise. Not kept on the cart: Identity keeps it with the anonymous session.'
       responses:
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
         '201':
@@ -4079,6 +4120,10 @@ paths:
       - query: marketing-crm#consentQuestionVersionRecords
         route: service
         for: 'its read of marketing.consent_question_version, Marketing''s data (CHG-MOD-001)'
+      - query: identity#endAnonymousGuestSession
+        route: in-process
+        for: 'ends the anonymous guest session createCart opened for the cart, once the cart is the guest''s (ADAM CR-183,
+          option A; CHG-R9CR-002)'
       security:
       - guestAuth: []
       x-ticvai-self-scoped: subject
@@ -4097,6 +4142,11 @@ paths:
         **The anonymous cart''s `token` proves it** (R8 blocker IDENTITY-C49, the lead''s answer A; CHG-R8MIG-021): the
         body''s `cartToken` must equal the cart''s `token` (403 otherwise), and the claim rotates the token, so a link
         shared before signing in does not reach the account after.
+
+
+        **The anonymous session ends with the claim** (ADAM CR-183, option A; CHG-R9CR-002): in the same transaction,
+        claimCart asks Identity''s in-process API `identity#endAnonymousGuestSession` with the cart''s id, so the
+        anonymous token stops working; the cart is then the guest''s by its `subject_id`.
 
         '
       tags:
@@ -4282,6 +4332,12 @@ paths:
         `VenueSettings.cartLeaseSeconds`). A payment started after the lock lapses is re-quoted at
         the rate then in force and the guest sees the new amount before confirming.
 
+
+        **The order access token is minted here** (ADAM CR-191, option A, decided 21 October 2026; CHG-R9CR-004), as
+        `Order.orderAccessToken` describes: bound to the new order and to the device in `X-Device-Id` (the device that
+        built the cart). Without `X-Device-Id` no token is minted and `orderAccessToken` is null; the order is read
+        with a session as before.
+
         '
       tags:
       - cart
@@ -4291,6 +4347,7 @@ paths:
       x-ticvai-conflict-policy: serverWins
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      - $ref: ../shared/common.yaml#/components/parameters/DeviceId
       requestBody:
         required: true
         content:
@@ -5010,9 +5067,11 @@ paths:
         required: false
         description: '`Order.orderAccessToken` from `checkoutCart`''s answer, in place of a session (IDENTITY-C52,
           CHG-R8SPN-025). Valid 24 hours for this order only; a token for another order, expired or forged, is
-          `404`, as an order that does not exist.'
+          `404`, as an order that does not exist. Sent with `X-Device-Id`, which must be the device the token names
+          (ADAM CR-191, option A; CHG-R9CR-004); without it, or from another device, also `404`.'
         schema:
           type: string
+      - $ref: ../shared/common.yaml#/components/parameters/DeviceId
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -5035,6 +5094,20 @@ paths:
         one order for 24 hours. With neither a session nor a valid token for this order the answer is `404`.
         For a signed-in guest a `404` is also what WEB-013 and WEB-012 show as their no-access state: the
         guest's own order lookup found nothing they may see (IDENTITY-C28); no permission is involved.
+
+        **A guest's own order, in the database** (ADAM CR-191, option A, decided 21 October 2026; CHG-R9CR-004).
+        `orders.sales_order` is read by staff by its scope path as before (the per-statement predicate of our
+        repository's migration 225) and by a guest by its own subject (`subject_id` = the session's
+        `ticvai.subject_id`; `x-ticvai-rls: guest-reads-own`), so a guest session needs no grant on the venue and
+        another guest's order is simply not visible. `orders.order_line` is read by a guest through its order;
+        `orders.payment`, `orders.order_line_discount` and `orders.order_line_eligibility` keep following their parent.
+        A guest writes none of them through this rule.
+
+        **The order access token, checked** (CR-191, option A). Its claims, signing key and minting are on
+        `Order.orderAccessToken`. getOrder verifies the signature, that `exp` is in the future, that `oid` is the path's
+        `orderId` and `tid` the routed tenant, and that `did` equals `X-Device-Id`; any failure is `404`. A verified
+        token reads that one order (its lines, payments, discounts and eligibility rows) under the routed tenant's
+        root grant, as the payment webhook does (ITenantRootGrant), and nothing else in the same transaction.
       tags:
       - order
       x-ticvai-permission: ORDER_VIEW
@@ -5065,6 +5138,15 @@ paths:
       operationId: getOrderCalendarEvent
       x-ticvai-consumed-by:
         - "P02 GST-018 Add to Calendar / Reminders"
+      x-ticvai-read-via:
+      - query: catalogue#performanceRecords
+        route: in-process
+        for: 'a performance line''s start and end (catalogue.performance starts_at, ends_at), Catalogue''s data (ADAM
+          CR-199, option A; CHG-R9CR-006)'
+      - query: platform-ops#tenantDomainRecords
+        route: service
+        for: 'the host of the link back: the tenant''s primary active web host (control.tenant_domain), Platform''s data,
+          asked as Tenancy''s resolveTenantHost asks it (ADAM CR-199, option A; CHG-R9CR-006)'
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -5076,6 +5158,35 @@ paths:
         a link back to the booking. **The event carries no ticket and no QR code**, because a calendar
         is synced to places a ticket should not go. Rescheduling the order changes the event UID''s
         sequence, so a calendar that re-imports it updates the entry rather than adding a second one.
+
+
+        **What each event holds** (ADAM CR-199, option A, decided 21 October 2026; CHG-R9CR-006):
+
+        - **A dated line** is an order line with a `performanceId` or a `bookedWindow`. Any other line (a product with
+        no date, a parking or transport line without either) is not dated and gives no event. An order with no dated
+        line is `409 noDatedLine`.
+
+        - **DTSTART and DTEND**, in UTC (`...Z`): a performance line''s are the performance''s `startsAt` and `endsAt`
+        (`catalogue.performance`, read with `catalogue#performanceRecords`); a booked-window line''s are its
+        `bookedWindow.startsAt` and `endsAt`. A line with both takes its booked window.
+
+        - **LOCATION** is the venue''s name (the line''s venue, `platform.scope`).
+
+        - **UID** is `<order line id>@ticvai.app`: the line''s id and the product''s own domain, the stem of every
+        platform subdomain (`<venue>.<cell>.ticvai.app`, resolveTenantHost). It never changes for the line, so a
+        re-import updates the entry.
+
+        - **SEQUENCE** is the number of the order''s `orders.order_event` rows with `eventType` `rescheduled`, which
+        `rescheduleOrder` writes once per reschedule: 0 for an order never rescheduled.
+
+        - **URL**, the link back, is the tenant''s guest web order page: `https://<host>/cart-and-checkout/order-confirmation?orderId=<orderId>`
+        (WEB-013 Booking Confirmation, the guest web screen that reads one order; a visitor with no session there sees
+        its no-access state). `<host>` is the tenant''s primary active host for the `web` channel (its domain marked
+        `isPrimary`). Platform keeps the tenant''s domains in the control database, which commerce has no connection to,
+        so this operation reads no table for the host: it asks Platform with `platform-ops#tenantDomainRecords` over
+        the service route, as Tenancy''s `resolveTenantHost` asks it, and Platform reads its own rows. Until
+        serviceAuth between deployables is built (ADAM CR-174), the event is written without URL; nothing else
+        changes.
 
         '
       tags:
@@ -6165,6 +6276,9 @@ paths:
       - query: tenancy#venueSettingsRecords
         route: in-process
         for: 'the venue''s refund settings the policy is told from, Tenancy''s data (r8 integration, CHG-R8INT-014)'
+      x-ticvai-reads:
+      - table: orders.refund_policy
+        for: 'the venue''s refund policy row the guest''s part is cut from, the row getRefundPolicy returns to staff (r9 integration, CHG-R9INT-001)'
       x-ticvai-audience:
       - guest
       security:
@@ -7165,11 +7279,13 @@ paths:
         - "P08 BO-027 Reissue & Media Replacement"
       x-ticvai-read-via:
       - query: access#entitlementRecords
-        route: service
-        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
+        route: in-process
+        for: 'the entitlements on the media code (access.entitlement, Access''s data), in process under the caller''s
+          scope: the commerce role is granted SELECT (ADAM CR-196, option B; CHG-R9CR-005; XDR-001)'
       - query: access#scanEventRecords
-        route: service
-        for: 'its read of access.scan_event, Access''s data (CHG-MOD-001)'
+        route: in-process
+        for: 'their use (access.scan_event, Access''s data), in process under the caller''s scope: the commerce role is
+          granted SELECT (ADAM CR-196, option B; CHG-R9CR-005; XDR-001)'
       - query: catalogue#entitlementTemplateRecords
         route: in-process
         for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001)'
@@ -7184,6 +7300,16 @@ paths:
 
         **Media here is the glossary''s Media: the QR, wristband or card that carries a ticket.** It is
         not a digital-library asset (`assets.yaml`), which shares the `/media` prefix and nothing else.
+
+
+        **Where the answer comes from** (ADAM CR-196, option B, decided 21 October 2026; CHG-R9CR-005). Access owns
+        the rows; Orders asks `access#entitlementRecords` (where `mediaCode` is the code) and
+        `access#scanEventRecords` (their scans) **in process**, in this call''s transaction under the caller''s own
+        connection, so the tables'' row-level security shows a venue cashier only what their scope reaches. DB-ROLES
+        grants the commerce role SELECT on the two tables for this read (ADR-0055 rule 4 as amended;
+        docs/active/cross-deployable-writes.yaml XDR-001). **A code that resolves to no entitlement the caller can see
+        is `404`.** The media has no record of its own; everything else is derived from its entitlements, as
+        `MediaEntitlements` says.
 
         '
       tags:
@@ -7445,6 +7571,12 @@ paths:
         **Appends to `orders.order_event`** (the order and reservation lifecycle log) one row per state
         change it makes, with the previous and new state, the actor and the correlation id (decided 29
         September, writers pass).
+
+
+        **And one `rescheduled` row per reschedule** (ADAM CR-199, option A, decided 21 October 2026; CHG-R9CR-006):
+        `eventType` `rescheduled`, `relatedEntityType` `performance`, `relatedEntityId` the target performance, in the
+        same transaction, even when the order''s status does not change. `getOrderCalendarEvent` counts these rows
+        as the calendar event''s SEQUENCE.
 
         '
       tags:
@@ -19235,6 +19367,10 @@ components:
     OrderEvent:
       type: object
       x-ticvai-persistence: orders.order_event
+      # Staff by scope as before; a guest reads the events of its own order, through orders.sales_order, so
+      # getOrderCalendarEvent counts its reschedules for the event's SEQUENCE (ADAM CR-199 and CR-191, option A;
+      # CHG-R9CR-006).
+      x-ticvai-rls: guest-reads-own
       description: '**The order and reservation lifecycle log** (DM5, 29 September: data model for
         the agreed operations). Append-only: one row per state change or integration step, with
         the correlation id that ties a payment callback, a sync rejection and the order it touched
@@ -19294,6 +19430,9 @@ components:
         eventType:
           type: string
           maxLength: 60
+          description: What happened, in camelCase (`created`, `voided`, ...). `rescheduled` is written by
+            `rescheduleOrder` once per reschedule, and `getOrderCalendarEvent` counts those rows as the event's
+            SEQUENCE (ADAM CR-199, option A; CHG-R9CR-006).
         previousState:
           type: string
           maxLength: 40
@@ -22591,6 +22730,10 @@ components:
     MediaEntitlements:
       type: object
       x-ticvai-persistence: none — projection over entitlement and scan history
+      description: '**Derived from the entitlements on the code, with no media table** (ADAM CR-196, decided 21 October
+        2026, the derivation its recommendation names; CHG-R9CR-005). An entitlement on the code **counts** while its
+        `status` is `issued` or `partiallyConsumed`, its `validTo` is null or after now, and it is not suspended
+        (`suspendedReason` null). A code with no entitlement the caller can see is `404`, never this answer.'
       required:
       - mediaCode
       - isValid
@@ -22606,19 +22749,28 @@ components:
           - card
           - nfc
           - mobilePass
+          description: 'From the entitlements'' `credentialFormat` (CR-196): `platformSignedQr`, `staticQr` or null (which
+            is `platformSignedQr`, CHG-R6-031) is `qr`, and `rfidCard` is `card`. Where the entitlements disagree, the one
+            issued last decides. `wristband`, `nfc` and `mobilePass` are not derived from any stored field yet and are
+            not returned.'
         subjectId:
           type: string
           format: uuid
           nullable: true
         isValid:
           type: boolean
+          description: True when at least one entitlement on the code counts (see the schema's description).
         invalidReason:
           type: string
           nullable: true
+          description: 'Null while `isValid`. Otherwise the reason of the entitlement issued last on the code (CR-196),
+            one of four values: `expired` (status `expired`, or `validTo` past), `used` (`fullyConsumed`), `surrendered`
+            (`surrendered`) or `blocked` (`cancelled`, or `issued` with a `suspendedReason`). Kept a plain string, not an
+            enum, so a client built at r1 still validates.'
         canAcceptMore:
           type: boolean
           description: 'False where the media has been surrendered, expired or blocked. A cashier should
-            know before taking money, not after.
+            know before taking money, not after. Equal to `isValid` (ADAM CR-196; CHG-R9CR-005).
 
             '
         entitlements:
@@ -23187,6 +23339,9 @@ components:
       # — so it is the rows of its own child table rather than a column of order_line.
       # `discounts` is the applied discounts, one row each in orders.order_line_discount (SD-008).
       x-ticvai-persistence: orders.order_line + orders.order_line_eligibility + orders.order_line_discount
+      # Staff by venue as before; a guest reads the lines of its own order, through orders.sales_order (ADAM CR-191,
+      # option A; CHG-R9CR-004). The discount and eligibility rows keep following their line.
+      x-ticvai-rls: guest-reads-own
       x-ticvai-retired-columns:
       - promotion_id
       - name
@@ -23483,6 +23638,9 @@ components:
     Cart:
       type: object
       x-ticvai-persistence: orders.cart
+      # Staff and partners by venue as before; a guest reads and writes its own carts by subject (ADAM CR-184,
+      # option A; CHG-R9CR-003). orders.cart_line follows the cart.
+      x-ticvai-rls: guest-owns
       required:
       - id
       - venueId
@@ -23605,13 +23763,16 @@ components:
           type: string
           format: date-time
           description: The earliest lease expiry in the cart, or the cart's own window where it holds
-            none.
+            none. The window is set at creation to now plus the venue's `cartLeaseSeconds`, else the tenant
+            default (ADAM CR-184, option A; CHG-R9CR-003; see `createCart`).
         extensionsUsed:
           type: integer
           readOnly: true
         maxExtensions:
           type: integer
           readOnly: true
+          description: The venue's `cartMaxExtensions`, else the tenant default, set when the cart is created (ADAM
+            CR-184, option A; CHG-R9CR-003; see `createCart`).
         locale:
           type: string
         createdAt:
@@ -23878,6 +24039,10 @@ components:
       - other
     Order:
       x-ticvai-persistence: orders.sales_order + orders.order_line
+      # Staff by scope as before, in migration 225's per-statement shape; a guest reads its own orders by subject
+      # (ADAM CR-191, option A; CHG-R9CR-004). payment, order_line_discount and order_line_eligibility keep following
+      # their parent.
+      x-ticvai-rls: guest-reads-own
       type: object
       required:
       - id
@@ -23909,7 +24074,16 @@ components:
             device, valid 24 hours, never stored. `getOrder` accepts it in `X-Order-Access-Token` in place of a
             session, so a guest who checked out with no account, or whose session ended, still sees the
             confirmation (WEB-013 keeps it in its navigation state). It reads this order only and grants nothing
-            else.'
+            else.
+
+
+            **What it is** (ADAM CR-191, option A, decided 21 October 2026; CHG-R9CR-004; the same treatment as
+            common.yaml `AdmissionToken`): a compact JWS signed **HMAC-SHA256** with a Key Vault secret of the tenant''s
+            cell (the order access token key, rotated like the other signing secrets; Orders signs and checks it, it
+            never leaves the server). Its claims: `tid` the tenant, `oid` this order''s id, `did` the device id from
+            `checkoutCart`''s `X-Device-Id`, `exp` 24 hours after it is minted, and `jti` a unique id (a UUIDv7). Minted
+            by `checkoutCart` only when `X-Device-Id` was sent; checked by `getOrder`, which also needs the same
+            `X-Device-Id`.'
         orderNumber:
           x-ticvai-unique: tenant
           type: string

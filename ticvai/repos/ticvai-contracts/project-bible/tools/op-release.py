@@ -294,6 +294,14 @@ def build(rows, mp, sched, lineage, retire_plan, unexplained, release, held=None
             loc = fr.location_sentence(w)
             carry.append(fr.repo_sentence(w) + (f"; {fe_sid}: {loc}" if loc and w["repo"] else
                                                  (f" {fe_sid}: {loc}." if loc else "")))
+            # **The design it is built to, and the look's done-check** (CHG-R9UI-004; the lead, 21 October 2026: "I
+            # wanna get all of those changes out now.."): the screen ticket and its build sub-task name the approved
+            # prototype view, the frame adam_pull writes (wireframe-<anchor>.html) and each state's pattern, or say there
+            # is no approved design yet. WEB-007's build sub-task said "Matches the design" and named none.
+            design_ = _done.design_sentence(fe_sid) if part in ("", "build") else ""
+            if design_:
+                head_, _, rest_ = design_.partition(": ")
+                carry.append(f"**{head_}:** {rest_}")
         tickets.append({
             "key": key, "type": typ, "type_id": push.TYPES[typ], "parent": parent or None,
             "subject": subject[:255], "priority_id": push.PRIORITY.get(r["wave"] or "2", 8),

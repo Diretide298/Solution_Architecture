@@ -4127,10 +4127,29 @@ components:
       type: object
       x-ticvai-persistence: platform.idempotency_record
       x-ticvai-agreed: '29 September: system-design review SD-024 (durable idempotency store)'
+      # Unique on (operation, key): the index is platform.idempotency_record_operation_id_idempotency_key_uniq
+      # (ADAM CR-182, option A; CHG-R9CR-001).
+      x-ticvai-unique-together: [[operationId, idempotencyKey]]
       description: '**The durable idempotency record** (SD-024, 29 September): written in the same transaction as
-        the state change a keyed write makes, unique on (`idempotencyKey`, `operationId`). A replay returns the
-        stored response; Redis is a cache in front of this table. Rows expire after `expiresAt` (a sweeper
-        deletes them in batches; offline clients replay within the offline bound, so the window covers it).'
+        the state change a keyed write makes, unique on (`operationId`, `idempotencyKey`). A replay returns the
+        stored response; Redis is a cache in front of this table.
+
+
+        **How it is written, decided 21 October 2026** (ADAM CR-182, option A; CHG-R9CR-001). The unique index
+        `platform.idempotency_record_operation_id_idempotency_key_uniq` on (`operation_id`, `idempotency_key`) is
+        the guarantee. The row is written **once, on completion**, inside the transaction of the change it guards,
+        with the response the caller gets, so `status` has one value, `completed`. A concurrent retry of the same
+        key inserts the same pair, waits on the index until the first transaction ends, and then fails on it;
+        it rolls back and replays the stored response (or answers `409 idempotency-conflict` when its
+        `requestHash` differs). There is no in-progress row and nothing to clean up after a crash: a transaction
+        that never committed left no row, so the retry runs the write. `scopePath` is the tenant root, so a replay
+        is found whoever retries it: the kernel''s store runs its own two statements (the lookup and the insert)
+        with `ticvai.scope_paths` set to the tenant root and sets the caller''s paths back after them, in the same
+        transaction, as the connection context does for a call with no session (backend/MIGRATIONS.md, "The
+        connection context"), so the table''s scope policy admits the row for a venue cashier, a guest, the payment
+        webhook or a job alike, and nothing else in the transaction gains the root. Rows expire 24 hours after
+        `createdAt` and are purged by the maintenance job in the workers host (the job MIG-PARTITIONS builds, which
+        already removes what retention has expired).'
       required:
       - id
       - idempotencyKey
@@ -4144,12 +4163,19 @@ components:
         id:
           type: string
           format: uuid
+          description: The record's own id, a UUIDv7 minted by the server.
         idempotencyKey:
           type: string
           format: uuid
+          description: The `Idempotency-Key` header the client sent (a UUIDv7; a create body's client `id` is the same
+            value). Unique together with `operationId`.
         operationId:
           type: string
           maxLength: 100
+          x-ticvai-unique-compare: exact
+          description: The operation the key was used with (its `operationId`, such as `checkoutCart`), compared exactly,
+            so the unique index is on the plain columns and `ON CONFLICT (operation_id, idempotency_key)` names it. The
+            same key on two operations is two records.
         requestHash:
           type: string
           maxLength: 64
@@ -4157,28 +4183,41 @@ components:
         status:
           type: string
           enum:
-          - inProgress
           - completed
+          description: '`completed`, the only value (ADAM CR-182, option A; CHG-R9CR-001): the row is written once, when
+            the guarded write commits, in its transaction. `inProgress` is withdrawn: a database built before r9 may
+            hold the wider CHECK until its forward migration narrows it, and no writer uses the old value.'
         responseStatus:
           type: integer
           nullable: true
+          description: The HTTP status of the first answer, returned again on a replay.
         responseBody:
           type: object
           nullable: true
           additionalProperties: true
+          description: The body of the first answer, returned again on a replay; null for an answer with no body (`204`).
         principalId:
           type: string
           format: uuid
           nullable: true
+          description: The signed-in principal that made the first call; null for a guest, a webhook, a consumer or a job.
+            Recorded for the audit trail, not used to find a replay.
         createdAt:
           type: string
           format: date-time
+          description: When the guarded write committed (the transaction's time).
         expiresAt:
           type: string
           format: date-time
+          description: '`createdAt` plus 24 hours (ADAM CR-182, option A; CHG-R9CR-001): long enough for an offline client
+            to replay its outbox. A row past it is no longer a replay: the maintenance job in the workers host deletes
+            such rows in batches, and a request arriving after that runs as new.'
         scopePath:
           type: string
-          description: The partition key (ADR-0005).
+          description: '**The tenant root, always** (ADAM CR-182, option A; CHG-R9CR-001), never the caller''s grant or
+            the venue of the write, so a replay is found by whoever retries, including a caller with no grant (the
+            payment webhook, a consumer, a job), and the row carries no venue data (the stored response is already
+            what the caller was allowed to see). The partition key (ADR-0005).'
     ControlAuditRecord:
       type: object
       x-ticvai-persistence: control.audit_record

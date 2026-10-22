@@ -438,7 +438,7 @@ operationsByContract:
     scope: venue
     permission: null
     offline: false
-    reads: 0
+    reads: 1
     writes: 0
   - operation: getMediaEntitlements
     verb: GET

@@ -24,6 +24,8 @@ The kernel tables every host needs, and the writes that cannot route yet, are in
     X-EVENT      an event route names an event that is not catalogued, that the operation does not emit
                  (`emittedBy`, `x-ticvai-emits`), or that no consumer of the table's owning module `writes`
     X-OPERATION  an operation route names an operation that does not exist or that the table's owner does not serve
+    X-READ       a granted cross-deployable read (`reads`, ADAM CR-196, CHG-R9CR-005) missing a field, granting more
+                 than SELECT, or naming a table its reader's deployable owns
     X-STALE      a route or an exception for a write that is not cross-deployable, or a write both routed and
                  excepted, or an exception entry missing a field
     X-EXPIRED    an exception whose removal release is already tagged
@@ -66,6 +68,7 @@ KERNEL = {
 WRITE_PRIVS = {"INSERT", "UPDATE", "DELETE"}
 EXC_FIELDS = ("id", "operation", "table", "kind", "reason", "added", "removal_release")
 EXC_KINDS = ("misplaced-table", "owner-operation-missing")
+READ_FIELDS = ("id", "reader", "tables", "privileges", "queries", "operations", "added", "decision_ref", "why")
 
 
 def yl(p):
@@ -170,6 +173,19 @@ def analyse():
         if not re.match(r"^r\d+$", str(x.get("removal_release"))):
             bad.append(("X-STALE", x["id"], "removal_release is a release tag, r<N>"))
         exc[(str(x["operation"]), str(x["table"]))] = x
+
+    # X-READ (ADAM CR-196, CHG-R9CR-005): a read the lead granted across deployables
+    for r in auth.get("reads") or []:
+        miss = [f for f in READ_FIELDS if not r.get(f)]
+        if miss:
+            bad.append(("X-READ", str(r.get("id")), "a granted read without %s" % ", ".join(miss)))
+            continue
+        if [str(p).upper() for p in r["privileges"]] != ["SELECT"]:
+            bad.append(("X-READ", r["id"], "grants %s; a read grants SELECT only" % "/".join(r["privileges"])))
+        for t in r["tables"]:
+            osvc = owner_of_schema.get(str(t).split(".", 1)[0])
+            if not osvc or dep_of.get(osvc) == r["reader"]:
+                bad.append(("X-READ", r["id"], "%s is not a table another deployable owns than %s" % (t, r["reader"])))
 
     evs = events()
     emits = contract_emits()
@@ -277,6 +293,17 @@ def render(cross, route_of, exc, auth) -> str:
             r = "**unrouted**"
         L.append("| `%s` | %s / %s | `%s` | %s / %s | %s |" % (o, c["writer_dep"], c["writer"], t, c["owner_dep"],
                                                              c["owner"], r))
+    L += ["", "## Reads granted across deployables", "",
+          "A deployable's role may SELECT these tables although another deployable owns them, and asks the owner's "
+          "named queries in process (ADAM CR-196, decided by Chinmay on 21 October 2026; ADR-0055 rule 4 and DB-ROLES "
+          "as amended). Row-level security still applies; the grant reaches existing databases in the forward "
+          "migration tools/derive-ddl.py writes.", "",
+          "| Id | Reader | Tables | Queries | Operations | Decided | Why |", "|---|---|---|---|---|---|---|"]
+    for r in auth.get("reads") or []:
+        L.append("| %s | %s | %s | %s | %s | %s | %s |" % (
+            r.get("id"), r.get("reader"), ", ".join("`%s`" % t for t in r.get("tables") or []),
+            ", ".join("`%s`" % q for q in r.get("queries") or []), ", ".join("`%s`" % o for o in r.get("operations") or []),
+            r.get("decision_ref"), " ".join(str(r.get("why") or "").split())))
     L += ["", "## The exceptions", "",
           "| Id | Operation | Table | Kind | Added | Removed by | Reason |", "|---|---|---|---|---|---|---|"]
     for x in sorted(exc.values(), key=lambda x: str(x["id"])):

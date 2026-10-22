@@ -155,6 +155,128 @@ def control_only(names, lineage: dict | None = None) -> bool:
     return seen
 
 
+# ---- the design a screen is built to (CHG-R9UI-004, 21 October 2026) ----------------------------------------------
+# The lead: "I wanna get all of those changes out now..". WEB-007 (#31848) was built with a bare error page: its build
+# sub-task said "Matches the design" and named none, its state checklist was cut to "State error: Could not load.", and
+# only 22 of 8,443 descriptions mentioned a prototype or a wireframe. Every screen ticket and its build sub-task now
+# names the client-approved prototype view, the board frame adam_pull writes into the ticket folder
+# (`wireframe-<anchor>.html`), each state's pattern (handoff/design-frames.json, from tools/derive-state-views.py) and a
+# visual done-check; a screen with no approved design says so and is built on its app's shell.
+DESIGN_HEAD = "Design (client-approved, build identical)"
+NO_DESIGN_HEAD = "Design (no client-approved design yet)"
+STRUCTURE_ONLY = ("The screen's layout block (template, regions, pattern) and any frame generated from the YAML under "
+                  "wireframes/incoming/ are structure only, not the look.")
+_FRAMES: dict | None = None
+_REPOS = None
+
+
+def design_frames() -> dict:
+    """handoff/design-frames.json, read once (tools/derive-state-views.py writes it)."""
+    global _FRAMES
+    if _FRAMES is None:
+        import json
+        from pathlib import Path
+        p = Path(__file__).resolve().parents[1] / "handoff" / "design-frames.json"
+        try:
+            _FRAMES = json.loads(p.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            _FRAMES = {}
+    return _FRAMES
+
+
+def _repo_of(sid: str):
+    global _REPOS
+    if _REPOS is None:
+        import importlib.util
+        from pathlib import Path
+        spec = importlib.util.spec_from_file_location("frontend_repos_td",
+                                                      Path(__file__).resolve().parent / "frontend_repos.py")
+        _REPOS = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(_REPOS)
+    try:
+        return _REPOS.where(sid).get("repo")
+    except Exception:
+        return None
+
+
+def shell_key(repo) -> str | None:
+    """The shell and design-tokens task of a frontend repository (block-a-extra-tasks.json, CHG-R9UI-001):
+    ticvai-guest-web -> SETUP-SHELL-GUEST-WEB."""
+    if not repo:
+        return None
+    return "SETUP-SHELL-" + re.sub(r"^ticvai-", "", str(repo)).upper()
+
+
+def viewports_text(vps) -> str:
+    return " and ".join(str(v).replace("x", "×") for v in vps) or "the prototype's frame size"
+
+
+def design_verified(sid: str) -> bool:
+    return bool(((design_frames().get("screens") or {}).get(sid) or {}).get("clientVerified"))
+
+
+def visual_check(sid: str) -> str:
+    """The visual done-check of a client-verified screen, with its platform's viewports."""
+    e = (design_frames().get("screens") or {}).get(sid) or {}
+    return ("the visual check passes for every state (screenshots side by side with the prototype view, or the "
+            f"state's pattern, per state at {viewports_text(e.get('viewports') or [])}, LTR and RTL; attach them to "
+            "the Ready-for-QA comment)")
+
+
+def state_look(sid: str, state: str) -> str:
+    """One state's look, for a checklist line: its pattern and where it is drawn, or its design gap."""
+    e = (design_frames().get("screens") or {}).get(sid) or {}
+    v = (e.get("states") or {}).get(state)
+    if v:
+        where = (f"`{v['frame']}` (pulled as `{v['pulled']}`)" if v.get("frame")
+                 else f"`{v.get('prototype')}`, {v.get('where')}")
+        return f"look: {v['name']}, {where}" + (f"; {v['status']}" if v.get("status") else "")
+    if state in (e.get("gaps") or {}):
+        gid = e["gaps"][state]
+        return (f"look: not drawn by the approved design ({gid or 'a design gap'} on docs/active/left-out.yaml): build "
+                "no look of your own; raise a blocking CR for this state and take the next one")
+    return ""
+
+
+def design_sentence(sid: str) -> str:
+    """The "Design" section of a screen ticket, as one paragraph (a pointer line, a plan sentence)."""
+    e = (design_frames().get("screens") or {}).get(sid)
+    if e is None:
+        return ""
+    tok = e.get("tokens") or {}
+    if not e.get("clientVerified"):
+        shell = shell_key(_repo_of(sid))
+        return (f"{NO_DESIGN_HEAD}: {sid} has no client-approved prototype view or frame. Build its structure from "
+                f"the screen spec, on the app shell's tokens (`{tok.get('file')}`) and state patterns"
+                + (f" ({shell})" if shell else "") + ". " + STRUCTURE_ONLY)
+    pr = e.get("prototype") or {}
+    out = (f"{DESIGN_HEAD}: prototype `{pr.get('file')}`" + (f" ({pr.get('rev')})" if pr.get("rev") else "")
+           + (f", view: {pr.get('view')}" if pr.get("view") else "")
+           + {"partial": " (it shows part of this screen: build the rest from the screen spec in the same look)",
+              "none": " (it does not draw this screen: build it from the screen spec in the look of the frame below)"}
+           .get(pr.get("match"), "") + ". ")
+    if e.get("board"):
+        out += f"Wireframe frame `{e['board']}`, which adam_pull writes into the ticket folder as `{e.get('pulled')}`. "
+    out += ("Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens "
+            f"(`{tok.get('file')}`). ")
+    def drawn(v):
+        if v.get("frame"):
+            return f" (`{v['frame']}`, pulled as `{v['pulled']}`)"
+        if v.get("prototype") == pr.get("file"):
+            return f" (the prototype, {v.get('where')})"
+        return f" (`{v.get('prototype')}`, {v.get('where')})"
+    looks = [f"{st}: {v['name']}" + drawn(v) + (" [drawn by the package from the approved design, r9; not yet seen by the "
+                                                "client]" if v.get("status") else "")
+             for st, v in (e.get("states") or {}).items()]
+    if looks:
+        out += "Each state's look: " + "; ".join(looks) + ". "
+    if e.get("gaps"):
+        out += ("Not drawn by the approved design (design gaps on docs/active/left-out.yaml: build no look of your "
+                "own, raise a blocking CR for the state and ask the lead): "
+                + ", ".join(f"{st} ({gid})" if gid else st for st, gid in e["gaps"].items()) + ". ")
+    return out + STRUCTURE_ONLY
+
+
 def done_when(r, part, builds):
     """What finishes this ticket, as one line every pointer carries (CHG-REL-003). The plan's own "Done when" when the
     task has one; otherwise the test strategy's (docs/active/block-test-strategy.md) for its kind, naming what it
@@ -192,17 +314,28 @@ def done_when(r, part, builds):
                 f"({guard}); every migration from an empty database runs once a day and in the merge-request "
                 "pipeline; and a peer has reviewed it.")
     if kind == "Frontend" and names:
-        step = {"build": "the layout is built from the screen spec (and its wireframe once client-verified)",
+        # **The look is part of done** (CHG-R9UI-004): a client-verified screen is done when the visual check passes for
+        # every state; one with no approved design is built on its app's shell, structure only.
+        sids = [n for n in names if design_verified(n)]
+        look = visual_check(sids[0]) if len(sids) == 1 else (
+            "the visual check passes for every state of each (screenshots side by side with the prototype view, or "
+            "the state's pattern, per state at the app's viewports, LTR and RTL; attach them to the Ready-for-QA "
+            "comment)") if sids else ""
+        step = {"build": (look if sids else "the layout is built from the screen spec on the app shell's tokens and "
+                          "state patterns (no client-approved design yet: structure only)"),
                 "wire": "every bound operation is called as the screen spec says, with its loading, empty and error states",
                 "test": "a component or interaction test covers every state, navigation link and permission"}.get(part)
         if step:
             return f"Done when, for {named}: {step}."
+        last = f", and {look}" if look else ""
+        joiner = "," if look else ", and"
         if scope_of(r):    # a split screen: its part, not the whole screen (CHG-FXP-001)
             return (f"Done when {named} reaches every state its spec lists for the operations in its scope, every "
-                    "navigation link it owns works, an allowed and a refused user see what its permissions say, and it "
-                    "calls only the operations its scope names (block-test-strategy).")
+                    "navigation link it owns works, an allowed and a refused user see what its permissions say"
+                    f"{joiner} it calls only the operations its scope names{last} (block-test-strategy).")
         return (f"Done when {named} reaches every state its spec lists, every navigation link works, an allowed and a "
-                "refused user see what its permissions say, and it calls only its bound operations (block-test-strategy).")
+                f"refused user see what its permissions say{joiner} it calls only its bound operations{last} "
+                "(block-test-strategy).")
     if kind == "Test":
         return ("Done when every flow the block claims passes end to end on the integration environment, every defect "
                 "found is triaged with no open severity 1 or 2 defect, and the lead has signed the block test off "
@@ -331,7 +464,9 @@ def define_sentence(sid: str, day: float, why: str | None = "gaps") -> str:
             f"{d.year}; until then build nothing from the default layout.")
 
 
-CARRY = re.compile(r"((?:Scope|Waits for its definition): [^\n]+?\.)(?= |$)")
+# "App shell and mock API: ..." (CHG-R9UI-001, -002): what a screen task waits on first, or, when it started before
+# them, that it does not wait and is aligned with them when they land; its pointer carries it like the scope.
+CARRY = re.compile(r"((?:Scope|Waits for its definition|App shell and mock API|App shell|Mock API): [^\n]+?\.)(?= |$)")
 
 # **A migration is written in the developer's repository, copied from the package's SQL** (CHG-R5-002, 7 October). A
 # developer's agent stopped MIG-BASELINE (#27646): the ticket names V0001__baseline.sql, which the package no longer
@@ -360,9 +495,11 @@ def baseline_functions(root) -> dict:
 
 
 AFTER_R1_FILE = re.compile(r"^V0[1-9]\d\d[a-z]?__(?:names_(?:early_)?)?after_r1_\d{8}\.sql$")
-# A block of the names file (ddl_forward.tag): `-- <table> | <kind> | <detail> [| <other table>]` (R8-MIG-001)
+# A block of the names file (ddl_forward.tag): `-- <table> | <kind> | <detail> [| <other table>]` (R8-MIG-001); a key
+# put in the reference's form and a widened primary key (CHG-R9KEY-001) are on the tickets of the tables they name too
 NAMES_TAG = re.compile(r"^-- (\w+\.\w+) \| (rename table|move table|rename policy|rename column|rename constraint|"
-                       r"rename index|create index|drop index|drop foreign key|foreign key) \| (\S+(?: to \S+)?)"
+                       r"rename index|create index|drop index|drop foreign key|foreign key|change foreign key|"
+                       r"widen primary key) \| (\S+(?: to \S+)?)"
                        r"(?: \| (\w+\.\w+))?$")
 _AR1 = [
     (re.compile(r"^CREATE TABLE IF NOT EXISTS (\w+\.\w+)"), None),

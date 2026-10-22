@@ -1,6 +1,6 @@
 {
  "scope": "platform",
- "generated": "2026-10-21",
+ "generated": "2026-10-22",
  "note": "Derived on every run by tools/build-status.py. A hand-maintained status page is worse than none, because somebody plans against it.",
  "counts": {
   "operations": 2845,
@@ -26,7 +26,7 @@
   "design": [
    {
     "name": "API data lineage resolved",
-    "done": 2810,
+    "done": 2812,
     "total": 2845,
     "percent": 99,
     "note": "Every operation maps to the tables it reads and writes."
@@ -172,7 +172,7 @@
   }
  },
  "headline": {
-  "design": 95,
+  "design": 96,
   "build": 33
  },
  "waves": {

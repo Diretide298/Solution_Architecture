@@ -159,8 +159,11 @@ x-ticvai-queries:
       lets it see them (the table's row-level security, under the caller's connection and transaction). It
       decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
       a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked
-      from another deployable through Access' service route (serviceAuth).
-    served: [service]
+      from another deployable through Access' service route (serviceAuth), and in process by commerce (ADAM CR-196,
+      option B, decided 21 October 2026; CHG-R9CR-005): DB-ROLES grants the commerce role SELECT on
+      access.entitlement (docs/active/cross-deployable-writes.yaml XDR-001), so Orders' getMediaEntitlements calls
+      the C# query interface Access implements, in its own transaction, under the caller's own scope.
+    served: [in-process, service]
   scanEventRecords:
     module: access
     table: access.scan_event
@@ -177,8 +180,11 @@ x-ticvai-queries:
       it see them (the table's row-level security, under the caller's connection and transaction). It decides
       nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and a
       question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked from
-      another deployable through Access' service route (serviceAuth).
-    served: [service]
+      another deployable through Access' service route (serviceAuth), and in process by commerce (ADAM CR-196,
+      option B, decided 21 October 2026; CHG-R9CR-005): DB-ROLES grants the commerce role SELECT on
+      access.scan_event (docs/active/cross-deployable-writes.yaml XDR-001), so Orders' getMediaEntitlements calls the
+      C# query interface Access implements, in its own transaction, under the caller's own scope.
+    served: [in-process, service]
 paths:
   /access/validate:
     post:

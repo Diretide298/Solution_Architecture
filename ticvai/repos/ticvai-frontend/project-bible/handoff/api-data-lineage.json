@@ -799,6 +799,9 @@
     "route": "in-process",
     "for": "the region's time zone the series is read in: daysOfWeek, until, firstStart and lastStart (ADAM CR-096)"
    }
+  ],
+  "readsInProcess": [
+   "platform.region_settings"
   ]
  },
  "listChannelCapacities": {
@@ -1043,6 +1046,9 @@
     "route": "in-process",
     "for": "the tax codes the bundle carries (ADAM CR-110)"
    }
+  ],
+  "readsInProcess": [
+   "ledger.tax_code"
   ]
  },
  "getLatestBundle": {
@@ -1222,6 +1228,10 @@
     "route": "in-process",
     "for": "its read of platform.workstation, Tenancy's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings",
+   "platform.workstation"
   ]
  },
  "renewInventoryHold": {
@@ -2536,6 +2546,10 @@
     "route": "in-process",
     "for": "catalogueState.staleAfter and pendingBundleVersion, from catalogue.published_bundle, Catalogue's data (r8 gate, CHG-R8GT2-007)"
    }
+  ],
+  "readsInProcess": [
+   "catalogue.bundle_application",
+   "catalogue.published_bundle"
   ]
  },
  "getWorkstation": {
@@ -2605,6 +2619,10 @@
     "route": "in-process",
     "for": "catalogueState.staleAfter and pendingBundleVersion, from catalogue.published_bundle, Catalogue's data (r8 gate, CHG-R8GT2-007; check-cross-module-reads XR-FACT)"
    }
+  ],
+  "readsInProcess": [
+   "catalogue.bundle_application",
+   "catalogue.published_bundle"
   ]
  },
  "configureWorkstation": {
@@ -2690,7 +2708,11 @@
     "time_zone",
     "venue_id"
    ]
-  }
+  },
+  "readsInProcess": [
+   "catalogue.bundle_application",
+   "catalogue.published_bundle"
+  ]
  },
  "listOutlets": {
   "contract": "tenancy",
@@ -3392,6 +3414,9 @@
     "route": "in-process",
     "for": "the performance's seat limit on the channel (422 seat-limit-exceeded) (CHG-MOD-003)"
    }
+  ],
+  "readsInProcess": [
+   "catalogue.performance"
   ]
  },
  "getOrder": {
@@ -3657,6 +3682,9 @@
     "route": "in-process",
     "for": "the seated lines' leases (409 seat-lease-expiring) (CHG-MOD-003)"
    }
+  ],
+  "readsInProcess": [
+   "seating.seat"
   ]
  },
  "resumeOrder": {
@@ -4423,6 +4451,9 @@
     "route": "in-process",
     "for": "what its text calls \"venue setting\": platform.venue_settings, Tenancy's data (CHG-RTE-001)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "createPayment": {
@@ -4517,6 +4548,12 @@
     "route": "in-process",
     "for": "the venue's settings for the cash receipt: its region and trading currency (ADAM CR-168)"
    }
+  ],
+  "readsInProcess": [
+   "catalogue.inventory_reservation",
+   "ledger.fx_rate",
+   "platform.region_settings",
+   "platform.venue_settings"
   ]
  },
  "inquirePaymentStatus": {
@@ -4713,6 +4750,11 @@
     "route": "in-process",
     "for": "the venue's settings for the cash receipt: its region and trading currency (ADAM CR-168)"
    }
+  ],
+  "readsInProcess": [
+   "ledger.fx_rate",
+   "platform.region_settings",
+   "platform.venue_settings"
   ]
  },
  "convertReservation": {
@@ -4914,6 +4956,11 @@
     "route": "in-process",
     "for": "its read of catalogue.variant, Catalogue's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "catalogue.inventory_reservation",
+   "catalogue.price_list",
+   "catalogue.variant"
   ]
  },
  "listSyncRejections": {
@@ -5135,13 +5182,13 @@
   "readVia": [
    {
     "query": "access#entitlementRecords",
-    "route": "service",
-    "for": "its read of access.entitlement, Access's data (CHG-MOD-001)"
+    "route": "in-process",
+    "for": "the entitlements on the media code (access.entitlement, Access's data), in process under the caller's scope: the commerce role is granted SELECT (ADAM CR-196, option B; CHG-R9CR-005; XDR-001)"
    },
    {
     "query": "access#scanEventRecords",
-    "route": "service",
-    "for": "its read of access.scan_event, Access's data (CHG-MOD-001)"
+    "route": "in-process",
+    "for": "their use (access.scan_event, Access's data), in process under the caller's scope: the commerce role is granted SELECT (ADAM CR-196, option B; CHG-R9CR-005; XDR-001)"
    },
    {
     "query": "catalogue#entitlementTemplateRecords",
@@ -5153,6 +5200,11 @@
     "route": "in-process",
     "for": "its read of pii.subject, Identity's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "access.entitlement",
+   "access.scan_event",
+   "catalogue.entitlement_template"
   ]
  },
  "appendEntitlementToMedia": {
@@ -5341,6 +5393,9 @@
     "route": "in-process",
     "for": "what its text calls \"venue setting\": platform.venue_settings, Tenancy's data (CHG-RTE-001)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "rescheduleOrder": {
@@ -5386,6 +5441,10 @@
     "route": "in-process",
     "for": "what its text calls \"venue setting\": platform.venue_settings, Tenancy's data (CHG-RTE-001)"
    }
+  ],
+  "readsInProcess": [
+   "catalogue.performance",
+   "platform.venue_settings"
   ]
  },
  "reprintOrder": {
@@ -5483,6 +5542,9 @@
     "route": "in-process",
     "for": "whether the product allows transfer (409 transfer-not-allowed) (CHG-MOD-003)"
    }
+  ],
+  "readsInProcess": [
+   "catalogue.product"
   ]
  },
  "claimTicketTransfer": {
@@ -5585,6 +5647,9 @@
     "route": "in-process",
     "for": "its read of ledger.posting, Ledger's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "ledger.posting"
   ]
  },
  "listReservations": {
@@ -5839,6 +5904,9 @@
     "route": "in-process",
     "for": "what its text calls \"venue setting\": platform.venue_settings, Tenancy's data (CHG-RTE-001)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "getB2bCredit": {
@@ -7102,6 +7170,11 @@
     "route": "in-process",
     "for": "its read of platform.workstation, Tenancy's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "identity.principal",
+   "platform.venue_settings",
+   "platform.workstation"
   ]
  },
  "getCurrentShift": {
@@ -7184,6 +7257,9 @@
     "route": "in-process",
     "for": "the session's workstation (404 no-current-shift) (CHG-MOD-003)"
    }
+  ],
+  "readsInProcess": [
+   "platform.workstation"
   ]
  },
  "getShift": {
@@ -7432,7 +7508,10 @@
     "pos_shift_id",
     "principal_id"
    ]
-  }
+  },
+  "readsInProcess": [
+   "ledger.fiscal_period"
+  ]
  },
  "suspendShift": {
   "contract": "shift",
@@ -7599,6 +7678,9 @@
     "route": "in-process",
     "for": "the shift's workstation (409 shift-already-open) (CHG-MOD-003)"
    }
+  ],
+  "readsInProcess": [
+   "platform.workstation"
   ]
  },
  "closeShift": {
@@ -7711,7 +7793,12 @@
     "pos_shift_id",
     "principal_id"
    ]
-  }
+  },
+  "readsInProcess": [
+   "ledger.fx_rate",
+   "platform.denomination",
+   "platform.venue_settings"
+  ]
  },
  "acceptShiftVariance": {
   "contract": "shift",
@@ -8629,6 +8716,10 @@
     "route": "in-process",
     "for": "its read of platform.workstation, Tenancy's data (CHG-MOD-001; R8 IDENTITY-C10)"
    }
+  ],
+  "readsInProcess": [
+   "platform.region_settings",
+   "platform.workstation"
   ]
  },
  "selectRole": {
@@ -8673,6 +8764,10 @@
     "route": "in-process",
     "for": "its read of platform.workstation, Tenancy's data (CHG-MOD-001; R8 IDENTITY-C10)"
    }
+  ],
+  "readsInProcess": [
+   "platform.region_settings",
+   "platform.workstation"
   ]
  },
  "refreshToken": {
@@ -8773,6 +8868,9 @@
     "route": "in-process",
     "for": "its read of platform.workstation, Tenancy's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "platform.workstation"
   ]
  },
  "getCurrentSession": {
@@ -8827,6 +8925,10 @@
     "route": "in-process",
     "for": "the session's workstation fields: code, regionId and devices (ADAM CR-096)"
    }
+  ],
+  "readsInProcess": [
+   "platform.region_settings",
+   "platform.workstation"
   ]
  },
  "listPrincipals": {
@@ -9173,6 +9275,9 @@
     "route": "in-process",
     "for": "minorAgeThreshold, for each grant's overSubjectIsMinor (CHG-R8MIG-009) (r8 gate, CHG-R8GT2-007; check-cross-module-reads XR-FACT)"
    }
+  ],
+  "readsInProcess": [
+   "platform.region_settings"
   ]
  },
  "createDelegatedAccess": {
@@ -9249,6 +9354,9 @@
     "route": "in-process",
     "for": "minorAgeThreshold, for the returned grant's overSubjectIsMinor (CHG-R8MIG-009) (r8 gate, CHG-R8GT2-007; check-cross-module-reads XR-FACT)"
    }
+  ],
+  "readsInProcess": [
+   "platform.region_settings"
   ]
  },
  "deleteDelegatedAccess": {
@@ -9402,6 +9510,9 @@
     "route": "in-process",
     "for": "the venue's two-step, step-up and one-time-code settings (guestTwoStep, stepUpActions, guestOtpMaxAttempts) in platform venue settings, Tenancy's data (CHG-MOD-001; R8 IDENTITY-C08)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "requestGuestOtp": {
@@ -9440,6 +9551,9 @@
     "route": "in-process",
     "for": "the venue's two-step, step-up and one-time-code settings (guestTwoStep, stepUpActions, guestOtpMaxAttempts) in platform venue settings, Tenancy's data (CHG-MOD-001; R8 IDENTITY-C08)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "verifyGuestOtp": {
@@ -9498,6 +9612,9 @@
     "route": "in-process",
     "for": "the venue's two-step, step-up and one-time-code settings (guestTwoStep, stepUpActions, guestOtpMaxAttempts) in platform venue settings, Tenancy's data (CHG-MOD-001; R8 IDENTITY-C08)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "guestSocialLogin": {
@@ -9555,6 +9672,9 @@
     "route": "in-process",
     "for": "the venue's two-step, step-up and one-time-code settings (guestTwoStep, stepUpActions, guestOtpMaxAttempts) in platform venue settings, Tenancy's data (CHG-MOD-001; R8 IDENTITY-C08)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "guestUaePassLogin": {
@@ -9613,6 +9733,9 @@
     "route": "in-process",
     "for": "the venue's two-step, step-up and one-time-code settings (guestTwoStep, stepUpActions, guestOtpMaxAttempts) in platform venue settings, Tenancy's data (CHG-MOD-001; R8 IDENTITY-C08)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "getGuestSession": {
@@ -9667,6 +9790,9 @@
     "route": "in-process",
     "for": "the venue's two-step, step-up and one-time-code settings (guestTwoStep, stepUpActions, guestOtpMaxAttempts) in platform venue settings, Tenancy's data (CHG-MOD-001; R8 IDENTITY-C08)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "guestLogout": {
@@ -9892,6 +10018,10 @@
     "route": "in-process",
     "for": "its read of platform.workstation, Tenancy's data (CHG-MOD-001; R8 IDENTITY-C10)"
    }
+  ],
+  "readsInProcess": [
+   "platform.region_settings",
+   "platform.workstation"
   ]
  },
  "getSsoConfig": {
@@ -10044,6 +10174,9 @@
     "route": "in-process",
     "for": "the venue's two-step, step-up and one-time-code settings (guestTwoStep, stepUpActions, guestOtpMaxAttempts) in platform venue settings, Tenancy's data (CHG-MOD-001; R8 IDENTITY-C08)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "enrolMfaMethod": {
@@ -10082,6 +10215,9 @@
     "route": "in-process",
     "for": "the venue's two-step, step-up and one-time-code settings (guestTwoStep, stepUpActions, guestOtpMaxAttempts) in platform venue settings, Tenancy's data (CHG-MOD-001; R8 IDENTITY-C08)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "verifyMfaEnrolment": {
@@ -10135,6 +10271,9 @@
     "route": "in-process",
     "for": "the venue's two-step, step-up and one-time-code settings (guestTwoStep, stepUpActions, guestOtpMaxAttempts) in platform venue settings, Tenancy's data (CHG-MOD-001; R8 IDENTITY-C08)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "removeMfaMethod": {
@@ -10171,6 +10310,9 @@
     "route": "in-process",
     "for": "the venue's two-step, step-up and one-time-code settings (guestTwoStep, stepUpActions, guestOtpMaxAttempts) in platform venue settings, Tenancy's data (CHG-MOD-001; R8 IDENTITY-C08)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "createMfaChallenge": {
@@ -10210,6 +10352,9 @@
     "route": "in-process",
     "for": "the venue's two-step, step-up and one-time-code settings (guestTwoStep, stepUpActions, guestOtpMaxAttempts) in platform venue settings, Tenancy's data (CHG-MOD-001; R8 IDENTITY-C08)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "verifyMfaChallenge": {
@@ -10309,7 +10454,10 @@
     "venue_id",
     "workstation_id"
    ]
-  }
+  },
+  "readsInProcess": [
+   "platform.workstation"
+  ]
  },
  "revokeAllSessions": {
   "contract": "identity",
@@ -10739,6 +10887,9 @@
     "route": "in-process",
     "for": "what its text calls \"region's time zone\": platform.region_settings, Tenancy's data (CHG-RTE-001)"
    }
+  ],
+  "readsInProcess": [
+   "platform.region_settings"
   ]
  },
  "updateTaxCode": {
@@ -10790,6 +10941,9 @@
     "route": "in-process",
     "for": "what its text calls \"region's time zone\": platform.region_settings, Tenancy's data (CHG-RTE-001)"
    }
+  ],
+  "readsInProcess": [
+   "platform.region_settings"
   ]
  },
  "listTaxExemptions": {
@@ -10884,6 +11038,9 @@
     "route": "in-process",
     "for": "what its text calls \"region's time zone\": platform.region_settings, Tenancy's data (CHG-RTE-001)"
    }
+  ],
+  "readsInProcess": [
+   "platform.region_settings"
   ]
  },
  "calculateTax": {
@@ -10927,6 +11084,10 @@
     "route": "in-process",
     "for": "its read of platform.region_settings, Tenancy's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "catalogue.tax_profile",
+   "platform.region_settings"
   ]
  },
  "listRecognitionSchedules": {
@@ -11052,6 +11213,10 @@
     "route": "in-process",
     "for": "what its text calls \"region's time zone\": platform.region_settings, Tenancy's data (CHG-RTE-001)"
    }
+  ],
+  "readsInProcess": [
+   "orders.sales_order",
+   "platform.region_settings"
   ]
  },
  "runRecognition": {
@@ -11089,6 +11254,9 @@
     "route": "in-process",
     "for": "its read of orders.sales_order, Orders's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "orders.sales_order"
   ]
  },
  "listJournalEntries": {
@@ -11222,6 +11390,9 @@
     "route": "in-process",
     "for": "what its text calls \"region's time zone\": platform.region_settings, Tenancy's data (CHG-RTE-001)"
    }
+  ],
+  "readsInProcess": [
+   "platform.region_settings"
   ]
  },
  "getJournalEntry": {
@@ -11355,6 +11526,9 @@
     "route": "in-process",
     "for": "what its text calls \"region's time zone\": platform.region_settings, Tenancy's data (CHG-RTE-001)"
    }
+  ],
+  "readsInProcess": [
+   "platform.region_settings"
   ]
  },
  "rejectJournal": {
@@ -11427,6 +11601,9 @@
     "route": "in-process",
     "for": "what its text calls \"region's time zone\": platform.region_settings, Tenancy's data (CHG-RTE-001)"
    }
+  ],
+  "readsInProcess": [
+   "platform.region_settings"
   ]
  },
  "reverseJournalEntry": {
@@ -11500,6 +11677,9 @@
     "route": "in-process",
     "for": "what its text calls \"region's time zone\": platform.region_settings, Tenancy's data (CHG-RTE-001)"
    }
+  ],
+  "readsInProcess": [
+   "platform.region_settings"
   ]
  },
  "listFxRates": {
@@ -11623,6 +11803,11 @@
     "route": "in-process",
     "for": "what its text calls \"region's time zone\": platform.region_settings, Tenancy's data (CHG-RTE-001)"
    }
+  ],
+  "readsInProcess": [
+   "orders.payment",
+   "orders.pos_shift",
+   "platform.region_settings"
   ]
  },
  "listInterEntityObligations": {
@@ -11746,6 +11931,9 @@
     "route": "in-process",
     "for": "what its text calls \"region's time zone\": platform.region_settings, Tenancy's data (CHG-RTE-001)"
    }
+  ],
+  "readsInProcess": [
+   "platform.region_settings"
   ]
  },
  "getTrialBalance": {
@@ -11832,6 +12020,10 @@
     "route": "in-process",
     "for": "what its text calls \"venue setting\": platform.venue_settings, Tenancy's data (CHG-RTE-001)"
    }
+  ],
+  "readsInProcess": [
+   "platform.region_settings",
+   "platform.venue_settings"
   ]
  },
  "reviewPriceVariance": {
@@ -11992,6 +12184,10 @@
     "route": "in-process",
     "for": "what its text calls \"region's time zone\": platform.region_settings, Tenancy's data (CHG-RTE-001)"
    }
+  ],
+  "readsInProcess": [
+   "payments.provider_connection",
+   "platform.region_settings"
   ]
  },
  "getSettlement": {
@@ -12127,6 +12323,9 @@
     "route": "in-process",
     "for": "the payment matchedPaymentId names (400) (CHG-MOD-003)"
    }
+  ],
+  "readsInProcess": [
+   "orders.payment"
   ]
  },
  "listLegalEntities": {
@@ -12310,6 +12509,9 @@
     "route": "in-process",
     "for": "what its text calls \"region's time zone\": platform.region_settings, Tenancy's data (CHG-RTE-001)"
    }
+  ],
+  "readsInProcess": [
+   "platform.region_settings"
   ]
  },
  "abandonPeriodClose": {
@@ -12369,6 +12571,9 @@
     "route": "in-process",
     "for": "what its text calls \"region's time zone\": platform.region_settings, Tenancy's data (CHG-RTE-001)"
    }
+  ],
+  "readsInProcess": [
+   "platform.region_settings"
   ]
  },
  "reopenPeriod": {
@@ -14653,6 +14858,9 @@
     "route": "service",
     "for": "the outlet's admissionContext and whether it is taking orders (403 entry-ticket-required, 409 outlet-closed, 422 the outlet's delivery policy) (CHG-MOD-003)"
    }
+  ],
+  "readsInProcess": [
+   "inventory.movement"
   ]
  },
  "getGuestOrderStatus": {
@@ -16998,6 +17206,9 @@
     "route": "in-process",
     "for": "its read of inventory.inventory_item, Inventory's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "inventory.inventory_item"
   ]
  },
  "recordWaste": {
@@ -20824,6 +21035,10 @@
     "route": "service",
     "for": "the order lines the sale lines name (orderLineId): unit price, tax, net and gross as Orders priced them (422 order-line-mismatch) (r8 re-walk, CHG-R8RW-004)"
    }
+  ],
+  "readsInProcess": [
+   "inventory.kit_component",
+   "inventory.movement"
   ]
  },
  "getRetailSale": {
@@ -21094,6 +21309,9 @@
     "route": "in-process",
     "for": "its read of inventory.kit_component, Inventory's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "inventory.kit_component"
   ]
  },
  "createRetailExchange": {
@@ -21361,6 +21579,13 @@
     "route": "in-process",
     "for": "the order the payment paid: its subject must be this wallet's, and it is paid in full (422 payment-not-for-top-up) (r8 re-walk, CHG-R8RW-001; CHG-R8RW-009)"
    }
+  ],
+  "readsInProcess": [
+   "catalogue.product",
+   "catalogue.variant",
+   "orders.order_line",
+   "orders.payment",
+   "orders.sales_order"
   ]
  },
  "listWalletTransactions": {
@@ -21676,6 +21901,9 @@
     "route": "service",
     "for": "the retail lines lineIds names on the orderId path (ADAM CR-096)"
    }
+  ],
+  "readsInProcess": [
+   "fnb.delivery_location"
   ]
  },
  "lookupShopAndDrop": {
@@ -21740,6 +21968,9 @@
     "route": "in-process",
     "for": "what its text calls \"collection point\": fnb.delivery_location, F&B's data (CHG-RTE-001)"
    }
+  ],
+  "readsInProcess": [
+   "fnb.delivery_location"
   ]
  },
  "collectShopAndDrop": {
@@ -21806,6 +22037,9 @@
     "route": "in-process",
     "for": "the collection point's closing time behind the default collectBy, fnb.delivery_location, F&B's data (r8 integration, CHG-R8INT-014)"
    }
+  ],
+  "readsInProcess": [
+   "fnb.delivery_location"
   ]
  },
  "reserveMerchandise": {
@@ -21872,6 +22106,10 @@
     "route": "in-process",
     "for": "its read of inventory.stock_earmark, Inventory's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "inventory.movement",
+   "inventory.stock_earmark"
   ]
  },
  "listAssets": {
@@ -22803,6 +23041,9 @@
     "route": "in-process",
     "for": "its read of inventory.stock_earmark, Inventory's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "inventory.stock_earmark"
   ]
  },
  "cancelWorkOrder": {
@@ -26827,6 +27068,9 @@
     "route": "in-process",
     "for": "the venue setting promotions.nearZeroLinePrice, the near-zero floor (ADAM CR-096)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "analysePromotionConflicts": {
@@ -26857,6 +27101,9 @@
     "route": "in-process",
     "for": "the venue setting promotions.nearZeroLinePrice, the near-zero minimum (ADAM CR-096)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "getPromotionUsage": {
@@ -29364,6 +29611,9 @@
     "route": "service",
     "for": "its read of promotions.promotion, Catalogue's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "marketing.loyalty_position"
   ]
  },
  "getWaitingGuest": {
@@ -30755,6 +31005,10 @@
     "route": "in-process",
     "for": "showPoweredBy false: the tenant's licence add-on keyed poweredByRemoval, else 403 powered-by-locked (ADAM CR-096)"
    }
+  ],
+  "readsInProcess": [
+   "assets.media_asset",
+   "control.licence_add_on"
   ]
  },
  "getAppIcons": {
@@ -30811,6 +31065,9 @@
     "route": "in-process",
     "for": "the 1024x1024 source's type, size and dimensions (ADAM CR-096)"
    }
+  ],
+  "readsInProcess": [
+   "assets.media_asset"
   ]
  },
  "getTheme": {
@@ -31843,7 +32100,13 @@
     "for": "the tenant's cell address (Tenant.cellHost) a platform operator's X-Tenant-Id resolves to, Platform's data (r8 integration, CHG-R8INT-014)"
    }
   ],
-  "fixNote": "18 October 2026: CHG-CRA-003: the plan catalogue and the records about a tenant moved from subscription to the control database (ADAM CR-150, CR-097)"
+  "fixNote": "18 October 2026: CHG-CRA-003: the plan catalogue and the records about a tenant moved from subscription to the control database (ADAM CR-150, CR-097)",
+  "readsInProcess": [
+   "control.contract",
+   "control.licence_add_on",
+   "control.plan",
+   "control.tenant"
+  ]
  },
  "setModuleEnablement": {
   "contract": "white-label",
@@ -31919,7 +32182,13 @@
     "for": "its read of control.plan, Platform's data (CHG-MOD-001)"
    }
   ],
-  "fixNote": "18 October 2026: CHG-CRA-003: the plan catalogue and the records about a tenant moved from subscription to the control database (ADAM CR-150, CR-097)"
+  "fixNote": "18 October 2026: CHG-CRA-003: the plan catalogue and the records about a tenant moved from subscription to the control database (ADAM CR-150, CR-097)",
+  "readsInProcess": [
+   "control.contract",
+   "control.licence_add_on",
+   "control.module_listing",
+   "control.plan"
+  ]
  },
  "getFeatureToggles": {
   "contract": "white-label",
@@ -32842,6 +33111,10 @@
     "route": "in-process",
     "for": "its read of identity.principal, Identity's data (CHG-MOD-001; R8 lineage request)"
    }
+  ],
+  "readsInProcess": [
+   "identity.delegated_access",
+   "identity.principal"
   ]
  },
  "createApprovalRequest": {
@@ -32950,6 +33223,9 @@
     "route": "in-process",
     "for": "its read of identity.principal, Identity's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "identity.principal"
   ]
  },
  "evaluateApprovalRequirement": {
@@ -33032,6 +33308,10 @@
     "route": "in-process",
     "for": "its read of identity.principal, Identity's data (CHG-MOD-001; R8 lineage request)"
    }
+  ],
+  "readsInProcess": [
+   "identity.delegated_access",
+   "identity.principal"
   ]
  },
  "decideApprovalRequest": {
@@ -33170,6 +33450,10 @@
     "route": "in-process",
     "for": "its read of identity.principal, Identity's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "identity.delegated_access",
+   "identity.principal"
   ]
  },
  "withdrawApprovalRequest": {
@@ -33480,6 +33764,10 @@
     "route": "in-process",
     "for": "its read of identity.principal, Identity's data (CHG-MOD-001; R8 lineage request)"
    }
+  ],
+  "readsInProcess": [
+   "identity.delegated_access",
+   "identity.principal"
   ]
  },
  "listApprovalMatrices": {
@@ -33665,6 +33953,9 @@
     "route": "in-process",
     "for": "its read of identity.principal, Identity's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "identity.principal"
   ]
  },
  "createApprovalDelegation": {
@@ -33726,6 +34017,10 @@
     "route": "in-process",
     "for": "its read of identity.principal, Identity's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "identity.delegated_access",
+   "identity.principal"
   ]
  },
  "revokeApprovalDelegation": {
@@ -34256,6 +34551,9 @@
     "route": "in-process",
     "for": "its read of identity.principal, Identity's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "identity.principal"
   ]
  },
  "createRotaAssignment": {
@@ -34319,6 +34617,10 @@
     "route": "in-process",
     "for": "its read of identity.principal, Identity's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "identity.delegated_access",
+   "identity.principal"
   ]
  },
  "updateRotaAssignment": {
@@ -34417,6 +34719,9 @@
     "route": "in-process",
     "for": "its read of identity.principal, Identity's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "identity.principal"
   ]
  },
  "listAttendance": {
@@ -34686,6 +34991,9 @@
     "route": "in-process",
     "for": "its read of identity.role, Identity's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "identity.role"
   ]
  },
  "acknowledgeAnnouncement": {
@@ -34750,6 +35058,9 @@
     "route": "in-process",
     "for": "its read of identity.principal, Identity's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "identity.principal"
   ]
  },
  "createCart": {
@@ -34852,6 +35163,11 @@
   },
   "readVia": [
    {
+    "query": "identity#openAnonymousGuestSession",
+    "route": "in-process",
+    "for": "opens the anonymous guest session for a caller with no credential, bound to the new cart and its deviceId, and gets its token for Cart.anonymousSessionToken (ADAM CR-183, option A; CHG-R9CR-002)"
+   },
+   {
     "query": "identity#subjectRecords",
     "route": "in-process",
     "for": "its read of pii.subject, Identity's data (CHG-MOD-001)"
@@ -34865,7 +35181,15 @@
     "query": "marketing-crm#consentQuestionVersionRecords",
     "route": "service",
     "for": "its read of marketing.consent_question_version, Marketing's data (CHG-MOD-001)"
+   },
+   {
+    "query": "tenancy#venueSettingsRecords",
+    "route": "in-process",
+    "for": "the new cart's window and cap: cartLeaseSeconds and cartMaxExtensions of the venue's row, else of the tenant's own row of platform.venue_settings (ADAM CR-184, option A; CHG-R9CR-003)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "getCart": {
@@ -34984,6 +35308,11 @@
     "route": "in-process",
     "for": "its read of promotions.promotion, Catalogue's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "catalogue.channel_capacity",
+   "catalogue.inventory_reservation",
+   "promotions.promotion"
   ]
  },
  "abandonCart": {
@@ -35239,6 +35568,9 @@
     "route": "service",
     "for": "its read of marketing.consent_question_version, Marketing's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "catalogue.channel_capacity"
   ]
  },
  "removeCartLine": {
@@ -35457,6 +35789,10 @@
     "route": "in-process",
     "for": "what its text calls \"venue settings\": platform.venue_settings, Tenancy's data (CHG-RTE-001)"
    }
+  ],
+  "readsInProcess": [
+   "catalogue.inventory_reservation",
+   "platform.venue_settings"
   ]
  },
  "claimCart": {
@@ -35554,6 +35890,11 @@
    ]
   },
   "readVia": [
+   {
+    "query": "identity#endAnonymousGuestSession",
+    "route": "in-process",
+    "for": "ends the anonymous guest session createCart opened for the cart, once the cart is the guest's (ADAM CR-183, option A; CHG-R9CR-002)"
+   },
    {
     "query": "identity#subjectRecords",
     "route": "in-process",
@@ -35731,6 +36072,9 @@
     "route": "service",
     "for": "its read of marketing.consent_question, Marketing's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "catalogue.inventory_reservation"
   ]
  },
  "listAbandonedCarts": {
@@ -35870,6 +36214,9 @@
     "route": "in-process",
     "for": "its read of ledger.account, Ledger's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "ledger.account"
   ]
  },
  "updateDonationCampaign": {
@@ -37884,6 +38231,9 @@
     "route": "in-process",
     "for": "its read of identity.principal, Identity's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "identity.principal"
   ]
  },
  "allocateDepositBox": {
@@ -37975,6 +38325,12 @@
     "route": "in-process",
     "for": "its read of platform.workstation, Tenancy's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "identity.principal",
+   "platform.denomination",
+   "platform.venue_settings",
+   "platform.workstation"
   ]
  },
  "adjustDepositBoxFloat": {
@@ -38052,6 +38408,10 @@
     "route": "in-process",
     "for": "what its text calls \"venue's cashDrawerLimit\": platform.venue_settings, Tenancy's data (CHG-RTE-001)"
    }
+  ],
+  "readsInProcess": [
+   "platform.denomination",
+   "platform.venue_settings"
   ]
  },
  "withdrawFromDepositBox": {
@@ -38131,7 +38491,10 @@
     "deposit_box_id",
     "id"
    ]
-  }
+  },
+  "readsInProcess": [
+   "platform.venue_settings"
+  ]
  },
  "closeDepositBoxes": {
   "contract": "shift",
@@ -38211,6 +38574,10 @@
     "route": "in-process",
     "for": "what its text calls \"venue's cashDrawerLimit\": platform.venue_settings, Tenancy's data (CHG-RTE-001)"
    }
+  ],
+  "readsInProcess": [
+   "ledger.fx_rate",
+   "platform.venue_settings"
   ]
  },
  "settleAiUsage": {
@@ -38861,6 +39228,11 @@
     "route": "in-process",
     "for": "its read of wallet.wallet, Wallet's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "promotions.voucher",
+   "wallet.gift_card",
+   "wallet.wallet"
   ]
  },
  "captureStoredValue": {
@@ -39075,6 +39447,10 @@
     "route": "in-process",
     "for": "its read of orders.sales_order, Orders's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "orders.cart",
+   "orders.sales_order"
   ]
  },
  "bulkChangePrices": {
@@ -39111,6 +39487,9 @@
     "route": "in-process",
     "for": "what its text calls \"venue setting\": platform.venue_settings, Tenancy's data (CHG-RTE-001)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "listGuestMemberships": {
@@ -39144,6 +39523,9 @@
     "route": "in-process",
     "for": "its read of orders.sales_order, Orders's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "orders.sales_order"
   ]
  },
  "getMyMemberships": {
@@ -39247,6 +39629,9 @@
     "route": "in-process",
     "for": "live orders against a category the file would replace (409 category-has-live-orders) (CHG-MOD-003)"
    }
+  ],
+  "readsInProcess": [
+   "orders.sales_order"
   ]
  },
  "commitCatalogueImport": {
@@ -39374,7 +39759,11 @@
     "recipient_name",
     "scope_path"
    ]
-  }
+  },
+  "readsInProcess": [
+   "catalogue.product",
+   "identity.principal"
+  ]
  },
  "listInvitationAllowances": {
   "contract": "orders",
@@ -39417,6 +39806,9 @@
     "route": "in-process",
     "for": "its read of identity.principal, Identity's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "identity.principal"
   ]
  },
  "listVenueMaps": {
@@ -40340,6 +40732,10 @@
     "route": "in-process",
     "for": "chargeCurrencies: each must be one the venue's payment provider can charge (ADAM CR-096)"
    }
+  ],
+  "readsInProcess": [
+   "ledger.fx_rate",
+   "payments.provider"
   ]
  },
  "listResources": {
@@ -40751,6 +41147,9 @@
     "route": "in-process",
     "for": "its read of marketing.consent_record, Marketing's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "marketing.consent_record"
   ]
  },
  "reorderPerformanceManifest": {
@@ -40844,6 +41243,9 @@
     "route": "in-process",
     "for": "its read of orders.sales_order, Orders's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "orders.sales_order"
   ]
  },
  "settleDeposit": {
@@ -40933,6 +41335,11 @@
     "route": "in-process",
     "for": "its read of wallet.wallet_transaction, Wallet's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "orders.payment",
+   "platform.region_settings",
+   "wallet.wallet_transaction"
   ]
  },
  "listPaymentProviders": {
@@ -41820,6 +42227,9 @@
     "route": "service",
     "for": "its read of platform.outlet, Tenancy's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "inventory.movement"
   ]
  },
  "completeProductionRun": {
@@ -42125,6 +42535,9 @@
     "route": "in-process",
     "for": "what its text calls \"region's time zone\": platform.region_settings, Tenancy's data (CHG-RTE-001)"
    }
+  ],
+  "readsInProcess": [
+   "platform.region_settings"
   ]
  },
  "validateRecognitionSchedules": {
@@ -42165,6 +42578,9 @@
     "route": "in-process",
     "for": "its read of catalogue.product, Catalogue's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "catalogue.product"
   ]
  },
  "assignSeats": {
@@ -42312,6 +42728,10 @@
     "route": "in-process",
     "for": "what its text calls \"venue setting\": platform.venue_settings, Tenancy's data (CHG-RTE-001)"
    }
+  ],
+  "readsInProcess": [
+   "catalogue.entitlement_template",
+   "platform.venue_settings"
   ]
  },
  "quoteUpgrade": {
@@ -42361,6 +42781,10 @@
     "route": "in-process",
     "for": "its read of catalogue.product, Catalogue's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "catalogue.price",
+   "catalogue.product"
   ]
  },
  "printTicketProof": {
@@ -42396,6 +42820,9 @@
     "route": "in-process",
     "for": "its read of catalogue.product, Catalogue's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "catalogue.product"
   ]
  },
  "setReaderProfile": {
@@ -42494,7 +42921,10 @@
     "scope_path",
     "status"
    ]
-  }
+  },
+  "readsInProcess": [
+   "marketing.segment"
+  ]
  },
  "publishContentBlock": {
   "contract": "white-label",
@@ -42861,6 +43291,9 @@
     "route": "in-process",
     "for": "minorAgeThreshold, for overSubjectIsMinor (R8 blocker ORDERS-MONEY-C20, CHG-R8MIG-009)"
    }
+  ],
+  "readsInProcess": [
+   "platform.region_settings"
   ]
  },
  "grantDelegation": {
@@ -42926,6 +43359,9 @@
     "route": "in-process",
     "for": "the minor age, RegionSettings.minorAgeThreshold in platform.region_settings, Tenancy's data (IDENTITY-C19; CHG-R8SPN-024)"
    }
+  ],
+  "readsInProcess": [
+   "platform.region_settings"
   ]
  },
  "setPasswordPolicy": {
@@ -43110,6 +43546,10 @@
     "route": "in-process",
     "for": "its read of orders.sales_order, Orders's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "orders.order_line",
+   "orders.sales_order"
   ]
  },
  "setPromotionVariants": {
@@ -43196,6 +43636,9 @@
     "route": "in-process",
     "for": "its read of orders.cart, Orders's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "orders.cart"
   ]
  },
  "splitOrder": {
@@ -43282,6 +43725,9 @@
     "route": "in-process",
     "for": "its read of catalogue.product, Catalogue's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "catalogue.product"
   ]
  },
  "shareEntitlement": {
@@ -43338,6 +43784,10 @@
     "route": "in-process",
     "for": "its read of identity.delegated_access, Identity's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "catalogue.entitlement_template",
+   "identity.delegated_access"
   ]
  },
  "registerDeveloper": {
@@ -44473,6 +44923,9 @@
     "route": "in-process",
     "for": "its read of catalogue.product, Catalogue's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "catalogue.product"
   ]
  },
  "openGuestCreditAccount": {
@@ -44632,6 +45085,9 @@
     "route": "service",
     "for": "its read of venuemap.point, VenueOps's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "identity.principal"
   ]
  },
  "listSeededReports": {
@@ -44707,6 +45163,13 @@
     "route": "in-process",
     "for": "its read of inventory.supplier, Inventory's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "inventory.goods_receipt",
+   "inventory.movement",
+   "inventory.purchase_order",
+   "inventory.supplier",
+   "inventory.supplier_contract"
   ]
  },
  "listMyEntitlements": {
@@ -44965,6 +45428,9 @@
     "route": "in-process",
     "for": "the venue's guest code attempt limit (VenueSettings.identity), Tenancy's data (r8 integration, CHG-R8INT-014)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "getPaymentLink": {
@@ -45706,6 +46172,10 @@
     "route": "in-process",
     "for": "its read of platform.region_settings, Tenancy's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "platform.denomination",
+   "platform.region_settings"
   ]
  },
  "logTemperature": {
@@ -45817,6 +46287,9 @@
     "route": "in-process",
     "for": "its read of inventory.goods_receipt, Inventory's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "inventory.goods_receipt"
   ]
  },
  "getHaccpStatus": {
@@ -46707,6 +47180,10 @@
     "route": "in-process",
     "for": "its read of inventory.movement, Inventory's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "inventory.inventory_item",
+   "inventory.movement"
   ]
  },
  "requestRecount": {
@@ -48572,6 +49049,9 @@
     "route": "in-process",
     "for": "its read of inventory.movement, Inventory's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "inventory.movement"
   ]
  },
  "listProductionRuns": {
@@ -48623,6 +49103,9 @@
     "route": "service",
     "for": "what its text calls \"Region's time zone\": platform.region_settings, Tenancy's data (CHG-RTE-001)"
    }
+  ],
+  "readsInProcess": [
+   "inventory.movement"
   ]
  },
  "setSubstitutionRules": {
@@ -48732,6 +49215,9 @@
     "route": "in-process",
     "for": "its read of inventory.inventory_item, Inventory's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "inventory.inventory_item"
   ]
  },
  "buildProductionPlan": {
@@ -48901,6 +49387,9 @@
     "route": "in-process",
     "for": "its read of identity.principal, Identity's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "identity.principal"
   ]
  },
  "setRolePermissions": {
@@ -48959,6 +49448,11 @@
     "route": "in-process",
     "for": "its read of identity.segregation_rule, Identity's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "identity.role",
+   "identity.role_permission",
+   "identity.segregation_rule"
   ]
  },
  "updateSupplier": {
@@ -49081,6 +49575,9 @@
     "route": "in-process",
     "for": "its read of fnb.cold_chain_event, F&B's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "fnb.cold_chain_event"
   ]
  },
  "listCustomDomains": {
@@ -49185,6 +49682,10 @@
     "route": "in-process",
     "for": "its read of control.tenant, Platform's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "control.tenant",
+   "control.tenant_domain"
   ]
  },
  "verifyCustomDomain": {
@@ -49787,6 +50288,9 @@
     "route": "in-process",
     "for": "its read of platform.region_settings, Tenancy's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "platform.region_settings"
   ]
  },
  "setFxProvider": {
@@ -49832,6 +50336,9 @@
     "route": "in-process",
     "for": "its read of platform.region_settings, Tenancy's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "platform.region_settings"
   ]
  },
  "listDeadLetters": {
@@ -50865,6 +51372,9 @@
     "route": "in-process",
     "for": "its read of catalogue.price, Catalogue's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "catalogue.price"
   ]
  },
  "listPersonTypeProduct": {
@@ -50897,6 +51407,9 @@
     "route": "in-process",
     "for": "its read of catalogue.product, Catalogue's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "catalogue.product"
   ]
  },
  "listUpgradeConversion": {
@@ -50939,6 +51452,9 @@
     "route": "in-process",
     "for": "its read of catalogue.product, Catalogue's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "catalogue.product"
   ]
  },
  "listUpgradeEligibilityQualification": {
@@ -50980,6 +51496,9 @@
     "route": "in-process",
     "for": "its read of catalogue.product, Catalogue's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "catalogue.product"
   ]
  },
  "listUpgradeException": {
@@ -51017,6 +51536,9 @@
     "route": "in-process",
     "for": "its read of identity.principal, Identity's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "identity.principal"
   ]
  },
  "listUpgradeFinancialTreatment": {
@@ -51051,6 +51573,9 @@
     "route": "in-process",
     "for": "its read of catalogue.price, Catalogue's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "catalogue.price"
   ]
  },
  "listUpgradeTimingUsage": {
@@ -51148,6 +51673,9 @@
     "route": "in-process",
     "for": "its read of catalogue.product, Catalogue's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "catalogue.product"
   ]
  },
  "approveBookingLimitCommercial": {
@@ -51350,6 +51878,9 @@
     "route": "in-process",
     "for": "its read of catalogue.price, Catalogue's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "catalogue.price"
   ]
  },
  "approveListingModeration": {
@@ -51698,6 +52229,10 @@
     "route": "in-process",
     "for": "its read of orders.sales_order, Orders's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "orders.cart",
+   "orders.sales_order"
   ]
  },
  "approveRoleAuthorityDelegation": {
@@ -51748,6 +52283,10 @@
     "route": "in-process",
     "for": "its read of identity.principal, Identity's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "identity.delegated_access",
+   "identity.principal"
   ]
  },
  "approveUnifiedDecision": {
@@ -51789,6 +52328,9 @@
     "route": "in-process",
     "for": "its read of identity.principal, Identity's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "identity.principal"
   ]
  },
  "approveVersioningGovernance": {
@@ -51996,6 +52538,9 @@
     "route": "in-process",
     "for": "its read of catalogue.entitlement_template, Catalogue's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "catalogue.entitlement_template"
   ]
  },
  "createLiveDynamicPrice": {
@@ -52379,6 +52924,9 @@
     "route": "in-process",
     "for": "its read of orders.discount, Orders's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "orders.discount"
   ]
  },
  "listAdvancedOfferGuardrail": {
@@ -52552,6 +53100,10 @@
     "route": "in-process",
     "for": "its read of orders.sales_order, Orders's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "orders.discount",
+   "orders.sales_order"
   ]
  },
  "listAudiencePreviewReach": {
@@ -52602,6 +53154,10 @@
     "route": "in-process",
     "for": "its read of orders.sales_order, Orders's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "orders.discount",
+   "orders.sales_order"
   ]
  },
  "listAuthorizationGovernanceTemporary": {
@@ -52719,6 +53275,12 @@
     "route": "in-process",
     "for": "its read of orders.sales_order, Orders's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "orders.cart",
+   "orders.discount",
+   "orders.order_line",
+   "orders.sales_order"
   ]
  },
  "listBestOfferCustomer": {
@@ -52990,6 +53552,9 @@
     "route": "in-process",
     "for": "its read of orders.discount, Orders's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "orders.discount"
   ]
  },
  "listBulkPricingUpdate": {
@@ -53118,6 +53683,10 @@
     "route": "in-process",
     "for": "its read of orders.sales_order, Orders's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "orders.order_line",
+   "orders.sales_order"
   ]
  },
  "listBundleBogoAdvanced": {
@@ -53164,6 +53733,11 @@
     "route": "in-process",
     "for": "its read of orders.sales_order, Orders's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "orders.discount",
+   "orders.order_line",
+   "orders.sales_order"
   ]
  },
  "listBundleCombo": {
@@ -53210,6 +53784,11 @@
     "route": "in-process",
     "for": "its read of orders.sales_order, Orders's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "orders.discount",
+   "orders.order_line",
+   "orders.sales_order"
   ]
  },
  "listBundlePricingCommercial": {
@@ -53334,6 +53913,9 @@
     "route": "in-process",
     "for": "its read of pii.subject, Identity's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "catalogue.inventory_reservation"
   ]
  },
  "listBuyerPurchaseResale": {
@@ -53486,6 +54068,10 @@
     "route": "in-process",
     "for": "its read of orders.sales_order, Orders's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "orders.discount",
+   "orders.sales_order"
   ]
  },
  "listCampaignFinancialCommercial": {
@@ -53528,6 +54114,10 @@
     "route": "in-process",
     "for": "its read of orders.sales_order, Orders's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "orders.discount",
+   "orders.sales_order"
   ]
  },
  "listCampaignGovernanceBudget": {
@@ -53569,6 +54159,10 @@
     "route": "in-process",
     "for": "its read of orders.sales_order, Orders's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "orders.discount",
+   "orders.sales_order"
   ]
  },
  "listCampaignPromotionPerformance": {
@@ -53626,6 +54220,11 @@
     "route": "in-process",
     "for": "its read of orders.sales_order, Orders's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "orders.discount",
+   "orders.order_line",
+   "orders.sales_order"
   ]
  },
  "listCapacityInventoryReconciliation": {
@@ -53666,6 +54265,9 @@
     "route": "in-process",
     "for": "its read of catalogue.channel_capacity, Catalogue's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "catalogue.channel_capacity"
   ]
  },
  "listCapacityPoolReservation": {
@@ -53734,6 +54336,10 @@
     "route": "in-process",
     "for": "its read of catalogue.inventory_reservation, Catalogue's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "catalogue.channel_capacity",
+   "catalogue.inventory_reservation"
   ]
  },
  "listCartTransactionThreshold": {
@@ -53807,6 +54413,10 @@
     "route": "in-process",
     "for": "its read of orders.sales_order, Orders's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "orders.cart",
+   "orders.sales_order"
   ]
  },
  "listChangePropagationDependency": {
@@ -54067,6 +54677,9 @@
     "route": "in-process",
     "for": "its read of orders.sales_order, Orders's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "orders.sales_order"
   ]
  },
  "listChannelPerformanceCommercial": {
@@ -54102,6 +54715,9 @@
     "route": "in-process",
     "for": "its read of orders.sales_order, Orders's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "orders.sales_order"
   ]
  },
  "listChannelSaleRule": {
@@ -54243,6 +54859,9 @@
     "route": "in-process",
     "for": "its read of orders.discount, Orders's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "orders.discount"
   ]
  },
  "listCommercialAgreement": {
@@ -55527,6 +56146,9 @@
     "route": "in-process",
     "for": "its read of orders.discount, Orders's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "orders.discount"
   ]
  },
  "listCrossModuleOrchestration": {
@@ -55720,6 +56342,11 @@
     "route": "in-process",
     "for": "its read of orders.sales_order, Orders's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "orders.discount",
+   "orders.order_line",
+   "orders.sales_order"
   ]
  },
  "listCustomerSegmentProfile": {
@@ -55787,6 +56414,9 @@
     "route": "in-process",
     "for": "its read of orders.sales_order, Orders's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "orders.sales_order"
   ]
  },
  "listDepositGuaranteeFinancial": {
@@ -56122,6 +56752,11 @@
     "route": "in-process",
     "for": "its read of orders.sales_order, Orders's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "orders.discount",
+   "orders.order_line",
+   "orders.sales_order"
   ]
  },
  "listDynamicAccessPolicy": {
@@ -56347,6 +56982,9 @@
     "route": "in-process",
     "for": "its read of orders.sales_order, Orders's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "orders.sales_order"
   ]
  },
  "listEdgePackageData": {
@@ -56608,6 +57246,11 @@
     "route": "in-process",
     "for": "its read of orders.sales_order, Orders's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "orders.discount",
+   "orders.order_line",
+   "orders.sales_order"
   ]
  },
  "listExternalPartnerCredential": {
@@ -56668,6 +57311,9 @@
     "route": "in-process",
     "for": "its read of ledger.settlement, Ledger's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "ledger.settlement"
   ]
  },
  "listFaceChangeEnrollment": {
@@ -56991,6 +57637,9 @@
     "route": "in-process",
     "for": "its read of ledger.posting, Ledger's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "ledger.posting"
   ]
  },
  "listFraudDetectionRule": {
@@ -57535,6 +58184,11 @@
     "route": "in-process",
     "for": "its read of catalogue.performance, Catalogue's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "catalogue.channel_capacity",
+   "catalogue.inventory_reservation",
+   "catalogue.performance"
   ]
  },
  "listGroupSale2": {
@@ -57866,6 +58520,11 @@
     "route": "in-process",
     "for": "its read of orders.sales_order, Orders's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "orders.discount",
+   "orders.order_line",
+   "orders.sales_order"
   ]
  },
  "listInternalDemandBooking": {
@@ -57908,6 +58567,10 @@
     "route": "in-process",
     "for": "its read of orders.sales_order, Orders's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "orders.cart",
+   "orders.sales_order"
   ]
  },
  "listInventoryCapacityChannel": {
@@ -59069,6 +59732,10 @@
     "route": "in-process",
     "for": "its read of orders.sales_order, Orders's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "orders.discount",
+   "orders.sales_order"
   ]
  },
  "listOfferBasketTrace": {
@@ -59139,6 +59806,10 @@
     "route": "in-process",
     "for": "its read of catalogue.product, Catalogue's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "catalogue.performance",
+   "catalogue.product"
   ]
  },
  "listOfflineCredentialRevocation": {
@@ -59324,6 +59995,10 @@
     "route": "in-process",
     "for": "its read of ledger.settlement, Ledger's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "ledger.settlement",
+   "ledger.settlement_exception"
   ]
  },
  "listOrderLifecycleTimeline": {
@@ -59414,6 +60089,10 @@
     "route": "in-process",
     "for": "its read of catalogue.product, Catalogue's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "catalogue.performance",
+   "catalogue.product"
   ]
  },
  "listOrderPaymentDetail": {
@@ -59460,6 +60139,9 @@
     "route": "in-process",
     "for": "its read of ledger.settlement_exception, Ledger's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "ledger.settlement_exception"
   ]
  },
  "listOrderReservation": {
@@ -59512,6 +60194,9 @@
     "route": "in-process",
     "for": "its read of catalogue.inventory_reservation, Catalogue's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "catalogue.inventory_reservation"
   ]
  },
  "listOrderSplitMerge": {
@@ -60575,6 +61260,10 @@
     "route": "in-process",
     "for": "its read of ledger.settlement, Ledger's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "ledger.settlement",
+   "ledger.settlement_exception"
   ]
  },
  "listPaymentReconciliationException": {
@@ -60614,6 +61303,10 @@
     "route": "in-process",
     "for": "its read of ledger.settlement, Ledger's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "ledger.settlement",
+   "ledger.settlement_exception"
   ]
  },
  "listPercentageFixedDiscount": {
@@ -60850,6 +61543,9 @@
     "route": "in-process",
     "for": "its read of orders.sales_order, Orders's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "orders.sales_order"
   ]
  },
  "listPriceListTemplate": {
@@ -60924,6 +61620,9 @@
     "route": "in-process",
     "for": "its read of orders.sales_order, Orders's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "orders.sales_order"
   ]
  },
  "listPricingCompliance": {
@@ -60957,6 +61656,9 @@
     "route": "in-process",
     "for": "its read of orders.sales_order, Orders's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "orders.sales_order"
   ]
  },
  "listPricingDistributionSynchronization": {
@@ -61093,6 +61795,9 @@
     "route": "in-process",
     "for": "its read of orders.sales_order, Orders's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "orders.sales_order"
   ]
  },
  "listPricingRule": {
@@ -61417,6 +62122,9 @@
     "route": "in-process",
     "for": "its read of orders.sales_order, Orders's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "orders.sales_order"
   ]
  },
  "listProductTrailChange": {
@@ -61554,6 +62262,9 @@
     "route": "in-process",
     "for": "its read of orders.discount, Orders's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "orders.discount"
   ]
  },
  "listPromotionChannel": {
@@ -61636,6 +62347,11 @@
     "route": "in-process",
     "for": "its read of orders.sales_order, Orders's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "orders.discount",
+   "orders.order_line",
+   "orders.sales_order"
   ]
  },
  "listPromotionExclusionCompatibility": {
@@ -61708,6 +62424,11 @@
     "route": "in-process",
     "for": "its read of orders.sales_order, Orders's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "orders.discount",
+   "orders.order_line",
+   "orders.sales_order"
   ]
  },
  "listPromotionLifecycleStatus": {
@@ -61783,6 +62504,11 @@
     "route": "in-process",
     "for": "its read of orders.sales_order, Orders's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "orders.discount",
+   "orders.order_line",
+   "orders.sales_order"
   ]
  },
  "listPromotionPriorityHierarchy": {
@@ -62087,6 +62813,10 @@
     "route": "in-process",
     "for": "its read of orders.sales_order, Orders's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "orders.discount",
+   "orders.sales_order"
   ]
  },
  "listRedemptionCodeLookup": {
@@ -62131,6 +62861,11 @@
     "route": "in-process",
     "for": "its read of orders.sales_order, Orders's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "orders.discount",
+   "orders.order_line",
+   "orders.sales_order"
   ]
  },
  "listRedemptionConversionFunnel": {
@@ -62177,6 +62912,11 @@
     "route": "in-process",
     "for": "its read of orders.sales_order, Orders's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "orders.cart",
+   "orders.discount",
+   "orders.sales_order"
   ]
  },
  "listRedemptionDiscountExposure": {
@@ -62369,6 +63109,9 @@
     "route": "in-process",
     "for": "its read of catalogue.channel_capacity, Catalogue's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "catalogue.channel_capacity"
   ]
  },
  "listResaleConfirmationOwnership": {
@@ -62457,6 +63200,9 @@
     "route": "in-process",
     "for": "its read of catalogue.performance, Catalogue's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "catalogue.performance"
   ]
  },
  "listResaleFeeCommission": {
@@ -62566,6 +63312,9 @@
     "route": "in-process",
     "for": "its read of catalogue.performance, Catalogue's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "catalogue.performance"
   ]
  },
  "listResaleListingSeller": {
@@ -62611,6 +63360,9 @@
     "route": "in-process",
     "for": "its read of catalogue.performance, Catalogue's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "catalogue.performance"
   ]
  },
  "listResaleMarketplace": {
@@ -62653,6 +63405,9 @@
     "route": "in-process",
     "for": "its read of catalogue.performance, Catalogue's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "catalogue.performance"
   ]
  },
  "listResaleOwnership": {
@@ -62749,6 +63504,9 @@
     "route": "in-process",
     "for": "its read of catalogue.price, Catalogue's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "catalogue.price"
   ]
  },
  "listResaleTicketDetail": {
@@ -62795,6 +63553,10 @@
     "route": "in-process",
     "for": "its read of catalogue.product, Catalogue's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "catalogue.performance",
+   "catalogue.product"
   ]
  },
  "listReservationConfirmationExpiry": {
@@ -62830,6 +63592,9 @@
     "route": "in-process",
     "for": "its read of catalogue.inventory_reservation, Catalogue's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "catalogue.inventory_reservation"
   ]
  },
  "listReservationHoldRelease": {
@@ -63011,6 +63776,9 @@
     "route": "in-process",
     "for": "its read of orders.sales_order, Orders's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "orders.sales_order"
   ]
  },
  "listRewardSelectionSubstitution": {
@@ -63422,6 +64190,9 @@
     "route": "in-process",
     "for": "its read of identity.principal, Identity's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "identity.principal"
   ]
  },
  "listSlaEscalationReminder": {
@@ -63542,6 +64313,9 @@
     "route": "in-process",
     "for": "its read of orders.discount, Orders's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "orders.discount"
   ]
  },
  "listTargetingConflictFrequency": {
@@ -63575,6 +64349,9 @@
     "route": "in-process",
     "for": "its read of orders.discount, Orders's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "orders.discount"
   ]
  },
  "listTargetingEligibility": {
@@ -63621,6 +64398,9 @@
     "route": "in-process",
     "for": "its read of orders.discount, Orders's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "orders.discount"
   ]
  },
  "listTaxFeeCalculation": {
@@ -63984,6 +64764,9 @@
     "route": "in-process",
     "for": "its read of catalogue.performance, Catalogue's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "catalogue.performance"
   ]
  },
  "listTimeBasedSeasonal": {
@@ -64156,6 +64939,10 @@
     "route": "in-process",
     "for": "its read of orders.sales_order, Orders's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "orders.order_line",
+   "orders.sales_order"
   ]
  },
  "listUsageCapacityFrequency": {
@@ -64190,6 +64977,9 @@
     "route": "in-process",
     "for": "its read of orders.discount, Orders's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "orders.discount"
   ]
  },
  "listValidationExceptionReason": {
@@ -64674,6 +65464,9 @@
     "route": "in-process",
     "for": "its read of identity.principal, Identity's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "identity.principal"
   ]
  },
  "listWorkflowAutonomouGovernance": {
@@ -64788,6 +65581,9 @@
     "route": "in-process",
     "for": "its read of identity.principal, Identity's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "identity.principal"
   ]
  },
  "listWorkflowProcessPerformance": {
@@ -66374,6 +67170,11 @@
     "route": "in-process",
     "for": "its read of catalogue.product, Catalogue's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "catalogue.group_package",
+   "catalogue.price",
+   "catalogue.product"
   ]
  },
  "setGroupQuotationProposal": {
@@ -66421,6 +67222,9 @@
     "route": "in-process",
     "for": "its read of catalogue.price, Catalogue's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "catalogue.price"
   ]
  },
  "setHandheldMobileAccess": {
@@ -66830,6 +67634,10 @@
     "route": "in-process",
     "for": "its read of catalogue.inventory_reservation, Catalogue's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "catalogue.channel_capacity",
+   "catalogue.inventory_reservation"
   ]
  },
  "setOrderDetailTransaction": {
@@ -67317,6 +68125,9 @@
     "route": "in-process",
     "for": "its read of orders.sales_order, Orders's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "orders.sales_order"
   ]
  },
  "setPricingChangeRequest": {
@@ -68590,6 +69401,9 @@
     "route": "in-process",
     "for": "its read of orders.sales_order, Orders's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "orders.sales_order"
   ]
  },
  "listDynamicBundle": {
@@ -68625,6 +69439,9 @@
     "route": "in-process",
     "for": "its read of orders.order_line, Orders's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "orders.order_line"
   ]
  },
  "listDynamicPricingStrategy": {
@@ -72517,6 +73334,12 @@
     "route": "service",
     "for": "the venue's businessDayCutoff, which closes the default period, its business day (platform.venue_settings) (r8 re-walk, CHG-R8RW-005)"
    }
+  ],
+  "readsInProcess": [
+   "fnb.table_reservation",
+   "fnb.table_visit",
+   "fnb.waitlist_entry",
+   "marketing.loyalty_position"
   ]
  },
  "getLabourCost": {
@@ -72759,6 +73582,9 @@
     "route": "in-process",
     "for": "its read of ledger.settlement, Ledger's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "ledger.settlement"
   ]
  },
  "getPaymentProviderHealth": {
@@ -72823,6 +73649,10 @@
     "route": "in-process",
     "for": "its read of orders.sales_order, Orders's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "orders.order_line",
+   "orders.sales_order"
   ]
  },
  "getRecommendationPerformance": {
@@ -72856,6 +73686,9 @@
     "route": "in-process",
     "for": "its read of orders.order_line, Orders's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "orders.order_line"
   ]
  },
  "getRentalAvailability": {
@@ -82809,6 +83642,9 @@
     "route": "in-process",
     "for": "its read of identity.principal, Identity's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "identity.principal"
   ]
  },
  "verifyAccreditationDocument": {
@@ -85700,6 +86536,9 @@
     "route": "in-process",
     "for": "its read of ledger.tax_invoice_line, Ledger's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "ledger.tax_invoice_line"
   ]
  },
  "getDunningPolicy": {
@@ -86866,6 +87705,9 @@
     "route": "in-process",
     "for": "its read of platform.denomination, Tenancy's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "platform.denomination"
   ]
  },
  "updateGroupBooking": {
@@ -87005,6 +87847,21 @@
   "stores": [
    "postgres",
    "redis"
+  ],
+  "readVia": [
+   {
+    "query": "catalogue#performanceRecords",
+    "route": "in-process",
+    "for": "a performance line's start and end (catalogue.performance starts_at, ends_at), Catalogue's data (ADAM CR-199, option A; CHG-R9CR-006)"
+   },
+   {
+    "query": "platform-ops#tenantDomainRecords",
+    "route": "service",
+    "for": "the host of the link back: the tenant's primary active web host (control.tenant_domain), Platform's data, asked as Tenancy's resolveTenantHost asks it (ADAM CR-199, option A; CHG-R9CR-006)"
+   }
+  ],
+  "readsInProcess": [
+   "catalogue.performance"
   ]
  },
  "getVisitReminder": {
@@ -87483,6 +88340,10 @@
     "route": "in-process",
     "for": "its read of catalogue.product, Catalogue's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "catalogue.group_package",
+   "catalogue.product"
   ]
  },
  "retryMyDunningPayment": {
@@ -88614,6 +89475,9 @@
     "route": "in-process",
     "for": "its read of identity.delegated_access, Identity's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "identity.delegated_access"
   ]
  },
  "applyCartPromoCode": {
@@ -88736,6 +89600,11 @@
     "route": "in-process",
     "for": "its lookup of a promotion's own code, promotions.promotion, Promotions' data (ORDERS-MONEY-C11; CHG-R8SPN-026)"
    }
+  ],
+  "readsInProcess": [
+   "promotions.coupon_campaign",
+   "promotions.coupon_code",
+   "promotions.promotion"
   ]
  },
  "assignPerformanceMedia": {
@@ -88966,6 +89835,9 @@
     "route": "in-process",
     "for": "the venue's two-step, step-up and one-time-code settings (guestTwoStep, stepUpActions, guestOtpMaxAttempts) in platform venue settings, Tenancy's data (CHG-MOD-001; R8 IDENTITY-C08)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "leaveRestaurantWaitlist": {
@@ -89379,6 +90251,10 @@
     "route": "in-process",
     "for": "its read of identity.principal, Identity's data (CHG-MOD-001; R8 lineage request)"
    }
+  ],
+  "readsInProcess": [
+   "identity.delegated_access",
+   "identity.principal"
   ]
  },
  "updateSeatCategory": {
@@ -91561,6 +92437,10 @@
     "route": "in-process",
     "for": "whether the membership is active (409 membership-not-active) (CHG-MOD-003)"
    }
+  ],
+  "readsInProcess": [
+   "catalogue.product",
+   "identity.customer_membership"
   ]
  },
  "proposeGuidedChoice": {
@@ -93260,6 +94140,9 @@
     "route": "in-process",
     "for": "what its text calls \"venue setting\": platform.venue_settings, Tenancy's data (CHG-RTE-001)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "setResourceBookingProgress": {
@@ -94350,6 +95233,9 @@
     "route": "in-process",
     "for": "what its text calls \"region's time zone\": platform.region_settings, Tenancy's data (CHG-RTE-001)"
    }
+  ],
+  "readsInProcess": [
+   "platform.region_settings"
   ]
  },
  "voidEntitlement": {
@@ -98089,6 +98975,9 @@
     "route": "in-process",
     "for": "what its text calls \"venue's trading currency\": platform.venue_settings, Tenancy's data (CHG-RTE-001)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "setMediaBindingRule": {
@@ -101064,6 +101953,10 @@
     "route": "in-process",
     "for": "its read of workforce.work_assignment, Tenancy's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "workforce.employee",
+   "workforce.work_assignment"
   ]
  },
  "createAiGovernancePolicyDraft": {
@@ -101392,6 +102285,9 @@
     "route": "in-process",
     "for": "whether the product qualifies under the instalment policy (422 not-eligible-for-instalments) (CHG-MOD-003)"
    }
+  ],
+  "readsInProcess": [
+   "catalogue.product"
   ]
  },
  "createRiskCase": {
@@ -102744,6 +103640,10 @@
     "route": "in-process",
     "for": "its read of catalogue.product, Catalogue's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "catalogue.product",
+   "catalogue.product_category"
   ]
  },
  "getConfigurationBlueprint": {
@@ -103615,6 +104515,9 @@
     "route": "in-process",
     "for": "what its text calls \"region's time zone\": platform.region_settings, Tenancy's data (CHG-RTE-001)"
    }
+  ],
+  "readsInProcess": [
+   "platform.region_settings"
   ]
  },
  "getWalletAutoReloadSetting": {
@@ -103700,6 +104603,9 @@
     "route": "in-process",
     "for": "its read of payments.stored_forward, Orders's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "payments.stored_forward"
   ]
  },
  "issueCreditMemo": {
@@ -103793,6 +104699,9 @@
     "route": "in-process",
     "for": "its read of orders.refund, Orders's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "orders.refund"
   ]
  },
  "issueCreditNote": {
@@ -104023,6 +104932,12 @@
     "route": "in-process",
     "for": "what its text calls \"region's time zone\": platform.region_settings, Tenancy's data (CHG-RTE-001)"
    }
+  ],
+  "readsInProcess": [
+   "orders.order_line",
+   "orders.payment",
+   "orders.sales_order",
+   "platform.region_settings"
   ]
  },
  "listAuthorisationPolicyEffectiveness": {
@@ -106135,6 +107050,9 @@
     "route": "in-process",
     "for": "what its text calls \"region's time zone\": platform.region_settings, Tenancy's data (CHG-RTE-001)"
    }
+  ],
+  "readsInProcess": [
+   "platform.region_settings"
   ]
  },
  "listWebhookEventTypes": {
@@ -107048,6 +107966,10 @@
     "route": "in-process",
     "for": "its read of ledger.fiscal_period, Ledger's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "ledger.account_mapping",
+   "ledger.fiscal_period"
   ]
  },
  "recordChargebackOutcome": {
@@ -107129,6 +108051,10 @@
     "route": "in-process",
     "for": "its read of ledger.fiscal_period, Ledger's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "ledger.account_mapping",
+   "ledger.fiscal_period"
   ]
  },
  "recordEInvoiceTransmissionStatus": {
@@ -109208,6 +110134,9 @@
     "route": "in-process",
     "for": "its read of payments.token, Orders's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "payments.token"
   ]
  },
  "settleWalletAtExit": {
@@ -109270,6 +110199,9 @@
     "route": "in-process",
     "for": "its read of payments.stored_forward, Orders's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "payments.stored_forward"
   ]
  },
  "simulateActionPlan": {
@@ -109680,6 +110612,10 @@
     "route": "in-process",
     "for": "its read of workforce.work_assignment, Tenancy's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "workforce.employee",
+   "workforce.work_assignment"
   ]
  },
  "transmitEInvoices": {
@@ -110374,6 +111310,9 @@
     "route": "in-process",
     "for": "its read of inventory.supplier, Inventory's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "inventory.supplier"
   ]
  },
  "decideProductionAccess": {
@@ -111775,6 +112714,11 @@
     "route": "in-process",
     "for": "what its text calls \"region's time zone\": platform.region_settings, Tenancy's data (CHG-RTE-001)"
    }
+  ],
+  "readsInProcess": [
+   "orders.order_line",
+   "orders.sales_order",
+   "platform.region_settings"
   ]
  },
  "receivePaymentProviderWebhook": {
@@ -112974,6 +113918,10 @@
     "route": "in-process",
     "for": "its read of platform.venue_settings, Tenancy's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "ledger.fx_rate",
+   "platform.venue_settings"
   ]
  },
  "getWorkstationShift": {
@@ -113057,6 +114005,9 @@
     "route": "in-process",
     "for": "the session's workstation (404 no-current-shift) (CHG-MOD-003)"
    }
+  ],
+  "readsInProcess": [
+   "platform.workstation"
   ]
  },
  "getPublishedTenantConfig": {
@@ -113466,6 +114417,10 @@
     "route": "in-process",
     "for": "its read of identity.principal, Identity's data (CHG-MOD-001; R8 lineage request)"
    }
+  ],
+  "readsInProcess": [
+   "identity.delegated_access",
+   "identity.principal"
   ]
  },
  "buildDeepLink": {
@@ -114242,6 +115197,10 @@
     "route": "in-process",
     "for": "the tenant's cell, whose name the address carries (ADAM CR-096)"
    }
+  ],
+  "readsInProcess": [
+   "control.cell",
+   "control.tenant_domain"
   ]
  },
  "getPrepSheetTemplate": {
@@ -118916,13 +119875,18 @@
     "route": "in-process",
     "for": "the rate a refund in another currency is shown at (Refund, ledger.fx_rate), Ledger's data (r8 integration, CHG-R8INT-014)"
    }
+  ],
+  "readsInProcess": [
+   "ledger.fx_rate"
   ]
  },
  "getGuestRefundPolicy": {
   "contract": "orders",
   "verb": "GET",
   "path": "/venues/{venueId}/guest-refund-policy",
-  "reads": [],
+  "reads": [
+   "orders.refund_policy"
+  ],
   "writes": [],
   "routing": "replica",
   "scope": "venue",
@@ -118944,6 +119908,9 @@
     "route": "in-process",
     "for": "the venue's refund settings the policy is told from, Tenancy's data (r8 integration, CHG-R8INT-014)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "runGuidedChoiceSuggestionJob": {
@@ -119707,7 +120674,12 @@
     "scope_path",
     "target_id"
    ]
-  }
+  },
+  "readsInProcess": [
+   "identity.principal",
+   "identity.role",
+   "platform.workstation"
+  ]
  },
  "setProductSalePermissionRules": {
   "contract": "catalogue",
@@ -119773,7 +120745,13 @@
     "scope_path",
     "target_id"
    ]
-  }
+  },
+  "readsInProcess": [
+   "identity.delegated_access",
+   "identity.principal",
+   "identity.role",
+   "platform.workstation"
+  ]
  },
  "checkProductSalePermission": {
   "contract": "catalogue",
@@ -119801,7 +120779,10 @@
   "contract": "catalogue",
   "verb": "GET",
   "path": "/sale-permission-targets",
-  "reads": [],
+  "reads": [
+   "catalogue.product",
+   "catalogue.sales_channel"
+  ],
   "writes": [],
   "routing": "replica",
   "scope": "venue",
@@ -119843,7 +120824,20 @@
     "route": "in-process",
     "for": "the workstations a `workstation` rule can name: platform.workstation, Tenancy's data"
    }
-  ]
+  ],
+  "readsInProcess": [
+   "identity.delegated_access",
+   "identity.principal",
+   "identity.role",
+   "platform.workstation"
+  ],
+  "readColumns": {
+   "catalogue.sales_channel": [
+    "id",
+    "name",
+    "venue_id"
+   ]
+  }
  },
  "getProductDashboard": {
   "contract": "catalogue",
@@ -121394,7 +122388,10 @@
     "slug",
     "title"
    ]
-  }
+  },
+  "readsInProcess": [
+   "control.seo_metadata"
+  ]
  },
  "setSeoMetadata": {
   "contract": "marketing-crm",
@@ -121463,7 +122460,10 @@
     "slug",
     "title"
    ]
-  }
+  },
+  "readsInProcess": [
+   "control.seo_metadata"
+  ]
  },
  "createUrlRedirect": {
   "contract": "marketing-crm",
@@ -121520,7 +122520,10 @@
     "status_code",
     "to_path"
    ]
-  }
+  },
+  "readsInProcess": [
+   "control.url_redirect"
+  ]
  },
  "listLostItems": {
   "contract": "marketing-crm",
@@ -121574,7 +122577,10 @@
    ]
   },
   "audienceNote": "Narrowed 31 August: the register is staff-side; a guest reports and claims.",
-  "guestCallable": true
+  "guestCallable": true,
+  "readsInProcess": [
+   "venuemap.point"
+  ]
  },
  "recordLostItem": {
   "contract": "marketing-crm",
@@ -121641,7 +122647,10 @@
    ]
   },
   "audienceNote": "Narrowed 31 August: staff record what was handed in.",
-  "guestCallable": true
+  "guestCallable": true,
+  "readsInProcess": [
+   "venuemap.point"
+  ]
  },
  "getLostItemMatches": {
   "contract": "marketing-crm",
@@ -126886,7 +127895,10 @@
     "updated_at"
    ]
   },
-  "lineageNote": "upsert keyed on policy_id (one row per policy version); status draft<->review, review raises approvals.createApprovalRequest (approval_request_id stored), approved/approved_by/approved_at stamped only by decideApprovalRequest; server sets the previous published version superseded on publish. Validates policy_id against whitelabel.policy (read through white-label). Cross-service call to approvals, not a direct write."
+  "lineageNote": "upsert keyed on policy_id (one row per policy version); status draft<->review, review raises approvals.createApprovalRequest (approval_request_id stored), approved/approved_by/approved_at stamped only by decideApprovalRequest; server sets the previous published version superseded on publish. Validates policy_id against whitelabel.policy (read through white-label). Cross-service call to approvals, not a direct write.",
+  "readsInProcess": [
+   "whitelabel.policy"
+  ]
  },
  "setMinorGuardianAge": {
   "contract": "marketing-crm",

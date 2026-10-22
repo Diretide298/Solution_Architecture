@@ -1,0 +1,90 @@
+# The left-out list: everything a release leaves out or defers, in one place.
+#
+# **The rule** (the council of 20 October 2026, night; accepted by the lead, Chinmay): an item left out of a release
+# or deferred exists only once it is on this one list, with where it came from, why, and the release it is targeted
+# at. A deferral written only in a report, a ledger or a change notice does not count. Settled items that become
+# developer work still go to OpenProject as tickets; this list is what is still left out.
+#
+# This file is the package's copy of that list, in git, so a check can read it (CHG-R9UI-003). tools/check-state-views.py
+# reads its `design-gap` items: a client-verified screen's state with no view (screens/_state-patterns.yaml, written into
+# the screen as wireframe.stateViews) must be named here by platform and state, or the check fails. A design gap is
+# never filled with an invented look.
+#
+# **The r9 design gaps were drawn, not left out** (CHG-R9UI-005; the lead, 21 October 2026: "290 of them were ingested
+# and never built we need to built them for r9"). The 290 states of P01, P02 and P04 that the approved prototypes never
+# drew (LO-R9UI-001 to -020 when this list was made) are drawn by the package in each app's approved look
+# (wireframes/states/, tools/draw-state-frames.py) and left this list; showing them to the client is LO-R9UI-025.
+# LO-R9UI-021 to -024 stay: those apps have no client-approved design at all, so their look is the app shells' to
+# carry on the shared tokens until the client approves one (CHG-R9UI-001).
+#
+# Fields: id (LO-<batch>-<nnn>), kind (design-gap, or deferred for any other left-out item), platform, states
+# (the state names it covers, for a design gap), screens (the client-verified screens that have the state), what,
+# source (where it was found), reason (why it is left out), target (the release or event it waits for), owner,
+# added (date), change (the change entry that added it).
+version: 1
+
+items:
+# ---------------------------------------------------------------- the apps with no client-approved design (shell tokens)
+- id: LO-R9UI-021
+  kind: design-gap-app
+  platform: P05
+  what: 'The client-approved look of the kiosk (ticvai-kiosk): its tokens and state patterns. No P05 screen is
+    client-verified and no kiosk prototype exists; the kiosk shell (SETUP-SHELL-KIOSK) builds the structure on the
+    shared tokens (screens/_design-tokens.yaml) until the client approves a design.'
+  source: screens/P05-guest-kiosk.yaml (no client-verified screen); CHG-R9UI-001
+  reason: no client-approved design to take the tokens from; inventing one would be a design nobody approved
+  target: 'when the client approves the kiosk design (not yet scheduled; the lead asks at the 4 November sign-off)'
+  owner: Chinmay, to the client
+  added: '2026-10-21'
+  change: CHG-R9UI-001
+- id: LO-R9UI-022
+  kind: design-gap-app
+  platform: P06
+  what: 'The client-approved look of the employee app (ticvai-employee-app, P06 and P07): its tokens and state
+    patterns. No P06 or P07 screen is client-verified; TICVAI_Employee_App_UI_Reference_1.pdf is a reference, not an
+    approved design. The shell (SETUP-SHELL-EMPLOYEE-APP) builds the structure on the shared tokens until then.'
+  source: screens/P06-staff-app.yaml, screens/P07-staff-scanner.yaml (no client-verified screen); CHG-R9UI-001
+  reason: no client-approved design to take the tokens from
+  target: 'when the client approves the employee app design (the lead asks at the 4 November sign-off)'
+  owner: Chinmay, to the client
+  added: '2026-10-21'
+  change: CHG-R9UI-001
+- id: LO-R9UI-023
+  kind: design-gap-app
+  platform: P08
+  what: 'The client-approved look of venue management (ticvai-venue-management, P08 and P13): its tokens and state
+    patterns. The back office is rebuilt module by module from wireframes the client signs (CHG-R8DEC-005); none is
+    signed yet. The shell (SETUP-SHELL-VENUE-MANAGEMENT) builds the structure on the shared tokens until the first
+    signed module wireframe gives the look.'
+  source: docs/active/held-tasks.yaml backoffice-module-wireframe (CHG-R8DEC-005); CHG-R9UI-001
+  reason: no client-approved design to take the tokens from yet
+  target: 'the first signed back-office module wireframe (target 4 November 2026)'
+  owner: Chinmay, to the client
+  added: '2026-10-21'
+  change: CHG-R9UI-001
+- id: LO-R9UI-024
+  kind: design-gap-app
+  platform: P09
+  what: 'The client-approved look of the TICVAI console (ticvai-web, P09): its tokens and state patterns. No P09
+    screen is client-verified. The shell (SETUP-SHELL-WEB) builds the structure on the shared tokens until then.'
+  source: screens/P09-platform-admin-console.yaml (no client-verified screen); CHG-R9UI-001
+  reason: no client-approved design to take the tokens from
+  target: 'when the client approves the console design (the lead asks at the 4 November sign-off)'
+  owner: Chinmay, to the client
+  added: '2026-10-21'
+  change: CHG-R9UI-001
+# ---------------------------------------------------------------- the frames the package drew, for the client
+- id: LO-R9UI-025
+  kind: deferred
+  platform: P01, P02, P04
+  what: 'Show the client the 20 state frames the package drew in r9 (wireframes/states/: P01 5, P02 9, P04 6), each
+    marked "drawn by the package from the approved design (r9), not yet seen by the client", and record the client''s
+    answer: approved as drawn, or the client''s own drawing, which then replaces the frame through an approved-UI
+    change.'
+  source: 'CHG-R9UI-005; the lead, 21 October 2026: "290 of them were ingested and never built we need to built them
+    for r9"'
+  reason: the lead decided to build them before the client saw them; the client still reviews them
+  target: 'the next client review (the 4 November 2026 wireframe sign-off)'
+  owner: Chinmay, to the client
+  added: '2026-10-21'
+  change: CHG-R9UI-005

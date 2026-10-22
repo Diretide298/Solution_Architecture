@@ -139,6 +139,14 @@ python3 tools/derive-screen-wiring.py --apply
 # `wireframeBoard` plus the id, so there is nothing here to decide -- and it never overwrites an
 # anchor that exists, which is what keeps the client-pack links intact.
 python3 tools/derive-board-anchors.py --apply
+# **The look of every state, and the guest apps' tokens, from the client-approved prototypes** (21 October 2026, r9,
+# CHG-R9UI-001 and -003; the WEB-007 seat page was built bare because nothing said what a state looks like). After the
+# anchors (a pattern names board frames) and before anything writes ticket text: derive-state-views writes
+# wireframe.stateViews into the client-verified screens (invisible: check-approved-ui compares no wireframe field),
+# handoff/design-frames.json (what the tickets and spec pages name) and wireframes/incoming/README.md;
+# derive-design-tokens writes handoff/design-tokens/guest-web.yaml and guest-app.yaml from the prototypes' CSS variables.
+python3 tools/derive-design-tokens.py
+python3 tools/derive-state-views.py --apply
 
 python3 tools/derive-wireframes.py
 # **`board-index.json` was stale for a week and nothing said so.** It is derived from the
@@ -417,6 +425,7 @@ retire-answered-questions                                          # never run: 
 retest-gap-rows                                                    # reports review candidates; a verdict is a judgement, not a rebuild
 build-provisional-review                                           # its sheets carry people's decisions; a rebuild would erase them
 bench derive-services render-screens                               # deliberate, not a rebuild
+draw-state-frames                                                  # draws the r9 state frames (wireframes/states/) in each app's approved look: a drawing, run by hand when a frame changes and reviewed like one; derive-state-views reads them (21 October 2026, CHG-R9UI-005)
 refresh-manifest                                                   # traces this script (C13); run by refresh-safe.sh, never inside it
 build-plan-deck                                                    # the presentation plan, run by hand after a refresh
 build-plan-doc                                                     # the Word build plan for the PM, run by hand after build-plan-deck (1 October)

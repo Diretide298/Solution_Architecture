@@ -336,7 +336,7 @@ Returns the cart with any conflicts the addition created (2.9.5) — golf at 13:
 | couponCodes | array of string |  | The promo codes the guest entered through applyCartPromoCode (decided 28 September, audit R073 (e)). (read-only) |
 | expiresAt | string (date-time) |  | The earliest lease expiry in the cart, or the cart's own window where it holds none. |
 | extensionsUsed | integer |  | (read-only) |
-| maxExtensions | integer |  | (read-only) |
+| maxExtensions | integer |  | The venue's cartMaxExtensions, else the tenant default, set when the cart is created (ADAM CR-184, option A; CHG-R9CR-003; see createCart). (read-only) |
 | locale | string |  |  |
 | createdAt | string (date-time) |  |  |
 | updatedAt | string (date-time) |  |  |
@@ -473,7 +473,7 @@ Applying a code the cart already holds returns the cart unchanged.
 | couponCodes | array of string |  | The promo codes the guest entered through applyCartPromoCode (decided 28 September, audit R073 (e)). (read-only) |
 | expiresAt | string (date-time) |  | The earliest lease expiry in the cart, or the cart's own window where it holds none. |
 | extensionsUsed | integer |  | (read-only) |
-| maxExtensions | integer |  | (read-only) |
+| maxExtensions | integer |  | The venue's cartMaxExtensions, else the tenant default, set when the cart is created (ADAM CR-184, option A; CHG-R9CR-003; see createCart). (read-only) |
 | locale | string |  |  |
 | createdAt | string (date-time) |  |  |
 | updatedAt | string (date-time) |  |  |
@@ -506,6 +506,8 @@ The cart is retained, not deleted — a checkout that fails at payment must be r
 **A line's `recommendationId` is carried to the order line** (design 2.2 A step 8), so `order.completed` attributes the purchase to the recommendation it came from.
 **The guest may pay in the currency they selected** (decided 2 October 2026, Chinmay; CHG-FIN-001; reverses the display-only rule of 10 August, MoM 10 Aug 2026 4.7 option (a) and DI-211, in favour of its option (b), charging in the guest's currency at the gateway). `chargeCurrency` names it. The order stays in the venue's base currency (ADR-0018) and the ledger posts in base currency; the order carries the charge currency, the rate used, its source and the converted total, locked until `chargeRateLockedUntil` (the cart lease, `VenueSettings.cartLeaseSeconds`). A payment started after the lock lapses is re-quoted at the rate then in force and the guest sees the new amount before confirming.
 
+**The order access token is minted here** (ADAM CR-191, option A, decided 21 October 2026; CHG-R9CR-004), as `Order.orderAccessToken` describes: bound to the new order and to the device in `X-Device-Id` (the device that built the cart). Without `X-Device-Id` no token is minted and `orderAccessToken` is null; the order is read with a session as before.
+
 |  |  |
 |---|---|
 | Permission | `None` |
@@ -525,6 +527,7 @@ The cart is retained, not deleted — a checkout that fails at payment must be r
 |---|---|---|---|---|
 | cartId | path | yes | string (uuid) |  |
 | Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
+| X-Device-Id | header |  | string (uuid) | The device a guest app or browser is (ADAM CR-191, option A, decided 21 October 2026; CHG-R9CR-004): the client UUIDv7 the app mints once per installation and keeps, the same value it sends as create… |
 
 **Request body**
 
@@ -716,6 +719,8 @@ Where the guest already has a cart, the two **merge rather than one replacing th
 
 **The anonymous cart's `token` proves it** (R8 blocker IDENTITY-C49, the lead's answer A; CHG-R8MIG-021): the body's `cartToken` must equal the cart's `token` (403 otherwise), and the claim rotates the token, so a link shared before signing in does not reach the account after.
 
+**The anonymous session ends with the claim** (ADAM CR-183, option A; CHG-R9CR-002): in the same transaction, claimCart asks Identity's in-process API `identity#endAnonymousGuestSession` with the cart's id, so the anonymous token stops working; the cart is then the guest's by its `subject_id`.
+
 |  |  |
 |---|---|
 | Permission | `None` |
@@ -815,7 +820,7 @@ Where the guest already has a cart, the two **merge rather than one replacing th
 | cart.couponCodes | array of string |  | The promo codes the guest entered through applyCartPromoCode (decided 28 September, audit R073 (e)). (read-only) |
 | cart.expiresAt | string (date-time) |  | The earliest lease expiry in the cart, or the cart's own window where it holds none. |
 | cart.extensionsUsed | integer |  | (read-only) |
-| cart.maxExtensions | integer |  | (read-only) |
+| cart.maxExtensions | integer |  | The venue's cartMaxExtensions, else the tenant default, set when the cart is created (ADAM CR-184, option A; CHG-R9CR-003; see createCart). (read-only) |
 | cart.locale | string |  |  |
 | cart.createdAt | string (date-time) |  |  |
 | cart.updatedAt | string (date-time) |  |  |
@@ -844,6 +849,12 @@ Created against a guest subject where one is known, or an anonymous token where 
 
 **Who may start one** (R8 blocker IDENTITY-C49, CHG-R8MIG-021): a signed-in guest (the cart is theirs), an anonymous guest token (`guestAuth` with no subject: the cart is anonymous and its `token` brings the guest back), or a staff or partner session, whose cart records the session and its workstation (`orders.cart.session_id`, `workstation_id`) and is that session's own. A till's cart is also created implicitly by its first `addCartLine`.
 
+**The anonymous session is Identity's** (ADAM CR-183, option A, decided 21 October 2026; CHG-R9CR-002). Called with no credential, createCart writes the cart and then asks Identity's in-process API `identity#openAnonymousGuestSession` with the cart's id and the body's `deviceId`, in the same transaction; Identity opens the session in its session registry, signs its token and returns `{ sessionId, token }`, and the token is `Cart.anonymousSessionToken`. Orders never writes Identity's session store and never holds its signing key. `claimCart` ends it through the same API (`identity#endAnonymousGuestSession`). **Without a credential, `deviceId` is required** (`400 validation` otherwise); with one it is ignored.
+
+**Whose cart it is, in the database** (ADAM CR-184, option A; CHG-R9CR-003): `orders.cart` is read and written by staff and partners by its venue, as before, and by a guest by its own subject (`subject_id` = the session's `ticvai.subject_id`, `x-ticvai-rls: guest-owns`), so a signed-in guest needs no grant on the venue and never sees another guest's cart; `orders.cart_line` follows its cart.
+
+**The new cart's window and cap** (ADAM CR-184, option A; CHG-R9CR-003). A new cart holds no lease, so its `expiresAt` is its own window: now plus `cartLeaseSeconds`, and its `maxExtensions` is `cartMaxExtensions`. Both are read with `tenancy#venueSettingsRecords`: the venue's row first, and where its value is null, the tenant's default, which is the tenant's own row of `platform.venue_settings` (the row with no venue that `setVenueSettingsDefaults` writes); where that is null too, the field's proposed default (900 seconds, 1 extension). `extensionsUsed` starts at 0.
+
 |  |  |
 |---|---|
 | Permission | `None` |
@@ -871,6 +882,7 @@ Created against a guest subject where one is known, or an anonymous token where 
 | channel | SalesChannel: enum (pos, kiosk, guestApp, guestWeb, callCentre, partner, api, backOffice, …) | yes | Where a sale came from. |
 | subjectId | string (uuid) |  | (nullable) |
 | locale | string |  |  |
+| deviceId | string (uuid) |  | The device the anonymous session is bound to (ADAM CR-183, option A; CHG-R9CR-002): a client UUIDv7 the app mints once per installation and keeps. (nullable) |
 
 **Response**: `Cart`
 
@@ -960,7 +972,7 @@ Created against a guest subject where one is known, or an anonymous token where 
 | couponCodes | array of string |  | The promo codes the guest entered through applyCartPromoCode (decided 28 September, audit R073 (e)). (read-only) |
 | expiresAt | string (date-time) |  | The earliest lease expiry in the cart, or the cart's own window where it holds none. |
 | extensionsUsed | integer |  | (read-only) |
-| maxExtensions | integer |  | (read-only) |
+| maxExtensions | integer |  | The venue's cartMaxExtensions, else the tenant default, set when the cart is created (ADAM CR-184, option A; CHG-R9CR-003; see createCart). (read-only) |
 | locale | string |  |  |
 | createdAt | string (date-time) |  |  |
 | updatedAt | string (date-time) |  |  |
@@ -969,6 +981,7 @@ Created against a guest subject where one is known, or an anonymous token where 
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 400 | BadRequest | Validation failed |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 | 201 |  | Started |
 
@@ -1088,7 +1101,7 @@ Offered once, typically, and the interface should say it is the last extension r
 | couponCodes | array of string |  | The promo codes the guest entered through applyCartPromoCode (decided 28 September, audit R073 (e)). (read-only) |
 | expiresAt | string (date-time) |  | The earliest lease expiry in the cart, or the cart's own window where it holds none. |
 | extensionsUsed | integer |  | (read-only) |
-| maxExtensions | integer |  | (read-only) |
+| maxExtensions | integer |  | The venue's cartMaxExtensions, else the tenant default, set when the cart is created (ADAM CR-184, option A; CHG-R9CR-003; see createCart). (read-only) |
 | locale | string |  |  |
 | createdAt | string (date-time) |  |  |
 | updatedAt | string (date-time) |  |  |
@@ -1218,7 +1231,7 @@ Returns the conflicts (2.9.5) and the leases with their remaining time, so the i
 | couponCodes | array of string |  | The promo codes the guest entered through applyCartPromoCode (decided 28 September, audit R073 (e)). (read-only) |
 | expiresAt | string (date-time) |  | The earliest lease expiry in the cart, or the cart's own window where it holds none. |
 | extensionsUsed | integer |  | (read-only) |
-| maxExtensions | integer |  | (read-only) |
+| maxExtensions | integer |  | The venue's cartMaxExtensions, else the tenant default, set when the cart is created (ADAM CR-184, option A; CHG-R9CR-003; see createCart). (read-only) |
 | locale | string |  |  |
 | createdAt | string (date-time) |  |  |
 | updatedAt | string (date-time) |  |  |
@@ -1345,7 +1358,7 @@ Releases its lease immediately.
 | couponCodes | array of string |  | The promo codes the guest entered through applyCartPromoCode (decided 28 September, audit R073 (e)). (read-only) |
 | expiresAt | string (date-time) |  | The earliest lease expiry in the cart, or the cart's own window where it holds none. |
 | extensionsUsed | integer |  | (read-only) |
-| maxExtensions | integer |  | (read-only) |
+| maxExtensions | integer |  | The venue's cartMaxExtensions, else the tenant default, set when the cart is created (ADAM CR-184, option A; CHG-R9CR-003; see createCart). (read-only) |
 | locale | string |  |  |
 | createdAt | string (date-time) |  |  |
 | updatedAt | string (date-time) |  |  |
@@ -1479,7 +1492,7 @@ Increasing extends the lease and may fail on capacity; decreasing releases part 
 | couponCodes | array of string |  | The promo codes the guest entered through applyCartPromoCode (decided 28 September, audit R073 (e)). (read-only) |
 | expiresAt | string (date-time) |  | The earliest lease expiry in the cart, or the cart's own window where it holds none. |
 | extensionsUsed | integer |  | (read-only) |
-| maxExtensions | integer |  | (read-only) |
+| maxExtensions | integer |  | The venue's cartMaxExtensions, else the tenant default, set when the cart is created (ADAM CR-184, option A; CHG-R9CR-003; see createCart). (read-only) |
 | locale | string |  |  |
 | createdAt | string (date-time) |  |  |
 | updatedAt | string (date-time) |  |  |
@@ -1987,10 +2000,10 @@ The media is the join, not the order. That is why this operation is keyed on `me
 | order.syncedAt | string (date-time) |  | (nullable) |
 | media | object | yes | The full set now on the media, so the cashier can say what the QR does. |
 | media.mediaCode | string | yes |  |
-| media.mediaKind | enum (qr, wristband, card, nfc, mobilePass) |  |  |
+| media.mediaKind | enum (qr, wristband, card, nfc, mobilePass) |  | From the entitlements' credentialFormat (CR-196): platformSignedQr, staticQr or null (which is platformSignedQr, CHG-R6-031) is qr, and rfidCard is card. |
 | media.subjectId | string (uuid) |  | (nullable) |
-| media.isValid | boolean | yes |  |
-| media.invalidReason | string |  | (nullable) |
+| media.isValid | boolean | yes | True when at least one entitlement on the code counts (see the schema's description). |
+| media.invalidReason | string |  | Null while isValid. (nullable) |
 | media.canAcceptMore | boolean |  | False where the media has been surrendered, expired or blocked. |
 | media.entitlements | array of object | yes |  |
 | media.entitlements[].entitlementId | string (uuid) |  |  |
@@ -2625,6 +2638,8 @@ The replacement is held before the original is released, never the other way rou
 Scanned at a counter before adding something. Shows what the guest holds so a cashier does not sell a locker to someone who already has one.
 **Media here is the glossary's Media: the QR, wristband or card that carries a ticket.** It is not a digital-library asset (`assets.yaml`), which shares the `/media` prefix and nothing else.
 
+**Where the answer comes from** (ADAM CR-196, option B, decided 21 October 2026; CHG-R9CR-005). Access owns the rows; Orders asks `access#entitlementRecords` (where `mediaCode` is the code) and `access#scanEventRecords` (their scans) **in process**, in this call's transaction under the caller's own connection, so the tables' row-level security shows a venue cashier only what their scope reaches. DB-ROLES grants the commerce role SELECT on the two tables for this read (ADR-0055 rule 4 as amended; docs/active/cross-deployable-writes.yaml XDR-001). **A code that resolves to no entitlement the caller can see is `404`.** The media has no record of its own; everything else is derived from its entitlements, as `MediaEntitlements` says.
+
 |  |  |
 |---|---|
 | Permission | `ORDER_VIEW` |
@@ -2650,10 +2665,10 @@ Scanned at a counter before adding something. Shows what the guest holds so a ca
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | mediaCode | string | yes |  |
-| mediaKind | enum (qr, wristband, card, nfc, mobilePass) |  |  |
+| mediaKind | enum (qr, wristband, card, nfc, mobilePass) |  | From the entitlements' credentialFormat (CR-196): platformSignedQr, staticQr or null (which is platformSignedQr, CHG-R6-031) is qr, and rfidCard is card. |
 | subjectId | string (uuid) |  | (nullable) |
-| isValid | boolean | yes |  |
-| invalidReason | string |  | (nullable) |
+| isValid | boolean | yes | True when at least one entitlement on the code counts (see the schema's description). |
+| invalidReason | string |  | Null while isValid. (nullable) |
 | canAcceptMore | boolean |  | False where the media has been surrendered, expired or blocked. |
 | entitlements | array of object | yes |  |
 | entitlements[].entitlementId | string (uuid) |  |  |
@@ -2682,6 +2697,8 @@ Scanned at a counter before adding something. Shows what the guest holds so a ca
 
 **A guest acts on their own only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-002; `x-ticvai-self-scoped: subject`): a guest caller needs no permission and is answered for an order they placed; another guest's order is refused exactly as one that does not exist, never returned. `ORDER_VIEW` is what a staff caller must hold to act for any guest (ADR-0025).
 **Or with the order's access token and no session** (decided 20 October 2026, Chinmay, R8 blocker cause IDENTITY-C52, option A; CHG-R8SPN-025): the device that checked out, or a payer with no session, sends `X-Order-Access-Token` (`Order.orderAccessToken`, from `checkoutCart`) and reads this one order for 24 hours. With neither a session nor a valid token for this order the answer is `404`. For a signed-in guest a `404` is also what WEB-013 and WEB-012 show as their no-access state: the guest's own order lookup found nothing they may see (IDENTITY-C28); no permission is involved.
+**A guest's own order, in the database** (ADAM CR-191, option A, decided 21 October 2026; CHG-R9CR-004). `orders.sales_order` is read by staff by its scope path as before (the per-statement predicate of our repository's migration 225) and by a guest by its own subject (`subject_id` = the session's `ticvai.subject_id`; `x-ticvai-rls: guest-reads-own`), so a guest session needs no grant on the venue and another guest's order is simply not visible. `orders.order_line` is read by a guest through its order; `orders.payment`, `orders.order_line_discount` and `orders.order_line_eligibility` keep following their parent. A guest writes none of them through this rule.
+**The order access token, checked** (CR-191, option A). Its claims, signing key and minting are on `Order.orderAccessToken`. getOrder verifies the signature, that `exp` is in the future, that `oid` is the path's `orderId` and `tid` the routed tenant, and that `did` equals `X-Device-Id`; any failure is `404`. A verified token reads that one order (its lines, payments, discounts and eligibility rows) under the routed tenant's root grant, as the payment webhook does (ITenantRootGrant), and nothing else in the same transaction.
 
 |  |  |
 |---|---|
@@ -2703,6 +2720,7 @@ Scanned at a counter before adding something. Shows what the guest holds so a ca
 | orderId | path | yes | string (uuid) |  |
 | X-Consistency-Token | header |  | string | Opaque token returned by a prior write: the database instance and its WAL LSN (SD-025, 29 September; ADR-0040 allows several instances per region, so an LSN alone is ambiguous). |
 | X-Order-Access-Token | header |  | string | Order.orderAccessToken from checkoutCart's answer, in place of a session (IDENTITY-C52, CHG-R8SPN-025). |
+| X-Device-Id | header |  | string (uuid) | The device a guest app or browser is (ADAM CR-191, option A, decided 21 October 2026; CHG-R9CR-004): the client UUIDv7 the app mints once per installation and keeps, the same value it sends as create… |
 
 **Response**: `Order`
 
@@ -2873,6 +2891,14 @@ Scanned at a counter before adding something. Shows what the guest holds so a ca
 
 **`GST-018 Add to Calendar / Reminders` had no calendar operation**, only the order and a wallet pass, so the screen named after a calendar could not put anything in one.
 Returns an iCalendar (RFC 5545) event per dated line: the venue, the session start and end, and a link back to the booking. **The event carries no ticket and no QR code**, because a calendar is synced to places a ticket should not go. Rescheduling the order changes the event UID's sequence, so a calendar that re-imports it updates the entry rather than adding a second one.
+
+**What each event holds** (ADAM CR-199, option A, decided 21 October 2026; CHG-R9CR-006):
+- **A dated line** is an order line with a `performanceId` or a `bookedWindow`. Any other line (a product with no date, a parking or transport line without either) is not dated and gives no event. An order with no dated line is `409 noDatedLine`.
+- **DTSTART and DTEND**, in UTC (`...Z`): a performance line's are the performance's `startsAt` and `endsAt` (`catalogue.performance`, read with `catalogue#performanceRecords`); a booked-window line's are its `bookedWindow.startsAt` and `endsAt`. A line with both takes its booked window.
+- **LOCATION** is the venue's name (the line's venue, `platform.scope`).
+- **UID** is `<order line id>@ticvai.app`: the line's id and the product's own domain, the stem of every platform subdomain (`<venue>.<cell>.ticvai.app`, resolveTenantHost). It never changes for the line, so a re-import updates the entry.
+- **SEQUENCE** is the number of the order's `orders.order_event` rows with `eventType` `rescheduled`, which `rescheduleOrder` writes once per reschedule: 0 for an order never rescheduled.
+- **URL**, the link back, is the tenant's guest web order page: `https://<host>/cart-and-checkout/order-confirmation?orderId=<orderId>` (WEB-013 Booking Confirmation, the guest web screen that reads one order; a visitor with no session there sees its no-access state). `<host>` is the tenant's primary active host for the `web` channel (its domain marked `isPrimary`). Platform keeps the tenant's domains in the control database, which commerce has no connection to, so this operation reads no table for the host: it asks Platform with `platform-ops#tenantDomainRecords` over the service route, as Tenancy's `resolveTenantHost` asks it, and Platform reads its own rows. Until serviceAuth between deployables is built (ADAM CR-174), the event is written without URL; nothing else changes.
 
 |  |  |
 |---|---|
@@ -3606,6 +3632,8 @@ The common case of an exchange, and worth its own operation because it is what a
 Where the new performance is priced differently, the balance settles as for an exchange. Where the venue charges a rescheduling fee, it appears as a line.
 **A transport trip moves to another departure of the same route** (decided 29 September, rev 3 REV3-21): the prototype's "Change your trip free up to two hours before departure" is the proposed value of a transport venue's `rescheduleCutoffHours` (2, with no rescheduling fee), client to correct.
 **Appends to `orders.order_event`** (the order and reservation lifecycle log) one row per state change it makes, with the previous and new state, the actor and the correlation id (decided 29 September, writers pass).
+
+**And one `rescheduled` row per reschedule** (ADAM CR-199, option A, decided 21 October 2026; CHG-R9CR-006): `eventType` `rescheduled`, `relatedEntityType` `performance`, `relatedEntityId` the target performance, in the same transaction, even when the order's status does not change. `getOrderCalendarEvent` counts these rows as the calendar event's SEQUENCE.
 
 |  |  |
 |---|---|
@@ -6279,7 +6307,7 @@ A venue with no refund policy answers `404`.
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | replica |
-| Reads | - |
+| Reads | `orders.refund_policy` |
 | Writes | - |
 | Called by | GST-067 |
 
@@ -9576,7 +9604,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | coupon_codes | text[] | no | The promo codes the guest entered through applyCartPromoCode (decided 28 September, audit R073 (e)). |
 | expires_at | timestamptz | no | The earliest lease expiry in the cart, or the cart's own window where it holds none. |
 | extensions_used | integer | no |  |
-| max_extensions | integer | no |  |
+| max_extensions | integer | no | The venue's cartMaxExtensions, else the tenant default, set when the cart is created (ADAM CR-184, option A; CHG-R9CR-003; see createCart). |
 | locale | text | no |  |
 | created_at | timestamptz | no |  |
 | updated_at | timestamptz | no |  |
@@ -9837,7 +9865,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | id | uuid | yes |  |
 | order_id | uuid | no | The order; null on a reservation's own events before it is converted. |
 | reservation_id | uuid | no |  |
-| event_type | text | yes |  |
+| event_type | text | yes | What happened, in camelCase (created, voided, ...). |
 | previous_state | text | no |  |
 | new_state | text | no |  |
 | channel | text | no |  |

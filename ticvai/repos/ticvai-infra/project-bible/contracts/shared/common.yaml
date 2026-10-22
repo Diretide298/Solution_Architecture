@@ -108,6 +108,14 @@ components:
         read-through cache in front of it and never the guarantee, so a Redis failover during a retry storm
         cannot let `createPayment` or `syncOrders` apply twice.
 
+        - **How the record is written** (ADAM CR-182, option A, decided 21 October 2026; CHG-R9CR-001). The unique
+        index `platform.idempotency_record_operation_id_idempotency_key_uniq` on (`operation_id`, `idempotency_key`)
+        is the guarantee. The row is written once, on completion, inside the change''s transaction, with
+        `status` `completed` (its only value): a concurrent retry waits on the index, fails on it when the first
+        commits, rolls back and replays. `scope_path` is the tenant root, so a replay is found whoever retries,
+        and `expires_at` is `created_at` plus 24 hours, after which the maintenance job in the workers host purges
+        the row (`tenancy.PlatformIdempotencyRecord`).
+
         '
       schema:
         type: string
@@ -172,6 +180,17 @@ components:
         '
       schema:
         type: string
+    DeviceId:
+      name: X-Device-Id
+      in: header
+      required: false
+      description: '**The device a guest app or browser is** (ADAM CR-191, option A, decided 21 October 2026;
+        CHG-R9CR-004): the client UUIDv7 the app mints once per installation and keeps, the same value it sends as
+        `createCart`''s `deviceId`. `checkoutCart` binds the order access token it mints to it, and `getOrder` reads
+        an order with `X-Order-Access-Token` only from the device the token names. Never stored on a row.'
+      schema:
+        type: string
+        format: uuid
   headers:
     ConsistencyToken:
       description: 'WAL LSN of the write that produced this response. A client that reads its own

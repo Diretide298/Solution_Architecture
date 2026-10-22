@@ -195,6 +195,7 @@
  },
  "OrderLine": {
   "x-ticvai-persistence": "orders.order_line + orders.order_line_eligibility + orders.order_line_discount",
+  "x-ticvai-rls": "guest-reads-own",
   "x-ticvai-retired-columns": [
    "promotion_id",
    "name",

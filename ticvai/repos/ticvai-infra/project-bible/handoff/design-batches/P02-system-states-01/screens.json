@@ -85,6 +85,12 @@
     "match": "exact",
     "view": "Account → All screens → Wave 1 → Arabic / RTL experience; language button on home",
     "differences": "Rev 3 decision: the basket stays on the right in Arabic by default (configurable)."
+   },
+   "stateViews": {
+    "loading": "P02/venue-loader",
+    "error": "P02/state-error",
+    "emptyFirstRun": "P02/dashed-note",
+    "offline": "P02/state-offline"
    }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 0 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
@@ -238,6 +244,17 @@
     "verified": "2026-09-28",
     "match": "exact",
     "view": "Account → All screens → Wave 1 → Maintenance / upgrade"
+   },
+   "stateViews": {
+    "loading": "P02/venue-loader",
+    "error": "P02/state-error",
+    "emptyFirstRun": "P02/dashed-note",
+    "offline": "P02/state-offline",
+    "forcedUpgrade": "P02/state-unavailable",
+    "soldOut": "P02/state-unavailable",
+    "closed": "P02/state-unavailable",
+    "emptyNoAccess": "P02/sign-in-prompt",
+    "maintenance": "P02/maintenance-page"
    }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",

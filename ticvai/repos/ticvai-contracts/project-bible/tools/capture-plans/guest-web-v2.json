@@ -1,5 +1,5 @@
 {
- "about": "P01 guest web: the screens that are views in the client's Guest Booking v2 website and its Visit Planner, from the 30 September return (WebApp_30thSep.zip, sources/designs/guest-rev3-30-september). Captured with tools/capture-prototype.mjs in viewport mode (1440 x 900, the page as the guest sees it; proof texts must be on screen). The screens chosen are the ones this return or the 29 September audit changed on the website: the booking flows of the 30 September feedback (multi-park counters WEB-005, surf session tickets WEB-006, transport WEB-049), the At the venue tabs (WEB-036, 039, 040, 041, 042, 043, 046) and the Visit Planner (WEB-050, which had no frame). Flows are chosen in the prototype's engine controls (Venue type, then the Booking flow list), then Book; the At the venue screens pick Theme park (Summit Peaks) first, because the prototype remembers the last venue between page loads.",
+ "about": "P01 guest web: the screens that are views in the client's Guest Booking v2 website and its Visit Planner, from the 30 September return (WebApp_30thSep.zip, sources/designs/guest-rev3-30-september). Captured with tools/capture-prototype.mjs in viewport mode (1440 x 900, the page as the guest sees it; proof texts must be on screen). The screens chosen are the ones this return or the 29 September audit changed on the website: the booking flows of the 30 September feedback (multi-park counters WEB-005, surf session tickets WEB-006, transport WEB-049), the At the venue tabs (WEB-036, 039, 040, 041, 042, 043, 046) and the Visit Planner (WEB-050, which had no frame). Flows are chosen in the prototype's engine controls (Venue type, then the Booking flow list), then Book; the At the venue screens pick Theme park (Summit Peaks) first, because the prototype remembers the last venue between page loads. **Every client-verified screen with a view here has an entry** (21 October 2026, CHG-R9UI-004: the WEB-007 seat page was built bare and no reference capture of it existed): an entry with `pending` names the view and has no click path yet (capture-prototype.mjs lists it as pending); `verified: false` marks steps written from the prototype's source and not run yet.",
  "prototype": "sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html",
  "assetRoots": ["sources/designs/guest-rev3-29-september", "sources/designs/guest-rev3-28-september"],
  "caption": "Client prototype web rev 3 (30 Sep 2026)",
@@ -53,6 +53,94 @@
 
   {"id": "WEB-046", "name": "In-Venue Notifications", "view": "Summit Peaks → header 'At the venue' → Alerts",
    "steps": [{"clickSelector": "[aria-label='Open engine controls']"}, {"click": "Theme park"}, {"wait": 800}, {"clickSelector": "[aria-label='Close engine controls']"}, {"click": "At the venue"}, {"wait": 2500}, {"click": "Alerts"}, {"wait": 2000}, {"scrollTo": "You are at"}],
-   "expect": ["Summit Peaks", "Summit Coaster is calling your party", "FNB-4471 is being made", "Queue calls and order updates always send"]}
+   "expect": ["Summit Peaks", "Summit Coaster is calling your party", "FNB-4471 is being made", "Queue calls and order updates always send"]},
+
+  {"id": "WEB-007", "name": "Interactive Seat Selection", "view": "Engine controls → Stadium (Union Arena) → Flow 1 · Fixed date → zone → seat map → Book → Lower Tier (the seat map with its zone picked)", "steps": [{"clickSelector": "[aria-label='Open engine controls']"}, {"click": "Stadium"}, {"wait": 800}, {"select": "Flow 1 · Fixed date → zone → seat map"}, {"wait": 800}, {"clickSelector": "[aria-label='Close engine controls']"}, {"click": "Book"}, {"wait": 2500}, {"click": "End tour"}, {"click": "Lower Tier"}, {"wait": 1500}, {"scrollTo": "Choose your seats"}], "expect": ["Union Arena", "Choose your seats", "Seats are held for six minutes once selected"], "verified": false, "note": "written from the prototype's source on 21 October 2026 and not run yet: the capture needs the network for the prototype's fonts and libraries (CHG-R9UI-004)"},
+
+  {"id": "WEB-007-WAITING", "name": "Interactive Seat Selection, waiting for a choice (state emptyFirstRun)", "view": "As WEB-007 before a zone is picked: the dashed note \"Choose ... to see the seats.\"", "steps": [{"clickSelector": "[aria-label='Open engine controls']"}, {"click": "Stadium"}, {"wait": 800}, {"select": "Flow 1 · Fixed date → zone → seat map"}, {"wait": 800}, {"clickSelector": "[aria-label='Close engine controls']"}, {"click": "Book"}, {"wait": 2500}, {"click": "End tour"}, {"scrollTo": "Choose your seats"}], "expect": ["Choose your seats", "to see the seats"], "verified": false, "note": "written from the prototype's source on 21 October 2026 and not run yet: the capture needs the network for the prototype's fonts and libraries (CHG-R9UI-004)"},
+
+  {"id": "WEB-007-FLOW2", "name": "Interactive Seat Selection, Flow 2 (date and time over the seat map)", "view": "Engine controls → Stadium (Union Arena) → Flow 2 · Choose date & time → seat map → Book", "steps": [{"clickSelector": "[aria-label='Open engine controls']"}, {"click": "Stadium"}, {"wait": 800}, {"select": "Flow 2 · Choose date & time → seat map"}, {"wait": 800}, {"clickSelector": "[aria-label='Close engine controls']"}, {"click": "Book"}, {"wait": 2500}, {"click": "End tour"}, {"scrollTo": "Choose your seats"}], "expect": ["Union Arena", "Choose your seats"], "verified": false, "note": "written from the prototype's source on 21 October 2026 and not run yet: the capture needs the network for the prototype's fonts and libraries (CHG-R9UI-004)"},
+
+  {"id": "WEB-007-PLAYHOUSE", "name": "Interactive Seat Selection, the theatre plan (Grand Playhouse, Flow 1)", "view": "Engine controls → Theatre (Grand Playhouse) → Flow 1 · Single performance → seat map → Book", "steps": [{"clickSelector": "[aria-label='Open engine controls']"}, {"click": "Theatre"}, {"wait": 800}, {"select": "Flow 1 · Single performance → seat map"}, {"wait": 800}, {"clickSelector": "[aria-label='Close engine controls']"}, {"click": "Book"}, {"wait": 2500}, {"click": "End tour"}, {"scrollTo": "Choose your seats"}], "expect": ["Grand Playhouse", "Choose your seats", "STAGE"], "verified": false, "note": "written from the prototype's source on 21 October 2026 and not run yet: the capture needs the network for the prototype's fonts and libraries (CHG-R9UI-004)"},
+
+  {"id": "WEB-007-PLAYHOUSE-FLOW2", "name": "Interactive Seat Selection, the theatre plan (Grand Playhouse, Flow 2)", "view": "Engine controls → Theatre (Grand Playhouse) → Flow 2 · Date & time → seat map → Book", "steps": [{"clickSelector": "[aria-label='Open engine controls']"}, {"click": "Theatre"}, {"wait": 800}, {"select": "Flow 2 · Date & time → seat map"}, {"wait": 800}, {"clickSelector": "[aria-label='Close engine controls']"}, {"click": "Book"}, {"wait": 2500}, {"click": "End tour"}, {"scrollTo": "Choose your seats"}], "expect": ["Grand Playhouse", "Choose your seats"], "verified": false, "note": "written from the prototype's source on 21 October 2026 and not run yet: the capture needs the network for the prototype's fonts and libraries (CHG-R9UI-004)"},
+
+  {"id": "WEB-029", "name": "Error / Sold Out / Maintenance (state error: the status card every P01 error uses)", "view": "Footer → Service status → Error", "steps": [{"scrollTo": "Service status"}, {"click": "Service status"}, {"wait": 1200}, {"click": "Error"}, {"wait": 800}], "expect": ["Something went wrong on our side", "Your basket is safe and nothing was charged"], "verified": false, "note": "written from the prototype's source on 21 October 2026 and not run yet: the capture needs the network for the prototype's fonts and libraries (CHG-R9UI-004)"},
+
+  {"id": "WEB-029-SOLDOUT", "name": "Error / Sold Out / Maintenance, Sold out (state soldOut)", "view": "Footer → Service status → Sold out", "steps": [{"scrollTo": "Service status"}, {"click": "Service status"}, {"wait": 1200}, {"click": "Sold out"}, {"wait": 800}], "expect": ["This date is sold out"], "verified": false, "note": "written from the prototype's source on 21 October 2026 and not run yet: the capture needs the network for the prototype's fonts and libraries (CHG-R9UI-004)"},
+
+  {"id": "WEB-029-MAINTENANCE", "name": "Error / Sold Out / Maintenance, Maintenance (state maintenance)", "view": "Footer → Service status → Maintenance", "steps": [{"scrollTo": "Service status"}, {"click": "Service status"}, {"wait": 1200}, {"click": "Maintenance"}, {"wait": 800}], "expect": ["Booking is paused for maintenance"], "verified": false, "note": "written from the prototype's source on 21 October 2026 and not run yet: the capture needs the network for the prototype's fonts and libraries (CHG-R9UI-004)"},
+
+  {"id": "WEB-001", "name": "Home / Landing", "view": "Header 'Discover' (default view on load)", "steps": [], "expect": [], "pending": "the view is named (the screen's wireframe.prototype.view); its click path is not recorded yet"},
+
+  {"id": "WEB-002", "name": "Event & Attraction Listing", "view": "Header 'What's on'", "steps": [], "expect": [], "pending": "the view is named (the screen's wireframe.prototype.view); its click path is not recorded yet"},
+
+  {"id": "WEB-003", "name": "Search Results", "view": "Discover → search box in the hero (opens the search panel) → Enter lands on What's on filtered by the query", "steps": [], "expect": [], "pending": "the view is named (the screen's wireframe.prototype.view); its click path is not recorded yet"},
+
+  {"id": "WEB-004", "name": "Attraction Details", "view": "Config → Marketing layer → 'Single-event page' on, then Book; or any product card → 'Read more' dialog; or a listing card's preview aside", "steps": [], "expect": [], "pending": "the view is named (the screen's wireframe.prototype.view); its click path is not recorded yet"},
+
+  {"id": "WEB-008", "name": "Add-ons & Upsell", "view": "Book → 'Extras' step (e.g. Summit Peaks → Dated day pass → Continue)", "steps": [], "expect": [], "pending": "the view is named (the screen's wireframe.prototype.view); its click path is not recorded yet"},
+
+  {"id": "WEB-009", "name": "Wishlist", "view": "Discover → 'Wishlist' link (discoverLinks)", "steps": [], "expect": [], "pending": "the view is named (the screen's wireframe.prototype.view); its click path is not recorded yet"},
+
+  {"id": "WEB-010", "name": "Shopping Cart", "view": "Visible on every booking step as the cart sidebar (Config → Layout & locale → 'Cart & summary' changes it to slide-in, bottom sheet, floating icon or single column)", "steps": [], "expect": [], "pending": "the view is named (the screen's wireframe.prototype.view); its click path is not recorded yet"},
+
+  {"id": "WEB-011", "name": "Guest Details & Attendee Forms", "view": "Book → 'Your details' step (after Extras)", "steps": [], "expect": [], "pending": "the view is named (the screen's wireframe.prototype.view); its click path is not recorded yet"},
+
+  {"id": "WEB-012", "name": "Checkout — Payment", "view": "Book → 'Payment' step; Config → Layout & locale → 'Payment outcome (demo)' = Interrupted / Declined for the failure states; Config → Steps & cards → 'Guest checkout (code proof)' for the guest route", "steps": [], "expect": [], "pending": "the view is named (the screen's wireframe.prototype.view); its click path is not recorded yet"},
+
+  {"id": "WEB-013", "name": "Booking Confirmation", "view": "Book → final step 'Confirmed' after paying", "steps": [], "expect": [], "pending": "the view is named (the screen's wireframe.prototype.view); its click path is not recorded yet"},
+
+  {"id": "WEB-015", "name": "Branded Queue / Waiting Room", "view": "Only when the host tweak 'waitingRoom' is on; it is not in the Config drawer lists, so a reviewer cannot switch it on from the page", "steps": [], "expect": [], "pending": "the view is named (the screen's wireframe.prototype.view); its click path is not recorded yet"},
+
+  {"id": "WEB-016", "name": "Login / Register", "view": "Header profile icon (signed out), or automatically when leaving Add-ons / at payment", "steps": [], "expect": [], "pending": "the view is named (the screen's wireframe.prototype.view); its click path is not recorded yet"},
+
+  {"id": "WEB-017", "name": "My Account Dashboard", "view": "Sign in → avatar menu → 'Account overview'", "steps": [], "expect": [], "pending": "the view is named (the screen's wireframe.prototype.view); its click path is not recorded yet"},
+
+  {"id": "WEB-018", "name": "My Tickets", "view": "Header 'My tickets' → a ticket → 'Manage' (ticket sheet)", "steps": [], "expect": [], "pending": "the view is named (the screen's wireframe.prototype.view); its click path is not recorded yet"},
+
+  {"id": "WEB-019", "name": "Order History", "view": "Account → 'Order history'", "steps": [], "expect": [], "pending": "the view is named (the screen's wireframe.prototype.view); its click path is not recorded yet"},
+
+  {"id": "WEB-020", "name": "Profile & Preferences", "view": "Account → 'Personal details', 'Notifications', 'Accessibility'", "steps": [], "expect": [], "pending": "the view is named (the screen's wireframe.prototype.view); its click path is not recorded yet"},
+
+  {"id": "WEB-021", "name": "Wallet & Gift Cards", "view": "Account → 'Wallet & gift cards' (and 'Payment methods')", "steps": [], "expect": [], "pending": "the view is named (the screen's wireframe.prototype.view); its click path is not recorded yet"},
+
+  {"id": "WEB-022", "name": "Membership Plans", "view": "Summit Peaks → 'Annual pass / membership' flow; Kids Club → 'Membership pass'; Account → Membership → 'Other plans — Compare'", "steps": [], "expect": [], "pending": "the view is named (the screen's wireframe.prototype.view); its click path is not recorded yet"},
+
+  {"id": "WEB-023", "name": "Membership Management", "view": "Account → 'Membership' → 'Billing statement — View'", "steps": [], "expect": [], "pending": "the view is named (the screen's wireframe.prototype.view); its click path is not recorded yet"},
+
+  {"id": "WEB-024", "name": "Devices, Wishlist & Consent", "view": "Account → 'Security' (devices), 'Face Pass', 'Data & privacy', 'Newsletters' (devices that get notifications)", "steps": [], "expect": [], "pending": "the view is named (the screen's wireframe.prototype.view); its click path is not recorded yet"},
+
+  {"id": "WEB-025", "name": "Help Centre / FAQ", "view": "Header 'Help'", "steps": [], "expect": [], "pending": "the view is named (the screen's wireframe.prototype.view); its click path is not recorded yet"},
+
+  {"id": "WEB-026", "name": "Survey & Feedback", "view": "Account → 'Reviews & feedback'", "steps": [], "expect": [], "pending": "the view is named (the screen's wireframe.prototype.view); its click path is not recorded yet"},
+
+  {"id": "WEB-027", "name": "Newsletter Subscription", "view": "Account → 'Newsletters'; Contact page → 'Choose newsletters'", "steps": [], "expect": [], "pending": "the view is named (the screen's wireframe.prototype.view); its click path is not recorded yet"},
+
+  {"id": "WEB-028", "name": "Contact & Venue Information", "view": "Footer 'Contact', or Discover → 'Contact & venue info'", "steps": [], "expect": [], "pending": "the view is named (the screen's wireframe.prototype.view); its click path is not recorded yet"},
+
+  {"id": "WEB-030", "name": "Ticket Transfer", "view": "Account → 'Transfer & resale'; My tickets → Manage → 'Transfer ticket'; Confirmation → 'Transfer tickets'", "steps": [], "expect": [], "pending": "the view is named (the screen's wireframe.prototype.view); its click path is not recorded yet"},
+
+  {"id": "WEB-031", "name": "My Reservations", "view": "Account → 'Reservations'", "steps": [], "expect": [], "pending": "the view is named (the screen's wireframe.prototype.view); its click path is not recorded yet"},
+
+  {"id": "WEB-032", "name": "Offers & Promotions", "view": "Discover → 'Offers & promotions'", "steps": [], "expect": [], "pending": "the view is named (the screen's wireframe.prototype.view); its click path is not recorded yet"},
+
+  {"id": "WEB-033", "name": "Shop", "view": "No pre-arrival shop page; retail items appear as add-ons in the Extras step (images/shop product squares) and in At the venue → 'Shop & drop'", "steps": [], "expect": [], "pending": "the view is named (the screen's wireframe.prototype.view); its click path is not recorded yet"},
+
+  {"id": "WEB-034", "name": "Lost & Found", "view": "Account → 'Lost & found, reports'; Help → 'Your cases' → Raise a case → topic 'Lost property'", "steps": [], "expect": [], "pending": "the view is named (the screen's wireframe.prototype.view); its click path is not recorded yet"},
+
+  {"id": "WEB-035", "name": "Multi-Currency & Pricing", "view": "Discover → 'Prices in your currency'", "steps": [], "expect": [], "pending": "the view is named (the screen's wireframe.prototype.view); its click path is not recorded yet"},
+
+  {"id": "WEB-037", "name": "Menu Item Detail", "view": "At the venue → Order food → tap a dish; Takeaway/Delivery → 'Add' opens the modifier side panel", "steps": [], "expect": [], "pending": "the view is named (the screen's wireframe.prototype.view); its click path is not recorded yet"},
+
+  {"id": "WEB-038", "name": "F&B – Order Tracking", "view": "At the venue → Order food → 'Send to the kitchen'", "steps": [], "expect": [], "pending": "the view is named (the screen's wireframe.prototype.view); its click path is not recorded yet"},
+
+  {"id": "WEB-044", "name": "AI Concierge – Home", "view": "Floating 'Ask Sahli' button on every page", "steps": [], "expect": [], "pending": "the view is named (the screen's wireframe.prototype.view); its click path is not recorded yet"},
+
+  {"id": "WEB-045", "name": "Help Centre & Accessibility", "view": "Header 'Help' → 'Policies and accessibility'; footer 'Accessibility'", "steps": [], "expect": [], "pending": "the view is named (the screen's wireframe.prototype.view); its click path is not recorded yet"},
+
+  {"id": "WEB-047", "name": "Map Booking — Cabanas & Spots", "view": "Coastal Aqua → 'Cabana & locker rentals' → cabana map ('Remaining time' counter)", "steps": [], "expect": [], "pending": "the view is named (the screen's wireframe.prototype.view); its click path is not recorded yet"},
+
+  {"id": "WEB-048", "name": "Book a Space by the Hour", "view": "House of Pages → 'Meeting room by the hour'", "steps": [], "expect": [], "pending": "the view is named (the screen's wireframe.prototype.view); its click path is not recorded yet"}
  ]
 }

@@ -1,6 +1,6 @@
 # Package report
 
-**Generated 2026-10-21 by `tools/build-package-report.py`.** Every figure is read from a file another tool wrote in the same refresh.
+**Generated 2026-10-22 by `tools/build-package-report.py`.** Every figure is read from a file another tool wrote in the same refresh.
 
 ## Scale
 
@@ -31,7 +31,7 @@
 | Requirements contracted | 3153 / 3165 | 100% | an operation or schema field demonstrably serves it |
 | Operations declaring a service | 2845 / 2845 | 100% | the operation is owned by one of the seventeen deployables |
 | Operations declaring a permission | 2655 / 2845 | 93% | the checklist a grant screen renders is built from these |
-| Operations with resolved lineage | 2810 / 2845 | 99% | names the tables it reads and writes -- the join the DDL cannot make itself |
+| Operations with resolved lineage | 2812 / 2845 | 99% | names the tables it reads and writes -- the join the DDL cannot make itself |
 | Operations reaching a screen | 2570 / 2845 | 90% | sync, webhook and job operations legitimately have none |
 | Screens naming an operation | 2390 / 2453 | 97% | the rest are static, navigation shells or workshop-blocked |
 | Tables reached by an operation | 1138 / 1149 | 99% | a table nothing reaches is a missing operation or a table that should not exist |
@@ -102,7 +102,7 @@
 | ai | 146 | 131 | 146 | 140 |
 | approvals | 59 | 47 | 58 | 58 |
 | assets | 28 | 26 | 28 | 26 |
-| catalogue | 269 | 238 | 259 | 263 |
+| catalogue | 269 | 238 | 260 | 263 |
 | cross-region | 20 | 2 | 20 | 9 |
 | finance | 72 | 62 | 72 | 70 |
 | fnb | 138 | 130 | 137 | 125 |
@@ -111,7 +111,7 @@
 | inventory | 59 | 56 | 59 | 59 |
 | maintenance | 44 | 44 | 44 | 44 |
 | marketing-crm | 280 | 233 | 279 | 250 |
-| orders | 227 | 212 | 223 | 206 |
+| orders | 227 | 212 | 224 | 206 |
 | payments | 49 | 48 | 49 | 46 |
 | platform-ops | 40 | 39 | 40 | 40 |
 | promotions | 145 | 135 | 144 | 143 |
@@ -163,7 +163,7 @@
 | Requirements Partial | 12 |
 | Operations No Screen | 275 |
 | Screens No Operation | 63 |
-| Operations No Lineage | 35 |
+| Operations No Lineage | 33 |
 | Tables Not Reached | 11 |
 | Permissions Without Label | 70 |
 | Capability Pairs | 291 |

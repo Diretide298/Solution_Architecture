@@ -263,6 +263,11 @@ def main() -> int:
               "Design drew, and it is kept so the redraw knows what existed.")
     if bad:
         print(f"  {bad} broken link(s). Run with --detail to see them.")
+        # **_dump/ is gitignored, so a fresh worktree has none** (22 October 2026, CHG-R9INT-003): every claim into an
+        # archived board then reads as "no such board". Said here, so the next reader looks at the tree, not the claims.
+        if not (ROOT / "_dump").is_dir():
+            print("  !! _dump/ is not here (gitignored): a claim into an archived board cannot be told from a missing "
+                  "board. Copy it from the main checkout (refresh-safe hydrates it from there) and run again.")
         return 1
     print("  every link resolves.")
     return 0

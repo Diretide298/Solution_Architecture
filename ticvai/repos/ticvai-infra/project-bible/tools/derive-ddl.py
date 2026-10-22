@@ -728,8 +728,26 @@ $$;
 #     every host allocates from. A deleted counter would start its aggregate's sequence again. The three policies are
 #     our team's repository migration 240's (`_read`, `_append`, `_update`), made with apply_split_rls and its
 #     `_delete` dropped, so no new helper function reaches a database that already has them.
+#   * `x-ticvai-rls: guest-owns` (CHG-R9CR-003; ADAM CR-184, option A, decided 21 October 2026): staff and partners
+#     read and write by the base rule as before (the venue, or the scope path), and a guest reads and writes the rows
+#     of its own subject (`subject_id` = the session's `ticvai.subject_id`), and no other: orders.cart, so a guest
+#     reaches its own cart without a grant on the venue, which would show it every cart there ("a guest token can
+#     never widen to another subject", guestAuth). Its children follow it through the parent rule, split.
+#   * `x-ticvai-rls: guest-reads-own` (CHG-R9CR-004; ADAM CR-191, option A, and CR-199): staff read and write by the
+#     base rule, and a guest reads (never writes) the rows of its own subject, or, on a table with no `subject_id`,
+#     the rows whose parent it names by a declared reference is the guest's own (`orders.order_line` and
+#     `orders.order_event` through `orders.sales_order`). The scope-path rule is written in the per-statement shape of
+#     our team's repository migration 225 (`scope_path <@ ANY ((SELECT platform.current_scope_paths())::ltree[])`,
+#     evaluated once per statement on these hot tables), and the guest's subject the same way.
 RLS_MARKS = ("read-beneath", "grant-holder-read", "own-row", "home-scope-write", "subject-self", "own-or-home-scope",
-             "signed-in-read", "scope-or-subject", "any-grant-no-delete")
+             "signed-in-read", "scope-or-subject", "any-grant-no-delete", "guest-owns", "guest-reads-own")
+# The checks `guest-owns` and `guest-reads-own` build on, `{a}` standing for the row's alias (CHG-R9CR-003/004). The
+# scope rule is migration 225's per-statement predicate (apply_statement_scope_rls in our team's repository), the
+# guest's subject compared the same way, so neither calls a function per row.
+STATEMENT_SCOPE = ("{a}scope_path IS NOT NULL AND {a}scope_path <@ ANY ((SELECT platform.current_scope_paths())"
+                   "::ltree[])")
+GUEST_SUBJECT = "{a}subject_id = (SELECT NULLIF(current_setting('ticvai.subject_id', true), '')::uuid)"
+
 # The check apply_split_rls gets for `any-grant-no-delete`: a scope path set, the WITH CHECK the append-only trail's
 # INSERT has (CHG-R6-002).
 ANY_GRANT = "cardinality(platform.current_scope_paths()) > 0"
@@ -1462,6 +1480,36 @@ def obj_name(*parts: str, suffix: str) -> str:
 
 def sql_literal(v) -> str:
     return "'" + str(v).replace("'", "''") + "'"
+
+
+# The authored list of the cross-deployable grants (CHG-R6-020; `reads` since CHG-R9CR-005).
+CROSS_DEPLOYABLE = ROOT / "docs" / "active" / "cross-deployable-writes.yaml"
+
+
+def deployable_read_grants() -> str:
+    """The `reads` of docs/active/cross-deployable-writes.yaml as guarded GRANT blocks (ADAM CR-196, CHG-R9CR-005).
+
+    One block per table: `GRANT <privileges> ON <table> TO <reader>` when the role and the table exist. DB-ROLES makes
+    the roles (`commerce`, `access`, `operations`, `workers`, `ticvai_ai`); a database without them is left alone."""
+    doc = yaml.safe_load(CROSS_DEPLOYABLE.read_text(encoding="utf-8")) or {}
+    out = []
+    for r in doc.get("reads") or []:
+        role = str(r.get("reader") or "")
+        privs = ", ".join(str(p).upper() for p in r.get("privileges") or [])
+        if not re.match(r"^[a-z_]+$", role) or privs not in ("SELECT",):
+            print(f"  ! cross-deployable read {r.get('id')}: reader {role!r} with {privs!r} is not a role and SELECT; "
+                  "no grant written")
+            continue
+        for t in r.get("tables") or []:
+            out.append(f"-- {r.get('id')}: {role} reads {t} in process (ADR-0055 rule 4 as amended; "
+                       f"{r.get('decision_ref') or ''})")
+            out.append(f"DO $$ BEGIN IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = {sql_literal(role)}) AND "
+                       f"to_regclass({sql_literal(t)}) IS NOT NULL THEN GRANT {privs} ON {t} TO {role}; "
+                       "END IF; END $$;")
+    if not out:
+        return ""
+    return ("\n-- **Reads granted across deployables** (docs/active/cross-deployable-writes.yaml `reads`; ADAM CR-196,\n"
+            "-- CHG-R9CR-005). Row-level security still applies to every row these roles read.\n" + "\n".join(out) + "\n")
 
 
 def exactly_one_sql(short: str, group: list) -> str:
@@ -2869,7 +2917,38 @@ def main() -> int:
             base, write = "subject", "platform.subject_in_scope({a}subject_id)"
         else:
             base, write = "tenant root", "platform.tenant_root_in_scope()"
-        if mark == "any-grant-no-delete":
+        if mark in ("guest-owns", "guest-reads-own"):
+            if base not in ("scope_path", "venue_id"):
+                print(f"  ! {t}: x-ticvai-rls {mark} needs a scope_path or venue_id for staff; the base rule stands")
+                continue
+            staff = STATEMENT_SCOPE if base == "scope_path" else "platform.venue_in_scope({a}venue_id)"
+            if "subject_id" in has:
+                guest = GUEST_SUBJECT
+            elif mark == "guest-reads-own":
+                # the guest's own parent: the one declared reference to a table that carries the guest's subject and
+                # is itself marked for the guest (orders.sales_order)
+                via = sorted({(c["column"], c["references"]) for c in cols[t]
+                              if c.get("references") in real and c.get("enforced") == "yes"
+                              and ((marks.get(c["references"]) or {}).get("rls") in ("guest-owns", "guest-reads-own"))
+                              and any(x["column"] == "subject_id" for x in cols.get(c["references"], []))})
+                if len(via) != 1:
+                    print(f"  ! {t}: x-ticvai-rls guest-reads-own on a table with no subject_id needs exactly one "
+                          f"declared reference to a table with one (found {via}); the base rule stands")
+                    continue
+                fk, par_t = via[0]
+                guest = (f"EXISTS (SELECT 1 FROM {tq(par_t)} gp WHERE gp.id = {tq(t)}.{q(fk)} AND "
+                         + GUEST_SUBJECT.format(a="gp.") + ")")
+            else:
+                print(f"  ! {t}: x-ticvai-rls guest-owns needs a subject_id; the base rule stands")
+                continue
+            read = f"({staff}) OR ({guest})"
+            write = staff if mark == "guest-reads-own" else read
+            call = (f"SELECT platform.apply_split_rls('{tq(t)}'::regclass, {sql_literal(read.format(a=''))}, "
+                    f"{sql_literal(write.format(a=''))});")
+            write = "(" + write + ")"
+            base = ("the guest's own subject, or staff by " + base if mark == "guest-owns"
+                    else "staff by " + base + "; read also by the guest it belongs to")
+        elif mark == "any-grant-no-delete":
             if base != "tenant root" or t not in DESCOPED:
                 print(f"  ! {t}: x-ticvai-rls any-grant-no-delete is for a table that takes no scope (x-ticvai-scope: "
                       "none) and has no venue, subject or owner; the base rule stands")
@@ -3064,6 +3143,15 @@ def main() -> int:
             by_subject=smine, tenant_only=tmine, append_audit=amine,
             split=[(t, c, w) for t, (c, w) in sorted(split_calls.items()) if area(t.split(".")[0]) == db],
             across=across)
+
+    # **A deployable's role reads a table another deployable owns, where the lead granted it** (ADAM CR-196, option B,
+    # decided 21 October 2026; CHG-R9CR-005; ADR-0055 rule 4 and DB-ROLES as amended). The grants are the `reads` of
+    # docs/active/cross-deployable-writes.yaml, appended to the tenant row-level security file, so the forward
+    # migration carries them to databases already built. Each is guarded on the role and the table existing: a
+    # database built without DB-ROLES' roles, or before the table, is left as it is. Row-level security still
+    # applies to every row the role reads.
+    files["tenant/920-row-level-security.sql"] = (files["tenant/920-row-level-security.sql"].rstrip("\n") + "\n"
+                                                  + deployable_read_grants())
 
     # **Range partitioning by month** (ADR-0056). The tables declare `PARTITION BY RANGE` where they
     # are created; this file holds each one's DEFAULT partition and the months ahead.

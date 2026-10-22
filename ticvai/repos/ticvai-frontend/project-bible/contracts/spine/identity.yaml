@@ -77,6 +77,39 @@ x-ticvai-queries:
       `supervisor-step-up-refused` and nothing is written by it.'
     served: [in-process, service]
     operation: verifySupervisorStepUp
+  # **The anonymous guest session, opened and ended for Orders** (ADAM CR-183, option A, decided 21 October 2026;
+  # CHG-R9CR-002). Identity mints and keeps its own sessions; Orders only asks, in process within commerce (ADR-0055
+  # rule 3: another module writes only through the owner's in-process API).
+  openAnonymousGuestSession:
+    module: identity
+    inputs:
+      cartId: uuid, the orders.cart createCart has just written in the same transaction (Cart.id)
+      deviceId: uuid, the client UUIDv7 the app sent as createCart's deviceId; the token is bound to it
+    returns:
+      sessionId: uuid, the new session's id, the token's `sid`
+      token: string, the guestAuth access token createCart returns as Cart.anonymousSessionToken
+    rule: 'Called by orders.createCart only, for a caller with no credential (CHG-R8SPN-031). Identity opens a guest
+      session with **no subject**, bound to `cartId` and `deviceId`, and signs its token with the key every guestAuth
+      token is signed with (Orders never holds it). The session is kept where every guest session is, in Identity''s
+      session registry (GuestSession, Redis, persistence none), with its cart and device beside it; no row is written to
+      identity.guest_session or identity.session, which both need a subject or a principal. It slides like any guest
+      session (30 days, guestAuth). Its token reaches the cart operations and nothing that needs a known guest
+      (guestAuth); a call under it acts on its own cart only: Orders runs that cart''s statements under the routed
+      tenant''s root grant once Identity has verified the token and its cart, as a verified order access token reads its
+      one order (getOrder, ADAM CR-191). A second call for the same cart and device returns the session already open
+      (the createCart Idempotency-Key makes a retry return the first answer anyway).'
+    served: [in-process]
+  endAnonymousGuestSession:
+    module: identity
+    inputs:
+      cartId: uuid, the anonymous cart claimCart has just moved to the signed-in guest
+    returns:
+      endedSessions: integer, 0 or 1; 0 when no anonymous session is open for that cart (not an error)
+    rule: 'The other half of openAnonymousGuestSession, on the same in-process API (ADAM CR-183, option A; CHG-R9CR-002).
+      Called by orders.claimCart once the cart is the guest''s: Identity ends the anonymous session bound to `cartId`
+      in its session registry, so its token is refused at its next request (the registry is read on every request).
+      The guest''s own signed-in session is not touched.'
+    served: [in-process]
   # **Data reads other modules ask this module for** (MOD audit, 14 October 2026, CHG-MOD-001): one query per
   # table, instead of a raw read of it (check-cross-module-reads XR-UNCOVERED; ADR-0055 rule 2, amended
   # 14 October). Rule questions keep queries of their own, above.

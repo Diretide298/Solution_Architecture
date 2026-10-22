@@ -1,10 +1,10 @@
 # Migration changes for a person
 
-**Written by `tools/derive-ddl.py` in frozen mode (20261021). Do not edit; it is rewritten on every run.**
+**Written by `tools/derive-ddl.py` in frozen mode (20261022). Do not edit; it is rewritten on every run.**
 
 The baseline migrations under `backend/` are frozen at `r1 (9cec72d)` (`tools/check-migration-freeze.py`). `derive-ddl.py` writes additive changes (new tables, columns and indexes) as the next forward migration, `backend/<area>/V<nnnn>__*.sql`. **The changes below it does not write**, because each has a data question behind it: which rows survive a drop, what fills a new NOT NULL column, whether a rename is a rename. Write each as a forward migration by hand; once a forward migration carries it, it leaves this list.
 
-**176 change(s).**
+**171 change(s).**
 
 | Kind | Database | Object | Change | What a person does |
 |---|---|---|---|---|
@@ -125,8 +125,6 @@ The baseline migrations under `backend/` are frozen at `r1 (9cec72d)` (`tools/ch
 | column changed | tenant | `pii.subject_contact.kind` | `kind pii.contact_kind NOT NULL` -> `kind text NOT NULL CONSTRAINT subject_contact_kind_chk CHECK (kind IN ('email', 'mobile', 'phone', 'whatsapp', 'postal'))` | type, default, nullability or check changed: write the ALTER COLUMN (and any data rewrite) by hand |
 | not null | tenant | `platform.audit_read.read_at` | still nullable in the databases; the schema reference says NOT NULL | backfill, then ALTER COLUMN ... SET NOT NULL |
 | not null | tenant | `platform.audit_read.target` | still nullable in the databases; the schema reference says NOT NULL | backfill, then ALTER COLUMN ... SET NOT NULL |
-| column changed | tenant | `platform.configuration_profile.id` | `id uuid PRIMARY KEY` -> `id uuid` | type, default, nullability or check changed: write the ALTER COLUMN (and any data rewrite) by hand |
-| constraint added | tenant | `platform.configuration_profile` | `CONSTRAINT configuration_profile_pkey PRIMARY KEY (id, version)` | existing rows may violate it: validate, then add by hand |
 | not null | tenant | `platform.denomination.scope_path` | still nullable in the databases; the schema reference says NOT NULL, and row-level security reads it | in a forward migration, backfill first, then the NOT NULL: UPDATE platform.denomination SET scope_path = (SELECT path FROM platform.scope WHERE level = 'tenant') WHERE scope_path IS NULL; ALTER TABLE platform.denomination ALTER COLUMN scope_path SET NOT NULL |
 | not null | tenant | `platform.device.scope_path` | still nullable in the databases; the schema reference says NOT NULL, and row-level security reads it | in a forward migration, backfill first, then the NOT NULL: UPDATE platform.device x SET scope_path = p.scope_path FROM platform.workstation p WHERE p.id = x.workstation_id AND x.scope_path IS DISTINCT FROM p.scope_path; UPDATE platform.device SET scope_path = (SELECT path FROM platform.scope WHERE level = 'tenant') WHERE scope_path IS NULL; ALTER TABLE platform.device ALTER COLUMN scope_path SET NOT NULL |
 | column changed | tenant | `platform.device.status` | `status text CONSTRAINT device_status_chk CHECK (status IN ('online', 'offline', 'error', 'consumableLow', 'needsAttention', 'localMode', 'unknown'))` -> `status text DEFAULT 'unknown' CONSTRAINT device_status_chk CHECK (status IN ('online', 'offline', 'error', 'consumableLow', 'needsAttention', 'localMode', 'unknown'))` | type, default, nullability or check changed: write the ALTER COLUMN (and any data rewrite) by hand |
@@ -159,9 +157,6 @@ The baseline migrations under `backend/` are frozen at `r1 (9cec72d)` (`tools/ch
 | constraint added | tenant | `promotions.promotion promotion_venue_id_id_uniq` | `ALTER TABLE promotions.promotion ADD CONSTRAINT promotion_venue_id_id_uniq UNIQUE (venue_id, id)` | existing rows may violate it: validate, then add by hand (NOT VALID, then VALIDATE) |
 | constraint added | tenant | `transport.station station_venue_id_id_uniq` | `ALTER TABLE transport.station ADD CONSTRAINT station_venue_id_id_uniq UNIQUE (venue_id, id)` | existing rows may violate it: validate, then add by hand (NOT VALID, then VALIDATE) |
 | constraint added | tenant | `venuemap.map map_venue_id_id_uniq` | `ALTER TABLE venuemap.map ADD CONSTRAINT map_venue_id_id_uniq UNIQUE (venue_id, id)` | existing rows may violate it: validate, then add by hand (NOT VALID, then VALIDATE) |
-| constraint changed | tenant | `platform.profile_deployment profile_deployment_profile_id_fkey` | `ALTER TABLE platform.profile_deployment ADD CONSTRAINT profile_deployment_profile_id_fkey FOREIGN KEY (profile_id) REFERENCES platform.configuration_profile(id)` -> `ALTER TABLE platform.profile_deployment ADD CONSTRAINT profile_deployment_profile_id_fkey FOREIGN KEY (profile_id, version) REFERENCES platform.configuration_profile(id, version)` | drop and re-add by hand |
-| constraint changed | tenant | `rental.booking booking_deposit_authorisation_id_fkey` | `ALTER TABLE rental.booking ADD CONSTRAINT booking_deposit_authorisation_id_fkey FOREIGN KEY (deposit_authorisation_id) REFERENCES orders.stored_value_authorisation(id)` -> `ALTER TABLE rental.booking ADD CONSTRAINT booking_deposit_authorisation_id_fkey FOREIGN KEY (deposit_authorisation_id) REFERENCES orders.payment(id)` | drop and re-add by hand |
-| constraint changed | tenant | `venuemap.visit_plan visit_plan_subject_id_fkey` | `ALTER TABLE venuemap.visit_plan ADD CONSTRAINT visit_plan_subject_id_fkey FOREIGN KEY (subject_id) REFERENCES marketing.guest_profile(id)` -> `ALTER TABLE venuemap.visit_plan ADD CONSTRAINT visit_plan_subject_id_fkey FOREIGN KEY (subject_id) REFERENCES pii.subject(id)` | drop and re-add by hand |
 | table dropped | tenant | `marketing.message_delivery` | no longer in the schema reference | a rename or a drop: decide, then ALTER TABLE ... RENAME or DROP TABLE by hand |
 | table dropped | tenant | `orders.payment_tip` | no longer in the schema reference | a rename or a drop: decide, then ALTER TABLE ... RENAME or DROP TABLE by hand |
 | table dropped | tenant | `platform.cell_endpoint` | no longer in the schema reference | a rename or a drop: decide, then ALTER TABLE ... RENAME or DROP TABLE by hand |

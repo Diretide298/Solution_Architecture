@@ -163,6 +163,14 @@
     "match": "exact",
     "view": "Account → All screens → Wave 2 → Offers & promotions",
     "differences": "Promo code entry is here in the prototype; the YAML puts applyCartPromoCode on GST-041. **Codes are applied in the basket (GST-041), not here**: one place to apply a code (CHG-SGU-020)."
+   },
+   "stateViews": {
+    "loading": "P02/venue-loader",
+    "error": "P02/state-error",
+    "emptyFirstRun": "P02/dashed-note",
+    "emptyNoResults": "P02/no-results-note",
+    "emptyNoAccess": "P02/sign-in-prompt",
+    "offline": "P02/state-offline"
    }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",

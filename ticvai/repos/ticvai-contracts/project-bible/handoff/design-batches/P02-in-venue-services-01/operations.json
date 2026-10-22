@@ -168,6 +168,11 @@
     "name": "X-Order-Access-Token",
     "in": "header",
     "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,

@@ -6,7 +6,7 @@ journeys through them, and the reasoning behind every decision that was not obvi
 
 **2845 operations · 33 contracts · 1149 tables · 2453 screens · 208 state models · 98 flows · 71 ADRs**
 
-**Design 95% · Build 33%.**
+**Design 96% · Build 33%.**
 
 ---
 

@@ -13,6 +13,8 @@
 | Themes | light, dark |
 | Directions | ltr, rtl |
 | Packages | design-tokens, ui, api-client, offline-core |
+| Design tokens | P04 `screens/_design-tokens.yaml` (the till's tokens, written down on 9 September 2026 from the client's own POS file and the boards (Manrope)); P15 `screens/_design-tokens.yaml` (the shared tokens (no client-approved design for this app yet)) |
+| App shell | ticvai-pos: SETUP-SHELL-POS |
 | target | POS terminal — Windows or Android |
 | distribution | device management push |
 | bundleUpdate | catalogue bundle applies at shift open; app on a scheduled window |
@@ -81,7 +83,9 @@
 | Route | `/kitchen/kitchen-operations-command-center` |
 | Repository | none yet: ask the lead |
 | Component | `KitchenOperationsCommandCenterBoard` |
-| Pattern | commandCentre |
+| Layout pattern | commandCentre (structure only, not the look) |
+
+**Design (no client-approved design yet).** KIT-001 has no client-approved prototype view or frame. Build its structure from the screen spec, on the app shell's tokens (`screens/_design-tokens.yaml`) and state patterns. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
 
 **Entry parameters**
 
@@ -100,14 +104,14 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | Every station's load, then the tickets, in the server's order. |
-| error | Could not reach the platform. The rail is still live from cache and every bump is queued. |
-| emptyFirstRun | No tickets. The kitchen is clear, and that is worth saying plainly rather than showing a blank rail — a screen that looks broken and a screen that means nothing to do are the same picture otherwise. |
-| emptyNoResults | Nothing matches the station chips; the kitchen is not empty. |
-| emptyNoAccess | Shown when the caller lacks `ORDER_VIEW`, the screen's permission, and names it. The command centre is not tied to one station, so it never says "not assigned to a station". |
-| offline | Amber, and it keeps working. The kitchen still has to send food out — a display that blanks mid-service is worse than one that says it is behind, and every bump journals locally and syncs when the network returns. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | Every station's load, then the tickets, in the server's order. |  |
+| error | Could not reach the platform. The rail is still live from cache and every bump is queued. |  |
+| emptyFirstRun | No tickets. The kitchen is clear, and that is worth saying plainly rather than showing a blank rail — a screen that looks broken and a screen that means nothing to do are the same picture otherwise. |  |
+| emptyNoResults | Nothing matches the station chips; the kitchen is not empty. |  |
+| emptyNoAccess | Shown when the caller lacks `ORDER_VIEW`, the screen's permission, and names it. The command centre is not tied to one station, so it never says "not assigned to a station". |  |
+| offline | Amber, and it keeps working. The kitchen still has to send food out — a display that blanks mid-service is worse than one that says it is behind, and every bump journals locally and syncs when the network returns. |  |
 
 **Goes to**
 
@@ -135,7 +139,9 @@
 | Route | `/kitchen/kitchen-display-system-kds` |
 | Repository | none yet: ask the lead |
 | Component | `KitchenDisplaySystemKdsBoard` |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (no client-approved design yet).** KIT-002 has no client-approved prototype view or frame. Build its structure from the screen spec, on the app shell's tokens (`screens/_design-tokens.yaml`) and state patterns. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
 
 **Entry parameters**
 
@@ -158,14 +164,14 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The rail. The count renders before the tickets. The server's order, never re-sorted on the device (`listKitchenTickets` orders by priority weights; design-notes correction fnb-retail): no "oldest first" and no "promise time" sort of its own. |
-| error | Could not reach the platform. The rail is still live from cache and every bump is queued. |
-| emptyFirstRun | No tickets. The kitchen is clear, and that is worth saying plainly rather than showing a blank rail — a screen that looks broken and a screen that means nothing to do are the same picture otherwise. |
-| emptyNoResults | Nothing matches this station or course filter. The rail is not empty — the filter is narrow, and on a kitchen screen that distinction is the difference between calm and panic. |
-| emptyNoAccess | This display is not assigned to a station. Assignment is a back-office act — a kitchen screen does not choose what it shows. A principal without `ORDER_VIEW` gets this state naming `ORDER_VIEW`, the screen's `permission` and the one its read enforces; a button whose own `permission` the principal lacks is hidden, and a 403 from an action names that operation's permission. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_MODIFY` for `setKitchenTicketStatus`, `refireItem`, `recallKitchenTicket`, `notifyServer`. |
-| offline | Amber, and it keeps working. The kitchen still has to send food out — a display that blanks mid-service is worse than one that says it is behind, and every bump journals locally and syncs when the network returns. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The rail. The count renders before the tickets. The server's order, never re-sorted on the device (`listKitchenTickets` orders by priority weights; design-notes correction fnb-retail): no "oldest first" and no "promise time" sort of its own. |  |
+| error | Could not reach the platform. The rail is still live from cache and every bump is queued. |  |
+| emptyFirstRun | No tickets. The kitchen is clear, and that is worth saying plainly rather than showing a blank rail — a screen that looks broken and a screen that means nothing to do are the same picture otherwise. |  |
+| emptyNoResults | Nothing matches this station or course filter. The rail is not empty — the filter is narrow, and on a kitchen screen that distinction is the difference between calm and panic. |  |
+| emptyNoAccess | This display is not assigned to a station. Assignment is a back-office act — a kitchen screen does not choose what it shows. A principal without `ORDER_VIEW` gets this state naming `ORDER_VIEW`, the screen's `permission` and the one its read enforces; a button whose own `permission` the principal lacks is hidden, and a 403 from an action names that operation's permission. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_MODIFY` for `setKitchenTicketStatus`, `refireItem`, `recallKitchenTicket`, `notifyServer`. |  |
+| offline | Amber, and it keeps working. The kitchen still has to send food out — a display that blanks mid-service is worse than one that says it is behind, and every bump journals locally and syncs when the network returns. |  |
 
 **Goes to**
 
@@ -189,7 +195,9 @@
 | Route | `/kitchen/order-firing-course-management` |
 | Repository | none yet: ask the lead |
 | Component | `OrderFiringCourseManagementBoard` |
-| Pattern | configEditor |
+| Layout pattern | configEditor (structure only, not the look) |
+
+**Design (no client-approved design yet).** KIT-003 has no client-approved prototype view or frame. Build its structure from the screen spec, on the app shell's tokens (`screens/_design-tokens.yaml`) and state patterns. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
 
 **Entry parameters**
 
@@ -212,14 +220,14 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The rail, oldest ticket first. The count renders before the tickets — a kitchen wants to know how deep it is before it reads anything. |
-| error | Could not reach the platform. The rail is still live from cache and every bump is queued. |
-| emptyFirstRun | No tickets. The kitchen is clear, and that is worth saying plainly rather than showing a blank rail — a screen that looks broken and a screen that means nothing to do are the same picture otherwise. |
-| emptyNoResults | Nothing matches this course filter. The rail is not empty — the filter is narrow, and on a kitchen screen that distinction is the difference between calm and panic (audit R277). |
-| emptyNoAccess | Without `ORDER_VIEW`, which `listKitchenTickets` requires, the screen does not load and this state names that permission. This display is not assigned to a station. Assignment is a back-office act — a kitchen screen does not choose what it shows. A principal without `ORDER_MODIFY` gets this state naming `ORDER_MODIFY`, the screen's `permission` and the one its fire, hold, status and prioritise actions need (the screen has no read); a button whose own `permission` the principal lacks is hidden, and a 403 from an action names that operation's permission. |
-| offline | Amber, and it keeps working. The kitchen still has to send food out — a display that blanks mid-service is worse than one that says it is behind, and every bump journals locally and syncs when the network returns. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The rail, oldest ticket first. The count renders before the tickets — a kitchen wants to know how deep it is before it reads anything. |  |
+| error | Could not reach the platform. The rail is still live from cache and every bump is queued. |  |
+| emptyFirstRun | No tickets. The kitchen is clear, and that is worth saying plainly rather than showing a blank rail — a screen that looks broken and a screen that means nothing to do are the same picture otherwise. |  |
+| emptyNoResults | Nothing matches this course filter. The rail is not empty — the filter is narrow, and on a kitchen screen that distinction is the difference between calm and panic (audit R277). |  |
+| emptyNoAccess | Without `ORDER_VIEW`, which `listKitchenTickets` requires, the screen does not load and this state names that permission. This display is not assigned to a station. Assignment is a back-office act — a kitchen screen does not choose what it shows. A principal without `ORDER_MODIFY` gets this state naming `ORDER_MODIFY`, the screen's `permission` and the one its fire, hold, status and prioritise actions need (the screen has no read); a button whose own `permission` the principal lacks is hidden, and a 403 from an action names that operation's permission. |  |
+| offline | Amber, and it keeps working. The kitchen still has to send food out — a display that blanks mid-service is worse than one that says it is behind, and every bump journals locally and syncs when the network returns. |  |
 
 **Goes to**
 
@@ -240,7 +248,9 @@
 | Route | `/kitchen/active-order-management-fulfilment-journey` |
 | Repository | none yet: ask the lead |
 | Component | `ActiveOrderManagementFulfilmentJouBoard` |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (no client-approved design yet).** KIT-004 has no client-approved prototype view or frame. Build its structure from the screen spec, on the app shell's tokens (`screens/_design-tokens.yaml`) and state patterns. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
 
 **Entry parameters**
 
@@ -259,14 +269,14 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The order, then its tickets at each station. |
-| error | Could not reach the platform. The rail is still live from cache and every bump is queued. |
-| emptyFirstRun | No tickets. The kitchen is clear, and that is worth saying plainly rather than showing a blank rail — a screen that looks broken and a screen that means nothing to do are the same picture otherwise. |
-| emptyNoResults | Nothing matches this station or course filter. The rail is not empty — the filter is narrow, and on a kitchen screen that distinction is the difference between calm and panic. |
-| emptyNoAccess | Shown when the caller lacks ORDER_VIEW for this outlet, and names it. |
-| offline | Amber, and it keeps working. The kitchen still has to send food out — a display that blanks mid-service is worse than one that says it is behind, and every bump journals locally and syncs when the network returns. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The order, then its tickets at each station. |  |
+| error | Could not reach the platform. The rail is still live from cache and every bump is queued. |  |
+| emptyFirstRun | No tickets. The kitchen is clear, and that is worth saying plainly rather than showing a blank rail — a screen that looks broken and a screen that means nothing to do are the same picture otherwise. |  |
+| emptyNoResults | Nothing matches this station or course filter. The rail is not empty — the filter is narrow, and on a kitchen screen that distinction is the difference between calm and panic. |  |
+| emptyNoAccess | Shown when the caller lacks ORDER_VIEW for this outlet, and names it. |  |
+| offline | Amber, and it keeps working. The kitchen still has to send food out — a display that blanks mid-service is worse than one that says it is behind, and every bump journals locally and syncs when the network returns. |  |
 
 **Goes to**
 
@@ -287,7 +297,9 @@
 | Route | `/kitchen/kitchen-station-workload-dynamic-routing` |
 | Repository | none yet: ask the lead |
 | Component | `KitchenStationWorkloadDynamicRoutiBoard` |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (no client-approved design yet).** KIT-005 has no client-approved prototype view or frame. Build its structure from the screen spec, on the app shell's tokens (`screens/_design-tokens.yaml`) and state patterns. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
 
 **Entry parameters**
 
@@ -306,14 +318,14 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The rail, oldest ticket first. The count renders before the tickets — a kitchen wants to know how deep it is before it reads anything. |
-| error | Could not reach the platform. The rail is still live from cache and every bump is queued. |
-| emptyFirstRun | No tickets. The kitchen is clear, and that is worth saying plainly rather than showing a blank rail — a screen that looks broken and a screen that means nothing to do are the same picture otherwise. |
-| emptyNoResults | Nothing matches this station or course filter. The rail is not empty — the filter is narrow, and on a kitchen screen that distinction is the difference between calm and panic. |
-| emptyNoAccess | This display is not assigned to a station. Assignment is a back-office act — a kitchen screen does not choose what it shows. A principal without `PRODUCT_VIEW` gets this state naming `PRODUCT_VIEW`, the screen's `permission` and the one its read enforces; a button whose own `permission` the principal lacks is hidden, and a 403 from an action names that operation's permission. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRODUCT_CONFIGURE` for `rebalanceStationLoad`. |
-| offline | Amber, and it keeps working. The kitchen still has to send food out — a display that blanks mid-service is worse than one that says it is behind, and every bump journals locally and syncs when the network returns. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The rail, oldest ticket first. The count renders before the tickets — a kitchen wants to know how deep it is before it reads anything. |  |
+| error | Could not reach the platform. The rail is still live from cache and every bump is queued. |  |
+| emptyFirstRun | No tickets. The kitchen is clear, and that is worth saying plainly rather than showing a blank rail — a screen that looks broken and a screen that means nothing to do are the same picture otherwise. |  |
+| emptyNoResults | Nothing matches this station or course filter. The rail is not empty — the filter is narrow, and on a kitchen screen that distinction is the difference between calm and panic. |  |
+| emptyNoAccess | This display is not assigned to a station. Assignment is a back-office act — a kitchen screen does not choose what it shows. A principal without `PRODUCT_VIEW` gets this state naming `PRODUCT_VIEW`, the screen's `permission` and the one its read enforces; a button whose own `permission` the principal lacks is hidden, and a 403 from an action names that operation's permission. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRODUCT_CONFIGURE` for `rebalanceStationLoad`. |  |
+| offline | Amber, and it keeps working. The kitchen still has to send food out — a display that blanks mid-service is worse than one that says it is behind, and every bump journals locally and syncs when the network returns. |  |
 
 **Goes to**
 
@@ -333,7 +345,9 @@
 | Route | `/kitchen/expeditor-order-assembly` |
 | Repository | none yet: ask the lead |
 | Component | `ExpeditorOrderAssemblyBoard` |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (no client-approved design yet).** KIT-006 has no client-approved prototype view or frame. Build its structure from the screen spec, on the app shell's tokens (`screens/_design-tokens.yaml`) and state patterns. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
 
 **Entry parameters**
 
@@ -357,14 +371,14 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | Whole orders, in the server's order. |
-| error | Could not reach the platform. The rail is still live from cache and every bump is queued. |
-| emptyFirstRun | No tickets. The kitchen is clear, and that is worth saying plainly rather than showing a blank rail — a screen that looks broken and a screen that means nothing to do are the same picture otherwise. |
-| emptyNoResults | Nothing matches this station or course filter. The rail is not empty — the filter is narrow, and on a kitchen screen that distinction is the difference between calm and panic. |
-| emptyNoAccess | This display is not assigned to a station. Assignment is a back-office act — a kitchen screen does not choose what it shows. A principal without `ORDER_VIEW` gets this state naming `ORDER_VIEW`, the screen's `permission` and the one its read enforces; a button whose own `permission` the principal lacks is hidden, and a 403 from an action names that operation's permission. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_MODIFY` for `setKitchenTicketStatus`, `chaseStation`, `markOrderCollected`, `recordOrderHandover`. |
-| offline | Amber, and it keeps working. The kitchen still has to send food out — a display that blanks mid-service is worse than one that says it is behind, and every bump journals locally and syncs when the network returns. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | Whole orders, in the server's order. |  |
+| error | Could not reach the platform. The rail is still live from cache and every bump is queued. |  |
+| emptyFirstRun | No tickets. The kitchen is clear, and that is worth saying plainly rather than showing a blank rail — a screen that looks broken and a screen that means nothing to do are the same picture otherwise. |  |
+| emptyNoResults | Nothing matches this station or course filter. The rail is not empty — the filter is narrow, and on a kitchen screen that distinction is the difference between calm and panic. |  |
+| emptyNoAccess | This display is not assigned to a station. Assignment is a back-office act — a kitchen screen does not choose what it shows. A principal without `ORDER_VIEW` gets this state naming `ORDER_VIEW`, the screen's `permission` and the one its read enforces; a button whose own `permission` the principal lacks is hidden, and a 403 from an action names that operation's permission. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_MODIFY` for `setKitchenTicketStatus`, `chaseStation`, `markOrderCollected`, `recordOrderHandover`. |  |
+| offline | Amber, and it keeps working. The kitchen still has to send food out — a display that blanks mid-service is worse than one that says it is behind, and every bump journals locally and syncs when the network returns. |  |
 
 **Goes to**
 
@@ -385,7 +399,9 @@
 | Route | `/kitchen/guest-collection-buzzer-digital-notification` |
 | Repository | none yet: ask the lead |
 | Component | `GuestCollectionBuzzerDigitalNotifiBoard` |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (no client-approved design yet).** KIT-007 has no client-approved prototype view or frame. Build its structure from the screen spec, on the app shell's tokens (`screens/_design-tokens.yaml`) and state patterns. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
 
 **Entry parameters**
 
@@ -402,14 +418,14 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | Order numbers under Preparing and Ready for pickup. |
-| error | Could not reach the platform. The rail is still live from cache and every bump is queued. |
-| emptyFirstRun | Nothing preparing or ready: the board shows the venue's idle message. |
-| emptyNoResults | Nothing matches this station or course filter. The rail is not empty — the filter is narrow, and on a kitchen screen that distinction is the difference between calm and panic. |
-| emptyNoAccess | Never shown on the board: it is an unattended guest display and carries no staff state. |
-| offline | Amber, and it keeps working. The kitchen still has to send food out — a display that blanks mid-service is worse than one that says it is behind, and every bump journals locally and syncs when the network returns. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | Order numbers under Preparing and Ready for pickup. |  |
+| error | Could not reach the platform. The rail is still live from cache and every bump is queued. |  |
+| emptyFirstRun | Nothing preparing or ready: the board shows the venue's idle message. |  |
+| emptyNoResults | Nothing matches this station or course filter. The rail is not empty — the filter is narrow, and on a kitchen screen that distinction is the difference between calm and panic. |  |
+| emptyNoAccess | Never shown on the board: it is an unattended guest display and carries no staff state. |  |
+| offline | Amber, and it keeps working. The kitchen still has to send food out — a display that blanks mid-service is worse than one that says it is behind, and every bump journals locally and syncs when the network returns. |  |
 
 **Goes to**
 
@@ -429,7 +445,9 @@
 | Route | `/kitchen/exceptions-re-fire-unavailable-items` |
 | Repository | none yet: ask the lead |
 | Component | `ExceptionsReFireUnavailableItemsBoard` |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (no client-approved design yet).** KIT-008 has no client-approved prototype view or frame. Build its structure from the screen spec, on the app shell's tokens (`screens/_design-tokens.yaml`) and state patterns. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
 
 **Entry parameters**
 
@@ -453,14 +471,14 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The rail, oldest ticket first. The count renders before the tickets — a kitchen wants to know how deep it is before it reads anything. |
-| error | Could not reach the platform. The rail is still live from cache and every bump is queued. |
-| emptyFirstRun | No tickets. The kitchen is clear, and that is worth saying plainly rather than showing a blank rail — a screen that looks broken and a screen that means nothing to do are the same picture otherwise. |
-| emptyNoResults | Nothing matches this station or course filter. The rail is not empty — the filter is narrow, and on a kitchen screen that distinction is the difference between calm and panic. |
-| emptyNoAccess | This display is not assigned to a station. Assignment is a back-office act — a kitchen screen does not choose what it shows. A principal without `PRODUCT_VIEW` gets this state naming `PRODUCT_VIEW`, the screen's `permission` and the one `list86Events`, the population it reads, enforces (`getHaccpStatus` needs `INCIDENT_VIEW` and reaches no component yet, see `gaps`); a button whose own `permission` the principal lacks is hidden, and a 403 from an action names that operation's permission. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `INCIDENT_REPORT` for `logKitchenException`; `PRODUCT_CONFIGURE` for `setItemAvailability`. |
-| offline | Amber, and it keeps working. The kitchen still has to send food out — a display that blanks mid-service is worse than one that says it is behind, and every bump journals locally and syncs when the network returns. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The rail, oldest ticket first. The count renders before the tickets — a kitchen wants to know how deep it is before it reads anything. |  |
+| error | Could not reach the platform. The rail is still live from cache and every bump is queued. |  |
+| emptyFirstRun | No tickets. The kitchen is clear, and that is worth saying plainly rather than showing a blank rail — a screen that looks broken and a screen that means nothing to do are the same picture otherwise. |  |
+| emptyNoResults | Nothing matches this station or course filter. The rail is not empty — the filter is narrow, and on a kitchen screen that distinction is the difference between calm and panic. |  |
+| emptyNoAccess | This display is not assigned to a station. Assignment is a back-office act — a kitchen screen does not choose what it shows. A principal without `PRODUCT_VIEW` gets this state naming `PRODUCT_VIEW`, the screen's `permission` and the one `list86Events`, the population it reads, enforces (`getHaccpStatus` needs `INCIDENT_VIEW` and reaches no component yet, see `gaps`); a button whose own `permission` the principal lacks is hidden, and a 403 from an action names that operation's permission. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `INCIDENT_REPORT` for `logKitchenException`; `PRODUCT_CONFIGURE` for `setItemAvailability`. |  |
+| offline | Amber, and it keeps working. The kitchen still has to send food out — a display that blanks mid-service is worse than one that says it is behind, and every bump journals locally and syncs when the network returns. |  |
 
 **Goes to**
 
@@ -480,7 +498,9 @@
 | Route | `/kitchen/sla-priority-service-rules` |
 | Repository | none yet: ask the lead |
 | Component | `SlaPriorityServiceRulesBoard` |
-| Pattern | configEditor |
+| Layout pattern | configEditor (structure only, not the look) |
+
+**Design (no client-approved design yet).** KIT-009 has no client-approved prototype view or frame. Build its structure from the screen spec, on the app shell's tokens (`screens/_design-tokens.yaml`) and state patterns. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
 
 **Entry parameters**
 
@@ -501,13 +521,13 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The rail, oldest ticket first. The count renders before the tickets — a kitchen wants to know how deep it is before it reads anything. |
-| error | Could not reach the platform. The rail is still live from cache and every bump is queued. |
-| emptyFirstRun | No tickets. The kitchen is clear, and that is worth saying plainly rather than showing a blank rail — a screen that looks broken and a screen that means nothing to do are the same picture otherwise. |
-| emptyNoAccess | This display is not assigned to a station. Assignment is a back-office act — a kitchen screen does not choose what it shows. Shown when the caller lacks `PRODUCT_VIEW`, which `getKitchenSla` requires to show this screen, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRODUCT_CONFIGURE` for `setKitchenSla`. |
-| offline | Amber, and it keeps working. The kitchen still has to send food out — a display that blanks mid-service is worse than one that says it is behind, and every bump journals locally and syncs when the network returns. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The rail, oldest ticket first. The count renders before the tickets — a kitchen wants to know how deep it is before it reads anything. |  |
+| error | Could not reach the platform. The rail is still live from cache and every bump is queued. |  |
+| emptyFirstRun | No tickets. The kitchen is clear, and that is worth saying plainly rather than showing a blank rail — a screen that looks broken and a screen that means nothing to do are the same picture otherwise. |  |
+| emptyNoAccess | This display is not assigned to a station. Assignment is a back-office act — a kitchen screen does not choose what it shows. Shown when the caller lacks `PRODUCT_VIEW`, which `getKitchenSla` requires to show this screen, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRODUCT_CONFIGURE` for `setKitchenSla`. |  |
+| offline | Amber, and it keeps working. The kitchen still has to send food out — a display that blanks mid-service is worse than one that says it is behind, and every bump journals locally and syncs when the network returns. |  |
 
 **Goes to**
 
@@ -527,7 +547,9 @@
 | Route | `/kitchen/kitchen-performance-ai-operational-optimization` |
 | Repository | none yet: ask the lead |
 | Component | `KitchenPerformanceAiOperationalOptBoard` |
-| Pattern | statusTracker |
+| Layout pattern | statusTracker (structure only, not the look) |
+
+**Design (no client-approved design yet).** KIT-010 has no client-approved prototype view or frame. Build its structure from the screen spec, on the app shell's tokens (`screens/_design-tokens.yaml`) and state patterns. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
 
 **Entry parameters**
 
@@ -548,14 +570,14 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | Kitchen and station performance for the period, then the AI analysis. |
-| error | Could not load the performance figures. Names which read failed. |
-| emptyFirstRun | Insufficient data: fewer service days than the analysis needs; says how many more. |
-| emptyNoResults | No service in the chosen period. |
-| emptyNoAccess | Shown when the caller lacks `REPORT_VIEW_VENUE`, which `getDashboard` requires to show this screen, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | Not available offline. `getDashboard` is an analytical read (ADR-0016) and there is nothing local to serve. The rail on KIT-001 is what survives a network loss. Corrected 24 August: the earlier wording described the kitchen rather than this screen, and a checker cannot tell those apart from prose. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | Kitchen and station performance for the period, then the AI analysis. |  |
+| error | Could not load the performance figures. Names which read failed. |  |
+| emptyFirstRun | Insufficient data: fewer service days than the analysis needs; says how many more. |  |
+| emptyNoResults | No service in the chosen period. |  |
+| emptyNoAccess | Shown when the caller lacks `REPORT_VIEW_VENUE`, which `getDashboard` requires to show this screen, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |  |
+| offline | Not available offline. `getDashboard` is an analytical read (ADR-0016) and there is nothing local to serve. The rail on KIT-001 is what survives a network loss. Corrected 24 August: the earlier wording described the kitchen rather than this screen, and a checker cannot tell those apart from prose. |  |
 
 **Goes to**
 
@@ -576,7 +598,11 @@
 | Repository | ticvai-pos (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-pos.git) |
 | Component | `SignInTerminal` |
 | Suggested location | `src/routes/SignInTerminal.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | form |
+| Layout pattern | form (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/TICVAI_POS_Terminal_v2.html` (v2, 1 October 2026 (TICVAI POS Terminal (3).html)), view: Opens here: venue co-branding (Ferrari World), recent cashiers four at a time with their last shift, cashier-ID entry, PIN or password. Wireframe frame `wireframes/P04 Venue POS.dc.html#pos-000`, which adam_pull writes into the ticket folder as `wireframe-pos-000.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`screens/_design-tokens.yaml`). Each state's look: loading: the shimmer tiles (`wireframes/states/P04 Venue POS states.dc.html#pos-state-loading`, pulled as `wireframe-pos-state-loading.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the empty panel note (the prototype, the cart ("No items yet", "Tap a product, scan a barcode, or recall a held sale to begin.") and the order board ("No orders waiting") (decoded template)); error: the could-not-load panel (`wireframes/states/P04 Venue POS states.dc.html#pos-state-error`, pulled as `wireframe-pos-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; denied: the refusal toast (the prototype, the toast ("{{ toastMsg }}", flash(..., 'warn')), e.g. "Opening the drawer without a sale needs a Supervisor role or above" and "Approval declined." (decoded template)); emptyNoAccess: the no-access panel (`wireframes/states/P04 Venue POS states.dc.html#pos-state-no-access`, pulled as `wireframe-pos-state-no-access.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; mfaRequired: the second-factor modal (`wireframes/states/P04 Venue POS states.dc.html#pos-state-mfa`, pulled as `wireframe-pos-state-mfa.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; offline: the network pill and the connection toast (the prototype, the header's network pill ("{{ netLabel }}", "Offline · queued locally") and the toast "Connection lost — sales continue and queue locally." (decoded template of the bundle)). The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 1620×1080, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -599,15 +625,15 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | Checking the credential. The keypad stays visible and disabled. |
-| emptyFirstRun | A till nobody has signed into yet. No recent operators, so the quick-login row is not there and the keypad is the whole screen. This is the state on the morning a terminal is first plugged in, and it is the one a venue sees when it opens - not a fault, and it must not read as one. |
-| error | Identity could not be reached. Says so rather than saying the PIN is wrong -- telling an operator their PIN failed when the network did sends them to a supervisor with the wrong question. |
-| denied | The employee number and PIN do not match, or the account is locked. Names which, and how many attempts remain before the lock. |
-| emptyNoAccess | Authentication succeeded and the operator holds no role on this workstation. A real outcome on a shared till -- a steward badged for the gate is not a cashier -- and it is the session that succeeded and the authorisation that did not. |
-| mfaRequired | Signed in, not yet through. The principal holds a permission that requires MFA (ROLE_MANAGE, LEDGER_APPROVE, any platform-staff permission, or one the tenant added), so after `login` the screen calls `createMfaChallenge` and asks for the authenticator code; `verifyMfaChallenge` completes the sign-in. Email me a code instead is the fallback. Five wrong codes lock step-up for the policy's lockout minutes and the screen says so. A principal with no enrolled method is sent to enrol first (decided 28 September, audit R135, R126). A cashier never reaches this state. |
-| offline | Signs in against the cached operator list and syncs when the link returns. A till that cannot open because the network is down is a till that does not sell, which is the same reasoning POS-001 applies to the float. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | Checking the credential. The keypad stays visible and disabled. | the shimmer tiles, `wireframes/states/P04 Venue POS states.dc.html#pos-state-loading` (pulled as `wireframe-pos-state-loading.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | A till nobody has signed into yet. No recent operators, so the quick-login row is not there and the keypad is the whole screen. This is the state on the morning a terminal is first plugged in, and it is the one a venue sees when it opens - not a fault, and it must not read as one. | the empty panel note, `sources/designs/TICVAI_POS_Terminal_v2.html`, the cart ("No items yet", "Tap a product, scan a barcode, or recall a held sale to begin.") and the order board ("No orders waiting") (decoded template) |
+| error | Identity could not be reached. Says so rather than saying the PIN is wrong -- telling an operator their PIN failed when the network did sends them to a supervisor with the wrong question. | the could-not-load panel, `wireframes/states/P04 Venue POS states.dc.html#pos-state-error` (pulled as `wireframe-pos-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| denied | The employee number and PIN do not match, or the account is locked. Names which, and how many attempts remain before the lock. | the refusal toast, `sources/designs/TICVAI_POS_Terminal_v2.html`, the toast ("{{ toastMsg }}", flash(..., 'warn')), e.g. "Opening the drawer without a sale needs a Supervisor role or above" and "Approval declined." (decoded template) |
+| emptyNoAccess | Authentication succeeded and the operator holds no role on this workstation. A real outcome on a shared till -- a steward badged for the gate is not a cashier -- and it is the session that succeeded and the authorisation that did not. | the no-access panel, `wireframes/states/P04 Venue POS states.dc.html#pos-state-no-access` (pulled as `wireframe-pos-state-no-access.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| mfaRequired | Signed in, not yet through. The principal holds a permission that requires MFA (ROLE_MANAGE, LEDGER_APPROVE, any platform-staff permission, or one the tenant added), so after `login` the screen calls `createMfaChallenge` and asks for the authenticator code; `verifyMfaChallenge` completes the sign-in. Email me a code instead is the fallback. Five wrong codes lock step-up for the policy's lockout minutes and the screen says so. A principal with no enrolled method is sent to enrol first (decided 28 September, audit R135, R126). A cashier never reaches this state. | the second-factor modal, `wireframes/states/P04 Venue POS states.dc.html#pos-state-mfa` (pulled as `wireframe-pos-state-mfa.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| offline | Signs in against the cached operator list and syncs when the link returns. A till that cannot open because the network is down is a till that does not sell, which is the same reasoning POS-001 applies to the float. | the network pill and the connection toast, `sources/designs/TICVAI_POS_Terminal_v2.html`, the header's network pill ("{{ netLabel }}", "Offline · queued locally") and the toast "Connection lost — sales continue and queue locally." (decoded template of the bundle) |
 
 **Goes to**
 
@@ -629,7 +655,11 @@
 | Repository | ticvai-pos (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-pos.git) |
 | Component | `BeginShiftWizard` |
 | Suggested location | `src/routes/shift/BeginShiftWizard.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | approvalInbox |
+| Layout pattern | approvalInbox (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/TICVAI_POS_Terminal_v2.html` (v2, 1 October 2026 (TICVAI POS Terminal (3).html)), view: Sign in -> 'Continue to float count' -> 'STEP 2 OF 2 · SHIFT OPENING' (eleven denominations, typed or tapped, with the hardware check running beside the count). Wireframe frame `wireframes/P04 Venue POS.dc.html#pos-001`, which adam_pull writes into the ticket folder as `wireframe-pos-001.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`screens/_design-tokens.yaml`). Each state's look: loading: the shimmer tiles (`wireframes/states/P04 Venue POS states.dc.html#pos-state-loading`, pulled as `wireframe-pos-state-loading.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; error: the could-not-load panel (`wireframes/states/P04 Venue POS states.dc.html#pos-state-error`, pulled as `wireframe-pos-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the empty panel note (the prototype, the cart ("No items yet", "Tap a product, scan a barcode, or recall a held sale to begin.") and the order board ("No orders waiting") (decoded template)); emptyNoResults: the nothing-matches panel (`wireframes/states/P04 Venue POS states.dc.html#pos-state-no-results`, pulled as `wireframe-pos-state-no-results.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyNoAccess: the no-access panel (`wireframes/states/P04 Venue POS states.dc.html#pos-state-no-access`, pulled as `wireframe-pos-state-no-access.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; offline: the network pill and the connection toast (the prototype, the header's network pill ("{{ netLabel }}", "Offline · queued locally") and the toast "Connection lost — sales continue and queue locally." (decoded template of the bundle)); denied: the refusal toast (the prototype, the toast ("{{ toastMsg }}", flash(..., 'warn')), e.g. "Opening the drawer without a sale needs a Supervisor role or above" and "Approval declined." (decoded template)). The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 1620×1080, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -653,15 +683,15 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The begin shift list. |
-| error | Could not load. Names which read failed and leaves the begin shift untouched. |
-| emptyFirstRun | Nothing is waiting, which is the good outcome. An empty queue means every item has been decided; it offers no create action, because creating work is not what it needs. |
-| emptyNoResults | Never shown: nothing on this screen filters its list, so an empty list is always the first-run state above. |
-| emptyNoAccess | Shown when the caller lacks `SHIFT_OPEN`, which `getCurrentShift` requires to show this screen, and names that permission (the screen's other reads need `DEVICE_VIEW` and say so in their own panels). Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `SHIFT_APPROVE_OPEN` for `approveShiftOpen`. |
-| offline | Cannot open offline. `openShift` is online only (F32; audit R257): an opening float declared offline is one nobody can reconcile against the safe. Says so and keeps the count on screen until the link returns (design-notes correction fnb-retail POS-001). |
-| denied | Sign-in succeeds and the shift will not open — the operator's role does not hold `sale.create` on this terminal. The float count is kept, not discarded, and a supervisor can open the shift against the same count. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The begin shift list. | the shimmer tiles, `wireframes/states/P04 Venue POS states.dc.html#pos-state-loading` (pulled as `wireframe-pos-state-loading.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| error | Could not load. Names which read failed and leaves the begin shift untouched. | the could-not-load panel, `wireframes/states/P04 Venue POS states.dc.html#pos-state-error` (pulled as `wireframe-pos-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | Nothing is waiting, which is the good outcome. An empty queue means every item has been decided; it offers no create action, because creating work is not what it needs. | the empty panel note, `sources/designs/TICVAI_POS_Terminal_v2.html`, the cart ("No items yet", "Tap a product, scan a barcode, or recall a held sale to begin.") and the order board ("No orders waiting") (decoded template) |
+| emptyNoResults | Never shown: nothing on this screen filters its list, so an empty list is always the first-run state above. | the nothing-matches panel, `wireframes/states/P04 Venue POS states.dc.html#pos-state-no-results` (pulled as `wireframe-pos-state-no-results.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyNoAccess | Shown when the caller lacks `SHIFT_OPEN`, which `getCurrentShift` requires to show this screen, and names that permission (the screen's other reads need `DEVICE_VIEW` and say so in their own panels). Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `SHIFT_APPROVE_OPEN` for `approveShiftOpen`. | the no-access panel, `wireframes/states/P04 Venue POS states.dc.html#pos-state-no-access` (pulled as `wireframe-pos-state-no-access.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| offline | Cannot open offline. `openShift` is online only (F32; audit R257): an opening float declared offline is one nobody can reconcile against the safe. Says so and keeps the count on screen until the link returns (design-notes correction fnb-retail POS-001). | the network pill and the connection toast, `sources/designs/TICVAI_POS_Terminal_v2.html`, the header's network pill ("{{ netLabel }}", "Offline · queued locally") and the toast "Connection lost — sales continue and queue locally." (decoded template of the bundle) |
+| denied | Sign-in succeeds and the shift will not open — the operator's role does not hold `sale.create` on this terminal. The float count is kept, not discarded, and a supervisor can open the shift against the same count. | the refusal toast, `sources/designs/TICVAI_POS_Terminal_v2.html`, the toast ("{{ toastMsg }}", flash(..., 'warn')), e.g. "Opening the drawer without a sale needs a Supervisor role or above" and "Approval declined." (decoded template) |
 
 **Goes to**
 
@@ -699,7 +729,11 @@
 | Repository | ticvai-pos (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-pos.git) |
 | Component | `SellTicketCatalogueBoard` |
 | Suggested location | `src/routes/sell/SellTicketCatalogueBoard.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/TICVAI_POS_Terminal_v2.html` (v2, 1 October 2026 (TICVAI POS Terminal (3).html)), view: Left rail 'Tickets', with a timed ticket added (Aqua Park · Day Pass, 12:00, two adults and a child, add-ons dialog continued): REFINE chips, availability on each card, On now / Builder / Scan, the cart with the inventory hold, Reserve and Proceed to payment. Wireframe frame `wireframes/P04 Venue POS.dc.html#pos-002`, which adam_pull writes into the ticket folder as `wireframe-pos-002.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`screens/_design-tokens.yaml`). Each state's look: loading: the shimmer tiles (`wireframes/states/P04 Venue POS states.dc.html#pos-state-loading`, pulled as `wireframe-pos-state-loading.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; error: the could-not-load panel (`wireframes/states/P04 Venue POS states.dc.html#pos-state-error`, pulled as `wireframe-pos-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the empty panel note (the prototype, the cart ("No items yet", "Tap a product, scan a barcode, or recall a held sale to begin.") and the order board ("No orders waiting") (decoded template)); emptyNoResults: the nothing-matches panel (`wireframes/states/P04 Venue POS states.dc.html#pos-state-no-results`, pulled as `wireframe-pos-state-no-results.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyNoAccess: the no-access panel (`wireframes/states/P04 Venue POS states.dc.html#pos-state-no-access`, pulled as `wireframe-pos-state-no-access.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; offline: the network pill and the connection toast (the prototype, the header's network pill ("{{ netLabel }}", "Offline · queued locally") and the toast "Connection lost — sales continue and queue locally." (decoded template of the bundle)); denied: the refusal toast (the prototype, the toast ("{{ toastMsg }}", flash(..., 'warn')), e.g. "Opening the drawer without a sale needs a Supervisor role or above" and "Approval declined." (decoded template)). The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 1620×1080, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -752,15 +786,15 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The sell ticket catalogue list. |
-| error | Could not load. Names which read failed and leaves the sell ticket catalogue untouched. |
-| emptyFirstRun | No sell ticket catalogue yet. Offers Create order (`createOrder`); distinct from a filter that matched nothing. |
-| emptyNoResults | Nothing matches the filter on venueId, kind, isSellable and the sell ticket catalogue are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires to show this screen, and names that permission (the screen's other reads need `ORDER_VIEW`, `PRICE_VIEW`, `SCOPE_VIEW` and say so in their own panels). Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `APPROVAL_REQUEST` for `createApprovalRequest`; `APPROVAL_VIEW` for `evaluateApprovalRequirement`; `GUEST_VIEW` for `getGuestLoyalty`, `identifyGuest`; `LOYALTY_REDEEM` for `redeemLoyaltyPoints`; `ORDER_CREATE` for `createOrder`, `createPayment`, `issueGameCard`, `createRetailSale`; `ORDER_DISCOUNT` for `applyManualDiscount`. |
-| offline | Served from the local catalogue bundle (ADR-0013). One read path, always local — the terminal does not know whether it has a network. |
-| denied | The catalogue reads normally and Charge is refused without `payment.take`. The cart is held, not cleared, so a permitted operator can complete the same sale. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The sell ticket catalogue list. | the shimmer tiles, `wireframes/states/P04 Venue POS states.dc.html#pos-state-loading` (pulled as `wireframe-pos-state-loading.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| error | Could not load. Names which read failed and leaves the sell ticket catalogue untouched. | the could-not-load panel, `wireframes/states/P04 Venue POS states.dc.html#pos-state-error` (pulled as `wireframe-pos-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | No sell ticket catalogue yet. Offers Create order (`createOrder`); distinct from a filter that matched nothing. | the empty panel note, `sources/designs/TICVAI_POS_Terminal_v2.html`, the cart ("No items yet", "Tap a product, scan a barcode, or recall a held sale to begin.") and the order board ("No orders waiting") (decoded template) |
+| emptyNoResults | Nothing matches the filter on venueId, kind, isSellable and the sell ticket catalogue are still there. Names the active filter and offers to clear it. | the nothing-matches panel, `wireframes/states/P04 Venue POS states.dc.html#pos-state-no-results` (pulled as `wireframe-pos-state-no-results.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyNoAccess | Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires to show this screen, and names that permission (the screen's other reads need `ORDER_VIEW`, `PRICE_VIEW`, `SCOPE_VIEW` and say so in their own panels). Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `APPROVAL_REQUEST` for `createApprovalRequest`; `APPROVAL_VIEW` for `evaluateApprovalRequirement`; `GUEST_VIEW` for `getGuestLoyalty`, `identifyGuest`; `LOYALTY_REDEEM` for `redeemLoyaltyPoints`; `ORDER_CREATE` for `createOrder`, `createPayment`, `issueGameCard`, `createRetailSale`; `ORDER_DISCOUNT` for `applyManualDiscount`. | the no-access panel, `wireframes/states/P04 Venue POS states.dc.html#pos-state-no-access` (pulled as `wireframe-pos-state-no-access.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| offline | Served from the local catalogue bundle (ADR-0013). One read path, always local — the terminal does not know whether it has a network. | the network pill and the connection toast, `sources/designs/TICVAI_POS_Terminal_v2.html`, the header's network pill ("{{ netLabel }}", "Offline · queued locally") and the toast "Connection lost — sales continue and queue locally." (decoded template of the bundle) |
+| denied | The catalogue reads normally and Charge is refused without `payment.take`. The cart is held, not cleared, so a permitted operator can complete the same sale. | the refusal toast, `sources/designs/TICVAI_POS_Terminal_v2.html`, the toast ("{{ toastMsg }}", flash(..., 'warn')), e.g. "Opening the drawer without a sale needs a Supervisor role or above" and "Approval declined." (decoded template) |
 
 **Goes to**
 
@@ -797,7 +831,11 @@
 | Repository | ticvai-pos (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-pos.git) |
 | Component | `SellTicketCatalogueBoard` |
 | Suggested location | `src/routes/sell/SellTicketCatalogueBoard.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/TICVAI_POS_Terminal_v2.html` (v2, 1 October 2026 (TICVAI POS Terminal (3).html)), view: Tickets -> 'Aqua Park · Day Pass' -> drawer: business date, the entry-slot grid with what is left per slot (12:00 PM picked), guests by ticket type (two adults, one child) (it shows part of this screen: build the rest from the screen spec in the same look). Wireframe frame `wireframes/P04 Venue POS.dc.html#pos-003`, which adam_pull writes into the ticket folder as `wireframe-pos-003.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`screens/_design-tokens.yaml`). Each state's look: loading: the shimmer tiles (`wireframes/states/P04 Venue POS states.dc.html#pos-state-loading`, pulled as `wireframe-pos-state-loading.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; error: the could-not-load panel (`wireframes/states/P04 Venue POS states.dc.html#pos-state-error`, pulled as `wireframe-pos-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the empty panel note (the prototype, the cart ("No items yet", "Tap a product, scan a barcode, or recall a held sale to begin.") and the order board ("No orders waiting") (decoded template)); emptyNoResults: the nothing-matches panel (`wireframes/states/P04 Venue POS states.dc.html#pos-state-no-results`, pulled as `wireframe-pos-state-no-results.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyNoAccess: the no-access panel (`wireframes/states/P04 Venue POS states.dc.html#pos-state-no-access`, pulled as `wireframe-pos-state-no-access.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; offline: the network pill and the connection toast (the prototype, the header's network pill ("{{ netLabel }}", "Offline · queued locally") and the toast "Connection lost — sales continue and queue locally." (decoded template of the bundle)); denied: the refusal toast (the prototype, the toast ("{{ toastMsg }}", flash(..., 'warn')), e.g. "Opening the drawer without a sale needs a Supervisor role or above" and "Approval declined." (decoded template)). The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 1620×1080, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -819,15 +857,15 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The sell timed entry list. |
-| error | Could not load. Names which read failed and leaves the sell timed entry untouched. |
-| emptyFirstRun | No sell timed entry yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
-| emptyNoResults | Never shown: `listProductVariants` takes no filter, so an empty list is always the first-run state above. |
-| emptyNoAccess | Shown when the caller lacks `PRODUCT_VIEW`, which `getAvailability` requires to show this screen, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_CREATE` for `acquireInventoryHold`. |
-| offline | Availability is never served from the bundle. A lease is acquired against the server; without one the terminal sells only from its allocated lease and refuses beyond it (ADR-0013) |
-| denied | Session and date selection are readable; adding to a sale needs `payment.take` to complete. The hold is not taken until the sale can be charged. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The sell timed entry list. | the shimmer tiles, `wireframes/states/P04 Venue POS states.dc.html#pos-state-loading` (pulled as `wireframe-pos-state-loading.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| error | Could not load. Names which read failed and leaves the sell timed entry untouched. | the could-not-load panel, `wireframes/states/P04 Venue POS states.dc.html#pos-state-error` (pulled as `wireframe-pos-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | No sell timed entry yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. | the empty panel note, `sources/designs/TICVAI_POS_Terminal_v2.html`, the cart ("No items yet", "Tap a product, scan a barcode, or recall a held sale to begin.") and the order board ("No orders waiting") (decoded template) |
+| emptyNoResults | Never shown: `listProductVariants` takes no filter, so an empty list is always the first-run state above. | the nothing-matches panel, `wireframes/states/P04 Venue POS states.dc.html#pos-state-no-results` (pulled as `wireframe-pos-state-no-results.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyNoAccess | Shown when the caller lacks `PRODUCT_VIEW`, which `getAvailability` requires to show this screen, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_CREATE` for `acquireInventoryHold`. | the no-access panel, `wireframes/states/P04 Venue POS states.dc.html#pos-state-no-access` (pulled as `wireframe-pos-state-no-access.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| offline | Availability is never served from the bundle. A lease is acquired against the server; without one the terminal sells only from its allocated lease and refuses beyond it (ADR-0013) | the network pill and the connection toast, `sources/designs/TICVAI_POS_Terminal_v2.html`, the header's network pill ("{{ netLabel }}", "Offline · queued locally") and the toast "Connection lost — sales continue and queue locally." (decoded template of the bundle) |
+| denied | Session and date selection are readable; adding to a sale needs `payment.take` to complete. The hold is not taken until the sale can be charged. | the refusal toast, `sources/designs/TICVAI_POS_Terminal_v2.html`, the toast ("{{ toastMsg }}", flash(..., 'warn')), e.g. "Opening the drawer without a sale needs a Supervisor role or above" and "Approval declined." (decoded template) |
 
 **Goes to**
 
@@ -851,7 +889,11 @@
 | Repository | ticvai-pos (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-pos.git) |
 | Component | `SellTicketCatalogueBoard` |
 | Suggested location | `src/routes/sell/SellTicketCatalogueBoard.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | statusTracker |
+| Layout pattern | statusTracker (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/TICVAI_POS_Terminal_v2.html` (v2, 1 October 2026 (TICVAI POS Terminal (3).html)), view: Tickets -> 'Pluma Circus · Reserved' -> drawer -> 'Choose date & time' -> 3:00 PM -> section map -> section 103 (seats, with held and sold seats) (it shows part of this screen: build the rest from the screen spec in the same look). Wireframe frame `wireframes/P04 Venue POS.dc.html#pos-004`, which adam_pull writes into the ticket folder as `wireframe-pos-004.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`screens/_design-tokens.yaml`). Each state's look: loading: the shimmer tiles (`wireframes/states/P04 Venue POS states.dc.html#pos-state-loading`, pulled as `wireframe-pos-state-loading.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; error: the could-not-load panel (`wireframes/states/P04 Venue POS states.dc.html#pos-state-error`, pulled as `wireframe-pos-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the empty panel note (the prototype, the cart ("No items yet", "Tap a product, scan a barcode, or recall a held sale to begin.") and the order board ("No orders waiting") (decoded template)); emptyNoAccess: the no-access panel (`wireframes/states/P04 Venue POS states.dc.html#pos-state-no-access`, pulled as `wireframe-pos-state-no-access.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; offline: the network pill and the connection toast (the prototype, the header's network pill ("{{ netLabel }}", "Offline · queued locally") and the toast "Connection lost — sales continue and queue locally." (decoded template of the bundle)); denied: the refusal toast (the prototype, the toast ("{{ toastMsg }}", flash(..., 'warn')), e.g. "Opening the drawer without a sale needs a Supervisor role or above" and "Approval declined." (decoded template)); zoneUnavailable: the struck-out zone and the warning toast (`wireframes/states/P04 Venue POS states.dc.html#pos-state-zone-unavailable`, pulled as `wireframe-pos-state-zone-unavailable.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 1620×1080, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -876,15 +918,15 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The sell seat map, read by `getSeatAvailability`. |
-| error | Could not load. Names which read failed and leaves the sell seat map untouched. |
-| emptyFirstRun | No sell seat map yet. Offers Create seat hold (`createSeatHold`). |
-| emptyNoAccess | Shown when the caller lacks `PRODUCT_VIEW`, which `getSeatAvailability` requires to show this screen, and names that permission (the screen's other reads need `ORDER_VIEW` and say so in their own panels). Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_CREATE` for `createSeatHold`, `relinquishSeatHold`, `createOrder`, `createPayment`. |
-| offline | Not available offline. Seat holds require the primary; two terminals selling the same seat is unrecoverable |
-| denied | Seats can be viewed but not held without `payment.take` — an unchargeable hold takes capacity off sale for eight minutes and returns it unsold. |
-| zoneUnavailable | The zone sold out while the cashier was choosing. The board refuses the zone rather than the sale — the seat map reloads with that zone struck out and the cart intact. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The sell seat map, read by `getSeatAvailability`. | the shimmer tiles, `wireframes/states/P04 Venue POS states.dc.html#pos-state-loading` (pulled as `wireframe-pos-state-loading.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| error | Could not load. Names which read failed and leaves the sell seat map untouched. | the could-not-load panel, `wireframes/states/P04 Venue POS states.dc.html#pos-state-error` (pulled as `wireframe-pos-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | No sell seat map yet. Offers Create seat hold (`createSeatHold`). | the empty panel note, `sources/designs/TICVAI_POS_Terminal_v2.html`, the cart ("No items yet", "Tap a product, scan a barcode, or recall a held sale to begin.") and the order board ("No orders waiting") (decoded template) |
+| emptyNoAccess | Shown when the caller lacks `PRODUCT_VIEW`, which `getSeatAvailability` requires to show this screen, and names that permission (the screen's other reads need `ORDER_VIEW` and say so in their own panels). Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_CREATE` for `createSeatHold`, `relinquishSeatHold`, `createOrder`, `createPayment`. | the no-access panel, `wireframes/states/P04 Venue POS states.dc.html#pos-state-no-access` (pulled as `wireframe-pos-state-no-access.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| offline | Not available offline. Seat holds require the primary; two terminals selling the same seat is unrecoverable | the network pill and the connection toast, `sources/designs/TICVAI_POS_Terminal_v2.html`, the header's network pill ("{{ netLabel }}", "Offline · queued locally") and the toast "Connection lost — sales continue and queue locally." (decoded template of the bundle) |
+| denied | Seats can be viewed but not held without `payment.take` — an unchargeable hold takes capacity off sale for eight minutes and returns it unsold. | the refusal toast, `sources/designs/TICVAI_POS_Terminal_v2.html`, the toast ("{{ toastMsg }}", flash(..., 'warn')), e.g. "Opening the drawer without a sale needs a Supervisor role or above" and "Approval declined." (decoded template) |
+| zoneUnavailable | The zone sold out while the cashier was choosing. The board refuses the zone rather than the sale — the seat map reloads with that zone struck out and the cart intact. | the struck-out zone and the warning toast, `wireframes/states/P04 Venue POS states.dc.html#pos-state-zone-unavailable` (pulled as `wireframe-pos-state-zone-unavailable.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 
 **Goes to**
 
@@ -908,7 +950,11 @@
 | Repository | ticvai-pos (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-pos.git) |
 | Component | `PaymentForm` |
 | Suggested location | `src/routes/payment/PaymentForm.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/TICVAI_POS_Terminal_v2.html` (v2, 1 October 2026 (TICVAI POS Terminal (3).html)), view: Cart 'Proceed to payment' (the POS-002 sale): tenders, cash keypad; a split is taken on the tender itself ('Add to split', 'Half'), there is no Split payment tender. Wireframe frame `wireframes/P04 Venue POS.dc.html#pos-005`, which adam_pull writes into the ticket folder as `wireframe-pos-005.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`screens/_design-tokens.yaml`). Each state's look: loading: the shimmer tiles (`wireframes/states/P04 Venue POS states.dc.html#pos-state-loading`, pulled as `wireframe-pos-state-loading.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; error: the could-not-load panel (`wireframes/states/P04 Venue POS states.dc.html#pos-state-error`, pulled as `wireframe-pos-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the empty panel note (the prototype, the cart ("No items yet", "Tap a product, scan a barcode, or recall a held sale to begin.") and the order board ("No orders waiting") (decoded template)); emptyNoResults: the nothing-matches panel (`wireframes/states/P04 Venue POS states.dc.html#pos-state-no-results`, pulled as `wireframe-pos-state-no-results.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyNoAccess: the no-access panel (`wireframes/states/P04 Venue POS states.dc.html#pos-state-no-access`, pulled as `wireframe-pos-state-no-access.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; offline: the network pill and the connection toast (the prototype, the header's network pill ("{{ netLabel }}", "Offline · queued locally") and the toast "Connection lost — sales continue and queue locally." (decoded template of the bundle)). The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 1620×1080, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -939,14 +985,14 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The payment list. |
-| error | Could not load. Names which read failed and leaves the payment untouched. |
-| emptyFirstRun | No payment yet. Offers Create payment (`createPayment`); distinct from a filter that matched nothing. |
-| emptyNoResults | Never shown: the payment screen completes one sale and has no list filter. |
-| emptyNoAccess | Shown when the caller lacks `ORDER_VIEW`, which `listRetailSales` requires to show this screen, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `GUEST_MANAGE` for `enrolFaceTag`; `LOYALTY_REDEEM` for `redeemLoyaltyPoints`; `ORDER_CREATE` for `createPayment`, `inquirePaymentStatus`, `capturePayment`, `createRetailSale` and 2 more; `ORDER_MODIFY` for `addTip`; `ORDER_REPRINT` for `reprintReceipt`. |
-| offline | Cash completes locally and journals. Card does not — an offline card approval the acquirer never saw is a sale that vanishes at settlement |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The payment list. | the shimmer tiles, `wireframes/states/P04 Venue POS states.dc.html#pos-state-loading` (pulled as `wireframe-pos-state-loading.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| error | Could not load. Names which read failed and leaves the payment untouched. | the could-not-load panel, `wireframes/states/P04 Venue POS states.dc.html#pos-state-error` (pulled as `wireframe-pos-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | No payment yet. Offers Create payment (`createPayment`); distinct from a filter that matched nothing. | the empty panel note, `sources/designs/TICVAI_POS_Terminal_v2.html`, the cart ("No items yet", "Tap a product, scan a barcode, or recall a held sale to begin.") and the order board ("No orders waiting") (decoded template) |
+| emptyNoResults | Never shown: the payment screen completes one sale and has no list filter. | the nothing-matches panel, `wireframes/states/P04 Venue POS states.dc.html#pos-state-no-results` (pulled as `wireframe-pos-state-no-results.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyNoAccess | Shown when the caller lacks `ORDER_VIEW`, which `listRetailSales` requires to show this screen, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `GUEST_MANAGE` for `enrolFaceTag`; `LOYALTY_REDEEM` for `redeemLoyaltyPoints`; `ORDER_CREATE` for `createPayment`, `inquirePaymentStatus`, `capturePayment`, `createRetailSale` and 2 more; `ORDER_MODIFY` for `addTip`; `ORDER_REPRINT` for `reprintReceipt`. | the no-access panel, `wireframes/states/P04 Venue POS states.dc.html#pos-state-no-access` (pulled as `wireframe-pos-state-no-access.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| offline | Cash completes locally and journals. Card does not — an offline card approval the acquirer never saw is a sale that vanishes at settlement | the network pill and the connection toast, `sources/designs/TICVAI_POS_Terminal_v2.html`, the header's network pill ("{{ netLabel }}", "Offline · queued locally") and the toast "Connection lost — sales continue and queue locally." (decoded template of the bundle) |
 
 **Goes to**
 
@@ -975,7 +1021,11 @@
 | Repository | ticvai-pos (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-pos.git) |
 | Component | `HeldOrdersBoard` |
 | Suggested location | `src/routes/sell/HeldOrdersBoard.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/TICVAI_POS_Terminal_v2.html` (v2, 1 October 2026 (TICVAI POS Terminal (3).html)), view: Cart 'Hold sale', then F2 'Recall held' -> 'Held sales' screen (was a modal): parked value, every line in full, Recall into sale / Print hold slip / Discard hold (it shows part of this screen: build the rest from the screen spec in the same look). Wireframe frame `wireframes/P04 Venue POS.dc.html#pos-006`, which adam_pull writes into the ticket folder as `wireframe-pos-006.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`screens/_design-tokens.yaml`). Each state's look: loading: the shimmer tiles (`wireframes/states/P04 Venue POS states.dc.html#pos-state-loading`, pulled as `wireframe-pos-state-loading.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; error: the could-not-load panel (`wireframes/states/P04 Venue POS states.dc.html#pos-state-error`, pulled as `wireframe-pos-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the empty panel note (the prototype, the cart ("No items yet", "Tap a product, scan a barcode, or recall a held sale to begin.") and the order board ("No orders waiting") (decoded template)); emptyNoResults: the nothing-matches panel (`wireframes/states/P04 Venue POS states.dc.html#pos-state-no-results`, pulled as `wireframe-pos-state-no-results.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyNoAccess: the no-access panel (`wireframes/states/P04 Venue POS states.dc.html#pos-state-no-access`, pulled as `wireframe-pos-state-no-access.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; offline: the network pill and the connection toast (the prototype, the header's network pill ("{{ netLabel }}", "Offline · queued locally") and the toast "Connection lost — sales continue and queue locally." (decoded template of the bundle)); denied: the refusal toast (the prototype, the toast ("{{ toastMsg }}", flash(..., 'warn')), e.g. "Opening the drawer without a sale needs a Supervisor role or above" and "Approval declined." (decoded template)). The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 1620×1080, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -1004,15 +1054,15 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The held orders list. |
-| error | Could not load. Names which read failed and leaves the held orders untouched. |
-| emptyFirstRun | No held orders yet. Offers Create order (`createOrder`); distinct from a filter that matched nothing. |
-| emptyNoResults | Nothing on this terminal matches the search; the holds are still there. Clear the search. |
-| emptyNoAccess | Shown when the caller lacks `ORDER_VIEW`, which `listOrders` requires to show this screen, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_CREATE` for `createOrder`; `ORDER_DISCOUNT` for `applyManualDiscount`; `ORDER_EXCHANGE` for `exchangeOrderLines`; `ORDER_MODIFY` for `resumeOrder`, `holdOrder`, `modifyOrder`; `ORDER_REFUND` for `createRefund`; `ORDER_REPRINT` for `reprintOrder`. |
-| offline | Orders held at this terminal are listed. Those held elsewhere are not — resuming another till's sale needs the server |
-| denied | Held sales are listed and cannot be recalled without `sale.resume`. The list is still shown, because a cashier who cannot see the held sale fetches a supervisor to the wrong screen. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The held orders list. | the shimmer tiles, `wireframes/states/P04 Venue POS states.dc.html#pos-state-loading` (pulled as `wireframe-pos-state-loading.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| error | Could not load. Names which read failed and leaves the held orders untouched. | the could-not-load panel, `wireframes/states/P04 Venue POS states.dc.html#pos-state-error` (pulled as `wireframe-pos-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | No held orders yet. Offers Create order (`createOrder`); distinct from a filter that matched nothing. | the empty panel note, `sources/designs/TICVAI_POS_Terminal_v2.html`, the cart ("No items yet", "Tap a product, scan a barcode, or recall a held sale to begin.") and the order board ("No orders waiting") (decoded template) |
+| emptyNoResults | Nothing on this terminal matches the search; the holds are still there. Clear the search. | the nothing-matches panel, `wireframes/states/P04 Venue POS states.dc.html#pos-state-no-results` (pulled as `wireframe-pos-state-no-results.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyNoAccess | Shown when the caller lacks `ORDER_VIEW`, which `listOrders` requires to show this screen, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_CREATE` for `createOrder`; `ORDER_DISCOUNT` for `applyManualDiscount`; `ORDER_EXCHANGE` for `exchangeOrderLines`; `ORDER_MODIFY` for `resumeOrder`, `holdOrder`, `modifyOrder`; `ORDER_REFUND` for `createRefund`; `ORDER_REPRINT` for `reprintOrder`. | the no-access panel, `wireframes/states/P04 Venue POS states.dc.html#pos-state-no-access` (pulled as `wireframe-pos-state-no-access.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| offline | Orders held at this terminal are listed. Those held elsewhere are not — resuming another till's sale needs the server | the network pill and the connection toast, `sources/designs/TICVAI_POS_Terminal_v2.html`, the header's network pill ("{{ netLabel }}", "Offline · queued locally") and the toast "Connection lost — sales continue and queue locally." (decoded template of the bundle) |
+| denied | Held sales are listed and cannot be recalled without `sale.resume`. The list is still shown, because a cashier who cannot see the held sale fetches a supervisor to the wrong screen. | the refusal toast, `sources/designs/TICVAI_POS_Terminal_v2.html`, the toast ("{{ toastMsg }}", flash(..., 'warn')), e.g. "Opening the drawer without a sale needs a Supervisor role or above" and "Approval declined." (decoded template) |
 
 **Goes to**
 
@@ -1035,7 +1085,11 @@
 | Repository | ticvai-pos (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-pos.git) |
 | Component | `CloseShiftWizard` |
 | Suggested location | `src/routes/shift/CloseShiftWizard.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | approvalInbox |
+| Layout pattern | approvalInbox (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/TICVAI_POS_Terminal_client_approved.html` (TICVAI OS 4.2.1, build 2026.08.14), view: Left rail 'Close' (goClose) or palette 'Shift close & Z-report'. Wireframe frame `wireframes/P04 Venue POS.dc.html#pos-007`, which adam_pull writes into the ticket folder as `wireframe-pos-007.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`screens/_design-tokens.yaml`). Each state's look: loading: the shimmer tiles (`wireframes/states/P04 Venue POS states.dc.html#pos-state-loading`, pulled as `wireframe-pos-state-loading.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; error: the could-not-load panel (`wireframes/states/P04 Venue POS states.dc.html#pos-state-error`, pulled as `wireframe-pos-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the empty panel note (`sources/designs/TICVAI_POS_Terminal_v2.html`, the cart ("No items yet", "Tap a product, scan a barcode, or recall a held sale to begin.") and the order board ("No orders waiting") (decoded template)); emptyNoResults: the nothing-matches panel (`wireframes/states/P04 Venue POS states.dc.html#pos-state-no-results`, pulled as `wireframe-pos-state-no-results.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyNoAccess: the no-access panel (`wireframes/states/P04 Venue POS states.dc.html#pos-state-no-access`, pulled as `wireframe-pos-state-no-access.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; offline: the network pill and the connection toast (`sources/designs/TICVAI_POS_Terminal_v2.html`, the header's network pill ("{{ netLabel }}", "Offline · queued locally") and the toast "Connection lost — sales continue and queue locally." (decoded template of the bundle)); denied: the refusal toast (`sources/designs/TICVAI_POS_Terminal_v2.html`, the toast ("{{ toastMsg }}", flash(..., 'warn')), e.g. "Opening the drawer without a sale needs a Supervisor role or above" and "Approval declined." (decoded template)); pendingVariance: the close-shift variance step (POS-007) (`sources/designs/TICVAI_POS_Terminal_v2.html`, the close-shift steps ("STEP 2 OF 3 · VARIANCE RESOLUTION") and the supervisor answer ("Rejected — recount the drawer.") (decoded template)); recountRequested: the close-shift variance step (POS-007) (`sources/designs/TICVAI_POS_Terminal_v2.html`, the close-shift steps ("STEP 2 OF 3 · VARIANCE RESOLUTION") and the supervisor answer ("Rejected — recount the drawer.") (decoded template)); reasonRequired: the close-shift variance step (POS-007) (`sources/designs/TICVAI_POS_Terminal_v2.html`, the close-shift steps ("STEP 2 OF 3 · VARIANCE RESOLUTION") and the supervisor answer ("Rejected — recount the drawer.") (decoded template)). The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 1620×1080, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -1061,18 +1115,18 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The close shift list. |
-| error | Could not load. Names which read failed and leaves the close shift untouched. |
-| emptyFirstRun | Nothing is waiting, which is the good outcome. An empty queue means every item has been decided; it offers no create action, because creating work is not what it needs. |
-| emptyNoResults | Never shown: `listCashMovements` takes no filter, so an empty list is always the first-run state above. |
-| emptyNoAccess | Shown when the caller lacks `SHIFT_OPEN`, which `getCurrentShift` requires to show this screen, and names that permission (the screen's other reads need `REPORT_VIEW_WORKSTATION` and say so in their own panels). Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `OVERSHORT_ACCEPT` for `acceptShiftVariance`, `rejectShiftVariance`; `SHIFT_CLOSE` for `submitShiftCount`, `closeShift`. |
-| offline | Cannot close. Closing requires the server total, and a locally computed variance is not a variance |
-| denied | `acceptShiftVariance` was refused: the caller lacks OVERSHORT_ACCEPT at this venue, or is the cashier whose shift it is. The shift stays `pendingVariance` against the same count, and a supervisor accepts it on this till (audit R080 (e)). |
-| pendingVariance | Counted; "Under review". `submitShiftCount` answered `referredToSupervisor`. The cashier sees "Under review" and no amount, and may sign out: the shift waits, and the next cashier opens a shift on this till meanwhile (it never blocks the next one). A supervisor resolves it with their PIN on this till or any till of the venue (accept the variance, ask for a recount, or close it with `closeShift`), or in the daily cash reconciliation, which lists every shift of the day and resolves them one by one (decided 2 October 2026, Chinmay, batch 3 #1 and pre-apply round; DEC-059, DEC-173; CHG-CSP-012; CHG-FIN-003; audit R080 (e)). |
-| recountRequested | "Recount requested". A supervisor rejected the variance (`rejectShiftVariance`) with a reason the cashier reads; the shift is still pendingVariance with `recountRequestedAt` set. The cashier counts the drawer blind again, at any till of the venue, and submits with `submitShiftCount`; a recount within the threshold closes the shift (DEC-175; DI-804; CHG-CSP-013). |
-| reasonRequired | "Give a reason to close". `submitShiftCount` answered `awaitingCloseApproval` with `varianceReasonRequired`: the count differed from the expected figure within the venue's threshold and no reason came with it. The count is locked; the till asks for a reason (till error, unrecorded refund, miscount, other, with a note) and `giveShiftVarianceReason` closes the shift. No amount, no over or short (the client's policy of 6 October 2026, T10.1; CHG-R4-019; CHG-FIN-003). A reason given with the count skips this step. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The close shift list. | the shimmer tiles, `wireframes/states/P04 Venue POS states.dc.html#pos-state-loading` (pulled as `wireframe-pos-state-loading.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| error | Could not load. Names which read failed and leaves the close shift untouched. | the could-not-load panel, `wireframes/states/P04 Venue POS states.dc.html#pos-state-error` (pulled as `wireframe-pos-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | Nothing is waiting, which is the good outcome. An empty queue means every item has been decided; it offers no create action, because creating work is not what it needs. | the empty panel note, `sources/designs/TICVAI_POS_Terminal_v2.html`, the cart ("No items yet", "Tap a product, scan a barcode, or recall a held sale to begin.") and the order board ("No orders waiting") (decoded template) |
+| emptyNoResults | Never shown: `listCashMovements` takes no filter, so an empty list is always the first-run state above. | the nothing-matches panel, `wireframes/states/P04 Venue POS states.dc.html#pos-state-no-results` (pulled as `wireframe-pos-state-no-results.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyNoAccess | Shown when the caller lacks `SHIFT_OPEN`, which `getCurrentShift` requires to show this screen, and names that permission (the screen's other reads need `REPORT_VIEW_WORKSTATION` and say so in their own panels). Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `OVERSHORT_ACCEPT` for `acceptShiftVariance`, `rejectShiftVariance`; `SHIFT_CLOSE` for `submitShiftCount`, `closeShift`. | the no-access panel, `wireframes/states/P04 Venue POS states.dc.html#pos-state-no-access` (pulled as `wireframe-pos-state-no-access.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| offline | Cannot close. Closing requires the server total, and a locally computed variance is not a variance | the network pill and the connection toast, `sources/designs/TICVAI_POS_Terminal_v2.html`, the header's network pill ("{{ netLabel }}", "Offline · queued locally") and the toast "Connection lost — sales continue and queue locally." (decoded template of the bundle) |
+| denied | `acceptShiftVariance` was refused: the caller lacks OVERSHORT_ACCEPT at this venue, or is the cashier whose shift it is. The shift stays `pendingVariance` against the same count, and a supervisor accepts it on this till (audit R080 (e)). | the refusal toast, `sources/designs/TICVAI_POS_Terminal_v2.html`, the toast ("{{ toastMsg }}", flash(..., 'warn')), e.g. "Opening the drawer without a sale needs a Supervisor role or above" and "Approval declined." (decoded template) |
+| pendingVariance | Counted; "Under review". `submitShiftCount` answered `referredToSupervisor`. The cashier sees "Under review" and no amount, and may sign out: the shift waits, and the next cashier opens a shift on this till meanwhile (it never blocks the next one). A supervisor resolves it with their PIN on this till or any till of the venue (accept the variance, ask for a recount, or close it with `closeShift`), or in the daily cash reconciliation, which lists every shift of the day and resolves them one by one (decided 2 October 2026, Chinmay, batch 3 #1 and pre-apply round; DEC-059, DEC-173; CHG-CSP-012; CHG-FIN-003; audit R080 (e)). | the close-shift variance step (POS-007), `sources/designs/TICVAI_POS_Terminal_v2.html`, the close-shift steps ("STEP 2 OF 3 · VARIANCE RESOLUTION") and the supervisor answer ("Rejected — recount the drawer.") (decoded template) |
+| recountRequested | "Recount requested". A supervisor rejected the variance (`rejectShiftVariance`) with a reason the cashier reads; the shift is still pendingVariance with `recountRequestedAt` set. The cashier counts the drawer blind again, at any till of the venue, and submits with `submitShiftCount`; a recount within the threshold closes the shift (DEC-175; DI-804; CHG-CSP-013). | the close-shift variance step (POS-007), `sources/designs/TICVAI_POS_Terminal_v2.html`, the close-shift steps ("STEP 2 OF 3 · VARIANCE RESOLUTION") and the supervisor answer ("Rejected — recount the drawer.") (decoded template) |
+| reasonRequired | "Give a reason to close". `submitShiftCount` answered `awaitingCloseApproval` with `varianceReasonRequired`: the count differed from the expected figure within the venue's threshold and no reason came with it. The count is locked; the till asks for a reason (till error, unrecorded refund, miscount, other, with a note) and `giveShiftVarianceReason` closes the shift. No amount, no over or short (the client's policy of 6 October 2026, T10.1; CHG-R4-019; CHG-FIN-003). A reason given with the count skips this step. | the close-shift variance step (POS-007), `sources/designs/TICVAI_POS_Terminal_v2.html`, the close-shift steps ("STEP 2 OF 3 · VARIANCE RESOLUTION") and the supervisor answer ("Rejected — recount the drawer.") (decoded template) |
 
 **Goes to**
 
@@ -1097,7 +1151,11 @@
 | Repository | ticvai-pos (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-pos.git) |
 | Component | `ReportsDashboard` |
 | Suggested location | `src/routes/reports/ReportsDashboard.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/TICVAI_POS_Terminal_client_approved.html` (TICVAI OS 4.2.1, build 2026.08.14), view: Left rail 'Reports' or Home launcher 'Venue command' (it shows part of this screen: build the rest from the screen spec in the same look). Wireframe frame `wireframes/P04 Venue POS.dc.html#pos-008`, which adam_pull writes into the ticket folder as `wireframe-pos-008.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`screens/_design-tokens.yaml`). Each state's look: loading: the shimmer tiles (`wireframes/states/P04 Venue POS states.dc.html#pos-state-loading`, pulled as `wireframe-pos-state-loading.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; error: the could-not-load panel (`wireframes/states/P04 Venue POS states.dc.html#pos-state-error`, pulled as `wireframe-pos-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the empty panel note (`sources/designs/TICVAI_POS_Terminal_v2.html`, the cart ("No items yet", "Tap a product, scan a barcode, or recall a held sale to begin.") and the order board ("No orders waiting") (decoded template)); emptyNoResults: the nothing-matches panel (`wireframes/states/P04 Venue POS states.dc.html#pos-state-no-results`, pulled as `wireframe-pos-state-no-results.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyNoAccess: the no-access panel (`wireframes/states/P04 Venue POS states.dc.html#pos-state-no-access`, pulled as `wireframe-pos-state-no-access.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; offline: the network pill and the connection toast (`sources/designs/TICVAI_POS_Terminal_v2.html`, the header's network pill ("{{ netLabel }}", "Offline · queued locally") and the toast "Connection lost — sales continue and queue locally." (decoded template of the bundle)). The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 1620×1080, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -1117,14 +1175,14 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The reports list. |
-| error | Could not load. Names which read failed and leaves the reports untouched. |
-| emptyFirstRun | No reports yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
-| emptyNoResults | Nothing matches the filter on category, search and the reports are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Shown when the caller holds neither REPORT_VIEW_OWN (a cashier's own figures) nor REPORT_VIEW_WORKSTATION (this terminal's, for a supervisor), and names them. Never the venue-wide report permission: a till shows the person's or the terminal's day. |
-| offline | Not available. Reporting reads the analytical replica (ADR-0016) and a terminal-local figure would disagree with the back office |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The reports list. | the shimmer tiles, `wireframes/states/P04 Venue POS states.dc.html#pos-state-loading` (pulled as `wireframe-pos-state-loading.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| error | Could not load. Names which read failed and leaves the reports untouched. | the could-not-load panel, `wireframes/states/P04 Venue POS states.dc.html#pos-state-error` (pulled as `wireframe-pos-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | No reports yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. | the empty panel note, `sources/designs/TICVAI_POS_Terminal_v2.html`, the cart ("No items yet", "Tap a product, scan a barcode, or recall a held sale to begin.") and the order board ("No orders waiting") (decoded template) |
+| emptyNoResults | Nothing matches the filter on category, search and the reports are still there. Names the active filter and offers to clear it. | the nothing-matches panel, `wireframes/states/P04 Venue POS states.dc.html#pos-state-no-results` (pulled as `wireframe-pos-state-no-results.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyNoAccess | Shown when the caller holds neither REPORT_VIEW_OWN (a cashier's own figures) nor REPORT_VIEW_WORKSTATION (this terminal's, for a supervisor), and names them. Never the venue-wide report permission: a till shows the person's or the terminal's day. | the no-access panel, `wireframes/states/P04 Venue POS states.dc.html#pos-state-no-access` (pulled as `wireframe-pos-state-no-access.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| offline | Not available. Reporting reads the analytical replica (ADR-0016) and a terminal-local figure would disagree with the back office | the network pill and the connection toast, `sources/designs/TICVAI_POS_Terminal_v2.html`, the header's network pill ("{{ netLabel }}", "Offline · queued locally") and the toast "Connection lost — sales continue and queue locally." (decoded template of the bundle) |
 
 **Goes to**
 
@@ -1145,7 +1203,11 @@
 | Repository | ticvai-pos (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-pos.git) |
 | Component | `StaffRosterBoard` |
 | Suggested location | `src/routes/sell/StaffRosterBoard.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | approvalInbox |
+| Layout pattern | approvalInbox (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/TICVAI_POS_Terminal_client_approved.html` (TICVAI OS 4.2.1, build 2026.08.14) (it does not draw this screen: build it from the screen spec in the look of the frame below). Wireframe frame `wireframes/P04 Venue POS.dc.html#pos-009`, which adam_pull writes into the ticket folder as `wireframe-pos-009.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`screens/_design-tokens.yaml`). Each state's look: loading: the shimmer tiles (`wireframes/states/P04 Venue POS states.dc.html#pos-state-loading`, pulled as `wireframe-pos-state-loading.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; error: the could-not-load panel (`wireframes/states/P04 Venue POS states.dc.html#pos-state-error`, pulled as `wireframe-pos-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the empty panel note (`sources/designs/TICVAI_POS_Terminal_v2.html`, the cart ("No items yet", "Tap a product, scan a barcode, or recall a held sale to begin.") and the order board ("No orders waiting") (decoded template)); emptyNoResults: the nothing-matches panel (`wireframes/states/P04 Venue POS states.dc.html#pos-state-no-results`, pulled as `wireframe-pos-state-no-results.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyNoAccess: the no-access panel (`wireframes/states/P04 Venue POS states.dc.html#pos-state-no-access`, pulled as `wireframe-pos-state-no-access.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; offline: the network pill and the connection toast (`sources/designs/TICVAI_POS_Terminal_v2.html`, the header's network pill ("{{ netLabel }}", "Offline · queued locally") and the toast "Connection lost — sales continue and queue locally." (decoded template of the bundle)). The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 1620×1080, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -1163,14 +1225,14 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The staff roster list. |
-| error | Could not load. Names which read failed and leaves the staff roster untouched. |
-| emptyFirstRun | Nothing is waiting, which is the good outcome. An empty queue means every item has been decided; it offers no create action, because creating work is not what it needs. |
-| emptyNoResults | Nothing matches the filter on workstationId, status, openedFrom, openedTo and the staff roster are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Shown when the caller lacks `REPORT_VIEW_WORKSTATION`, which `listShifts` requires to show this screen, and names that permission (the screen's other reads need `WORKFORCE_VIEW` and say so in their own panels). Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ATTENDANCE_RECORD` for `recordAttendance`. |
-| offline | Last known roster, with its age shown |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The staff roster list. | the shimmer tiles, `wireframes/states/P04 Venue POS states.dc.html#pos-state-loading` (pulled as `wireframe-pos-state-loading.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| error | Could not load. Names which read failed and leaves the staff roster untouched. | the could-not-load panel, `wireframes/states/P04 Venue POS states.dc.html#pos-state-error` (pulled as `wireframe-pos-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | Nothing is waiting, which is the good outcome. An empty queue means every item has been decided; it offers no create action, because creating work is not what it needs. | the empty panel note, `sources/designs/TICVAI_POS_Terminal_v2.html`, the cart ("No items yet", "Tap a product, scan a barcode, or recall a held sale to begin.") and the order board ("No orders waiting") (decoded template) |
+| emptyNoResults | Nothing matches the filter on workstationId, status, openedFrom, openedTo and the staff roster are still there. Names the active filter and offers to clear it. | the nothing-matches panel, `wireframes/states/P04 Venue POS states.dc.html#pos-state-no-results` (pulled as `wireframe-pos-state-no-results.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyNoAccess | Shown when the caller lacks `REPORT_VIEW_WORKSTATION`, which `listShifts` requires to show this screen, and names that permission (the screen's other reads need `WORKFORCE_VIEW` and say so in their own panels). Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ATTENDANCE_RECORD` for `recordAttendance`. | the no-access panel, `wireframes/states/P04 Venue POS states.dc.html#pos-state-no-access` (pulled as `wireframe-pos-state-no-access.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| offline | Last known roster, with its age shown | the network pill and the connection toast, `sources/designs/TICVAI_POS_Terminal_v2.html`, the header's network pill ("{{ netLabel }}", "Offline · queued locally") and the toast "Connection lost — sales continue and queue locally." (decoded template of the bundle) |
 
 **Goes to**
 
@@ -1193,7 +1255,11 @@
 | Repository | ticvai-pos (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-pos.git) |
 | Component | `AddToExistingTicketDetail` |
 | Suggested location | `src/routes/sell/AddToExistingTicketDetail.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | statusTracker |
+| Layout pattern | statusTracker (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/TICVAI_POS_Terminal_client_approved.html` (TICVAI OS 4.2.1, build 2026.08.14) (it does not draw this screen: build it from the screen spec in the look of the frame below). Wireframe frame `wireframes/P04 Venue POS.dc.html#pos-010`, which adam_pull writes into the ticket folder as `wireframe-pos-010.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`screens/_design-tokens.yaml`). Each state's look: loading: the shimmer tiles (`wireframes/states/P04 Venue POS states.dc.html#pos-state-loading`, pulled as `wireframe-pos-state-loading.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; error: the could-not-load panel (`wireframes/states/P04 Venue POS states.dc.html#pos-state-error`, pulled as `wireframe-pos-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the empty panel note (`sources/designs/TICVAI_POS_Terminal_v2.html`, the cart ("No items yet", "Tap a product, scan a barcode, or recall a held sale to begin.") and the order board ("No orders waiting") (decoded template)); emptyNoAccess: the no-access panel (`wireframes/states/P04 Venue POS states.dc.html#pos-state-no-access`, pulled as `wireframe-pos-state-no-access.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; offline: the network pill and the connection toast (`sources/designs/TICVAI_POS_Terminal_v2.html`, the header's network pill ("{{ netLabel }}", "Offline · queued locally") and the toast "Connection lost — sales continue and queue locally." (decoded template of the bundle)). The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 1620×1080, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -1214,13 +1280,13 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The add existing ticket, read by `getMediaEntitlements`. |
-| error | Could not load. Names which read failed and leaves the add existing ticket untouched. |
-| emptyFirstRun | No add existing ticket yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
-| emptyNoAccess | Shown when the caller lacks `ORDER_VIEW`, which `getMediaEntitlements` requires to show this screen, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_CREATE` for `appendEntitlementToMedia`; `ORDER_EXCHANGE` for `exchangeOrderLines`. |
-| offline | Not available. The entitlement set must be read live; appending to a stale picture double-sells a locker |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The add existing ticket, read by `getMediaEntitlements`. | the shimmer tiles, `wireframes/states/P04 Venue POS states.dc.html#pos-state-loading` (pulled as `wireframe-pos-state-loading.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| error | Could not load. Names which read failed and leaves the add existing ticket untouched. | the could-not-load panel, `wireframes/states/P04 Venue POS states.dc.html#pos-state-error` (pulled as `wireframe-pos-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | No add existing ticket yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. | the empty panel note, `sources/designs/TICVAI_POS_Terminal_v2.html`, the cart ("No items yet", "Tap a product, scan a barcode, or recall a held sale to begin.") and the order board ("No orders waiting") (decoded template) |
+| emptyNoAccess | Shown when the caller lacks `ORDER_VIEW`, which `getMediaEntitlements` requires to show this screen, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_CREATE` for `appendEntitlementToMedia`; `ORDER_EXCHANGE` for `exchangeOrderLines`. | the no-access panel, `wireframes/states/P04 Venue POS states.dc.html#pos-state-no-access` (pulled as `wireframe-pos-state-no-access.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| offline | Not available. The entitlement set must be read live; appending to a stale picture double-sells a locker | the network pill and the connection toast, `sources/designs/TICVAI_POS_Terminal_v2.html`, the header's network pill ("{{ netLabel }}", "Offline · queued locally") and the toast "Connection lost — sales continue and queue locally." (decoded template of the bundle) |
 
 **Goes to**
 
@@ -1245,7 +1311,11 @@
 | Repository | ticvai-pos (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-pos.git) |
 | Component | `ReturnsRefundsExchangesBoard` |
 | Suggested location | `src/routes/sell/ReturnsRefundsExchangesBoard.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/TICVAI_POS_Terminal_client_approved.html` (TICVAI OS 4.2.1, build 2026.08.14), view: Left rail 'Refunds' (or tap a Recent transaction on Home) (it shows part of this screen: build the rest from the screen spec in the same look). Wireframe frame `wireframes/P04 Venue POS.dc.html#pos-011`, which adam_pull writes into the ticket folder as `wireframe-pos-011.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`screens/_design-tokens.yaml`). Each state's look: loading: the shimmer tiles (`wireframes/states/P04 Venue POS states.dc.html#pos-state-loading`, pulled as `wireframe-pos-state-loading.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; error: the could-not-load panel (`wireframes/states/P04 Venue POS states.dc.html#pos-state-error`, pulled as `wireframe-pos-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the empty panel note (`sources/designs/TICVAI_POS_Terminal_v2.html`, the cart ("No items yet", "Tap a product, scan a barcode, or recall a held sale to begin.") and the order board ("No orders waiting") (decoded template)); emptyNoResults: the nothing-matches panel (`wireframes/states/P04 Venue POS states.dc.html#pos-state-no-results`, pulled as `wireframe-pos-state-no-results.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyNoAccess: the no-access panel (`wireframes/states/P04 Venue POS states.dc.html#pos-state-no-access`, pulled as `wireframe-pos-state-no-access.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; offline: the network pill and the connection toast (`sources/designs/TICVAI_POS_Terminal_v2.html`, the header's network pill ("{{ netLabel }}", "Offline · queued locally") and the toast "Connection lost — sales continue and queue locally." (decoded template of the bundle)). The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 1620×1080, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -1271,14 +1341,14 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The returns refunds exchanges list. |
-| error | Could not load. Names which read failed and leaves the returns refunds exchanges untouched. |
-| emptyFirstRun | No returns refunds exchanges yet. Offers Create refund (`createRefund`); distinct from a filter that matched nothing. |
-| emptyNoResults | Nothing matches the filter on includeInactive and the returns refunds exchanges are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Shown when the caller lacks `PRODUCT_VIEW`, which `listSerialisedItems` requires to show this screen, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `LEDGER_POST` for `issueCreditMemo`; `ORDER_EXCHANGE` for `exchangeOrderLines`; `ORDER_REFUND` for `createRefund`, `createRetailReturn`; `ORDER_VIEW` for `getReturnPolicy`, `lookupRetailSale`. |
-| offline | Refunds and returns are refused offline (F58 step 8; design-notes correction fnb-retail POS-011). The till keeps selling from the local journal; a refund needs the original sale and its payment, which only the server holds. Says so and offers to try again when the link returns. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The returns refunds exchanges list. | the shimmer tiles, `wireframes/states/P04 Venue POS states.dc.html#pos-state-loading` (pulled as `wireframe-pos-state-loading.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| error | Could not load. Names which read failed and leaves the returns refunds exchanges untouched. | the could-not-load panel, `wireframes/states/P04 Venue POS states.dc.html#pos-state-error` (pulled as `wireframe-pos-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | No returns refunds exchanges yet. Offers Create refund (`createRefund`); distinct from a filter that matched nothing. | the empty panel note, `sources/designs/TICVAI_POS_Terminal_v2.html`, the cart ("No items yet", "Tap a product, scan a barcode, or recall a held sale to begin.") and the order board ("No orders waiting") (decoded template) |
+| emptyNoResults | Nothing matches the filter on includeInactive and the returns refunds exchanges are still there. Names the active filter and offers to clear it. | the nothing-matches panel, `wireframes/states/P04 Venue POS states.dc.html#pos-state-no-results` (pulled as `wireframe-pos-state-no-results.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyNoAccess | Shown when the caller lacks `PRODUCT_VIEW`, which `listSerialisedItems` requires to show this screen, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `LEDGER_POST` for `issueCreditMemo`; `ORDER_EXCHANGE` for `exchangeOrderLines`; `ORDER_REFUND` for `createRefund`, `createRetailReturn`; `ORDER_VIEW` for `getReturnPolicy`, `lookupRetailSale`. | the no-access panel, `wireframes/states/P04 Venue POS states.dc.html#pos-state-no-access` (pulled as `wireframe-pos-state-no-access.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| offline | Refunds and returns are refused offline (F58 step 8; design-notes correction fnb-retail POS-011). The till keeps selling from the local journal; a refund needs the original sale and its payment, which only the server holds. Says so and offers to try again when the link returns. | the network pill and the connection toast, `sources/designs/TICVAI_POS_Terminal_v2.html`, the header's network pill ("{{ netLabel }}", "Offline · queued locally") and the toast "Connection lost — sales continue and queue locally." (decoded template of the bundle) |
 
 **Goes to**
 
@@ -1301,7 +1371,11 @@
 | Repository | ticvai-pos (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-pos.git) |
 | Component | `OmnichannelOrderFulfilmentCenterBoard` |
 | Suggested location | `src/routes/sell/OmnichannelOrderFulfilmentCenterBoard.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/TICVAI_POS_Terminal_v2.html` (v2, 1 October 2026 (TICVAI POS Terminal (3).html)), view: Left rail 'F&B' -> 'Loaded Fries' -> cart order type 'Delivery' (four order types: Dine-in, Quick service, Takeaway, Delivery) + left rail 'Queue' (it shows part of this screen: build the rest from the screen spec in the same look). Wireframe frame `wireframes/P04 Venue POS.dc.html#pos-012`, which adam_pull writes into the ticket folder as `wireframe-pos-012.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`screens/_design-tokens.yaml`). Each state's look: loading: the shimmer tiles (`wireframes/states/P04 Venue POS states.dc.html#pos-state-loading`, pulled as `wireframe-pos-state-loading.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; error: the could-not-load panel (`wireframes/states/P04 Venue POS states.dc.html#pos-state-error`, pulled as `wireframe-pos-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the empty panel note (the prototype, the cart ("No items yet", "Tap a product, scan a barcode, or recall a held sale to begin.") and the order board ("No orders waiting") (decoded template)); emptyNoResults: the nothing-matches panel (`wireframes/states/P04 Venue POS states.dc.html#pos-state-no-results`, pulled as `wireframe-pos-state-no-results.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyNoAccess: the no-access panel (`wireframes/states/P04 Venue POS states.dc.html#pos-state-no-access`, pulled as `wireframe-pos-state-no-access.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; offline: the network pill and the connection toast (the prototype, the header's network pill ("{{ netLabel }}", "Offline · queued locally") and the toast "Connection lost — sales continue and queue locally." (decoded template of the bundle)). The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 1620×1080, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -1325,14 +1399,14 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The omnichannel order fulfilment list. |
-| error | Could not load. Names which read failed and leaves the omnichannel order fulfilment untouched. |
-| emptyFirstRun | No omnichannel order fulfilment yet. Offers Record order handover (`recordOrderHandover`); distinct from a filter that matched nothing. |
-| emptyNoResults | Nothing matches the filter on venueId, principalId, shiftId, status, createdFrom, createdTo and the omnichannel order fulfilment are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Shown when the caller lacks `ORDER_VIEW`, which `listOrders` requires to show this screen, and names that permission (the screen's other reads need `SHIFT_OPEN` and say so in their own panels). Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_CREATE` for `reserveMerchandise`; `ORDER_MODIFY` for `recordOrderHandover`, `collectShopAndDrop`. |
-| offline | Working from the local journal. The till keeps taking money; this reconciles on sync. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The omnichannel order fulfilment list. | the shimmer tiles, `wireframes/states/P04 Venue POS states.dc.html#pos-state-loading` (pulled as `wireframe-pos-state-loading.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| error | Could not load. Names which read failed and leaves the omnichannel order fulfilment untouched. | the could-not-load panel, `wireframes/states/P04 Venue POS states.dc.html#pos-state-error` (pulled as `wireframe-pos-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | No omnichannel order fulfilment yet. Offers Record order handover (`recordOrderHandover`); distinct from a filter that matched nothing. | the empty panel note, `sources/designs/TICVAI_POS_Terminal_v2.html`, the cart ("No items yet", "Tap a product, scan a barcode, or recall a held sale to begin.") and the order board ("No orders waiting") (decoded template) |
+| emptyNoResults | Nothing matches the filter on venueId, principalId, shiftId, status, createdFrom, createdTo and the omnichannel order fulfilment are still there. Names the active filter and offers to clear it. | the nothing-matches panel, `wireframes/states/P04 Venue POS states.dc.html#pos-state-no-results` (pulled as `wireframe-pos-state-no-results.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyNoAccess | Shown when the caller lacks `ORDER_VIEW`, which `listOrders` requires to show this screen, and names that permission (the screen's other reads need `SHIFT_OPEN` and say so in their own panels). Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_CREATE` for `reserveMerchandise`; `ORDER_MODIFY` for `recordOrderHandover`, `collectShopAndDrop`. | the no-access panel, `wireframes/states/P04 Venue POS states.dc.html#pos-state-no-access` (pulled as `wireframe-pos-state-no-access.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| offline | Working from the local journal. The till keeps taking money; this reconciles on sync. | the network pill and the connection toast, `sources/designs/TICVAI_POS_Terminal_v2.html`, the header's network pill ("{{ netLabel }}", "Offline · queued locally") and the toast "Connection lost — sales continue and queue locally." (decoded template of the bundle) |
 
 **Goes to**
 
@@ -1354,7 +1428,11 @@
 | Repository | ticvai-pos (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-pos.git) |
 | Component | `MobilePosEventSalesOfflineOperatioBoard` |
 | Suggested location | `src/routes/sell/MobilePosEventSalesOfflineOperatioBoard.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/TICVAI_POS_Terminal_client_approved.html` (TICVAI OS 4.2.1, build 2026.08.14), view: Left rail 'Sync' (or the network pill in the top bar) (it shows part of this screen: build the rest from the screen spec in the same look). Wireframe frame `wireframes/P04 Venue POS.dc.html#pos-013`, which adam_pull writes into the ticket folder as `wireframe-pos-013.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`screens/_design-tokens.yaml`). Each state's look: loading: the shimmer tiles (`wireframes/states/P04 Venue POS states.dc.html#pos-state-loading`, pulled as `wireframe-pos-state-loading.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; error: the could-not-load panel (`wireframes/states/P04 Venue POS states.dc.html#pos-state-error`, pulled as `wireframe-pos-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the empty panel note (`sources/designs/TICVAI_POS_Terminal_v2.html`, the cart ("No items yet", "Tap a product, scan a barcode, or recall a held sale to begin.") and the order board ("No orders waiting") (decoded template)); emptyNoResults: the nothing-matches panel (`wireframes/states/P04 Venue POS states.dc.html#pos-state-no-results`, pulled as `wireframe-pos-state-no-results.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyNoAccess: the no-access panel (`wireframes/states/P04 Venue POS states.dc.html#pos-state-no-access`, pulled as `wireframe-pos-state-no-access.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; offline: the network pill and the connection toast (`sources/designs/TICVAI_POS_Terminal_v2.html`, the header's network pill ("{{ netLabel }}", "Offline · queued locally") and the toast "Connection lost — sales continue and queue locally." (decoded template of the bundle)); denied: the refusal toast (`sources/designs/TICVAI_POS_Terminal_v2.html`, the toast ("{{ toastMsg }}", flash(..., 'warn')), e.g. "Opening the drawer without a sale needs a Supervisor role or above" and "Approval declined." (decoded template)). The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 1620×1080, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -1373,15 +1451,15 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The mobile pos event list. |
-| error | Could not load. Names which read failed and leaves the mobile pos event untouched. |
-| emptyFirstRun | No mobile pos event yet. Offers Create order (`createOrder`). |
-| emptyNoResults | Never shown: nothing on this screen filters its list, so an empty list is always the first-run state above. |
-| emptyNoAccess | Shown when the caller lacks `ORDER_VIEW`, which `listSyncRejections` requires to show this screen, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_CREATE` for `syncOrders`, `createOrder`. |
-| offline | Working from the local journal. The till keeps taking money; this reconciles on sync. |
-| denied | The sync queue is readable by anyone on shift. Resolving a conflict changes stock and needs `inventory.conflict.resolve`; a supervisor PIN unlocks it in place. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The mobile pos event list. | the shimmer tiles, `wireframes/states/P04 Venue POS states.dc.html#pos-state-loading` (pulled as `wireframe-pos-state-loading.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| error | Could not load. Names which read failed and leaves the mobile pos event untouched. | the could-not-load panel, `wireframes/states/P04 Venue POS states.dc.html#pos-state-error` (pulled as `wireframe-pos-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | No mobile pos event yet. Offers Create order (`createOrder`). | the empty panel note, `sources/designs/TICVAI_POS_Terminal_v2.html`, the cart ("No items yet", "Tap a product, scan a barcode, or recall a held sale to begin.") and the order board ("No orders waiting") (decoded template) |
+| emptyNoResults | Never shown: nothing on this screen filters its list, so an empty list is always the first-run state above. | the nothing-matches panel, `wireframes/states/P04 Venue POS states.dc.html#pos-state-no-results` (pulled as `wireframe-pos-state-no-results.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyNoAccess | Shown when the caller lacks `ORDER_VIEW`, which `listSyncRejections` requires to show this screen, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_CREATE` for `syncOrders`, `createOrder`. | the no-access panel, `wireframes/states/P04 Venue POS states.dc.html#pos-state-no-access` (pulled as `wireframe-pos-state-no-access.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| offline | Working from the local journal. The till keeps taking money; this reconciles on sync. | the network pill and the connection toast, `sources/designs/TICVAI_POS_Terminal_v2.html`, the header's network pill ("{{ netLabel }}", "Offline · queued locally") and the toast "Connection lost — sales continue and queue locally." (decoded template of the bundle) |
+| denied | The sync queue is readable by anyone on shift. Resolving a conflict changes stock and needs `inventory.conflict.resolve`; a supervisor PIN unlocks it in place. | the refusal toast, `sources/designs/TICVAI_POS_Terminal_v2.html`, the toast ("{{ toastMsg }}", flash(..., 'warn')), e.g. "Opening the drawer without a sale needs a Supervisor role or above" and "Approval declined." (decoded template) |
 
 **Goes to**
 
@@ -1405,7 +1483,11 @@
 | Repository | ticvai-pos (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-pos.git) |
 | Component | `SalesExceptionsControlsOperationalBoard` |
 | Suggested location | `src/routes/sell/SalesExceptionsControlsOperationalBoard.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | configEditor |
+| Layout pattern | configEditor (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/TICVAI_POS_Terminal_client_approved.html` (TICVAI OS 4.2.1, build 2026.08.14), view: Spread across: cart 'Discount' modal; Refunds 'Void'; Home hot key F3 'Open drawer'; 'AUTHORISATION REQUIRED' PIN modal (it shows part of this screen: build the rest from the screen spec in the same look). Wireframe frame `wireframes/P04 Venue POS.dc.html#pos-014`, which adam_pull writes into the ticket folder as `wireframe-pos-014.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`screens/_design-tokens.yaml`). Each state's look: loading: the shimmer tiles (`wireframes/states/P04 Venue POS states.dc.html#pos-state-loading`, pulled as `wireframe-pos-state-loading.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; error: the could-not-load panel (`wireframes/states/P04 Venue POS states.dc.html#pos-state-error`, pulled as `wireframe-pos-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the empty panel note (`sources/designs/TICVAI_POS_Terminal_v2.html`, the cart ("No items yet", "Tap a product, scan a barcode, or recall a held sale to begin.") and the order board ("No orders waiting") (decoded template)); emptyNoAccess: the no-access panel (`wireframes/states/P04 Venue POS states.dc.html#pos-state-no-access`, pulled as `wireframe-pos-state-no-access.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; offline: the network pill and the connection toast (`sources/designs/TICVAI_POS_Terminal_v2.html`, the header's network pill ("{{ netLabel }}", "Offline · queued locally") and the toast "Connection lost — sales continue and queue locally." (decoded template of the bundle)); approvalRejected: the refusal toast (`sources/designs/TICVAI_POS_Terminal_v2.html`, the toast ("{{ toastMsg }}", flash(..., 'warn')), e.g. "Opening the drawer without a sale needs a Supervisor role or above" and "Approval declined." (decoded template)). The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 1620×1080, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -1426,14 +1508,14 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The saved sales exceptions controls. |
-| error | Could not load. Names which read failed and leaves the sales exceptions controls untouched. |
-| emptyFirstRun | No sales exceptions controls configured. The form opens empty and `recordNoSale` saves the first one; it says what the platform does in the meantime. |
-| emptyNoAccess | Shown when the caller lacks `ORDER_VIEW`, which `getOrder` requires to show this screen, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `CASH_NO_SALE` for `recordNoSale`; `ORDER_DISCOUNT` for `applyManualDiscount`; `ORDER_VOID` for `voidOrder`. |
-| offline | Working from the local journal. The till keeps taking money; this reconciles on sync. |
-| approvalRejected | The supervisor declined the no-sale or void; the drawer stays shut and the reason is shown. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The saved sales exceptions controls. | the shimmer tiles, `wireframes/states/P04 Venue POS states.dc.html#pos-state-loading` (pulled as `wireframe-pos-state-loading.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| error | Could not load. Names which read failed and leaves the sales exceptions controls untouched. | the could-not-load panel, `wireframes/states/P04 Venue POS states.dc.html#pos-state-error` (pulled as `wireframe-pos-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | No sales exceptions controls configured. The form opens empty and `recordNoSale` saves the first one; it says what the platform does in the meantime. | the empty panel note, `sources/designs/TICVAI_POS_Terminal_v2.html`, the cart ("No items yet", "Tap a product, scan a barcode, or recall a held sale to begin.") and the order board ("No orders waiting") (decoded template) |
+| emptyNoAccess | Shown when the caller lacks `ORDER_VIEW`, which `getOrder` requires to show this screen, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `CASH_NO_SALE` for `recordNoSale`; `ORDER_DISCOUNT` for `applyManualDiscount`; `ORDER_VOID` for `voidOrder`. | the no-access panel, `wireframes/states/P04 Venue POS states.dc.html#pos-state-no-access` (pulled as `wireframe-pos-state-no-access.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| offline | Working from the local journal. The till keeps taking money; this reconciles on sync. | the network pill and the connection toast, `sources/designs/TICVAI_POS_Terminal_v2.html`, the header's network pill ("{{ netLabel }}", "Offline · queued locally") and the toast "Connection lost — sales continue and queue locally." (decoded template of the bundle) |
+| approvalRejected | The supervisor declined the no-sale or void; the drawer stays shut and the reason is shown. | the refusal toast, `sources/designs/TICVAI_POS_Terminal_v2.html`, the toast ("{{ toastMsg }}", flash(..., 'warn')), e.g. "Opening the drawer without a sale needs a Supervisor role or above" and "Approval declined." (decoded template) |
 
 **Goes to**
 
@@ -1454,7 +1536,11 @@
 | Repository | ticvai-pos (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-pos.git) |
 | Component | `CashOperationsDashboardBoard` |
 | Suggested location | `src/routes/sell/CashOperationsDashboardBoard.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/TICVAI_POS_Terminal_client_approved.html` (TICVAI OS 4.2.1, build 2026.08.14) (it does not draw this screen: build it from the screen spec in the look of the frame below). Wireframe frame `wireframes/P04 Venue POS.dc.html#pos-015`, which adam_pull writes into the ticket folder as `wireframe-pos-015.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`screens/_design-tokens.yaml`). Each state's look: loading: the shimmer tiles (`wireframes/states/P04 Venue POS states.dc.html#pos-state-loading`, pulled as `wireframe-pos-state-loading.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; error: the could-not-load panel (`wireframes/states/P04 Venue POS states.dc.html#pos-state-error`, pulled as `wireframe-pos-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the empty panel note (`sources/designs/TICVAI_POS_Terminal_v2.html`, the cart ("No items yet", "Tap a product, scan a barcode, or recall a held sale to begin.") and the order board ("No orders waiting") (decoded template)); emptyNoResults: the nothing-matches panel (`wireframes/states/P04 Venue POS states.dc.html#pos-state-no-results`, pulled as `wireframe-pos-state-no-results.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyNoAccess: the no-access panel (`wireframes/states/P04 Venue POS states.dc.html#pos-state-no-access`, pulled as `wireframe-pos-state-no-access.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; offline: the network pill and the connection toast (`sources/designs/TICVAI_POS_Terminal_v2.html`, the header's network pill ("{{ netLabel }}", "Offline · queued locally") and the toast "Connection lost — sales continue and queue locally." (decoded template of the bundle)). The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 1620×1080, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -1472,14 +1558,14 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The cash operations list. |
-| error | Could not load. Names which read failed and leaves the cash operations untouched. |
-| emptyFirstRun | No cash operations yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
-| emptyNoResults | Never shown: `listCashMovements` takes no filter, so an empty list is always the first-run state above. |
-| emptyNoAccess | Shown when the caller lacks `REPORT_VIEW_WORKSTATION`, which `listCashMovements` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | Working from the local journal. The till keeps taking money; this reconciles on sync. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The cash operations list. | the shimmer tiles, `wireframes/states/P04 Venue POS states.dc.html#pos-state-loading` (pulled as `wireframe-pos-state-loading.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| error | Could not load. Names which read failed and leaves the cash operations untouched. | the could-not-load panel, `wireframes/states/P04 Venue POS states.dc.html#pos-state-error` (pulled as `wireframe-pos-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | No cash operations yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. | the empty panel note, `sources/designs/TICVAI_POS_Terminal_v2.html`, the cart ("No items yet", "Tap a product, scan a barcode, or recall a held sale to begin.") and the order board ("No orders waiting") (decoded template) |
+| emptyNoResults | Never shown: `listCashMovements` takes no filter, so an empty list is always the first-run state above. | the nothing-matches panel, `wireframes/states/P04 Venue POS states.dc.html#pos-state-no-results` (pulled as `wireframe-pos-state-no-results.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyNoAccess | Shown when the caller lacks `REPORT_VIEW_WORKSTATION`, which `listCashMovements` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. | the no-access panel, `wireframes/states/P04 Venue POS states.dc.html#pos-state-no-access` (pulled as `wireframe-pos-state-no-access.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| offline | Working from the local journal. The till keeps taking money; this reconciles on sync. | the network pill and the connection toast, `sources/designs/TICVAI_POS_Terminal_v2.html`, the header's network pill ("{{ netLabel }}", "Offline · queued locally") and the toast "Connection lost — sales continue and queue locally." (decoded template of the bundle) |
 
 **Goes to**
 
@@ -1501,7 +1587,11 @@
 | Repository | ticvai-pos (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-pos.git) |
 | Component | `TillConfigurationBoard` |
 | Suggested location | `src/routes/sell/TillConfigurationBoard.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | configEditor |
+| Layout pattern | configEditor (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/TICVAI_POS_Terminal_client_approved.html` (TICVAI OS 4.2.1, build 2026.08.14), view: Left rail 'Setup'; hardware status also from the top-bar device icon (openHw). Wireframe frame `wireframes/P04 Venue POS.dc.html#pos-016`, which adam_pull writes into the ticket folder as `wireframe-pos-016.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`screens/_design-tokens.yaml`). Each state's look: loading: the shimmer tiles (`wireframes/states/P04 Venue POS states.dc.html#pos-state-loading`, pulled as `wireframe-pos-state-loading.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; error: the could-not-load panel (`wireframes/states/P04 Venue POS states.dc.html#pos-state-error`, pulled as `wireframe-pos-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the empty panel note (`sources/designs/TICVAI_POS_Terminal_v2.html`, the cart ("No items yet", "Tap a product, scan a barcode, or recall a held sale to begin.") and the order board ("No orders waiting") (decoded template)); emptyNoAccess: the no-access panel (`wireframes/states/P04 Venue POS states.dc.html#pos-state-no-access`, pulled as `wireframe-pos-state-no-access.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; offline: the network pill and the connection toast (`sources/designs/TICVAI_POS_Terminal_v2.html`, the header's network pill ("{{ netLabel }}", "Offline · queued locally") and the toast "Connection lost — sales continue and queue locally." (decoded template of the bundle)). The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 1620×1080, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -1526,13 +1616,13 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The saved till. |
-| error | Could not load. Names which read failed and leaves the till untouched. |
-| emptyFirstRun | No till configured. The form opens empty and `allocateDepositBox` saves the first one; it says what the platform does in the meantime. |
-| emptyNoAccess | Shown when the caller lacks `DEVICE_VIEW`, which `listDevices` requires to show this screen, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `DEVICE_MANAGE` for `setDeviceAssignment`; `SHIFT_OPEN` for `allocateDepositBox`; `WORKSTATION_CONFIGURE` for `configureWorkstation`. |
-| offline | Working from the local journal. The till keeps taking money; this reconciles on sync. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The saved till. | the shimmer tiles, `wireframes/states/P04 Venue POS states.dc.html#pos-state-loading` (pulled as `wireframe-pos-state-loading.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| error | Could not load. Names which read failed and leaves the till untouched. | the could-not-load panel, `wireframes/states/P04 Venue POS states.dc.html#pos-state-error` (pulled as `wireframe-pos-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | No till configured. The form opens empty and `allocateDepositBox` saves the first one; it says what the platform does in the meantime. | the empty panel note, `sources/designs/TICVAI_POS_Terminal_v2.html`, the cart ("No items yet", "Tap a product, scan a barcode, or recall a held sale to begin.") and the order board ("No orders waiting") (decoded template) |
+| emptyNoAccess | Shown when the caller lacks `DEVICE_VIEW`, which `listDevices` requires to show this screen, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `DEVICE_MANAGE` for `setDeviceAssignment`; `SHIFT_OPEN` for `allocateDepositBox`; `WORKSTATION_CONFIGURE` for `configureWorkstation`. | the no-access panel, `wireframes/states/P04 Venue POS states.dc.html#pos-state-no-access` (pulled as `wireframe-pos-state-no-access.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| offline | Working from the local journal. The till keeps taking money; this reconciles on sync. | the network pill and the connection toast, `sources/designs/TICVAI_POS_Terminal_v2.html`, the header's network pill ("{{ netLabel }}", "Offline · queued locally") and the toast "Connection lost — sales continue and queue locally." (decoded template of the bundle) |
 
 **Goes to**
 
@@ -1554,7 +1644,11 @@
 | Repository | ticvai-pos (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-pos.git) |
 | Component | `CashInCashOutOperationsBoard` |
 | Suggested location | `src/routes/sell/CashInCashOutOperationsBoard.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | configEditor |
+| Layout pattern | configEditor (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/TICVAI_POS_Terminal_client_approved.html` (TICVAI OS 4.2.1, build 2026.08.14) (it does not draw this screen: build it from the screen spec in the look of the frame below). Wireframe frame `wireframes/P04 Venue POS.dc.html#pos-017`, which adam_pull writes into the ticket folder as `wireframe-pos-017.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`screens/_design-tokens.yaml`). Each state's look: loading: the shimmer tiles (`wireframes/states/P04 Venue POS states.dc.html#pos-state-loading`, pulled as `wireframe-pos-state-loading.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; error: the could-not-load panel (`wireframes/states/P04 Venue POS states.dc.html#pos-state-error`, pulled as `wireframe-pos-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the empty panel note (`sources/designs/TICVAI_POS_Terminal_v2.html`, the cart ("No items yet", "Tap a product, scan a barcode, or recall a held sale to begin.") and the order board ("No orders waiting") (decoded template)); emptyNoAccess: the no-access panel (`wireframes/states/P04 Venue POS states.dc.html#pos-state-no-access`, pulled as `wireframe-pos-state-no-access.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; offline: the network pill and the connection toast (`sources/designs/TICVAI_POS_Terminal_v2.html`, the header's network pill ("{{ netLabel }}", "Offline · queued locally") and the toast "Connection lost — sales continue and queue locally." (decoded template of the bundle)). The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 1620×1080, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -1572,13 +1666,13 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The saved cash cash out. |
-| error | Could not load. Names which read failed and leaves the cash cash out untouched. |
-| emptyFirstRun | No cash cash out configured. The form opens empty and `createCashMovement` saves the first one; it says what the platform does in the meantime. |
-| emptyNoAccess | Shown when the caller lacks `REPORT_VIEW_WORKSTATION`, which `listCashMovements` requires to show this screen, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `CASH_LIFT` for `createCashMovement`. |
-| offline | Working from the local journal. The till keeps taking money; this reconciles on sync. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The saved cash cash out. | the shimmer tiles, `wireframes/states/P04 Venue POS states.dc.html#pos-state-loading` (pulled as `wireframe-pos-state-loading.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| error | Could not load. Names which read failed and leaves the cash cash out untouched. | the could-not-load panel, `wireframes/states/P04 Venue POS states.dc.html#pos-state-error` (pulled as `wireframe-pos-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | No cash cash out configured. The form opens empty and `createCashMovement` saves the first one; it says what the platform does in the meantime. | the empty panel note, `sources/designs/TICVAI_POS_Terminal_v2.html`, the cart ("No items yet", "Tap a product, scan a barcode, or recall a held sale to begin.") and the order board ("No orders waiting") (decoded template) |
+| emptyNoAccess | Shown when the caller lacks `REPORT_VIEW_WORKSTATION`, which `listCashMovements` requires to show this screen, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `CASH_LIFT` for `createCashMovement`. | the no-access panel, `wireframes/states/P04 Venue POS states.dc.html#pos-state-no-access` (pulled as `wireframe-pos-state-no-access.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| offline | Working from the local journal. The till keeps taking money; this reconciles on sync. | the network pill and the connection toast, `sources/designs/TICVAI_POS_Terminal_v2.html`, the header's network pill ("{{ netLabel }}", "Offline · queued locally") and the toast "Connection lost — sales continue and queue locally." (decoded template of the bundle) |
 
 **Goes to**
 
@@ -1599,7 +1693,11 @@
 | Repository | ticvai-pos (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-pos.git) |
 | Component | `SafeDropCashTransferManagementBoard` |
 | Suggested location | `src/routes/sell/SafeDropCashTransferManagementBoard.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/TICVAI_POS_Terminal_client_approved.html` (TICVAI OS 4.2.1, build 2026.08.14) (it does not draw this screen: build it from the screen spec in the look of the frame below). Wireframe frame `wireframes/P04 Venue POS.dc.html#pos-018`, which adam_pull writes into the ticket folder as `wireframe-pos-018.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`screens/_design-tokens.yaml`). Each state's look: loading: the shimmer tiles (`wireframes/states/P04 Venue POS states.dc.html#pos-state-loading`, pulled as `wireframe-pos-state-loading.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; error: the could-not-load panel (`wireframes/states/P04 Venue POS states.dc.html#pos-state-error`, pulled as `wireframe-pos-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the empty panel note (`sources/designs/TICVAI_POS_Terminal_v2.html`, the cart ("No items yet", "Tap a product, scan a barcode, or recall a held sale to begin.") and the order board ("No orders waiting") (decoded template)); emptyNoResults: the nothing-matches panel (`wireframes/states/P04 Venue POS states.dc.html#pos-state-no-results`, pulled as `wireframe-pos-state-no-results.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyNoAccess: the no-access panel (`wireframes/states/P04 Venue POS states.dc.html#pos-state-no-access`, pulled as `wireframe-pos-state-no-access.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; offline: the network pill and the connection toast (`sources/designs/TICVAI_POS_Terminal_v2.html`, the header's network pill ("{{ netLabel }}", "Offline · queued locally") and the toast "Connection lost — sales continue and queue locally." (decoded template of the bundle)). The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 1620×1080, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -1619,14 +1717,14 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The safe drop cash list. |
-| error | Could not load. Names which read failed and leaves the safe drop cash untouched. |
-| emptyFirstRun | No safe drop cash yet. Offers Create cash movement (`createCashMovement`); distinct from a filter that matched nothing. |
-| emptyNoResults | Nothing matches the filter on scopePath, isActive and the safe drop cash are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Shown when the caller lacks `SHIFT_OPEN`, which `listDepositBoxes` requires to show this screen, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `CASH_LIFT` for `createCashMovement`, `withdrawFromDepositBox`. |
-| offline | Working from the local journal. The till keeps taking money; this reconciles on sync. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The safe drop cash list. | the shimmer tiles, `wireframes/states/P04 Venue POS states.dc.html#pos-state-loading` (pulled as `wireframe-pos-state-loading.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| error | Could not load. Names which read failed and leaves the safe drop cash untouched. | the could-not-load panel, `wireframes/states/P04 Venue POS states.dc.html#pos-state-error` (pulled as `wireframe-pos-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | No safe drop cash yet. Offers Create cash movement (`createCashMovement`); distinct from a filter that matched nothing. | the empty panel note, `sources/designs/TICVAI_POS_Terminal_v2.html`, the cart ("No items yet", "Tap a product, scan a barcode, or recall a held sale to begin.") and the order board ("No orders waiting") (decoded template) |
+| emptyNoResults | Nothing matches the filter on scopePath, isActive and the safe drop cash are still there. Names the active filter and offers to clear it. | the nothing-matches panel, `wireframes/states/P04 Venue POS states.dc.html#pos-state-no-results` (pulled as `wireframe-pos-state-no-results.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyNoAccess | Shown when the caller lacks `SHIFT_OPEN`, which `listDepositBoxes` requires to show this screen, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `CASH_LIFT` for `createCashMovement`, `withdrawFromDepositBox`. | the no-access panel, `wireframes/states/P04 Venue POS states.dc.html#pos-state-no-access` (pulled as `wireframe-pos-state-no-access.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| offline | Working from the local journal. The till keeps taking money; this reconciles on sync. | the network pill and the connection toast, `sources/designs/TICVAI_POS_Terminal_v2.html`, the header's network pill ("{{ netLabel }}", "Offline · queued locally") and the toast "Connection lost — sales continue and queue locally." (decoded template of the bundle) |
 
 **Goes to**
 
@@ -1648,7 +1746,11 @@
 | Repository | ticvai-pos (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-pos.git) |
 | Component | `ShiftTemplatesPoliciesBoard` |
 | Suggested location | `src/routes/sell/ShiftTemplatesPoliciesBoard.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/TICVAI_POS_Terminal_client_approved.html` (TICVAI OS 4.2.1, build 2026.08.14) (it does not draw this screen: build it from the screen spec in the look of the frame below). Wireframe frame `wireframes/P04 Venue POS.dc.html#pos-019`, which adam_pull writes into the ticket folder as `wireframe-pos-019.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`screens/_design-tokens.yaml`). Each state's look: loading: the shimmer tiles (`wireframes/states/P04 Venue POS states.dc.html#pos-state-loading`, pulled as `wireframe-pos-state-loading.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; error: the could-not-load panel (`wireframes/states/P04 Venue POS states.dc.html#pos-state-error`, pulled as `wireframe-pos-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the empty panel note (`sources/designs/TICVAI_POS_Terminal_v2.html`, the cart ("No items yet", "Tap a product, scan a barcode, or recall a held sale to begin.") and the order board ("No orders waiting") (decoded template)); emptyNoResults: the nothing-matches panel (`wireframes/states/P04 Venue POS states.dc.html#pos-state-no-results`, pulled as `wireframe-pos-state-no-results.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyNoAccess: the no-access panel (`wireframes/states/P04 Venue POS states.dc.html#pos-state-no-access`, pulled as `wireframe-pos-state-no-access.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; offline: the network pill and the connection toast (`sources/designs/TICVAI_POS_Terminal_v2.html`, the header's network pill ("{{ netLabel }}", "Offline · queued locally") and the toast "Connection lost — sales continue and queue locally." (decoded template of the bundle)). The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 1620×1080, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -1667,14 +1769,14 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The shift templates policies list. |
-| error | Could not load. Names which read failed and leaves the shift templates policies untouched. |
-| emptyFirstRun | No shift templates policies yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
-| emptyNoResults | Nothing matches the filter on workstationId, status, openedFrom, openedTo and the shift templates policies are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Shown when the caller lacks `REPORT_VIEW_WORKSTATION`, which `listShifts` requires to show this screen, and names that permission (the screen's other reads need `SCOPE_VIEW` and say so in their own panels). Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `WORKSTATION_CONFIGURE` for `setTillShiftPolicy`. |
-| offline | Working from the local journal. The till keeps taking money; this reconciles on sync. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The shift templates policies list. | the shimmer tiles, `wireframes/states/P04 Venue POS states.dc.html#pos-state-loading` (pulled as `wireframe-pos-state-loading.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| error | Could not load. Names which read failed and leaves the shift templates policies untouched. | the could-not-load panel, `wireframes/states/P04 Venue POS states.dc.html#pos-state-error` (pulled as `wireframe-pos-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | No shift templates policies yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. | the empty panel note, `sources/designs/TICVAI_POS_Terminal_v2.html`, the cart ("No items yet", "Tap a product, scan a barcode, or recall a held sale to begin.") and the order board ("No orders waiting") (decoded template) |
+| emptyNoResults | Nothing matches the filter on workstationId, status, openedFrom, openedTo and the shift templates policies are still there. Names the active filter and offers to clear it. | the nothing-matches panel, `wireframes/states/P04 Venue POS states.dc.html#pos-state-no-results` (pulled as `wireframe-pos-state-no-results.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyNoAccess | Shown when the caller lacks `REPORT_VIEW_WORKSTATION`, which `listShifts` requires to show this screen, and names that permission (the screen's other reads need `SCOPE_VIEW` and say so in their own panels). Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `WORKSTATION_CONFIGURE` for `setTillShiftPolicy`. | the no-access panel, `wireframes/states/P04 Venue POS states.dc.html#pos-state-no-access` (pulled as `wireframe-pos-state-no-access.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| offline | Working from the local journal. The till keeps taking money; this reconciles on sync. | the network pill and the connection toast, `sources/designs/TICVAI_POS_Terminal_v2.html`, the header's network pill ("{{ netLabel }}", "Offline · queued locally") and the toast "Connection lost — sales continue and queue locally." (decoded template of the bundle) |
 
 **Goes to**
 
@@ -1696,7 +1798,11 @@
 | Repository | ticvai-pos (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-pos.git) |
 | Component | `ShiftExceptionsAlertsBoard` |
 | Suggested location | `src/routes/sell/ShiftExceptionsAlertsBoard.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | approvalInbox |
+| Layout pattern | approvalInbox (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/TICVAI_POS_Terminal_client_approved.html` (TICVAI OS 4.2.1, build 2026.08.14), view: Top-bar bell -> 'Notifications' panel; Reports -> 'Needs attention' (it shows part of this screen: build the rest from the screen spec in the same look). Wireframe frame `wireframes/P04 Venue POS.dc.html#pos-020`, which adam_pull writes into the ticket folder as `wireframe-pos-020.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`screens/_design-tokens.yaml`). Each state's look: loading: the shimmer tiles (`wireframes/states/P04 Venue POS states.dc.html#pos-state-loading`, pulled as `wireframe-pos-state-loading.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; error: the could-not-load panel (`wireframes/states/P04 Venue POS states.dc.html#pos-state-error`, pulled as `wireframe-pos-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the empty panel note (`sources/designs/TICVAI_POS_Terminal_v2.html`, the cart ("No items yet", "Tap a product, scan a barcode, or recall a held sale to begin.") and the order board ("No orders waiting") (decoded template)); emptyNoResults: the nothing-matches panel (`wireframes/states/P04 Venue POS states.dc.html#pos-state-no-results`, pulled as `wireframe-pos-state-no-results.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyNoAccess: the no-access panel (`wireframes/states/P04 Venue POS states.dc.html#pos-state-no-access`, pulled as `wireframe-pos-state-no-access.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; offline: the network pill and the connection toast (`sources/designs/TICVAI_POS_Terminal_v2.html`, the header's network pill ("{{ netLabel }}", "Offline · queued locally") and the toast "Connection lost — sales continue and queue locally." (decoded template of the bundle)). The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 1620×1080, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -1720,14 +1826,14 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The shift exceptions alerts list. |
-| error | Could not load. Names which read failed and leaves the shift exceptions alerts untouched. |
-| emptyFirstRun | Nothing is waiting, which is the good outcome. An empty queue means every item has been decided; it offers no create action, because creating work is not what it needs. |
-| emptyNoResults | Nothing matches the filter on status, severity, workstationId, shiftId, itemId and the shift exceptions alerts are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Shown when the caller lacks `REPORT_VIEW_VENUE`, which `listAlerts` requires to show this screen, and names that permission (the screen's other reads need `APPROVAL_VIEW` and say so in their own panels). Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `APPROVAL_DECIDE` for `decideApprovalRequest`; `APPROVAL_REQUEST` for `createApprovalRequest`; `CASH_NO_SALE` for `recordNoSale`. |
-| offline | The till keeps taking money; this screen does not keep showing alerts. `listAlerts` reads the analytical replica (ADR-0016) and there is nothing local to read — the offline trading happens on POS-002 and POS-013, and this monitor goes quiet until the network returns. Corrected 24 August: the prose claimed continued function the wiring cannot deliver. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The shift exceptions alerts list. | the shimmer tiles, `wireframes/states/P04 Venue POS states.dc.html#pos-state-loading` (pulled as `wireframe-pos-state-loading.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| error | Could not load. Names which read failed and leaves the shift exceptions alerts untouched. | the could-not-load panel, `wireframes/states/P04 Venue POS states.dc.html#pos-state-error` (pulled as `wireframe-pos-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | Nothing is waiting, which is the good outcome. An empty queue means every item has been decided; it offers no create action, because creating work is not what it needs. | the empty panel note, `sources/designs/TICVAI_POS_Terminal_v2.html`, the cart ("No items yet", "Tap a product, scan a barcode, or recall a held sale to begin.") and the order board ("No orders waiting") (decoded template) |
+| emptyNoResults | Nothing matches the filter on status, severity, workstationId, shiftId, itemId and the shift exceptions alerts are still there. Names the active filter and offers to clear it. | the nothing-matches panel, `wireframes/states/P04 Venue POS states.dc.html#pos-state-no-results` (pulled as `wireframe-pos-state-no-results.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyNoAccess | Shown when the caller lacks `REPORT_VIEW_VENUE`, which `listAlerts` requires to show this screen, and names that permission (the screen's other reads need `APPROVAL_VIEW` and say so in their own panels). Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `APPROVAL_DECIDE` for `decideApprovalRequest`; `APPROVAL_REQUEST` for `createApprovalRequest`; `CASH_NO_SALE` for `recordNoSale`. | the no-access panel, `wireframes/states/P04 Venue POS states.dc.html#pos-state-no-access` (pulled as `wireframe-pos-state-no-access.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| offline | The till keeps taking money; this screen does not keep showing alerts. `listAlerts` reads the analytical replica (ADR-0016) and there is nothing local to read — the offline trading happens on POS-002 and POS-013, and this monitor goes quiet until the network returns. Corrected 24 August: the prose claimed continued function the wiring cannot deliver. | the network pill and the connection toast, `sources/designs/TICVAI_POS_Terminal_v2.html`, the header's network pill ("{{ netLabel }}", "Offline · queued locally") and the toast "Connection lost — sales continue and queue locally." (decoded template of the bundle) |
 
 **Goes to**
 
@@ -1749,7 +1855,11 @@
 | Repository | ticvai-pos (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-pos.git) |
 | Component | `SellFoodDrinkBoard` |
 | Suggested location | `src/routes/sell/SellFoodDrinkBoard.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/TICVAI_POS_Terminal_v2.html` (v2, 1 October 2026 (TICVAI POS Terminal (3).html)), view: Left rail 'F&B' (category tabs with counts, REFINE chips, Quick service order type). Wireframe frame `wireframes/P04 Venue POS.dc.html#pos-021`, which adam_pull writes into the ticket folder as `wireframe-pos-021.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`screens/_design-tokens.yaml`). Each state's look: loading: the shimmer tiles (`wireframes/states/P04 Venue POS states.dc.html#pos-state-loading`, pulled as `wireframe-pos-state-loading.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; error: the could-not-load panel (`wireframes/states/P04 Venue POS states.dc.html#pos-state-error`, pulled as `wireframe-pos-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the empty panel note (the prototype, the cart ("No items yet", "Tap a product, scan a barcode, or recall a held sale to begin.") and the order board ("No orders waiting") (decoded template)); emptyNoResults: the nothing-matches panel (`wireframes/states/P04 Venue POS states.dc.html#pos-state-no-results`, pulled as `wireframe-pos-state-no-results.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyNoAccess: the no-access panel (`wireframes/states/P04 Venue POS states.dc.html#pos-state-no-access`, pulled as `wireframe-pos-state-no-access.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; offline: the network pill and the connection toast (the prototype, the header's network pill ("{{ netLabel }}", "Offline · queued locally") and the toast "Connection lost — sales continue and queue locally." (decoded template of the bundle)); denied: the refusal toast (the prototype, the toast ("{{ toastMsg }}", flash(..., 'warn')), e.g. "Opening the drawer without a sale needs a Supervisor role or above" and "Approval declined." (decoded template)); soldOutByCount: the stock badge (the prototype, the product tile badges (OUT_OF_STOCK "Sold out"/"Out of stock", OFFLINE_STOCK "Unavailable offline") (decoded template)). The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 1620×1080, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -1772,16 +1882,16 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The menu board, sections in the order the outlet set them. |
-| error | Could not load. The last published menu is still on the device — a till that stops selling because a panel failed is worse than a stale panel. |
-| emptyFirstRun | No menu published for this outlet. Names the back-office screen that publishes one rather than showing an empty board. |
-| emptyNoResults | Nothing matches this section. |
-| emptyNoAccess | Shown when the caller lacks `SCOPE_VIEW`, which `getOutlet` requires to show this screen, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRICE_VIEW` for `evaluatePromotions`; `PRODUCT_CONFIGURE` for `setItemAvailability`. |
-| offline | Selling continues from the cached menu. 86 changes made while offline arrive on sync, which is why an item can be sold that the kitchen has just marked unavailable — the kitchen refuses it and the guest is refunded at the counter. |
-| denied | Ordering is refused without `payment.take`. The kitchen is not fired, so nothing is cooked against a sale that cannot be paid for. |
-| soldOutByCount | A dish whose daily count reached zero shows Sold out and cannot be added; the kitchen or the back office sets tomorrow's count (DEC-194; CHG-CSA-017). |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The menu board, sections in the order the outlet set them. | the shimmer tiles, `wireframes/states/P04 Venue POS states.dc.html#pos-state-loading` (pulled as `wireframe-pos-state-loading.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| error | Could not load. The last published menu is still on the device — a till that stops selling because a panel failed is worse than a stale panel. | the could-not-load panel, `wireframes/states/P04 Venue POS states.dc.html#pos-state-error` (pulled as `wireframe-pos-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | No menu published for this outlet. Names the back-office screen that publishes one rather than showing an empty board. | the empty panel note, `sources/designs/TICVAI_POS_Terminal_v2.html`, the cart ("No items yet", "Tap a product, scan a barcode, or recall a held sale to begin.") and the order board ("No orders waiting") (decoded template) |
+| emptyNoResults | Nothing matches this section. | the nothing-matches panel, `wireframes/states/P04 Venue POS states.dc.html#pos-state-no-results` (pulled as `wireframe-pos-state-no-results.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyNoAccess | Shown when the caller lacks `SCOPE_VIEW`, which `getOutlet` requires to show this screen, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRICE_VIEW` for `evaluatePromotions`; `PRODUCT_CONFIGURE` for `setItemAvailability`. | the no-access panel, `wireframes/states/P04 Venue POS states.dc.html#pos-state-no-access` (pulled as `wireframe-pos-state-no-access.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| offline | Selling continues from the cached menu. 86 changes made while offline arrive on sync, which is why an item can be sold that the kitchen has just marked unavailable — the kitchen refuses it and the guest is refunded at the counter. | the network pill and the connection toast, `sources/designs/TICVAI_POS_Terminal_v2.html`, the header's network pill ("{{ netLabel }}", "Offline · queued locally") and the toast "Connection lost — sales continue and queue locally." (decoded template of the bundle) |
+| denied | Ordering is refused without `payment.take`. The kitchen is not fired, so nothing is cooked against a sale that cannot be paid for. | the refusal toast, `sources/designs/TICVAI_POS_Terminal_v2.html`, the toast ("{{ toastMsg }}", flash(..., 'warn')), e.g. "Opening the drawer without a sale needs a Supervisor role or above" and "Approval declined." (decoded template) |
+| soldOutByCount | A dish whose daily count reached zero shows Sold out and cannot be added; the kitchen or the back office sets tomorrow's count (DEC-194; CHG-CSA-017). | the stock badge, `sources/designs/TICVAI_POS_Terminal_v2.html`, the product tile badges (OUT_OF_STOCK "Sold out"/"Out of stock", OFFLINE_STOCK "Unavailable offline") (decoded template) |
 
 **Goes to**
 
@@ -1804,7 +1914,11 @@
 | Repository | ticvai-pos (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-pos.git) |
 | Component | `SendToKitchenBoard` |
 | Suggested location | `src/routes/sell/SendToKitchenBoard.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/TICVAI_POS_Terminal_v2.html` (v2, 1 October 2026 (TICVAI POS Terminal (3).html)), view: Left rail 'Queue' -> partner order DLV-8842 'Send to kitchen' (it moves to Preparing; the guest status board above shows takeaway and quick-service numbers only, never partner, delivery or dine-in orders) (it shows part of this screen: build the rest from the screen spec in the same look). Wireframe frame `wireframes/P04 Venue POS.dc.html#pos-022`, which adam_pull writes into the ticket folder as `wireframe-pos-022.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`screens/_design-tokens.yaml`). Each state's look: loading: the shimmer tiles (`wireframes/states/P04 Venue POS states.dc.html#pos-state-loading`, pulled as `wireframe-pos-state-loading.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; error: the could-not-load panel (`wireframes/states/P04 Venue POS states.dc.html#pos-state-error`, pulled as `wireframe-pos-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the empty panel note (the prototype, the cart ("No items yet", "Tap a product, scan a barcode, or recall a held sale to begin.") and the order board ("No orders waiting") (decoded template)); emptyNoResults: the nothing-matches panel (`wireframes/states/P04 Venue POS states.dc.html#pos-state-no-results`, pulled as `wireframe-pos-state-no-results.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyNoAccess: the no-access panel (`wireframes/states/P04 Venue POS states.dc.html#pos-state-no-access`, pulled as `wireframe-pos-state-no-access.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; offline: the network pill and the connection toast (the prototype, the header's network pill ("{{ netLabel }}", "Offline · queued locally") and the toast "Connection lost — sales continue and queue locally." (decoded template of the bundle)); denied: the refusal toast (the prototype, the toast ("{{ toastMsg }}", flash(..., 'warn')), e.g. "Opening the drawer without a sale needs a Supervisor role or above" and "Approval declined." (decoded template)). The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 1620×1080, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -1827,15 +1941,15 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The send kitchen list. |
-| error | Could not load. Names which read failed and leaves the send kitchen untouched. |
-| emptyFirstRun | No send kitchen yet. Offers Create F&B order (`createFnbOrder`); distinct from a filter that matched nothing. |
-| emptyNoResults | Nothing matches the filter on stationId, status and the send kitchen are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Shown when the caller lacks `ORDER_VIEW`, which `listKitchenTickets` requires to show this screen, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_CREATE` for `createFnbOrder`; `ORDER_MODIFY` for `setKitchenTicketStatus`, `markOrderCollected`, `cancelFnbOrder`. |
-| offline | Queued locally and sent on reconnect. The kitchen display is on the same LAN, so a venue-wide outage stops both and a device outage stops neither. |
-| denied | The rail is readable and Send to kitchen is refused without `payment.take`. Tickets already fired are unaffected. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The send kitchen list. | the shimmer tiles, `wireframes/states/P04 Venue POS states.dc.html#pos-state-loading` (pulled as `wireframe-pos-state-loading.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| error | Could not load. Names which read failed and leaves the send kitchen untouched. | the could-not-load panel, `wireframes/states/P04 Venue POS states.dc.html#pos-state-error` (pulled as `wireframe-pos-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | No send kitchen yet. Offers Create F&B order (`createFnbOrder`); distinct from a filter that matched nothing. | the empty panel note, `sources/designs/TICVAI_POS_Terminal_v2.html`, the cart ("No items yet", "Tap a product, scan a barcode, or recall a held sale to begin.") and the order board ("No orders waiting") (decoded template) |
+| emptyNoResults | Nothing matches the filter on stationId, status and the send kitchen are still there. Names the active filter and offers to clear it. | the nothing-matches panel, `wireframes/states/P04 Venue POS states.dc.html#pos-state-no-results` (pulled as `wireframe-pos-state-no-results.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyNoAccess | Shown when the caller lacks `ORDER_VIEW`, which `listKitchenTickets` requires to show this screen, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_CREATE` for `createFnbOrder`; `ORDER_MODIFY` for `setKitchenTicketStatus`, `markOrderCollected`, `cancelFnbOrder`. | the no-access panel, `wireframes/states/P04 Venue POS states.dc.html#pos-state-no-access` (pulled as `wireframe-pos-state-no-access.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| offline | Queued locally and sent on reconnect. The kitchen display is on the same LAN, so a venue-wide outage stops both and a device outage stops neither. | the network pill and the connection toast, `sources/designs/TICVAI_POS_Terminal_v2.html`, the header's network pill ("{{ netLabel }}", "Offline · queued locally") and the toast "Connection lost — sales continue and queue locally." (decoded template of the bundle) |
+| denied | The rail is readable and Send to kitchen is refused without `payment.take`. Tickets already fired are unaffected. | the refusal toast, `sources/designs/TICVAI_POS_Terminal_v2.html`, the toast ("{{ toastMsg }}", flash(..., 'warn')), e.g. "Opening the drawer without a sale needs a Supervisor role or above" and "Approval declined." (decoded template) |
 
 **Goes to**
 
@@ -1858,7 +1972,11 @@
 | Repository | ticvai-pos (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-pos.git) |
 | Component | `SellMerchandiseBoard` |
 | Suggested location | `src/routes/sell/SellMerchandiseBoard.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/TICVAI_POS_Terminal_v2.html` (v2, 1 October 2026 (TICVAI POS Terminal (3).html)), view: Left rail 'Retail' (category tabs incl. Lockers, REFINE chips). Wireframe frame `wireframes/P04 Venue POS.dc.html#pos-023`, which adam_pull writes into the ticket folder as `wireframe-pos-023.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`screens/_design-tokens.yaml`). Each state's look: loading: the shimmer tiles (`wireframes/states/P04 Venue POS states.dc.html#pos-state-loading`, pulled as `wireframe-pos-state-loading.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; error: the could-not-load panel (`wireframes/states/P04 Venue POS states.dc.html#pos-state-error`, pulled as `wireframe-pos-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the empty panel note (the prototype, the cart ("No items yet", "Tap a product, scan a barcode, or recall a held sale to begin.") and the order board ("No orders waiting") (decoded template)); emptyNoResults: the nothing-matches panel (`wireframes/states/P04 Venue POS states.dc.html#pos-state-no-results`, pulled as `wireframe-pos-state-no-results.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyNoAccess: the no-access panel (`wireframes/states/P04 Venue POS states.dc.html#pos-state-no-access`, pulled as `wireframe-pos-state-no-access.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; offline: the network pill and the connection toast (the prototype, the header's network pill ("{{ netLabel }}", "Offline · queued locally") and the toast "Connection lost — sales continue and queue locally." (decoded template of the bundle)); denied: the refusal toast (the prototype, the toast ("{{ toastMsg }}", flash(..., 'warn')), e.g. "Opening the drawer without a sale needs a Supervisor role or above" and "Approval declined." (decoded template)); stockConflict: the stock conflict modal (the prototype, the conflict modal ("{{ closeConflict }}"; "Conflict resolution — stock corrected") (decoded template)). The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 1620×1080, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -1878,16 +1996,16 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The catalogue for this store. |
-| error | Could not load. The cached catalogue is still sellable. |
-| emptyFirstRun | No merchandise published to this outlet. |
-| emptyNoResults | Nothing matches. A scan that finds nothing is a barcode not in the catalogue — said plainly, because the cashier will otherwise scan it four more times. |
-| emptyNoAccess | Shown when the caller lacks `PRODUCT_VIEW`, which `lookupMerchandise` requires to show this screen, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRICE_VIEW` for `evaluatePromotions`. |
-| offline | A retail sale needs the link (`createRetailSale` is not offline-capable). The tiles stay browsable from the cached catalogue; Charge says to reconnect. (Design-notes correction fnb-retail POS-023; the offline-overselling rule is an open question, CHG-SPO-020.) |
-| denied | Merchandise scans and prices normally; charging needs `payment.take`. Stock reserved on add is released rather than held against a sale that cannot complete. |
-| stockConflict | The merchandise line went out of stock between scan and charge. The line is flagged and the rest of the sale stands. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The catalogue for this store. | the shimmer tiles, `wireframes/states/P04 Venue POS states.dc.html#pos-state-loading` (pulled as `wireframe-pos-state-loading.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| error | Could not load. The cached catalogue is still sellable. | the could-not-load panel, `wireframes/states/P04 Venue POS states.dc.html#pos-state-error` (pulled as `wireframe-pos-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | No merchandise published to this outlet. | the empty panel note, `sources/designs/TICVAI_POS_Terminal_v2.html`, the cart ("No items yet", "Tap a product, scan a barcode, or recall a held sale to begin.") and the order board ("No orders waiting") (decoded template) |
+| emptyNoResults | Nothing matches. A scan that finds nothing is a barcode not in the catalogue — said plainly, because the cashier will otherwise scan it four more times. | the nothing-matches panel, `wireframes/states/P04 Venue POS states.dc.html#pos-state-no-results` (pulled as `wireframe-pos-state-no-results.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyNoAccess | Shown when the caller lacks `PRODUCT_VIEW`, which `lookupMerchandise` requires to show this screen, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRICE_VIEW` for `evaluatePromotions`. | the no-access panel, `wireframes/states/P04 Venue POS states.dc.html#pos-state-no-access` (pulled as `wireframe-pos-state-no-access.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| offline | A retail sale needs the link (`createRetailSale` is not offline-capable). The tiles stay browsable from the cached catalogue; Charge says to reconnect. (Design-notes correction fnb-retail POS-023; the offline-overselling rule is an open question, CHG-SPO-020.) | the network pill and the connection toast, `sources/designs/TICVAI_POS_Terminal_v2.html`, the header's network pill ("{{ netLabel }}", "Offline · queued locally") and the toast "Connection lost — sales continue and queue locally." (decoded template of the bundle) |
+| denied | Merchandise scans and prices normally; charging needs `payment.take`. Stock reserved on add is released rather than held against a sale that cannot complete. | the refusal toast, `sources/designs/TICVAI_POS_Terminal_v2.html`, the toast ("{{ toastMsg }}", flash(..., 'warn')), e.g. "Opening the drawer without a sale needs a Supervisor role or above" and "Approval declined." (decoded template) |
+| stockConflict | The merchandise line went out of stock between scan and charge. The line is flagged and the rest of the sale stands. | the stock conflict modal, `sources/designs/TICVAI_POS_Terminal_v2.html`, the conflict modal ("{{ closeConflict }}"; "Conflict resolution — stock corrected") (decoded template) |
 
 **Goes to**
 
@@ -1909,7 +2027,11 @@
 | Repository | ticvai-pos (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-pos.git) |
 | Component | `OutletSetupBoard` |
 | Suggested location | `src/routes/sell/OutletSetupBoard.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/TICVAI_POS_Terminal_client_approved.html` (TICVAI OS 4.2.1, build 2026.08.14) (it does not draw this screen: build it from the screen spec in the look of the frame below). Wireframe frame `wireframes/P04 Venue POS.dc.html#pos-024`, which adam_pull writes into the ticket folder as `wireframe-pos-024.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`screens/_design-tokens.yaml`). Each state's look: loading: the shimmer tiles (`wireframes/states/P04 Venue POS states.dc.html#pos-state-loading`, pulled as `wireframe-pos-state-loading.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; error: the could-not-load panel (`wireframes/states/P04 Venue POS states.dc.html#pos-state-error`, pulled as `wireframe-pos-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the empty panel note (`sources/designs/TICVAI_POS_Terminal_v2.html`, the cart ("No items yet", "Tap a product, scan a barcode, or recall a held sale to begin.") and the order board ("No orders waiting") (decoded template)); emptyNoResults: the nothing-matches panel (`wireframes/states/P04 Venue POS states.dc.html#pos-state-no-results`, pulled as `wireframe-pos-state-no-results.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyNoAccess: the no-access panel (`wireframes/states/P04 Venue POS states.dc.html#pos-state-no-access`, pulled as `wireframe-pos-state-no-access.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; offline: the network pill and the connection toast (`sources/designs/TICVAI_POS_Terminal_v2.html`, the header's network pill ("{{ netLabel }}", "Offline · queued locally") and the toast "Connection lost — sales continue and queue locally." (decoded template of the bundle)). The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 1620×1080, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -1932,14 +2054,14 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | This outlet, its tables and its menu. |
-| error | Could not load configuration. Selling is unaffected. |
-| emptyFirstRun | A new outlet with no layout. The one action that draws the first table. |
-| emptyNoResults | Nothing matches. |
-| emptyNoAccess | Shown when the caller lacks `ORDER_VIEW`, which `getTableMap` requires to show this screen, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRODUCT_CONFIGURE` for `setTableLayout`, `setTableCombinations`, `setItemAvailability`. |
-| offline | Configuration is refused offline. A table layout edited on two disconnected tablets is two layouts, and the room only has one. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | This outlet, its tables and its menu. | the shimmer tiles, `wireframes/states/P04 Venue POS states.dc.html#pos-state-loading` (pulled as `wireframe-pos-state-loading.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| error | Could not load configuration. Selling is unaffected. | the could-not-load panel, `wireframes/states/P04 Venue POS states.dc.html#pos-state-error` (pulled as `wireframe-pos-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | A new outlet with no layout. The one action that draws the first table. | the empty panel note, `sources/designs/TICVAI_POS_Terminal_v2.html`, the cart ("No items yet", "Tap a product, scan a barcode, or recall a held sale to begin.") and the order board ("No orders waiting") (decoded template) |
+| emptyNoResults | Nothing matches. | the nothing-matches panel, `wireframes/states/P04 Venue POS states.dc.html#pos-state-no-results` (pulled as `wireframe-pos-state-no-results.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyNoAccess | Shown when the caller lacks `ORDER_VIEW`, which `getTableMap` requires to show this screen, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRODUCT_CONFIGURE` for `setTableLayout`, `setTableCombinations`, `setItemAvailability`. | the no-access panel, `wireframes/states/P04 Venue POS states.dc.html#pos-state-no-access` (pulled as `wireframe-pos-state-no-access.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| offline | Configuration is refused offline. A table layout edited on two disconnected tablets is two layouts, and the room only has one. | the network pill and the connection toast, `sources/designs/TICVAI_POS_Terminal_v2.html`, the header's network pill ("{{ netLabel }}", "Offline · queued locally") and the toast "Connection lost — sales continue and queue locally." (decoded template of the bundle) |
 
 **Goes to**
 
@@ -1960,7 +2082,11 @@
 | Repository | ticvai-pos (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-pos.git) |
 | Component | `TillHomeBoard` |
 | Suggested location | `src/routes/home/TillHomeBoard.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | dashboard |
+| Layout pattern | dashboard (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/TICVAI_POS_Terminal_v2.html` (v2, 1 October 2026 (TICVAI POS Terminal (3).html)), view: After 'Open shift & start selling', or left rail 'Home': the F1-F7 function bar replaces the home hot keys; the KPI tiles drill into the Sales journal. Wireframe frame `wireframes/P04 Venue POS.dc.html#pos-025`, which adam_pull writes into the ticket folder as `wireframe-pos-025.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`screens/_design-tokens.yaml`). Each state's look: loading: the shimmer tiles (`wireframes/states/P04 Venue POS states.dc.html#pos-state-loading`, pulled as `wireframe-pos-state-loading.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; error: the could-not-load panel (`wireframes/states/P04 Venue POS states.dc.html#pos-state-error`, pulled as `wireframe-pos-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the empty panel note (the prototype, the cart ("No items yet", "Tap a product, scan a barcode, or recall a held sale to begin.") and the order board ("No orders waiting") (decoded template)); emptyNoAccess: the no-access panel (`wireframes/states/P04 Venue POS states.dc.html#pos-state-no-access`, pulled as `wireframe-pos-state-no-access.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; offline: the network pill and the connection toast (the prototype, the header's network pill ("{{ netLabel }}", "Offline · queued locally") and the toast "Connection lost — sales continue and queue locally." (decoded template of the bundle)); denied: the refusal toast (the prototype, the toast ("{{ toastMsg }}", flash(..., 'warn')), e.g. "Opening the drawer without a sale needs a Supervisor role or above" and "Approval declined." (decoded template)). The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 1620×1080, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -1984,14 +2110,14 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The saved till home. |
-| error | Could not load. Names which read failed and leaves the till home untouched. |
-| emptyFirstRun | A till with no sale boards assigned. Nothing to create here: says that the till layout is set per outlet in the back office (with a till override on POS-016) and names who at the venue configures it, and the launcher shows only what needs no board (design-notes correction platform-foundation POS-025). |
-| emptyNoAccess | Shown when the caller lacks `REPORT_VIEW_WORKSTATION`, which `getWorkstationShift` requires to show this screen, and names that permission (the screen's other reads need `DEVICE_VIEW`, `REPORT_VIEW_VENUE`, `SCOPE_VIEW` and say so in their own panels). Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `SHIFT_REOPEN` for `reopenShift`; `SHIFT_SUSPEND` for `suspendShift`. |
-| offline | Working from the local journal. The tiles show what this workstation knows; the queue and alerts are last-known and say so. |
-| denied | Names the permission the operator does not hold and who at this venue does. Never a disabled tile with no explanation — that reads as a broken till. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The saved till home. | the shimmer tiles, `wireframes/states/P04 Venue POS states.dc.html#pos-state-loading` (pulled as `wireframe-pos-state-loading.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| error | Could not load. Names which read failed and leaves the till home untouched. | the could-not-load panel, `wireframes/states/P04 Venue POS states.dc.html#pos-state-error` (pulled as `wireframe-pos-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | A till with no sale boards assigned. Nothing to create here: says that the till layout is set per outlet in the back office (with a till override on POS-016) and names who at the venue configures it, and the launcher shows only what needs no board (design-notes correction platform-foundation POS-025). | the empty panel note, `sources/designs/TICVAI_POS_Terminal_v2.html`, the cart ("No items yet", "Tap a product, scan a barcode, or recall a held sale to begin.") and the order board ("No orders waiting") (decoded template) |
+| emptyNoAccess | Shown when the caller lacks `REPORT_VIEW_WORKSTATION`, which `getWorkstationShift` requires to show this screen, and names that permission (the screen's other reads need `DEVICE_VIEW`, `REPORT_VIEW_VENUE`, `SCOPE_VIEW` and say so in their own panels). Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `SHIFT_REOPEN` for `reopenShift`; `SHIFT_SUSPEND` for `suspendShift`. | the no-access panel, `wireframes/states/P04 Venue POS states.dc.html#pos-state-no-access` (pulled as `wireframe-pos-state-no-access.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| offline | Working from the local journal. The tiles show what this workstation knows; the queue and alerts are last-known and say so. | the network pill and the connection toast, `sources/designs/TICVAI_POS_Terminal_v2.html`, the header's network pill ("{{ netLabel }}", "Offline · queued locally") and the toast "Connection lost — sales continue and queue locally." (decoded template of the bundle) |
+| denied | Names the permission the operator does not hold and who at this venue does. Never a disabled tile with no explanation — that reads as a broken till. | the refusal toast, `sources/designs/TICVAI_POS_Terminal_v2.html`, the toast ("{{ toastMsg }}", flash(..., 'warn')), e.g. "Opening the drawer without a sale needs a Supervisor role or above" and "Approval declined." (decoded template) |
 
 **Goes to**
 
@@ -2025,7 +2151,11 @@
 | Repository | ticvai-pos (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-pos.git) |
 | Component | `ReceiptReprintBoard` |
 | Suggested location | `src/routes/sell/ReceiptReprintBoard.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | detail |
+| Layout pattern | detail (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/TICVAI_POS_Terminal_client_approved.html` (TICVAI OS 4.2.1, build 2026.08.14), view: After a successful payment (receipt screen); reprint via Home F4 or cart 'History' -> 'Reprint' (it shows part of this screen: build the rest from the screen spec in the same look). Wireframe frame `wireframes/P04 Venue POS.dc.html#pos-026`, which adam_pull writes into the ticket folder as `wireframe-pos-026.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`screens/_design-tokens.yaml`). Each state's look: loading: the shimmer tiles (`wireframes/states/P04 Venue POS states.dc.html#pos-state-loading`, pulled as `wireframe-pos-state-loading.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; error: the could-not-load panel (`wireframes/states/P04 Venue POS states.dc.html#pos-state-error`, pulled as `wireframe-pos-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the empty panel note (`sources/designs/TICVAI_POS_Terminal_v2.html`, the cart ("No items yet", "Tap a product, scan a barcode, or recall a held sale to begin.") and the order board ("No orders waiting") (decoded template)); emptyNoAccess: the no-access panel (`wireframes/states/P04 Venue POS states.dc.html#pos-state-no-access`, pulled as `wireframe-pos-state-no-access.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; offline: the network pill and the connection toast (`sources/designs/TICVAI_POS_Terminal_v2.html`, the header's network pill ("{{ netLabel }}", "Offline · queued locally") and the toast "Connection lost — sales continue and queue locally." (decoded template of the bundle)). The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 1620×1080, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -2053,13 +2183,13 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The saved receipt. |
-| error | Could not load. Names which read failed and leaves the receipt untouched. |
-| emptyFirstRun | No receipt yet. Carries the create action and says what the till does in the meantime. |
-| emptyNoAccess | Shown when the caller lacks `LEDGER_VIEW`, which `getTaxInvoice` requires to show this screen, and names that permission (the screen's other reads need `ORDER_VIEW` and say so in their own panels). Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `LEDGER_POST` for `issueTaxInvoice`; `ORDER_EXCHANGE` for `reissueEntitlement`; `ORDER_REPRINT` for `reprintReceipt`, `reprintOrder`. |
-| offline | Reprint is available offline; reissue is not. A reissue changes what the gate will admit, and the gate cannot be told from here. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The saved receipt. | the shimmer tiles, `wireframes/states/P04 Venue POS states.dc.html#pos-state-loading` (pulled as `wireframe-pos-state-loading.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| error | Could not load. Names which read failed and leaves the receipt untouched. | the could-not-load panel, `wireframes/states/P04 Venue POS states.dc.html#pos-state-error` (pulled as `wireframe-pos-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | No receipt yet. Carries the create action and says what the till does in the meantime. | the empty panel note, `sources/designs/TICVAI_POS_Terminal_v2.html`, the cart ("No items yet", "Tap a product, scan a barcode, or recall a held sale to begin.") and the order board ("No orders waiting") (decoded template) |
+| emptyNoAccess | Shown when the caller lacks `LEDGER_VIEW`, which `getTaxInvoice` requires to show this screen, and names that permission (the screen's other reads need `ORDER_VIEW` and say so in their own panels). Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `LEDGER_POST` for `issueTaxInvoice`; `ORDER_EXCHANGE` for `reissueEntitlement`; `ORDER_REPRINT` for `reprintReceipt`, `reprintOrder`. | the no-access panel, `wireframes/states/P04 Venue POS states.dc.html#pos-state-no-access` (pulled as `wireframe-pos-state-no-access.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| offline | Reprint is available offline; reissue is not. A reissue changes what the gate will admit, and the gate cannot be told from here. | the network pill and the connection toast, `sources/designs/TICVAI_POS_Terminal_v2.html`, the header's network pill ("{{ netLabel }}", "Offline · queued locally") and the toast "Connection lost — sales continue and queue locally." (decoded template of the bundle) |
 
 **Goes to**
 
@@ -2081,7 +2211,11 @@
 | Repository | ticvai-pos (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-pos.git) |
 | Component | `GuestLookupBoard` |
 | Suggested location | `src/routes/sell/GuestLookupBoard.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/TICVAI_POS_Terminal_client_approved.html` (TICVAI OS 4.2.1, build 2026.08.14), view: Left rail 'Guests', or cart guest button (goGuests). Wireframe frame `wireframes/P04 Venue POS.dc.html#pos-027`, which adam_pull writes into the ticket folder as `wireframe-pos-027.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`screens/_design-tokens.yaml`). Each state's look: loading: the shimmer tiles (`wireframes/states/P04 Venue POS states.dc.html#pos-state-loading`, pulled as `wireframe-pos-state-loading.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; error: the could-not-load panel (`wireframes/states/P04 Venue POS states.dc.html#pos-state-error`, pulled as `wireframe-pos-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the empty panel note (`sources/designs/TICVAI_POS_Terminal_v2.html`, the cart ("No items yet", "Tap a product, scan a barcode, or recall a held sale to begin.") and the order board ("No orders waiting") (decoded template)); emptyNoAccess: the no-access panel (`wireframes/states/P04 Venue POS states.dc.html#pos-state-no-access`, pulled as `wireframe-pos-state-no-access.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; offline: the network pill and the connection toast (`sources/designs/TICVAI_POS_Terminal_v2.html`, the header's network pill ("{{ netLabel }}", "Offline · queued locally") and the toast "Connection lost — sales continue and queue locally." (decoded template of the bundle)). The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 1620×1080, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -2103,13 +2237,13 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The saved guest lookup. |
-| error | Could not load. Names which read failed and leaves the guest lookup untouched. |
-| emptyFirstRun | No guest lookup yet. Carries the create action and says what the till does in the meantime. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | Search needs the network. A scanned wristband still resolves offline against the local entitlement cache; a name search does not. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The saved guest lookup. | the shimmer tiles, `wireframes/states/P04 Venue POS states.dc.html#pos-state-loading` (pulled as `wireframe-pos-state-loading.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| error | Could not load. Names which read failed and leaves the guest lookup untouched. | the could-not-load panel, `wireframes/states/P04 Venue POS states.dc.html#pos-state-error` (pulled as `wireframe-pos-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | No guest lookup yet. Carries the create action and says what the till does in the meantime. | the empty panel note, `sources/designs/TICVAI_POS_Terminal_v2.html`, the cart ("No items yet", "Tap a product, scan a barcode, or recall a held sale to begin.") and the order board ("No orders waiting") (decoded template) |
+| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. | the no-access panel, `wireframes/states/P04 Venue POS states.dc.html#pos-state-no-access` (pulled as `wireframe-pos-state-no-access.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| offline | Search needs the network. A scanned wristband still resolves offline against the local entitlement cache; a name search does not. | the network pill and the connection toast, `sources/designs/TICVAI_POS_Terminal_v2.html`, the header's network pill ("{{ netLabel }}", "Offline · queued locally") and the toast "Connection lost — sales continue and queue locally." (decoded template of the bundle) |
 
 **Goes to**
 
@@ -2131,7 +2265,11 @@
 | Repository | ticvai-pos (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-pos.git) |
 | Component | `TableServiceBoard` |
 | Suggested location | `src/routes/sell/TableServiceBoard.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | board |
+| Layout pattern | board (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/TICVAI_POS_Terminal_v2.html` (v2, 1 October 2026 (TICVAI POS Terminal (3).html)), view: Left rail 'Tables' -> 'Table service': halls (Main Hall, Terrace, Majlis rooms), the plan drawn to scale, status filters, the hall's table list with Seat & order / Recall check / Settle bill / Seat booking (it shows part of this screen: build the rest from the screen spec in the same look). Wireframe frame `wireframes/P04 Venue POS.dc.html#pos-028`, which adam_pull writes into the ticket folder as `wireframe-pos-028.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`screens/_design-tokens.yaml`). Each state's look: loading: the shimmer tiles (`wireframes/states/P04 Venue POS states.dc.html#pos-state-loading`, pulled as `wireframe-pos-state-loading.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; error: the could-not-load panel (`wireframes/states/P04 Venue POS states.dc.html#pos-state-error`, pulled as `wireframe-pos-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the empty panel note (the prototype, the cart ("No items yet", "Tap a product, scan a barcode, or recall a held sale to begin.") and the order board ("No orders waiting") (decoded template)); emptyNoAccess: the no-access panel (`wireframes/states/P04 Venue POS states.dc.html#pos-state-no-access`, pulled as `wireframe-pos-state-no-access.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; offline: the network pill and the connection toast (the prototype, the header's network pill ("{{ netLabel }}", "Offline · queued locally") and the toast "Connection lost — sales continue and queue locally." (decoded template of the bundle)). The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 1620×1080, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -2163,13 +2301,13 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The saved floor. |
-| error | Could not load. Names which read failed and leaves the floor untouched. |
-| emptyFirstRun | No floor yet. Carries the create action and says what the till does in the meantime. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | The floor is held locally and reconciles on sync. Seating, covers and server changes made offline queue; two tills changing the same visit while disconnected reconcile server-wins on reconnect and the till says which change stood. (Moving and merging tables is not on this screen until after r2, POSV2-8; design-notes correction fnb-retail POS-028.) |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The saved floor. | the shimmer tiles, `wireframes/states/P04 Venue POS states.dc.html#pos-state-loading` (pulled as `wireframe-pos-state-loading.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| error | Could not load. Names which read failed and leaves the floor untouched. | the could-not-load panel, `wireframes/states/P04 Venue POS states.dc.html#pos-state-error` (pulled as `wireframe-pos-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | No floor yet. Carries the create action and says what the till does in the meantime. | the empty panel note, `sources/designs/TICVAI_POS_Terminal_v2.html`, the cart ("No items yet", "Tap a product, scan a barcode, or recall a held sale to begin.") and the order board ("No orders waiting") (decoded template) |
+| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. | the no-access panel, `wireframes/states/P04 Venue POS states.dc.html#pos-state-no-access` (pulled as `wireframe-pos-state-no-access.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| offline | The floor is held locally and reconciles on sync. Seating, covers and server changes made offline queue; two tills changing the same visit while disconnected reconcile server-wins on reconnect and the till says which change stood. (Moving and merging tables is not on this screen until after r2, POSV2-8; design-notes correction fnb-retail POS-028.) | the network pill and the connection toast, `sources/designs/TICVAI_POS_Terminal_v2.html`, the header's network pill ("{{ netLabel }}", "Offline · queued locally") and the toast "Connection lost — sales continue and queue locally." (decoded template of the bundle) |
 
 **Goes to**
 
@@ -2192,7 +2330,11 @@
 | Repository | ticvai-pos (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-pos.git) |
 | Component | `OrderQueueBoard` |
 | Suggested location | `src/routes/sell/OrderQueueBoard.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | board |
+| Layout pattern | board (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/TICVAI_POS_Terminal_v2.html` (v2, 1 October 2026 (TICVAI POS Terminal (3).html)), view: Left rail 'Queue': stage counts, the guest status board (order numbers only, mirrors the kitchen display), takeaway, partner, dine-in, delivery and quick-service orders. Wireframe frame `wireframes/P04 Venue POS.dc.html#pos-029`, which adam_pull writes into the ticket folder as `wireframe-pos-029.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`screens/_design-tokens.yaml`). Each state's look: loading: the shimmer tiles (`wireframes/states/P04 Venue POS states.dc.html#pos-state-loading`, pulled as `wireframe-pos-state-loading.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; error: the could-not-load panel (`wireframes/states/P04 Venue POS states.dc.html#pos-state-error`, pulled as `wireframe-pos-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the empty panel note (the prototype, the cart ("No items yet", "Tap a product, scan a barcode, or recall a held sale to begin.") and the order board ("No orders waiting") (decoded template)); emptyNoAccess: the no-access panel (`wireframes/states/P04 Venue POS states.dc.html#pos-state-no-access`, pulled as `wireframe-pos-state-no-access.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; offline: the network pill and the connection toast (the prototype, the header's network pill ("{{ netLabel }}", "Offline · queued locally") and the toast "Connection lost — sales continue and queue locally." (decoded template of the bundle)). The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 1620×1080, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -2214,13 +2356,13 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The saved queue. |
-| error | Could not load. Names which read failed and leaves the queue untouched. |
-| emptyFirstRun | No queue yet. Offers no create action — this screen declares no operation that makes one and says what the till does in the meantime. |
-| emptyNoAccess | Shown when the caller lacks `ORDER_VIEW`, which `listFnbOrders` requires to show this screen, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_MODIFY` for `acceptFnbOrder`, `setKitchenTicketStatus`, `recordOrderHandover`. |
-| offline | The queue is the one thing that must never look current when it is not. Offline, every card carries the time it was last known and the advance action is withheld. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The saved queue. | the shimmer tiles, `wireframes/states/P04 Venue POS states.dc.html#pos-state-loading` (pulled as `wireframe-pos-state-loading.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| error | Could not load. Names which read failed and leaves the queue untouched. | the could-not-load panel, `wireframes/states/P04 Venue POS states.dc.html#pos-state-error` (pulled as `wireframe-pos-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | No queue yet. Offers no create action — this screen declares no operation that makes one and says what the till does in the meantime. | the empty panel note, `sources/designs/TICVAI_POS_Terminal_v2.html`, the cart ("No items yet", "Tap a product, scan a barcode, or recall a held sale to begin.") and the order board ("No orders waiting") (decoded template) |
+| emptyNoAccess | Shown when the caller lacks `ORDER_VIEW`, which `listFnbOrders` requires to show this screen, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_MODIFY` for `acceptFnbOrder`, `setKitchenTicketStatus`, `recordOrderHandover`. | the no-access panel, `wireframes/states/P04 Venue POS states.dc.html#pos-state-no-access` (pulled as `wireframe-pos-state-no-access.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| offline | The queue is the one thing that must never look current when it is not. Offline, every card carries the time it was last known and the advance action is withheld. | the network pill and the connection toast, `sources/designs/TICVAI_POS_Terminal_v2.html`, the header's network pill ("{{ netLabel }}", "Offline · queued locally") and the toast "Connection lost — sales continue and queue locally." (decoded template of the bundle) |
 
 **Goes to**
 
@@ -2242,7 +2384,11 @@
 | Repository | ticvai-pos (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-pos.git) |
 | Component | `SalesJournalBoard` |
 | Suggested location | `src/routes/sell/SalesJournalBoard.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/TICVAI_POS_Terminal_v2.html` (v2, 1 October 2026 (TICVAI POS Terminal (3).html)), view: F7 'Sales journal' or a Till Home KPI tile -> the journal, first row expanded; the cart's 'History' opens it as Cart history (this terminal, by day), drawn as the variant (it shows part of this screen: build the rest from the screen spec in the same look). Wireframe frame `wireframes/P04 Venue POS.dc.html#pos-030`, which adam_pull writes into the ticket folder as `wireframe-pos-030.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`screens/_design-tokens.yaml`). Each state's look: loading: the shimmer tiles (`wireframes/states/P04 Venue POS states.dc.html#pos-state-loading`, pulled as `wireframe-pos-state-loading.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; error: the could-not-load panel (`wireframes/states/P04 Venue POS states.dc.html#pos-state-error`, pulled as `wireframe-pos-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the empty panel note (the prototype, the cart ("No items yet", "Tap a product, scan a barcode, or recall a held sale to begin.") and the order board ("No orders waiting") (decoded template)); emptyNoResults: the nothing-matches panel (`wireframes/states/P04 Venue POS states.dc.html#pos-state-no-results`, pulled as `wireframe-pos-state-no-results.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyNoAccess: the no-access panel (`wireframes/states/P04 Venue POS states.dc.html#pos-state-no-access`, pulled as `wireframe-pos-state-no-access.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; denied: the refusal toast (the prototype, the toast ("{{ toastMsg }}", flash(..., 'warn')), e.g. "Opening the drawer without a sale needs a Supervisor role or above" and "Approval declined." (decoded template)); offline: the network pill and the connection toast (the prototype, the header's network pill ("{{ netLabel }}", "Offline · queued locally") and the toast "Connection lost — sales continue and queue locally." (decoded template of the bundle)). The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 1620×1080, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -2270,15 +2416,15 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | This terminal's sales today, newest first. The filters render before the rows. |
-| error | Could not load the journal. Names which read failed and keeps the filters as they were. |
-| emptyFirstRun | No sales on this terminal today yet. Says so plainly; the journal fills as sales are made. |
-| emptyNoResults | Nothing matches the filter on terminal, day, customer, payment method or status, and the till's sales are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Shown when the caller lacks `ORDER_VIEW`, which `listOrders` requires to show this screen, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `GUEST_VIEW` for `searchGuests`; `LEDGER_POST` for `issueTaxInvoice`; `LEDGER_VIEW` for `getTaxDocumentRendition`; `ORDER_REPRINT` for `reprintReceipt`, `reprintOrder`. |
-| denied | Another terminal's or another cashier's sales need `ORDER_VIEW_OTHER`. This terminal's own sales are still listed; the filter names what is withheld. |
-| offline | Orders taken on this terminal are listed from the local journal; other terminals, the customer search and tax invoices need the network. Reprint works offline (`reprintOrder`). |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | This terminal's sales today, newest first. The filters render before the rows. | the shimmer tiles, `wireframes/states/P04 Venue POS states.dc.html#pos-state-loading` (pulled as `wireframe-pos-state-loading.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| error | Could not load the journal. Names which read failed and keeps the filters as they were. | the could-not-load panel, `wireframes/states/P04 Venue POS states.dc.html#pos-state-error` (pulled as `wireframe-pos-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | No sales on this terminal today yet. Says so plainly; the journal fills as sales are made. | the empty panel note, `sources/designs/TICVAI_POS_Terminal_v2.html`, the cart ("No items yet", "Tap a product, scan a barcode, or recall a held sale to begin.") and the order board ("No orders waiting") (decoded template) |
+| emptyNoResults | Nothing matches the filter on terminal, day, customer, payment method or status, and the till's sales are still there. Names the active filter and offers to clear it. | the nothing-matches panel, `wireframes/states/P04 Venue POS states.dc.html#pos-state-no-results` (pulled as `wireframe-pos-state-no-results.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyNoAccess | Shown when the caller lacks `ORDER_VIEW`, which `listOrders` requires to show this screen, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `GUEST_VIEW` for `searchGuests`; `LEDGER_POST` for `issueTaxInvoice`; `LEDGER_VIEW` for `getTaxDocumentRendition`; `ORDER_REPRINT` for `reprintReceipt`, `reprintOrder`. | the no-access panel, `wireframes/states/P04 Venue POS states.dc.html#pos-state-no-access` (pulled as `wireframe-pos-state-no-access.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| denied | Another terminal's or another cashier's sales need `ORDER_VIEW_OTHER`. This terminal's own sales are still listed; the filter names what is withheld. | the refusal toast, `sources/designs/TICVAI_POS_Terminal_v2.html`, the toast ("{{ toastMsg }}", flash(..., 'warn')), e.g. "Opening the drawer without a sale needs a Supervisor role or above" and "Approval declined." (decoded template) |
+| offline | Orders taken on this terminal are listed from the local journal; other terminals, the customer search and tax invoices need the network. Reprint works offline (`reprintOrder`). | the network pill and the connection toast, `sources/designs/TICVAI_POS_Terminal_v2.html`, the header's network pill ("{{ netLabel }}", "Offline · queued locally") and the toast "Connection lost — sales continue and queue locally." (decoded template of the bundle) |
 
 **Goes to**
 
@@ -2302,7 +2448,11 @@
 | Repository | ticvai-pos (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-pos.git) |
 | Component | `ReservationsGroupArrivalsBoard` |
 | Suggested location | `src/routes/sell/ReservationsGroupArrivalsBoard.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
-| Pattern | listDetail |
+| Layout pattern | listDetail (structure only, not the look) |
+
+**Design (client-approved, build identical).** Prototype `sources/designs/TICVAI_POS_Terminal_v2.html` (v2, 1 October 2026 (TICVAI POS Terminal (3).html)), view: Left rail 'Bookings' (F5 'Reservations') -> a group reservation (deposit paid, balance due, Take payment); a confirmed unpaid group opens the encode dialog, drawn as the variant (it shows part of this screen: build the rest from the screen spec in the same look). Wireframe frame `wireframes/P04 Venue POS.dc.html#pos-031`, which adam_pull writes into the ticket folder as `wireframe-pos-031.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`screens/_design-tokens.yaml`). Each state's look: loading: the shimmer tiles (`wireframes/states/P04 Venue POS states.dc.html#pos-state-loading`, pulled as `wireframe-pos-state-loading.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; error: the could-not-load panel (`wireframes/states/P04 Venue POS states.dc.html#pos-state-error`, pulled as `wireframe-pos-state-error.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyFirstRun: the empty panel note (the prototype, the cart ("No items yet", "Tap a product, scan a barcode, or recall a held sale to begin.") and the order board ("No orders waiting") (decoded template)); emptyNoResults: the nothing-matches panel (`wireframes/states/P04 Venue POS states.dc.html#pos-state-no-results`, pulled as `wireframe-pos-state-no-results.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; emptyNoAccess: the no-access panel (`wireframes/states/P04 Venue POS states.dc.html#pos-state-no-access`, pulled as `wireframe-pos-state-no-access.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; denied: the refusal toast (the prototype, the toast ("{{ toastMsg }}", flash(..., 'warn')), e.g. "Opening the drawer without a sale needs a Supervisor role or above" and "Approval declined." (decoded template)); offline: the network pill and the connection toast (the prototype, the header's network pill ("{{ netLabel }}", "Offline · queued locally") and the toast "Connection lost — sales continue and queue locally." (decoded template of the bundle)). The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+
+**Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 1620×1080, LTR and RTL; attach them to the Ready-for-QA comment).
 
 **Entry parameters**
 
@@ -2330,15 +2480,15 @@
 
 **States**
 
-| State | Behaviour |
-|---|---|
-| loading | The reservations held at this venue, soonest expiry first, and the groups due today. |
-| error | Could not load. Names which read failed and leaves the reservations untouched. |
-| emptyFirstRun | No reservations held and no groups due today. Offers New reservation (`createReservation`). |
-| emptyNoResults | Nothing matches the status or expiry filter, and the reservations are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Shown when the caller lacks `ORDER_VIEW`, which `listReservations` requires to show this screen, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_CANCEL` for `cancelReservation`; `ORDER_CREATE` for `createReservation`, `extendReservation`, `convertReservation`; `ORDER_MODIFY` for `recordGroupCheckIn`. |
-| denied | Reservations are listed; New reservation, Take payment and Extend need `ORDER_CREATE`, Cancel needs `ORDER_CANCEL` and the check-in `ORDER_MODIFY`. The list is still shown, so the cashier can fetch a supervisor to the right reservation. |
-| offline | Reservations need the network: a hold is capacity, and only the server knows what is left. Offline the screen says so and sells nothing from here. |
+| State | Behaviour | Look |
+|---|---|---|
+| loading | The reservations held at this venue, soonest expiry first, and the groups due today. | the shimmer tiles, `wireframes/states/P04 Venue POS states.dc.html#pos-state-loading` (pulled as `wireframe-pos-state-loading.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| error | Could not load. Names which read failed and leaves the reservations untouched. | the could-not-load panel, `wireframes/states/P04 Venue POS states.dc.html#pos-state-error` (pulled as `wireframe-pos-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyFirstRun | No reservations held and no groups due today. Offers New reservation (`createReservation`). | the empty panel note, `sources/designs/TICVAI_POS_Terminal_v2.html`, the cart ("No items yet", "Tap a product, scan a barcode, or recall a held sale to begin.") and the order board ("No orders waiting") (decoded template) |
+| emptyNoResults | Nothing matches the status or expiry filter, and the reservations are still there. Names the active filter and offers to clear it. | the nothing-matches panel, `wireframes/states/P04 Venue POS states.dc.html#pos-state-no-results` (pulled as `wireframe-pos-state-no-results.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| emptyNoAccess | Shown when the caller lacks `ORDER_VIEW`, which `listReservations` requires to show this screen, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_CANCEL` for `cancelReservation`; `ORDER_CREATE` for `createReservation`, `extendReservation`, `convertReservation`; `ORDER_MODIFY` for `recordGroupCheckIn`. | the no-access panel, `wireframes/states/P04 Venue POS states.dc.html#pos-state-no-access` (pulled as `wireframe-pos-state-no-access.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| denied | Reservations are listed; New reservation, Take payment and Extend need `ORDER_CREATE`, Cancel needs `ORDER_CANCEL` and the check-in `ORDER_MODIFY`. The list is still shown, so the cashier can fetch a supervisor to the right reservation. | the refusal toast, `sources/designs/TICVAI_POS_Terminal_v2.html`, the toast ("{{ toastMsg }}", flash(..., 'warn')), e.g. "Opening the drawer without a sale needs a Supervisor role or above" and "Approval declined." (decoded template) |
+| offline | Reservations need the network: a hold is capacity, and only the server knows what is left. Offline the screen says so and sells nothing from here. | the network pill and the connection toast, `sources/designs/TICVAI_POS_Terminal_v2.html`, the header's network pill ("{{ netLabel }}", "Offline · queued locally") and the toast "Connection lost — sales continue and queue locally." (decoded template of the bundle) |
 
 **Goes to**
 

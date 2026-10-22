@@ -367,22 +367,43 @@ def cmd_include(repo, wt, authored_list):
 HYDRATE_SKIP = re.compile(r"(^|/)(__pycache__|bin|obj|\.venv|node_modules)(/|$)|\.(pyc|pyo|log)$"
                           r"|^[^/]+/Updating old wireframes/|^[^/]+/repos/")
 
+def main_worktree(repo):
+    """The repository's main working tree (the first `git worktree list` entry), or None."""
+    for line in git(repo, "worktree", "list", "--porcelain").decode("utf-8", "replace").splitlines():
+        if line.startswith("worktree "):
+            return line[len("worktree "):].strip()
+    return None
+
 def cmd_hydrate(repo, wt, pkg_rel):
     """Gitignored files some tools read (audit-links reads _dump/; index-packs hashes sources/).
     The worktree has only what git tracks, so without these the checks would see less than the
-    main tree does. Mirrors under repos/ are outputs and are not copied."""
-    files = z(git(repo, "ls-files", "--others", "--ignored", "--exclude-standard", "-z", "--", pkg_rel))
+    main tree does. Mirrors under repos/ are outputs and are not copied.
+
+    **From the main checkout too, when the run starts in a linked worktree** (22 October 2026,
+    CHG-R9INT-003). A lane's own worktree (D:/wt/r9-int) has only what git tracks, so it had no
+    _dump/ to copy, and the r9 gates read the 262 boardFrames claims into the archived boards as
+    'no such board' (audit-links), where the r8 gate, run from a tree that had _dump/, read them as
+    archived. The tree the run starts in is copied first; the main checkout fills what it lacks."""
+    sources = [repo]
+    main = main_worktree(repo)
+    if main and os.path.isdir(main) and os.path.normcase(os.path.abspath(main)) != os.path.normcase(os.path.abspath(repo)):
+        sources.append(main)
     n = size = 0
-    for p in files:
-        if HYDRATE_SKIP.search(p):
-            continue
-        src, dst = os.path.join(repo, p), os.path.join(wt, p)
-        if not os.path.isfile(src) or os.path.exists(dst):
-            continue
-        os.makedirs(os.path.dirname(dst), exist_ok=True)
-        shutil.copy2(src, dst)
-        n += 1
-        size += os.path.getsize(src)
+    for src_repo in sources:
+        files = z(git(src_repo, "ls-files", "--others", "--ignored", "--exclude-standard", "-z", "--", pkg_rel))
+        n0 = n
+        for p in files:
+            if HYDRATE_SKIP.search(p):
+                continue
+            src, dst = os.path.join(src_repo, p), os.path.join(wt, p)
+            if not os.path.isfile(src) or os.path.exists(dst):
+                continue
+            os.makedirs(os.path.dirname(dst), exist_ok=True)
+            shutil.copy2(src, dst)
+            n += 1
+            size += os.path.getsize(src)
+        if src_repo != repo:
+            print("  %d gitignored input file(s) from the main checkout %s" % (n - n0, src_repo))
     print("  hydrated %d gitignored input file(s), %.1f MB" % (n, size / 1e6))
 
 def cmd_normalise(pkg, t0):
