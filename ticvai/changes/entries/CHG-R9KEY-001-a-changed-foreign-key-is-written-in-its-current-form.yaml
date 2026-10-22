@@ -63,7 +63,8 @@ triage: blocker
 prevention:
   type: generator-rule
   ref: tools/ddl_forward.py::guard_change_foreign_key
-status: open
+status: closed
+closed_by_commit: 'bd473835'
 notes: 'Superseded keys found, every "constraint changed" row of handoff/migration-review.md at cf6e1379 (all three are
   foreign keys whose target or columns changed): rental.booking booking_deposit_authorisation_id_fkey
   (orders.stored_value_authorisation -> orders.payment, CR-146), platform.profile_deployment
@@ -80,4 +81,8 @@ notes: 'Superseded keys found, every "constraint changed" row of handoff/migrati
   PostgreSQL 18 (22 October 2026), psql -1 ON_ERROR_STOP, each file twice, 0 errors, schema unchanged by the second
   run: a copy of t_live with V0113 then the names file (deposit key on orders.payment, profile_deployment on
   (profile_id, version)); a copy of t_live with migration 242 simulated (the deposit key keeps its oid and stays
-  validated); a fresh package-built database (every key the reference''s).'
+  validated); a fresh package-built database (every key the reference''s). Not committed here: the derived files (the names file, handoff/migration-review.md, the tickets), which the
+  combined gate writes after the merge, under the number and date it gives them (on 22 October in this tree: the
+  CR lane''s V0114 and this change''s V0115__names_after_r1_20261022.sql, 172 review rows instead of 177). The R8-DB
+  tasks (docs/active/block-a-extra-tasks.json) must then list the new files (check-ticket-builds B-DB-FILES), as
+  CHG-R9MIG-003 listed V0113.'
