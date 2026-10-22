@@ -36,6 +36,7 @@ keys_touched:
     R8-DB-LOCAL-SURENDRA, R8-DB-LOCAL-KALPITA-MEJARI, R8-DB-SHARED]
   files:
   - backend/tenant/V0114__after_r1_20261022.sql
+  - backend/tenant/V0115__names_after_r1_20261022.sql
   - docs/active/block-a-extra-tasks.json
   - tools/check-cited-sources.py
 root_class: 'a citation of a generated file by the name an uncommitted run gave it'
@@ -52,7 +53,9 @@ prevention:
   type: check
   ref: tools/check-cited-sources.py
 status: open
-notes: 'The next forward file (the key-fix lane''s, after V0114) needs, in each of the eleven tasks, one `file
-  backend/<db>/V0115__...sql` line in builds and one entry, marked (r9), in the text''s file list after V0114 (plus, if
-  wanted, a sentence on what it does); the steps, checks and done-when need no edit. Its change entries cite it only
-  once the file is committed under the name the run that wrote it gave it.'
+notes: 'After the key-fix lane merged (CHG-R9KEY-001), the merged generator wrote the next file in the gate''s kept
+  tree, backend/tenant/V0115__names_after_r1_20261022.sql (the same file as the key lane''s own tree), committed here
+  under that name; it reached the eleven tasks as the edit this change made routine: one `builds` line and one (r9)
+  entry in the file list, plus a sentence on what it does. The steps, checks and done-when needed no edit. A later
+  forward file is the same edit, and its change entries cite it only once it is committed under the name the run
+  that wrote it gave it.'
