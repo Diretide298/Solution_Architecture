@@ -30,7 +30,7 @@ keys_touched:
   files:
   - contracts/spine/orders.yaml
   - tools/derive-ddl.py
-  - backend/tenant/V0114__after_r1_20261021.sql
+  - backend/tenant/V0114__after_r1_20261022.sql
 root_class: 'new: a guest-owned table under staff-only row security'
 tickets:
   started:
@@ -46,4 +46,7 @@ prevention:
 status: open
 notes: 'Proved on a copy of the live-equivalent repository database and on a package-built one: a guest session
   (ticvai.subject_id set, no scope paths) sees its own cart only and cannot insert one for another subject; staff at the
-  venue see every cart there, as before. The staff branch is unchanged (platform.venue_in_scope).'
+  venue see every cart there, as before. The staff branch is unchanged (platform.venue_in_scope).
+  Integration gate of 22 October 2026 (CHG-R9INT-002): the forward migration is cited by the name it is committed
+  under, backend/tenant/V0114__after_r1_20261022.sql; this lane had cited the name its own run of 21 October wrote and
+  never committed (check-cited-sources CS-MISSING).'

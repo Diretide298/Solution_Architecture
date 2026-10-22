@@ -1,0 +1,58 @@
+id: CHG-R9INT-002
+date: '2026-10-22'
+source: audit
+kind: plan
+proposed: '2026-10-22T15:00'
+summary: 'The forward migration the r9 CRs derive is committed under the name the integration gate gave it,
+  backend/tenant/V0114__after_r1_20261022.sql, the five CR entries cite that name, and the eleven R8-DB tasks apply it:
+  `builds` and the file list name it as an r9 file, the steps apply every file marked r9 in name order, and the checks
+  and the done-when ask for every listed file, so the next forward file is one more `builds` line and one more entry in
+  the list. check-cited-sources says, for a forward migration git does not track, which file git has under that
+  number or that none is committed yet.'
+decision:
+  what: 'backend/tenant/V0114__after_r1_20261022.sql: the file tools/derive-ddl.py wrote in the gate''s worktree
+    (run 20261022-134945-1394), unchanged. changes/entries/CHG-R9CR-001, -003, -004, -005, -006: keys_touched cites it.
+    docs/active/block-a-extra-tasks.json, R8-DB-LOCAL-* (10) and R8-DB-SHARED: `file
+    backend/tenant/V0114__after_r1_20261022.sql` in builds; in the text it joins the list as (r9), "Then apply the files
+    marked r9 in the list above, in name order", a sentence on what V0114 does, the schema_version checks list every
+    file above (`where version like ''V01%''`), and done when every listed file is in its database''s
+    platform.schema_version. tools/check-cited-sources.py: forward_hint on a CS-MISSING forward migration.'
+  by: Chinmay
+  date: '2026-10-22'
+waivers:
+  cooling_off: {by: Chinmay, date: '2026-10-21', quote: 'I wanna get all of those changes out now..'}
+  release_window: {by: Chinmay, date: '2026-10-21', quote: 'Yes update all CRs check if can push that we current fix and get them out'}
+why: 'Finding: the combined r9 gate (refresh-safe run 20261022-134945-1394). check-cited-sources CS-MISSING, 5 new: the
+  CR lane''s entries cited V0114 by the name its own run of 21 October wrote (`V0114__after_r1_20261021.sql`), and
+  the lane never committed the file; derive-ddl names a new forward migration by the date of the run that writes it
+  (frozen_mode, `stamp`), so the gate of 22 October wrote it as ..._20261022.sql. Once committed, the file keeps its
+  name: the next run reads it as part of the old side and writes nothing for it. check-ticket-builds B-DB-FILES, 11
+  new: V0114 is new since r8 and the R8-DB tasks did not apply it (CHG-R8INT-035). The lead, Chinmay, 21 October 2026:
+  "Yes update all CRs check if can push that we current fix and get them out" and "I wanna get all of those changes out
+  now.." (r9; the cooling-off and the Tuesday/Friday window waived as for CHG-R9UI-001).'
+keys_touched:
+  tickets: [R8-DB-LOCAL-PRANAY-SHINDE, R8-DB-LOCAL-NARAYAN-GAONKAR, R8-DB-LOCAL-DEEP-KHANVILKAR, R8-DB-LOCAL-PALLAVI-SAWANT,
+    R8-DB-LOCAL-SANKET-KELUSKAR, R8-DB-LOCAL-CHINMAY-PATKAR, R8-DB-LOCAL-CHITRANGI-MESTRY, R8-DB-LOCAL-PRADNYA-YERAM,
+    R8-DB-LOCAL-SURENDRA, R8-DB-LOCAL-KALPITA-MEJARI, R8-DB-SHARED]
+  files:
+  - backend/tenant/V0114__after_r1_20261022.sql
+  - docs/active/block-a-extra-tasks.json
+  - tools/check-cited-sources.py
+root_class: 'a citation of a generated file by the name an uncommitted run gave it'
+tickets:
+  started: []
+  unstarted:
+  - 'R8-DB-LOCAL-* (#36186-#36195) and R8-DB-SHARED (#36196): the new text reaches them at the release, as a comment
+    where a task is started (ticvai/CLAUDE.md rule 6).'
+release_tag: r9
+decision_owner: Chinmay
+adam_cr: 'none: the combined r9 gate, a release fix'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-cited-sources.py
+status: open
+notes: 'The next forward file (the key-fix lane''s, after V0114) needs, in each of the eleven tasks, one `file
+  backend/<db>/V0115__...sql` line in builds and one entry, marked (r9), in the text''s file list after V0114 (plus, if
+  wanted, a sentence on what it does); the steps, checks and done-when need no edit. Its change entries cite it only
+  once the file is committed under the name the run that wrote it gave it.'

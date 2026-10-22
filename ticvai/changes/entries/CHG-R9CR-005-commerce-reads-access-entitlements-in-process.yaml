@@ -43,7 +43,7 @@ keys_touched:
   - tools/check-cross-module-reads.py
   - tools/check-cross-deployable-writes.py
   - handoff/cross-deployable-writes.md
-  - backend/tenant/V0114__after_r1_20261021.sql
+  - backend/tenant/V0114__after_r1_20261022.sql
 root_class: 'new: a cross-deployable read with no route that is built'
 tickets:
   started:
@@ -62,4 +62,7 @@ status: open
 notes: 'XR-ROUTE still fails an in-process read across deployables that is not in the reads list, so the exception
   cannot spread unseen; X-READ fails a granted read with a missing field, more than SELECT, or a table its reader owns.
   The commerce host composes Access''s query interface for these two reads (the read side only). Proved: the grant
-  exists on both database copies after the forward migration.'
+  exists on both database copies after the forward migration.
+  Integration gate of 22 October 2026 (CHG-R9INT-002): the forward migration is cited by the name it is committed
+  under, backend/tenant/V0114__after_r1_20261022.sql; this lane had cited the name its own run of 21 October wrote and
+  never committed (check-cited-sources CS-MISSING).'

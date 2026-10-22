@@ -34,7 +34,7 @@ keys_touched:
   - contracts/shared/common.yaml
   - tools/derive-table-notes.py
   - tools/check-storage-promises.py
-  - backend/tenant/V0114__after_r1_20261021.sql
+  - backend/tenant/V0114__after_r1_20261022.sql
 root_class: 'new: a uniqueness the contract text promises and no x-ticvai-unique-together keeps'
 tickets:
   started:
@@ -54,4 +54,7 @@ notes: 'Prevention run on the commit before the fix: check-storage-promises SP-U
   tenancy.PlatformIdempotencyRecord ("unique on (idempotencyKey, operationId) and no x-ticvai-unique-together keeps
   that set"); with the fix it finds nothing (payments.PaymentProviderEvent passes: its providerEventId is unique on
   its own). The CHECK is added NOT VALID: a database holding an inProgress row keeps it until a person validates
-  (migration-review). On a repository-built database, which had no CHECK, the forward migration adds one.'
+  (migration-review). On a repository-built database, which had no CHECK, the forward migration adds one.
+  Integration gate of 22 October 2026 (CHG-R9INT-002): the forward migration is cited by the name it is committed
+  under, backend/tenant/V0114__after_r1_20261022.sql; this lane had cited the name its own run of 21 October wrote and
+  never committed (check-cited-sources CS-MISSING).'

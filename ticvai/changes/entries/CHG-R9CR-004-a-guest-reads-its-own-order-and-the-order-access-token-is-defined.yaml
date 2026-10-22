@@ -33,7 +33,7 @@ keys_touched:
   - contracts/spine/orders.yaml
   - contracts/shared/common.yaml
   - tools/derive-ddl.py
-  - backend/tenant/V0114__after_r1_20261021.sql
+  - backend/tenant/V0114__after_r1_20261022.sql
 root_class: 'new: a guest-owned table under staff-only row security'
 tickets:
   started:
@@ -50,4 +50,7 @@ status: open
 notes: 'The children of orders.sales_order (deposit, discount, group_booking, order_fee, payment, refund,
   ticket_transfer, upgrade and theirs) follow it for reading only, as the generator does for every split parent: read
   where the parent is visible, written where the parent may be written. Their staff behaviour is unchanged. Proved on
-  copies: a guest session sees its own order and line only, updates no other order, and cannot write an order line.'
+  copies: a guest session sees its own order and line only, updates no other order, and cannot write an order line.
+  Integration gate of 22 October 2026 (CHG-R9INT-002): the forward migration is cited by the name it is committed
+  under, backend/tenant/V0114__after_r1_20261022.sql; this lane had cited the name its own run of 21 October wrote and
+  never committed (check-cited-sources CS-MISSING).'
