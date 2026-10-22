@@ -541,6 +541,10 @@ class Model:
                 continue   # a renamed table's policies take its name (CHG-R8WFM-001): the model keys no policy name
             g = None if RETIRE_GUARD.match(s) else GUARD.match(s)
             from_guard = bool(g)
+            if g and len(split_statements(g.group("body"))) > 1:
+                # a widened primary key (CHG-R9KEY-001): the keys that depended on it dropped, then the key replaced
+                self.apply_forward(";\n".join(split_statements(g.group("body"))) + ";\n")
+                continue
             if g:
                 # a guarded rename, key or dropped index (R8-MIG-001): fold in the one change it makes
                 stmt = s = re.sub(r" NOT VALID$", "", norm(g.group("body")), flags=re.I)
@@ -631,6 +635,28 @@ class Model:
                         self.drop(lambda k: k[0] == "constraint" and k[1] == t and k[2] == unq(a.group(1)))
                         tab.constraints = {c for c in tab.constraints
                                            if not c.upper().startswith(f"CONSTRAINT {unq(a.group(1)).upper()} ")}
+                        if unq(a.group(1)) == _pg_name(t.split(".", 1)[1], "pkey"):
+                            # the implicit primary key of an inline `PRIMARY KEY` column (CHG-R9KEY-001)
+                            for c_, d_ in list(tab.cols.items()):
+                                tab.cols[c_] = strip_inline_pk(d_) if re.search(r"\bPRIMARY KEY\b", d_, re.I) else d_
+                        handled = True
+                        continue
+                    # A primary key a forward migration put in place (a widened key, CHG-R9KEY-001) is the table's
+                    # constraint, as in the generated CREATE TABLE; its columns are NOT NULL through it (parse_table).
+                    a = re.match(rf"ADD (CONSTRAINT {NAME} PRIMARY KEY\s*\(([^)]*)\))$", action, re.I)
+                    if a:
+                        tab.constraints = {c for c in tab.constraints if not re.search(r"\bPRIMARY KEY\b", c, re.I)}
+                        tab.constraints.add(norm(a.group(1)))
+                        for c_ in (unq(x.strip()) for x in a.group(2).split(",")):
+                            if c_ in tab.cols:
+                                tab.cols[c_] = norm(re.sub(r"\s+NOT NULL\b", "", tab.cols[c_], flags=re.I))
+                        handled = True
+                        continue
+                    # a key dropped and added again in one ALTER TABLE (a changed key, CHG-R9KEY-001); a lone ADD
+                    # CONSTRAINT is kept as written, below
+                    a = re.match(rf"ADD (CONSTRAINT {NAME} FOREIGN KEY .*?)(?: NOT VALID)?$", action, re.I)
+                    if a and len(top_level_split(m.group(2))) > 1:
+                        self.add(f"ALTER TABLE {t} ADD {norm(a.group(1))}")
                         handled = True
                 if handled:
                     continue
@@ -826,20 +852,119 @@ def guard_foreign_key(stmt: str, not_valid: bool = True) -> str | None:
     t, name, cols, parent, pcols, tail = f
     if "NOT VALID" in tail.upper():
         return None
-    (tsch, tn), (psch, pn) = _split_t(t), _split_t(parent)
     exist = " AND ".join([f"to_regclass('{t}') IS NOT NULL", f"to_regclass('{parent}') IS NOT NULL",
                           f"NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = '{name}' AND conrelid = "
                           f"to_regclass('{t}'))"])
-    same_type = " AND ".join(
+    body = norm(stmt).rstrip(";") + (" NOT VALID" if not_valid else "")
+    return (f"DO $$ BEGIN IF {exist} AND {_same_type(t, cols, parent, pcols)} AND {_unique_on(parent, pcols)} THEN "
+            f"{body}; END IF; END $$")
+
+
+def _same_type(t: str, cols, parent: str, pcols) -> str:
+    """Each key column of `t` has the type of its column in `parent` (false where either column is missing)."""
+    return " AND ".join(
         f"(SELECT atttypid FROM pg_attribute WHERE attrelid = to_regclass('{t}') AND attname = '{c}') = "
         f"(SELECT atttypid FROM pg_attribute WHERE attrelid = to_regclass('{parent}') AND attname = '{pc}')"
         for c, pc in zip(cols, pcols))
+
+
+def _unique_on(parent: str, pcols) -> str:
+    """`parent` has a unique index on exactly the columns `pcols` (in any order): a key can point at them."""
     arr = "ARRAY[" + ", ".join(f"'{c}'" for c in sorted(pcols)) + "]"
-    unique = (f"EXISTS (SELECT 1 FROM pg_index i WHERE i.indrelid = to_regclass('{parent}') AND i.indisunique AND "
-              f"i.indpred IS NULL AND i.indexprs IS NULL AND (SELECT array_agg(a.attname::text ORDER BY a.attname) "
-              f"FROM pg_attribute a WHERE a.attrelid = i.indrelid AND a.attnum = ANY (i.indkey)) = {arr})")
-    body = norm(stmt).rstrip(";") + (" NOT VALID" if not_valid else "")
-    return f"DO $$ BEGIN IF {exist} AND {same_type} AND {unique} THEN {body}; END IF; END $$"
+    return (f"EXISTS (SELECT 1 FROM pg_index i WHERE i.indrelid = to_regclass('{parent}') AND i.indisunique AND "
+            f"i.indpred IS NULL AND i.indexprs IS NULL AND (SELECT array_agg(a.attname::text ORDER BY a.attname) "
+            f"FROM pg_attribute a WHERE a.attrelid = i.indrelid AND a.attnum = ANY (i.indkey)) = {arr})")
+
+
+def _key_columns(rel: str, keys: str) -> str:
+    """The names of the columns `keys` (an int2[] of attribute numbers such as conkey) lists on `rel`, in its order."""
+    return (f"(SELECT array_agg(a.attname::text ORDER BY k.n) FROM unnest({keys}) WITH ORDINALITY k(attnum, n) "
+            f"JOIN pg_attribute a ON a.attrelid = {rel} AND a.attnum = k.attnum)")
+
+
+def _array(cols) -> str:
+    return "ARRAY[" + ", ".join(f"'{c}'" for c in cols) + "]"
+
+
+# ---- a key the reference has changed since a forward migration added it (CHG-R9KEY-001) ------------------------------
+# **A foreign key is written as the schema reference has it now, never left in a superseded form** (22 October 2026, on
+# a copy of the live database). r8's names file (V0107) added rental.booking's deposit key onto
+# orders.stored_value_authorisation, the reference as it stood before CR-146 reached it, and platform.profile_deployment's
+# key on profile_id alone, before CHG-R8MIG-019 keyed a configuration profile (id, version). Once a shipped file carries
+# a key, the old side of the diff has it, and a key whose target or columns the reference changed afterwards was a
+# "constraint changed" row for a person, "drop and re-add by hand"; no ticket named it, so on live every rental
+# card-deposit checkout was refused by a key onto the wrong table. Now the key is written as a guarded change: where
+# the constraint of that name is not already the reference's (its table, columns, referenced table and referenced
+# columns), it is dropped and added again in the reference's form, NOT VALID, in one ALTER TABLE; where it already is
+# (our team's repository re-pointed rental.booking's in its migration 242), the block does nothing; where a table or
+# column is missing, or the referenced columns are not a unique key yet, it does nothing either.
+
+
+def fk_is(t: str, name: str, cols, parent: str, pcols) -> str:
+    """The constraint `name` on `t` is the foreign key (cols) -> parent(pcols), columns in order."""
+    return (f"EXISTS (SELECT 1 FROM pg_constraint c WHERE c.conname = '{name}' AND c.conrelid = to_regclass('{t}') AND "
+            f"c.contype = 'f' AND c.confrelid = to_regclass('{parent}') AND {_key_columns('c.conrelid', 'c.conkey')} = "
+            f"{_array(cols)} AND {_key_columns('c.confrelid', 'c.confkey')} = {_array(pcols)})")
+
+
+def guard_change_foreign_key(stmt: str, not_valid: bool = True) -> str | None:
+    """The foreign key `stmt` (the reference's form) put in place of a constraint of the same name in any other form:
+    `ALTER TABLE t DROP CONSTRAINT IF EXISTS k, ADD CONSTRAINT k ... NOT VALID`, guarded on both tables, the key's
+    columns having the parent's types, the parent's columns being a unique key, and the constraint not already being
+    this key. A database without the constraint gets it, as a guarded add would give it. NOT VALID, as every key the
+    names file adds (a partitioned table's checked, guard_foreign_key); VALIDATE stays the owner's."""
+    f = parse_fk(stmt)
+    if not f or "NOT VALID" in f[5].upper() or f[5]:
+        return None
+    t, name, cols, parent, pcols, _tail = f
+    guard = " AND ".join([f"to_regclass('{t}') IS NOT NULL", f"to_regclass('{parent}') IS NOT NULL",
+                          _same_type(t, cols, parent, pcols), _unique_on(parent, pcols),
+                          "NOT " + fk_is(t, name, cols, parent, pcols)])
+    add = norm(stmt).rstrip(";").split(f" ADD CONSTRAINT {name} ", 1)[1]
+    body = (f"ALTER TABLE {t} DROP CONSTRAINT IF EXISTS {name}, ADD CONSTRAINT {name} {add}"
+            + (" NOT VALID" if not_valid else ""))
+    return f"DO $$ BEGIN IF {guard} THEN {body}; END IF; END $$"
+
+
+def guard_widen_primary_key(t: str, old_name: str, old_cols, new_name: str, new_cols, inbound) -> str:
+    """The primary key of `t` widened from `old_cols` to `new_cols` (a superset: CHG-R8MIG-019's configuration profile,
+    (id) to (id, version)), which no row can break once the added columns are NOT NULL. Guarded: the table and the new
+    key's columns exist and are NOT NULL, the primary key is still `old_name` on exactly `old_cols`, and no foreign key
+    depends on it but `inbound` [(table, key)], the keys the reference points at the new key instead; those are dropped
+    first (PostgreSQL refuses to drop a key another depends on), and the changed-key blocks after this one add them in
+    the reference's form. Anything else depending on the old key leaves the table as it is, for a person."""
+    sch, name = _split_t(t)
+    have = " AND ".join(_col_exists(sch, name, c) for c in new_cols)
+    not_null = (f"NOT EXISTS (SELECT 1 FROM pg_attribute WHERE attrelid = to_regclass('{t}') AND attname IN ("
+                + ", ".join(f"'{c}'" for c in new_cols) + ") AND NOT attnotnull)")
+    pk = (f"SELECT {{}} FROM pg_constraint p WHERE p.conname = '{old_name}' AND p.conrelid = to_regclass('{t}') AND "
+          f"p.contype = 'p'")
+    is_old = (f"EXISTS ({pk.format('1')} AND (SELECT array_agg(a.attname::text ORDER BY a.attname) FROM pg_attribute a "
+              f"WHERE a.attrelid = p.conrelid AND a.attnum = ANY (p.conkey)) = {_array(sorted(old_cols))})")
+    known = " OR ".join(f"(f.conrelid = to_regclass('{ct}') AND f.conname = '{cn}')" for ct, cn, _c, _p in inbound)
+    others = (f"NOT EXISTS (SELECT 1 FROM pg_constraint f WHERE f.contype = 'f' AND f.confrelid = to_regclass('{t}') "
+              f"AND f.conindid = ({pk.format('p.conindid')})" + (f" AND NOT ({known})" if known else "") + ")")
+    # each key dropped here can be added again onto the new key: its table is gone, or its columns have the new types
+    readd = [f"(to_regclass('{ct}') IS NULL OR {_same_type(ct, cols, t, pcols)})" for ct, _cn, cols, pcols in inbound]
+    body = [f"ALTER TABLE IF EXISTS {ct} DROP CONSTRAINT IF EXISTS {cn}" for ct, cn, _c, _p in inbound]
+    body.append(f"ALTER TABLE {t} DROP CONSTRAINT {old_name}, ADD CONSTRAINT {new_name} PRIMARY KEY "
+                f"({', '.join(new_cols)})")
+    return (f"DO $$ BEGIN IF " + " AND ".join([f"to_regclass('{t}') IS NOT NULL", have, not_null, is_old, others] + readd)
+            + " THEN " + "; ".join(body) + "; END IF; END $$")
+
+
+def primary_key(tab) -> tuple:
+    """(constraint name or None for the implicit `<table>_pkey`, [columns]) of a parsed table's primary key."""
+    for c in sorted(tab.constraints):
+        m = re.match(rf"(?:CONSTRAINT ({NAME}) )?PRIMARY KEY\s*\(([^)]*)\)", c, re.I)
+        if m:
+            return (unq(m.group(1)) if m.group(1) else None, [unq(x.strip()) for x in m.group(2).split(",")])
+    inline = [c for c, d in tab.cols.items() if re.search(r"\bPRIMARY KEY\b", d, re.I)]
+    return (None, inline)
+
+
+def strip_inline_pk(coldef: str) -> str:
+    return norm(re.sub(r"\s+PRIMARY KEY\b", "", coldef, flags=re.I))
 
 
 RLS_CALL = re.compile(r"^SELECT platform\.(apply_\w*rls|drop_rls_policies)\('([^']+)'::regclass", re.I)
@@ -1209,6 +1334,7 @@ def diff(area: str, old: Model, new: Model, renames: dict | None = None, retired
     Every statement written is guarded at the end (`guard_statements`, CHG-R9MIG-002)."""
     p = Plan(area)
     recon_cols, recon_names, recon_fk, recon_drop = [], [], [], []   # (statement, rollback), in the order they run
+    recon_pk = []                                                    # widened primary keys (CHG-R9KEY-001)
     renames = renames or {}
     retired = retired or {}
     known = set(old.tables) | set(new.tables)
@@ -1298,6 +1424,38 @@ def diff(area: str, old: Model, new: Model, renames: dict | None = None, retired
 
     def all_pure(t, cols) -> bool:
         return all(pure_rename(t, c) for c in (cols or ()) if (t, c) in rc)
+
+    def partitioned(t) -> bool:
+        return "PARTITION BY" in ((new.tables.get(t) or Table()).tail or "").upper()
+
+    # **A primary key the reference widens is written** (CHG-R9KEY-001): (id) to (id, version), CHG-R8MIG-019's
+    # configuration profile. Every row keeps a unique key (the old columns were one), so there is no data question once
+    # the added columns are NOT NULL; the keys onto the old primary key must be dropped first, so it is written only when
+    # the reference points each of them at the new key. table -> (old name, old columns, new name, new columns,
+    # [(table, key, columns, referenced columns) of the keys onto the old one]).
+    widened = {}
+    for t in sorted(set(old.tables) & set(new.tables)):
+        a, b = old.tables[t], new.tables[t]
+        (on, oc), (nn, nc) = primary_key(a), primary_key(b)
+        if not oc or not nc or not set(oc) < set(nc) or a.tail != b.tail or any(c not in a.cols for c in nc) \
+                or any((t, c) in rc for c in nc):
+            continue
+        inbound, ok = [], True
+        for k, st in sorted(old.stmts.items()):
+            f = parse_fk(st) if k[0] == "constraint" else None
+            if not f or f[3] != t or set(f[4]) != set(oc):
+                continue
+            nf = parse_fk(new.stmts[k]) if k in new.stmts else None
+            if nf and nf[3] == t and set(nf[4]) == set(nc) and not nf[5] and k[1] in new.tables                     and k[1] not in rt.values():
+                inbound.append((k[1], k[2], nf[2], nf[4]))         # pointed at the new key: its changed-key block
+            else:
+                ok = False     # withdrawn, renamed or kept on the old key: the key change stays a person's
+        if ok:
+            rel = t.split(".", 1)[1]
+            widened[t] = (on or _pg_name(rel, "pkey"), oc, nn or _pg_name(rel, "pkey"), nc, inbound)
+
+    def nn_free(d: str) -> str:
+        return norm(re.sub(r"\s+NOT NULL\b", "", d, flags=re.I))
 
     for t in sorted(rt):
         o = rt[t]
@@ -1392,7 +1550,9 @@ def diff(area: str, old: Model, new: Model, renames: dict | None = None, retired
                 elif a.cols[c] != d and (t, c) not in old.handled:
                     fill = (scope_path_backfill(t, b.cols, was_tenant_root(old, t), was_venue_rls(old, t))
                             if c == "scope_path" else None)
-                    if a.cols[c] == relaxed(d) and fill:
+                    if t in widened and c in widened[t][1] and nn_free(strip_inline_pk(a.cols[c])) == nn_free(d):
+                        pass   # its inline PRIMARY KEY gives way to the widened key, written below (CHG-R9KEY-001)
+                    elif a.cols[c] == relaxed(d) and fill:
                         # **A scope_path an earlier forward migration added keeps its named backfill** (MOD audit,
                         # 14 October 2026, CHG-MOD-007). Once that migration is in the old side, the column is "still
                         # nullable", and this row used to drop the backfill CHG-R6G-002 names, so
@@ -1457,6 +1617,8 @@ def diff(area: str, old: Model, new: Model, renames: dict | None = None, retired
             old_names = {re.match(r"CONSTRAINT (\S+) ", x).group(1) for x in a.constraints
                          if re.match(r"CONSTRAINT (\S+) ", x)}
             for c in sorted(b.constraints - a.constraints):
+                if t in widened and re.search(r"\bPRIMARY KEY\b", c, re.I):
+                    continue   # the widened primary key, written below (CHG-R9KEY-001)
                 chk = re.match(r"CONSTRAINT (\S+) CHECK\b", c, re.I)
                 if chk and chk.group(1) not in old_names:
                     # **A new table CHECK is written** (CHG-MGN-001, ADAM CR-156): NOT VALID, so adding it takes no
@@ -1479,6 +1641,8 @@ def diff(area: str, old: Model, new: Model, renames: dict | None = None, retired
                     continue
                 review("constraint added", t, f"`{c}`", "existing rows may violate it: validate, then add by hand")
             for c in sorted(a.constraints - b.constraints):
+                if t in widened and re.search(r"\bPRIMARY KEY\b", c, re.I):
+                    continue   # the primary key the widened one replaces (CHG-R9KEY-001)
                 review("constraint dropped", t, f"`{c}`", "drop by hand if intended")
             if a.tail != b.tail:
                 review("table changed", t, f"`{a.tail or '(none)'}` -> `{b.tail or '(none)'}`",
@@ -1587,6 +1751,21 @@ def diff(area: str, old: Model, new: Model, renames: dict | None = None, retired
                 review("constraint added", f"{t} {name}", f"`{new.stmts[k]}`",
                        "existing rows may violate it: validate, then add by hand (NOT VALID, then VALIDATE)")
             else:
+                # **A key whose target or columns changed is put in the reference's form** (CHG-R9KEY-001): guarded,
+                # so a database whose key is already the reference's (our team's migration 242) is left as it is.
+                of, nf = parse_fk(old.stmts[k]), parse_fk(new.stmts[k])
+                g = None
+                if (of and nf and not of[5] and not nf[5] and (of[2], of[3], of[4]) != (nf[2], nf[3], nf[4])
+                        and t in old.tables and t not in rt and nf[3] in known and nf[3] not in rt):
+                    g = guard_change_foreign_key(new.stmts[k], not_valid=not partitioned(t))
+                if g:
+                    # onto a widened primary key, the old key comes back in that key's rollback, after the old key
+                    onto_widened = of[3] in widened and set(of[4]) == set(widened[of[3]][1])
+                    recon_fk.append((tag(t, "change foreign key", name, g, nf[3]),
+                                     f"ALTER TABLE {t} DROP CONSTRAINT IF EXISTS {name};"
+                                     + ("" if onto_widened else f" {old.stmts[k].rstrip(';')} NOT VALID;")))
+                    p.recon_counts["keys"] += 1
+                    continue
                 review("constraint changed", f"{t} {name}", f"`{old.stmts[k]}` -> `{new.stmts[k]}`",
                        "drop and re-add by hand")
             continue
@@ -1716,6 +1895,25 @@ def diff(area: str, old: Model, new: Model, renames: dict | None = None, retired
     # The old helpers come back first when the rollback runs (it runs in reverse), then each policy is applied again.
     p.rollback += [r.rstrip().rstrip(";") + ";" for r in restore]
 
+    # The widened primary keys (CHG-R9KEY-001), each before the changed keys that point at it; then every key onto it
+    # that an earlier names file added guarded while the key was missing (CHG-R8MIG-019's workstation key waited for
+    # it), added again, guarded, so a database whose primary key this file widens gets it too. Where it is there,
+    # the block does nothing.
+    for t, (on, oc, nn, nc, inbound) in sorted(widened.items()):
+        back = (f"ALTER TABLE {t} DROP CONSTRAINT {nn}, ADD CONSTRAINT {on} PRIMARY KEY ({', '.join(oc)});"
+                + "".join(f" {old.stmts[('constraint', ct, cn)].rstrip().rstrip(';')} NOT VALID;"
+                          for ct, cn, _c, _p in inbound))
+        recon_pk.append((tag(t, "widen primary key", nn, guard_widen_primary_key(t, on, oc, nn, nc, inbound)), back))
+        p.recon_counts["keys"] += 1
+        for k, st in new.order:
+            f = parse_fk(new.stmts[k]) if k[0] == "constraint" else None
+            if not f or f[3] != t or set(f[4]) != set(nc) or old.stmts.get(k) != new.stmts[k] or k[1] not in old.tables:
+                continue
+            g = guard_foreign_key(new.stmts[k], not_valid=not partitioned(k[1]))
+            if g:
+                recon_fk.append((tag(k[1], "foreign key", k[2], g, t), f"ALTER TABLE {k[1]} DROP CONSTRAINT IF EXISTS {k[2]};"))
+                p.recon_counts["keys"] += 1
+
     removed_tables = set(old.tables) - set(new.tables)
     renamed_away = set(rt.values())
     for t, objs in sorted(follows.items()):
@@ -1788,8 +1986,9 @@ def diff(area: str, old: Model, new: Model, renames: dict | None = None, retired
             if not (refs and refs <= removed_tables):
                 review("statement dropped", ", ".join(sorted(refs)) or "(database)", f"`{old.stmts[k]}`",
                        "undo it by hand if intended")
-    # Renames first (a key or an index below names the new column), then the keys, then the drops.
-    for stmt_, back_ in recon_cols + recon_names + recon_fk + recon_drop:
+    # Renames first (a key or an index below names the new column), then a widened primary key, then the keys (the
+    # changed keys onto it after it), then the drops.
+    for stmt_, back_ in recon_cols + recon_names + recon_pk + recon_fk + recon_drop:
         p.recon.append(stmt_)
         p.recon_rollback.append(back_)
     p.statements = guard_statements(p.statements, old, new)
@@ -2023,6 +2222,16 @@ def render_recon(p: Plan, version: str, baseline: str, stamp: str, before: str =
         "-- by a migration that runs after this one copies the blocks that name it (ticket text: 'Changes this file",
         "-- makes to your tables'). A foreign key is added NOT VALID: it checks every new write, and the owner runs",
         "-- ALTER TABLE ... VALIDATE CONSTRAINT when the rows already there are known to be clean.",
+    ] + ([
+        "-- A foreign key the schema reference has changed since a forward migration added it (its referenced table or",
+        "-- its columns) is put in the reference's form: where the constraint of that name is any other key, it is",
+        "-- dropped and added again NOT VALID in one ALTER TABLE; where it is already the reference's key, the block does",
+        "-- nothing (CHG-R9KEY-001).",
+    ] if any("| change foreign key |" in x for x in p.recon) else []) + ([
+        "-- A primary key the schema reference widens (its old columns and more) is replaced where it is still the old",
+        "-- one and its new columns are NOT NULL, after dropping the keys that point at it; the changed keys after it add",
+        "-- them again onto the new key (CHG-R9KEY-001).",
+    ] if any("| widen primary key |" in x for x in p.recon) else []) + [
         f"-- {what}.",
     ] + ([
         "--",
