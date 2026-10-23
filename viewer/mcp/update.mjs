@@ -775,7 +775,7 @@ async function main() {
       stdio: 'inherit', env: { ...process.env, ADAM_UPDATE_HANDOFF: '1' },
     });
     if (next.status === 0) {
-      say('Restart Claude Code to load it — the running connector is still the old one.');
+      restartConnector();
       return;
     }
     say('the new updater did not finish; run /update-adam once more from your workspace folder.');
@@ -783,7 +783,50 @@ async function main() {
   }
   await ensureHooks();
   await refreshHere();
-  say('Restart Claude Code to load it — the running connector is still the old one.');
+  if (!process.env.ADAM_UPDATE_HANDOFF) restartConnector();
+}
+
+/**
+ * Stops the connector processes still running the build just replaced, so nobody has to close VS Code.
+ *
+ * The running server.mjs keeps its old code until it is started again, and "restart Claude Code" was read as
+ * restarting the chat, which leaves it running (22 October 2026). Only this install's server.mjs is matched.
+ * Claude Code shows `adam` as stopped; `/mcp` and Reconnect starts the new build. `--keep-running` skips it.
+ */
+function restartConnector() {
+  if (process.argv.includes('--keep-running')) {
+    say('Restart Claude Code to load it — the running connector is still the old one.');
+    return;
+  }
+  // Compared resolved and case-folded: Claude Code may have started it as C:\Users\CHINMA~1.PAR\... while this file
+  // sees C:\Users\Chinmay.Parab\..., and with either slash. Only node processes, never a shell that mentions the path.
+  const real = (f) => { try { return realpathSync.native(f); } catch { return f; } };
+  const norm = (f) => real(String(f)).toLowerCase().replace(/\\/g, '/');
+  const mine = norm(path.join(HERE, 'server.mjs'));
+  let stopped = 0;
+  try {
+    if (process.platform === 'win32') {
+      const ps = spawnSync('powershell', ['-NoProfile', '-NonInteractive', '-Command',
+        "Get-CimInstance Win32_Process -Filter \"Name='node.exe'\" | Where-Object { $_.CommandLine -like '*server.mjs*' }"
+        + ' | Select-Object ProcessId, CommandLine | ConvertTo-Json -Compress'], { encoding: 'utf8' });
+      const found = [].concat(JSON.parse(String(ps.stdout).trim() || '[]'));
+      for (const p of found) {
+        if (p.ProcessId === process.pid) continue;
+        const args = String(p.CommandLine).match(/"[^"]+"|\S+/g) ?? [];
+        if (!args.some((a) => a.replace(/^"|"$/g, '').endsWith('server.mjs') && norm(a.replace(/^"|"$/g, '')) === mine)) continue;
+        try { process.kill(p.ProcessId); stopped++; } catch { /* already gone */ }
+      }
+    } else {
+      const pk = spawnSync('pkill', ['-f', path.join(HERE, 'server.mjs')], { encoding: 'utf8' });
+      stopped = pk.status === 0 ? 1 : 0;
+    }
+  } catch { /* nothing to stop, or no way to look */ }
+  if (stopped) {
+    say(`stopped the old connector (${stopped} process${stopped === 1 ? '' : 'es'}). In Claude Code run /mcp, `
+      + 'choose adam and Reconnect: it starts the new build. No need to close VS Code.');
+  } else {
+    say('Restart Claude Code (or /mcp, adam, Reconnect) to load it.');
+  }
 }
 
 main().catch((error) => {

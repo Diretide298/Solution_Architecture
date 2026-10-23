@@ -41,6 +41,38 @@ import path from 'node:path';
 const here = path.dirname(fileURLToPath(import.meta.url));
 const SERVER = path.join(here, 'server.mjs');
 
+// **Run by hand, it checks the ADAM this connector is registered with.** Setup passes the address and account in
+// the environment; a developer typing `node mcp-check.mjs` has neither, and the check went to localhost (23 October
+// 2026). Whatever the environment does not set comes from the registration Claude Code keeps for this server.mjs in
+// ~/.claude.json, then the address from viewer-url.txt beside it. Read here, passed to the server it starts, never
+// printed.
+{
+  const { readFileSync, realpathSync } = await import('node:fs');
+  const { homedir } = await import('node:os');
+  const real = (f) => { try { return realpathSync.native(f); } catch { return f; } };
+  const norm = (f) => real(String(f)).toLowerCase().replace(/\\/g, '/');
+  let registered = {};
+  try {
+    const cfg = JSON.parse(readFileSync(path.join(homedir(), '.claude.json'), 'utf8'));
+    const mine = norm(SERVER);
+    const groups = [cfg.mcpServers ?? {}, ...Object.values(cfg.projects ?? {}).map((p) => p?.mcpServers ?? {})];
+    for (const group of groups) {
+      for (const s of Object.values(group)) {
+        if ((s?.args ?? []).map(norm).includes(mine) && s?.env?.ADAM_VIEWER_URL) registered = s.env;
+      }
+    }
+  } catch { /* no readable registration */ }
+  for (const name of ['ADAM_VIEWER_URL', 'ADAM_EMAIL', 'ADAM_PASSWORD', 'ADAM_PROJECT']) {
+    if (!process.env[name] && registered[name]) process.env[name] = registered[name];
+  }
+  if (!process.env.ADAM_VIEWER_URL) {
+    try {
+      const url = readFileSync(path.join(here, 'viewer-url.txt'), 'utf8').trim();
+      if (/^https?:\/\//.test(url)) process.env.ADAM_VIEWER_URL = url;
+    } catch { /* an install from before 7 October has none */ }
+  }
+}
+
 const results = [];
 const pass = (what) => { results.push([true, what]); console.log(`  ok    ${what}`); };
 const fail = (what, why) => { results.push([false, what]); console.log(`  FAIL  ${what}\n        ${why}`); };
