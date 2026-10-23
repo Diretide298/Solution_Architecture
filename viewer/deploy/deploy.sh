@@ -545,7 +545,10 @@ sudo -u "$APP_USER" HOME="/home/$APP_USER" pm2 save >/dev/null
 
 # Survive a reboot. pm2 startup prints a command to run as root rather than
 # doing it, so this runs what it prints.
-STARTUP="$(sudo -u "$APP_USER" HOME="/home/$APP_USER" pm2 startup systemd -u "$APP_USER" --hp "/home/$APP_USER" | tail -1)"
+# pm2 startup, run as the service user, prints the root command and exits 1 by design. Under pipefail that ended
+# the deploy here with no message, so the backup job and the checks below never ran (found 23 October 2026: no
+# /etc/cron.d/ticvai-backup on the box). Take the line it prints and carry on.
+STARTUP="$( { sudo -u "$APP_USER" HOME="/home/$APP_USER" pm2 startup systemd -u "$APP_USER" --hp "/home/$APP_USER" || true; } | tail -1)"
 if [[ "$STARTUP" == sudo* || "$STARTUP" == env* ]]; then
   eval "$STARTUP" >/dev/null 2>&1 || note "could not install the boot hook automatically"
 fi
