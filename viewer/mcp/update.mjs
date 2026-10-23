@@ -38,6 +38,7 @@
 
 import { readFile, writeFile, mkdir, rename, copyFile, access } from 'node:fs/promises';
 import { readFileSync, realpathSync } from 'node:fs';
+import { spawnSync } from 'node:child_process';
 import os from 'node:os';
 import path from 'node:path';
 import { FILES, HERE, buildOf } from './version.mjs';
@@ -765,11 +766,23 @@ async function main() {
   }
 
   say(`updated to ${now}. The previous build is in ${backup}.`);
+  // **One command, not two.** The code running now is the build just replaced: it only knows its own file list and
+  // its own way of refreshing the workspace, so whatever the new build adds would wait for a second /update-adam.
+  // Hand over once to the updater just written; it fetches anything this one could not name, then installs the hooks
+  // and refreshes the workspace with the new code. The flag stops it handing over again.
+  if (!process.env.ADAM_UPDATE_HANDOFF) {
+    const next = spawnSync(process.execPath, [path.join(HERE, 'update.mjs'), ...process.argv.slice(2)], {
+      stdio: 'inherit', env: { ...process.env, ADAM_UPDATE_HANDOFF: '1' },
+    });
+    if (next.status === 0) {
+      say('Restart Claude Code to load it — the running connector is still the old one.');
+      return;
+    }
+    say('the new updater did not finish; run /update-adam once more from your workspace folder.');
+    process.exit(next.status ?? 1);
+  }
   await ensureHooks();
-  // The code running is the one just replaced, so a refresh that arrived with this update is made by the next run.
   await refreshHere();
-  say('This update also brings the part that refreshes the ADAM files in your workspace, and it can only start on the next run: '
-    + 'run /update-adam once more, from your workspace folder (or re-run setup.cmd).');
   say('Restart Claude Code to load it — the running connector is still the old one.');
 }
 

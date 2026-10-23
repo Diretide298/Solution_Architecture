@@ -218,11 +218,11 @@ LATER
                                      and ADAM's are only added if missing.
   * Got a newer version of this zip? Run its setup.cmd the same way.
   * Keep the connector current:      /update-adam in Claude Code, then
-                                     restart Claude Code. On a connector
-                                     from before 13 October 2026, run
-                                     /update-adam twice: the first run
-                                     brings the updater that knows about
-                                     the usage hook, the second brings it.
+                                     restart Claude Code. One run is
+                                     enough from 23 October 2026: the new
+                                     updater finishes the job itself. A
+                                     connector older than that needs
+                                     /update-adam twice, once.
   * Another project or role?         Run setup.cmd again and pick it.
   * Remove ADAM from one folder, in PowerShell:
         powershell -ExecutionPolicy Bypass -File "$env:USERPROFILE\.adam\connector\setup.ps1" -RemoveFolder "C:\work\ticvai-backend"
