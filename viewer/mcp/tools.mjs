@@ -3868,6 +3868,8 @@ export const TOOLS = [
         kind: { type: 'string', description: 'Artefact kind, e.g. operation, schema, table, screen, flow' },
         target: { type: 'string', description: 'Artefact id, e.g. identity#requestGuestCode' },
         ticket: { type: 'string', description: 'OpenProject work package number' },
+        limit: { type: 'integer', description: 'How many to list, newest first; default 40' },
+        offset: { type: 'integer', description: 'How many of the newest to skip, to read the next page' },
         from: {
           type: 'string',
           description: 'Release notes: the change requests settled (accepted or done) after this release tag, e.g. r1',
@@ -3878,7 +3880,7 @@ export const TOOLS = [
         },
       },
     },
-    async run(client, { id, status, kind, target, ticket, from, to } = {}) {
+    async run(client, { id, status, kind, target, ticket, limit, offset, from, to } = {}) {
       const project = (await client.projectId()) ?? '';
       if (from || to) {
         const query = new URLSearchParams({ project_id: project });
@@ -3911,10 +3913,20 @@ export const TOOLS = [
       if (ticket) query.set('ticket', String(ticket).replace(/^#/, ''));
       const answer = await client.service(`/api/changes?${query}`);
       if (!answer.ok) return { found: false, error: answer.data?.detail ?? `HTTP ${answer.status}` };
-      const { items, ...rest } = answer.data;
+      // A list, newest first and a page at a time: by 22 October the project's whole list was 121 KB, past the
+      // answer ceiling, so a bare call (the first thing an agent and mcp-check make) failed outright.
+      const { items: all, ...rest } = answer.data;
+      const skip = Math.max(0, Number(offset) || 0);
+      const take = Math.max(1, Math.min(200, Number(limit) || 40));
+      const items = [...all].sort((a, b) => String(b.raisedAt ?? '').localeCompare(String(a.raisedAt ?? '')))
+        .slice(skip, skip + take);
+      const more = Math.max(0, all.length - skip - items.length);
       return {
         found: items.length > 0,
         ...rest,
+        total: rest.total ?? all.length,
+        shown: items.length,
+        ...(more ? { more: `${more} more follow: call again with offset ${skip + items.length}, or narrow by status, kind + target, or ticket` } : {}),
         items: items.map((c) => ({
           id: c.id, status: c.status, title: c.title, target: c.target,
           blocking: c.blocking, ticket: c.ticket, raisedBy: c.raisedBy, raisedAt: c.raisedAt,
