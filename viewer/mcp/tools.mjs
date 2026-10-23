@@ -3002,9 +3002,11 @@ export const TOOLS = [
       for (const t of items) {
         if ((t.subtasks ?? []).length) held[t.key] = t.subtasks;
       }
+      // Counted, not listed. After r9's links (59,213) one foundation ticket touches hundreds of tables, and the
+      // full lists took a 30-row board to 131 KB, past the ceiling (23 October). adam_pull <ticket> gives the list.
       const touching = {};
       for (const t of items) {
-        if ((t.touches ?? []).length) touching[t.key] = t.touches;
+        if ((t.touches ?? []).length) touching[t.key] = t.touches.length;
       }
 
       const wanted = args?.subtasks === true;
@@ -3053,6 +3055,7 @@ export const TOOLS = [
         ...(wanted ? { subtasks: held } : {}),
         ...(wanted ? {} : { subtasksHeld: Object.keys(held).length }),
         touches: touching,
+        touchesNote: 'How many artefacts each ticket touches; adam_pull <ticket> lists them.',
         display: wanted
           ? 'Show `rows` as a markdown table using `columns`, then the subtasks under their ticket; if `subtaskNote` is '
             + 'present, say it in one line. '
