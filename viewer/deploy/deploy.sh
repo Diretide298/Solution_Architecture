@@ -581,10 +581,12 @@ for i in $(seq 1 30); do
 done
 note "accounts service up on $API_PORT"
 
-for i in $(seq 1 30); do
+# Two minutes, not thirty seconds: the viewer reads every registered package before it listens, and with two
+# projects at r9 that is past thirty seconds (23 October 2026: "never answered", then up a few seconds later).
+for i in $(seq 1 120); do
   curl -so /dev/null "http://127.0.0.1:$VIEWER_PORT/login.html" && break
   sleep 1
-  [[ $i -eq 30 ]] && die "the viewer never answered — pm2 logs ticvai-viewer"
+  [[ $i -eq 120 ]] && die "the viewer never answered in two minutes — pm2 logs ticvai-viewer"
 done
 note "viewer up on $VIEWER_PORT"
 
