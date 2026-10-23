@@ -1040,6 +1040,20 @@ $server = Join-Path $InstallDir 'server.mjs'
 Set-Content -LiteralPath (Join-Path $InstallDir 'viewer-url.txt') -Value $ViewerUrl -Encoding ascii
 Good "copied to $InstallDir"
 
+# **A zip is a snapshot; ADAM is the current build.** The copy above puts this zip's files over whatever was
+# installed, so setup from an older zip took a developer back to an older connector, and the check below then
+# failed on bugs ADAM had already fixed (23 October 2026: adam_board and adam_changes "too large"). Bring the
+# installed copy to the build ADAM serves before checking it. Not reaching ADAM is a note, not a stop.
+if ($node) {
+    $updater = Join-Path $InstallDir 'update.mjs'
+    try {
+        $out = & $node.Source $updater 2>&1
+        $out | ForEach-Object { Note "$_" }
+    } catch {
+        Note "could not bring the connector up to date now: $($_.Exception.Message). Run /update-adam later."
+    }
+}
+
 # /update-adam, for every folder rather than only this one.
 #
 # **This is what makes the zip a first-install-only thing.** The command also
