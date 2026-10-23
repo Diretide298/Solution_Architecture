@@ -2324,15 +2324,13 @@ async function pullOne(client, key, base, when) {
   const runnable = runnableFiles(touches, [text?.text, wp.description].filter(Boolean).join('\n'));
   const runs = [];
   const screens = [];
-  for (const { kind, id } of touches) {
-    if (kind === 'adr') continue;
+  // Eight at a time, in the ticket's order. One by one, a foundation ticket touching hundreds of tables took past
+  // 90 seconds to pull (#27645, 23 October); each lookup is independent and is written to its own file.
+  const pullArtefact = async ({ kind, id }) => {
+    let run = null;
     if (kind === 'file' && runnable.includes(String(id))) {
-      const whole = await writeWhole(client, String(id), folder).catch((error) => ({ path: String(id), error: error.message }));
-      runs.push(whole);
-      if (!whole.error) {
-        files.push({ kind, id, file: whole.file });
-        continue;
-      }
+      run = await writeWhole(client, String(id), folder).catch((error) => ({ path: String(id), error: error.message }));
+      if (!run.error) return { run, entry: { kind, id, file: run.file } };
       // Not written whole: its window is still listed below for reading, and README.md says it is not to be run.
     }
     const file = `${safeName(kind)}-${safeName(id)}.json`;
@@ -2341,9 +2339,25 @@ async function pullOne(client, key, base, when) {
     const result = await BY_NAME.get(toolName).run(client, args).catch((error) => ({ found: false, error: error.message }));
     const record = { kind, id, from: toolName, ...(release.current ? { release: release.current } : {}), ...result };
     await writeFile(path.join(folder, file), json(trimForPull(record)));
-    if (record.found === false) missing.push({ kind, id });
-    files.push({ kind, id, file });
-    if (kind === 'screen' && record.found !== false && record.screen) screens.push(record.screen);
+    return {
+      run, entry: { kind, id, file }, missing: record.found === false,
+      screen: kind === 'screen' && record.found !== false && record.screen ? record.screen : null,
+    };
+  };
+  const wanted = touches.filter((t) => t.kind !== 'adr');
+  const pulledArtefacts = new Array(wanted.length);
+  let nextArtefact = 0;
+  await Promise.all(Array.from({ length: Math.min(8, wanted.length) }, async () => {
+    while (nextArtefact < wanted.length) {
+      const at = nextArtefact++;
+      pulledArtefacts[at] = await pullArtefact(wanted[at]);
+    }
+  }));
+  for (const [at, done] of pulledArtefacts.entries()) {
+    if (done.run) runs.push(done.run);
+    files.push(done.entry);
+    if (done.missing) missing.push({ kind: wanted[at].kind, id: wanted[at].id });
+    if (done.screen) screens.push(done.screen);
   }
   // A file the ticket's text says to run without linking it is written whole too.
   for (const rel of runnable.filter((r) => !runs.some((x) => x.path === r))) {
@@ -3266,7 +3280,16 @@ export const TOOLS = [
       }
       if (answer.status === 404) return { found: false, error: `no work package #${key}` };
       if (!answer.ok) return { found: false, error: answer.data?.detail ?? `HTTP ${answer.status}` };
-      return { found: true, ...answer.data };
+      // A ticket touching hundreds of artefacts (the foundation database ticket, #27645) came back at 118 KB, past the
+      // ceiling. Past 80, the answer counts them by kind and names the first 80; adam_pull writes every one.
+      const touches = answer.data.touches ?? [];
+      if (touches.length <= 80) return { found: true, ...answer.data };
+      const byKind = {};
+      for (const t of touches) byKind[t.kind] = (byKind[t.kind] ?? 0) + 1;
+      return {
+        found: true, ...answer.data, touches: touches.slice(0, 80), touchesTotal: touches.length, touchesByKind: byKind,
+        touchesNote: `${touches.length} artefacts; the first 80 are listed. adam_pull ${key} writes every one.`,
+      };
     },
   },
 
