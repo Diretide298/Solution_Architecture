@@ -1,0 +1,48 @@
+id: CHG-R10UI-011
+date: '2026-10-25'
+source: cr
+kind: plan
+proposed: 2026-10-21T00:00
+summary: SETUP-CLIENTS is re-scoped to publish @ticvai/api-client as a versioned package, generated from ticvai-contracts
+  at each release tag and published to the ticvai-frontend group's GitLab package registry; every app repository depends
+  on it by exact version, ticvai-guest-web first. Every FE screen's "connect to API" sub-task uses that package and waits
+  for it, with no hand-written client and no per-repository generator; frontend-patterns 4.5 states the rule.
+decision:
+  what: 'ADAM CR-195, option A, settled 25 October 2026. tools/build-service-docs.py: the SETUP-CLIENTS task (title "Publish
+    @ticvai/api-client as a versioned package, generated from ticvai-contracts at each release tag", text and done-when).
+    tools/push-openproject.py (read by tools/op-release.py): the FE "connect to API" sub-task text. viewer/mcp/setup/starters/docs/frontend-patterns.md
+    4.5. For WEB-028 (#27888): getTenantAppStatus stays behind the contract''s types until the package is published, then
+    #31060 and #31061 are finished.'
+  by: Chinmay
+  date: '2026-10-25'
+why: 'ADAM CR-195 (Chinmay Patkar, #27888 WEB-028). SETUP-CLIENTS still generated "for the frontend workspace", the one-workspace
+  layout retired on 13 October; no app repository depended on @ticvai/api-client, so every connect-to-API sub-task (#31060
+  and #31061 first) stubbed its calls. The package route itself was set in r8 (CHG-R8RW-006, the ADR-0007 amendment).'
+keys_touched:
+  tickets:
+  - SETUP-CLIENTS (27640)
+  - '27888'
+  - '31060'
+  - '31061'
+  files:
+  - tools/build-service-docs.py
+  - tools/push-openproject.py
+  - ../viewer/mcp/setup/starters/docs/frontend-patterns.md
+root_class: foundation task text left behind by a repository layout change (CHG-R8WFC-008, CHG-R8RW-006)
+tickets:
+  started:
+  - 'SETUP-CLIENTS (27640) and 27888 (WEB-028): through CR-195''s comment, as CHG-ADM-002 says; their text is not rewritten.'
+  unstarted:
+  - every FE screen task's connect-to-API sub-task not yet created takes the new text
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-195
+triage: blocker
+prevention:
+  type: template-field
+  ref: tools/push-openproject.py::sub_tasks
+status: open
+notes: 'Partly in r8: CHG-R8RW-006 already moved the client to ticvai-contracts and the npm registry; the title, the guest-web-first
+  dependency and the sub-task text were left. "At each release tag" is written as the v* tag the contracts repository takes
+  when the package releases (the ADR-0007 amendment). Sub-tasks already in OpenProject keep their text (rule 6); they get
+  the CR''s comment.'
