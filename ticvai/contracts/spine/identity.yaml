@@ -3308,7 +3308,7 @@ paths:
                   - sms
                   - email
                   description: '**Optional for a mobile number** (ADAM CR-222, 25 October 2026): left out, the server
-                    picks WhatsApp or SMS from the tenant''s configured delivery (DI-209), so a guest is never asked
+                    picks WhatsApp first and SMS as the fallback (the lead, 25 October 2026, r10 Q5), from the tenant''s configured delivery (DI-209), so a guest is never asked
                     to pick one. An email identifier sends email. A caller that sends `channel` still gets it
                     (additive).'
                 purpose:
@@ -10860,7 +10860,7 @@ components:
           - sms
           - whatsapp
           description: '**Optional for a mobile number** (ADAM CR-222, 25 October 2026): left out, the server picks
-            WhatsApp or SMS from the tenant''s configured delivery (DI-209), as `requestGuestOtp` does; an email
+            WhatsApp first and SMS as the fallback (the lead, 25 October 2026, r10 Q5), from the tenant''s configured delivery (DI-209), as `requestGuestOtp` does; an email
             identifier sends email. A caller that sends `channel` still gets it (additive).'
         displayName:
           type: string

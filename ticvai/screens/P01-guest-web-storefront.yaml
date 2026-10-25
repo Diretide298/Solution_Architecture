@@ -4237,7 +4237,7 @@ screens:
     trigger: Create an account
     body: '**Collects what `registerGuest` sends before it is called.** Required: `identifier`. The guest
       never picks a channel: an email address is sent with `channel` `email`; a mobile number is sent with
-      none, and the server picks WhatsApp or SMS from the tenant''s configured delivery (ADAM CR-222).
+      none, and the server picks WhatsApp first and SMS as the fallback (the lead, 25 October 2026, r10 Q5), from the tenant''s configured delivery (ADAM CR-222).
       Optional: `displayName`, `password`, `preferredLanguage`, `consents`. The code it sends is typed in
       the Code field and confirmed with `verifyGuestEmail` (`mode` `code`). Dismissing sends nothing;
       the screen behind is unchanged.'
@@ -4291,7 +4291,7 @@ screens:
     trigger: Send me a code
     body: '**Collects only the email or mobile number.** The guest is never asked to pick a channel: an email
       address is sent with `channel` `email`; a mobile number is sent with no `channel`, and the server picks
-      WhatsApp or SMS from the tenant''s configured delivery (DI-209; ADAM CR-222, 25 October 2026).
+      WhatsApp first and SMS as the fallback (the lead, 25 October 2026, r10 Q5), from the tenant''s configured delivery (DI-209; ADAM CR-222, 25 October 2026).
       Dismissing sends nothing.'
     confirm:
       label: Request guest OTP

@@ -1,0 +1,61 @@
+id: CHG-R10UI-016
+date: '2026-10-25'
+source: cr
+kind: contract
+summary: 'The lead''s r10 answers built in: a sign-in code to a mobile number goes by WhatsApp first and SMS as the
+  fallback (requestGuestOtp, RegisterGuestRequest, GST-042, WEB-016); P10 stays assumed until ticvai-partner-web is
+  created in ticvai-frontend (frontend-repos.yaml, ADAM setup''s table). check-screen-value-sources skips a screen merged
+  into another (CHG-MOV-002), as check-binding-ratchet skips screens not built; an overlay names the list reads its
+  pickers use (`reads`), which check-screen-wiring counts as reached (BO-036, BO-069). AccreditationCredential answers
+  the badge''s holderName, zones and validTo (read with it, not stored), and POS-012''s order type is sent with
+  createFnbOrder.'
+decision:
+  what: 'The lead accepted every recommended answer of the r10 open questions on 25 October 2026: question 5 (CR-222:
+    WhatsApp first, SMS as the fallback) and question 8 (CR-153: create ticvai-partner-web in ticvai-frontend; until then
+    P10 stays assumed), and round 3: skip merged screens in the check; let an overlay name its picker reads; add the
+    badge''s holder name, zones and expiry to the read the screen already makes, from the accreditation contract''s own
+    data; put the order type on the operation that creates the F&B order from the cart. Files:
+    contracts/spine/identity.yaml, screens P01 and P02 (the two OTP forms each), docs/active/frontend-repos.yaml,
+    viewer/mcp/setup/starters/frontend/CLAUDE.md, tools/check-screen-value-sources.py and its test,
+    tools/check-screen-wiring.py (overlay_refs and its self-test), screens/_schema.yaml (overlay `reads`), screens/P08
+    BO-036 and BO-069 (`reads`), contracts/satellite/accreditation.yaml (AccreditationCredential holderName, zones,
+    validTo, x-ticvai-persisted false), screens/P04 POS-012 (createFnbOrder, Order type bound to
+    CreateFnbOrderRequest.serviceMode).'
+  by: Chinmay
+  date: '2026-10-25'
+why: 'ADAM CR-222 and CR-153 left these two questions open (CHG-R10UI-005, CHG-R10UI-010). The rest are the
+  check-screen-value-sources findings left after CHG-R10UI-015: three merged screens the check should not judge, a
+  conflict between SV-PICK and S-OP-UNREACHED for a picker inside a form, ACC-005 and ACC-008 with no read of the
+  badge''s holder, zones and expiry, and POS-012''s order type with no operation to send it.'
+keys_touched:
+  screens: [GST-042, WEB-016, BO-036, BO-069, POS-012]
+  operations: [requestGuestOtp, registerGuest, listMyAccreditationCredentials, listAccreditationCredentials,
+    createFnbOrder]
+  schemas: [RegisterGuestRequest, AccreditationCredential]
+  files:
+  - contracts/spine/identity.yaml
+  - contracts/satellite/accreditation.yaml
+  - screens/P01-guest-web-storefront.yaml
+  - screens/P02-guest-mobile-app.yaml
+  - screens/P04-point-of-sale.yaml
+  - screens/P08-venue-back-office.yaml
+  - screens/_schema.yaml
+  - docs/active/frontend-repos.yaml
+  - ../viewer/mcp/setup/starters/frontend/CLAUDE.md
+  - tools/check-screen-value-sources.py
+  - tools/tests/test_check_screen_value_sources.py
+  - tools/check-screen-wiring.py
+root_class: 'two checks that disagreed on one screen, and a merged screen judged as if it were built'
+tickets:
+  started: []
+  unstarted: ['the screens'' and operations'' tasks pick the change up at the next tag through their pointer bodies']
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-222, CR-153
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: open
+notes: 'No table change: holderName, zones and validTo are x-ticvai-persisted false (read from accreditation.holder and
+  accreditation.holder_access). The overlay `reads` field is invisible metadata (check-approved-ui does not compare it).'
