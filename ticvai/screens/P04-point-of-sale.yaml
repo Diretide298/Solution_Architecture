@@ -1560,7 +1560,6 @@ screens:
   - id: drawerSeatSelection
     component: drawer
     trigger: Continue from date and performance
-    bindsTo: SeatAvailability
     body: '**Seats, for a seated product only.** Carries the seating rules the venue configured — a group
       whose seats must stay together cannot be split here, and the map says so at the point of selection
       rather than at payment.'
@@ -2247,19 +2246,6 @@ screens:
         operation: listAlternativeCodes
         provenance: contract catalogue.yaml GET /products/{productId}/alternative-codes
       - kind: dataTable
-        label: Every inventory hold
-        bindsTo: InventoryHold
-        columns:
-        - InventoryHold.requestedUnits
-        - InventoryHold.channel
-        - InventoryHold.status
-        - InventoryHold.acquiredAt
-        - InventoryHold.expiresAt
-        - InventoryHold.releasedAt
-        provenance: contract catalogue.yaml GET /inventory-holds
-        notes: 'Never drawn (GPS-C12) and bound to nothing (r8 second round, GPS-C11): the till lists
-          no holds; the cart''s countdown is the only hold the cashier sees.'
-      - kind: dataTable
         label: Every product
         bindsTo: Product
         columns:
@@ -2289,13 +2275,6 @@ screens:
     - name: actionBar
       slot: rowActions
       components:
-      - kind: secondaryButton
-        label: Acquire inventory hold
-        provenance: contract catalogue.yaml POST /inventory-holds
-        notes: '**Not a cashier control** (v2, POSV2-10): the terminal takes its lease when the line is
-          added and the cashier sees only the cart''s countdown. Never drawn as a button, and bound to
-          nothing since r8 (GPS-C11): `addCartLine` (on POS-002''s quantity step) takes the cart''s hold,
-          which is the only hold; this screen calls no `acquireInventoryHold`.'
       - kind: secondaryButton
         label: Resolve product by code
         operation: resolveProductByCode
@@ -2410,25 +2389,6 @@ screens:
   apisNote: 'Rebuilt 9 September 2026 from the 10 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
-  overlays:
-  - id: formAcquireInventoryHold
-    component: modal
-    trigger: Acquire inventory hold
-    body: '**Never opened** (r8 second round, GPS-C11): its button is never drawn and this screen takes
-      no hold; the cart''s hold, taken by `addCartLine`, is the only one. Kept only because the approved
-      snapshot lists it.'
-    bindsTo: AcquireLeaseRequest
-    confirm:
-      label: Acquire inventory hold
-    dismiss:
-      label: Cancel
-      discards:
-      - id
-      - channelCapacityId
-      - requestedUnits
-      - ttlSeconds
-      - channel
-    provenance: client-verified
 - id: POS-004
   name: Sell — Seat Map
   module: Sell
@@ -9090,9 +9050,11 @@ screens:
           own loads the home (CHG-DOOR-005). A 404 `no-current-shift` is the no-shift state, not an error.'
       - kind: metricTile
         label: Open holds
-        bindsTo: Order
+        operation: listOrders
+        bindsTo: OrderSummary
       - kind: metricTile
         label: Queue waiting
+        operation: listQueues
         bindsTo: Queue
       - kind: cardList
         label: Sale boards — tickets, F&B, retail
@@ -9184,6 +9146,16 @@ screens:
       may reopen
     trigger: onLoad
     provenance: defined 4 October 2026 (CHG-FXS-003)
+  - operationId: listOrders
+    contract: orders
+    purpose: 'Open holds: the orders held at this till (`status` held, `workstationId`) (check-screen-value-sources,
+      CHG-R10UI-015)'
+    trigger: onLoad
+  - operationId: listQueues
+    contract: queue
+    purpose: 'Queue waiting: the venue''s open queues and their waiting counts (check-screen-value-sources,
+      CHG-R10UI-015)'
+    trigger: onLoad
   entryState:
     params:
     - name: workstationId
@@ -10091,6 +10063,7 @@ screens:
         provenance: v2 build, Queue (the guest status board)
       - kind: cardList
         label: Feed health
+        operation: listQueueFeeds
         bindsTo: QueueFeed
       - kind: secondaryButton
         label: Accept order
@@ -10143,6 +10116,10 @@ screens:
       after ready)'
     trigger: onAction
     provenance: defined 4 October 2026 (CHG-FXS-003)
+  - operationId: listQueueFeeds
+    contract: queue
+    purpose: 'The delivery partners'' order feeds and their health (check-screen-value-sources, CHG-R10UI-015)'
+    trigger: onLoad
   entryState:
     params:
     - name: workstationId

@@ -8225,13 +8225,12 @@ screens:
         provenance: contract promotions.yaml GET /promotions/{promotionId}
       - kind: detailPanel
         label: The coupon code
-        bindsTo: CouponCode
+        bindsTo: GuestCouponCode
         columns:
-        - CouponCode.code
-        - CouponCode.status
-        - CouponCode.redemptionCount
-        - CouponCode.discount
-        - CouponCode.validFrom
+        - GuestCouponCode.code
+        - GuestCouponCode.status
+        - GuestCouponCode.discount
+        - GuestCouponCode.validFrom
         operation: getGuestCouponCode
         provenance: contract promotions.yaml GET /coupon-codes/{code}
   states:
@@ -12094,13 +12093,12 @@ screens:
       components:
       - kind: detailPanel
         label: The bundle
-        bindsTo: Bundle
+        bindsTo: GuestBundle
         columns:
-        - Bundle.code
-        - Bundle.name
-        - Bundle.description
-        - Bundle.price
-        - Bundle.savingsAmount
+        - GuestBundle.name
+        - GuestBundle.description
+        - GuestBundle.price
+        - GuestBundle.savingsAmount
         operation: getGuestBundle
         provenance: contract promotions.yaml GET /bundles/{bundleId}
     - name: actionBar

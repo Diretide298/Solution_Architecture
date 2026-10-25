@@ -1,0 +1,59 @@
+id: CHG-R10UI-015
+date: '2026-10-25'
+source: audit
+kind: spec
+summary: 'Twenty-five of the 34 screen values check-screen-value-sources found with no source are wired to a read the
+  screen declares, or bound to the field of an answer it already reads, as the lead''s accepted defaults of 25 October
+  2026 say. Declared reads: CMS-006 listProducts, CMS-066 and ADM-540 listOrgUnits (the venues), POS-025 listOrders and
+  listQueues, POS-029 listQueueFeeds, BO-036 listSaleBoards, BO-069 listInspections, BO-044 getRegionSettings (with
+  regionId from the session). Rebound to the answer the screen has: ACC-004, ACC-006 and ACC-007 to
+  AccreditationApplication, BO-223 to GuestJourneySimulationView, BO-243 to AccessDynamicPolicyEffectiveness, CMS-066
+  Category to MediaTaxonomy.categories, CMS-096 to MediaDistributionChannel.fallbackAssetId, GST-037 and WEB-010 to
+  GuestCouponCode, GST-056 and WEB-008 to GuestBundle, WEB-031 to ProductStartTime. POS-002''s seat drawer no longer
+  binds SeatAvailability (POS-004 reads it); POS-003''s never-drawn hold list, button and form are removed; WEB-005''s
+  quick tour names BookingFlowLevelSettings.quickTour, which getPublishedBookingFlow answers.'
+decision:
+  what: 'The lead''s accepted defaults for check-screen-value-sources (CHG-R10GEN-003), 25 October 2026: a binding to a
+    workshop draft schema or one no declared operation answers: declare the read the screen needs, or rebind to the
+    answer it already has; an answer that lacks the field: bind the field the answer has; a picker whose list read is
+    undeclared (BO-036, BO-069) and ADM-540''s venue filter: declare the read; WEB-005 quickTour: the note is corrected
+    to the flow-level setting getPublishedBookingFlow answers, which keeps what the note said true. Visible changes
+    (dropped or renamed columns on ACC-006, GST-037, GST-056, WEB-008, WEB-010, WEB-031; POS-003''s never-drawn
+    controls) are recorded in docs/active/approved-ui-changes.yaml, naming this check.'
+  by: Chinmay
+  date: '2026-10-25'
+why: 'check-screen-value-sources (CHG-R10GEN-003, r10 lane E) found 34 values on 30 screens that no declared operation
+  answers, the class behind ADAM CR-186, CR-187, CR-220, CR-221 and CR-233. ADM-097, ADM-252 and ADM-611 are left as
+  they were: they were merged into BO-441, BO-391 and BO-1146 on 2 October 2026 (CHG-MOV-002), which declare the reads;
+  declaring them again on the merged ids fails S-DUP-SCREEN and S-SCREEN-PERMISSION.'
+keys_touched:
+  screens: [ACC-004, ACC-006, ACC-007, ADM-540, BO-036, BO-044, BO-069, BO-223, BO-243, CMS-006, CMS-066, CMS-096,
+    GST-037, GST-056, POS-002, POS-003, POS-025, POS-029, WEB-005, WEB-008, WEB-010, WEB-031]
+  operations: [listProducts, listOrgUnits, listOrders, listQueues, listQueueFeeds, listSaleBoards, listInspections,
+    getRegionSettings]
+  files:
+  - screens/P01-guest-web-storefront.yaml
+  - screens/P02-guest-mobile-app.yaml
+  - screens/P04-point-of-sale.yaml
+  - screens/P08-venue-back-office.yaml
+  - screens/P09-platform-admin-console.yaml
+  - screens/P11-accreditation-portal.yaml
+  - screens/P13-white-label-cms.yaml
+  - docs/active/approved-ui-changes.yaml
+root_class: 'a screen value with no source among its declared operations (CHG-R10GEN-003)'
+tickets:
+  started: []
+  unstarted: ['the screens'' tasks: their pointer bodies give the bindings at the next tag']
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: a finding of the r10 check, fixed under the lead''s accepted defaults'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-value-sources.py
+status: open
+notes: 'Still failing, each for the lead: ACC-005 and ACC-008 (no guest or staff read answers the badge''s holder name,
+  zones and expiry: a contract change), BO-305 and BO-355 (pack workspace views of 20 to 30 fields with no read; each
+  field needs mapping to Order or Entitlement), POS-012 (no declared write takes the cart''s order type,
+  FnbOrder.serviceMode), and ADM-097, ADM-252, ADM-611 (merged screens the check should not judge). BO-036 and BO-069''s
+  picker reads are new S-OP-UNREACHED findings: a form''s picker cannot name the read that fills it.'

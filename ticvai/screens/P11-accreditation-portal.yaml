@@ -515,27 +515,30 @@ screens:
       components:
       - kind: banner
         label: With a reviewer
-        bindsTo: ApprovalRequest.status
-        notes: 'Where it is now, and **the date a decision is due** — `ApprovalRequest.slaDueAt`. *"Fourth
-          in the queue"* was considered and rejected on the frame: a position moves backwards and a date
-          does not.
-
-          '
+        operation: listMyAccreditationApplications
+        bindsTo: AccreditationApplication.status
+        notes: 'Where it is now, and **the date a decision is due** — `AccreditationApplication.decisionDueAt`.
+          *"Fourth in the queue"* was considered and rejected on the frame: a position moves backwards and a
+          date does not.'
         provenance: frame claude-design/Accreditation Board.dc.html#acc-004
       - kind: timeline
         label: Where it has been
-        bindsTo: ApprovalRequest.decisions
+        bindsTo: AccreditationApplication
         operation: listMyAccreditationApplications
-        notes: Received, documents checked, decision — each with its date.
+        notes: 'From the application itself: `submittedAt`, `requirementStatus` and `missingRequirements`
+          (documents checked), `decidedAt` (check-screen-value-sources, CHG-R10UI-015). Received, documents
+          checked, decision — each with its date.'
         provenance: frame claude-design/Accreditation Board.dc.html#acc-004
     - name: contentBody
       slot: record
       components:
       - kind: detailPanel
         label: Application
-        bindsTo: ApprovalRequest.summary
+        bindsTo: AccreditationApplication
         operation: listMyAccreditationApplications
-        notes: The reference, the performances, and what was requested.
+        notes: '`AccreditationApplication.reference`, `programmeId`, `categoryCode` and `subject`
+          (check-screen-value-sources, CHG-R10UI-015). The reference, the performances, and what was
+          requested.'
         provenance: frame claude-design/Accreditation Board.dc.html#acc-004
     - name: actionBar
       slot: actions
@@ -815,26 +818,24 @@ screens:
       components:
       - kind: dataTable
         label: Queue
-        bindsTo: ApprovalRequest[]
+        bindsTo: AccreditationApplication[]
         operation: listAccreditationApplications
         columns:
-        - ApprovalRequest.summary
-        - ApprovalRequest.requestedAt
-        - ApprovalRequest.slaDueAt
-        - ApprovalRequest.status
-        notes: '**Due first, and how long it has waited.** `slaDueAt` is the sort, not `requestedAt` —
-          an application for tonight outranks one submitted earlier for next month. Rows carry the signals
-          a reviewer decides on: *no press card, no commission*, *commission letter attached*, *accredited
-          last season*.
-
-          '
+        - AccreditationApplication.reference
+        - AccreditationApplication.submittedAt
+        - AccreditationApplication.decisionDueAt
+        - AccreditationApplication.status
+        notes: '**Due first, and how long it has waited.** `decisionDueAt` is the sort, not `submittedAt` — an
+          application for tonight outranks one submitted earlier for next month. Rows carry the signals a
+          reviewer decides on: *no press card, no commission*, *commission letter attached*, *accredited last
+          season*.'
         provenance: frame claude-design/Accreditation Board.dc.html#acc-006
     - name: contextPanel
       slot: item
       components:
       - kind: detailPanel
         label: Selected application
-        bindsTo: ApprovalRequest
+        bindsTo: AccreditationApplication
         operation: listAccreditationApplications
         notes: Enough to approve without opening `ACC-007`.
         provenance: frame claude-design/Accreditation Board.dc.html#acc-006
@@ -961,7 +962,7 @@ screens:
       components:
       - kind: detailPanel
         label: The application
-        bindsTo: ApprovalRequest
+        bindsTo: AccreditationApplication
         operation: getAccreditationApplication
         notes: 'Role, outlet, press card, commission — **including the ones that are absent**, stated
           as *Not stated* and *None attached* rather than left blank. A blank field and a declared absence
@@ -978,7 +979,7 @@ screens:
         provenance: frame claude-design/Accreditation Board.dc.html#acc-007
       - kind: banner
         label: Decision due
-        bindsTo: ApprovalRequest.slaDueAt
+        bindsTo: AccreditationApplication.decisionDueAt
         operation: getAccreditationApplication
         provenance: frame claude-design/Accreditation Board.dc.html#acc-007
     - name: actionBar
