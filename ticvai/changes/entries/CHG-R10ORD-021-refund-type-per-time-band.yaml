@@ -1,0 +1,41 @@
+id: CHG-R10ORD-021
+date: '2026-10-25'
+source: cr
+kind: contract
+summary: Each refund time band names the refund type that applies in it (RefundPolicy.timeBands[].refundType); a venue with
+  no bands refunds in full before the cut-off and nothing after it; createRefund and simulateRefund say so.
+decision:
+  what: 'Question 2 (ADAM CR-208): the venue''s refund policy names the type per time band; until a venue sets one, full
+    before the cut-off and none after. contracts/spine/orders.yaml RefundPolicy.timeBands[].refundType (the five RefundCalculationPolicyView.refundTypes
+    values, nullable: a band saved before r10 is percentageRefund at its percentage), createRefund and simulateRefund.'
+  by: Chinmay
+  date: '2026-10-25'
+why: ADAM CR-208's decision asked the contract to say when each refund type applies and gave no rule (CHG-R10ORD-014 left
+  it for the lead); the lead's answers of 25 October 2026 to the r10 lanes' open questions (audit LEAD-QUESTIONS-r10, every
+  recommended answer accepted), question 2.
+keys_touched:
+  operations:
+  - createRefund
+  - simulateRefund
+  - setRefundPolicy
+  schemas:
+  - RefundPolicy
+  tables:
+  - orders.refund_policy_time_band
+  files:
+  - contracts/spine/orders.yaml
+root_class: 'new: a computed answer with no stated rule'
+tickets:
+  started:
+  - '28284 (simulateRefund): through CR-208''s comment; its text is not rewritten.'
+  unstarted: []
+adam_cr: CR-208
+triage: fix-forward
+prevention:
+  type: none
+  reason: A business rule the decision left open; no check can tell which refund type a venue meant.
+notes: 'Database change: orders.refund_policy_time_band.refund_type (text, nullable, CHECK of the five values). The cut-off
+  is the line''s performance, or the end of refundWindowDays for an undated line.'
+release_tag: pending
+decision_owner: Chinmay
+status: open

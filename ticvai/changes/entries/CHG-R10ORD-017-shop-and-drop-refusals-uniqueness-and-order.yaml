@@ -50,7 +50,9 @@ notes: 'Database change: retail.shop_and_drop.collection_note (text, nullable); 
   decision names a format without giving one). Needs the lead: the decision decides collectionPointClosed from the serving
   outlets'' opening hours (fnb.delivery_location_outlet to platform.outlet_opening_hour) with no new hours column, but r8
   (CHG-R8SAT-001, 19 October) added opens_at and closes_at to fnb.delivery_location and the operation uses them; left as
-  r8 wrote it until the lead says which.'
+  r8 wrote it until the lead says which. The lead answered on 25 October 2026 (the r10 lanes'' question 16): keep r8''s
+  opens_at and closes_at on the delivery location for collectionPointClosed and the collectBy default, and the dropReference
+  format DXB1-SD-000123.'
 release_tag: pending
 decision_owner: Chinmay
 status: open

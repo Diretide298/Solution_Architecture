@@ -1,0 +1,33 @@
+id: CHG-R10ORD-026
+date: '2026-10-25'
+source: cr
+kind: contract
+summary: issueOrderEntitlements mints mediaCode as the venue prefix and 12 base32 characters, unique in the tenant, and
+  a seasonEnd expiry anchor ends at the end of the product's validity (its onSaleTo).
+decision:
+  what: 'Question 28 (ADAM CR-167): mediaCode is the venue prefix plus 12 base32 characters; seasonEnd comes from the product''s
+    validity. contracts/spine/access.yaml issueOrderEntitlements.'
+  by: Chinmay
+  date: '2026-10-25'
+why: CHG-R10ORD-010 left the mediaCode format and the source of seasonEnd for the lead; the lead's answers of 25 October
+  2026 to the r10 lanes' open questions (audit LEAD-QUESTIONS-r10, every recommended answer accepted), question 28.
+keys_touched:
+  operations:
+  - issueOrderEntitlements
+  files:
+  - contracts/spine/access.yaml
+root_class: 'new: a rule a write depends on and nobody wrote'
+tickets:
+  started:
+  - '27701 (PLATFORM-SAGA-PAID): through CR-167''s comment; its text is not rewritten.'
+  unstarted: []
+adam_cr: CR-167
+triage: fix-forward
+prevention:
+  type: none
+  reason: A format and a source the decision left open; no check can tell the intended one.
+notes: No database change. The product's validity is read as catalogue.Product.onSaleTo, the only validity end a product
+  carries; listed in the report in case the lead meant another field.
+release_tag: pending
+decision_owner: Chinmay
+status: open

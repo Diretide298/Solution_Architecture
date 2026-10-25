@@ -105,3 +105,18 @@ items:
   owner: Chinmay, to the client
   added: '2026-10-25'
   change: CHG-R10UI-003
+- id: LO-R10ORD-001
+  kind: deferred
+  platform: P04
+  screens: [POS-010]
+  what: 'The product kinds locker, parking and experience. MediaEntitlements.entitlements[].kind maps the product''s
+    kind onto eight values, and catalogue ProductKind has no locker, parking or experience, so an entitlement of such a
+    product is answered without kind (it is optional), and POS-010 cannot tell a second locker from the kind alone.'
+  source: 'ADAM CR-226 (Pranay Shinde, #30686), settled by Chinmay on 25 October 2026, option A; the lead''s answer to
+    the r10 lanes'' question 20; CHG-R10ORD-024'
+  reason: 'adding a value to ProductKind is a response-enum change in every contract that returns a product (a breaking
+    change under ADR-0026) and needs the products that carry the kinds; not made inside a media read'
+  target: 'a catalogue change that adds the kinds to ProductKind (not scheduled)'
+  owner: Chinmay
+  added: '2026-10-25'
+  change: CHG-R10ORD-024

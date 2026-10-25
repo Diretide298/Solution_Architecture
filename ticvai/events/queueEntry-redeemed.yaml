@@ -8,9 +8,11 @@ publisher: queue
 description: A party with a Fast Pass entitlement was admitted at the ride from its virtual queue entry, and the
   entitlement's use is Access's to take.
 aggregate: queueEntry
-emittedWhen: QueueEntryStatus called to redeemed by redeemWaitingGuest, where the entry carries an entitlementId
+emittedWhen: QueueEntryStatus to redeemed, by redeemWaitingGuest (from called) or overrideWaitingGuest (from called,
+  expired or noShow; CHG-R10ORD-023), where the entry carries an entitlementId
 emittedBy:
 - queue.redeemWaitingGuest
+- queue.overrideWaitingGuest
 payload:
 - field: entryId
   type: uuid

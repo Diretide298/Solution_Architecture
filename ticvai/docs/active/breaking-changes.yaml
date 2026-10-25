@@ -1561,3 +1561,14 @@ changes:
     tag: r10
     producer-tickets: [SVC-WHITELABEL-WHITE-LABEL-1, SVC-WHITELABEL-WHITE-LABEL-2]
     consumer-tickets: [APP-WL-ADM-017, APP-WL-CMS-017, TEST-AM-WHITE-LABEL-P09, TEST-AM-WHITE-LABEL-P13]
+  - id: BC-491
+    contract: queue
+    operation: overrideWaitingGuest
+    change: "x-ticvai-emits changed"
+    reason: 'ADAM CR-238 as the lead answered on 25 October 2026 (CHG-R10ORD-023): an override that admits a Fast Pass
+      entry writes queueEntry.redeemed as redeemWaitingGuest does (BC-488), so Access takes the entitlement''s use.
+      Adding an emitted event is labelled breaking by the check; the response is unchanged.'
+    approved-by: 'Chinmay, 25 October 2026 (the answers to the r10 lanes'' questions, question 19)'
+    tag: r10
+    producer-tickets: [SVC-VENUEOPS-ENTRY-2]
+    consumer-tickets: [SVC-ACCESS-VALIDATION-2]

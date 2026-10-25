@@ -714,6 +714,10 @@ paths:
       x-ticvai-writes:
       - table: queue.entry
         for: 'what this operation writes (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
+      - table: platform.outbox
+        for: 'queueEntry.redeemed, for an entry with a Fast Pass entitlement, in the override''s transaction (ADAM CR-238; CHG-R10ORD-023)'
+      x-ticvai-emits:
+      - queueEntry.redeemed
       x-ticvai-reads:
       - table: queue.entry
         for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
@@ -730,6 +734,11 @@ paths:
         queue-entry-already-redeemed`; `cancelled` and `released` entries stay refused (`409
         queue-entry-cancelled`). **It never records a no-show and never returns a party to the queue**: those are
         `resolveCalledWaitingGuest`.
+
+        **A `waiting` entry is refused** (`409 queue-entry-not-called`; the lead's answer of 25 October 2026 to the r10 lanes' questions, CHG-R10ORD-023): it
+        has not been called, so no redemption has failed. **An override that admits a Fast Pass entry writes
+        `queueEntry.redeemed`** through the outbox in the same transaction, as `redeemWaitingGuest` does (ADAM CR-238),
+        so Access takes the entitlement's use; `entitlementRemaining` is null.
       tags: [entry]
       x-ticvai-permission: QUEUE_OVERRIDE
       x-ticvai-scope-level: venue
@@ -758,8 +767,8 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/QueueRedemptionResult' }
         '409':
-          description: 'The entry was already `redeemed` (`queue-entry-already-redeemed`), or was `cancelled` or `released` from the queue (`queue-entry-cancelled`); there is no failed redemption to override. Nobody is admitted.'
-          x-ticvai-problem-types: [queue-entry-already-redeemed, queue-entry-cancelled]
+          description: 'The entry was already `redeemed` (`queue-entry-already-redeemed`), or was `cancelled` or `released` from the queue (`queue-entry-cancelled`), or is still `waiting` and has not been called (`queue-entry-not-called`; CHG-R10ORD-023); there is no failed redemption to override. Nobody is admitted.'
+          x-ticvai-problem-types: [queue-entry-already-redeemed, queue-entry-cancelled, queue-entry-not-called]
           content:
             application/problem+json:
               schema:

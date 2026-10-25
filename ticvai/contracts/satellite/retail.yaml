@@ -2000,6 +2000,13 @@ components:
         requiresSerialNumber: { type: boolean, default: false }
         imageAssetRef: { type: string, nullable: true }
         isActive: { type: boolean }
+        isPublished:
+          type: boolean
+          default: false
+          description: '**Whether a guest or a visitor may see the item** (the lead''s answer of 25 October 2026 to the r10 lanes'' questions, question 22;
+            CHG-R10ORD-025): the flag `listMerchandise` and `lookupMerchandise` already named for "published" (r8 walk
+            of ticket 27820). A guest sees an item only while it is active and published; staff see every item. Set by
+            `PRODUCT_CONFIGURE` holders with `createMerchandise` and `updateMerchandise`; false until set.'
         isDroppable:
           type: boolean
           default: true
@@ -2083,6 +2090,10 @@ components:
           default: true
           description: Whether the item may go to shop-and-drop; the venue sets chilled, fragile or oversized items
             false (R8 blocker APPROVALS-TENANCY-C34).
+        isPublished:
+          type: boolean
+          default: false
+          description: Whether guests and visitors may see the item (`MerchandiseItem.isPublished`; CHG-R10ORD-025).
 
     PriceCheck:
       x-ticvai-persistence: "none — computed"
