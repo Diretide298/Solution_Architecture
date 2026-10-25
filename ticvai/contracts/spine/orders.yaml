@@ -7289,6 +7289,9 @@ paths:
       - query: catalogue#entitlementTemplateRecords
         route: in-process
         for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#productRecords
+        route: in-process
+        for: 'each entitlement''s kind: the product''s kind (catalogue.product), Catalogue''s data (ADAM CR-226)'
       - query: identity#subjectRecords
         route: in-process
         for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
@@ -22794,12 +22797,20 @@ components:
                 - rental
                 - experience
                 - membership
+                description: 'The product''s kind (`catalogue.Product.kind`, read through `catalogue#productRecords` by the
+                  entitlement''s `productId`), mapped onto these values (ADAM CR-226, option A; Chinmay, 25 October 2026;
+                  CHG-R10ORD-012): `admission`, `timedAdmission`, `datedAdmission`, `openDated` and `seated` are
+                  `admission`; `membership`, `fnb`, `retail` and `rental` are themselves. A product of any other kind is
+                  answered without `kind` (it is optional) until its value is decided; `locker`, `parking` and
+                  `experience` have no product kind yet.'
               orderId:
                 type: string
                 format: uuid
               addedAt:
                 type: string
                 format: date-time
+                description: 'When the entitlement was put on this media: `access.entitlement.media_linked_at`, written
+                  when the media code is set or rotated (ADAM CR-226). Null for a row written before the column.'
               status:
                 allOf:
                 - $ref: '#/components/schemas/EntitlementStatus'
@@ -22821,6 +22832,9 @@ components:
                 type: string
                 format: uuid
                 nullable: true
+                description: 'The `subjectId` of the entitlement whose `supersedesEntitlementId` names this one with
+                  `issuedVia` `transfer` (ADAM CR-226), read through `access#entitlementRecords`; null when it was not
+                  transferred.'
               validTo:
                 type: string
                 format: date-time

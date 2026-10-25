@@ -2321,6 +2321,14 @@ paths:
         **`performanceId` is null** until a source is decided. Pinning the template''s values onto
         `access.entitlement` at issue (CR-240 option C) is a later, separate change, not part of this operation.
 
+
+        **The delta counts `access.entitlement.change_version`** (ADAM CR-239, option A; Chinmay, 25 October 2026;
+        CHG-R10ORD-011), which a trigger moves on every insert and update: `entitlementsVersion` is the highest
+        `change_version` of the rows in the package, and `sinceVersion` returns the rows whose `change_version` is
+        above it, void and used ones included, so the device drops them. **The whole-package path ships first**
+        (`ETag`, `If-None-Match`, `304`); the delta is served once the column is in the database (a migration for
+        the migration owner); until then every call is served the whole package.
+
         '
       tags:
       - sync
@@ -2331,9 +2339,11 @@ paths:
       parameters:
       - name: sinceVersion
         in: query
-        description: The `entitlementsVersion` of the package the device holds; omitted, the whole package (SD-052).
+        description: 'The `entitlementsVersion` of the package the device holds; omitted, the whole package (SD-052).
+          Given, only the entitlements whose `change_version` is above it, void and used ones included (ADAM CR-239).'
         schema:
           type: integer
+          format: int64
       - $ref: '../shared/common.yaml#/components/parameters/ConsistencyToken'
       - name: validFrom
         in: query
@@ -25680,6 +25690,7 @@ components:
     Entitlement:
       type: object
       x-ticvai-persistence: access.entitlement
+      x-ticvai-index: [[venueId, changeVersion]]   # the offline package's delta: a venue's rows changed after N (ADAM CR-239)
       description: '**What a guest actually holds.** Found missing on 18 August by the schema audit —
         33 tables in `orders`, seven in `access`, and none of them stored an issued ticket.
 
@@ -25702,6 +25713,7 @@ components:
       - status
       - validFrom
       - validTo
+      - changeVersion
       properties:
         id:
           type: string
@@ -25783,6 +25795,27 @@ components:
             without reissuing**, because a guest whose wristband broke should not need a new ticket.
 
             '
+        changeVersion:
+          type: integer
+          format: int64
+          readOnly: true
+          x-ticvai-change-version: true
+          description: '**What the offline package''s delta counts** (ADAM CR-239, option A; Chinmay, 25 October 2026;
+            CHG-R10ORD-011). Set from a per-database sequence by a BEFORE INSERT OR UPDATE trigger, so every operation
+            that writes `access.entitlement` (seventeen of them, in three contracts) moves it without remembering to;
+            never set by an operation and never sent. `OfflinePackage.entitlementsVersion` is the highest of the
+            package''s rows, and `sinceVersion` selects the rows above it, void and used ones included. Indexed with
+            `venueId`.'
+        mediaLinkedAt:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+          description: '**When the entitlement was put on its media** (ADAM CR-226, option A; Chinmay, 25 October 2026;
+            CHG-R10ORD-012): written when `mediaCode` is set or rotated: at issue (`issueOrderEntitlements`, onto new
+            media or, through `appendEntitlementToMedia`''s order, onto media the guest already holds), and whenever an
+            operation replaces or rotates the code (`replaceCredential`, `getEntitlementCredential` with `rotate=true`).
+            Not `validFrom`, which is the validity window''s start. `MediaEntitlements` answers it as `addedAt`.'
         rotationSecret:
           type: string
           nullable: true
@@ -27659,9 +27692,11 @@ components:
           format: uuid
         entitlementsVersion:
           type: integer
-          description: The highest `access.entitlement` change included (SD-052, 29 September). A refresh sends it
-            as `sinceVersion` and receives only what changed after it, so a 60,000-guest venue is not re-sent
-            whole.
+          format: int64
+          description: 'The highest `access.entitlement` change included (SD-052, 29 September): the maximum
+            `change_version` of the package''s rows (ADAM CR-239, option A; CHG-R10ORD-011). A refresh sends it as
+            `sinceVersion` and receives only the rows whose `change_version` is above it, void and used ones included,
+            so a 60,000-guest venue is not re-sent whole.'
         policySetVersion:
           type: string
           description: '**The active admission policy version the package carries** (ADR-0068, 1 October): a

@@ -1,0 +1,53 @@
+id: CHG-R10ORD-011
+date: '2026-10-25'
+source: cr
+kind: contract
+summary: access.entitlement gains change_version bigint NOT NULL, set from a per-database sequence by a BEFORE INSERT OR
+  UPDATE trigger and indexed with venue_id; OfflinePackage.entitlementsVersion is its maximum and sinceVersion selects the
+  rows above it; the whole-package path (ETag, 304) ships first; the generator gains the x-ticvai-change-version rule that
+  writes the sequence and trigger.
+decision:
+  what: 'ADAM CR-239, option A: change_version bigint NOT NULL on access.entitlement from a per-database sequence by a BEFORE
+    INSERT OR UPDATE trigger (so all 17 writers move it), indexed with venue_id; entitlementsVersion = max(change_version)
+    of the rows in the package; sinceVersion returns rows with change_version > N, void and used included; ship the whole-package
+    path now and the delta once the column is there. contracts/spine/access.yaml Entitlement.changeVersion (x-ticvai-change-version,
+    required), x-ticvai-index [[venueId, changeVersion]], OfflinePackage and getOfflinePackage. tools/derive-ddl.py change_version_sql
+    (CHANGE_VERSION_MARK) and tools/ddl_forward.py CHANGE_VERSION, so the generator writes the sequence, function and trigger
+    as one guarded block into the forward migration.'
+  by: Chinmay
+  date: '2026-10-25'
+why: 'ADAM CR-239 (Hrushikant Patkar, #27706 OfflinePackage, blocking), settled by the lead on 25 October 2026 (the 48 CRs
+  settled without a release; the decision is the comment the developers'' agents already build to). access.entitlement had
+  no column that orders its changes (no version, no updated_at), so entitlementsVersion and sinceVersion had nothing to
+  count; SD-052 asks for the delta.'
+keys_touched:
+  operations:
+  - getOfflinePackage
+  schemas:
+  - Entitlement
+  - OfflinePackage
+  tables:
+  - access.entitlement
+  files:
+  - contracts/spine/access.yaml
+  - tools/derive-ddl.py
+  - tools/ddl_forward.py
+root_class: 'new: a delta read with no stored change order'
+tickets:
+  started:
+  - '27706 (getOfflinePackage): through CR-239''s comment; its text is not rewritten. Migration work: a child task of the
+    affected MIG ticket for Hrushikant Patkar (docs/active/team.json migrations.owner), raised at the r10 release.'
+  unstarted: []
+adam_cr: CR-239
+triage: blocker
+prevention:
+  type: generator-rule
+  ref: tools/derive-ddl.py::change_version_sql
+notes: 'Database change: access.entitlement.change_version (bigint; NOT NULL in the full DDL, added nullable by the forward
+  migration and listed for the backfill and SET NOT NULL, as every NOT NULL column without a default), sequence access.entitlement_change_version_seq,
+  function access.entitlement_change_version_set(), trigger entitlement_change_version_trg, index entitlement_venue_id_change_version_idx.
+  The trigger block is guarded on the table and the column, so it does nothing on a database where the column is not yet
+  added.'
+release_tag: pending
+decision_owner: Chinmay
+status: open

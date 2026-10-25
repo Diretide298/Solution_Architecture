@@ -743,6 +743,12 @@ GRANT_READ = re.compile(r"^DO \$\$ BEGIN IF EXISTS \(SELECT 1 FROM pg_roles WHER
                         re.I)
 
 
+# derive-ddl's change version block (ADAM CR-239, CHG-R10ORD-011): the table, the sequence, the function, the trigger.
+CHANGE_VERSION = re.compile(r"^DO \$\$ BEGIN IF to_regclass\('([\w.]+)'\) IS NOT NULL AND EXISTS \(.*?\) THEN "
+                            r"CREATE SEQUENCE IF NOT EXISTS ([\w.]+); CREATE OR REPLACE FUNCTION ([\w.]+)\(\) .*?"
+                            r"DROP TRIGGER IF EXISTS (\w+) ON [\w.]+; CREATE TRIGGER .*END IF; END \$\$;?$", re.I | re.S)
+
+
 def unguard(stmt: str) -> list:
     """The statements a PERFORM-led guarded block runs, as SELECT statements a model folds (CHG-R9MIG-002); any other
     statement as it is. The single-statement blocks need no unwrapping here: GUARD reads them."""
@@ -1850,6 +1856,17 @@ def diff(area: str, old: Model, new: Model, renames: dict | None = None, retired
             p.rollback.append(f"SELECT platform.drop_rls_policies('{rc_[2]}'::regclass); "
                               + " ".join(w.rstrip(";") + ";" for w in was))
             p.counts["policies"] = p.counts.get("policies", 0) + 1
+            continue
+        cv = CHANGE_VERSION.match(norm(s))
+        if cv and unq(cv.group(1)) in old.tables:
+            # **A change version every writer moves** (ADAM CR-239, CHG-R10ORD-011): derive-ddl writes the sequence, the
+            # function and the BEFORE trigger as one block guarded on the table and the column. It touches no row (a
+            # row written before it keeps a null until the backfill a person runs, listed with the column) and runs
+            # twice, so it is written as it is.
+            p.statements.append(stmt)
+            p.rollback.append(f"DROP TRIGGER IF EXISTS {cv.group(4)} ON {unq(cv.group(1))}; DROP FUNCTION IF EXISTS "
+                              f"{cv.group(3)}(); DROP SEQUENCE IF EXISTS {cv.group(2)};")
+            p.counts["other"] += 1
             continue
         g = GRANT_READ.match(s)
         if g and unq(g.group(2)) in old.tables:

@@ -1518,6 +1518,32 @@ def exactly_one_sql(short: str, group: list) -> str:
             f"num_nonnulls({', '.join(q(k) for k in group)}) = 1)")
 
 
+# **A change version every writer moves** (ADAM CR-239, option A, settled 25 October 2026; CHG-R10ORD-011). The
+# property mark `x-ticvai-change-version: true` on a bigint property makes its column the row's change version: a
+# per-database sequence `<table>_<column>_seq`, and a BEFORE INSERT OR UPDATE trigger that sets the column from it, so
+# every operation that writes the table moves it without remembering to (access.entitlement has seventeen writers).
+# A delta read ("changed after N") then has something to count. One guarded block, written as it is into a forward
+# migration by tools/ddl_forward.py (CHANGE_VERSION); it does nothing where the table or the column is missing.
+CHANGE_VERSION_MARK = "x-ticvai-change-version"
+
+
+def change_version_sql(schema: str, short: str, table: str, col: str) -> str:
+    """The sequence, the function and the trigger behind `x-ticvai-change-version` (ADAM CR-239, CHG-R10ORD-011)."""
+    seq = f"{schema}.{short}_{col}_seq"
+    fn = f"{schema}.{short}_{col}_set"
+    trg = f"{short}_{col}_trg"
+    return (f"-- change version (x-ticvai-change-version): {table}.{col}, from {seq}, set on every insert and update\n"
+            f"DO $$ BEGIN IF to_regclass({sql_literal(table)}) IS NOT NULL AND EXISTS (SELECT 1 FROM "
+            f"information_schema.columns WHERE table_schema = {sql_literal(schema)} AND table_name = "
+            f"{sql_literal(short)} AND column_name = {sql_literal(col)}) THEN "
+            f"CREATE SEQUENCE IF NOT EXISTS {seq}; "
+            f"CREATE OR REPLACE FUNCTION {fn}() RETURNS trigger LANGUAGE plpgsql AS $f$ BEGIN "
+            f"NEW.{col} := nextval({sql_literal(seq)}); RETURN NEW; END $f$; "
+            f"DROP TRIGGER IF EXISTS {trg} ON {table}; "
+            f"CREATE TRIGGER {trg} BEFORE INSERT OR UPDATE ON {table} FOR EACH ROW EXECUTE FUNCTION {fn}(); "
+            "END IF; END $$;")
+
+
 def index_sql(schema: str, short: str, table: str, group: list) -> str:
     """`x-ticvai-index` (ADAM CR-165, CR-166; CHG-CRA-004): a plain index over the columns the contract names."""
     return (f"-- declared index (x-ticvai-index): {table} ({', '.join(group)})\n"
@@ -2457,6 +2483,12 @@ def main() -> int:
                 body.append(f"    {q(col):<33} {typ}{pk}{nn}{rules}")
                 col_type[col] = typ
                 n_cols += 1
+                # `x-ticvai-change-version` (ADAM CR-239, CHG-R10ORD-011): the sequence and trigger that move it.
+                if (column_spec(c, contract_props) or {}).get(CHANGE_VERSION_MARK) is True:
+                    if typ != "bigint":
+                        print(f"  ! {t}.{col}: x-ticvai-change-version needs a bigint (integer, int64), not {typ}")
+                    else:
+                        idx_lines.append((schema, change_version_sql(schema, short, t, col)))
 
                 ref = c.get("references")
                 if ref and ref in real:
