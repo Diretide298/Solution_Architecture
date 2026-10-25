@@ -1425,7 +1425,9 @@ paths:
           description: 'The delegation would hand over authority that is not there. `refusedReason` is
             `delegateLacksPermission` where the delegate does not hold the permission being delegated,
             or `exceedsDelegatorAuthority` where `kinds` or `maxAmount` go beyond what the delegator may
-            approve. The shared `Forbidden`, with no `refusedReason`, is the caller lacking
+            approve, that is **the delegator''s own approval limit**, the highest amount it may approve itself under the matrix
+            in force for that kind at the scope (the lead, 25 October 2026, r10 round 3, ADAM CR-102; CHG-R10ID-020).
+            The shared `Forbidden`, with no `refusedReason`, is the caller lacking
             `APPROVAL_DECIDE`.
 
             '
@@ -2003,9 +2005,9 @@ paths:
         | `delegator`, `delegate` (principal ids; `user` is the delegator when `delegator` is absent) | `delegatorPrincipalId`, `delegatePrincipalId` |
         | `start`, `end`, `reason` | `from`, `to`, `reason` |
         | `requestKind` | `kinds` = [it] (an `ApprovalKind`; absent, every kind) |
-        | `authorityAmount`, `authorityPercentage` | `maxAmount`, `maxPercentage`: the delegation's own cap, which never exceeds what the delegator may approve under the matrix (`403 exceedsDelegatorAuthority`, as `createApprovalDelegation` refuses it) |
+        | `authorityAmount`, `authorityPercentage` | `maxAmount`, `maxPercentage`: the delegation's own cap, which never exceeds what the delegator may approve under the matrix, its own approval limit as `createApprovalDelegation` defines it (`403 exceedsDelegatorAuthority`, as `createApprovalDelegation` refuses it) |
         | `scope`, `venue`, `region`, `department` | `scopePath`: the most specific scope node given |
-        | `businessUnit`, `legalEntity` | **not a scope, and not stored** (ADAM CR-102, option 1; CHG-R10ID-015): neither is a level of `platform.scope`, so neither sets `scopePath`. Kept in the schema so an r1 client still validates; a value sent is ignored |
+        | `businessUnit`, `legalEntity` | **not a scope, and not stored** (ADAM CR-102, option 1; CHG-R10ID-015): neither is a level of the scope tree, so neither sets `scopePath`. Kept in the schema so an r1 client still validates; a value sent is ignored |
         | `delegationType` | `delegationType` |
         | `requiredRole` (and `role`, `position`) | `requiredRoleId`: the delegate must hold it (`409 delegateLacksRequiredRole` otherwise); `role` and `position` are display only |
 
@@ -5552,9 +5554,17 @@ components:
 
             '
         minAmount:
-          $ref: ../shared/common.yaml#/components/schemas/Money
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/Money
+          description: '**Amounts compare in the venue''s currency** (the lead, 25 October 2026, r10 round 3, ADAM CR-102;
+            CHG-R10ID-020): a request amount in another currency (a supplier''s, a tender''s) is converted into the
+            currency of the venue the request is raised at, at that day''s FX rate (finance `listFxRates`), before it is
+            compared with `minAmount` and `maxAmount`; a tenant- or region-level matrix''s bounds are read in that same
+            venue currency.'
         maxAmount:
-          $ref: ../shared/common.yaml#/components/schemas/Money
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/Money
+          description: The upper bound, compared as `minAmount` is (venue currency, the day''s FX rate; CR-102).
         riskScoreAbove:
           type: number
           nullable: true
@@ -5765,7 +5775,8 @@ components:
         region''s, else the tenant''s, routes it alone; its rules are not followed by an ancestor''s, because a venue or
         region matrix may only tighten what it inherits (`loosensParentRule`), so the nearest matrix already holds the
         ancestor''s floor. At a node, the matrix **in force** is its highest `version`; when that version has `isActive`
-        false, the node sets no matrix of that kind and the next ancestor''s applies. The request stores the matrix it
+        false, the node sets no matrix of that kind and the next ancestor''s applies (confirmed by the lead, 25 October
+        2026, r10 round 3; CHG-R10ID-020). The request stores the matrix it
         was routed by (`approvalMatrixId`) and its `matrixVersion`, so a decision is checked against exactly that rule
         set.'
       required:

@@ -3,7 +3,7 @@
 **Status:** Accepted · 25 October 2026 · Chinmay Parab (ADAM CR-175, option A, accepted 21 October 2026: "1,2,3 all")
 **Date:** 2026-10-25 · **Deciders:** Chinmay Parab
 **Source:** ADAM CR-175 (Sanket Keluskar, ticket 30742 `openPlatformStaffGrant`; 30739 `listOwnPlatformStaffGrants`); change entry CHG-R10ID-007; R8 blocker IDENTITY-C20 (CHG-R8MIG-006), which settled that the cell validates the Control Plane token and reads the step-up from it, and left the token itself undefined
-**Related:** ADR-0004 (IdentityService issues a tenant's JWT; one session per user) · ADR-0038 and ADR-0039 (the Control Plane is a database of its own) · ADR-0063 (keys; Key Vault) · ADR-0071 (credentials) · audit R098 (a tenant never grants a support role; platform-staff grants), R135 (MFA by permission), R203 (`PLATFORM_*` never rides in a grant)
+**Related:** ADR-0004 (IdentityService issues a tenant's JWT; one session per user) · ADR-0038 (as amended by ADR-0040) and ADR-0039 (the Control Plane is a database of its own) · ADR-0063 (keys; Key Vault) · ADR-0071 (credentials) · audit R098 (a tenant never grants a support role; platform-staff grants), R135 (MFA by permission), R203 (`PLATFORM_*` never rides in a grant)
 
 ---
 
@@ -25,7 +25,7 @@ a tenant table keyed to a tenant principal. An operator is neither.
    signed with a Control Plane key held in Key Vault (ADR-0063); its public keys are published as a JWKS that
    every cell host trusts (configured per environment, never fetched from a URL the token names). **Audience**
    is the cell the call goes to (`control.cell.id`): a token for one cell opens nothing in another.
-   Lifetime at most 15 minutes (proposed; the lead to confirm); the Console refreshes it from its platform
+   Lifetime at most 15 minutes (confirmed by the lead, 25 October 2026); the Console refreshes it from its platform
    session.
 2. **Claims.** `sub` is the operator (`control.platform_operator.id`, a Control Plane principal, never a
    tenant `identity.principal`); `ticvai_platform_permissions` is the operator's `PLATFORM_*` set, nothing
@@ -41,7 +41,7 @@ a tenant table keyed to a tenant principal. An operator is neither.
    (`control.platform_session.step_up_action`, `step_up_at`), and carried in the token (`ticvai_step_up`). A
    cell operation that declares `x-ticvai-step-up: mfa` for a platform caller (`openPlatformStaffGrant`) accepts
    it when `ticvai_step_up.action` names the operation, `ticvai_step_up.at` is within the step-up window (5
-   minutes, proposed; the lead to confirm) and `amr` includes `mfa`; it never looks for an
+   minutes, confirmed by the lead, 25 October 2026) and `amr` includes `mfa`; it never looks for an
    `identity.mfa_challenge` row. A tenant step-up is single-use (`consumedAt`); a platform one is bounded by
    its window and its action instead, since the cell keeps no row for it.
 5. **The cell builds a platform caller** from a verified token: an operator id, the `PLATFORM_*` set and the

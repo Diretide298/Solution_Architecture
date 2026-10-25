@@ -1859,7 +1859,7 @@ paths:
 
                         '
         '400':
-          x-ticvai-problem-types: [unknown-guided-answer]
+          x-ticvai-problem-types: [unknown-guided-answer, venue-required]
           description: A `guidedAnswerIds` entry that is not an answer of the venue's published guided choice
             (W4, 29 September).
           content:
@@ -2387,7 +2387,7 @@ paths:
                       items:
                         $ref: '#/components/schemas/Product'
         '400':
-          x-ticvai-problem-types: [category-not-in-venue, guided-answer-not-published]
+          x-ticvai-problem-types: [category-not-in-venue, guided-answer-not-published, venue-required]
           description: A `categoryId` that names no category of the venue, or a `guidedAnswerIds` entry that is
             not an answer of the venue's published guided choice (W4, 29 September).
           content:
@@ -2505,6 +2505,8 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       responses:
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/VenueRequired
         '200':
           description: The current setting
           content:
@@ -2652,6 +2654,8 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       responses:
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/VenueRequired
         '200':
           description: The current setting
           content:
@@ -2870,6 +2874,8 @@ paths:
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/GuestVenue
       responses:
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/VenueRequired
         '200':
           description: Product
           content:
@@ -3219,6 +3225,8 @@ paths:
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
       - $ref: ../shared/common.yaml#/components/parameters/GuestVenue
       responses:
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/VenueRequired
         '200':
           description: Variants
           content:
@@ -3750,6 +3758,8 @@ paths:
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
       - $ref: ../shared/common.yaml#/components/parameters/GuestVenue
       responses:
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/VenueRequired
         '200':
           description: Performances, by `startsAt` ascending with `id` as the tiebreak — the order a
             date-and-performance picker shows them in, and the key the cursor pages on.
@@ -5128,7 +5138,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/PerformanceAvailabilityPage'
         '400':
-          $ref: ../shared/common.yaml#/components/responses/BadRequest
+          description: The request breaks a schema rule (`validation`), or names no venue
+            (`venue-required`; ADAM CR-198, CHG-R10ID-022).
+          x-ticvai-problem-types: [validation, venue-required]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /products/{productId}/lifecycle:
@@ -5833,6 +5849,8 @@ paths:
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/GuestVenue
       responses:
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/VenueRequired
         '200':
           description: Performance
           content:
@@ -17691,6 +17709,8 @@ paths:
           format: uuid
       - $ref: ../shared/common.yaml#/components/parameters/GuestVenue
       responses:
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/VenueRequired
         '200':
           description: Benefits granted
           content:

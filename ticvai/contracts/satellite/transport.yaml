@@ -404,6 +404,8 @@ paths:
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/GuestVenue
       responses:
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/VenueRequired
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
         '200':
@@ -581,6 +583,8 @@ paths:
           schema: { type: string, format: uuid }
         - $ref: ../shared/common.yaml#/components/parameters/GuestVenue
       responses:
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/VenueRequired
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
         '200':
@@ -643,6 +647,8 @@ paths:
           description: The instant whose table is returned (the travel time for a guest). Default now (CHG-RUL-012).
         - $ref: ../shared/common.yaml#/components/parameters/GuestVenue
       responses:
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/VenueRequired
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
         '200':
@@ -1109,6 +1115,8 @@ paths:
         - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
         - $ref: ../shared/common.yaml#/components/parameters/GuestVenue
       responses:
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/VenueRequired
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
         '200':
@@ -1295,6 +1303,8 @@ paths:
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/GuestVenue
       responses:
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/VenueRequired
         '200':
           description: One departure, as a guest books it
           content:
@@ -1405,6 +1415,8 @@ paths:
         - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
         - $ref: ../shared/common.yaml#/components/parameters/GuestVenue
       responses:
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/VenueRequired
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
         '200':

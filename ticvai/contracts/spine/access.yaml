@@ -1469,7 +1469,13 @@ paths:
                       items:
                         $ref: '#/components/schemas/ParkingFacility'
         '400':
-          $ref: ../shared/common.yaml#/components/responses/BadRequest
+          description: The request breaks a schema rule (`validation`), or names no venue
+            (`venue-required`; ADAM CR-198, CHG-R10ID-022).
+          x-ticvai-problem-types: [validation, venue-required]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /parking-facilities/{parkingFacilityId}:

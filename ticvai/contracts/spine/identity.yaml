@@ -1354,14 +1354,22 @@ paths:
         (`SubjectDataExport`, status `awaitingApproval`) beside the request. The job runs when the request is approved
         (Identity consumes `approval.granted` for subject type `subjectDataExport`), or at once where the tenant''s
         matrix asks for no approval step; a rejected, withdrawn or expired request ends the row `rejected` with no file.
+        **No matrix means it runs at once** (the lead, 25 October 2026, r10 round 3; CHG-R10ID-024): where Approvals
+        answers `createApprovalRequest` with `no-approval-route` (no rule of the tenant''s matrix matches the subject
+        type), no request is raised, the job runs at once, and `requestId` is the export''s own id (a UUIDv7 Identity
+        mints), used the same way by the privacy case.
         The job writes the file in the asked format to the tenant''s private object storage and sets the row `ready`.
+        **The file is kept 7 days** from `readyAt` (r10 round 3): then the job deletes it and the row becomes `expired`;
+        a guest who needs it again asks again.
         **The guest and staff read where it has got to, and download it, with `getSubjectDataExport`**, which issues
         a short-lived signed link to a `ready` file; no link is ever stored or sent by message.
 
 
         **The statutory clock** (CR-101). The call emits `identity.privacyRequestRaised`, which Marketing turns into a
         privacy case in its queue (request type `access`), so the request sits in the privacy queue and its `dueAt`
-        (the jurisdiction''s configured response period) applies. **The statutory period itself is the client''s to
+        (the jurisdiction''s configured response period) applies. **The jurisdiction is the country of the venue the
+        request is raised at** (the request''s venue, CR-198; the lead, 25 October 2026, r10 round 3), carried on the
+        event, and **the case carries the request id** (`approvalRequestId`), so the queue and the request are one. **The statutory period itself is the client''s to
         give** (`setPrivacyRequestTypes` `deadlines[].responseDays`); until it is configured the queue shows no
         deadline, and `estimatedCompletionAt` stays null.
 
@@ -1483,6 +1491,7 @@ paths:
         type: string
         format: uuid
     - name: requestId
+      x-ticvai-column: identity.subject_data_export.id
       in: path
       required: true
       description: The `requestId` `exportSubjectData` answered with.
@@ -3625,6 +3634,9 @@ paths:
       - table: pii.subject_identity
         for: 'the UAE Pass user id a returning guest is found by (R8 blocker IDENTITY-C54) (r8 gate, CHG-R8GT2-003;
           check-parameter-columns P-NAMED-TABLE)'
+      - table: identity.redirect_host
+        for: 'the hosts a UAE Pass redirect may land on, Identity''s projection of the tenant''s custom domains (r10 ruling,
+          ADR-0028; CHG-R10ID-018)'
       x-ticvai-writes:
       - table: pii.subject_identity
         for: 'the uaePass identity row of a new link (R8 blocker IDENTITY-C54) (r8 gate, CHG-R8GT2-003)'
@@ -6112,12 +6124,14 @@ paths:
         (a Control Plane operator, ADR-0072), `ticvai_platform_permissions` the `PLATFORM_*` set, `sid` the platform
         session. The MFA step-up is recorded in the Control Plane on the operator''s platform session and carried
         as `ticvai_step_up` (`{action, at}`) beside `amr`: this operation accepts it when its action names this
-        operation and it is recent (ADR-0072), and never reads `identity.mfa_challenge` for an operator. The
+        operation and it is at most 5 minutes old, in a token that lives at most 15 minutes (ADR-0072), and never reads `identity.mfa_challenge` for an operator. The
         verification is built in the cell hosts by the platform-auth ticket; until it lands this ticket waits.
 
         '
       tags:
       - administration
+      # Named only to say the operator's step-up is NOT read from it (ADR-0072; CHG-R10ID-007).
+      x-ticvai-names-for-context: [identity.mfa_challenge]
       x-ticvai-permission: PLATFORM_TENANT_ACCESS
       x-ticvai-audience:
       - staff
@@ -9560,6 +9574,8 @@ components:
         `awaitingApproval`) and by the export job, which runs when the request is approved (`approval.granted`) or at
         once where the tenant's matrix asks for no approval step, assembles the file and writes it to the tenant's
         private object storage (never a public or CDN path; encrypted at rest under the tenant's keys, ADR-0063).
+        The file is deleted 7 days after `readyAt` and the row becomes `expired` (the lead, 25 October 2026, r10 round
+        3; CHG-R10ID-024).
         **Never returned by any operation** (`handoff/schema-storage-only.md`): `getSubjectDataExport` answers with
         `SubjectDataExportStatus`, and `fileRef` never leaves the server; the file is reached only through the
         short-lived signed link that read issues (ADR-0023).
@@ -9580,7 +9596,7 @@ components:
           enum: [json, csv, pdf]
         status:
           type: string
-          enum: [awaitingApproval, running, ready, failed, rejected]
+          enum: [awaitingApproval, running, ready, failed, rejected, expired]
           description: '`awaitingApproval` until the request is approved (or at once `running` where the matrix asks
             for no step); `running` while the job assembles the file; `ready` once the file is stored; `failed` when
             the job stops with `failureReason`; `rejected` when the request was rejected, withdrawn or expired, and
@@ -9625,7 +9641,7 @@ components:
           enum: [json, csv, pdf]
         status:
           type: string
-          enum: [awaitingApproval, running, ready, failed, rejected]
+          enum: [awaitingApproval, running, ready, failed, rejected, expired]
           description: As `SubjectDataExport.status`.
         requestedAt:
           type: string
@@ -10977,7 +10993,8 @@ components:
         2026, as `identity.guest_provider_identity`; CHG-R10ID-009): subject, provider, the provider''s subject id and
         when it was linked, unique on provider and provider subject, written by `guestSocialLogin` and
         `guestUaePassLogin`; `password` and `otp` are derived from `identity.guest_credential` and a verified contact.
-        It has been here since r8, so no second table is made.'
+        It has been here since r8, so no second table is made (confirmed by the lead, 25 October 2026, r10 round 3;
+        CHG-R10ID-021).'
       required: [id, subjectId, provider, providerSubject, linkedAt]
       properties:
         id:

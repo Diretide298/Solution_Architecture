@@ -1,0 +1,49 @@
+id: CHG-R10ID-025
+date: '2026-10-25'
+source: audit
+kind: contract
+summary: 'The merged tree''s findings on lane A1''s work: captureWalletAuthorisation''s 409 is judged on its own row and
+  names no other module (E-READ-VIA); getSubjectDataExport''s requestId names its column; generateInvoice,
+  approveRoleAuthorityDelegation and openPlatformStaffGrant no longer name a table their lineage lacks (or name it for
+  context only); guestUaePassLogin declares its own projection read; attachGuestCheckoutOrders gives its consistency
+  token; the platform price and invoice tables are on check-package''s stored-currency list with their reason; ADR-0072
+  says ADR-0038 is amended. openPlatformStaffGrant''s XR-FACT was already clear (round 2 reworded it): the cell reads
+  no control.platform_operator row, so no owner query is declared for a read that does not happen.'
+decision:
+  what: 'contracts/spine/cross-region.yaml captureWalletAuthorisation 409; contracts/spine/identity.yaml
+    getSubjectDataExport (x-ticvai-column), guestUaePassLogin (x-ticvai-reads identity.redirect_host),
+    openPlatformStaffGrant (x-ticvai-names-for-context identity.mfa_challenge); contracts/satellite/subscription.yaml
+    generateInvoice text; contracts/spine/approvals.yaml approveRoleAuthorityDelegation text and createApprovalDelegation
+    403 wording; contracts/spine/orders.yaml attachGuestCheckoutOrders 200 header; tools/check-package.py CURRENCY_OK
+    (eight control tables); docs/adr/0072.'
+  by: Chinmay
+  date: '2026-10-25'
+why: 'Finding: check-error-sources E-READ-VIA (captureWalletAuthorisation), check-parameter-columns P-PARAM-NO-COLUMN and
+  P-NAMED-TABLE, check-package (stored currency, consistency token, ADR citation) on fix/r10-integration 3eeaaf14 with
+  lane A1''s round-3 work; CHG-R10ID-013, CHG-R10ID-017, CHG-R10ID-018.'
+keys_touched:
+  operations: [captureWalletAuthorisation, getSubjectDataExport, guestUaePassLogin, openPlatformStaffGrant,
+    generateInvoice, approveRoleAuthorityDelegation, attachGuestCheckoutOrders]
+  files:
+  - contracts/spine/cross-region.yaml
+  - contracts/spine/identity.yaml
+  - contracts/satellite/subscription.yaml
+  - contracts/spine/approvals.yaml
+  - contracts/spine/orders.yaml
+  - tools/check-package.py
+  - docs/adr/0072-a-platform-operator-enters-a-cell-on-a-control-plane-token.md
+root_class: 'existing: operation text naming storage its declarations do not carry'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: r10 integration finding'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-error-sources.py
+status: open
+notes: 'After the fixes, on a locally re-derived lineage and schema reference (not committed): check-error-sources,
+  check-cross-module-reads, check-money-currency, check-state-refusals, check-storage-promises PASS;
+  check-parameter-columns has only simulateRefund''s three (lane C).'

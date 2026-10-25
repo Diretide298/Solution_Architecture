@@ -1,0 +1,46 @@
+id: CHG-R10ID-023
+date: '2026-10-25'
+source: cr
+kind: contract
+summary: 'A tenant''s contract names the TICVAI legal entity that invoices it (issuingLegalEntity: Ainfinite AI UAE or
+  India), copied onto each invoice and used for its gapless number; TICVAI''s own tax rate per country is a new control
+  table kept by platform staff (control.platform_tax_rate; listPlatformTaxRates, setPlatformTaxRate), applied at
+  generation; the exact-period unique index skips cancelled invoices, so a cancelled draft can be generated again.'
+decision:
+  what: 'The lead accepted the recommended answer of the r10 lane questions (25 October 2026), question 1.
+    contracts/satellite/subscription.yaml: Subscription.issuingLegalEntity; SubscriptionInvoice.issuingLegalEntity
+    (readOnly, copied) and x-ticvai-unique-when (tenant, period start, period end where status is not cancelled) in
+    place of the plain unique; InvoiceNumberSequence.legalEntityCode values; PlatformTaxRate (control.platform_tax_rate,
+    unique on country and effective date); listPlatformTaxRates (paged) and setPlatformTaxRate (409
+    tax-rate-period-exists); generateInvoice reads both and says so (a country with no rate in force is 422
+    billing-entity-incomplete). tools/check-business-rules.py BR-PLATFORM-INVOICE. Database: control.contract
+    issuing_legal_entity, control.invoice issuing_legal_entity, control.platform_tax_rate (new), the invoice''s unique
+    index becomes partial, from the generator.'
+  by: Chinmay
+  date: '2026-10-25'
+why: 'ADAM CR-202 (Surendra Loke, ticket 28000; CHG-R10ID-013): the decision named no issuing entity and no tax-rate
+  source, and the plain unique index stopped a cancelled draft from being regenerated; asked in lane A1''s report.'
+keys_touched:
+  operations: [generateInvoice, issueInvoice, listPlatformTaxRates, setPlatformTaxRate]
+  schemas: [Subscription, SubscriptionInvoice, InvoiceNumberSequence, PlatformTaxRate]
+  tables: [control.contract, control.invoice, control.platform_tax_rate]
+  files:
+  - contracts/satellite/subscription.yaml
+  - tools/check-business-rules.py
+root_class: 'existing: an invoice rule the decision left to the lead'
+tickets:
+  started: []
+  unstarted:
+  - '28000 (generateInvoice) and the issueInvoice task pick it up at the r10 tag; the two new operations need a task
+    (integration files them); the columns, the table and the partial index are migration work for Hrushikant Patkar
+    (control database).'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-202
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-business-rules.py
+status: open
+notes: 'Replacing the plain unique by a partial one is not additive: the migration review lists the drop and the new
+  index for a person. The two new operations carry x-ticvai-no-screen until a P09 board shows the table.'
