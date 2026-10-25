@@ -26,6 +26,7 @@ keys_touched:
   - contracts/spine/tenancy.yaml
   - contracts/spine/access.yaml
   - docs/active/cross-deployable-writes.yaml
+  - handoff/cross-deployable-writes.md
 root_class: 'new: a cross-deployable read with no route that is built'
 tickets:
   started:
@@ -41,4 +42,5 @@ prevention:
 status: open
 notes: 'No new grant: XDR-001 already grants commerce SELECT on access.scan_event (r9). Which identity operation writes
   the sign-in row of kind access is not declared in any contract yet (the sign-in path is Identity''s); reported to the
-  lead.'
+  lead. handoff/cross-deployable-writes.md is regenerated with check-cross-deployable-writes --write (X-DOC) and committed,
+  as CHG-R9CR-005 did: no refresh step writes it.'

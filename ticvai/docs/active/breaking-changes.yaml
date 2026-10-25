@@ -1361,3 +1361,15 @@ changes:
     tag: r8
     producer-tickets: [AM-WALLET-CASHLESS-P08-2, VM-WALLET-WALLET-1]
     consumer-tickets: [AM-WALLET-CASHLESS-P08-5]
+  - id: BC-480
+    contract: white-label
+    operation: recordStorefrontSessionEvents
+    change: "params `header:Idempotency-Key` removed"
+    reason: 'ADAM CR-107 (CHG-R10TEN-013): the storefront runtime posts this as a beacon, and navigator.sendBeacon cannot
+      set a header, so a required Idempotency-Key could never be sent. Each batch carries its own key, batchId, and the
+      operation de-duplicates on it. Numbered BC-480 so the r10 lanes do not collide on the next free number.'
+    approved-by: 'Chinmay, ADAM CR-107 accepted 15 October 2026, option 1: "drops Idempotency-Key from this operation in
+      favour of batchId"; put in r10 on 25 October 2026 ("update and get r10 out")'
+    tag: r10
+    producer-tickets: [SVC-WHITELABEL-OVERVIEW-2]
+    consumer-tickets: [AM-WHITE-LABEL-P01, AM-WHITE-LABEL-P02]

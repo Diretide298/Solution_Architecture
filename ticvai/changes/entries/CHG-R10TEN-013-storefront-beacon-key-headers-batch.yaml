@@ -22,6 +22,7 @@ keys_touched:
   files:
   - contracts/satellite/white-label.yaml
   - events/storefront-sessionEvent.yaml
+  - docs/active/breaking-changes.yaml
 root_class: 'new: a shared secret and edge fields left unnamed'
 tickets:
   started:
@@ -35,4 +36,5 @@ prevention:
   type: check
   ref: tools/check-contract-compat.py
 status: open
-notes: The header names are this lane's; the edge owner may rename them before the edge contract is written.
+notes: Removing the Idempotency-Key header is breaking (check-contract-compat); it is registered as BC-480, quoting
+  the decision, numbered high so the r10 lanes do not collide. The header names are this lane's; the edge owner may rename them before the edge contract is written.

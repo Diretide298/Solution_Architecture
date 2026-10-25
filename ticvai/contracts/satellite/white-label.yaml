@@ -649,7 +649,7 @@ paths:
 
         **One primary per kind, kept by the database** (ADAM CR-105, option 1; CHG-R10TEN-011): this call sets
         `isPrimary` on this domain and clears it on the tenant''s other domain of the same `kind`, in one
-        transaction, under a unique index on `kind` where `isPrimary`; `control.tenant_domain` keeps one active
+        transaction, under a unique index on `kind` where `isPrimary`; tenancy''s routing row keeps one active
         primary per tenant and channel the same way.
 
         '
@@ -1082,8 +1082,8 @@ paths:
 
         **Through an event, as an asset** (ADAM CR-106, option 1, accepted 15 October 2026; CHG-R10TEN-012): this call
         stores the `SitePackage` `building` and writes `sitePackage.requested` to the outbox in the same transaction;
-        the job is the white-label jobs component''s, which consumes it. The package is a `MediaAsset` in Assets,
-        named by `packageAssetRef`; `downloadUrl` is a short-lived link to that asset. A `version` that does not exist
+        the job is the white-label jobs component''s, which consumes it. The package is stored in the Assets
+        library, named by `packageAssetRef`; `downloadUrl` is a short-lived link to it. A `version` that does not exist
         or is not published is refused `409` `version-not-published`.
 
         '
@@ -1976,8 +1976,6 @@ paths:
       - query: assets#mediaAssetRecords
         route: in-process
         for: 'the 1024x1024 source''s type, size and dimensions (ADAM CR-096), and whether it has transparency (ADAM CR-106)'
-      x-ticvai-calls:
-      - assets.requestMediaRendition
       x-ticvai-singleton: true
       x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
@@ -1992,10 +1990,11 @@ paths:
 
         **Asked of Assets, answered pending** (ADAM CR-106, option 1, accepted 15 October 2026; CHG-R10TEN-012). The
         transparency check reads the source''s `MediaAsset.hasTransparency`, which Assets records from the image''s
-        alpha channel when the upload completes; `true` is `400` `icon-has-transparency`. The derived sizes are asked
-        of Assets (`requestMediaRendition`, one per size, in process) and returned in `derived` in the same shape,
-        each entry pending until its rendition is ready: `platform` and `size` set, `assetRef` absent until Assets
-        has made it. Nothing on screen changes shape.
+        alpha channel when the upload completes; `true` is `400` `icon-has-transparency`. This call stores the source
+        and returns every derived size in `derived` in the same shape, each entry pending: `platform` and `size`
+        set, `assetRef` absent. The renditions are asked of Assets after the write (`requestMediaRendition`, one per
+        size) by the white-label jobs component, which fills each `assetRef` when Assets has made it; this call does
+        not wait for them. Nothing on screen changes shape.
 
         **Generated: the iOS and Android store sets, plus web favicons (decided 28 September, audit
         R163).** iOS: 1024 (App Store), 180, 167, 152, 120, 87, 80, 76, 60, 58, 40, 29 and 20 px. Android:
@@ -11696,14 +11695,11 @@ components:
                 type: integer
               areas:
                 type: array
+                description: 'The kinds of the missing items, from the closed list `contentPages`, `banners`, `promoBlocks`,
+                  `faqs`, `policies` (ADAM CR-194). Stated here rather than as an enum, so a client built on r1, which
+                  read a free string, is not broken.'
                 items:
                   type: string
-                  enum:
-                  - contentPages
-                  - banners
-                  - promoBlocks
-                  - faqs
-                  - policies
     UiStringPack:
       x-ticvai-persistence: whitelabel.ui_string_pack
       x-ticvai-unique-together: [[language]]

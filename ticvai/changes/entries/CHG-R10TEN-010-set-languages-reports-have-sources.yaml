@@ -37,4 +37,6 @@ prevention:
   ref: tools/check-parameter-columns.py
 status: open
 notes: 'Database: new table whitelabel.ui_string_pack (id, language, coverage_percent, status, scope_path; unique lower(language));
-  migration work for Hrushikant Patkar (MIG-WHITELABEL). No operation writes it: a string pack writes its row when it ships.'
+  migration work for Hrushikant Patkar (MIG-WHITELABEL). No operation writes it: a string pack writes its row when it ships.
+  areas keeps items type string and states the closed list in its description: an enum would be a breaking response change
+  against r1 (check-contract-compat).'

@@ -58,4 +58,6 @@ prevention:
 status: open
 notes: 'Database: whitelabel.site_package package_asset_ref uuid; app_build_platform_uniq (where status in queued, building);
   assets.media_asset has_transparency boolean. Migration work for Hrushikant Patkar (MIG-WHITELABEL, MIG-ASSETS). The jobs
-  component needs a ticket of its own (a plan input), not added by this lane.'
+  component needs a ticket of its own (a plan input), not added by this lane. setAppIcons declares no x-ticvai-calls: the
+  renditions are asked by the jobs component after the write, as the decision''s ''Leave the work itself to the job'' says;
+  a direct call failed check-plan-closure C-CALLS (requestMediaRendition is Block B, SVC-VENUEOPS-ASSETS-3).'
