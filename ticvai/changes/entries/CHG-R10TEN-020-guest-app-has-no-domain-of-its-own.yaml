@@ -1,0 +1,32 @@
+id: CHG-R10TEN-020
+date: '2026-10-25'
+source: cr
+kind: contract
+summary: 'A custom-domain claim of kind guestApp is stored and mapped as guestWeb: the guest app is served on the guestWeb
+  domain and has no domain of its own; the enum keeps the value for r1 clients.'
+decision:
+  what: 'r10 question 4, recommended answer accepted: guestApp maps to guestWeb''s domain. The lead, 25 October 2026, accepted
+    every recommended answer in the r10 lead questions (LEAD-QUESTIONS-r10.md).'
+  by: Chinmay
+  date: '2026-10-25'
+why: 'ADAM CR-105 (Deep Khanvilkar, #27895/#27894) left guestApp''s channel to the lead (CHG-R10TEN-011 notes).'
+keys_touched:
+  operations:
+  - claimCustomDomain
+  schemas:
+  - CustomDomain
+  files:
+  - contracts/satellite/white-label.yaml
+root_class: 'new: an enum value with no mapping downstream'
+tickets:
+  started:
+  - '27895 and 27894: through CR-105''s comment.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-105
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-contract-compat.py
+status: open

@@ -1,0 +1,30 @@
+id: CHG-R10TEN-021
+date: '2026-10-25'
+source: cr
+kind: contract
+summary: setMinorGuardianAge and setCustomerServiceCopilot are keyed by their body (country; scopePath) with x-ticvai-body-key,
+  replacing a singleton note that said "one per venue, the caller's venue".
+decision:
+  what: 'r10 question 26, recommended answer accepted: fix the notes. The lead, 25 October 2026, accepted every recommended
+    answer in the r10 lead questions (LEAD-QUESTIONS-r10.md).'
+  by: Chinmay
+  date: '2026-10-25'
+why: 'Found by lane A2 on CR-229''s siblings (CHG-R10TEN-002 notes): the notes contradicted the operations'' own keys.'
+keys_touched:
+  operations:
+  - setMinorGuardianAge
+  - setCustomerServiceCopilot
+  files:
+  - contracts/satellite/marketing-crm.yaml
+root_class: 'new: a singleton note on a write keyed by its body'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-229
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-contract-shapes.py
+status: open

@@ -109,6 +109,25 @@ x-ticvai-queries:
   # **Data reads other modules ask this module for** (MOD audit, 14 October 2026, CHG-MOD-001): one query per
   # table, instead of a raw read of it (check-cross-module-reads XR-UNCOVERED; ADR-0055 rule 2, amended
   # 14 October).
+  # **A staff sign-in on a device, recorded on the device** (ADAM CR-232 as the lead answered, 25 October 2026, r10
+  # question 23; CHG-R10TEN-018). Identity's login asks it in process within commerce (ADR-0055 rule 3: another
+  # module writes only through the owner's in-process API), so listDeviceAuditRecords reads sign-ins from Tenancy's
+  # own tenancy.device_audit.
+  recordDeviceSignIn:
+    module: tenancy
+    table: tenancy.device_audit
+    inputs:
+      workstationId: uuid, the workstation the sign-in named (LoginRequest.workstationId); a browser door sends none and does not ask
+      principalId: uuid, who signed in
+      at: date-time, when the session opened
+    returns:
+      recorded: integer, the device_audit rows written (one per device bound to the workstation; 0 when none is)
+    rule: 'Called by identity.login on a successful device sign-in, in the same transaction as the session it opens.
+      Tenancy writes one tenancy.device_audit row for each registered device bound to the workstation (platform.device
+      workstation_id): kind access, action signIn, actorPrincipalId the principal, at the session''s opening time,
+      previousValue and newValue absent. A failed sign-in opens no session and records nothing here
+      (identity.loginRecorded carries it). listDeviceAuditRecords returns these rows with the scans.'
+    served: [in-process]
   deadLetterRecords:
     module: tenancy
     table: platform.dead_letter
@@ -686,7 +705,8 @@ paths:
         **Reading the audit log is itself audited.** `platform.audit_read` exists for that reason:
         a trail nobody can inspect is useless, and one anybody can inspect without trace is a
         different problem. Each call writes one `AuditRead` row (`target` `auditRecord`, the
-        caller, the time, the filters and the number of rows returned; CHG-R8MIG-004).
+        caller, the time, the filters and the number of rows returned; CHG-R8MIG-004), with the org unit the
+        caller's session acts at (`orgUnitId`, CHG-R10TEN-019).
 
         **Never deletes and never edits.** The only operations on an audit record are write and
         read — which is why there is no `updateAuditRecord` here and never will be.
@@ -3506,7 +3526,9 @@ paths:
         **Where each half comes from, decided 25 October 2026** (ADAM CR-232, option A, as CR-196; CHG-R10TEN-005):
 
         - **The device audit** is `tenancy.device_audit`, Tenancy''s own, every kind as stored. **Sign-ins are
-        rows of it** of kind `access`, written by the sign-in path.
+        rows of it** of kind `access`, action `signIn`, written by Identity''s `login` on a device sign-in through
+        Tenancy''s in-process API `tenancy#recordDeviceSignIn` (the lead''s answer to r10 question 23;
+        CHG-R10TEN-018).
 
         - **The scans** are `access.scan_event` rows of this device (`device_id`), read in process through
         `access#scanEventRecords` (the commerce role reads the table; XDR-001), under the caller''s own scope. A
@@ -4095,12 +4117,18 @@ components:
     AuditRead:
       type: object
       x-ticvai-persistence: platform.audit_read
+      # Read by the tenant root and by a grant over the row's org unit, as platform.audit_record (ADAM CR-185 sibling,
+      # the lead's answer to r10 question 24; CHG-R10TEN-019): derive-ddl APPEND_AUDIT_MARKS.
+      x-ticvai-rls: audit-read-beneath
       description: '**Who read audited data, when, and what they asked for** (R8 blocker APPROVALS-TENANCY-C09,
         CHG-R8MIG-004; the lead''s answer, option A). One row per audited read, never edited: a read of a guest''s
         PII (`target` `subject`, `subjectId` set) and every `listAuditRecords` call (`target` `auditRecord`, the
         filter it was called with and how many rows it returned; `subjectId` null). Written by the reading
         operation in its own transaction; storage only, no operation returns it. Any principal holding a grant
-        appends a row and only the tenant root reads one, as `platform.audit_record` (CHG-R6-002).'
+        appends a row, as `platform.audit_record` (CHG-R6-002). **Read as `platform.audit_record` is** (the lead''s
+        answer to r10 question 24, 25 October 2026; CHG-R10TEN-019): the tenant root reads every row, and a venue or
+        region grant reads the rows whose `orgUnitId` names a scope node at or beneath it; a row with no `orgUnitId`
+        is the tenant root''s.'
       required:
       - id
       - principalId
@@ -4141,6 +4169,13 @@ components:
           type: integer
           nullable: true
           description: How many rows the read returned.
+        orgUnitId:
+          type: string
+          format: uuid
+          nullable: true
+          x-ticvai-references: platform.scope
+          description: The venue the reader's session acts at, else its region; null for a session at the tenant root
+            (CHG-R10TEN-019). What a venue or region grant reads the row by.
     AuditRecord:
       x-ticvai-append-only: occurredAt
       type: object

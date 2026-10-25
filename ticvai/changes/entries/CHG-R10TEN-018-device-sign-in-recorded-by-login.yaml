@@ -1,0 +1,38 @@
+id: CHG-R10TEN-018
+date: '2026-10-25'
+source: cr
+kind: contract
+summary: Identity's login records a device sign-in on the workstation's devices through a new Tenancy in-process API, tenancy#recordDeviceSignIn
+  (one tenancy.device_audit row per bound device, kind access, action signIn), which listDeviceAuditRecords returns.
+decision:
+  what: 'r10 question 23, recommended answer accepted: identity''s staff sign-in writes the row; the operation is named.
+    The lead, 25 October 2026, accepted every recommended answer in the r10 lead questions (LEAD-QUESTIONS-r10.md).'
+  by: Chinmay
+  date: '2026-10-25'
+why: 'ADAM CR-232 (Pranay Shinde, #30828) left the writer of the sign-in row unnamed (CHG-R10TEN-005 notes).'
+keys_touched:
+  operations:
+  - login
+  - listDeviceAuditRecords
+  tables:
+  - tenancy.device_audit
+  other:
+  - query tenancy#recordDeviceSignIn
+  files:
+  - contracts/spine/tenancy.yaml
+  - contracts/spine/identity.yaml
+root_class: 'new: a write another module needs, with no owner''s API named'
+tickets:
+  started:
+  - '30828 (listDeviceAuditRecords): through CR-232''s comment.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-232
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-cross-module-reads.py
+status: open
+notes: 'identity.yaml is lane A1''s contract: one read-via entry and one paragraph on login. Within commerce, ADR-0055 rule
+  3: the owner''s in-process API.'
