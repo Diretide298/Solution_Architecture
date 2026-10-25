@@ -82,7 +82,6 @@
    "builds": [
     "table platform.outbox",
     "table kernel.inbox",
-    "table platform.dead_letter",
     "table control.outbox_relay",
     "adr ADR-0033",
     "adr ADR-0057",

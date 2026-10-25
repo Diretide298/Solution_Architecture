@@ -1,0 +1,34 @@
+id: CHG-R10TEN-023
+date: '2026-10-25'
+source: cr
+kind: plan
+summary: PLATFORM-OUTBOX no longer lists platform.dead_letter among its builds; MIG-PLATFORM-4 (Tenancy & Venues, Sprint
+  3) builds it, and the Foundation · Platform module test stops claiming it.
+decision:
+  what: 'r10 question 25, recommended answer accepted: remove it there too. The lead, 25 October 2026, accepted every recommended
+    answer in the r10 lead questions.'
+  by: Chinmay
+  date: '2026-10-25'
+why: Siblings of ADAM CR-093 (CHG-R10TEN-015) and CR-106 (CHG-R10TEN-012).
+keys_touched:
+  tickets:
+  - PLATFORM-OUTBOX
+  - TEST-AM-FOUNDATION-PLATFORM
+  files:
+  - docs/active/block-a-extra-tasks.json
+root_class: 'new: a task listing as built what it only uses'
+tickets:
+  started: []
+  unstarted:
+  - 'PLATFORM-OUTBOX: its builds list at the next tag.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-093
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-plan-closure.py
+status: open
+proposed: '2026-10-25'
+notes: 'A plan change proposed and decided on 25 October: check-changelog fails it on the 24-hour cooling-off until the
+  lead waives it (waivers.cooling_off) or it is decided again a day later.'
