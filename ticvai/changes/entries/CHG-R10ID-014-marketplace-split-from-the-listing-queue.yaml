@@ -1,0 +1,51 @@
+id: CHG-R10ID-014
+date: '2026-10-25'
+source: cr
+kind: contract
+summary: 'The public marketplace is its own operation: listMarketplaceListings (security {}) answers only certified,
+  public, unexpired listings, by name then id, paged; listIntegrationListings is authenticated only, a developer''s
+  own listings in every status or, for TICVAI staff, every listing with status and developerId filters, pending review
+  first then name then id, paged; listProductionAccessRequests gives a tenant''s staff only the requests whose
+  allowedTenantIds contain their tenant; requestProductionAccess refuses a listing of another developer (422
+  listing-not-owned).'
+decision:
+  what: 'ADAM CR-203, option B, as settled. contracts/satellite/public-api.yaml: new GET /marketplace/listings
+    (listMarketplaceListings, x-ticvai-permission null, audience public, scope platform, category filter,
+    PageSize/PageCursor, x-ticvai-no-screen: the developer site''s public marketplace page); listIntegrationListings
+    loses the anonymous security alternative and the public audience, gains status and developerId filters, an order
+    and paging (response becomes a Page); listProductionAccessRequests states the tenant-staff rule (BO-1073,
+    BO-1177); requestProductionAccess 422 listing-not-owned. docs/active/breaking-changes.yaml BC-466
+    (listIntegrationListings security).'
+  by: Chinmay
+  date: '2026-10-25'
+why: 'ADAM CR-203 (Surendra Loke, ticket 28008 listIntegrationListings), settled 25 October 2026 with option B.
+  listIntegrationListings accepted anonymous callers yet served DEV-007 (a developer''s own drafts) and DEV-008 (the
+  staff certification queue) with no visibility rule, order or paging, so an anonymous caller got every developer''s
+  draft, private and rejected listing; tenant staff on BO-1073 and BO-1177 would see every developer''s production
+  requests across tenants; and requestProductionAccess did not say the listing must be the developer''s.'
+keys_touched:
+  operations: [listMarketplaceListings, listIntegrationListings, listProductionAccessRequests, requestProductionAccess]
+  schemas: [IntegrationListing, ProductionAccessRequest]
+  screens: [DEV-007, DEV-008, BO-1073, BO-1177]
+  files:
+  - contracts/satellite/public-api.yaml
+  - docs/active/breaking-changes.yaml
+root_class: 'new: one list operation serving an anonymous audience and a privileged one with no visibility rule'
+tickets:
+  started:
+  - '28008 (listIntegrationListings): through CR-203''s comment, as CHG-ADM-002 says; its text is not rewritten.'
+  unstarted:
+  - 'SVC-PLATFORM-PUBLICAPI-10 and the DEV-007, DEV-008, BO-1073 and BO-1177 front-end tasks pick it up at the r10
+    tag. listMarketplaceListings has no ticket yet (no screen in the package draws the public marketplace).'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-203
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-contract-compat.py
+status: open
+notes: 'check-contract-compat refuses a security alternative removed from an operation unless the lead''s approval is
+  recorded (BC-466), so a public read cannot be narrowed, or a private one widened, silently. No screen changes: DEV-007
+  and DEV-008 keep binding listIntegrationListings (their columns are unchanged, the list is now paged), and BO-1073 and
+  BO-1177 keep listProductionAccessRequests; nothing visible changes.'
