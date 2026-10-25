@@ -32,8 +32,8 @@ decision:
 why: 'PROCESS-LOG P-30 (25 October): about 13 of the 48 CRs raised 21-24 October were findings the build had already
   reported and acknowledged. The XR-FACT findings were baselined on 18 October (354acd74) and acknowledged on started
   tickets "until the next class release" (again at the r8 gate, 92eb4150); the release never ran. listDepositBoxes''
-  three Tenancy reads, flagged on #32643 and #30823, came back as ADAM CR-218. Brief: the lead''s r10 lane E brief, kept outside the package
-  section 1.'
+  three Tenancy reads, flagged on #32643 and #30823, came back as ADAM CR-218. Brief: section 1 of the lead''s r10 lane E brief,
+  kept outside the package.'
 keys_touched:
   operations: [getMembership, guestUaePassLogin, holdOrder, buildProductionPlan, listDepositBoxes, getKpiValues]
   files:
