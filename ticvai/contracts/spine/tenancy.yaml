@@ -292,6 +292,47 @@ x-ticvai-queries:
       own operation, and a question with a rule of its own (open, live, sellable) is declared as a query of its
       own. It is asked from another deployable through Tenancy's service route (serviceAuth).
     served: [service]
+  scopeRecords:
+    module: tenancy
+    table: platform.scope
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The platform.scope rows asked for, by id (a venue id from a session or an order, for its path or its name).'}
+      paths: {type: array, items: {type: string, pattern: '^[a-z0-9_]+(\.[a-z0-9_]+)*$'}, description: 'Or the rows whose path equals one of these ltree paths exactly (a row''s scope_path, for the node it names: ADAM CR-235); ids, paths and where together narrow.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as level or parentId); ids, paths and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Tenancy stores it, active or not; an id or a path with no visible row is absent.'
+      items: {$ref: '#/components/schemas/OrgUnit'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October; ADAM CR-217, CR-235 and CR-227, decided 25 October 2026, CHG-R10CAT-001). Tenancy answers with its
+      platform.scope rows, as it stores them and as the caller's scope lets it see them (the table's row-level
+      security, under the caller's connection and transaction), whether or not the node is still active: an asker
+      that wants active venues only asks activeVenues, which is a rule question. It decides nothing: an asker that
+      refuses or chooses on these rows states that rule in its own operation. A path is matched exactly, never as an
+      ancestor or a descendant. It is asked in process within commerce, through the C# query interface Tenancy
+      implements (Catalogue: a venue's path for a venue-scoped row, and a row's path back to its venue; Orders: a
+      venue's name), and asked from another deployable through Tenancy's service route (serviceAuth).
+    served: [in-process, service]
+  offlinePolicyRecords:
+    module: tenancy
+    table: platform.offline_policy
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The platform.offline_policy rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as scopePath); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Tenancy stores it; an id with no visible row is absent, and a node with nothing saved has no row.'
+      items: {$ref: '#/components/schemas/OfflinePolicy'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October; ADAM CR-110, decided 15 October 2026, CHG-R10CAT-010). Tenancy answers with its
+      platform.offline_policy rows, as it stores them and as the caller's scope lets it see them (the table's
+      row-level security, under the caller's connection and transaction). It decides nothing: an asker that falls
+      back to the schema's defaults where no row is saved (as getOfflinePolicy does) states that rule in its own
+      operation. It is asked in process within commerce, through the C# query interface Tenancy implements, and
+      asked from another deployable through Tenancy's service route (serviceAuth).
+    served: [in-process, service]
   activeVenues:
     module: tenancy
     table: platform.scope
