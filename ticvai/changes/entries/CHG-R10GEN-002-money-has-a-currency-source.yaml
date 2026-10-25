@@ -1,0 +1,54 @@
+id: CHG-R10GEN-002
+date: '2026-10-25'
+source: cr
+kind: process
+summary: 'A new check, check-money-currency (MC-NO-CURRENCY), fails an operation that answers or accepts common Money
+  from a row that stores the amount only (or computes it from rows that hold no currency) and asks no read of the
+  venue''s or region''s currency. Its fixer, tools/applied/money-currency-reads-r10.py, writes the
+  tenancy#venueSettingsRecords (or regionSettingsRecords) read where the row holds the venue or region, and lists the
+  rest for the lead by kind. The fixer''s output is not committed here: integration runs it on the merged tree.'
+decision:
+  what: 'naming-and-style 5.1 and ADR-0018 as the rule: Money''s currency and scale resolve from what denominates the
+    amount (a stored currency column on the row or a parent row of its module, else the venue''s frozen trading
+    currency, which is Tenancy''s and asked through a declared query, ADR-0055 rule 2 as amended 14 October). The
+    lead''s rule for r10: a new check blocks in the release it arrives and its findings are fixed in that release;
+    nothing is baselined. Mechanical: the venue read where the row, a parent row of its schema, or the operation
+    (venueId or outletId) holds the venue, route in-process within commerce and service across (CR-234 option A);
+    the region read where the row holds only a region. For the lead: rows that keep only a scope_path (CR-217 and
+    CR-235 option A, tenancy#scopeRecords, which a second run then routes), platform billing rows of control.*
+    (CR-202 option A, a billing currency stored on the row), rows with no venue, and computed answers that read no
+    table.'
+  by: Chinmay
+  date: '2026-10-25'
+why: 'ADAM CR-234 (mergeTableVisits, #28586), CR-197 (getGuestBundle, #36301), CR-217 (createEntitlementTemplate,
+  #30944), CR-235 (setEntitlementTemplateBlackoutDates, #30945) and CR-202 (generateInvoice, #28000), raised 21-23
+  October and settled 25 October without a release. Finding: PROCESS-LOG P-30, "Money with no currency source": the
+  read 5.1 implies was named in no operation''s words, so XR-FACT could not see it and no other check looked. On r9
+  the check finds 451 operations, all five CRs'' among them; the fixer routes 301; 150 remain for the lead (112
+  scope-path rows, 38 once tenancy#scopeRecords is declared). Measured in a throwaway worktree: after the fixer and
+  derive-lineage --apply, check-cross-module-reads has no new finding (XR-FACT falls from 720 to 697, the venue
+  settings reads it also named), check-lineage, check-contract-shapes and check-error-sources are unchanged, and a
+  second run writes nothing.'
+keys_touched:
+  operations: [mergeTableVisits, getGuestBundle, createEntitlementTemplate, setEntitlementTemplateBlackoutDates,
+    generateInvoice]
+  files:
+  - tools/check-money-currency.py
+  - tools/applied/money-currency-reads-r10.py
+  - tools/tests/test_check_money_currency.py
+root_class: 'an implied read no check could see: a rule (5.1) that makes every Money answer a read of the venue''s
+  settings, stated once in the style guide and never in the operations'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r10
+decision_owner: Chinmay
+adam_cr: CR-197, CR-202, CR-217, CR-234, CR-235
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-money-currency.py
+status: open
+notes: 'Integration, after the CR lanes land: python tools/applied/money-currency-reads-r10.py (dry run), then
+  --apply, then python tools/derive-lineage.py --apply, then python tools/check-money-currency.py and
+  python tools/check-cross-module-reads.py. The held list prints with a recommended default ruling per kind.'

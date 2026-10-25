@@ -1,0 +1,48 @@
+id: CHG-R10GEN-004
+date: '2026-10-25'
+source: cr
+kind: process
+summary: 'New check check-list-order: a list whose stated order names a field that can be null states where the rows
+  without it go (LO-NULLABLE-KEY), and a whole list of stored rows a screen shows states an order at all
+  (LO-UNORDERED). Its fixer tools/applied/order-and-refusals-r10.py writes the default rulings into the contracts,
+  for integration to run once on the merged tree after the lead accepts them.'
+decision:
+  what: 'r10 lane E, brief section 2 ("An order on a nullable field"). LO-NULLABLE-KEY: nullable in the schema, or
+    optional in the schema on a column that is not NOT NULL (schema-reference `source`); `id`, `...Id` keys and
+    `createdAt` are never null keys; a place is stated by NULLS FIRST/LAST, coalesce(), or a sentence naming the key
+    with a null word and a place word. LO-UNORDERED: an unpaged array a screen calls (x-ticvai-consumed-by) whose
+    items persist to a table and carry no position field, with no order phrase; paged lists stay with
+    check-contract-shapes C-PAGED-ORDER, computed answers are left out. No baseline: a new check blocks in the release
+    it arrives (the lead''s rule). Default rulings the fixer writes (the lead to accept or override per operation in
+    its OVERRIDE table): a null key sorts last (NULLS LAST) with `id` breaking ties, as CR-236 recommended; a whole
+    list is sorted by a never-null name (displayName, name, title, label, code) then `id`, else newest first by
+    createdAt then `id`, else by `id` descending (UUIDv7). On r9: 102 LO-NULLABLE-KEY on 102 lists, 122 LO-UNORDERED;
+    the fixer writes 224 sentences and both rules then find 0; a second run writes nothing.'
+  by: Chinmay
+  date: '2026-10-25'
+why: 'ADAM CR-236 (listMyWaitingGuests orders on the nullable estimatedCallAt, #33057), CR-206 (listShifts orders on
+  recordedAt, optional and nullable; accepted as coalesce(recordedAt, openedAt)), CR-190 (listSsoProviders lists the
+  sign-in buttons in no stated order, #30730); PROCESS-LOG P-30 (48 CRs on gaps the builds passed, 21-24 October
+  2026). Finding: check-contract-shapes C-PAGED-ORDER asked only that a paged list name its sort field.'
+keys_touched:
+  files:
+  - tools/check-list-order.py
+  - tools/applied/order-and-refusals-r10.py
+  - tools/tests/test_check_list_order.py
+  - tools/tests/test_order_and_refusals_apply.py
+root_class: 'a rule nobody wrote: a stated order that is not total (a nullable key, or no order at all)'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r10
+decision_owner: Chinmay
+adam_cr: CR-236, CR-206, CR-190
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-list-order.py
+status: open
+notes: 'Must-catch on r9 text: listMyWaitingGuests:estimatedCallAt, listShifts:recordedAt (LO-NULLABLE-KEY) and
+  listSsoProviders (LO-UNORDERED) all found. The fixer was measured in a throwaway worktree (contracts restored);
+  check-contract-shapes unchanged by its output (172 known before and after). Wire into tools/run-checks.py at
+  integration.'

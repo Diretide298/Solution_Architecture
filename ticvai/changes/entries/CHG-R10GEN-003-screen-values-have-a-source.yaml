@@ -1,0 +1,47 @@
+id: CHG-R10GEN-003
+date: '2026-10-25'
+source: cr
+kind: process
+summary: 'A new check, check-screen-value-sources, fails a screen that binds, shows, offers or saves a value no
+  operation it declares carries: a binding or a shown Schema.field whose schema nothing the screen declares answers
+  or sends and the app shell does not preload (SV-SCHEMA, SV-FIELD), a choice whose options have no read before the
+  choice (SV-OPTIONS), a photo that is only an asset id (SV-MEDIA), an id to pick from a list the package has and the
+  screen does not declare (SV-PICK), and a save its text promises with no write declared (SV-WRITE). No fixer: every
+  fix adds a read to the screen, which must be reached by a control (check-screen-wiring S-OP-UNREACHED) on screens
+  whose visible YAML is the client-approved prototype, or changes a contract, so each is a ruling.'
+decision:
+  what: 'The rule: a value a screen names is in the answer of an operation the screen declares in apis (every response
+    body, $refs followed at every level), in what it sends, or in what the app shell preloads. Precision first, as
+    the lead asked of every r10 check: prose counts only outside parentheses, after a word that shows or limits the
+    value, and only in a component with no operation of its own (or a form with no confirm operation); a field the
+    component''s own operation answers (or its own write sends) is its source. The lead''s rule for r10: a new check
+    blocks in the release it arrives and its findings are fixed in that release; nothing is baselined.'
+  by: Chinmay
+  date: '2026-10-25'
+why: 'ADAM CR-220 (GST-051 cuisineTags and retailTags, #33038), CR-221 (WEB-003 product photo url, #28145), CR-233
+  (WEB-023 saved cards, #28295), CR-187 (WEB-007 Cart.expiresAt and maxSeatsPerGuestOrder, #31848) and CR-186 (GST-043
+  profile language, #31071), raised 21-22 October and settled 25 October without a release. Finding: PROCESS-LOG P-30,
+  "a screen shows or does something its declared operations don''t return": check-bindings asks only whether a bound
+  schema exists and check-screen-wiring whether a declared operation is reached. On r9 the check finds 55 values on
+  48 screens, the five CRs'' among them (SV-SCHEMA 33, SV-MEDIA 13, SV-PICK 4, SV-OPTIONS 3, SV-FIELD 1, SV-WRITE 1).'
+keys_touched:
+  screens: [GST-051, WEB-003, WEB-023, WEB-007, GST-043]
+  files:
+  - tools/check-screen-value-sources.py
+  - tools/tests/test_check_screen_value_sources.py
+root_class: 'a screen value with no source: a binding or a promise in a screen''s words that no operation the screen
+  declares answers, which no check compared'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r10
+decision_owner: Chinmay
+adam_cr: CR-186, CR-187, CR-220, CR-221, CR-233
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-screen-value-sources.py
+status: open
+notes: 'Integration, after the CR lanes land (their screen and contract fixes for the five CRs clear those findings):
+  python tools/check-screen-value-sources.py, then bring the remaining findings to the lead grouped by kind with the
+  recommended rulings in the lane report. Wire it into tools/run-checks.py beside check-bindings.'
