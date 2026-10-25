@@ -1,0 +1,39 @@
+id: CHG-R10TEN-014
+date: '2026-10-25'
+source: cr
+kind: contract
+summary: 'The table record (the schema workbook''s Columns and Tables sheets, which ADAM reads) is built from the generated
+  DDL: Required from NOT NULL, the DDL''s columns, the declared keys and the row-level-security helper; the database module
+  test''s done-when says "matches the package DDL".'
+decision:
+  what: 'ADAM CR-092, option 1, as accepted. tools/derive-ddl.py ddl_records writes `records` into handoff/ddl-column-types.json;
+    tools/build-schema-workbook.py reads it (Required, DDL-only columns, Keys, Row security); tools/build-service-docs.py
+    rewords the database module test. The lead, 25 October 2026: "update and get r10 out", with every accepted CR in it
+    (audit r10 plan).'
+  by: Chinmay
+  date: '2026-10-25'
+why: 'ADAM CR-092 (Pranay Shinde, #27686 TEST-AM-FOUNDATION-DATABASE), accepted 15 October 2026 for the next release: 218
+  of 497 records disagreed with the DDL they come from (CR-067 settled the DDL is right).'
+keys_touched:
+  tickets:
+  - '27686'
+  files:
+  - tools/derive-ddl.py
+  - tools/build-schema-workbook.py
+  - tools/build-service-docs.py
+root_class: 'new: a derived record that lags the artefact it describes'
+tickets:
+  started:
+  - '27686 (TEST-AM-FOUNDATION-DATABASE): through CR-092''s comment; its done-when changes at its next pull.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-092
+triage: fix-forward
+prevention:
+  type: generator-rule
+  ref: tools/derive-ddl.py::ddl_records
+status: open
+notes: 'Measured on this tree: every scope_path on the Columns sheet now reads required (679), where 490 schema-reference
+  rows say otherwise. ADAM shows the new Keys and Row security columns only once its Tables reader takes them (viewer, not
+  this lane).'

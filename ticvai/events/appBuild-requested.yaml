@@ -1,0 +1,36 @@
+# appBuild.requested v1 — published by whitelabel
+# Added 25 October 2026 (ADAM CR-106, option 1, accepted 15 October 2026; CHG-R10TEN-012): the white-label jobs
+# component on the workers host carries app builds, site packages and preview rendering, one event each.
+# Checked by tools/check-states.py.
+
+name: appBuild.requested
+version: 1
+publisher: whitelabel
+description: A tenant asked for its branded app to be built for a store.
+aggregate: appBuild
+emittedWhen: requestAppBuild stores an AppBuild queued
+emittedBy:
+- requestAppBuild
+payload:
+- field: appBuildId
+  type: uuid
+  notes: The build's id, the event's aggregateId
+- field: platform
+  type: string
+  notes: ios or android
+- field: configVersion
+  type: string
+  notes: The published ConfigVersion.version to build
+- field: submitToStore
+  type: boolean
+- field: requestedByPrincipalId
+  type: uuid
+  required: false
+consumers:
+- context: white-label
+  purpose: 'Build and sign the app package from the version''s snapshot, store it in Assets (packageAssetRef), and move the build queued -> building -> built or failed; with submitToStore, submit it with the client''s recorded credential. The white-label jobs component in the workers host'
+  idempotencyKey: appBuildId
+  onFailure: retryThenDeadLetter
+  isCritical: true
+retention: 30 days after publication
+notes: 'No state model emits this: the request is stored by the operation and the work is the jobs component''s.'

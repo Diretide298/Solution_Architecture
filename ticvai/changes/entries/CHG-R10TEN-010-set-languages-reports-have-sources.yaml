@@ -1,0 +1,40 @@
+id: CHG-R10TEN-010
+date: '2026-10-25'
+source: cr
+kind: contract
+summary: setLanguages' translationGaps counts the tenant's content pages, banners, promo blocks, FAQ entries and policies
+  (areas a closed list; products are Catalogue's), and uiStringCoverage reads a new table whitelabel.ui_string_pack (language,
+  coverage_percent, status) for any language but English and Arabic.
+decision:
+  what: 'ADAM CR-194, option A. white-label.yaml: setLanguages'' reads and description, LanguageConfig, a new persisted
+    schema UiStringPack (whitelabel.ui_string_pack, unique on language). The lead, 25 October 2026: "update and get r10
+    out", with every accepted CR in it (audit r10 plan).'
+  by: Chinmay
+  date: '2026-10-25'
+why: 'ADAM CR-194 (Sanket Keluskar, #30763 setLanguages), settled 25 October 2026 with option A: both report fields had
+  no declared source.'
+keys_touched:
+  operations:
+  - setLanguages
+  schemas:
+  - LanguageConfig
+  - UiStringPack
+  tables:
+  - whitelabel.ui_string_pack
+  files:
+  - contracts/satellite/white-label.yaml
+root_class: 'new: a response field with no declared source'
+tickets:
+  started:
+  - '30763 (setLanguages): through CR-194''s comment.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-194
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-parameter-columns.py
+status: open
+notes: 'Database: new table whitelabel.ui_string_pack (id, language, coverage_percent, status, scope_path; unique lower(language));
+  migration work for Hrushikant Patkar (MIG-WHITELABEL). No operation writes it: a string pack writes its row when it ships.'

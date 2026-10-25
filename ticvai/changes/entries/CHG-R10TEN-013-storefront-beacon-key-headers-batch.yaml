@@ -1,0 +1,38 @@
+id: CHG-R10TEN-013
+date: '2026-10-25'
+source: cr
+kind: contract
+summary: recordStorefrontSessionEvents names the tenant key (the tenant's blind-index key, HMAC-SHA-256, 64 lowercase hex,
+  ADR-0063), adds a 64-hex pattern to sessionRef and deviceIdHash, names the edge headers (X-Edge-Ip-Hash, X-Edge-Ip-Country,
+  X-Edge-Ua-Family, stripped from client traffic), sets batchEndedAt to server receipt, and drops Idempotency-Key for batchId.
+decision:
+  what: 'ADAM CR-107, option 1, on ADR-0063. white-label.yaml recordStorefrontSessionEvents and WhiteLabelStorefrontSessionBatch;
+    events/storefront-sessionEvent.yaml notes. The lead, 25 October 2026: "update and get r10 out", with every accepted
+    CR in it (audit r10 plan).'
+  by: Chinmay
+  date: '2026-10-25'
+why: 'ADAM CR-107 (Deep Khanvilkar, #27777 / #30764), accepted 15 October 2026 for the next release with option 1.'
+keys_touched:
+  operations:
+  - recordStorefrontSessionEvents
+  schemas:
+  - WhiteLabelStorefrontSessionBatch
+  other:
+  - event storefront.sessionEvent
+  files:
+  - contracts/satellite/white-label.yaml
+  - events/storefront-sessionEvent.yaml
+root_class: 'new: a shared secret and edge fields left unnamed'
+tickets:
+  started:
+  - '27777 / 30764: through CR-107''s comment.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-107
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-contract-compat.py
+status: open
+notes: The header names are this lane's; the edge owner may rename them before the edge contract is written.

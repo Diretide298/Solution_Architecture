@@ -183,7 +183,8 @@ x-ticvai-queries:
       another deployable through Access' service route (serviceAuth), and in process by commerce (ADAM CR-196,
       option B, decided 21 October 2026; CHG-R9CR-005): DB-ROLES grants the commerce role SELECT on
       access.scan_event (docs/active/cross-deployable-writes.yaml XDR-001), so Orders' getMediaEntitlements calls the
-      C# query interface Access implements, in its own transaction, under the caller's own scope.
+      C# query interface Access implements, in its own transaction, under the caller's own scope. Tenancy's
+      listDeviceAuditRecords reads its device's scans the same way (ADAM CR-232, option A, 25 October 2026).
     served: [in-process, service]
 paths:
   /access/validate:

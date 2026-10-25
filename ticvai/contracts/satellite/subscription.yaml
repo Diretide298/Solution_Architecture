@@ -192,7 +192,9 @@ x-ticvai-queries:
     rule: >-
       A data read, not a rule question (ADR-0055 rule 2 as amended 14 October; r8 integration, CHG-R8INT-014).
       Platform answers with its control.cell_tenant rows, as it stores them. It decides nothing: resolveTenantHost,
-      which asks it, states its own rule (one database that is live, suspended or draining). It is asked from another
+      which asks it, states its own rule (one database that is live, suspended or draining), and
+      setTenantDomainMapping, which asks it too, states its own (the 403 when the tenant is not one of the calling
+      cell's tenants; ADAM CR-205). It is asked from another
       deployable through Platform's service route (serviceAuth).
     served: [service]
   tenantRequestLimits:

@@ -1,0 +1,37 @@
+id: CHG-R10TEN-017
+date: '2026-10-25'
+source: cr
+kind: process
+summary: 'CR-136 needs no package edit: the foreign key (V0107, NOT VALID, guarded) and the parent policy (V0104, apply_parent_rls,
+  re-runnable) are in shipped forward migrations, which are frozen; the decision is a migration task for Hrushikant Patkar
+  under MIG-MARKETING #27677, which integration files.'
+decision:
+  what: 'ADAM CR-136, option A: the two statements become their own task, "[CR-136] consent_question_version: foreign key
+    and its question''s access rule (ahead of V0104)", priority Immediate, the key NOT VALID then VALIDATE, both guarded.
+    The lead, 25 October 2026: "update and get r10 out", with every accepted CR in it (audit r10 plan).'
+  by: Chinmay
+  date: '2026-10-25'
+why: 'ADAM CR-136 (Chinmay Patkar, #27922 and #31162), accepted 15 October 2026 with option A.'
+keys_touched:
+  tables:
+  - marketing.consent_question_version
+  tickets:
+  - '27677'
+  - '27922'
+  - '31162'
+root_class: 'new: a migration carried only inside a package-wide forward migration'
+tickets:
+  started:
+  - '27922, 31162: On hold until the task is merged, as CR-136 says.'
+  unstarted:
+  - 'MIG-MARKETING #27677: the child task, filed by integration.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-136
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-migration-freeze.py
+status: open
+notes: No forward migration writes VALIDATE CONSTRAINT consent_question_version_question_id_fkey; the task does, after the
+  orphan check the CR describes.

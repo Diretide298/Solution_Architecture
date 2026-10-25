@@ -627,6 +627,17 @@ APPEND_AUDIT = {
     "identity.authz_audit",    # CHG-R6-014
 }
 
+# **A trail a venue reads its own part of** (CHG-R10TEN-006; ADAM CR-185, option B, decided 21 October 2026).
+# listAuditRecords is a venue operation behind six venue screens, and the tenant-root read gave a venue manager
+# holding AUDIT_VIEW an empty page with no error. `x-ticvai-rls: audit-read-beneath` on an APPEND_AUDIT table's
+# contract schema keeps every write where CR-005 put it (any grant appends; the tenant root alone corrects or
+# removes) and widens SELECT: the tenant root reads every row, and a grant reads the rows whose org-unit column
+# names a platform.scope node at or beneath it. A row with no org unit (a consumer, a job, the webhook) stays the
+# tenant root's. The value is the column the mark reads.
+APPEND_AUDIT_MARKS = {"audit-read-beneath": "org_unit_id"}
+APPEND_AUDIT_BENEATH = ("platform.tenant_root_in_scope() OR ({col} IS NOT NULL AND EXISTS (SELECT 1 FROM "
+                        "platform.scope au WHERE au.id = {col} AND platform.in_scope(au.path)))")
+
 RLS_APPEND_AUDIT = """
 -- **An append-only audit trail** (CHG-R6-002): any connection holding a grant may append a row, and
 -- only the tenant root may read, correct or remove one. A venue principal's business write audits itself
@@ -654,6 +665,22 @@ BEGIN
                    'WITH CHECK (platform.tenant_root_in_scope())', base || '_update', target);
     EXECUTE format('CREATE POLICY %I ON %s FOR DELETE USING (platform.tenant_root_in_scope())',
                    base || '_delete', target);
+END
+$$;
+
+-- **An append-only audit trail with a wider read** (CHG-R10TEN-006, ADAM CR-185): as apply_append_audit_rls,
+-- but SELECT is `read_check`, generated from the table's `x-ticvai-rls` mark (the tenant root, or a grant over
+-- the row's org unit). Appending, correcting and removing are unchanged.
+CREATE OR REPLACE FUNCTION platform.apply_append_audit_read_rls(target regclass, read_check text)
+    RETURNS void
+    LANGUAGE plpgsql
+AS $$
+DECLARE
+    base text := (SELECT left(c.relname, 55) FROM pg_class c WHERE c.oid = target);
+BEGIN
+    PERFORM platform.apply_append_audit_rls(target);
+    EXECUTE format('DROP POLICY IF EXISTS %I ON %s', base || '_read', target);
+    EXECUTE format('CREATE POLICY %I ON %s FOR SELECT USING (%s)', base || '_read', target, read_check);
 END
 $$;
 """
@@ -1413,9 +1440,15 @@ def rls_file(db: str, scoped: list, by_venue: list, by_parent: list, unscoped: l
                  for t, why in tenant_only]
     if append_audit:
         body.append("\n-- Append-only audit trails (CHG-R6-002): any connection holding a grant appends, only the\n"
-                    "-- tenant root reads, corrects or removes.")
-        body += [f"SELECT platform.apply_append_audit_rls('{qual(t)}'::regclass);  -- was: {why}"
-                 for t, why in append_audit]
+                    "-- tenant root reads, corrects or removes; a trail marked audit-read-beneath (CHG-R10TEN-006,\n"
+                    "-- CR-185) is also read by a grant over the row's org unit.")
+        for t, why, *col in append_audit:
+            if col and col[0]:
+                read = APPEND_AUDIT_BENEATH.format(col=col[0])
+                body.append(f"SELECT platform.apply_append_audit_read_rls('{qual(t)}'::regclass, "
+                            f"{sql_literal(read)});  -- was: {why}")
+            else:
+                body.append(f"SELECT platform.apply_append_audit_rls('{qual(t)}'::regclass);  -- was: {why}")
     if unscoped:
         body.append("\n-- No policy. Each needs a scoping decision (carry scope_path or venue_id, or a\n"
                     "-- NOT NULL owning reference) before row-level security can hold for it.")
@@ -1527,13 +1560,21 @@ def index_sql(schema: str, short: str, table: str, group: list) -> str:
 
 def unique_when_sql(schema: str, short: str, table: str, keycols: list, cond: dict, keys: list) -> str:
     """`x-ticvai-unique-when` (ADAM CR-154; CHG-CRA-004): a partial unique index. `keys` are the index's
-    expressions (a text key as `lower(...)`); `cond` maps a column to the value that selects the rows."""
+    expressions (a text key as `lower(...)`); `cond` maps a column to the value that selects the rows, or to
+    `{not: value}` for the rows whose value is anything else (CHG-R10TEN-011, ADAM CR-105: a hostname is unique among
+    a tenant's claims that are not revoked, since a revoked claim is kept and the domain may be claimed again), or to
+    `{in: [values]}` for the rows holding one of them (CHG-R10TEN-012, ADAM CR-106)."""
     preds = []
     for k, v in sorted(cond.items()):
         if v is True:
             preds.append(q(k))
         elif v is False:
             preds.append(f"NOT {q(k)}")
+        elif isinstance(v, dict) and set(v) == {"not"}:
+            preds.append(f"{q(k)} IS DISTINCT FROM {sql_literal(v['not'])}")
+        elif isinstance(v, dict) and set(v) == {"in"} and isinstance(v["in"], list) and v["in"]:
+            # one of several values (CHG-R10TEN-012, ADAM CR-106: one app build per platform while queued or building)
+            preds.append(f"{q(k)} IN ({', '.join(sql_literal(x) for x in v['in'])})")
         else:
             preds.append(f"{q(k)} = {sql_literal(v)}")
     where = " AND ".join(preds)
@@ -1919,6 +1960,72 @@ DECLARED_PK: dict = {}
 # `numeric` quantities nobody intends, while the DDL generated for it says uuid and numeric(18,4).
 DDL_TYPES: dict = {}
 DDL_TYPES_FILE = ROOT / "handoff" / "ddl-column-types.json"
+
+
+def ddl_records(files: dict) -> dict:
+    """**The whole table record, read from the DDL this run generates** (CHG-R10TEN-014; ADAM CR-092, accepted 15
+    October 2026). The workbook's Columns sheet, and ADAM's table view built from it, took `Required` from the schema
+    reference, which leaves a `scope_path` optional where every scoped table's DDL says `ltree NOT NULL`, and listed
+    only the columns the schema reference names; #27686 was done when "every table matches its record", and 218 of
+    497 records disagreed with the DDL they come from. CR-067 settled that the DDL is right and took the types from it;
+    this takes the rest: per table, each column in the generated CREATE TABLE with whether it is NOT NULL (a primary-key
+    column always is), the declared keys (the primary key, every foreign key and every unique index, partial ones with
+    their condition) and the row-level-security helper the table's policy is made with.
+
+    Returns `{table: {"columns": [[column, notNull]], "primaryKey": [...], "keys": [...], "policy": helper}}`."""
+    out: dict = {}
+
+    def rec(t: str) -> dict:
+        return out.setdefault(t, {"columns": [], "primaryKey": [], "keys": [], "policy": ""})
+
+    for name in sorted(files):
+        if not name.endswith(".sql"):
+            continue
+        for st in ddl_forward.split_statements(files[name]):
+            s = ddl_forward.norm(st)
+            m = re.match(r"CREATE TABLE (?:IF NOT EXISTS )?(\S+)\s*\(", s, re.I)
+            if m:
+                t = ddl_forward.unq(m.group(1))
+                start = s.index("(", m.start(1))
+                body = s[start + 1:ddl_forward.balanced(s, start)]
+                r = rec(t)
+                for item in ddl_forward.top_level_split(body):
+                    head = item.split()[0].upper() if item.split() else ""
+                    if item.upper().startswith(ddl_forward.TABLE_LEVEL):
+                        pk = re.search(r"PRIMARY KEY\s*\(([^)]*)\)", item, re.I)
+                        if pk:
+                            r["primaryKey"] = [ddl_forward.unq(x.strip()) for x in pk.group(1).split(",")]
+                        continue
+                    if head in ("LIKE",):
+                        continue
+                    col = ddl_forward.unq(item.split()[0])
+                    is_pk = bool(re.search(r"\bPRIMARY KEY\b", item, re.I))
+                    if is_pk:
+                        r["primaryKey"] = [col]
+                    r["columns"].append([col, is_pk or bool(re.search(r"\bNOT NULL\b", item, re.I))])
+                continue
+            m = re.match(r"ALTER TABLE (?:ONLY )?(\S+) ADD CONSTRAINT (\S+) FOREIGN KEY \(([^)]*)\) REFERENCES "
+                         r"(\S+?)\s*\(([^)]*)\)", s, re.I)
+            if m:
+                rec(ddl_forward.unq(m.group(1)))["keys"].append(
+                    f"foreign key ({m.group(3).replace(chr(34), '')}) -> {ddl_forward.unq(m.group(4))}"
+                    f"({m.group(5).replace(chr(34), '')})")
+                continue
+            m = re.match(r"CREATE UNIQUE INDEX (?:IF NOT EXISTS )?\S+ ON (\S+)(?: USING \w+)? \((.*?)\)(?: WHERE (.+))?$",
+                         s.rstrip(";"), re.I)
+            if m:
+                rec(ddl_forward.unq(m.group(1)))["keys"].append(
+                    f"unique ({m.group(2).replace(chr(34), '')})" + (f" where {m.group(3)}" if m.group(3) else ""))
+                continue
+            m = re.match(r"SELECT platform\.(apply_\w*rls)\('([^']+)'::regclass", s, re.I)
+            if m:
+                rec(ddl_forward.unq(m.group(2)))["policy"] = m.group(1)
+    for t, r in out.items():
+        if r["primaryKey"]:
+            pkset = set(r["primaryKey"])
+            r["columns"] = [[c, nn or c in pkset] for c, nn in r["columns"]]
+        r["keys"] = sorted(set(r["keys"]))
+    return {t: r for t, r in sorted(out.items()) if r["columns"]}
 
 
 def key_of(table: str, cols: dict) -> str | None:
@@ -2898,6 +3005,8 @@ def main() -> int:
         mark = (marks.get(t) or {}).get("rls") or TABLE_RLS.get(t)
         if not mark:
             continue
+        if t in APPEND_AUDIT and mark in APPEND_AUDIT_MARKS:
+            continue   # an append-only trail's wider read is its own helper (CHG-R10TEN-006), applied below
         if mark not in RLS_MARKS:
             print(f"  ! {t}: x-ticvai-rls {mark!r} is not one of {', '.join(RLS_MARKS)}; the base rule stands")
             continue
@@ -3126,7 +3235,15 @@ def main() -> int:
                 if t in split_calls:
                     continue
                 if t in APPEND_AUDIT:
-                    amine.append((t, why))
+                    amark = (marks.get(t) or {}).get("rls")
+                    acol = APPEND_AUDIT_MARKS.get(amark) if amark else None
+                    if amark and not acol:
+                        print(f"  ! {t}: x-ticvai-rls {amark!r} on an append-only trail is not one of "
+                              f"{', '.join(APPEND_AUDIT_MARKS)}; the append policy stands")
+                    if acol and not any(c["column"] == acol for c in cols[t]):
+                        print(f"  ! {t}: x-ticvai-rls {amark} needs a {acol} column; the append policy stands")
+                        acol = None
+                    amine.append((t, why, acol))
                 elif any(c["column"] == "subject_id" for c in cols[t]):
                     smine.append((t, why))
                 else:
@@ -3195,13 +3312,20 @@ def main() -> int:
                 dest.chmod(0o755)
 
     if a.apply:
+        # `records` one table to a line (CHG-R10TEN-014): a column per line would add some 70,000 lines to the file.
+        _recs = ddl_records(files)
+        _rec_text = ("{\n" + ",\n".join(f"  {json.dumps(t_)}: {json.dumps(r_, ensure_ascii=False)}"
+                                         for t_, r_ in _recs.items()) + "\n }") if _recs else "{}"
         DDL_TYPES_FILE.write_text(json.dumps({
             "note": "Derived by tools/derive-ddl.py. Do not hand-edit. The type each column takes in the DDL this run "
                     "generates (ADR-0056 one id type, numeric(18,4)), under the names the tables and columns have now, "
                     "including those renamed after r1 whose rename is still a forward migration to write "
-                    "(handoff/migration-review.md). Read by build-schema-workbook.py for the Columns sheet (CR-067).",
+                    "(handoff/migration-review.md). Read by build-schema-workbook.py for the Columns sheet (CR-067). "
+                    "`records` is the rest of each table's record from the same DDL: its columns in order with "
+                    "NOT NULL, its primary key, its declared keys and its row-level-security helper (CR-092).",
             "tables": {t: dict(sorted(c.items())) for t, c in sorted(DDL_TYPES.items())},
-        }, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
+            "records": "@RECORDS@",
+        }, indent=1, ensure_ascii=False).replace('"@RECORDS@"', _rec_text) + "\n", encoding="utf-8")
     print(f"  {n_tables} tables · {n_cols} columns · {n_fk} foreign keys · {n_idx} indexes · "
           f"{n_chk} checks · {n_def} defaults · {n_uniq} unique indexes")
     if no_unique:

@@ -1,0 +1,61 @@
+id: CHG-R10TEN-012
+date: '2026-10-25'
+source: cr
+kind: contract
+summary: The white-label jobs component on the workers host carries app builds, site packages and preview rendering, from
+  three new events (appBuild.requested, sitePackage.requested, preview.requested); one app build per platform while queued
+  or building; an unpublished version is refused 409 version-not-published; site packages are Assets media (packageAssetRef);
+  the preview has a named route; setAppIcons asks Assets for renditions and returns them pending in the same shape, and
+  media_asset records hasTransparency.
+decision:
+  what: 'ADAM CR-106, option 1. white-label.yaml: requestAppBuild, exportSitePackage, createPreview, setAppIcons, AppBuild,
+    SitePackage, AppIcons; three event files; assets.yaml MediaAsset.hasTransparency and completeUpload; tools/derive-ddl.py
+    unique_when_sql takes {in: [values]}. The lead, 25 October 2026: "update and get r10 out", with every accepted CR in
+    it (audit r10 plan).'
+  by: Chinmay
+  date: '2026-10-25'
+why: 'ADAM CR-106 (Deep Khanvilkar, #27876, #27778 / #30767, #27880), accepted 15 October 2026 for the next release with
+  option 1.'
+keys_touched:
+  operations:
+  - requestAppBuild
+  - exportSitePackage
+  - createPreview
+  - setAppIcons
+  - completeUpload
+  schemas:
+  - AppBuild
+  - SitePackage
+  - AppIcons
+  - MediaAsset
+  tables:
+  - whitelabel.app_build
+  - whitelabel.site_package
+  - assets.media_asset
+  other:
+  - event appBuild.requested
+  - event sitePackage.requested
+  - event preview.requested
+  files:
+  - contracts/satellite/white-label.yaml
+  - contracts/satellite/assets.yaml
+  - events/appBuild-requested.yaml
+  - events/sitePackage-requested.yaml
+  - events/preview-requested.yaml
+  - tools/derive-ddl.py
+root_class: 'new: an asynchronous operation whose executor is not named'
+tickets:
+  started:
+  - '27876, 27778 / 30767, 27880: through CR-106''s comment.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-106
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-write-lineage.py
+status: open
+notes: 'Database: whitelabel.site_package package_asset_ref uuid; app_build_platform_uniq (where status in queued, building);
+  assets.media_asset has_transparency boolean. Migration work for Hrushikant Patkar (MIG-WHITELABEL, MIG-ASSETS). The jobs
+  component needs a ticket of its own (a plan input), not added by this lane.'

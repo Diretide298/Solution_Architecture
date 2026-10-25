@@ -888,6 +888,11 @@ paths:
         match key (email, mobile or either), and `offerAtCheckout` off skips the check entirely (audit
         R149).
 
+
+        **A session acting at no venue is refused `404` `not-found`** ("no venue in this session") and nothing
+        is written: the policy is one per venue, the caller''s, and head office sets a venue''s by acting at that
+        venue (the rule ADAM CR-229 settled for the venue singletons, applied to this one; CHG-R10TEN-002).
+
         '
       tags:
       - guests
@@ -920,6 +925,8 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /guest-checkout/profile-match:
@@ -17034,6 +17041,11 @@ paths:
       description: >
         **Set whole, because removing an option is only safe when the values are in view.** An
         option deleted while guests still hold it leaves rows pointing at nothing.
+
+        **A session acting at no venue is refused `404` `not-found`** ("no venue in this session") and
+        nothing is written: the set is one per venue, the caller's, and head office sets a venue's by acting
+        at that venue (the rule ADAM CR-229 settled for the venue singletons, applied to this one;
+        CHG-R10TEN-002).
       tags:
       - marketing
       x-ticvai-permission: MARKETING_MANAGE
@@ -17065,6 +17077,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/GuestExtraFieldDefinition'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /guests/{guestId}/extra-values:

@@ -1,0 +1,35 @@
+id: CHG-R10TEN-016
+date: '2026-10-25'
+source: cr
+kind: contract
+summary: AuditRecord and listAuditRecords say every write leaves a row, written by the platform in the write's transaction
+  (action the operationId or the consumer's or job's name), not a fixed set of self-auditing operations.
+decision:
+  what: 'ADAM CR-179, option 1, as recommended: description only. The entry of 21 October said "fixed at the source in r9",
+    and r9 still had "Written by the operations that audit themselves". The lead, 25 October 2026: "update and get r10 out",
+    with every accepted CR in it (audit r10 plan).'
+  by: Chinmay
+  date: '2026-10-25'
+why: 'ADAM CR-179 (Pranay Shinde, #27694 PLATFORM-AUDIT), accepted 21 October 2026 with option 1; PLATFORM-AUDIT and CR-005
+  say every write, by the kernel.'
+keys_touched:
+  operations:
+  - listAuditRecords
+  schemas:
+  - AuditRecord
+  files:
+  - contracts/spine/tenancy.yaml
+root_class: 'new: a description contradicting its ticket'
+tickets:
+  started:
+  - '27694 (PLATFORM-AUDIT): through CR-179''s comment; built as the ticket says.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-179
+triage: fix-forward
+prevention:
+  type: none
+  reason: A rule stated in an operation's prose (what a request is refused for); no check can read whether the prose covers
+    every value of a body field. Lead to approve.
+status: open

@@ -11,6 +11,8 @@ enumProperty: status
 owner: tenancy
 # A registered device starts `unknown` (r8, APPROVALS-TENANCY-C27): nothing has been heard from it yet, so its
 # first heartbeat moves it unknown -> online, and `offline` is reached only from the heartbeat timer.
+# A heartbeat from offline or unknown sets whatever status it reports (ADAM CR-103, CHG-R10TEN-007): the timer windows
+# are 15 minutes to offline and 7 days more to unknown, proposed defaults the client can correct.
 initial:
 - unknown
 terminal: []
@@ -109,7 +111,7 @@ transitions:
   to: unknown
   trigger: timer
   guard: '**Silent long enough that offline is no longer the explanation.** Lost, stolen, or decommissioned
-    without telling anyone'
+    without telling anyone. After 7 days offline (ADAM CR-103, a proposed default the client can correct)'
   emits:
   - device.statusChanged
 - from: unknown
@@ -118,6 +120,62 @@ transitions:
   trigger: operation
   guard: Reappeared
   isReversal: true
+  emits:
+  - device.statusChanged
+- from: offline
+  to: error
+  operation: recordDeviceHeartbeat
+  trigger: operation
+  guard: 'Reported in, and reported error (ADAM CR-103, option 3, accepted 15 October 2026; CHG-R10TEN-007: the
+    device state model allows the reported statuses out of offline and unknown)'
+  emits:
+  - device.statusChanged
+- from: offline
+  to: consumableLow
+  operation: recordDeviceHeartbeat
+  trigger: operation
+  guard: 'Reported in, and reported consumableLow (ADAM CR-103, option 3, accepted 15 October 2026; CHG-R10TEN-007: the
+    device state model allows the reported statuses out of offline and unknown)'
+  emits:
+  - device.statusChanged
+- from: offline
+  to: needsAttention
+  operation: recordDeviceHeartbeat
+  trigger: operation
+  guard: 'Reported in, and reported needsAttention (ADAM CR-103, option 3, accepted 15 October 2026; CHG-R10TEN-007: the
+    device state model allows the reported statuses out of offline and unknown)'
+  emits:
+  - device.statusChanged
+- from: unknown
+  to: error
+  operation: recordDeviceHeartbeat
+  trigger: operation
+  guard: 'Reported in, and reported error (ADAM CR-103, option 3, accepted 15 October 2026; CHG-R10TEN-007: the
+    device state model allows the reported statuses out of offline and unknown)'
+  emits:
+  - device.statusChanged
+- from: unknown
+  to: consumableLow
+  operation: recordDeviceHeartbeat
+  trigger: operation
+  guard: 'Reported in, and reported consumableLow (ADAM CR-103, option 3, accepted 15 October 2026; CHG-R10TEN-007: the
+    device state model allows the reported statuses out of offline and unknown)'
+  emits:
+  - device.statusChanged
+- from: unknown
+  to: needsAttention
+  operation: recordDeviceHeartbeat
+  trigger: operation
+  guard: 'Reported in, and reported needsAttention (ADAM CR-103, option 3, accepted 15 October 2026; CHG-R10TEN-007: the
+    device state model allows the reported statuses out of offline and unknown)'
+  emits:
+  - device.statusChanged
+- from: unknown
+  to: localMode
+  operation: recordDeviceHeartbeat
+  trigger: operation
+  guard: 'Reported in, and reported localMode (ADAM CR-103, option 3, accepted 15 October 2026; CHG-R10TEN-007: the
+    device state model allows the reported statuses out of offline and unknown)'
   emits:
   - device.statusChanged
 notes: '**No terminal state, which is deliberate.** A device is never finished — it is somewhere, in

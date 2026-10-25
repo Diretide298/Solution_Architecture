@@ -325,6 +325,8 @@ paths:
         to lapsing is an `active` domain with an early `certificateExpiresAt`; there is no separate status
         for it.
 
+        **Order.** By `hostname`, then `id` (ADAM CR-105, option 1; CHG-R10TEN-011).
+
         '
       tags:
       - white-label
@@ -371,6 +373,16 @@ paths:
         the CNAME), and Front Door issues a managed certificate. `routing` asks for a delegated subdomain instead;
         the apex only on request. The tenant''s platform subdomain (`getPlatformSubdomain`) keeps working throughout.
 
+
+        **What a claim checks and starts** (ADAM CR-105, option 1, accepted 15 October 2026; CHG-R10TEN-011). A
+        `hostname` that is not a valid lower-case host name (labels of letters, digits and hyphens, at most 253
+        characters, at least one dot) is refused `400` `invalid-hostname`; a bare domain (an apex) sent without
+        `routing` `apex` is refused `400` `apex-not-requested`. The tenant may hold a hostname once among its claims
+        that are not `revoked` (`409` `domain-already-claimed`), and across tenants as above. The claim is stored
+        `pending` with `validationExpiresAt` set 7 days ahead (the validation window, a proposed default the client
+        can correct). Nothing here issues a certificate: issuing, renewal and revalidation are the white-label domain
+        job''s (see `verifyCustomDomain`).
+
         '
       tags:
       - white-label
@@ -409,6 +421,15 @@ paths:
                   - cname
                   - httpFile
                   default: dnsTxt
+                routing:
+                  type: string
+                  enum:
+                  - cname
+                  - delegatedSubdomain
+                  - apex
+                  default: cname
+                  description: How the hostname reaches TICVAI (`CustomDomain.routing`); `apex` is the only way to
+                    claim a bare domain (ADAM CR-105).
       responses:
         '201':
           headers:
@@ -419,6 +440,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CustomDomain'
+        '400':
+          x-ticvai-problem-types: [invalid-hostname, apex-not-requested]
+          description: The hostname is not a valid host name (`invalid-hostname`), or is a bare domain claimed without
+            `routing` `apex` (`apex-not-requested`; ADAM CR-105).
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
           x-ticvai-problem-types: [domain-already-claimed]
           description: '**Already claimed.** Named as unavailable rather than attributed.
@@ -457,6 +486,31 @@ paths:
         *verify* every ten minutes is a tenant who will give up before it resolves.
 
 
+        **The white-label domain job** (ADAM CR-105, option 1, accepted 15 October 2026; CHG-R10TEN-011). This
+        call does the DNS check once, now: it moves a `pending` or `failed` domain to `verifying`, and to `verified`
+        or `failed` by what DNS answers. Everything after it is the domain job''s, in the workers host, every five
+        minutes (a proposed default):
+
+        - **verify**: a domain still `verifying` is checked again (the `_dnsauth` TXT record and the CNAME, or the
+        NS delegation, through a public DNS resolver) until it verifies, or until `validationExpiresAt` passes, when
+        it is `failed` with `revalidation` `timedOut` (`regenerateDomainToken` starts it again);
+
+        - **issue**: a `verified` domain is added to the cell''s Azure Front Door profile as a custom domain with a
+        Front Door managed certificate and associated with the tenant''s route (`issuing`); the job reads Front
+        Door''s validation and deployment state until it is `active` (with `certificateExpiresAt`) or `failed`
+        (with `failureReason`);
+
+        - **renew**: Front Door renews a managed certificate itself; a domain whose certificate lapsed anyway is
+        `expired`, and the job requests it again (`issuing`);
+
+        - **revalidate**: an `active` domain''s records are re-checked; one that stopped resolving to us is
+        `pendingRevalidation` and keeps serving, and when that times out the job calls tenancy
+        `setTenantDomainMapping` with `status` `detached` and sets `isCnameLost`.
+
+        The state model (`states/custom-domain.yaml`) credits these transitions to the job, not to
+        `claimCustomDomain`.
+
+
         **Verification routes the hostname** (system-design review SD-021, 29 September; applied 30
         September). In the same step that marks the domain verified, it calls tenancy
         `setTenantDomainMapping`, which writes `control.tenant_domain` (hostname, tenant, cell, database,
@@ -487,6 +541,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CustomDomain'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
           description: The hostname is already routed to another tenant (`hostname-taken`, from tenancy
             `setTenantDomainMapping`, SD-021); nothing was verified or issued.
@@ -552,6 +608,8 @@ paths:
             X-Consistency-Token:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Released
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
           x-ticvai-problem-types: [only-active-domain-for-app]
           description: '**The only active domain for a live app.** Refused, naming what would break.
@@ -588,7 +646,15 @@ paths:
         **One mapping call per host** (r8, APPROVALS-TENANCY-C11): this sends one `setTenantDomainMapping` for the
         new primary; demoting the channel''s other primary is the control plane consumer''s, from the same event.
 
+
+        **One primary per kind, kept by the database** (ADAM CR-105, option 1; CHG-R10TEN-011): this call sets
+        `isPrimary` on this domain and clears it on the tenant''s other domain of the same `kind`, in one
+        transaction, under a unique index on `kind` where `isPrimary`; `control.tenant_domain` keeps one active
+        primary per tenant and channel the same way.
+
         '
+      x-ticvai-calls:
+      - tenancy.setTenantDomainMapping
       tags:
       - white-label
       x-ticvai-permission: TENANT_CONFIGURE
@@ -639,7 +705,8 @@ paths:
       summary: Issue a new validation token
       description: '**For a claim that timed out, or a revalidation that needs a fresh record** (CHG-CSA-043). Issues a
         new `_dnsauth` token, returns the records to publish again, and restarts the validation window. The old
-        token stops validating.
+        token stops validating. The window is `validationExpiresAt`, set again 7 days ahead, and `revalidation`
+        returns to `none` (ADAM CR-105; CHG-R10TEN-011).
 
         '
       tags:
@@ -1012,6 +1079,13 @@ paths:
         `building` -> `ready` (with its download link, which expires 24 hours after it is issued) or `failed` (with
         the reason). Nothing else is stored.
 
+
+        **Through an event, as an asset** (ADAM CR-106, option 1, accepted 15 October 2026; CHG-R10TEN-012): this call
+        stores the `SitePackage` `building` and writes `sitePackage.requested` to the outbox in the same transaction;
+        the job is the white-label jobs component''s, which consumes it. The package is a `MediaAsset` in Assets,
+        named by `packageAssetRef`; `downloadUrl` is a short-lived link to that asset. A `version` that does not exist
+        or is not published is refused `409` `version-not-published`.
+
         '
       tags:
       - publishing
@@ -1043,9 +1117,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/SitePackage'
         '409':
-          description: Nothing is published yet (`nothing-published`).
+          description: Nothing is published yet (`nothing-published`), or the `version` named is not a published
+            version (`version-not-published`, ADAM CR-106).
           x-ticvai-problem-types:
           - nothing-published
+          - version-not-published
           content:
             application/problem+json:
               schema:
@@ -1899,7 +1975,9 @@ paths:
       x-ticvai-read-via:
       - query: assets#mediaAssetRecords
         route: in-process
-        for: 'the 1024x1024 source''s type, size and dimensions (ADAM CR-096)'
+        for: 'the 1024x1024 source''s type, size and dimensions (ADAM CR-096), and whether it has transparency (ADAM CR-106)'
+      x-ticvai-calls:
+      - assets.requestMediaRendition
       x-ticvai-singleton: true
       x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
@@ -1911,6 +1989,13 @@ paths:
         The sizes generated for each platform are listed in `derived`.
 
         Source is a single 1024×1024 PNG without transparency; derived sizes are generated.
+
+        **Asked of Assets, answered pending** (ADAM CR-106, option 1, accepted 15 October 2026; CHG-R10TEN-012). The
+        transparency check reads the source''s `MediaAsset.hasTransparency`, which Assets records from the image''s
+        alpha channel when the upload completes; `true` is `400` `icon-has-transparency`. The derived sizes are asked
+        of Assets (`requestMediaRendition`, one per size, in process) and returned in `derived` in the same shape,
+        each entry pending until its rendition is ready: `platform` and `size` set, `assetRef` absent until Assets
+        has made it. Nothing on screen changes shape.
 
         **Generated: the iOS and Android store sets, plus web favicons (decided 28 September, audit
         R163).** iOS: 1024 (App Store), 180, 167, 152, 120, 87, 80, 76, 60, 58, 40, 29 and 20 px. Android:
@@ -2471,6 +2556,24 @@ paths:
 
         Bottom navigation is capped at five visible items; the remainder moves to the overflow menu.
 
+        **Five rules, as built** (ADAM CR-230, option A, decided 25 October 2026; CHG-R10TEN-003):
+
+        1. **A new draft''s version is `"draft"`.** Where this call creates the tenant''s draft `tenant_config` row,
+        its `version` is the text `draft`.
+
+        2. **`module_enablement.referenced_by` entries are `navigationItem:<itemId>`** for this operation''s links
+        (`setHomepageLayout` writes `homepageSection:<sectionId>` for its own). This call replaces only the
+        `navigationItem:` entries, in the same transaction as the items, and leaves every other entry as it is.
+
+        3. **A module with no `module_enablement` row in the draft is not enabled:** an item pointing at it is
+        refused `400` `module-disabled`, as an item pointing at a disabled module is.
+
+        4. **Which links point at a module:** a target of kind `module` points at its `moduleKey`; a target of kind
+        `appSection` with `appSection` `plan` points at `visitPlanner`. No other `appSection` needs a module.
+
+        5. **The five-visible cap applies to `kind` `bottomNavigation` only.** A `drawer` or `tabs` set may mark
+        any number of its items visible.
+
         **Accepts `Prefer: validate-only`** (29 September, build pass, group G2): validates and answers 200
         with the would-be result without writing, for the AI executor''s plan validation; registered as an
         AI tool (`ai.AiTool`, 1.2.59, 2.6.50).
@@ -2503,7 +2606,9 @@ paths:
                 $ref: '#/components/schemas/NavigationConfig'
         '400':
           x-ticvai-problem-types: [module-disabled, too-many-visible-items]
-          description: An item targets a disabled module, or more than five are marked visible
+          description: An item targets a module that is disabled or has no enablement row (`module-disabled`), or
+            more than five items of a `bottomNavigation` set are marked visible (`too-many-visible-items`; ADAM
+            CR-230)
           content:
             application/problem+json:
               schema:
@@ -2551,7 +2656,10 @@ paths:
         on the guest''s home screen.
 
         **A section whose module is disabled is refused (400)**, by the mapping on `HomepageSectionKind`,
-        which is proposed, client to correct (audit R163).
+        which is proposed, client to correct (audit R163). A module with no `module_enablement` row in the
+        draft is not enabled, so its section is refused the same way; this call keeps the module''s
+        `referenced_by` entries `homepageSection:<sectionId>`, replacing only those, in the same transaction
+        as the sections (ADAM CR-230, the rule `setNavigation` follows; CHG-R10TEN-003).
 
         **Accepts `Prefer: validate-only`** (29 September, build pass, group G2): validates and answers 200
         with the would-be result without writing, for the AI executor''s plan validation; registered as an
@@ -3787,6 +3895,18 @@ paths:
       x-ticvai-reads:
       - table: whitelabel.tenant_config
         for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
+      - table: whitelabel.content_page
+        for: 'translationGaps, area contentPages: a page missing a language (ADAM CR-194, option A; CHG-R10TEN-010)'
+      - table: whitelabel.banner
+        for: 'translationGaps, area banners (ADAM CR-194)'
+      - table: whitelabel.promo_block
+        for: 'translationGaps, area promoBlocks (ADAM CR-194)'
+      - table: whitelabel.faq_entry
+        for: 'translationGaps, area faqs (ADAM CR-194)'
+      - table: whitelabel.policy
+        for: 'translationGaps, area policies (ADAM CR-194)'
+      - table: whitelabel.ui_string_pack
+        for: 'uiStringCoverage for a language other than English and Arabic (ADAM CR-194)'
       x-ticvai-singleton: true
       x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
@@ -3799,6 +3919,21 @@ paths:
         **Any language, not only English and Arabic** (Chinmay, 2 October, workbook Q145; CHG-CSA-039): a venue
         adds its own interface languages here (ADM-018 for platform staff under a grant, CMS-011 for the tenant).
         The response''s `uiStringCoverage` says how far the interface strings reach in each.
+
+
+        **Where the two reports come from, decided 25 October 2026** (ADAM CR-194, option A; CHG-R10TEN-010):
+
+        - **`translationGaps`** counts the WhiteLabel content the tenant translates, all of it this module''s own:
+        content pages (`whitelabel.content_page`), banners (`whitelabel.banner`), promo blocks
+        (`whitelabel.promo_block`), FAQ entries (`whitelabel.faq_entry`) and policies (`whitelabel.policy`). An
+        item is missing for a language when a `LocalisedText` of it has no value for that language. One entry per
+        enabled language with any item missing: `missingCount` the items missing, `areas` the kinds they are, from
+        the closed list `contentPages`, `banners`, `promoBlocks`, `faqs`, `policies`. Products are not counted here:
+        their texts are Catalogue''s, and Catalogue reports them.
+
+        - **`uiStringCoverage`**: English and Arabic are `complete` (100). Any other language is read from
+        `whitelabel.ui_string_pack`, the row a string pack writes when it ships: its `coveragePercent` and
+        `status`. A language with no row is `missing` at 0.
 
         '
       tags:
@@ -3881,6 +4016,15 @@ paths:
         reference is held in Redis under `cache:preview:{tenantId}:{previewId}` until `expiresAt` (its time to live),
         and `url` is served from that entry; after it expires the link answers 404. The read that serves the link is
         requested of the surface lane (`GET /tenant-config/preview/{previewId}`).
+
+
+        **Rendered by the white-label jobs component, at a named route** (ADAM CR-106, option 1, accepted 15 October
+        2026; CHG-R10TEN-012). This call writes the cache entry and `preview.requested` to the outbox, and answers
+        `201`. The jobs component, in the workers host, consumes it and renders the draft for the platform and
+        language asked, with the `outputs` (the PDF ticket and the Wallet passes from the ticket and pass templates),
+        writing their references into the same cache entry. `url` is the route
+        `https://<the tenant''s platform subdomain>/previews/{previewId}`, served by the guest web host from that
+        entry until `expiresAt`; `getPreview` reads the entry back.
 
         '
       tags:
@@ -5367,6 +5511,27 @@ paths:
         hashed at the edge with the same tenant key as the `ipHash` `ai.scoreTransactionRisk` receives, and added
         to the event; the runtime never sends it.
 
+
+        **The key, the edge fields and the batch, decided** (ADAM CR-107, option 1, accepted 15 October 2026, on
+        ADR-0063; CHG-R10TEN-013):
+
+        - **"The tenant key" is the tenant''s blind-index key** (ADR-0063): every hash here is HMAC-SHA-256 under
+        it, written as 64 lowercase hex characters, computed through the kernel''s blind-index call, so no module
+        calls Key Vault itself. White-label (`sessionRef`, `deviceIdHash`), the edge (`ipHash`) and Orders''
+        checkout (the `sessionRef` it passes to `ai.scoreTransactionRisk`) use the same key and get the same value.
+        `sessionRef` and `deviceIdHash` arrive as the browser''s SHA-256, 64 lowercase hex; anything else is the
+        `400` for an unhashed id.
+
+        - **The edge fields come from three headers the edge sets**: `X-Edge-Ip-Hash` (the client address under the
+        tenant key), `X-Edge-Ip-Country` (ISO 3166-1 alpha-2) and `X-Edge-Ua-Family` (browser or app family and
+        major version). The edge strips all three from inbound client traffic before it sets them, so a caller
+        cannot forge them; a header that is absent leaves its field out of the event.
+
+        - **`batchEndedAt` is the time the server received the batch.**
+
+        - **De-duplicated on `batchId`, with no `Idempotency-Key`.** A beacon cannot set headers, so the operation
+        takes none; a batch whose `batchId` was already accepted is answered `202` and not published again.
+
         '
       tags:
       - overview
@@ -5374,11 +5539,11 @@ paths:
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
+      x-ticvai-idempotency-exempt: 'A beacon cannot send headers (navigator.sendBeacon); each batch carries its own key,
+        batchId, and a repeated batchId is accepted and not published twice (ADAM CR-107, option 1; CHG-R10TEN-013).'
       security:
       - {}
       - guestAuth: []
-      parameters:
-      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
         content:
@@ -6537,6 +6702,17 @@ paths:
         account is not recorded (`setStoreAccounts`), when no version has been published, or while a build
         for the same platform is running.
 
+
+        **What this call does, and what the white-label jobs component does** (ADAM CR-106, option 1, accepted 15
+        October 2026; CHG-R10TEN-012). This call stores the `AppBuild` `queued` and writes `appBuild.requested` to
+        the outbox in the same transaction, and answers `202`. A `configVersion` that is not a published
+        `ConfigVersion.version` is refused `409` `version-not-published`. **At most one build per platform is
+        `queued` or `building`**, under a unique index on `platform` for those statuses: a second request, however
+        close, is `409` `app-build-in-progress`. The white-label jobs component, in the workers host, consumes the
+        event, builds and signs the package from the version''s snapshot, stores it in Assets (`packageAssetRef`),
+        and moves the build `queued` -> `building` -> `built` or `failed`; with `submitToStore` it submits it with the
+        client''s recorded credential and follows the store from `submitted` on.
+
         '
       tags:
       - appPublishing
@@ -6583,9 +6759,10 @@ paths:
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '409':
-          x-ticvai-problem-types: [store-account-missing, nothing-published, app-build-in-progress]
-          description: No store account for the platform, nothing published yet, or a build for the platform
-            already running; the problem says which
+          x-ticvai-problem-types: [store-account-missing, nothing-published, app-build-in-progress, version-not-published]
+          description: No store account for the platform, nothing published yet, a build for the platform
+            already queued or building, or a `configVersion` that is not published (ADAM CR-106); the problem says
+            which
           content:
             application/problem+json:
               schema:
@@ -6723,17 +6900,22 @@ components:
         batchId:
           type: string
           format: uuid
-          description: UUIDv7 minted by the runtime; a retried beacon repeats it.
+          description: UUIDv7 minted by the runtime; a retried beacon repeats it. The batch's idempotency key (ADAM
+            CR-107).
         sessionRef:
           type: string
           maxLength: 128
-          description: The runtime's own session id, SHA-256 hashed in the browser; hashed again with the tenant key
-            on arrival and published as `storefront.sessionEvent.sessionRef`. The checkout passes the same value to
-            `ai.scoreTransactionRisk`.
+          pattern: ^[0-9a-f]{64}$
+          description: The runtime's own session id, SHA-256 hashed in the browser (64 lowercase hex); hashed again
+            with the tenant's blind-index key on arrival (HMAC-SHA-256, ADR-0063) and published as
+            `storefront.sessionEvent.sessionRef`. The checkout passes the same value to `ai.scoreTransactionRisk`.
         deviceIdHash:
           type: string
           maxLength: 128
+          pattern: ^[0-9a-f]{64}$
           nullable: true
+          description: The runtime's own device id, SHA-256 hashed in the browser (64 lowercase hex); hashed again
+            with the tenant's blind-index key on arrival (ADAM CR-107).
         surface:
           type: string
           enum:
@@ -8371,6 +8553,10 @@ components:
                 description: What to do next, in the operator's language.
     AppBuild:
       x-ticvai-persistence: whitelabel.app_build
+      # One build per platform while it is queued or building (ADAM CR-106, option 1; CHG-R10TEN-012).
+      x-ticvai-unique-when:
+      - columns: [platform]
+        when: {status: {in: [queued, building]}}
       type: object
       description: '**One build of the tenant''s branded app (decided 24 September, M24-08).** Made from a published
         `ConfigVersion`, signed for the client''s own store account.
@@ -8419,9 +8605,9 @@ components:
           - approved
           - rejected
           - released
-          description: '`queued` to `built` or `failed` is the build service''s; from `submitted` on it is
-            read from the store with the client''s credential, or stays `built` when the client uploads by
-            hand.'
+          description: '`queued` to `built` or `failed` is the white-label jobs component''s, in the workers host,
+            from `appBuild.requested` (ADAM CR-106); from `submitted` on it is read from the store with the client''s
+            credential, or stays `built` when the client uploads by hand.'
         failureReason:
           type: string
           nullable: true
@@ -8551,6 +8737,13 @@ components:
     CustomDomain:
       type: object
       x-ticvai-persistence: whitelabel.custom_domain
+      # A hostname once among a tenant's claims that are not revoked, and one primary per kind (ADAM CR-105, option 1;
+      # CHG-R10TEN-011). Across tenants the hostname is control.tenant_domain's (one active row per hostname).
+      x-ticvai-unique-when:
+      - columns: [hostname]
+        when: {status: {not: revoked}}
+      - columns: [kind]
+        when: {isPrimary: true}
       description: '24 August. **`ADM-017 Domain & Certificate Management` declared 41 operations and
         not one of them was about a domain** — it carried the same bulk-attached set as every other white-label
         screen, and **no domain or certificate operation existed anywhere in 1,010.**
@@ -8642,6 +8835,14 @@ components:
           type: string
           format: date-time
           nullable: true
+        validationExpiresAt:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+          description: '**When the validation window ends** (ADAM CR-105, option 1; CHG-R10TEN-011): 7 days after
+            `claimCustomDomain` or `regenerateDomainToken` issued the token (a proposed default the client can
+            correct). A domain not verified by then is `failed` with `revalidation` `timedOut`. Null once verified.'
         failureReason:
           type: string
           nullable: true
@@ -8883,6 +9084,13 @@ components:
           - building
           - ready
           - failed
+        packageAssetRef:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          description: The package in the `assets` library, set when `ready` (ADAM CR-106; CHG-R10TEN-012).
+            `downloadUrl` is a short-lived link to it.
         downloadUrl:
           type: string
           nullable: true
@@ -9703,7 +9911,8 @@ components:
           readOnly: true
           x-ticvai-derived: onWrite
           description: Generated by `setAppIcons` from the source, one entry per platform and size — the
-            iOS and Android store sets and the web favicons listed on `setAppIcons` (audit R163).
+            iOS and Android store sets and the web favicons listed on `setAppIcons` (audit R163). Asked of Assets as
+            renditions, an entry is pending, with no `assetRef`, until its rendition is ready (ADAM CR-106).
           items:
             type: object
             properties:
@@ -10390,8 +10599,9 @@ components:
           - map
           - account
           - buyTickets
-          description: Required when `kind` is `appSection`. `plan` needs the `visitPlanner` module and `map`
-            the `map` module enabled, or `setNavigation` refuses it.
+          description: Required when `kind` is `appSection`. `plan` needs the `visitPlanner` module enabled, or
+            `setNavigation` refuses it; no other value needs a module (ADAM CR-230, option A, decided 25 October
+            2026, which settled that only Plan maps to a module; CHG-R10TEN-003).
         contentPageId:
           type: string
           format: uuid
@@ -10469,7 +10679,8 @@ components:
                 $ref: '#/components/schemas/LinkTarget'
               isVisible:
                 type: boolean
-                description: At most five may be visible in bottom navigation; the rest overflow.
+                description: At most five may be visible when `kind` is `bottomNavigation`; the rest overflow. The cap
+                  does not apply to `drawer` or `tabs` (ADAM CR-230).
               sortOrder:
                 type: integer
         buyButton:
@@ -11282,7 +11493,9 @@ components:
           readOnly: true
           x-ticvai-derived: onWrite
           description: Navigation items and homepage sections pointing at this module. Maintained by `setNavigation`
-            and `setHomepageLayout` in the same transaction as the links they write.
+            and `setHomepageLayout` in the same transaction as the links they write. Each entry is
+            `navigationItem:<itemId>` (written by `setNavigation`) or `homepageSection:<sectionId>` (written by
+            `setHomepageLayout`); each operation replaces only its own entries (ADAM CR-230; CHG-R10TEN-003).
           items:
             type: string
     ModuleReferenceProblem:
@@ -11430,7 +11643,8 @@ components:
             2 October, workbook Q145; CHG-CSA-039). Any ISO 639-1 language. English and Arabic ship with complete
             interface strings; for any other, the interface strings come as a TICVAI string pack drafted by AI
             translation and reviewed (T03), and a string with no translation falls back to English. Content
-            (pages, products, banners) is the tenant''s to translate (`translationGaps`).'
+            (content pages, banners, promo blocks, FAQ entries and policies) is the tenant''s to translate
+            (`translationGaps`); product texts are Catalogue''s (ADAM CR-194).'
           items:
             type: string
             pattern: ^[a-z]{2}$
@@ -11441,7 +11655,8 @@ components:
           type: array
           readOnly: true
           description: How complete the interface strings are in each enabled language (CHG-CSA-039). English and
-            Arabic are always complete.
+            Arabic are always complete; any other language is its `whitelabel.ui_string_pack` row (`UiStringPack`),
+            or `missing` where the language has none (ADAM CR-194).
           items:
             type: object
             properties:
@@ -11469,7 +11684,9 @@ components:
         translationGaps:
           type: array
           readOnly: true
-          description: Content lacking a version in an enabled language.
+          description: Content lacking a version in an enabled language. The content is the tenant's content pages,
+            banners, promo blocks, FAQ entries and policies; an item is missing when a `LocalisedText` of it has no
+            value for the language (ADAM CR-194; see `setLanguages`).
           items:
             type: object
             properties:
@@ -11481,6 +11698,50 @@ components:
                 type: array
                 items:
                   type: string
+                  enum:
+                  - contentPages
+                  - banners
+                  - promoBlocks
+                  - faqs
+                  - policies
+    UiStringPack:
+      x-ticvai-persistence: whitelabel.ui_string_pack
+      x-ticvai-unique-together: [[language]]
+      type: object
+      description: '**How far the TICVAI interface strings reach in one language** (ADAM CR-194, option A, decided 25
+        October 2026; CHG-R10TEN-010). One row per language other than English and Arabic, written when a string pack
+        for it ships (T03: drafted by AI translation, then reviewed), and replaced when a later pack ships. Read by
+        `setLanguages` for `uiStringCoverage`; a language with no row is `missing`.'
+      required:
+      - id
+      - language
+      - coveragePercent
+      - status
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        language:
+          type: string
+          pattern: ^[a-z]{2}$
+          description: The ISO 639-1 language the pack is for.
+        coveragePercent:
+          type: number
+          minimum: 0
+          maximum: 100
+          description: The share of the interface strings the pack translates.
+        status:
+          type: string
+          enum:
+          - complete
+          - draft
+          description: '`complete` once the pack is reviewed; `draft` while it is AI-translated and not yet
+            reviewed.'
+        scopePath:
+          type: string
+          readOnly: true
+          description: The partition key (ADR-0005). Written at `tenant` scope.
     Preview:
       x-ticvai-persistence: none — short-lived, cache only
       type: object
@@ -11865,7 +12126,8 @@ components:
           format: uuid
         version:
           type: string
-          description: The draft's working version label; the published one is `ConfigVersion.version`.
+          description: The draft's working version label; the published one is `ConfigVersion.version`. A draft
+            created by the first `set*` call has the version `draft` (ADAM CR-230; CHG-R10TEN-003).
         isDraft:
           type: boolean
           readOnly: true
