@@ -244,6 +244,24 @@ x-ticvai-queries:
       control.cell_endpoint rows, which the control plane writes at cell provisioning. Asked from commerce through
       Platform's service route (serviceAuth) by Tenancy's listCellEndpoints.
     served: [in-process, service]
+  invoiceRecords:
+    module: subscription
+    table: control.invoice
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The control.invoice rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Platform stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/SubscriptionInvoice'}
+    rule: >-
+      A data read, not a rule question (r10 lane E, 25 October 2026, CHG-R10GEN-001; ADR-0055 rule 2 as amended 14
+      October). Platform answers with its control.invoice rows, as it stores them and as the caller's scope lets it
+      see them (the table's row-level security, under the caller's connection and transaction). It decides nothing:
+      an asker that refuses or chooses on these rows states that rule in its own operation, and a question with a
+      rule of its own (open, live, sellable) is declared as a query of its own. It is asked from another deployable
+      through Platform's service route (serviceAuth).
+    served: [service]
 paths:
   /onboarding-applications:
     post:
@@ -252,6 +270,10 @@ paths:
         - "P09 ADM-380 Customer & Organization Registration"
         - "P17 SGN-002 Customer & Organization Registration"
         - "P17 SGN-020 Billing & Legal Entity Information"
+      x-ticvai-read-via:
+      - query: tenancy#regionSettingsRecords
+        route: service
+        for: 'what its text calls "RegionSettings": platform.region_settings, Tenancy''s data (CHG-R10GEN-001)'
       summary: A prospect signs themselves up
       description: 'BL-165. **The operator-led path assumes somebody at Softlabs decided this tenant exists.**
         This is the other one.
@@ -318,7 +340,7 @@ paths:
         **A template is a starting point and not a constraint** — everything it creates is editable the
         moment it lands.
 
-        '
+         **Order.** Sorted by `name` ascending, then by `id`. (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - subscription
       x-ticvai-permission: TENANT_CONFIGURE
@@ -437,6 +459,8 @@ paths:
         route: service
         for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       summary: What is listed on which OTA
+      description: >-
+        **Order.** Sorted by `id` descending (a UUIDv7, so newest first). (r10 default ruling, CHG-R10GEN-004)
       tags:
       - subscription
       x-ticvai-permission: PARTNER_VIEW
@@ -603,6 +627,9 @@ paths:
       - query: ai#policyRecords
         route: service
         for: 'its read of ai.policy, AI''s data (CHG-MOD-001)'
+      - query: tenancy#regionSettingsRecords
+        route: service
+        for: 'the region''s trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: body.billedAmount, body.providerCost (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
       - staff
       summary: Turn metered AI interactions into a billable usage record
@@ -815,7 +842,7 @@ paths:
         Credit limits, channel allocations and settlement all existed; the agreement that says what a
         partner is entitled to did not.
 
-        '
+         **Order.** Sorted by `id` descending (a UUIDv7, so newest first). (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - subscription
       x-ticvai-permission: PARTNER_MANAGE
@@ -2104,6 +2131,9 @@ paths:
       - query: tenancy#tenantRecords
         route: service
         for: 'its read of platform.tenant, Tenancy''s data (CHG-MOD-001)'
+      - query: tenancy#regionSettingsRecords
+        route: service
+        for: 'the region''s trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: SubscriptionPreview.priceChange, SubscriptionPreview.proratedAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       security:
       - bearerAuth: []
       - prospectAuth: []
@@ -2162,6 +2192,10 @@ paths:
         - "P09 ADM-422 Administrator & Security Initialization"
         - "P09 ADM-424 Module Activation & Dependency Validation"
         - "P09 ADM-450 Entitlement & License Inventory"
+      x-ticvai-read-via:
+      - query: tenancy#regionSettingsRecords
+        route: service
+        for: 'the region''s trading currency and scale (currency_code, currency_scale) for the Money it answers: EntitlementLimit.overageUnitPrice (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: primary
@@ -2255,6 +2289,10 @@ paths:
         - "P09 ADM-005 Tenant Directory"
         - "P09 ADM-007 Module & Feature Entitlement"
         - "P09 ADM-011 Licence & Seat Management"
+      x-ticvai-read-via:
+      - query: tenancy#regionSettingsRecords
+        route: service
+        for: 'the region''s trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: EntitlementLimit.overageUnitPrice (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
       - staff
       x-ticvai-calls:
@@ -2416,7 +2454,7 @@ paths:
       - staff
       x-ticvai-read-routing: replica
       summary: List a tenant's cells
-      description: One per region (ADR-0014), with placement, tier and health.
+      description: One per region (ADR-0014), with placement, tier and health. **Order.** Sorted by `name` ascending, then by `id`. (r10 default ruling, CHG-R10GEN-004)
       tags:
       - cell
       x-ticvai-permission: PLATFORM_CELL_VIEW
@@ -3635,6 +3673,10 @@ paths:
       operationId: setBillingEntity
       x-ticvai-consumed-by:
         - "P09 ADM-411 Billing & Legal Entity Information"
+      x-ticvai-read-via:
+      - query: tenancy#regionSettingsRecords
+        route: service
+        for: 'what its text calls "RegionSettings": platform.region_settings, Tenancy''s data (CHG-R10GEN-001)'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '2 October: Chinmay, workbook Q209 and Q210 (ADM-411); shape follows the billing operations'
@@ -4114,7 +4156,7 @@ paths:
         the screen has to show, and the request and response want confirming before anything is built
         against them.
 
-        '
+         **Order.** Newest first, by `createdAt` descending, then by `id`. (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - partner
       x-ticvai-permission: PARTNER_VIEW
@@ -4601,6 +4643,12 @@ paths:
       - query: catalogue#productRecords
         route: service
         for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
+      - query: tenancy#scopeRecords
+        route: service
+        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it accepts or answers: FamilyHouseholdDependentMembershipConfigurationInput.memberChangeFee, FamilyHouseholdDependentMembershipConfigurationView.memberChangeFee (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: FamilyHouseholdDependentMembershipConfigurationInput.memberChangeFee, FamilyHouseholdDependentMembershipConfigurationView.memberChangeFee (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-body-key: [membershipCode]
       x-ticvai-body-key-note: 'Keyed by the body''s `membershipCode`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per membership product within the caller''s tenant; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body. **Required in fact**: a body without `membershipCode` is refused `400 validation`; the schema leaves it optional only so a client built at r1 still validates.'
       x-ticvai-audience:
@@ -4966,7 +5014,7 @@ paths:
         (Member 360). The pack''s Renewed and Replaced statuses are lifecycle events shown in listMemberLifecycleCase,
         not states.
 
-        **Order.** Soonest first, by `expiryDate` ascending, then by `customerId`.'
+        **Order.** Soonest first, by `expiryDate` ascending, then by `customerId`. Where `expiryDate` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - drafted
       x-ticvai-permission: PLATFORM_TENANT_VIEW
@@ -6598,7 +6646,7 @@ paths:
         AI extraction is advisory and human verification stays required; a missing or expired mandatory document
         applies its expiryAction to the partner.
 
-        **Order.** Soonest first, by `expiryDate` ascending, then by `documentId`.'
+        **Order.** Soonest first, by `expiryDate` ascending, then by `documentId`. Where `expiryDate` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - drafted
       x-ticvai-permission: PLATFORM_TENANT_VIEW
@@ -6687,7 +6735,7 @@ paths:
         grant is the ceiling: Identity/RBAC never gives a partner user a permission its partner lacks (pack
         p.17); sensitive functions may need internal approval through the approvals engine.
 
-        **Order.** Soonest first, by `effectiveFrom` ascending, then by `partnerId`.'
+        **Order.** Soonest first, by `effectiveFrom` ascending, then by `partnerId`. Where `effectiveFrom` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - drafted
       x-ticvai-permission: PARTNER_VIEW
@@ -7412,7 +7460,7 @@ paths:
         and "exposure exceeds verified security" are raised by the finance controls; an expired security applies
         its expiryAction automatically.
 
-        **Order.** Soonest first, by `expiryDate` ascending, then by `agreementId`.'
+        **Order.** Soonest first, by `expiryDate` ascending, then by `agreementId`. Where `expiryDate` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - drafted
       x-ticvai-permission: PARTNER_VIEW
@@ -8005,7 +8053,7 @@ paths:
         product eligibility, rate, allocation, credit, booking limit and cancellation policy are revalidated;
         the order stays owned by Order Management.
 
-        **Order.** Soonest first, by `visitDate` ascending, then by `orderId`.'
+        **Order.** Soonest first, by `visitDate` ascending, then by `orderId`. Where `visitDate` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - drafted
       x-ticvai-permission: PLATFORM_TENANT_VIEW
@@ -8355,7 +8403,7 @@ paths:
         by Finance; this is a partner-centric view; an authorised partner user can view and download its own
         statement.
 
-        **Order.** Sorted by `dueDate` ascending.'
+        **Order.** Sorted by `dueDate` ascending. Where `dueDate` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - drafted
       x-ticvai-permission: PLATFORM_TENANT_VIEW
@@ -9115,7 +9163,7 @@ paths:
         a customer falls below it, and what happens when they exceed the tier, both have to be stated
         or the first invoice is a negotiation.
 
-        '
+         **Order.** Sorted by `code` ascending, then by `id`. (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - subscription
       x-ticvai-permission: PLATFORM_PLAN_MANAGE
@@ -9204,7 +9252,7 @@ paths:
         redemption needs wallet — and a customer who buys the first of each pair and not the second
         discovers it during go-live.
 
-        '
+         **Order.** Sorted by `id` descending (a UUIDv7, so newest first). (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - subscription
       x-ticvai-permission: PLATFORM_PLAN_MANAGE
@@ -9276,6 +9324,10 @@ paths:
         - "P09 ADM-466 Commercial Scenario Simulator"
         - "P17 SGN-011 Recommended Package Overview"
         - "P17 SGN-012 Commercial Model & Tier Selection"
+      x-ticvai-read-via:
+      - query: tenancy#regionSettingsRecords
+        route: service
+        for: 'the region''s trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: PackageSimulation.amount, PackageSimulation.contractTotal, PackageSimulation.minimumGuarantee, PackageSimulation.oneOffTotal and 2 more (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -9474,6 +9526,10 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-377 Subscription Exceptions & Commercial Alerts"
         - "P09 ADM-454 Minimum Guarantee & Variable Consumption Monitor"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: LicenceEnforcement.overageCharge (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       summary: Where a tenant stands against its entitlements, and what happens next
       description: 'Board 9.5. **`getEntitlementUsage` reported consumption and nothing said what to do
         about it.** Approaching a limit, at it, and over it are three states with three responses —
@@ -9594,6 +9650,10 @@ paths:
         - "P09 ADM-456 Usage Alerts, Reconciliation & Exception Center"
         - "P09 ADM-461 Consumption Reconciliation & Billing Approval"
         - "P09 ADM-468 Renewal Approval, Activation & Commercial Handoff"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: BillingReconciliation.amount, BillingReconciliation.unitPrice (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       summary: Metered consumption against what was invoiced
       description: 'Boards 10.2 and 10.3. **The customer will check, and the first invoice sets the
         tone for the relationship.** Every billable event, grouped and priced, against the invoice line
@@ -11405,6 +11465,10 @@ paths:
         - "P09 ADM-378 Executive AI Commercial Intelligence"
         - "P09 ADM-452 Operational Usage & Threshold Monitor"
         - "P09 ADM-465 AI Upgrade, Downgrade & Commercial Right-Sizing"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: SubscriptionPlanRecommendation.projectedAddedCost, SubscriptionPlanRecommendation.projectedMonthlyCost, SubscriptionPlanRecommendation.projectedSaving, body.currentMonthlyCost (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: our build plan (20.8.4, 20.8.5 plan-fit and cost-saving recommendations to

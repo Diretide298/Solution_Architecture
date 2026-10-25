@@ -280,6 +280,24 @@ x-ticvai-queries:
       commerce, through the C# query interface Ledger implements, and asked from another deployable through Ledger's
       service route (serviceAuth).
     served: [in-process, service]
+  journalLineRecords:
+    module: finance
+    table: ledger.journal_line
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The ledger.journal_line rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Ledger stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/JournalLine'}
+    rule: >-
+      A data read, not a rule question (r10 lane E, 25 October 2026, CHG-R10GEN-001; ADR-0055 rule 2 as amended 14
+      October). Ledger answers with its ledger.journal_line rows, as it stores them and as the caller's scope lets
+      it see them (the table's row-level security, under the caller's connection and transaction). It decides
+      nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and a question
+      with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked from another
+      deployable through Ledger's service route (serviceAuth).
+    served: [service]
 paths:
   /internal/order-postings:
     post:
@@ -294,6 +312,9 @@ paths:
       - query: tenancy#regionSettingsRecords
         route: in-process
         for: 'what its text calls "region''s time zone": platform.region_settings, Tenancy''s data (CHG-RTE-001)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'what its text calls "VenueSettings": platform.venue_settings, Tenancy''s data (CHG-R10GEN-001)'
       security:
       - serviceAuth: []
       x-ticvai-audience:
@@ -581,6 +602,13 @@ paths:
       operationId: settleDeposit
       x-ticvai-consumed-by:
         - "P08 BO-024 Payment Exceptions"
+      x-ticvai-read-via:
+      - query: orders#depositRecords
+        route: in-process
+        for: 'what its text calls "orders.deposit": orders.deposit, Order''s data (CHG-R10GEN-001)'
+      - query: orders#depositPolicyRecords
+        route: in-process
+        for: 'what its text calls "orders.DepositPolicy.dining": orders.deposit_policy, Order''s data (CHG-R10GEN-001)'
       summary: Convert to revenue, return it, or forfeit it
       description: 'Four outcomes and **none of them is a refund**. Converting recognises revenue against
         the completed sale; returning discharges the liability; forfeiting recognises it as income under
@@ -698,6 +726,9 @@ paths:
       - query: tenancy#regionSettingsRecords
         route: in-process
         for: 'what its text calls "region''s time zone": platform.region_settings, Tenancy''s data (CHG-RTE-001)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'what its text calls "VenueSettings": platform.venue_settings, Tenancy''s data (CHG-R10GEN-001)'
       summary: Every money source against the ledger, in one view
       description: '4.2.19. **Reconciliation was per provider and the question is not per provider.**
         `ingestSettlementFile` and its siblings are good and gateway-scoped; **a venue closing a day needs
@@ -1560,7 +1591,7 @@ paths:
       - staff
       x-ticvai-read-routing: replica
       summary: List tax exemptions
-      description: Exemption by account, product class or channel — diplomatic, export, B2B.
+      description: Exemption by account, product class or channel — diplomatic, export, B2B. Where `validFrom` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)
 
         **Order.** Soonest first, by `validFrom` ascending, then by `id`.
       tags:
@@ -1681,7 +1712,7 @@ paths:
       operationId: listRecognitionSchedules
       x-ticvai-consumed-by:
         - "P08 BO-076 Revenue Recognition"
-      description: '**Order.** Sorted by `priority` ascending, then by `id`.'
+      description: '**Order.** Sorted by `priority` ascending, then by `id`. Where `priority` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -2271,6 +2302,10 @@ paths:
         - "P01 WEB-035 Multi-Currency & Pricing"
         - "P02 GST-044 Multi-Currency & Pricing"
         - "P08 BO-077 FX Rates & Variances"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'what its text calls "tenancy.VenueSettings.displayCurrencies": platform.venue_settings, Tenancy''s data (CHG-R10GEN-001)'
       # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
       # or staff token is still accepted. `{}` makes the credential optional.
       security:
@@ -2371,6 +2406,10 @@ paths:
       operationId: setFxRate
       x-ticvai-consumed-by:
         - "P08 BO-077 FX Rates & Variances"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'what its text calls "tenancy.VenueSettings.chargeCurrencies": platform.venue_settings, Tenancy''s data (CHG-R10GEN-001)'
       x-ticvai-audience:
       - staff
       x-ticvai-config-scope: region
@@ -2765,6 +2804,9 @@ paths:
       - query: tenancy#venueSettingsRecords
         route: in-process
         for: 'what its text calls "venue setting": platform.venue_settings, Tenancy''s data (CHG-RTE-001)'
+      - query: orders#refundPolicyRecords
+        route: in-process
+        for: 'what its text calls "orders.RefundPolicy.varianceThreshold": orders.refund_policy, Order''s data (CHG-R10GEN-001)'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -2844,6 +2886,10 @@ paths:
       operationId: reviewPriceVariance
       x-ticvai-consumed-by:
         - "P08 BO-077 FX Rates & Variances"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: PriceVariance.quotedPrice, PriceVariance.serverPrice, PriceVariance.variance (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
       - staff
       summary: Record a review decision on an exception variance
@@ -2970,6 +3016,9 @@ paths:
       - query: tenancy#regionSettingsRecords
         route: in-process
         for: 'what its text calls "region''s time zone": platform.region_settings, Tenancy''s data (CHG-RTE-001)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'what its text calls "VenueSettings": platform.venue_settings, Tenancy''s data (CHG-R10GEN-001)'
       x-ticvai-api-scope: partner.write
       x-ticvai-audience:
       - staff
@@ -3248,7 +3297,7 @@ paths:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
-          description: The exception is already resolved.
+          description: The exception is already resolved. Also refused when the settlement is `failed`, `ingesting`, `matched`, `matching` or `parsing`; states/settlement.yaml moves this call only from `hasExceptions`. (r10 default ruling, CHG-R10GEN-005)
           x-ticvai-problem-types:
           - settlement-exception-resolved
           content:
@@ -3797,6 +3846,9 @@ paths:
       - query: tenancy#regionSettingsRecords
         route: in-process
         for: 'its read of platform.region_settings, Tenancy''s data (CHG-MOD-001)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'what its text calls "tenancy.VenueSettings.chargeCurrencies": platform.venue_settings, Tenancy''s data (CHG-R10GEN-001)'
       summary: Pull rates from the configured provider
       description: '**Scheduled ingestion, which had no home.** `setFxRate` is a `PUT` carrying `setByPrincipalId`
         — a person setting a rate — so a daily provider pull had to be modelled as a person doing it,
@@ -4554,7 +4606,7 @@ paths:
       operationId: listTaxInvoiceTemplates
       x-ticvai-consumed-by:
         - "P08 ADM-069 Tax Profile & Jurisdiction Configuration"
-      description: '**Order.** Soonest first, by `effectiveFrom` ascending, then by `id`.'
+      description: '**Order.** Soonest first, by `effectiveFrom` ascending, then by `id`. Where `effectiveFrom` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: our build plan (retrace 5.7.93 template, numbering, language); shape follows listLegalEntities'

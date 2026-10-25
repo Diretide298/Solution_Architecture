@@ -232,6 +232,10 @@ paths:
         - "P08 BO-043 Daily Reconciliation"
         - "P08 BO-053 Staff Directory"
         - "P08 BO-100 Venue Home"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: Shift.countedCash, Shift.expectedCash, Shift.liftsTotal, Shift.openingFloat and 3 more (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       description: >-
         **Order.** Newest first, by `recordedAt` where the device sent one and otherwise by `openedAt`, the
         server's open time: `coalesce(recorded_at, opened_at)` descending, then `id` (`ORDER BY coalesce(recorded_at, opened_at) DESC, id`), and `PageCursor`
@@ -302,6 +306,9 @@ paths:
       - query: tenancy#workstationRecords
         route: in-process
         for: 'its read of platform.workstation, Tenancy''s data (CHG-MOD-001)'
+      - query: tenancy#denominationRecords
+        route: in-process
+        for: 'what its text calls "platform.denomination": platform.denomination, Tenancy''s data (CHG-R10GEN-001)'
       x-ticvai-audience: [staff]
       summary: Open a shift
       description: >
@@ -368,6 +375,10 @@ paths:
       x-ticvai-consumed-by:
         - "P04 POS-019 Shift Templates & Policies"
         - "P08 BO-065 Venue Configuration"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: TillShiftPolicy.openingFloatTolerance (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: The rules every till in the venue opens and closes to
@@ -394,6 +405,10 @@ paths:
       x-ticvai-consumed-by:
         - "P04 POS-019 Shift Templates & Policies"
         - "P08 BO-065 Venue Configuration"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: TillShiftPolicy.openingFloatTolerance (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience: [staff]
       x-ticvai-config-scope: venue
       summary: Set the rules every till in the venue opens and closes to
@@ -729,6 +744,9 @@ paths:
       - query: tenancy#venueSettingsRecords
         route: in-process
         for: 'what its text calls "venue''s cashDrawerLimit": platform.venue_settings, Tenancy''s data (CHG-RTE-001)'
+      - query: tenancy#workstationRecords
+        route: in-process
+        for: 'what its text calls "tenancy.Workstation.cashDrawerLimit": platform.workstation, Tenancy''s data (CHG-R10GEN-001)'
       x-ticvai-audience: [staff]
       summary: Change the initial fund
       description: >
@@ -848,6 +866,12 @@ paths:
       - query: tenancy#venueSettingsRecords
         route: in-process
         for: 'what its text calls "venue''s cashDrawerLimit": platform.venue_settings, Tenancy''s data (CHG-RTE-001)'
+      - query: tenancy#denominationRecords
+        route: in-process
+        for: 'what its text calls "platform.denomination": platform.denomination, Tenancy''s data (CHG-R10GEN-001)'
+      - query: tenancy#workstationRecords
+        route: in-process
+        for: 'what its text calls "tenancy.Workstation.cashDrawerLimit": platform.workstation, Tenancy''s data (CHG-R10GEN-001)'
       x-ticvai-step-up-reason: The cashier the cash came from countersigns the withdrawal with their own PIN on the same device (DEC-178; CHG-CSP-015).
       x-ticvai-step-up-carrier: body:witnessStepUp
       x-ticvai-scope-level: venue
@@ -923,6 +947,12 @@ paths:
       - query: tenancy#venueSettingsRecords
         route: in-process
         for: 'what its text calls "venue''s cashDrawerLimit": platform.venue_settings, Tenancy''s data (CHG-RTE-001)'
+      - query: tenancy#denominationRecords
+        route: in-process
+        for: 'what its text calls "platform.denomination": platform.denomination, Tenancy''s data (CHG-R10GEN-001)'
+      - query: tenancy#workstationRecords
+        route: in-process
+        for: 'what its text calls "tenancy.Workstation.cashDrawerLimit": platform.workstation, Tenancy''s data (CHG-R10GEN-001)'
       x-ticvai-audience: [staff]
       summary: Close one box or all of them
       description: >
@@ -1006,6 +1036,9 @@ paths:
       - query: tenancy#workstationRecords
         route: in-process
         for: 'the session''s workstation (404 no-current-shift) (CHG-MOD-003)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: Shift.countedCash, Shift.expectedCash, Shift.liftsTotal, Shift.openingFloat and 3 more (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: primary   # cash position drives close-out
       summary: The open or suspended shift on the session's workstation
@@ -1041,6 +1074,9 @@ paths:
       - query: tenancy#workstationRecords
         route: in-process
         for: 'the session''s workstation (404 no-current-shift) (CHG-MOD-003)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: Shift.countedCash, Shift.expectedCash, Shift.liftsTotal, Shift.openingFloat and 3 more (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: primary   # the till home shows the live shift, not a replica's
       summary: Read the open or suspended shift on the session's workstation, without the right to open one
@@ -1094,6 +1130,10 @@ paths:
         - "P08 BO-039 Shift Directory"
         - "P08 BO-040 Variance Approval"
         - "P08 BO-041 Cash Movements"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: Shift.countedCash, Shift.expectedCash, Shift.liftsTotal, Shift.openingFloat and 3 more (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: primary
       summary: Read a shift
@@ -1147,6 +1187,9 @@ paths:
       - query: identity#verifySupervisorStepUp
         route: in-process
         for: 'the PIN step-up in `supervisorStepUp` is checked by Identity, never by reading identity.* here (ADAM CR-200; as acceptShiftVariance, CHG-CRD-004); same deployable (commerce): the C# query interface Identity implements, in the caller''s transaction (ADR-0055 rule 2)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: Shift.countedCash, Shift.expectedCash, Shift.liftsTotal, Shift.openingFloat and 3 more (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-step-up-reason: A supervisor approves an out-of-tolerance opening float in person, with their own PIN on the cashier's till (ADAM CR-200, option A).
       x-ticvai-step-up-carrier: body:supervisorStepUp
       x-ticvai-scope-level: venue
@@ -1245,6 +1288,9 @@ paths:
       - query: identity#verifySupervisorStepUp
         route: in-process
         for: 'the PIN step-up in `supervisorStepUp` is checked by Identity, never by reading identity.* here (CHG-CRD-004, ADAM CR-078); same deployable (commerce): the C# query interface Identity implements, in the caller''s transaction (ADR-0055 rule 2)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: Shift.countedCash, Shift.expectedCash, Shift.liftsTotal, Shift.openingFloat and 3 more (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-step-up-reason: Reopening a counted shift is a reversal; a supervisor signs it in place (audit R144).
       x-ticvai-step-up-carrier: body:supervisorStepUp
       x-ticvai-scope-level: venue
@@ -1312,6 +1358,10 @@ paths:
       x-ticvai-consumed-by:
         - "P04 POS-025 Till Home"
         - "P06 EMP-009 End shift"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: Shift.countedCash, Shift.expectedCash, Shift.liftsTotal, Shift.openingFloat and 3 more (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience: [staff]
       summary: Suspend a shift so another user can log in
       description: >
@@ -1372,6 +1422,9 @@ paths:
       - query: tenancy#workstationRecords
         route: in-process
         for: 'the shift''s workstation (409 shift-already-open) (CHG-MOD-003)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: Shift.countedCash, Shift.expectedCash, Shift.liftsTotal, Shift.openingFloat and 3 more (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience: [staff]
       summary: Resume a suspended shift
       description: >
@@ -1620,6 +1673,9 @@ paths:
       - query: identity#verifySupervisorStepUp
         route: in-process
         for: 'the PIN step-up in `supervisorStepUp` is checked by Identity, never by reading identity.* here (CHG-CRD-004, ADAM CR-078); same deployable (commerce): the C# query interface Identity implements, in the caller''s transaction (ADR-0055 rule 2)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: Shift.countedCash, Shift.expectedCash, Shift.liftsTotal, Shift.openingFloat and 3 more (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-step-up-reason: A supervisor signs off a cashier's over/short in person, with their own PIN on the device they use (audit R080 (e); any till or the daily reconciliation since 2 October, CHG-CSP-012).
       x-ticvai-step-up-carrier: body:supervisorStepUp
       x-ticvai-scope-level: venue
@@ -1718,6 +1774,9 @@ paths:
       - query: identity#verifySupervisorStepUp
         route: in-process
         for: 'the PIN step-up in `supervisorStepUp` is checked by Identity, never by reading identity.* here (CHG-CRD-004, ADAM CR-078); same deployable (commerce): the C# query interface Identity implements, in the caller''s transaction (ADR-0055 rule 2)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: Shift.countedCash, Shift.expectedCash, Shift.liftsTotal, Shift.openingFloat and 3 more (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-step-up-reason: The same supervisor act as accepting a variance, in person with their own PIN (audit R080 (e); DEC-175).
       x-ticvai-step-up-carrier: body:supervisorStepUp
       x-ticvai-scope-level: venue
@@ -1790,6 +1849,13 @@ paths:
         - "P04 POS-007 Close Shift"
         - "P08 BO-040 Variance Approval"
         - "P08 BO-043 Daily Reconciliation"
+      x-ticvai-read-via:
+      - query: tenancy#denominationRecords
+        route: in-process
+        for: 'what its text calls "platform.denomination": platform.denomination, Tenancy''s data (CHG-R10GEN-001)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: CashCountLine.countedValue (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: The denomination breakdown of a shift's counts
@@ -1807,6 +1873,8 @@ paths:
         value only (`CashCountLine.expectedQuantity` is derived and not returned), so the read is safe for
         the shift's own cashier as well as the supervisor; the expected figure and the variance stay on
         `Shift` for OVERSHORT_ACCEPT or SHIFT_CLOSE_OTHER holders (CHG-FIN-003).
+
+        Where `countKind` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)
       tags: [shift]
       x-ticvai-permission: REPORT_VIEW_WORKSTATION
       x-ticvai-scope-level: venue
@@ -1856,6 +1924,9 @@ paths:
       - query: tenancy#venueSettingsRecords
         route: in-process
         for: 'its read of platform.venue_settings, Tenancy''s data (CHG-MOD-001)'
+      - query: tenancy#denominationRecords
+        route: in-process
+        for: 'what its text calls "platform.denomination": platform.denomination, Tenancy''s data (CHG-R10GEN-001)'
       x-ticvai-audience: [staff]
       summary: The cashier's blind count, closing their own shift
       description: >
@@ -2041,6 +2112,10 @@ paths:
         schema: { type: string, format: uuid }
     post:
       operationId: approveShiftClose
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: Shift.countedCash, Shift.expectedCash, Shift.liftsTotal, Shift.openingFloat and 3 more (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience: [staff]
       summary: Release a shift held for close approval
       description: >
@@ -2205,6 +2280,10 @@ paths:
         - "P08 BO-039 Shift Directory"
         - "P08 BO-040 Variance Approval"
         - "P08 BO-041 Cash Movements"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: CreateCashMovementRequest.amount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       description: '**Order.** Newest first, by `recordedAt` descending, then by `id`.'
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: primary
@@ -2241,6 +2320,16 @@ paths:
         - "P04 POS-018 Safe Drop & Cash Transfer Management"
         - "P08 BO-041 Cash Movements"
         - "P08 BO-042 Banking & Safe"
+      x-ticvai-read-via:
+      - query: tenancy#denominationRecords
+        route: in-process
+        for: 'what its text calls "platform.denomination": platform.denomination, Tenancy''s data (CHG-R10GEN-001)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'what its text calls "tenancy.VenueSettings.cashDrawerLimit": platform.venue_settings, Tenancy''s data (CHG-R10GEN-001)'
+      - query: tenancy#workstationRecords
+        route: in-process
+        for: 'what its text calls "tenancy.Workstation.cashDrawerLimit": platform.workstation, Tenancy''s data (CHG-R10GEN-001)'
       x-ticvai-audience: [staff]
       summary: Record a cash lift or add
       description: >

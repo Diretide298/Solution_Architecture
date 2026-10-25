@@ -291,6 +291,10 @@ paths:
         - "P08 BO-007 Product Directory"
         - "P08 BO-048 Retail Products"
         - "P08 BO-116 Merchandising & Product Presentation"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: GuestMerchandiseItem.price, MerchandiseItem.price (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
       # or staff token is still accepted. `{}` makes the credential optional.
       security:
@@ -383,6 +387,10 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-007 Product Directory"
         - "P08 BO-048 Retail Products"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: MerchandiseItem.price (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience: [staff]
       summary: Create a merchandise item
       description: >
@@ -430,6 +438,10 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-048 Retail Products"
         - "P08 BO-116 Merchandising & Product Presentation"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: MerchandiseItem.price (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience: [staff]
       summary: Amend a merchandise item
       tags: [merchandise]
@@ -513,6 +525,9 @@ paths:
       - query: promotions#liveEffectivePrice
         route: service
         for: 'the price after any live promotion (ADAM CR-096)'
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: PriceCheck.effectivePrice, PriceCheck.listPrice (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
       # or staff token is still accepted. `{}` makes the credential optional.
       security:
@@ -597,6 +612,10 @@ paths:
       operationId: listRetailSales
       x-ticvai-consumed-by:
         - "P04 POS-005 Payment"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: RetailSale.discount, RetailSale.discountAmount, RetailSale.grossAmount, RetailSale.lineTotal and 3 more (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       description: '**Order.** Newest first, by `createdAt` descending, then by `id`.'
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
@@ -661,6 +680,9 @@ paths:
       - query: orders#orderLineDiscountRecords
         route: service
         for: 'the discounts Orders applied to those lines, summed onto each sale line (r8 re-walk, CHG-R8RW-004)'
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: RetailSale.discount, RetailSale.discountAmount, RetailSale.grossAmount, RetailSale.lineTotal and 3 more (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-reads:
       - table: retail.merchandise
         for: 'each line''s item: its stock item, and whether it is serialised (409 serialNumberRequired) (r8 re-walk,
@@ -749,6 +771,10 @@ paths:
       operationId: getRetailSale
       x-ticvai-consumed-by:
         - "P04 POS-005 Payment"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: RetailSale.discount, RetailSale.discountAmount, RetailSale.grossAmount, RetailSale.lineTotal and 3 more (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: Read a retail sale
@@ -777,6 +803,10 @@ paths:
         - "P04 POS-005 Payment"
         - "P04 POS-011 Returns, Refunds & Exchanges"
         - "P08 BO-021 Order Search"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: RetailSale.discount, RetailSale.discountAmount, RetailSale.grossAmount, RetailSale.lineTotal and 3 more (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: Find a sale from a receipt
@@ -899,6 +929,10 @@ paths:
   /retail-returns:
     get:
       operationId: listRetailReturns
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: RetailReturn.refundAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       description: '**Order.** Newest first, by `createdAt` descending, then by `id`.'
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
@@ -949,6 +983,9 @@ paths:
       - query: inventory#kitComponentRecords
         route: in-process
         for: 'its read of inventory.kit_component, Inventory''s data (CHG-MOD-001)'
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: RetailReturn.refundAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience: [staff]
       summary: Accept a return
       description: >
@@ -1038,6 +1075,10 @@ paths:
   /retail-exchanges:
     post:
       operationId: createRetailExchange
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: CreateExchangeReplacementLine.overridePrice, RetailExchange.difference, RetailExchange.replacementValue, RetailExchange.returnedValue (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience: [staff]
       summary: Exchange one item for another
       description: >
@@ -1087,6 +1128,10 @@ paths:
         - "P04 POS-011 Returns, Refunds & Exchanges"
         - "P08 BO-044 F&B Outlets"
         - "P08 BO-143 Retail Global Settings & Controls"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: ReturnPolicy.requiresApprovalAbove, ReturnPolicy.requiresSecondUserAbove, ReturnPolicy.selfAuthoriseLimit (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: Read the retail return policy
@@ -1113,6 +1158,10 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-044 F&B Outlets"
         - "P08 BO-143 Retail Global Settings & Controls"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: ReturnPolicy.requiresApprovalAbove, ReturnPolicy.requiresSecondUserAbove, ReturnPolicy.selfAuthoriseLimit (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience: [staff]
       x-ticvai-config-scope: outlet   # CF-138: F&B and retail configure at outlet, decided 18 August
       summary: Set the retail return policy
@@ -1365,6 +1414,8 @@ paths:
         **What it returns, in what order** (ADAM CR-104, option 1; CHG-R10ORD-017): the drops still awaiting
         collection, `status` `awaitingCollection` or `partiallyCollected`; a collected, uncollected or disposed drop
         is not returned. Newest first, by `droppedAt` descending, then `id`.
+
+        Where `droppedAt` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)
       tags: [floor]
       x-ticvai-permission: ORDER_VIEW
       x-ticvai-self-scoped: subject
@@ -1501,6 +1552,8 @@ paths:
           description: >
             Already collected (`alreadyCollected`), or past the collection deadline
             (`pastCollectBy`). `refusedReason` says which.
+
+            Also refused when the shop and drop is `disposed`; states/shop-and-drop.yaml moves this call only from `awaitingCollection`, `partiallyCollected` or `uncollected`. (r10 default ruling, CHG-R10GEN-005)
           content:
             application/problem+json:
               schema: { $ref: '#/components/schemas/ShopAndDropProblem' }
@@ -1629,6 +1682,10 @@ paths:
       operationId: listStoreRules
       x-ticvai-consumed-by:
         - "P08 BO-142 Store Rules, Controls & Permissions"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: StoreRule.thresholdAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
       - staff
       summary: Rules and controls in force in the store
@@ -1636,7 +1693,7 @@ paths:
 
         
 
-        **Order.** Newest first, by `updatedAt` descending, then by `id`.'
+        **Order.** Newest first, by `updatedAt` descending, then by `id`. Where `updatedAt` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - retail
       x-ticvai-permission: PRODUCT_VIEW
@@ -1668,6 +1725,10 @@ paths:
       operationId: setStoreRules
       x-ticvai-consumed-by:
         - "P08 BO-142 Store Rules, Controls & Permissions"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: StoreRule.thresholdAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
       - staff
       summary: Change a store rule

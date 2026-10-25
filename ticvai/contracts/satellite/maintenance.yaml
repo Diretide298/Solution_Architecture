@@ -133,6 +133,10 @@ paths:
         - "P08 BO-504 Rental Inventory Command Center"
         - "P08 BO-505 Serialized Equipment Registry"
         - "P08 BO-903 Equipment & Asset Command Center"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: Asset.accumulatedDepreciation, Asset.acquisitionCost, Asset.disposalProceeds, Asset.residualValue (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       description: '**Order.** Sorted by `name` ascending, then by `id`.'
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
@@ -179,6 +183,10 @@ paths:
       operationId: createAsset
       x-ticvai-consumed-by:
         - "P08 BO-069 Asset Register"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: Asset.accumulatedDepreciation, Asset.acquisitionCost, Asset.disposalProceeds, Asset.residualValue (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience: [staff]
       summary: Register an asset
       description: >
@@ -223,6 +231,10 @@ paths:
         - "P08 BO-069 Asset Register"
         - "P08 BO-506 Equipment / Asset Profile"
         - "P08 BO-508 Equipment Status & Condition Management"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: Asset.accumulatedDepreciation, Asset.acquisitionCost, Asset.disposalProceeds, Asset.residualValue (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: Read an asset with history and documents
@@ -249,6 +261,10 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-069 Asset Register"
         - "P08 BO-506 Equipment / Asset Profile"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: Asset.accumulatedDepreciation, Asset.acquisitionCost, Asset.disposalProceeds, Asset.residualValue (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience: [staff]
       summary: Amend an asset
       tags: [asset]
@@ -306,6 +322,10 @@ paths:
         - "P08 BO-069 Asset Register"
         - "P08 BO-509 QR / Barcode Equipment Identification"
         - "P08 BO-548 Equipment Scan & Validation"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: Asset.accumulatedDepreciation, Asset.acquisitionCost, Asset.disposalProceeds, Asset.residualValue (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: Find an asset by tag or QR
@@ -347,6 +367,10 @@ paths:
         - "P08 BO-508 Equipment Status & Condition Management"
         - "P08 BO-581 Return-to-Service Inspection & Approval"
         - "P08 BO-582 Asset Retirement, Write-Off & Replacement Recommendation"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: Asset.accumulatedDepreciation, Asset.acquisitionCost, Asset.disposalProceeds, Asset.residualValue (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience: [staff]
       summary: Take an asset out of service or return it
       description: >
@@ -582,6 +606,10 @@ paths:
         - "P08 BO-030 Work Order Verification"
         - "P08 BO-070 Work Orders"
         - "P08 BO-577 Maintenance Work Order"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: WorkOrderDetail.cost, WorkOrderDetail.labourCost, WorkOrderDetail.partsCost, WorkOrderDetail.totalCost (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: Read a work order
@@ -733,6 +761,9 @@ paths:
       - query: inventory#stockEarmarkRecords
         route: in-process
         for: 'its read of inventory.stock_earmark, Inventory''s data (CHG-MOD-001)'
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: WorkOrderDetail.cost, WorkOrderDetail.labourCost, WorkOrderDetail.partsCost, WorkOrderDetail.totalCost (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience: [staff]
       summary: Record parts consumed
       description: >
@@ -1511,6 +1542,10 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-070 Work Orders"
         - "P08 BO-577 Maintenance Work Order"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: VendorServiceRequest.finalCost, VendorServiceRequest.quotedCost (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       description: '**Order.** Newest first, by `createdAt` descending, then by `id`.'
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
@@ -1557,6 +1592,9 @@ paths:
       - query: inventory#supplierRecords
         route: in-process
         for: 'its read of inventory.supplier, Inventory''s data (CHG-MOD-001)'
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: VendorServiceRequest.finalCost, VendorServiceRequest.quotedCost (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience: [staff]
       x-ticvai-agreed: '29 September: M17-13 (MoM 17 September): external vendors engaged through vendor service requests'
       summary: Engage an outside vendor on a work order
@@ -1606,6 +1644,10 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-070 Work Orders"
         - "P08 BO-577 Maintenance Work Order"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: VendorServiceRequest.finalCost, VendorServiceRequest.quotedCost, body.finalCost, body.quotedCost (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience: [staff]
       x-ticvai-agreed: '29 September: M17-13 (MoM 17 September): external vendors engaged through vendor service requests'
       summary: Move a vendor request along
@@ -1839,6 +1881,8 @@ paths:
       summary: List inspection templates
       description: >
         Opening checks, closing checks, daily ride inspections, fire safety, food hygiene.
+
+        **Order.** Sorted by `name` ascending, then by `id`. (r10 default ruling, CHG-R10GEN-004)
       tags: [inspection]
       x-ticvai-permission: INSPECTION_VIEW
       x-ticvai-scope-level: venue
@@ -2326,6 +2370,10 @@ paths:
       operationId: addIncidentPerson
       x-ticvai-consumed-by:
         - "P06 EMP-026 Incident report"
+      x-ticvai-read-via:
+      - query: identity#subjectRecords
+        route: service
+        for: 'what its text calls "pii.subject": pii.subject, Identity''s data (CHG-R10GEN-001)'
       x-ticvai-agreed: '3 October: Chinmay, Block A business rules, EMP-026 ("a person involved entry: name, role, contact, optional guest lookup, stored as PII subjects; consent rules apply"); CHG-RUL-013; shape follows reportIncident involved parties'
       x-ticvai-audience: [staff]
       summary: Add a person involved in an incident

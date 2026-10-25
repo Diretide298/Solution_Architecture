@@ -733,7 +733,7 @@ paths:
                 $ref: '#/components/schemas/WalletAuthorisation'
         '409':
           x-ticvai-problem-types: [wallet-hold-expired, already-captured, capture-exceeds-hold]
-          description: Hold expired, already captured, or capture exceeds the hold
+          description: Hold expired, already captured, or capture exceeds the hold Also refused when the cross-cell wallet authorisation is `released`; states/wallet-authorisation.yaml moves this call only from `held` or `partiallyCaptured`. (r10 default ruling, CHG-R10GEN-005)
           content:
             application/problem+json:
               schema:

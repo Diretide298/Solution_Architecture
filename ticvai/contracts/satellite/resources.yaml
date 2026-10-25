@@ -75,7 +75,13 @@ paths:
         - "P08 BO-903 Equipment & Asset Command Center"
         - "P08 BO-923 AI Resource Intelligence Command Center"
         - "P08 BO-943 Resource Analytics Command Center"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: Resource.depositAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       summary: Resources at this venue
+      description: >-
+        **Order.** Sorted by `name` ascending, then by `id`. (r10 default ruling, CHG-R10GEN-004)
       tags:
       - resources
       x-ticvai-permission: RESOURCE_VIEW
@@ -117,6 +123,10 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-095 Resources"
         - "P08 BO-857 Resource Creation & Profile"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: Resource.depositAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       summary: Define a bookable resource
       tags:
       - resources
@@ -234,6 +244,8 @@ paths:
         - "P08 BO-933 My Resource Operations Home"
         - "P08 BO-935 Assignment Detail & Operational Brief"
       summary: Bookings, filtered
+      description: >-
+        **Order.** Sorted by `id` descending (a UUIDv7, so newest first). (r10 default ruling, CHG-R10GEN-004)
       tags:
       - resources
       x-ticvai-permission: RESOURCE_VIEW
@@ -438,6 +450,9 @@ paths:
       - query: identity#subjectRecords
         route: service
         for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: body.depositAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-write-via:
       - table: orders.stored_value_authorisation
         operation: authoriseStoredValue
@@ -537,6 +552,10 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-097 Check Out & Check In"
         - "P08 BO-937 Resource Collection, Handover & Return"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: body.captureAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-write-via:
       - table: orders.stored_value_authorisation
         operation: captureStoredValue
@@ -634,7 +653,7 @@ paths:
         replaces the whole set, so a screen that cannot load the current set can only overwrite it
         blind — and the expiry on each row is the thing an operator opens the screen to check.
 
-        '
+         **Order.** Sorted by `name` ascending, then by `id`. (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - resources
       x-ticvai-permission: RESOURCE_VIEW
@@ -846,7 +865,7 @@ paths:
         part of the platform. A locker is rentable and deposit-applicable and not schedule-controlled;
         an instructor is schedule-controlled and qualification-required and not rentable.
 
-        '
+         **Order.** Sorted by `name` ascending, then by `id`. (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - resources
       x-ticvai-permission: RESOURCE_VIEW
@@ -1093,7 +1112,7 @@ paths:
         certification level and rental condition are all one mechanism — a typed, validated, per-type
         attribute definition — and shipping them as columns would mean a release per customer.
 
-        '
+         **Order.** Sorted by `label` ascending, then by `id`. (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - resources
       x-ticvai-permission: RESOURCE_VIEW
@@ -1164,6 +1183,10 @@ paths:
         - "P08 BO-862 Multi-Venue Resource Assignment"
         - "P08 BO-866 Resource Availability Schedule Configuration"
         - "P08 BO-935 Assignment Detail & Operational Brief"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: Resource.depositAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       summary: One resource, with every configured section
       description: 'Board 1.04. Identity, organisation, operational configuration, location, commercial,
         integration and the customer attributes in one read — **the profile is one screen, and a client
@@ -1193,6 +1216,10 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-857 Resource Creation & Profile"
         - "P08 BO-866 Resource Availability Schedule Configuration"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: Resource.depositAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       summary: Change a resource
       tags:
       - resources
@@ -1246,6 +1273,10 @@ paths:
         - "P08 BO-857 Resource Creation & Profile"
         - "P08 BO-863 Resource Lifecycle, Governance & Audit"
         - "P08 BO-912 Asset Lifecycle, Depreciation & Retirement"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: Resource.depositAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       summary: Move a resource through its lifecycle, with a reason
       description: 'Board 1.10. **One operation, not seven.** Draft, pending approval, approved, active,
         temporarily unavailable, under maintenance, suspended, retired and archived are states of one
@@ -1332,6 +1363,10 @@ paths:
       operationId: cloneResource
       x-ticvai-consumed-by:
         - "P08 BO-857 Resource Creation & Profile"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: Resource.depositAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       summary: Copy a resource and its configuration into new ones
       description: '**A venue with forty identical strollers has forty resources.** That is the model,
         and it is only bearable if the fortieth is one action rather than forty fields.
@@ -1551,6 +1586,13 @@ paths:
         - "P08 BO-861 Resource Package & Bundle Configuration"
         - "P08 BO-895 Resource Combination Builder"
         - "P08 BO-918 Event Resource Template Library"
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: service
+        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it answers: ResourcePackage.internalCost (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: ResourcePackage.internalCost (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       summary: Predefined combinations assigned as one
       description: 'Board 1.08. *Conference Package — meeting room, projector, screen, microphone,
         technician. VIP Cabana Package — cabana, towels, locker, service attendant.*
@@ -1559,7 +1601,7 @@ paths:
         are resource-type slots filled at allocation time by `allocateResources`; naming a specific
         technician in the package would make the package unbookable whenever that person is off.
 
-        '
+         **Order.** Sorted by `name` ascending, then by `id`. (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - resources
       x-ticvai-permission: RESOURCE_VIEW
@@ -1586,6 +1628,13 @@ paths:
         - "P08 BO-861 Resource Package & Bundle Configuration"
         - "P08 BO-895 Resource Combination Builder"
         - "P08 BO-918 Event Resource Template Library"
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: service
+        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it accepts or answers: ResourcePackage.internalCost (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: ResourcePackage.internalCost (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       summary: Define a reusable combination
       tags:
       - resources
@@ -1631,6 +1680,13 @@ paths:
         - "P08 BO-861 Resource Package & Bundle Configuration"
         - "P08 BO-895 Resource Combination Builder"
         - "P08 BO-918 Event Resource Template Library"
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: service
+        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it accepts or answers: ResourcePackage.internalCost (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: ResourcePackage.internalCost (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       summary: Change a combination
       tags:
       - resources
@@ -1737,7 +1793,7 @@ paths:
         Carries the source channel and API origin, so a change made by an integration is distinguishable
         from one made by a person.
 
-        '
+         **Order.** Sorted by `id` descending (a UUIDv7, so newest first). (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - resources
       x-ticvai-permission: RESOURCE_VIEW
@@ -2074,6 +2130,8 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-870 Operational Time & Resource Blocking"
       summary: Operational, setup and maintenance blocks
+      description: >-
+        **Order.** Sorted by `id` descending (a UUIDv7, so newest first). (r10 default ruling, CHG-R10GEN-004)
       tags:
       - resources
       x-ticvai-permission: RESOURCE_VIEW
@@ -2523,6 +2581,10 @@ paths:
         - "P08 BO-899 Customer / Cashier Resource Assignment Experience"
         - "P08 BO-924 Optimal Resource Recommendation Engine"
         - "P08 BO-930 Alternative & Replacement Resource"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: Resource.depositAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       summary: Resources matching a requirement, by attribute
       description: '**Deliberately not AI, and 26 August says so.** *"skill-based resource matching
         should rely on straightforward keyword/attribute matching (e.g., skill level, language) rather
@@ -2532,7 +2594,7 @@ paths:
         Arabic-speaking level-3 instructor needs no model and no training data — it is a query, and it is
         explainable to the operator who has to defend the result.
 
-        '
+         **Order.** Sorted by `name` ascending, then by `id`. (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - resources
       x-ticvai-permission: RESOURCE_VIEW
@@ -2591,6 +2653,8 @@ paths:
         - "P08 BO-893 Experience Resource Requirement Builder"
         - "P08 BO-894 Staff-to-Experience Qualification Mapping"
       summary: What an experience needs before it can run
+      description: >-
+        **Order.** Sorted by `id` descending (a UUIDv7, so newest first). (r10 default ruling, CHG-R10GEN-004)
       tags:
       - resources
       x-ticvai-permission: RESOURCE_VIEW
@@ -2732,6 +2796,10 @@ paths:
         - "P01 WEB-047 Map Booking — Cabanas & Spots"
         - "P02 GST-058 Resource Availability (Cabana)"
         - "P02 GST-074 Map Booking — Cabanas & Spots"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: MapResourceAvailability.price (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
       # or staff token is still accepted. `{}` makes the credential optional.
       security:
@@ -2829,6 +2897,13 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-047 Map Booking — Cabanas & Spots"
         - "P02 GST-074 Map Booking — Cabanas & Spots"
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: service
+        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it accepts or answers: ResourceHold.totalPrice (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: ResourceHold.totalPrice (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -2927,6 +3002,13 @@ paths:
         - "P01 WEB-047 Map Booking — Cabanas & Spots"
         - "P02 GST-041 Checkout Entry"
         - "P02 GST-074 Map Booking — Cabanas & Spots"
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: service
+        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it answers: ResourceHold.totalPrice (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: ResourceHold.totalPrice (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -2999,6 +3081,10 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-047 Map Booking — Cabanas & Spots"
         - "P02 GST-074 Map Booking — Cabanas & Spots"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'what its text calls "VenueSettings.seating": platform.venue_settings, Tenancy''s data (CHG-R10GEN-001)'
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -3285,6 +3371,10 @@ paths:
       operationId: getResourceCostAnalytics
       x-ticvai-consumed-by:
         - "P08 BO-945 Resource Cost, Revenue & Efficiency Analytics"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: ResourceCostAnalytics.costPerBookedHour, ResourceCostAnalytics.operatingCost, ResourceCostAnalytics.replacementCost, ResourceCostAnalytics.revenue and 1 more (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-agreed: '29 September: VM close-out; pack labels on BO-945 (Transfer cost, Asset operating cost, Resource replacement cost); shape follows getResourceUtilisation'
       summary: What resources cost and earn, grouped
       description: '**The cost half of BO-945** (decided 29 September, readiness close-out). `getResourceUtilisation`
@@ -3348,6 +3438,10 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-912 Asset Lifecycle, Depreciation & Retirement"
         - "P08 BO-945 Resource Cost, Revenue & Efficiency Analytics"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: ResourceCostEntry.amount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: writers pass; pack labels on BO-945 (Transfer cost, Asset operating
@@ -3416,6 +3510,10 @@ paths:
         - "P08 BO-910 Maintenance & Resource Blocking"
         - "P08 BO-912 Asset Lifecycle, Depreciation & Retirement"
         - "P08 BO-945 Resource Cost, Revenue & Efficiency Analytics"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: ResourceCostEntry.amount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: writers pass; pack labels on BO-945 (Transfer cost, Asset operating

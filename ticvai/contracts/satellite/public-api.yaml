@@ -353,6 +353,8 @@ paths:
         **Whose clients** (ADAM CR-098; CHG-R10ID-011): a partner caller gets its own developer account's clients only
         (the rule in this contract's description, "Who a partner caller acts for"); TICVAI staff get every client.
         A client's secrets are never returned.
+
+        **Order.** Sorted by `name` ascending, then by `id`. (r10 default ruling, CHG-R10GEN-004)
       tags: [publicApi]
       x-ticvai-permission: DEVELOPER_VIEW
       x-ticvai-audience: [staff, partner]
@@ -667,6 +669,8 @@ paths:
       x-ticvai-consumed-by:
         - "P14 DEV-004 Sandbox"
       summary: Sandbox environments
+      description: >-
+        **Order.** Sorted by `name` ascending, then by `id`. (r10 default ruling, CHG-R10GEN-004)
       tags: [publicApi]
       x-ticvai-permission: DEVELOPER_VIEW
       x-ticvai-audience: [staff, partner]
@@ -802,6 +806,8 @@ paths:
         **Per tenant, filterable by API client** (decided 28 September, audit R214 (4)). Returns every
         webhook subscription in the tenant; `clientId` narrows it to what one API client is subscribed
         to. A partner caller sees only its own client's subscriptions whatever it sends.
+
+        **Order.** Sorted by `id` descending (a UUIDv7, so newest first). (r10 default ruling, CHG-R10GEN-004)
       tags: [publicApi]
       x-ticvai-permission: DEVELOPER_VIEW
       x-ticvai-audience: [staff, partner]
@@ -954,6 +960,8 @@ paths:
       description: >
         13.1.30 and 13.3.23. **A developer debugging an integration needs the delivery log more than
         anything else in this contract**, and without it every question becomes a support ticket.
+
+        **Order.** Sorted by `id` descending (a UUIDv7, so newest first). (r10 default ruling, CHG-R10GEN-004)
       tags: [publicApi]
       x-ticvai-permission: DEVELOPER_VIEW
       x-ticvai-audience: [staff, partner]
@@ -1223,6 +1231,8 @@ paths:
         a staff caller must hold (`DEVELOPER_VIEW`, ADR-0025) is not enforced here, and a signed-in staff caller
         without it is not refused. Nobody is refused on this read, so the screen's no-access state cannot be reached
         through it.
+
+        **Order.** Sorted by `id` descending (a UUIDv7, so newest first). (r10 default ruling, CHG-R10GEN-004)
       tags: [publicApi]
       x-ticvai-permission: null
       x-ticvai-audience: [public, partner]
@@ -1945,6 +1955,8 @@ paths:
         TICVAI platform operator is platform staff, and any other staff caller is the tenant's.
 
         **Order.** Pending first (by `status`), then newest first, by `requestedAt` descending, then by `id`.
+
+        Where `requestedAt` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)
       tags: [publicApi]
       x-ticvai-permission: DEVELOPER_VIEW
       x-ticvai-audience: [staff, partner]

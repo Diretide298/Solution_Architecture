@@ -165,6 +165,24 @@ x-ticvai-queries:
       a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
       process within commerce, through the C# query interface Wallet implements.
     served: [in-process]
+  balanceRecords:
+    module: wallet
+    table: wallet.balance
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The wallet.balance rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Wallet stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/WalletBalance'}
+    rule: >-
+      A data read, not a rule question (r10 lane E, 25 October 2026, CHG-R10GEN-001; ADR-0055 rule 2 as amended 14
+      October). Wallet answers with its wallet.balance rows, as it stores them and as the caller's scope lets it see
+      them (the table's row-level security, under the caller's connection and transaction). It decides nothing: an
+      asker that refuses or chooses on these rows states that rule in its own operation, and a question with a rule
+      of its own (open, live, sellable) is declared as a query of its own. It is asked from another deployable
+      through Wallet's service route (serviceAuth).
+    served: [service]
 paths:
   /wallet-types:
     get:
@@ -178,6 +196,13 @@ paths:
         - "P08 BO-1090 Wallet Lifecycle Configuration"
         - "P08 BO-1091 Wallet Numbering, Identity & Digital Credentials"
         - "P08 BO-1094 Funding Method Configuration"
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it answers: WalletType.maximumBalance (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: WalletType.maximumBalance (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       summary: The kinds of wallet that may exist — who owns one
       description: 'Board 1.2. Guest, registered customer, family, parent, child, corporate, school,
         employee.
@@ -186,7 +211,7 @@ paths:
         lower limit; it has an owner who is not the holder, a funding source that is somebody else, and
         spending controls a parent sets.
 
-        '
+         **Order.** Sorted by `name` ascending, then by `id`. (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - wallet
       x-ticvai-permission: WALLET_VIEW
@@ -210,6 +235,13 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-1084 Wallet Type Library"
         - "P08 BO-1085 Wallet Creation & Provisioning Rules"
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it accepts or answers: WalletType.maximumBalance (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: WalletType.maximumBalance (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-conflict-policy: serverWins
       summary: Define a kind of wallet
       tags:
@@ -258,6 +290,13 @@ paths:
         - "P08 BO-1089 Wallet Feature Profile"
         - "P08 BO-1090 Wallet Lifecycle Configuration"
         - "P08 BO-1091 Wallet Numbering, Identity & Digital Credentials"
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it accepts or answers: WalletType.maximumBalance (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: WalletType.maximumBalance (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-conflict-policy: serverWins
       summary: Change a kind of wallet
       tags:
@@ -444,6 +483,13 @@ paths:
         - "P08 BO-1106 Credit Usage & Eligibility Rules"
         - "P08 BO-399 Wallet & Credit Acceptance Mapping"
         - "P08 BO-419 Bonus Usage Restrictions"
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it accepts or answers: CreditEligibility.minimumSpend (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: CreditEligibility.minimumSpend (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-conflict-policy: serverWins
       summary: Where this credit may be spent, and on what
       description: 'Board 3.4, and it supersedes the gaming pack''s *Wallet & Credit Acceptance
@@ -578,7 +624,7 @@ paths:
         has to put the money back in the lots it came from, or the guest gains or loses expiry they were
         never given.
 
-        '
+         **Order.** Sorted by `id` descending (a UUIDv7, so newest first). (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - wallet
       x-ticvai-permission: WALLET_VIEW
@@ -797,6 +843,13 @@ paths:
         - "P08 BO-1101 Funding Limits & Velocity Controls"
         - "P08 BO-417 Top-Up Configuration"
         - "P08 BO-418 Top-Up Bonus Rule Configuration"
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it answers: WalletFundingRules.amount, WalletFundingRules.approvalAboveAmount, WalletFundingRules.bonusAmount, WalletFundingRules.maxAmountPerDay and 7 more (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: WalletFundingRules.amount, WalletFundingRules.approvalAboveAmount, WalletFundingRules.bonusAmount, WalletFundingRules.maxAmountPerDay and 7 more (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       summary: How a wallet may be topped up
       description: |-
         **One set of rules per wallet type at the venue** (R8 blocker GPS-C19, CHG-R8STO-001), the one
@@ -853,6 +906,13 @@ paths:
         - "P08 BO-1101 Funding Limits & Velocity Controls"
         - "P08 BO-417 Top-Up Configuration"
         - "P08 BO-418 Top-Up Bonus Rule Configuration"
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it accepts or answers: WalletFundingRules.amount, WalletFundingRules.approvalAboveAmount, WalletFundingRules.bonusAmount, WalletFundingRules.maxAmountPerDay and 7 more (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: WalletFundingRules.amount, WalletFundingRules.approvalAboveAmount, WalletFundingRules.bonusAmount, WalletFundingRules.maxAmountPerDay and 7 more (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-body-key: [walletTypeId]
       x-ticvai-body-key-note: 'Keyed by the body''s `walletTypeId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per wallet type within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body. **Required in fact**: a body without `walletTypeId` is refused `400 validation`; the schema leaves it optional only so a client built at r1 still validates.'
       x-ticvai-conflict-policy: serverWins
@@ -994,7 +1054,7 @@ paths:
         A parent funds, a child spends, and neither model works if the wallet belongs to exactly one
         person.
 
-        '
+         **Order.** Sorted by `id` descending (a UUIDv7, so newest first). (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - wallet
       x-ticvai-permission: WALLET_VIEW
@@ -1137,7 +1197,7 @@ paths:
         is an entitlement with conditions — *one free child entry with a paid adult, weekdays, this
         venue* — and modelling it as money produces the wrong answer at the till and in the ledger.
 
-        '
+         **Order.** Sorted by `name` ascending, then by `id`. (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - wallet
       x-ticvai-permission: WALLET_VIEW
@@ -1199,6 +1259,13 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-1123 Gift Card & Digital Benefit Command Center"
         - "P08 BO-1124 Gift Card Product Configuration"
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it accepts or answers: GiftCardProduct.denominations, GiftCardProduct.maximumAmount, GiftCardProduct.minimumAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: GiftCardProduct.denominations, GiftCardProduct.maximumAmount, GiftCardProduct.minimumAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-conflict-policy: serverWins
       summary: Denominations, validity, activation and distribution
       description: 'Boards 5.2 and 5.3. **`issueGiftCard` and `activateGiftCard` exist in `retail` and
@@ -1256,6 +1323,13 @@ paths:
         - "P08 BO-1140 Offline Wallet & Degraded Mode Configuration"
         - "P08 BO-1141 Device, Terminal & Acceptance Point Mapping"
         - "P08 BO-1175 Integration Profile & System Mapping"
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it accepts or answers: WalletChannelRules.offlineFloorLimit, WalletChannelRules.pinAboveAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: WalletChannelRules.offlineFloorLimit, WalletChannelRules.pinAboveAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-singleton: true
       x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-conflict-policy: serverWins
@@ -1355,6 +1429,13 @@ paths:
       operationId: getWalletTransferRules
       x-ticvai-consumed-by:
         - "P08 BO-1144 Peer-to-Peer Transfer Configuration"
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it answers: WalletTransferRules.approvalAboveAmount, WalletTransferRules.maximumPerDay, WalletTransferRules.maximumPerTransfer (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: WalletTransferRules.approvalAboveAmount, WalletTransferRules.maximumPerDay, WalletTransferRules.maximumPerTransfer (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       summary: The peer-to-peer transfer rules in force
       description: |-
         **Added 21 October 2026 (r8 gate, CHG-R8RW-007; the contract gap CHG-WIR-027 of 2 October): `setWalletTransferRules`
@@ -1388,6 +1469,13 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-1144 Peer-to-Peer Transfer Configuration"
         - "P08 BO-1145 Transfer Eligibility, Limits & Approval Rules"
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it accepts or answers: WalletTransferRules.approvalAboveAmount, WalletTransferRules.maximumPerDay, WalletTransferRules.maximumPerTransfer (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: WalletTransferRules.approvalAboveAmount, WalletTransferRules.maximumPerDay, WalletTransferRules.maximumPerTransfer (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-singleton: true
       x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-conflict-policy: serverWins
@@ -1564,6 +1652,8 @@ paths:
         - "P08 BO-1160 Fraud Alert & Investigation Case Management"
         - "P08 BO-1179 Integration Monitoring & Exception Workbench"
       summary: Contested transactions and operational exceptions
+      description: >-
+        **Order.** Sorted by `id` descending (a UUIDv7, so newest first). (r10 default ruling, CHG-R10GEN-004)
       tags:
       - wallet
       x-ticvai-permission: WALLET_VIEW
@@ -3319,6 +3409,13 @@ paths:
       operationId: setWalletAuthenticationPolicy
       x-ticvai-consumed-by:
         - "P08 BO-1139 Digital Key & Wallet Authentication Policy"
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it accepts or answers: WalletAuthenticationPolicy.aboveAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: WalletAuthenticationPolicy.aboveAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-singleton: true
       x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-agreed: '29 September: VM close-out; pack ''Wallet_Configuration_Backend_Structure_v1.0.pdf''
@@ -3396,7 +3493,7 @@ paths:
 
         
 
-        **Order.** Newest first, by `publishedAt` descending.'
+        **Order.** Newest first, by `publishedAt` descending. Where `publishedAt` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - wallet
       x-ticvai-permission: WALLET_VIEW
@@ -3638,6 +3735,10 @@ paths:
       operationId: setWalletReconciliationSources
       x-ticvai-consumed-by:
         - "P08 BO-1166 Multi-Source Reconciliation Configuration"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'what its text calls "VenueSettings": platform.venue_settings, Tenancy''s data (CHG-R10GEN-001)'
       x-ticvai-singleton: true
       x-ticvai-singleton-note: 'One set per tenant, the caller''s tenant: a PUT replaces the whole set, and an entry the body leaves out is removed. There is no key in the path.'
       x-ticvai-agreed: '29 September: VM close-out; pack ''Wallet_Configuration_Backend_Structure_v1.0.pdf''

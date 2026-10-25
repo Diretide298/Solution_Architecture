@@ -233,6 +233,10 @@ paths:
       operationId: assignSeats
       x-ticvai-consumed-by:
         - "P08 BO-995 Find Seats For Me"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: body.maxPrice (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -405,7 +409,7 @@ paths:
         - "P08 BO-953 Seat Map Command Center"
         - "P08 BO-973 Layout Command Center"
         - "P08 BO-978 Multi-Performance Assignment"
-      description: '**Order.** Newest first, by `publishedAt` descending, then by `id`.'
+      description: '**Order.** Newest first, by `publishedAt` descending, then by `id`. Where `publishedAt` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -759,7 +763,7 @@ paths:
         - "P08 BO-1051 Seat Analytics Command Center"
         - "P08 BO-956 Rows & Seats"
         - "P08 BO-991 Seat History"
-      description: '**Order.** Sorted by `position` ascending, then by `id`.'
+      description: '**Order.** Sorted by `position` ascending, then by `id`. Where `position` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -1269,7 +1273,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ImportJob'
         '409':
-          description: Job has errors, or has already been committed
+          description: Job has errors, or has already been committed Also refused when the seat import job is `committing`, `failed` or `parsing`; states/import-job.yaml moves this call only from `previewReady`. (r10 default ruling, CHG-R10GEN-005)
           content:
             application/problem+json:
               schema:
@@ -1287,6 +1291,8 @@ paths:
       - staff
       x-ticvai-read-routing: replica
       summary: List reusable layout templates
+      description: >-
+        **Order.** Sorted by `name` ascending, then by `id`. (r10 default ruling, CHG-R10GEN-004)
       tags:
       - seatMap
       x-ticvai-permission: PRODUCT_VIEW
@@ -1360,6 +1366,10 @@ paths:
         - "P08 BO-1045 Price Bands & Categories"
         - "P08 BO-1055 Revenue by Seat Category"
         - "P08 BO-985 Status Model Configuration"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: SeatPriceBand.amount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -1396,6 +1406,10 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-1045 Price Bands & Categories"
         - "P08 BO-985 Status Model Configuration"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: SeatPriceBand.amount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
       - staff
       summary: Create a seat category
@@ -1475,6 +1489,10 @@ paths:
       operationId: updateSeatCategory
       x-ticvai-consumed-by:
         - "P08 BO-1045 Price Bands & Categories"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: SeatPriceBand.amount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
       - staff
       summary: Rename, re-rank or re-price a seat category
@@ -1646,6 +1664,10 @@ paths:
         - "P02 GST-049 Interactive Seat Selection"
         - "P04 POS-004 Sell — Seat Map"
         - "P08 BO-994 Choose My Seats"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'what its text calls "VenueSettings.seating": platform.venue_settings, Tenancy''s data (CHG-R10GEN-001)'
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -1761,6 +1783,13 @@ paths:
         - "P04 POS-004 Sell — Seat Map"
         - "P08 BO-987 Hold Tracker"
         - "P08 BO-999 Cart & Multi-Seat Management"
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it answers: SeatHold.totalPrice (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: SeatHold.totalPrice (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -1841,7 +1870,7 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
           description: The hold is no longer active (`holdNotActive`) - converted to an order, already
-            released or expired. Nothing changes.
+            released or expired. Nothing changes. Also refused when the seat hold is `sold`; states/seat-hold.yaml moves this call only from `held`. (r10 default ruling, CHG-R10GEN-005)
           content:
             application/problem+json:
               schema:
@@ -1860,6 +1889,10 @@ paths:
       operationId: extendSeatHold
       x-ticvai-consumed-by:
         - "P01 WEB-011 Guest Details & Attendee Forms"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'what its text calls "VenueSettings.seating": platform.venue_settings, Tenancy''s data (CHG-R10GEN-001)'
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -2066,6 +2099,13 @@ paths:
       operationId: allocateBlockedSeats
       x-ticvai-consumed-by:
         - "P10 PTR-009 Group / Bulk Booking"
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it accepts or answers: SeatHold.totalPrice (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: SeatHold.totalPrice (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-api-scope: seating.write
       x-ticvai-audience:
       - staff
@@ -2215,6 +2255,10 @@ paths:
         - "P08 BO-1001 View Preview, Compare & Heat Map"
         - "P08 BO-1002 AI Conversational Seat Assistant"
         - "P08 BO-1039 Seat Upgrade Recommendations"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: SeatRecommendation.totalPrice, SeatRecommendationRequest.maxPrice (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-reads:
       - table: catalogue.performance
         for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
@@ -2526,7 +2570,7 @@ paths:
         seats nobody can explain, and it is always a hold somebody placed for one show and never took
         back.
 
-        '
+         **Order.** Sorted by `name` ascending, then by `id`. (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - seating
       x-ticvai-permission: CAPACITY_CONFIGURE
@@ -2605,7 +2649,7 @@ paths:
         season''s allocation.** A sponsor pool that is never drawn down is seats the venue could have
         sold; one exhausted every night is a negotiation.
 
-        '
+         **Order.** Sorted by `id` descending (a UUIDv7, so newest first). (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - seating
       x-ticvai-permission: CAPACITY_CONFIGURE
@@ -2958,7 +3002,16 @@ paths:
         - "P08 BO-1029 Quote, Deposit & Payment"
         - "P08 BO-1030 Modify, Release & Cancel"
         - "P08 BO-1032 Group Reporting & Audit"
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it answers: GroupSeatRequest.budgetPerHead, GroupSeatRequest.depositAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: GroupSeatRequest.budgetPerHead, GroupSeatRequest.depositAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       summary: Group bookings, their status and their deposits
+      description: >-
+        **Order.** Sorted by `id` descending (a UUIDv7, so newest first). (r10 default ruling, CHG-R10GEN-004)
       tags:
       - seating
       x-ticvai-permission: ORDER_VIEW
@@ -2986,6 +3039,13 @@ paths:
       operationId: createGroupSeatRequest
       x-ticvai-consumed-by:
         - "P08 BO-1025 Group Request Intake"
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it accepts or answers: GroupSeatRequest.budgetPerHead, GroupSeatRequest.depositAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: GroupSeatRequest.budgetPerHead, GroupSeatRequest.depositAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       summary: Take a group enquiry before any seat is held
       description: 'Board 8.3. **A group enquiry is not a booking and must not hold seats.** Sixty
         seats held for a school that never confirms is a sold-out show with sixty empty places.
@@ -3033,6 +3093,10 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-1026 Availability & Best-Fit Search"
         - "P08 BO-1027 Bulk Seat Allocation"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: GroupSeatAllocation.totalPrice (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       summary: Find and hold the best contiguous block for a group
       description: 'Boards 8.6 and 8.7. **Best-fit for a group is not best-seat for one guest.** Sixty
         people want to sit together; splitting them across two tiers is worse than a poorer view, and
@@ -3250,6 +3314,13 @@ paths:
       operationId: reassignSeats
       x-ticvai-consumed-by:
         - "P08 BO-1040 Alternatives & Reseating"
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it accepts or answers: SeatReassignment.priceDifference (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: SeatReassignment.priceDifference (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       summary: Move a booked party, and tell them
       description: 'Board 9.8. **A venue moves people: a broken seat, a changed stage, a production
         requirement, a guest who asks.** The move has to keep the party together, respect companion

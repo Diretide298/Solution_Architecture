@@ -213,6 +213,42 @@ x-ticvai-queries:
       a rule of its own (open, live, sellable) is declared as a query of its own. It is asked from another
       deployable through AI's service route (serviceAuth).
     served: [service]
+  approvalRequestScoreRecords:
+    module: ai
+    table: ai.approval_request_score
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The ai.approval_request_score rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Ai stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/AiApprovalRequestScore'}
+    rule: >-
+      A data read, not a rule question (r10 lane E, 25 October 2026, CHG-R10GEN-001; ADR-0055 rule 2 as amended 14
+      October). Ai answers with its ai.approval_request_score rows, as it stores them and as the caller's scope lets
+      it see them (the table's row-level security, under the caller's connection and transaction). It decides
+      nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and a question
+      with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked from another
+      deployable through Ai's service route (serviceAuth).
+    served: [service]
+  knowledgeCollectionRecords:
+    module: ai
+    table: ai.knowledge_collection
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The ai.knowledge_collection rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Ai stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/KnowledgeCollection'}
+    rule: >-
+      A data read, not a rule question (r10 lane E, 25 October 2026, CHG-R10GEN-001; ADR-0055 rule 2 as amended 14
+      October). Ai answers with its ai.knowledge_collection rows, as it stores them and as the caller's scope lets
+      it see them (the table's row-level security, under the caller's connection and transaction). It decides
+      nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and a question
+      with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked from another
+      deployable through Ai's service route (serviceAuth).
+    served: [service]
 paths:
   /ai/translate:
     post:
@@ -2068,7 +2104,7 @@ paths:
         a filter on a shared index — a forgotten filter is a cross-tenant breach, and a missing collection
         is a loud failure. Only the second is recoverable.
 
-        '
+         **Order.** Sorted by `name` ascending, then by `id`. (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - retrieval
       x-ticvai-permission: AI_CONFIGURE
@@ -2434,6 +2470,13 @@ paths:
         - "P09 ADM-004 Platform Audit Log"
         - "P16 ANL-059 AI Insight History, Evidence & Explainability"
         - "P16 ANL-070 Analytics Governance, Security & Audit Center"
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: service
+        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it answers: AiInteraction.cost (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: AiInteraction.cost (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
       - staff
       summary: Every prompt, response and action
@@ -2523,7 +2566,7 @@ paths:
         every open proposal at the scope; a caller with `AI_USE` only sees the proposals they prompted,
         because those are the level 1 proposals they may approve themselves.
 
-        '
+         **Order.** Sorted by `id` descending (a UUIDv7, so newest first). (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - governance
       x-ticvai-permission: AI_USE
@@ -2694,6 +2737,13 @@ paths:
         - "P08 BO-091 AI Policy & Spend"
         - "P09 ADM-549 AI Governance Monitoring Command Center"
         - "P16 ANL-070 Analytics Governance, Security & Audit Center"
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: service
+        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it answers: AiUsageReport.cost, AiUsageReport.projectedCost, AiUsageReport.spend, AiUsageReport.usedSpend (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: AiUsageReport.cost, AiUsageReport.projectedCost, AiUsageReport.spend, AiUsageReport.usedSpend (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
       - staff
       summary: Usage, cost and performance
@@ -2794,6 +2844,10 @@ paths:
       operationId: setAiProvider
       x-ticvai-consumed-by:
         - "P09 ADM-037 AI Provider & Credentials"
+      x-ticvai-read-via:
+      - query: tenancy#regionSettingsRecords
+        route: service
+        for: 'what its text calls "RegionSettings.allowedAiResidencies": platform.region_settings, Tenancy''s data (CHG-R10GEN-001)'
       x-ticvai-audience:
       - staff
       summary: Configure a provider
@@ -3064,6 +3118,13 @@ paths:
       operationId: getAiSpendCeiling
       x-ticvai-consumed-by:
         - "P08 BO-091 AI Policy & Spend"
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: service
+        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it answers: AiSpendCeiling.spend (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: AiSpendCeiling.spend (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -3093,6 +3154,16 @@ paths:
       operationId: setAiSpendCeiling
       x-ticvai-consumed-by:
         - "P08 BO-091 AI Policy & Spend"
+      x-ticvai-read-via:
+      - query: subscription#invoiceRecords
+        route: service
+        for: 'what its text calls "SubscriptionInvoice": control.invoice, Platform''s data (CHG-R10GEN-001)'
+      - query: tenancy#scopeRecords
+        route: service
+        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it accepts or answers: AiSpendCeiling.spend (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: AiSpendCeiling.spend (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '2 October: Chinmay, workbook Q8 (BO-091); shape follows setAiPolicy'
@@ -3551,7 +3622,7 @@ paths:
         tenant''s document; an `embed` failure is whoever holds the provider key. Without it the two
         look alike, and both get reported as the platform being broken.
 
-        '
+         **Order.** Newest first, by `createdAt` descending, then by `id`. (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - retrieval
       x-ticvai-permission: AI_CONFIGURE
@@ -3604,7 +3675,7 @@ paths:
 
         
 
-        **Order.** Newest first, by `updatedAt` descending, then by `id`.'
+        **Order.** Newest first, by `updatedAt` descending, then by `id`. Where `updatedAt` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - governance
       x-ticvai-permission: AI_USE
@@ -3731,6 +3802,10 @@ paths:
         - "P09 ADM-525 Environment, Tenant & Scope Governance"
         - "P09 ADM-526 AI Policy Conflict, Exception & Override Management"
         - "P09 ADM-528 AI Governance Policy Publication & Effective Policy Map"
+      x-ticvai-read-via:
+      - query: tenancy#regionSettingsRecords
+        route: service
+        for: 'the region''s trading currency and scale (currency_code, currency_scale) for the Money it answers: AiGovernanceRule.maxAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-agreed: '29 September: AI system design 2.3 governance, 3.8; our build plan, shape follows getAiPolicy'
       summary: The policy in force for a capability at a scope
       description: '**What the governance decision point would apply, resolved and explained** (AIC-153, AIC-161,
@@ -3782,6 +3857,13 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-523 AI Action & Permission Policy Builder"
         - "P09 ADM-524 AI Data Access & Usage Policy"
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: service
+        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it accepts or answers: AiGovernanceRule.maxAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: AiGovernanceRule.maxAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-agreed: '29 September: AI system design 2.3 governance (draftAiGovernancePolicy), 3.1 Governance;
         our build plan, shape follows createKnowledgeCollection'
       summary: Draft a governance policy, or a new version of one
@@ -3940,6 +4022,13 @@ paths:
       operationId: publishAiGovernancePolicy
       x-ticvai-consumed-by:
         - "P09 ADM-528 AI Governance Policy Publication & Effective Policy Map"
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: service
+        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it accepts or answers: AiGovernanceRule.maxAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: AiGovernanceRule.maxAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-agreed: '29 September: AI system design 2.3 governance, 3.8; our build plan, shape follows decideProposedAction'
       summary: Publish a simulated policy version
       description: '**No material governance policy becomes active without a controlled review** (ADM-528). The
@@ -3998,7 +4087,7 @@ paths:
 
         
 
-        **Order.** Newest first, by `publishedAt` descending, then by `id`.'
+        **Order.** Newest first, by `publishedAt` descending, then by `id`. Where `publishedAt` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - governance
       x-ticvai-permission: AI_USE
@@ -4296,6 +4385,10 @@ paths:
   /governance/evaluate:
     post:
       operationId: evaluateAiGovernance
+      x-ticvai-read-via:
+      - query: tenancy#regionSettingsRecords
+        route: service
+        for: 'the region''s trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: body.amount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-agreed: '29 September: AI system design 2.3 governance (service audience), 3.8; our build plan, shape
         follows white-label proposeGuidedChoice (service)'
       summary: Ask the governance decision point (service callers)
@@ -5068,7 +5161,7 @@ paths:
 
         
 
-        **Order.** Newest first, by `startedAt` descending, then by `id`.'
+        **Order.** Newest first, by `startedAt` descending, then by `id`. Where `startedAt` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - configure
       x-ticvai-permission: AI_USE
@@ -5562,7 +5655,7 @@ paths:
 
         
 
-        **Order.** Newest first, by `lastAskedAt` descending, then by `id`.'
+        **Order.** Newest first, by `lastAskedAt` descending, then by `id`. Where `lastAskedAt` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - knowledge
       x-ticvai-permission: AI_USE
@@ -5780,7 +5873,7 @@ paths:
 
         
 
-        **Order.** Sorted by `name` ascending, then by `id`.'
+        **Order.** Sorted by `name` ascending, then by `id`. Where `name` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - knowledge
       x-ticvai-permission: AI_USE
@@ -5832,7 +5925,7 @@ paths:
 
         
 
-        **Order.** Newest first, by `detectedAt` descending, then by `id`.'
+        **Order.** Newest first, by `detectedAt` descending, then by `id`. Where `detectedAt` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - insights
       x-ticvai-permission: AI_USE
@@ -6256,7 +6349,7 @@ paths:
 
         
 
-        **Order.** Sorted by `name` ascending, then by `id`.'
+        **Order.** Sorted by `name` ascending, then by `id`. Where `name` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - forecast
       x-ticvai-permission: AI_USE
@@ -7183,6 +7276,13 @@ paths:
   /risk/transaction-scores:
     post:
       operationId: scoreTransactionRisk
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: service
+        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it accepts or answers: body.amount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: body.amount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-agreed: '29 September: AI system design 2.3 risk (service audience), 2.2 B; our build plan, shape
         follows white-label proposeGuidedChoice (service)'
       summary: Score a payment attempt (Orders)
@@ -7366,6 +7466,13 @@ paths:
       operationId: configureRiskStrategy
       x-ticvai-consumed-by:
         - "P08 ADM-637 AI Fraud, Anomaly & Payment Intelligence Center"
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: service
+        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it accepts or answers: AiRiskStrategy.minAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: AiRiskStrategy.minAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-singleton: true
       x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-agreed: '29 September: AI system design 2.3 risk (setRiskStrategy), 8 decision 6; our build plan,
@@ -7421,6 +7528,13 @@ paths:
       operationId: backtestRiskStrategy
       x-ticvai-consumed-by:
         - "P08 ADM-638 Payment Executive Intelligence, Risk Simulator & AI Advisor"
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: service
+        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it accepts or answers: AiRiskStrategy.minAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: AiRiskStrategy.minAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-agreed: '29 September: AI system design 2.3 risk; our build plan, shape follows simulateRecommendationStrategy'
       summary: Backtest a draft strategy
       description: 'What the draft would have done over a past window at the same review rate: recall, precision
@@ -8567,6 +8681,13 @@ paths:
         - "P09 ADM-037 AI Provider & Credentials"
         - "P09 ADM-544 Model, Provider & AI Runtime Trace"
         - "P16 ANL-060 AI Analytics Governance & Model Control"
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: service
+        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it answers: AiModel.inputCostPerMillionTokens, AiModel.outputCostPerMillionTokens (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: AiModel.inputCostPerMillionTokens, AiModel.outputCostPerMillionTokens (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-agreed: '29 September: AI system design 2.3 models, 3.3; our build plan, shape follows listAiProviders'
       summary: The model catalogue
       description: 'Platform and tenant models with capabilities, context size, tool calling, structured output,
@@ -8632,6 +8753,10 @@ paths:
       operationId: setAiModel
       x-ticvai-consumed-by:
         - "P09 ADM-037 AI Provider & Credentials"
+      x-ticvai-read-via:
+      - query: tenancy#regionSettingsRecords
+        route: service
+        for: 'what its text calls "tenancy.RegionSettings.allowedAiResidencies": platform.region_settings, Tenancy''s data (CHG-R10GEN-001)'
       x-ticvai-agreed: '29 September: AI system design 2.3 models, 2.3 permissions (PLATFORM_AI_MANAGE); our build
         plan, shape follows setAiProvider'
       summary: Add or change a platform model (platform)
@@ -8706,7 +8831,7 @@ paths:
 
         
 
-        **Order.** Newest first, by `publishedAt` descending, then by `id`.'
+        **Order.** Newest first, by `publishedAt` descending, then by `id`. Where `publishedAt` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - models
       x-ticvai-permission: AI_USE
@@ -8899,7 +9024,7 @@ paths:
 
         
 
-        **Order.** Newest first, by `startedAt` descending, then by `id`.'
+        **Order.** Newest first, by `startedAt` descending, then by `id`. Where `startedAt` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - models
       x-ticvai-permission: AI_USE
@@ -9235,6 +9360,13 @@ paths:
         - "P09 ADM-544 Model, Provider & AI Runtime Trace"
         - "P09 ADM-545 Governance, Approval & Human Decision Trace"
         - "P09 ADM-548 AI Trace Investigation & Replay Simulator"
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: service
+        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it answers: AiInteraction.cost (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: AiInteraction.cost (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-agreed: '29 September: AI system design 2.3 audit, 3.9; our build plan, shape follows getAiPolicy'
       summary: The full trace of a decision
       description: 'Evidence and provenance, candidates and rules, model and runtime, governance and approvals,
@@ -9417,7 +9549,7 @@ paths:
 
         
 
-        **Order.** Newest first, by `raisedAt` descending, then by `id`.'
+        **Order.** Newest first, by `raisedAt` descending, then by `id`. Where `raisedAt` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - monitoring
       x-ticvai-permission: AI_USE
@@ -9573,7 +9705,7 @@ paths:
 
         
 
-        **Order.** Newest first, by `openedAt` descending, then by `id`.'
+        **Order.** Newest first, by `openedAt` descending, then by `id`. Where `openedAt` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - monitoring
       x-ticvai-permission: AI_USE
@@ -9869,7 +10001,7 @@ paths:
 
         
 
-        **Order.** Newest first, by `updatedAt` descending, then by `id`.'
+        **Order.** Newest first, by `updatedAt` descending, then by `id`. Where `updatedAt` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - monitoring
       x-ticvai-permission: AI_USE
@@ -10196,6 +10328,10 @@ paths:
       operationId: suggestGuidedChoice
       x-ticvai-consumed-by:
         - "P13 CMS-101 Help Me Choose"
+      x-ticvai-read-via:
+      - query: catalogue#productEligibilityRuleRecords
+        route: service
+        for: 'what its text calls "ProductEligibilityRule.requiredCertificationCode": catalogue.product_eligibility_rule, Catalogue''s data (CHG-R10GEN-001)'
       x-ticvai-agreed: '29 September: AI system design 3.11 (Help me choose, decided 29 September); shape follows
         proposeVenueLabels'
       summary: Suggest a Help me choose set-up from the venue's catalogue
@@ -10401,6 +10537,10 @@ paths:
         - "P08 BO-927 AI Staffing Requirement Forecast"
         - "P09 ADM-489 AI Configuration Readiness Center"
         - "P16 ANL-071 AI Maturity & Learning"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: AiVenueSettings.averageSpend (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-agreed: '29 September: AI functions review (baseline then learn), packageFindings 7; shape follows getAiPolicy'
       summary: The venue AI profile the baselines stand on
       description: '**What every data-driven answer stands on before the venue has history** (29 September, AI functions
@@ -10438,6 +10578,10 @@ paths:
         - "P09 ADM-471 Venue & Business Model Discovery"
         - "P09 ADM-489 AI Configuration Readiness Center"
         - "P16 ANL-071 AI Maturity & Learning"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: AiVenueSettings.averageSpend (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-agreed: '29 September: AI functions review (baseline then learn), venue AI profile at onboarding; shape
         follows setForecastDefinition'
       summary: Set the venue AI profile
@@ -10742,7 +10886,7 @@ paths:
 
         
 
-        **Order.** Newest first, by `startedAt` descending, then by `id`.'
+        **Order.** Newest first, by `startedAt` descending, then by `id`. Where `startedAt` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - models
       x-ticvai-permission: AI_USE

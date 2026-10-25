@@ -735,7 +735,7 @@ paths:
             rather than rolled back** — three thousand products half-created is a state somebody has to
             see to repair.
 
-            '
+             Also refused when the catalogue import job is `committing`, `failed` or `parsing`; states/catalogue-import-job.yaml moves this call only from `previewReady`. (r10 default ruling, CHG-R10GEN-005)'
           content:
             application/problem+json:
               schema:
@@ -1052,6 +1052,10 @@ paths:
         type: integer
     post:
       operationId: restoreProductVersion
+      x-ticvai-read-via:
+      - query: assets#mediaAssetRecords
+        route: service
+        for: 'what its text calls "MediaAsset": assets.media_asset, VenueOps''s data (CHG-R10GEN-001)'
       x-ticvai-writes:
       - table: catalogue.product_version
         for: 'a version per committed change, unless content_hash is unchanged, as updateProduct defines (ADAM CR-214; CHG-R10CAT-006)'
@@ -1648,6 +1652,10 @@ paths:
       operationId: cloneProduct
       x-ticvai-consumed-by:
         - "P08 BO-008 Product Detail & Variants"
+      x-ticvai-read-via:
+      - query: assets#mediaAssetRecords
+        route: service
+        for: 'what its text calls "MediaAsset": assets.media_asset, VenueOps''s data (CHG-R10GEN-001)'
       summary: Copy a product as a new draft
       description: '1.1.47 and 1.1.48. `copyPriceList` and `cloneSeatMap` are the precedents and **the
         product equivalent did not exist**, so a seasonal variant was built by hand each year.
@@ -1716,6 +1724,12 @@ paths:
       - query: assets#mediaAssetRecords
         route: service
         for: 'a guest read''s ProductMedia url and thumbnailUrl: the asset''s stable CDN address when it is public and ready (assets.media_asset), Assets'' data, in operations (ADAM CR-221, option A; CHG-R10CAT-014)'
+      - query: white-label#guidedChoiceRecords
+        route: service
+        for: 'what its text calls "GuidedChoice": whitelabel.guided_choice, WhiteLabel''s data (CHG-R10GEN-001)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: body.fromPrice (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
       # or staff token is still accepted. `{}` makes the credential optional.
       security:
@@ -1859,13 +1873,17 @@ paths:
       operationId: listDonationCampaigns
       x-ticvai-consumed-by:
         - "P08 BO-1190 Donation Campaigns"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: DonationCampaign.fixedAmounts, DonationCampaign.maxAmount, DonationCampaign.minAmount, DonationCampaign.raisedTotal (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
       - staff
       summary: Campaigns a guest can give to
       description: '1.1.128–1.1.133. **Multiple campaigns may run at once and a single transaction may
         give to several** (1.1.131), which is why a donation is a line and not a flag on the order.
 
-        '
+         **Order.** Sorted by `name` ascending, then by `id`. (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - catalogue
       x-ticvai-permission: PRODUCT_VIEW
@@ -1892,6 +1910,9 @@ paths:
       - query: finance#accountRecords
         route: in-process
         for: 'its read of ledger.account, Ledger''s data (CHG-MOD-001)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: DonationCampaign.fixedAmounts, DonationCampaign.maxAmount, DonationCampaign.minAmount, DonationCampaign.raisedTotal (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
       - staff
       summary: Create a campaign
@@ -1941,6 +1962,10 @@ paths:
       operationId: updateDonationCampaign
       x-ticvai-consumed-by:
         - "P08 BO-1190 Donation Campaigns"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: DonationCampaign.fixedAmounts, DonationCampaign.maxAmount, DonationCampaign.minAmount, DonationCampaign.raisedTotal and 3 more (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
       - staff
       summary: Amend or close a campaign
@@ -2117,6 +2142,10 @@ paths:
       operationId: offerWaitlistCapacity
       x-ticvai-consumed-by:
         - "P08 BO-017 Capacity Management"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'what its text calls "VenueSettings.catalogue": platform.venue_settings, Tenancy''s data (CHG-R10GEN-001)'
       x-ticvai-audience:
       - staff
       summary: Tell a waiting guest that capacity appeared
@@ -2210,6 +2239,9 @@ paths:
       - query: assets#mediaAssetRecords
         route: service
         for: 'a guest read''s ProductMedia url and thumbnailUrl: the asset''s stable CDN address when it is public and ready (assets.media_asset), Assets'' data, in operations (ADAM CR-221, option A; CHG-R10CAT-014)'
+      - query: white-label#guidedChoiceRecords
+        route: service
+        for: 'what its text calls "GuidedChoice": whitelabel.guided_choice, WhiteLabel''s data (CHG-R10GEN-001)'
       # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
       # or staff token is still accepted. `{}` makes the credential optional.
       security:
@@ -2376,6 +2408,9 @@ paths:
       - query: white-label#bookingFlowRecords
         route: service
         for: 'its read of whitelabel.booking_flow, WhiteLabel''s data (CHG-MOD-001)'
+      - query: assets#mediaAssetRecords
+        route: service
+        for: 'what its text calls "MediaAsset": assets.media_asset, VenueOps''s data (CHG-R10GEN-001)'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: M17-04 (MoM 17 September): partners never create products, prices
@@ -2595,6 +2630,10 @@ paths:
         - "P01 WEB-031 My Reservations"
         - "P02 GST-072 Share & Group Booking"
         - "P08 BO-011 Packages & Bundles"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: GroupPackageDefinition.unitPrice (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
       # or staff token is still accepted. `{}` makes the credential optional.
       security:
@@ -2635,6 +2674,10 @@ paths:
       operationId: setGroupPackageDefinition
       x-ticvai-consumed-by:
         - "P08 BO-011 Packages & Bundles"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: GroupPackageDefinition.unitPrice (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       summary: Define a school-trip format or party package
       description: '**Design gap, 23 September.** The kids club sells school trips (half-day, full-day,
         curriculum day, priced per pupil) and birthday parties (Explorer to Exclusive hire, priced per package,
@@ -2688,6 +2731,10 @@ paths:
         - "P01 WEB-031 My Reservations"
         - "P02 GST-072 Share & Group Booking"
         - "P08 BO-268 Group Package & Experience Builder"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: GroupPackageDefinition.unitPrice (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       description: '**Order.** Sorted by `id` descending (a UUIDv7, so newest first).'
       # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
       # or staff token is still accepted. `{}` makes the credential optional.
@@ -2853,6 +2900,9 @@ paths:
       - query: white-label#bookingFlowRecords
         route: service
         for: 'its read of whitelabel.booking_flow, WhiteLabel''s data (CHG-MOD-001)'
+      - query: assets#mediaAssetRecords
+        route: service
+        for: 'what its text calls "MediaAsset": assets.media_asset, VenueOps''s data (CHG-R10GEN-001)'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: M17-04 (MoM 17 September): partners never create products, prices
@@ -2952,6 +3002,10 @@ paths:
         - "P08 BO-007 Product Directory"
         - "P08 BO-008 Product Detail & Variants"
         - "P08 BO-012 Membership Products"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: VariantDimension.priceDelta (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: A product's attribute axes
@@ -2986,6 +3040,10 @@ paths:
         - "P08 BO-007 Product Directory"
         - "P08 BO-008 Product Detail & Variants"
         - "P08 BO-012 Membership Products"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'what its text calls "VenueSettings.catalogue": platform.venue_settings, Tenancy''s data (CHG-R10GEN-001)'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: M17-04 (MoM 17 September): partners never create products, prices
@@ -3099,6 +3157,10 @@ paths:
         - "P08 BO-012 Membership Products"
         - "P08 BO-048 Retail Products"
         - "P10 PTR-006 Product Catalog (B2B Pricing)"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: ProductVariant.listPrice (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
       # or staff token is still accepted. `{}` makes the credential optional.
       security:
@@ -3129,6 +3191,8 @@ paths:
         for a visitor, the `channel` parameter); null where no price list prices the variant on that channel.
 
         **Order.** Sorted by `name` ascending, then by `id`.
+
+        Where `name` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)
       tags:
       - product
       x-ticvai-permission: PRODUCT_VIEW
@@ -3188,6 +3252,10 @@ paths:
       operationId: updateProductVariant
       x-ticvai-consumed-by:
         - "P08 BO-008 Product Detail & Variants"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: ProductVariant.listPrice (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
       - staff
       summary: Describe a variant
@@ -3268,7 +3336,7 @@ paths:
         - "P08 BO-009 Pricing Rules"
         - "P08 BO-291 Membership Commercial, Pricing & Channel Association"
         - "P10 PTR-006 Product Catalog (B2B Pricing)"
-      description: '**Order.** Soonest first, by `validFrom` ascending, then by `id`.'
+      description: '**Order.** Soonest first, by `validFrom` ascending, then by `id`. Where `validFrom` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)'
       x-ticvai-api-scope: ticketing.read
       x-ticvai-audience:
       - staff
@@ -3372,6 +3440,10 @@ paths:
         - "P08 BO-014 Catalogue Publishing"
         - "P08 BO-601 Product, Pricing & Sales Channel Setup"
         - "P10 PTR-006 Product Catalog (B2B Pricing)"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: Price.amount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       description: '**Order.** Sorted by `id` descending (a UUIDv7, so newest first).'
       x-ticvai-api-scope: ticketing.read
       x-ticvai-audience:
@@ -3776,7 +3848,7 @@ paths:
         - "P08 BO-013 Channel & Distribution"
         - "P08 BO-017 Capacity Management"
         - "P10 PTR-005 Inventory & Allocation View"
-      description: '**Order.** Sorted by `name` ascending, then by `id`.'
+      description: '**Order.** Sorted by `name` ascending, then by `id`. Where `name` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)'
       x-ticvai-api-scope: ticketing.read
       x-ticvai-audience:
       - staff
@@ -5077,6 +5149,9 @@ paths:
       - query: access#entitlementRecords
         route: service
         for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
+      - query: assets#mediaAssetRecords
+        route: service
+        for: 'what its text calls "MediaAsset": assets.media_asset, VenueOps''s data (CHG-R10GEN-001)'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: M17-04 (MoM 17 September): partners never create products, prices
@@ -5202,7 +5277,7 @@ paths:
       description: 'Partners and distributors use their own SKUs. Mapping them here means an inbound order
         can be matched without asking a partner to change their catalogue.
 
-        '
+         **Order.** Sorted by `code` ascending, then by `id`. (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - product
       x-ticvai-permission: PRODUCT_VIEW
@@ -5304,6 +5379,10 @@ paths:
         - "P08 BO-007 Product Directory"
         - "P08 BO-012 Membership Products"
         - "P10 PTR-006 Product Catalog (B2B Pricing)"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: ProductVariant.listPrice (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-api-scope: ticketing.read
       x-ticvai-audience:
       - staff
@@ -5888,6 +5967,12 @@ paths:
       - query: identity#verifySupervisorStepUp
         route: in-process
         for: 'the PIN step-up in `supervisorStepUp` is checked by Identity, never by reading identity.* here (CHG-CRD-004, ADAM CR-078); same deployable (commerce): the C# query interface Identity implements, in the caller''s transaction (ADR-0055 rule 2)'
+      - query: access#entitlementRecords
+        route: service
+        for: 'what its text calls "access.entitlement": access.entitlement, Access''s data (CHG-R10GEN-001)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: PerformanceCancellationResult.refundExposure (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-step-up-reason: Cancels a performance and queues refunds to every holder; a supervisor signs it in place (proposed by the coordinator, client to confirm, audit R144).
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
@@ -6036,6 +6121,10 @@ paths:
         - "P08 BO-1192 Entitlement Templates"
         - "P08 BO-288 Membership Entitlement & Admission Benefit Builder"
         - "P08 BO-289 Membership Usage, Visit & Consumption Rules"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: EntitlementTemplate.includedValue (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -6044,7 +6133,7 @@ paths:
         transferability. Separate from the product, because several products may grant the same right
         at different prices.
 
-        '
+         **Order.** Sorted by `name` ascending, then by `id`. (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - entitlement
       x-ticvai-permission: PRODUCT_VIEW
@@ -8243,7 +8332,7 @@ paths:
         times TICVAI opens sales, closes sales, suspends availability, releases allocation (ADM-262 rules) or
         switches the applicable rule; the window never changes the product''s own validity.
 
-        **Order.** Sorted by `product` ascending, then by `channelId`.'
+        **Order.** Sorted by `product` ascending, then by `channelId`. Where `product` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)'
       tags:
         - drafted
       x-ticvai-permission: PRODUCT_VIEW
@@ -8325,7 +8414,7 @@ paths:
         -> eligible / not eligible with explanation) is a button on ADM-264 evaluated by the same rule engine;
         eligibility is checked before a product is purchased; AI flags contradictory rules.
 
-        **Order.** Sorted by `product` ascending, then by `ruleId`.'
+        **Order.** Sorted by `product` ascending, then by `ruleId`. Where `product` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)'
       tags:
         - drafted
       x-ticvai-permission: PRODUCT_VIEW
@@ -9013,7 +9102,7 @@ paths:
         the approval threshold (10% of event capacity by default (decided 29 September, readiness close-out))
         needs Commercial Manager approval.
 
-        **Order.** Sorted by `product` ascending.'
+        **Order.** Sorted by `product` ascending. Where `product` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)'
       tags:
         - drafted
       x-ticvai-permission: PRODUCT_VIEW
@@ -9063,6 +9152,10 @@ paths:
       operationId: listChannelExceptionIncident
       x-ticvai-consumed-by:
         - "P08 ADM-273 Channel Exceptions, Incidents & Recovery"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: ChannelExceptionsIncidentsRecoveryView.businessImpact (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Sales_Channel_Management_Reference.pdf'' pp.27-29 (Exception Categories,
@@ -9081,7 +9174,7 @@ paths:
         Escalate and Assign Incident are buttons on ADM-273; technical details show only to technical users
         and sensitive data is masked.
 
-        **Order.** Newest first, by `timestamp` descending, then by `incidentId`.'
+        **Order.** Newest first, by `timestamp` descending, then by `incidentId`. Where `timestamp` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)'
       tags:
         - drafted
       x-ticvai-permission: PRODUCT_VIEW
@@ -9526,6 +9619,10 @@ paths:
       x-ticvai-consumed-by:
         - "P08 ADM-268 Channel Operations Command Center"
         - "P08 ADM-277 AI Channel Optimization & Intelligence Center"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: AiChannelOptimizationIntelligenceCenterView.revenueImpact (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Sales_Channel_Management_Reference.pdf'' pp.33-35 (AI Analysis,
@@ -11367,6 +11464,10 @@ paths:
       operationId: setTaxRuleTreatment
       x-ticvai-consumed-by:
         - "P08 ADM-070 Tax Rule & Treatment Builder"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: TaxRuleTreatmentBuilderInput.fixedAmount, TaxRuleTreatmentBuilderInput.fromAmount, TaxRuleTreatmentBuilderView.fixedAmount, TaxRuleTreatmentBuilderView.fromAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-body-key: [taxRuleId]
       x-ticvai-body-key-note: 'Keyed by the body''s `taxRuleId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per tax rule within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body. **Required in fact**: a body without `taxRuleId` is refused `400 validation`; the schema leaves it optional only so a client built at r1 still validates.'
       x-ticvai-audience:
@@ -11418,6 +11519,13 @@ paths:
       operationId: listFeeSurcharge
       x-ticvai-consumed-by:
         - "P08 ADM-071 Fee & Surcharge Library"
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it answers: FeeSurchargeLibraryView.amount, FeeSurchargeLibraryView.fromOrderValue (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: FeeSurchargeLibraryView.amount, FeeSurchargeLibraryView.fromOrderValue (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.43-44 (10.3.4 Fee
@@ -11506,6 +11614,13 @@ paths:
       operationId: setFeeApplicabilityCharging
       x-ticvai-consumed-by:
         - "P08 ADM-072 Fee Applicability & Charging Rule Builder"
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it accepts or answers: FeeApplicabilityChargingRuleBuilderInput.orderValueMax, FeeApplicabilityChargingRuleBuilderInput.orderValueMin, FeeApplicabilityChargingRuleBuilderView.orderValueMax, FeeApplicabilityChargingRuleBuilderView.orderValueMin (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: FeeApplicabilityChargingRuleBuilderInput.orderValueMax, FeeApplicabilityChargingRuleBuilderInput.orderValueMin, FeeApplicabilityChargingRuleBuilderView.orderValueMax, FeeApplicabilityChargingRuleBuilderView.orderValueMin (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-body-key: [ruleId]
       x-ticvai-body-key-note: 'Keyed by the body''s `ruleId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per fee rule within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body. **Required in fact**: a body without `ruleId` is refused `400 validation`; the schema leaves it optional only so a client built at r1 still validates.'
       x-ticvai-audience:
@@ -11558,6 +11673,13 @@ paths:
       operationId: listFeeWaiverTax
       x-ticvai-consumed-by:
         - "P08 ADM-073 Fee Waiver, Tax Exemption & Exception Rules"
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it answers: FeeWaiverTaxExemptionExceptionRulesView.reductionAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: FeeWaiverTaxExemptionExceptionRulesView.reductionAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.46-47 (10.3.6 Exception
@@ -12495,7 +12617,7 @@ paths:
         Retry, Queue, Investigate, Rollback Target and Suspend Target are actions on a failed row on ADM-085;
         alerts flag a target still on an older version than production.
 
-        **Order.** Sorted by `targetName` ascending.'
+        **Order.** Sorted by `targetName` ascending. Where `targetName` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)'
       tags:
         - drafted
       x-ticvai-permission: PRODUCT_VIEW
@@ -12597,7 +12719,7 @@ paths:
         default (decided 29 September, readiness close-out); AI may recommend a rollback but never executes
         one.
 
-        **Order.** Newest first, by `timestamp` descending, then by `actionId`.'
+        **Order.** Newest first, by `timestamp` descending, then by `actionId`. Where `timestamp` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)'
       tags:
         - drafted
       x-ticvai-permission: PRODUCT_VIEW
@@ -12886,6 +13008,10 @@ paths:
   /seat-pricing-rules:
     get:
       operationId: listSeatPricingRules
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: SeatPricingRule.ceilingPrice, SeatPricingRule.floorPrice, SeatPricingRule.stepPrice (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
         - staff
       x-ticvai-read-routing: replica
@@ -12894,7 +13020,7 @@ paths:
         screen only lists strategies; nothing writes a seat pricing rule"; CHG-CSP-049). Filter by strategy, seat map or
         performance. **Ordered by priority, highest first, then `id`.**
 
-        '
+         Where `priority` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)'
       tags:
         - drafted
       x-ticvai-permission: PRODUCT_VIEW
@@ -12945,6 +13071,10 @@ paths:
         format: uuid
     put:
       operationId: setSeatPricingRule
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: SeatPricingRule.ceilingPrice, SeatPricingRule.floorPrice, SeatPricingRule.stepPrice (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
         - staff
       x-ticvai-config-scope: venue
@@ -13014,6 +13144,10 @@ paths:
         - "P08 ADM-088 Dynamic Pricing Strategy Command Center"
         - "P08 ADM-089 Dynamic Pricing Strategy Builder"
         - "P08 BO-1044 Dynamic Seat Pricing"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: DynamicPricingStrategyCommandCenterView.currentPrice (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.75-76 (KPI Cards,
@@ -13179,6 +13313,10 @@ paths:
       operationId: setDemandOccupancyAvailability
       x-ticvai-consumed-by:
         - "P08 ADM-090 Demand, Occupancy & Availability Rule Builder"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: DemandOccupancyAvailabilityRuleBuilderInput.amount, DemandOccupancyAvailabilityRuleBuilderView.amount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-body-key: [ruleId]
       x-ticvai-body-key-note: 'Keyed by the body''s `ruleId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per pricing rule within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body. **Required in fact**: a body without `ruleId` is refused `400 validation`; the schema leaves it optional only so a client built at r1 still validates.'
       x-ticvai-audience:
@@ -13232,6 +13370,10 @@ paths:
       operationId: setBookingVelocityTime
       x-ticvai-consumed-by:
         - "P08 ADM-091 Booking Velocity & Time-to-Event Rule Builder"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: BookingVelocityTimeToEventRuleBuilderInput.amount, BookingVelocityTimeToEventRuleBuilderView.amount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-body-key: [ruleId]
       x-ticvai-body-key-note: 'Keyed by the body''s `ruleId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per pricing rule within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body. **Required in fact**: a body without `ruleId` is refused `400 validation`; the schema leaves it optional only so a client built at r1 still validates.'
       x-ticvai-audience:
@@ -13402,7 +13544,7 @@ paths:
         B2B and partner (reseller/OTA contract) sales are excluded from dynamic adjustment (decided 29 September,
         readiness close-out).
 
-        **Order.** Sorted by `channel` ascending, then by `locationId`.'
+        **Order.** Sorted by `channel` ascending, then by `locationId`. Where `channel` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)'
       tags:
         - drafted
       x-ticvai-permission: PRODUCT_VIEW
@@ -13486,6 +13628,10 @@ paths:
       operationId: listDynamicPriceBand
       x-ticvai-consumed-by:
         - "P08 ADM-094 Dynamic Price Bands, Ladders & Adjustment Matrix"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: DynamicPriceBandsLaddersAdjustmentMatrixView.allowedEndpoints, DynamicPriceBandsLaddersAdjustmentMatrixView.basePrice, DynamicPriceBandsLaddersAdjustmentMatrixView.maximumPrice, DynamicPriceBandsLaddersAdjustmentMatrixView.minimumPrice and 2 more (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.84-86 (Price Ladder
@@ -13555,6 +13701,13 @@ paths:
       operationId: listDynamicPricingGuardrail
       x-ticvai-consumed-by:
         - "P08 ADM-095 Dynamic Pricing Guardrails & Commercial Protection"
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it answers: DynamicPricingGuardrailsCommercialProtectionView.absoluteMaximumPrice, DynamicPricingGuardrailsCommercialProtectionView.absoluteMinimumPrice, DynamicPricingGuardrailsCommercialProtectionView.minimumMargin (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: DynamicPricingGuardrailsCommercialProtectionView.absoluteMaximumPrice, DynamicPricingGuardrailsCommercialProtectionView.absoluteMinimumPrice, DynamicPricingGuardrailsCommercialProtectionView.minimumMargin (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.86-87 (Core Guardrails,
@@ -13625,6 +13778,13 @@ paths:
       operationId: listDynamicPricingAutomation
       x-ticvai-consumed-by:
         - "P08 ADM-096 Dynamic Pricing Automation Policy & Control"
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it answers: DynamicPricingAutomationPolicyControlView.overridePrice (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: DynamicPricingAutomationPolicyControlView.overridePrice (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.87-89 (Automation
@@ -13703,6 +13863,13 @@ paths:
       operationId: listRulePriorityConflict
       x-ticvai-consumed-by:
         - "P08 BO-441 Price Priority & Conflict Rules"
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it answers: RulePriorityConflictResolutionDynamicPricingTestConsView.basePrice, RulePriorityConflictResolutionDynamicPricingTestConsView.expectedPrice, RulePriorityConflictResolutionDynamicPricingTestConsView.finalPrice, RulePriorityConflictResolutionDynamicPricingTestConsView.ladderPrice and 1 more (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: RulePriorityConflictResolutionDynamicPricingTestConsView.basePrice, RulePriorityConflictResolutionDynamicPricingTestConsView.expectedPrice, RulePriorityConflictResolutionDynamicPricingTestConsView.finalPrice, RulePriorityConflictResolutionDynamicPricingTestConsView.ladderPrice and 1 more (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.89-91 (Example,
@@ -13795,6 +13962,13 @@ paths:
       operationId: setRulePriorityConflict
       x-ticvai-consumed-by:
         - "P08 BO-441 Price Priority & Conflict Rules"
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it accepts or answers: RulePriorityConflictResolutionDynamicPricingTestConsView.basePrice, RulePriorityConflictResolutionDynamicPricingTestConsView.expectedPrice, RulePriorityConflictResolutionDynamicPricingTestConsView.finalPrice, RulePriorityConflictResolutionDynamicPricingTestConsView.ladderPrice and 3 more (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: RulePriorityConflictResolutionDynamicPricingTestConsView.basePrice, RulePriorityConflictResolutionDynamicPricingTestConsView.expectedPrice, RulePriorityConflictResolutionDynamicPricingTestConsView.finalPrice, RulePriorityConflictResolutionDynamicPricingTestConsView.ladderPrice and 3 more (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-singleton: true
       x-ticvai-singleton-note: 'One set per venue, the caller''s venue: a PUT replaces the whole set, and an entry the body leaves out is removed. There is no key in the path.'
       x-ticvai-audience:
@@ -13868,6 +14042,10 @@ paths:
       operationId: listPricing
       x-ticvai-consumed-by:
         - "P08 ADM-098 AI Pricing Intelligence Command Center"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: AiPricingIntelligenceCommandCenterSummary.estimatedRevenueOpportunity, AiPricingIntelligenceCommandCenterView.currentPrice, AiPricingIntelligenceCommandCenterView.recommendedPrice, AiPricingIntelligenceCommandCenterView.revenueOpportunity (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.94-95 (10.6.1 AI
@@ -13990,7 +14168,7 @@ paths:
         line dropped. Read model over TICVAI''s own transactions (highest-confidence signals, no vendor involved);
         anomaly lines are advisory AI output.
 
-        **Order.** Sorted by `product` ascending.'
+        **Order.** Sorted by `product` ascending. Where `product` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)'
       tags:
         - drafted
       x-ticvai-permission: PRODUCT_VIEW
@@ -14282,6 +14460,10 @@ paths:
       operationId: listCompetitorPricingMarket
       x-ticvai-consumed-by:
         - "P08 ADM-102 Competitor Pricing & Market Position Intelligence"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: CompetitorPricingMarketPositionIntelligenceView.marketMedianPrice, CompetitorPricingMarketPositionIntelligenceView.memberPriceWherePubliclyAvailable, CompetitorPricingMarketPositionIntelligenceView.peakPrice, CompetitorPricingMarketPositionIntelligenceView.promotionalPrice and 3 more (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.100-102 (10.6.5
@@ -14393,7 +14575,7 @@ paths:
         signal contributions), not by adding percentages; transport and market signals are optional where data
         is available; the source name is data, so any provider the client licenses fits.
 
-        **Order.** Soonest first, by `periodStart` ascending, then by `signalId`.'
+        **Order.** Soonest first, by `periodStart` ascending, then by `signalId`. Where `periodStart` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)'
       tags:
         - drafted
       x-ticvai-permission: PRODUCT_VIEW
@@ -14727,6 +14909,10 @@ paths:
       operationId: listPricingRecommendationExplainability
       x-ticvai-consumed-by:
         - "P08 ADM-106 AI Pricing Recommendation & Explainability Center"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: AiPricingRecommendationExplainabilityCenterView.currentPrice, AiPricingRecommendationExplainabilityCenterView.expectedRevenueImpact, AiPricingRecommendationExplainabilityCenterView.recommendedPrice (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.107-108 (10.6.9
@@ -14853,6 +15039,13 @@ paths:
       operationId: listSignalDataQuality
       x-ticvai-consumed-by:
         - "P08 ADM-107 AI Signal Registry, Data Quality & Model Governance"
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it answers: AiSignalRegistryDataQualityModelGovernanceView.revenuePerformance (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: AiSignalRegistryDataQualityModelGovernanceView.revenuePerformance (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.108-110 (10.6.10
@@ -14948,6 +15141,10 @@ paths:
         - "P08 ADM-108 Revenue Optimization Command Center"
         - "P08 BO-1043 Revenue Command Center"
         - "P08 BO-1050 Revenue Analytics & Audit"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: RevenueOptimizationCommandCenterSummary.incrementalRevenueGenerated, RevenueOptimizationCommandCenterSummary.revenueAtRisk, RevenueOptimizationCommandCenterSummary.revenueOpportunity, RevenueOptimizationCommandCenterView.currentPrice and 4 more (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.114-115 (10.7.1
@@ -15113,6 +15310,10 @@ paths:
       operationId: listScenarioModelingWhat
       x-ticvai-consumed-by:
         - "P08 ADM-110 Scenario Modeling & What-If Analysis"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: ScenarioModelingWhatIfAnalysisView.averagePrice, ScenarioModelingWhatIfAnalysisView.competitorPrice, ScenarioModelingWhatIfAnalysisView.margin, ScenarioModelingWhatIfAnalysisView.price and 1 more (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.117-119 (10.7.3
@@ -15198,6 +15399,10 @@ paths:
       operationId: setPricingExperiment
       x-ticvai-consumed-by:
         - "P08 ADM-111 A/B Pricing Experiment Studio"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: ABPricingExperimentStudioInput.maximumPrice, ABPricingExperimentStudioInput.minimumPrice, ABPricingExperimentStudioInput.price, ABPricingExperimentStudioView.maximumPrice and 2 more (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-singleton: true
       x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
@@ -15336,6 +15541,10 @@ paths:
       operationId: listRecommendationReviewDecision
       x-ticvai-consumed-by:
         - "P08 ADM-113 AI Recommendation Review & Decision Queue"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: AiRecommendationReviewDecisionQueueView.currentPrice, AiRecommendationReviewDecisionQueueView.humanSelectedPrice, AiRecommendationReviewDecisionQueueView.recommendedPrice, AiRecommendationReviewDecisionQueueView.revenueOpportunity and 1 more (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.122-123 (10.7.6
@@ -15359,7 +15568,7 @@ paths:
         createLiveDynamicPrice; the outcome feeds listLearningModelPerformance (decided 29 September, readiness
         close-out).
 
-        **Order.** Soonest first, by `scheduledFor` ascending, then by `recommendationId`.'
+        **Order.** Soonest first, by `scheduledFor` ascending, then by `recommendationId`. Where `scheduledFor` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)'
       tags:
         - drafted
       x-ticvai-permission: PRODUCT_VIEW
@@ -15520,6 +15729,10 @@ paths:
       operationId: createLiveDynamicPrice
       x-ticvai-consumed-by:
         - "P08 ADM-115 Live Dynamic Price Execution & Deployment Monitor"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: LiveDynamicPriceExecutionDeploymentMonitorInput.newPrice, LiveDynamicPriceExecutionDeploymentMonitorView.newPrice, LiveDynamicPriceExecutionDeploymentMonitorView.previousPrice, LiveDynamicPriceExecutionDeploymentMonitorView.price (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.125-126 (10.7.8
@@ -15720,7 +15933,7 @@ paths:
         suggestions need governance and never silently change production logic; override analysis is for learning,
         not employee scoring (pack p.130); model governance stays with the registry in listSignalDataQuality.
 
-        **Order.** Sorted by `product` ascending.'
+        **Order.** Sorted by `product` ascending. Where `product` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)'
       tags:
         - drafted
       x-ticvai-permission: PRODUCT_VIEW
@@ -15816,7 +16029,7 @@ paths:
         Shipping one event shape and configuring around it is how a platform ends up with a festival
         modelled as 400 performances.
 
-        '
+         **Order.** Sorted by `name` ascending, then by `id`. (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - events
       x-ticvai-permission: EVENT_CONFIGURE
@@ -16133,6 +16346,10 @@ paths:
       operationId: getEntitlementTemplate
       x-ticvai-consumed-by:
         - "P08 BO-1192 Entitlement Templates"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: EntitlementTemplate.includedValue (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -16167,6 +16384,10 @@ paths:
       operationId: updateEntitlementTemplate
       x-ticvai-consumed-by:
         - "P08 BO-1192 Entitlement Templates"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: EntitlementTemplate.includedValue (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
       - staff
       x-ticvai-config-scope: venue
@@ -16230,6 +16451,10 @@ paths:
       operationId: archiveEntitlementTemplate
       x-ticvai-consumed-by:
         - "P08 BO-1192 Entitlement Templates"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: EntitlementTemplate.includedValue (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
       - staff
       summary: Archive an entitlement template
@@ -16446,7 +16671,7 @@ paths:
         navigable**, and they are usually the same physical room described for two purposes.
         `venue-map` owns the geometry; this owns whether it can be used, by whom, and when.
 
-        '
+         **Order.** Sorted by `name` ascending, then by `id`. (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - events
       x-ticvai-permission: EVENT_CONFIGURE
@@ -16832,7 +17057,7 @@ paths:
         session is a Performance, and a template is how a day becomes performances. Formerly
         `listSessionTemplates` on `/session-templates`.
 
-        '
+         **Order.** Sorted by `code` ascending, then by `id`. (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - events
       x-ticvai-permission: PERFORMANCE_CONFIGURE
@@ -16901,6 +17126,13 @@ paths:
       operationId: setPrepaidMinutePackage
       x-ticvai-consumed-by:
         - "P08 BO-722 Prepaid Minute Package & Customer Balance Configuration"
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it accepts or answers: PrepaidMinutePackage.price (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: PrepaidMinutePackage.price (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       summary: Time bought in advance and drawn down per visit
       description: 'Event board 8.2. **Minutes are a credit type, and `wallet` already models those** —
         what is here is the product that sells them and the rule for how they are consumed: rounding,
@@ -17641,6 +17873,10 @@ paths:
       operationId: estimateEventResourceCost
       x-ticvai-consumed-by:
         - "P08 BO-920 Event Resource Cost Estimator"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: EventResourceCostEstimate.total, EventResourceCostEstimate.totalsByKind, EventResourceCostEstimate.unitCost (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: VM close-out; pack labels on BO-920 (Venue cost, Equipment cost, External resource cost); shape follows getEventResourcePlan, one line per requirement'
@@ -17830,6 +18066,10 @@ paths:
       x-ticvai-consumed-by:
         - "P08 ADM-078 Pricing Governance Command Center"
         - "P08 ADM-079 Pricing Change Request & Workspace"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: PricingChangeRequestWorkspaceView.currentAmount, PricingChangeRequestWorkspaceView.differenceAmount, PricingChangeRequestWorkspaceView.proposedAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: readiness close-out (QB: approve is an action on the ADM-078 change queue); pack ''Pricing___Revenue_Management_Reference.pdf'' pp.57-58 and p.65; MoM 1 Sep 2026 §4.6 (approval workflow before publishing); shape follows approveReviewDecision'
@@ -17914,6 +18154,10 @@ paths:
       x-ticvai-consumed-by:
         - "P08 ADM-106 AI Pricing Recommendation & Explainability Center"
         - "P08 ADM-113 AI Recommendation Review & Decision Queue"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: PricingRecommendationDecision.humanSelectedPrice, PricingRecommendationDecision.recommendedPrice, PricingRecommendationDecisionInput.humanSelectedPrice (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: readiness close-out (QB: Accept / Modify / Reject are actions, the row carries the decision record); pack ''Pricing___Revenue_Management_Reference.pdf'' pp.94, 107-112 (an LLM alone must not set prices; guardrails before execution); MoM 1 Sep 2026 §4.8; shape follows approveReviewDecision'
@@ -18567,6 +18811,10 @@ paths:
       operationId: updateChannelIncident
       x-ticvai-consumed-by:
         - "P08 ADM-273 Channel Exceptions, Incidents & Recovery"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: ChannelIncident.businessImpact (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       summary: Own, investigate, resolve or close a channel incident
       description: '**The person''s moves on a channel incident** (29 September, writers pass). Sets the owner,
         the SLA due time and the status of a `catalogue.channel_incident` along `states/channel-incident.yaml`:
@@ -18654,6 +18902,10 @@ paths:
       operationId: retryChannelIncident
       x-ticvai-consumed-by:
         - "P08 ADM-273 Channel Exceptions, Incidents & Recovery"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: ChannelIncident.businessImpact (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       summary: Retry the failed channel call behind an incident
       description: '**Retry, as a call** (29 September, writers pass). Moves an `open` or `investigating`
         `catalogue.channel_incident` to `retrying`, increments `retryCount` and queues the failed call again with
@@ -18768,6 +19020,10 @@ paths:
       operationId: getPackagePricingDefinition
       x-ticvai-consumed-by:
         - "P08 BO-011 Packages & Bundles"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: PackagePricing.packagePrice (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: The package pricing definition as saved
@@ -18795,6 +19051,10 @@ paths:
       x-ticvai-consumed-by:
         - "P08 ADM-053 Package, Bundle & Add-On Pricing"
         - "P08 BO-011 Packages & Bundles"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: PackagePricing.packagePrice (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-body-key: [productId]
       x-ticvai-body-key-note: 'Keyed by the body''s `productId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per package product within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body.'
       summary: Set how a package, bundle or add-on is priced
@@ -18926,6 +19186,13 @@ paths:
       operationId: setFeeDefinition
       x-ticvai-consumed-by:
         - "P08 ADM-071 Fee & Surcharge Library"
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it accepts or answers: PricingFee.amount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: PricingFee.amount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-names-for-context: [catalogue.fee_rule, orders.order_fee, payments.fee_rule]
       summary: Create or update a fee or surcharge
       description: '**The fee and surcharge library** (29 September, writers pass). Creates or updates a
@@ -19129,6 +19396,13 @@ paths:
         - "P08 ADM-095 Dynamic Pricing Guardrails & Commercial Protection"
         - "P08 ADM-096 Dynamic Pricing Automation Policy & Control"
         - "P08 ADM-114 Automation Policy & Autonomous Pricing Orchestrator"
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it accepts or answers: DynamicPricingControl.absoluteMaximumPrice, DynamicPricingControl.absoluteMinimumPrice (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: DynamicPricingControl.absoluteMaximumPrice, DynamicPricingControl.absoluteMinimumPrice (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-body-key: [scopeId]
       x-ticvai-body-key-note: 'Keyed by the body''s `scopeId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per scope node within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body. **Required in fact**: a body without `scopeId` is refused `400 validation`; the schema leaves it optional only so a client built at r1 still validates.'
       summary: Set the guardrails and automation level of dynamic pricing at one scope
@@ -19202,6 +19476,10 @@ paths:
       operationId: setPriceLadderMatrix
       x-ticvai-consumed-by:
         - "P08 ADM-094 Dynamic Price Bands, Ladders & Adjustment Matrix"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: PriceLadder.basePrice, PriceLadder.maximumPrice, PriceLadder.minimumPrice, PriceLadder.price and 1 more (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       summary: Set a strategy's price ladder
       description: '**The bands a strategy''s price moves between, and how fast** (29 September, writers pass).
         Creates or replaces the strategy''s `catalogue.price_ladder`: the adjustment model, the bands (ascending),
@@ -19564,6 +19842,8 @@ paths:
 
         Wireframe of 9 October (products module): the new Tags screen of the Setup Library, the tag picker on B1-S04
         Identity & Classification, the tag line on B11-S04 Promotion & Discount Link.
+
+        Where `displayOrder` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)
       tags:
       - catalogue
       x-ticvai-permission: PRODUCT_VIEW

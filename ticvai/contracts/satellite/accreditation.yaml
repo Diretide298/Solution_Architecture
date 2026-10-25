@@ -142,7 +142,7 @@ paths:
 
         `isTemplate=true` lists the reusable templates `cloneAccreditationProgramme` starts from (12.1.56).
 
-        '
+         **Order.** Sorted by `name` ascending, then by `id`. (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - accreditation
       x-ticvai-permission: ACCREDITATION_VIEW
@@ -258,6 +258,8 @@ paths:
         - "P08 BO-640 Rejection & Resubmission Management"
         - "P11 ACC-006 Reviewer Queue"
       summary: Applications, by state and programme
+      description: >-
+        **Order.** Sorted by `id` descending (a UUIDv7, so newest first). (r10 default ruling, CHG-R10GEN-004)
       tags:
       - accreditation
       x-ticvai-permission: ACCREDITATION_VIEW
@@ -456,6 +458,8 @@ paths:
         - "P08 BO-684 Accreditation Executive Dashboard"
         - "P08 BO-685 Accreditation Status & Portfolio Reporting"
       summary: Everybody accredited, and what state they are in
+      description: >-
+        **Order.** Sorted by `id` descending (a UUIDv7, so newest first). (r10 default ruling, CHG-R10GEN-004)
       tags:
       - accreditation
       x-ticvai-permission: ACCREDITATION_VIEW
@@ -583,7 +587,7 @@ paths:
 
         
 
-        **Order.** Newest first, by `submittedAt` descending, then by `id`; with `status=submitted` (the verification queue) oldest first, by `submittedAt` ascending.'
+        **Order.** Newest first, by `submittedAt` descending, then by `id`; with `status=submitted` (the verification queue) oldest first, by `submittedAt` ascending. Where `submittedAt` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - accreditation
       x-ticvai-permission: ACCREDITATION_VIEW
@@ -769,7 +773,7 @@ paths:
         Uses `marketing-crm`''s identity resolution rules rather than a second matcher, because two
         matchers means two answers to whether two people are the same.
 
-        '
+         **Order.** Sorted by `id` descending (a UUIDv7, so newest first). (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - accreditation
       x-ticvai-permission: ACCREDITATION_MANAGE
@@ -801,6 +805,8 @@ paths:
         - "P08 BO-653 Credential Registry & Credential History"
         - "P11 ACC-008 Credential Register"
       summary: Badges and digital credentials issued
+      description: >-
+        **Order.** Sorted by `id` descending (a UUIDv7, so newest first). (r10 default ruling, CHG-R10GEN-004)
       tags:
       - accreditation
       x-ticvai-permission: ACCREDITATION_VIEW
@@ -956,7 +962,7 @@ paths:
         security officer is meant to check at a glance are all design decisions with operational
         consequences.
 
-        '
+         **Order.** Sorted by `code` ascending, then by `id`. (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - accreditation
       x-ticvai-permission: ACCREDITATION_CONFIGURE
@@ -1025,7 +1031,7 @@ paths:
         to know which ones landed.** Reprinting the whole run wastes stock and produces duplicates
         that then have to be destroyed and accounted for.
 
-        '
+         **Order.** Sorted by `id` descending (a UUIDv7, so newest first). (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - accreditation
       x-ticvai-permission: ACCREDITATION_ISSUE
@@ -1093,7 +1099,7 @@ paths:
         photographers each given zones by hand is fifty chances to give somebody the pitch; one
         *Photographer* profile changed once is fifty people updated.
 
-        '
+         **Order.** Sorted by `name` ascending, then by `id`. (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - accreditation
       x-ticvai-permission: ACCREDITATION_VIEW
@@ -1589,7 +1595,7 @@ paths:
 
         Chained the same way `approvals` chains its decision records, and verified on read.
 
-        '
+         **Order.** Sorted by `id` descending (a UUIDv7, so newest first). (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - accreditation
       x-ticvai-permission: ACCREDITATION_VIEW
@@ -2265,7 +2271,7 @@ paths:
 
         
 
-        **Order.** Newest first, by `submittedAt` descending, then by `id`.'
+        **Order.** Newest first, by `submittedAt` descending, then by `id`. Where `submittedAt` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - accreditation
       x-ticvai-permission: ACCREDITATION_APPLY
@@ -2320,7 +2326,7 @@ paths:
 
         
 
-        **Order.** Newest first, by `issuedAt` descending, then by `id`.'
+        **Order.** Newest first, by `issuedAt` descending, then by `id`. Where `issuedAt` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - accreditation
       x-ticvai-permission: ACCREDITATION_APPLY
@@ -2686,7 +2692,7 @@ paths:
 
         
 
-        **Order.** Newest first, by `requestedAt` descending, then by `id`.'
+        **Order.** Newest first, by `requestedAt` descending, then by `id`. Where `requestedAt` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - accreditation
       x-ticvai-permission: ACCREDITATION_MANAGE

@@ -238,6 +238,8 @@ paths:
         - "P08 BO-092 Venue Maps"
         - "P08 BO-1061 Platform Command Center"
       summary: Maps for this venue
+      description: >-
+        **Order.** Sorted by `name` ascending, then by `id`. (r10 default ruling, CHG-R10GEN-004)
       tags: [venueMap]
       x-ticvai-permission: VENUE_MAP_VIEW
       x-ticvai-audience: [staff]
@@ -1697,6 +1699,9 @@ paths:
       - query: tenancy#activeVenues
         route: service
         for: 'what its plans call "active venues" (VisitPlan.availableAtVenueIds): platform.scope, Tenancy''s data (r8 integration, CHG-R8INT-014)'
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: VisitPlan.total (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       security:
       - guestAuth: []
       x-ticvai-agreed: 'r8 walk of ticket 28694: GST-059 opened cold, from the home screen or a notification, had no planId; shape follows listVisitPlanAlternatives (paged) and getVisitPlan (owner rule)'
@@ -1712,6 +1717,8 @@ paths:
 
         `date` keeps the plans whose current version has a day on that date (`VisitPlan.days[].date`).
         `status` keeps one status. With neither, every plan of the caller. An empty page is a 200, not a 404.
+
+        Where `updatedAt` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)
       tags: [visitPlan]
       x-ticvai-permission: null
       x-ticvai-guest-callable: true
@@ -1770,6 +1777,9 @@ paths:
       - query: tenancy#activeVenues
         route: service
         for: 'what its text calls "active venues": platform.scope, Tenancy''s data (CHG-RTE-001)'
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: VisitPlan.total, VisitPlanItem.pricePerGuest (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       security:
       - guestAuth: []
       x-ticvai-agreed: '29 September: MOB-6 and the Block A re-plan (the Plan tab is Block A, rules planner first, AI planner agent on top; supersedes rev 3 GAP-C3 and audits R187, R209); shape follows createCart (guest-owned, permission null)'
@@ -1897,6 +1907,13 @@ paths:
         - "P02 GST-053 Your Plan"
         - "P02 GST-054 AI Planner"
         - "P02 GST-059 Plan in Progress"
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: service
+        for: 'what its text calls "active venues": platform.scope, Tenancy''s data (CHG-R10GEN-001)'
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: VisitPlan.total, VisitPlanItem.pricePerGuest (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       security:
       - guestAuth: []
       x-ticvai-agreed: '29 September: MOB-6 (Plan tab Block A); shape follows getVenueMap (version query)'
@@ -1946,6 +1963,9 @@ paths:
       - query: tenancy#activeVenues
         route: service
         for: 'what its text calls "active venues": platform.scope, Tenancy''s data (CHG-RTE-001)'
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: VisitPlan.total, VisitPlanItem.pricePerGuest (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       security:
       - guestAuth: []
       x-ticvai-agreed: '29 September: MOB-6 (swap, remove, add and undo on GST-053); shape follows setVenuePoint (optimistic version)'
@@ -2085,6 +2105,8 @@ paths:
         `kind=meal` its dining points, food kiosks included.
 
         **Order.** Best first, by `matchedInterests` descending, then by `walkMinutes` ascending.
+
+        Where `walkMinutes` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)
       tags: [visitPlan]
       x-ticvai-permission: null
       x-ticvai-guest-callable: true

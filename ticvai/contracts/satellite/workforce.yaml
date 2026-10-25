@@ -467,6 +467,8 @@ paths:
         18.9.1. **Against the rota, not on its own.** A list of clock-ins says nothing; a list
         of clock-ins beside the assignments that expected them shows the no-shows, the late
         starts and the people who covered.
+
+        **Order.** Sorted by `id` descending (a UUIDv7, so newest first). (r10 default ruling, CHG-R10GEN-004)
       tags: [attendance]
       x-ticvai-permission: WORKFORCE_VIEW
       x-ticvai-scope-level: venue
@@ -652,6 +654,8 @@ paths:
         September, audit R129 (8)). An announcement is in the list when one of its `venueIds` is the
         caller's venue, or it targets a region or the tenant that contains that venue; department
         and role targeting then narrow it within the venue.
+
+        **Order.** Sorted by `title` ascending, then by `id`. (r10 default ruling, CHG-R10GEN-004)
       tags: [announcements]
       x-ticvai-permission: WORKFORCE_VIEW
       x-ticvai-scope-level: venue
@@ -820,7 +824,7 @@ paths:
       summary: Training completed and what is expiring
       description: '**Drafted 4 September as a stub.** EMP-041 *Training* sat on `semanticSearch` alone, which made it identical to the knowledge base. **The F&B `fireCourse` / `holdCourse` / `setCourseRules` operations are meal courses, not training** - the name collision is why this gap survived a search. The screen that needs it existed and this operation did not, so the screen shared a generic set with its neighbours and read as a duplicate of them. **The shape below is a proposal**: the fields are the minimum the screen has to show, and the request and response want confirming before anything is built against them.
 
-        '
+         **Order.** Sorted by `id` descending (a UUIDv7, so newest first). (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - workforce
       x-ticvai-permission: WORKFORCE_VIEW
@@ -851,7 +855,7 @@ paths:
       summary: Swap requests and their state
       description: '**Drafted 4 September as a stub.** `requestShiftSwap` existed and nothing could read the requests back, so EMP-023 shared the roster''s operations. **A request nobody can list is a request nobody can approve.** Returns the existing `ShiftSwap` schema: a first draft of this added a `ShiftSwapRequest` of its own and derived a second table for the same rows, which is the modelling mistake this package exists to make visible. The screen that needs it existed and this operation did not, so the screen shared a generic set with its neighbours and read as a duplicate of them. **The shape below is a proposal**: the fields are the minimum the screen has to show, and the request and response want confirming before anything is built against them.
 
-        '
+         **Order.** Sorted by `id` descending (a UUIDv7, so newest first). (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - workforce
       x-ticvai-permission: WORKFORCE_VIEW
@@ -881,7 +885,7 @@ paths:
         week; a template — early, late, split, double, on-call — is the unit a manager actually thinks
         in.
 
-        '
+         **Order.** Sorted by `name` ascending, then by `id`. (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - workforce
       x-ticvai-permission: WORKFORCE_VIEW
@@ -1075,6 +1079,8 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-880 Break, Leave & Absence Configuration"
       summary: Leave, absence and their effect on cover
+      description: >-
+        **Order.** Sorted by `id` descending (a UUIDv7, so newest first). (r10 default ruling, CHG-R10GEN-004)
       tags:
       - workforce
       x-ticvai-permission: WORKFORCE_VIEW
@@ -1258,7 +1264,7 @@ paths:
         **Eligibility is enforced, not advisory.** A shift requiring a lifeguard qualification is not
         offered to somebody without one.
 
-        '
+         **Order.** Sorted by `id` descending (a UUIDv7, so newest first). (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - workforce
       x-ticvai-permission: WORKFORCE_VIEW
@@ -1426,6 +1432,8 @@ paths:
         - "P08 BO-053 Staff Directory"
         - "P08 BO-873 Staff Resource Directory"
       summary: The job titles a posting can name
+      description: >-
+        **Order.** Sorted by `name` ascending, then by `id`. (r10 default ruling, CHG-R10GEN-004)
       tags:
       - workforce
       x-ticvai-permission: WORKFORCE_VIEW
@@ -1495,7 +1503,7 @@ paths:
       description: '**`requestLeave` existed and nothing described what could be requested.** A leave
         request carries a type; the types were a vocabulary nobody could read.
 
-        '
+         **Order.** Sorted by `name` ascending, then by `id`. (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - workforce
       x-ticvai-permission: WORKFORCE_VIEW
@@ -1562,7 +1570,7 @@ paths:
         workflow.** `requestLeave` has existed since the contract was written and the balance it
         should refuse against had no operation.
 
-        '
+         **Order.** Sorted by `id` descending (a UUIDv7, so newest first). (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - workforce
       x-ticvai-permission: WORKFORCE_VIEW
@@ -1603,7 +1611,7 @@ paths:
         `crossesMidnight`.** A pattern says that 22:00 to 06:00 is one shift; a template carries two
         timestamps and already knows. This is the definition, that is the instance.
 
-        '
+         **Order.** Sorted by `name` ascending, then by `id`. (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - workforce
       x-ticvai-permission: WORKFORCE_VIEW
@@ -1672,7 +1680,7 @@ paths:
         department, from 1 March and primary. **A roster could not be checked against a posting
         because only one of the two was wired.**
 
-        '
+         **Order.** Newest first, by `createdAt` descending, then by `id`. (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - workforce
       x-ticvai-permission: WORKFORCE_VIEW
@@ -1766,7 +1774,7 @@ paths:
       description: 'Resource board 10. **The six-state display the board asks for lives on this row** —
         what is connected, when it last synchronised, and whether its credentials still work.
 
-        '
+         **Order.** Sorted by `name` ascending, then by `id`. (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - workforce
       x-ticvai-permission: WORKFORCE_VIEW
@@ -1835,7 +1843,7 @@ paths:
         **Absent means ours**, so nothing has to be enumerated before it is decided and the set returned
         here is only what somebody has actually said.
 
-        '
+         **Order.** Sorted by `id` descending (a UUIDv7, so newest first). (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - workforce
       x-ticvai-permission: WORKFORCE_VIEW

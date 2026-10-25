@@ -965,6 +965,8 @@ paths:
         through `getConfigurationProfile` with `version`.
 
         **Order.** Newest first, by `publishedAt` descending, then by `id`.
+
+        Where `publishedAt` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)
       tags: [tenancy]
       x-ticvai-permission: TENANT_CONFIGURE
       x-ticvai-scope-level: tenant
@@ -1107,6 +1109,8 @@ paths:
         26 September, pull audit R206. **`deployConfigurationProfile` said the board shows recent
         deployments, and nothing read `platform.profile_deployment`.** Most recent first, by
         `startedAt`.
+
+        Where `startedAt` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)
       tags: [tenancy]
       x-ticvai-permission: TENANT_CONFIGURE
       x-ticvai-scope-level: tenant
@@ -1602,6 +1606,13 @@ paths:
         - "P08 BO-1062 Tenant & Brand Context"
         - "P09 ADM-019 Global Configuration & Defaults"
         - "P09 ADM-426 Initial Configuration & Regional Defaults"
+      x-ticvai-read-via:
+      - query: finance#fxRateRecords
+        route: in-process
+        for: 'what its text calls "FxRate": ledger.fx_rate, Ledger''s data (CHG-R10GEN-001)'
+      - query: orders#venueChargeCurrencies
+        route: in-process
+        for: 'what its text calls "orders.PaymentProvider.presentmentCurrencies": payments.provider, Order''s data (CHG-R10GEN-001)'
       x-ticvai-singleton: true
       x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience: [staff]
@@ -2066,6 +2077,8 @@ paths:
 
         An outlet is not a workstation. Several workstations sit in one outlet, and the outlet
         is what carries the menu, the stock location and the revenue attribution.
+
+        **Order.** Sorted by `name` ascending, then by `id`. (r10 default ruling, CHG-R10GEN-004)
       tags: [workstation]
       x-ticvai-permission: SCOPE_VIEW
       x-ticvai-scope-level: venue
@@ -2253,6 +2266,8 @@ paths:
       description: >
         The configured front ends a workstation may load. A board determines presentation and
         layout, never authorisation (ADR-0002).
+
+        **Order.** Sorted by `name` ascending, then by `id`. (r10 default ruling, CHG-R10GEN-004)
       tags: [workstation]
       x-ticvai-permission: SCOPE_VIEW
       x-ticvai-scope-level: venue
@@ -2988,7 +3003,7 @@ paths:
         handheld that dies during the afternoon rush, and the venue can act on that only if somebody
         stored the number.
 
-        '
+         **Order.** Sorted by `id` descending (a UUIDv7, so newest first). (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - devices
       x-ticvai-permission: DEVICE_VIEW
@@ -3035,7 +3050,7 @@ paths:
         is this scanner on* is rarely asked; *how many scanners are still on the version with the scan
         bug* is asked constantly.
 
-        '
+         **Order.** Sorted by `id` descending (a UUIDv7, so newest first). (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - devices
       x-ticvai-permission: DEVICE_VIEW
@@ -3641,7 +3656,7 @@ paths:
 
         
 
-        **Order.** Newest first, by `updatedAt` descending, then by `id`.'
+        **Order.** Newest first, by `updatedAt` descending, then by `id`. Where `updatedAt` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - tenancy
       x-ticvai-permission: TENANT_VIEW

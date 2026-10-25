@@ -744,6 +744,8 @@ paths:
       summary: List collections
       description: >
         Folders — by campaign, venue, season or product line. An asset may sit in several.
+
+        **Order.** Sorted by `name` ascending, then by `id`. (r10 default ruling, CHG-R10GEN-004)
       tags: [collection]
       x-ticvai-permission: ASSET_LIBRARY_VIEW
       x-ticvai-scope-level: venue
@@ -1092,7 +1094,7 @@ paths:
 
         So the impact list is part of the version read rather than a separate report nobody opens first.
 
-        '
+         **Order.** Newest first, by `createdAt` descending, then by `id`. (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - assets
       x-ticvai-permission: ASSET_LIBRARY_VIEW
@@ -1130,7 +1132,7 @@ paths:
         thumbnail has not been generated is an asset that renders as a broken image on a guest''s phone,
         and the library showing it as *Active* is showing the wrong thing.
 
-        '
+         **Order.** Sorted by `id` descending (a UUIDv7, so newest first). (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - assets
       x-ticvai-permission: ASSET_LIBRARY_VIEW
@@ -1559,7 +1561,7 @@ paths:
         log — the question asked afterwards is *who had this photograph and when*, and that is answered
         by shares and downloads rather than by metadata changes. Both are here.
 
-        '
+         **Order.** Sorted by `id` descending (a UUIDv7, so newest first). (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - assets
       x-ticvai-permission: ASSET_LIBRARY_VIEW

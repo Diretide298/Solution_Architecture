@@ -757,6 +757,9 @@ paths:
       - query: identity#subjectBiometricRecords
         route: service
         for: 'its read of pii.subject_biometric, Identity''s data (CHG-MOD-001)'
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'what its text calls "VenueSettings.biometrics": platform.venue_settings, Tenancy''s data (CHG-R10GEN-001)'
       x-ticvai-write-via:
       - table: pii.subject_biometric
         event: biometric.enrolmentChanged
@@ -1047,6 +1050,12 @@ paths:
       - query: marketing-crm#consentRecords
         route: service
         for: 'its read of marketing.consent_record, Marketing''s data (CHG-MOD-001)'
+      - query: tenancy#regionSettingsRecords
+        route: service
+        for: 'what its text calls "tenancy.RegionSettings.minorAgeThreshold": platform.region_settings, Tenancy''s data (CHG-R10GEN-001)'
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'what its text calls "VenueSettings.biometrics": platform.venue_settings, Tenancy''s data (CHG-R10GEN-001)'
       x-ticvai-write-via:
       - table: marketing.consent_record
         event: biometric.enrolmentChanged
@@ -2855,6 +2864,13 @@ paths:
         - "P08 BO-032 Admission Profiles"
         - "P08 BO-154 Access Rule Command Center"
         - "P08 BO-222 Special Event, Free View & Alternative Admission"
+      x-ticvai-read-via:
+      - query: tenancy#regionSettingsRecords
+        route: service
+        for: 'what its text calls "RegionSettings.minorAgeThreshold": platform.region_settings, Tenancy''s data (CHG-R10GEN-001)'
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'what its text calls "VenueSettings.biometrics": platform.venue_settings, Tenancy''s data (CHG-R10GEN-001)'
       x-ticvai-audience:
       - staff
       x-ticvai-config-scope: venue
@@ -2908,6 +2924,13 @@ paths:
         - "P08 BO-160 Multi-Park & Crossover Rules"
         - "P08 BO-219 Re-entry & Temporary Exit Journey"
         - "P08 BO-220 Multi-Park & Crossover Journey Orchestrator"
+      x-ticvai-read-via:
+      - query: tenancy#regionSettingsRecords
+        route: service
+        for: 'what its text calls "RegionSettings.minorAgeThreshold": platform.region_settings, Tenancy''s data (CHG-R10GEN-001)'
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'what its text calls "VenueSettings.biometrics": platform.venue_settings, Tenancy''s data (CHG-R10GEN-001)'
       x-ticvai-audience:
       - staff
       x-ticvai-config-scope: venue
@@ -2974,7 +2997,7 @@ paths:
       operationId: listBlacklist
       x-ticvai-consumed-by:
         - "P08 BO-033 Blacklist Management"
-      description: '**Order.** Soonest first, by `expiresAt` ascending, then by `addedByPrincipalId`.'
+      description: '**Order.** Soonest first, by `expiresAt` ascending, then by `addedByPrincipalId`. Where `expiresAt` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: primary
@@ -3008,6 +3031,10 @@ paths:
       operationId: addBlacklistEntry
       x-ticvai-consumed-by:
         - "P08 BO-033 Blacklist Management"
+      x-ticvai-read-via:
+      - query: approvals#requestRecords
+        route: service
+        for: 'what its text calls "approvals.request": approvals.request, Tenancy''s data (CHG-R10GEN-001)'
       x-ticvai-audience:
       - staff
       summary: Blacklist a media code
@@ -4428,6 +4455,10 @@ paths:
       operationId: setRfidNfcCard
       x-ticvai-consumed-by:
         - "P08 BO-349 RFID, NFC, Card & Wristband Media Designer"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: RfidNfcCardWristbandMediaDesignerInput.depositReferenceWhereApplicable, RfidNfcCardWristbandMediaDesignerView.depositReferenceWhereApplicable (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-body-key: [templateId]
       x-ticvai-body-key-note: 'Keyed by the body''s `templateId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per ticket media template within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body.'
       x-ticvai-audience:
@@ -6144,6 +6175,10 @@ paths:
       operationId: publishTopologyValidation
       x-ticvai-consumed-by:
         - "P08 BO-153 Topology Validation & Publication"
+      x-ticvai-read-via:
+      - query: approvals#ruleRecords
+        route: service
+        for: 'what its text calls "ApprovalRule.subjectTypes": approvals.rule, Tenancy''s data (CHG-R10GEN-001)'
       x-ticvai-body-key: [configurationVersionId]
       x-ticvai-body-key-note: 'Keyed by the body''s `configurationVersionId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per access configuration version within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body.'
       x-ticvai-audience:
@@ -8606,6 +8641,13 @@ paths:
       operationId: listBiometricConsentGuardian
       x-ticvai-consumed-by:
         - "P08 BO-187 Biometric Consent & Guardian Management"
+      x-ticvai-read-via:
+      - query: tenancy#regionSettingsRecords
+        route: service
+        for: 'what its text calls "tenancy.RegionSettings.minorAgeThreshold": platform.region_settings, Tenancy''s data (CHG-R10GEN-001)'
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'what its text calls "tenancy.VenueSettings.biometrics": platform.venue_settings, Tenancy''s data (CHG-R10GEN-001)'
       x-ticvai-audience:
       - staff
       x-ticvai-provisional: true
@@ -8713,6 +8755,10 @@ paths:
       operationId: listFaceTagTemporary
       x-ticvai-consumed-by:
         - "P08 BO-188 Face Tag Temporary Enrollment"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'what its text calls "tenancy.VenueSettings.biometrics": platform.venue_settings, Tenancy''s data (CHG-R10GEN-001)'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -8761,6 +8807,10 @@ paths:
       operationId: setFaceTagTemporaryEnrollment
       x-ticvai-consumed-by:
         - "P08 BO-188 Face Tag Temporary Enrollment"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'what its text calls "tenancy.VenueSettings.biometrics": platform.venue_settings, Tenancy''s data (CHG-R10GEN-001)'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: VM close-out; pack ''Access Control Module'' p.61 (BO-188); MoM 2 Sep 2026
@@ -12799,6 +12849,10 @@ paths:
       operationId: listSecurityDetectionGovernance
       x-ticvai-consumed-by:
         - "P08 BO-253 Security Analytics, AI Detection & Governance"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: SecurityAnalyticsAiDetectionGovernanceView.estimatedFraudPrevented, SecurityAnalyticsAiDetectionGovernanceView.financialExposure (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Access Control Module'' p.164 (11.10 Show, Analyze by, Measure,
@@ -14905,6 +14959,10 @@ paths:
       operationId: placeAccessDevice
       x-ticvai-consumed-by:
         - "P08 BO-196 Physical Device Registration & Provisioning"
+      x-ticvai-read-via:
+      - query: tenancy#deviceRecords
+        route: service
+        for: 'what its text calls "platform.device": platform.device, Tenancy''s data (CHG-R10GEN-001)'
       x-ticvai-names-for-context: [platform.device]
       x-ticvai-audience:
       - staff
@@ -14992,6 +15050,10 @@ paths:
       operationId: updateAccessDevicePlacement
       x-ticvai-consumed-by:
         - "P08 BO-196 Physical Device Registration & Provisioning"
+      x-ticvai-read-via:
+      - query: tenancy#deviceRecords
+        route: service
+        for: 'what its text calls "platform.device": platform.device, Tenancy''s data (CHG-R10GEN-001)'
       x-ticvai-names-for-context: [platform.device]
       x-ticvai-audience:
       - staff
@@ -16663,6 +16725,10 @@ paths:
         - "P08 BO-229 Credential Disable, Blacklist & Whitelist Operations"
         - "P08 BO-244 Access Security & Fraud Command Center"
         - "P08 BO-247 Unified Identity & Credential Lock Manager"
+      x-ticvai-read-via:
+      - query: approvals#requestRecords
+        route: service
+        for: 'what its text calls "approvals.request": approvals.request, Tenancy''s data (CHG-R10GEN-001)'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: writers pass; writes the table listUnifiedIdentityCredential reads (pack ''Access
@@ -16754,6 +16820,10 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-229 Credential Disable, Blacklist & Whitelist Operations"
         - "P08 BO-247 Unified Identity & Credential Lock Manager"
+      x-ticvai-read-via:
+      - query: approvals#requestRecords
+        route: service
+        for: 'what its text calls "approvals.request": approvals.request, Tenancy''s data (CHG-R10GEN-001)'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: writers pass; writes the table listUnifiedIdentityCredential reads (pack ''Access

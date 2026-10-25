@@ -448,6 +448,10 @@ paths:
   /internal/guest-sessions/end-for-device:
     post:
       operationId: endGuestDeviceSessions
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'what its text calls "VenueSettings.identity": platform.venue_settings, Tenancy''s data (CHG-R10GEN-001)'
       security:
       - serviceAuth: []
       x-ticvai-audience:
@@ -1155,7 +1159,7 @@ paths:
         **Rules are evidence as much as configuration.** An auditor asking *"what does this venue
         forbid"* is asking a question the platform should answer without a query.
 
-        '
+         **Order.** Sorted by `id` descending (a UUIDv7, so newest first). (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - identity
       x-ticvai-permission: PERMISSION_VIEW
@@ -4049,6 +4053,10 @@ paths:
         - "P09 ADM-001 Platform Login / MFA"
         - "P10 PTR-001 Partner Login / MFA"
         - "P12 SUP-001 Venue Management Sign In"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'what its text calls "VenueSettings.identity": platform.venue_settings, Tenancy''s data (CHG-R10GEN-001)'
       x-ticvai-audience:
       - anonymous
       x-ticvai-read-routing: replica
@@ -4229,6 +4237,8 @@ paths:
       - staff
       x-ticvai-read-routing: replica
       summary: Read SSO configuration
+      description: >-
+        **Order.** Sorted by `displayName` ascending, then by `id`. (r10 default ruling, CHG-R10GEN-004)
       tags:
       - sso
       x-ticvai-permission: USER_MANAGE
@@ -4327,6 +4337,8 @@ paths:
         '
       x-ticvai-read-routing: replica
       summary: Enrolled MFA methods
+      description: >-
+        **Order.** Sorted by `id` descending (a UUIDv7, so newest first). (r10 default ruling, CHG-R10GEN-004)
       tags:
       - mfa
       x-ticvai-permission: null
@@ -5725,7 +5737,7 @@ paths:
         and this is the first. Conflating them makes the common question — *who widened this and when* —
         a search through millions of decision records.
 
-        '
+         **Order.** Sorted by `id` descending (a UUIDv7, so newest first). (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - administration
       x-ticvai-permission: PERMISSION_VIEW
@@ -6488,7 +6500,7 @@ paths:
         somebody create one would produce a key no operation checks, which is worse than a missing
         key because it looks granted.
 
-        '
+         **Order.** Sorted by `name` ascending, then by `id`. (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - identity
       x-ticvai-permission: PERMISSION_VIEW
@@ -7056,6 +7068,13 @@ paths:
       operationId: getGuestVerificationPolicy
       x-ticvai-consumed-by:
         - "P08 ADM-342 Authentication & MFA Policy Manager"
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it answers: IdentityGuestVerificationPolicy.walletTopUpLimit (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: IdentityGuestVerificationPolicy.walletTopUpLimit (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-agreed: '29 September: our build plan (5.3.21 "configurable identity workflows"); shape follows
         getPasswordPolicy'
       summary: The tenant's guest identity-verification workflow
@@ -7079,6 +7098,13 @@ paths:
       operationId: setGuestVerificationPolicy
       x-ticvai-consumed-by:
         - "P08 ADM-342 Authentication & MFA Policy Manager"
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it accepts or answers: IdentityGuestVerificationPolicy.walletTopUpLimit (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: IdentityGuestVerificationPolicy.walletTopUpLimit (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-singleton: true
       x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-agreed: '29 September: our build plan (5.3.21 "configurable identity workflows"); shape follows
@@ -7413,7 +7439,7 @@ paths:
         `certify`, then the principal''s `displayName` ascending, then `id`** (decided 25 October 2026, Chinmay,
         ADAM CR-210 option A; CHG-R10ID-003); the keyset cursor encodes that order.
 
-        '
+         Where `recommendation` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - administration
       x-ticvai-permission: PERMISSION_VIEW

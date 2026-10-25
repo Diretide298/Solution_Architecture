@@ -635,6 +635,9 @@ paths:
       - query: tenancy#regionSettingsRecords
         route: in-process
         for: 'what its text calls "Region''s time zone": platform.region_settings, Tenancy''s data (CHG-RTE-001)'
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the plan''s trading day, a business date closing at the venue''s businessDayCutoff (r10 read routes; CHG-R10GEN-001)'
       summary: Turn a forecast into a prep list
       description: 'Board 2M. **Demand forecast through recipes to quantities per item and per station.**
 
@@ -1120,6 +1123,10 @@ paths:
       operationId: scheduleMenuPublish
       x-ticvai-consumed-by:
         - "P08 BO-045 Menu Management"
+      x-ticvai-read-via:
+      - query: tenancy#regionSettingsRecords
+        route: service
+        for: 'what its text calls "RegionSettings.timeZone": platform.region_settings, Tenancy''s data (CHG-R10GEN-001)'
       x-ticvai-config-scope: outlet
       summary: Publish it on a date, not now
       description: 'Board 2J. **`publishMenu` took an `effectiveAt` and nothing listed or cancelled what
@@ -2761,6 +2768,9 @@ paths:
       - query: tenancy#venueSettingsRecords
         route: in-process
         for: 'the currency and scale of the Money it answers: the venue''s frozen trading currency, from platform.venue_settings, Tenancy''s data, in process (ADAM CR-234; ADR-0055 as amended 25 October 2026)'
+      - query: tenancy#regionSettingsRecords
+        route: service
+        for: 'what its text calls "RegionSettings.timeZone": platform.region_settings, Tenancy''s data (CHG-R10GEN-001)'
       x-ticvai-consumed-by:
         - "P08 BO-045 Menu Management"
       x-ticvai-config-scope: outlet
@@ -2921,7 +2931,7 @@ paths:
 
         **Order.** Newest first, by `publishedAt` descending, then by `id`.
 
-        **Statuses.** Every `status` is returned, ended ones included (`superseded`); a screen that shows only live rows filters on `status` itself.'
+        **Statuses.** Every `status` is returned, ended ones included (`superseded`); a screen that shows only live rows filters on `status` itself. Where `publishedAt` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - menu
       x-ticvai-permission: PRODUCT_VIEW
@@ -2965,6 +2975,10 @@ paths:
       x-ticvai-consumed-by:
         - "P06 EMP-058 Live Table & Service Management"
         - "P15 KIT-003 Order Firing & Course Management"
+      x-ticvai-read-via:
+      - query: tenancy#outletRecords
+        route: service
+        for: 'what its text calls "tenancy.Outlet.paymentTiming": platform.outlet, Tenancy''s data (CHG-R10GEN-001)'
       summary: Send a held course to the pass
       description: 'Board 3 of the client F&B pack. **`KitchenTicket.coursing` carried the policy — `holdAndFire`,
         `phased`, `timed` — and nothing fired anything.** A venue could configure how coursing works and
@@ -3215,6 +3229,10 @@ paths:
       operationId: recallKitchenTicket
       x-ticvai-consumed-by:
         - "P15 KIT-002 Kitchen Display System (KDS)"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'what its text calls "VenueSettings.fnb": platform.venue_settings, Tenancy''s data (CHG-R10GEN-001)'
       summary: Bring back a ticket that was bumped by mistake
       description: 'Board 3. **A bumped ticket disappears from the rail**, and a bump is a single tap
         on a screen operated by somebody with their hands full.
@@ -4006,7 +4024,7 @@ paths:
 
         
 
-        **Order.** Soonest first, by `scheduledFor` ascending, then by `id`.'
+        **Order.** Soonest first, by `scheduledFor` ascending, then by `id`. Where `scheduledFor` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - fnb
       parameters:
@@ -4476,6 +4494,12 @@ paths:
       - query: tenancy#outletRecords
         route: service
         for: 'the outlet at the asked time (409 outlet-full-at-time) (CHG-MOD-003)'
+      - query: orders#depositRecords
+        route: service
+        for: 'what its text calls "orders.deposit": orders.deposit, Order''s data (CHG-R10GEN-001)'
+      - query: orders#depositPolicyRecords
+        route: service
+        for: 'what its text calls "orders.DepositPolicy.dining": orders.deposit_policy, Order''s data (CHG-R10GEN-001)'
       x-ticvai-names-for-context: [orders.deposit]
       security:
       - guestAuth: []
@@ -4574,6 +4598,9 @@ paths:
       - query: tenancy#venueSettingsRecords
         route: in-process
         for: 'the currency and scale of the Money it answers: the venue''s frozen trading currency, from platform.venue_settings, Tenancy''s data, in process (ADAM CR-234; ADR-0055 as amended 25 October 2026)'
+      - query: orders#depositPolicyRecords
+        route: service
+        for: 'what its text calls "DepositPolicy.dining": orders.deposit_policy, Order''s data (CHG-R10GEN-001)'
       x-ticvai-consumed-by:
         - "P01 WEB-031 My Reservations"
         - "P01 WEB-036 F&B – Browse & Order"
@@ -5839,7 +5866,7 @@ paths:
 
         
 
-        **Order.** Newest first, by `publishedAt` descending, then by `id`.'
+        **Order.** Newest first, by `publishedAt` descending, then by `id`. Where `publishedAt` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - menu
       x-ticvai-permission: PRODUCT_VIEW
@@ -7251,6 +7278,9 @@ paths:
       - query: tenancy#venueSettingsRecords
         route: in-process
         for: 'the currency and scale of the Money it answers: the venue''s frozen trading currency, from platform.venue_settings, Tenancy''s data, in process (ADAM CR-234; ADR-0055 as amended 25 October 2026)'
+      - query: tenancy#outletRecords
+        route: service
+        for: 'what its text calls "tenancy.Outlet.paymentTiming": platform.outlet, Tenancy''s data (CHG-R10GEN-001)'
       x-ticvai-consumed-by:
         - "P04 POS-028 Table Service"
         - "P06 EMP-059 Table Order, Bill & Payment Management"
@@ -7353,6 +7383,9 @@ paths:
       - query: orders#paymentRecords
         route: service
         for: 'the payments taken against the bill (409 payments-short-of-bill) (CHG-MOD-003)'
+      - query: tenancy#outletRecords
+        route: service
+        for: 'what its text calls "tenancy.Outlet.paymentTiming": platform.outlet, Tenancy''s data (CHG-R10GEN-001)'
       x-ticvai-audience:
       - staff
       summary: Settle and close a visit
@@ -7539,7 +7572,7 @@ paths:
         station resolves from that assignment; a `stationId` sent by an assigned display is ignored. The
         station-load tile is not in the first release.
 
-        '
+         Where `priority` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - kitchen
       parameters:
@@ -8495,7 +8528,7 @@ paths:
         '409':
           x-ticvai-problem-types: [waitlist-entry-already-closed]
           description: The party is already `seated`, `walkedAway` or `noShow`. Names the entry's current
-            status.
+            status. Also refused when the restaurant waitlist entry is `cancelled`; states/restaurant-waitlist.yaml moves this call only from `notified` or `waiting`. (r10 default ruling, CHG-R10GEN-005)
           content:
             application/problem+json:
               schema:
@@ -8984,6 +9017,9 @@ paths:
       - query: tenancy#venueSettingsRecords
         route: in-process
         for: 'the currency and scale of the Money it answers: the venue''s frozen trading currency, from platform.venue_settings, Tenancy''s data, in process (ADAM CR-234; ADR-0055 as amended 25 October 2026)'
+      - query: orders#depositPolicyRecords
+        route: service
+        for: 'what its text calls "orders.DepositPolicy.dining": orders.deposit_policy, Order''s data (CHG-R10GEN-001)'
       x-ticvai-consumed-by:
         - "P04 POS-028 Table Service"
         - "P06 EMP-055 Create / Edit Reservation"
