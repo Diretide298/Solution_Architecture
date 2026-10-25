@@ -11772,6 +11772,15 @@ components:
       - total
       - issuedAt
       properties:
+        currencyCode:
+          type: string
+          minLength: 3
+          maxLength: 3
+          pattern: '^[A-Z]{3}$'
+          readOnly: true
+          description: '**The currency of every Money on the credit note** (ADAM CR-202, option A as the lead ruled it for
+            r10, 25 October 2026; CHG-R10ID-017): the credited invoice''s `currencyCode` (the billing entity''s billing
+            currency, copied at generation), copied onto the credit note when it is issued.'
         id:
           type: string
           format: uuid
@@ -12494,6 +12503,15 @@ components:
       - code
       - billableUnit
       properties:
+        currencyCode:
+          type: string
+          minLength: 3
+          maxLength: 3
+          pattern: '^[A-Z]{3}$'
+          description: '**The ISO 4217 currency of the model''s `unitPrice` and `minimumGuarantee`** (ADAM CR-202, option A as the lead ruled it for r10, 25
+            October 2026; CHG-R10ID-017): a platform price is stored with its currency on the row, since a platform
+            row has no venue to resolve one from (naming-and-style 5.1). Set when the row is written; a later change
+            writes a new row or version and never re-denominates one already sold.'
         id:
           type: string
           format: uuid
@@ -12573,6 +12591,15 @@ components:
       required:
       - moduleCode
       properties:
+        currencyCode:
+          type: string
+          minLength: 3
+          maxLength: 3
+          pattern: '^[A-Z]{3}$'
+          description: '**The ISO 4217 currency of the module''s `price`** (ADAM CR-202, option A as the lead ruled it for r10, 25
+            October 2026; CHG-R10ID-017): a platform price is stored with its currency on the row, since a platform
+            row has no venue to resolve one from (naming-and-style 5.1). Set when the row is written; a later change
+            writes a new row or version and never re-denominates one already sold.'
         moduleCode:
           type: string
           description: |-
@@ -12939,6 +12966,15 @@ components:
       - unit
       - quantity
       properties:
+        currencyCode:
+          type: string
+          minLength: 3
+          maxLength: 3
+          pattern: '^[A-Z]{3}$'
+          description: '**The ISO 4217 currency of the pack''s `price`** (ADAM CR-202, option A as the lead ruled it for r10, 25
+            October 2026; CHG-R10ID-017): a platform price is stored with its currency on the row, since a platform
+            row has no venue to resolve one from (naming-and-style 5.1). Set when the row is written; a later change
+            writes a new row or version and never re-denominates one already sold.'
         id:
           type: string
           format: uuid
@@ -17503,6 +17539,15 @@ components:
       - limits
       - basePrice
       properties:
+        currencyCode:
+          type: string
+          minLength: 3
+          maxLength: 3
+          pattern: '^[A-Z]{3}$'
+          description: '**The ISO 4217 currency of the plan''s `basePrice` and every `overageUnitPrice` of its limits** (ADAM CR-202, option A as the lead ruled it for r10, 25
+            October 2026; CHG-R10ID-017): a platform price is stored with its currency on the row, since a platform
+            row has no venue to resolve one from (naming-and-style 5.1). Set when the row is written; a later change
+            writes a new row or version and never re-denominates one already sold.'
         code:
           x-ticvai-unique: tenant
           type: string
@@ -17707,6 +17752,15 @@ components:
       - status
       - startsAt
       properties:
+        currencyCode:
+          type: string
+          minLength: 3
+          maxLength: 3
+          pattern: '^[A-Z]{3}$'
+          description: '**The ISO 4217 currency of this contract''s `currentPrice`** (ADAM CR-202, option A as the lead ruled it for r10, 25
+            October 2026; CHG-R10ID-017): a platform price is stored with its currency on the row, since a platform
+            row has no venue to resolve one from (naming-and-style 5.1). Set when the row is written; a later change
+            writes a new row or version and never re-denominates one already sold.'
         tenantId:
           x-ticvai-references: control.tenant
           type: string
@@ -17834,6 +17888,15 @@ components:
       required:
       - moduleKey
       properties:
+        currencyCode:
+          type: string
+          minLength: 3
+          maxLength: 3
+          pattern: '^[A-Z]{3}$'
+          description: '**The ISO 4217 currency of the add-on''s `price`** (ADAM CR-202, option A as the lead ruled it for r10, 25
+            October 2026; CHG-R10ID-017): a platform price is stored with its currency on the row, since a platform
+            row has no venue to resolve one from (naming-and-style 5.1). Set when the row is written; a later change
+            writes a new row or version and never re-denominates one already sold.'
         tenantId:
           type: string
           format: uuid

@@ -91,6 +91,30 @@ tags:
 - name: kiosk
 x-ticvai-queries:
   # Queries other modules ask this module (ADR-0055 amendment, 14 October 2026): module, inputs, returns, rule, served.
+  # **The hosts a guest sign-in may redirect to, as Identity's projection** (r10, the lead's ruling on the ADR-0028
+  # tiers, 25 October 2026; CHG-R10ID-018): Identity is Foundation, so guestUaePassLogin checks its redirect URI
+  # against identity.redirect_host, fed by whitelabel.customDomainChanged, never against whitelabel.custom_domain.
+  customDomainRedirectHosts:
+    module: white-label
+    inputs:
+      hostname:
+        type: string
+        description: The host of the redirect URI a guest sign-in sends.
+    returns:
+      isRedirectHost:
+        type: boolean
+        description: True when the host is a domain of this tenant on which UAE Pass redirects may land.
+    rule: 'A host is a redirect host while its custom domain is `active` and its `readiness.uaePassRedirect` is `ready`
+      (CHG-CSA-043, DEC-547). Identity answers from its projection identity.redirect_host, which applies every
+      whitelabel.customDomainChanged in order of `changedAt`; a domain relinquished or no longer ready stops being one
+      at the next event.'
+    served: [projection]
+    projection:
+      context: identity
+      source: whitelabel.custom_domain
+      table: identity.redirect_host
+      feeds:
+      - whitelabel.customDomainChanged
   # **Data reads other modules ask this module for** (MOD audit, 14 October 2026, CHG-MOD-001): one query per
   # table, instead of a raw read of it (check-cross-module-reads XR-UNCOVERED; ADR-0055 rule 2, amended
   # 14 October).
@@ -372,6 +396,8 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: claimCustomDomain
+      x-ticvai-emits:
+      - whitelabel.customDomainChanged
       x-ticvai-consumed-by:
         - "P08 BO-835 Site, Brand & Domain Setup"
         - "P09 ADM-017 Domain & Certificate Management"
@@ -491,6 +517,8 @@ paths:
         format: uuid
     post:
       operationId: verifyCustomDomain
+      x-ticvai-emits:
+      - whitelabel.customDomainChanged
       x-ticvai-consumed-by:
         - "P09 ADM-017 Domain & Certificate Management"
         - "P13 CMS-017 Domain & Certificate"
@@ -586,6 +614,8 @@ paths:
         format: uuid
     delete:
       operationId: relinquishCustomDomain
+      x-ticvai-emits:
+      - whitelabel.customDomainChanged
       x-ticvai-consumed-by:
         - "P09 ADM-017 Domain & Certificate Management"
         - "P13 CMS-017 Domain & Certificate"
@@ -653,6 +683,8 @@ paths:
         format: uuid
     post:
       operationId: setPrimaryDomain
+      x-ticvai-emits:
+      - whitelabel.customDomainChanged
       x-ticvai-consumed-by:
         - "P09 ADM-017 Domain & Certificate Management"
         - "P13 CMS-017 Domain & Certificate"
@@ -717,6 +749,8 @@ paths:
         format: uuid
     post:
       operationId: regenerateDomainToken
+      x-ticvai-emits:
+      - whitelabel.customDomainChanged
       x-ticvai-consumed-by:
         - "P09 ADM-017 Domain & Certificate Management"
         - "P13 CMS-017 Domain & Certificate"

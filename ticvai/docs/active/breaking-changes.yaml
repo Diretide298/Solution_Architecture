@@ -1535,3 +1535,29 @@ changes:
     tag: r10
     producer-tickets: [SVC-VENUEOPS-ENTRY-2]
     consumer-tickets: [SVC-ACCESS-VALIDATION-2]
+  - id: BC-489
+    contract: identity
+    operation: linkGuestCheckout
+    change: "x-ticvai-emits changed"
+    reason: 'r10 integration, the lead''s ruling on the ADR-0028 tiers (CHG-R10ID-018): Identity is Foundation and no
+      longer reads or writes orders.sales_order; linkGuestCheckout matches the orders in its own projection
+      (orders#guestCheckoutOrders, identity.subject_holding) and emits identity.guestCheckoutLinked, which Orders''
+      attachGuestCheckoutOrders consumes and announces as order.linkedToGuest. The response is unchanged; an emitted
+      event added to an operation is breaking by the compat rule.'
+    approved-by: 'Chinmay, 25 October 2026, r10 lane E rulings, accepted by default (linkGuestCheckout "fix it the ADR-0028 way, by a projection or an event, not raw")'
+    tag: r10
+    producer-tickets: [SVC-IDENTITY-GUESTAUTH-2]
+    consumer-tickets: [APP-MOB-GST-010, APP-MOB-GST-042, APP-WEB-WEB-013, APP-WEB-WEB-016, TEST-AM-IDENTITY-SECURITY-P01, TEST-AM-IDENTITY-SECURITY-P02]
+  - id: BC-490
+    contract: white-label
+    operation: claimCustomDomain
+    operations: [claimCustomDomain, verifyCustomDomain, relinquishCustomDomain, setPrimaryDomain, regenerateDomainToken]
+    change: "x-ticvai-emits changed"
+    reason: 'r10 integration, the lead''s ruling on the ADR-0028 tiers (CHG-R10ID-018): guestUaePassLogin checks its
+      redirect URI against Identity''s projection of the tenant''s custom domains (identity.redirect_host,
+      white-label#customDomainRedirectHosts), fed by the new whitelabel.customDomainChanged that these five domain
+      writes emit. No response changes; an emitted event added to an operation is breaking by the compat rule.'
+    approved-by: 'Chinmay, 25 October 2026, r10 lane E rulings, accepted by default (guestUaePassLogin "redirect URIs come from a projection of white-label''s custom domains, fed by white-label''s domain events")'
+    tag: r10
+    producer-tickets: [SVC-WHITELABEL-WHITE-LABEL-1, SVC-WHITELABEL-WHITE-LABEL-2]
+    consumer-tickets: [APP-WL-ADM-017, APP-WL-CMS-017, TEST-AM-WHITE-LABEL-P09, TEST-AM-WHITE-LABEL-P13]

@@ -3621,6 +3621,10 @@ paths:
       - table: pii.subject_identity
         for: 'the uaePass identity row of a new link (R8 blocker IDENTITY-C54) (r8 gate, CHG-R8GT2-003)'
       x-ticvai-read-via:
+      - query: white-label#customDomainRedirectHosts
+        route: projection
+        for: 'whether the redirect URI''s host is a domain of the tenant on which UAE Pass redirects may land, from
+          Identity''s projection identity.redirect_host (r10 ruling, ADR-0028; CHG-R10ID-018)'
       - query: tenancy#venueSettingsRecords
         route: in-process
         for: 'the venue''s two-step, step-up and one-time-code settings (guestTwoStep, stepUpActions, guestOtpMaxAttempts) in platform venue settings, Tenancy''s data (CHG-MOD-001; R8 IDENTITY-C08)'
@@ -3646,7 +3650,11 @@ paths:
         providers (UAE Pass onboarding and an ICP service agreement), which is an external dependency the
         client owns. A UAE Pass identity counts as ID-verified (`IdentityGuestVerificationPolicy.uaePassSatisfiesIdDocument`);
         the ICP check is a document verification, not a sign-in (`IdentityGuestVerificationPolicy.verificationProvider`
-        `icp`). Each venue''s own redirect URI is part of its domain setup (white-label `CustomDomain`; DEC-547).
+        `icp`). Each venue''s own redirect URI is part of its domain setup (DEC-547). **The redirect URI''s host is checked
+        against Identity''s projection of the tenant''s domains** (`white-label#customDomainRedirectHosts`, route
+        projection: `identity.redirect_host`, fed by `whitelabel.customDomainChanged`; r10 ruling on ADR-0028,
+        CHG-R10ID-018): a host that is not an active domain with its UAE Pass redirect ready is refused as a failed
+        exchange (401) and nothing is exchanged.
 
 
         **What it stores** (R8 blocker IDENTITY-C54, CHG-R8MIG-015): a `pii.subject_identity` row (`provider`
@@ -3789,6 +3797,21 @@ paths:
         - "P01 WEB-016 Login / Register"
         - "P02 GST-010 Booking Confirmation"
         - "P02 GST-042 Simple Registration & OTP"
+      # Identity is Foundation and reads nothing above it but a projection (ADR-0028): it finds the orders in its own
+      # projection identity.subject_holding and asks Orders to attach them by an event (r10 ruling, CHG-R10ID-018).
+      x-ticvai-reads:
+      - table: identity.subject_holding
+        for: 'the guest-checkout orders still without a subject, by order number and verified contact (its own projection
+          of orders, fed by order.created; ADR-0028)'
+      - table: pii.subject_contact
+        for: the caller's verified identifier, whose keyed hash is compared with the order's verifiedContactRef
+      x-ticvai-emits:
+      - identity.guestCheckoutLinked
+      x-ticvai-read-via:
+      - query: orders#guestCheckoutOrders
+        route: projection
+        for: 'the guest-checkout orders the caller may claim, from Identity''s projection identity.subject_holding (r10
+          ruling, ADR-0028; CHG-R10ID-018)'
       x-ticvai-audience:
       - guest
       summary: Attach a guest checkout to an account
@@ -3802,11 +3825,17 @@ paths:
         claim would hand someone else''s booking history to whoever asked for it.
 
 
-        **Each attached order is announced as `order.linkedToGuest`** (ADAM CR-084, decided 14 October 2026,
-        CHG-GDL-003), one event per order with its `subjectId` and current status, written to `platform.outbox`
-        in the attaching transaction (ADR-0033). Identity''s projection identity.subject_holding consumes it, so an
-        attached order and the entitlements issued from it block `deleteGuestAccount` like any other the guest
-        holds; without it a guest could erase an account holding a valid ticket bought before registering.
+        **Read from Identity''s own projection, attached by Orders** (r10, the lead''s ruling on the ADR-0028 tiers,
+        25 October 2026; CHG-R10ID-018). Identity is Foundation and reads nothing above it but a projection, so it
+        never reads or writes an Orders table. It finds the named booking in `identity.subject_holding` (an
+        `order` row with no subject yet, by `orderNumber`, fed by `order.created`) and compares the row''s
+        `verifiedContactRef` with the keyed hash of the caller''s verified identifier (ADR-0045); a mismatch is 403
+        and nothing is emitted. Every other subject-less order row with the same `verifiedContactRef` is attached with
+        it. It then emits `identity.guestCheckoutLinked` (the subject and the order ids) to `platform.outbox` in its
+        transaction (ADR-0033); Orders'' consumer (`orders.attachGuestCheckoutOrders`) sets each order''s subject and
+        announces it as `order.linkedToGuest`, which sets the subject on the projection''s order and entitlement rows,
+        so an attached order and its tickets block `deleteGuestAccount` like any other the guest holds
+        (ADAM CR-084, CHG-GDL-003). `attachedOrderCount` counts the orders sent to be attached.
 
         '
       tags:
@@ -6072,7 +6101,7 @@ paths:
         **The token and where the step-up lives** (ADAM CR-175 option A, accepted 21 October 2026; ADR-0072;
         CHG-R10ID-007). The Control Plane token is a JWT signed by the Control Plane, verified against its JWKS
         (trusted by configuration), with this cell as its audience; `sub` is the operator
-        (`control.platform_operator`), `ticvai_platform_permissions` the `PLATFORM_*` set, `sid` the platform
+        (a Control Plane operator, ADR-0072), `ticvai_platform_permissions` the `PLATFORM_*` set, `sid` the platform
         session. The MFA step-up is recorded in the Control Plane on the operator''s platform session and carried
         as `ticvai_step_up` (`{action, at}`) beside `amr`: this operation accepts it when its action names this
         operation and it is recent (ADR-0072), and never reads `identity.mfa_challenge` for an operator. The
@@ -6360,7 +6389,8 @@ paths:
       operationId: getMembership
       summary: A membership with its history, usage and renewals
       description: '**Composed because of where the data lives.** A guest''s membership sits in their
-        home cell (`sync.guest_link.homeCellName`), so a venue in another cell reading the
+        home cell, the one the guest''s link names (`GuestSession.guestLinkId` and `homeCellName`, carried on the
+        guest''s session, ADR-0010; this operation reads no link table: r10 ruling, CHG-R10ID-018), so a venue in another cell reading the
         membership, its status history, its benefit usage and its renewal attempts as four calls
         makes **four cross-cell round trips at a counter**. One composed read is one.
 
@@ -9616,6 +9646,38 @@ components:
           type: string
           nullable: true
           description: Why the job failed, with `failed`; null otherwise.
+    RedirectHost:
+      x-ticvai-persistence: identity.redirect_host
+      x-ticvai-unique-together:
+      - [domainId]
+      type: object
+      description: '**The hosts a guest sign-in may redirect to, as Identity knows them** (r10, the lead''s ruling on the
+        ADR-0028 tiers, 25 October 2026; CHG-R10ID-018). A projection of the tenant''s custom domains, so
+        `guestUaePassLogin` checks its redirect URI without reading White-label''s table (Identity is Foundation and
+        reads nothing above it but a projection). **Never returned by any operation**; Identity''s consumer of
+        `whitelabel.customDomainChanged` writes it. The rule is White-label''s (`white-label#customDomainRedirectHosts`):
+        a host is a redirect host while `status` is `active` and `uaePassRedirect` is `ready`.'
+      required: [domainId, hostname, status, lastEventAt]
+      properties:
+        domainId:
+          type: string
+          format: uuid
+          description: The custom domain''s id in White-label.
+        hostname:
+          type: string
+          maxLength: 253
+        status:
+          type: string
+          maxLength: 40
+          description: The domain''s status as the last event applied gave it.
+        uaePassRedirect:
+          type: string
+          enum: [ready, pending, notApplicable]
+          nullable: true
+        lastEventAt:
+          type: string
+          format: date-time
+          description: The `changedAt` of the event last applied; an older redelivery changes nothing.
     SubjectHolding:
       x-ticvai-persistence: identity.subject_holding
       # One row per order or entitlement: an entitlement has one holder at a time (CHG-GDL-001).
@@ -9682,6 +9744,18 @@ components:
           format: uuid
           nullable: true
           description: For an entitlement, the order line it was issued from, so a partial refund reaches only its lines.
+        orderNumber:
+          type: string
+          maxLength: 40
+          nullable: true
+          description: For an order, its number as the confirmation shows it (`order.created` `orderNumber`), so
+            `linkGuestCheckout` finds a guest''s booking here, never in `orders.sales_order` (r10 ruling; CHG-R10ID-018).
+        verifiedContactRef:
+          type: string
+          maxLength: 128
+          nullable: true
+          description: For a guest-checkout order, the keyed hash of its verified checkout contact (`order.created`
+            `verifiedContactRef`, ADR-0045); `linkGuestCheckout` compares the caller''s verified identifier with it.
         status:
           type: string
           maxLength: 40

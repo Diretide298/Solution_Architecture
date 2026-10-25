@@ -106,6 +106,32 @@ x-ticvai-queries:
       exists whose scope_path is scopePath or beneath it, in any status (a voided or refunded order still carried
       amounts at the old scale). Orders answers in process; Tenancy reads none of Orders' tables.
     served: [in-process, service]
+  # **The guest-checkout orders a signed-in guest may claim, as Identity's projection** (r10, the lead's ruling on the
+  # ADR-0028 tiers, 25 October 2026; CHG-R10ID-018): linkGuestCheckout matches them in identity.subject_holding and
+  # Orders attaches them (attachGuestCheckoutOrders), so Identity never reads orders.sales_order.
+  guestCheckoutOrders:
+    module: orders
+    inputs:
+      orderNumber: {type: string, description: The booking the guest names (the order's number on its confirmation).}
+      verifiedContactRef: {type: string, description: The keyed hash of the caller's verified identifier (ADR-0045).}
+    returns:
+      orderIds:
+        type: array
+        items: {type: string, format: uuid}
+        description: The named order and every other guest-checkout order with the same verified contact, none of them
+          yet attached to an account; empty when the named order's contact is another.
+    rule: 'An order is a guest checkout to claim while it has no subject and was written with a verified checkout contact
+      (`verifiedContactRef`, ADR-0045); it is claimable by the caller when that reference equals the keyed hash of the
+      caller''s verified identifier. Identity answers from identity.subject_holding (its rows of kind order with no
+      subject, with orderNumber and verifiedContactRef from order.created); order.linkedToGuest gives a row its subject.'
+    served: [projection]
+    projection:
+      context: identity
+      source: orders.sales_order
+      table: identity.subject_holding
+      feeds:
+      - order.created
+      - order.linkedToGuest
   openOrdersForSubject:
     module: orders
     inputs:
@@ -11359,6 +11385,78 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CustomerGuestAccountAssignmentView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /guest-checkout-links:
+    post:
+      operationId: attachGuestCheckoutOrders
+      security:
+      - serviceAuth: []
+      x-ticvai-audience:
+      - service
+      x-ticvai-auth: service
+      x-ticvai-no-screen: 'The identity.guestCheckoutLinked consumer, invoked by the event relay, never by a screen.'
+      x-ticvai-writes:
+      - table: orders.sales_order
+        for: 'the subject of each guest-checkout order linkGuestCheckout matched (r10 ruling; CHG-R10ID-018)'
+      x-ticvai-emits:
+      - order.linkedToGuest
+      x-ticvai-consumes:
+      - identity.guestCheckoutLinked
+      summary: Attach the guest-checkout orders Identity matched to the guest's account
+      description: '**The `identity.guestCheckoutLinked` consumer** (r10, the lead''s ruling on the ADR-0028 tiers, 25
+        October 2026; CHG-R10ID-018), modelled as an operation so it has lineage and a ticket. Identity is Foundation and
+        never writes `orders.sales_order`: `linkGuestCheckout` matches a guest''s guest-checkout orders in its own
+        projection and emits the event; this sets `subject_id` on each listed order that still has none, and writes one
+        `order.linkedToGuest` per order it attaches to the outbox in the same transaction (ADR-0033), which
+        Identity''s projection consumes (ADAM CR-084, CHG-GDL-003). An order that already has a subject is left as it
+        is and not announced. **Idempotent on event id and order id**: a redelivery attaches nothing twice. Runs at the
+        tenant root as every `serviceAuth` call does.'
+      tags:
+      - orders
+      x-ticvai-permission: null
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - eventId
+              - subjectId
+              - orderIds
+              properties:
+                eventId:
+                  type: string
+                  description: The `identity.guestCheckoutLinked` event id, for the consumer's inbox record.
+                subjectId:
+                  type: string
+                  format: uuid
+                orderIds:
+                  type: array
+                  minItems: 1
+                  items:
+                    type: string
+                    format: uuid
+      responses:
+        '200':
+          description: Attached
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  attachedOrderIds:
+                    type: array
+                    description: The orders whose subject this call set; an order that already had one is not listed.
+                    items:
+                      type: string
+                      format: uuid
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /order-line-product:

@@ -1,0 +1,33 @@
+id: CHG-R10ID-019
+date: '2026-10-25'
+source: audit
+kind: contract
+summary: 'Two state models named an operation for a move its own 409 refuses: a sandbox''s resetting -> active is the
+  reset job ending, not resetSandbox (which refuses a sandbox already resetting), and an integration listing''s
+  revoked -> delisted is the listing job, not certifyIntegration (which refuses one that is not certified).'
+decision:
+  what: 'The lead''s r10 rulings, accepted by default on 25 October 2026 ("the state model''s trigger is wrong").
+    states/sandbox.yaml and states/integration-listing.yaml: those two transitions take trigger job and no operation.'
+  by: Chinmay
+  date: '2026-10-25'
+why: 'Finding: r10 lane E''s check-state-refusals (CHG-R10GEN-005) SR-ALLOWS-NO-MOVE on certifyIntegration and
+  resetSandbox.'
+keys_touched:
+  operations: [certifyIntegration, resetSandbox]
+  files:
+  - states/sandbox.yaml
+  - states/integration-listing.yaml
+root_class: 'existing: a state model naming an operation for a move the operation refuses'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: r10 integration finding'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-state-refusals.py
+status: open
+notes: 'check-state-refusals no longer lists either; the five it still lists (stopCampaign, submitPricingChangeRequest,
+  releaseProductionPlan, requestShiftSwap, closeShift) are other lanes'' contracts.'
