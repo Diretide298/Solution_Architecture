@@ -694,6 +694,14 @@ properties:
               id: { type: string }
               component: { type: string, description: From `_components.yaml`. }
               trigger: { type: string, description: The action or state that opens it. }
+              reads:
+                type: array
+                items: { type: string }
+                description: >
+                  **The list reads that fill the form's pickers** (CHG-R10UI-016, r10): operationIds of the
+                  screen's own `apis` (a sale board, an inspection to choose). A picker inside an overlay has
+                  no component to carry its read, so the overlay names it here; check-screen-wiring counts
+                  it as reached (S-OP-UNREACHED) and check-screen-value-sources' SV-PICK asks for it.
               body:
                 type: string
                 description: >

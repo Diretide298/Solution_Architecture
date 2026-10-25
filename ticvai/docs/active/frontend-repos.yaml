@@ -192,8 +192,9 @@ platforms:
     note: 'ADAM CR-153 (Chitrangi Mestry, 16 October 2026), accepted by Chinmay with option A: P10 is its own app in
       ticvai-partner-web, the repository in the ticvai-frontend group, which matches the one-repository-per-app
       decision of 13 October and overrides the shared ticvai-control app of 10 September (screens/P10 targetApp).
-      The decision left the confirmation that the repository was created on purpose to the lead, so the mapping is
-      marked assumed until he confirms it (CHG-R10UI-010).'
+      ticvai-partner-web is not one of the six repositories created on 13 October. The lead, 25 October 2026 (r10
+      question 8): create it in ticvai-frontend; until it exists the mapping stays assumed and nothing in P10 is
+      built anywhere (CHG-R10UI-010, CHG-R10UI-016).'
     observed:
       by: 'Chitrangi Mestry, scaffolding the repository (ADAM CR-153); relayed in the CR'
       date: '2026-10-16'

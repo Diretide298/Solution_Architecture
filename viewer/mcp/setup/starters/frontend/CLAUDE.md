@@ -15,7 +15,7 @@ repositories cloned inside this folder**, one subfolder each, from the GitLab gr
 | P07 Venue Scanner - Access Control (built inside the employee app with P06) | `ticvai-employee-app` |
 | P08 Venue Management - Back Office | `ticvai-venue-management` |
 | P09 TICVAI Web - Platform Console (a new repository: the lead creates it; ask the lead until it exists) | `ticvai-web` |
-| P10 Partner Web - Reseller Portal (its own app since ADAM CR-153; the lead confirms the repository) | `ticvai-partner-web` |
+| P10 Partner Web - Reseller Portal (its own app since ADAM CR-153; the lead creates the repository in ticvai-frontend: ask the lead until it exists) | `ticvai-partner-web` |
 | P13 Venue CMS - White Label (built inside venue management with P08) | `ticvai-venue-management` |
 | any other platform (P11, P12, P14 to P17, including P16, which the package serves from the same app as P08, and P15 Kitchen Display) | none yet: **ask the lead** before building it anywhere |
 

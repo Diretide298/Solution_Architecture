@@ -581,11 +581,22 @@ def screen_findings(pk: Package, screen: dict, platform: str = "") -> list:
     return uniq
 
 
+def merged_into(screen: dict):
+    """The screen this one was merged into, or None (CHG-MOV-002, 2 October 2026; CHG-R10UI-016). A merged screen gets no
+    build task: its target's ticket builds it and declares the reads (ticket_done.screen_hold, the test
+    check-binding-ratchet's not-built screens use), so its values are judged on the target, never on the merged id."""
+    from ticket_done import MERGED_NOTE
+    m = MERGED_NOTE.search(str(screen.get("notes") or ""))
+    return m.group(1) if m else None
+
+
 def findings(pk: Package = None) -> list:
-    """[(rule, key, message)] over every screen."""
+    """[(rule, key, message)] over every screen that is built: a screen merged into another is skipped."""
     pk = pk or Package()
     out = []
     for p, s in pk.screen_list:
+        if merged_into(s):
+            continue
         out += screen_findings(pk, s, p)
     return out
 

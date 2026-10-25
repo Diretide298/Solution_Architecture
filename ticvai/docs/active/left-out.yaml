@@ -120,3 +120,32 @@ items:
   owner: Chinmay
   added: '2026-10-25'
   change: CHG-R10ORD-024
+- id: LO-R10UI-002
+  kind: deferred
+  platform: P08
+  screens: [BO-305]
+  what: 'The Order Detail & Transaction Workspace values no read answers: reservation status, fulfilment status,
+    reservations, invoices, credentials, membership, waivers and related orders (tiles), and each line''s product name,
+    event, person type, fee and ticket status (columns). BO-305 is built on getOrder and getOrderStatement without them.'
+  source: 'check-screen-value-sources (CHG-R10GEN-003); the lead''s answer of 25 October 2026 (r10 round 3): drop the
+    fields with no source and list them here; CHG-R10UI-017'
+  reason: the workspace view the pack drew has no read; each value needs its owner's read (reservations, invoices,
+    waivers, memberships) aggregated for one order
+  target: 'Block B: an order-workspace read that gathers them, decided with the order 360 screens'
+  owner: Chinmay
+  added: '2026-10-25'
+  change: CHG-R10UI-017
+- id: LO-R10UI-003
+  kind: deferred
+  platform: P08
+  screens: [BO-355]
+  what: 'The Virtual Ticket & Credential 360 values no read answers: participant, event, performance and seat (tiles),
+    the five media roles (primary, secondary, fallback, temporary, revoked historical media), and the binding id,
+    provider, issued, delivered, last update and device reference (columns). BO-355 is built on getEntitlement,
+    getEntitlementCredential and getEntitlementHistory without them.'
+  source: 'check-screen-value-sources (CHG-R10GEN-003); the lead''s answer of 25 October 2026 (r10 round 3); CHG-R10UI-017'
+  reason: no read answers a ticket's media bindings or its performance and seat; they need a credential-binding read
+  target: 'Block B: a ticket media-binding read, decided with the ticket 360 screens'
+  owner: Chinmay
+  added: '2026-10-25'
+  change: CHG-R10UI-017

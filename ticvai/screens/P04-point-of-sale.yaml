@@ -5784,6 +5784,7 @@ screens:
         provenance: carried from the previous definition
       - kind: selectField
         label: Order type
+        operation: createFnbOrder
         notes: 'The cart''s order type, as drawn in v2 (POSV2-12, DEC-553): Dine-in, Quick service, Takeaway,
           Delivery. Delivery asks the fulfilment source, Own delivery or Delivery partner. Quick service
           is a counter order with no guest details whose number prints on the receipt and shows on the
@@ -5791,7 +5792,7 @@ screens:
           (design-notes correction fnb-retail POS-012). The delivery partner''s reference, driver and
           fee have no contract field yet (open entry CHG-SPO-019).'
         provenance: POS v2 candidate, accepted 2 October 2026 (POSV2-12)
-        bindsTo: FnbOrder.serviceMode
+        bindsTo: CreateFnbOrderRequest.serviceMode
     - name: contextPanel
       slot: selection
       components:
@@ -5888,6 +5889,11 @@ screens:
     purpose: Hand the dropped goods over
     trigger: onAction
     provenance: flow F17 step 5 and F51 step 4, 2 October 2026 (CHG-CLN-006)
+  - operationId: createFnbOrder
+    contract: fnb
+    purpose: 'Creates the F&B order from the cart, carrying the order type the cashier picked (`serviceMode`:
+      dine-in, quick service, takeaway, delivery; the lead, 25 October 2026, r10; CHG-R10UI-016)'
+    trigger: onAction
   entryState:
     params:
     - name: workstationId

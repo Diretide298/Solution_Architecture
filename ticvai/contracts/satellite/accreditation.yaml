@@ -3791,6 +3791,36 @@ components:
           default: 0
         scopePath:
           type: string
+        holderName:
+          type: string
+          readOnly: true
+          x-ticvai-persisted: false
+          description: '**What the badge prints and the register lists** (r10, check-screen-value-sources; ACC-005,
+            ACC-008; CHG-R10UI-016): the holder''s `AccreditationHolder.fullName`, read with the credential, not stored
+            on it.'
+        zones:
+          type: array
+          readOnly: true
+          x-ticvai-persisted: false
+          description: 'Where the badge works: the holder''s effective zones (`HolderAccess.effectiveZones`, from their
+            access profiles and exceptions), each with its name, as `verifyAccreditationCredential` answers them.
+            Read with the credential, not stored on it (CHG-R10UI-016).'
+          items:
+            type: object
+            properties:
+              zoneId:
+                type: string
+                format: uuid
+              zoneName:
+                type: string
+        validTo:
+          type: string
+          format: date
+          nullable: true
+          readOnly: true
+          x-ticvai-persisted: false
+          description: 'Valid until: the holder''s `AccreditationHolder.validTo`; null means no end date. `status`
+            `expired` or `revoked` overrides it. Read with the credential, not stored on it (CHG-R10UI-016).'
     BadgeTemplate:
       type: object
       x-ticvai-persistence: accreditation.badge_template

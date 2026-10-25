@@ -32,3 +32,8 @@ status: open
 proposed: '2026-10-25'
 notes: 'A plan change proposed and decided on 25 October: check-changelog fails it on the 24-hour cooling-off until the
   lead waives it (waivers.cooling_off) or it is decided again a day later.'
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-10-26'
+    quote: Waive it (Recommended)

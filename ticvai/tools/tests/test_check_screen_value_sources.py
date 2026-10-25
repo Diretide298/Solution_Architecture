@@ -218,6 +218,14 @@ def test_a_binding_to_a_schema_nothing_answers_is_one_finding_per_schema():
     assert run(s) == {("SV-SCHEMA", "ACC-005:Cart")}
 
 
+def test_a_merged_screen_is_judged_on_its_target():
+    """CHG-R10UI-016: ADM-097, ADM-252 and ADM-611 were merged on 2 October (CHG-MOV-002); their target declares the reads."""
+    s = screen("ADM-097", components=[{"kind": "detailPanel", "label": "Badge", "bindsTo": "Cart"}])
+    assert run(s) == {("SV-SCHEMA", "ADM-097:Cart")}
+    s["notes"] = "**Merged into BO-441 Price Priority & Conflict Rules** (decided 2 October 2026)."
+    assert run(s) == set()
+
+
 def test_paren_and_shown_word_helpers():
     t = "The limit is set per country (`A.b`). One countdown: `C.d`."
     assert sv.in_parens(t, t.index("`A.b`")) and not sv.in_parens(t, t.index("`C.d`"))

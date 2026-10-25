@@ -1,0 +1,38 @@
+id: CHG-R10UI-017
+date: '2026-10-25'
+source: audit
+kind: spec
+summary: 'BO-305 Order Detail & Transaction Workspace is bound to getOrder and getOrderStatement and BO-355 Virtual
+  Ticket & Credential 360 to getEntitlement, field by field; the values no read answers are dropped and listed on the
+  left-out list (LO-R10UI-002, LO-R10UI-003). ACC-005 and ACC-008 bind AccreditationCredential''s holderName, zones,
+  validTo and status. check-screen-value-sources now finds no value without a source.'
+decision:
+  what: 'The lead''s answer of 25 October 2026 (r10 round 3): rebind each field to Order or Entitlement where one maps,
+    drop the fields with no source and log them on docs/active/left-out.yaml with a target release. screens/P08 BO-305
+    (tiles and the line columns) and BO-355 (tiles and the credential columns); screens/P11 ACC-005 and ACC-008;
+    docs/active/approved-ui-changes.yaml (5 visible fields, naming this check); docs/active/left-out.yaml.'
+  by: Chinmay
+  date: '2026-10-25'
+why: 'check-screen-value-sources (CHG-R10GEN-003): BO-305 and BO-355 bound workshop-pack workspace views no read answers,
+  and ACC-005 and ACC-008 a badge shape no read answers (CHG-R10UI-015 left them for the lead).'
+keys_touched:
+  screens: [BO-305, BO-355, ACC-005, ACC-008]
+  operations: [getOrder, getOrderStatement, getEntitlement, listMyAccreditationCredentials, listAccreditationCredentials]
+  schemas: [Order, OrderStatement, Entitlement, AccreditationCredential]
+  files:
+  - screens/P08-venue-back-office.yaml
+  - screens/P11-accreditation-portal.yaml
+  - docs/active/approved-ui-changes.yaml
+  - docs/active/left-out.yaml
+root_class: 'a screen value with no source among its declared operations (CHG-R10GEN-003)'
+tickets:
+  started: []
+  unstarted: ['BO-305, BO-355, ACC-005, ACC-008: their pointer bodies give the bindings at the next tag']
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: a finding of the r10 check, fixed as the lead answered it'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-value-sources.py
+status: open
