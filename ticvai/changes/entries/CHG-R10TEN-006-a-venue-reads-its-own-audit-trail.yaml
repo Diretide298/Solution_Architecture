@@ -1,0 +1,43 @@
+id: CHG-R10TEN-006
+date: '2026-10-25'
+source: cr
+kind: contract
+summary: platform.audit_record is read by the tenant root and by a grant over the scope node a row's org_unit_id names;
+  rows with no org unit stay the root's; appending and correcting are unchanged. A new contract mark, x-ticvai-rls audit-read-beneath,
+  and a new helper, platform.apply_append_audit_read_rls, which the forward migration writes.
+decision:
+  what: 'ADAM CR-185, option B. contracts/spine/tenancy.yaml AuditRecord: x-ticvai-rls audit-read-beneath and the read rule;
+    listAuditRecords'' description. tools/derive-ddl.py: APPEND_AUDIT_MARKS, APPEND_AUDIT_BENEATH and the helper in RLS_APPEND_AUDIT;
+    tools/check-rls-scope-fit.py classes the helper. Derived: the policy change in the forward migration. The lead, 25 October
+    2026: "update and get r10 out", with every accepted CR in it (audit r10 plan).'
+  by: Chinmay
+  date: '2026-10-25'
+why: 'ADAM CR-185 (Pranay Shinde, #30824 listAuditRecords), accepted 21 October 2026 with option B ("Fixed at the source
+  in r10"). listAuditRecords is a venue operation behind six venue screens, and the tenant-root read (CR-005) gave a venue
+  manager an empty page with no error.'
+keys_touched:
+  operations:
+  - listAuditRecords
+  schemas:
+  - AuditRecord
+  tables:
+  - platform.audit_record
+  files:
+  - contracts/spine/tenancy.yaml
+  - tools/derive-ddl.py
+  - tools/check-rls-scope-fit.py
+root_class: 'new: an append-only trail read by the scope its rows name'
+tickets:
+  started:
+  - '30824 (listAuditRecords): through CR-185''s comment; no code change, the policy narrows the rows.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-185
+triage: fix-forward
+prevention:
+  type: generator-rule
+  ref: tools/derive-ddl.py::APPEND_AUDIT_MARKS
+status: open
+notes: 'platform.audit_read has the same tenant-root read; the decision names audit_record only, so audit_read is unchanged
+  (reported). Migration work: the policy change on platform.audit_record (MIG-PLATFORM, Hrushikant Patkar).'

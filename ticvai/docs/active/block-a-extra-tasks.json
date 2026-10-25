@@ -322,7 +322,6 @@
     "table ledger.journal_line",
     "table marketing.message_dispatch",
     "table platform.audit_record",
-    "table platform.dead_letter",
     "table platform.outbox",
     "adr ADR-0044",
     "adr ADR-0047",

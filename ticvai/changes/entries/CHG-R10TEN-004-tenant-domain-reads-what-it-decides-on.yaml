@@ -1,0 +1,40 @@
+id: CHG-R10TEN-004
+date: '2026-10-25'
+source: cr
+kind: contract
+summary: resolveTenantHost reads the tenant's status through subscription#tenantRecords for the terminated check and says
+  the edge uses only hostname, tenantId and cellId from the 200; setTenantDomainMapping bases its 403 on control.cell_tenant
+  through subscription#cellTenantRecords; tenantDomain.mapped's notes follow TenantDomain and only version 2 is emitted.
+decision:
+  what: 'ADAM CR-205, option A. tenancy.yaml: the read-via of both operations, their descriptions; events/tenantDomain-mapped.yaml:
+    kind customDomain, status active or detached, only v2; subscription.yaml cellTenantRecords'' rule names its second asker.
+    The lead, 25 October 2026: "update and get r10 out", with every accepted CR in it (audit r10 plan).'
+  by: Chinmay
+  date: '2026-10-25'
+why: 'ADAM CR-205 (Surendra Loke, #27990 setTenantDomainMapping), settled 25 October 2026 with option A. Both operations
+  decided on facts they declared no read of (control.tenant.status, control.cell_tenant), and the event notes contradicted
+  TenantDomain.'
+keys_touched:
+  operations:
+  - resolveTenantHost
+  - setTenantDomainMapping
+  other:
+  - event tenantDomain.mapped
+  - query subscription#cellTenantRecords
+  files:
+  - contracts/spine/tenancy.yaml
+  - contracts/satellite/subscription.yaml
+  - events/tenantDomain-mapped.yaml
+root_class: 'new: a rule on a fact the operation declares no read of'
+tickets:
+  started:
+  - '27990 (setTenantDomainMapping): through CR-205''s comment.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-205
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-cross-module-reads.py
+status: open

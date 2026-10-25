@@ -1,0 +1,38 @@
+id: CHG-R10TEN-009
+date: '2026-10-25'
+source: cr
+kind: contract
+summary: ConfigurationProfile says reads of "the profile" take its latest version and older ones stay readable by (id, version);
+  RegisteredDevice.configurationProfileId is a reference to the profile id by convention.
+decision:
+  what: 'ADAM CR-228, option A. The key change itself is already in r9 (V0115: configuration_profile primary key (id, version),
+    profile_deployment (profile_id, version) -> configuration_profile(id, version); the contract has x-ticvai-primary-key
+    [id, version] since CHG-R8MIG-019); this states the read rule. The lead, 25 October 2026: "update and get r10 out",
+    with every accepted CR in it (audit r10 plan).'
+  by: Chinmay
+  date: '2026-10-25'
+why: 'ADAM CR-228 (Sanket Keluskar, #30825 setConfigurationProfile), settled 25 October 2026 with option A.'
+keys_touched:
+  schemas:
+  - ConfigurationProfile
+  - RegisteredDevice
+  tables:
+  - platform.configuration_profile
+  files:
+  - contracts/spine/tenancy.yaml
+root_class: 'new: a versioned row keyed on its id alone'
+tickets:
+  started:
+  - '30825 (setConfigurationProfile): through CR-228''s comment.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-228
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-table-keys.py
+status: open
+notes: 'No migration from r10: the key change is r9''s V0115 (migration work already filed with r9, if it was). platform.workstation
+  keys (configuration_profile_id, configuration_profile_version) -> (id, version) since r8 (V0109); the decision calls it
+  a reference to id, which it still is while the version is null.'

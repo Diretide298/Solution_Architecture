@@ -1,0 +1,41 @@
+id: CHG-R10TEN-002
+date: '2026-10-25'
+source: cr
+kind: contract
+summary: setConnectivityThresholds and setOfflinePolicy (and the two marketing venue singletons, setGuestMatchPolicy and
+  setGuestExtraFields) refuse a session acting at no venue with 404 not-found ("no venue in this session") and write nothing.
+decision:
+  what: 'ADAM CR-229, option A, as built: one sentence in each operation''s description. The same gap in the marketing contract''s
+    venue singletons gets the same rule and a declared 404 (fix-at-source siblings). The lead, 25 October 2026: "update
+    and get r10 out", with every accepted CR in it (audit r10 plan).'
+  by: Chinmay
+  date: '2026-10-25'
+why: 'ADAM CR-229 (Sanket Keluskar, #30826 setConnectivityThresholds, #30827 setOfflinePolicy), settled 25 October 2026
+  with option A. Both target "the venue the caller''s session acts at" and a head-office session acts at none.'
+keys_touched:
+  operations:
+  - setConnectivityThresholds
+  - setOfflinePolicy
+  - setGuestMatchPolicy
+  - setGuestExtraFields
+  files:
+  - contracts/spine/tenancy.yaml
+  - contracts/satellite/marketing-crm.yaml
+root_class: 'new: a venue singleton with no rule for a session at no venue'
+tickets:
+  started:
+  - '30826 (setConnectivityThresholds) and 30827 (setOfflinePolicy): through CR-229''s comment.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-229
+triage: fix-forward
+prevention:
+  type: none
+  reason: A rule stated in an operation's prose (what a request is refused for); no check can read whether the prose covers
+    every value of a body field. Lead to approve.
+status: open
+notes: 'Siblings: every operation in tenancy, white-label, platform-ops and marketing-crm with x-ticvai-singleton and a
+  note keyed on the caller''s venue. setMinorGuardianAge (keyed by country) and setCustomerServiceCopilot (keyed by scopePath)
+  carry the same singleton note but are not keyed on the venue, so they are not changed; their notes disagree with their
+  descriptions (reported to the lead).'

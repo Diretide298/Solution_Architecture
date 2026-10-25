@@ -160,6 +160,9 @@ def classes(pol: dict) -> dict:
             r = ("subject", "subject")
         elif helper == "apply_append_audit_rls":
             r = ("tenant", "any")
+        elif helper == "apply_append_audit_read_rls":
+            # an append-only trail a grant reads at and beneath the row's org unit (CHG-R10TEN-006, ADAM CR-185)
+            r = ("scope", "any")
         elif helper == "apply_read_beneath_rls":
             r = ("above", "scope")
         elif helper == "apply_grant_holder_read_rls":

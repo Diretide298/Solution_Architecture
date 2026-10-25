@@ -74,9 +74,10 @@ reads:
   tables: [access.entitlement, access.scan_event]
   privileges: [SELECT]
   queries: [access#entitlementRecords, access#scanEventRecords]
-  operations: [getMediaEntitlements]
+  operations: [getMediaEntitlements, listDeviceAuditRecords]
   added: '2026-10-21'
-  decision_ref: ADAM CR-196, option B, Chinmay, 21 October 2026
+  decision_ref: ADAM CR-196, option B, Chinmay, 21 October 2026; listDeviceAuditRecords added by ADAM CR-232, option A,
+    Chinmay, 25 October 2026 (CHG-R10TEN-005)
   why: 'orders getMediaEntitlements (commerce) answers from Access''s entitlements on a media code and their scans. The
     service route between deployables (serviceAuth inside a cell) is not built and has no ticket (CR-174), and a call
     on it would run at the tenant root and lose the caller''s scope, so a venue cashier would see every venue''s

@@ -1,0 +1,44 @@
+id: CHG-R10TEN-003
+date: '2026-10-25'
+source: cr
+kind: contract
+summary: 'setNavigation states its five rules: a new draft''s version is "draft"; referenced_by entries are "navigationItem:<itemId>"
+  and "homepageSection:<sectionId>", each writer replacing only its own; a module with no enablement row is not enabled
+  (400 module-disabled); only kind module and appSection plan point at a module; the five-visible cap applies to bottomNavigation
+  only.'
+decision:
+  what: 'ADAM CR-230, option A, as built. setNavigation''s description and 400; TenantConfig.version; ModuleEnablement.referencedBy;
+    NavigationConfig items[].isVisible; LinkTarget.appSection (map no longer needs the map module: the decision says no
+    other appSection needs one); setHomepageLayout gets the no-row rule and its entry format (sibling). The lead, 25 October
+    2026: "update and get r10 out", with every accepted CR in it (audit r10 plan).'
+  by: Chinmay
+  date: '2026-10-25'
+why: 'ADAM CR-230 (Chinmay Patkar, #31051 setNavigation), settled 25 October 2026 with option A: five rules the build needed
+  and the package did not state.'
+keys_touched:
+  operations:
+  - setNavigation
+  - setHomepageLayout
+  schemas:
+  - TenantConfig
+  - ModuleEnablement
+  - NavigationConfig
+  - LinkTarget
+  files:
+  - contracts/satellite/white-label.yaml
+root_class: 'new: an operation rule built and not written down'
+tickets:
+  started:
+  - '31051 (setNavigation): through CR-230''s comment.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-230
+triage: fix-forward
+prevention:
+  type: none
+  reason: A rule stated in an operation's prose (what a request is refused for); no check can read whether the prose covers
+    every value of a body field. Lead to approve.
+status: open
+notes: LinkTarget.appSection said "`map` the `map` module enabled, or setNavigation refuses it"; the decision's point 4
+  ("no other appSection needs a module") removes that, as built. Reported in the lane report.

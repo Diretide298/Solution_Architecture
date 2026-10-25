@@ -1,0 +1,35 @@
+id: CHG-R10TEN-001
+date: '2026-10-25'
+source: cr
+kind: contract
+summary: updateSaleBoard refuses a body venueId other than the board's own venue, 400 validation on venueId ("a sale board
+  does not move between venues"), and writes nothing.
+decision:
+  what: 'ADAM CR-224, option A, as built: one sentence in updateSaleBoard''s description; no schema change. The lead, 25
+    October 2026: "update and get r10 out", with every accepted CR in it (audit r10 plan).'
+  by: Chinmay
+  date: '2026-10-25'
+why: 'ADAM CR-224 (Sanket Keluskar, #30801 updateSaleBoard), settled 25 October 2026 with option A. The body''s venueId
+  is required and nothing said what a different one meant; a moved board would leave the old venue''s outlets and workstations
+  drawing another venue''s board.'
+keys_touched:
+  operations:
+  - updateSaleBoard
+  files:
+  - contracts/spine/tenancy.yaml
+root_class: 'new: a body field naming the owner of a whole-replace PUT'
+tickets:
+  started:
+  - '30801 (updateSaleBoard): through CR-224''s comment; its text is not rewritten.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-224
+triage: fix-forward
+prevention:
+  type: none
+  reason: A rule stated in an operation's prose (what a request is refused for); no check can read whether the prose covers
+    every value of a body field. Lead to approve.
+status: open
+notes: 'Siblings looked for: every PUT in tenancy, white-label and platform-ops whose body schema carries a writable venueId;
+  only setAnalyticsProvider has one and it already states its venueId rule.'

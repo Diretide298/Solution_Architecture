@@ -1,0 +1,46 @@
+id: CHG-R10TEN-005
+date: '2026-10-25'
+source: cr
+kind: contract
+summary: listDeviceAuditRecords reads access.scan_event in process, as CR-196 settled for the same table (XDR-001 names
+  it), maps each scan onto DeviceAuditRecord (kind access, action scan.<outcome>, actor operator_principal_id, at recorded_at,
+  newValue deny_reason when denied), reads sign-ins as tenancy.device_audit rows of kind access, and interleaves both by
+  time.
+decision:
+  what: 'ADAM CR-232, option A, as CR-196. tenancy.yaml listDeviceAuditRecords: route in-process and the mapping; docs/active/cross-deployable-writes.yaml
+    XDR-001 operations; access.yaml scanEventRecords'' rule. The lead, 25 October 2026: "update and get r10 out", with every
+    accepted CR in it (audit r10 plan).'
+  by: Chinmay
+  date: '2026-10-25'
+why: 'ADAM CR-232 (Pranay Shinde, #30828 listDeviceAuditRecords), settled 25 October 2026 with option A. The scans were
+  read over a service route nothing builds (CR-174), and nothing mapped a scan or a sign-in onto the record.'
+keys_touched:
+  operations:
+  - listDeviceAuditRecords
+  schemas:
+  - DeviceAuditRecord
+  tables:
+  - access.scan_event
+  - tenancy.device_audit
+  files:
+  - contracts/spine/tenancy.yaml
+  - contracts/spine/access.yaml
+  - docs/active/cross-deployable-writes.yaml
+  - handoff/cross-deployable-writes.md
+root_class: 'new: a cross-deployable read with no route that is built'
+tickets:
+  started:
+  - '30828 (listDeviceAuditRecords): through CR-232''s comment.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-232
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-cross-deployable-writes.py
+status: open
+notes: 'No new grant: XDR-001 already grants commerce SELECT on access.scan_event (r9). Which identity operation writes
+  the sign-in row of kind access is not declared in any contract yet (the sign-in path is Identity''s); reported to the
+  lead. handoff/cross-deployable-writes.md is regenerated with check-cross-deployable-writes --write (X-DOC) and committed,
+  as CHG-R9CR-005 did: no refresh step writes it.'

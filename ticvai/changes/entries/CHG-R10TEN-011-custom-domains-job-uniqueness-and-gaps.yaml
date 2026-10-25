@@ -1,0 +1,52 @@
+id: CHG-R10TEN-011
+date: '2026-10-25'
+source: cr
+kind: contract
+summary: The white-label domain job (workers host) verifies, issues, renews and revalidates custom domains with its DNS
+  and Front Door calls and owns the issuing transitions; setPrimaryDomain calls setTenantDomainMapping; a hostname is unique
+  among a tenant's claims that are not revoked, one primary per kind (whitelabel) and per tenant and channel (control);
+  claimCustomDomain takes routing and refuses a malformed or unrequested apex hostname; 404s; validationExpiresAt; a list
+  order.
+decision:
+  what: 'ADAM CR-105, option 1. white-label.yaml: the domain operations and CustomDomain; tenancy.yaml TenantDomain unique-when;
+    states/custom-domain.yaml; tools/derive-ddl.py unique_when_sql takes {not: value}. The lead, 25 October 2026: "update
+    and get r10 out", with every accepted CR in it (audit r10 plan).'
+  by: Chinmay
+  date: '2026-10-25'
+why: 'ADAM CR-105 (Deep Khanvilkar, #27895 and #27894), accepted 15 October 2026 for the next release with option 1.'
+keys_touched:
+  operations:
+  - claimCustomDomain
+  - verifyCustomDomain
+  - relinquishCustomDomain
+  - setPrimaryDomain
+  - regenerateDomainToken
+  - listCustomDomains
+  schemas:
+  - CustomDomain
+  - TenantDomain
+  tables:
+  - whitelabel.custom_domain
+  - control.tenant_domain
+  files:
+  - contracts/satellite/white-label.yaml
+  - contracts/spine/tenancy.yaml
+  - states/custom-domain.yaml
+  - tools/derive-ddl.py
+root_class: 'new: an asynchronous state model credited to a one-shot operation'
+tickets:
+  started:
+  - '27895 and 27894: through CR-105''s comment.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-105
+triage: blocker
+prevention:
+  type: generator-rule
+  ref: tools/derive-ddl.py::unique_when_sql
+status: open
+notes: 'Not built, a question for the lead: the decision leaves guestApp''s channel open ("guestApp gets a channel, or is
+  mapped to guestWeb (the lead''s choice)"). Database: whitelabel.custom_domain validation_expires_at, unique custom_domain_hostname_uniq
+  (where status is not revoked) and custom_domain_kind_uniq (where is_primary); control.tenant_domain_tenant_id_channel_uniq
+  (where is_primary and active). The 7-day window and the five-minute run are proposed defaults.'

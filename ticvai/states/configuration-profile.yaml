@@ -42,15 +42,14 @@ transitions:
     is a till that ignores it silently.'
 - from: published
   to: deploying
-  trigger: deploy
-  operation: deployConfigurationProfile
-  guard: '**A target set is named** — a venue, a device class, one till. Deploying to everything is
-    a choice, not a default.'
+  trigger: job
+  guard: '**A deployment of it starts.** deployConfigurationProfile queues one, for the target set it names or,
+    naming none, for the profile''s whole fleet (its venueKindScope within its scope); the profile deployment job
+    in the workers host starts it and moves the version (ADAM CR-188, option A; CHG-R10TEN-008).'
 - from: deploying
   to: deployed
-  trigger: complete
-  operation: deployConfigurationProfile
-  guard: Every reachable device acknowledged.
+  trigger: job
+  guard: Every reachable device acknowledged (the profile deployment job, ADAM CR-188).
 - from: deploying
   to: rolledBack
   trigger: rollback

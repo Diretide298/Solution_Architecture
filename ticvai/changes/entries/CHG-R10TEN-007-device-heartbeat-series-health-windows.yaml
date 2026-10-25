@@ -1,0 +1,47 @@
+id: CHG-R10TEN-007
+date: '2026-10-25'
+source: cr
+kind: contract
+summary: recordDeviceHeartbeat appends each heartbeat to tenancy.device_telemetry with new body fields syncBacklog and errorCount;
+  getWorkstationHealth states its formula, weights, bands and the offline and unknown windows as proposed defaults; the
+  device state model accepts the reported statuses out of offline and unknown; setDeviceAssignment refuses unknown references
+  422 unknown-reference.
+decision:
+  what: 'ADAM CR-103, option 3 (as accepted). tenancy.yaml: recordDeviceHeartbeat (writes, body, description), getWorkstationHealth,
+    RegisteredDevice.status, setDeviceAssignment (422), DeviceTelemetryPoint (syncBacklog, errorCount); states/registered-device.yaml:
+    seven transitions and the 7-day unknown window. Already in r6/r8: platform.device_heartbeat retired, device_assignment.device_id
+    unique (V0108) and required (migration-review), the device health formula and the 15-minute offline window. The lead,
+    25 October 2026: "update and get r10 out", with every accepted CR in it (audit r10 plan).'
+  by: Chinmay
+  date: '2026-10-25'
+why: 'ADAM CR-103 (Deep Khanvilkar, #27803 / #30831 recordDeviceHeartbeat, #27941 getWorkstationHealth, #27788 / #30793
+  setDeviceAssignment), accepted 15 October 2026 for the next release with option 3.'
+keys_touched:
+  operations:
+  - recordDeviceHeartbeat
+  - getWorkstationHealth
+  - setDeviceAssignment
+  schemas:
+  - DeviceTelemetryPoint
+  - RegisteredDevice
+  tables:
+  - tenancy.device_telemetry
+  files:
+  - contracts/spine/tenancy.yaml
+  - states/registered-device.yaml
+root_class: 'new: a computed status with no stated formula or window'
+tickets:
+  started:
+  - '27803 / 30831, 27941, 27788 / 30793: through CR-103''s comment.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-103
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-states.py
+status: open
+notes: 'Database: tenancy.device_telemetry gains sync_backlog integer and error_count integer (migration work for Hrushikant
+  Patkar, MIG-TENANCY). The sync-backlog cap (100) and the 7-day unknown window are proposed defaults the client can correct.
+  lastSeenLocation stays unset: the decision adds no location to the heartbeat.'

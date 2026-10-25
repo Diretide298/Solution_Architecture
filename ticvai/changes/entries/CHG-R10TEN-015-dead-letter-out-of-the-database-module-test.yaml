@@ -1,0 +1,36 @@
+id: CHG-R10TEN-015
+date: '2026-10-25'
+source: cr
+kind: plan
+summary: MIG-PARTITIONS no longer lists platform.dead_letter among its builds, so TEST-AM-FOUNDATION-DATABASE stops claiming
+  a table only MIG-PLATFORM-4 (Tenancy & Venues, Sprint 3) builds; the Tenancy & Venues module test keeps it.
+decision:
+  what: 'ADAM CR-093, option 1. docs/active/block-a-extra-tasks.json MIG-PARTITIONS builds: platform.dead_letter removed
+    (its detail already says the job partitions it after MIG-PLATFORM-4). The lead, 25 October 2026: "update and get r10
+    out", with every accepted CR in it (audit r10 plan).'
+  by: Chinmay
+  date: '2026-10-25'
+why: 'ADAM CR-093 (Pranay Shinde, #27686), accepted 15 October 2026 for the next release: the module test listed a table
+  none of its tickets builds; the source was MIG-PARTITIONS'' builds list, which builds_of reads as tables built.'
+keys_touched:
+  tickets:
+  - '27686'
+  - MIG-PARTITIONS
+  files:
+  - docs/active/block-a-extra-tasks.json
+root_class: 'new: a task listing as built what it only maintains'
+tickets:
+  started:
+  - '27686: through CR-093''s comment.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-093
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-plan-closure.py
+status: open
+proposed: '2026-10-15'
+notes: 'A plan change: proposed when CR-093 was accepted (15 October), decided for r10 on 25 October. Sibling seen and not
+  changed: PLATFORM-OUTBOX (Foundation · Platform, Sprint 1) also lists platform.dead_letter; reported to the lead.'

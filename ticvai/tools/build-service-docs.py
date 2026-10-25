@@ -3726,9 +3726,13 @@ def main() -> int:
                      "evidence each asks for. ")
             done_ = "Done when every one of those done-whens holds on the integration environment with no open severity 1 or 2 defect. "
         elif kinds_ == {"table"}:
+            # **Matches the package DDL, not a record that lagged it** (ADAM CR-092, accepted 15 October 2026;
+            # CHG-R10TEN-014): the DDL is right and the records followed it late (CR-067), so the test compares with the
+            # DDL itself; the ADAM record is now built from the same DDL (derive-ddl `records`).
             what_ = ("the migrations of its tickets, in plan order, on an empty database and on the previous release's "
-                     "schema: each applies once and a second run applies nothing, every table matches its record in ADAM "
-                     "(columns, keys, indexes, row-level security forced), a row in another tenant's or venue's scope is "
+                     "schema: each applies once and a second run applies nothing, every table matches the package DDL "
+                     "(backend/<area>/010-*.sql, 900, 910 and 920, then the forward migrations V0100 onwards in order: "
+                     "columns, keys, indexes, row-level security forced), a row in another tenant's or venue's scope is "
                      "not visible under a scoped session, and a row pointing at a missing parent is refused. ")
             done_ = f"Done when it passes for {named} with no open severity 1 or 2 defect. "
         else:

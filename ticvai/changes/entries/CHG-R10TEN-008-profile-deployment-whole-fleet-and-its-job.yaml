@@ -1,0 +1,36 @@
+id: CHG-R10TEN-008
+date: '2026-10-25'
+source: cr
+kind: contract
+summary: deployConfigurationProfile with no target deploys to the profile's whole fleet (venueKindScope within its scope);
+  the profile deployment job in the workers host runs a queued deployment and owns its progress, and the state models credit
+  it.
+decision:
+  what: 'ADAM CR-188, option A. tenancy.yaml deployConfigurationProfile; states/profile-deployment.yaml and states/configuration-profile.yaml:
+    start, complete and partial failure, and published to deploying to deployed, are the job''s. The lead, 25 October 2026:
+    "update and get r10 out", with every accepted CR in it (audit r10 plan).'
+  by: Chinmay
+  date: '2026-10-25'
+why: 'ADAM CR-188 (Pranay Shinde, #30821 deployConfigurationProfile), accepted 21 October 2026 with option A ("Fixed at
+  the source in r10"; "Do not build an executor: it gets its own ticket").'
+keys_touched:
+  operations:
+  - deployConfigurationProfile
+  files:
+  - contracts/spine/tenancy.yaml
+  - states/profile-deployment.yaml
+  - states/configuration-profile.yaml
+root_class: 'new: an asynchronous operation whose executor is not named'
+tickets:
+  started:
+  - '30821 (deployConfigurationProfile): through CR-188''s comment; it queues the request as sent.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-188
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-states.py
+status: open
+notes: The job needs its own ticket (a plan input); not added by this lane. Reported to the lead.
