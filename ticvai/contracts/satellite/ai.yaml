@@ -1076,6 +1076,21 @@ paths:
         rejects **each segment** (BO-093); nothing is a path until then. A scanned PDF read through the
         OCR step is a raster here too.
 
+
+        **What is stored, so BO-093 can read it back** (ADAM CR-207, option A; Chinmay, 25 October 2026;
+        CHG-R10ORD-013). Each segment is one `ai.proposed_action` row whose `payload` stays the request body of
+        `venue-map.acceptWalkwayProposals`; its `confidence`, `basis`, `reasoning`, `distanceMetres` and `mapId` are
+        typed columns of the row (null on other proposals, as a translation draft''s fields are), so
+        `listProposedActions` with `targetOperation=acceptWalkwayProposals` and `mapId` re-reads a map''s open
+        segments with their confidence after a reload.
+
+
+        **Which import, and when it is refused** (ADAM CR-207). `importJobId` absent is the map''s latest import by
+        `created_at` (`venue-map#importJobRecords`); its `sourceRef` names the raster (`assets#mediaAssetRecords`).
+        **`409 map-has-vector-geometry`** when that import''s `format` is `pdfPlan`, `svgPlan`, `dwgPlan` or `dxfPlan`
+        and it found shapes (`shapesFound` above zero); a raster-only import (`rasterPlan`, or a PDF in which no
+        shape was found) goes ahead.
+
         '
       tags:
       - ai
@@ -1098,7 +1113,7 @@ paths:
                   type: string
                   format: uuid
                   description: The `venue-map` import job whose raster (and hand-marked strokes) to read.
-                    Absent, the map's latest import.
+                    Absent, the map's latest import by `createdAt` (ADAM CR-207).
                 basis:
                   type: string
                   enum:
@@ -1126,7 +1141,8 @@ paths:
           x-ticvai-problem-types: [map-has-vector-geometry]
           description: '**The map has vector geometry.** Refused deliberately — subtraction is available
             and better, and running a model where geometry exists is how a worse answer gets preferred
-            because it arrived in a nicer format.
+            because it arrived in a nicer format. The test (ADAM CR-207): the import''s `format` is `pdfPlan`,
+            `svgPlan`, `dwgPlan` or `dxfPlan` and `shapesFound` is above zero.
 
             '
           content:
@@ -2516,6 +2532,22 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: primary
+      parameters:
+      - name: targetOperation
+        in: query
+        required: false
+        description: 'Only the proposals whose `targetOperation` is this, e.g. `acceptWalkwayProposals` (ADAM CR-207,
+          CHG-R10ORD-013).'
+        schema:
+          type: string
+      - name: mapId
+        in: query
+        required: false
+        description: 'Only the proposals about this venue map (`ProposedAction.mapId`): BO-093 re-reads a map''s walkway
+          segments with their confidence after a reload (ADAM CR-207).'
+        schema:
+          type: string
+          format: uuid
       responses:
         '200':
           description: Awaiting a decision
@@ -18719,6 +18751,42 @@ components:
           readOnly: true
           description: For a translation draft, the proposed text; null otherwise. `payload` stays the request body of
             the target's write, with this text at `fieldPath` (R8 blocker FOUNDATION-AI-C40).
+        confidence:
+          type: number
+          minimum: 0
+          maximum: 1
+          nullable: true
+          readOnly: true
+          description: For a walkway segment (`proposeWalkways`), the model's confidence in it (`WalkwayProposal.confidence`);
+            null on every other proposal (ADAM CR-207, CHG-R10ORD-013).
+        basis:
+          type: string
+          nullable: true
+          readOnly: true
+          enum:
+          - handMarked
+          - seen
+          description: For a walkway segment, whether it was traced from a hand mark or seen in the picture
+            (`WalkwayProposal.basis`); null otherwise (ADAM CR-207).
+        reasoning:
+          type: string
+          nullable: true
+          readOnly: true
+          description: For a walkway segment, why the model proposed it (`WalkwayProposal.reasoning`); null otherwise
+            (ADAM CR-207).
+        distanceMetres:
+          type: number
+          nullable: true
+          readOnly: true
+          description: For a walkway segment, its length along the centreline; null where the plan has no georeference
+            and on every other proposal (ADAM CR-207).
+        mapId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          description: For a walkway segment, the venue map it is on (the path's `mapId`, which the target's request
+            body does not carry); null otherwise (ADAM CR-207). `listProposedActions` filters on it.
         kind:
           type: string
           enum:

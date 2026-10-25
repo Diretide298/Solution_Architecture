@@ -5782,6 +5782,20 @@ paths:
         hands it to the guest; it is not a voucher and not a top-up of the guest''s wallet. POS-011 offers it as
         "Gift card".
 
+
+        **What each line and payment has left, and where it goes** (ADAM CR-208, option A; Chinmay, 25 October 2026;
+        CHG-R10ORD-014). Every refund records what it took: one `orders.refund_line` row per order line it refunds
+        (`refundedAmount`) and one `orders.refund_allocation` row per payment it refunds against (`refundedAmount` in
+        the base currency, `tenderAmount` in the payment''s tender currency). **`refundableAmount`** is what each
+        line, or each payment, paid minus what earlier refunds took from it (their `refund_line` and
+        `refund_allocation` rows). **Allocation across payments**: the most recent payment first, cash last. **Time
+        bands apply per line**, by that line''s own performance: each line''s percentage is the band its own
+        performance falls in, so one refund of lines for two performances can carry two percentages.
+        **`settleTo` onto the venue''s `refundDestinations`** (`RefundCalculationPolicyView`): `originalTender` is
+        `originalPayment`; `advanceBalance` is `walletCredit`; `storeCredit` is `voucherCreditNote` (issued as a
+        gift card, CHG-CSP-037); `wireTransfer` is `originalPayment`, paid out by transfer. A `settleTo` whose
+        destination the venue does not list is not offered. `exceedsRefundable` is an amount above the lines'' (or the order''s) `refundableAmount`.
+
         '
       tags:
       - refund
@@ -5848,6 +5862,21 @@ paths:
         impact on a till. **Nothing is refunded, written or posted**; the answer is computed from the order, the venue''s
         refund policy and the payments as they stand, and can differ from a later `createRefund` if any of them changes.
         A POST because the question is a body, not because anything changes.
+
+
+        **What each line and payment has left, and where it goes** (ADAM CR-208, option A; Chinmay, 25 October 2026;
+        CHG-R10ORD-014). Every refund records what it took: one `orders.refund_line` row per order line it refunds
+        (`refundedAmount`) and one `orders.refund_allocation` row per payment it refunds against (`refundedAmount` in
+        the base currency, `tenderAmount` in the payment''s tender currency). **`refundableAmount`** is what each
+        line, or each payment, paid minus what earlier refunds took from it (their `refund_line` and
+        `refund_allocation` rows). **Allocation across payments**: the most recent payment first, cash last. **Time
+        bands apply per line**, by that line''s own performance: each line''s percentage is the band its own
+        performance falls in, so one refund of lines for two performances can carry two percentages.
+        **`settleTo` onto the venue''s `refundDestinations`** (`RefundCalculationPolicyView`): `originalTender` is
+        `originalPayment`; `advanceBalance` is `walletCredit`; `storeCredit` is `voucherCreditNote` (issued as a
+        gift card, CHG-CSP-037); `wireTransfer` is `originalPayment`, paid out by transfer. A `settleTo` whose
+        destination the venue does not list is not offered. `tenderRoutes` is the allocation `createRefund` would write, one row per payment, in that
+        order.
 
         '
       tags:
@@ -24515,7 +24544,7 @@ components:
           type: string
           format: date-time
     Refund:
-      x-ticvai-persistence: orders.refund
+      x-ticvai-persistence: "orders.refund + orders.refund_line + orders.refund_allocation"
       type: object
       required:
       - id
@@ -24618,7 +24647,57 @@ components:
           $ref: ../shared/common.yaml#/components/schemas/Money
         appliedPercentage:
           type: number
-          description: From the venue's time bands, or an approver override.
+          description: From the venue's time bands, or an approver override. Where the refunded lines fall in
+            different bands, each line's own percentage is on its `lines` row and this is the one the refund's lines
+            share, or null when they differ (ADAM CR-208).
+        lines:
+          type: array
+          readOnly: true
+          description: '**What the refund took from each order line** (ADAM CR-208, option A; CHG-R10ORD-014): child
+            rows, `orders.refund_line`, one per line refunded, written by `createRefund`. A line''s refundable amount is
+            what it paid minus its rows on earlier refunds.'
+          items:
+            type: object
+            required:
+            - orderLineId
+            - refundedAmount
+            properties:
+              orderLineId:
+                type: string
+                format: uuid
+                x-ticvai-references: orders.order_line
+              refundedAmount:
+                $ref: ../shared/common.yaml#/components/schemas/Money
+              appliedPercentage:
+                type: number
+                nullable: true
+                description: The time band of this line's own performance (ADAM CR-208).
+        allocations:
+          type: array
+          readOnly: true
+          description: '**What the refund took from each payment** (ADAM CR-208, option A; CHG-R10ORD-014): child rows,
+            `orders.refund_allocation`, one per payment refunded against, the most recent payment first and cash
+            last. A payment''s refundable amount is what it paid minus its rows on earlier refunds.'
+          items:
+            type: object
+            required:
+            - paymentId
+            - refundedAmount
+            properties:
+              paymentId:
+                type: string
+                format: uuid
+                x-ticvai-references: orders.payment
+              refundedAmount:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Money
+                description: In the base currency, for the ledger.
+              tenderAmount:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Money
+                nullable: true
+                description: In the payment's tender currency (`Payment.tenderCurrency`), at that currency's scale;
+                  null where the payment was in the base currency.
         status:
           type: string
           enum:
@@ -25498,7 +25577,8 @@ components:
         refundableAmount:
           allOf:
           - $ref: ../shared/common.yaml#/components/schemas/Money
-          description: What remains refundable on the order or lines, before this refund.
+          description: 'What remains refundable on the order or lines, before this refund: what each line paid minus
+            what earlier refunds took from it (`orders.refund_line`; ADAM CR-208).'
         amount:
           allOf:
           - $ref: ../shared/common.yaml#/components/schemas/Money
@@ -25523,7 +25603,9 @@ components:
           - storeCredit
         tenderRoutes:
           type: array
-          description: Where the money would go, one row per payment it would refund against.
+          description: Where the money would go, one row per payment it would refund against, the most recent payment
+            first and cash last, each up to what that payment has left after earlier refunds (`orders.refund_allocation`;
+            ADAM CR-208).
           items:
             type: object
             required:
