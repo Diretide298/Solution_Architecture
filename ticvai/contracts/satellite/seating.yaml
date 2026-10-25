@@ -1622,6 +1622,7 @@ paths:
           - graphical
           - list
           default: auto
+      - $ref: ../shared/common.yaml#/components/parameters/GuestVenue
       responses:
         '200':
           description: Availability

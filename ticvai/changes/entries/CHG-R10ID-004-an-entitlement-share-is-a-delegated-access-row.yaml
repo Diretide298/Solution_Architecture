@@ -1,0 +1,57 @@
+id: CHG-R10ID-004
+date: '2026-10-25'
+source: cr
+kind: contract
+summary: 'An entitlement share is one identity.delegated_access row: over_object_ref entitlement:<entitlementId>,
+  subject_id the recipient, over_subject_id the owner, permission ENTITLEMENT_USE with role_id null, delegation_kind
+  sharedEntitlement (a new CHECK value), valid_to the validUntil, granted_by_kind subject. The row gains
+  revoked_by_kind and revoked_by_subject_id so a guest owner''s revoke is recorded; revokeEntitlementShare matches the
+  shareId to its entitlement through over_object_ref and is 404 otherwise.'
+decision:
+  what: 'ADAM CR-209, option A, as settled. contracts/spine/identity.yaml DelegatedAccess: overObjectRef''s
+    <kind>:<id> form, delegationKind sharedEntitlement with the exact mapping, revokedByKind (principal, subject,
+    system) and revokedBySubjectId (-> pii.subject, required when revokedByKind is subject). contracts/spine/orders.yaml:
+    shareEntitlement and revokeEntitlementShare state the mapping, revokeEntitlementShare declares 404,
+    EntitlementShare says how it reads the row. contracts/shared/permissions.yaml: ENTITLEMENT_USE (access module), held
+    only through a share. docs/active/breaking-changes.yaml BC-483 (the enum value on the four grant reads).
+    tools/check-business-rules.py BR-ENTITLEMENT-SHARE. Database: the delegation_kind CHECK gains sharedEntitlement;
+    identity.delegated_access gains revoked_by_kind text and revoked_by_subject_id uuid, from the generator''s forward
+    migration.'
+  by: Chinmay
+  date: '2026-10-25'
+why: 'ADAM CR-209 (Surendra Loke, ticket 28285), settled 25 October 2026. EntitlementShare was "a view of the
+  delegated_access row" with no column mapping, the CHECK had no share value, nothing said whether a share carries a
+  role or a permission, and a guest (not a principal) could not be recorded as the one who revoked, so the two share
+  operations could store and match shares differently.'
+keys_touched:
+  operations: [shareEntitlement, revokeEntitlementShare, listDelegatedAccess, createDelegatedAccess, listDelegations,
+    grantDelegation]
+  schemas: [DelegatedAccess, EntitlementShare, Permission]
+  tables: [identity.delegated_access]
+  files:
+  - contracts/spine/identity.yaml
+  - contracts/spine/orders.yaml
+  - contracts/shared/permissions.yaml
+  - docs/active/breaking-changes.yaml
+  - tools/check-business-rules.py
+root_class: 'new: a view schema over a generic row with no stated column mapping'
+tickets:
+  started:
+  - '28285 (shareEntitlement / revokeEntitlementShare): through CR-209''s comment, as CHG-ADM-002 says; its text is
+    not rewritten.'
+  unstarted:
+  - 'The CHECK value and the two columns are migration work for Hrushikant Patkar, a child task of the affected MIG
+    ticket; not applied while server databases are frozen.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-209
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-business-rules.py
+status: open
+notes: 'BR-ENTITLEMENT-SHARE fails on the parent commit (3 findings) and passes after. ENTITLEMENT_USE joins the
+  vocabulary because the decision names it and a permission grant stores a vocabulary value; it sits in the access
+  module and no operation declares it, so ticking it on a role gives nothing (asked of the lead in the lane report:
+  whether it should stay off every role checklist instead). Orders still writes the Identity row directly (the
+  existing shape, "written by 2 contracts"); this entry does not change that.'

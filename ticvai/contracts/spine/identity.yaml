@@ -1060,6 +1060,10 @@ paths:
         `contracts/shared/permissions.yaml`''s, outside this contract). `module` filters to one module''s
         presets.
 
+
+        **Ordered by `module` ascending, then `name` ascending, then `id`** (decided 25 October 2026, Chinmay,
+        ADAM CR-210 option A; CHG-R10ID-003), with a null `module` last, as an ascending sort leaves it.
+
         '
       tags:
       - administration
@@ -1092,6 +1096,12 @@ paths:
         - "P08 BO-054 Role Assignment"
       x-ticvai-conflict-policy: serverWins
       summary: Save a tick-set under a name
+      description: '**Presets are read-only; a tenant saves its own beside them** (accepted 21 October 2026,
+        Chinmay, ADAM CR-176 option A; CHG-R10ID-005). A PUT addressed to a preset''s id (a row with `isPreset`
+        true, seeded by the platform) is `409 capability-template-is-preset` and changes nothing, so a later
+        reseed of the presets stays safe. On a tenant''s own template the server sets `isPreset` false and
+        `presetLevel` null whatever the body says; `module` is kept as sent, so a tenant may file its template
+        under a module.'
       tags:
       - administration
       x-ticvai-permission: ROLE_MANAGE
@@ -1122,6 +1132,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CapabilityTemplate'
+        '409':
+          description: The id is a platform preset's (`isPreset` true), which a tenant cannot overwrite
+            (`capability-template-is-preset`, ADAM CR-176). Nothing is changed.
+          x-ticvai-problem-types: [capability-template-is-preset]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /segregation-rules:
@@ -1313,6 +1331,43 @@ paths:
         call cross-region `createDsarRequest` (`kind: access`, `serviceAuth`), which raises the cross-cell
         sync.dsar_request; an unlinked guest raises no DSAR record.
 
+
+        **Which request, and who raised it** (ADAM CR-101, accepted 15 October 2026; CHG-R10ID-016). Kind
+        `configurationChange`, `subjectContract` `identity`, subject type `subjectDataExport`, `subjectId` the guest''s
+        `pii.subject` id (`ApprovalKind`). A guest caller is recorded as the request''s `requestedBySubjectId`, with
+        `requestedByPrincipalId` null; a staff caller (`GUEST_VIEW_PII`) as `requestedByPrincipalId`.
+
+
+        **The export job and the file** (CR-101). The call writes an `identity.subject_data_export` row
+        (`SubjectDataExport`, status `awaitingApproval`) beside the request. The job runs when the request is approved
+        (Identity consumes `approval.granted` for subject type `subjectDataExport`), or at once where the tenant''s
+        matrix asks for no approval step; a rejected, withdrawn or expired request ends the row `rejected` with no file.
+        The job writes the file in the asked format to the tenant''s private object storage and sets the row `ready`.
+        **The guest and staff read where it has got to, and download it, with `getSubjectDataExport`**, which issues
+        a short-lived signed link to a `ready` file; no link is ever stored or sent by message.
+
+
+        **The statutory clock** (CR-101). The call emits `identity.privacyRequestRaised`, which Marketing turns into a
+        `marketing.privacy_request` (request type `access`), so the request sits in the privacy queue and its `dueAt`
+        (the jurisdiction''s configured response period) applies. **The statutory period itself is the client''s to
+        give** (`setPrivacyRequestTypes` `deadlines[].responseDays`); until it is configured the queue shows no
+        deadline, and `estimatedCompletionAt` stays null.
+
+
+        **Which tables it reads** (CR-101). The table set comes from the derived subject-data marker, not from a list
+        kept by hand: a table holds a guest''s data when its declared storage has a `subject_id` column, and
+        `handoff/subject-data-register.json` (derived each refresh by `tools/derive-subject-data-register.py`, r8 cause
+        IDENTITY-C65, CHG-R8GEN-015) lists every such table under the module that owns it, so a new table joins the
+        export by its own column. Identity reads its own tables directly; every other owner answers through its
+        `subjectDataRecords(subjectId)` query, which this operation asks in turn as each owner declares it. Until an
+        owner has declared it, the export assembles that owner''s data from what the lineage lists for this operation
+        today.
+
+
+        **An erased guest** (CR-101). A subject whose `pii.subject` row is tombstoned (`is_erased` true) is answered
+        `410 subject-erased` and nothing is raised: there is nothing left to export, and the tombstone is the record
+        that the erasure was done.
+
         '
       x-ticvai-read-via:
       - query: access#liveEntitlementsForSubject
@@ -1321,8 +1376,15 @@ paths:
       - query: orders#openOrdersForSubject
         route: projection
         for: which orders the export reports as open
+      x-ticvai-writes:
+      - table: identity.subject_data_export
+        for: 'the export''s row, status awaitingApproval, which the export job moves on (ADAM CR-101, CHG-R10ID-016)'
+      # Marketing writes the privacy case from identity.privacyRequestRaised; this operation only emits it (CR-101).
+      x-ticvai-names-for-context: [marketing.privacy_request]
       tags:
       - identity
+      x-ticvai-emits:
+      - identity.privacyRequestRaised
       x-ticvai-permission: GUEST_VIEW_PII
       x-ticvai-guest-callable: true
       x-ticvai-audience:
@@ -1384,6 +1446,96 @@ paths:
                     description: Null until a response period reaches Identity, as for `deleteGuestAccount`
                       (the periods are marketing-crm `setPrivacyRequestTypes` `deadlines[].responseDays`, which
                       Identity does not read).
+        '404':
+          description: 'No such guest, or a guest caller naming a subject that is not its own (never 403, which would
+            confirm the subject exists). Nothing is raised (ADAM CR-101; CHG-R10ID-016).'
+          x-ticvai-problem-types: [not-found]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '410':
+          description: 'The guest was erased (`pii.subject.is_erased` true): there is no data left to export, and nothing
+            is raised (`subject-erased`; ADAM CR-101, CHG-R10ID-016).'
+          x-ticvai-problem-types: [subject-erased]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /guests/{subjectId}/data-export/{requestId}:
+    parameters:
+    - name: subjectId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    - name: requestId
+      in: path
+      required: true
+      description: The `requestId` `exportSubjectData` answered with.
+      schema:
+        type: string
+        format: uuid
+    get:
+      operationId: getSubjectDataExport
+      x-ticvai-consumed-by:
+        - "P01 WEB-024 Devices, Wishlist & Consent"
+        - "P02 GST-066 Privacy & My Data"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
+      summary: Where a guest's data export has got to, and its download link
+      description: '**The status and download read of a data export** (ADAM CR-101, accepted 15 October 2026;
+        CHG-R10ID-016). Answers the `identity.subject_data_export` row of the request (`SubjectDataExport`) with the
+        approval''s outcome folded in: `awaitingApproval`, `running`, `ready`, `failed` or `rejected`. For a `ready`
+        export it issues a signed link to the file in the tenant''s private storage, valid for five minutes; each read
+        issues a new one and none is stored (ADR-0023: an export on a signed URL is personal data, so the link is
+        short and the file is never public). A guest reads its own exports only; staff read any guest''s with
+        `GUEST_VIEW_PII`. An erased guest''s exports are gone with it: 410.
+
+        '
+      tags:
+      - identity
+      x-ticvai-permission: GUEST_VIEW_PII
+      x-ticvai-guest-callable: true
+      x-ticvai-audience:
+      - staff
+      - guest
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: primary
+      x-ticvai-reads:
+      - table: identity.subject_data_export
+        for: 'the export''s row (ADAM CR-101, CHG-R10ID-016)'
+      - table: pii.subject
+        for: '410 subject-erased (is_erased)'
+      responses:
+        '200':
+          description: The export's status, and a fresh download link when it is ready
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubjectDataExportStatus'
+        '404':
+          description: 'No export with this `requestId` for this guest, or a guest caller naming a subject that is not its
+            own (never 403).'
+          x-ticvai-problem-types: [not-found]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '410':
+          description: 'The guest was erased after the export was made; the file went with the erasure
+            (`subject-erased`).'
+          x-ticvai-problem-types: [subject-erased]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /guests/{subjectId}/delegations:
@@ -1711,7 +1863,13 @@ paths:
         default, proposed, client to correct) from its last use, and never past the session''s `expiresAt`. **A
         retired refresh token sent again is a reuse**: the server ends the session, revokes every refresh token
         issued from the same sign-in, and answers 401, so a stolen token works at most once (IDENTITY-C25,
-        FOUNDATION-AI-C27; CHG-R8SPN-014; the rule is written once on `bearerAuth`).'
+        FOUNDATION-AI-C27; CHG-R8SPN-014; the rule is written once on `bearerAuth`).
+
+
+        **A guest''s refresh token is stored as a staff one is** (accepted 15 October 2026, ADAM CR-100;
+        CHG-R10ID-009): an `identity.refresh_token` row with `subject_id` set and `principal_id` null (exactly one
+        of the two), so rotation, reuse detection and revocation (`guestLogout`, `endGuestDeviceSessions`) work the
+        same way for both.'
       security: []
       requestBody:
         required: true
@@ -2160,6 +2318,13 @@ paths:
         venue''s people and those homed beneath it, never a sibling venue''s.
 
 
+        **The reach is read from the per-scope set, never the flat one** (decided 25 October 2026, Chinmay,
+        ADAM CR-189 option A; CHG-R10ID-001; the rule on `Session.permissionsByScope`): the reach is the scope
+        paths at which `USER_MANAGE` holds after deny resolution, not the session''s scope paths. A caller with
+        `USER_MANAGE` at venue A and any other permission (for example `POS_SELL`) at venue B lists A''s
+        principals only, and a `scopePath` under B is `403`.
+
+
         **Each item''s `roles`** are read with it from the principal''s live role grants
         (`identity.delegated_access` joined to `identity.role`; see `Principal.roles`).
 
@@ -2423,6 +2588,20 @@ paths:
         A change to `displayName` alone ends nothing.
 
 
+        **Every session and refresh token, at every venue, through one function** (accepted 21 October 2026,
+        Chinmay, ADAM CR-180 option A; CHG-R10ID-006). The caller acts at a venue, but `identity.refresh_token` is
+        tenant-root and `identity.session` venue-isolated, so ending them with the caller''s own row security
+        would revoke no token and leave sessions at other venues live while answering 200. So the operation ends
+        them by calling `identity.end_principal_sessions(principal_id, ended_by, reason)`, a SECURITY DEFINER
+        function in the same transaction as the update: it first checks the caller may update that principal
+        (the principal''s own write rule: the tenant root, or a grant over its home scope), then sets every
+        `active` session of the principal `terminated` with `ended_at`, `ended_by_principal_id` and `end_reason`,
+        and revokes every live refresh token (`revoked_at`, `revocation_reason`), whatever the venue. No grant or
+        policy is widened. A refusal by the function fails the whole update. Any other operation that must end
+        all of a principal''s sessions calls the same function (`forceLogout` ends one session, at the caller''s
+        own venue, and does not need it).
+
+
         **It never grants or removes a role** (decided 20 October 2026, Chinmay, R8 blocker cause IDENTITY-C15,
         option A; CHG-R8SPN-024). A role held at a scope is a grant: `createDelegatedAccess` gives one (role,
         scope, validity) and `deleteDelegatedAccess` takes one away. CMS-019''s Change access calls those two for
@@ -2584,6 +2763,12 @@ paths:
         so the operation is called at the tenant scope, as `setRolePermissions` always was (approved breaking
         change BC-076). A venue manager reads the roles (`listRoles`) and grants them; it does not create them.
 
+
+        **`ROLE_MANAGE` must hold at the tenant root** (decided 25 October 2026, Chinmay, ADAM CR-189 option A;
+        CHG-R10ID-001; the rule on `Session.permissionsByScope`), read from the per-scope set: a caller holding
+        `ROLE_MANAGE` only below the root is `403`, even when it holds another permission (for example
+        `REPORT_VIEW`) at the root, which puts the root among its scope paths. Nothing is written.
+
         '
       tags:
       - administration
@@ -2637,6 +2822,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Role'
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
         '409':
           description: The code is already used in the tenant, compared case-insensitively (`duplicate-code`), or
             the initial permission set breaches a segregation rule whose severity is `block`
@@ -3527,6 +3714,9 @@ paths:
       - guest
       x-ticvai-read-routing: primary
       summary: Read the current guest session
+      description: '**A read: it issues no token** (accepted 15 October 2026, ADAM CR-100; CHG-R10ID-009; BC-482). The
+        answer is `GuestSessionView`, the session without `tokens`; only the guest sign-ins and `refreshToken` issue them, as on the staff
+        side. Nothing is rotated, so a cached copy stays true and the read stays offline-capable.'
       tags:
       - guestAuth
       x-ticvai-permission: null
@@ -3542,7 +3732,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GuestSession'
+                $ref: '#/components/schemas/GuestSessionView'
         '401':
           $ref: ../shared/common.yaml#/components/responses/Unauthorized
         '429':
@@ -3701,7 +3891,17 @@ paths:
         same transaction through Approvals' in-process `createApprovalRequest` (Approvals is in the Tenancy
         module, in `commerce` with Identity; ADR-0055 rule 3). A guest's own erasure needs no human approval
         step (ADR-0047 section 7); the tenant's approval matrix may add one, and then the erasure job waits
-        for the decision.
+        for the decision. **It is raised for the guest** (ADAM CR-101, accepted 15 October 2026; CHG-R10ID-016):
+        kind `configurationChange`, `subjectContract` `identity`, subject type `subjectErasure`, `subjectId` the
+        guest's `pii.subject` id, with the guest recorded as the request's `requestedBySubjectId` and
+        `requestedByPrincipalId` null, since a guest is not a principal.
+
+
+        **It enters the privacy queue** (CR-101, as for `exportSubjectData`). The call emits
+        `identity.privacyRequestRaised` (request type `deletion`), which Marketing turns into a privacy request, so
+        the request's `dueAt` applies; the statutory period is the client's to give. **The erasure job also deletes
+        the guest's data exports**: every `identity.subject_data_export` row of the subject and its file in the
+        tenant's storage, since an export on a signed link is a copy of the guest's data (ADR-0023).
 
 
         **Every guest is erased locally; only a linked guest fans out.** The job tombstones the guest's
@@ -3731,8 +3931,13 @@ paths:
       - query: orders#openOrdersForSubject
         route: projection
         for: 409 open-orders-remain (and the erasure job's re-check)
+      x-ticvai-writes:
+      - table: identity.subject_data_export
+        for: 'the erasure job deletes the guest''s data exports and their files (ADAM CR-101, CHG-R10ID-016)'
       tags:
       - guestAuth
+      x-ticvai-emits:
+      - identity.privacyRequestRaised
       x-ticvai-permission: null
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
@@ -3801,7 +4006,15 @@ paths:
       - partner
       x-ticvai-read-routing: replica
       summary: Identity providers configured for this tenant
-      description: Called before the login screen renders, so it is unauthenticated.
+      description: 'Called before the login screen renders, so it is unauthenticated.
+
+
+        **Active providers only, in a fixed order** (decided 25 October 2026, Chinmay, ADAM CR-190 option A;
+        CHG-R10ID-002). Only providers whose `identity.sso_provider.is_active` is true are listed; a null
+        `is_active` (the column has no default) counts as not active. Ordered by `displayName` ascending, then
+        `id` ascending. A tenant with no active provider answers `[]`, and its sign-in doors show no SSO
+        button. `SsoProvider` carries no `isActive`: the filter is the server''s, so a switched-off provider''s
+        name never reaches an unauthenticated caller.'
       tags:
       - sso
       x-ticvai-permission: null
@@ -5842,6 +6055,16 @@ paths:
         runs with `ticvai.scope_paths` set to the tenant root and the operator as the audited actor
         (`AuditRecord.platformStaffGrantId` once the grant exists).
 
+
+        **The token and where the step-up lives** (ADAM CR-175 option A, accepted 21 October 2026; ADR-0072;
+        CHG-R10ID-007). The Control Plane token is a JWT signed by the Control Plane, verified against its JWKS
+        (trusted by configuration), with this cell as its audience; `sub` is the operator
+        (`control.platform_operator`), `ticvai_platform_permissions` the `PLATFORM_*` set, `sid` the platform
+        session. The MFA step-up is recorded in the Control Plane on the operator''s platform session and carried
+        as `ticvai_step_up` (`{action, at}`) beside `amr`: this operation accepts it when its action names this
+        operation and it is recent (ADR-0072), and never reads `identity.mfa_challenge` for an operator. The
+        verification is built in the cell hosts by the platform-auth ticket; until it lands this ticket waits.
+
         '
       tags:
       - administration
@@ -6034,6 +6257,10 @@ paths:
         the operator only has if a grant carries it. Returns only grants whose `operatorPrincipalId` is
         the caller, most recent first: **ordered by `openedAt` descending, `id` as the tiebreak** (decided
         14 October 2026, ADAM CR-077; CHG-IDR-002).
+
+
+        **The caller is the verified Control Plane token''s `sub`** (ADAM CR-175 option A; ADR-0072; CHG-R10ID-007),
+        admitted as `openPlatformStaffGrant` admits it: no tenant session, no tenant principal.
 
         '
       tags:
@@ -6474,6 +6701,23 @@ paths:
 
         - **`conflicting`**: a pair a `SegregationRule` forbids, held together (the same test
         `listSegregationViolations` runs), so one screen shows all three.
+
+
+        **The thresholds and the sources** (decided 25 October 2026, Chinmay, ADAM CR-210 option A;
+        CHG-R10ID-003):
+
+        - **`missing`, by peer share.** The principal was denied the permission `deniedThreshold` times or more
+        in the window, and of the peers with the same role at the same scope (`peersHoldingPercent`): **at least
+        50%** hold it -> a finding with recommendation `grant`; **25% to under 50%** -> recommendation `review`;
+        **under 25%** -> no finding.
+
+        - **`excessive`, by recorded use.** Usage is read from `identity.access_decision`. **Every authorisation
+        check the host makes writes an `access_decision` row** (the per-scope check of every operation, not only
+        `evaluateAccess`; summarised per principal, permission, scope and day where the volume needs it), so a
+        permission used by ordinary operations is never flagged.
+
+        - **Held by policy** means the permissions an active `AuthorisationPolicy` allows for the principal at the
+        scope (with `draftPolicyId`, that draft as if active), beside those held by role and by delegation.
 
 
         **Advisory.** Nothing is revoked or granted by this read; a change goes through `createDelegatedAccess`,
@@ -7164,8 +7408,9 @@ paths:
       x-ticvai-agreed: '29 September: our build plan (7.1.35, 7.1.56); shape follows listPermissionFindings'
       summary: The grants a campaign asks somebody to certify or revoke
       description: 'One row per grant in the campaign, with the finding that pre-filled it and the decision so far.
-        `assignedToMe` is the reviewer''s own queue. Ordered by `recommendation` (revoke first), then principal; keyset
-        cursor.
+        `assignedToMe` is the reviewer''s own queue. **Ordered by `recommendation` `revoke`, then `review`, then
+        `certify`, then the principal''s `displayName` ascending, then `id`** (decided 25 October 2026, Chinmay,
+        ADAM CR-210 option A; CHG-R10ID-003); the keyset cursor encodes that order.
 
         '
       tags:
@@ -8726,9 +8971,13 @@ components:
     IdentityRefreshToken:
       type: object
       x-ticvai-persistence: identity.refresh_token
-      description: '**Taken from the backend workbook, 20 September.** Stores hashed refresh tokens and tracks token expiry, rotation, and revocation.'
+      description: '**Taken from the backend workbook, 20 September.** Stores hashed refresh tokens and tracks token
+        expiry, rotation, and revocation. **A staff member''s or a guest''s** (accepted 15 October 2026, ADAM CR-100;
+        CHG-R10ID-009): exactly one of `principalId` and `subjectId` is set, so a guest''s refresh token, which
+        `refreshToken` serves and `guestLogout` and `endGuestDeviceSessions` revoke, has a store and is revoked the
+        same way as a staff one.'
+      x-ticvai-exactly-one-of: [[principalId, subjectId]]
       required:
-      - principalId
       - hash
       - expiresAt
       - createdAt
@@ -8740,6 +8989,15 @@ components:
           x-ticvai-references: identity.principal
           type: string
           format: uuid
+          nullable: true
+          description: The staff member or partner the token belongs to; null on a guest's token (ADAM CR-100).
+        subjectId:
+          x-ticvai-references: pii.subject
+          type: string
+          format: uuid
+          nullable: true
+          description: The guest the token belongs to (a `pii.subject`, never a principal); null on a staff token
+            (ADAM CR-100).
         hash:
           type: string
           maxLength: 500
@@ -9228,6 +9486,109 @@ components:
           type: string
           readOnly: true
           description: The partition key (ADR-0005), the venue's path, as the event carries it.
+    SubjectDataExport:
+      x-ticvai-persistence: identity.subject_data_export
+      type: object
+      description: >-
+        **One guest data export, as stored** (ADAM CR-101, accepted 15 October 2026; CHG-R10ID-016). One row per
+        `exportSubjectData` request, keyed by the Approvals request id, written by `exportSubjectData` (status
+        `awaitingApproval`) and by the export job, which runs when the request is approved (`approval.granted`) or at
+        once where the tenant's matrix asks for no approval step, assembles the file and writes it to the tenant's
+        private object storage (never a public or CDN path; encrypted at rest under the tenant's keys, ADR-0063).
+        **Never returned by any operation** (`handoff/schema-storage-only.md`): `getSubjectDataExport` answers with
+        `SubjectDataExportStatus`, and `fileRef` never leaves the server; the file is reached only through the
+        short-lived signed link that read issues (ADR-0023).
+      required: [requestId, subjectId, format, status, requestedAt]
+      properties:
+        requestId:
+          type: string
+          format: uuid
+          x-ticvai-column: id
+          description: The `approvals.request` id `exportSubjectData` answered with; one export per request.
+        subjectId:
+          type: string
+          format: uuid
+          x-ticvai-references: pii.subject
+          description: The guest whose data is exported.
+        format:
+          type: string
+          enum: [json, csv, pdf]
+        status:
+          type: string
+          enum: [awaitingApproval, running, ready, failed, rejected]
+          description: '`awaitingApproval` until the request is approved (or at once `running` where the matrix asks
+            for no step); `running` while the job assembles the file; `ready` once the file is stored; `failed` when
+            the job stops with `failureReason`; `rejected` when the request was rejected, withdrawn or expired, and
+            no file is made.'
+        fileRef:
+          type: string
+          maxLength: 500
+          nullable: true
+          description: The object key of the file in the tenant's private storage; null until `ready`. Server only.
+        fileSizeBytes:
+          type: integer
+          format: int64
+          nullable: true
+        failureReason:
+          type: string
+          maxLength: 500
+          nullable: true
+        requestedAt:
+          type: string
+          format: date-time
+        readyAt:
+          type: string
+          format: date-time
+          nullable: true
+    SubjectDataExportStatus:
+      x-ticvai-persistence: none — computed from identity.subject_data_export and the approvals.request it names
+      type: object
+      description: >-
+        **Where a guest's data export has got to, and the link to download it** (ADAM CR-101; CHG-R10ID-016), the
+        answer of `getSubjectDataExport`. The link is issued afresh by each read of a `ready` export and is never
+        stored.
+      required: [requestId, subjectId, format, status, requestedAt]
+      properties:
+        requestId:
+          type: string
+          format: uuid
+        subjectId:
+          type: string
+          format: uuid
+        format:
+          type: string
+          enum: [json, csv, pdf]
+        status:
+          type: string
+          enum: [awaitingApproval, running, ready, failed, rejected]
+          description: As `SubjectDataExport.status`.
+        requestedAt:
+          type: string
+          format: date-time
+        readyAt:
+          type: string
+          format: date-time
+          nullable: true
+        downloadUrl:
+          type: string
+          format: uri
+          nullable: true
+          description: A signed link to the file in the tenant's private storage, valid for five minutes from this
+            answer (as the package's other short-lived signed links); null unless `status` is `ready`. Read again for a
+            new link.
+        downloadUrlExpiresAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: When `downloadUrl` stops working; null with no link.
+        fileSizeBytes:
+          type: integer
+          format: int64
+          nullable: true
+        failureReason:
+          type: string
+          nullable: true
+          description: Why the job failed, with `failed`; null otherwise.
     SubjectHolding:
       x-ticvai-persistence: identity.subject_holding
       # One row per order or entitlement: an entitlement has one holder at a time (CHG-GDL-001).
@@ -9441,6 +9802,13 @@ components:
       description: '3.3.37. **The decision, the policy version behind it, and the attribute values it
         actually saw.** The third is what separates *the policy is wrong* from *the data was stale*.
 
+
+        **Every authorisation check writes one** (decided 25 October 2026, Chinmay, ADAM CR-210 option A;
+        CHG-R10ID-003): not only `evaluateAccess`, but the per-scope permission check the host makes before every
+        operation (`decidedBy` `central`), permit and deny alike, so `listPermissionFindings` reads real use. Where
+        the volume needs it, the host summarises the checks per principal, permission, scope and day instead of
+        one row per check; the summary keeps the latest decision of the day.
+
         '
       properties:
         id:
@@ -9652,10 +10020,30 @@ components:
           description: The tenant root. **Operations write it at `tenant` scope**; the server sets it.
     GuestSession:
       x-ticvai-persistence: none — Redis session registry
+      description: '**A guest sign-in''s answer: the session and its new tokens** (`registerGuest`, `verifyGuestOtp`,
+        `guestPasswordLogin`, `guestSocialLogin`, `guestUaePassLogin`). **Tokens come with a sign-in, never with a
+        read** (accepted 15 October 2026 and approved by the lead as a breaking response change, ADAM CR-100;
+        CHG-R10ID-009; BC-482), as on the staff side, where `LoginResponse` carries tokens and `Session` does not:
+        `getGuestSession` returns `GuestSessionView`, the same session without `tokens`.'
+      allOf:
+      - $ref: '#/components/schemas/GuestSessionView'
+      - type: object
+        required:
+        - tokens
+        properties:
+          tokens:
+            allOf:
+            - $ref: '#/components/schemas/TokenPair'
+            description: 'The new access and refresh tokens; `refreshToken` returns the next pair. A guest''s refresh
+              token is stored as an `identity.refresh_token` row with `subjectId` set (`IdentityRefreshToken`).'
+    GuestSessionView:
+      x-ticvai-persistence: none — Redis session registry
       type: object
+      description: '**The guest session as `getGuestSession` reads it: no tokens** (accepted 15 October 2026, ADAM
+        CR-100; CHG-R10ID-009; BC-482). A read never issues or rotates a token, so it stays a read and stays
+        offline-capable; `GuestSession` (a sign-in''s answer) is this plus `tokens`.'
       required:
       - subjectId
-      - tokens
       - isVerified
       - expiresAt
       properties:
@@ -9665,8 +10053,6 @@ components:
         displayName:
           type: string
           nullable: true
-        tokens:
-          $ref: '#/components/schemas/TokenPair'
         isVerified:
           type: boolean
           description: 'False until an OTP or a verified provider identity confirms ownership. An unverified
@@ -10476,7 +10862,11 @@ components:
       description: '**An Apple, Google or UAE Pass identity linked to a guest account** (R8 blocker IDENTITY-C54,
         CHG-R8MIG-015). Written by `guestSocialLogin` and `guestUaePassLogin` when they link or create an account, read
         by them to find the account again (a private-relay email changes nothing) and by `GuestSession.identityProviders`.
-        Storage only, never returned.'
+        Storage only, never returned. **This is the linked-provider store ADAM CR-100 asked for** (accepted 15 October
+        2026, as `identity.guest_provider_identity`; CHG-R10ID-009): subject, provider, the provider''s subject id and
+        when it was linked, unique on provider and provider subject, written by `guestSocialLogin` and
+        `guestUaePassLogin`; `password` and `otp` are derived from `identity.guest_credential` and a verified contact.
+        It has been here since r8, so no second table is made.'
       required: [id, subjectId, provider, providerSubject, linkedAt]
       properties:
         id:
@@ -10664,7 +11054,9 @@ components:
           writeOnly: true
           x-ticvai-secret: field-encrypted
           description: The `totp` shared secret, encrypted with the tenant's field key (ADR-0063); null for other
-            kinds. Never returned after `MfaEnrolment.secret`.
+            kinds. Never returned after `MfaEnrolment.secret`. This is the encrypted column ADAM CR-173 asked for
+            (option A, accepted 21 October 2026; in the package since r8, CHG-R8INT-024; CHG-R10ID-008), which
+            `verifyMfaEnrolment` and `verifyMfaChallenge` decrypt to compute the expected code.
         destination:
           type: string
           nullable: true
@@ -11142,6 +11534,7 @@ components:
       x-ticvai-required-when:
         grantedByPrincipalId: {grantedByKind: principal}
         grantedBySubjectId: {grantedByKind: subject}
+        revokedBySubjectId: {revokedByKind: subject}
       type: object
       required:
       - id
@@ -11238,6 +11631,10 @@ components:
             a booking. `scopePath` answers *where*; this answers *what*, and a guest''s authority is almost
             always over a specific object rather than a branch of the tree.
 
+
+            **Written as `<kind>:<id>`.** An entitlement share is `entitlement:<entitlementId>` (decided 25
+            October 2026, Chinmay, ADAM CR-209 option A; CHG-R10ID-004).
+
             '
         delegationKind:
           type: string
@@ -11250,9 +11647,19 @@ components:
           - corporateAdmin
           - corporateMember
           - carer
+          - sharedEntitlement
           description: '**What kind of relationship this expresses**, for display and for reporting. The
             mechanism does not branch on it — a family member and a group attendee are the same grant
             with different words around them, which is the point.
+
+
+            **`sharedEntitlement` is the row an entitlement share is** (decided 25 October 2026, Chinmay, ADAM
+            CR-209 option A; CHG-R10ID-004). `shareEntitlement` writes exactly: `overObjectRef`
+            `entitlement:<entitlementId>`, `subjectId` the recipient, `overSubjectId` the owner, `permission`
+            `ENTITLEMENT_USE` with `roleId` null, `delegationKind` `sharedEntitlement`, `effect` ALLOW, `validTo`
+            the request''s `validUntil`, `grantedByKind` `subject` with `grantedBySubjectId` the owner. `revokeEntitlementShare` finds the row by the path''s `shareId`
+            and matches it to the path''s `entitlementId` through `overObjectRef`; a row that does not match is
+            404. Orders'' `EntitlementShare` is this row seen through the share.
 
             '
         quota:
@@ -11299,6 +11706,23 @@ components:
             Taken from `identity.user_access`. This table recorded `revokedBy` and not when, so
             it could say who revoked a grant and not whether it was before or after the thing
             somebody is asking about.
+        revokedByKind:
+          type: string
+          enum: [principal, subject, system]
+          nullable: true
+          readOnly: true
+          description: '**Who revoked the grant** (decided 25 October 2026, Chinmay, ADAM CR-209 option A;
+            CHG-R10ID-004): a staff member (`revoked_by_principal_id`), a guest (`revokedBySubjectId`, for
+            example the owner taking back an entitlement share) or the system (an expiry sweep). Null while
+            the grant is live.'
+        revokedBySubjectId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          x-ticvai-references: pii.subject
+          description: The guest who revoked the grant; set when `revokedByKind` is `subject` (ADAM CR-209), since a
+            guest is not a principal and cannot fill `revoked_by_principal_id`.
         validFrom:
           type: string
           format: date-time
@@ -11613,13 +12037,25 @@ components:
           allOf:
           - $ref: ../shared/permissions.yaml#/components/schemas/PermissionSet
           description: 'Flattened set across all granted scopes, after deny resolution. Convenience for
-            coarse checks. Anything scope-sensitive must use `permissionsByScope`.
+            coarse checks only: it never decides an operation by itself (ADAM CR-189). Anything
+            scope-sensitive uses `permissionsByScope`.
 
             '
         permissionsByScope:
           type: array
-          description: 'Permissions effective at each granted scope path. Clients filter navigation on
-            this and never compute permissions themselves.
+          description: 'Permissions effective at each granted scope path, after deny resolution. Clients filter
+            navigation on this and never compute permissions themselves.
+
+
+            **The server keeps the same set and authorises from it** (decided 25 October 2026, Chinmay, ADAM
+            CR-189 option A; CHG-R10ID-001). The rule for every operation: `x-ticvai-permission` is evaluated
+            at the scope the operation acts on, from the per-scope set (the node acted on or one of its
+            ancestors); `effectivePermissions` is for coarse checks only. A list''s reach is the scope paths
+            where its permission holds, and a filter outside it is `403`; a tenant-level operation needs its
+            permission at the tenant root. The request kernel''s seam carries this set beside the flat one
+            (#27692 owns the field) and sign-in (#27666) fills it from the same resolution that fills this
+            property; tests fill the seam until sign-in lands. The full statement is
+            `docs/architecture/specs/permission-resolution.md` section 7.2. No wire shape changes.
 
             '
           items:

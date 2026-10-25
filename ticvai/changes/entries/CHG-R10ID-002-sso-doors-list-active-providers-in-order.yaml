@@ -1,0 +1,37 @@
+id: CHG-R10ID-002
+date: '2026-10-25'
+source: cr
+kind: contract
+summary: 'listSsoProviders lists only providers whose is_active is true (a null is_active is not active), ordered by
+  displayName then id; a tenant with no active provider answers [] and its doors show no SSO button. No field and no
+  wire change.'
+decision:
+  what: 'ADAM CR-190, option A, as settled. contracts/spine/identity.yaml listSsoProviders: the description states the
+    filter, the null rule, the order and the empty answer; SsoProvider gains no isActive. tools/check-business-rules.py
+    BR-SSO-ACTIVE.'
+  by: Chinmay
+  date: '2026-10-25'
+why: 'ADAM CR-190 (Deep Khanvilkar, ticket 30730 listSsoProviders), settled 25 October 2026. Nothing said whether a
+  switched-off provider is listed on the unauthenticated sign-in doors (EMP-001, ADM-001, PTR-001, SUP-001, EMP-042),
+  and the array had no order, so buttons could move between calls.'
+keys_touched:
+  operations: [listSsoProviders]
+  tables: [identity.sso_provider]
+  files:
+  - contracts/spine/identity.yaml
+  - tools/check-business-rules.py
+root_class: 'new: an unpaged list read with no filter on its own active flag and no order'
+tickets:
+  started:
+  - '30730 (listSsoProviders): through CR-190''s comment, as CHG-ADM-002 says; its text is not rewritten.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-190
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-business-rules.py
+status: open
+notes: 'BR-SSO-ACTIVE fails on the parent commit and passes after. How an unauthenticated call reads the row-secured
+  table stays out of scope, as the CR says.'

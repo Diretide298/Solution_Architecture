@@ -1,0 +1,75 @@
+id: CHG-R10ID-010
+date: '2026-10-25'
+source: cr
+kind: contract
+summary: 'Every public guest read of venue data runs under the venue the request names: the path''s {venueId}, a
+  required venueId query parameter, or the new shared X-Venue-Id header (common GuestVenue). The server checks it is
+  one of the tenant''s venues (404 otherwise) and reads under a read-only scope of that venue''s path, so row-level
+  security stays the line of defence and browsing needs no session; an anonymous guest session (CR-183) carries the
+  same venue scope. Stated once on guestAuth (and in permission-resolution 7.1); getGuestBundle and getBundle say so,
+  and the 42 venue-level public guest reads whose request named no venue declare GuestVenue.'
+decision:
+  what: 'ADAM CR-198, option A, for every public guest read of venue data, as settled. contracts/shared/common.yaml:
+    the GuestVenue parameter (X-Venue-Id, optional in the schema) and the rule on guestAuth, with what is not such a
+    read (getOrder and getPaymentLink, addressed by their own token; getWaitingRoomPosition, the waiting room''s own
+    store). docs/architecture/specs/permission-resolution.md 7.1. contracts/satellite/promotions.yaml getGuestBundle and
+    getBundle. GuestVenue declared on the siblings: fnb (getGuestMenu, getFnbDeliveryPolicy, listFulfilmentSlots,
+    listModifierGroups), marketing-crm (listLoyaltyProgrammes, listRewards, listBadges), promotions (listPromotions,
+    getPromotion, getGuestBundle, getBundle), queue (listQueues), resources (getMapResourceAvailability), retail
+    (listMerchandise, lookupMerchandise), seating (getSeatAvailability), transport (getTransportRoute,
+    getTransportRouteMap, getTransportFareTable, searchTransportDepartures, getTransportDeparture,
+    listTransportPassOffers), venue-map (getVenueMap, getVenueMapGraph), white-label (listAnalyticsProviders), access
+    (listParkingFacilities), catalogue (listProductCategories, searchCatalogue, listProducts,
+    getProductEligibilityRule, getGroupPackageDefinition, listGroupPackages, getProduct, listProductVariants, listEvents,
+    listPerformances, listCatalogueBundles, getAvailability, getPerformance, listMembershipProgrammes,
+    listMembershipBenefits, getPlanBenefits). tools/check-business-rules.py BR-GUEST-VENUE (general).'
+  by: Chinmay
+  date: '2026-10-25'
+why: 'ADAM CR-198 (Chinmay Patkar, ticket 36301 getGuestBundle), settled 25 October 2026, consistent with CR-183''s
+  anonymous guest session (CHG-R9CR-002). A visitor''s public read had no scope, so venue row-level security hid every
+  row and getGuestBundle could only answer 404 to its intended caller; nothing in the package said which venue scope a
+  public read runs under, and the same held for every guest-audience public read of venue data.'
+keys_touched:
+  operations: [getGuestBundle, getBundle, getGuestMenu, getFnbDeliveryPolicy, listFulfilmentSlots, listModifierGroups,
+    listLoyaltyProgrammes, listRewards, listBadges, listPromotions, getPromotion, listQueues, getMapResourceAvailability,
+    listMerchandise, lookupMerchandise, getSeatAvailability, getTransportRoute, getTransportRouteMap,
+    getTransportFareTable, searchTransportDepartures, getTransportDeparture, listTransportPassOffers, getVenueMap,
+    getVenueMapGraph, listAnalyticsProviders, listParkingFacilities, listProductCategories, searchCatalogue,
+    listProducts, getProductEligibilityRule, getGroupPackageDefinition, listGroupPackages, getProduct,
+    listProductVariants, listEvents, listPerformances, listCatalogueBundles, getAvailability, getPerformance,
+    listMembershipProgrammes, listMembershipBenefits, getPlanBenefits]
+  files:
+  - contracts/shared/common.yaml
+  - docs/architecture/specs/permission-resolution.md
+  - contracts/satellite/promotions.yaml
+  - contracts/satellite/fnb.yaml
+  - contracts/satellite/marketing-crm.yaml
+  - contracts/satellite/queue.yaml
+  - contracts/satellite/resources.yaml
+  - contracts/satellite/retail.yaml
+  - contracts/satellite/seating.yaml
+  - contracts/satellite/transport.yaml
+  - contracts/satellite/venue-map.yaml
+  - contracts/satellite/white-label.yaml
+  - contracts/spine/access.yaml
+  - contracts/spine/catalogue.yaml
+  - tools/check-business-rules.py
+root_class: 'new: a read callable without a session over a table whose row security needs a scope'
+tickets:
+  started:
+  - '36301 (getGuestBundle): through CR-198''s comment, as CHG-ADM-002 says; its text is not rewritten.'
+  unstarted:
+  - 'The request kernel (#27692) builds the venue scope from the request; every ticket of the operations above picks
+    the header up at the r10 tag, and SETUP-CLIENTS (@ticvai/api-client) carries it to the apps.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-198
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-business-rules.py
+status: open
+notes: 'BR-GUEST-VENUE fails on the parent commit (43 findings: the rule missing on guestAuth and 42 reads) and passes
+  after. Adding an optional header is additive (check-contract-compat). A read that names no venue still finds
+  nothing, as before; the decision gives no refusal for it, so none is invented. Tenant-level public reads (published
+  white-label pages, policies, FAQs, consent purposes) are not venue data and are outside this rule.'

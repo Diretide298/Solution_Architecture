@@ -2811,6 +2811,7 @@ paths:
         schema:
           type: integer
           minimum: 1
+      - $ref: ../shared/common.yaml#/components/parameters/GuestVenue
       responses:
         '200':
           description: Every placed resource with its status for the window

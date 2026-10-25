@@ -4919,6 +4919,7 @@ paths:
         schema:
           type: string
           pattern: ^[a-z]{2}$
+      - $ref: ../shared/common.yaml#/components/parameters/GuestVenue
       responses:
         '200':
           description: The menu in force
@@ -5347,6 +5348,7 @@ paths:
         schema:
           type: string
           format: uuid
+      - $ref: ../shared/common.yaml#/components/parameters/GuestVenue
       x-ticvai-permission: PRODUCT_VIEW
       x-ticvai-audience:
       - staff
@@ -5494,6 +5496,7 @@ paths:
           format: date
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      - $ref: ../shared/common.yaml#/components/parameters/GuestVenue
   /guest-orders:
     post:
       operationId: createGuestFnbOrder
@@ -6166,6 +6169,7 @@ paths:
         schema:
           type: string
           format: uuid
+      - $ref: ../shared/common.yaml#/components/parameters/GuestVenue
       x-ticvai-permission: PRODUCT_VIEW
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false

@@ -191,6 +191,7 @@ x-ticvai-permission-modules:
       - ACCESS_POINT_CONFIGURE
       - TURNSTILE_MODE_SET
       - TICKET_LOOKUP
+      - ENTITLEMENT_USE
       - ACCESS_AI_PUBLISH
       - BIOMETRIC_IMAGE_VIEW
       - ACCESS_DIRECTION_SET
@@ -661,6 +662,12 @@ components:
         - ACCESS_POINT_CONFIGURE
         - TURNSTILE_MODE_SET          # the podium: operating mode, and free rotation or closed within it (R221)
         - TICKET_LOOKUP               # read-only validity check, no admission
+        - ENTITLEMENT_USE             # present an entitlement shared with you; held only through a share grant
+        # **Held through a share, not ticked on a role** (decided 25 October 2026, Chinmay, ADAM CR-209 option A;
+        # CHG-R10ID-004). `shareEntitlement` writes it on an `identity.delegated_access` row whose
+        # `over_object_ref` is `entitlement:<entitlementId>`; it lets the recipient present that one entitlement
+        # and is checked only against that row. A role that ticks it gains nothing, because no operation
+        # declares it as its `x-ticvai-permission`.
 
         # --- Accreditation ----------------------------------------------------
         - ACCREDITATION_VIEW

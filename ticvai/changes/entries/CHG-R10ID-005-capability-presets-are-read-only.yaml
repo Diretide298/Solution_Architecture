@@ -1,0 +1,36 @@
+id: CHG-R10ID-005
+date: '2026-10-25'
+source: cr
+kind: contract
+summary: 'setCapabilityTemplate refuses a PUT to a platform preset''s id with 409 capability-template-is-preset and
+  changes nothing; on a tenant''s own template the server sets isPreset false and presetLevel null whatever the body
+  says, and keeps module as sent.'
+decision:
+  what: 'ADAM CR-176, option A, accepted 21 October 2026. contracts/spine/identity.yaml setCapabilityTemplate: the
+    description and the 409. tools/check-business-rules.py BR-PRESET-READONLY.'
+  by: Chinmay
+  date: '2026-10-21'
+why: 'ADAM CR-176 (Sanket Keluskar, ticket 30743 setCapabilityTemplate), accepted 21 October 2026 ("1,2,3 all").
+  The create-or-replace PUT did not say whether it may overwrite a seeded preset, nor what a tenant''s isPreset,
+  presetLevel and module mean. The acceptance said "fixed at the source in r9"; it was not (no 409, no text), so it
+  is fixed here.'
+keys_touched:
+  operations: [setCapabilityTemplate]
+  schemas: [CapabilityTemplate]
+  files:
+  - contracts/spine/identity.yaml
+  - tools/check-business-rules.py
+root_class: 'new: a create-or-replace PUT over a table that also holds platform-seeded rows'
+tickets:
+  started:
+  - '30743 (setCapabilityTemplate): through CR-176''s comment, as CHG-ADM-002 says; its text is not rewritten.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-176
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py
+status: open
+notes: 'BR-PRESET-READONLY fails on the parent commit and passes after. One additive response.'

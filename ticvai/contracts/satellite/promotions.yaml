@@ -585,6 +585,7 @@ paths:
           format: date-time
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      - $ref: ../shared/common.yaml#/components/parameters/GuestVenue
       responses:
         '200':
           description: Promotions. **A guest caller receives `GuestPromotion` items**; staff and partner
@@ -721,6 +722,8 @@ paths:
 
         '
       x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/GuestVenue
       responses:
         '200':
           description: Promotion. **A guest caller receives `GuestPromotion`**; staff and partner callers
@@ -1564,13 +1567,22 @@ paths:
         of 20 October 2026; GST-004, GST-056, WEB-008). Answers `GuestBundle`: name, description, kind, price and
         savings, components and choice groups, and validity, never the allocation, owner, campaign, code or whether it
         has been sold. A bundle in draft, unpublished or withdrawn answers 404. `getBundle` stays the staff read and
-        is unchanged. Published catalogue data, so no permission is needed.'
+        is unchanged. Published catalogue data, so no permission is needed.
+
+
+        **Read under the venue the request names** (decided 25 October 2026, Chinmay, ADAM CR-198 option A;
+        CHG-R10ID-010; the rule for every public guest read is on `guestAuth`): the guest app or site sends
+        `X-Venue-Id`; the server checks it is one of the tenant''s venues (else 404) and reads under a read-only scope
+        of that venue''s path, so `promotions.bundle`''s venue row-level security finds the venue''s bundles with no
+        session. An anonymous guest session carries the same venue scope (CR-183).'
       tags:
       - bundle
       x-ticvai-permission: null
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: true
       x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/GuestVenue
       responses:
         '200':
           description: The guest's view of the bundle.
@@ -1988,6 +2000,11 @@ paths:
         Pattern 4; CHG-GCF-001; `x-ticvai-guest-callable`): a guest or a visitor gets a published bundle, and
         nothing in draft, unpublished or withdrawn; asked for by id, such a record answers as not found.
         `PRODUCT_VIEW` is what a staff caller must hold, and staff also see drafts (ADR-0025).
+
+        **A guest or a visitor reads under the venue the request names** (decided 25 October 2026, Chinmay,
+        ADAM CR-198 option A; CHG-R10ID-010; the rule is on `guestAuth`): `X-Venue-Id`, checked to be one of
+        the tenant's venues (else 404), gives the read a read-only scope of that venue's path; a staff caller
+        reads under its own scope as before.
       tags:
       - bundle
       x-ticvai-permission: PRODUCT_VIEW
@@ -2001,6 +2018,8 @@ paths:
 
         '
       x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/GuestVenue
       responses:
         '200':
           description: Bundle

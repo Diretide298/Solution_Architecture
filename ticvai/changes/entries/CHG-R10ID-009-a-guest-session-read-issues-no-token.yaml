@@ -1,0 +1,51 @@
+id: CHG-R10ID-009
+date: '2026-10-25'
+source: cr
+kind: contract
+summary: 'getGuestSession answers GuestSessionView, the guest session without tokens: only the guest sign-ins
+  (GuestSession, unchanged) and refreshToken issue tokens, as on the staff side. A guest''s refresh token is an
+  identity.refresh_token row with subject_id set (exactly one of principal_id and subject_id), so revocation is the
+  same for staff and guests. Linked providers were already stored in r8 as pii.subject_identity, with the decided
+  columns and uniqueness, so no second table is made.'
+decision:
+  what: 'ADAM CR-100, accepted 15 October 2026, approved by the lead as a breaking response change. contracts/spine/
+    identity.yaml: GuestSession becomes GuestSessionView plus tokens (allOf); GuestSessionView (no tokens) is what
+    getGuestSession answers, with a description; IdentityRefreshToken gains subjectId (-> pii.subject), principalId
+    becomes nullable, x-ticvai-exactly-one-of [principalId, subjectId]; refreshToken says where a guest''s token is
+    kept; SubjectIdentity cites the CR. docs/active/breaking-changes.yaml BC-482. tools/check-business-rules.py
+    BR-GUEST-TOKENS. Database: identity.refresh_token gains subject_id uuid, principal_id drops NOT NULL, and a CHECK
+    that exactly one is set, from the generator.'
+  by: Chinmay
+  date: '2026-10-15'
+why: 'ADAM CR-100 (Deep Khanvilkar, ticket 30655 getGuestSession; 30657 guestLogout), accepted 15 October 2026.
+  getGuestSession had to return a TokenPair a read cannot read back, a guest refresh token had no store
+  (identity.refresh_token required a principal), and linked provider identities had no table.'
+keys_touched:
+  operations: [getGuestSession, refreshToken, guestLogout]
+  schemas: [GuestSession, GuestSessionView, IdentityRefreshToken, SubjectIdentity]
+  tables: [identity.refresh_token, pii.subject_identity]
+  files:
+  - contracts/spine/identity.yaml
+  - docs/active/breaking-changes.yaml
+  - tools/check-business-rules.py
+root_class: 'new: a read answer that requires a value only a write can produce'
+tickets:
+  started:
+  - '30655 (getGuestSession) and 30657 (guestLogout): through CR-100''s comment, as CHG-ADM-002 says; their text is
+    not rewritten.'
+  unstarted:
+  - 'identity.refresh_token.subject_id, principal_id nullable and the CHECK are migration work for Hrushikant Patkar
+    (a child task of the affected MIG ticket); principal_id DROP NOT NULL is not additive, so it is listed for a person
+    in the migration review.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-100
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-business-rules.py
+status: open
+notes: 'BR-GUEST-TOKENS fails on the parent commit (2 findings) and passes after. The decision named the linked-provider
+  table identity.guest_provider_identity; r8 (CHG-R8MIG-015, IDENTITY-C54) had already made pii.subject_identity with
+  the same columns (subject, provider, provider subject, linked at) and the same unique key, written by
+  guestSocialLogin and guestUaePassLogin. Kept, not duplicated; the lane report asks the lead to confirm.'

@@ -79,6 +79,20 @@ components:
       schema:
         type: string
         format: uuid
+    GuestVenue:
+      name: X-Venue-Id
+      in: header
+      required: false
+      description: '**The venue a guest app or site is browsing, named on every public read of venue data** (decided 25
+        October 2026, Chinmay, ADAM CR-198 option A; CHG-R10ID-010; the rule is on `guestAuth`). The server checks it
+        is one of the tenant''s venues (`404` when it is not) and runs the read under a read-only scope of that venue''s
+        path, so row-level security stays the line of defence and browsing needs no session. Not declared where the
+        path (`/venues/{venueId}/...`) or a required `venueId` query parameter already names the venue, which then serves
+        the same purpose. Optional in the schema
+        so an r1 client still validates.'
+      schema:
+        type: string
+        format: uuid
     IdempotencyKey:
       name: Idempotency-Key
       in: header
@@ -1050,6 +1064,22 @@ components:
         **An anonymous guest session** (20 October 2026, R8 blocker cause GPS-C23; CHG-R8SPN-031) is a guest token with
         no subject, opened by `orders.createCart` for a visitor with no credential and bound to that cart; it reaches the
         cart operations and nothing that needs a known guest, and it ends when `claimCart` moves the cart to an account.
+
+
+        **Every public guest read of venue data runs under the venue the request names** (decided 25 October 2026,
+        Chinmay, ADAM CR-198 option A; CHG-R10ID-010). A guest app or site names its venue on the request: the path''s
+        `{venueId}`, or a required `venueId` query parameter, where the operation has one, else the `X-Venue-Id` header
+        (the `GuestVenue` parameter, declared on each such read). The server checks the venue is one of the tenant''s venues (a venue not of the tenant is
+        `404`) and builds, for that request only, a read-only scope of the venue''s path (`ticvai.scope_paths` the
+        venue''s path, nothing written), so row-level security stays the line of defence and browsing needs no session.
+        A read that names no venue has no scope and finds nothing, as before. **An anonymous guest session (CR-183)
+        carries the same venue scope**: the venue it was opened for, checked the same way; a signed-in guest''s read of
+        public venue data takes the venue the request names in the same way, beside its own subject. This holds for
+        every venue-level read callable without a session (`security` admitting `{}`); an operation does not repeat
+        it, and needs only to declare `GuestVenue` when its request names no venue otherwise. Not such a read: one
+        addressed by its own token (`getOrder` under an order access token, `getPaymentLink` by the link''s token), whose
+        token gives its one-row reach, and `getWaitingRoomPosition`, which reads the waiting room''s own store
+        (ADR-0066), not a venue table.
 
         '
     serviceAuth:
