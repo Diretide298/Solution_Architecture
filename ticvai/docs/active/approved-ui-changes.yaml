@@ -162,3 +162,38 @@ changes:
     filled from listProductStartTimes (r8 ORDERS-MONEY-C08, option A): its start, end and free count; the column
     names the field the screen''s declared read answers, and nothing else on the screen changes'
   change: CHG-R10UI-015
+- screen: ACC-008
+  field: 'region:collection'
+  to: 1c70b8437aecbd5f
+  approval: 'check-screen-value-sources (CHG-R10GEN-003) as the lead answered it on 25 October 2026 (r10 round 3): the
+    register reads AccreditationCredential, whose state is `status`; holder name, zones and validity were added to
+    that read'
+  change: CHG-R10UI-017
+- screen: BO-305
+  field: 'region:headline'
+  to: cf488975a3bf07cb
+  approval: 'check-screen-value-sources (CHG-R10GEN-003) as the lead answered it on 25 October 2026 (r10 round 3): the tiles
+    and columns read the order (getOrder, getOrderStatement); fields with no source are dropped and listed on the
+    left-out list (LO-R10UI-002)'
+  change: CHG-R10UI-017
+- screen: BO-305
+  field: 'region:selection'
+  to: 62038d42a8e24f5a
+  approval: 'check-screen-value-sources (CHG-R10GEN-003) as the lead answered it on 25 October 2026 (r10 round 3): the tiles
+    and columns read the order (getOrder, getOrderStatement); fields with no source are dropped and listed on the
+    left-out list (LO-R10UI-002)'
+  change: CHG-R10UI-017
+- screen: BO-355
+  field: 'region:headline'
+  to: e4baa57763d4a033
+  approval: 'check-screen-value-sources (CHG-R10GEN-003) as the lead answered it on 25 October 2026 (r10 round 3): the tiles
+    and columns read the ticket (getEntitlement); fields with no source are dropped and listed on the left-out list
+    (LO-R10UI-003)'
+  change: CHG-R10UI-017
+- screen: BO-355
+  field: 'region:selection'
+  to: 5e5ba9ae57c7d7d8
+  approval: 'check-screen-value-sources (CHG-R10GEN-003) as the lead answered it on 25 October 2026 (r10 round 3): the tiles
+    and columns read the ticket (getEntitlement); fields with no source are dropped and listed on the left-out list
+    (LO-R10UI-003)'
+  change: CHG-R10UI-017

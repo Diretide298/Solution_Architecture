@@ -661,7 +661,8 @@ screens:
       components:
       - kind: credentialDisplay
         label: Your badge
-        bindsTo: AccreditationBadge
+        operation: listMyAccreditationCredentials
+        bindsTo: AccreditationCredential
         notes: 'The scannable credential, rendered large and bright. **Offline is required** — a stage
           door is the worst signal in the building, and the 2 September decision that a dynamic-QR ticket
           is redirected into the app exists for exactly this reason.
@@ -673,12 +674,14 @@ screens:
       components:
       - kind: detailPanel
         label: Holder
-        bindsTo: AccreditationBadge.holderName
+        operation: listMyAccreditationCredentials
+        bindsTo: AccreditationCredential.holderName
         notes: Name, role and outlet, as printed. Photographer · The Northern Review.
         provenance: frame claude-design/Accreditation Board.dc.html#acc-005
       - kind: detailPanel
         label: Where it works
-        bindsTo: AccreditationBadge.zones
+        operation: listMyAccreditationCredentials
+        bindsTo: AccreditationCredential.zones
         notes: '**Stage door, stalls and pit, named performances — and *any other door, refused*.** The
           negative case is stated on the badge because the steward reads this, not a policy.
 
@@ -689,11 +692,10 @@ screens:
       components:
       - kind: banner
         label: Valid until
-        bindsTo: AccreditationBadge.expiresAt
-        notes: '**`expired` and `revoked` must be unmistakable and must not resemble `loading`.** `AccreditationBadge.state`
-          carries both, and `revokedReason` says why.
-
-          '
+        operation: listMyAccreditationCredentials
+        bindsTo: AccreditationCredential.validTo
+        notes: '**`expired` and `revoked` must be unmistakable and must not resemble `loading`.**
+          `AccreditationCredential.status` carries both (CHG-R10UI-016).'
         provenance: contract approvals.yaml AccreditationBadge.state
     - name: actionBar
       slot: actions
@@ -1158,13 +1160,13 @@ screens:
       components:
       - kind: dataTable
         label: Credential register
-        bindsTo: AccreditationBadge[]
+        bindsTo: AccreditationCredential[]
         operation: listAccreditationCredentials
         columns:
-        - AccreditationBadge.holderName
-        - AccreditationBadge.zones
-        - AccreditationBadge.issuedAt
-        - AccreditationBadge.state
+        - AccreditationCredential.holderName
+        - AccreditationCredential.zones
+        - AccreditationCredential.issuedAt
+        - AccreditationCredential.status
         notes: 'Holder, valid for, issued, last used. **Revoked rows stay visible and read as revoked**
           — removing them from the register is how a revoked badge gets re-issued by mistake.
 
@@ -1175,7 +1177,7 @@ screens:
       components:
       - kind: detailPanel
         label: Credential
-        bindsTo: AccreditationBadge
+        bindsTo: AccreditationCredential
         operation: listAccreditationCredentials
         provenance: frame claude-design/Accreditation Board.dc.html#acc-008
     - name: actionBar

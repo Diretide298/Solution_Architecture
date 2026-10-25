@@ -11276,6 +11276,8 @@ screens:
     provenance: contract tenancy.yaml POST /devices
   - id: formConfigureWorkstation
     component: modal
+    reads:
+    - listSaleBoards
     trigger: Configure workstation
     body: '**Collects what `configureWorkstation` sends before it is called.** Required: `name`. Optional:
       `saleBoardId` (absent or null, the till uses its outlet''s board; DEC-183, CHG-CSP-006), `outletId`,
@@ -20336,6 +20338,8 @@ screens:
     provenance: contract maintenance.yaml POST /assets
   - id: formSetAssetStatus
     component: modal
+    reads:
+    - listInspections
     trigger: Save asset status
     body: '**Collects what `setAssetStatus` sends before it is called.** Required: `status`, `reason`,
       `recordedAt`. Optional: `inspectionId`, `raiseWorkOrder`. Dismissing sends nothing; the screen behind
@@ -58363,87 +58367,69 @@ screens:
       components:
       - kind: metricTile
         label: Order Number
+        operation: getOrder
         provenance: pack Order___Reservation_Management_Reference.pdf, page 5 §Display
-        bindsTo: OrderDetailTransactionWorkspaceView.orderNumber
+        bindsTo: Order.orderNumber
       - kind: metricTile
         label: Order Date/Time
+        operation: getOrder
+        bindsTo: Order.createdAt
         provenance: pack Order___Reservation_Management_Reference.pdf, page 5 §Display
       - kind: metricTile
         label: Order Status
+        operation: getOrder
         provenance: pack Order___Reservation_Management_Reference.pdf, page 5 §Display
-        bindsTo: OrderDetailTransactionWorkspaceView.orderStatus
-      - kind: metricTile
-        label: Reservation Status
-        provenance: pack Order___Reservation_Management_Reference.pdf, page 5 §Display
-        bindsTo: OrderDetailTransactionWorkspaceView.reservationStatus
+        bindsTo: Order.status
       - kind: metricTile
         label: Customer
+        operation: getOrder
         provenance: pack Order___Reservation_Management_Reference.pdf, page 5 §Display
-        bindsTo: OrderDetailTransactionWorkspaceView.customer
+        bindsTo: Order.subjectId
       - kind: metricTile
         label: Channel
+        operation: getOrder
         provenance: pack Order___Reservation_Management_Reference.pdf, page 5 §Display
-        bindsTo: OrderDetailTransactionWorkspaceView.channel
+        bindsTo: Order.channel
       - kind: metricTile
         label: Sales Location
+        operation: getOrder
         provenance: pack Order___Reservation_Management_Reference.pdf, page 5 §Display
-        bindsTo: OrderDetailTransactionWorkspaceView.salesLocation
+        bindsTo: Order.workstationId
       - kind: metricTile
         label: Cashier/Agent
+        operation: getOrder
         provenance: pack Order___Reservation_Management_Reference.pdf, page 5 §Display
-        bindsTo: OrderDetailTransactionWorkspaceView.cashierAgent
+        bindsTo: Order.principalId
       - kind: metricTile
         label: Currency
+        operation: getOrder
         provenance: pack Order___Reservation_Management_Reference.pdf, page 5 §Display
-        bindsTo: OrderDetailTransactionWorkspaceView.currency
+        bindsTo: Order.currency
       - kind: metricTile
         label: Total
+        operation: getOrder
         provenance: pack Order___Reservation_Management_Reference.pdf, page 5 §Display
-        bindsTo: OrderDetailTransactionWorkspaceView.total
+        bindsTo: Order.grossAmount
       - kind: metricTile
         label: Payment Status
+        operation: getOrder
         provenance: pack Order___Reservation_Management_Reference.pdf, page 5 §Display
-        bindsTo: OrderDetailTransactionWorkspaceView.paymentStatus
-      - kind: metricTile
-        label: Fulfillment Status
-        provenance: pack Order___Reservation_Management_Reference.pdf, page 5 §Display
-        bindsTo: OrderDetailTransactionWorkspaceView.fulfillmentStatus
+        bindsTo: Order.payments
       - kind: metricTile
         label: Tickets
+        operation: getOrder
         provenance: pack Order___Reservation_Management_Reference.pdf, page 5 §Show
-        bindsTo: OrderDetailTransactionWorkspaceView.tickets
-      - kind: metricTile
-        label: Reservations
-        provenance: pack Order___Reservation_Management_Reference.pdf, page 5 §Show
-        bindsTo: OrderDetailTransactionWorkspaceView.reservations
+        bindsTo: Order.lines[].entitlementIds
       - kind: metricTile
         label: Payments
+        operation: getOrderStatement
         provenance: pack Order___Reservation_Management_Reference.pdf, page 5 §Show
-        bindsTo: OrderDetailTransactionWorkspaceView.payments
+        bindsTo: OrderStatement.totalPaid
       - kind: metricTile
         label: Refunds
+        operation: getOrderStatement
         provenance: pack Order___Reservation_Management_Reference.pdf, page 5 §Show
-        bindsTo: OrderDetailTransactionWorkspaceView.refunds
-      - kind: metricTile
-        label: Invoices
-        provenance: pack Order___Reservation_Management_Reference.pdf, page 5 §Show
-        bindsTo: OrderDetailTransactionWorkspaceView.invoices
-      - kind: metricTile
-        label: Credentials
-        provenance: pack Order___Reservation_Management_Reference.pdf, page 5 §Show
-        bindsTo: OrderDetailTransactionWorkspaceView.credentials
-      - kind: metricTile
-        label: Membership
-        provenance: pack Order___Reservation_Management_Reference.pdf, page 5 §Show
-        bindsTo: OrderDetailTransactionWorkspaceView.membership
-      - kind: metricTile
-        label: Waivers
-        provenance: pack Order___Reservation_Management_Reference.pdf, page 5 §Show
-        bindsTo: OrderDetailTransactionWorkspaceView.waivers
-      - kind: metricTile
-        label: Related Orders
-        provenance: pack Order___Reservation_Management_Reference.pdf, page 5 §Show
-        bindsTo: OrderDetailTransactionWorkspaceView.relatedOrders
+        bindsTo: OrderStatement.totalRefunded
       - kind: detailPanel
         label: Order
         bindsTo: Order
@@ -58462,23 +58448,19 @@ screens:
       components:
       - kind: detailPanel
         label: The selected order detail transaction
-        bindsTo: OrderDetailTransactionWorkspaceView
+        operation: getOrder
+        bindsTo: Order
         columns:
-        - OrderDetailTransactionWorkspaceView.lines[].product
-        - OrderDetailTransactionWorkspaceView.lines[].ticketType
-        - OrderDetailTransactionWorkspaceView.lines[].event
-        - OrderDetailTransactionWorkspaceView.lines[].performance
-        - OrderDetailTransactionWorkspaceView.date
-        - OrderDetailTransactionWorkspaceView.lines[].timeslot
-        - OrderDetailTransactionWorkspaceView.lines[].quantity
-        - OrderDetailTransactionWorkspaceView.lines[].personType
-        - OrderDetailTransactionWorkspaceView.lines[].seat
-        - OrderDetailTransactionWorkspaceView.lines[].unitPrice
-        - OrderDetailTransactionWorkspaceView.lines[].discount
-        - OrderDetailTransactionWorkspaceView.lines[].tax
-        - OrderDetailTransactionWorkspaceView.lines[].fee
-        - OrderDetailTransactionWorkspaceView.total
-        - OrderDetailTransactionWorkspaceView.lines[].ticketStatus
+        - Order.lines[].variantId
+        - Order.lines[].performanceId
+        - Order.createdAt
+        - Order.lines[].bookedWindow
+        - Order.lines[].quantity
+        - Order.lines[].seatIds
+        - Order.lines[].serverUnitPrice
+        - Order.lines[].discounts
+        - Order.lines[].taxAmount
+        - Order.grossAmount
         notes: 'The pack groups this record''s detail under its own headings: “Order Total”, “Internal
           Notes”.'
         provenance: pack Order___Reservation_Management_Reference.pdf, page 5 §Each line should display
@@ -65419,76 +65401,49 @@ screens:
       components:
       - kind: metricTile
         label: Virtual Ticket ID
+        operation: getEntitlement
         provenance: pack Ticket_Media___Credential_Management_Reference.pdf, page 43 §Display
-        bindsTo: VirtualTicketCredential360WorkspaceView.virtualTicketId
+        bindsTo: Entitlement.id
       - kind: metricTile
         label: Ticket Holder
+        operation: getEntitlement
         provenance: pack Ticket_Media___Credential_Management_Reference.pdf, page 43 §Display
-        bindsTo: VirtualTicketCredential360WorkspaceView.ticketHolder
-      - kind: metricTile
-        label: Participant
-        provenance: pack Ticket_Media___Credential_Management_Reference.pdf, page 43 §Display
-        bindsTo: VirtualTicketCredential360WorkspaceView.participant
+        bindsTo: Entitlement.holderName
       - kind: metricTile
         label: Product
+        operation: getEntitlement
         provenance: pack Ticket_Media___Credential_Management_Reference.pdf, page 43 §Display
-        bindsTo: VirtualTicketCredential360WorkspaceView.product
-      - kind: metricTile
-        label: Event
-        provenance: pack Ticket_Media___Credential_Management_Reference.pdf, page 43 §Display
-        bindsTo: VirtualTicketCredential360WorkspaceView.event
-      - kind: metricTile
-        label: Performance
-        provenance: pack Ticket_Media___Credential_Management_Reference.pdf, page 43 §Display
-        bindsTo: VirtualTicketCredential360WorkspaceView.performance
+        bindsTo: Entitlement.productName
       - kind: metricTile
         label: Venue
+        operation: getEntitlement
         provenance: pack Ticket_Media___Credential_Management_Reference.pdf, page 43 §Display
-        bindsTo: VirtualTicketCredential360WorkspaceView.venue
-      - kind: metricTile
-        label: Seat
-        provenance: pack Ticket_Media___Credential_Management_Reference.pdf, page 43 §Display
-        bindsTo: VirtualTicketCredential360WorkspaceView.seat
+        bindsTo: Entitlement.venueName
       - kind: metricTile
         label: Order
+        operation: getEntitlement
         provenance: pack Ticket_Media___Credential_Management_Reference.pdf, page 43 §Display
-        bindsTo: VirtualTicketCredential360WorkspaceView.order
+        bindsTo: Entitlement.orderId
       - kind: metricTile
         label: Ticket Status
+        operation: getEntitlement
         provenance: pack Ticket_Media___Credential_Management_Reference.pdf, page 43 §Display
-        bindsTo: VirtualTicketCredential360WorkspaceView.ticketStatus
+        bindsTo: Entitlement.status
       - kind: metricTile
         label: Usage Status
+        operation: getEntitlement
         provenance: pack Ticket_Media___Credential_Management_Reference.pdf, page 43 §Display
-        bindsTo: VirtualTicketCredential360WorkspaceView.usageStatus
+        bindsTo: Entitlement.entriesUsed
       - kind: metricTile
         label: Validity
+        operation: getEntitlement
         provenance: pack Ticket_Media___Credential_Management_Reference.pdf, page 43 §Display
-        bindsTo: VirtualTicketCredential360WorkspaceView.validity
+        bindsTo: Entitlement.validTo
       - kind: metricTile
         label: Entitlements
+        operation: getEntitlement
         provenance: pack Ticket_Media___Credential_Management_Reference.pdf, page 43 §Display
-        bindsTo: VirtualTicketCredential360WorkspaceView.entitlements
-      - kind: metricTile
-        label: Primary
-        provenance: pack Ticket_Media___Credential_Management_Reference.pdf, page 43 §Identify
-        bindsTo: VirtualTicketCredential360WorkspaceView.mediaRole
-      - kind: metricTile
-        label: Secondary
-        provenance: pack Ticket_Media___Credential_Management_Reference.pdf, page 43 §Identify
-        bindsTo: VirtualTicketCredential360WorkspaceView.mediaRole
-      - kind: metricTile
-        label: Fallback
-        provenance: pack Ticket_Media___Credential_Management_Reference.pdf, page 43 §Identify
-        bindsTo: VirtualTicketCredential360WorkspaceView.mediaRole
-      - kind: metricTile
-        label: Temporary
-        provenance: pack Ticket_Media___Credential_Management_Reference.pdf, page 43 §Identify
-        bindsTo: VirtualTicketCredential360WorkspaceView.mediaRole
-      - kind: metricTile
-        label: Revoked historical media
-        provenance: pack Ticket_Media___Credential_Management_Reference.pdf, page 43 §Identify
-        bindsTo: VirtualTicketCredential360WorkspaceView.mediaRole
+        bindsTo: Entitlement.entriesAllowed
       - kind: detailPanel
         label: The ticket
         bindsTo: Entitlement
@@ -65512,19 +65467,16 @@ screens:
       components:
       - kind: detailPanel
         label: The selected virtual ticket credential
-        bindsTo: VirtualTicketCredential360WorkspaceView
+        operation: getEntitlement
+        bindsTo: Entitlement
         columns:
-        - VirtualTicketCredential360WorkspaceView.bindingId
-        - VirtualTicketCredential360WorkspaceView.mediaType
-        - VirtualTicketCredential360WorkspaceView.provider
-        - VirtualTicketCredential360WorkspaceView.issued
-        - VirtualTicketCredential360WorkspaceView.delivered
-        - VirtualTicketCredential360WorkspaceView.activated
+        - Entitlement.credentialFormat
+        - Entitlement.mediaCode
+        - Entitlement.issuedVia
+        - Entitlement.mediaLinkedAt
         - Valid From/To
-        - VirtualTicketCredential360WorkspaceView.lastUpdate
-        - Last presentation/use
-        - VirtualTicketCredential360WorkspaceView.deviceReferenceWhereAppropriate
-        - VirtualTicketCredential360WorkspaceView.status
+        - Entitlement.lastEntryAt
+        - Entitlement.status
         notes: 'The pack groups this record''s detail under its own headings: “Credential Wallet”, “Media
           Status”, “Dynamic QR Active”, “Apple Wallet Active”, “Old RFID RF-88410”, “Provide one chronological
           timeline”.'
