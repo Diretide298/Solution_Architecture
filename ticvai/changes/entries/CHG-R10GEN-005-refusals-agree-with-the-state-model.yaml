@@ -1,0 +1,47 @@
+id: CHG-R10GEN-005
+date: '2026-10-25'
+source: cr
+kind: process
+summary: 'New check check-state-refusals: an operation a state model names has a 409 that agrees with the model. It
+  may not refuse a state the model moves it from (SR-REFUSES-ALLOWED), its allowed states ("is not `x`", "only a `y`")
+  equal the states the model moves it from (SR-ALLOWS-NO-MOVE), and a 409 that refuses some terminal states leaves
+  no other terminal state unanswered (SR-TERMINAL-UNANSWERED, overrideWaitingGuest). The fixer
+  tools/applied/order-and-refusals-r10.py writes the default ruling for the last rule.'
+decision:
+  what: 'r10 lane E, brief section 2 ("Refusals against the state model"). Compared per model and per operation its
+    transitions name, leaving out moves the call does not make itself (a cascade, job, timer, system or external
+    trigger, and the older record a new version supersedes). A 409 is judged against a model only when every state it
+    backticks is one of that model''s states. Refused states: backticked after is/was/already/still, not followed by
+    and/with/while/but (a condition, not a state); "already `x`" where the call moves records into `x` refuses only
+    the repeat. Allowed states: backticked after not/no longer/only/unless/other than/must be/neither. A 409 that says
+    "already decided" or "already has an outcome" answers every ended state. No baseline: a new check blocks in the
+    release it arrives (the lead''s rule). Default ruling the fixer writes for SR-TERMINAL-UNANSWERED: the state
+    model is right, and the 409 also refuses the states it left unanswered. SR-ALLOWS-NO-MOVE and SR-REFUSES-ALLOWED
+    need the lead to say which side is right. On r9: SR-TERMINAL-UNANSWERED 10, SR-ALLOWS-NO-MOVE 7,
+    SR-REFUSES-ALLOWED 0; after the fixer the 10 are 0 and the 7 remain for rulings.'
+  by: Chinmay
+  date: '2026-10-25'
+why: 'ADAM CR-237 (overrideWaitingGuest admits a party, but states/queue-entry.yaml moves it from `called` only, to
+  noShow or back to waiting, and its 409 leaves expired and noShow unanswered; #33058); PROCESS-LOG P-30. Finding:
+  check-states checks that the operations a model names exist, not that their text agrees with the model.'
+keys_touched:
+  files:
+  - tools/check-state-refusals.py
+  - tools/applied/order-and-refusals-r10.py
+  - tools/tests/test_check_state_refusals.py
+  - tools/tests/test_order_and_refusals_apply.py
+root_class: 'an operation''s text contradicts its state model, and no check compared them'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r10
+decision_owner: Chinmay
+adam_cr: CR-237
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-state-refusals.py
+status: open
+notes: 'Must-catch on r9 text: overrideWaitingGuest (SR-TERMINAL-UNANSWERED: expired and noShow, and no answer for
+  waiting) found. CR-237''s own settlement (its CR lane) decides overrideWaitingGuest; the fixer acts only on what
+  the check still finds when it runs. Wire into tools/run-checks.py at integration.'
