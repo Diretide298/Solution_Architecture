@@ -78,6 +78,32 @@ x-ticvai-queries:
       (white-label's getPublishedTenantConfig, for paymentTokenisation) through the service route (serviceAuth; r8
       integration, CHG-R8INT-005).
     served: [in-process, service]
+  approvedPaymentMethods:
+    module: payments
+    table: payments.method
+    reads: [payments.method, payments.method_config]
+    inputs:
+      venueId: {type: string, format: uuid, description: 'The venue asked about.'}
+      channelId: {type: string, format: uuid, description: 'Optional: the sales channel, where a method_config row names one.'}
+    returns:
+      type: array
+      description: 'The payment methods approved at the venue, each once; an empty list when none is.'
+      items:
+        type: object
+        required: [paymentMethodId, code, kind]
+        properties:
+          paymentMethodId: {type: string, format: uuid}
+          code: {type: string}
+          kind: {type: string}
+    rule: >-
+      A rule question (ADAM CR-212, option A, decided 25 October 2026; CHG-R10CAT-004). A payment method is approved
+      at a venue when its payments.method row is active and its venue_ids is empty or holds the venue, and the
+      payments.method_config row for it at the venue's path or the nearest ancestor that has one (the channel's own
+      row first, where channelId is given and one names it) is enabled and active. Orders answers under the caller's
+      scope (the tables' row-level security, under the caller's connection and transaction). Catalogue's
+      setChannelFeePayment reports a method that is not approved as paymentMethodNotApproved. It is asked in process
+      within commerce, through the C# query interface Orders implements.
+    served: [in-process]
   storedForwardRecords:
     module: payments
     table: payments.stored_forward

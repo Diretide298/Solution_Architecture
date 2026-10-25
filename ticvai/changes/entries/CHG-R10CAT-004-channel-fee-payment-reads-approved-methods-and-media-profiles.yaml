@@ -1,0 +1,53 @@
+id: CHG-R10CAT-004
+date: '2026-10-25'
+source: cr
+kind: contract
+summary: 'setChannelFeePayment judges paymentMethodNotApproved from payments#approvedPaymentMethods (a new rule query,
+  in process) and mediaProfileMissing from access#mediaEncodingProfileRecords (a new data read, in process from
+  commerce as a granted read, XDR-002); feeType maps to catalogue.fee.fee_type, and a referenced fee profile must
+  exist, be of that type and be active, else feeProfileMissing.'
+decision:
+  what: 'ADAM CR-212, option A, the resolution of 25 October 2026. contracts/spine/catalogue.yaml setChannelFeePayment:
+    the two read-vias, x-ticvai-reads catalogue.fee, the rules (paymentMethods by kind, accountCredit as storedValue,
+    b2bCredit as onAccount; otherPaymentMethodCodes by code; rfid, nfc and wristband need an active profile at the
+    venue), the feeType mapping on the input and view. contracts/satellite/payments.yaml: approvedPaymentMethods
+    (payments.method active and venue_ids empty or holding the venue; the nearest method_config at the venue''s path
+    enabled and active). contracts/spine/access.yaml (lane C, minimal): mediaEncodingProfileRecords.
+    docs/active/cross-deployable-writes.yaml: XDR-002, commerce SELECT on access.media_encoding_profile; derived:
+    handoff/cross-deployable-writes.md (--write) and the guarded GRANT in the forward migration.'
+  by: Chinmay
+  date: '2026-10-25'
+why: 'ADAM CR-212 (Surendra Loke, #29762), settled 25 October 2026: the operation had to expose only methods approved
+  in Payment and Ticket Media but declared no read of either, and its fee types did not match catalogue.fee. The
+  granted read follows XDR-001 (ADAM CR-196, CHG-R9CR-005): the service route between deployables is not built
+  (CR-174).'
+keys_touched:
+  operations: [setChannelFeePayment]
+  schemas: [ChannelFeesPaymentFulfillmentConfigurationInput, ChannelFeesPaymentFulfillmentConfigurationView]
+  tables: [payments.method, payments.method_config, access.media_encoding_profile, catalogue.fee]
+  files:
+  - contracts/spine/catalogue.yaml
+  - contracts/satellite/payments.yaml
+  - contracts/spine/access.yaml
+  - docs/active/cross-deployable-writes.yaml
+  - handoff/cross-deployable-writes.md
+  other:
+  - 'XDR-002 (granted read)'
+root_class: 'storage-route gap: a rule judged on another module''s data with no declared read'
+tickets:
+  started: []
+  unstarted:
+  - '29762: CR-212''s comment; its pointer body picks the fix up at r10.'
+  - 'DB-ROLES: the guarded GRANT reaches a built database through the forward migration, as XDR-001''s did.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-212
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-cross-deployable-writes.py
+status: open
+notes: 'XR-ROUTE fails an in-process read across deployables that is not in the reads list; X-READ checks XDR-002''s
+  fields. The paymentMethods-to-kind mapping for accountCredit and b2bCredit is this lane''s reading (the decision
+  names the check, not the mapping); the lead may correct it. Database: a guarded GRANT SELECT on
+  access.media_encoding_profile to the commerce role, no column.'

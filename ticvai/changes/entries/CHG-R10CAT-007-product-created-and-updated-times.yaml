@@ -1,0 +1,43 @@
+id: CHG-R10CAT-007
+date: '2026-10-25'
+source: cr
+kind: contract
+summary: 'catalogue.product gains created_at (NOT NULL DEFAULT now(), backfilled) and updated_at; Product returns
+  read-only createdAt and updatedAt; updateProduct and the product sub-resource writes set updated_at;
+  listProductLifecycle orders by createdAt descending then productId, its createdFrom, createdTo and modifiedSince
+  filters read the columns, and lastModifiedAt is updated_at.'
+decision:
+  what: 'ADAM CR-204, option A, the resolution of 25 October 2026. contracts/spine/catalogue.yaml: Product.createdAt
+    (required, read-only) and updatedAt (read-only, nullable); updateProduct sets updated_at; setProductChannelTexts,
+    setProductSalePermissionRules and setProductOwnerForms declare the catalogue.product write;
+    listProductLifecycle''s dates, filters and lastModifiedAt.'
+  by: Chinmay
+  date: '2026-10-25'
+why: 'ADAM CR-204 (Surendra Loke, #36199), settled 25 October 2026: listProductLifecycle ordered and filtered on
+  createdAt and lastModifiedAt, and catalogue.product stored neither.'
+keys_touched:
+  operations: [listProductLifecycle, updateProduct, setProductChannelTexts, setProductSalePermissionRules,
+    setProductOwnerForms]
+  schemas: [Product, ProductLifecycleCommandCenterView]
+  tables: [catalogue.product]
+  files:
+  - contracts/spine/catalogue.yaml
+root_class: 'storage gap: an operation orders and filters on columns its table does not have'
+tickets:
+  started: []
+  unstarted:
+  - '36199 (products wave 1, All products): CR-204''s comment; its pointer body picks the fix up at r10.'
+  - 'MIG-CATALOGUE (catalogue.product): a child task for Hrushikant Patkar: created_at and updated_at, the backfill,
+    then created_at SET NOT NULL and SET DEFAULT now(); not applied while server databases are frozen.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-204
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-contract-storage.py
+status: open
+notes: 'Database (generated): ADD COLUMN created_at timestamptz and updated_at timestamptz; created_at is added
+  nullable and listed in handoff/migration-review.md ("backfill, then SET NOT NULL"), because the generator writes no
+  timestamp default and no backfill. The migration task writes the backfill (the earliest of the first version''s
+  published_at and the migration time), the NOT NULL and DEFAULT now().'

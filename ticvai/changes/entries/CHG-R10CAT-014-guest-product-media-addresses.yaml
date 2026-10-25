@@ -1,0 +1,38 @@
+id: CHG-R10CAT-014
+date: '2026-10-25'
+source: cr
+kind: contract
+summary: 'ProductMedia carries read-only url and thumbnailUrl, the asset''s stable CDN address for a public, ready
+  asset, on the guest-facing reads (searchCatalogue, listProducts, getProduct for a guest or visitor), as
+  getPublishedTenantConfig does for white-label assets; staff reads are unchanged. The three reads ask
+  assets#mediaAssetRecords on Assets'' service route.'
+decision:
+  what: 'ADAM CR-221, option A, the resolution of 25 October 2026. contracts/spine/catalogue.yaml: ProductMedia url and
+    thumbnailUrl (not persisted, derived on read); searchCatalogue, listProducts and getProduct x-ticvai-read-via
+    assets#mediaAssetRecords (service: Assets runs in operations, Catalogue in commerce).'
+  by: Chinmay
+  date: '2026-10-25'
+why: 'ADAM CR-221 (Chinmay Patkar, #28145 WEB-003), settled 25 October 2026: a guest card could not show a product''s
+  photo, because ProductMedia carried only an asset id and every read that turns one into an address is staff-only.'
+keys_touched:
+  operations: [searchCatalogue, listProducts, getProduct]
+  schemas: [ProductMedia]
+  tables: [assets.media_asset]
+  files:
+  - contracts/spine/catalogue.yaml
+root_class: 'a guest screen value with no guest source'
+tickets:
+  started: []
+  unstarted:
+  - '28145 (WEB-003): CR-221''s comment; the guest cards bind url and thumbnailUrl (lane D, CR-223).'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-221
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-cross-module-reads.py
+status: open
+notes: 'No database change. Siblings: the only guest operations whose responses carry ProductMedia are the three
+  named. Open: the read crosses deployables on the service route, which is not built yet (CR-174); until it is, the
+  addresses can be filled only if the lead grants an in-process read as for XDR-001 and XDR-002.'

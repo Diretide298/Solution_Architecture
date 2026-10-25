@@ -5165,6 +5165,10 @@ paths:
         route: service
         for: 'the host of the link back: the tenant''s primary active web host (control.tenant_domain), Platform''s data,
           asked as Tenancy''s resolveTenantHost asks it (ADAM CR-199, option A; CHG-R9CR-006)'
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'LOCATION: the line''s venue node''s name (platform.scope, by the venue id), active or not, Tenancy''s data
+          (ADAM CR-227, option A; CHG-R10CAT-001)'
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -5188,7 +5192,9 @@ paths:
         (`catalogue.performance`, read with `catalogue#performanceRecords`); a booked-window line''s are its
         `bookedWindow.startsAt` and `endsAt`. A line with both takes its booked window.
 
-        - **LOCATION** is the venue''s name (the line''s venue, `platform.scope`).
+        - **LOCATION** is the venue''s name: the name of the line''s venue node, read with `tenancy#scopeRecords` by the
+        venue id, whether or not the venue is still active (ADAM CR-227, option A, decided 25 October 2026;
+        CHG-R10CAT-001). Orders never reads `platform.scope` raw.
 
         - **UID** is `<order line id>@ticvai.app`: the line''s id and the product''s own domain, the stem of every
         platform subdomain (`<venue>.<cell>.ticvai.app`, resolveTenantHost). It never changes for the line, so a

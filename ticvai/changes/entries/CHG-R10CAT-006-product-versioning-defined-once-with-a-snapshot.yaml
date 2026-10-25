@@ -1,0 +1,47 @@
+id: CHG-R10CAT-006
+date: '2026-10-25'
+source: cr
+kind: contract
+summary: 'Product versioning is defined once, on updateProduct: every committed updateProduct and every product
+  sub-resource write that says "versioned as updateProduct" (channel texts, sale-permission rules, classification,
+  owner forms, bulkUpdateCatalogueProducts) creates a catalogue.product_version row (next integer, is_current moved,
+  published_at and published_by the write''s) unless content_hash is unchanged; content_hash covers the product row
+  and its sub-resources; catalogue.product_version gains snapshot jsonb, which restoreProductVersion restores.'
+decision:
+  what: 'ADAM CR-214, option A, the resolution of 25 October 2026. contracts/spine/catalogue.yaml: updateProduct
+    description and x-ticvai-writes catalogue.product_version; the five sibling writes and restoreProductVersion
+    declare the product_version write; ProductVersion.snapshot (jsonb, read-only, null before r10);
+    restoreProductVersion restores the snapshot, 409 version-has-no-snapshot for an older version.'
+  by: Chinmay
+  date: '2026-10-25'
+why: 'ADAM CR-214 (Surendra Loke, #36212), settled 25 October 2026: several products-wave-1 writes said "versioned as
+  updateProduct versions the product", and updateProduct stated no versioning; product_version held no snapshot.'
+keys_touched:
+  operations: [updateProduct, setProductChannelTexts, setProductSalePermissionRules, setProductClassification,
+    setProductOwnerForms, bulkUpdateCatalogueProducts, restoreProductVersion]
+  schemas: [ProductVersion]
+  tables: [catalogue.product_version, catalogue.product]
+  files:
+  - contracts/spine/catalogue.yaml
+root_class: 'undefined rule referenced by other operations'
+tickets:
+  started: []
+  unstarted:
+  - '36212: CR-214''s comment; its pointer body picks the fix up at r10.'
+  - 'MIG-CATALOGUE (catalogue.product_version): a child task for Hrushikant Patkar, the migration owner, for the new
+    snapshot column; build and test against it, not applied while server databases are frozen.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-214
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-contract-storage.py
+status: open
+notes: 'Database (generated): ALTER TABLE catalogue.product_version ADD COLUMN snapshot jsonb (nullable); and,
+  because venue-scoped writes now write versions, ProductVersion.productId is required (it references
+  catalogue.product), so the table moves from tenant-root row security to its product''s (apply_parent_rls in the
+  forward migration; check-rls-scope-fit RF-TENANT-ROOT found it at the gate). product_id SET NOT NULL is the
+  migration task''s, after deleting or backfilling any row without a product. Siblings
+  found by the sentence "versioned as updateProduct": setProductClassification and setProductOwnerForms besides the
+  three the CR names.'

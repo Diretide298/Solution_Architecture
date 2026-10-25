@@ -1,0 +1,59 @@
+id: CHG-R10CAT-009
+date: '2026-10-25'
+source: cr
+kind: contract
+summary: 'The event lifecycle has a state model (states/event.yaml) with each precondition against named columns and
+  an event.lifecycleChanged event; setEventLifecycleState answers 404, 409 invalid-event-transition and 409
+  event-has-sales (a cancel while a performance has sales; performances are cancelled through cancelPerformance), and
+  a move with a future effectiveFrom is kept on the event and applied by the event lifecycle job. cloneEvent maps each
+  include value to Catalogue''s own tables, refuses staffPlan and accessRules 422 include-not-routed, says what
+  shiftDatesByDays shifts, and answers 404.'
+decision:
+  what: 'ADAM CR-109, option 2, accepted 15 October 2026 (the DECISION line): no treatment field (the approved screen
+    has Move to, Reason and Effective from only); cancel refused 409 while any performance has sales; states/event.yaml,
+    event.lifecycleChanged, the 404s, the job that applies effectiveFrom, the include values mapped to tables with
+    accessRules and staffPlan left out; approval routing waits for its threshold. Files: states/event.yaml,
+    events/event-lifecycleChanged.yaml; contracts/spine/catalogue.yaml setEventLifecycleState (x-ticvai-reads,
+    x-ticvai-writes, x-ticvai-emits, the body stored as, 200 Event, 404, 409), cloneEvent (reads, writes, the mapping,
+    404, 422), Event.scheduledLifecycleState / scheduledLifecycleAt / scheduledLifecycleReason, EventLifecycleState
+    (the named list the state model checks against); docs/active/breaking-changes.yaml BC-481 (the new emitted event).'
+  by: Chinmay
+  date: '2026-10-15'
+why: 'ADAM CR-109 (Deep Khanvilkar, #28020 cloneEvent and setEventLifecycleState), accepted 15 October 2026 for the
+  next release and moved from r9 to r10: no state model, preconditions in prose only, no cancel treatment, no approval
+  route, no event, and cloneEvent''s include values mapped to no store.'
+keys_touched:
+  operations: [setEventLifecycleState, cloneEvent]
+  schemas: [Event, EventLifecycleState, CloneEventRequest]
+  tables: [catalogue.event, catalogue.performance, catalogue.channel_capacity, catalogue.price_assignment,
+    catalogue.event_schedule, catalogue.event_capacity_profile, catalogue.event_resource_plan,
+    catalogue.event_registration]
+  files:
+  - states/event.yaml
+  - events/event-lifecycleChanged.yaml
+  - contracts/spine/catalogue.yaml
+  - docs/active/breaking-changes.yaml
+  other:
+  - 'BC-481'
+root_class: 'undecided rule: a lifecycle with no state model'
+tickets:
+  started: []
+  unstarted:
+  - '28020 and 31410 (setEventLifecycleState), and the BO-716 / BO-717 screens: CR-109''s settlement; the pointer
+    bodies pick the fix up at r10.'
+  - 'MIG-CATALOGUE (catalogue.event): a child task for Hrushikant Patkar for the three scheduled-move columns; not
+    applied while server databases are frozen.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-109
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-states.py
+status: open
+notes: 'Database (generated): catalogue.event gains scheduled_lifecycle_state (text, CHECK the seven values),
+  scheduled_lifecycle_at (timestamptz) and scheduled_lifecycle_reason (text, 500). The scheduled move needed somewhere
+  to wait; the decision names the job, not its storage, so these three nullable columns are this lane''s reading.
+  The precondition columns chosen: schedule = a performance not cancelled; capacity = a channel_capacity row of such a
+  performance; price = a catalogue.price row for a variant of a product whose event_id is the event; resource plan =
+  event_resource_plan.readiness ready. The lead may correct any of them.'

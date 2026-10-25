@@ -1,0 +1,46 @@
+# event.lifecycleChanged v1 — published by catalogue
+# Checked by tools/check-states.py.
+# ADAM CR-109, option 2, accepted 15 October 2026 (Chinmay); CHG-R10CAT-009.
+
+name: event.lifecycleChanged
+version: 1
+publisher: catalogue
+description: An event moved in its lifecycle (draft, planned, onSale, live, closed, cancelled, archived).
+aggregate: event
+emittedWhen: Event.lifecycleState changes, by setEventLifecycleState or by the event lifecycle job at effectiveFrom
+emittedBy:
+- setEventLifecycleState
+payload:
+- field: eventId
+  type: uuid
+- field: venueId
+  type: uuid
+- field: fromState
+  type: string
+- field: toState
+  type: string
+- field: reason
+  type: string
+  required: false
+  notes: The reason the mover gave, if any
+- field: changedAt
+  type: timestamp
+- field: changedByPrincipalId
+  type: uuid
+  required: false
+  notes: Null when the event lifecycle job applied a move scheduled with effectiveFrom
+consumers:
+- context: reporting
+  purpose: The event's lifecycle on the event dashboards (BO-716), and on-sale and cancelled counts
+  idempotencyKey: eventId + changedAt
+  onFailure: retry
+  isCritical: false
+- context: ai
+  purpose: Add the event to, or drop it from, forecast and recommendation candidates as it goes on sale, closes or is
+    cancelled
+  idempotencyKey: eventId + changedAt
+  onFailure: retry
+  isCritical: false
+retention: 2 years, the reporting window
+notes: 'Cancelling an event moves no performance: each performance is cancelled through cancelPerformance, which writes
+  performance.cancelled for the refunds (ADAM CR-109).'

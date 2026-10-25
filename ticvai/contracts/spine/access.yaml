@@ -73,6 +73,25 @@ x-ticvai-queries:
   # Rule questions other modules ask Access, answered by the owner (ADR-0055 amendment, 14 October 2026; the shape is
   # the r6 shared convention: module, inputs, returns, rule, served). An asking operation names one in
   # `x-ticvai-read-via`.
+  mediaEncodingProfileRecords:
+    module: access
+    table: access.media_encoding_profile
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The access.media_encoding_profile rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as venueId or isActive); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Access stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/AccessMediaEncodingProfile'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October; ADAM CR-212, decided 25 October 2026, CHG-R10CAT-004). Access answers with its
+      access.media_encoding_profile rows, as it stores them and as the caller's scope lets it see them (the table's
+      row-level security, under the caller's connection and transaction). It decides nothing: Catalogue's
+      setChannelFeePayment states its own rule (mediaProfileMissing). It is asked in process from commerce, a read the
+      lead granted across deployables (docs/active/cross-deployable-writes.yaml XDR-002, as XDR-001), and from another
+      deployable through Access's service route (serviceAuth).
+    served: [in-process, service]
   liveEntitlementsForSubject:
     module: access
     inputs:

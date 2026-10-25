@@ -1,0 +1,55 @@
+id: CHG-R10CAT-011
+date: '2026-10-25'
+source: cr
+kind: contract
+summary: 'The catalogue and promotions rules of CR-111: resolveProductByCode needs partnerId from staff and answers a
+  product-level code with its default variant or 409; unique (partner_id, lower(code)) on alternative_code and
+  product_id on group_package and product_eligibility_rule; relinquishChannelAllocation sets allocated to sold plus
+  leased, 404, 409 for no or a frozen allocation, the reason audited, a job runs the scheduled release;
+  createChannelCapacity derives isSeated and adds 400 and 404; publishPromotion 409 invalid state and window ended, 404;
+  updatePromotion loses isPaused, locks terms in scheduled and paused too, 404, createPromotion''s 400s; listPromotions
+  orders drafts by creation; getPerformance''s published follows the event''s lifecycle.'
+decision:
+  what: 'ADAM CR-111, option 1, accepted 15 October 2026 (the DECISION line). contracts/spine/catalogue.yaml
+    resolveProductByCode, setAlternativeCodes and AlternativeCode, ProductEligibilityRule, GroupPackageDefinition,
+    relinquishChannelAllocation, createChannelCapacity and ChannelCapacity.isSeated, getPerformance;
+    contracts/satellite/promotions.yaml publishPromotion, updatePromotion, createPromotion (its 400 names its problem
+    types), listPromotions; docs/active/breaking-changes.yaml BC-482 (isPaused removed from updatePromotion''s body).'
+  by: Chinmay
+  date: '2026-10-15'
+why: 'ADAM CR-111 (Deep Khanvilkar, #27852, #28097, #28027, #28018), accepted 15 October 2026 for the next release
+  and moved to r10.'
+keys_touched:
+  operations: [resolveProductByCode, setAlternativeCodes, setGroupPackageDefinition, setProductEligibilityRule,
+    relinquishChannelAllocation, createChannelCapacity, publishPromotion, updatePromotion, createPromotion,
+    listPromotions, getPerformance]
+  schemas: [AlternativeCode, ProductEligibilityRule, GroupPackageDefinition, ChannelCapacity]
+  tables: [catalogue.alternative_code, catalogue.group_package, catalogue.product_eligibility_rule,
+    catalogue.channel_envelope, catalogue.audit_entry, promotions.promotion]
+  files:
+  - contracts/spine/catalogue.yaml
+  - contracts/satellite/promotions.yaml
+  - docs/active/breaking-changes.yaml
+  other:
+  - 'BC-482'
+root_class: 'missing keys and undocumented refusals'
+tickets:
+  started: []
+  unstarted:
+  - '27852, 28097, 28027, 28018: CR-111''s settlement; the pointer bodies pick the fix up at r10.'
+  - 'MIG-CATALOGUE (alternative_code, group_package, product_eligibility_rule): a child task for Hrushikant Patkar for
+    the three unique indexes; a database holding duplicates must be cleaned first. Not applied while server databases
+    are frozen.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-111
+triage: blocker
+prevention:
+  type: generator-rule
+  ref: tools/derive-ddl.py::x-ticvai-unique-together
+status: open
+notes: 'Database (generated): alternative_code_partner_id_code_uniq (partner_id, lower(code)),
+  group_package_product_id_uniq, product_eligibility_rule_product_id_uniq. The terms-lock refusal keeps its r9 problem
+  type, live-promotion-terms-locked, for scheduled and paused too. The listPromotions draft order uses the UUIDv7 id
+  as the creation time (promotions.promotion has no created_at), so no column is added. createPromotion''s 400 now
+  names discount-cap-exceeded and conditions-unsatisfiable (two fewer responses without problem types).'

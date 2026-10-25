@@ -1,0 +1,45 @@
+id: CHG-R10CAT-012
+date: '2026-10-25'
+source: cr
+kind: contract
+summary: 'Promotion, CreatePromotionRequest and GuestPromotion carry nameLocalised and descriptionLocalised
+  (LocalisedText, ISO 639-1), a guest-facing label (LocalisedText, the card''s pill) and venues [{venueId, name,
+  nameLocalised}] (empty means every venue), set in the back office through createPromotion and updatePromotion, each
+  venueId checked with tenancy#scopeRecords (422 unknown-venue). WEB-032''s Use this offer carries the code to WEB-010.'
+decision:
+  what: 'ADAM CR-225 (the GuestPromotion contract side: label, venues) and CR-231, option A each, the resolutions of
+    25 October 2026. contracts/satellite/promotions.yaml: CreatePromotionRequest nameLocalised, descriptionLocalised,
+    label, venues (jsonb value column); PromotionVenue and LocalisedText schemas; GuestPromotion the same four;
+    updatePromotion body takes them (display fields, editable in any state but expired and ended); createPromotion
+    and updatePromotion read tenancy#scopeRecords and answer 422 unknown-venue.'
+  by: Chinmay
+  date: '2026-10-25'
+why: 'ADAM CR-225 (Chinmay Patkar, #28185 WEB-032: the pill and the venue line of a client-approved frame had no
+  source) and CR-231 (Chinmay Patkar, #28185: a promotion''s name and description had one language only), settled 25
+  October 2026.'
+keys_touched:
+  operations: [createPromotion, updatePromotion, listPromotions, getPromotion]
+  schemas: [CreatePromotionRequest, Promotion, GuestPromotion, PromotionVenue, LocalisedText]
+  tables: [promotions.promotion]
+  files:
+  - contracts/satellite/promotions.yaml
+root_class: 'an approved screen field with no source in the data'
+tickets:
+  started: []
+  unstarted:
+  - '28185 (WEB-032): CR-225''s and CR-231''s comments; the screen side (the pill, the venue line, Use this offer to
+    WEB-010, the page language) is lane D''s.'
+  - 'MIG-PROMOTIONS (promotions.promotion): a child task for Hrushikant Patkar for four jsonb columns; not applied while
+    server databases are frozen.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-225, CR-231
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-contract-storage.py
+status: open
+notes: 'Database (generated): promotions.promotion name_localised, description_localised, label and venues, jsonb,
+  nullable. Venue names are localised on the promotion itself (set in the back office), because platform.scope keeps
+  one name per node and no localised venue name exists anywhere in the package. venues is display only; the
+  conditions still decide where the discount applies.'

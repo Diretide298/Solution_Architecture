@@ -554,7 +554,9 @@ paths:
         promotions, and nothing in draft, unpublished or withdrawn; asked for by id, such a record answers as
         not found. `PRICE_VIEW` is what a staff caller must hold, and staff also see drafts (ADR-0025).
 
-        **Order.** Newest first, by `publishedAt` descending, then by `id`.
+        **Order.** Newest first, by `publishedAt` descending, then by `id`. **A draft has no `publishedAt`** and sorts
+        after every published promotion, newest first by its creation time, which its `id` carries (a UUIDv7), so
+        `published_at DESC NULLS LAST, id DESC` (ADAM CR-111, option 1, accepted 15 October 2026; CHG-R10CAT-011).
       tags:
       - promotion
       x-ticvai-permission: PRICE_VIEW
@@ -611,6 +613,11 @@ paths:
       operationId: createPromotion
       x-ticvai-consumed-by:
         - "P08 BO-010 Promotions & Coupons"
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'each venues[].venueId names a venue node of the tenant (platform.scope), Tenancy''s data (ADAM CR-225;
+          CHG-R10CAT-012)'
       x-ticvai-api-scope: ticketing.write
       x-ticvai-audience:
       - staff
@@ -666,12 +673,20 @@ paths:
             condition that cannot hold.
 
             '
+          x-ticvai-problem-types: [discount-cap-exceeded, conditions-unsatisfiable]
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
           $ref: ../shared/common.yaml#/components/responses/DuplicateCode
+        '422':
+          x-ticvai-problem-types: [unknown-venue]
+          description: A `venues[].venueId` that names no venue of the tenant (ADAM CR-225).
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /promotions/{promotionId}:
@@ -742,6 +757,15 @@ paths:
       operationId: updatePromotion
       x-ticvai-consumed-by:
         - "P08 BO-010 Promotions & Coupons"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the discount cap, the venue setting promotions.maxDiscountPercent, for the 400 createPromotion also
+          answers (ADAM CR-111; CHG-R10CAT-011)'
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'each venues[].venueId names a venue node of the tenant (platform.scope), Tenancy''s data (ADAM CR-225;
+          CHG-R10CAT-012)'
       x-ticvai-api-scope: ticketing.write
       x-ticvai-audience:
       - staff
@@ -749,6 +773,21 @@ paths:
       summary: Amend a promotion
       description: 'Amending a live promotion changes behaviour mid-sale. Conditions and discount are
         editable only in draft; a live promotion may be paused, extended or ended, nothing more.
+
+
+        **The terms lock and the refusals** (ADAM CR-111, option 1, accepted 15 October 2026; CHG-R10CAT-011). `conditions` and
+        `discount` are editable in `draft` only: sent for a promotion that is `scheduled`, `live` or `paused` they are
+        `409 live-promotion-terms-locked` (the problem type keeps its r9 name for all three), and for one that is `expired` or `ended` every field is `409
+        invalid-promotion-state`. Pausing is `pausePromotion`''s alone (it takes the reason and suspends the channel
+        rows), so this body no longer carries `isPaused`. The discount cap and unsatisfiable conditions are refused
+        `400` exactly as `createPromotion` refuses them. An unknown promotion, or one outside the caller''s scope, is
+        404.
+
+
+        **The guest-facing texts** (ADAM CR-225 and CR-231, option A, decided 25 October 2026; CHG-R10CAT-012):
+        `nameLocalised`, `descriptionLocalised`, `label` and `venues` are display fields, editable in any state but
+        `expired` and `ended`; each `venues[].venueId` must be a venue of the tenant (`tenancy#scopeRecords`), else
+        `422 unknown-venue`.
 
         **Writes `promotions.promotion_channel_publication` and `promotions.promotion_audit`.** Each
         channel row of the promotion that is `published` moves to `outOfSync`
@@ -777,11 +816,29 @@ paths:
                 name:
                   type: string
                   maxLength: 200
+                nameLocalised:
+                  allOf:
+                  - $ref: '#/components/schemas/LocalisedText'
+                  nullable: true
+                  description: As `Promotion.nameLocalised` (ADAM CR-231).
+                descriptionLocalised:
+                  allOf:
+                  - $ref: '#/components/schemas/LocalisedText'
+                  nullable: true
+                  description: As `Promotion.descriptionLocalised` (ADAM CR-231).
+                label:
+                  allOf:
+                  - $ref: '#/components/schemas/LocalisedText'
+                  nullable: true
+                  description: As `Promotion.label` (ADAM CR-225).
+                venues:
+                  type: array
+                  description: As `Promotion.venues`; the whole list, an empty list meaning every venue (ADAM CR-225).
+                  items:
+                    $ref: '#/components/schemas/PromotionVenue'
                 validTo:
                   type: string
                   format: date-time
-                isPaused:
-                  type: boolean
                 conditions:
                   $ref: '#/components/schemas/PromotionConditions'
                 discount:
@@ -796,9 +853,28 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Promotion'
+        '400':
+          x-ticvai-problem-types: [discount-cap-exceeded, conditions-unsatisfiable]
+          description: 'The discount exceeds the venue''s cap, or the conditions cannot hold; the same refusals, with the
+            same rules, as `createPromotion`''s 400 (ADAM CR-111). Each refusal names the condition.'
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
-          x-ticvai-problem-types: [live-promotion-terms-locked]
-          description: Conditions or discount amended on a live promotion
+          x-ticvai-problem-types: [live-promotion-terms-locked, invalid-promotion-state]
+          description: 'Conditions or discount amended on a promotion that is `scheduled`, `live` or `paused`
+            (`live-promotion-terms-locked`, its r9 name kept for all three), or any change to one that is `expired` or
+            `ended` (`invalid-promotion-state`). Nothing changes (ADAM CR-111).'
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '422':
+          x-ticvai-problem-types: [unknown-venue]
+          description: A `venues[].venueId` that names no venue of the tenant (ADAM CR-225).
           content:
             application/problem+json:
               schema:
@@ -1042,6 +1118,13 @@ paths:
         `promotions.promotion_conflict` by the conflict detection job, not by this operation (decided 29
         September, writers pass).
 
+
+        **From which state** (ADAM CR-111, option 1, accepted 15 October 2026; CHG-R10CAT-011): a promotion is published from
+        `draft` (to `scheduled`) or resumed from `paused` (to `live`), as `states/promotion.yaml` says. From any other
+        state (`scheduled`, `live`, `expired`, `ended`) it is `409 invalid-promotion-state`. A paused promotion whose
+        `validTo` has passed is not resumed: `409 promotion-window-ended` (end it instead). An unknown promotion, or one
+        outside the caller''s scope, is 404.
+
         '
       tags:
       - promotion
@@ -1061,8 +1144,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Promotion'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
-          description: Conflict analysis failed. The response names each conflicting promotion
+          x-ticvai-problem-types: [stacking-conflict, invalid-promotion-state, promotion-window-ended]
+          description: 'Conflict analysis failed, and the response names each conflicting promotion (`stacking-conflict`);
+            the promotion is not in `draft` or `paused` (`invalid-promotion-state`); or a paused promotion''s window has
+            ended (`promotion-window-ended`). Nothing changes (ADAM CR-111).'
           content:
             application/problem+json:
               schema:
@@ -1555,6 +1643,14 @@ paths:
         - "P01 WEB-008 Add-ons & Upsell"
         - "P02 GST-004 Item Detail"
         - "P02 GST-056 Bundle Package"
+      x-ticvai-reads:
+      - table: promotions.bundle
+        for: 'the bundle itself, and whether it is published (variant_id), active (is_active) and in its window (ADAM CR-197, option B; CHG-R10CAT-002)'
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s currency and scale for the bundle''s Money (price, savingsAmount), platform.venue_settings,
+          Tenancy''s data, in process within commerce (ADAM CR-197, option B; CHG-R10CAT-002)'
       x-ticvai-audience:
       - guest
       # Public, with an optional token, as getBundle: a visitor browses before signing in.
@@ -1574,7 +1670,15 @@ paths:
         CHG-R10ID-010; the rule for every public guest read is on `guestAuth`): the guest app or site sends
         `X-Venue-Id`; the server checks it is one of the tenant''s venues (else 404) and reads under a read-only scope
         of that venue''s path, so `promotions.bundle`''s venue row-level security finds the venue''s bundles with no
-        session. An anonymous guest session carries the same venue scope (CR-183).'
+        session. An anonymous guest session carries the same venue scope (CR-183).
+
+        **What a guest sees** (ADAM CR-197, option B, decided 25 October 2026; CHG-R10CAT-002). A bundle is
+        **published** when `promotions.bundle.variant_id` is not null (r8, CHG-R8MIG-023: "null until published"),
+        and **withdrawn** when `is_active` is false. A guest or a visitor gets the bundle only when `variant_id` is
+        set, `is_active` is true and now is within `valid_from` / `valid_to` (a null bound is open); any other bundle,
+        draft, unpublished, withdrawn or out of its window, answers 404, never a reason. `variant_id` is set by the
+        step that creates the bundle''s catalogue product, the publication step of `updateBundle`. `price` and
+        `savingsAmount` are Money in the venue''s currency and scale, read with `tenancy#venueSettingsRecords`.'
       tags:
       - bundle
       x-ticvai-permission: null
@@ -1984,6 +2088,11 @@ paths:
         - "P08 ADM-181 Guest Choice & Build-Your-Own Bundle Designer"
         - "P08 ADM-187 Bundle Preview, Simulation & AI Recommendation"
         - "P08 BO-011 Packages & Bundles"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s currency and scale for the bundle''s Money (price, savingsAmount), platform.venue_settings,
+          Tenancy''s data, in process within commerce (ADAM CR-197, option B; CHG-R10CAT-002)'
       # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
       # or staff token is still accepted. `{}` makes the credential optional.
       security:
@@ -2005,6 +2114,10 @@ paths:
         ADAM CR-198 option A; CHG-R10ID-010; the rule is on `guestAuth`): `X-Venue-Id`, checked to be one of
         the tenant's venues (else 404), gives the read a read-only scope of that venue's path; a staff caller
         reads under its own scope as before.
+
+        **Published, for a guest caller**, is `getGuestBundle`''s rule (ADAM CR-197, option B, decided 25 October 2026;
+        CHG-R10CAT-002): `variant_id` set, `is_active` true and now within `valid_from` / `valid_to`; otherwise 404.
+        Money (`price`, `savingsAmount`) is in the venue''s currency and scale, read with `tenancy#venueSettingsRecords`.
       tags:
       - bundle
       x-ticvai-permission: PRODUCT_VIEW
@@ -2035,6 +2148,13 @@ paths:
       operationId: updateBundle
       x-ticvai-consumed-by:
         - "P08 BO-011 Packages & Bundles"
+      x-ticvai-writes:
+      - table: catalogue.product
+        for: 'the publication step creates the bundle''s catalogue product, kind bundle (ADAM CR-197, option B; CHG-R10CAT-002)'
+      - table: catalogue.variant
+        for: 'the bundle''s one variant, whose id becomes promotions.bundle.variant_id (ADAM CR-197, option B; CHG-R10CAT-002)'
+      - table: promotions.allocation_split
+        for: 'the record of the split, with allocation_component; bundle.allocation is derived from them (ADAM CR-110; CHG-R10CAT-010)'
       x-ticvai-audience:
       - staff
       summary: Amend a bundle
@@ -2049,6 +2169,24 @@ paths:
         **Writes `promotions.promotion_audit`** in the same transaction, as every promotions
         configuration change does (entityType `bundle`, eventType `modified`, the changed fields before
         and after) (decided 29 September, writers pass).
+
+
+        **Publishing a bundle** (ADAM CR-197, option B, decided 25 October 2026; CHG-R10CAT-002). `createBundle` stores
+        a bundle unpublished: `variant_id` null and `is_active` false. The first `isActive: true` on a bundle whose
+        `variant_id` is null is the **publication step**: in the same transaction it creates the bundle''s catalogue
+        product (kind `bundle`, its code and name the bundle''s, one variant at the bundle''s price; Catalogue owns
+        `catalogue.product` and `catalogue.variant`, and Promotions runs in the same service) and writes that
+        variant''s id to `promotions.bundle.variant_id`. From then on the bundle is published: `isActive: false`
+        withdraws it, and `isActive: true` puts it back on sale with the same product and variant. A guest sees it
+        only while published, active and within its validity window (`getGuestBundle`).
+
+
+        **The split** (ADAM CR-110, option 1, decided 15 October 2026; CHG-R10CAT-010). `promotions.allocation_split`
+        and `promotions.allocation_component` are the record of the split; `promotions.bundle.allocation` is a copy
+        derived from them in the same transaction and never read for a rule. The `fixedAmount` 400 is judged on
+        `allocation_component.fixed_amount`. `savingsAmount` is the sum of the components'' `list_price` captured on
+        `allocation_component` when the bundle was created, less the bundle price; a later change to a variant''s
+        price does not move it. An unknown bundle, or one outside the caller''s scope, is 404.
 
         '
       tags:
@@ -2095,6 +2233,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /allocation-splits:
@@ -9443,9 +9583,40 @@ components:
         name:
           type: string
           maxLength: 200
+        nameLocalised:
+          allOf:
+          - $ref: '#/components/schemas/LocalisedText'
+          nullable: true
+          description: '**The promotion''s name in each of the tenant''s enabled languages** (ADAM CR-231, option A,
+            decided 25 October 2026; CHG-R10CAT-012), keyed by ISO 639-1 code, as `Product.nameLocalised`. The back
+            office collects one per enabled language; a guest screen shows the page language''s entry and falls back to
+            `name`. At most 200 characters per language, as `name`.'
         description:
           type: string
           maxLength: 1000
+        descriptionLocalised:
+          allOf:
+          - $ref: '#/components/schemas/LocalisedText'
+          nullable: true
+          description: The description in each enabled language, as `nameLocalised`; falls back to `description`. At
+            most 1000 characters per language (ADAM CR-231).
+        label:
+          allOf:
+          - $ref: '#/components/schemas/LocalisedText'
+          nullable: true
+          description: '**The guest-facing label**, the pill on the offer card (BUNDLE, RENTAL, MEMBERSHIP, SEASON,
+            PARKING on WEB-032), per language as `nameLocalised` (ADAM CR-225 and CR-231, option A, decided 25 October
+            2026; CHG-R10CAT-012). Set in the back office; null shows no pill. At most 40 characters per language.'
+        venues:
+          type: array
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
+          description: '**Where a guest may use the offer**, as the offer card''s venue line shows it (ADAM CR-225,
+            option A, decided 25 October 2026; CHG-R10CAT-012). Set in the back office; empty or absent means every
+            venue. Display only: `venueId` above stays the owning venue and the conditions still decide where the
+            discount applies.'
+          items:
+            $ref: '#/components/schemas/PromotionVenue'
         venueId:
           type: string
           format: uuid
@@ -9507,6 +9678,36 @@ components:
           items:
             type: string
             format: uuid
+    PromotionVenue:
+      x-ticvai-persistence: none — jsonb column promotions.promotion.venues
+      type: object
+      description: 'One venue on a promotion''s guest-facing venue line (ADAM CR-225; CR-231 localises its name;
+        CHG-R10CAT-012).'
+      required:
+      - venueId
+      - name
+      properties:
+        venueId:
+          type: string
+          format: uuid
+          x-ticvai-references: platform.scope
+          description: A venue node of the tenant (checked with `tenancy#scopeRecords` on write).
+        name:
+          type: string
+          maxLength: 200
+          description: The venue's name as the back office gives it for guests.
+        nameLocalised:
+          allOf:
+          - $ref: '#/components/schemas/LocalisedText'
+          nullable: true
+          description: The name in each enabled language; falls back to `name` (ADAM CR-231).
+    LocalisedText:
+      x-ticvai-persistence: none — jsonb column
+      type: object
+      description: Keyed by ISO 639-1 code. Every enabled language should be present. The same shape as Catalogue's
+        and white-label's `LocalisedText` (ADAM CR-231).
+      additionalProperties:
+        type: string
     Promotion:
       x-ticvai-persistence: promotions.promotion
       allOf:
@@ -10491,6 +10692,30 @@ components:
         maxRedemptionsPerGuest:
           type: integer
           nullable: true
+        nameLocalised:
+          allOf:
+          - $ref: '#/components/schemas/LocalisedText'
+          nullable: true
+          description: '`Promotion.nameLocalised`; the screen shows the page language''s entry, else `name` (ADAM
+            CR-231).'
+        descriptionLocalised:
+          allOf:
+          - $ref: '#/components/schemas/LocalisedText'
+          nullable: true
+          description: '`Promotion.descriptionLocalised`; the screen shows the page language''s entry, else
+            `description` (ADAM CR-231).'
+        label:
+          allOf:
+          - $ref: '#/components/schemas/LocalisedText'
+          nullable: true
+          description: The card's pill, `Promotion.label`, per language (ADAM CR-225, CR-231).
+        venues:
+          type: array
+          description: 'The card''s venue line, `Promotion.venues`; empty means every venue (ADAM CR-225). WEB-032''s
+            "Use this offer" carries `code` into the booking flow to WEB-010, where `applyCartPromoCode` already runs,
+            so the offers page needs no cart operation.'
+          items:
+            $ref: '#/components/schemas/PromotionVenue'
     ConflictAnalysis:
       x-ticvai-persistence: none — computed
       type: object
@@ -11313,6 +11538,9 @@ components:
             $ref: '#/components/schemas/BundleChoiceGroup'
         allocation:
           type: object
+          description: 'Stored as `promotions.allocation_split` and `promotions.allocation_component`, the record of
+            the split; `promotions.bundle.allocation` is a copy derived from them in the same transaction (ADAM CR-110,
+            option 1; CHG-R10CAT-010).'
           required:
           - method
           - components
@@ -11390,11 +11618,20 @@ components:
             description: '**The catalogue variant a cart line of this bundle names** (R8 blocker ORDERS-MONEY-C43,
               CHG-R8MIG-023): each sold bundle has a catalogue product of kind bundle with one variant, made when the
               bundle is published; `addCartLine` sends it as `variantId`, with the picks in `attributes.bundle`. Null
-              until published.'
+              until published.
+
+
+              **It is the bundle''s published mark** (ADAM CR-197, option B, decided 25 October 2026; CHG-R10CAT-002):
+              not null is published, and `isActive` false is withdrawn. It is written once, by the publication step of
+              `updateBundle` (the first `isActive: true` on a bundle with no variant), which creates the bundle''s
+              catalogue product, and is never cleared: withdrawing and putting the bundle back on sale keep the same
+              product and variant.'
           savingsAmount:
             allOf:
             - $ref: ../shared/common.yaml#/components/schemas/Money
-            description: Sum of component list prices less the bundle price.
+            description: 'Sum of component list prices less the bundle price: the `list_price` captured on each
+              `promotions.allocation_component` when the bundle was created, not the variants'' current prices (ADAM
+              CR-110, option 1; CHG-R10CAT-010).'
           savingsPercentage:
             type: number
           hasBeenSold:

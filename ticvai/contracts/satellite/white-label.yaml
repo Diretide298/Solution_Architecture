@@ -309,7 +309,11 @@ x-ticvai-queries:
       transaction). It decides nothing: an asker that refuses or chooses on these rows states that rule in its
       own operation, and a question with a rule of its own (open, live, sellable) is declared as a query of its
       own. It is asked from another deployable through WhiteLabel's service route (serviceAuth). Added for the products
-      module, wave 1 (CHG-R8PRD-012).
+      module, wave 1 (CHG-R8PRD-012). **On the service route it answers at the tenant root, not under the asking
+      caller's row security** (serviceAuth's connection context: the tenant root's scope path; ADAM CR-213, option A,
+      decided 25 October 2026, CHG-R10CAT-005): Catalogue's setProductChannelTexts and getProductChannelTexts read the
+      draft's languages for a venue-scoped caller before the tenant's first publish. Only the languages are used; the
+      draft configuration stays readable by staff at the tenant root only (getTenantConfig, TENANT_CONFIGURE).
     served: [service]
 paths:
   /tenant-domains:

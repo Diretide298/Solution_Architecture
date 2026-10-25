@@ -1,0 +1,63 @@
+id: CHG-R10CAT-001
+date: '2026-10-25'
+source: cr
+kind: contract
+summary: 'Tenancy declares tenancy#scopeRecords, a data read of platform.scope by ids, by exact path or by columns,
+  served in process and by service, active or not. createEntitlementTemplate writes its scope_path from the caller''s
+  working venue through it (403 working-venue-required with no working venue) and checks includedValue against the
+  venue''s currency and scale (400); setEntitlementTemplateBlackoutDates goes scope_path -> venue -> venue settings to
+  answer includedValue, and its audit row is stated as built; getOrderCalendarEvent''s LOCATION is the venue node''s
+  name through it. Sibling: getProductSalePermissionRules names a venue rule''s target through it.'
+decision:
+  what: 'ADAM CR-217 option A, CR-235 option A (with CR-217) and CR-227 option A, the resolutions of 25 October 2026.
+    contracts/spine/tenancy.yaml x-ticvai-queries: scopeRecords (table platform.scope; inputs ids, paths, where;
+    returns OrgUnit rows; served [in-process, service]), in the shape of the other per-table data reads (CHG-MOD-001).
+    contracts/spine/catalogue.yaml: createEntitlementTemplate x-ticvai-read-via scopeRecords and venueSettingsRecords
+    (in-process), description, 400 venue-currency-mismatch / venue-scale-mismatch and 403 working-venue-required;
+    setEntitlementTemplateBlackoutDates x-ticvai-read-via scopeRecords (by path) and venueSettingsRecords, the
+    includedValue rule (no 500 refusal) and the audit values confirmed as built (domain product, action updated,
+    category validity, entity_type entitlementTemplate, field blackoutDates, previous_value and new_value JSON arrays,
+    scope_path the template''s, actor_principal_id the caller). contracts/spine/orders.yaml getOrderCalendarEvent:
+    x-ticvai-read-via scopeRecords, LOCATION the venue node''s name whether or not the venue is active (lane C''s
+    contract, the read-via and the one sentence only).'
+  by: Chinmay
+  date: '2026-10-25'
+why: 'ADAM CR-217 (Chinmay Patkar, #30944 createEntitlementTemplate), CR-235 (Chinmay Patkar, #30945
+  setEntitlementTemplateBlackoutDates) and CR-227 (Pranay Shinde, #30688 getOrderCalendarEvent), settled 25 October
+  2026 (decisions-2026-10-25). Catalogue and Orders may not read platform.scope raw (ADR-0055 rule 2 as amended; the
+  repository''s architecture test refuses it), and Tenancy''s only query over it, activeVenues, answers active venues
+  by id over the service route. A template keeps only its scope_path, so its venue''s currency had no declared route.'
+keys_touched:
+  operations: [createEntitlementTemplate, setEntitlementTemplateBlackoutDates, getOrderCalendarEvent,
+    getProductSalePermissionRules]
+  schemas: [EntitlementTemplate, OrgUnit]
+  tables: [platform.scope, platform.venue_settings, catalogue.entitlement_template, catalogue.audit_entry]
+  files:
+  - contracts/spine/tenancy.yaml
+  - contracts/spine/catalogue.yaml
+  - contracts/spine/orders.yaml
+  other:
+  - 'tenancy#scopeRecords (new query, owned by lane B in Tenancy''s contract)'
+root_class: 'storage-route gap: a fact another module owns (a venue''s path or name) with no declared query'
+tickets:
+  started:
+  - '30688 (getOrderCalendarEvent, In progress): through CR-227''s comment, as CHG-ADM-002 says; its text is not
+    rewritten.'
+  - '30944 and 30945 (built on the developer''s branches, per the CRs): through CR-217''s and CR-235''s comments; their
+    text is not rewritten.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-217, CR-235, CR-227
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-cross-module-reads.py
+status: open
+notes: 'Siblings: getProductSalePermissionRules named a venue rule''s target through activeVenues (service, active
+  venues only), so a saved rule on a deactivated venue lost its name; it now asks scopeRecords in process. The other
+  activeVenues askers (setProductSalePermissionRules, listSalePermissionTargets) ask a rule question (an active venue)
+  and keep it. publishBundle (CR-110, CHG-R10CAT-010) and the promotion venue check (CR-225, CHG-R10CAT-012) use the
+  same query. No database change. Open for integration: a guest caller (getOrderCalendarEvent under guestAuth) carries
+  no scope path, so under platform.scope''s scope_scope policy the in-process read sees no row; the same holds for every
+  guest in-process data read of a scoped table (createCart''s venueSettingsRecords).'

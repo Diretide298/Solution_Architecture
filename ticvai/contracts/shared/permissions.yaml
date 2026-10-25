@@ -108,6 +108,7 @@ x-ticvai-permission-modules:
       - PRODUCT_CONFIGURE
       - PRODUCT_APPROVE
       - PRODUCT_PUBLISH
+      - SALES_CHANNEL_OVERRIDE
       - PRICE_VIEW
       - PRICE_CONFIGURE
       - EVENT_CONFIGURE
@@ -593,6 +594,7 @@ components:
         # **Approving and publishing are different acts — decided 28 September, audit R091 (2).**
         # A product manager approves; an operator publishes. Both rode `PRODUCT_CONFIGURE`, so the
         # person who wrote a product could also approve and publish it.
+        - SALES_CHANNEL_OVERRIDE      # take a sales channel live past readiness warnings, with a reason (ADAM CR-211)
         - PRICE_VIEW
         - PRICE_CONFIGURE
         - EVENT_CONFIGURE

@@ -2841,6 +2841,11 @@ paths:
         they have none left for the guests who need them, and venues that gate them too hard turn people
         away at the door.
 
+
+        **Nothing saved answers the defaults, never 404** (ADAM CR-112, option 1, accepted 15 October 2026; CHG-R10CAT-013): a seat map with
+        no `seating.accessible` row answers `200` with that `seatMapId`, no `spaces`, and every other field at its
+        schema default. There is at most one row per seat map (unique on `seat_map_id`).
+
         '
       tags:
       - seating
@@ -3138,6 +3143,16 @@ paths:
         - "P08 BO-1041 Scoring Rules & Model Governance"
         - "P08 BO-1042 Performance, Feedback & Audit"
       summary: What "best" means at this venue
+      description: '**The rules in force for a seat map and a performance** (ADAM CR-112, option 1, accepted 15 October 2026; CHG-R10CAT-013).
+        The approved Recommendation Command Center shows the configuration in force by seat map and performance, so
+        the read is asked for one: with `seatMapId` and `performanceId`, the row saved for both; else the seat map''s own
+        row (`performance_id` null); else the venue default, which is the schema''s defaults (no row can be saved without
+        a seat map). With `seatMapId` alone, the seat map''s row, else the venue default; with neither, the venue
+        default. `performanceId` without `seatMapId` is `400 seat-map-required`. The answer''s `seatMapId` and
+        `performanceId` say which level answered (both null, and no `id`, for the venue default). **Nothing saved
+        answers the defaults, never 404.**
+
+        '
       tags:
       - seating
       x-ticvai-permission: CAPACITY_CONFIGURE
@@ -3145,13 +3160,35 @@ paths:
       - staff
       x-ticvai-scope-level: venue
       x-ticvai-read-routing: replica
+      parameters:
+      - name: seatMapId
+        in: query
+        required: false
+        description: The seat map whose rules are asked for; omitted, the venue default (ADAM CR-112).
+        schema:
+          type: string
+          format: uuid
+      - name: performanceId
+        in: query
+        required: false
+        description: A performance on that seat map, for its override; read with `seatMapId` only (ADAM CR-112).
+        schema:
+          type: string
+          format: uuid
       responses:
         '200':
-          description: The rules
+          description: The rules in force at the level asked for, or the defaults
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/SeatRecommendationRules'
+        '400':
+          x-ticvai-problem-types: [seat-map-required]
+          description: '`performanceId` sent without `seatMapId` (ADAM CR-112).'
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
@@ -3163,8 +3200,8 @@ paths:
         - "P08 BO-1037 Family Seating Recommendations"
         - "P08 BO-1038 Accessibility Recommendations"
         - "P08 BO-1041 Scoring Rules & Model Governance"
-      x-ticvai-body-key: [seatMapId]
-      x-ticvai-body-key-note: 'Keyed by the body''s `seatMapId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per seat map within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body. **Required in fact**: a body without `seatMapId` is refused `400 validation`; the schema leaves it optional only so a client built at r1 still validates.'
+      x-ticvai-body-key: [seatMapId, performanceId]
+      x-ticvai-body-key-note: 'Keyed by the body''s `seatMapId` and `performanceId`, not a singleton (r8 walk fix, CHG-R8WFC-001; ADAM CR-112, CHG-R10CAT-013): one record for a seat map (`performanceId` null) and one for each performance overriding it, unique on `(seat_map_id, performance_id)` with a null performance counted as one value; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body. **seatMapId is required in fact**: a body without it is refused `400 validation`; the schema leaves it optional only so a client built at r1 still validates.'
       summary: Scoring for best seat, best value, closest, family and accessible
       description: 'Board 9, and it is the 21 August minute made configurable: *"best-seat ranking (e.g.
         last-row-is-best vs. first-row-is-best, depending on venue sightlines) must be configurable per
@@ -3602,6 +3639,10 @@ components:
     AccessibleSeating:
       type: object
       x-ticvai-persistence: seating.accessible
+      # One record per seat map (ADAM CR-112; CHG-R10CAT-013). A null seat_map_id never collides, so the index holds
+      # only the rows that name a seat map, as the decision's partial index does.
+      x-ticvai-unique-together:
+      - [seatMapId]
       description: 'Boards 7.6 to 7.8. **An accessible seat with no accessible route is not an
         accessible seat.**
 
@@ -3820,6 +3861,11 @@ components:
     SeatRecommendationRules:
       type: object
       x-ticvai-persistence: seating.recommendation_rule
+      # One record per seat map and one per performance override (ADAM CR-112; CHG-R10CAT-013): a null performance_id
+      # (the seat map's own row) collides with another null, so a seat map cannot have two.
+      x-ticvai-unique-together:
+      - [seatMapId, performanceId]
+      x-ticvai-unique-nulls: not-distinct
       description: 'Board 9, and the 21 August minute: *"best-seat ranking… must be configurable per
         seat map/event."* **Five kinds, one scoring model** — five algorithms would eventually
         contradict each other.

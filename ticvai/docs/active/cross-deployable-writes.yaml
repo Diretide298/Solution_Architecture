@@ -85,3 +85,16 @@ reads:
     connection, so the tables'' row-level security scopes it. The lead chose in-process reads for the same kind of
     cross-module read in CR-167 (the workers host). Removed when the service route is built, if the lead wants the
     deployables kept apart (CR-196 option A).'
+- id: XDR-002
+  reader: commerce
+  tables: [access.media_encoding_profile]
+  privileges: [SELECT]
+  queries: [access#mediaEncodingProfileRecords]
+  operations: [setChannelFeePayment]
+  added: '2026-10-25'
+  decision_ref: ADAM CR-212, option A, Chinmay, 25 October 2026
+  why: 'catalogue setChannelFeePayment (commerce) reports mediaProfileMissing for an RFID, NFC or wristband fulfilment
+    method the venue has no active media encoding profile for, and the profiles are Access''s. The decision declares
+    the read in process, as XDR-001 does for the same reason: the service route between deployables is not built
+    (CR-174), and a call on it would run at the tenant root and lose the caller''s scope. A plain select on the same
+    tenant database under the caller''s own connection, so the table''s row-level security scopes it.'
