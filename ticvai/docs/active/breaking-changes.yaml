@@ -1361,3 +1361,39 @@ changes:
     tag: r8
     producer-tickets: [AM-WALLET-CASHLESS-P08-2, VM-WALLET-WALLET-1]
     consumer-tickets: [AM-WALLET-CASHLESS-P08-5]
+  # BC-480 to BC-482: lane B of r10 (CHG-R10CAT-003, -009, -011). Numbered from 480 so the parallel r10 lanes never
+  # take one id twice; integration may renumber.
+  - id: BC-480
+    contract: catalogue
+    operation: publishChannelReadinessValidation
+    change: "response `status`"
+    reason: 'ADAM CR-211 (CHG-R10CAT-003): the view''s status was free text describing a nine-value lifecycle that
+      SalesChannelProfile.status and its DDL check do not have; the decision makes it the five values of the state
+      model, so a client can branch on it. Typing a response string as an enum is not additive.'
+    approved-by: 'Chinmay, 25 October 2026, CR-211 resolution: "The view''s status uses the five values of
+      SalesChannelProfile and the DDL: draft, pendingApproval, scheduled, active, suspended."'
+    tag: r10
+    producer-tickets: ['29762', '35237']
+    consumer-tickets: ['29774', '35819', '35820', '35821']
+  - id: BC-481
+    contract: catalogue
+    operation: setEventLifecycleState
+    change: "x-ticvai-emits changed"
+    reason: 'ADAM CR-109 (CHG-R10CAT-009): every lifecycle move now writes event.lifecycleChanged (events/
+      event-lifecycleChanged.yaml, consumed by reporting and ai). A new emitted event is labelled breaking by the
+      compat rule.'
+    approved-by: 'Chinmay, 15 October 2026, CR-109 decision (option 2): "The next release adds: ... an
+      event.lifecycleChanged event"'
+    tag: r10
+    producer-tickets: ['28020', '31410']
+    consumer-tickets: ['28041', '29902', '31464', '35442']
+  - id: BC-482
+    contract: promotions
+    operation: updatePromotion
+    change: "request `isPaused` removed"
+    reason: 'ADAM CR-111 (CHG-R10CAT-011): pausePromotion owns pausing (a reason, the channel rows suspended), and
+      updatePromotion''s isPaused bypassed both. The decision removes it from the body.'
+    approved-by: 'Chinmay, 15 October 2026, CR-111 decision (option 1): "remove isPaused from updatePromotion"'
+    tag: r10
+    producer-tickets: ['28027', '31429']
+    consumer-tickets: ['28043', '31470', '31471', '31472']

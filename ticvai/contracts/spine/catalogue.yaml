@@ -1023,6 +1023,9 @@ paths:
         type: integer
     post:
       operationId: restoreProductVersion
+      x-ticvai-writes:
+      - table: catalogue.product_version
+        for: 'a version per committed change, unless content_hash is unchanged, as updateProduct defines (ADAM CR-214; CHG-R10CAT-006)'
       x-ticvai-consumed-by:
         - "P08 BO-008 Product Detail & Variants"
       summary: Put a previous version back
@@ -1038,6 +1041,12 @@ paths:
         `requested` -> `executing` -> `completed` (or `failed`) within the call (`states/catalogue-rollback-action.yaml`),
         and one `catalogue.audit_entry` (`domain: product`, `source: rollback`, `rollbackActionId` set). ADM-132
         lists these rows.
+
+
+        **What comes back** (ADAM CR-214, option A, decided 25 October 2026; CHG-R10CAT-006): the restored version''s `snapshot`,
+        the product row with its media, channel texts, sale-permission rules and owner-form links, replaces the current
+        ones, and the result is a new version (`restoredFromVersion` the one restored). A version written before r10
+        has no snapshot and is `409 version-has-no-snapshot`; nothing changes.
 
         '
       tags:
@@ -1073,8 +1082,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/Product'
         '409':
-          description: 'The product is `archived`; an archived product takes no new version. Nothing changes.'
-          x-ticvai-problem-types: [product-archived]
+          description: 'The product is `archived`, and an archived product takes no new version; or the version has no
+            `snapshot` to restore (`version-has-no-snapshot`, ADAM CR-214). Nothing changes.'
+          x-ticvai-problem-types: [product-archived, version-has-no-snapshot]
           content:
             application/problem+json:
               schema:
@@ -1153,6 +1163,9 @@ paths:
   /products/bulk-update:
     post:
       operationId: bulkUpdateCatalogueProducts
+      x-ticvai-writes:
+      - table: catalogue.product_version
+        for: 'a version per committed change, unless content_hash is unchanged, as updateProduct defines (ADAM CR-214; CHG-R10CAT-006)'
       x-ticvai-consumed-by:
         - "P08 BO-007 Product Directory"
       x-ticvai-agreed: '2 October: Chinmay, contract follow-ups ("BO-007 bulk edit: a new catalogue operation"); the
@@ -1671,6 +1684,9 @@ paths:
       - query: white-label#guidedChoiceAnswerRecords
         route: service
         for: 'its read of whitelabel.guided_choice_answer, WhiteLabel''s data (CHG-MOD-001)'
+      - query: assets#mediaAssetRecords
+        route: service
+        for: 'a guest read''s ProductMedia url and thumbnailUrl: the asset''s stable CDN address when it is public and ready (assets.media_asset), Assets'' data, in operations (ADAM CR-221, option A; CHG-R10CAT-014)'
       # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
       # or staff token is still accepted. `{}` makes the credential optional.
       security:
@@ -2161,6 +2177,9 @@ paths:
       - query: white-label#guidedChoiceAnswerRecords
         route: service
         for: 'its read of whitelabel.guided_choice_answer, WhiteLabel''s data (CHG-MOD-001)'
+      - query: assets#mediaAssetRecords
+        route: service
+        for: 'a guest read''s ProductMedia url and thumbnailUrl: the asset''s stable CDN address when it is public and ready (assets.media_asset), Assets'' data, in operations (ADAM CR-221, option A; CHG-R10CAT-014)'
       # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
       # or staff token is still accepted. `{}` makes the credential optional.
       security:
@@ -2711,6 +2730,10 @@ paths:
         format: uuid
     get:
       operationId: getProduct
+      x-ticvai-read-via:
+      - query: assets#mediaAssetRecords
+        route: service
+        for: 'a guest read''s ProductMedia url and thumbnailUrl: the asset''s stable CDN address when it is public and ready (assets.media_asset), Assets'' data, in operations (ADAM CR-221, option A; CHG-R10CAT-014)'
       x-ticvai-consumed-by:
         - "P01 WEB-004 Attraction Details"
         - "P01 WEB-006 Date & Performance Selection"
@@ -2776,6 +2799,15 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     patch:
       operationId: updateProduct
+      x-ticvai-reads:
+      - table: catalogue.product_media
+        for: 'a sub-resource that content_hash and snapshot cover (ADAM CR-214; CHG-R10CAT-006)'
+      - table: catalogue.product_channel_text
+        for: 'a sub-resource that content_hash and snapshot cover (ADAM CR-214; CHG-R10CAT-006)'
+      - table: catalogue.product_sale_permission
+        for: 'a sub-resource that content_hash and snapshot cover (ADAM CR-214; CHG-R10CAT-006)'
+      - table: catalogue.product_owner_form
+        for: 'a sub-resource that content_hash and snapshot cover (ADAM CR-214; CHG-R10CAT-006)'
       x-ticvai-consumed-by:
         - "P08 BO-007 Product Directory"
         - "P08 BO-008 Product Detail & Variants"
@@ -2795,7 +2827,28 @@ paths:
       description: '**Accepts `Prefer: validate-only`** (29 September, build): validates and answers 200
         with the would-be result without writing, for the AI executor''s plan validation.
 
+
+        **How a product is versioned**, defined here once for every write that says "versioned as `updateProduct`"
+        (ADAM CR-214, option A, decided 25 October 2026; CHG-R10CAT-006). Every committed `updateProduct`, and every product
+        sub-resource PUT that says so (`setProductChannelTexts`, `setProductSalePermissionRules`,
+        `setProductClassification`, `setProductOwnerForms`) and each product `bulkUpdateCatalogueProducts` changes,
+        creates one `catalogue.product_version` row: `version` the product''s highest plus one, `is_current` moved to it
+        in the same transaction, `published_at` and `published_by_principal_id` the write''s time and caller,
+        `content_hash` and `snapshot` as below. **Unless `content_hash` is unchanged**: a write that changes nothing the
+        hash covers creates no version. `content_hash` is the SHA-256 of the product row and its sub-resources (its
+        `catalogue.product_media`, `catalogue.product_channel_text`, `catalogue.product_sale_permission` and
+        `catalogue.product_owner_form` rows) in canonical JSON; `snapshot` is that same JSON, so `restoreProductVersion`
+        brings back the channel texts and sale-permission rules with the product. A validate-only call writes no
+        version.
+
+
+        **updatedAt** (ADAM CR-204, option A, decided 25 October 2026; CHG-R10CAT-007): each of those writes also sets
+        `catalogue.product.updated_at` to its time, whether or not a version is created.
+
         '
+      x-ticvai-writes:
+      - table: catalogue.product_version
+        for: 'a version per committed change, unless content_hash is unchanged (ADAM CR-214; CHG-R10CAT-006)'
       tags:
       - product
       x-ticvai-permission: PRODUCT_CONFIGURE
@@ -3733,6 +3786,11 @@ paths:
         and partner prices (listProducts, getProduct, listPriceLists, getPriceList, listPrices). An exception is a
         platform grant through public-api setApiLicensing, never a default.'
       summary: Create a channel capacity
+      description: '**isSeated is derived** (ADAM CR-111, option 1, accepted 15 October 2026; CHG-R10CAT-011): true when the body names a
+        `seatCategoryId`, false otherwise; it is not taken from the body. A body that breaks the schema is `400`
+        (`errors[]` names the field); a `performanceId` that names no performance the caller can see is 404.
+
+        '
       tags:
       - capacity
       x-ticvai-permission: CAPACITY_CONFIGURE
@@ -3757,6 +3815,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ChannelCapacity'
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /channel-capacities/{channelCapacityId}/channel-allocations:
@@ -3896,6 +3958,11 @@ paths:
         - "P08 BO-013 Channel & Distribution"
         - "P08 BO-017 Capacity Management"
         - "P10 PTR-005 Inventory & Allocation View"
+      x-ticvai-writes:
+      - table: catalogue.channel_envelope
+        for: 'allocated_units set to sold_units + leased_units (ADAM CR-111; CHG-R10CAT-011)'
+      - table: catalogue.audit_entry
+        for: 'the release and its reason (ADAM CR-111; CHG-R10CAT-011)'
       x-ticvai-api-scope: ticketing.write
       x-ticvai-audience:
       - staff
@@ -3903,6 +3970,17 @@ paths:
       summary: Return unsold channel allocation to the general pool
       description: 'The standard mechanism for freeing distribution holds close to a performance. May
         be scheduled on the allocation itself, or triggered manually.
+
+
+        **What it does** (ADAM CR-111, option 1, accepted 15 October 2026; CHG-R10CAT-011). For each channel named, the
+        `catalogue.channel_envelope` row of this channel capacity has `allocated_units` set to `sold_units +
+        leased_units`, so its unsold, unheld units return to the general pool and nothing sold or held moves; the row is
+        kept. A channel with no allocation on this capacity, or an allocation that is frozen (`is_frozen`), is `409`
+        and nothing is released. Each released row writes one `catalogue.audit_entry` (domain `channel`, action
+        `released`, category `capacity`, entity_type `channelAllocation`, field `allocatedUnits`, the units before and
+        after, and the body''s `reason`). **The scheduled release** (`releaseAt`, or `releaseHoursBeforeEvent` before
+        the performance starts) is run by the allocation release job in the workers host, which does the same with
+        source `scheduler` and no reason. An unknown channel capacity, or one outside the caller''s scope, is 404.
 
         '
       tags:
@@ -3928,6 +4006,7 @@ paths:
                   items:
                     $ref: '#/components/schemas/Channel'
                 reason:
+                  x-ticvai-stored-as: catalogue.audit_entry.reason
                   type: string
                   maxLength: 500
       responses:
@@ -3940,6 +4019,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ChannelAllocationSet'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          x-ticvai-problem-types: [no-channel-allocation, channel-allocation-frozen]
+          description: 'A channel named has no allocation on this capacity (`no-channel-allocation`), or its allocation is
+            frozen (`channel-allocation-frozen`). Nothing is released (ADAM CR-111).'
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /catalogue/bundles:
@@ -4039,6 +4128,14 @@ paths:
       - query: finance#taxCodeRecords
         route: in-process
         for: 'the tax codes the bundle carries (ADAM CR-110)'
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the venue: that venueId names a venue node the caller can see (404 otherwise), and its path, the key of
+          its offline policy (platform.scope), Tenancy''s data (ADAM CR-110, option 1; CHG-R10CAT-010)'
+      - query: tenancy#offlinePolicyRecords
+        route: in-process
+        for: 'the default staleAfterHours: the venue''s offline policy maxOfflineHours (platform.offline_policy),
+          Tenancy''s data (ADAM CR-110, option 2''s stale default; CHG-R10CAT-010)'
       x-ticvai-audience:
       - staff
       summary: Compute, sign and publish a catalogue bundle
@@ -4063,6 +4160,19 @@ paths:
         `product` tile whose product is not `isSellable` in the bundle being published is dropped from the
         bundle''s copy of the board (the stored board keeps it), so the till never draws a button it
         cannot sell; the tile comes back with the first bundle in which its product is sellable again.
+
+
+        **Version, row and publisher** (ADAM CR-110, option 1 with option 2''s stale default, decided 15 October 2026;
+        CHG-R10CAT-010). Each publish writes **one** `catalogue.published_bundle` row, the full snapshot
+        (`isDelta` false); a terminal''s delta is computed by `getLatestBundle` from its `since`. `version` is a
+        per-venue integer, 1 for the venue''s first bundle and one more than the venue''s highest for each publish
+        after, carried on the wire as its decimal string; `(venue_id, version)` is unique, so two publishes can never
+        take one number. The row keeps `published_at` (the commit time), `published_by` (the caller) and the body''s
+        `note`, which `BundleSummary` returns. **staleAfterHours** defaults to the venue''s offline policy
+        `maxOfflineHours` (the policy saved at the venue''s node, read with `tenancy#offlinePolicyRecords` by the
+        venue''s path from `tenancy#scopeRecords`; 24, the schema default, where none is saved); no second bound is
+        configured. Signing is Ed25519 with the key `signatureKeyId` names (CHG-R8SPN-022). A `venueId` that names no
+        venue the caller can see is 404.
 
         '
       tags:
@@ -4092,8 +4202,8 @@ paths:
                   type: integer
                   minimum: 1
                   description: 'How long a terminal may trade on this bundle before refusing. Defaults
-                    to the venue''s configured bound. A terminal offline for a week must not sell last
-                    month''s prices.
+                    to the venue''s offline policy `maxOfflineHours` (24 where none is saved; ADAM CR-110). A
+                    terminal offline for a week must not sell last month''s prices.
 
                     '
       responses:
@@ -4108,6 +4218,8 @@ paths:
                 $ref: '#/components/schemas/BundleSummary'
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
           x-ticvai-problem-types: [bundle-publish-in-progress]
           description: A publish is already in progress for this venue
@@ -5084,6 +5196,12 @@ paths:
         A code is unique per partner. Every `variantId` must be a variant of this product; one that
         belongs to another product is a `400`.
 
+
+        **Unique per partner on the index** (ADAM CR-111, option 1, accepted 15 October 2026; CHG-R10CAT-011): `catalogue.alternative_code` is
+        unique on `(partner_id, lower(code))` across the tenant. Alternative codes are venue-scoped since r6, so a
+        lookup under row security cannot see another venue''s rows; the duplicate is found by the index refusing the
+        insert, answered `409 duplicate-code`, never by a read first.
+
         '
       tags:
       - product
@@ -5154,6 +5272,14 @@ paths:
       description: 'Called on inbound distribution orders. Accepts a partner''s own SKU and returns the
         variant it maps to.
 
+
+        **Which partner, and which variant** (ADAM CR-111, option 1, accepted 15 October 2026; CHG-R10CAT-011). A partner caller resolves
+        its own codes: `partnerId` is its own, and one naming another partner is 403. A staff caller must send
+        `partnerId` (400 `partner-required` without it), so a code two partners share is never guessed. A code mapped to
+        a variant returns that variant. A product-level code (the row''s `variant_id` null) returns the product''s
+        default variant (`isDefault`), or `409 no-default-variant` when the product has none. A code that matches
+        nothing for the partner is 404.
+
         '
       tags:
       - product
@@ -5169,6 +5295,8 @@ paths:
           type: string
       - name: partnerId
         in: query
+        description: 'Required from a staff caller (400 `partner-required`); a partner caller''s own, which it may
+          omit (ADAM CR-111).'
         schema:
           type: string
           format: uuid
@@ -5179,8 +5307,24 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProductVariant'
+        '400':
+          x-ticvai-problem-types: [partner-required]
+          description: A staff caller sent no `partnerId` (ADAM CR-111).
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          x-ticvai-problem-types: [no-default-variant]
+          description: The code is a product-level code and the product has no default variant (ADAM CR-111).
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /price-lists/{priceListId}:
@@ -5547,6 +5691,12 @@ paths:
         Pattern 4; CHG-GCF-001; `x-ticvai-guest-callable`): a guest or a visitor gets a published performance,
         and nothing in draft, unpublished or withdrawn; asked for by id, such a record answers as not found.
         `PRODUCT_VIEW` is what a staff caller must hold, and staff also see drafts (ADR-0025).
+
+
+        **Published follows the event's lifecycle** (ADAM CR-111, option 1, accepted 15 October 2026; CHG-R10CAT-011):
+        a performance is published when its event's `lifecycleState` is `onSale` or `live`, as `listEvents` shows a
+        guest; `Performance.status` has no draft value and does not decide it. Any other performance answers a guest
+        404.
       tags:
       - event
       x-ticvai-permission: PRODUCT_VIEW
@@ -5871,14 +6021,40 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createEntitlementTemplate
+      x-ticvai-writes:
+      - table: catalogue.entitlement_template
+        for: 'the template, its scope_path the working venue''s path from tenancy#scopeRecords (ADAM CR-217; CHG-R10CAT-001)'
       x-ticvai-consumed-by:
         - "P08 BO-012 Membership Products"
         - "P08 BO-1192 Entitlement Templates"
         - "P08 BO-288 Membership Entitlement & Admission Benefit Builder"
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the caller''s working venue''s path (platform.scope, by id), written as the template''s scope_path,
+          Tenancy''s data (ADAM CR-217, option A; CHG-R10CAT-001)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s currency and scale, against which includedValue is checked (platform.venue_settings),
+          Tenancy''s data (ADAM CR-217, option A; CHG-R10CAT-001)'
       x-ticvai-audience:
       - staff
       x-ticvai-config-scope: venue
       summary: Create an entitlement template
+      description: '**Where the template is written** (ADAM CR-217, option A, decided 25 October 2026; CHG-R10CAT-001).
+        `catalogue.entitlement_template.scope_path` is set by the server, never taken from the body: it is the path of
+        the caller''s working venue (the session''s venue id), read with `tenancy#scopeRecords` by id. Catalogue never
+        reads `platform.scope` raw (ADR-0055 rule 2 as amended). **A session with no working venue** (a head-office or
+        region caller) is `403 working-venue-required`, and nothing is written; giving such a caller a venue in the body
+        waits for its own decision.
+
+
+        **includedValue** is common Money, and the column keeps the amount only (ADR-0018; naming-and-style 5.1): its
+        currency and scale are the venue''s (`tenancy#venueSettingsRecords`, by the working venue''s id). A request whose
+        `includedValue.currency` or `scale` differs from the venue''s is `400 venue-currency-mismatch` or
+        `venue-scale-mismatch`, and nothing is written. The 201 answers includedValue in the venue''s currency and scale.
+
+        '
       tags:
       - entitlement
       x-ticvai-permission: PRODUCT_CONFIGURE
@@ -5903,6 +6079,22 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/EntitlementTemplate'
+        '400':
+          description: '`includedValue` is in another currency or scale than the working venue''s (`venue-currency-mismatch`,
+            `venue-scale-mismatch`). Nothing is written.'
+          x-ticvai-problem-types: [venue-currency-mismatch, venue-scale-mismatch]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '403':
+          description: 'The session has no working venue, so the template has no venue to be written under
+            (`working-venue-required`); or the caller lacks PRODUCT_CONFIGURE at the venue. Nothing is written.'
+          x-ticvai-problem-types: [working-venue-required]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
           $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
         '429':
@@ -6017,6 +6209,12 @@ paths:
         runs through the lifecycle transition operations. The by-state tiles MoM 31 Aug §4.10 asks for are the
         list filtered by lifecycleState.
 
+
+        **The dates** (ADAM CR-204, option A, decided 25 October 2026; CHG-R10CAT-007): a row''s `createdAt` is
+        `catalogue.product.created_at` and its `lastModifiedAt` is `catalogue.product.updated_at` (null until the first
+        change). `createdFrom` and `createdTo` filter on `created_at` (whole days, inclusive), and `modifiedSince` keeps
+        rows whose `updated_at` is on or after that day.
+
         **Order.** Newest first, by `createdAt` descending, then by `productId`.'
       tags:
         - drafted
@@ -6090,14 +6288,14 @@ paths:
           schema:
             type: string
             format: date
-          description: Creation date to
+          description: Creation date to (catalogue.product.created_at; ADAM CR-204)
         - name: modifiedSince
           in: query
           required: false
           schema:
             type: string
             format: date
-          description: Last modification on or after
+          description: Last modification on or after (catalogue.product.updated_at; ADAM CR-204)
         - name: search
           in: query
           required: false
@@ -8221,6 +8419,18 @@ paths:
       operationId: setChannelFeePayment
       x-ticvai-consumed-by:
         - "P08 ADM-266 Channel Fees, Payment & Fulfillment Configuration"
+      x-ticvai-read-via:
+      - query: payments#approvedPaymentMethods
+        route: in-process
+        for: 'the payment methods approved at the channel''s venue, for paymentMethodNotApproved (payments.method,
+          payments.method_config), the payments module''s data (ADAM CR-212, option A; CHG-R10CAT-004)'
+      - query: access#mediaEncodingProfileRecords
+        route: in-process
+        for: 'the venue''s active media encoding profiles, for mediaProfileMissing (access.media_encoding_profile),
+          Access''s data, a granted read (XDR-002; ADAM CR-212, option A; CHG-R10CAT-004)'
+      x-ticvai-reads:
+      - table: catalogue.fee
+        for: 'each referenced fee profile: it exists, is of the mapped fee_type and is active (ADAM CR-212; CHG-R10CAT-004)'
       x-ticvai-body-key: [channelId]
       x-ticvai-body-key-note: 'Keyed by the body''s `channelId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per sales channel within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body. **Required in fact**: a body without `channelId` is refused `400 validation`; the schema leaves it optional only so a client built at r1 still validates.'
       x-ticvai-audience:
@@ -8238,7 +8448,21 @@ paths:
         (the Fee Engine owns amounts); 7 payment and 11 fulfilment fields became two enum lists; the per-channel
         example fields dropped; print-at-home, voucher, API delivery and bulk CSV added as fulfilment methods;
         validationIssues added. Saving exposes only methods approved in Payment and Ticket Media; an incompatible
-        combination is reported in validationIssues and blocks readiness.'
+        combination is reported in validationIssues and blocks readiness.
+
+
+        **How each validation issue is found** (ADAM CR-212, option A, decided 25 October 2026; CHG-R10CAT-004). **paymentMethodNotApproved**: a
+        method in `paymentMethods` (by kind: `card`, `cash`, `digitalWallet` and `paymentLink` as named, `accountCredit`
+        as `storedValue`, `b2bCredit` as `onAccount`) or in `otherPaymentMethodCodes` (by code) that is not among the
+        channel''s venue''s approved methods, asked of the payments module with `payments#approvedPaymentMethods` in
+        process. **mediaProfileMissing**: an `rfid`, `nfc` or `wristband` fulfilment method with no active
+        `access.media_encoding_profile` for the channel''s venue, read in process with `access#mediaEncodingProfileRecords`
+        (a granted read, XDR-002). **feeProfileMissing**: each `fees[].feeType` maps to `catalogue.fee.fee_type`
+        (`booking` -> `bookingFee`, `transaction` -> `transactionFee`, `channel` -> `channelFee`, `service` ->
+        `serviceFee`, `delivery` -> `deliveryFee`, `payment` -> `paymentFee`), and a referenced `feeProfileId` must name
+        a `catalogue.fee` that exists, is of that type and is `active` (`CatalogueConfigStatus`); otherwise
+        `feeProfileMissing`. The issues are answered in `validationIssues`; the configuration is still saved, and
+        readiness is blocked until they are fixed.'
       tags:
         - drafted
       x-ticvai-permission: PRODUCT_CONFIGURE
@@ -8271,6 +8495,11 @@ paths:
       operationId: publishChannelReadinessValidation
       x-ticvai-consumed-by:
         - "P08 ADM-267 Channel Publication, Readiness & AI Validation"
+      x-ticvai-read-via:
+      - query: approvals#requestRecords
+        route: in-process
+        for: 'the approvalRequestId scheduleActivation and activate take: an approvals.request of kind
+          configurationChange, subject salesChannel, for this channel, approved (ADAM CR-211, option A; CHG-R10CAT-003)'
       x-ticvai-body-key: [channelId]
       x-ticvai-body-key-note: 'Keyed by the body''s `channelId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per sales channel within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body. **Required in fact**: a body without `channelId` is refused `400 validation`; the schema leaves it optional only so a client built at r1 still validates.'
       x-ticvai-audience:
@@ -8290,10 +8519,29 @@ paths:
         Activation, Activate, Return for Changes and Suspend on ADM-267 are this PUT''s action; a critical issue
         blocks activation, warnings pass only with the override permission and a mandatory reason; preview returns
         the effective Product -> Channel -> Customer -> Price -> Capacity -> Payment -> Fulfillment chain without
-        activating.'
+        activating.
+
+
+        **Approval, override, refusals and the timer** (ADAM CR-211, option A, decided 25 October 2026; CHG-R10CAT-003). The moves are
+        `states/sales-channel.yaml`; the view''s `status` is its five values. `submitForApproval` (draft ->
+        pendingApproval) raises an approval request through `approvals.createApprovalRequest` (kind
+        `configurationChange`, `subjectType` `salesChannel`, `subjectContract` `catalogue`, `subjectId` the channel) and
+        answers its id as `approvalRequestId`. `scheduleActivation` and `activate` from `pendingApproval` take that
+        `approvalRequestId`, and are refused `409 approval-required` unless it names an approved request for this
+        channel (read with `approvals#requestRecords`). **Warnings** pass only with `overrideWarnings` from a holder of
+        `SALES_CHANNEL_OVERRIDE` (`x-ticvai-permission-escalated`; 403 without it) and a `reason`; a critical issue is
+        never overridden. **Refusals**: a move the state model does not allow (for example `activate` from `draft`) is
+        `409 invalid-channel-transition`; a blocking critical issue is `422 critical-issue-blocks-activation`; a missing
+        reason (overriding warnings, returning for changes, suspending) is `422 reason-required`; a missing or past
+        `scheduledAt` on `scheduleActivation` is `422 scheduled-at-invalid`. Nothing changes on a refusal. **preview**
+        carries the effective chain in the view''s `preview`, and changes nothing. **The scheduled activation** is run by
+        the channel activation job in the workers host: at `activation_scheduled_at` it moves a `scheduled` channel to
+        `active` when readiness still has no critical issue, and otherwise leaves it `scheduled` and writes the issue to
+        `catalogue.audit_entry` (result `failure`).'
       tags:
         - drafted
       x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-permission-escalated: SALES_CHANNEL_OVERRIDE
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -8316,6 +8564,26 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ChannelPublicationReadinessAiValidationView'
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '409':
+          x-ticvai-problem-types: [invalid-channel-transition, approval-required]
+          description: 'The action is a move `states/sales-channel.yaml` does not allow from the channel''s status
+            (`invalid-channel-transition`), or `scheduleActivation` / `activate` from `pendingApproval` without an approved
+            approval request for this channel (`approval-required`). Nothing changes (ADAM CR-211).'
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '422':
+          x-ticvai-problem-types: [critical-issue-blocks-activation, reason-required, scheduled-at-invalid]
+          description: 'A critical readiness issue blocks the move (`critical-issue-blocks-activation`); the reason is
+            missing where it is mandatory (`reason-required`); or `scheduledAt` is missing or in the past on
+            `scheduleActivation` (`scheduled-at-invalid`). Nothing changes (ADAM CR-211).'
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /channel:
@@ -15574,10 +15842,74 @@ paths:
       operationId: cloneEvent
       x-ticvai-consumed-by:
         - "P08 BO-696 Event Duplication & Clone Configuration"
+      x-ticvai-writes:
+      - table: catalogue.event
+        for: 'the copy, in draft (ADAM CR-109; CHG-R10CAT-009)'
+      - table: catalogue.event_schedule
+        for: 'include schedule (ADAM CR-109; CHG-R10CAT-009)'
+      - table: catalogue.performance
+        for: 'include schedule: the performances, status scheduled (ADAM CR-109; CHG-R10CAT-009)'
+      - table: catalogue.channel_capacity
+        for: 'include schedule with capacityProfile: the copied performances'' envelopes, sold and leased 0 (ADAM CR-109; CHG-R10CAT-009)'
+      - table: catalogue.price_assignment
+        for: 'include pricing (ADAM CR-109; CHG-R10CAT-009)'
+      - table: catalogue.event_capacity_profile
+        for: 'include capacityProfile, and seatMap''s reference (ADAM CR-109; CHG-R10CAT-009)'
+      - table: catalogue.event_resource_plan
+        for: 'include resourceRequirements (ADAM CR-109; CHG-R10CAT-009)'
+      - table: catalogue.event_registration
+        for: 'include registrationForm (ADAM CR-109; CHG-R10CAT-009)'
+      x-ticvai-reads:
+      - table: catalogue.event
+        for: 'the source event (ADAM CR-109; CHG-R10CAT-009)'
+      - table: catalogue.event_schedule
+        for: 'the source''s schedule (ADAM CR-109; CHG-R10CAT-009)'
+      - table: catalogue.performance
+        for: 'the source''s performances (ADAM CR-109; CHG-R10CAT-009)'
+      - table: catalogue.channel_capacity
+        for: 'the source performances'' envelopes (ADAM CR-109; CHG-R10CAT-009)'
+      - table: catalogue.price_assignment
+        for: 'the source''s price assignments (ADAM CR-109; CHG-R10CAT-009)'
+      - table: catalogue.event_capacity_profile
+        for: 'the source''s capacity profiles (ADAM CR-109; CHG-R10CAT-009)'
+      - table: catalogue.event_resource_plan
+        for: 'the source''s resource plan (ADAM CR-109; CHG-R10CAT-009)'
+      - table: catalogue.event_registration
+        for: 'the source''s registration form (ADAM CR-109; CHG-R10CAT-009)'
       summary: Copy an event, choosing what comes with it
       description: 'Event board 1.3. **Most events are last year''s event**, and the question is never
         whether to clone but what to bring: the schedule, the prices, the seat map, the resource plan,
         the staff roster — rarely all of them, and never the sales.
+
+
+        **What each `include` copies** (ADAM CR-109, option 2, accepted 15 October 2026; CHG-R10CAT-009). The copy is a
+        new `catalogue.event` in `draft`, and only Catalogue''s own rows are copied:
+
+        - `schedule`: the `catalogue.event_schedule` row and every `catalogue.performance` of the source that is not
+        cancelled, each as a new performance in `scheduled`. With `capacityProfile` too, each copied performance gets
+        its `catalogue.channel_capacity` rows with `sold` and `leased` 0 and `remaining` equal to `capacity`.
+
+        - `pricing`: the `catalogue.price_assignment` rows whose `event_id` is the source, with `event_id` the copy; the
+        price lists and prices they point at are shared, not copied.
+
+        - `capacityProfile`: the `catalogue.event_capacity_profile` rows (the event''s, and with `schedule` each copied
+        performance''s).
+
+        - `seatMap`: the copied capacity profiles keep the source''s `seat_map_id`, a reference to Seating''s map, never
+        a copy of it (without `seatMap` it is null on the copy).
+
+        - `resourceRequirements`: the `catalogue.event_resource_plan` row''s requirements and contractors, with nothing
+        secured (`securedCount` 0, no `bookingIds`) and readiness worked out again.
+
+        - `registrationForm`: the `catalogue.event_registration` row, naming the same form.
+
+        - `staffPlan` and `accessRules` are another module''s data (Workforce and Access) and have no route yet; asked
+        for, they are refused `422 include-not-routed` and nothing is copied.
+
+        **shiftDatesByDays** moves, by that many days, every copied time: the performances'' `starts_at` and `ends_at`,
+        the schedule''s performance times, the resource requirements'' `from` and `to`, and the price assignments''
+        `effective_from` and `effective_to`. Sales, holds and orders are never copied. An unknown source event, or one
+        outside the caller''s scope, is 404.
 
         '
       tags:
@@ -15612,8 +15944,18 @@ paths:
                     type: string
                     description: The copy's event code, as sent in `newCode` or as the server chose it
                       (CHG-R4-016).
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
           $ref: ../shared/common.yaml#/components/responses/DuplicateCode
+        '422':
+          x-ticvai-problem-types: [include-not-routed]
+          description: '`include` names `staffPlan` or `accessRules`, another module''s data with no route yet (ADAM
+            CR-109). Nothing is copied.'
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /events/{eventId}/schedule:
@@ -15913,6 +16255,15 @@ paths:
       operationId: setEntitlementTemplateBlackoutDates
       x-ticvai-consumed-by:
         - "P08 BO-1192 Entitlement Templates"
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the template''s venue: its scope_path to the venue node (platform.scope, by path), Tenancy''s data (ADAM
+          CR-235, option A; CHG-R10CAT-001)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'that venue''s currency and scale, for the includedValue it answers (platform.venue_settings), Tenancy''s
+          data (ADAM CR-235, option A; CHG-R10CAT-001)'
       x-ticvai-audience:
         - staff
       x-ticvai-config-scope: venue
@@ -15925,6 +16276,19 @@ paths:
         entitlements issued from the template from now on and to existing ones at their next validation; a date already
         admitted on is not undone. A whole-venue closure day is the access operating calendar''s
         (`setOperatingCalendarEntry` with `venueClosed`).
+
+
+        **includedValue in the answer** (ADAM CR-235, option A with CR-217, decided 25 October 2026; CHG-R10CAT-001).
+        The 200 is the whole template, and its includedValue is answered in its venue''s currency and scale: the
+        template keeps only its `scope_path`, so Catalogue asks `tenancy#scopeRecords` by that path for the venue node,
+        then `tenancy#venueSettingsRecords` by the venue''s id. It is never guessed from the caller''s working venue, and
+        a template with includedValue is answered, not refused.
+
+
+        **The audit row** (confirmed as built, ADAM CR-235): one `catalogue.audit_entry` with domain `product`, action
+        `updated`, category `validity`, entity_type `entitlementTemplate`, entity id the template''s, field
+        `blackoutDates`, previous_value and new_value the two lists as JSON arrays, `reason` the body''s, scope_path the
+        template''s, and actor_principal_id the caller.
 
         '
       tags:
@@ -16289,16 +16653,51 @@ paths:
         format: uuid
     post:
       operationId: setEventLifecycleState
+      x-ticvai-writes:
+      - table: catalogue.event
+        for: 'lifecycle_state, or the scheduled move (scheduled_lifecycle_state, _at, _reason) (ADAM CR-109; CHG-R10CAT-009)'
       x-ticvai-consumed-by:
         - "P08 BO-716 Event Lifecycle & Change Command Center"
         - "P08 BO-717 Lifecycle Transition Configuration"
+      x-ticvai-reads:
+      - table: catalogue.performance
+        for: 'the schedule precondition, and the performances whose sales refuse a cancel (ADAM CR-109; CHG-R10CAT-009)'
+      - table: catalogue.channel_capacity
+        for: 'the capacity precondition, and sold above 0 refuses a cancel (ADAM CR-109; CHG-R10CAT-009)'
+      - table: catalogue.price
+        for: 'the price precondition (ADAM CR-109; CHG-R10CAT-009)'
+      - table: catalogue.product
+        for: 'the event''s products (event_id), for the price precondition (ADAM CR-109; CHG-R10CAT-009)'
+      - table: catalogue.variant
+        for: 'the event''s products'' variants, for the price precondition (ADAM CR-109; CHG-R10CAT-009)'
+      - table: catalogue.event_resource_plan
+        for: 'the resource plan precondition, readiness ready (ADAM CR-109; CHG-R10CAT-009)'
+      x-ticvai-emits:
+      - event.lifecycleChanged
       summary: Draft, planned, on sale, live, closed, cancelled
       description: 'Event boards 7.2 and 7.3. **The transitions are the product.** Going on sale
-        requires a price, a capacity and a schedule; going live requires a resource plan; cancelling
-        requires a treatment for everybody who bought.
+        requires a price, a capacity and a schedule; going live requires a resource plan.
 
-        A change request above a configured impact routes through `approvals` — moving a sold-out
-        performance is not a decision one person makes at a desk.
+
+        **The state model is `states/event.yaml`** (ADAM CR-109, option 2, accepted 15 October 2026; CHG-R10CAT-009):
+        the moves allowed, and each precondition against named columns. A move it does not allow is `409
+        invalid-event-transition`; a move whose preconditions fail is `409 event-preconditions-not-met`, listing each
+        one missing. **Cancelling** is refused `409 event-has-sales` while any performance of the event that is not
+        cancelled has sales (`catalogue.channel_capacity.sold` above 0); cancelling the event cancels none of its
+        performances, and each performance is cancelled with its own treatment through `cancelPerformance` (the
+        approved screen has only Move to, Reason and Effective from, so this body carries no treatment). Each move
+        writes `event.lifecycleChanged` to the outbox in the same transaction.
+
+
+        **effectiveFrom.** Null or not in the future: the move is made now. In the future: the move is checked now,
+        kept on the event (`scheduledLifecycleState`, `scheduledLifecycleAt`, `scheduledLifecycleReason`; a later
+        request replaces it), and applied at that time by the event lifecycle job in the workers host, which checks the
+        preconditions again and, if they no longer hold, clears the scheduled move and changes nothing else. The 200
+        answers the event as it is after the request.
+
+
+        **Approval routing above a configured impact waits for its threshold** (CR-109): nothing routes through
+        `approvals` yet. An unknown event, or one outside the caller''s scope, is 404.
 
         '
       tags:
@@ -16328,22 +16727,40 @@ paths:
                   - closed
                   - cancelled
                   - archived
+                  x-ticvai-stored-as: catalogue.event.lifecycle_state
+                  description: 'The state to move to: written to `lifecycle_state` now, or to `scheduled_lifecycle_state`
+                    while the move waits for its `effectiveFrom` (ADAM CR-109).'
                 reason:
                   type: string
+                  maxLength: 500
                   nullable: true
+                  x-ticvai-stored-as: catalogue.event.scheduled_lifecycle_reason
+                  description: 'Carried on `event.lifecycleChanged`; kept as `scheduledLifecycleReason` while a move waits
+                    for its `effectiveFrom`.'
                 effectiveFrom:
                   type: string
                   format: date-time
                   nullable: true
+                  x-ticvai-stored-as: catalogue.event.scheduled_lifecycle_at
+                  description: 'In the future, the move is scheduled and the event lifecycle job applies it then (ADAM
+                    CR-109); otherwise it is made now.'
       responses:
         '200':
           headers:
             X-Consistency-Token:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
-          description: Moved
+          description: Moved, or scheduled for `effectiveFrom`; the event as it is now
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Event'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
-          x-ticvai-problem-types: [event-preconditions-not-met]
-          description: Preconditions for the transition are not met; they are listed
+          x-ticvai-problem-types: [event-preconditions-not-met, invalid-event-transition, event-has-sales]
+          description: 'The preconditions for the move are not met, each listed (`event-preconditions-not-met`); the
+            move is not one `states/event.yaml` allows (`invalid-event-transition`); or a cancel while a performance of
+            the event has sales (`event-has-sales`). Nothing changes.'
           content:
             application/problem+json:
               schema:
@@ -19277,6 +19694,8 @@ paths:
       - table: catalogue.audit_entry
         for: 'the audit row (category classification, the category and tags before and after) (r8 integration,
           CHG-R8INT-019)'
+      - table: catalogue.product_version
+        for: 'a version per committed change, unless content_hash is unchanged, as updateProduct defines (ADAM CR-214; CHG-R10CAT-006)'
       summary: File a product under a category and give it its tags, both from the master lists
       description: >-
         **The product form's category drop-down and tag picker write here** (16 October 2026 minutes, 4.6 and
@@ -19471,6 +19890,13 @@ paths:
         **A product with nothing saved** answers every text null, which means each channel shows the product's own
         `nameLocalised` and `descriptionLocalised`. `missingTranslations` lists, per enabled language of the tenant,
         the texts that are set in some language and not in that one.
+
+        **enabledLanguages** (ADAM CR-213, option A, decided 25 October 2026; CHG-R10CAT-005): the answer carries the tenant's enabled
+        languages (the published set, or the draft's before the first publish), so B1-S06 draws one block per enabled
+        language from this one call, under `PRODUCT_VIEW` at venue scope, even when every text is complete. The two
+        white-label reads run on WhiteLabel's service route, which answers at the tenant root (serviceAuth's
+        connection context), so a venue-scoped caller gets the languages; the draft configuration itself stays readable
+        only at the tenant root (`getTenantConfig`).
       tags:
       - product
       x-ticvai-permission: PRODUCT_VIEW
@@ -19498,6 +19924,8 @@ paths:
       x-ticvai-writes:
       - table: catalogue.audit_entry
         for: 'the audit row (category channelTexts, the texts before and after) (r8 integration, CHG-R8INT-014; check-parameter-columns P-NAMED-TABLE)'
+      - table: catalogue.product_version
+        for: 'a version per committed change, unless content_hash is unchanged, as updateProduct defines (ADAM CR-214; CHG-R10CAT-006)'
       x-ticvai-read-via:
       - query: white-label#tenantLanguageRecords
         route: service
@@ -19510,6 +19938,12 @@ paths:
         **Replaces all of the product's channel texts** (CHG-R8PRD-003): a text sent as null, or left out, falls
         back to the product's name or description. Each text is keyed by language code, and every key must be an
         enabled language of the tenant (`422 language-not-enabled`). The length limits are per language value.
+
+        **The languages are checked on the service route** (ADAM CR-213, option A, decided 25 October 2026; CHG-R10CAT-005):
+        `white-label#tenantLanguageRecords` and, before the tenant's first publish, `white-label#tenantConfigRecords`
+        are asked through WhiteLabel's service route, which answers at the tenant root rather than under the caller's
+        row security, so a venue product administrator's save is checked against the tenant's languages before the
+        first publish as after it. The draft configuration itself stays tenant-root only.
 
         **Versioned as `updateProduct` versions the product**, and refused on an archived product
         (`409 product-archived`). **Audited:** written to `catalogue.audit_entry` (`domain: product`, `action:
@@ -19641,6 +20075,8 @@ paths:
       x-ticvai-writes:
       - table: catalogue.audit_entry
         for: 'the audit row (category ownerForms, the links before and after) (r8 integration, CHG-R8INT-014; check-parameter-columns P-NAMED-TABLE)'
+      - table: catalogue.product_version
+        for: 'a version per committed change, unless content_hash is unchanged, as updateProduct defines (ADAM CR-214; CHG-R10CAT-006)'
       x-ticvai-read-via:
       - query: marketing-crm#formDefinitionRecords
         route: service
@@ -19804,9 +20240,10 @@ paths:
     get:
       operationId: getProductSalePermissionRules
       x-ticvai-read-via:
-      - query: tenancy#activeVenues
-        route: service
-        for: 'the name of a `venue` rule''s target: platform.scope, Tenancy''s data'
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the name of a `venue` rule''s target, active or not (platform.scope, by id), Tenancy''s data (sibling of
+          ADAM CR-227: a saved rule on a venue since deactivated keeps its name; CHG-R10CAT-001)'
       - query: tenancy#workstationRecords
         route: in-process
         for: 'the name of a `workstation` rule''s target: platform.workstation, Tenancy''s data'
@@ -19855,6 +20292,8 @@ paths:
       x-ticvai-writes:
       - table: catalogue.audit_entry
         for: 'the audit row (category salePermissions, the rule set before and after) (r8 integration, CHG-R8INT-014; check-parameter-columns P-NAMED-TABLE)'
+      - table: catalogue.product_version
+        for: 'a version per committed change, unless content_hash is unchanged, as updateProduct defines (ADAM CR-214; CHG-R10CAT-006)'
       x-ticvai-read-via:
       - query: tenancy#activeVenues
         route: service
@@ -19974,6 +20413,13 @@ paths:
 
         A guest channel (website, app, kiosk) has no seller: send no `roleId` and no `principalId`, and only `global`,
         `venue`, `salesChannel` and `workstation` rules can match.
+
+        **Testing a draft before saving it** (ADAM CR-215, option A, decided 25 October 2026; CHG-R10CAT-008): a body
+        with `rules` (a draft `ProductSalePermissionRuleSet`) is evaluated instead of the saved rules of each product
+        asked, by the same rule engine, and nothing is saved; the back office sends the one product it is editing. The
+        result then names the deciding rule by `decidedByRuleIndex`, its index in the draft''s `rules`, and
+        `decidedByRuleId` is null. Without `rules`, the saved rules decide and `decidedByRuleId` names the rule, as
+        before.
       tags:
       - product
       x-ticvai-permission: PRODUCT_CONFIGURE
@@ -22286,6 +22732,17 @@ components:
             product should not create a version.
 
             '
+        snapshot:
+          type: object
+          nullable: true
+          readOnly: true
+          additionalProperties: true
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
+          description: '**What the version was**, so a restore brings it all back (ADAM CR-214, option A, decided 25
+            October 2026; CHG-R10CAT-006): the product row and its `product_media`, `product_channel_text`,
+            `product_sale_permission` and `product_owner_form` rows, in the canonical JSON `contentHash` is taken over.
+            Null on a version written before r10.'
         restoredFromVersion:
           type: integer
           nullable: true
@@ -22396,6 +22853,9 @@ components:
     AlternativeCode:
       x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by listAlternativeCodes, setAlternativeCodes
       x-ticvai-persistence: catalogue.alternative_code
+      # A code is unique per partner across the tenant, case-insensitively (ADAM CR-111; CHG-R10CAT-011).
+      x-ticvai-unique-together:
+      - [partnerId, code]
       type: object
       required:
       - code
@@ -23131,6 +23591,9 @@ components:
     ProductEligibilityRule:
       type: object
       x-ticvai-persistence: catalogue.product_eligibility_rule
+      # One rule per product: setProductEligibilityRule is a per-product PUT (ADAM CR-111; CHG-R10CAT-011).
+      x-ticvai-unique-together:
+      - [productId]
       description: Participation limits for one product. Absent means anyone may take part, and
         `getProductEligibilityRule` returns that absence as this schema with every limit null, never as
         a `404`.
@@ -23293,6 +23756,9 @@ components:
     GroupPackageDefinition:
       type: object
       x-ticvai-persistence: catalogue.group_package
+      # One definition per product: setGroupPackageDefinition is a per-product PUT (ADAM CR-111; CHG-R10CAT-011).
+      x-ticvai-unique-together:
+      - [productId]
       required:
       - kind
       - maxParticipants
@@ -23386,6 +23852,7 @@ components:
       - scopePath
       - isSellable
       - hasVariants
+      - createdAt
       properties:
         id:
           type: string
@@ -23419,8 +23886,8 @@ components:
           allOf:
           - $ref: '#/components/schemas/LocalisedText'
           nullable: true
-          description: '**The product''s name in each language the venue sells in** (6 October 2026,
-            CHG-R4-011), keyed by ISO 639-1 code, e.g. `{"en": "Aquarium entry", "ar": "دخول الأكواريوم"}`.
+          description: '**The product''s name in each of the tenant''s enabled languages** (6 October 2026,
+            CHG-R4-011; the tenant''s languages, not the venue''s: CHG-R8PRD-009, ADAM CR-213), keyed by ISO 639-1 code, e.g. `{"en": "Aquarium entry", "ar": "دخول الأكواريوم"}`.
             Every guest surface shows the entry for the guest''s language and falls back to `name`, which
             stays the name staff search and reports print. Null, or a language missing from it, means
             `name` is shown. At most 200 characters per language, as `name`.
@@ -23718,6 +24185,23 @@ components:
           description: '**The event this product sells admission to** (4 October 2026, CHG-FXC-011; WEB-002, WEB-004): a
             product page finds its event and the event''s performances (`Performance.eventId`) give it dates. Null for a product
             not tied to an event (merchandise, a pass, a membership).'
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: '**When the product was created** (ADAM CR-204, option A, decided 25 October 2026; CHG-R10CAT-007):
+            `catalogue.product.created_at`, NOT NULL DEFAULT now(), set by the server and never by a request. Rows that
+            predate it are backfilled by the migration task (the earliest of the product''s first version''s
+            `published_at` and the migration time), then the NOT NULL and the DEFAULT are set. `listProductLifecycle`
+            orders and filters on it.'
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+          description: '**When the product last changed** (ADAM CR-204): set by `updateProduct` and by every product
+            sub-resource PUT and bulk change that versions the product; null until the first change after creation.
+            `listProductLifecycle`''s `lastModifiedAt` and `modifiedSince` read it.'
     CreateProductRequest:
       type: object
       required:
@@ -24097,6 +24581,27 @@ components:
         displayOrder:
           type: integer
           default: 100
+        url:
+          type: string
+          format: uri
+          nullable: true
+          readOnly: true
+          x-ticvai-persisted: false
+          x-ticvai-derived: onRead
+          description: '**The asset''s stable CDN address, for a guest card** (ADAM CR-221, option A, decided 25 October
+            2026; CHG-R10CAT-014): the asset library''s public address for the asset, set on guest-facing reads (`searchCatalogue`,
+            `listProducts` and `getProduct` for a guest or a visitor) when the asset is public and `ready`, as
+            `getPublishedTenantConfig` returns white-label assets (`brandUrls`). Null otherwise, and on staff reads,
+            which are unchanged.'
+        thumbnailUrl:
+          type: string
+          format: uri
+          nullable: true
+          readOnly: true
+          x-ticvai-persisted: false
+          x-ticvai-derived: onRead
+          description: 'The asset library''s thumbnail address for the asset, on the same reads and with the same rule as
+            `url` (ADAM CR-221).'
         altText:
           allOf:
           - $ref: '#/components/schemas/LocalisedText'
@@ -24447,13 +24952,57 @@ components:
           - cancelled
           - archived
           description: '**Where the event is in its lifecycle** (4 October 2026, CHG-FXC-003; catalogue.event had nowhere to
-            keep it). Written only by `setEventLifecycleState`, which checks the transition; `createEvent` and `cloneEvent`
-            create an event in `draft`. `isActive` stays the switch that hides an event from sale without changing its state.'
+            keep it). Written only by `setEventLifecycleState` and the event lifecycle job, which check the transition
+            against `states/event.yaml` (ADAM CR-109); `createEvent` and `cloneEvent` create an event in `draft`.
+            `isActive` stays the switch that hides an event from sale without changing its state.'
         lifecycleStateChangedAt:
           type: string
           format: date-time
           readOnly: true
           nullable: true
+        scheduledLifecycleState:
+          type: string
+          readOnly: true
+          nullable: true
+          enum:
+          - draft
+          - planned
+          - onSale
+          - live
+          - closed
+          - cancelled
+          - archived
+          description: '**A move waiting for its effectiveFrom** (ADAM CR-109, option 2; CHG-R10CAT-009): written by
+            `setEventLifecycleState` when `effectiveFrom` is in the future, applied and cleared by the event lifecycle job
+            in the workers host at `scheduledLifecycleAt`. Null when nothing waits.'
+        scheduledLifecycleAt:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+          description: When the waiting move is applied (the request's `effectiveFrom`; ADAM CR-109).
+        scheduledLifecycleReason:
+          type: string
+          maxLength: 500
+          readOnly: true
+          nullable: true
+          description: The reason given with the waiting move, carried on `event.lifecycleChanged` when it is applied
+            (ADAM CR-109).
+    EventLifecycleState:
+      type: string
+      description: '**An event''s lifecycle** (4 October 2026, CHG-FXC-003). Its moves and their preconditions are
+        `states/event.yaml` (ADAM CR-109, option 2, accepted 15 October 2026; CHG-R10CAT-009); named here so the state
+        model checks against it. `Event.lifecycleState`, `scheduledLifecycleState` and `setEventLifecycleState`''s
+        `state` carry the same values inline, as they did before it was named (the column keeps its CHECK and the wire
+        shape does not change).'
+      enum:
+      - draft
+      - planned
+      - onSale
+      - live
+      - closed
+      - cancelled
+      - archived
     CreateEventRequest:
       type: object
       required:
@@ -24773,8 +25322,13 @@ components:
             '
         isSeated:
           type: boolean
+          readOnly: true
           description: 'Seated envelopes cannot be leased and are blocked offline. A seat map is not a
             count.
+
+
+            **Derived by the server**: true when the capacity has a `seatCategoryId`, false otherwise (ADAM CR-111,
+            option 1; CHG-R10CAT-011).
 
             '
     CreateEnvelopeRequest:
@@ -25051,6 +25605,9 @@ components:
           nullable: true
     CatalogueBundle:
       x-ticvai-persistence: catalogue.published_bundle
+      # One row per publish, numbered per venue (ADAM CR-110, option 1; CHG-R10CAT-010).
+      x-ticvai-unique-together:
+      - [venueId, version]
       type: object
       required:
       - version
@@ -25064,9 +25621,20 @@ components:
       properties:
         version:
           type: string
+          x-ticvai-unique-compare: exact
+          description: 'The venue''s bundle number: a per-venue integer, 1 for the first publish and one more than
+            the venue''s highest for each publish after, as its decimal string; unique with `venueId` (ADAM CR-110,
+            option 1; CHG-R10CAT-010).'
         venueId:
           type: string
           format: uuid
+        note:
+          type: string
+          maxLength: 500
+          nullable: true
+          readOnly: true
+          description: 'The publisher''s note from `publishBundle`''s body; `BundleSummary.note` (ADAM CR-110, option 1;
+            CHG-R10CAT-010).'
         publishedAt:
           type: string
           format: date-time
@@ -25550,11 +26118,13 @@ components:
           nullable: true
         createdAt:
           type: string
-          description: Creation date-time
+          description: Creation date-time, `catalogue.product.created_at` (ADAM CR-204)
           format: date-time
         lastModifiedAt:
           type: string
-          description: Last modification date-time
+          nullable: true
+          description: Last modification date-time, `catalogue.product.updated_at`; null until the first change (ADAM
+            CR-204)
           format: date-time
         validationIssues:
           type: array
@@ -28844,8 +29414,12 @@ components:
                   - service
                   - delivery
                   - payment
+                description: 'Maps to `catalogue.fee.fee_type`: booking -> bookingFee, transaction -> transactionFee,
+                  channel -> channelFee, service -> serviceFee, delivery -> deliveryFee, payment -> paymentFee (ADAM
+                  CR-212).'
               feeProfileId:
                 type: string
+                description: A `catalogue.fee` of the mapped type that is `active`, else `feeProfileMissing` (ADAM CR-212).
           description: 'Fee Associations (pack p.14-15): which approved fee profile applies for each fee type;
             amounts are the Pricing/Fee Engine''s'
         paymentMethods:
@@ -28927,8 +29501,12 @@ components:
                   - service
                   - delivery
                   - payment
+                description: 'Maps to `catalogue.fee.fee_type`: booking -> bookingFee, transaction -> transactionFee,
+                  channel -> channelFee, service -> serviceFee, delivery -> deliveryFee, payment -> paymentFee (ADAM
+                  CR-212).'
               feeProfileId:
                 type: string
+                description: A `catalogue.fee` of the mapped type that is `active`, else `feeProfileMissing` (ADAM CR-212).
           description: 'Fee Associations (pack p.14-15): which approved fee profile applies for each fee type;
             amounts are the Pricing/Fee Engine''s'
         paymentMethods:
@@ -29000,8 +29578,54 @@ components:
           description: 'Channel: the configured channel''s ID from the Sales Channel Command Center (ADM-258)'
         status:
           type: string
-          description: 'Status after the action: draft, configuration, validation, approved, scheduled, active,
-            suspended, disabled or archived (the pack''s suggested lifecycle, p.5)'
+          enum:
+          - draft
+          - pendingApproval
+          - scheduled
+          - active
+          - suspended
+          description: 'Status after the action: the channel''s `SalesChannelProfile.status`, the five values of the
+            state model and the DDL (ADAM CR-211, option A; CHG-R10CAT-003). The pack''s suggested lifecycle (p.5) is not
+            a second vocabulary.'
+        approvalRequestId:
+          type: string
+          format: uuid
+          nullable: true
+          description: The approval request `submitForApproval` raised, to send back with `scheduleActivation` or
+            `activate` once approved (ADAM CR-211).
+        preview:
+          type: object
+          nullable: true
+          description: '**The effective chain `preview` returns**, Product -> Channel -> Customer -> Price -> Capacity ->
+            Payment -> Fulfillment, one step per link in that order; null for any other action (ADAM CR-211).'
+          properties:
+            steps:
+              type: array
+              items:
+                type: object
+                required:
+                - stage
+                properties:
+                  stage:
+                    type: string
+                    enum:
+                    - product
+                    - channel
+                    - customer
+                    - price
+                    - capacity
+                    - payment
+                    - fulfillment
+                  summary:
+                    type: string
+                    description: What is in effect at this link for the channel.
+                  result:
+                    type: string
+                    enum:
+                    - passed
+                    - warning
+                    - failed
+                    - notRequired
         readinessScore:
           type: number
           description: Channel Readiness %
@@ -29105,8 +29729,15 @@ components:
           nullable: true
         overrideWarnings:
           type: boolean
-          description: Proceed despite warnings (needs the override permission and a reason); critical issues
-            cannot be overridden
+          description: Proceed despite warnings (needs `SALES_CHANNEL_OVERRIDE` and a reason; ADAM CR-211); critical
+            issues cannot be overridden
+        approvalRequestId:
+          type: string
+          format: uuid
+          nullable: true
+          description: 'The approved approval request `submitForApproval` raised; required by `scheduleActivation` and
+            `activate` from `pendingApproval`, which are refused `409 approval-required` without an approved one (ADAM
+            CR-211).'
     ChannelOperationsCommandCenterView:
       type: object
       x-ticvai-drafted-shape: true
@@ -45266,6 +45897,17 @@ components:
               maxLength: 8000
           nullable: true
           description: The product's own terms (wireframe B1-S06); at most 8000 characters per language.
+        enabledLanguages:
+          type: array
+          readOnly: true
+          x-ticvai-persisted: false
+          x-ticvai-derived: onRead
+          description: '**The tenant''s enabled languages**, ISO 639-1 codes in the tenant''s order: the published set,
+            or the draft''s before the first publish (white-label `LanguageConfig.languages`). B1-S06 shows one block per
+            language here (ADAM CR-213, option A; CHG-R10CAT-005). Ignored in a request body.'
+          items:
+            type: string
+            pattern: ^[a-z]{2}$
         missingTranslations:
           type: array
           readOnly: true
@@ -45544,6 +46186,12 @@ components:
           format: uuid
           nullable: true
           description: The seller; absent on a guest channel.
+        rules:
+          allOf:
+          - $ref: '#/components/schemas/ProductSalePermissionRuleSet'
+          nullable: true
+          description: '**A draft rule set to test**, evaluated instead of the saved rules, by the same engine; nothing is
+            saved (ADAM CR-215, option A; CHG-R10CAT-008). The result names the deciding rule by `decidedByRuleIndex`.'
     SalePermissionCheckResult:
       type: object
       x-ticvai-persistence: none — computed
@@ -45577,7 +46225,14 @@ components:
                 type: string
                 format: uuid
                 nullable: true
-                description: For `deniedByRule`, a matching DENY; for `allowedByRule`, a matching ALLOW; the first by level in the order of `SalePermissionLevel`, then by id. Null for `noRules` and `noMatchingRule`.
+                description: For `deniedByRule`, a matching DENY; for `allowedByRule`, a matching ALLOW; the first by level in the order of `SalePermissionLevel`, then by id. Null for `noRules` and `noMatchingRule`, and when a draft `rules` was evaluated (ADAM CR-215).
+              decidedByRuleIndex:
+                type: integer
+                minimum: 0
+                nullable: true
+                description: 'When the request sent a draft `rules`: the deciding rule''s index in it, chosen as
+                  `decidedByRuleId` is (the first by level, then by position). Null when the saved rules were evaluated,
+                  and for `noRules` and `noMatchingRule` (ADAM CR-215, option A; CHG-R10CAT-008).'
               decidedAtLevel:
                 allOf:
                 - $ref: '#/components/schemas/SalePermissionLevel'
