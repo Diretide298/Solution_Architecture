@@ -40,6 +40,7 @@ prevention:
 status: open
 notes: 'The step that sets variant_id did not exist; the decision says to name it, and the bundle''s first isActive
   true on updateBundle is the step chosen (the bundle''s product is made when it is first put on sale, as
-  transport.createTransportRoute makes its route''s product). createBundle takes no isActive, and now stores false. No
+  transport.createTransportRoute makes its route''s product); confirmed by the lead on 25 October 2026 (r10 question 15,
+  CHG-R10CAT-016). createBundle takes no isActive, and now stores false. No
   database change: variant_id and is_active exist. Sibling Money reads on other promotions reads are lane E''s
   "Money with no currency read" sweep.'

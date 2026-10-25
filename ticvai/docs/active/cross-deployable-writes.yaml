@@ -142,3 +142,16 @@ reads:
     way to put a currency on the Money it answers. The operations host registers Tenancy''s in-process queries as the
     workers host does (IModuleQueries); the read runs in the caller''s transaction under the caller''s row-level
     security. mergeTableVisits raised it (CR-234); every F&B operation that answers Money reads it the same way.'
+- id: XDR-005
+  reader: commerce
+  tables: [assets.media_asset]
+  privileges: [SELECT]
+  queries: [assets#mediaAssetRecords]
+  operations: [searchCatalogue, listProducts, getProduct]
+  added: '2026-10-25'
+  decision_ref: ADAM CR-221, option A; the lead's answer to r10 question 14 (recommended answer accepted), Chinmay, 25 October 2026
+  why: 'The guest product reads (catalogue, commerce) answer each ProductMedia''s url and thumbnailUrl, the asset''s
+    stable CDN address, and the assets are Assets'' (VenueOps, operations). The service route between deployables is not
+    built (CR-174), and a call on it would run at the tenant root and lose the caller''s scope; read in process instead,
+    as XDR-001 and XDR-002, a plain select on the same tenant database under the caller''s own connection, so the
+    table''s row-level security scopes it.'

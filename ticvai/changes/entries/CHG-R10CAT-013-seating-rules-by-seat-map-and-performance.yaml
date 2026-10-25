@@ -40,6 +40,6 @@ status: open
 notes: 'Database (generated): accessible_seat_map_id_uniq (seat_map_id) and recommendation_rule_seat_map_id_performance_id_uniq
   (seat_map_id, performance_id) NULLS NOT DISTINCT. The decision says partial unique indexes; the generator''s
   x-ticvai-unique-when takes only value conditions (no IS NOT NULL), so the same effect is reached with plain unique
-  indexes: a null seat_map_id never collides on accessible, and on recommendation_rule NULLS NOT DISTINCT lets a seat
+  indexes (confirmed by the lead on 25 October 2026, r10 question 15, CHG-R10CAT-016): a null seat_map_id never collides on accessible, and on recommendation_rule NULLS NOT DISTINCT lets a seat
   map have one row of its own. A venue default row cannot be saved (seatMapId is required in fact), so the venue
   default is the schema''s defaults.'

@@ -1,0 +1,45 @@
+id: CHG-R10CAT-015
+date: '2026-10-25'
+source: cr
+kind: contract
+summary: 'The guest product reads (searchCatalogue, listProducts, getProduct) read assets.media_asset in process
+  from commerce for ProductMedia url and thumbnailUrl, a read the lead granted across deployables as XDR-005 (commerce
+  SELECT on assets.media_asset), as XDR-001 and XDR-002.'
+decision:
+  what: 'The lead''s answer to r10 question 14 (the recommended answer, accepted 25 October 2026): grant CR-221''s media
+    read in process. docs/active/cross-deployable-writes.yaml: XDR-005. contracts/spine/catalogue.yaml: the three
+    assets#mediaAssetRecords read-vias move from service to in-process; ProductMedia.url says so.
+    contracts/satellite/assets.yaml: mediaAssetRecords'' rule names the granted read. Derived:
+    handoff/cross-deployable-writes.md (--write) and the guarded GRANT in the forward migration.'
+  by: Chinmay
+  date: '2026-10-25'
+why: 'ADAM CR-221 (Chinmay Patkar, #28145), CHG-R10CAT-014: the read crossed deployables on a service route that is
+  not built (CR-174), so the guest addresses could not be filled. The lead''s questions of 25 October
+  (the r10 lead questions, question 14).'
+keys_touched:
+  operations: [searchCatalogue, listProducts, getProduct]
+  schemas: [ProductMedia]
+  tables: [assets.media_asset]
+  files:
+  - docs/active/cross-deployable-writes.yaml
+  - contracts/spine/catalogue.yaml
+  - contracts/satellite/assets.yaml
+  - handoff/cross-deployable-writes.md
+  other:
+  - 'XDR-005 (granted read)'
+root_class: 'storage-route gap: a cross-deployable read on a route that is not built'
+tickets:
+  started: []
+  unstarted:
+  - '28145 (WEB-003): through CR-221''s comment.'
+  - 'DB-ROLES: the guarded GRANT reaches a built database through the forward migration, as XDR-001''s did.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-221
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-cross-deployable-writes.py
+status: open
+notes: 'XR-ROUTE fails an in-process read across deployables that is not in the reads list; X-READ checks XDR-005''s
+  fields. Database: GRANT SELECT ON assets.media_asset TO commerce (guarded), no column.'

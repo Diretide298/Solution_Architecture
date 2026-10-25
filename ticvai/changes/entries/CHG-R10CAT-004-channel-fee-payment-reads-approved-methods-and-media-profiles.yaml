@@ -49,5 +49,5 @@ prevention:
 status: open
 notes: 'XR-ROUTE fails an in-process read across deployables that is not in the reads list; X-READ checks XDR-002''s
   fields. The paymentMethods-to-kind mapping for accountCredit and b2bCredit is this lane''s reading (the decision
-  names the check, not the mapping); the lead may correct it. Database: a guarded GRANT SELECT on
+  names the check, not the mapping); confirmed by the lead on 25 October 2026 (r10 question 15, CHG-R10CAT-016). Database: a guarded GRANT SELECT on
   access.media_encoding_profile to the commerce role, no column.'
