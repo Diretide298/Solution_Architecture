@@ -1,0 +1,48 @@
+id: CHG-R10ID-001
+date: '2026-10-25'
+source: cr
+kind: contract
+summary: 'The server authorises every operation from the per-scope permission set, not the flat one: the request''s
+  resolved session carries the permissions held at each scope path after deny resolution, x-ticvai-permission is
+  evaluated at the scope the operation acts on (the node or an ancestor), and effectivePermissions is for coarse
+  checks only. Stated once (permission-resolution 7.2 and Session.permissionsByScope), so later operations do not
+  ask again; listPrincipals reads its reach from it and createRole needs ROLE_MANAGE at the tenant root (403).'
+decision:
+  what: 'ADAM CR-189, option A, as settled. docs/architecture/specs/permission-resolution.md 7.2: the per-scope rule,
+    a list''s reach, a tenant-level operation at the root, the seam owned by the kernel ticket #27692 and filled by
+    sign-in #27666 (tests fill it until then); no wire shape changes. contracts/spine/identity.yaml:
+    Session.effectivePermissions (coarse only) and Session.permissionsByScope (the server keeps the same set and
+    authorises from it); listPrincipals (the reach is where USER_MANAGE holds; USER_MANAGE at venue A plus POS_SELL at
+    B lists A only, a scopePath under B is 403); createRole (ROLE_MANAGE at the tenant root, else 403 even with
+    another permission at the root; 403 declared). tools/check-business-rules.py BR-SCOPE-AUTHZ.'
+  by: Chinmay
+  date: '2026-10-25'
+why: 'ADAM CR-189 (Deep Khanvilkar, ticket 30740 listPrincipals; 30738 createRole affected), settled 25 October 2026.
+  The kernel seam carried only the flat effectivePermissions and the session''s scope paths, so USER_MANAGE at one
+  venue plus any permission at another listed the other venue''s staff, and a venue-level ROLE_MANAGE plus any
+  permission at the root created tenant roles, against CR-076; row-level security stops neither.'
+keys_touched:
+  operations: [listPrincipals, createRole]
+  schemas: [Session]
+  files:
+  - docs/architecture/specs/permission-resolution.md
+  - contracts/spine/identity.yaml
+  - tools/check-business-rules.py
+root_class: 'new: an authorisation decision that depends on where a permission holds, made from a flattened set'
+tickets:
+  started:
+  - '30740 (listPrincipals): through CR-189''s comment, as CHG-ADM-002 says; its text is not rewritten.'
+  - '30738 (createRole), #27692 (the kernel seam) and #27666 (sign-in fills it): the same, through the CR''s comment
+    where started; an unstarted one picks it up at the r10 tag.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-189
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-business-rules.py
+status: open
+notes: 'BR-SCOPE-AUTHZ fails on the parent commit (4 findings) and passes after. Operations already built on the flat
+  check need no contract change: the kernel seam applies the rule to every operation; whether any built handler
+  bypasses the kernel is for the kernel ticket to list (acceptance 5 of the CR).'

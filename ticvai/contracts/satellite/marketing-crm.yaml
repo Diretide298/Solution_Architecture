@@ -7114,6 +7114,7 @@ paths:
         schema:
           type: string
           format: uuid
+      - $ref: ../shared/common.yaml#/components/parameters/GuestVenue
       x-ticvai-permission: MARKETING_VIEW
       x-ticvai-guest-callable: true
       x-ticvai-scope-level: venue
@@ -16638,6 +16639,7 @@ paths:
           format: uuid
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      - $ref: ../shared/common.yaml#/components/parameters/GuestVenue
       responses:
         '200':
           description: Rewards
@@ -16816,6 +16818,7 @@ paths:
         schema:
           type: string
           format: uuid
+      - $ref: ../shared/common.yaml#/components/parameters/GuestVenue
       responses:
         '200':
           description: Badges
@@ -29938,7 +29941,10 @@ components:
       type: object
       x-ticvai-persistence: marketing.privacy_request
       description: One customer privacy request (pack 17.2.4 Case Information). The case layer over the
-        cross-region `sync.dsar_request` fan-out, which it references when it raises one.
+        cross-region `sync.dsar_request` fan-out, which it references when it raises one. **A guest's data export or
+        erasure raised in Identity arrives here too** (ADAM CR-101; CHG-R10ID-016), by the event
+        `identity.privacyRequestRaised` (request type `access` or `deletion`, requester role `self`), so its `dueAt`
+        applies like any other request's.
       required:
       - subjectId
       - requestType

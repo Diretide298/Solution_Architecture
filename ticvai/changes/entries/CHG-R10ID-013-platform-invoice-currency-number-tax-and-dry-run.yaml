@@ -1,0 +1,68 @@
+id: CHG-R10ID-013
+date: '2026-10-25'
+source: cr
+kind: contract
+summary: 'A TICVAI platform invoice can be priced and numbered: the billing entity carries a billing currency, copied
+  onto control.invoice.currency_code at generation; generateInvoice creates a draft with no number, and a new
+  issueInvoice assigns it from the gapless per-legal-entity sequence control.invoice_number_sequence; tax follows the
+  billing entity''s country and TRN; dryRun is an unsaved preview (200, no number, no row, never 409); 409 is the
+  exact same period, backed by unique (tenant_id, period_start, period_end); missing billing-entity documents are 422
+  and nothing is written; credit_note.invoice_id is uuid. Overage pricing and the AI-token staff/guest split are not
+  built: those lines stay out of the invoice until a follow-up request decides them.'
+decision:
+  what: 'ADAM CR-202, option B (currency, numbering, tax and dryRun now; overage pricing and the includedAiTokens split
+    left to a follow-up request). contracts/satellite/subscription.yaml: BillingEntity.billingCurrency (ISO 4217,
+    required on save by setBillingEntity); SubscriptionInvoice.currencyCode (required, readOnly), invoiceNumber
+    nullable and no longer required, x-ticvai-unique-together [tenantId, periodStart, periodEnd]; new persisted
+    InvoiceNumberSequence (control.invoice_number_sequence: id, legal_entity_code, document_kind invoice or
+    creditNote, prefix, next_number, updated_at; unique on legal entity and kind), the credit-note sequence of 20.7.7
+    in the same table as a sibling; generateInvoice: draft with no number, tax from countryCode and trn, dryRun 200
+    preview, 409 exact period, 422 billing-entity-incomplete, no overage and no AI metered lines; new issueInvoice
+    (POST /invoices/{invoiceId}/issue, PLATFORM_BILLING_MANAGE, 409 invoice-not-draft); issueCreditNote takes its
+    number from the creditNote row; listSubscriptionInvoices orders drafts first and states the currency;
+    SubscriptionCreditNote.invoiceId format uuid. states/invoice.yaml: draft to issued by issueInvoice.
+    docs/active/breaking-changes.yaml BC-467 (invoiceNumber no longer guaranteed) and BC-468 (credit note invoiceId
+    uuid).'
+  by: Chinmay
+  date: '2026-10-25'
+why: 'ADAM CR-202 (Surendra Loke, ticket 28000 generateInvoice), settled 25 October 2026 with option B. Nothing said
+  which currency a platform invoice is in (control.invoice stored amounts only, and a platform invoice has no venue
+  to resolve one from, naming-and-style 5.1), which status generateInvoice creates or where the gapless
+  per-legal-entity sequence (R152) lives, where taxAmount comes from, what dryRun does, what the 409 is keyed on, and
+  setBillingEntity''s "invoicing waits on" missing documents had no refusal behind it. credit_note.invoice_id was text
+  against a uuid key.'
+keys_touched:
+  operations: [generateInvoice, issueInvoice, listSubscriptionInvoices, setBillingEntity, issueCreditNote]
+  schemas: [BillingEntity, SubscriptionInvoice, InvoiceNumberSequence, SubscriptionCreditNote]
+  tables: [control.billing_entity, control.invoice, control.invoice_number_sequence, control.credit_note]
+  files:
+  - contracts/satellite/subscription.yaml
+  - states/invoice.yaml
+  - docs/active/breaking-changes.yaml
+root_class: 'new: a stored amount and a document number with no currency or sequence to come from'
+tickets:
+  started:
+  - '28000 (generateInvoice): through CR-202''s comment, as CHG-ADM-002 says; its text is not rewritten.'
+  unstarted:
+  - 'listSubscriptionInvoices, setBillingEntity and issueCreditNote tasks pick it up at the r10 tag; issueInvoice is
+    a new operation with no ticket or screen binding yet (ADM-009 / ADM-462 would carry it). The database changes are
+    migration work for Hrushikant Patkar, a child task of the affected MIG ticket; not applied while server databases
+    are frozen.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-202
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-storage-promises.py
+status: open
+notes: 'SP-UNIQUE-PROMISED holds the 409 to its unique index. Database changes the generator writes:
+  control.billing_entity.billing_currency (text, check 3 upper-case letters); control.invoice.currency_code (text, not
+  null: existing rows need a backfill from their billing entity, or the table is empty); control.invoice.invoice_number
+  drops NOT NULL (a non-additive change, listed for a person in migration-review); unique index on control.invoice
+  (tenant_id, period_start, period_end); new table control.invoice_number_sequence; control.credit_note.invoice_id
+  text to uuid (a type change, for a person). Open for the lead: which TICVAI legal entity issues which tenant''s
+  invoice is not recorded on the invoice (one entity today; the sequence row is keyed by its code); the tax rate a
+  country applies to a platform invoice is not named by the decision; and with the unique period index, a draft
+  cancelled in error still holds its period, while issueCreditNote''s text says a draft is "changed by regenerating
+  it".'

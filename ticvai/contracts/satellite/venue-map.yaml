@@ -354,6 +354,7 @@ paths:
             **Read the working draft instead of a published version.** Staff only, and it needs
             `VENUE_MAP_MANAGE`, because the draft is unfinished work that must never reach a guest.
             A guest session, or a caller with only `VENUE_MAP_VIEW`, gets 403.
+        - $ref: ../shared/common.yaml#/components/parameters/GuestVenue
       responses:
         '200':
           description: >
@@ -1164,6 +1165,7 @@ paths:
           description: >
             **Returns the step-free subgraph, not a filtered copy of the whole one.** Filtering
             after the fact produces routes that cross a staircase to reach a ramp.
+        - $ref: ../shared/common.yaml#/components/parameters/GuestVenue
       responses:
         '200':
           description: Graph

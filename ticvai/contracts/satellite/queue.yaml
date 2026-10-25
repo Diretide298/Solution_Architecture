@@ -200,6 +200,7 @@ paths:
           schema: { type: boolean, default: false }
         - $ref: '../shared/common.yaml#/components/parameters/PageSize'
         - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+        - $ref: ../shared/common.yaml#/components/parameters/GuestVenue
       responses:
         '200':
           description: Queues

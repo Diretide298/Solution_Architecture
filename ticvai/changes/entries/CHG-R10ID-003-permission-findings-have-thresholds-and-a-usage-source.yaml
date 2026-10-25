@@ -1,0 +1,45 @@
+id: CHG-R10ID-003
+date: '2026-10-25'
+source: cr
+kind: contract
+summary: 'listPermissionFindings: missing is a finding when the principal was denied deniedThreshold times and at
+  least 50% of same-role peers at the scope hold the permission (grant), 25-50% (review), under 25% no finding;
+  excessive reads identity.access_decision, which every authorisation check the host makes now writes (summarised per
+  principal, permission, scope and day if the volume needs it); held by policy is what an AuthorisationPolicy allows
+  at the scope. listCapabilityTemplates orders by module, name, id; listAccessReviewItems by revoke, review, certify,
+  then the principal''s displayName, then id.'
+decision:
+  what: 'ADAM CR-210, option A, as settled. contracts/spine/identity.yaml: listPermissionFindings (the thresholds, the
+    usage source, the policy-held set), AccessDecision (every check writes one, decidedBy central, the daily summary),
+    listCapabilityTemplates and listAccessReviewItems (their orders). tools/check-business-rules.py
+    BR-PERMISSION-FINDINGS.'
+  by: Chinmay
+  date: '2026-10-25'
+why: 'ADAM CR-210 (Surendra Loke, ticket 28288 listPermissionFindings), settled 25 October 2026. "Most holders" had no
+  threshold and grant against review no rule; evaluateAccess was the only writer of access_decision, so excessive
+  would flag every permission never checked through it; "held by policy" was undefined; two Identity lists lacked a
+  full order (CR-077).'
+keys_touched:
+  operations: [listPermissionFindings, listCapabilityTemplates, listAccessReviewItems]
+  schemas: [AccessDecision]
+  tables: [identity.access_decision]
+  files:
+  - contracts/spine/identity.yaml
+  - tools/check-business-rules.py
+root_class: 'new: a computed finding whose threshold and evidence source are unstated'
+tickets:
+  started:
+  - '28288 (listPermissionFindings): through CR-210''s comment, as CHG-ADM-002 says; its text is not rewritten.'
+  unstarted:
+  - 'The host''s authorisation layer writes the access_decision rows; that ticket picks the rule up from the
+    AccessDecision text at the r10 tag.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-210
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-business-rules.py
+status: open
+notes: 'BR-PERMISSION-FINDINGS fails on the parent commit (3 findings) and passes after. No database change: a daily
+  summary row is an access_decision row; the decision adds no count column.'

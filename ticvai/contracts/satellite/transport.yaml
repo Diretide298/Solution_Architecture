@@ -401,6 +401,8 @@ paths:
       - {}
       - guestAuth: []
       - bearerAuth: []
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/GuestVenue
       responses:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
@@ -577,6 +579,7 @@ paths:
         - name: toStationId
           in: query
           schema: { type: string, format: uuid }
+        - $ref: ../shared/common.yaml#/components/parameters/GuestVenue
       responses:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
@@ -634,6 +637,7 @@ paths:
           required: false
           schema: { type: string, format: date-time }
           description: The instant whose table is returned (the travel time for a guest). Default now (CHG-RUL-012).
+        - $ref: ../shared/common.yaml#/components/parameters/GuestVenue
       responses:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
@@ -1088,6 +1092,7 @@ paths:
             items: { type: string, pattern: '^[a-z][a-zA-Z0-9]{0,31}:[0-9]{1,2}$' }
         - $ref: '../shared/common.yaml#/components/parameters/PageSize'
         - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+        - $ref: ../shared/common.yaml#/components/parameters/GuestVenue
       responses:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
@@ -1266,6 +1271,8 @@ paths:
         - {}
         - guestAuth: []
         - bearerAuth: []
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/GuestVenue
       responses:
         '200':
           description: One departure, as a guest books it
@@ -1371,6 +1378,7 @@ paths:
           schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/PageSize'
         - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+        - $ref: ../shared/common.yaml#/components/parameters/GuestVenue
       responses:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'

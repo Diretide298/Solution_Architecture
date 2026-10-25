@@ -1783,6 +1783,14 @@ paths:
 
         Governed by `EntitlementTemplate.canShareMedia`, which already exists and had nothing behind it.
 
+
+        **The row a share is** (decided 25 October 2026, Chinmay, ADAM CR-209 option A; CHG-R10ID-004): one
+        `identity.delegated_access` row with `over_object_ref` `entitlement:<entitlementId>`, `subject_id` the
+        recipient (`toSubjectId`), `over_subject_id` the owner, `permission` `ENTITLEMENT_USE` and `role_id` null,
+        `delegation_kind` `sharedEntitlement`, `effect` ALLOW, `valid_to` the request''s `validUntil`, and
+        `granted_by_kind` `subject` with `granted_by_subject_id` the owner. `revokeEntitlementShare` matches by
+        exactly this mapping (Identity''s `DelegatedAccess.delegationKind`).
+
         '
       tags:
       - orders
@@ -1874,6 +1882,14 @@ paths:
         the entitlement at once. It moves nothing — the owner held the entitlement throughout — and an
         admission the recipient already used stays used.
 
+
+        **Which share, and who revoked it** (decided 25 October 2026, Chinmay, ADAM CR-209 option A;
+        CHG-R10ID-004). The path''s `shareId` is an `identity.delegated_access` row with `delegation_kind`
+        `sharedEntitlement`; its `over_object_ref` must be `entitlement:<entitlementId>` for the path''s
+        `entitlementId`, or the answer is `404` and nothing changes. Revoking sets `revoked_at` and records who:
+        a guest owner as `revoked_by_kind` `subject` with `revoked_by_subject_id`, a staff member as `principal`
+        with `revoked_by_principal_id`.
+
         '
       tags:
       - orders
@@ -1897,6 +1913,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/EntitlementShare'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
           description: The share is already revoked or has expired (`shareNotActive`).
           x-ticvai-problem-types: [share-not-active]
@@ -25342,7 +25360,10 @@ components:
       x-ticvai-persistence: none — a view of the identity.delegated_access row shareEntitlement writes
       description: '**A second person''s right to present an entitlement the owner still holds.** Returned
         by `shareEntitlement` and `revokeEntitlementShare`; its `id` is the delegated-access row the share
-        is.
+        is. **Read from that row** (ADAM CR-209; CHG-R10ID-004): `entitlementId` from `over_object_ref`
+        (`entitlement:<entitlementId>`), `toSubjectId` from `subject_id`, `validFrom` and `validUntil` from
+        `valid_from` and `valid_to`, `revokedAt` from `revoked_at`; `status` is `revoked` when `revoked_at` is
+        set, `expired` when `valid_to` has passed, else `active`.
 
         '
       required:

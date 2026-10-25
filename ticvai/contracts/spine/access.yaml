@@ -1415,6 +1415,7 @@ paths:
           format: uuid
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      - $ref: ../shared/common.yaml#/components/parameters/GuestVenue
       x-ticvai-permission: PARKING_CONFIGURE
       x-ticvai-guest-callable: true
       x-ticvai-scope-level: venue

@@ -355,6 +355,7 @@ paths:
           schema: { type: string, minLength: 1, maxLength: 100 }
         - $ref: '../shared/common.yaml#/components/parameters/PageSize'
         - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+        - $ref: ../shared/common.yaml#/components/parameters/GuestVenue
       responses:
         '200':
           description: >
@@ -568,6 +569,7 @@ paths:
             Ignored for a workstation caller, whose own outlet is used. Required when the
             caller has no workstation; absent then, the request is a `400`.
           schema: { type: string, format: uuid }
+        - $ref: ../shared/common.yaml#/components/parameters/GuestVenue
       responses:
         '200':
           description: Price and stock

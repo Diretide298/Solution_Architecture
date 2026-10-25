@@ -1,0 +1,45 @@
+id: CHG-R10ID-006
+date: '2026-10-25'
+source: cr
+kind: contract
+summary: 'updatePrincipal ends every session and refresh token of the principal, at every venue, through one SECURITY
+  DEFINER function, identity.end_principal_sessions(principal_id, ended_by, reason): it checks the caller may update
+  the principal (the principal''s home-scope-write rule), then terminates every active session and revokes every live
+  refresh token, and puts the caller''s scope back. No grant or policy is widened.'
+decision:
+  what: 'ADAM CR-180, option A, accepted 21 October 2026. tools/derive-ddl.py END_PRINCIPAL_SESSIONS_SQL: the function,
+    appended to the tenant row-level security file, so the forward migration carries it (CREATE OR REPLACE).
+    contracts/spine/identity.yaml updatePrincipal: why and how it ends them. tools/check-business-rules.py
+    BR-END-SESSIONS.'
+  by: Chinmay
+  date: '2026-10-21'
+why: 'ADAM CR-180 (Sanket Keluskar, ticket 30744 updatePrincipal), accepted 21 October 2026 ("1,2,3 all").
+  updatePrincipal runs at venue scope and must end every live session (audit R126), but identity.refresh_token is
+  tenant-root and identity.session venue-isolated, so a venue manager''s revoke updated no token and left other
+  venues'' sessions live while answering 200. The acceptance said "fixed at the source in r9"; it was not.'
+keys_touched:
+  operations: [updatePrincipal]
+  tables: [identity.session, identity.refresh_token, identity.principal]
+  files:
+  - tools/derive-ddl.py
+  - contracts/spine/identity.yaml
+  - tools/check-business-rules.py
+root_class: 'new: a write the operation promises across rows its caller''s row security cannot reach'
+tickets:
+  started:
+  - '30744 (updatePrincipal): through CR-180''s comment, as CHG-ADM-002 says; its text is not rewritten.'
+  unstarted:
+  - 'The function is migration work for Hrushikant Patkar (a child task of the affected MIG ticket), from the
+    generator''s forward migration; not applied while server databases are frozen.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-180
+triage: blocker
+prevention:
+  type: generator-rule
+  ref: tools/derive-ddl.py::END_PRINCIPAL_SESSIONS_SQL
+status: open
+notes: 'BR-END-SESSIONS (tools/check-business-rules.py) also holds it, failing on the parent commit and passing after.
+  The function lifts ticvai.scope_paths to the tenant root with set_config(..., true) for its two statements and
+  restores the caller''s value, so it works whether or not its owner bypasses row-level security. forceLogout ends one
+  session at the caller''s own venue and does not need it.'

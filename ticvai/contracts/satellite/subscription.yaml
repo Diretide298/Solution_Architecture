@@ -3328,6 +3328,59 @@ paths:
                     type: integer
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /invoices/{invoiceId}/issue:
+    parameters:
+    - name: invoiceId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: issueInvoice
+      x-ticvai-audience:
+      - staff
+      x-ticvai-writes:
+      - table: control.invoice_number_sequence
+        for: 'the issuing legal entity''s next number, taken and incremented in the issuing transaction (ADAM CR-202,
+          option B; CHG-R10ID-013)'
+      summary: Issue a draft invoice, giving it its number
+      description: '**The step that numbers an invoice** (ADAM CR-202, option B, 25 October 2026; CHG-R10ID-013).
+        `generateInvoice` creates a `draft` with no number; issuing moves it to `issued`, sets `issuedAt`, and assigns
+        `invoiceNumber` from the gapless sequence of the TICVAI legal entity that issues it
+        (`control.invoice_number_sequence`, `InvoiceNumberSequence`), locked and incremented in the same transaction,
+        so the sequence has no gap. An invoice that is not `draft` is 409 `invoice-not-draft` and nothing changes.
+
+        '
+      tags:
+      - billing
+      x-ticvai-permission: PLATFORM_BILLING_MANAGE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Issued, with its number
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubscriptionInvoice'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          x-ticvai-problem-types: [invoice-not-draft]
+          description: The invoice is not a `draft` (ADAM CR-202). Nothing changes.
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /invoices/{invoiceId}/payment:
     parameters:
     - name: invoiceId
@@ -3588,7 +3641,9 @@ paths:
         CHG-CSA-030). Replaces the tenant''s billing entity whole. A trade licence is always required; a VAT
         certificate is required once a `trn` is entered (workbook Q210); a country may require more (tenancy
         `RegionSettings`). Missing documents do not refuse the save; they are listed in `missingDocuments`, and
-        invoicing waits on them.
+        invoicing waits on them: `generateInvoice` refuses 422 `billing-entity-incomplete` until none is missing
+        (ADAM CR-202, option B, 25 October 2026; CHG-R10ID-013). `billingCurrency` is required on save, as
+        `legalName` and `countryCode` are (400 otherwise); a change applies to invoices generated afterwards.
 
         '
       tags:
@@ -3646,7 +3701,10 @@ paths:
 
         
 
-        **Order.** Newest first, by `issuedAt` descending, then by `id`.'
+        **Order.** Drafts first (no `issuedAt` yet), then newest first, by `issuedAt` descending, then by `id`.
+
+        **Currency** (ADAM CR-202; CHG-R10ID-013): every Money on an invoice is in that invoice''s `currencyCode`,
+        the billing currency copied at generation.'
       tags:
       - billing
       x-ticvai-permission: PLATFORM_BILLING_VIEW
@@ -3685,16 +3743,36 @@ paths:
       x-ticvai-audience:
       - staff
       summary: Generate an invoice for a period
+      x-ticvai-reads:
+      - table: control.billing_entity
+        for: 'the billing currency, the country and TRN the tax follows, and the documents invoicing waits on (ADAM
+          CR-202, option B; CHG-R10ID-013)'
       description: 'Prices the metered usage against the subscription''s plan version. Idempotent per
         tenant and period — running twice does not double-bill, which matters because it will be scheduled.
 
         **The lines, per module (decided 29 September, Chinmay).** One `module` line for each module the
         tenant licensed (the package''s modules and each add-on), at the module''s price set on the platform
-        (`setModuleListing`); a `basePlan` line for the package''s own fee where it has one; `overage` for
-        limits exceeded. **AI token usage is a `metered` line** (metric `aiTokens`, `moduleCode` the AI
-        module): the tokens `settleAiUsage` recorded for the period beyond the plan''s `includedAiTokens`,
-        at the AI module''s metered price, staff and guest as separate lines. Credit notes issued since the
-        last invoice with settlement `offsetNextInvoice` come off as `credit` lines.
+        (`setModuleListing`); a `basePlan` line for the package''s own fee where it has one. Credit notes issued
+        since the last invoice with settlement `offsetNextInvoice` come off as `credit` lines. **No `overage` line and
+        no AI-token `metered` line are written yet** (ADAM CR-202, option B, 25 October 2026; CHG-R10ID-013): the
+        price of a limit exceeded and how the plan''s `includedAiTokens` is split between the staff and guest metered
+        lines are left to a follow-up request, and those lines stay out of the invoice until it decides them.
+
+        **Currency, status, number, tax and dry run** (ADAM CR-202, option B, 25 October 2026; CHG-R10ID-013).
+        (1) **Currency:** the invoice is in the tenant''s billing entity''s `billingCurrency`, copied onto the
+        invoice as `currencyCode` at generation; every Money on the invoice, its lines and its totals, is in it, and
+        a later change of the billing currency never moves an invoice already generated. (2) **Status and number:**
+        the invoice is created `draft` with `invoiceNumber` null; the number is assigned when it is issued
+        (`issueInvoice`), from the gapless sequence of the issuing legal entity
+        (`control.invoice_number_sequence`, `InvoiceNumberSequence`). (3) **Tax:** `taxAmount` follows the billing
+        entity''s `countryCode` and `trn` as they stand at generation. (4) **`dryRun` true** answers 200 with an
+        unsaved preview: the same lines and totals, no number, no row written, and never 409, whatever exists for the
+        period. (5) **409 is the exact same period:** an invoice of this tenant with the same `periodStart` and
+        `periodEnd` (unique on tenant and period) is 409 `period-already-invoiced`; an overlapping but different
+        period is not refused here. (6) **Missing billing-entity documents:** a tenant with no billing entity, or
+        whose billing entity lists `missingDocuments`, or has no `billingCurrency`, is 422
+        `billing-entity-incomplete` and nothing is written (a dry run is refused the same way, since it cannot be
+        priced).
 
         '
       tags:
@@ -3724,19 +3802,38 @@ paths:
                 dryRun:
                   type: boolean
                   default: false
+                  x-ticvai-persisted: false
+                  description: 'True: an unsaved preview, answered 200, with no number and no row, never 409 (ADAM
+                    CR-202).'
       responses:
+        '200':
+          description: 'A dry run (`dryRun` true): the invoice as it would be generated, unsaved, `status` `draft`,
+            `invoiceNumber` null (ADAM CR-202).'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubscriptionInvoice'
         '201':
           headers:
             X-Consistency-Token:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
-          description: Generated
+          description: Generated, as a `draft` with no number yet
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/SubscriptionInvoice'
         '409':
           x-ticvai-problem-types: [period-already-invoiced]
-          description: An invoice already exists for this period
+          description: An invoice of this tenant already exists for exactly this `periodStart` and `periodEnd`
+            (ADAM CR-202). Never answered to a dry run.
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '422':
+          x-ticvai-problem-types: [billing-entity-incomplete]
+          description: 'The tenant has no billing entity, or it has no `billingCurrency`, or it lists
+            `missingDocuments` (`billing-entity-incomplete`; ADAM CR-202). Nothing is written.'
           content:
             application/problem+json:
               schema:
@@ -11181,6 +11278,10 @@ paths:
         type: string
     post:
       operationId: issueCreditNote
+      x-ticvai-writes:
+      - table: control.invoice_number_sequence
+        for: 'the issuing legal entity''s next credit-note number, taken and incremented in the same transaction (ADAM
+          CR-202; CHG-R10ID-013)'
       x-ticvai-consumed-by:
         - "P09 ADM-462 Invoice & Payment Management"
         - "P09 ADM-467 Discount, Credit & Commercial Override Management"
@@ -11191,7 +11292,8 @@ paths:
       description: >
         **A credit note is its own tax document** (20.7.7): it has its own number from its own gapless
         sequence per issuing legal entity (the rule R152 set for invoices, applied to a second
-        sequence), names the invoice it credits, and carries its own lines, tax and total. **The
+        sequence: the entity's `creditNote` row of `control.invoice_number_sequence`, ADAM CR-202;
+        CHG-R10ID-013), names the invoice it credits, and carries its own lines, tax and total. **The
         invoice is never edited**: it stays as issued, and what has been credited against it is the sum
         of its credit notes (`SubscriptionInvoice.creditedTotal`).
 
@@ -11616,7 +11718,9 @@ components:
         invoiceId:
           x-ticvai-references: control.invoice
           type: string
-          description: The invoice credited.
+          format: uuid
+          description: The invoice credited. A uuid, as `control.invoice.id` is (ADAM CR-202; CHG-R10ID-013).
+            The credit note's own Money is in the credited invoice's `currencyCode`.
         tenantId:
           x-ticvai-references: control.tenant
           type: string
@@ -13073,6 +13177,16 @@ components:
           type: string
           minLength: 2
           maxLength: 2
+        billingCurrency:
+          type: string
+          minLength: 3
+          maxLength: 3
+          nullable: true
+          pattern: '^[A-Z]{3}$'
+          description: '**The currency TICVAI invoices this tenant in** (ADAM CR-202, option B, 25 October 2026;
+            CHG-R10ID-013), an ISO 4217 code. Required on save (`setBillingEntity`, 400 otherwise); null only while the
+            record rides on an onboarding application. `generateInvoice` copies it onto each new invoice as
+            `currencyCode`, so a later change never moves an invoice already generated.'
         address:
           type: string
           maxLength: 1000
@@ -13120,6 +13234,137 @@ components:
           type: string
           format: date-time
           readOnly: true
+    PlatformOperator:
+      type: object
+      x-ticvai-persistence: control.platform_operator
+      description: '**A TICVAI platform operator, a Control Plane principal** (ADAM CR-175 option A, accepted 21
+        October 2026; ADR-0072; CHG-R10ID-007). Never a principal of a tenant: an operator has no row, credential or
+        session in any tenant database (audit R098). Its `PLATFORM_*` set is what the platform token carries
+        (`ticvai_platform_permissions`); a cell honours one only on the operations that name it (R203). Written by
+        the Control Plane sign-in of the platform-auth ticket.'
+      required: [id, email, displayName, platformPermissions, isActive, createdAt]
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+          description: The token's `sub`, which a cell records as `operatorPrincipalId` (no foreign key there).
+        email:
+          type: string
+          format: email
+          maxLength: 320
+          x-ticvai-unique: tenant
+        displayName:
+          type: string
+          maxLength: 200
+        platformPermissions:
+          type: array
+          description: The operator's `PLATFORM_*` permissions, and nothing else (a tenant permission is only ever
+            held through an open platform-staff grant).
+          items:
+            $ref: ../shared/permissions.yaml#/components/schemas/Permission
+        isActive:
+          type: boolean
+          default: true
+          description: False stops new sign-ins and token refreshes; a token already issued lasts to its expiry.
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+    PlatformSession:
+      type: object
+      x-ticvai-persistence: control.platform_session
+      description: '**One sign-in of a platform operator to the Platform Console, and its MFA step-up** (ADAM CR-175
+        option A; ADR-0072; CHG-R10ID-007). The platform token''s `sid`. The step-up is recorded here, against the
+        session, and carried in the token as `ticvai_step_up` (`stepUpAction`, `stepUpAt`), so a cell checks it with
+        no tenant `identity.mfa_challenge` row.'
+      required: [id, operatorId, startedAt, expiresAt]
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        operatorId:
+          type: string
+          format: uuid
+          x-ticvai-references: control.platform_operator
+        startedAt:
+          type: string
+          format: date-time
+        expiresAt:
+          type: string
+          format: date-time
+          description: When the session ends at the latest; refreshing the token never moves it.
+        endedAt:
+          type: string
+          format: date-time
+          nullable: true
+        mfaVerifiedAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: When the operator passed the second factor in this session; until then the token's `amr` has
+            no `mfa` and every `PLATFORM_*` operation is refused (audit R135).
+        stepUpAction:
+          type: string
+          maxLength: 100
+          nullable: true
+          description: The operation the last step-up was for (for example `openPlatformStaffGrant`).
+        stepUpAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: When the last step-up was passed.
+    PlatformOperatorMfaMethod:
+      type: object
+      x-ticvai-persistence: control.platform_operator_mfa
+      description: '**A platform operator''s second factor, in the Control Plane** (ADAM CR-175 option A; ADR-0072;
+        CHG-R10ID-007). As a tenant''s `MfaMethod`, but keyed to the operator: a `totp` secret has to be read back to
+        compute the code and an `emailOtp` destination to send it, so both are stored encrypted, here under the
+        Control Plane''s field key (ADR-0063), since the control database has no tenant key; write-only, never
+        returned.'
+      required: [id, operatorId, kind, isActive, enrolledAt]
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        operatorId:
+          type: string
+          format: uuid
+          x-ticvai-references: control.platform_operator
+        kind:
+          type: string
+          enum: [totp, emailOtp]
+          description: Staff and operators enrol only these two kinds (audit R126 (5)); `totp` is the primary.
+        secret:
+          type: string
+          nullable: true
+          writeOnly: true
+          maxLength: 500
+          x-ticvai-secret: field-encrypted
+          description: The `totp` shared secret, encrypted with the Control Plane's field key; null for `emailOtp`.
+        destination:
+          type: string
+          nullable: true
+          writeOnly: true
+          maxLength: 500
+          x-ticvai-secret: field-encrypted
+          description: The email an `emailOtp` code is sent to, encrypted with the Control Plane's field key; null
+            for `totp`.
+        isPrimary:
+          type: boolean
+          default: false
+        isActive:
+          type: boolean
+          default: true
+        enrolledAt:
+          type: string
+          format: date-time
+        lastUsedAt:
+          type: string
+          format: date-time
+          nullable: true
     VenueTypeTemplate:
       type: object
       x-ticvai-persistence: control.venue_type_template
@@ -18635,13 +18880,17 @@ components:
     SubscriptionInvoice:
       x-ticvai-persistence: control.invoice + control.invoice_line
       type: object
+      # One invoice per tenant and exact period (ADAM CR-202, option B, 25 October 2026; CHG-R10ID-013):
+      # generateInvoice's 409 period-already-invoiced is this unique index.
+      x-ticvai-unique-together:
+      - [tenantId, periodStart, periodEnd]
       required:
       - id
-      - invoiceNumber
       - tenantId
       - periodStart
       - periodEnd
       - status
+      - currencyCode
       - total
       properties:
         id:
@@ -18649,12 +18898,24 @@ components:
           format: uuid
         invoiceNumber:
           type: string
+          nullable: true
           readOnly: true
           description: 'A tax invoice number, so **gapless, per legal entity** (decided 28 September, audit
             R152): one unbroken sequence for the TICVAI legal entity that issues it, assigned when the
-            invoice is issued, never reused. A cancelled invoice keeps its number.
+            invoice is issued, never reused. A cancelled invoice keeps its number. **Null while the invoice is a
+            `draft`** (ADAM CR-202, option B, 25 October 2026; CHG-R10ID-013): `generateInvoice` creates the draft
+            with no number and `issueInvoice` takes the next number from `control.invoice_number_sequence`
+            (`InvoiceNumberSequence`) in the same transaction, so a number is never taken and lost.
 
             '
+        currencyCode:
+          type: string
+          minLength: 3
+          maxLength: 3
+          readOnly: true
+          description: '**The currency of every Money on this invoice** (ADAM CR-202, option B; CHG-R10ID-013): the
+            billing entity''s `billingCurrency`, copied at generation and never changed afterwards. Lines, subtotal,
+            tax, total and the credited total are all in it, here and on `listSubscriptionInvoices`.'
         tenantId:
           x-ticvai-references: control.tenant
           type: string
@@ -18735,6 +18996,40 @@ components:
           type: string
           format: date-time
           nullable: true
+    InvoiceNumberSequence:
+      type: object
+      x-ticvai-persistence: control.invoice_number_sequence
+      description: '**The gapless number sequence of one issuing legal entity** (ADAM CR-202, option B, 25 October
+        2026; CHG-R10ID-013; the R152 rule of 28 September). One row per TICVAI legal entity that issues tenant
+        invoices and per kind of document: invoices and credit notes each have their own sequence (20.7.7), and
+        `issueCreditNote` takes its number from the `creditNote` row the same way. `issueInvoice` locks the row (`SELECT ... FOR UPDATE`), writes `prefix` + `nextNumber` onto the
+        invoice and increments `nextNumber` in the same transaction, so the numbers have no gap and none is reused;
+        a rolled-back issue takes no number. Never returned by an operation: the numbers it gives are. Seeded by the
+        platform with the legal entity; no operation edits it.'
+      x-ticvai-unique-together:
+      - [legalEntityCode, documentKind]
+      required: [id, legalEntityCode, documentKind, prefix, nextNumber]
+      properties:
+        id: { type: string, format: uuid, readOnly: true }
+        legalEntityCode:
+          type: string
+          maxLength: 50
+          description: The TICVAI legal entity that issues the documents this row numbers, by its code.
+        documentKind:
+          type: string
+          enum: [invoice, creditNote]
+          description: Which sequence of the entity this is; an invoice and a credit note never share a number line.
+        prefix:
+          type: string
+          maxLength: 20
+          description: Printed before the number, for example the entity's invoice series.
+        nextNumber:
+          type: integer
+          format: int64
+          minimum: 1
+          default: 1
+          description: The number the next issued invoice takes.
+        updatedAt: { type: string, format: date-time, readOnly: true, nullable: true }
     BurstEnvironment:
       type: object
       x-ticvai-persistence: control.burst_environment

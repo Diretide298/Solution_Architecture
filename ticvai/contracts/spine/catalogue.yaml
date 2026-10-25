@@ -549,6 +549,7 @@ paths:
         schema:
           type: string
           format: uuid
+      - $ref: ../shared/common.yaml#/components/parameters/GuestVenue
       responses:
         '200':
           description: The tree. The root categories in `displayOrder`, each carrying its `children`
@@ -1757,6 +1758,7 @@ paths:
             type: string
             format: uuid
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/GuestVenue
       responses:
         '200':
           description: Results
@@ -2290,6 +2292,7 @@ paths:
             format: uuid
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      - $ref: ../shared/common.yaml#/components/parameters/GuestVenue
       responses:
         '200':
           description: Products
@@ -2439,6 +2442,7 @@ paths:
         required: true
         schema:
           type: string
+      - $ref: ../shared/common.yaml#/components/parameters/GuestVenue
     put:
       operationId: setProductEligibilityRule
       x-ticvai-consumed-by:
@@ -2579,6 +2583,7 @@ paths:
         required: true
         schema:
           type: string
+      - $ref: ../shared/common.yaml#/components/parameters/GuestVenue
     put:
       operationId: setGroupPackageDefinition
       x-ticvai-consumed-by:
@@ -2677,6 +2682,7 @@ paths:
           - party
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      - $ref: ../shared/common.yaml#/components/parameters/GuestVenue
       responses:
         '200':
           description: Packages
@@ -2763,6 +2769,8 @@ paths:
 
         '
       x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/GuestVenue
       responses:
         '200':
           description: Product
@@ -3064,6 +3072,7 @@ paths:
           $ref: '#/components/schemas/Channel'
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      - $ref: ../shared/common.yaml#/components/parameters/GuestVenue
       responses:
         '200':
           description: Variants
@@ -3435,6 +3444,7 @@ paths:
           format: uuid
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      - $ref: ../shared/common.yaml#/components/parameters/GuestVenue
       responses:
         '400':
           description: 'No `venueId` from a caller with no venue (`venue-required`), or one that is not a venue of the tenant
@@ -3585,6 +3595,7 @@ paths:
           pattern: ^[A-Za-z]{2,3}(-[A-Za-z0-9]{1,8})*$
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      - $ref: ../shared/common.yaml#/components/parameters/GuestVenue
       responses:
         '200':
           description: Performances, by `startsAt` ascending with `id` as the tiebreak — the order a
@@ -3996,6 +4007,7 @@ paths:
         schema:
           type: string
           format: uuid
+      - $ref: ../shared/common.yaml#/components/parameters/GuestVenue
       responses:
         '200':
           description: Bundles, newest first
@@ -4895,6 +4907,7 @@ paths:
           format: date-time
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      - $ref: ../shared/common.yaml#/components/parameters/GuestVenue
       responses:
         '200':
           description: Availability, one row per channel capacity, by performance start
@@ -5560,6 +5573,8 @@ paths:
 
         '
       x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/GuestVenue
       responses:
         '200':
           description: Performance
@@ -16808,6 +16823,7 @@ paths:
         schema:
           type: string
           format: uuid
+      - $ref: ../shared/common.yaml#/components/parameters/GuestVenue
       responses:
         '200':
           description: Programmes
@@ -16900,6 +16916,7 @@ paths:
         schema:
           type: string
           format: uuid
+      - $ref: ../shared/common.yaml#/components/parameters/GuestVenue
       responses:
         '200':
           description: Benefits
@@ -16988,6 +17005,7 @@ paths:
         schema:
           type: string
           format: uuid
+      - $ref: ../shared/common.yaml#/components/parameters/GuestVenue
       responses:
         '200':
           description: Benefits granted

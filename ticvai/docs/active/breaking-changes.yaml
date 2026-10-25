@@ -1361,3 +1361,114 @@ changes:
     tag: r8
     producer-tickets: [AM-WALLET-CASHLESS-P08-2, VM-WALLET-WALLET-1]
     consumer-tickets: [AM-WALLET-CASHLESS-P08-5]
+  - id: BC-464
+    contract: public-api
+    operation: registerDeveloper
+    change: "removed"
+    reason: 'ADAM CR-098 (Deep Khanvilkar, ticket 27976), accepted 15 October 2026 (CHG-R10ID-011): registerDeveloper
+      took DeveloperAccount, whose required id and status (and verifiedAt) are the server''s, so a caller had to send
+      read-only fields. The body is now CreateDeveloperAccountRequest (organisationName, contactEmail, websiteUrl,
+      countryCode, partnerId); the response is unchanged. Request fields removed cannot be additive.'
+    approved-by: 'Chinmay, CR-098 accepted for r10 (cr-34 decision: "registerDeveloper as public with no permission, a create-request body")'
+    tag: r10
+    producer-tickets: [SVC-PLATFORM-PUBLICAPI-2]
+    consumer-tickets: [APP-SETUP-DEV-002, APP-SETUP-DEV-002-REST, TEST-AM-SETUP-PLATFORM-FOUNDATION-P14]
+  - id: BC-465
+    contract: public-api
+    operation: registerDeveloper
+    change: "x-ticvai-permission changed"
+    reason: 'ADAM CR-098 (CHG-R10ID-011): registerDeveloper is public (security []) yet declared DEVELOPER_VIEW and tenant
+      scope, though a developer account has no tenant and an anonymous caller holds no permission. It now declares no
+      permission and platform scope. A permission change cannot be additive.'
+    approved-by: 'Chinmay, CR-098 accepted for r10 (cr-34 decision: "registerDeveloper as public with no permission")'
+    tag: r10
+    producer-tickets: [SVC-PLATFORM-PUBLICAPI-2]
+    consumer-tickets: [APP-SETUP-DEV-002, APP-SETUP-DEV-002-REST, TEST-AM-SETUP-PLATFORM-FOUNDATION-P14]
+  - id: BC-466
+    contract: public-api
+    operation: listIntegrationListings
+    change: "security changed"
+    reason: 'ADAM CR-203, option B (Surendra Loke, ticket 28008), settled 25 October 2026 (CHG-R10ID-014): the one list
+      served the anonymous marketplace, a developer''s drafts and the staff certification queue, so an anonymous caller
+      received every draft, private and rejected listing. The public marketplace is the new listMarketplaceListings
+      (security {}); listIntegrationListings drops the anonymous alternative and is paged, with status and developerId
+      filters. Removing a security alternative cannot be additive.'
+    approved-by: 'Chinmay, 25 October 2026, CR-203 settled with option B ("listIntegrationListings becomes authenticated only")'
+    tag: r10
+    producer-tickets: [SVC-PLATFORM-PUBLICAPI-10]
+    consumer-tickets: [APP-DEVPORTAL-DEV-007, APP-SETUP-DEV-008, APP-SETUP-DEV-008-REST, TEST-AM-PUBLIC-API-P14, TEST-AM-SETUP-PLATFORM-FOUNDATION-P14-REST]
+  - id: BC-480
+    contract: approvals
+    operation: listApprovalRequests
+    operations: [listApprovalRequests, createApprovalRequest, submitApprovalRequest, decideApprovalRequest, withdrawApprovalRequest, cancelApprovalRequest, reopenApprovalRequest, assignApprovalRequest, escalateApprovalRequest, resubmitApprovalRequest, recordExternalApprovalDecision, getApprovalRequest]
+    change: "requestedByPrincipalId` is no longer guaranteed"
+    reason: 'ADAM CR-101 (CHG-R10ID-016): a guest''s privacy request (exportSubjectData, deleteGuestAccount) is raised for
+      a guest, who is a pii.subject and not a principal, so the request records requestedBySubjectId and leaves
+      requestedByPrincipalId null (exactly one of the two is set). A response field that may now be absent cannot be
+      additive.'
+    approved-by: 'Chinmay Parab, 15 October 2026 (ADAM CR-101 accepted: "the requester recorded as a subject (a requested_by_subject_id beside a nullable requested_by_principal_id)")'
+    tag: r10
+    producer-tickets: [SVC-TENANCY-REQUEST-1, SVC-TENANCY-REQUEST-2, SVC-TENANCY-REQUEST-3, VM-TENANCY-REQUEST-1]
+    consumer-tickets: [AM-ADMISSION-ACCESS-P08, AM-ADMISSION-ACCESS-P08-5, AM-APPROVALS-P04, AM-APPROVALS-P08, AM-APPROVALS-P08-4, AM-APPROVALS-P08-5, AM-APPROVALS-P08-BLOCK-A, AM-APPROVALS-P09, AM-FOOD-BEVERAGE-P08-BLOCK-A, AM-ORDERS-RESERVATIONS-P04, AM-PAYMENTS-P08, AM-PRICING-PROMOTIONS-P08-4, AM-TICKETING-P08-2, AM-TICKETING-P08-7, AM-WALLET-CASHLESS-P08-7, AM-WORKFORCE-P06, APP-SETUP-BO-045, APP-SETUP-BO-045-REST, TEST-AM-APPROVALS-P04, TEST-AM-APPROVALS-P08-BLOCK-A]
+  - id: BC-481
+    contract: identity
+    operation: exportSubjectData
+    operations: [exportSubjectData, deleteGuestAccount]
+    change: "x-ticvai-emits changed"
+    reason: 'ADAM CR-101 (CHG-R10ID-016): a guest''s data export or erasure enters Marketing''s privacy queue by an event,
+      so the response period gives it a dueAt; both operations now emit identity.privacyRequestRaised. An emitted event
+      added to an operation is breaking by the compat rule; no response shape changes.'
+    approved-by: 'Chinmay Parab, 15 October 2026 (ADAM CR-101 accepted: "The request enters the privacy queue by event, so its due date applies")'
+    tag: r10
+    producer-tickets: [SVC-IDENTITY-IDENTITY-1, SVC-IDENTITY-GUESTAUTH-1]
+    consumer-tickets: [APP-MOB-GST-066, APP-WEB-WEB-024]
+  - id: BC-467
+    contract: subscription
+    operation: generateInvoice
+    operations: [generateInvoice, listSubscriptionInvoices]
+    change: "invoiceNumber` is no longer guaranteed"
+    reason: 'ADAM CR-202, option B (Surendra Loke, ticket 28000), settled 25 October 2026 (CHG-R10ID-013): generateInvoice
+      creates the invoice as a draft with invoice_number null, and the number is assigned at issue (issueInvoice) from
+      the gapless per-legal-entity sequence, so a draft carries no number. A response field no longer required cannot
+      be additive.'
+    approved-by: 'Chinmay, 25 October 2026, CR-202 settled with option B ("generateInvoice creates the invoice as draft with invoice_number null")'
+    tag: r10
+    producer-tickets: [SVC-PLATFORM-BILLING-6]
+    consumer-tickets: [APP-SETUP-ADM-008, APP-SETUP-ADM-008-REST, APP-CONSOLE-ADM-009, APP-CONSOLE-ADM-459, APP-CONSOLE-ADM-460, APP-CONSOLE-ADM-462, TEST-AM-SETUP-PLATFORM-FOUNDATION-P09-REST, TEST-AM-SUBSCRIPTION-LICENSING-P09-2, TEST-AM-SUBSCRIPTION-LICENSING-P09-5, TEST-AM-SUBSCRIPTION-LICENSING-P09-6]
+  - id: BC-468
+    contract: subscription
+    operation: issueCreditNote
+    operations: [issueCreditNote, listCreditNotes]
+    change: "invoiceId` type string -> string:uuid"
+    reason: 'ADAM CR-202 (CHG-R10ID-013): credit_note.invoice_id becomes uuid, as the control.invoice key it references
+      is. The value was always an invoice id; the declared format now says so. A type change cannot be additive.'
+    approved-by: 'Chinmay, 25 October 2026, CR-202 settled ("credit_note.invoice_id becomes uuid")'
+    tag: r10
+    producer-tickets: [SVC-PLATFORM-BILLING-4, SVC-PLATFORM-BILLING-2]
+    consumer-tickets: [APP-CONSOLE-ADM-462, APP-CONSOLE-ADM-467, TEST-AM-SUBSCRIPTION-LICENSING-P09-6]
+  - id: BC-482
+    contract: identity
+    operation: getGuestSession
+    change: "response `tokens"
+    reason: 'ADAM CR-100 (Deep Khanvilkar, ticket 30655), accepted 15 October 2026 (CHG-R10ID-009): getGuestSession had
+      to return a TokenPair it cannot read back (refresh tokens are kept only as a hash), so every read would have
+      issued and rotated a new pair. It now answers GuestSessionView, the session without tokens; only the guest
+      sign-ins (GuestSession, unchanged) and refreshToken issue tokens, as on the staff side. A removed response field
+      cannot be additive.'
+    approved-by: 'Chinmay, ADAM CR-100 accepted 15 October 2026 ("approved by the lead as a breaking response change (no tokens on a read of the guest session)")'
+    tag: r10
+    producer-tickets: [SVC-IDENTITY-GUESTAUTH-1]
+    consumer-tickets: [APP-MOB-GST-042, APP-MOB-GST-073, APP-WEB-WEB-016, TEST-AM-IDENTITY-SECURITY-P01, TEST-AM-IDENTITY-SECURITY-P02]
+  - id: BC-483
+    contract: identity
+    operation: listDelegatedAccess
+    operations: [listDelegatedAccess, createDelegatedAccess, listDelegations, grantDelegation]
+    change: "delegationKind` gained enum value(s) ['sharedEntitlement']"
+    reason: 'ADAM CR-209, option A (Surendra Loke, ticket 28285), settled 25 October 2026 (CHG-R10ID-004): an entitlement
+      share is an identity.delegated_access row of kind sharedEntitlement, so the grant lists can return that value. A
+      response enum gaining a value is breaking by the compat rule; a client that does not know it shows the grant
+      without a relationship label.'
+    approved-by: 'Chinmay, 25 October 2026, CR-209 settled ("delegation_kind sharedEntitlement (new CHECK value)")'
+    tag: r10
+    producer-tickets: [SVC-IDENTITY-ADMINISTRATION-8, SVC-IDENTITY-IDENTITY-2]
+    consumer-tickets: [APP-MOB-GST-015, APP-MOB-GST-069, APP-PARTNER-PTR-020, APP-WEB-WEB-024, TEST-AM-ADMISSION-ACCESS-P02, TEST-AM-IDENTITY-SECURITY-P10, TEST-AM-MARKETING-CRM-P01, TEST-AM-ORDERS-RESERVATIONS-P02]

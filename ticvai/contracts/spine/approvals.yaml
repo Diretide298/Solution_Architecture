@@ -287,7 +287,13 @@ paths:
         the request at `draft`: nobody is asked, no SLA runs, and it does not count as an open request
         for the `409` below, so a person may keep a draft while a contract raises the real one. The
         draft is sent with `submitApprovalRequest`, which is when the matrix is read, the approvers are
-        resolved and `matrixVersion` is fixed. A contract raising a request never drafts.
+        resolved and `matrixVersion` is fixed. A contract raising a request never drafts. A request that is not a
+        draft is routed here the same way: the matrix id and version are fixed and the approver chain is stored
+        (`ApprovalRequest.approvers`; ADAM CR-102, CHG-R10ID-015).
+
+        **A guest''s request** (ADAM CR-101; CHG-R10ID-016). Identity raises a guest''s privacy request in process for
+        the guest (`exportSubjectData`, `deleteGuestAccount`): the request records the guest as
+        `requestedBySubjectId`, and `requestedByPrincipalId` stays null. Every other request names its principal.
 
         **No route, no request** (lead''s ruling on lane H review 3 N-1, 20 October 2026; CHG-R8SPN-015). A request
         that is not a draft and matches no active rule (no rule of its kind and subject type at its `scopePath`, or for
@@ -366,8 +372,11 @@ paths:
       description: '11.1.51. **Decided 28 September, audit R129 (3): a person may save a draft and submit
         it later.** Only the requester who saved the draft submits it.
 
-        Submitting is the moment the request is routed: the matrix in force now is read, its version is
-        fixed on the request as `matrixVersion`, the approver chain is resolved and the SLA starts. **The
+        Submitting is the moment the request is routed: the matrix in force now is read (`ApprovalMatrix`: the
+        nearest node''s matrix, its highest version), its id and version are fixed on the request as
+        `approvalMatrixId` and `matrixVersion`, the approver chain is resolved and stored as
+        `approvals.request_approver` rows (`ApprovalRequest.approvers`; ADAM CR-102, CHG-R10ID-015) and the SLA
+        starts. **The
         draft''s saving time decides nothing** — a draft saved last week is decided by this week''s rules,
         because nobody was asked under last week''s.
 
@@ -474,9 +483,10 @@ paths:
         Read-only and deliberately cheap. It runs on the hot path — every refund, every discount, every
         price override — and a slow answer here is a slow till.
 
-        **Rules match without a condition** (APPROVALS-TENANCY-C06, CHG-R8SPN-016): no stored rule has one, because
-        `setApprovalMatrix` and `approveMatrixMultiLevel` refuse a condition or skip condition `422
-        condition-not-supported` until a condition language exists (`ApprovalRule.condition`).
+        **Rules match on their condition too** (ADAM CR-102, option 1; CHG-R10ID-015, which replaces the
+        no-condition rule of APPROVALS-TENANCY-C06): the matrix in force (`ApprovalMatrix`) is matched on kind,
+        scope, subject type, amount and `matchAttributes`, and then on the rule''s `condition`, evaluated against
+        `attributes` in the language `ApprovalRule.condition` defines; the first rule that matches wins.
         `createApprovalRequest` and `submitApprovalRequest` route by the same match.
 
         '
@@ -632,8 +642,9 @@ paths:
                 $ref: '#/components/schemas/ApprovalRequest'
         '403':
           description: 'The approver may not decide this request. **Always carries `refusedReason`**,
-            one value per cause — the approver is the requester (`approverIsRequester`), is not in the
-            resolved chain (`notInApproverChain`), lacks the permission the rule demands
+            one value per cause — the approver is the requester (`approverIsRequester`), has no row at the
+            current level of the chain stored at routing (`notInApproverChain`; `ApprovalRequest.approvers`,
+            never recomputed from current role holders, CHG-R10ID-015), lacks the permission the rule demands
             (`insufficientPermission`), gave no step-up token where the rule requires MFA
             (`mfaRequired`) or no signature where it requires one (`signatureRequired`), is deciding
             through a delegation that has ended (`delegationExpired`), or has already decided at this
@@ -1248,11 +1259,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/ApprovalMatrixRefusedProblem'
         '422':
-          description: 'A rule carries a `condition` (not null), and no condition language exists yet (pull audit R104;
-            APPROVALS-TENANCY-C06, CHG-R8SPN-016). Nothing is stored; `errors[]` names the rule''s `order`. Send the
-            rule with `condition` null, or narrow it with `subjectTypes`, `minAmount`, `maxAmount` or
-            `matchAttributes`.'
-          x-ticvai-problem-types: [condition-not-supported]
+          description: 'A rule''s `condition` does not parse in the condition language (`ApprovalRule.condition`: clauses
+            `<attribute> <operator> <value>` joined by ` AND `, at most 10; ADAM CR-102, CHG-R10ID-015), so it could
+            never be evaluated. Nothing is stored; `errors[]` names the rule''s `order` and the first clause that failed.
+            Until r10 any non-null condition was refused here (`condition-not-supported`, APPROVALS-TENANCY-C06); the
+            grammar lifts that.'
+          x-ticvai-problem-types: [condition-invalid]
           content:
             application/problem+json:
               schema:
@@ -1827,7 +1839,7 @@ paths:
         | `product`, `department`, `customerType`, `risk`, `exceptionType`, `legalEntity` | `matchAttributes` (with `module`) |
         | `minimumApprovals`, `rejectionBehavior` | the same-named rule fields |
         | `requestChanges`, `delegate`, `reassign` | `allowRequestChanges`, `allowDelegate`, `allowReassign` |
-        | `skipConditions` | `condition`, negated: the rule is skipped where it holds. **Refused `422 condition-not-supported` when not empty** until a condition language exists (APPROVALS-TENANCY-C06, CHG-R8SPN-016) |
+        | `skipConditions` | `condition`, negated: the rule is skipped where it holds (ADAM CR-102, CHG-R10ID-015). It is one or more clauses of the condition language (`ApprovalRule.condition`) joined by ` OR ` (skip when any holds); the stored `condition` is each clause negated (`=` and `!=`, `<` and `>=`, `>` and `<=`, `in` and `notIn` swap) joined by ` AND `. A clause that does not parse, or an ` AND ` inside `skipConditions` (its negation would need an OR), is `422 condition-invalid` and nothing is stored. As for any condition, a request missing the attribute does not match the rule |
         | `requiredApproverRole` | `requiredApproverRoleId`, and `approverRoleIds` = [it] when the rule is new. **Required when the rule is new** (`400 approver-role-required`), so `approver_role_ids` is never empty; an existing rule keeps the list it has |
         | (not sent) `sort_order` | a new rule gets **last + 1 in its matrix**, so it is the last rule tried; an existing rule keeps its place. `setApprovalMatrix` reorders |
 
@@ -1889,10 +1901,10 @@ paths:
               schema:
                 $ref: '#/components/schemas/ApprovalMatrixRefusedProblem'
         '422':
-          description: '`skipConditions` is not empty, and no condition language exists yet (pull audit R104;
-            APPROVALS-TENANCY-C06, CHG-R8SPN-016): it would be the rule''s `condition`, negated, and a condition is
-            refused, never stored (`ApprovalRule.condition`). Nothing is stored. Send it empty or absent.'
-          x-ticvai-problem-types: [condition-not-supported]
+          description: '`skipConditions` cannot become the rule''s `condition` (ADAM CR-102, CHG-R10ID-015): a clause does
+            not parse in the condition language (`ApprovalRule.condition`), or it joins clauses with ` AND `, whose
+            negation the language cannot hold. Nothing is stored; `errors[]` names the clause.'
+          x-ticvai-problem-types: [condition-invalid]
           content:
             application/problem+json:
               schema:
@@ -1938,7 +1950,8 @@ paths:
         | `start`, `end`, `reason` | `from`, `to`, `reason` |
         | `requestKind` | `kinds` = [it] (an `ApprovalKind`; absent, every kind) |
         | `authorityAmount`, `authorityPercentage` | `maxAmount`, `maxPercentage`: the delegation's own cap, which never exceeds what the delegator may approve under the matrix (`403 exceedsDelegatorAuthority`, as `createApprovalDelegation` refuses it) |
-        | `scope`, `venue`, `region`, `businessUnit`, `legalEntity`, `department` | `scopePath`: the most specific scope node given |
+        | `scope`, `venue`, `region`, `department` | `scopePath`: the most specific scope node given |
+        | `businessUnit`, `legalEntity` | **not a scope, and not stored** (ADAM CR-102, option 1; CHG-R10ID-015): neither is a level of `platform.scope`, so neither sets `scopePath`. Kept in the schema so an r1 client still validates; a value sent is ignored |
         | `delegationType` | `delegationType` |
         | `requiredRole` (and `role`, `position`) | `requiredRoleId`: the delegate must hold it (`409 delegateLacksRequiredRole` otherwise); `role` and `position` are display only |
 
@@ -5382,6 +5395,13 @@ components:
         **A rota shift swap** (4 October 2026, CHG-FXC-008; Sprint 1-2 judging: `workforce.requestShiftSwap` raised a request
         with no kind that fits). `configurationChange`, subject `shiftSwap`, `subjectContract` `workforce`, `subjectId` the
         ShiftSwap id: an existing kind narrowed by `subjectTypes`, as the optional review steps above, so no kind is added.
+
+        **A guest's privacy request** (ADAM CR-101, accepted 15 October 2026; CHG-R10ID-016). `configurationChange`,
+        `subjectContract` `identity`, `subjectId` the guest's subject id, subject `subjectDataExport` for
+        `exportSubjectData` and `subjectErasure` for `deleteGuestAccount`: an existing kind narrowed by `subjectTypes`,
+        so no kind is added. Raised by Identity in process for the guest, it records the guest as `requestedBySubjectId`
+        (`requestedByPrincipalId` null). A guest's own request needs no human approval step (ADR-0047 section 7); a
+        tenant that wants one saves a rule for these subject types.
       enum:
       - refund
       - priceOverride
@@ -5432,6 +5452,9 @@ components:
     ApprovalRule:
       type: object
       x-ticvai-persistence: approvals.rule
+      # A rule's code is unique within its matrix where it is set (ADAM CR-102, option 1; CHG-R10ID-015): a unique index
+      # on (matrix_id, code); rows with a null code do not collide.
+      x-ticvai-unique-together: [[matrix_id, code]]
       required:
       - order
       - approverRoleIds
@@ -5471,21 +5494,41 @@ components:
         condition:
           type: string
           nullable: true
-          description: '11.1.13. Evaluated against the attributes the caller supplied.
+          maxLength: 500
+          description: '11.1.13. Evaluated against the attributes the caller supplied (`CreateApprovalRequest.attributes`,
+            stored on the request).
 
 
-            **No condition language is defined yet** (pull audit R104, 26 September): the grammar, the
-            attributes it may name and how two conditions are compared for `unreachableRule` are an
-            open decision, not something to infer from this field.
+            **The condition language: attribute comparisons joined by AND** (ADAM CR-102, option 1, accepted 15 October
+            2026; the open decision of pull audit R104, settled for r10; CHG-R10ID-015). It lifts the refusal of R8
+            blocker cause APPROVALS-TENANCY-C06 (CHG-R8SPN-016), which held only until the grammar was decided. A
+            condition is one or more clauses separated by ` AND ` (upper case, single spaces); there is no OR, no NOT and
+            no parentheses (an OR is two rules). A clause is `<attribute> <operator> <value>`:
+
+            - `<attribute>` names a key of the request''s `attributes`, by name (`[a-z][A-Za-z0-9]{0,63}`; for example
+            `customerType`, `riskScore`, `department`);
+
+            - `<operator>` is one of `=`, `!=`, `<`, `<=`, `>`, `>=`, `in`, `notIn`;
+
+            - `<value>` is a single-quoted string (`''vip''`, a quote inside doubled), a number (`-12.5`), `true` or
+            `false`, or, for `in` and `notIn`, a bracketed list of strings or of numbers (`[''a'', ''b'']`, at most 50).
+
+            A condition holds when every clause holds. A clause holds only when the attribute is present and of the
+            value''s type (string, number or boolean; `<`, `<=`, `>` and `>=` take numbers only); an absent or
+            mistyped attribute makes the clause, and so the rule, not match. Strings compare exactly, case included. At
+            most 10 clauses. `setApprovalMatrix` parses a non-null `condition` and refuses one that does not parse with
+            `422 condition-invalid`, storing nothing, so a stored condition always parses. A rule matches when kind,
+            scope, subject type, amount and `matchAttributes` match and then its `condition`, if any, holds.
 
 
-            **So a condition is refused, never stored** (decided 20 October 2026, Chinmay, R8 blocker cause
-            APPROVALS-TENANCY-C06, option C; CHG-R8SPN-016). `setApprovalMatrix` refuses a rule whose `condition`
-            is not null, and `approveMatrixMultiLevel` one whose `skipConditions` is not empty, with `422
-            condition-not-supported`, and store nothing. Every stored rule therefore has no condition, and
-            `evaluateApprovalRequirement`, `createApprovalRequest` and `submitApprovalRequest` match on kind, scope,
-            subject type, amount and `matchAttributes` only. A rule meant to restrict can never route silently as if
-            unrestricted. The refusal is lifted when the grammar is decided.
+            **How two conditions are compared for `unreachableRule`.** A later rule is unreachable when an earlier rule
+            always matches first: every request that makes the later rule match also makes the earlier one match. For
+            conditions this is decided clause by clause, and only where it can be proved: the earlier rule''s condition
+            is null, or each of its clauses is implied by a clause of the later rule on the same attribute (equal
+            clauses; `= v` implies `!= w` for w other than v, `in` a list holding v and `notIn` a list without v; `> a`
+            implies `> b` and `>= b` for a >= b, and likewise for `<`; `in L` implies `in M` when L is within M). A
+            clause not provably implied counts as reachable, so the check never refuses a matrix that could route a
+            request to the later rule.
 
             '
         approverRoleIds:
@@ -5576,8 +5619,10 @@ components:
           type: string
           maxLength: 64
           nullable: true
-          description: '**A stable code for the rule, unique within its matrix** (4 October 2026, CHG-FXC-005). The composite
-            `approveMatrixMultiLevel` upserts a rule by it; `setApprovalMatrix` may leave it null.'
+          description: '**A stable code for the rule, unique within its matrix** (4 October 2026, CHG-FXC-005; enforced by a
+            unique index on (`matrix_id`, `code`) since ADAM CR-102, CHG-R10ID-015, compared without case). The composite
+            `approveMatrixMultiLevel` upserts a rule by it; `setApprovalMatrix` may leave it null, and two null codes do
+            not collide. A body with two rules of one code is `400 validation`.'
         minimumApprovals:
           type: integer
           minimum: 1
@@ -5639,10 +5684,20 @@ components:
       x-ticvai-rls: read-beneath   # ADAM CR-095, CHG-RSF-001: a matrix set at the tenant or a region governs every venue beneath it, so a venue reads the matrices it inherits (approvals.rule follows its matrix for reading) and still writes only its own
       # One matrix per kind, scope and version, as the contract promises (R8 blocker APPROVALS-TENANCY-C02, CHG-R8MIG-009).
       x-ticvai-unique-together: [[kind, scopePath, version]]
+      description: '**Which matrix routes a request, and which version of it** (ADAM CR-102, option 1, accepted 15 October
+        2026; CHG-R10ID-015). Matrices resolve up the scope tree as configuration does (ADR-0018: nearest ancestor
+        wins): for the request''s `kind` at its `scopePath`, the matrix of the nearest node, the venue''s, else the
+        region''s, else the tenant''s, routes it alone; its rules are not followed by an ancestor''s, because a venue or
+        region matrix may only tighten what it inherits (`loosensParentRule`), so the nearest matrix already holds the
+        ancestor''s floor. At a node, the matrix **in force** is its highest `version`; when that version has `isActive`
+        false, the node sets no matrix of that kind and the next ancestor''s applies. The request stores the matrix it
+        was routed by (`approvalMatrixId`) and its `matrixVersion`, so a decision is checked against exactly that rule
+        set.'
       required:
       - kind
       - scopeLevel
       - rules
+      - version
       properties:
         id:
           type: string
@@ -5668,6 +5723,8 @@ components:
 
             **(`kind`, `scopePath`, `version`) is unique**, and a stored version is never edited: a
             request''s `matrixVersion` names exactly one rule set (decided 28 September, audit R129 (2)).
+            **Never null** (ADAM CR-102, CHG-R10ID-015): the server sets it, 1 for a new matrix and the previous
+            version plus one after; it is not sent and is ignored on input.
 
             '
         rules:
@@ -5844,12 +5901,15 @@ components:
     ApprovalRequest:
       type: object
       # The escalation history is a child table (14 October 2026, CHG-CRD-006, ADAM CR-078): `escalations[]` are its rows.
-      x-ticvai-persistence: approvals.request + approvals.escalation
+      # The approver chain fixed at routing is a child table too (ADAM CR-102, option 1; CHG-R10ID-015): `approvers[]`.
+      x-ticvai-persistence: approvals.request + approvals.escalation + approvals.request_approver
+      # Raised by a principal (staff, a contract acting for one) or by a guest subject, never both (ADAM CR-101;
+      # CHG-R10ID-016): a table CHECK, num_nonnulls(requested_by_principal_id, requested_by_subject_id) = 1.
+      x-ticvai-exactly-one-of: [[requestedByPrincipalId, requestedBySubjectId]]
       required:
       - id
       - kind
       - status
-      - requestedByPrincipalId
       - requestedAt
       properties:
         id:
@@ -5914,6 +5974,21 @@ components:
         requestedByPrincipalId:
           type: string
           format: uuid
+          nullable: true
+          x-ticvai-references: identity.principal
+          description: 'The principal who raised the request, or for whom the raising contract raised it. **Null when a
+            guest raised it** (ADAM CR-101, accepted 15 October 2026; CHG-R10ID-016): a guest is a subject, not a
+            principal, so a guest''s privacy request (`exportSubjectData`, `deleteGuestAccount`) records
+            `requestedBySubjectId` instead. Exactly one of the two is set.'
+        requestedBySubjectId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          x-ticvai-references: pii.subject
+          description: '**The guest who raised the request** (ADAM CR-101; CHG-R10ID-016), set by the server from the
+            guest session; null for a request a principal raised. Segregation of duties holds for it too: no approver
+            decides a request raised for their own subject.'
         matrixVersion:
           type: integer
         mode:
@@ -5922,8 +5997,39 @@ components:
           type: integer
         totalLevels:
           type: integer
+        approvers:
+          type: array
+          readOnly: true
+          description: '**The approver chain, fixed when the request is routed** (ADAM CR-102, option 1, accepted 15
+            October 2026; CHG-R10ID-015). One `approvals.request_approver` row per approver per level, written by
+            `createApprovalRequest` (when not a draft) and `submitApprovalRequest` from the matched rule''s roles and the
+            delegations in force at that moment (`isDelegate` true for a delegate standing in). The chain is not
+            recomputed at decision time: `decideApprovalRequest` refuses `notInApproverChain` to anyone with no row at
+            the current level, so a role change after routing neither adds nor removes an approver of a request in
+            flight. An escalation (`escalateApprovalRequest`, the SLA job) and a reroute (`rerouteOnNoApprover`) add
+            rows; a returned or information-requested request keeps its chain when resubmitted. Rows are never edited
+            or deleted.'
+          items:
+            type: object
+            required: [level, principalId, isDelegate]
+            properties:
+              level:
+                type: integer
+                minimum: 1
+                description: The level of the chain this approver decides at.
+              principalId:
+                type: string
+                format: uuid
+                x-ticvai-references: identity.principal
+                description: The approver, a principal of the tenant.
+              isDelegate:
+                type: boolean
+                description: True when the approver stands in for another through an `ApprovalDelegation` in force at
+                  routing.
         pendingApprovers:
           x-ticvai-persisted: false
+          description: 'The rows of `approvers` at `currentLevel` who have not decided yet, with their names; derived, not
+            stored (CHG-R10ID-015).'
           type: array
           items:
             type: object
@@ -7068,10 +7174,14 @@ components:
           description: Venue
         businessUnit:
           type: string
-          description: Business Unit
+          deprecated: true
+          description: 'Business Unit. **Not a scope and not stored** (ADAM CR-102, option 1; CHG-R10ID-015): not a level
+            of `platform.scope`, so it never sets the delegation''s `scopePath`; a value sent is ignored.'
         legalEntity:
           type: string
-          description: Legal Entity
+          deprecated: true
+          description: 'Legal Entity. **Not a scope and not stored** (ADAM CR-102, option 1; CHG-R10ID-015): not a level
+            of `platform.scope`, so it never sets the delegation''s `scopePath`; a value sent is ignored.'
         region:
           type: string
           description: Region

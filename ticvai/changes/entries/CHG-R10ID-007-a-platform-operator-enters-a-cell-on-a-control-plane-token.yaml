@@ -1,0 +1,53 @@
+id: CHG-R10ID-007
+date: '2026-10-25'
+source: cr
+kind: contract
+summary: 'ADR-0072 defines the platform token a cell trusts: a JWT signed by the Control Plane, verified against its
+  JWKS, audience the cell, sub the operator, the PLATFORM_* set and the platform session in claims, and the MFA step-up
+  carried as a short-lived claim (action and time). The Control Plane holds operators, their platform sessions (with
+  the step-up) and their second factors in three new tables; openPlatformStaffGrant and listOwnPlatformStaffGrants
+  cite it.'
+decision:
+  what: 'ADAM CR-175, option A, accepted 21 October 2026. docs/adr/0072-a-platform-operator-enters-a-cell-on-a-control-plane-token.md
+    (and the ADR index). contracts/satellite/subscription.yaml: PlatformOperator (control.platform_operator),
+    PlatformSession (control.platform_session), PlatformOperatorMfaMethod (control.platform_operator_mfa, secrets
+    field-encrypted under the Control Plane''s key). contracts/spine/identity.yaml: openPlatformStaffGrant and
+    listOwnPlatformStaffGrants cite the token and the step-up claim. tools/check-business-rules.py BR-PLATFORM-TOKEN.
+    Database: the three control tables, from the generator.'
+  by: Chinmay
+  date: '2026-10-21'
+why: 'ADAM CR-175 (Sanket Keluskar, ticket 30742 openPlatformStaffGrant; 30739 listOwnPlatformStaffGrants), accepted 21
+  October 2026 ("1,2,3 all"). R8 blocker IDENTITY-C20 (CHG-R8MIG-006) said the cell validates the Control Plane token
+  and reads the step-up from it, but nothing defined the token, its keys and claims, or where an operator and its
+  second factor are stored; the acceptance''s "fixed at the source in r9" covered only that part.'
+keys_touched:
+  operations: [openPlatformStaffGrant, listOwnPlatformStaffGrants]
+  schemas: [PlatformOperator, PlatformSession, PlatformOperatorMfaMethod]
+  tables: [control.platform_operator, control.platform_session, control.platform_operator_mfa]
+  files:
+  - docs/adr/0072-a-platform-operator-enters-a-cell-on-a-control-plane-token.md
+  - docs/adr/README.md
+  - contracts/satellite/subscription.yaml
+  - contracts/spine/identity.yaml
+  - tools/check-business-rules.py
+root_class: 'new: a cross-cell credential the contract relies on and nothing defines'
+tickets:
+  started:
+  - '30742 and 30739: through CR-175''s comment, as CHG-ADM-002 says; their text is not rewritten. Both wait for the
+    platform-auth ticket (the decision).'
+  unstarted:
+  - 'The platform-auth ticket (the Control Plane sign-in that writes the three tables, token issue, the JWKS, and
+    verification in every cell host) is not created here: it is a plan change for the lead. The three tables are
+    migration work for Hrushikant Patkar (control database), from the generator''s forward migration.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-175
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-business-rules.py
+status: open
+notes: 'BR-PLATFORM-TOKEN fails on the parent commit (5 findings) and passes after. Two values in the ADR are proposed
+  for the lead to confirm: a token life of at most 15 minutes and a 5-minute step-up window. No operation writes the
+  three tables yet (audit-unwired-tables, report-only, lists them) until the platform-auth ticket adds the Control
+  Plane sign-in.'

@@ -1512,6 +1512,54 @@ def deployable_read_grants() -> str:
             "-- CHG-R9CR-005). Row-level security still applies to every row these roles read.\n" + "\n".join(out) + "\n")
 
 
+# **Ending every session of a principal, whatever venue the caller acts at** (ADAM CR-180, option A, accepted 21 October
+# 2026; CHG-R10ID-006). updatePrincipal runs at venue scope, but identity.refresh_token is tenant-root and
+# identity.session venue-isolated, so a venue manager's revoke updated no token and only its own venue's sessions, and
+# the PATCH still answered 200. This one SECURITY DEFINER function first checks the caller may update the principal, by
+# the principal's own write rule (x-ticvai-rls home-scope-write: the tenant root, or a grant over its home scope), then
+# ends every live session and revokes every live refresh token of that principal. No grant or policy is widened: the
+# function lifts the connection to the tenant root for its own two statements only and puts the caller's scope back
+# before it returns. updatePrincipal (deactivation, validTo, primaryRoleId) and forceLogout call it.
+END_PRINCIPAL_SESSIONS_SQL = """
+-- **identity.end_principal_sessions** (ADAM CR-180, option A; CHG-R10ID-006): ends every live session and revokes every
+-- live refresh token of one principal, at every venue, once the caller is shown to be allowed to update that principal
+-- (identity.principal's write rule, home-scope-write). Returns the number of sessions ended. Whatever its owner, it
+-- reads and writes the two tables at the tenant root for these statements only, and restores the caller's
+-- ticvai.scope_paths before returning.
+CREATE OR REPLACE FUNCTION identity.end_principal_sessions(target_principal_id uuid, ended_by uuid, reason text)
+    RETURNS integer
+    LANGUAGE plpgsql
+    VOLATILE
+    SECURITY DEFINER
+    SET search_path = pg_catalog, public, pg_temp
+AS $$
+DECLARE
+    caller_paths text := current_setting('ticvai.scope_paths', true);
+    root_path text;
+    ended integer := 0;
+BEGIN
+    IF NOT (platform.tenant_root_in_scope() OR EXISTS (
+            SELECT 1 FROM identity.principal hp JOIN platform.scope hs ON hs.id = hp.home_scope_id
+             WHERE hp.id = target_principal_id AND platform.in_scope(hs.path))) THEN
+        RAISE EXCEPTION 'identity.end_principal_sessions: the caller may not update principal %', target_principal_id
+            USING ERRCODE = '42501';
+    END IF;
+    SELECT s.path::text INTO root_path FROM platform.scope s WHERE s.level = 'tenant' LIMIT 1;
+    PERFORM set_config('ticvai.scope_paths', COALESCE(root_path, ''), true);
+    UPDATE identity.session
+       SET status = 'terminated', ended_at = now(), ended_by_principal_id = ended_by, end_reason = left(reason, 500)
+     WHERE principal_id = target_principal_id AND status = 'active';
+    GET DIAGNOSTICS ended = ROW_COUNT;
+    UPDATE identity.refresh_token
+       SET revoked_at = now(), revocation_reason = left(reason, 250)
+     WHERE principal_id = target_principal_id AND revoked_at IS NULL;
+    PERFORM set_config('ticvai.scope_paths', COALESCE(caller_paths, ''), true);
+    RETURN ended;
+END
+$$;
+"""
+
+
 def exactly_one_sql(short: str, group: list) -> str:
     """`x-ticvai-exactly-one-of` (ADAM CR-158, CHG-CRA-002): the table CHECK line that exactly one column is set."""
     return (f"    CONSTRAINT {obj_name(short, *group, 'one', suffix='chk')} CHECK ("
@@ -3152,6 +3200,12 @@ def main() -> int:
     # applies to every row the role reads.
     files["tenant/920-row-level-security.sql"] = (files["tenant/920-row-level-security.sql"].rstrip("\n") + "\n"
                                                   + deployable_read_grants())
+
+    # ADAM CR-180 (CHG-R10ID-006): the one function that ends a principal's sessions everywhere, written beside the
+    # policies it works within; the forward migration carries it (CREATE OR REPLACE) to databases already built.
+    if all(t in cols for t in ("identity.session", "identity.refresh_token", "identity.principal")):
+        files["tenant/920-row-level-security.sql"] = (files["tenant/920-row-level-security.sql"].rstrip("\n") + "\n"
+                                                      + END_PRINCIPAL_SESSIONS_SQL)
 
     # **Range partitioning by month** (ADR-0056). The tables declare `PARTITION BY RANGE` where they
     # are created; this file holds each one's DEFAULT partition and the months ahead.

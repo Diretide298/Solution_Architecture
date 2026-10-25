@@ -1,0 +1,49 @@
+id: CHG-R10ID-012
+date: '2026-10-25'
+source: cr
+kind: contract
+summary: 'replayEvents still reads no outbox: the request refuses only to before from, a window over 7 days and an
+  event type the subscription does not hold; the workers-host dispatcher enforces retention and the 10,000-event cap
+  by failing the job with failureReason replay-window-beyond-retention or replay-window-too-large and replaying
+  nothing. control.webhook_replay gains tenant_id (uuid, not null, the caller''s tenant) and failure_reason (text,
+  null), and the dispatcher reads only that tenant''s outbox.'
+decision:
+  what: 'ADAM CR-201, option A, as settled. contracts/satellite/public-api.yaml replayEvents: the description splits
+    what the request refuses from what the dispatcher refuses; the 400 drops replay-window-beyond-retention and keeps
+    replay-window-too-large for the 7-day bound only. WebhookReplayJob: tenantId (required, readOnly, a key to
+    control.tenant, set from the caller''s tenant) and failureReason (nullable, readOnly, maxLength 500).
+    states/webhook-replay.yaml: queued to failed by the dispatcher''s refusal, and the notes say retention and the cap
+    are the dispatcher''s. Database: control.webhook_replay.tenant_id uuid NOT NULL and failure_reason text null, from
+    the generator''s forward migration.'
+  by: Chinmay
+  date: '2026-10-25'
+why: 'ADAM CR-201 (Surendra Loke, ticket 27996 replayEvents; module test 27998), settled 25 October 2026. After CR-140
+  the request reads no outbox, yet the r8 text still required two refusals at request time that only the outbox can
+  answer (a from older than the oldest attached partition, more than 10,000 events), and control.webhook_replay
+  recorded no tenant although the dispatcher reads each tenant database''s outbox and an API client may name several
+  tenants.'
+keys_touched:
+  operations: [replayEvents]
+  schemas: [WebhookReplayJob]
+  tables: [control.webhook_replay]
+  files:
+  - contracts/satellite/public-api.yaml
+  - states/webhook-replay.yaml
+root_class: 'new: a request-time refusal only a store the request does not read can answer'
+tickets:
+  started:
+  - '27996 (replayEvents): through CR-201''s comment, as CHG-ADM-002 says; its text is not rewritten.'
+  unstarted:
+  - '27998 (module test) and the replay dispatcher''s task pick it up at the r10 tag. The two columns are migration
+    work for Hrushikant Patkar, a child task of the affected MIG ticket; not applied while server databases are frozen.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-201
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-storage-promises.py
+status: open
+notes: 'tenant_id is NOT NULL on a table that may already hold rows: the forward migration needs a backfill or an
+  empty table (the dispatcher is not built yet, so the table is expected empty). The integration run should confirm
+  what the generator writes for it.'
