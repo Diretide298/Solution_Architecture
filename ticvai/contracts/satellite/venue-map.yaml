@@ -380,6 +380,10 @@ paths:
       description: >
         21.2.1 to 21.2.4 and 1.4.24. **Deterministic, and it fails loudly.**
 
+        **The job records what it read** (ADAM CR-207, option A; CHG-R10ORD-013): `sourceRef` and `format` are stored
+        on the `venuemap.import_job` row with its `createdAt`, so `ai.proposeWalkways` finds the map's latest import,
+        reads its raster and tells a vector source from a raster one.
+
         Accepts what a venue's drawing office actually holds: PDF, SVG, DWG, DXF and raster.
         **Converting CAD to PDF loses the layer names this depends on**, which is why native
         formats are accepted rather than requested as exports.
@@ -1557,6 +1561,11 @@ paths:
           switched all of them off.
         - `interestTags`: per published park map of the venue, the interest tags its published points carry
           (`VenuePoint.interestTags`), each tag once.
+        - `cuisineTags` and `retailTags` (ADAM CR-220, option A; CHG-R10ORD-015): per published park map, the
+          `VenuePoint.cuisineTags` of its published dining points (restaurant, cafe, food kiosk) and the
+          `VenuePoint.retailTags` of its published shops and retail kiosks, each tag once, in the shape of
+          `interestTags`. GST-051 and WEB-050 build the lunch and shop questions and the `preferenceNotAtVenue` chip
+          from them; no new operation on the screen.
         - `fastTrackBundles`: the venue's published bundles that carry Fast Track, read from Promotions
           (`promotions#bundleRecords`), as id and name only.
 
@@ -1567,7 +1576,7 @@ paths:
       x-ticvai-guest-callable: true
       x-ticvai-audience: [staff, guest]
       x-ticvai-agreed: 'R8 blocker GPS-C21, the lead''s answer B of 20 October 2026: venue-defined presets in a table; the guest read of the planner options (the surface lane''s request, applied at the r8 integration)'
-      x-ticvai-bounded: 'one venue''s presets (a dozen), its parks'' interest tags (12 per point, a closed list) and its Fast Track bundles (a handful)'
+      x-ticvai-bounded: 'one venue''s presets (a dozen), its parks'' interest tags (12 per point, a closed list), cuisine and retail tags (8 per point) and its Fast Track bundles (a handful)'
       x-ticvai-scope-level: venue
       x-ticvai-read-routing: replica
       x-ticvai-offline-capable: true
@@ -2484,6 +2493,43 @@ components:
           type: array
           maxItems: 50
           description: Per published park map of the venue, the interest tags its points carry.
+          items:
+            type: object
+            required: [mapId, tags]
+            properties:
+              mapId: { type: string, format: uuid }
+              mapName: { type: string }
+              tags:
+                type: array
+                maxItems: 50
+                items: { type: string }
+        cuisineTags:
+          type: array
+          maxItems: 50
+          description: >
+            Per published park map of the venue, the cuisine tags of its published dining points (`kind` restaurant,
+            cafe, or a kiosk that sells food), each tag once (ADAM CR-220, option A; Chinmay, 25 October 2026;
+            CHG-R10ORD-015). GST-051 and WEB-050 build the lunch question from it, name the parks that serve each
+            cuisine, and mark a cuisine no chosen park serves (`preferenceNotAtVenue`) before the plan is made.
+            Additive; the same shape as `interestTags`.
+          items:
+            type: object
+            required: [mapId, tags]
+            properties:
+              mapId: { type: string, format: uuid }
+              mapName: { type: string }
+              tags:
+                type: array
+                maxItems: 50
+                items: { type: string }
+        retailTags:
+          type: array
+          maxItems: 50
+          description: >
+            Per published park map of the venue, the retail tags of its published shops and retail kiosks (`kind`
+            shop, or a kiosk that sells goods), each tag once (ADAM CR-220, option A; CHG-R10ORD-015). GST-051 and
+            WEB-050 build the shop question and its `preferenceNotAtVenue` chip from it. Additive; the same shape as
+            `interestTags`.
           items:
             type: object
             required: [mapId, tags]
@@ -3838,6 +3884,28 @@ components:
           description: 'Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller''s scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007).'
         id: { type: string, format: uuid }
         mapId: { type: string, format: uuid }
+        sourceRef:
+          type: string
+          format: uuid
+          nullable: true
+          description: >
+            The drawing the import read: `importVenueGeometry`'s `sourceRef`, an `assets.MediaAsset` id (ADAM CR-207,
+            option A; CHG-R10ORD-013). `ai.proposeWalkways` reads the raster through it. Null on a job recorded
+            before r10.
+        format:
+          type: string
+          nullable: true
+          enum: [pdfPlan, svgPlan, dwgPlan, dxfPlan, rasterPlan, glbModel, navigationFile]
+          description: >
+            The `format` `importVenueGeometry` took (ADAM CR-207). With `shapesFound`, the vector-geometry test of
+            `ai.proposeWalkways`' 409: `pdfPlan`, `svgPlan`, `dwgPlan` or `dxfPlan` with shapes found.
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: >
+            When the import was started (ADAM CR-207). The map's latest import, which `ai.proposeWalkways` reads when
+            no `importJobId` is given, is the one with the latest `createdAt`.
         status: { type: string, enum: [parsing, previewReady, committed, failed] }
         outcome: { type: string, enum: [parsed, parsedWithFindings, nothingFound, noLayersMatched, unreadable] }
         shapesFound: { type: integer }

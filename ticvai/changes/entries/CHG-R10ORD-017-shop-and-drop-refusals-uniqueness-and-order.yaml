@@ -1,0 +1,56 @@
+id: CHG-R10ORD-017
+date: '2026-10-25'
+source: cr
+kind: contract
+summary: 'Shop & Drop gets what CR-104 accepted: 400 for both or neither of saleId and orderId, 422 for unknown references,
+  one drop per sale and per order (unique indexes), a dropReference format, the collection note stored, 400/404 on collect,
+  lookupShopAndDrop''s status set and order, merchandise barcode and SKU unique per outlet; itemNotDroppable is not raised
+  until an approved screen sets isDroppable.'
+decision:
+  what: 'ADAM CR-104, option 1 with the lead''s two changes: a collection note column (ShopAndDrop.collectionNote, retail.shop_and_drop.collection_note);
+    per-line quantity on collect (already in r8, APPROVALS-TENANCY-C34); 400 sale-or-order-required; 422 unknown-sale, unknown-order,
+    unknown-collection-point, unknown-line; unique sale_id and order_id for alreadyDropped; dropReference server-assigned,
+    venue prefix and a per-venue sequence as orderNumber, unique in the tenant; merchandise (outlet_id, barcode) and (outlet_id,
+    sku) unique; lookupShopAndDrop returns awaitingCollection and partiallyCollected, newest first by droppedAt then id;
+    collectShopAndDrop 404 unknown dropId and 400 lines not on the drop; itemNotDroppable not raised until an approved screen
+    can set the attribute. contracts/satellite/retail.yaml.'
+  by: Chinmay
+  date: '2026-10-15'
+why: 'ADAM CR-104 (Deep Khanvilkar, #27820 Shop & Drop), accepted with option 1 and two changes on 15 October 2026 (the
+  34 accepted CRs). r8 (CHG-R8SAT-001, R8 blocker APPROVALS-TENANCY-C34) added per-line collection, isDroppable and collection-point
+  hours; the rest was not written.'
+keys_touched:
+  operations:
+  - createShopAndDrop
+  - collectShopAndDrop
+  - lookupShopAndDrop
+  - lookupMerchandise
+  schemas:
+  - ShopAndDrop
+  - MerchandiseItem
+  tables:
+  - retail.shop_and_drop
+  - retail.merchandise
+  files:
+  - contracts/satellite/retail.yaml
+root_class: 'new: a write whose refusals and status moves are not declared'
+tickets:
+  started:
+  - '27820 (Shop & Drop): built to the CR''s ''build now''; its text is not rewritten. Migration work: a child task of the
+    affected MIG ticket for Hrushikant Patkar, raised at the r10 release.'
+  unstarted: []
+adam_cr: CR-104
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-problem-types.py
+notes: 'Database change: retail.shop_and_drop.collection_note (text, nullable); unique indexes on retail.shop_and_drop sale_id,
+  order_id and drop_reference; unique indexes on retail.merchandise (outlet_id, barcode) and (outlet_id, sku), replacing
+  the venue uniqueness the DDL could not key. The dropReference format follows orderNumber''s (chosen by precedent; the
+  decision names a format without giving one). Needs the lead: the decision decides collectionPointClosed from the serving
+  outlets'' opening hours (fnb.delivery_location_outlet to platform.outlet_opening_hour) with no new hours column, but r8
+  (CHG-R8SAT-001, 19 October) added opens_at and closes_at to fnb.delivery_location and the operation uses them; left as
+  r8 wrote it until the lead says which.'
+release_tag: pending
+decision_owner: Chinmay
+status: open

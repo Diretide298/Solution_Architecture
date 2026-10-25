@@ -1,0 +1,47 @@
+id: CHG-R10ORD-006
+date: '2026-10-25'
+source: cr
+kind: contract
+summary: 'overrideWaitingGuest admits: the queue-entry state model gains called, expired and noShow to redeemed by it (expired
+  and noShow are no longer terminal), and the no-show and return-to-queue transitions move to a new operation, resolveCalledWaitingGuest.'
+decision:
+  what: 'ADAM CR-237, option A: states/queue-entry.yaml called -> redeemed, expired -> redeemed and noShow -> redeemed via
+    overrideWaitingGuest (the entry ends redeemed with the override fields set, so a second override is 409 queue-entry-already-redeemed;
+    redeemed, cancelled and released stay refused); called -> noShow and called -> waiting move to resolveCalledWaitingGuest
+    (POST /waiting-guests/{entryId}/resolve-call, outcome noShow | returnToQueue, 409 queue-entry-not-called, QUEUE_MANAGE).
+    contracts/satellite/queue.yaml.'
+  by: Chinmay
+  date: '2026-10-25'
+why: 'ADAM CR-237 (Surendra Loke, #33058 overrideWaitingGuest, blocking), settled by the lead on 25 October 2026 (the 48
+  CRs settled without a release; the decision is the comment the developers'' agents already build to). The operation admitted
+  a party while the state model gave it only a no-show and a return to the queue, from called only, and listed expired and
+  noShow as terminal.'
+keys_touched:
+  operations:
+  - overrideWaitingGuest
+  - resolveCalledWaitingGuest
+  schemas:
+  - QueueEntryStatus
+  tables:
+  - queue.entry
+  files:
+  - contracts/satellite/queue.yaml
+  - states/queue-entry.yaml
+root_class: 'new: refusals that disagree with the state model'
+tickets:
+  started:
+  - '33058 (overrideWaitingGuest): through CR-237''s comment; its text is not rewritten. The no-show and return-to-queue
+    are not built in it.'
+  unstarted:
+  - 'resolveCalledWaitingGuest: a new operation; its ticket is created at the r10 release as any new operation''s is.'
+adam_cr: CR-237
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-states.py
+notes: 'The decision does not say what a waiting entry (never called) answers on overrideWaitingGuest, nor the permission
+  of the new operation; the operation names QUEUE_MANAGE, the permission of callNextParties, which moves called entries.
+  Both are listed for the lead in the r10 lane C report. No database change: queue.entry already carries the override fields.'
+release_tag: pending
+decision_owner: Chinmay
+status: open

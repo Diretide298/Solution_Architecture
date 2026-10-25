@@ -1520,3 +1520,18 @@ changes:
     tag: r10
     producer-tickets: ['28027', '31429']
     consumer-tickets: ['28043', '31470', '31471', '31472']
+  # BC-480 onward: r10 lane C (orders, shift, F&B, queue, access, AI, venue map, retail). Numbered from 480 so the
+  # r10 lanes, which add entries on separate branches the same day, do not collide on an id.
+  - id: BC-480
+    contract: queue
+    operation: redeemWaitingGuest
+    change: "x-ticvai-emits changed"
+    reason: 'ADAM CR-238, option B (CHG-R10ORD-007): redeemWaitingGuest no longer calls access.validateAccess across
+      deployables; for an entry with a Fast Pass entitlement it writes queueEntry.redeemed through the outbox and
+      Access consumes it (recordQueueRedemptionUse, new at r10, built on the Access side). Adding an emitted event is
+      labelled breaking by the check; the response is unchanged except that entitlementRemaining, already nullable,
+      is null.'
+    approved-by: 'Chinmay, 25 October 2026 (the 48 CRs settled that day; CR-238 option B)'
+    tag: r10
+    producer-tickets: [SVC-VENUEOPS-ENTRY-2]
+    consumer-tickets: [SVC-ACCESS-VALIDATION-2]

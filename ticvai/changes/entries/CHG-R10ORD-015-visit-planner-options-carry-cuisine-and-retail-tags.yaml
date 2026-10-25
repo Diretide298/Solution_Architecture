@@ -1,0 +1,40 @@
+id: CHG-R10ORD-015
+date: '2026-10-25'
+source: cr
+kind: contract
+summary: VisitPlannerOptions gains per-map cuisineTags (from published dining points) and retailTags (from published shops
+  and retail kiosks), in the shape of interestTags, so GST-051 and WEB-050 build the lunch and shop questions and the preferenceNotAtVenue
+  chip from getVisitPlannerOptions.
+decision:
+  what: 'ADAM CR-220, option A: per-map cuisineTags (published dining points: restaurant, cafe, food kiosk) and retailTags
+    (published shops and retail kiosks) on VisitPlannerOptions, beside interestTags, in the same {mapId, mapName, tags}
+    shape; additive; no new operation on the screen. contracts/satellite/venue-map.yaml VisitPlannerOptions and getVisitPlannerOptions.
+    The screen side (GST-051, WEB-050 bindings) is lane D''s.'
+  by: Chinmay
+  date: '2026-10-25'
+why: 'ADAM CR-220 (Chitrangi Mestry, #33038 GST-051, blocking), settled by the lead on 25 October 2026 (the 48 CRs settled
+  without a release; the decision is the comment the developers'' agents already build to). GST-051''s lunch and shop questions
+  and its preferenceNotAtVenue state need each park''s cuisine and retail tags, and no operation the screen declares returned
+  them.'
+keys_touched:
+  operations:
+  - getVisitPlannerOptions
+  schemas:
+  - VisitPlannerOptions
+  files:
+  - contracts/satellite/venue-map.yaml
+root_class: 'new: a screen value with no source'
+tickets:
+  started:
+  - '33038 (GST-051 planner): through CR-220''s comment; its text is not rewritten.'
+  unstarted: []
+adam_cr: CR-220
+triage: blocker
+prevention:
+  type: none
+  reason: Lane E of r10 adds the check for a screen value with no source (named for GST-051's cuisineTags and retailTags);
+    integration names it here once it lands.
+notes: 'Contract side only (lane C). No database change: computed on read from venuemap.point.'
+release_tag: pending
+decision_owner: Chinmay
+status: open

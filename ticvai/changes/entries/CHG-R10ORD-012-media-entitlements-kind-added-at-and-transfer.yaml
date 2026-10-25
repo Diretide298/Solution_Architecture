@@ -1,0 +1,47 @@
+id: CHG-R10ORD-012
+date: '2026-10-25'
+source: cr
+kind: contract
+summary: 'MediaEntitlements'' items get their sources: kind is the product''s kind read through catalogue#productRecords
+  and mapped onto the eight values, addedAt is the new access.entitlement.media_linked_at written when the media code is
+  set or rotated, and transferredToSubjectId is the subject of the entitlement that supersedes this one by transfer.'
+decision:
+  what: 'ADAM CR-226, option A: kind is the product''s kind, read through catalogue#productRecords (added to getMediaEntitlements''
+    read-via), mapped onto the eight values; addedAt is a new access.entitlement.media_linked_at, written when the media
+    code is set or rotated; transferredToSubjectId is the subject_id of the entitlement whose supersedes_entitlement_id
+    names this one with issued_via = transfer. contracts/spine/orders.yaml getMediaEntitlements and MediaEntitlements; contracts/spine/access.yaml
+    Entitlement.mediaLinkedAt.'
+  by: Chinmay
+  date: '2026-10-25'
+why: 'ADAM CR-226 (Pranay Shinde, #30686 getMediaEntitlements, not blocking), settled by the lead on 25 October 2026 (the
+  48 CRs settled without a release; the decision is the comment the developers'' agents already build to). kind, addedAt
+  and transferredToSubjectId had no table or declared read behind them; #30686 omits them until settled.'
+keys_touched:
+  operations:
+  - getMediaEntitlements
+  schemas:
+  - MediaEntitlements
+  - Entitlement
+  tables:
+  - access.entitlement
+  files:
+  - contracts/spine/orders.yaml
+  - contracts/spine/access.yaml
+root_class: 'new: a response field with no source'
+tickets:
+  started:
+  - '30686 (getMediaEntitlements): through CR-226''s comment; its text is not rewritten. Migration work: a child task of
+    the affected MIG ticket for Hrushikant Patkar, raised at the r10 release.'
+  unstarted: []
+adam_cr: CR-226
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-cross-module-reads.py
+notes: 'Database change: access.entitlement.media_linked_at (timestamptz, nullable). The mapping onto the eight kinds is
+  not spelled out in the decision: the admission kinds map to admission and membership, fnb, retail and rental to themselves;
+  bundle, addOn, giftCard and walletTopUp have no target, and locker, parking and experience have no product kind. Listed
+  for the lead; until then kind is omitted (it is optional) for those.'
+release_tag: pending
+decision_owner: Chinmay
+status: open

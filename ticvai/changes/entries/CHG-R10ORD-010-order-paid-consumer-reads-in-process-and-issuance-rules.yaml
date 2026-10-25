@@ -1,0 +1,58 @@
+id: CHG-R10ORD-010
+date: '2026-10-25'
+source: cr
+kind: contract
+summary: 'The rest of CR-167: order.paid v1 lines carry productId; issueOrderEntitlements reads Orders and Catalogue in
+  process as a workers consumer, adding catalogue#performanceRecords and the new catalogue#salesChannelRecords; the issuance
+  rules are written (one per unit, validity from the template and the performance, mediaCode minted at issue, the rotation
+  seed stored on the entitlement, subjectId nullable); paid to completed is triggered by entitlement.issued with the template
+  guard; check-cross-module-reads treats an event consumer as running in workers.'
+decision:
+  what: 'ADAM CR-167, option A: order.paid v1 additive (lineId, productId, performanceId per line); issueOrderEntitlements''
+    reads in process because the consumer runs in the workers host, which composes every module, adding catalogue#productRecords,
+    catalogue#performanceRecords and a new catalogue#salesChannelRecords; one entitlement per unit; valid_from/valid_to
+    from validityKind, offsets, expiryAnchor and the performance; mediaCode minted at issue; the rotation seed stored on
+    the entitlement (Entitlement.rotationSecret, access.entitlement.rotation_secret_ciphertext, field-encrypted); Entitlement.subjectId
+    null for a guest checkout (it was already nullable; it stays required, always present); states/order.yaml paid -> completed by entitlement.issued, guard ''every line with a
+    template holds quantity entitlements; lines without one need none''. tools/check-cross-module-reads.py: an operation
+    with x-ticvai-consumes runs in workers (XR-ROUTE).'
+  by: Chinmay
+  date: '2026-10-18'
+why: 'ADAM CR-167 (Hrushikant Patkar, #27701 PLATFORM-SAGA-PAID), accepted with option A on 18 October 2026 (the 34 accepted
+  CRs). r8 put lineId and performanceId on order.paid (FOUNDATION-AI-C04) and r9 cited CR-167 for the in-process pattern
+  (CHG-R9CR-005), but the reads still routed to service routes nobody built, productId, the performance and sales channel
+  reads, the issuance rules, the seed''s storage and the completion rule were not written.'
+keys_touched:
+  operations:
+  - issueOrderEntitlements
+  schemas:
+  - Entitlement
+  tables:
+  - access.entitlement
+  - catalogue.sales_channel
+  files:
+  - contracts/spine/access.yaml
+  - contracts/spine/catalogue.yaml
+  - events/order-paid.yaml
+  - events/entitlement-issued.yaml
+  - states/order.yaml
+  - tools/check-cross-module-reads.py
+  - docs/adr/0055-a-modular-monolith-deployed-as-five-units.md
+root_class: 'new: an event consumer''s reads routed to a host it does not run in'
+tickets:
+  started:
+  - '27701 (PLATFORM-SAGA-PAID): built to the CR''s ''build now''; its text is not rewritten.'
+  unstarted: []
+adam_cr: CR-167
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-cross-module-reads.py
+notes: 'Partly in r8/r9: lineId and performanceId on order.paid and the request (r8, FOUNDATION-AI-C04), the in-process
+  pattern (CHG-R9CR-005). Database change: access.entitlement.rotation_secret_ciphertext (text, nullable); access.entitlement.subject_id
+  was already nullable in the DDL. The mediaCode format and the source of a seasonEnd expiry anchor are not in the decision
+  and are listed for the lead. Cross-lane: catalogue#salesChannelRecords is declared in lane B''s contract; the rule text
+  of catalogue#productRecords, performanceRecords and variantRecords says the workers host asks them in process.'
+release_tag: pending
+decision_owner: Chinmay
+status: open

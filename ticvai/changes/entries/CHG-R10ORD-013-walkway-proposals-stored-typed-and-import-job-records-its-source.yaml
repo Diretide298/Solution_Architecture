@@ -1,0 +1,54 @@
+id: CHG-R10ORD-013
+date: '2026-10-25'
+source: cr
+kind: contract
+summary: ai.proposed_action and ProposedAction gain confidence, basis, reasoning, distance_metres and map_id (null on other
+  proposals), listProposedActions takes targetOperation and mapId filters, and venuemap.import_job and VenueMapImportJob
+  gain source_ref, format and created_at; proposeWalkways defaults to the latest import by created_at and its 409 is a pdf/svg/dwg/dxf
+  import with shapes found.
+decision:
+  what: 'ADAM CR-207, option A: the five ai.proposed_action columns and ProposedAction fields (null on other proposal kinds,
+    as translation drafts); listProposedActions targetOperation and mapId filters; venuemap.import_job source_ref, format,
+    created_at and VenueMapImportJob; importJobId defaults to the map''s latest import by created_at; 409 map-has-vector-geometry
+    when the import''s format is pdfPlan, svgPlan, dwgPlan or dxfPlan and shapes were found, a raster-only import goes ahead.
+    contracts/satellite/ai.yaml (proposeWalkways, listProposedActions, ProposedAction), contracts/satellite/venue-map.yaml
+    (VenueMapImportJob, importVenueGeometry).'
+  by: Chinmay
+  date: '2026-10-25'
+why: 'ADAM CR-207 (Surendra Loke, #28214 proposeWalkways, blocking), settled by the lead on 25 October 2026 (the 48 CRs
+  settled without a release; the decision is the comment the developers'' agents already build to). A segment''s confidence,
+  basis and map had no column, listProposedActions could not filter by map or operation, and the import job recorded neither
+  its source asset nor its format nor when it ran.'
+keys_touched:
+  operations:
+  - proposeWalkways
+  - listProposedActions
+  - importVenueGeometry
+  schemas:
+  - ProposedAction
+  - VenueMapImportJob
+  tables:
+  - ai.proposed_action
+  - venuemap.import_job
+  files:
+  - contracts/satellite/ai.yaml
+  - contracts/satellite/venue-map.yaml
+root_class: 'new: a response field with no source'
+tickets:
+  started:
+  - '28214 (proposeWalkways): through CR-207''s comment; its text is not rewritten. Migration work: a child task of the
+    affected MIG ticket for Hrushikant Patkar, raised at the r10 release.'
+  unstarted: []
+adam_cr: CR-207
+triage: blocker
+prevention:
+  type: none
+  reason: Lane E of r10 adds the check for a screen value with no source (bindsTo a field no declared operation answers);
+    integration names it here once it lands.
+notes: 'Database change: ai.proposed_action.confidence (numeric), basis (text, CHECK handMarked/seen), reasoning (text),
+  distance_metres (numeric), map_id (uuid); venuemap.import_job.source_ref (uuid), format (text, CHECK of the seven formats),
+  created_at (timestamptz). The decision calls the 409 ''has-vector-geometry''; the operation''s existing problem type map-has-vector-geometry
+  is kept (renaming a problem type breaks clients).'
+release_tag: pending
+decision_owner: Chinmay
+status: open

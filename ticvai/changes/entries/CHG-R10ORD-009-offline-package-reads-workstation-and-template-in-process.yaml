@@ -1,0 +1,61 @@
+id: CHG-R10ORD-009
+date: '2026-10-25'
+source: cr
+kind: contract
+summary: getOfflinePackage reads the session's access point (tenancy#workstationRecords) and each entitlement's reentryAllowed
+  and admissionRulesId (catalogue#entitlementTemplateRecords) in process, the access host composing Tenancy's and Catalogue's
+  queries (granted read XDR-003); performanceId is null until a source is decided; every Access operation reading the template
+  moves to in-process.
+decision:
+  what: 'ADAM CR-240, option A: getOfflinePackage declares x-ticvai-read-via tenancy#workstationRecords (access_point_id)
+    and catalogue#entitlementTemplateRecords (is_reentry_allowed, admission_rules_id), route in-process; the access host
+    composes TenancyModuleQueries and CatalogueModuleQueries as CR-167 lets the workers host (same tenant database, the
+    caller''s transaction and row security). performanceId is null until a source is decided. Option C (pin the template
+    values onto access.entitlement at issue) is later and separate. contracts/spine/access.yaml, docs/active/cross-deployable-writes.yaml
+    XDR-003, ADR-0055 amendment of 25 October, the two queries'' rule text.'
+  by: Chinmay
+  date: '2026-10-25'
+why: 'ADAM CR-240 (Hrushikant Patkar, #27706 getOfflinePackage, blocking), settled by the lead on 25 October 2026 (the 48
+  CRs settled without a release; the decision is the comment the developers'' agents already build to). The package needs
+  values Access does not store, read from the access deployable with no declared route, and tenancy#workstationRecords was
+  served in process only within commerce.'
+keys_touched:
+  operations:
+  - getOfflinePackage
+  - validateAccess
+  - validateGroupAccess
+  - lookupTicket
+  - getEntitlement
+  - listMyEntitlements
+  schemas:
+  - OfflinePackage
+  tables:
+  - platform.workstation
+  - catalogue.entitlement_template
+  files:
+  - contracts/spine/access.yaml
+  - contracts/spine/tenancy.yaml
+  - contracts/spine/catalogue.yaml
+  - docs/active/cross-deployable-writes.yaml
+  - docs/adr/0055-a-modular-monolith-deployed-as-five-units.md
+  - handoff/cross-deployable-writes.md
+root_class: 'new: a cross-deployable read with no route that is built'
+tickets:
+  started:
+  - '27706 (getOfflinePackage): through CR-240''s comment; its text is not rewritten.'
+  unstarted:
+  - 'The other Access operations reading the template: through their pointer bodies at the r10 tag.'
+adam_cr: CR-240
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-cross-module-reads.py
+notes: 'Sibling sweep: the 20 other Access operations that asked catalogue#entitlementTemplateRecords by a service route
+  that is not built (validateAccess, validateGroupAccess, lookupTicket, getEntitlement, listMyEntitlements and the BO read
+  models) read it in process under the same grant; issueOrderEntitlements reads it in process as a workers consumer (CHG-R10ORD-010).
+  Database change: a guarded GRANT SELECT on platform.workstation and catalogue.entitlement_template to the access role
+  (derive-ddl). Cross-lane: the rule text of tenancy#workstationRecords (lane A2''s contract) and catalogue#entitlementTemplateRecords
+  (lane B''s) says the access host asks it in process.'
+release_tag: pending
+decision_owner: Chinmay
+status: open

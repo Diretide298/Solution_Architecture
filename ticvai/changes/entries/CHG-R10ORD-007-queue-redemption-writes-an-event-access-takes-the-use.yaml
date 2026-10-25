@@ -1,0 +1,52 @@
+id: CHG-R10ORD-007
+date: '2026-10-25'
+source: cr
+kind: contract
+summary: 'redeemWaitingGuest no longer calls access.validateAccess: for an entry with a Fast Pass entitlement it writes
+  queueEntry.redeemed through the outbox (entitlementId, the queue''s accessPointId), Access consumes it with the new internal
+  operation recordQueueRedemptionUse and takes the use, and entitlementRemaining is null.'
+decision:
+  what: 'ADAM CR-238, option B: events/queueEntry-redeemed.yaml (publisher queue, consumer access, idempotency entryId,
+    critical); queue redeemWaitingGuest writes platform.outbox and emits it, entitlementRemaining null, offline the event
+    goes at sync; access recordQueueRedemptionUse (POST /internal/queue-redemptions, serviceAuth, x-ticvai-consumes queueEntry.redeemed)
+    takes one use as validateAccess would; states/queue-entry.yaml called -> redeemed emits it; states/entitlement-status.yaml
+    gains the three consumption transitions by recordQueueRedemptionUse.'
+  by: Chinmay
+  date: '2026-10-25'
+why: 'ADAM CR-238 (Surendra Loke, #33059 redeemWaitingGuest, blocking), settled by the lead on 25 October 2026 (the 48 CRs
+  settled without a release; the decision is the comment the developers'' agents already build to). The operation called
+  access.validateAccess across deployables (operations to access, ADR-0055) with no declared route and no serviceAuth built
+  (CR-174, CR-196), and a write into Access''s entitlement from Queue would cross the module boundary.'
+keys_touched:
+  operations:
+  - redeemWaitingGuest
+  - recordQueueRedemptionUse
+  schemas:
+  - QueueRedemptionResult
+  tables:
+  - queue.entry
+  - access.entitlement
+  - platform.outbox
+  files:
+  - contracts/satellite/queue.yaml
+  - contracts/spine/access.yaml
+  - events/queueEntry-redeemed.yaml
+  - states/queue-entry.yaml
+  - states/entitlement-status.yaml
+root_class: 'new: a call into another deployable with no route'
+tickets:
+  started:
+  - '33059 (redeemWaitingGuest): through CR-238''s comment; its text is not rewritten.'
+  unstarted:
+  - 'recordQueueRedemptionUse: the Access consumer, a new operation built on the Access side; its ticket is created at the
+    r10 release.'
+adam_cr: CR-238
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-states.py
+notes: Whether overrideWaitingGuest, which now admits, also writes the event for a Fast Pass entry is not in the decision;
+  listed for the lead. No database change.
+release_tag: pending
+decision_owner: Chinmay
+status: open

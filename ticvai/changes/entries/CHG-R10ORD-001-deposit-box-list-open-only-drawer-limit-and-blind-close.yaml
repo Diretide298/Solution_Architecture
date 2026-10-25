@@ -1,0 +1,44 @@
+id: CHG-R10ORD-001
+date: '2026-10-25'
+source: cr
+kind: contract
+summary: listDepositBoxes defines openOnly (the boxes not yet closed), reads the workstation's and the venue's cashDrawerLimit
+  in process, defines a trading box's expected cash for overDrawerLimit, and DepositBox.expectedTotal and variance follow
+  the blind close (null without OVERSHORT_ACCEPT or SHIFT_CLOSE_OTHER).
+decision:
+  what: 'ADAM CR-218, option A: (1) openOnly=true returns allocated, open, suspended and closing boxes, and the description
+    says so; (2) listDepositBoxes reads tenancy#workstationRecords and tenancy#venueSettingsRecords in process; while a
+    box trades its expected cash is opening float + cash payments on the box''s shift - change given - withdrawn_amount,
+    and overDrawerLimit compares it with the workstation''s cashDrawerLimit, else the venue''s; (3) expectedTotal and variance
+    are returned only to OVERSHORT_ACCEPT or SHIFT_CLOSE_OTHER, null to everyone else including the box''s own cashier.
+    contracts/spine/shift.yaml listDepositBoxes and DepositBox.'
+  by: Chinmay
+  date: '2026-10-25'
+why: 'ADAM CR-218 (Pranay Shinde, #32644 listDepositBoxes, blocking), settled by the lead on 25 October 2026 (the 48 CRs
+  settled without a release; the decision is the comment the developers'' agents already build to). openOnly was undefined
+  and contradicted by the description, overDrawerLimit had no declared read of the limits and no running expected figure,
+  and DepositBox''s expected figure and variance reached the box''s own cashier, which the blind close (CHG-FIN-003) withholds
+  on the shift.'
+keys_touched:
+  operations:
+  - listDepositBoxes
+  schemas:
+  - DepositBox
+  files:
+  - contracts/spine/shift.yaml
+root_class: 'new: a computed flag with no declared read of its inputs'
+tickets:
+  started:
+  - '32644 (listDepositBoxes): through CR-218''s comment, as CHG-ADM-002 says; its text is not rewritten.'
+  unstarted: []
+adam_cr: CR-218
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-cross-module-reads.py
+notes: 'Siblings: the blind rule is on the DepositBox schema, so every operation answering DepositBox (allocateDepositBox,
+  adjustDepositBoxFloat, withdrawFromDepositBox, closeDepositBoxes) follows it. check-cross-module-reads XR-FACT names "venue''s
+  cashDrawerLimit"; the declared reads cover it. No database change: expected_amount and variance_amount are unchanged columns.'
+release_tag: pending
+decision_owner: Chinmay
+status: open

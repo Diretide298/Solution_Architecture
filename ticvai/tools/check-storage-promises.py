@@ -295,9 +295,16 @@ def main() -> int:
         # the persisted schema may carry the marker where the request does not (derive-ddl reads both)
         resource = re.sub(r"^(Create|Update)(\w+)Request$", r"\2", g.ref_name(str(req.get("$ref") or "")))
         rprops = props_of({"$ref": f"#/components/schemas/{resource}"}, f["contract"], by) if resource else {}
+        together = set()
         for k, n in body_schemas(op):                    # an inline request: the resource it answers with
             if k == "res" and isinstance(n, dict) and n.get("$ref"):
                 rprops = {**props_of(n, f["contract"], by), **rprops}
+                # **A field unique together with another is kept too** (ADAM CR-104, 25 October 2026, CHG-R10ORD-017):
+                # retail.merchandise's barcode and SKU are unique per outlet, `x-ticvai-unique-together: [[outletId,
+                # barcode], ...]` on the resource, which derive-ddl writes as a unique index over both columns.
+                rnode, _ = deref(n, f["contract"], by)
+                together = {str(x) for grp in ((rnode or {}).get("x-ticvai-unique-together") or [])
+                            if isinstance(grp, list) for x in grp}
                 break
         if "$ref" in r409:
             # the shared `DuplicateCode` 409 is a uniqueness promise too: some field must carry the marker
@@ -326,6 +333,8 @@ def main() -> int:
             continue
         level = next((lvl for lvl, rx in SCOPE_WORDS if rx.search(desc)), "tenant")
         for p in named:
+            if p in together:
+                continue
             mark = props[p].get("x-ticvai-unique")
             if mark is None:
                 mark = (rprops.get(p) or {}).get("x-ticvai-unique")

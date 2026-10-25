@@ -1,0 +1,67 @@
+id: CHG-R10ORD-008
+date: '2026-10-25'
+source: cr
+kind: contract
+summary: Every F&B operation that answers Money reads the venue's currency through tenancy#venueSettingsRecords (or regionSettingsRecords)
+  in process, the operations host composing Tenancy's queries as the workers host does (granted read XDR-004); mergeTableVisits
+  says which visits are closed (409), and refuses a self-merge or a cross-outlet merge (400).
+decision:
+  what: 'ADAM CR-234, option A: an in-process read of Tenancy''s venue currency (tenancy#venueSettingsRecords / regionSettingsRecords)
+    for mergeTableVisits and every other F&B operation that answers Money; the operations host registers Tenancy''s in-process
+    queries as the workers host does (IModuleQueries); reads run under the caller''s row-level security. Closed means settled,
+    merged or cancelled (billRequested is open): 409. A self-merge is 400; both visits at the same outlet, else 400. contracts/satellite/fnb.yaml
+    (67 operations: 51 gain the read, 16 existing venue/region settings reads move from service to in-process), docs/active/cross-deployable-writes.yaml
+    XDR-004 (operations SELECT on platform.venue_settings and platform.region_settings), ADR-0055 amendment of 25 October,
+    the two queries'' rule text in contracts/spine/tenancy.yaml.'
+  by: Chinmay
+  date: '2026-10-25'
+why: 'ADAM CR-234 (Surendra Loke, #28586 mergeTableVisits, blocking), settled by the lead on 25 October 2026 (the 48 CRs
+  settled without a release; the decision is the comment the developers'' agents already build to). F&B runs in operations
+  and Tenancy in commerce (ADR-0055); mergeTableVisits answered Money (runningTotal, order amounts) with no declared currency
+  read, the service route is not built (CR-174, CR-196), and the closed states, a self-merge and a cross-outlet merge were
+  not defined.'
+keys_touched:
+  operations:
+  - mergeTableVisits
+  - applyMenuActions
+  - getBill
+  - getTableVisit
+  - listFnbOrders
+  - createFnbOrder
+  - getGuestMenu
+  - listMenus
+  - splitBill
+  - closeTableVisit
+  tables:
+  - platform.venue_settings
+  - platform.region_settings
+  files:
+  - contracts/satellite/fnb.yaml
+  - contracts/spine/tenancy.yaml
+  - docs/active/cross-deployable-writes.yaml
+  - docs/adr/0055-a-modular-monolith-deployed-as-five-units.md
+  - handoff/cross-deployable-writes.md
+  other:
+  - 'XDR-004: the 67 F&B operations are listed in docs/active/cross-deployable-writes.yaml'
+root_class: 'new: Money answered with no currency source'
+tickets:
+  started:
+  - '28586 (mergeTableVisits): through CR-234''s comment; its text is not rewritten. Started F&B tickets whose operations
+    gained the read get it at their next pull (CHG-ADM-001).'
+  unstarted:
+  - 'The other F&B operations: through their pointer bodies at the r10 tag.'
+adam_cr: CR-234
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-cross-module-reads.py
+notes: 'Sibling sweep: every operation in contracts/satellite/fnb.yaml whose response reaches common Money (59) gained the
+  read or had its existing one moved to in-process, and applyMenuActions, which accepts Money; every other venue/region
+  settings read in fnb.yaml moved to in-process too (the grant covers the query, not one operation). Lane E''s r10 check
+  for Money with no currency source is the class prevention; check-cross-module-reads XR-ROUTE fails an in-process read
+  across deployables that no grant covers. Database change: a guarded GRANT SELECT on platform.venue_settings and platform.region_settings
+  to the operations role (derive-ddl, as XDR-001). backend-patterns (ADAM''s starter docs) is not in the package; ADR-0055
+  states the composition.'
+release_tag: pending
+decision_owner: Chinmay
+status: open
