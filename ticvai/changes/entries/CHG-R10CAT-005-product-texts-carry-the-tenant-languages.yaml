@@ -1,0 +1,42 @@
+id: CHG-R10CAT-005
+date: '2026-10-25'
+source: cr
+kind: contract
+summary: 'ProductChannelTexts answers enabledLanguages (the tenant''s published languages, or the draft''s before the
+  first publish), so B1-S06 draws one block per language from one call under PRODUCT_VIEW at venue scope.
+  setProductChannelTexts and getProductChannelTexts read the languages on WhiteLabel''s service route, which answers
+  at the tenant root, not under the caller''s row security, so a venue product administrator works before the first
+  publish; the draft config stays tenant-root only. Product.nameLocalised means the tenant''s enabled languages.'
+decision:
+  what: 'ADAM CR-213, option A, the resolution of 25 October 2026. contracts/spine/catalogue.yaml: ProductChannelTexts
+    enabledLanguages (read-only, derived on read); getProductChannelTexts and setProductChannelTexts descriptions;
+    Product.nameLocalised wording. contracts/satellite/white-label.yaml (lane A2, minimal): tenantConfigRecords''
+    rule says the service route answers at the tenant root and only the languages are used.'
+  by: Chinmay
+  date: '2026-10-25'
+why: 'ADAM CR-213 (Surendra Loke, #36212), settled 25 October 2026: whitelabel.tenant_config is tenant-root only, so a
+  venue-scoped PRODUCT_CONFIGURE caller saw no row and every language was refused before the first publish; no staff
+  read of the languages existed below TENANT_CONFIGURE; Product.nameLocalised still said the venue''s languages against
+  CHG-R8PRD-009.'
+keys_touched:
+  operations: [getProductChannelTexts, setProductChannelTexts]
+  schemas: [ProductChannelTexts, Product]
+  tables: [whitelabel.tenant_config, whitelabel.config_version]
+  files:
+  - contracts/spine/catalogue.yaml
+  - contracts/satellite/white-label.yaml
+root_class: 'row security too narrow for a read another module needs'
+tickets:
+  started: []
+  unstarted:
+  - '36212 (translatable product texts per channel): CR-213''s comment; its pointer body picks the fix up at r10.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-213
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-cross-module-reads.py
+status: open
+notes: 'No database change (enabledLanguages is not persisted). White-label''s tenantConfigRecords stays served by
+  service only; its rule now says what the service route''s tenant-root context means for a venue-scoped asker.'

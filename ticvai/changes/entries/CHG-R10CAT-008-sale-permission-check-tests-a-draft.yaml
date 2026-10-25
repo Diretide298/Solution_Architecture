@@ -1,0 +1,34 @@
+id: CHG-R10CAT-008
+date: '2026-10-25'
+source: cr
+kind: contract
+summary: 'SalePermissionCheckRequest takes an optional rules (a draft ProductSalePermissionRuleSet), evaluated instead
+  of the saved set by the same engine; the result names the deciding draft rule by decidedByRuleIndex, and
+  decidedByRuleId stays for saved rules.'
+decision:
+  what: 'ADAM CR-215, option A, the resolution of 25 October 2026. contracts/spine/catalogue.yaml:
+    SalePermissionCheckRequest.rules, SalePermissionCheckResult.results[].decidedByRuleIndex, the
+    checkProductSalePermission description.'
+  by: Chinmay
+  date: '2026-10-25'
+why: 'ADAM CR-215 (Surendra Loke, #36215), settled 25 October 2026: the operation promised to test a rule set before
+  saving it and its request carried no rules.'
+keys_touched:
+  operations: [checkProductSalePermission]
+  schemas: [SalePermissionCheckRequest, SalePermissionCheckResult]
+  files:
+  - contracts/spine/catalogue.yaml
+root_class: 'a promise in the text the request cannot carry'
+tickets:
+  started: []
+  unstarted:
+  - '36215 (who can sell a product, screens): CR-215''s comment; its pointer body picks the fix up at r10.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-215
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-contract-compat.py
+status: open
+notes: 'Additive (an optional request field and an optional response field). No database change.'

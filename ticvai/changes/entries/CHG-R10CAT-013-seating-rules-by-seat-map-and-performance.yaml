@@ -1,0 +1,45 @@
+id: CHG-R10CAT-013
+date: '2026-10-25'
+source: cr
+kind: contract
+summary: 'getSeatRecommendationRules takes optional seatMapId and performanceId and answers the rules in force,
+  falling back from the performance''s row to the seat map''s to the venue default (the schema defaults); both seating
+  GETs answer defaults when nothing is saved, never 404; seating.accessible is unique on seat_map_id and
+  seating.recommendation_rule on (seat_map_id, performance_id) with a null performance counted once.'
+decision:
+  what: 'ADAM CR-112, option 1, accepted 15 October 2026 (the DECISION line; recommendation_rule.profiles was already
+    in r6). contracts/satellite/seating.yaml: getSeatRecommendationRules parameters, fallback and 400
+    seat-map-required; getAccessibleSeating defaults; setSeatRecommendationRules keyed by seatMapId and performanceId;
+    AccessibleSeating x-ticvai-unique-together [seatMapId]; SeatRecommendationRules [seatMapId, performanceId] with
+    x-ticvai-unique-nulls not-distinct.'
+  by: Chinmay
+  date: '2026-10-15'
+why: 'ADAM CR-112 (Deep Khanvilkar, #28109 getAccessibleSeating, getSeatRecommendationRules), accepted 15 October
+  2026 for the next release and moved to r10.'
+keys_touched:
+  operations: [getSeatRecommendationRules, setSeatRecommendationRules, getAccessibleSeating]
+  schemas: [SeatRecommendationRules, AccessibleSeating]
+  tables: [seating.accessible, seating.recommendation_rule]
+  files:
+  - contracts/satellite/seating.yaml
+root_class: 'missing keys on singletons'
+tickets:
+  started: []
+  unstarted:
+  - '28109: CR-112''s settlement; its pointer body picks the fix up at r10.'
+  - 'MIG-SEATING (accessible, recommendation_rule): a child task for Hrushikant Patkar for the two unique indexes; a
+    database holding duplicates must be cleaned first. Not applied while server databases are frozen.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-112
+triage: blocker
+prevention:
+  type: generator-rule
+  ref: tools/derive-ddl.py::x-ticvai-unique-together
+status: open
+notes: 'Database (generated): accessible_seat_map_id_uniq (seat_map_id) and recommendation_rule_seat_map_id_performance_id_uniq
+  (seat_map_id, performance_id) NULLS NOT DISTINCT. The decision says partial unique indexes; the generator''s
+  x-ticvai-unique-when takes only value conditions (no IS NOT NULL), so the same effect is reached with plain unique
+  indexes: a null seat_map_id never collides on accessible, and on recommendation_rule NULLS NOT DISTINCT lets a seat
+  map have one row of its own. A venue default row cannot be saved (seatMapId is required in fact), so the venue
+  default is the schema''s defaults.'

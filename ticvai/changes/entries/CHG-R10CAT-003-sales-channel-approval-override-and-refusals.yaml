@@ -1,0 +1,51 @@
+id: CHG-R10CAT-003
+date: '2026-10-25'
+source: cr
+kind: contract
+summary: 'publishChannelReadinessValidation routes a channel''s approval through the approvals engine
+  (configurationChange, subject salesChannel): submitForApproval raises the request, scheduleActivation and activate
+  from pendingApproval take its approvalRequestId and are refused 409 approval-required without an approved one.
+  Warnings pass only with the new SALES_CHANNEL_OVERRIDE and a reason. 409 invalid-channel-transition, 422
+  critical-issue-blocks-activation / reason-required / scheduled-at-invalid. The view''s status is the five
+  SalesChannelProfile values, a preview property carries the chain, and the channel activation job in the workers
+  host moves scheduled to active.'
+decision:
+  what: 'ADAM CR-211, option A, the resolution of 25 October 2026. contracts/spine/catalogue.yaml
+    publishChannelReadinessValidation: x-ticvai-read-via approvals#requestRecords (in-process), the approval request raised
+    through approvals.createApprovalRequest (Approvals runs in commerce too, so no write-via), x-ticvai-permission-escalated SALES_CHANNEL_OVERRIDE, the rules, 403,
+    409 and 422; the input''s approvalRequestId; the view''s status enum, approvalRequestId and preview.
+    contracts/shared/permissions.yaml: SALES_CHANNEL_OVERRIDE in the enum and the Catalogue module group.
+    states/sales-channel.yaml: the guards, scheduled -> active by the job. contracts/spine/approvals.yaml (lane A1,
+    minimal): requestRecords served in process too; the sales-channel subject named in ApprovalKind''s list.'
+  by: Chinmay
+  date: '2026-10-25'
+why: 'ADAM CR-211 (Surendra Loke, #29762), settled 25 October 2026: no approval route, no named override
+  permission, no refusal errors, two status vocabularies and no preview field (the state model''s requiresApproval
+  could not be built).'
+keys_touched:
+  operations: [publishChannelReadinessValidation]
+  schemas: [ChannelPublicationReadinessAiValidationInput, ChannelPublicationReadinessAiValidationView,
+    SalesChannelProfile, Permission]
+  tables: [catalogue.sales_channel, approvals.request, catalogue.audit_entry]
+  files:
+  - contracts/spine/catalogue.yaml
+  - contracts/shared/permissions.yaml
+  - contracts/spine/approvals.yaml
+  - states/sales-channel.yaml
+root_class: 'undecided rule: a requiresApproval transition with no way for the approval to enter'
+tickets:
+  started: []
+  unstarted:
+  - '29762 (publishChannelReadinessValidation, setChannelFeePayment): CR-211''s comment; its pointer body picks the fix
+    up at r10.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-211
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-states.py
+status: open
+notes: 'check-states rule 14 holds the requiresApproval transitions to a granted approvalRequestId with 409
+  approval-required. No database change: activation_scheduled_at and status exist. A role gets SALES_CHANNEL_OVERRIDE
+  by ticking it in the Catalogue module group (no seed preset is changed).'

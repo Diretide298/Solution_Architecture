@@ -1,0 +1,45 @@
+id: CHG-R10CAT-002
+date: '2026-10-25'
+source: cr
+kind: contract
+summary: 'A promotions bundle is published when promotions.bundle.variant_id is set and withdrawn when is_active is
+  false; a guest sees it (getGuestBundle, and getBundle for a guest) only when published, active and inside its
+  validity window, else 404. The publication step is named: the first isActive true on updateBundle for a bundle with
+  no variant creates the bundle''s catalogue product (kind bundle, one variant) and writes variant_id. Bundle Money
+  reads the venue''s currency and scale through tenancy#venueSettingsRecords in process.'
+decision:
+  what: 'ADAM CR-197, option B, the resolution of 25 October 2026. contracts/satellite/promotions.yaml: getGuestBundle
+    and getBundle x-ticvai-read-via tenancy#venueSettingsRecords (in-process) and the published rule; getGuestBundle
+    x-ticvai-reads promotions.bundle; updateBundle the publication step (createBundle stores a bundle unpublished,
+    variant_id null and is_active false) and x-ticvai-writes catalogue.product and catalogue.variant (Promotions runs
+    in CatalogueService); Bundle.variantId described as the published mark, written once, never cleared.'
+  by: Chinmay
+  date: '2026-10-25'
+why: 'ADAM CR-197 (Chinmay Patkar, #36301 getGuestBundle), settled 25 October 2026. getGuestBundle 404s a draft,
+  unpublished or withdrawn bundle, but promotions.bundle stores no such state and nothing set variant_id (r8,
+  CHG-R8MIG-023: "null until published"); GuestBundle Money had no declared currency read (ADR-0055 rule 2).'
+keys_touched:
+  operations: [getGuestBundle, getBundle, updateBundle, createBundle]
+  schemas: [Bundle, GuestBundle]
+  tables: [promotions.bundle, catalogue.product, catalogue.variant, platform.venue_settings]
+  files:
+  - contracts/satellite/promotions.yaml
+root_class: 'undecided rule: a state an operation refuses on that no column records'
+tickets:
+  started: []
+  unstarted:
+  - '36301 (getGuestBundle, New at the 22 October read): CR-197''s comment; its pointer body picks the fix up at r10.'
+  - '28023 (publishBundle, updateBundle): the publication step lands on updateBundle; its text is not rewritten.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-197
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-cross-module-reads.py
+status: open
+notes: 'The step that sets variant_id did not exist; the decision says to name it, and the bundle''s first isActive
+  true on updateBundle is the step chosen (the bundle''s product is made when it is first put on sale, as
+  transport.createTransportRoute makes its route''s product). createBundle takes no isActive, and now stores false. No
+  database change: variant_id and is_active exist. Sibling Money reads on other promotions reads are lane E''s
+  "Money with no currency read" sweep.'
