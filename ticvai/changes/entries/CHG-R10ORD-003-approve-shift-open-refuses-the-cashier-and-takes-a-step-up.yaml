@@ -1,0 +1,36 @@
+id: CHG-R10ORD-003
+date: '2026-10-25'
+source: cr
+kind: contract
+summary: approveShiftOpen refuses the principal who opened the shift (403 approver-is-cashier) and takes a supervisor PIN
+  step-up in the body, verified through identity#verifySupervisorStepUp, as acceptShiftVariance does.
+decision:
+  what: 'ADAM CR-200, option A: approveShiftOpen refuses the cashier who opened the shift (403 approver-is-cashier) and
+    takes supervisorStepUp (x-ticvai-step-up pin, carrier body:supervisorStepUp, read via identity#verifySupervisorStepUp
+    in process), refused without it (403 supervisor-step-up-refused). contracts/spine/shift.yaml.'
+  by: Chinmay
+  date: '2026-10-21'
+why: 'ADAM CR-200 (Pranay Shinde, #30805 approveShiftOpen), accepted with option A on 21 October 2026 (the 34 accepted CRs):
+  every other approval on a shift names who may not approve and how the approver proves presence, and approveShiftOpen is
+  called on the cashier''s own till (POS-001), so a cashier holding SHIFT_APPROVE_OPEN could approve their own out-of-tolerance
+  float.'
+keys_touched:
+  operations:
+  - approveShiftOpen
+  files:
+  - contracts/spine/shift.yaml
+root_class: 'new: an approval that does not say who may not approve'
+tickets:
+  started:
+  - '30805 (approveShiftOpen): built to the CR''s ''what to do now''; its text is not rewritten.'
+  unstarted: []
+adam_cr: CR-200
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-step-up.py
+notes: 'POS-001 needs the supervisor PIN prompt for the approval: a visible change on an approved screen, which is lane
+  D''s (screens) to log against CR-200 in approved-ui-changes.yaml; listed as cross-lane in the r10 lane C report.'
+release_tag: pending
+decision_owner: Chinmay
+status: open

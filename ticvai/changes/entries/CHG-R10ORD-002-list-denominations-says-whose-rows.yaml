@@ -1,0 +1,34 @@
+id: CHG-R10ORD-002
+date: '2026-10-25'
+source: cr
+kind: contract
+summary: 'listDenominations says whose denominations it returns: the trading currency of each region the caller can see,
+  each valued at its region''s scale.'
+decision:
+  what: 'ADAM CR-219, option A, as built: listDenominations returns the denominations of the trading currency of each region
+    the caller can see (its own region for a venue caller, every region for the tenant root), each valued at its region''s
+    scale; the sentence is added to the description in contracts/spine/shift.yaml.'
+  by: Chinmay
+  date: '2026-10-25'
+why: 'ADAM CR-219 (Pranay Shinde, #32643 listDenominations, not blocking), settled by the lead on 25 October 2026 (the 48
+  CRs settled without a release; the decision is the comment the developers'' agents already build to). platform.denomination
+  is grant-holder-read, so without a stated rule a Dubai till could list Muscat''s OMR coins it cannot price.'
+keys_touched:
+  operations:
+  - listDenominations
+  files:
+  - contracts/spine/shift.yaml
+root_class: 'new: a list that does not say whose rows it returns'
+tickets:
+  started:
+  - '32643 (listDenominations): through CR-219''s comment; its text is not rewritten.'
+  unstarted: []
+adam_cr: CR-219
+triage: fix-forward
+prevention:
+  type: none
+  reason: A sentence saying whose rows a list returns under row security; no check can judge that the rule is the intended
+    one. The row-level security and the declared regionSettingsRecords read stand as they were.
+release_tag: pending
+decision_owner: Chinmay
+status: open

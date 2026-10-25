@@ -1,0 +1,31 @@
+id: CHG-R10ORD-004
+date: '2026-10-25'
+source: cr
+kind: contract
+summary: listShifts orders newest first by coalesce(recordedAt, openedAt), then id, and its cursor encodes that value.
+decision:
+  what: 'ADAM CR-206, option A: ORDER BY coalesce(recorded_at, opened_at) DESC, id, and the same value in PageCursor. contracts/spine/shift.yaml
+    listShifts.'
+  by: Chinmay
+  date: '2026-10-21'
+why: 'ADAM CR-206 (Pranay Shinde, #32645 listShifts), accepted with option A on 21 October 2026: recordedAt is optional
+  on openShift and nullable on orders.pos_shift, so a shift opened online had no place in ''newest first by recordedAt''.'
+keys_touched:
+  operations:
+  - listShifts
+  files:
+  - contracts/spine/shift.yaml
+root_class: 'new: an order on a nullable field'
+tickets:
+  started:
+  - '32645 (listShifts): built to the CR''s ''what to do now''; its text is not rewritten.'
+  unstarted: []
+adam_cr: CR-206
+triage: fix-forward
+prevention:
+  type: none
+  reason: Lane E of r10 adds the check for an order on a nullable field (named for listShifts and listMyWaitingGuests);
+    integration replaces this with its ref once it lands.
+release_tag: pending
+decision_owner: Chinmay
+status: open

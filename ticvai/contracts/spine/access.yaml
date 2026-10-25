@@ -1649,6 +1649,86 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /internal/queue-redemptions:
+    post:
+      operationId: recordQueueRedemptionUse
+      x-ticvai-writes:
+      - table: access.entitlement
+        for: 'the Fast Pass entitlement''s use: entriesUsed, lastEntryAt, firstEntryAt and its status (ADAM CR-238)'
+      x-ticvai-reads:
+      - table: access.entitlement
+        for: 'the entitlement named by the event (ADAM CR-238)'
+      security:
+      - serviceAuth: []
+      x-ticvai-audience:
+      - service
+      x-ticvai-auth: service
+      summary: Take a Fast Pass's use when its queue entry is redeemed
+      description: '**The `queueEntry.redeemed` consumer, modelled as an operation so it has lineage and a ticket**
+        (ADAM CR-238, option B; Chinmay, 25 October 2026; CHG-R10ORD-007). Queue''s `redeemWaitingGuest` no longer
+        calls `validateAccess` across deployables; it writes `queueEntry.redeemed` through the outbox, and Access, which
+        owns `access.entitlement`, takes the use here. Run by the `workers` host, which runs every module''s consumers
+        (ADR-0055). Invoked by the event relay with the event''s payload, never by a screen.
+
+
+        **One use, as `validateAccess` would have taken at the queue''s access point**: `entriesUsed` goes up by one,
+        `lastEntryAt` (and `firstEntryAt`, where it was null) take the event''s `recordedAt`, and the status moves as
+        `states/entitlement-status.yaml` says (`issued` to `partiallyConsumed` or `fullyConsumed`,
+        `partiallyConsumed` to `fullyConsumed`). An entitlement already `fullyConsumed`, `expired`, `cancelled` or
+        `surrendered` takes no use and the event is recorded as handled, not retried: the party was admitted at the
+        ride and the redemption stands. **Idempotent on `entryId`**: a redelivered event finds the use already taken
+        and changes nothing. A failure is retried, then dead-lettered.'
+      tags:
+      - validation
+      x-ticvai-permission: null
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-consumes:
+      - queueEntry.redeemed
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - eventId
+              - entryId
+              - entitlementId
+              - recordedAt
+              properties:
+                eventId:
+                  type: string
+                  description: The `queueEntry.redeemed` event id, for the consumer's inbox record.
+                entryId:
+                  type: string
+                  format: uuid
+                  description: The redeemed queue entry, from the event; the consumer's idempotency key.
+                entitlementId:
+                  type: string
+                  format: uuid
+                accessPointId:
+                  type: string
+                  format: uuid
+                  nullable: true
+                  description: The queue's access point, from the event.
+                admittedCount:
+                  type: integer
+                  minimum: 1
+                  nullable: true
+                recordedAt:
+                  type: string
+                  format: date-time
+      responses:
+        '204':
+          description: The use is taken, or was already taken for this entry, or the entitlement had none left to take.
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /parking-entitlements:
     post:
       operationId: createParkingEntitlement

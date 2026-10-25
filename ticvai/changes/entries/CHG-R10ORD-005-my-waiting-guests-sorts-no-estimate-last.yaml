@@ -1,0 +1,34 @@
+id: CHG-R10ORD-005
+date: '2026-10-25'
+source: cr
+kind: contract
+summary: listMyWaitingGuests orders by estimatedCallAt with entries that have none last (NULLS LAST), then joinedAt, then
+  id, the cursor encodes it, and a signed-in caller with no guest subject gets an empty list, not 401.
+decision:
+  what: 'ADAM CR-236, option A, as built: ORDER BY estimated_call_at ASC NULLS LAST, joined_at, id, encoded in the cursor;
+    a staff session (no guest subject) gets an empty list. contracts/satellite/queue.yaml listMyWaitingGuests.'
+  by: Chinmay
+  date: '2026-10-25'
+why: 'ADAM CR-236 (Surendra Loke, #33057 listMyWaitingGuests, not blocking), settled by the lead on 25 October 2026 (the
+  48 CRs settled without a release; the decision is the comment the developers'' agents already build to). WaitingGuest.estimatedCallAt
+  is nullable and the order did not place a null; the operation accepts bearerAuth and did not say what a staff session
+  gets.'
+keys_touched:
+  operations:
+  - listMyWaitingGuests
+  files:
+  - contracts/satellite/queue.yaml
+root_class: 'new: an order on a nullable field'
+tickets:
+  started:
+  - '33057 (listMyWaitingGuests): through CR-236''s comment; its text is not rewritten.'
+  unstarted: []
+adam_cr: CR-236
+triage: fix-forward
+prevention:
+  type: none
+  reason: Lane E of r10 adds the check for an order on a nullable field (named for listShifts and listMyWaitingGuests);
+    integration replaces this with its ref once it lands.
+release_tag: pending
+decision_owner: Chinmay
+status: open
