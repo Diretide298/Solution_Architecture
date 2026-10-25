@@ -1,0 +1,37 @@
+id: CHG-R10CAT-016
+date: '2026-10-25'
+source: cr
+kind: contract
+summary: 'The lead confirmed lane B''s four readings of the 25 October decisions as the package states them: CR-197''s
+  publishing step is the bundle''s first isActive true; CR-212 maps accountCredit to storedValue and b2bCredit to
+  onAccount; CR-110''s version stays a decimal string; CR-112 uses plain unique indexes. No contract text changes; the
+  entries that made them record the confirmation.'
+decision:
+  what: 'The lead''s answer to r10 question 15 (the recommended answer, "confirm all four", accepted 25 October 2026).
+    changes/entries CHG-R10CAT-002, -004, -010 and -013: the notes record the confirmation.'
+  by: Chinmay
+  date: '2026-10-25'
+why: 'ADAM CR-197, CR-212, CR-110 and CR-112, built by this lane with a reading the decisions left open
+  (CHG-R10CAT-002, -004, -010, -013); the lead''s questions of 25 October (the r10 lead questions,
+  question 15). The checks that hold the confirmed text are named by the entries that made it; this entry adds
+  none.'
+keys_touched:
+  operations: [updateBundle, setChannelFeePayment, publishBundle, setSeatRecommendationRules]
+  files:
+  - changes/entries/CHG-R10CAT-002-guest-bundle-published-by-its-variant.yaml
+  - changes/entries/CHG-R10CAT-004-channel-fee-payment-reads-approved-methods-and-media-profiles.yaml
+  - changes/entries/CHG-R10CAT-010-catalogue-bundle-version-publisher-and-split.yaml
+  - changes/entries/CHG-R10CAT-013-seating-rules-by-seat-map-and-performance.yaml
+root_class: 'a reading of a decision, confirmed'
+tickets:
+  started: []
+  unstarted:
+  - '36301, 29762, 28023, 28109: nothing changes for them; the package already says what was confirmed.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-197, CR-212, CR-110, CR-112
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-changelog.py
+status: open

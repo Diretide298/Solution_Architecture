@@ -34,5 +34,5 @@ prevention:
   ref: tools/check-cross-module-reads.py
 status: open
 notes: 'No database change. Siblings: the only guest operations whose responses carry ProductMedia are the three
-  named. Open: the read crosses deployables on the service route, which is not built yet (CR-174); until it is, the
-  addresses can be filled only if the lead grants an in-process read as for XDR-001 and XDR-002.'
+  named. The read crosses deployables; the lead granted it in process on 25 October 2026 (r10 question 14), as
+  XDR-005: CHG-R10CAT-015.'

@@ -47,4 +47,4 @@ notes: 'Already in r9: published_at and published_by (CHG-R8MIG-015), Ed25519 si
   published_bundle_venue_id_version_uniq on (venue_id, version), exact (version is a decimal string). version stays a
   string on the wire, carrying the per-venue integer as its decimal digits, so no response type changes; changing it
   to integer would be a breaking change across getLatestBundle''s since and bundle_application, which the decision did
-  not ask for.'
+  not ask for; confirmed by the lead on 25 October 2026 (r10 question 15, CHG-R10CAT-016).'

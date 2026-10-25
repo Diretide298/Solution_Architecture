@@ -121,8 +121,10 @@ x-ticvai-queries:
       it see them (the table's row-level security, under the caller's connection and transaction). It decides
       nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and a question
       with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in process within
-      operations, through the C# query interface VenueOps implements, and asked from another deployable through
-      VenueOps' service route (serviceAuth).
+      operations, through the C# query interface VenueOps implements; in process from commerce for the guest product
+      reads (searchCatalogue, listProducts, getProduct), a read the lead granted across deployables
+      (docs/active/cross-deployable-writes.yaml XDR-005; ADAM CR-221, CHG-R10CAT-015); and asked from another
+      deployable through VenueOps' service route (serviceAuth).
     served: [in-process, service]
 paths:
   /media:
