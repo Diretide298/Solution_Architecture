@@ -37,7 +37,18 @@ Rules:
                     schema another module's contract persists, or a phrase of FACTS, and the operation asks no
                     query over that table (ADAM CR-096 and CR-135, 15-17 October 2026; CHG-RTE-001). The
                     lineage holds only the tables behind response schemas (derive-lineage.py), so a rule stated in
-                    words read data no rule above could see.
+                    words read data no rule above could see. A read (GET) counts a fact its own words name, or one
+                    its response schema says is worked out on read (computed on read, resolved from, a projection
+                    over); a fact only in its response schema is the writer's rule (CHG-RTE-001's fix round 1, the
+                    check's rule since CHG-R10GEN-001). The sentences the r10 dry run read as not reads (a contrast,
+                    a cited shape, who writes it) are NOT_READ, or NOT_READ_FOR the operations they are not reads for.
+
+**The class release, 25 October 2026** (r10 lane E, CHG-R10GEN-001; PROCESS-LOG P-30). The 720 XR-FACT findings of r9
+were baselined on 18 October and acknowledged on started tickets until a class release that never ran, and about 13
+of the 48 CRs of 21-24 October were among them (listDepositBoxes' drawer limits, CR-218). With the read rule above
+and the dry run's NOT_READ, 198 remain, and tools/applied/read-routes-r10.py routes all but the two an Identity
+operation would ask above the foundation tier (getMembership's guest link, guestUaePassLogin's custom domain), which
+are the lead's.
 
 A read counts as covered only by a query over that table (its `table`, its projection's `source`, its `reads`),
 or by a rule query of the owner that names no table: until 18 October any query of the owner covered every one of
@@ -173,7 +184,197 @@ NOT_READ: tuple = tuple(re.compile(p, re.I | re.S) for p in (
     # r8 integration (20 October 2026, CHG-R8INT-017): two sentences that name a table to say Identity does not read it
     r"never reads\s+`orders\.pos_shift`",      # Session.hasOpenShift (forceLogout, listSessions): fed by events
     r"`marketing\.device_consent\.scope_path`;\s+Identity\s+may\s+not\s+read\s+that\s+table",  # recordConsentIdentifier
+    # r10 lane E (25 October 2026, CHG-R10GEN-001): the read-routes-r10 dry run, read group by group. Each sentence
+    # names another module's table, field or schema to contrast, to explain where something lives, to cite a shape it
+    # follows, or to say who writes it; none is a read by the operation that carries it.
+    r"`accessPoint`\s+is\s+a\s+gate\s+\(access\s+`AccessPoint`\),\s+`operatingArea`\s+a\s+zone\s+of\s+the\s+venue\s+"
+    r"\(tenancy\),\s+`outlet`\s+an\s+outlet\s+\(tenancy\s+`Outlet`\)",          # the kiosk-config family: kinds of place
+    r"`access`\s+keeps\s+every\s+issued\s+credential.{0,200}?in\s+`access\.accreditation_credential`",   # verify...Credential
+    r"`AdmissionRules`\s+may\s+carry\s+a\s+`biometricPolicy`",                  # get/setVenueSettings(Defaults)
+    r"is\s+now\s+`access\.device_placement`\s+and\s+holds\s+only",              # approveDevice, enrolDevice, registerDevice
+    r"Access\s+keeps\s+only\s+where\s+an\s+access-control\s+device\s+is\s+placed\s+\(`access\.device_placement`",  # listDevices
+    r"the\s+access\s+contract's\s+(?:validation\s+against\s+)?`AccessDynamicPolicy`(?:\s+\(`access\.dynamic_policy`\))?",
+    r"beside\s+access's\s+`AccessDynamicPolicy`",                                # the Identity policy family: the other engine
+    r"Software-permission\s+policies\s+are\s+identity's\s+`AuthorisationPolicy`",  # listDynamicPolicyEffectiveness
+    r"Not\s+identity\.authorisation_policy,\s+which\s+is\s+staff\s+permission",  # setVisualDynamicPolicy, validateAccess
+    r"The\s+mechanism\s+already\s+existed\W+`access\.entitlement`\s+carries",   # the product family: open-dated passes
+    r"the\s+entitlement\s+is\s+written\s+by\s+OrderService\s+\(`access\.entitlement`",   # respondToInvitation
+    r"Live\s+counters\s+stay\s+on\s+access\.entitlement",                        # setMembershipUsagePolicy
+    r"The\s+limit\s+is\s+the\s+venue's\s+offline\s+policy\s+\(access\s+`AccessOfflinePolicy`\),\s+carried\s+in\s+the\s+"
+    r"reader's\s+edge\s+package",                                                # reportReaderQueue: the reader decides
+    r"A\s+product's\s+own\s+override\s+\(access\s+`AccessVerificationMethodPolicy\.credentialFormatOverride`\)\s+wins\s+"
+    r"over\s+this",                                                              # setChannelFeePayment
+    r"Null:\s+the\s+product\s+takes\s+its\s+sales\s+channel's\s+`ticketCredentialFormat`\s+\(catalogue\s+"
+    r"`SalesChannelProfile`\)",                                                  # setVerificationMethodPolicy
+    r"`suggestionRef`\s+is\s+the\s+id\s+of\s+its\s+`AiGuidedChoiceSuggestion`",  # proposeGuidedChoice
+    r"records\s+the\s+question\s+as\s+an\s+`ai\.knowledge_gap`",                 # askReportingQuestion: ai writes it
+    r"turns\s+into\s+\"not\s+available\s+yet\"\s+and\s+an\s+`ai\.knowledge_gap`",   # runSemanticQuery
+    r"The\s+`AiProvider\.residency`\s+values\s+a\s+tenant\s+in\s+this\s+region\s+may\s+use",  # updateRegionSettings
+    r"goes\s+through\s+approvals\.request",                                      # updatePartnerAgreement: a write
+    r"\*\*Not\s+`approvals\.sla_policy`,\s+which\s+times\s+an\s+approval\s+request\.\*\*",   # listSlaPolicies
+    r"Setting\s+the\s+list\s+records\s+each\s+reference\s+as\s+asset\s+usage\s+\(`MediaUsage`",  # the product family
+    r"`EntitlementTemplate\.crossesCells`\s+already\s+propagates\s+a\s+redemption\s+right\s+on\s+issue",  # getMembership
+    r"\*\*Creating\s+a\s+route\s+creates\s+its\s+catalogue\s+side\*\*\W+a\s+catalogue\s+`Event`",   # createTransportRoute
+    r"`performanceId`\s+is\s+a\s+`catalogue\.performance`\s+id",                 # getPerformanceManifest: a key
+    r"The\s+catalogue\s+Performance\s+the\s+manifest\s+belongs\s+to\s+\(`catalogue\.performance`\)",  # reorder...Manifest
+    r"the\s+same\s+defect\s+`Product\.onSaleFrom`\s+fixed",                      # the content-block family
+    r"Catalogue\s+`Product\.segmentTags`,\s+e\.g\.\s+a\s+level\s+tag",           # the guided-choice family: filter names
+    r"checked\s+against\s+each\s+product's\s+age\s+rule\s+\(catalogue\s+`ProductEligibilityRule`\)",
+    r"`catalogue\.product`\s+(?:is\s+reindexed\s+when|names)\s+`catalogue\.productPublished`",   # list/setIndexSource
+    r"for\s+the\s+same\s+reason\s+`ProductCategory`\s+does",                     # listModules
+    r"the\s+field\s+definitions\s+travel\s+in\s+the\s+catalogue\s+bundle\s+\(`catalogue\.CatalogueBundle\.payload`\)",
+    r"`control\.integration_listing`\s+is\s+the\s+marketplace\s+entry\s+an\s+adapter\s+comes\s+from",
+    r"The\s+subscription\s+contract's\s+billing\s+entity\s+and\s+`PartnerDocument`\s+read\s+this\s+list",
+    r"`seating\.seat_reservation_item`\s+and\s+`control\.rollout`\s+both\s+point\s+at\s+it",   # listWalletHolds
+    r"which\s+writes\s+`control\.tenant_domain`",                                # verifyCustomDomain: a call
+    r"`fnb\.FnbReservationPolicy\.reservedLeadMinutes`\s+is\s+canonical",        # the venue-settings family
+    r"deprecated\s+in\s+favour\s+of\s+`fnb\.FnbReservationPolicy\.reservedLeadMinutes`",
+    r"tenancy\s+`VenueSettings\.fnb\.tableReservedLeadMinutes`\s+is\s+deprecated\s+in\s+its\s+favour",
+    r"`identity\.customer_membership\.auto_renew`\s+carries\s+the\s+flag\s+per\s+holder",   # entitlement templates
+    r"`orders\.membership_renewal`\s+records\s+`previousExpiryAt`\s+and\s+`newExpiryAt`",
+    r"never\s+become\s+`identity\.principal`\s+or\s+`identity\.delegated_access`\s+rows",   # setDeveloperMembers
+    r"put\s+it\s+on\s+the\s+tenant's\s+`PasswordPolicy`,\s+which\s+no\s+longer\s+carries\s+it",
+    r"Identity's\s+projection\s+of\s+what\s+each\s+guest\s+holds\s+\(`SubjectHolding`\)\s+learns",  # an event
+    r"\*\*Not\s+the\s+same\s+as\s+a\s+procurement\s+quotation\*\*\s+-\s+`inventory\.quotation`",
+    r"The\s+supplier\s+is\s+an\s+`inventory\.supplier`",                         # updateVendorServiceRequest: a key
+    r"\*\*not\*\*\s+`ledger\.deposit`,\s+which\s+is\s+the\s+liability\s+posting",   # listDepositActivity
+    r"`ledger\.deposit`\s+holds\s+the\s+liability\s+posting\s+and\s+its\s+`refundableUntil`",   # listDeposits
+    r"the\s+precision\s+`finance\.FxRate\.rate`\s+asks\s+for",                   # every rate field: a precision
+    r"`ledger\.journal_entry`\s+is\s+append-only\s+and\s+a\s+failed\s+posting\s+is\s+an\s+incident",  # dead letters
+    r"`sync\.dsar_request`\s+carries\s+a\s+legal\s+clock",
+    r"for\s+the\s+same\s+reason\s+`maintenance\.asset\.retired_on`\s+is\s+one",  # the device family
+    r"\*\*Not\s+`marketing\.campaign`\*\*",                                      # commercial campaigns
+    r"Partner\s+cases\s+stay\s+apart\s+from\s+`marketing\.case`",
+    r"\*\*Same\s+shape\s+as\s+`marketing\.case\.resolution_note`\*\*",           # the dunning family
+    r"Marketing\s+turns\s+it\s+into\s+the\s+reminder\s+\(a\s+`MessageTrigger`\s+on\s+the\s+event",
+    r"the\s+same\s+gap\s+as\s+`MessageTrigger`,\s+seen\s+from\s+the\s+operational\s+side",
+    r"a\s+guest\s+meets\s+them\s+through\s+`orders\.Cart\.consentQuestions`,\s+never\s+by\s+listing",
+    r"A\s+waitlist\s+entry\s+never\s+holds\s+a\s+deposit,\s+even\s+where\s+the\s+venue's\s+`DepositPolicy\.dining`\s+is\s+on",
+    r"snapshotted\s+from\s+`orders\.DepositPolicy\.dining`\s+when\s+it\s+was\s+made",   # TableReservation.deposit
+    r"parties\s+take\s+a\s+deposit\s+\(see\s+`DepositPolicy`\)",
+    r"so\s+the\s+orders\s+`FraudRule`\s+refund\s+rules",                         # createRetailReturn: Orders evaluates
+    r"Distinct\s+from\s+a\s+provider's\s+processing\s+cost\s+\(`payments\.fee_rule`\)\s+and\s+from\s+a\s+fee\s+as\s+"
+    r"charged\s+on\s+an\s+order\s+\(`orders\.order_fee`\)",
+    r"the\s+(?:same\s+)?rule-and-record\s+split\s+(?:as\s+)?`(?:fnb\.service_charge_policy|payments\.fee_rule)`\s+and\s+"
+    r"`orders\.order_fee`",
+    r"never\s+`orders\.order_line`",                                             # transferOrderItems: F&B lines
+    r"Same\s+rule\s+as\s+`orders\.payment\.fxRate`\s+under\s+CF-37",             # the wallet authorisation family
+    r"without\s+reading\s+Orders'\s+`orders\.pos_shift`",                        # endOwnSession, the session family
+    r"A\s+refund\s+it\s+produces\s+is\s+an\s+`orders\.refund`",
+    r"The\s+shape\s+is\s+`orders\.RefundPolicy\.requiresApprovalAbove`",         # setRentalFeePolicy
+    r"locked\s+on\s+the\s+order\s+\(`orders\.Order\.chargeFxRate`\)",            # listFxRates
+    r"Distinct\s+from\s+`payments\.currency_rule`",                              # setCurrencyRoundingRule
+    r"the\s+IP\s+address\s+and\s+user\s+agent\s+stay\s+in\s+`pii\.consent_identifier`\s+and\s+are\s+not\s+joined\s+here",
+    r"`recordDeviceConsent`\s+writes\s+the\s+IP\s+address\s+and\s+user\s+agent\s+to\s+`pii\.consent_identifier`",
+    r"never\s+`pii\.subject\.display_name`",                                     # the loyalty family
+    r"written\s+to\s+the\s+erasable\s+store\s+\(`pii\.subject`\)",               # addIncidentPerson: a write
+    r"go\s+to\s+the\s+erasable\s+store\s+\(`pii\.subject`",                      # reportIncident
+    r"erasure\s+is\s+the\s+ADR-0047\s+tombstone\s+\(`pii\.subject\.is_erased`\)",
+    r"Nothing\s+here\s+reads\s+`pii\.subject`",                                  # setLeaderboardNickname
+    r"as\s+the\s+DDL\s+names\s+it\W+`pii\.subject_contact\.email`",              # the AI policy family: an example
+    r"e\.g\.\s+`pii\.subject_contact`",                                          # setDataDiscoveryAccess: an example
+    r"`platform\.device`\s+is\s+staff\s+hardware\s+bound\s+to\s+a\s+workstation",   # listGuestDevices
+    r"which\s+records\s+its\s+kind,\s+hardware\s+type.{0,80}?in\s+`platform\.device`",   # placeAccessDevice
+    r"a\s+model\s+that\s+devices\s+name\s+\(`platform\.device\.hardwareModelId`",
+    r"is\s+changed\s+in\s+the\s+register,\s+tenancy\s+`platform\.device`,\s+not\s+here",
+    r"published\s+through\s+`platform\.outbox`",                                 # createWebhookSubscription
+    r"which\s+the\s+tenant's\s+region\s+may\s+restrict\s+\(`tenancy\.RegionSettings\.allowedAiResidencies`\)",
+    r"a\s+region\s+restricts\s+the\s+choice\s+through\s+`tenancy\.RegionSettings\.allowedAiResidencies`\s+and\s+nothing\s+else",
+    r"read\s+from\s+`platform\.sale_board`\s+when\s+the\s+bundle\s+is\s+snapshotted",   # getLatestBundle
+    # set once by the writer (openShift, holdOrder, buildProductionPlan, which declare their own read), returned by
+    # every operation that answers the row:
+    r"\*\*The\s+business\s+day\s+the\s+shift\s+belongs\s+to\*\*.{0,120}?`businessDayCutoff`\s+\(tenancy\s+`VenueSettings`",
+    r"or\s+the\s+venue's\s+next\s+business-day\s+cut-off\s+\(`VenueSettings\.businessDayCutoff`\)\s+when\s+the\s+cashier\s+"
+    r"sent\s+none",
+    r"The\s+trading\s+day\s+this\s+prep\s+list\s+is\s+for,\s+in\s+the\s+Region's\s+time\s+zone;\s+a\s+business\s+date,\s+"
+    r"closing\s+at\s+the\s+venue's\s+`businessDayCutoff`\s+\(tenancy\s+`VenueSettings`",
+    r"Where\s+`VenueSettings\.alerting\.escalateAfterMinutes`\s+passed\s+with\s+no\s+acknowledgement",   # the alert family
+    r"The\s+trading\s+day\s+closes\s+at\s+the\s+venue's\s+`businessDayCutoff`\s+\(tenancy\s+`VenueSettings`",
+    r"The\s+variance\s+threshold\s+and\s+the\s+drawer\s+limit\s+stay\s+where\s+they\s+are\s+\(`tenancy\.VenueSettings\."
+    r"shiftVarianceThreshold`",                                                  # setTillShiftPolicy
+    r"`endOfBusinessDay`\s+runs\s+when\s+the\s+venue's\s+business\s+day\s+closes",   # setWalletReconciliationSources
+    r"\*\*Not\s+`queue\.joinQueue`\.\*\*\s+That\s+is\s+the\s+ride\s+queue\s+\(Q1\)\s+and\s+writes\s+`queue\.entry`",
+    r"`rentalAgreement`\s+is\s+the\s+existing\s+use\s+from\s+`rental\.agreement_item`",   # the stock-reservation family
+    r"`rental\.agreement_item`\s+points\s+here",
+    r"`rental\.fee_policy`\s+is\s+the\s+shape\s+being\s+followed\s+here",        # getFnbServiceChargePolicy
+    r"an\s+`AlertRule`\s+on\s+metric\s+`staffingShortfall`",                     # getStaffingCoverage: reporting raises it
+    r"\(reporting\s+`AlertRule\.deliverTo:\s+push`\)",                           # registerDevice
+    r"the\s+hold\s+is\s+converted\s+to\s+a\s+`ResourceBooking`",                 # checkoutCart: a call to resources
+    r"calls\s+`resources`\s+to\s+write\s+a\s+`ResourceBooking`",                 # createOrder
+    r"which\s+raises\s+the\s+cross-cell\s+sync\.dsar_request",                   # deleteGuestAccount, exportSubjectData
+    r"The\s+case\s+layer\s+over\s+the\s+cross-region\s+`sync\.dsar_request`\s+fan-out",   # setPrivacyRequest
+    r"`sync\.rejection`\s+exists\s+because",                                     # the burst-environment family
+    r"the\s+encoding\s+that\s+`venue-map`\s+uses\s+for\s+`VenuePath\.geometry`",  # proposeWalkways
+    r"guarded\s+update\s+on\s+`wallet\.balance`\s+under\s+its\s+row\s+lock",     # authoriseWalletSpend: wallet's call
+    r"Schema-qualified,\s+e\.g\.\s+`whitelabel\.content_page`",                  # setIndexSource: an example
+    r"while\s+white-label's\s+`CustomDomain`\s+is\s+`pendingRevalidation`",      # resolveTenantHost: pushed by white-label
+    r"`whitelabel\.custom_domain`\s+stays\s+the\s+tenant's\s+own\s+record",      # setTenantDomainMapping
+    r"They\s+are\s+\*\*not\*\*\s+the\s+white-label\s+app\s+features\s+of\s+`white-label\.ModuleEnablement\.moduleKey`",
+    r"the\s+vocabulary\s+of\s+`white-label\.ModuleEnablement\.moduleKey`",       # setModuleListing
+    r"it\s+resolved\s+to\s+`whitelabel\.policy`",                                # getPaymentRules: a dropped column
+    r"`RotaAssignment`\s+carried\s+`requiredRoleId`\s+alone",                    # setResourceQualifications
+    # second mentions in the same operations, found by the dry run's second pass
+    r"\*\*An\s+exchange\s+rate:\s+a\s+decimal\s+string,\s+never\s+a\s+float\*\*",   # every rate field
+    r"was\s+on\s+the\s+access-control\s+device\s+row,\s+now\s+`access\.device_placement`",   # the device family
+    r"\*\*`AccessDynamicPolicy`\s+governs\s+who\s+may\s+pass\s+which\s+gate\*\*",       # the Identity policy family
+    r"Identity's\s+staff-permission\s+engine\s+was\s+renamed\s+`AuthorisationPolicy`",   # the access policy family
+    r"is\s+`platform\.device`,\s+the\s+only\s+device\s+register",                  # placeAccessDevice, update...
+    r"Distinct\s+from\s+`payments\.fee_rule`\s+\(a\s+provider's\s+processing\s+cost\)\s+and\s+`orders\.order_fee`",
+    r"hostname\s+taken\s+by\s+another\s+tenant",                                # verifyCustomDomain
+    r"raises\s+an\s+`Alert`\s+to\s+the\s+dashboard\s+panel",                     # getStaffingCoverage
+    r"a\s+cross-cell\s+sync\.dsar_request\s+raised\s+by\s+`createDsarRequest`",    # exportSubjectData
+    r"The\s+model\s+choice\s+per\s+class\s+is\s+the\s+AI\s+engine's\s+\(ai\s+`AiProvider`",   # updateRegionSettings
+    r"as\s+the\s+subscription\s+contract's\s+`PartnerDocument`\s+names\s+it",
+    r"(?:A\s+hostname\s+already|The\s+hostname\s+is\s+already)\s+routed\s+to\s+another\s+tenant",   # verifyCustomDomain
 ))
+# **The same words, a read for one operation and not for another** (CHG-R10GEN-001): removed only from the text of the
+# operations named. A metric-source table describes where each metric comes from; the operation that computes the
+# metrics reads those tables (getKpiValues, askReportingQuestion, runSemanticQuery), and one that defines, lists,
+# targets or acknowledges them does not.
+NOT_READ_FOR: tuple = tuple((re.compile(p, re.I | re.S), frozenset(o)) for p, o in (
+    (r"\|\s*Metric\s*\|\s*Source\s*\|.*",
+     {"acknowledgeAlert", "listAlerts", "setAlertRule", "setKpiTargets"}),
+    (r"\|\s*Code\s*\|\s*Unit\s*\|\s*Source\s*\|.*", {"createKpi", "listSeededReports", "listKpis"}),
+    # the two policy engines (ADR-0068) name each other to say which governs what; neither reads the other's rows
+    (r"`AccessDynamicPolicy`|`access\.dynamic_policy`",
+     {"createAuthorisationPolicy", "updateAuthorisationPolicy", "restoreAuthorisationPolicyVersion",
+      "setAuthorisationPolicyState", "simulateAuthorisationPolicy", "evaluateAccess", "listAuthorisationPolicies",
+      "getAuthorisationPolicy", "getAuthorisationPolicyBundle", "listAuthorisationPolicyHistory",
+      "listAuthorisationPolicyTemplates", "listAuthorisationPolicyEffectiveness", "listPermissionFindings"}),
+    (r"`AuthorisationPolicy`|`identity\.authorisation_policy`",
+     {"listDynamicPolicyEffectiveness", "setContextTimeEvent", "setVisualDynamicPolicy", "validateAccess"}),
+    (r"\*\*Three\s+accreditation\s+sources\s+added\s+29\s+September\*\*.*",
+     {"createReport", "updateReport", "listReportFields", "saveNaturalLanguageQuery", "listSeededReports"}),
+    # a campaign names its segment's portfolio rule; the segment's evaluation (previewSegmentDraft) reads delegations
+    (r"`portfolioScope`\s+aggregates\s+across\s+a\s+`DelegatedAccess`\s+delegation",
+     {"createCampaign", "pauseCampaign", "stopCampaign", "unscheduleCampaign", "updateCampaign", "createSegment"}),
+    # the venue settings say which other modules' rows each setting governs; Tenancy reads none of them
+    (r"each\s+one\s+its\s+region\s+holds\s+an\s+`FxRate`\s+for", {"getVenueSettings", "getVenueSettingsDefaults"}),
+    (r"A\s+code\s+the\s+region\s+has\s+no\s+rate\s+for\s+is\s+refused", {"getVenueSettings", "getVenueSettingsDefaults"}),
+    (r"each\s+code\s+must\s+also\s+be\s+one\s+the\s+venue's\s+payment\s+provider\s+can\s+charge\s+"
+     r"\(`orders\.PaymentProvider\.presentmentCurrencies`\)", {"getVenueSettings", "getVenueSettingsDefaults"}),
+    (r"the\s+same-business-day\s+void\s+\(orders\s+`AfterSalePolicy\.voidSameBusinessDayOnly`\)",
+     {"getVenueSettings", "getVenueSettingsDefaults", "setVenueSettings", "setVenueSettingsDefaults"}),
+    (r"\(`Cart\.maxExtensions`\)",
+     {"getVenueSettings", "getVenueSettingsDefaults", "setVenueSettings", "setVenueSettingsDefaults"}),
+    (r"BO-042\s+flags\s+the\s+box\s+\(`shift\.DepositBox\.overDrawerLimit`\)",
+     {"getVenueSettings", "getVenueSettingsDefaults", "setVenueSettings", "setVenueSettingsDefaults"}),
+    (r"a\s+shift's\s+business\s+date\s+and\s+its\s+close\s+\(shift\s+`Shift\.businessDate`",
+     {"getVenueSettings", "getVenueSettingsDefaults", "setVenueSettings", "setVenueSettingsDefaults"}),
+    # FxRate.chargeable answers for the venue a listFxRates caller names; a rate written has no venue
+    (r"With\s+`venueId`,\s+true\s+where\s+a\s+guest\s+may\s+select\s+this\s+currency", {"ingestFxRates", "setFxRate"}),
+    # a dispatch's attribution window belongs to the campaign's performance figures, not to sending one message
+    (r"The\s+window\s+these\s+figures\s+were\s+attributed\s+over,\s+from\s+`VenueSettings\.marketing\."
+     r"attributionWindowDays`", {"retryMessageDispatch", "sendTransactionalMessage", "testSendCampaign"}),
+))
+
+
+def strip_not_read(op: str, text: str) -> str:
+    """The text without the NOT_READ_FOR sentences scoped to `op` (a chunk at a time: a table runs to its chunk's end)."""
+    for rx, ops in NOT_READ_FOR:
+        if op in ops:
+            text = rx.sub(" ", text)
+    return text
 TABLE_IN_TEXT = re.compile(r"(?<![\w.])([a-z][a-z0-9_]*)\.([a-z][a-z0-9_]+)\b")
 FIELD_IN_TEXT = re.compile(r"(?<![\w.])(?:([a-z][a-z-]+)\.)?([A-Z][A-Za-z0-9]+)\.([a-z][A-Za-z0-9]+)\b")
 SCHEMA_IN_TEXT = re.compile(r"`([A-Z][A-Za-z0-9]+)`")
@@ -242,6 +443,39 @@ def op_text(stem: str, op: dict, item: dict, by: dict) -> str:
     the descriptions and x-ticvai-persistence of its own contract's schemas they use (`$ref` followed, every level),
     and of an own schema named in backticks (`ConflictAnalysis`), one hop. A field that only holds a key (`id`,
     `...Id`, `...Ids`, `...Ref`, a uuid) is skipped: naming the record it points at is not reading it."""
+    return "\n".join(op_chunks(stem, op, item, by))
+
+
+# **A read answers from its rows; the rules in its response schema are kept by the writer** (fix round 1 of
+# CHG-RTE-001, 18 October 2026, made the check's rule by CHG-R10GEN-001, 25 October). A GET names a fact by its own
+# words (summary, description, parameters) or by its response schema. A phrase that sits only in the response
+# schema is a rule the writing operation keeps (`businessDate` is set from the venue's cut-off when the shift opens;
+# getShift returns it), unless the schema says the value is worked out when it is read: a field computed on read
+# (listDepositBoxes' overDrawerLimit against the drawer limits, ADAM CR-218, whose finding round 1 left unswept), a
+# value resolved from another table when the record is read (a case's guest name from `pii.subject`), or a response
+# that is a projection or an aggregate over the tables it lists (`none — projection over ...`).
+READ_ON_READ = re.compile(
+    r"\b(?:computed|worked out|resolved|derived|calculated|evaluated) (?:on|at) read\b"
+    r"|\bon read\b|\bat read time\b|\bwhen (?:the [\w ]{1,30} )?is read\b|\bwhen it is read\b"
+    r"|\bresolved from\b|\bread from `?[a-z][a-z-]*\.[A-Z]"
+    r"|^none\s*\W+\s*(?:projection|aggregated?|computed|derived|joined|read)\b"
+    r"|\bprojection over\b|\baggregated from\b"
+    r"|\bas `[a-z][a-z-]*\.[A-Z]\w*\.\w+`|\bthe server turns\b",
+    re.I | re.M)
+
+
+def get_counts(method: str, table: str, own: dict, response_chunks: list, named) -> bool:
+    """Whether a fact `table` an operation's text names is a read of it (fix round 1 as the check's rule): every
+    fact of a write; a read's (GET's) fact when its own words name it (`own`: facts_named of the text without its
+    responses), or when a response chunk that names it says it is worked out on read (READ_ON_READ). `named(chunk)`
+    gives the tables a chunk names."""
+    if str(method).lower() != "get" or table in own:
+        return True
+    return any(READ_ON_READ.search(c) and table in named(c) for c in response_chunks)
+
+
+def op_chunks(stem: str, op: dict, item: dict, by: dict) -> list:
+    """op_text's pieces, one per description, summary or persistence string, in the order op_text reads them."""
     out, seen = [], set()
 
     def walk(node, depth=0, name=""):
@@ -277,7 +511,7 @@ def op_text(stem: str, op: dict, item: dict, by: dict) -> str:
         if (stem, n) in by and (stem, n) not in seen:
             seen.add((stem, n))
             walk(by[(stem, n)], 1)
-    return "\n".join(out)
+    return out
 
 
 def facts_named(text: str, reader: str, owner_of_schema: dict, tables: set, persist: dict = None,
@@ -353,12 +587,24 @@ def fact_findings(ignore=None) -> list:
         skip = set(e.get("reads") or []) | set(e.get("writes") or [])
         skip |= {str(w.get("table")) for w in e.get("writeVia") or [] if isinstance(w, dict)}
         skip |= {t.rsplit("_for_", 1)[0] for t in e.get("reads") or [] if "_for_" in t}
-        text = op_text(f["contract"], f["op"], f["item"], by)
-        for t, hits in sorted(facts_named(text, reader, owner_of_schema, tables, persist, names,
-                                          svc_of_contract).items()):
+        def chunks(op, item, _o=o, _c=f["contract"]):
+            return [strip_not_read(_o, c) for c in op_chunks(_c, op, item, by)]
+
+        def named(chunk, _reader=reader):
+            return facts_named(chunk, _reader, owner_of_schema, tables, persist, names, svc_of_contract)
+
+        text = "\n".join(chunks(f["op"], f["item"]))
+        own = resp = None
+        for t, hits in sorted(named(text).items()):
             owner = owner_of_schema.get(t.split(".", 1)[0])
             if t in skip or is_covered(t, owner, cov_t, cov_o):
                 continue
+            if str(f["method"]).lower() == "get":
+                if own is None:
+                    own = named("\n".join(chunks({k: v for k, v in f["op"].items() if k != "responses"}, f["item"])))
+                    resp = chunks({"responses": f["op"].get("responses")}, None)
+                if not get_counts(f["method"], t, own, resp, named):
+                    continue
             how, phrase = hits[0]
             out.append((o, reader, t, owner, how, phrase))
     return out

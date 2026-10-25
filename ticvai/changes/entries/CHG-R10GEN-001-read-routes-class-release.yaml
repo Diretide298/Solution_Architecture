@@ -1,0 +1,67 @@
+id: CHG-R10GEN-001
+date: '2026-10-25'
+source: audit
+kind: process
+summary: 'The XR-FACT class release the 18 October sweep left for later. check-cross-module-reads judges a read (GET)
+  by fix round 1''s rule (a fact only in its response schema is the writer''s, unless the schema says it is worked
+  out on read) and leaves out the sentences the r10 dry run read as not reads; tools/applied/read-routes-r10.py
+  routes every remaining finding to the owner''s query over its table, declaring a per-table data read where the
+  owner has none. The script''s output is not committed here: integration runs it once on the merged tree.'
+decision:
+  what: 'The 720 XR-FACT findings of r9 (436 operations, 114 tables; 58 tables with an owner query, 522 facts; 56
+    with none, 198 facts) are fixed as a class, not acknowledged again. (1) The read rule of CHG-RTE-001''s fix round 1
+    becomes the check''s: a GET counts a fact its own words name, or one its response schema says is worked out on
+    read (computed or resolved on read, a projection or an aggregate over the table, a field answered as another
+    module''s `x.Y.z`), which is the case round 1 missed (listDepositBoxes'' overDrawerLimit, ADAM CR-218): 189
+    findings leave the class. (2) The dry run was read group by group: 333 findings were sentences that name another
+    module''s data to contrast it (`Not marketing.campaign`), cite a shape or a precision (`finance.FxRate.rate`),
+    say who writes it or where it lives, or describe metric sources an operation defines but does not compute; they
+    are NOT_READ, or NOT_READ_FOR the operations they are not reads for (the metric tables stay reads for
+    getKpiValues, askReportingQuestion and runSemanticQuery). (3) The other 198 are routed: 185 to an existing
+    owner query (its `<table>Records` first), 13 to new per-table data reads in the CHG-MOD-001 shape
+    (ai#approvalRequestScoreRecords, ai#knowledgeCollectionRecords, approvals#ruleRecords,
+    catalogue#salesChannelRecords, finance#journalLineRecords, marketing-crm#guestMatchPolicyRecords,
+    orders#depositPolicyRecords, orders#depositRecords, orders#orderFeeRecords, orders#refundPolicyRecords,
+    subscription#invoiceRecords, wallet#balanceRecords, white-label#storeAccountRecords), in-process within one
+    deployable and service across, each query''s served gaining the route; plus holdOrder''s and
+    buildProductionPlan''s venue business-day cut-off, which the check now leaves to the writer. Not routed, for the
+    lead: getMembership''s read of sync.guest_link and guestUaePassLogin''s of white-label CustomDomain, an Identity
+    operation above the foundation tier (ADR-0028: only a projection).'
+  by: Chinmay
+  date: '2026-10-25'
+why: 'PROCESS-LOG P-30 (25 October): about 13 of the 48 CRs raised 21-24 October were findings the build had already
+  reported and acknowledged. The XR-FACT findings were baselined on 18 October (354acd74) and acknowledged on started
+  tickets "until the next class release" (again at the r8 gate, 92eb4150); the release never ran. listDepositBoxes''
+  three Tenancy reads, flagged on #32643 and #30823, came back as ADAM CR-218. Brief: audit/ticvai/r10/LANE-E-GEN.md
+  section 1.'
+keys_touched:
+  operations: [getMembership, guestUaePassLogin, holdOrder, buildProductionPlan, listDepositBoxes, getKpiValues]
+  files:
+  - tools/check-cross-module-reads.py
+  - tools/applied/read-routes-r10.py
+  - tools/tests/test_read_routes_r10.py
+  - tools/run-checks.py
+root_class: A22 LINEAGE
+tickets:
+  started: [27959, 30686, 30688, 30798, 30800, 30801, 30804, 30821, 30822, 30823, 30824, 31062, 31064, 31071, 31074,
+    31258, 31736, 31738, 31848, 32643]
+  unstarted: []
+release_tag: r10
+decision_owner: Chinmay
+adam_cr: CR-218 (the class); P-30
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-cross-module-reads.py
+status: open
+notes: 'Measured on r9 in a throwaway worktree: read-routes-r10.py --apply wrote 198 read routes on 156 operations and
+  13 queries in 22 contracts (933 lines added); derive-lineage --apply gave 156 entries readVia; then
+  check-cross-module-reads: XR-FACT 2 found (the two Identity reads above, already known), 0 new, 753 baseline entries
+  gone; XR-QUERY, XR-ROUTE, XR-LINEAGE 0. check-lineage, check-contract-shapes, check-contract-compat,
+  check-error-sources, check-storage-promises and check-problem-types gave the same verdict before and after. A
+  second run writes nothing; check-money-currency falls from 451 to 436 with the routes. XR-UNCOVERED and
+  XR-FOUNDATION each keep one finding on a started ticket, unchanged by this lane. The started tickets are those
+  whose operations get a route (a comment for each agent, 14 October rule; their OpenProject text is not
+  rewritten). Integration: read-routes-r10.py (dry run, then --apply), derive-lineage.py --apply,
+  check-cross-module-reads.py, then --update-baseline to drop the entries gone. The run-checks entries of
+  CHG-R10GEN-002..005 are written in this change.'
