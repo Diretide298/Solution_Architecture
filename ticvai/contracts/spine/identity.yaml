@@ -527,6 +527,9 @@ paths:
       - query: tenancy#regionSettingsRecords
         route: in-process
         for: 'its read of the region''s settings, Tenancy''s data (CHG-MOD-001; R8 IDENTITY-C10)'
+      - query: tenancy#recordDeviceSignIn
+        route: in-process
+        for: 'a device sign-in is recorded on the workstation''s devices (tenancy.device_audit, kind access), for listDeviceAuditRecords (ADAM CR-232; r10 question 23; CHG-R10TEN-018)'
       x-ticvai-audience:
       - anonymous
       - partner
@@ -566,6 +569,11 @@ paths:
         sign-in, or a `pin` sign-in before `resetPrincipalCredential` has issued a PIN, is refused 401
         `sso-sign-in-required`, and the door offers `startSsoAuthorization`. A temporary
         credential (`Principal.mustChangeCredential`) signs in with `LoginResponse.mustChangeCredential` true.
+
+        **A device sign-in is recorded on the device** (ADAM CR-232, the lead''s answer to r10 question 23, 25 October
+        2026; CHG-R10TEN-018). A successful sign-in that names a `workstationId` asks Tenancy''s in-process API
+        `tenancy#recordDeviceSignIn` in the same transaction as the session, so each device bound to that workstation
+        gets a `tenancy.device_audit` row of kind `access`, action `signIn`, which `listDeviceAuditRecords` returns.
 
         '
       security: []

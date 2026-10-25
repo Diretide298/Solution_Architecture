@@ -422,6 +422,12 @@ paths:
         the apex only on request. The tenant''s platform subdomain (`getPlatformSubdomain`) keeps working throughout.
 
 
+        **The guest app has no domain of its own** (ADAM CR-105, the lead''s answer to r10 question 4, 25 October
+        2026; CHG-R10TEN-020). It is served on the tenant''s `guestWeb` domain, where its app links are published
+        (`readiness.appLinks`). A claim of `kind` `guestApp` is stored and mapped as `guestWeb` (channel `guestWeb`
+        in `setTenantDomainMapping`); the value stays in the enum so a client built at r1 still validates.
+
+
         **What a claim checks and starts** (ADAM CR-105, option 1, accepted 15 October 2026; CHG-R10TEN-011). A
         `hostname` that is not a valid lower-case host name (labels of letters, digits and hyphens, at most 253
         characters, at least one dot) is refused `400` `invalid-hostname`; a bare domain (an apex) sent without
@@ -2056,7 +2062,8 @@ paths:
         and returns every derived size in `derived` in the same shape, each entry pending: `platform` and `size`
         set, `assetRef` absent. The renditions are asked of Assets after the write (`requestMediaRendition`, one per
         size) by the white-label jobs component, which fills each `assetRef` when Assets has made it; this call does
-        not wait for them. Nothing on screen changes shape.
+        not wait for them. Nothing on screen changes shape. Kept so by the lead (r10 question 27, 25 October 2026;
+        CHG-R10TEN-022): `requestMediaRendition` is built in Block B, and this Block A operation does not call it.
 
         **Generated: the iOS and Android store sets, plus web favicons (decided 28 September, audit
         R163).** iOS: 1024 (App Store), 180, 167, 152, 120, 87, 80, 76, 60, 58, 40, 29 and 20 px. Android:
@@ -8881,6 +8888,8 @@ components:
           - guestApp
           - partnerPortal
           - developerPortal
+          description: '`guestApp` is stored as `guestWeb`: the guest app is served on the guestWeb domain and has no
+            domain of its own (r10 question 4; CHG-R10TEN-020). Kept in the enum for clients built at r1.'
         status:
           type: string
           enum:

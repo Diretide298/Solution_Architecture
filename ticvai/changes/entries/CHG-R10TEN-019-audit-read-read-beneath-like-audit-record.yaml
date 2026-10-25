@@ -1,0 +1,36 @@
+id: CHG-R10TEN-019
+date: '2026-10-25'
+source: cr
+kind: contract
+summary: 'platform.audit_read gains org_unit_id (the reader''s venue, else region) and the same read as platform.audit_record:
+  the tenant root, or a grant over the row''s org unit.'
+decision:
+  what: 'r10 question 24, recommended answer accepted. AuditRead: x-ticvai-rls audit-read-beneath, orgUnitId; listAuditRecords
+    writes it. The lead, 25 October 2026, accepted every recommended answer in the r10 lead questions (LEAD-QUESTIONS-r10.md).'
+  by: Chinmay
+  date: '2026-10-25'
+why: 'The sibling of ADAM CR-185 (CHG-R10TEN-006): audit_read kept the tenant-root read.'
+keys_touched:
+  operations:
+  - listAuditRecords
+  schemas:
+  - AuditRead
+  tables:
+  - platform.audit_read
+  files:
+  - contracts/spine/tenancy.yaml
+root_class: 'new: an append-only trail read by the scope its rows name'
+tickets:
+  started:
+  - '30824 (listAuditRecords): through CR-185''s comment.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-185
+triage: fix-forward
+prevention:
+  type: generator-rule
+  ref: tools/derive-ddl.py::APPEND_AUDIT_MARKS
+status: open
+notes: 'Database: platform.audit_read.org_unit_id uuid with a key to platform.scope and an index; its policy reapplied with
+  apply_append_audit_read_rls (MIG-PLATFORM, Hrushikant Patkar).'

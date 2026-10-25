@@ -9535,8 +9535,8 @@ paths:
       operationId: setMinorGuardianAge
       x-ticvai-consumed-by:
         - "P13 CMS-029 Minor, Guardian & Age-Based Privacy Configuration"
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [country]
+      x-ticvai-body-key-note: 'Keyed by the body''s `country` (the lead''s answer to r10 question 26, 25 October 2026; CHG-R10TEN-021): one rule per jurisdiction within the caller''s tenant; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body. Not one per venue: the note said so and the operation is an upsert on `country`.'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Privacy__Consent___Preference_Management_Reference.pdf'' pp.15-16 (17.1.9: configure by jurisdiction, do not hard-code 13, 16 or 18); the ages are the tenant''s configuration per country with no shipped default, so no age is guessed'
@@ -11824,8 +11824,8 @@ paths:
       - query: ai#policyRecords
         route: service
         for: 'what its text calls "ai.policy": ai.policy, Ai''s data (CHG-R10GEN-001)'
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [scopePath]
+      x-ticvai-body-key-note: 'Keyed by the body''s `scopePath` (the lead''s answer to r10 question 26, 25 October 2026; CHG-R10TEN-021): one configuration per scope node, the tenant row the default and a venue row narrowing it; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body. Not one per venue: the note said so and the operation is an upsert on `scopePath`.'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: MoM 31 Aug §4.1 (AI summariser on a case); pack ''Customer Service_Reference.pdf'' pp.19-21 (10.1.10); inherits getAiPolicy (ADR-0018: a venue narrows, never widens)'

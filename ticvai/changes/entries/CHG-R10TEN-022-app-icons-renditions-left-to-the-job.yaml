@@ -1,0 +1,31 @@
+id: CHG-R10TEN-022
+date: '2026-10-25'
+source: cr
+kind: contract
+summary: setAppIcons records that it leaves rendition requests to the white-label jobs component, as the lead kept it (requestMediaRendition
+  is built in Block B).
+decision:
+  what: 'r10 question 27, recommended answer accepted: keep it so. The lead, 25 October 2026, accepted every recommended
+    answer in the r10 lead questions.'
+  by: Chinmay
+  date: '2026-10-25'
+why: 'ADAM CR-106 (Deep Khanvilkar, #27880): lane A2 asked whether setAppIcons should call requestMediaRendition (CHG-R10TEN-012
+  notes).'
+keys_touched:
+  operations:
+  - setAppIcons
+  files:
+  - contracts/satellite/white-label.yaml
+root_class: 'new: a Block A operation calling a later block''s operation'
+tickets:
+  started:
+  - '27880: through CR-106''s comment.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-106
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-plan-closure.py
+status: open
