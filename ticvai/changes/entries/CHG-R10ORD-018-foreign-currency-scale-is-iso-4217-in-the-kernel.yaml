@@ -1,0 +1,44 @@
+id: CHG-R10ORD-018
+date: '2026-10-25'
+source: cr
+kind: contract
+summary: 'The scale of a currency other than the venue''s or region''s trading currency is its ISO 4217 minor units, one
+  fixed list in the kernel beside Money: stated on common.yaml Money.scale and on the amounts in another currency (Payment.tenderAmount,
+  Order.chargeTotal, Refund.tenderAmount, a deposit box''s foreign holdings).'
+decision:
+  what: 'ADAM CR-192, option A: the scale of any currency is its ISO 4217 minor units, held as one fixed list in the kernel
+    (TICVAI.Domain, next to Money); the venue and region settings keep their own currency_scale for the trading currency.
+    contracts/shared/common.yaml Money.scale; contracts/spine/orders.yaml Payment.tenderAmount, Order.chargeTotal, Refund.tenderAmount;
+    contracts/spine/shift.yaml DepositBox.foreignHoldings.'
+  by: Chinmay
+  date: '2026-10-21'
+why: 'ADAM CR-192 (Pranay Shinde, #30687 getOrder), accepted with option A on 21 October 2026: Money carries a scale, and
+  nothing in the package gave the scale of a tourist''s tender currency or a guest-selected charge currency.'
+keys_touched:
+  schemas:
+  - Money
+  - Payment
+  - Order
+  - Refund
+  - DepositBox
+  files:
+  - contracts/shared/common.yaml
+  - contracts/spine/orders.yaml
+  - contracts/spine/shift.yaml
+root_class: 'new: Money answered with no currency source'
+tickets:
+  started:
+  - '30687 (getOrder): built to the CR''s ''what to do now''; its text is not rewritten.'
+  unstarted:
+  - The kernel list itself (TICVAI.Domain, beside Money) belongs to the kernel's Money work; no ticket carries it yet, listed
+    for the lead.
+adam_cr: CR-192
+triage: fix-forward
+prevention:
+  type: none
+  reason: Lane E of r10 adds the check for Money with no currency source; a foreign-currency amount names its rule in the
+    contract, which that check reads.
+notes: No database change.
+release_tag: pending
+decision_owner: Chinmay
+status: open

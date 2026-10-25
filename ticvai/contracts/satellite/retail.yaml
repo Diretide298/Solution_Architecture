@@ -411,7 +411,7 @@ paths:
               schema: { $ref: '#/components/schemas/MerchandiseItem' }
         '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
         '409':
-          description: Barcode already in use in this venue. `refusedReason` is `barcodeInUse`.
+          description: Barcode already in use at this outlet (ADAM CR-104). `refusedReason` is `barcodeInUse`.
           content:
             application/problem+json:
               schema: { $ref: '#/components/schemas/MerchandiseConflictProblem' }
@@ -483,7 +483,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/MerchandiseItem' }
         '409':
-          description: The new barcode is already in use in this venue. `refusedReason` is `barcodeInUse`.
+          description: The new barcode is already in use at this outlet (ADAM CR-104). `refusedReason` is `barcodeInUse`.
           content:
             application/problem+json:
               schema: { $ref: '#/components/schemas/MerchandiseConflictProblem' }
@@ -1243,6 +1243,17 @@ paths:
         `opensAt` and `closesAt` (time of day, local to the venue). The drop is refused 409 `collectionPointClosed`
         when it would be collected while the point is closed, and `collectBy` defaults to the close of the point's
         day when the request sends none.
+
+        **What is refused, and how** (ADAM CR-104, option 1 as amended; Chinmay, 15 October 2026; CHG-R10ORD-017).
+        Both `saleId` and `orderId`, or neither, is `400 sale-or-order-required`. A `saleId`, `orderId` or
+        `collectionPointId` that names nothing the caller can see is `422` (`unknown-sale`, `unknown-order`,
+        `unknown-collection-point`), and a `lineIds` entry that is not a line of that sale or order is `422
+        unknown-line`. **One drop per sale and one per order**: a second is `409 alreadyDropped`, kept by a unique
+        index on each of `sale_id` and `order_id` (a row without one does not count), whatever `lineIds` it names.
+        **`itemNotDroppable` is not raised** until an approved screen can set `MerchandiseItem.isDroppable`: none
+        does today (CR-104), so every item is droppable. **`dropReference`** is server-assigned, the venue prefix
+        and a sequence per venue, as `orderNumber` is (for example `DXB1-SD-000123`), unique in the tenant; the slip
+        prints it and `lookupShopAndDrop` matches it exactly.
       tags: [floor]
       x-ticvai-permission: ORDER_CREATE
       x-ticvai-scope-level: workstation
@@ -1296,10 +1307,26 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/ShopAndDrop' }
+        '400':
+          description: Both `saleId` and `orderId`, or neither (`sale-or-order-required`; ADAM CR-104).
+          x-ticvai-problem-types: [sale-or-order-required]
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '422':
+          description: >
+            The sale, order or collection point named is not one the caller can see (`unknown-sale`,
+            `unknown-order`, `unknown-collection-point`), or a `lineIds` entry is not a line of it (`unknown-line`;
+            ADAM CR-104). `errors[]` names the field.
+          x-ticvai-problem-types: [unknown-sale, unknown-order, unknown-collection-point, unknown-line]
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
         '409':
           description: >
             Sale already dropped (`alreadyDropped`), an item is non-droppable — chilled,
-            fragile, oversized — (`itemNotDroppable`), or the collection point is closed before
+            fragile, oversized — (`itemNotDroppable`, not raised until an approved screen sets
+            `isDroppable`; ADAM CR-104), or the collection point is closed before
             `collectBy` (`collectionPointClosed`). `refusedReason` says which.
           content:
             application/problem+json:
@@ -1332,6 +1359,10 @@ paths:
         `x-ticvai-self-scoped: subject`): a guest caller needs no permission and is answered for goods they
         dropped themselves; another guest's goods is refused exactly as one that does not exist, never
         returned. `ORDER_VIEW` is what a staff caller must hold to act for any guest (ADR-0025).
+
+        **What it returns, in what order** (ADAM CR-104, option 1; CHG-R10ORD-017): the drops still awaiting
+        collection, `status` `awaitingCollection` or `partiallyCollected`; a collected, uncollected or disposed drop
+        is not returned. Newest first, by `droppedAt` descending, then `id`.
       tags: [floor]
       x-ticvai-permission: ORDER_VIEW
       x-ticvai-self-scoped: subject
@@ -1427,8 +1458,16 @@ paths:
                 verifiedBy:
                   type: string
                   enum: [entitlementScan, receipt, dropReference, staffOverride]
-                note: { type: string, maxLength: 500 }
-                recordedAt: { type: string, format: date-time }
+                note:
+                  type: string
+                  maxLength: 500
+                  x-ticvai-stored-as: retail.shop_and_drop.collection_note
+                  description: Kept on the drop as `collectionNote` (ADAM CR-104).
+                recordedAt:
+                  type: string
+                  format: date-time
+                  x-ticvai-stored-as: retail.shop_and_drop.collected_at
+                  description: When the device recorded the handover; kept as `collectedAt` (ADAM CR-104).
       responses:
         '200':
           headers:
@@ -1438,6 +1477,19 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/ShopAndDrop' }
+        '400':
+          description: A `lines` or `lineIds` entry that is not a line of this drop, or a quantity past what the line
+            has left (`line-not-on-drop`, `quantity-exceeds-line`; ADAM CR-104). `errors[]` names the entry.
+          x-ticvai-problem-types: [line-not-on-drop, quantity-exceeds-line]
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '404':
+          description: No drop with this `dropId` the caller can see (ADAM CR-104).
+          x-ticvai-problem-types: [not-found]
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
         '409':
           description: >
             Already collected (`alreadyCollected`), or past the collection deadline
@@ -1840,6 +1892,7 @@ components:
           description: Who last changed this rule. Set by the server from the caller of `setStoreRules`.
     MerchandiseItem:
       x-ticvai-persistence: "retail.merchandise"
+      x-ticvai-unique-together: [[outletId, barcode], [outletId, sku]]   # ADAM CR-104: a barcode and a SKU are unique per outlet
       type: object
       required: [id, sku, name, outletId, variantId, price, onHand, isActive]
       properties:
@@ -1849,8 +1902,15 @@ components:
 
             '
         id: { type: string, format: uuid }
-        sku: { type: string }
-        barcode: { type: string, nullable: true, x-ticvai-unique: venue }
+        sku:
+          type: string
+          description: Unique per outlet (ADAM CR-104, CHG-R10ORD-017); `lookupMerchandise` matches it exactly.
+        barcode:
+          type: string
+          nullable: true
+          x-ticvai-unique-compare: exact
+          description: Unique per outlet where set (ADAM CR-104; was unique per venue, which the table has no venue
+            column to key); `lookupMerchandise` matches it exactly and returns one row.
         name: { type: string }
         outletId: { type: string, format: uuid }
         categoryId: { type: string, format: uuid, nullable: true }
@@ -2464,16 +2524,27 @@ components:
         id: { type: string }
         dropReference:
           type: string
-          description: Short and readable. Printed on the slip a guest may or may not keep.
+          readOnly: true
+          maxLength: 32
+          x-ticvai-unique: tenant
+          x-ticvai-unique-compare: exact
+          description: Short and readable. Printed on the slip a guest may or may not keep. **Server-assigned, the
+            venue prefix and a sequence per venue** (ADAM CR-104; as `orderNumber`), for example `DXB1-SD-000123`,
+            unique in the tenant.
         saleId:
           type: string
           nullable: true
-          description: The till sale. Null for an online order, which sets `orderId` (audit R236).
+          x-ticvai-unique: tenant
+          x-ticvai-unique-compare: exact
+          description: The till sale. Null for an online order, which sets `orderId` (audit R236). **One drop per
+            sale** (ADAM CR-104), unique where set, which is what `alreadyDropped` refuses.
         orderId:
           type: string
           format: uuid
           nullable: true
-          description: The paid online order that created this collection (audit R236).
+          x-ticvai-unique: tenant
+          description: The paid online order that created this collection (audit R236). **One drop per order**
+            (ADAM CR-104), unique where set.
         entitlementId:
           type: string
           nullable: true
@@ -2506,6 +2577,12 @@ components:
         collectedAt: { type: string, format: date-time, nullable: true }
         collectedByPrincipalId: { type: string, format: uuid, nullable: true }
         verifiedBy: { type: string, nullable: true }
+        collectionNote:
+          type: string
+          maxLength: 500
+          nullable: true
+          description: The `note` given with the latest `collectShopAndDrop` (ADAM CR-104, CHG-R10ORD-017); null when
+            none was given.
 
     ShopAndDropProblem:
       x-ticvai-persistence: "none — error shape"

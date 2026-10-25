@@ -1149,6 +1149,19 @@ paths:
                     type: string
                   expiresInSeconds:
                     type: integer
+                  provider:
+                    type: object
+                    description: '**The provider the client tokenises against** (ADAM CR-099, option 1; CHG-R10ORD-016):
+                      the venue''s active `payments.provider` for the link''s channel, the one `payByLink` charges.'
+                    required:
+                    - providerId
+                    properties:
+                      providerId:
+                        type: string
+                        format: uuid
+                        x-ticvai-references: payments.provider
+                      providerName:
+                        type: string
         '410':
           description: '**Expired, paid, superseded or cancelled — and it says which**
             (`linkExpired`, `linkPaid`, `linkSuperseded`, `linkCancelled`, the four terminal states of
@@ -1194,6 +1207,20 @@ paths:
 
         **The card never reaches the platform.** Tokenised at the gateway like every other payment (CF-131),
         and the link carries no card data at any point.
+
+
+        **On `createPayment`''s rules** (ADAM CR-099, option 1; Chinmay, 15 October 2026; CHG-R10ORD-016). The
+        provider is the venue''s active provider for the link''s channel, which `getPaymentLink` returns so the
+        client tokenises against it. One `payments.payment_attempt` row per provider call and the cash-receipt
+        ledger posting follow `createPayment`; a decline is `402 providerDeclined`, as there. **The status moves**:
+        the order (`orders.sales_order`, already created when the link was, `payment_link.order_id`) goes from
+        `pending` or `held` to `paid`; where the link was issued against a reservation, the reservation goes from
+        `held` to `converted` with `converted_order_id` set to the order; the link goes to `paid` with `paidAt`;
+        `order.paid` is written in the same transaction. **`entitlementIds` is empty in the answer**: Access issues
+        the entitlements from `order.paid` after it (`x-ticvai-write-via`), and the client reads them from the order.
+        **The token**: the link is found by its blind index (`PaymentLink.token`, a keyed hash, unique in the
+        tenant), never by the token itself. An unknown token is `404`; a link that is expired, paid, superseded or
+        cancelled is `410` naming which, as `getPaymentLink` (ADR-0027: a superseded token answers 410, never 404).
 
         '
       tags:
@@ -1246,9 +1273,37 @@ paths:
                     format: uuid
                   entitlementIds:
                     type: array
+                    description: '**Empty at response time** (ADAM CR-099): the entitlements are written from
+                      `order.paid` after this answer; read them from the order. Optional, kept so a client built at
+                      r1 still validates.'
                     items:
                       type: string
                       format: uuid
+        '402':
+          description: The provider declined the payment (`providerDeclined`), as `createPayment` answers it (ADAM
+            CR-099). Nothing is converted and the link stays open.
+          x-ticvai-problem-types: [provider-declined]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/PaymentProblem'
+        '404':
+          description: No payment link has this token (ADAM CR-099). A real token is never 404; it is 410 once it
+            stops working.
+          x-ticvai-problem-types: [payment-link-not-found]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '410':
+          description: 'The link has expired, been paid, been superseded or been cancelled (`linkExpired`, `linkPaid`,
+            `linkSuperseded`, `linkCancelled`), as `getPaymentLink` answers it (ADAM CR-099; ADR-0027). Nothing is
+            charged.'
+          x-ticvai-problem-types: [link-expired, link-paid, link-superseded, link-cancelled]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/PaymentLinkProblem'
         '409':
           description: '**The hold went while they were paying** (`linesUnavailable`). Rare and real
             — a link near its expiry and a guest reading slowly. Nothing is charged. The response names
@@ -2834,6 +2889,14 @@ paths:
       tags:
       - orders
       parameters:
+      - name: subjectId
+        in: query
+        required: false
+        description: 'The guest whose saved methods a staff caller reads (ADAM CR-099, option 1; CHG-R10ORD-016). A
+          guest caller reads its own: another subject is 403.'
+        schema:
+          type: string
+          format: uuid
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
       x-ticvai-permission: ORDER_VIEW
@@ -4638,11 +4701,22 @@ paths:
         be wrong in the one direction with a regulator at the end of it.
 
         **A guest sees their own and nothing else** (`x-ticvai-self-scoped: subject`); supplying
-        another subject is 403 rather than silently honoured.
+        another subject is 403 rather than silently honoured. **Staff name the subject** with `subjectId`
+        (ADAM CR-099, option 1; CHG-R10ORD-016).
 
-        
 
-        **Order.** Newest first, by `occurredAt` descending, then by `id`.'
+        **What a statement is** (ADAM CR-099): one billing cycle of a membership agreement
+        (`identity.customer_membership`, read through `identity#customerMembershipRecords`), named by `agreementId`.
+        Its `id` is derived from the agreement and the period, a name-based UUID (v5) of `agreementId`,
+        `periodStart` and `periodEnd`, so `getBillingStatement` finds the same statement again.
+
+
+        **Order.** Most recent period first: `periodStart` descending, then `id` (one order; ADAM CR-099).'
+      x-ticvai-read-via:
+      - query: identity#customerMembershipRecords
+        route: in-process
+        for: 'the membership agreements whose billing cycles the statements are, identity.customer_membership, Identity''s
+          data (ADAM CR-099); same deployable (commerce)'
       tags:
       - orders
       x-ticvai-permission: ORDER_VIEW
@@ -4655,6 +4729,14 @@ paths:
       - guestAuth: []
       - bearerAuth: []
       parameters:
+      - name: subjectId
+        in: query
+        required: false
+        description: 'The guest whose statements a staff caller reads (ADAM CR-099). A guest caller reads its own:
+          another subject is 403.'
+        schema:
+          type: string
+          format: uuid
       - name: from
         in: query
         description: Only statements whose `periodEnd` is on or after this date.
@@ -20120,12 +20202,19 @@ components:
             '
         token:
           x-ticvai-secret: blind-index
+          x-ticvai-unique: tenant
+          x-ticvai-unique-compare: exact
           type: string
           format: password
           writeOnly: true
           description: '**Write-only, single purpose, and it is the only thing the guest presents.** Long
             enough not to be guessed and scoped to one order — **a token that can read a second order
             is a token that read somebody else''s booking.**
+
+
+            **Stored hashed, with a unique index** (ADAM CR-099, option 1; CHG-R10ORD-016): the column holds a
+            keyed hash of the token (the blind index, ADR-0063), never the token, unique in the tenant;
+            `getPaymentLink` and `payByLink` hash the presented token and look the link up by it.
 
             '
         status:
@@ -23143,6 +23232,7 @@ components:
         about money, and the package already has one of those.
       required:
       - id
+      - agreementId
       - periodStart
       - periodEnd
       - total
@@ -23151,6 +23241,13 @@ components:
         id:
           type: string
           format: uuid
+          description: A name-based UUID (v5) of `agreementId`, `periodStart` and `periodEnd`, so the same statement
+            has the same id on every read (ADAM CR-099).
+        agreementId:
+          type: string
+          format: uuid
+          description: The membership agreement this statement is one billing cycle of (`identity.customer_membership.id`;
+            ADAM CR-099).
         subjectId:
           type: string
           format: uuid
@@ -24225,6 +24322,8 @@ components:
           description: >-
             `grossAmount` converted at `chargeFxRate` and rounded to the charge currency's scale:
             what the guest pays and what the payment request to the provider asks for (CHG-FIN-001).
+            The charge currency's scale is its ISO 4217 minor units, from the kernel's fixed list (ADAM CR-192;
+            common.yaml `Money.scale`), when it is not the venue's trading currency.
         chargeRateLockedUntil:
           type: string
           format: date-time
@@ -24641,7 +24740,8 @@ components:
           allOf:
           - $ref: ../shared/common.yaml#/components/schemas/Money
           readOnly: true
-          description: The refund in `tenderCurrency`, at that currency's own scale (CHG-FIN-001).
+          description: The refund in `tenderCurrency`, at that currency's own scale (CHG-FIN-001), its ISO 4217 minor
+            units from the kernel's fixed list where it is not the venue's trading currency (ADAM CR-192).
         amount:
           x-ticvai-column: refunded_amount
           $ref: ../shared/common.yaml#/components/schemas/Money
@@ -24882,7 +24982,8 @@ components:
         tenderAmount:
           allOf:
           - $ref: ../shared/common.yaml#/components/schemas/Money
-          description: The amount in `tenderCurrency`, at that currency's own scale.
+          description: The amount in `tenderCurrency`, at that currency's own scale, its ISO 4217 minor units from the
+            kernel's fixed list where it is not the venue's trading currency (ADAM CR-192, option A; CHG-R10ORD-018).
         fxRate:
           allOf:
           - $ref: '#/components/schemas/ExchangeRateDecimal'
@@ -25317,10 +25418,10 @@ components:
           refusedReason:
             type: string
             enum:
-            - linkExpired        # getPaymentLink 410
-            - linkPaid           # getPaymentLink 410
-            - linkSuperseded     # getPaymentLink 410: resendPaymentLink retired it
-            - linkCancelled      # getPaymentLink 410
+            - linkExpired        # getPaymentLink 410, payByLink 410 (ADAM CR-099)
+            - linkPaid           # getPaymentLink 410, payByLink 410
+            - linkSuperseded     # getPaymentLink 410, payByLink 410: resendPaymentLink retired it
+            - linkCancelled      # getPaymentLink 410, payByLink 410
             - linesUnavailable   # payByLink 409: the hold went while the guest was paying
           unavailableLines:
             type: array

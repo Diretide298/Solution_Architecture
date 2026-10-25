@@ -2498,7 +2498,8 @@ components:
                   foreign holding is by definition cash in a currency the till does not trade in, so it
                   cannot resolve the way the box's own amounts do (naming-and-style 5.1; ADAM CR-135);
                   it is the key of the row, one per currency per box. The amounts on this item are in
-                  this currency.
+                  this currency, at its ISO 4217 minor units from the kernel's fixed list (ADAM CR-192;
+                  common.yaml `Money.scale`).
               expectedAmount:
                 allOf:
                   - $ref: '../shared/common.yaml#/components/schemas/Money'

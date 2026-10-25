@@ -1,0 +1,54 @@
+id: CHG-R10ORD-016
+date: '2026-10-25'
+source: cr
+kind: contract
+summary: payByLink declares 410 (the four PaymentLinkProblem reasons), 404 for an unknown token and 402 providerDeclined,
+  follows createPayment's attempt and ledger rules with the venue's active provider (which getPaymentLink returns), answers
+  entitlementIds empty, writes the order and reservation status moves down, and the link token is stored hashed with a unique
+  index; a billing statement is one billing cycle of a membership agreement (agreementId, an id derived from agreement and
+  period, one order); staff get subjectId on listBillingStatements and listPaymentTokens.
+decision:
+  what: 'ADAM CR-099, option 1: payByLink 410 with PaymentLinkProblem''s four reasons, 404 unknown token, 402 providerDeclined,
+    createPayment''s attempt and ledger rules; the provider is the venue''s active provider for the channel, also returned
+    by getPaymentLink; entitlementIds optional and empty at response time (entitlements come from order.paid); the order
+    and reservation status moves written down; the token stored hashed with a unique index (PaymentLink.token blind index,
+    x-ticvai-unique tenant); a billing statement is one billing cycle of a membership agreement, agreementId added, id derived
+    from agreement and period, one order (periodStart descending, id); staff subjectId on listBillingStatements and listPaymentTokens.
+    contracts/spine/orders.yaml.'
+  by: Chinmay
+  date: '2026-10-15'
+why: 'ADAM CR-099 (Deep Khanvilkar, #27863 payByLink), accepted with option 1 on 15 October 2026 (the 34 accepted CRs):
+  payByLink had no answer for a dead link, an unknown token or a decline, returned entitlement ids written after the response,
+  named no provider, and the token had no index; billing statements had no period rule, agreement or stable id, and staff
+  could not name a subject.'
+keys_touched:
+  operations:
+  - payByLink
+  - getPaymentLink
+  - listBillingStatements
+  - getBillingStatement
+  - listPaymentTokens
+  schemas:
+  - PaymentLink
+  - PaymentLinkProblem
+  - BillingStatement
+  tables:
+  - orders.payment_link
+  files:
+  - contracts/spine/orders.yaml
+root_class: 'new: a write whose refusals and status moves are not declared'
+tickets:
+  started:
+  - '27863 (payByLink): built to the CR''s ''build now''; its text is not rewritten.'
+  unstarted: []
+adam_cr: CR-099
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-problem-types.py
+notes: 'Database change: a unique index on orders.payment_link.token (the blind-index column), unique in the tenant. Not
+  changed: listPaymentTokens'' two stated sort orders (the CR names the disagreement; the decision does not choose); listed
+  for the lead.'
+release_tag: pending
+decision_owner: Chinmay
+status: open
