@@ -1,0 +1,42 @@
+id: CHG-R10UI-009
+date: '2026-10-25'
+source: cr
+kind: spec
+summary: GST-051 and WEB-050 bind the lunch question to VisitPlannerOptions.cuisineTags and the shop question to VisitPlannerOptions.retailTags,
+  read with getVisitPlannerOptions per chosen park, which also gives the preferenceNotAtVenue chip.
+decision:
+  what: 'ADAM CR-220 (screen side), option A, settled 25 October 2026: "GST-051 (and WEB-050) build the lunch and shop questions
+    and the preferenceNotAtVenue chip from it. Additive; no new operation on the screen." screens/P02 GST-051 and screens/P01
+    WEB-050: bindsTo and operation on the two questions, their notes, and getVisitPlannerOptions'' purpose.'
+  by: Chinmay
+  date: '2026-10-25'
+why: 'ADAM CR-220 (Chitrangi Mestry, #33038 GST-051). No operation the screen declared returned the per-park cuisine or
+  retail tags (MoM 4.7, 30 September), so the lunch and shop questions and the Not at the parks you chose chip could not
+  be built.'
+keys_touched:
+  screens:
+  - GST-051
+  - WEB-050
+  operations:
+  - getVisitPlannerOptions
+  schemas:
+  - VisitPlannerOptions
+  files:
+  - screens/P02-guest-mobile-app.yaml
+  - screens/P01-guest-web-storefront.yaml
+root_class: a screen choice with no source among its declared operations
+tickets:
+  started:
+  - '33038 (GST-051): through CR-220''s comment, as CHG-ADM-002 says; its text is not rewritten.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-220
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: open
+notes: 'VisitPlannerOptions.cuisineTags and .retailTags are lane C''s half (contracts/satellite/venue-map.yaml): until it
+  merges, check-screen-wiring S-FIELD-BINDING, check-bindings and check-binding-ratchet (guest A unknown-field 17 -> 21)
+  name the four bindings.'

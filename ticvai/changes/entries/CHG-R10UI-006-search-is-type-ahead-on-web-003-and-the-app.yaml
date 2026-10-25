@@ -1,0 +1,40 @@
+id: CHG-R10UI-006
+date: '2026-10-25'
+source: cr
+kind: spec
+summary: 'searchCatalogue is type-ahead on WEB-003, GST-063 and the app''s Explore search (GST-002, the same implementation):
+  called once typing pauses (300 ms debounce), only for 2 or more characters, Enter at once, the latest answer wins. frontend-patterns
+  4.6 states the pattern for every search-as-you-type field.'
+decision:
+  what: 'ADAM CR-223, option A, as built, settled 25 October 2026. screens/P01 WEB-003 and screens/P02 GST-063 and GST-002:
+    the search field''s note and searchCatalogue''s purpose (trigger stays onAction: the guest''s typing is the action).
+    viewer/mcp/setup/starters/docs/frontend-patterns.md 4.6.'
+  by: Chinmay
+  date: '2026-10-25'
+why: 'ADAM CR-223 (Chinmay Patkar, #28145 WEB-003). The record called searchCatalogue on Enter while the client-approved
+  prototype (rev 3) searches as the guest types, and the build is type-ahead; QA reading the record would flag it.'
+keys_touched:
+  screens:
+  - WEB-003
+  - GST-063
+  - GST-002
+  operations:
+  - searchCatalogue
+  files:
+  - screens/P01-guest-web-storefront.yaml
+  - screens/P02-guest-mobile-app.yaml
+  - ../viewer/mcp/setup/starters/docs/frontend-patterns.md
+root_class: a record that lags the build and the approved prototype
+tickets:
+  started:
+  - '28145 (WEB-003): through CR-223''s comment, as CHG-ADM-002 says; its text is not rewritten.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-223
+triage: fix-forward
+prevention:
+  type: template-field
+  ref: ../viewer/mcp/setup/starters/docs/frontend-patterns.md::4.6 Search as you type
+status: open
+notes: 'No visible change. frontend-patterns ships in ADAM''s setup zip: an ADAM deploy carries it.'

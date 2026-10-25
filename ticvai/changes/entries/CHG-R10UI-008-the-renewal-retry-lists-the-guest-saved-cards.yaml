@@ -1,0 +1,40 @@
+id: CHG-R10UI-008
+date: '2026-10-25'
+source: cr
+kind: spec
+summary: 'WEB-023 and GST-015 declare orders listPaymentTokens, called when the guest chooses Use another card: the retry
+  modal lists the saved cards (masked identifier, method, expiry, default first) and sends the chosen one''s id as paymentTokenId
+  to retryMyDunningPayment.'
+decision:
+  what: 'ADAM CR-233, option A, settled 25 October 2026 ("No contract change"). screens/P01 WEB-023: listPaymentTokens onAction,
+    shownBy Use another card (the prototype''s own control); the retry modal body. screens/P02 GST-015: the same api and
+    body, and a Use another card button, which its client-approved frame (wireframes/frames/gst-015.html) already draws;
+    approved-ui-changes.yaml GST-015 region:rowActions, logged as CR-233.'
+  by: Chinmay
+  date: '2026-10-25'
+why: 'ADAM CR-233 (Chinmay Patkar, #28295 WEB-023). Use another card (rev 3 DG-2) had no saved cards to choose from: the
+  screens did not declare the guest-callable listPaymentTokens, so a hard decline had no way forward.'
+keys_touched:
+  screens:
+  - WEB-023
+  - GST-015
+  operations:
+  - listPaymentTokens
+  - retryMyDunningPayment
+  files:
+  - screens/P01-guest-web-storefront.yaml
+  - screens/P02-guest-mobile-app.yaml
+  - docs/active/approved-ui-changes.yaml
+root_class: a drawn control with no operation behind it
+tickets:
+  started:
+  - '28295 (WEB-023): through CR-233''s comment, as CHG-ADM-002 says; its text is not rewritten.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-233
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: open

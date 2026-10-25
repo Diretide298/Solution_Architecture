@@ -1,6 +1,6 @@
 # ADR-0066: The on-sale waiting room sits at the edge, apart from the ride queue
 
-**Status:** Accepted · 1 October 2026 · Chinmay Parab — a vendor stays the fallback, and only a vendor would need the client · **amended 6 October 2026**: sized and load-tested at 50,000+ arrivals, the sale behind it accepted at 3,000 concurrent ([below](#amendment-6-october-2026-sized-for-50000-arrivals-the-sale-behind-it-accepted-at-3000-concurrent-chinmay-chg-r4-017))
+**Status:** Accepted · 1 October 2026 · Chinmay Parab — a vendor stays the fallback, and only a vendor would need the client · **amended 6 October 2026**: sized and load-tested at 50,000+ arrivals, the sale behind it accepted at 3,000 concurrent ([below](#amendment-6-october-2026-sized-for-50000-arrivals-the-sale-behind-it-accepted-at-3000-concurrent-chinmay-chg-r4-017)) · **amended 25 October 2026**: on the guest web the admission token is an HttpOnly cookie the edge sets, and a gone entry is a 404 ([below](#amendment-25-october-2026-the-web-keeps-the-admission-in-an-edge-cookie-and-a-gone-entry-is-a-404-chinmay-adam-cr-216))
 **Date:** 2026-10-01 (drafted 30 September from the system-design review) · **Deciders:** Chinmay Parab (the client only if a vendor is bought)
 **Finding:** SD-039 (high)
 **Amends:** ADR-0012 (queue integration, amended by this ADR) — Q2 gets its own endpoints and screens, not Q1's
@@ -144,3 +144,21 @@ sized for **50,000+ simultaneous arrivals**, and that is a floor, not a ceiling:
   large sale, with the sale behind the room held at 3,000 concurrent B2C users and then stepped above it, to show the
   benchmark is not a limit. The scenarios are in `docs/active/block-test-strategy.md` ("Load scenarios").
 - **Revisit** (Consequences) is unchanged: on-sales above 5,000 rps, or more than one a week, consider the vendor.
+
+## Amendment, 25 October 2026: the web keeps the admission in an edge cookie, and a gone entry is a 404 (Chinmay, ADAM CR-216)
+
+**Raised by Chinmay Patkar on WEB-015 (#28137), settled by the lead on 25 October 2026, option A.** The guest web may
+not use `localStorage` or `sessionStorage` (frontend-patterns 4.2), so a token held in memory was lost on a reload or in
+a second tab, and the guest who reloaded the sale after admission was refused and sent back with no entry, to a new
+place at the back: the outcome the room exists to prevent.
+
+- **The admission token is kept in an HttpOnly, short-lived, per-performance cookie set by the edge on the admitted
+  answer** of `getWaitingRoomPosition`. The browser sends it with `addCartLine`; no script reads it and the page stores
+  nothing. It lives no longer than the token (`admission.expiresAt`) and is scoped to the one performance. The token
+  check at the cart is unchanged: the same signature check, in middleware, whether the token arrives as this cookie
+  or as `X-Admission-Token` (the guest app, which keeps sending the header).
+- **The way back to the room carries `waitingEntryId`** (optional) on the WEB-006 to WEB-015 edge, and on the app's
+  GST-007 to GST-046, so a guest sent back keeps their place.
+- **A `404` from `getWaitingRoomPosition` for a performance the page knows means the entry is gone** (evicted, or the
+  room restarted): the guest re-enters. An unknown performance is the page's cold entry, which offers the event.
+

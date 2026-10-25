@@ -175,7 +175,9 @@ components:
         is on** (catalogue `WaitingRoomSetting`): the check is a signature check in middleware with no database read,
         and a missing, expired, forged or other-performance token is refused `403 admission-required` before
         anything is held. Ignored for a performance with the room off. A vendor''s token (the fallback, such as
-        Queue-it) is checked the same way.
+        Queue-it) is checked the same way. **On the guest web the same token arrives as the HttpOnly,
+        per-performance cookie the edge sets on the admitted answer** (ADR-0066 amendment of 25 October 2026,
+        ADAM CR-216) and is checked the same way; the guest app sends this header.
 
         '
       schema:

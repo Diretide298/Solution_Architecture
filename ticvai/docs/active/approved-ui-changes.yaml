@@ -18,4 +18,84 @@
 # An entry approves that content only: a later edit to the same field fails again until it has its own approval.
 # When the client approves a whole new UI, the lead re-takes the snapshot (`--snapshot <ref>`) in a reviewed commit
 # and the entries it has taken in can go (the check notes them).
-changes: []
+changes:
+- screen: BO-1144
+  field: 'region:fields'
+  to: a1c126fd87b702ca
+  approval: 'ADAM CR-193 (raised by Surendra Loke on #36207, 21 October 2026; settled 25 October 2026, option C by Chinmay):
+    since 22 October 2026 a developer may change approved UI when the change is logged in ADAM (the lead, 22 October
+    2026: "let frontend change ui and log it in changes. dont worry about it"); this CR is that log'
+  change: CHG-R10UI-003
+- screen: BO-1144
+  field: 'region:publish'
+  to: 958df2d794f13ce0
+  approval: 'ADAM CR-193 (raised by Surendra Loke on #36207, 21 October 2026; settled 25 October 2026, option C by Chinmay):
+    since 22 October 2026 a developer may change approved UI when the change is logged in ADAM (the lead, 22 October
+    2026: "let frontend change ui and log it in changes. dont worry about it"); this CR is that log'
+  change: CHG-R10UI-003
+- screen: GST-015
+  field: 'region:rowActions'
+  to: 539f2e2b281c5835
+  approval: 'ADAM CR-233 (raised by Chinmay Patkar on #28295, 22 October 2026; settled 25 October 2026, option A by
+    Chinmay): since 22 October 2026 a developer may change approved UI when the change is logged in ADAM (the lead,
+    22 October 2026: "let frontend change ui and log it in changes. dont worry about it"); this CR is that log; the
+    client-approved frame wireframes/frames/gst-015.html already draws Use another card'
+  change: CHG-R10UI-008
+- screen: GST-047
+  field: 'region:record'
+  to: fd8f7d789e4f068d
+  approval: 'ADAM CR-181 (raised by Chitrangi Mestry on #31074, 21 October 2026; accepted 21 October 2026, option A by
+    Chinmay): since 22 October 2026 a developer may change approved UI when the change is logged in ADAM (the lead,
+    22 October 2026: "let frontend change ui and log it in changes. dont worry about it"); this CR is that log'
+  change: CHG-R10UI-014
+- screen: WEB-029
+  field: 'navigation'
+  to: b53293b1d2192646
+  approval: 'ADAM CR-178 (raised by Chitrangi Mestry on #31062, 21 October 2026; accepted 21 October 2026, option A by
+    Chinmay): since 22 October 2026 a developer may change approved UI when the change is logged in ADAM (the lead,
+    22 October 2026: "let frontend change ui and log it in changes. dont worry about it"); this CR is that log'
+  change: CHG-R10UI-013
+- screen: WEB-029
+  field: 'region:record'
+  to: c9e151fe8f42f2e1
+  approval: 'ADAM CR-178 (raised by Chitrangi Mestry on #31062, 21 October 2026; accepted 21 October 2026, option A by
+    Chinmay): since 22 October 2026 a developer may change approved UI when the change is logged in ADAM (the lead,
+    22 October 2026: "let frontend change ui and log it in changes. dont worry about it"); this CR is that log'
+  change: CHG-R10UI-013
+- screen: WEB-029
+  field: 'state:closed'
+  to: 4f112cdc809adeb7
+  approval: 'ADAM CR-178 (raised by Chitrangi Mestry on #31062, 21 October 2026; accepted 21 October 2026, option A by
+    Chinmay): since 22 October 2026 a developer may change approved UI when the change is logged in ADAM (the lead,
+    22 October 2026: "let frontend change ui and log it in changes. dont worry about it"); this CR is that log'
+  change: CHG-R10UI-013
+- screen: WEB-029
+  field: 'state:open'
+  to: 53070e386c010044
+  approval: 'ADAM CR-178 (raised by Chitrangi Mestry on #31062, 21 October 2026; accepted 21 October 2026, option A by
+    Chinmay): since 22 October 2026 a developer may change approved UI when the change is logged in ADAM (the lead,
+    22 October 2026: "let frontend change ui and log it in changes. dont worry about it"); this CR is that log'
+  change: CHG-R10UI-013
+- screen: WEB-029
+  field: 'state:soldOut'
+  to: 341fc8f62853eab0
+  approval: 'ADAM CR-178 (raised by Chitrangi Mestry on #31062, 21 October 2026; accepted 21 October 2026, option A by
+    Chinmay): since 22 October 2026 a developer may change approved UI when the change is logged in ADAM (the lead,
+    22 October 2026: "let frontend change ui and log it in changes. dont worry about it"); this CR is that log'
+  change: CHG-R10UI-013
+- screen: WEB-032
+  field: 'navigation'
+  to: ece155c2407f3206
+  approval: 'ADAM CR-225 (raised by Chinmay Patkar on #28185, 22 October 2026; settled 25 October 2026, option A by
+    Chinmay): since 22 October 2026 a developer may change approved UI when the change is logged in ADAM (the lead,
+    22 October 2026: "let frontend change ui and log it in changes. dont worry about it"); this CR is that log; the
+    client-approved frame (prototype rev 3, match exact) draws Use this offer'
+  change: CHG-R10UI-007
+- screen: WEB-032
+  field: 'region:collection'
+  to: 8fad5457579341ff
+  approval: 'ADAM CR-225 (raised by Chinmay Patkar on #28185, 22 October 2026; settled 25 October 2026, option A by
+    Chinmay): since 22 October 2026 a developer may change approved UI when the change is logged in ADAM (the lead,
+    22 October 2026: "let frontend change ui and log it in changes. dont worry about it"); this CR is that log; the
+    client-approved frame (prototype rev 3, match exact) draws the pill, the venue line and Use this offer'
+  change: CHG-R10UI-007

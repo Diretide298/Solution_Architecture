@@ -1,0 +1,44 @@
+id: CHG-R10UI-013
+date: '2026-10-25'
+source: cr
+kind: spec
+summary: 'WEB-029 Error / Sold Out / Maintenance settles its four gaps: maintenance wins over closed, closed over sold out;
+  sold out offers Pick another day to WEB-002; with the site open the page says everything is running and goes back to WEB-001
+  (a new open state, shown as the status card); the CMS publishing columns leave the guest''s panel; closed says the site,
+  not the venue.'
+decision:
+  what: 'ADAM CR-178, option A, accepted 21 October 2026 (as "Fixed at the source in r9", which it was not: WEB-029 was
+    unchanged at r9). screens/P01 WEB-029: notes (precedence), the two transitions, the detail panel columns, the banner
+    note, states soldOut, closed and open, stateViews open; screens/_state-patterns.yaml WEB-029 open status-card; approved-ui-changes.yaml
+    WEB-029 navigation, region:record and states closed, open and soldOut, logged as CR-178.'
+  by: Chinmay
+  date: '2026-10-21'
+why: 'ADAM CR-178 (Chitrangi Mestry, #31062 WEB-029). Maintenance and availability can both hold and nothing said which
+  wins, sold out offered another day with nowhere to go, the open page was undefined, CMS publishing fields sat on a guest
+  page (CHG-SPF-002), and closed still said the venue after WHITE-C16; the build of 16 October (#27889) guessed all four.'
+keys_touched:
+  screens:
+  - WEB-029
+  operations:
+  - getTenantAppStatus
+  - getPublishedTenantConfig
+  files:
+  - screens/P01-guest-web-storefront.yaml
+  - screens/_state-patterns.yaml
+  - docs/active/approved-ui-changes.yaml
+root_class: states named one at a time with no precedence and no exit
+tickets:
+  started:
+  - '31062 (WEB-029) and 27889: through CR-178''s comment, as CHG-ADM-002 says; their text is not rewritten.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-178
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-approved-ui.py
+status: open
+notes: 'Visible change to an approved screen, logged in ADAM as CR-178 (the rule of 22 October). The open state reuses WEB-029''s
+  own status card; no new look is invented. GST-047, the app''s twin, gets the precedence in its notes only: its closed
+  copy still says the venue, a visible change no CR names (raised for the lead).'

@@ -1,0 +1,51 @@
+id: CHG-R10UI-004
+date: '2026-10-25'
+source: cr
+kind: spec
+summary: 'The on-sale waiting room keeps a guest''s place: the WEB-006 to WEB-015 edge carries waitingEntryId (optional),
+  the guest web keeps the admission token in an HttpOnly, short-lived, per-performance cookie the edge sets on the admitted
+  answer (no client storage), and a 404 from getWaitingRoomPosition for a known performance means the entry is gone and
+  the guest re-enters. ADR-0066 is amended; the app''s GST-007 and GST-046 carry waitingEntryId the same way.'
+decision:
+  what: 'ADAM CR-216, option A, as settled on 25 October 2026. screens/P01 WEB-015 (edge precondition, carries, poll purpose,
+    waitingEntryId from WEB-006) and WEB-006 (the edge carries waitingEntryId; entry state); screens/P02 GST-046 and GST-007
+    (the same carry; the app keeps sending the header). docs/adr/0066: the amendment of 25 October. contracts/spine/catalogue.yaml
+    getWaitingRoomPosition and contracts/shared/common.yaml AdmissionToken: the cookie and the meaning of a 404, in their
+    descriptions. frontend-patterns 4.2: an HttpOnly edge cookie is not client storage.'
+  by: Chinmay
+  date: '2026-10-25'
+why: 'ADAM CR-216 (Chinmay Patkar, #28137 WEB-015), settled 25 October 2026. frontend-patterns 4.2 bans localStorage and
+  sessionStorage, so the token lived in memory and a reload after admission sent the guest back with no entry, to a new
+  place at the back, against ADR-0066; a 404 on the poll had no stated meaning.'
+keys_touched:
+  screens:
+  - WEB-015
+  - WEB-006
+  - GST-046
+  - GST-007
+  operations:
+  - getWaitingRoomPosition
+  - addCartLine
+  files:
+  - screens/P01-guest-web-storefront.yaml
+  - screens/P02-guest-mobile-app.yaml
+  - docs/adr/0066-the-on-sale-waiting-room-is-separate-from-the-ride-queue.md
+  - contracts/spine/catalogue.yaml
+  - contracts/shared/common.yaml
+  - ../viewer/mcp/setup/starters/docs/frontend-patterns.md
+root_class: a client-held secret with no storage the standards allow
+tickets:
+  started:
+  - '28137 (WEB-015): through CR-216''s comment, as CHG-ADM-002 says; its text is not rewritten.'
+  unstarted:
+  - EDGE-WAITING-ROOM (ADR-0066 action item 3) sets the cookie; it reads the amended ADR at its pull.
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-216
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-navigation.py
+status: open
+notes: 'Binding-only on the screens (carries, preconditions, purposes); no visible change. Cross-lane: catalogue.yaml (lane
+  B) and common.yaml (shared) get description text only, no shape change.'

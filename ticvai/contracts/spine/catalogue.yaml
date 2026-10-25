@@ -16682,6 +16682,13 @@ paths:
         a missing or invalid token `403 admission-required` for a performance whose room is on. The admitted
         answer is never cached at the edge.
 
+
+        **On the guest web the edge also sets the token as an HttpOnly, short-lived, per-performance cookie** on
+        the admitted answer (ADR-0066 amendment of 25 October 2026, ADAM CR-216): the browser sends it with
+        `addCartLine` and the page stores nothing, so a reload or a second tab stays admitted. **A `404` for a
+        performance the caller knows means the entry is gone** (evicted, or the room restarted): the guest
+        re-enters with `enterWaitingRoom`.
+
         '
       tags:
       - event

@@ -1,0 +1,53 @@
+id: CHG-R10UI-005
+date: '2026-10-25'
+source: cr
+kind: contract
+summary: GST-042 and WEB-016 confirm the code registerGuest sends with verifyGuestEmail (mode code) under the session registerGuest
+  returned, keeping verifyGuestOtp for Send me a code; channel becomes optional on requestGuestOtp and registerGuest for
+  a mobile identifier, the server picking WhatsApp or SMS from the tenant's configured delivery, so the guest is never asked
+  to pick one.
+decision:
+  what: 'ADAM CR-177, option A (accepted 21 October 2026 as "Fixed at the source in r9", which it was not: GST-042 still
+    declared no verifyGuestEmail at r9), and ADAM CR-222 (settled 25 October 2026): "(1) As CR-177 option A ... (2) Option
+    B: channel becomes optional on requestGuestOtp and registerGuest for a mobile identifier, and the server picks WhatsApp
+    or SMS from the tenant''s configured delivery; an email identifier sends email. The guest is never asked to pick. Additive."
+    screens/P01 WEB-016 and screens/P02 GST-042: verifyGuestEmail in apis (sent by the Code field after Create an account),
+    the Code field note, the formRegisterGuest and formRequestGuestOtp bodies. contracts/spine/identity.yaml: channel no
+    longer required in requestGuestOtp''s body or in RegisterGuestRequest, with the rule on the property.'
+  by: Chinmay
+  date: '2026-10-25'
+why: 'ADAM CR-177 (Chitrangi Mestry, #36183 GST-042) and CR-222 (Chitrangi Mestry, #30696 WEB-016). At r8 registerGuest
+  says its code is confirmed with verifyGuestEmail mode code, but both sign-in screens sent it to verifyGuestOtp; and requestGuestOtp
+  required a channel that no guest-readable source gave for a mobile number.'
+keys_touched:
+  screens:
+  - GST-042
+  - WEB-016
+  operations:
+  - verifyGuestEmail
+  - verifyGuestOtp
+  - requestGuestOtp
+  - registerGuest
+  schemas:
+  - RegisterGuestRequest
+  files:
+  - screens/P01-guest-web-storefront.yaml
+  - screens/P02-guest-mobile-app.yaml
+  - contracts/spine/identity.yaml
+root_class: a decision fixed on one twin screen and not the other (CR-177 named GST-042 only)
+tickets:
+  started:
+  - '36183 (GST-042) and 30696 (WEB-016): through the CRs'' comments, as CHG-ADM-002 says; their text is not rewritten.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-177, CR-222
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-contract-compat.py
+status: open
+notes: 'Binding-only on the screens: verifyGuestEmail is declared background ("sent by the Code field after Create an account"),
+  so the approved code field is unchanged. Cross-lane: identity.yaml is lane A1''s contract; the edit is the required lists
+  and two property descriptions (compatible: check-contract-compat passes). The decision does not say which channel wins
+  when a tenant has both WhatsApp and SMS delivery: raised for the lead.'
