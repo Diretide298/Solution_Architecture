@@ -1279,8 +1279,8 @@ screens:
         provenance: decided 29 September, rev 3 REV3-11
       - kind: iconButton
         label: Quick tour
-        notes: Replays the four-step coach-mark tour. Shown only when `BookingFlowConfig.quickTour` is
-          on (default off).
+        notes: 'Replays the four-step coach-mark tour. Shown only when `BookingFlowLevelSettings.quickTour`
+          (`getPublishedBookingFlow`) is on (default off).'
         provenance: decided 29 September, rev 3 REV3-20
       - kind: cardList
         bindsTo: ProductVariant[]
@@ -2304,16 +2304,14 @@ screens:
           `recordRecommendationEvents`.'
       - kind: detailPanel
         label: The bundle
-        bindsTo: Bundle
+        bindsTo: GuestBundle
         columns:
-        - Bundle.code
-        - Bundle.name
-        - Bundle.description
-        - Bundle.kind
-        - Bundle.price
-        - Bundle.savingsAmount
-        - Bundle.savingsPercentage
-        - Bundle.hasBeenSold
+        - GuestBundle.name
+        - GuestBundle.description
+        - GuestBundle.kind
+        - GuestBundle.price
+        - GuestBundle.savingsAmount
+        - GuestBundle.savingsPercentage
         operation: getGuestBundle
         provenance: contract promotions.yaml GET /bundles/{bundleId}
         notes: A bundle the recommendation slot names (`kind` bundle), opened from its card; signed catalogue
@@ -2686,16 +2684,14 @@ screens:
         provenance: contract orders.yaml GET /carts/{cartId}
       - kind: detailPanel
         label: The coupon code
-        bindsTo: CouponCode
+        bindsTo: GuestCouponCode
         columns:
-        - CouponCode.code
-        - CouponCode.status
-        - CouponCode.redemptionCount
-        - CouponCode.discount
-        - CouponCode.invalidReason
-        - CouponCode.validFrom
-        - CouponCode.validTo
-        - CouponCode.redeemedAt
+        - GuestCouponCode.code
+        - GuestCouponCode.status
+        - GuestCouponCode.discount
+        - GuestCouponCode.invalidReason
+        - GuestCouponCode.validFrom
+        - GuestCouponCode.validTo
         operation: getGuestCouponCode
         provenance: contract promotions.yaml GET /coupon-codes/{code}
       - kind: textField
@@ -7839,11 +7835,11 @@ screens:
         provenance: contract orders.yaml GET /group-bookings/{groupBookingId}
       - kind: detailPanel
         label: The resource availability
-        bindsTo: ResourceAvailability
+        bindsTo: ProductStartTime
         columns:
-        - ResourceAvailability.resourceId
-        - ResourceAvailability.freeWindows
-        - ResourceAvailability.blockedWindows
+        - ProductStartTime.startsAt
+        - ProductStartTime.endsAt
+        - ProductStartTime.freeCount
         operation: listProductStartTimes
         notes: 'Build note (r8 second round, ORDERS-MONEY-C08, option A): drawn as approved, filled from
           `listProductStartTimes` for the reserved line''s product and variant on the picked date: the

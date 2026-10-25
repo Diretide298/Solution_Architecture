@@ -36339,7 +36339,8 @@ screens:
       components:
       - kind: selectField
         label: Venue
-        operation: searchAiDecisions
+        bindsTo: OrgUnit.id
+        operation: listOrgUnits
         notes: 'Sent as `venueId` (18 September minutes, M18-03: searchable by venue).'
         provenance: 29 September pass (group A)
       - kind: searchField
@@ -36387,6 +36388,11 @@ screens:
     trigger: onAction
     invalidates:
     - listOwnPlatformStaffGrants
+  - operationId: listOrgUnits
+    contract: tenancy
+    purpose: 'The venues to filter by (scope nodes at level venue); the chosen one''s id is sent as venueId
+      (check-screen-value-sources, CHG-R10UI-015)'
+    trigger: onLoad
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-540

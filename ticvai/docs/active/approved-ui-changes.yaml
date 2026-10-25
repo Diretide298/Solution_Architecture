@@ -99,3 +99,66 @@ changes:
     22 October 2026: "let frontend change ui and log it in changes. dont worry about it"); this CR is that log; the
     client-approved frame (prototype rev 3, match exact) draws the pill, the venue line and Use this offer'
   change: CHG-R10UI-007
+- screen: ACC-006
+  field: 'region:queue'
+  to: e23804edf5d82ff9
+  approval: 'check-screen-value-sources (CHG-R10GEN-003) with the lead''s accepted defaults of 25 October 2026: the queue
+    answers AccreditationApplication (reference, submittedAt, decisionDueAt), not the approvals ApprovalRequest; the
+    column names the field the screen''s declared read answers, and nothing else on the screen changes'
+  change: CHG-R10UI-015
+- screen: GST-037
+  field: 'region:selection'
+  to: 3de2590bff15013d
+  approval: 'check-screen-value-sources (CHG-R10GEN-003) with the lead''s accepted defaults of 25 October 2026: a guest
+    reads GuestCouponCode, which has no redemption count; the column names the field the screen''s declared read
+    answers, and nothing else on the screen changes'
+  change: CHG-R10UI-015
+- screen: GST-056
+  field: 'region:selection'
+  to: d8ffbff602fa7c0d
+  approval: 'check-screen-value-sources (CHG-R10GEN-003) with the lead''s accepted defaults of 25 October 2026: a guest
+    reads GuestBundle, which has no code; the column names the field the screen''s declared read answers, and
+    nothing else on the screen changes'
+  change: CHG-R10UI-015
+- screen: POS-003
+  field: 'overlay:formAcquireInventoryHold'
+  to: removed
+  approval: 'check-screen-value-sources (CHG-R10GEN-003) with the lead''s accepted defaults of 25 October 2026: never
+    opened: the till takes no hold here (r8 GPS-C11); its request had no source; the column names the field the
+    screen''s declared read answers, and nothing else on the screen changes'
+  change: CHG-R10UI-015
+- screen: POS-003
+  field: 'region:collection'
+  to: d3cf578f888bc0b3
+  approval: 'check-screen-value-sources (CHG-R10GEN-003) with the lead''s accepted defaults of 25 October 2026: the
+    never-drawn hold list is removed: the till lists no holds (r8 GPS-C11, GPS-C12); the column names the field the
+    screen''s declared read answers, and nothing else on the screen changes'
+  change: CHG-R10UI-015
+- screen: POS-003
+  field: 'region:rowActions'
+  to: 8fc51208f5b41c3d
+  approval: 'check-screen-value-sources (CHG-R10GEN-003) with the lead''s accepted defaults of 25 October 2026: the
+    never-drawn Acquire inventory hold button is removed (POSV2-10, r8 GPS-C11); the column names the field the
+    screen''s declared read answers, and nothing else on the screen changes'
+  change: CHG-R10UI-015
+- screen: WEB-008
+  field: 'region:record'
+  to: cf74ef45e27b02ae
+  approval: 'check-screen-value-sources (CHG-R10GEN-003) with the lead''s accepted defaults of 25 October 2026: a guest
+    reads GuestBundle, which has no code and no sold flag; the column names the field the screen''s declared read
+    answers, and nothing else on the screen changes'
+  change: CHG-R10UI-015
+- screen: WEB-010
+  field: 'region:record'
+  to: d3edc77d7b51cd24
+  approval: 'check-screen-value-sources (CHG-R10GEN-003) with the lead''s accepted defaults of 25 October 2026: a guest
+    reads GuestCouponCode, which has no redemption count or redeemed time; the column names the field the screen''s
+    declared read answers, and nothing else on the screen changes'
+  change: CHG-R10UI-015
+- screen: WEB-031
+  field: 'region:selection'
+  to: cab903ea5c9e2a05
+  approval: 'check-screen-value-sources (CHG-R10GEN-003) with the lead''s accepted defaults of 25 October 2026: the panel is
+    filled from listProductStartTimes (r8 ORDERS-MONEY-C08, option A): its start, end and free count; the column
+    names the field the screen''s declared read answers, and nothing else on the screen changes'
+  change: CHG-R10UI-015
