@@ -227,7 +227,9 @@ LATER
   * Remove ADAM from one folder, in PowerShell:
         powershell -ExecutionPolicy Bypass -File "$env:USERPROFILE\.adam\connector\setup.ps1" -RemoveFolder "C:\work\ticvai-backend"
     Setup prints this line, with your own folder, when it finishes.
-  * Remove it everywhere:            Double-click uninstall.cmd. Project
+  * Remove it everywhere:            Double-click uninstall.cmd in
+                                     %USERPROFILE%\.adam\connector (setup
+                                     puts it there). Project
                                      folders are left as they are. ADAM's
                                      usage hooks are taken out of your
                                      Claude Code settings; nothing else
@@ -275,9 +277,11 @@ IF SOMETHING GOES WRONG
 WHAT IS IN THIS FOLDER
 ----------------------
   setup.cmd        double-click to create a project folder and connect it
-  uninstall.cmd    double-click to remove ADAM from every folder
+                   (the only thing to run here)
   adam-connector\
-    setup.ps1      what both of those run
+    setup.ps1      what setup.cmd runs
+    uninstall.cmd  removes ADAM from every folder; run the installed copy
+                   in %USERPROFILE%\.adam\connector, not this one
     server.mjs     the connector Claude Code starts
     client.mjs     how it talks to ADAM
     tools.mjs      the 19 tools

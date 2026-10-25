@@ -57,8 +57,9 @@ powershell -ExecutionPolicy Bypass -File viewer\mcp\setup\build-zip.ps1
 ```
 
 That writes `adam-connector-setup.zip` (about 220 KB, gitignored) at the repository root, and nothing
-personal — the same file works for everyone. It opens to `adam-setup\`: `setup.cmd`,
-`uninstall.cmd` and a README on top, and `adam-connector\` beside them with the connector files,
+personal — the same file works for everyone. It opens to `adam-setup\`: `setup.cmd` and a README
+on top (one command, so nobody wonders which to run), and `adam-connector\` beside them with the
+connector files, `uninstall.cmd`,
 `setup.ps1` and `starters\` — a backend and a frontend skeleton (`setup/starters/backend`,
 `setup/starters/frontend`) and the coding standards (`setup/starters/docs`, copied from
 `ticvai-docs/setup`). A developer unzips it into their work folder and double-clicks `setup.cmd`,

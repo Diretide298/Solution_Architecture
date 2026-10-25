@@ -6,8 +6,7 @@
     The zip opens to one folder, adam-setup\:
 
         adam-setup\
-          setup.cmd          what the developer runs
-          uninstall.cmd
+          setup.cmd          what the developer runs (the only command on top)
           README.txt
           docs\              the TICVAI build plan and development plan, how tickets
                              are ordered, build readiness and the decisions register
@@ -103,11 +102,13 @@ try {
         $text = ($text -replace "`r`n", "`n") -replace "`n", "`r`n"
         [IO.File]::WriteAllText($target, $text, (New-Object System.Text.UTF8Encoding($false)))
     }
-    # The launchers at the top, where the developer looks, and beside setup.ps1,
-    # where setup copies them from when it installs itself.
-    foreach ($place in $top, $folder) {
-        & $crlf (Join-Path $Here 'setup.cmd') (Join-Path $place 'setup.cmd') $build
-        & $crlf (Join-Path $Here 'uninstall.cmd') (Join-Path $place 'uninstall.cmd') $build
+    # One command on top, where the developer looks: setup.cmd (the lead, 25 October
+    # 2026: two commands side by side confused people). Both launchers go beside
+    # setup.ps1, where setup copies them from into the installed copy; uninstall.cmd
+    # is run from there (%USERPROFILE%\.adam\connector).
+    & $crlf (Join-Path $Here 'setup.cmd') (Join-Path $top 'setup.cmd') $build
+    foreach ($launcher in 'setup.cmd', 'uninstall.cmd') {
+        & $crlf (Join-Path $Here $launcher) (Join-Path $folder $launcher) $build
     }
     & $crlf (Join-Path $Here 'README.txt') (Join-Path $top 'README.txt') $build
 

@@ -349,7 +349,7 @@ function Remove-FolderRegistration([string]$Path) {
 
 function Show-RemoveHelp($entries) {
     $script = Join-Path $InstallDir 'setup.ps1'
-    Write-Host '  To remove it later: double-click uninstall.cmd (removes everything), or run:'
+    Write-Host ('  To remove it later: double-click ' + (Join-Path $InstallDir 'uninstall.cmd') + ' (removes everything), or run:')
     foreach ($entry in $entries) {
         if ($entry.Scope -eq 'user') {
             Write-Host "     claude mcp remove $Name -s user" -ForegroundColor Gray
