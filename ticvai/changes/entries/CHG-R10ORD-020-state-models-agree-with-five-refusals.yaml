@@ -1,0 +1,46 @@
+id: CHG-R10ORD-020
+date: '2026-10-25'
+source: audit
+kind: contract
+summary: 'Five state models now agree with their operations'' 409s: stopCampaign moves a sending campaign to stopped and
+  closeShift a suspended shift to pendingClosure; the catalogue change request''s moves out of pendingValidation are the
+  validation job''s, a released production plan''s cancellation names no operation, and a rota assignment returns from swapPending
+  by cascade from the swap.'
+decision:
+  what: 'The lead''s default rulings on lane E''s check-state-refusals (LANE-E-RULINGS.md section 4, accepted 25 October
+    2026): stopCampaign and closeShift, the 409 is right and the state model gains the moves (states/campaign.yaml sending
+    -> stopped, states/shift.yaml suspended -> pendingClosure); submitPricingChangeRequest, releaseProductionPlan and requestShiftSwap,
+    the model''s trigger is wrong and is corrected (states/catalogue-change-request.yaml pendingValidation -> pendingApproval
+    and -> draft by job; states/production-plan.yaml released -> cancelled without releaseProductionPlan; states/rota-assignment.yaml
+    swapPending -> published by cascade). certifyIntegration and resetSandbox are lane A1''s.'
+  by: Chinmay
+  date: '2026-10-25'
+why: 'check-state-refusals (lane E, r10) on the merged r10 tree: SR-ALLOWS-NO-MOVE, a 409''s allowed states differing from
+  the states the model moves the operation from (ADAM CR-237 was the first of the class).'
+keys_touched:
+  operations:
+  - stopCampaign
+  - closeShift
+  - submitPricingChangeRequest
+  - releaseProductionPlan
+  - requestShiftSwap
+  files:
+  - states/campaign.yaml
+  - states/shift.yaml
+  - states/catalogue-change-request.yaml
+  - states/production-plan.yaml
+  - states/rota-assignment.yaml
+root_class: 'new: refusals that disagree with the state model'
+tickets:
+  started: []
+  unstarted:
+  - The five operations' tickets pick the model up at the r10 tag.
+adam_cr: CR-237
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-state-refusals.py
+notes: No database change. Which operation cancels a released production plan stays the model's open question.
+release_tag: pending
+decision_owner: Chinmay
+status: open

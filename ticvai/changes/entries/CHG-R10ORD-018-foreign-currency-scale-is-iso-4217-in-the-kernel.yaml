@@ -35,9 +35,8 @@ tickets:
 adam_cr: CR-192
 triage: fix-forward
 prevention:
-  type: none
-  reason: Lane E of r10 adds the check for Money with no currency source; a foreign-currency amount names its rule in the
-    contract, which that check reads.
+  type: check
+  ref: tools/check-money-currency.py
 notes: No database change.
 release_tag: pending
 decision_owner: Chinmay

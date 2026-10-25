@@ -8365,6 +8365,10 @@ paths:
   /recommendation-simulations:
     post:
       operationId: simulateRecommendationStrategy
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the currency and scale of the Money it answers or accepts: the venue it acts at (the caller''s working venue), Tenancy''s data (CHG-R10ORD-019, the lead''s ruling of 25 October 2026)'
       x-ticvai-consumed-by:
         - "P08 ADM-648 Recommendation Strategy Simulator & AI Advisor"
         - "P08 ADM-658 Upgrade Simulator, Comparison & AI Advisor"
@@ -8383,6 +8387,10 @@ paths:
         the replay uses the same eligibility, ranking and guardrails as the live slot. Promotions owns the
         strategy; the engine decides.
 
+
+        **Its currency** (CHG-R10ORD-019; the lead''s ruling of 25 October 2026 on check-money-currency): the Money
+        this operation answers or accepts is in the currency of the venue it acts at, the caller''s working venue,
+        read through `tenancy#venueSettingsRecords` with its scale; the rows behind it store the amount only.
         '
       tags:
       - recommendations

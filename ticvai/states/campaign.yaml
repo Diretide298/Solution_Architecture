@@ -43,6 +43,11 @@ transitions:
   to: completed
   trigger: job
   guard: Every recipient attempted
+- from: sending
+  to: stopped
+  operation: stopCampaign
+  trigger: operation
+  guard: Stopped mid-send; recipients not yet attempted are not sent to. stopCampaign's 409 already allowed sending (r10 ruling on check-state-refusals, the lead, 25 October 2026; CHG-R10ORD-020)
 - from: paused
   to: stopped
   operation: stopCampaign

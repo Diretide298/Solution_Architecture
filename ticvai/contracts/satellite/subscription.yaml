@@ -5693,6 +5693,9 @@ paths:
   /member-exception-override:
     get:
       operationId: listMemberExceptionOverride
+      x-ticvai-reads:
+      - table: control.billing_entity
+        for: 'the platform billing currency its Money is in (billingCurrency; CHG-R10ORD-019, ADAM CR-202)'
       x-ticvai-consumed-by:
         - "P08 BO-301 Member Exceptions, Overrides & Service Recovery"
         - "P08 BO-949 Approval, Exception & Override Control Center"
@@ -5724,7 +5727,11 @@ paths:
         requestor != approver; remedies priced through central commercial services; AI suggestions are advisory.
         Served alongside BO-949''s general approval centre.
 
-        **Order.** Sorted by `exceptionId` descending (a UUIDv7, so newest first).'
+        **Order.** Sorted by `exceptionId` descending (a UUIDv7, so newest first).
+
+        **Its currency** (CHG-R10ORD-019; the lead''s ruling of 25 October 2026 on check-money-currency): a
+        platform-level answer, so its Money is in the platform billing currency, the tenant''s billing entity''s
+        `billingCurrency` (`control.billing_entity`, ADAM CR-202), at its ISO 4217 scale.'
       tags:
       - drafted
       x-ticvai-permission: PLATFORM_TENANT_VIEW
@@ -9089,6 +9096,9 @@ paths:
   /vsi-assessments:
     post:
       operationId: scoreVsiAssessment
+      x-ticvai-reads:
+      - table: control.billing_entity
+        for: 'the platform billing currency its Money is in (billingCurrency; CHG-R10ORD-019, ADAM CR-202)'
       x-ticvai-consumed-by:
         - "P09 ADM-372 Operational Profile, VSI & Commercial Model Intelligence"
         - "P09 ADM-381 Venue Type & Business Profile"
@@ -9119,6 +9129,10 @@ paths:
         prospect told only their price has been told nothing they can argue with, and the first thing
         a serious buyer does is argue with it.
 
+
+        **Its currency** (CHG-R10ORD-019; the lead''s ruling of 25 October 2026 on check-money-currency): a
+        platform-level answer, so its Money is in the platform billing currency, the tenant''s billing entity''s
+        `billingCurrency` (`control.billing_entity`, ADAM CR-202), at its ISO 4217 scale.
         '
       tags:
       - subscription
@@ -9692,6 +9706,9 @@ paths:
   /commercial-metrics:
     get:
       operationId: getCommercialMetrics
+      x-ticvai-reads:
+      - table: control.billing_entity
+        for: 'the platform billing currency its Money is in (billingCurrency; CHG-R10ORD-019, ADAM CR-202)'
       x-ticvai-consumed-by:
         - "P09 ADM-369 Commercial Command Center"
         - "P09 ADM-372 Operational Profile, VSI & Commercial Model Intelligence"
@@ -9733,7 +9750,11 @@ paths:
 
 
         **One customer or the portfolio.** With `tenantId` the figures are that customer''s (the billing and
-        renewal centres); without it, the whole portfolio. With no `period`, the current calendar month.'
+        renewal centres); without it, the whole portfolio. With no `period`, the current calendar month.
+
+        **Its currency** (CHG-R10ORD-019; the lead''s ruling of 25 October 2026 on check-money-currency): a
+        platform-level answer, so its Money is in the platform billing currency, the tenant''s billing entity''s
+        `billingCurrency` (`control.billing_entity`, ADAM CR-202), at its ISO 4217 scale.'
       tags:
       - subscription
       x-ticvai-permission: PLATFORM_BILLING_VIEW

@@ -1,0 +1,64 @@
+id: CHG-R10ORD-019
+date: '2026-10-25'
+source: audit
+kind: contract
+summary: 'The 19 operations check-money-currency found answering Money from a row with no venue or from a computed answer
+  now state their currency: 16 read the venue they act at (the caller''s working venue) through tenancy#venueSettingsRecords
+  in process, and the three platform-level answers use the platform billing currency (control.billing_entity.billing_currency).'
+decision:
+  what: 'The lead''s default rulings on lane E''s check-money-currency (audit/ticvai/r10/LANE-E-RULINGS.md section 2, accepted
+    25 October 2026): a row with no venue and a computed answer take the currency of the venue the operation acts at, read
+    through tenancy#venueSettingsRecords, and the operation says so; a clearly platform-level answer uses the platform billing
+    currency. Venue: activateGiftCard, blockGiftCard, getGiftCard, issueGiftCard, redeemGiftCard, createSharedWallet, listSharedWallets,
+    setSharedWalletMembers, getWalletMovementSummary, getWalletPreCloseChecks (wallet); addToWishlist, getWishlist (marketing-crm,
+    added to XDR-002); openGuestCreditAccount, listRefundDisputeResale, simulateRefund (orders); simulateRecommendationStrategy
+    (promotions). Platform billing currency, by x-ticvai-reads control.billing_entity: getCommercialMetrics, listMemberExceptionOverride,
+    scoreVsiAssessment (subscription).'
+  by: Chinmay
+  date: '2026-10-25'
+why: 'check-money-currency (CHG-R10GEN-002) on the merged r10 tree: 11 rows with no venue and 8 computed answers that read
+  no table holding a currency; ADR-0018 and naming-and-style 5.1 resolve the currency from what denominates the amount,
+  ADAM CR-234 and CR-202 set the two patterns.'
+keys_touched:
+  operations:
+  - activateGiftCard
+  - blockGiftCard
+  - getGiftCard
+  - issueGiftCard
+  - redeemGiftCard
+  - createSharedWallet
+  - listSharedWallets
+  - setSharedWalletMembers
+  - getWalletMovementSummary
+  - getWalletPreCloseChecks
+  - addToWishlist
+  - getWishlist
+  - openGuestCreditAccount
+  - listRefundDisputeResale
+  - simulateRefund
+  - simulateRecommendationStrategy
+  - getCommercialMetrics
+  - listMemberExceptionOverride
+  - scoreVsiAssessment
+  files:
+  - contracts/satellite/wallet.yaml
+  - contracts/satellite/marketing-crm.yaml
+  - contracts/spine/orders.yaml
+  - contracts/satellite/promotions.yaml
+  - contracts/satellite/subscription.yaml
+  - docs/active/cross-deployable-writes.yaml
+root_class: 'new: Money answered with no currency source'
+tickets:
+  started:
+  - Any started ticket of these operations gets the read at its next pull (CHG-ADM-001); no ticket text is rewritten.
+  unstarted: []
+adam_cr: CR-234
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-money-currency.py
+notes: No database change. The 13 platform billing rows left (control.plan, control.contract, control.licence_add_on, module
+  listings, the tenant) are CR-202's group, a billing currency stored on the row, not this lane's.
+release_tag: pending
+decision_owner: Chinmay
+status: open
