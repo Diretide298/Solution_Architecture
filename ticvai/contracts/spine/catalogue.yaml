@@ -22706,6 +22706,7 @@ components:
         '
       required:
       - version
+      - productId
       - publishedAt
       - publishedByPrincipalId
       properties:
@@ -22714,6 +22715,11 @@ components:
         productId:
           type: string
           format: uuid
+          x-ticvai-references: catalogue.product
+          description: '**The product this is a version of**, always set (ADAM CR-214; CHG-R10CAT-006). Required, so the
+            row follows its product''s row security: a venue that writes a product writes its versions, which every
+            product write that versions it now does (until r10 product_id was nullable and the table was tenant-root
+            only).'
         publishedAt:
           type: string
           format: date-time
