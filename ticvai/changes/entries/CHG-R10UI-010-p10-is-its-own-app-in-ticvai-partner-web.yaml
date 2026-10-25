@@ -1,0 +1,52 @@
+id: CHG-R10UI-010
+date: '2026-10-25'
+source: cr
+kind: spec
+summary: 'P10 Partner Web is its own app in the ticvai-partner-web repository: docs/active/frontend-repos.yaml maps it (assumed
+  until the lead confirms), every P10 component path is src/routes/<area>/<Component>.tsx (apply-repo-layout), appStatus
+  is scaffolded, targetApp is partner-web (overriding the shared TICVAI Control app of 10 September, which P09, P11, P14
+  and P17 keep), and ADAM setup''s frontend table lists P10. check-binding-ratchet compares a screen whose platform changed
+  app under the app it was counted in.'
+decision:
+  what: 'ADAM CR-153, accepted for the next release: "Option A is recommended if ticvai-partner-web was created on purpose:
+    P10 is its own app there ... The next release gives P10 its repository entry. The ticket text then gives every P10 screen
+    as src/routes/<area>/<Component>.tsx (the apps/partner-web/ prefix goes), the platform''s appStatus becomes scaffolded,
+    and the frontend workspace''s table lists P10." docs/active/frontend-repos.yaml P10 (repo ticvai-partner-web, assumed:
+    true, observed as relayed in the CR); screens/P10 platform (appStatus, targetApp) and its 43 component paths (tools/apply-repo-layout.py);
+    screens/P09, P11, P14 and P17 targetApp siblings; viewer/mcp/setup/starters/frontend/CLAUDE.md (the platform table and
+    the generated profile block); tools/check-binding-ratchet.py (apps followed).'
+  by: Chinmay
+  date: '2026-10-21'
+why: ADAM CR-153 (Chitrangi Mestry, 16 October 2026, scaffolding ticvai-partner-web). All 43 P10 screens named the retired
+  Nx path apps/partner-web/..., the platform said not scaffolded, targetApp said ticvai-control, and the setup table told
+  developers to ask before building P10 anywhere.
+keys_touched:
+  screens:
+  - PTR-001 to PTR-051 (all 43 P10 screens)
+  files:
+  - docs/active/frontend-repos.yaml
+  - screens/P10-partner-reseller-portal.yaml
+  - screens/P09-platform-admin-console.yaml
+  - screens/P11-accreditation-portal.yaml
+  - screens/P14-developer-portal.yaml
+  - screens/P17-ticvai-signup.yaml
+  - ../viewer/mcp/setup/starters/frontend/CLAUDE.md
+  - tools/check-binding-ratchet.py
+root_class: a platform left on the retired one-workspace layout
+tickets:
+  started: []
+  unstarted:
+  - 'every P10 screen task: its pointer body gives the new path at the next tag'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-153
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-frontend-repos.py
+status: open
+notes: The decision makes option A conditional on the repository having been created on purpose, and builds nothing in P10
+  until the lead confirms; the mapping is marked assumed and the confirmation is raised for the lead. Moving P10 out of
+  ticvai-control moved 137 counted findings from that app to partner-web with nothing added; check-binding-ratchet read
+  it as a rise, so it now follows each screen's app at the baseline (read from the baseline commit's platform files), as
+  it follows blocks (CHG-GT1-006). The setup file ships in ADAM's setup zip.

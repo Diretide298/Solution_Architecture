@@ -187,7 +187,23 @@ platforms:
   P10:
     name: Partner Web - Reseller Portal
     app: partner-web
-    repo: null
+    repo: ticvai-partner-web
+    assumed: true
+    note: 'ADAM CR-153 (Chitrangi Mestry, 16 October 2026), accepted by Chinmay with option A: P10 is its own app in
+      ticvai-partner-web, the repository in the ticvai-frontend group, which matches the one-repository-per-app
+      decision of 13 October and overrides the shared ticvai-control app of 10 September (screens/P10 targetApp).
+      The decision left the confirmation that the repository was created on purpose to the lead, so the mapping is
+      marked assumed until he confirms it (CHG-R10UI-010).'
+    observed:
+      by: 'Chitrangi Mestry, scaffolding the repository (ADAM CR-153); relayed in the CR'
+      date: '2026-10-16'
+      how: 'ADAM CR-153: the repository exists and is scaffolded as React + Vite + TypeScript with screens under
+        src/routes/<area>/. Nobody on the package team opened it.'
+      reachable: false
+      result: 'Not read by the package team (GitLab is private and the team has no login), so its profile is the
+        default above (assumed), which is the layout the CR reports: src/routes/<area>/<Component>.tsx. The
+        repository''s owner confirms the real layout.'
+      confirmed: false
   P11:
     name: Accreditation Web - Applications
     app: accreditation-web
