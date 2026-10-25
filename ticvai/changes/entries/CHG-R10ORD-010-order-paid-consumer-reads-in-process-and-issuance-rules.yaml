@@ -13,7 +13,7 @@ decision:
     catalogue#performanceRecords and a new catalogue#salesChannelRecords; one entitlement per unit; valid_from/valid_to
     from validityKind, offsets, expiryAnchor and the performance; mediaCode minted at issue; the rotation seed stored on
     the entitlement (Entitlement.rotationSecret, access.entitlement.rotation_secret_ciphertext, field-encrypted); Entitlement.subjectId
-    nullable (no longer required); states/order.yaml paid -> completed by entitlement.issued, guard ''every line with a
+    null for a guest checkout (it was already nullable; it stays required, always present); states/order.yaml paid -> completed by entitlement.issued, guard ''every line with a
     template holds quantity entitlements; lines without one need none''. tools/check-cross-module-reads.py: an operation
     with x-ticvai-consumes runs in workers (XR-ROUTE).'
   by: Chinmay

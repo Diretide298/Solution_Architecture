@@ -2,16 +2,16 @@ id: CHG-R10ORD-014
 date: '2026-10-25'
 source: cr
 kind: contract
-summary: A refund records what it took from each order line (orders.refund_line) and each payment (orders.refund_allocation);
+summary: A refund records what it took from each order line (orders.refund_line) and each payment (orders.refund_payment);
   refundableAmount is what each line and payment paid minus earlier refunds; payments are allocated most recent first, cash
   last; time bands apply per line by its own performance; settleTo maps onto the venue's refundDestinations.
 decision:
   what: 'ADAM CR-208, option A: orders.refund_line (refund_id, order_line_id, refunded_amount) and orders.refund_allocation
-    (refund_id, payment_id, refunded_amount, tender_amount) as Refund.lines and Refund.allocations (child rows); refundableAmount
-    = paid minus what earlier refunds took; allocation most recent payment first, cash last; time bands per line by that
-    line''s performance; settleTo -> refundDestinations: originalTender -> originalPayment, advanceBalance -> walletCredit,
-    storeCredit -> voucherCreditNote, wireTransfer -> originalPayment (paid out by transfer). contracts/spine/orders.yaml
-    createRefund, simulateRefund, Refund, RefundSimulation.'
+    (refund_id, payment_id, refunded_amount, tender_amount) as Refund.lines and Refund.payments (child rows; the allocation
+    table is named orders.refund_payment, see notes); refundableAmount = paid minus what earlier refunds took; allocation
+    most recent payment first, cash last; time bands per line by that line''s performance; settleTo -> refundDestinations:
+    originalTender -> originalPayment, advanceBalance -> walletCredit, storeCredit -> voucherCreditNote, wireTransfer ->
+    originalPayment (paid out by transfer). contracts/spine/orders.yaml createRefund, simulateRefund, Refund, RefundSimulation.'
   by: Chinmay
   date: '2026-10-25'
 why: 'ADAM CR-208 (Surendra Loke, #28284 simulateRefund, blocking), settled by the lead on 25 October 2026 (the 48 CRs settled
@@ -27,7 +27,7 @@ keys_touched:
   - RefundSimulation
   tables:
   - orders.refund_line
-  - orders.refund_allocation
+  - orders.refund_payment
   files:
   - contracts/spine/orders.yaml
 root_class: 'new: a computed answer with no stored history behind it'
@@ -42,8 +42,11 @@ prevention:
   type: none
   reason: A history the rule needs but nothing stored; no generic check can tell a computed figure lacks its inputs. The
     tables are generated from the contract (derive-ddl).
-notes: 'Database change: new tables orders.refund_line (id, refund_id -> orders.refund, order_line_id -> orders.order_line,
-  refunded_amount, applied_percentage) and orders.refund_allocation (id, refund_id -> orders.refund, payment_id -> orders.payment,
+notes: 'The decision names the payment table orders.refund_allocation; naming-and-style 3 bans `allocation` in DDL names
+  (check-ddl-conventions D-BANNED-NAME) and adding an exception would be exempting a check to pass, so the table is orders.refund_payment
+  with exactly the decided columns. Listed for the lead: keep refund_payment, or record refund_allocation as a naming-and-style
+  3.3 exception. Database change: new tables orders.refund_line (id, refund_id -> orders.refund, order_line_id -> orders.order_line,
+  refunded_amount, applied_percentage) and orders.refund_payment (id, refund_id -> orders.refund, payment_id -> orders.payment,
   refunded_amount, tender_amount). Not done: ''state when each refundType applies in the operation''. The decision asks
   for it without giving the rule for fullRefund, partialRefund, percentageRefund, proRataRefund and originalValueLessFees;
   listed for the lead rather than guessed.'

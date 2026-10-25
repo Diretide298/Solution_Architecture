@@ -411,7 +411,7 @@ paths:
               schema: { $ref: '#/components/schemas/MerchandiseItem' }
         '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
         '409':
-          description: Barcode already in use at this outlet (ADAM CR-104). `refusedReason` is `barcodeInUse`.
+          description: Barcode already in use by another item with the same `outletId` (ADAM CR-104). `refusedReason` is `barcodeInUse`.
           content:
             application/problem+json:
               schema: { $ref: '#/components/schemas/MerchandiseConflictProblem' }
@@ -483,7 +483,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/MerchandiseItem' }
         '409':
-          description: The new barcode is already in use at this outlet (ADAM CR-104). `refusedReason` is `barcodeInUse`.
+          description: The new barcode is already in use by another item with the same `outletId` (ADAM CR-104). `refusedReason` is `barcodeInUse`.
           content:
             application/problem+json:
               schema: { $ref: '#/components/schemas/MerchandiseConflictProblem' }
@@ -1410,6 +1410,11 @@ paths:
       operationId: collectShopAndDrop
       x-ticvai-consumed-by:
         - "P04 POS-012 Omnichannel Order & Fulfilment Center"
+      x-ticvai-writes:
+      - table: retail.shop_and_drop
+        for: 'the drop''s status, collectedAt, collectedByPrincipalId, verifiedBy and collectionNote (ADAM CR-104)'
+      - table: retail.shop_and_drop_line
+        for: 'each line''s collectedQuantity'
       x-ticvai-read-via:
       - query: fnb#deliveryLocationRecords
         route: in-process

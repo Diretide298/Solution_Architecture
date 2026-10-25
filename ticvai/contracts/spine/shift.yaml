@@ -576,6 +576,9 @@ paths:
         - "P04 POS-015 Cash Operations Dashboard"
         - "P04 POS-018 Safe Drop & Cash Transfer Management"
         - "P08 BO-042 Banking & Safe"
+      x-ticvai-reads:
+      - table: orders.payment
+        for: 'the cash payments taken on a trading box''s shift and the change given, for overDrawerLimit (ADAM CR-218)'
       x-ticvai-read-via:
       - query: identity#principalRecords
         route: in-process
@@ -1163,10 +1166,12 @@ paths:
                 supervisorStepUp:
                   allOf:
                     - $ref: '../shared/common.yaml#/components/schemas/SupervisorStepUp'
+                  x-ticvai-persisted: false
                   description: >
                     The supervisor approving, signing on this device (ADAM CR-200). Refused without it
                     (`403 supervisor-step-up-refused`). May not be the cashier who opened the shift
-                    (`403 approver-is-cashier`).
+                    (`403 approver-is-cashier`). Verified, never stored: the PIN is not kept, and the
+                    supervisor it names is recorded as the approving principal.
       responses:
         '200':
           headers:

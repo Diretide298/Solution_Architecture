@@ -302,6 +302,11 @@ SHARED_SCOPE = {
 # the rows of `Dashboard.tiles[]` (`dashboard_id`), and `report_id -> reporting.report_definition` names
 # what the tile shows. Each follows its parent.
 ROW_OWNER = {
+    # CHG-R10ORD-014 (ADAM CR-208, 25 October 2026): a refund's line and payment rows are the refund's. Each has a
+    # second protected candidate (`order_line_id -> orders.order_line`, `payment_id -> orders.payment`), which names
+    # what the refund took from; the payment rows fell to the tenant root ("several protected owners").
+    "orders.refund_line": "refund_id",            # CHG-R10ORD-014 (CR-208)
+    "orders.refund_payment": "refund_id",         # CHG-R10ORD-014 (CR-208)
     "catalogue.product_media": "product_id",   # CHG-R6-005 (CR-009)
     "inventory.quotation_line": "quotation_id",   # CHG-R6-013
     "reporting.dashboard_tile": "dashboard_id",   # CHG-R6-013

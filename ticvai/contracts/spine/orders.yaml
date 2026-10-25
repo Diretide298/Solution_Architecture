@@ -125,6 +125,9 @@ x-ticvai-queries:
       waitsOnActor:
         partiallyPaid: money was captured, so only a person may end it (createPayment for the balance, or createRefund);
           a timer that dropped it would strand the guest's money, and blocking the erasure until then is right
+        paid: completion follows the entitlements Access issues from order.paid (entitlement.issued, ADAM CR-167); an
+          issuance that fails is retried, then dead-lettered and replayed, never dropped, and until it completes the
+          guest holds a paid order with nothing issued, so blocking the erasure is right
     projection:
       context: identity
       table: identity.subject_holding
@@ -1191,6 +1194,9 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-014 Pay for a Booking"
         - "P02 GST-009 Review & Payment"
+      x-ticvai-writes:
+      - table: payments.payment_attempt
+        for: 'one row per provider call, as createPayment (ADAM CR-099)'
       x-ticvai-write-via:
       - table: access.entitlement
         event: order.paid
@@ -5867,10 +5873,10 @@ paths:
 
         **What each line and payment has left, and where it goes** (ADAM CR-208, option A; Chinmay, 25 October 2026;
         CHG-R10ORD-014). Every refund records what it took: one `orders.refund_line` row per order line it refunds
-        (`refundedAmount`) and one `orders.refund_allocation` row per payment it refunds against (`refundedAmount` in
+        (`refundedAmount`) and one `orders.refund_payment` row per payment it refunds against (`refundedAmount` in
         the base currency, `tenderAmount` in the payment''s tender currency). **`refundableAmount`** is what each
         line, or each payment, paid minus what earlier refunds took from it (their `refund_line` and
-        `refund_allocation` rows). **Allocation across payments**: the most recent payment first, cash last. **Time
+        `refund_payment` rows). **Allocation across payments**: the most recent payment first, cash last. **Time
         bands apply per line**, by that line''s own performance: each line''s percentage is the band its own
         performance falls in, so one refund of lines for two performances can carry two percentages.
         **`settleTo` onto the venue''s `refundDestinations`** (`RefundCalculationPolicyView`): `originalTender` is
@@ -5948,10 +5954,10 @@ paths:
 
         **What each line and payment has left, and where it goes** (ADAM CR-208, option A; Chinmay, 25 October 2026;
         CHG-R10ORD-014). Every refund records what it took: one `orders.refund_line` row per order line it refunds
-        (`refundedAmount`) and one `orders.refund_allocation` row per payment it refunds against (`refundedAmount` in
+        (`refundedAmount`) and one `orders.refund_payment` row per payment it refunds against (`refundedAmount` in
         the base currency, `tenderAmount` in the payment''s tender currency). **`refundableAmount`** is what each
         line, or each payment, paid minus what earlier refunds took from it (their `refund_line` and
-        `refund_allocation` rows). **Allocation across payments**: the most recent payment first, cash last. **Time
+        `refund_payment` rows). **Allocation across payments**: the most recent payment first, cash last. **Time
         bands apply per line**, by that line''s own performance: each line''s percentage is the band its own
         performance falls in, so one refund of lines for two performances can carry two percentages.
         **`settleTo` onto the venue''s `refundDestinations`** (`RefundCalculationPolicyView`): `originalTender` is
@@ -24323,7 +24329,7 @@ components:
             `grossAmount` converted at `chargeFxRate` and rounded to the charge currency's scale:
             what the guest pays and what the payment request to the provider asks for (CHG-FIN-001).
             The charge currency's scale is its ISO 4217 minor units, from the kernel's fixed list (ADAM CR-192;
-            common.yaml `Money.scale`), when it is not the venue's trading currency.
+            common.yaml `Money.scale`), when it is not the currency the venue trades in.
         chargeRateLockedUntil:
           type: string
           format: date-time
@@ -24643,7 +24649,7 @@ components:
           type: string
           format: date-time
     Refund:
-      x-ticvai-persistence: "orders.refund + orders.refund_line + orders.refund_allocation"
+      x-ticvai-persistence: "orders.refund + orders.refund_line + orders.refund_payment"
       type: object
       required:
       - id
@@ -24741,7 +24747,7 @@ components:
           - $ref: ../shared/common.yaml#/components/schemas/Money
           readOnly: true
           description: The refund in `tenderCurrency`, at that currency's own scale (CHG-FIN-001), its ISO 4217 minor
-            units from the kernel's fixed list where it is not the venue's trading currency (ADAM CR-192).
+            units from the kernel's fixed list where it is not the currency the venue trades in (ADAM CR-192).
         amount:
           x-ticvai-column: refunded_amount
           $ref: ../shared/common.yaml#/components/schemas/Money
@@ -24772,11 +24778,11 @@ components:
                 type: number
                 nullable: true
                 description: The time band of this line's own performance (ADAM CR-208).
-        allocations:
+        payments:
           type: array
           readOnly: true
           description: '**What the refund took from each payment** (ADAM CR-208, option A; CHG-R10ORD-014): child rows,
-            `orders.refund_allocation`, one per payment refunded against, the most recent payment first and cash
+            `orders.refund_payment` (the decision''s `refund_allocation`; naming-and-style bans `allocation` in DDL), one per payment refunded against, the most recent payment first and cash
             last. A payment''s refundable amount is what it paid minus its rows on earlier refunds.'
           items:
             type: object
@@ -24983,7 +24989,7 @@ components:
           allOf:
           - $ref: ../shared/common.yaml#/components/schemas/Money
           description: The amount in `tenderCurrency`, at that currency's own scale, its ISO 4217 minor units from the
-            kernel's fixed list where it is not the venue's trading currency (ADAM CR-192, option A; CHG-R10ORD-018).
+            kernel's fixed list where it is not the currency the venue trades in (ADAM CR-192, option A; CHG-R10ORD-018).
         fxRate:
           allOf:
           - $ref: '#/components/schemas/ExchangeRateDecimal'
@@ -25705,7 +25711,7 @@ components:
         tenderRoutes:
           type: array
           description: Where the money would go, one row per payment it would refund against, the most recent payment
-            first and cash last, each up to what that payment has left after earlier refunds (`orders.refund_allocation`;
+            first and cash last, each up to what that payment has left after earlier refunds (`orders.refund_payment`;
             ADAM CR-208).
           items:
             type: object

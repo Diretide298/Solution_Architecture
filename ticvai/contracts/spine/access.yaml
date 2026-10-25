@@ -100,6 +100,9 @@ x-ticvai-queries:
         issued->fullyConsumed:validateAccess: access.validated carries no status; the rule's validTo bounds it, so a
           pass used up early counts as live until validTo, which errs towards refusing a deletion
         partiallyConsumed->fullyConsumed:validateAccess: as issued->fullyConsumed
+        issued->fullyConsumed:recordQueueRedemptionUse: as issued->fullyConsumed by validateAccess (ADAM CR-238), the use
+          a redeemed queue entry takes carries no status event; validTo bounds it
+        partiallyConsumed->fullyConsumed:recordQueueRedemptionUse: as issued->fullyConsumed
         issued->expired:timer: the rule's own condition, validTo > now(); the projection holds validTo
         partiallyConsumed->expired:timer: as issued->expired
         issued->cancelled:cancelPerformance: every holder is made whole by createRefund (F09), whose order.refunded
@@ -2343,7 +2346,6 @@ paths:
           Given, only the entitlements whose `change_version` is above it, void and used ones included (ADAM CR-239).'
         schema:
           type: integer
-          format: int64
       - $ref: '../shared/common.yaml#/components/parameters/ConsistencyToken'
       - name: validFrom
         in: query
@@ -25710,6 +25712,7 @@ components:
       - templateId
       - productId
       - orderId
+      - subjectId
       - status
       - validFrom
       - validTo
@@ -25780,8 +25783,9 @@ components:
           format: uuid
           nullable: true
           description: 'Who holds it. **Null is legitimate** — a ticket bought as a gift or sold at a
-            till to somebody who gave no details has no subject until it is claimed. **Not required** (ADAM CR-167,
-            CHG-R10ORD-010): `issueOrderEntitlements` leaves it null for a guest checkout.
+            till to somebody who gave no details has no subject until it is claimed. **Null for a guest checkout**
+            (ADAM CR-167, CHG-R10ORD-010): `issueOrderEntitlements` leaves it null where `order.paid` names no
+            subject; the field is always present, null or not.
 
             '
         venueId:
@@ -27692,7 +27696,6 @@ components:
           format: uuid
         entitlementsVersion:
           type: integer
-          format: int64
           description: 'The highest `access.entitlement` change included (SD-052, 29 September): the maximum
             `change_version` of the package''s rows (ADAM CR-239, option A; CHG-R10ORD-011). A refresh sends it as
             `sinceVersion` and receives only the rows whose `change_version` is above it, void and used ones included,
