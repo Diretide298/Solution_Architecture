@@ -112,8 +112,8 @@ blind-indexes a value for the current tenant, so no module calls Key Vault itsel
 ST-SECRET-FORM fails on a stored write-only token, secret, credential, password or PIN that does not say which of the
 four forms it takes; the 17 that predate the rule are baselined and listed there.
 
-**Amended 25 October 2026 (Chinmay; ADAM CR-098, accepted for r10; CHG-R10ID-011): an API client secret is a
-keyed hash under a platform key.** `control.api_client` had nowhere to keep a client secret, and none of the four forms
+**Amended 25 October 2026 (Chinmay; ADAM CR-098, accepted for r10; CHG-R10ID-011; the form confirmed by the lead in
+r10 round 3, CHG-R10ID-020): an API client secret is a keyed hash under a platform key.** `control.api_client` had nowhere to keep a client secret, and none of the four forms
 above fitted one: the control database has no tenant, so it has no tenant data key or tenant blind-index key, and
 Argon2id (ADR-0071) is built for low-entropy passwords at a cost `issueApiToken` would pay on every token request. The
 rule:

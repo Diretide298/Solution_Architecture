@@ -1,0 +1,36 @@
+id: CHG-R10ID-021
+date: '2026-10-25'
+source: cr
+kind: contract
+summary: 'ENTITLEMENT_USE stays off every staff role checklist: permissions.yaml gains x-ticvai-share-only, which no
+  role, preset, staff grant or checklist carries (createRole, setRolePermissions, createDelegatedAccess and
+  createPrincipal refuse it 400). r8''s pii.subject_identity stays the linked-provider store (confirmed).'
+decision:
+  what: 'The lead accepted the recommended answers of the r10 lane questions (25 October 2026), questions 9 and 10.
+    contracts/shared/permissions.yaml: x-ticvai-share-only [ENTITLEMENT_USE] and its comment.
+    contracts/spine/identity.yaml SubjectIdentity: the choice confirmed. tools/check-business-rules.py
+    BR-ENTITLEMENT-SHARE: the share-only list holds ENTITLEMENT_USE.'
+  by: Chinmay
+  date: '2026-10-25'
+why: 'ADAM CR-209 (Surendra Loke, ticket 28285; CHG-R10ID-004) and CR-100 (Deep Khanvilkar, ticket 30655;
+  CHG-R10ID-009): questions in lane A1''s report.'
+keys_touched:
+  schemas: [Permission, SubjectIdentity]
+  files:
+  - contracts/shared/permissions.yaml
+  - contracts/spine/identity.yaml
+  - tools/check-business-rules.py
+root_class: 'new: a permission a guest holds through a share, in a vocabulary every role is built from'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-209
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py
+status: open
+notes: 'check-contract-compat and check-permission-vocabulary pass: ENTITLEMENT_USE still sits in one module group, as
+  the vocabulary rule needs, and the share-only list is what keeps it off the checklist.'

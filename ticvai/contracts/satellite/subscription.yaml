@@ -3720,6 +3720,100 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /platform-tax-rates:
+    get:
+      operationId: listPlatformTaxRates
+      x-ticvai-audience:
+      - staff
+      x-ticvai-read-routing: replica
+      x-ticvai-no-screen: 'Platform staff keep the table; no P09 board shows it yet (r10 round 3, CHG-R10ID-023).'
+      summary: The tax rates TICVAI charges on its own invoices, per country
+      description: '**The platform tax-rate table** (the lead, 25 October 2026, r10 round 3, ADAM CR-202;
+        CHG-R10ID-023), which `generateInvoice` reads. **Ordered by `countryCode`, then `effectiveFrom` descending, then
+        `id`.**'
+      tags:
+      - billing
+      x-ticvai-permission: PLATFORM_BILLING_VIEW
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - name: countryCode
+        in: query
+        schema:
+          type: string
+          minLength: 2
+          maxLength: 2
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: Tax rates
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/PlatformTaxRate'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /platform-tax-rates/{taxRateId}:
+    put:
+      operationId: setPlatformTaxRate
+      x-ticvai-audience:
+      - staff
+      x-ticvai-no-screen: 'Platform staff keep the table; no P09 board shows it yet (r10 round 3, CHG-R10ID-023).'
+      summary: Set a country's tax rate on TICVAI's own invoices
+      description: '**Creates or replaces one rate row** (the lead, 25 October 2026, r10 round 3, ADAM CR-202;
+        CHG-R10ID-023). A new rate for a country is a new row with its `effectiveFrom`; the server closes the previous
+        current row''s `effectiveTo` on the day before. Two rows of a country with the same `effectiveFrom` are 409
+        `tax-rate-period-exists`. Invoices already generated keep the rate they were priced at.'
+      tags:
+      - billing
+      x-ticvai-permission: PLATFORM_BILLING_MANAGE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - name: taxRateId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        schema: { type: string, format: uuid }
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PlatformTaxRate'
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Saved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlatformTaxRate'
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '409':
+          description: Another rate of this country already starts on this `effectiveFrom` (`tax-rate-period-exists`;
+            unique on country and effective date). Nothing changes.
+          x-ticvai-problem-types: [tax-rate-period-exists]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /tenants/{tenantId}/invoices:
     parameters:
     - name: tenantId
@@ -3791,6 +3885,11 @@ paths:
       - table: control.billing_entity
         for: 'the billing currency, the country and TRN the tax follows, and the documents invoicing waits on (ADAM
           CR-202, option B; CHG-R10ID-013)'
+      - table: control.platform_tax_rate
+        for: 'the tax rate of the billing entity''s country in force at generation (the lead, 25 October 2026, r10 round 3,
+          CR-202; CHG-R10ID-023)'
+      - table: control.contract
+        for: 'the TICVAI legal entity that issues the tenant''s invoices (`issuingLegalEntity`; r10 round 3, CHG-R10ID-023)'
       description: 'Prices the metered usage against the subscription''s plan version. Idempotent per
         tenant and period — running twice does not double-bill, which matters because it will be scheduled.
 
@@ -3808,12 +3907,18 @@ paths:
         a later change of the billing currency never moves an invoice already generated. (2) **Status and number:**
         the invoice is created `draft` with `invoiceNumber` null; the number is assigned when it is issued
         (`issueInvoice`), from the gapless sequence of the issuing legal entity
-        (`control.invoice_number_sequence`, `InvoiceNumberSequence`). (3) **Tax:** `taxAmount` follows the billing
-        entity''s `countryCode` and `trn` as they stand at generation. (4) **`dryRun` true** answers 200 with an
+        (`InvoiceNumberSequence`) of the entity the tenant''s contract names
+        (`Subscription.issuingLegalEntity`, Ainfinite AI UAE or India), copied onto the invoice as `issuingLegalEntity`
+        at generation (the lead, 25 October 2026, r10 round 3; CHG-R10ID-023). (3) **Tax:** `taxAmount` follows the
+        billing entity''s `countryCode` and `trn` as they stand at generation, at the rate of that country in force on
+        the generation date in the platform''s tax-rate table (`control.platform_tax_rate`, `PlatformTaxRate`, kept by
+        platform staff with `setPlatformTaxRate`; r10 round 3). A country with no rate in force is 422
+        `billing-entity-incomplete`, as a missing document is. (4) **`dryRun` true** answers 200 with an
         unsaved preview: the same lines and totals, no number, no row written, and never 409, whatever exists for the
         period. (5) **409 is the exact same period:** an invoice of this tenant with the same `periodStart` and
-        `periodEnd` (unique on tenant and period) is 409 `period-already-invoiced`; an overlapping but different
-        period is not refused here. (6) **Missing billing-entity documents:** a tenant with no billing entity, or
+        `periodEnd` (unique on tenant and period among invoices that are not `cancelled`) is 409
+        `period-already-invoiced`; an overlapping but different period is not refused here, and a cancelled invoice
+        does not hold its period, so a cancelled draft can be generated again (r10 round 3; CHG-R10ID-023). (6) **Missing billing-entity documents:** a tenant with no billing entity, or
         whose billing entity lists `missingDocuments`, or has no `billingCurrency`, is 422
         `billing-entity-incomplete` and nothing is written (a dry run is refused the same way, since it cannot be
         priced).
@@ -17773,6 +17878,12 @@ components:
       - status
       - startsAt
       properties:
+        issuingLegalEntity:
+          type: string
+          enum: [ainfiniteAiUae, ainfiniteAiIndia]
+          description: '**The TICVAI legal entity that invoices this tenant** (the lead, 25 October 2026, r10 round 3, ADAM
+            CR-202; CHG-R10ID-023): Ainfinite AI UAE or Ainfinite AI India. `generateInvoice` copies it onto each invoice
+            and `issueInvoice` numbers the invoice from that entity''s gapless sequence.'
         currencyCode:
           type: string
           minLength: 3
@@ -19031,9 +19142,11 @@ components:
       x-ticvai-persistence: control.invoice + control.invoice_line
       type: object
       # One invoice per tenant and exact period (ADAM CR-202, option B, 25 October 2026; CHG-R10ID-013):
-      # generateInvoice's 409 period-already-invoiced is this unique index.
-      x-ticvai-unique-together:
-      - [tenantId, periodStart, periodEnd]
+      # generateInvoice's 409 period-already-invoiced is this unique index. A cancelled invoice does not hold its
+      # period (the lead, 25 October 2026, r10 round 3; CHG-R10ID-023): a partial unique index.
+      x-ticvai-unique-when:
+      - columns: [tenantId, periodStart, periodEnd]
+        when: {status: {not: cancelled}}
       required:
       - id
       - tenantId
@@ -19058,6 +19171,13 @@ components:
             (`InvoiceNumberSequence`) in the same transaction, so a number is never taken and lost.
 
             '
+        issuingLegalEntity:
+          type: string
+          enum: [ainfiniteAiUae, ainfiniteAiIndia]
+          readOnly: true
+          description: 'The TICVAI legal entity that issues the invoice, copied at generation from the tenant''s contract
+            (`Subscription.issuingLegalEntity`); its number comes from that entity''s sequence (`InvoiceNumberSequence`
+            with `legalEntityCode` equal to this value). The lead, 25 October 2026, r10 round 3; CHG-R10ID-023.'
         currencyCode:
           type: string
           minLength: 3
@@ -19146,6 +19266,40 @@ components:
           type: string
           format: date-time
           nullable: true
+    PlatformTaxRate:
+      type: object
+      x-ticvai-persistence: control.platform_tax_rate
+      description: '**The tax rate TICVAI charges on its own invoices, per country** (the lead, 25 October 2026, r10 round
+        3, ADAM CR-202; CHG-R10ID-023). A small table kept by platform staff (`setPlatformTaxRate`): `generateInvoice`
+        applies the rate of the billing entity''s country in force on the generation date. A change takes effect from
+        its `effectiveFrom` and never re-prices an invoice already generated.'
+      x-ticvai-unique-together:
+      - [countryCode, effectiveFrom]
+      required: [id, countryCode, taxName, ratePercent, effectiveFrom]
+      properties:
+        id: { type: string, format: uuid, readOnly: true }
+        countryCode:
+          type: string
+          minLength: 2
+          maxLength: 2
+          description: ISO 3166-1 alpha-2, as `BillingEntity.countryCode`.
+        taxName:
+          type: string
+          maxLength: 50
+          description: What the invoice calls the tax, for example VAT or GST.
+        ratePercent:
+          type: number
+          minimum: 0
+          maximum: 100
+        effectiveFrom:
+          type: string
+          format: date
+        effectiveTo:
+          type: string
+          format: date
+          nullable: true
+          description: The last day the rate applies; null while it is the current rate.
+        updatedAt: { type: string, format: date-time, readOnly: true, nullable: true }
     InvoiceNumberSequence:
       type: object
       x-ticvai-persistence: control.invoice_number_sequence
@@ -19164,7 +19318,8 @@ components:
         legalEntityCode:
           type: string
           maxLength: 50
-          description: The TICVAI legal entity that issues the documents this row numbers, by its code.
+          description: The TICVAI legal entity that issues the documents this row numbers, by its code, one of the
+            `Subscription.issuingLegalEntity` values (`ainfiniteAiUae`, `ainfiniteAiIndia`; r10 round 3).
         documentKind:
           type: string
           enum: [invoice, creditNote]

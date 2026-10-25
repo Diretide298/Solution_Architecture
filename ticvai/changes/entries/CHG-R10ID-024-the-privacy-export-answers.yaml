@@ -1,0 +1,44 @@
+id: CHG-R10ID-024
+date: '2026-10-25'
+source: cr
+kind: contract
+summary: 'A guest''s data export with no matching approval rule runs at once (no Approvals request; the export''s own id
+  is the request id); the file is kept 7 days and the row then becomes expired; the privacy case''s jurisdiction is the
+  country of the venue the request is raised at, carried on identity.privacyRequestRaised; and the case carries the
+  request id (marketing.privacy_request approval_request_id).'
+decision:
+  what: 'The lead accepted the recommended answers of the r10 lane questions (25 October 2026), question 3.
+    contracts/spine/identity.yaml exportSubjectData and SubjectDataExport (no matrix runs at once, 7 days, expired in
+    both status enums). events/identity-privacyRequestRaised.yaml: jurisdiction, and the consumer sets jurisdiction and
+    approvalRequestId. contracts/satellite/marketing-crm.yaml DataSubjectCustomerPrivacyRequestManagementView:
+    approvalRequestId. tools/check-business-rules.py BR-PRIVACY-REQUEST. Database: marketing.privacy_request
+    approval_request_id, from the generator.'
+  by: Chinmay
+  date: '2026-10-25'
+why: 'ADAM CR-101 (Deep Khanvilkar, ticket 30720; CHG-R10ID-016): four points the decision left open, asked in lane
+  A1''s report.'
+keys_touched:
+  operations: [exportSubjectData, getSubjectDataExport]
+  schemas: [SubjectDataExport, SubjectDataExportStatus, DataSubjectCustomerPrivacyRequestManagementView]
+  tables: [identity.subject_data_export, marketing.privacy_request]
+  files:
+  - contracts/spine/identity.yaml
+  - contracts/satellite/marketing-crm.yaml
+  - events/identity-privacyRequestRaised.yaml
+  - tools/check-business-rules.py
+root_class: 'existing: a privacy rule the decision left to the lead'
+tickets:
+  started: []
+  unstarted:
+  - '30720 (exportSubjectData) and the privacy-queue consumer pick it up at the r10 tag; the column is migration work
+    for Hrushikant Patkar.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-101
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py
+status: open
+notes: 'marketing-crm.yaml is lane A2''s contract: one property added. The new status value and event field are on
+  schemas and an event first published in r10, so they are not breaking.'

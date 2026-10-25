@@ -5019,6 +5019,8 @@ paths:
           pattern: ^[a-z]{2}$
       - $ref: ../shared/common.yaml#/components/parameters/GuestVenue
       responses:
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/VenueRequired
         '200':
           description: The menu in force
           content:
@@ -5460,6 +5462,8 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       responses:
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/VenueRequired
         '200':
           description: The current setting
           content:
@@ -5564,6 +5568,8 @@ paths:
       - {}
       - guestAuth: []
       responses:
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/VenueRequired
         '200':
           description: Open slots
           content:
@@ -6307,6 +6313,8 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       responses:
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/VenueRequired
         '200':
           description: Groups
           content:

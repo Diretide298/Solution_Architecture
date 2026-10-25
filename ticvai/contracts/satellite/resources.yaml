@@ -2881,6 +2881,8 @@ paths:
           minimum: 1
       - $ref: ../shared/common.yaml#/components/parameters/GuestVenue
       responses:
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/VenueRequired
         '200':
           description: Every placed resource with its status for the window
           content:

@@ -7287,6 +7287,8 @@ paths:
       x-ticvai-offline-capable: true
       x-ticvai-conflict-policy: serverWins
       responses:
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/VenueRequired
         '200':
           description: Programmes
           content:
@@ -16951,6 +16953,8 @@ paths:
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
       - $ref: ../shared/common.yaml#/components/parameters/GuestVenue
       responses:
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/VenueRequired
         '200':
           description: Rewards
           content:
@@ -17130,6 +17134,8 @@ paths:
           format: uuid
       - $ref: ../shared/common.yaml#/components/parameters/GuestVenue
       responses:
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/VenueRequired
         '200':
           description: Badges
           content:
@@ -30409,6 +30415,14 @@ components:
           nullable: true
           readOnly: true
           description: The cross-region `DsarRequest.requestId`, when fulfilment fanned out.
+        approvalRequestId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          description: 'The request a guest''s export or erasure was raised as (`identity.privacyRequestRaised`
+            `approvalRequestId`), so the case and the request are one (the lead, 25 October 2026, r10 round 3, ADAM
+            CR-101; CHG-R10ID-024). Null on a case opened by hand.'
         caseId:
           type: string
           format: uuid

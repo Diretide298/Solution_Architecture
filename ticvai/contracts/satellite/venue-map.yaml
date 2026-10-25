@@ -358,6 +358,8 @@ paths:
             A guest session, or a caller with only `VENUE_MAP_VIEW`, gets 403.
         - $ref: ../shared/common.yaml#/components/parameters/GuestVenue
       responses:
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/VenueRequired
         '200':
           description: >
             The published version asked for, or the draft. **A map that has never been published
@@ -1173,6 +1175,8 @@ paths:
             after the fact produces routes that cross a staircase to reach a ramp.
         - $ref: ../shared/common.yaml#/components/parameters/GuestVenue
       responses:
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/VenueRequired
         '200':
           description: Graph
           content:

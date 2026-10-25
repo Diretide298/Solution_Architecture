@@ -50,7 +50,9 @@ And one rule per decision:
                    operator, its platform session and its second factors; openPlatformStaffGrant cites the ADR.
   BR-GUEST-TOKENS  (r10, ADAM CR-100, CHG-R10ID-009) getGuestSession answers GuestSessionView, which has no tokens;
                    a refresh token belongs to exactly one of a principal and a guest subject.
-  BR-GUEST-VENUE   (r10, ADAM CR-198, CHG-R10ID-010, general) every venue-level read callable without a session by a
+  BR-PLATFORM-INVOICE (r10 round 3, ADAM CR-202, CHG-R10ID-023) the contract names the issuing legal entity, the
+                   platform tax-rate table exists, and the exact-period unique index skips cancelled invoices.
+  BR-GUEST-VENUE   (r10, ADAM CR-198, CHG-R10ID-010, general; 400 venue-required since round 3, CHG-R10ID-022) every venue-level read callable without a session by a
                    guest, a visitor or the public names its venue: a path {venueId}, a required venueId query
                    parameter or the shared GuestVenue header (X-Venue-Id); the rule is stated on guestAuth. Exempt:
                    reads addressed by their own token, and the waiting room's own store (GUEST_VENUE_EXEMPT).
@@ -599,6 +601,27 @@ def main() -> int:
     evd = yaml.safe_load(ev.read_text(encoding="utf-8")) if ev.exists() else {}
     need("BR-PRIVACY-REQUEST", any((c or {}).get("context") == "marketing" for c in (evd or {}).get("consumers") or []),
          "identity.privacyRequestRaised has no Marketing consumer (the privacy queue)")
+    # r10 round 3 (CHG-R10ID-024): the jurisdiction travels, the case carries the request id, the file expires.
+    need("BR-PRIVACY-REQUEST", any((x or {}).get("field") == "jurisdiction" for x in (evd or {}).get("payload") or []),
+         "identity.privacyRequestRaised carries no jurisdiction (the venue's country)")
+    mdoc = load("contracts/satellite/marketing-crm.yaml")
+    pr = ((mdoc.get("components") or {}).get("schemas") or {}).get("DataSubjectCustomerPrivacyRequestManagementView") or {}
+    need("BR-PRIVACY-REQUEST", "approvalRequestId" in (pr.get("properties") or {}),
+         "the privacy case does not carry the request id (approvalRequestId)")
+    sde = ((load("contracts/spine/identity.yaml").get("components") or {}).get("schemas") or {}).get("SubjectDataExport") or {}
+    need("BR-PRIVACY-REQUEST", "expired" in (((sde.get("properties") or {}).get("status") or {}).get("enum") or [])
+         and "7 days" in str(sde.get("description")), "a data export file has no stated keeping period (7 days)")
+    # BR-PLATFORM-INVOICE (r10 round 3, ADAM CR-202; CHG-R10ID-023): who issues, at what tax rate, and a cancelled
+    # invoice frees its period.
+    sub = load("contracts/satellite/subscription.yaml")
+    ssch = (sub.get("components") or {}).get("schemas") or {}
+    need("BR-PLATFORM-INVOICE", "issuingLegalEntity" in ((ssch.get("Subscription") or {}).get("properties") or {}),
+         "the contract names no issuing legal entity")
+    need("BR-PLATFORM-INVOICE", (ssch.get("PlatformTaxRate") or {}).get("x-ticvai-persistence") == "control.platform_tax_rate",
+         "no platform tax-rate table")
+    uw = (ssch.get("SubscriptionInvoice") or {}).get("x-ticvai-unique-when") or []
+    need("BR-PLATFORM-INVOICE", any("cancelled" in str(u.get("when")) for u in uw if isinstance(u, dict)),
+         "the exact-period unique index does not skip cancelled invoices")
     # BR-SCOPE-AUTHZ (ADAM CR-189, CHG-R10ID-001): the per-scope rule, stated once, and its two first users.
     idoc = load("contracts/spine/identity.yaml")
     isch = (idoc.get("components") or {}).get("schemas") or {}
@@ -629,6 +652,9 @@ def main() -> int:
     da = (isch.get("DelegatedAccess") or {}).get("properties") or {}
     need("BR-ENTITLEMENT-SHARE", "sharedEntitlement" in ((da.get("delegationKind") or {}).get("enum") or []),
          "DelegatedAccess.delegationKind has no sharedEntitlement")
+    need("BR-ENTITLEMENT-SHARE", "ENTITLEMENT_USE" in ((load("contracts/shared/permissions.yaml")
+                                                        .get("x-ticvai-share-only") or {}).get("permissions") or []),
+         "ENTITLEMENT_USE is not kept off role checklists (x-ticvai-share-only; r10 round 3)")
     need("BR-ENTITLEMENT-SHARE", "revokedBySubjectId" in da and "revokedByKind" in da,
          "DelegatedAccess cannot record a guest's revoke (revokedByKind, revokedBySubjectId)")
     res = op("revokeEntitlementShare")[3]
@@ -684,6 +710,10 @@ def main() -> int:
                 named = True
         need("BR-GUEST-VENUE", named, f"{oid} ({f.name}): a public guest read of venue data names no venue "
              "(declare common GuestVenue)")
+        if any(str((pp or {}).get("$ref", "")).endswith("/parameters/GuestVenue") for pp in params if isinstance(pp, dict)):
+            r400 = (o.get("responses") or {}).get("400") or {}
+            need("BR-GUEST-VENUE", "venue-required" in str(r400) or "VenueRequired" in str(r400),
+                 f"{oid} ({f.name}): declares GuestVenue but no 400 venue-required (r10 round 3, CHG-R10ID-022)")
     # BR-ALERT-RECIPIENT (CHG-R8SPN-020): reporting's listAlerts says whose alerts come back (the recipient role; an
     # over/short alert only to a holder of OVERSHORT_ACCEPT).
     la = next((o for oid, (f, _p, _m, o, _d) in ops.items() if oid == "listAlerts" and f.stem == "reporting"),
@@ -710,7 +740,8 @@ def main() -> int:
              "BR-HOLD-LAPSE", "BR-LOGIN-ATTEMPTS", "BR-GATE-CANCEL", "BR-APPROVAL-ROUTE", "BR-GUEST-SELF-403",
              "BR-APPROVED-OUTCOME", "BR-APPROVAL-ENGINE", "BR-PRIVACY-REQUEST",
              "BR-SCOPE-AUTHZ", "BR-SSO-ACTIVE", "BR-PERMISSION-FINDINGS", "BR-ENTITLEMENT-SHARE",
-             "BR-PRESET-READONLY", "BR-END-SESSIONS", "BR-PLATFORM-TOKEN", "BR-GUEST-TOKENS", "BR-GUEST-VENUE"]
+             "BR-PRESET-READONLY", "BR-END-SESSIONS", "BR-PLATFORM-TOKEN", "BR-GUEST-TOKENS", "BR-GUEST-VENUE",
+             "BR-PLATFORM-INVOICE"]
     for r in rules:
         print(f"  {r:18} {len(errors.get(r, [])):3d}")
         for m in errors.get(r, [])[:12]:

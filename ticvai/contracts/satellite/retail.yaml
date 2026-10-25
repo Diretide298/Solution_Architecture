@@ -361,6 +361,8 @@ paths:
         - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
         - $ref: ../shared/common.yaml#/components/parameters/GuestVenue
       responses:
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/VenueRequired
         '200':
           description: >
             Merchandise, one page. Items are `MerchandiseItem` for a staff caller and
@@ -592,7 +594,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/PriceCheck' }
         '400':
-          x-ticvai-problem-types: [lookup-key-missing, outlet-required]
+          x-ticvai-problem-types: [lookup-key-missing, outlet-required, venue-required]
           description: Neither barcode nor SKU supplied, or a caller with no workstation sent no `outletId` (audit R215)
           content:
             application/problem+json:

@@ -775,6 +775,12 @@ components:
           status: 400
           title: Validation failed
           when: The request is malformed or breaks a schema rule. `errors[]` names each failing field.
+        venue-required:
+          status: 400
+          title: Venue required
+          when: A public guest read of venue data named no venue (no path `{venueId}`, no required `venueId`, no
+            `X-Venue-Id`), so it has no scope to read under (the lead, 25 October 2026, r10 round 3, ADAM CR-198;
+            CHG-R10ID-022). Nothing is read.
         unauthenticated:
           status: 401
           title: Not signed in
@@ -896,6 +902,15 @@ components:
         hasMore:
           type: boolean
   responses:
+    VenueRequired:
+      description: 'A public guest read of venue data named no venue (`venue-required`; ADAM CR-198, CHG-R10ID-022): send
+        `X-Venue-Id`. Nothing is read.'
+      x-ticvai-problem-types:
+      - venue-required
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
     BadRequest:
       description: Validation failed
       x-ticvai-problem-types:
@@ -1080,7 +1095,10 @@ components:
         (the `GuestVenue` parameter, declared on each such read). The server checks the venue is one of the tenant''s venues (a venue not of the tenant is
         `404`) and builds, for that request only, a read-only scope of the venue''s path (`ticvai.scope_paths` the
         venue''s path, nothing written), so row-level security stays the line of defence and browsing needs no session.
-        A read that names no venue has no scope and finds nothing, as before. **An anonymous guest session (CR-183)
+        **A read that names no venue is 400 `venue-required`** and reads nothing (the lead, 25 October 2026, r10 round
+        3; CHG-R10ID-022); each such read declares it. **A guest read that reaches venue data through an in-process
+        scoped query** (`getOrderCalendarEvent`, `createCart`, and any like them) runs that query under the same request
+        venue scope, by this rule (r10 round 3). **An anonymous guest session (CR-183)
         carries the same venue scope**: the venue it was opened for, checked the same way; a signed-in guest''s read of
         public venue data takes the venue the request names in the same way, beside its own subject. This holds for
         every venue-level read callable without a session (`security` admitting `{}`); an operation does not repeat

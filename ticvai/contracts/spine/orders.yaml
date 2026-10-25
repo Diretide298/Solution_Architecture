@@ -541,7 +541,10 @@ paths:
       - staff
       - partner
       summary: Start a cart
-      description: '**A cart holds leases; an order holds money.** Different lifetimes, different failure
+      description: '**A guest''s call runs its in-process scoped queries under the request''s venue scope** (the lead,
+        25 October 2026, r10 round 3, by CR-198''s rule on `guestAuth`; CHG-R10ID-022).
+
+        **A cart holds leases; an order holds money.** Different lifetimes, different failure
         modes, and merging them is why this contract did not exist until 17 August — `createOrder` takes
         a whole basket at once, which is correct for a till and cannot be resumed on another device.
 
@@ -5510,6 +5513,9 @@ paths:
       summary: The visit as a calendar entry
       description: '**`GST-018 Add to Calendar / Reminders` had no calendar operation**, only the order
         and a wallet pass, so the screen named after a calendar could not put anything in one.
+
+        **A guest''s call runs its in-process scoped queries under the request''s venue scope** (the lead, 25 October
+        2026, r10 round 3, by CR-198''s rule on `guestAuth`; CHG-R10ID-022).
 
         Returns an iCalendar (RFC 5545) event per dated line: the venue, the session start and end, and
         a link back to the booking. **The event carries no ticket and no QR code**, because a calendar
@@ -11460,6 +11466,9 @@ paths:
                     format: uuid
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Attached
           content:
             application/json:

@@ -1,0 +1,52 @@
+id: CHG-R10ID-022
+date: '2026-10-25'
+source: cr
+kind: contract
+summary: 'A public guest read of venue data that names no venue answers 400 venue-required and reads nothing: a new
+  common problem type and shared response (VenueRequired), declared on all 42 reads that carry GuestVenue. A guest read
+  that reaches venue data through an in-process scoped query (getOrderCalendarEvent, createCart) runs it under the
+  request''s venue scope, by the same rule on guestAuth.'
+decision:
+  what: 'The lead accepted the recommended answers of the r10 lane questions (25 October 2026), questions 12 and 13.
+    contracts/shared/common.yaml: problem type venue-required, response VenueRequired, the guestAuth rule.
+    The 42 GuestVenue reads (fnb, marketing-crm, promotions, queue, resources, retail, seating, transport, venue-map,
+    white-label, access, catalogue): 400 venue-required, added as the shared response or appended to the 400 they had.
+    contracts/spine/orders.yaml getOrderCalendarEvent and createCart: the in-process scope sentence.
+    tools/check-business-rules.py BR-GUEST-VENUE: a GuestVenue read declares venue-required.'
+  by: Chinmay
+  date: '2026-10-25'
+why: 'ADAM CR-198 (Chinmay Patkar, ticket 36301; CHG-R10ID-010): a read naming no venue had no scope and found
+  nothing, which the decision did not rule on; asked in lane A1''s report.'
+keys_touched:
+  operations: [getOrderCalendarEvent, createCart, getGuestBundle, getBundle, searchCatalogue, listProducts, getProduct]
+  files:
+  - contracts/shared/common.yaml
+  - contracts/spine/orders.yaml
+  - contracts/spine/catalogue.yaml
+  - contracts/spine/access.yaml
+  - contracts/satellite/fnb.yaml
+  - contracts/satellite/marketing-crm.yaml
+  - contracts/satellite/promotions.yaml
+  - contracts/satellite/queue.yaml
+  - contracts/satellite/resources.yaml
+  - contracts/satellite/retail.yaml
+  - contracts/satellite/seating.yaml
+  - contracts/satellite/transport.yaml
+  - contracts/satellite/venue-map.yaml
+  - contracts/satellite/white-label.yaml
+  - tools/check-business-rules.py
+root_class: 'existing: a read callable without a session over a table whose row security needs a scope'
+tickets:
+  started:
+  - '36301 (getGuestBundle): through CR-198''s comment; its text is not rewritten.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-198
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py
+status: open
+notes: 'A new 400 response is additive (check-contract-compat passes). The operations listed under keys_touched are a
+  sample; the full list of 42 is CHG-R10ID-010''s.'

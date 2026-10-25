@@ -318,6 +318,16 @@ x-ticvai-permission-modules:
       - PLATFORM_MIGRATION_VIEW
       - PLATFORM_MIGRATION_APPLY
       - PLATFORM_TENANT_ACCESS
+x-ticvai-share-only:
+  description: >
+    **Permissions a guest holds only through a share, never on a role** (the lead, 25 October 2026, r10 round 3,
+    ADAM CR-209; CHG-R10ID-021). Each sits in a module group because the vocabulary rule puts every value in exactly
+    one, but the role builder leaves it out: `listModuleCapabilities` shows it on no checklist, no preset copies it,
+    and `createRole`, `setRolePermissions`, `createDelegatedAccess` and `createPrincipal` refuse it with 400
+    `validation` (a staff grant that names it is never valid). Only `shareEntitlement` writes it, on a guest's
+    `identity.delegated_access` row of kind `sharedEntitlement`.
+  permissions:
+  - ENTITLEMENT_USE
 x-ticvai-module-ai-publish:
   description: >
     **Which permission publishes each module's AI** (Chinmay, 2 October, workbook Q3 and Q7: "the permission holder
@@ -668,8 +678,9 @@ components:
         # **Held through a share, not ticked on a role** (decided 25 October 2026, Chinmay, ADAM CR-209 option A;
         # CHG-R10ID-004). `shareEntitlement` writes it on an `identity.delegated_access` row whose
         # `over_object_ref` is `entitlement:<entitlementId>`; it lets the recipient present that one entitlement
-        # and is checked only against that row. A role that ticks it gains nothing, because no operation
-        # declares it as its `x-ticvai-permission`.
+        # and is checked only against that row. **It stays off every staff role checklist** (the lead, 25 October
+        # 2026, r10 round 3; CHG-R10ID-021): it is listed in `x-ticvai-share-only` below, so no role, preset, staff
+        # grant or role checklist carries it.
 
         # --- Accreditation ----------------------------------------------------
         - ACCREDITATION_VIEW

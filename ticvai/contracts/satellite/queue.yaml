@@ -202,6 +202,8 @@ paths:
         - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
         - $ref: ../shared/common.yaml#/components/parameters/GuestVenue
       responses:
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/VenueRequired
         '200':
           description: Queues
           content:
