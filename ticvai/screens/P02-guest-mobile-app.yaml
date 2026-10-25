@@ -13185,6 +13185,12 @@ screens:
     contract: identity
     purpose: Everything the platform holds about one guest
     trigger: onAction
+  - operationId: getSubjectDataExport
+    contract: identity
+    purpose: 'Where the requested data export has got to, and a fresh short-lived download link once it is ready
+      (ADAM CR-101, CHG-R10ID-016); polled with the requestId exportSubjectData answered while the export is not yet
+      ready, and read again for a new link when an old one has lapsed'
+    trigger: onInterval
   - operationId: deleteGuestAccount
     contract: identity
     purpose: Self-service account deletion

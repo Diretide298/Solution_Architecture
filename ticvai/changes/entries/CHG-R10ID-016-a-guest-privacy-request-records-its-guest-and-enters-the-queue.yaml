@@ -1,0 +1,83 @@
+id: CHG-R10ID-016
+date: '2026-10-25'
+source: cr
+kind: contract
+summary: 'A guest''s data export and erasure are Approvals requests the package can now record, deliver and clock:
+  they use configurationChange with subject types subjectDataExport and subjectErasure; the request records a guest
+  as requestedBySubjectId beside a now-nullable requestedByPrincipalId (exactly one set); the export is a stored
+  identity.subject_data_export row run on approval, its file in the tenant''s private storage, read with the new
+  getSubjectDataExport (status and a five-minute signed link); both requests emit identity.privacyRequestRaised into
+  Marketing''s privacy queue so dueAt applies; an erased guest is 410 subject-erased; the table set is the derived
+  subject-data register.'
+decision:
+  what: 'ADAM CR-101, accepted on 15 October 2026 ("the statutory period is the client''s to give"): proposed
+    request with an existing kind and subjectType and the requester recorded as a subject; export run on approval or at
+    once where the matrix asks for none, file in tenant storage behind a short-lived signed link, a status and download
+    read for guest and staff; the request enters the privacy queue by event; scope from a subject-data marker, not a
+    hand list; an erased subject answered with a stated problem type. contracts/spine/approvals.yaml: ApprovalKind
+    names the kind and subject types; ApprovalRequest x-ticvai-exactly-one-of [[requestedByPrincipalId,
+    requestedBySubjectId]], requestedByPrincipalId nullable (identity.principal), requestedBySubjectId (pii.subject);
+    createApprovalRequest says Identity raises it for the guest. contracts/spine/identity.yaml: exportSubjectData
+    (kind, requester, job, clock, tables from handoff/subject-data-register.json, 404, 410 subject-erased, emits,
+    writes identity.subject_data_export); new getSubjectDataExport; new schemas SubjectDataExport (persisted,
+    identity.subject_data_export) and SubjectDataExportStatus; deleteGuestAccount (sibling: kind, requester subject,
+    emits, the erasure job deletes the guest''s exports). events/identity-privacyRequestRaised.yaml (new, consumer
+    marketing); identity consumers on approval.granted, approval.rejected, approval.withdrawn and approval.expired.
+    contracts/satellite/marketing-crm.yaml: one sentence on marketing.privacy_request (cross-lane, lane A2).
+    screens/P01-guest-web-storefront.yaml WEB-024 and screens/P02-guest-mobile-app.yaml GST-066: getSubjectDataExport
+    in apis (binding only). docs/active/breaking-changes.yaml BC-480 (requestedByPrincipalId no longer guaranteed) and
+    BC-481 (the two operations emit), tag r10.'
+  by: Chinmay
+  date: '2026-10-15'
+why: 'ADAM CR-101 (Deep Khanvilkar, #30720 exportSubjectData; through point 1 also #30654 deleteGuestAccount), accepted
+  on 15 October 2026 and moved from r9 to r10. No ApprovalKind fitted an export, approvals.request required a principal
+  a guest does not have, the export had no file, delivery or status read, nothing put it on a statutory clock, and
+  there was no answer for an erased subject.'
+keys_touched:
+  operations: [exportSubjectData, getSubjectDataExport, deleteGuestAccount, createApprovalRequest]
+  schemas: [ApprovalKind, ApprovalRequest, SubjectDataExport, SubjectDataExportStatus,
+    DataSubjectCustomerPrivacyRequestManagementView]
+  tables: [approvals.request, identity.subject_data_export]
+  files:
+  - contracts/spine/approvals.yaml
+  - contracts/spine/identity.yaml
+  - contracts/satellite/marketing-crm.yaml
+  - events/identity-privacyRequestRaised.yaml
+  - events/approval-granted.yaml
+  - events/approval-rejected.yaml
+  - events/approval-withdrawn.yaml
+  - events/approval-expired.yaml
+  - screens/P01-guest-web-storefront.yaml
+  - screens/P02-guest-mobile-app.yaml
+  - docs/active/breaking-changes.yaml
+  - tools/check-business-rules.py
+root_class: 'new: a guest-raised act stored in a table that only knows principals'
+tickets:
+  started: []
+  unstarted:
+  - '30720 (exportSubjectData) and 30654 (deleteGuestAccount), New when last read (22 October); the r10 tag reaches
+    them through their pointer bodies. 27750 and 27727 (the IdentityService tasks), the guest screens'' tickets
+    (APP-MOB-GST-066, APP-WEB-WEB-024) and the approvals request tickets (BC-480''s list) move to r10 together. The MIG
+    tickets of approvals and identity take the new column, the CHECK and the new table from the next forward
+    migration.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-101
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-business-rules.py
+status: open
+notes: 'BR-PRIVACY-REQUEST (new) in check-business-rules: on a copy of the parent commit it reports 6 findings (no
+  subject requester, no emit on either operation, no 410, no status read, no Marketing consumer); on this tree it
+  passes. Questions for the lead: (1) "at once where the matrix asks for none" against createApprovalRequest''s 422
+  no-approval-route (CHG-R8SPN-015, "never approved automatically"): how a privacy request with no matching rule is
+  recorded; (2) how long a ready export file is kept; (3) which jurisdiction the privacy case takes
+  (marketing.privacy_request.jurisdiction is required and selects the response period); (4) whether the privacy case
+  should carry the approvals request id. The subject-data register (CHG-R8GEN-015) is the marker the decision names;
+  the owners'' subjectDataRecords queries are not declared yet (every module''s query is null in the register), which
+  is each owner''s contract work. Database (forward migration from the generator): approvals.request
+  requested_by_subject_id uuid null (FK pii.subject), requested_by_principal_id DROP NOT NULL (non-additive: for
+  review), CHECK num_nonnulls(requested_by_principal_id, requested_by_subject_id) = 1; new table
+  identity.subject_data_export (id, subject_id, format, status, file_ref, file_size_bytes, failure_reason,
+  requested_at, ready_at).'

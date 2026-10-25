@@ -1,0 +1,71 @@
+id: CHG-R10ID-015
+date: '2026-10-25'
+source: cr
+kind: contract
+summary: 'The approvals engine gets what CR-102 found missing: a condition language (attribute comparisons joined by
+  AND, with operators =, !=, <, <=, >, >=, in, notIn) and the clause-by-clause rule unreachableRule uses, which lifts
+  the r8 refusal of every condition (422 condition-not-supported becomes 422 condition-invalid for one that does not
+  parse); skipConditions negated into it; the approver chain fixed at routing and stored (ApprovalRequest.approvers,
+  a new approvals.request_approver table) and checked by decideApprovalRequest; a matrix version that is never null;
+  a rule code unique per matrix; the routing precedence written down; businessUnit and legalEntity no longer a scope.'
+decision:
+  what: 'ADAM CR-102, option 1, accepted on 15 October 2026 for the next release ("the lead settles it in the next
+    release (option 1)"). contracts/spine/approvals.yaml: ApprovalRule.condition defines the language and the
+    unreachableRule comparison (maxLength 500); ApprovalRule x-ticvai-unique-together [[matrix_id, code]];
+    ApprovalMatrix.version required, and the matrix description states which matrix routes (ADR-0018, nearest
+    ancestor wins; the highest version at a node is in force; an inactive one passes to the ancestor);
+    ApprovalRequest persists to approvals.request + approvals.escalation + approvals.request_approver with
+    approvers[] (level, principalId, isDelegate), pendingApprovers derived from it; createApprovalRequest,
+    submitApprovalRequest and decideApprovalRequest (notInApproverChain) say the chain is fixed at routing;
+    evaluateApprovalRequirement matches on the condition; setApprovalMatrix and approveMatrixMultiLevel 422
+    condition-invalid, skipConditions as OR-joined clauses negated into an AND condition;
+    approveRoleAuthorityDelegation and RolesAuthorityDelegationApprovalLimitsInput: businessUnit and legalEntity are
+    not a scope and not stored (deprecated, ignored). Already in r8 and not changed: request attributes stored
+    (CHG-CRA-005), the request''s matrix id (approvalMatrixId, CHG-R8MIG-009), unique (kind, scopePath, version)
+    (CHG-R8MIG-009), return and requestInformation as decisions (CHG-R8MIG-009), the composite operations'' 400, 403
+    and 409 and exceedsDelegatorAuthority 403 everywhere (APPROVALS-TENANCY-C04), approveMatrixMultiLevel at the
+    caller''s own node (audit R183).'
+  by: Chinmay
+  date: '2026-10-15'
+why: 'ADAM CR-102 (Deep Khanvilkar, #27833 submitApprovalRequest; also #27934 setApprovalMatrix and #27812
+  approveMatrixMultiLevel / approveRoleAuthorityDelegation), accepted with option 1 on 15 October 2026 and moved from
+  r9 to r10. Conditions had no grammar (pull audit R104), so submit could not evaluate a rule nor setApprovalMatrix
+  detect unreachableRule; the approver chain was resolved and never stored, so notInApproverChain had nothing to check;
+  matrix.version was nullable and rule codes were unique only in prose; businessUnit and legalEntity were mapped to a
+  scope node that does not exist.'
+keys_touched:
+  operations: [setApprovalMatrix, approveMatrixMultiLevel, approveRoleAuthorityDelegation, evaluateApprovalRequirement,
+    createApprovalRequest, submitApprovalRequest, decideApprovalRequest]
+  schemas: [ApprovalRule, ApprovalMatrix, ApprovalRequest, RolesAuthorityDelegationApprovalLimitsInput]
+  tables: [approvals.rule, approvals.matrix, approvals.request_approver]
+  files:
+  - contracts/spine/approvals.yaml
+  - tools/check-business-rules.py
+root_class: 'new: an engine rule the contract defers to an open decision after the decision is taken'
+tickets:
+  started: []
+  unstarted:
+  - '27833 (submitApprovalRequest), 27934 and 27931 (setApprovalMatrix), 27812 (approveMatrixMultiLevel,
+    approveRoleAuthorityDelegation), 27811 and 27813 (createApprovalRequest, decideApprovalRequest,
+    evaluateApprovalRequirement): New when last read (22 October); they pick the change up at the r10 tag through
+    their pointer bodies. The MIG ticket of the approvals tables takes the new table, the unique index and the NOT
+    NULL from the next forward migration.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-102
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-business-rules.py
+status: open
+notes: 'BR-APPROVAL-ENGINE (new) and BR-APPROVAL-ROUTE (now condition-invalid) in check-business-rules: run on a copy of
+  the parent commit''s contracts they report 6 findings (no language, no unique code, nullable version, no stored chain,
+  and the two composites refusing condition-not-supported); on this tree they pass. Two parts of option 1 are not
+  written, because CR-102 names no rule for them: how amounts compare across currencies (a tenant- or region-level
+  matrix, a tenant-scoped request, a supplier currency; CR-094''s rule waits on the client) and what "the delegator may
+  approve under the matrix" means for exceedsDelegatorAuthority. Both are questions for the lead. The precedence
+  sentence that an inactive highest version passes to the ancestor is read from ADR-0018 and the review steps being
+  "off until the venue saves an active matrix"; the lead to confirm. Database (forward migration from the generator):
+  new table approvals.request_approver (request_id, level, principal_id, is_delegate, id); approvals.matrix.version
+  SET NOT NULL (non-additive: listed for review); unique index on approvals.rule (matrix_id, lower(code));
+  approvals.rule.condition length CHECK 500.'
