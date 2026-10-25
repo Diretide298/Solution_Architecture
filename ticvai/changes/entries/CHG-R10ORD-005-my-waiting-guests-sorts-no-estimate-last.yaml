@@ -26,9 +26,8 @@ tickets:
 adam_cr: CR-236
 triage: fix-forward
 prevention:
-  type: none
-  reason: Lane E of r10 adds the check for an order on a nullable field (named for listShifts and listMyWaitingGuests);
-    integration replaces this with its ref once it lands.
+  type: check
+  ref: tools/check-list-order.py
 release_tag: pending
 decision_owner: Chinmay
 status: open

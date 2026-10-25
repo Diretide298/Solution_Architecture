@@ -31,9 +31,8 @@ tickets:
 adam_cr: CR-220
 triage: blocker
 prevention:
-  type: none
-  reason: Lane E of r10 adds the check for a screen value with no source (named for GST-051's cuisineTags and retailTags);
-    integration names it here once it lands.
+  type: check
+  ref: tools/check-screen-value-sources.py
 notes: 'Contract side only (lane C). No database change: computed on read from venuemap.point.'
 release_tag: pending
 decision_owner: Chinmay

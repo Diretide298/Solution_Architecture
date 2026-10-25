@@ -42,9 +42,8 @@ tickets:
 adam_cr: CR-207
 triage: blocker
 prevention:
-  type: none
-  reason: Lane E of r10 adds the check for a screen value with no source (bindsTo a field no declared operation answers);
-    integration names it here once it lands.
+  type: check
+  ref: tools/check-screen-value-sources.py
 notes: 'Database change: ai.proposed_action.confidence (numeric), basis (text, CHECK handMarked/seen), reasoning (text),
   distance_metres (numeric), map_id (uuid); venuemap.import_job.source_ref (uuid), format (text, CHECK of the seven formats),
   created_at (timestamptz). The decision calls the 409 ''has-vector-geometry''; the operation''s existing problem type map-has-vector-geometry

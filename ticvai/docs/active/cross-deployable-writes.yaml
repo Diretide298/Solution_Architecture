@@ -90,7 +90,7 @@ reads:
   tables: [access.media_encoding_profile]
   privileges: [SELECT]
   queries: [access#mediaEncodingProfileRecords]
-  operations: [setChannelFeePayment]
+  operations: [setChannelFeePayment, addToWishlist, getWishlist]
   added: '2026-10-25'
   decision_ref: ADAM CR-212, option A, Chinmay, 25 October 2026
   why: 'catalogue setChannelFeePayment (commerce) reports mediaProfileMissing for an RFID, NFC or wristband fulfilment

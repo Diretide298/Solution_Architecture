@@ -1671,6 +1671,9 @@ paths:
     post:
       operationId: openGuestCreditAccount
       x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the currency and scale of the Money it answers or accepts: the venue it acts at (the caller''s working venue), Tenancy''s data (CHG-R10ORD-019, the lead''s ruling of 25 October 2026)'
       - query: identity#subjectRecords
         route: in-process
         for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
@@ -1695,6 +1698,10 @@ paths:
         opens `pendingApproval` whatever the body says. A pending account is released by a supervisor holding
         `ORDER_DISCOUNT` through the approvals inbox (`decideApprovalRequest`); until then it extends no credit.
 
+
+        **Its currency** (CHG-R10ORD-019; the lead''s ruling of 25 October 2026 on check-money-currency): the Money
+        this operation answers or accepts is in the currency of the venue it acts at, the caller''s working venue,
+        read through `tenancy#venueSettingsRecords` with its scale; the rows behind it store the amount only.
         '
       tags:
       - orders
@@ -6219,6 +6226,10 @@ paths:
         format: uuid
     post:
       operationId: simulateRefund
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the currency and scale of the Money it answers or accepts: the venue it acts at (the caller''s working venue), Tenancy''s data (CHG-R10ORD-019, the lead''s ruling of 25 October 2026)'
       x-ticvai-idempotency-exempt: A simulation writes nothing and calls no provider; repeating it is harmless (CHG-CSP-046).
       x-ticvai-audience:
       - staff
@@ -6247,6 +6258,10 @@ paths:
         destination the venue does not list is not offered. `tenderRoutes` is the allocation `createRefund` would write, one row per payment, in that
         order.
 
+
+        **Its currency** (CHG-R10ORD-019; the lead''s ruling of 25 October 2026 on check-money-currency): the Money
+        this operation answers or accepts is in the currency of the venue it acts at, the caller''s working venue,
+        read through `tenancy#venueSettingsRecords` with its scale; the rows behind it store the amount only.
         '
       tags:
       - refund
@@ -13936,6 +13951,10 @@ paths:
   /refund-dispute-resale:
     get:
       operationId: listRefundDisputeResale
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the currency and scale of the Money it answers or accepts: the venue it acts at (the caller''s working venue), Tenancy''s data (CHG-R10ORD-019, the lead''s ruling of 25 October 2026)'
       x-ticvai-consumed-by:
         - "P08 ADM-295 Refunds, Disputes & Resale Exceptions"
       x-ticvai-audience:
@@ -13971,7 +13990,11 @@ paths:
         much: the resale buyer at the resale price, the original purchaser at face value, or a
         split, and is the seller''s payout clawed back if already paid? The pack itself says this
         ''cannot be assumed''. A wrong default changes what customers are refunded in a way the
-        client''s commercial and finance teams would reverse (c).'
+        client''s commercial and finance teams would reverse (c).
+
+        **Its currency** (CHG-R10ORD-019; the lead''s ruling of 25 October 2026 on check-money-currency): the Money
+        this operation answers or accepts is in the currency of the venue it acts at, the caller''s working venue,
+        read through `tenancy#venueSettingsRecords` with its scale; the rows behind it store the amount only.'
       tags:
       - drafted
       x-ticvai-permission: ORDER_VIEW
