@@ -1563,6 +1563,10 @@ paths:
         - "P08 BO-994 Choose My Seats"
         - "P08 BO-995 Find Seats For Me"
         - "P08 BO-996 Filters & Interactive Legend"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s maxSeatsPerGuestOrder (VenueSettings.seating) returned as SeatAvailability.maxSeatsPerGuestOrder, Tenancy''s data (ADAM CR-187)'
       # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
       # or staff token is still accepted. `{}` makes the credential optional.
       security:
@@ -5017,6 +5021,17 @@ components:
                 type: integer
               price:
                 $ref: ../shared/common.yaml#/components/schemas/Money
+        maxSeatsPerGuestOrder:
+          type: integer
+          minimum: 1
+          maximum: 50
+          readOnly: true
+          description: '**The most seats one guest booking may hold at this performance''s venue** (ADAM CR-187, 25
+            October 2026): the venue''s `VenueSettings.seating.maxSeatsPerGuestOrder` (default 10, bounds 1 to 50,
+            decided 29 September, rev 3 REV3-7), read through `tenancy#venueSettingsRecords` (the venue''s row,
+            else the tenant''s own row, else 10). A guest screen caps its party stepper with it before anything is
+            held (WEB-007, GST-049); `createSeatHold` still refuses more with `422` `seat-limit-exceeded`, whose
+            `maxSeats` is this value on a guest channel. Computed, not stored.'
         zones:
           type: array
           description: '**The standing zones and what is left in each** (r8, GPS-C38): a zone has no seats, so it is

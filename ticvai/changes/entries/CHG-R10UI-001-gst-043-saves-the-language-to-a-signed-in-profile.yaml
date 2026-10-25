@@ -1,0 +1,43 @@
+id: CHG-R10UI-001
+date: '2026-10-25'
+source: cr
+kind: spec
+summary: 'GST-043 Arabic / RTL Experience: for a signed-in guest the language choice is also written to the profile with
+  marketing-crm updateMyProfile, sending only preferredLanguage, after the device copy is saved; signed out, the device
+  copy is all there is. getMyProfile reads the profile language the write changes.'
+decision:
+  what: 'ADAM CR-186, option A, as settled on 25 October 2026: "For a signed-in guest, GST-043 also calls marketing-crm#updateMyProfile
+    (onAction, sending only preferredLanguage) after the device copy is saved; signed out, the device copy is all there
+    is. Add the operation to GST-043''s API list. No contract change." screens/P02 GST-043: updateMyProfile in apis, sent
+    by the Language choice (declared trigger background because it has no control of its own, as claimDeviceConsent on GST-042;
+    check-screen-wiring S-OP-UNREACHED), and getMyProfile onLoad with shownBy Language, so the edit reads what it edits
+    (check-screen-patterns READ). The Language note says when the profile is written.'
+  by: Chinmay
+  date: '2026-10-25'
+why: 'ADAM CR-186 (Chitrangi Mestry, #31071 GST-043), settled 25 October 2026. GST-043 said the choice is stored as the
+  profile''s language for a signed-in guest but declared only getPublishedTenantConfig, so a guest who switched to Arabic
+  kept the old language on the profile and in every message sent from it.'
+keys_touched:
+  screens:
+  - GST-043
+  operations:
+  - updateMyProfile
+  - getMyProfile
+  files:
+  - screens/P02-guest-mobile-app.yaml
+root_class: a screen note promising a write the screen does not declare
+tickets:
+  started:
+  - '31071 (GST-043): through CR-186''s comment, as CHG-ADM-002 says; its text is not rewritten.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-186
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: open
+notes: 'No visible change: the Language control is the approved one. The decision''s "onAction" is kept in substance (the
+  write is sent on the guest''s choice); it is declared background because the lead''s ruling of 20 October bars background
+  only on a read a person sees.'

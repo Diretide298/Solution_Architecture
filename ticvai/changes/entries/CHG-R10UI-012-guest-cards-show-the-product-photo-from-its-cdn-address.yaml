@@ -1,0 +1,52 @@
+id: CHG-R10UI-012
+date: '2026-10-25'
+source: cr
+kind: spec
+summary: Every guest card and media panel that shows a product photo (WEB-001, WEB-003, WEB-004, WEB-022, GST-002, GST-003,
+  GST-004, GST-015, GST-021, GST-038, GST-050, GST-063, KSK-001, KSK-003) shows ProductMedia.thumbnailUrl (url for the full
+  view) of the primary item, the CDN address the guest read returns; the client never turns an assetId into an address.
+decision:
+  what: 'ADAM CR-221 (screen side), option A, settled 25 October 2026: "On guest-facing reads that return ProductMedia ...
+    add read-only url and thumbnailUrl ... Guest cards bind those; staff reads are unchanged." screens/P01, P02 and P05:
+    the notes of the 15 components that show Product.media or primaryMedia name thumbnailUrl and url.'
+  by: Chinmay
+  date: '2026-10-25'
+why: 'ADAM CR-221 (Chinmay Patkar, #28145 WEB-003). Guest listings must show each product''s own photo (23SEP-4), but ProductMedia
+  carried only an assetId and every read that turns it into an address is staff-only.'
+keys_touched:
+  screens:
+  - WEB-001
+  - WEB-003
+  - WEB-004
+  - WEB-022
+  - GST-002
+  - GST-003
+  - GST-004
+  - GST-015
+  - GST-021
+  - GST-038
+  - GST-050
+  - GST-063
+  - KSK-001
+  - KSK-003
+  schemas:
+  - ProductMedia
+  files:
+  - screens/P01-guest-web-storefront.yaml
+  - screens/P02-guest-mobile-app.yaml
+  - screens/P05-guest-kiosk.yaml
+root_class: a guest card bound to a field a guest cannot render
+tickets:
+  started:
+  - '28145 (WEB-003): through CR-221''s comment, as CHG-ADM-002 says; its text is not rewritten.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-221
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: open
+notes: 'Notes only: the columns stay Product.media (the field a column is compared by), so no approved card changes. url
+  and thumbnailUrl on ProductMedia are lane B''s half (contracts/spine/catalogue.yaml).'

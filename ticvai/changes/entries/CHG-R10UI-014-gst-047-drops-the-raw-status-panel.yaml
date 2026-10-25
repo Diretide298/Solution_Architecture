@@ -1,0 +1,35 @@
+id: CHG-R10UI-014
+date: '2026-10-25'
+source: cr
+kind: spec
+summary: 'GST-047 Maintenance / Upgrade Page loses its raw TenantAppStatus detail panel (publishedAt, expectedBackAt, minimumAppVersion,
+  availability, availabilityMessage): each value already appears, in words, in the state or banner that binds it.'
+decision:
+  what: 'ADAM CR-181, option A, accepted 21 October 2026 (as "Fixed at the source in r9", which it was not: the panel was
+    still there at r9). screens/P02 GST-047: the panel removed, the notes; approved-ui-changes.yaml GST-047 region:record,
+    logged as CR-181.'
+  by: Chinmay
+  date: '2026-10-21'
+why: 'ADAM CR-181 (Chitrangi Mestry, #31074 GST-047). The panel put a config publish time, a version string and an enum
+  value in front of a guest beside the states that already say them; #31074 built the five states without it.'
+keys_touched:
+  screens:
+  - GST-047
+  operations:
+  - getTenantAppStatus
+  files:
+  - screens/P02-guest-mobile-app.yaml
+  - docs/active/approved-ui-changes.yaml
+root_class: a generic pattern panel left on a designed state screen
+tickets:
+  started:
+  - '31074 (GST-047): through CR-181''s comment, as CHG-ADM-002 says; its text is not rewritten.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-181
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-approved-ui.py
+status: open

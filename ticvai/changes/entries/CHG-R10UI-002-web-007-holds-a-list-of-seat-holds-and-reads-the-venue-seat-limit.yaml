@@ -1,0 +1,55 @@
+id: CHG-R10UI-002
+date: '2026-10-25'
+source: cr
+kind: contract
+summary: 'WEB-007 follows seating.yaml''s one-hold-per-tap model: the edge to WEB-010 and both entry states carry holdIds
+  (a list), getSeatHold is called on load when holdIds are given, and the banner counts down to the earliest SeatHold.expiresAt
+  (Cart.expiresAt from WEB-010 on). SeatAvailability gains the read-only maxSeatsPerGuestOrder (the venue setting, read
+  in process from tenancy#venueSettingsRecords), which caps the Recommend seats stepper; a 422 still reads Up to {maxSeats}
+  seats per booking.'
+decision:
+  what: 'ADAM CR-187, option A, as settled on 25 October 2026. screens/P01: the WEB-007 transition to WEB-010 carries holdIds;
+    entryState holdIds; apis getSeatHold (onLoad, reached by the countdown banner, bindsTo SeatHold.expiresAt); the banner,
+    seat map and formRecommendSeats notes; WEB-010 entryState holdIds (holdId stays, optional, for getResourceHold''s cabana
+    or spot hold, which check-screens needs as a path parameter). contracts/satellite/seating.yaml: SeatAvailability.maxSeatsPerGuestOrder
+    (integer 1-50, readOnly, computed) and getSeatAvailability x-ticvai-read-via tenancy#venueSettingsRecords in-process
+    (seating and tenancy are both in commerce, ADR-0055). Siblings: GST-049 and GST-041, the app''s seat map and basket,
+    carry holdIds and cap the stepper the same way.'
+  by: Chinmay
+  date: '2026-10-25'
+why: 'ADAM CR-187 (Chitrangi Mestry, #31848 WEB-007), settled 25 October 2026. WEB-007 still bound one holdId and a Cart
+  countdown after the r8 seating contract made one hold per tap, read no cart, and had no guest-readable source for maxSeatsPerGuestOrder
+  (only the 422 SeatLimitProblem after a refusal; REV3-7).'
+keys_touched:
+  screens:
+  - WEB-007
+  - WEB-010
+  - GST-049
+  - GST-041
+  operations:
+  - getSeatAvailability
+  - getSeatHold
+  schemas:
+  - SeatAvailability
+  files:
+  - screens/P01-guest-web-storefront.yaml
+  - screens/P02-guest-mobile-app.yaml
+  - contracts/satellite/seating.yaml
+root_class: a screen left behind by a contract decision (the r8 seating hold model)
+tickets:
+  started:
+  - '31848 (WEB-007): through CR-187''s comment, as CHG-ADM-002 says; its text is not rewritten.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-187
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screens.py
+status: open
+notes: 'No table change: SeatAvailability is computed (x-ticvai-persistence none). Cross-lane: seating.yaml is lane B''s
+  contract; the brief gives this field to lane D. createSeatHold names the same venue setting in words and declares no read-via:
+  left to lane E''s read-routes sweep (XR-FACT), so one operation is not edited twice. GST-049 does not declare getSeatHold:
+  it has no countdown element to reach it with, and a read a person sees is never background (the lead, 20 October); raised
+  for the lead.'

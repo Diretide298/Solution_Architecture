@@ -157997,89 +157997,54 @@ screens:
     - name: contentBody
       slot: fields
       components:
-      - kind: selectField
+      - kind: toggle
         label: P2P enabled
         bindsTo: WalletTransferRules.peerToPeerAllowed
         operation: getWalletTransferRules
-        provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 76 §Configure
-      - kind: selectField
-        label: Eligible wallet types
-        provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 76 §Configure
-      - kind: selectField
-        label: Eligible customer types
-        provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 76 §Configure
-      - kind: selectField
+        provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 76 §Configure; ADAM CR-193 (option C), settled by Chinmay 25 October 2026; contract wallet.yaml WalletTransferRules
+      - kind: multiSelect
         label: Eligible credit types
-        provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 76 §Configure
-      - kind: selectField
-        label: Supported currencies
-        provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 76 §Configure
-      - kind: selectField
-        label: Minimum transfer
-        provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 76 §Configure
-      - kind: selectField
+        bindsTo: WalletTransferRules.transferableCreditTypeIds
+        operation: listCreditTypes
+        notes: The venue's credit types (`listCreditTypes`); the chosen ids are sent as `transferableCreditTypeIds`.
+        provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 76 §Configure; ADAM CR-193 (option C), settled by Chinmay 25 October 2026; contract wallet.yaml WalletTransferRules
+      - kind: numberField
         label: Maximum transfer
-        provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 76 §Configure
-      - kind: selectField
+        bindsTo: WalletTransferRules.maximumPerTransfer
+        operation: getWalletTransferRules
+        provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 76 §Configure; ADAM CR-193 (option C), settled by Chinmay 25 October 2026; contract wallet.yaml WalletTransferRules
+      - kind: numberField
         label: Daily transfer amount
-        provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 76 §Configure
-      - kind: selectField
-        label: Monthly transfer amount
-        provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 76 §Configure
-      - kind: selectField
-        label: Maximum transfer count
-        provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 76 §Configure
-      - kind: selectField
-        label: Transfer fee
-        provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 76 §Configure
-      - kind: selectField
+        bindsTo: WalletTransferRules.maximumPerDay
+        operation: getWalletTransferRules
+        provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 76 §Configure; ADAM CR-193 (option C), settled by Chinmay 25 October 2026; contract wallet.yaml WalletTransferRules
+      - kind: numberField
+        label: Approval above amount
+        bindsTo: WalletTransferRules.approvalAboveAmount
+        operation: getWalletTransferRules
+        notes: A transfer above this amount waits for approval; empty means none does.
+        provenance: ADAM CR-193 (option C), settled by Chinmay 25 October 2026; contract wallet.yaml WalletTransferRules
+      - kind: toggle
         label: Recipient verification
-        provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 76 §Configure
-      - kind: selectField
-        label: Sender authentication
-        provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 76 §Configure
-      - kind: selectField
-        label: Recipient confirmation
-        provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 76 §Configure
-      - kind: selectField
-        label: Transfer expiry
-        provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 76 §Configure
-      - kind: selectField
-        label: Cross-tenant transfer
-        provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 76 §Configure
-      - kind: selectField
-        label: Cross-venue transfer
-        provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 76 §Configure
-      - kind: selectField
-        label: Cross-currency transfer
-        provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 76 §Configure
-      - kind: selectField
-        label: Example
-        provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 76 §Configure
-      - kind: selectField
-        label: Wallet A
-        provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 76 §Configure
-      - kind: textField
-        label: 'Cash Credit: AED 500'
-        provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 76 §Configure
+        bindsTo: WalletTransferRules.bothPartiesIdentified
+        operation: getWalletTransferRules
+        notes: Both the sender and the recipient must be identified guests (default on).
+        provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 76 §Configure; ADAM CR-193 (option C), settled by Chinmay 25 October 2026; contract wallet.yaml WalletTransferRules
+      - kind: toggle
+        label: Within a shared wallet only
+        bindsTo: WalletTransferRules.withinSharedWalletOnly
+        operation: getWalletTransferRules
+        notes: Transfers only between members of one shared (family) wallet (default off).
+        provenance: ADAM CR-193 (option C), settled by Chinmay 25 October 2026; contract wallet.yaml WalletTransferRules
     - name: actionBar
       slot: publish
       components:
       - kind: primaryButton
-        label: Wallet ID
-        provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 76 §Support
-      - kind: secondaryButton
-        label: Customer ID
-        provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 76 §Support
-      - kind: secondaryButton
-        label: Membership ID
-        provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 76 §Support
-      - kind: secondaryButton
-        label: Contact selection
-        provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 76 §Support
-      - kind: secondaryButton
-        label: API
-        provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 76 §Support
+        label: Save
+        operation: setWalletTransferRules
+        notes: Sends the whole `WalletTransferRules` with the version read for If-Match; a 412 says someone else
+          saved first and reloads.
+        provenance: ADAM CR-193 (option C), settled by Chinmay 25 October 2026; contract wallet.yaml WalletTransferRules
   states:
     loading: The peer-to-peer transfer configuration as saved.
     error: Could not load. Names which read failed and leaves the peer-to-peer transfer untouched.
@@ -158092,7 +158057,7 @@ screens:
   apis:
   - operationId: setWalletTransferRules
     contract: wallet
-    purpose: Whether guests may transfer
+    purpose: Save the transfer rules (the seven WalletTransferRules fields the form shows), with If-Match
     trigger: onAction
     provenance: board reading, 19 September 2026
   - operationId: getWalletTransferRules
@@ -158100,16 +158065,27 @@ screens:
     purpose: The transfer rules as saved, with their version for If-Match
     trigger: onLoad
     provenance: defined 21 October 2026 (r8 gate, CHG-R8RW-007; closes the CHG-WIR-027 gap)
+  - operationId: listCreditTypes
+    contract: wallet
+    purpose: The venue's credit types, the choices of Eligible credit types (ADAM CR-193)
+    trigger: onLoad
+    provenance: ADAM CR-193, settled by Chinmay 25 October 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1144
     workshopBoard: wireframes/WS192 Wallet Configuration Backend Structure v1.0 Board 7.dc.html#bo-1144
   apisNote: 'Regenerated 9 September 2026 from Wallet_Configuration_Backend_Structure_v1.0.pdf page 76.
-    0 of 0 labels bound to a contract property; 26 of 39 pack bullets carried onto the screen — the rest
-    are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
-    rather than here. **Pack actions reconciled 29 September (VM close-out):** Wallet ID, Customer ID,
-    Membership ID, Contact selection, API are choices sent by `setWalletTransferRules` (field gap: add
-    recipientLookupMethods walletId|customerId|membershipId|contact|api).'
+    **Trimmed to the contract on 25 October 2026 (ADAM CR-193, option C, settled by Chinmay; raised by
+    Surendra Loke on #36207).** The form is WalletTransferRules as it stands: P2P enabled ->
+    peerToPeerAllowed, Eligible credit types -> transferableCreditTypeIds, Maximum transfer ->
+    maximumPerTransfer, Daily transfer amount -> maximumPerDay, Recipient verification ->
+    bothPartiesIdentified, and two fields added for approvalAboveAmount and withinSharedWalletOnly. Every pack
+    field with no contract property is dropped (eligible wallet and customer types, currencies, minimum,
+    monthly and count limits, the fee, sender authentication, recipient confirmation, expiry, the cross-tenant,
+    cross-venue and cross-currency switches, and the lookup methods Wallet ID, Customer ID, Membership ID,
+    Contact selection and API), with the pack''s example prose ("Example", "Wallet A", "Cash Credit: AED 500").
+    Those rules wait on a client and compliance decision and come as a separate request (docs/active/left-out.yaml
+    LO-R10UI-001).'
 - id: BO-1145
   name: Transfer Eligibility, Limits & Approval Rules
   module: Orders & Money

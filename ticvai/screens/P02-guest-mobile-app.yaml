@@ -867,14 +867,19 @@ screens:
         - Product.displayTags
         operation: listProducts
         provenance: decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)
-        notes: The venue is the one the guest picked on Home (`venueId` from the session, audit R267),
-          never typed. Was the generated table 'Every product'; staff and plumbing columns removed (decided
-          by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)).
+        notes: '**The photo is the primary item''s `ProductMedia.thumbnailUrl`** (`isPrimary`; `url` for the
+          full-size view): the stable CDN address the guest read returns for a public, ready asset (ADAM
+          CR-221, 25 October 2026). The client never turns an `assetId` into an address and calls no asset
+          read. The venue is the one the guest picked on Home (`venueId` from the session, audit R267),
+          never typed. Was the generated table ''Every product''; staff and plumbing columns removed
+          (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)).'
       - kind: searchField
         label: Search the venue
         operation: searchCatalogue
-        notes: Sends `?q=` to `searchCatalogue`; results replace the tiles in place (GST-063, the same
-          implementation).
+        notes: '**Type-ahead, as GST-063** (ADAM CR-223, 25 October 2026): `searchCatalogue` is called with `?q=`
+          once typing pauses (300 ms debounce), only for 2 or more characters, Enter searches at once, and
+          the latest answer wins; results replace the tiles in place (GST-063, the same implementation).
+          frontend-patterns 4.6.'
         provenance: decided 29 September 2026, MOB-1
       - kind: cardList
         label: Inline video previews
@@ -908,7 +913,8 @@ screens:
     trigger: onLoad
   - operationId: searchCatalogue
     contract: catalogue
-    purpose: Search from the top of Explore; results are GST-063, a state of this screen
+    purpose: 'Search from the top of Explore, type-ahead as on GST-063 (ADAM CR-223); results are GST-063,
+      a state of this screen'
     trigger: onAction
     provenance: decided 29 September 2026, MOB-1
   entryState:
@@ -1066,9 +1072,12 @@ screens:
         - Product.displayTags
         operation: listProducts
         provenance: decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)
-        notes: The venue is the one the guest picked on Home (`venueId` from the session, audit R267),
-          never typed. Was the generated table 'Every product'; staff and plumbing columns removed (decided
-          by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)).
+        notes: '**The photo is the primary item''s `ProductMedia.thumbnailUrl`** (`isPrimary`; `url` for the
+          full-size view): the stable CDN address the guest read returns for a public, ready asset (ADAM
+          CR-221, 25 October 2026). The client never turns an `assetId` into an address and calls no asset
+          read. The venue is the one the guest picked on Home (`venueId` from the session, audit R267),
+          never typed. Was the generated table ''Every product''; staff and plumbing columns removed
+          (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)).'
       - kind: banner
         label: Help me choose
         operation: getPublishedGuidedChoice
@@ -1326,11 +1335,14 @@ screens:
       - kind: detailPanel
         label: Photo and video
         bindsTo: Product.media
-        notes: '**The video plays directly, with no loader in front of it** (client meeting 30 September,
-          MoM 4.8, Qossai; agreed by Chinmay). The info button reveals the ride details and starts the
-          primary video in place, as the header video does elsewhere; while it buffers the poster frame
-          (the primary image, or the video''s first frame) shows, never a spinner or loading screen. Read
-          more opens on the primary video or photo.'
+        notes: '**Each item plays or shows from its `ProductMedia.url`** (`thumbnailUrl` as the poster frame while
+          it buffers): the stable CDN address `getProduct` returns to a guest for a public, ready asset
+          (ADAM CR-221, 25 October 2026). The client never turns an `assetId` into an address and calls no
+          asset read. **The video plays directly, with no loader in front of it** (client meeting 30
+          September, MoM 4.8, Qossai; agreed by Chinmay). The info button reveals the ride details and
+          starts the primary video in place, as the header video does elsewhere; while it buffers the poster
+          frame (the primary image, or the video''s first frame) shows, never a spinner or loading screen.
+          Read more opens on the primary video or photo.'
         operation: getProduct
         provenance: decided 29 September, rev 3 23SEP-4; decided 30 September 2026, client meeting MoM
           4.8 (Qossai)
@@ -1878,9 +1890,11 @@ screens:
       trigger: Adds tickets for a performance whose on-sale waiting room is on
       operation: addCartLine
       precondition: '`addCartLine` refused `403 admission-required`: this performance''s room is on and
-        the app holds no admission token for it'
+        the app holds no admission token for it. The edge carries the `waitingEntryId` the app got back
+        from GST-046, when it has one, so the guest keeps their place (ADAM CR-216)'
       carries:
       - performanceId
+      - waitingEntryId
       returnsTo: GST-007
       provenance: ADR-0066 (accepted 1 October 2026) and its 1 October amendment
   notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose derived
@@ -2090,6 +2104,11 @@ screens:
       from: navigation
       optional: true
       notes: 'Optional: opened without it, the screen makes one with `joinWaitlist`.'
+    - name: waitingEntryId
+      from: GST-046
+      optional: true
+      notes: 'The on-sale waiting-room entry the guest was admitted from (ADAM CR-216, 25 October 2026): held
+        only to carry back to GST-046 if `addCartLine` is refused `403 admission-required`.'
     coldEntry: '**A guest arriving cold on a link that no longer resolves is shown what happened and one
       way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened
       three weeks late all land here, and the person holding the link did nothing wrong. **The screen
@@ -3965,10 +3984,13 @@ screens:
         - Product.media
         operation: listProducts
         provenance: decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)
-        notes: The venue's membership plans, to join or upgrade. The venue is the one the guest picked
-          on Home (`venueId` from the session, audit R267), never typed. Was the generated table 'Every
-          product'; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts,
-          2 October 2026 (GFIX-3)).
+        notes: '**The photo is the primary item''s `ProductMedia.thumbnailUrl`** (`isPrimary`; `url` for the
+          full-size view): the stable CDN address the guest read returns for a public, ready asset (ADAM
+          CR-221, 25 October 2026). The client never turns an `assetId` into an address and calls no asset
+          read. The venue''s membership plans, to join or upgrade. The venue is the one the guest picked on
+          Home (`venueId` from the session, audit R267), never typed. Was the generated table ''Every
+          product''; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2
+          October 2026 (GFIX-3)).'
     - name: contextPanel
       slot: selection
       components:
@@ -4005,6 +4027,16 @@ screens:
         label: Retry the payment
         operation: retryMyDunningPayment
         provenance: contract payments.yaml POST /dunning-cases/{caseId}/retry
+      - kind: secondaryButton
+        label: Use another card
+        operation: listPaymentTokens
+        notes: 'On a declined renewal (rev 3 DG-2: a soft decline offers it beside Retry now, a hard decline
+          offers only this): lists the guest''s saved cards (`listPaymentTokens`: masked identifier, method,
+          expiry, default first) in the retry modal, and the chosen one''s id is sent as `paymentTokenId` to
+          `retryMyDunningPayment` (ADAM CR-233, 25 October 2026). Drawn on the client-approved frame
+          (wireframes/frames/gst-015.html), which already shows it.'
+        provenance: ADAM CR-233 (option A), settled by Chinmay 25 October 2026; client-approved frame gst-015
+          (19 October 2026)
   states:
     loading: The memberships list.
     error: Could not load. Names which read failed and leaves the memberships untouched.
@@ -4038,6 +4070,13 @@ screens:
     contract: payments
     purpose: Retry a declined payment, on another card if needed
     trigger: onAction
+  - operationId: listPaymentTokens
+    contract: orders
+    purpose: 'Called when the guest chooses Use another card: the saved cards the retry modal lists (masked
+      identifier, method, expiry, default first); the chosen one''s id goes to retryMyDunningPayment as
+      paymentTokenId (ADAM CR-233, 25 October 2026)'
+    trigger: onAction
+    provenance: ADAM CR-233 (option A), settled by Chinmay 25 October 2026
   - operationId: getMyMemberships
     contract: catalogue
     purpose: A guest's own memberships, benefits and history
@@ -4119,7 +4158,10 @@ screens:
     component: modal
     trigger: Retry the payment
     body: '**Collects what `retryMyDunningPayment` sends before it is called.** Nothing in the body is
-      required. Optional: `paymentTokenId`. Dismissing sends nothing; the screen behind is unchanged.'
+      required. Optional: `paymentTokenId`. **Use another card lists the guest''s saved cards** from
+      `listPaymentTokens` (masked identifier, method, expiry, the default first) and sends the chosen one''s
+      id as `paymentTokenId`; a hard decline is never retried on the same card (ADAM CR-233, 25 October 2026).
+      Dismissing sends nothing; the screen behind is unchanged.'
     bindsTo: RetryDunningPaymentRequest
     confirm:
       label: Retry my dunning payment
@@ -5087,10 +5129,13 @@ screens:
         - Product.displayTags
         operation: listProducts
         provenance: decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)
-        notes: Pins by point category (rides, dining, shows); a pin opens Item Detail. The venue is the
-          one the guest picked on Home (`venueId` from the session, audit R267), never typed. Was the
-          generated table 'Every product'; staff and plumbing columns removed (decided by Chinmay, fix
-          before Block A starts, 2 October 2026 (GFIX-3)).
+        notes: '**The photo is the primary item''s `ProductMedia.thumbnailUrl`** (`isPrimary`; `url` for the
+          full-size view): the stable CDN address the guest read returns for a public, ready asset (ADAM
+          CR-221, 25 October 2026). The client never turns an `assetId` into an address and calls no asset
+          read. Pins by point category (rides, dining, shows); a pin opens Item Detail. The venue is the one
+          the guest picked on Home (`venueId` from the session, audit R267), never typed. Was the generated
+          table ''Every product''; staff and plumbing columns removed (decided by Chinmay, fix before Block
+          A starts, 2 October 2026 (GFIX-3)).'
       - kind: selectField
         label: Map
         bindsTo: BookableVenueMaps.maps
@@ -8152,12 +8197,12 @@ screens:
       components:
       - kind: cardList
         label: Offers
-        bindsTo: Promotion
+        bindsTo: GuestPromotion
         columns:
-        - Promotion.code
-        - Promotion.name
-        - Promotion.description
-        - Promotion.validFrom
+        - GuestPromotion.code
+        - GuestPromotion.name
+        - GuestPromotion.description
+        - GuestPromotion.validFrom
         operation: listPromotions
         provenance: decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)
         notes: The offers active now at the guest's venue. The venue is the one the guest picked on Home
@@ -8169,13 +8214,13 @@ screens:
       components:
       - kind: detailPanel
         label: The selected promotion
-        bindsTo: Promotion
+        bindsTo: GuestPromotion
         columns:
-        - Promotion.code
-        - Promotion.name
-        - Promotion.description
-        - Promotion.discount
-        - Promotion.validFrom
+        - GuestPromotion.code
+        - GuestPromotion.name
+        - GuestPromotion.description
+        - GuestPromotion.discount
+        - GuestPromotion.validFrom
         operation: getPromotion
         provenance: contract promotions.yaml GET /promotions/{promotionId}
       - kind: detailPanel
@@ -8236,11 +8281,11 @@ screens:
       names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.**
       Arrives with `promotionId`.'
     preloaded:
-    - Promotion.code
-    - Promotion.name
-    - Promotion.description
-    - Promotion.venueId
-    - Promotion.discount
+    - GuestPromotion.code
+    - GuestPromotion.name
+    - GuestPromotion.description
+    - GuestPromotion.venues
+    - GuestPromotion.discount
   wireframe:
     status: notStarted
     provenance: client-verified
@@ -8342,10 +8387,13 @@ screens:
         - Product.displayTags
         operation: listProducts
         provenance: decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)
-        notes: What is on at the venue under the chosen tab (map, waits, food, shows, shop, services).
-          The venue is the one the guest picked on Home (`venueId` from the session, audit R267), never
-          typed. Was the generated table 'Every product'; staff and plumbing columns removed (decided
-          by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)).
+        notes: '**The photo is the primary item''s `ProductMedia.thumbnailUrl`** (`isPrimary`; `url` for the
+          full-size view): the stable CDN address the guest read returns for a public, ready asset (ADAM
+          CR-221, 25 October 2026). The client never turns an `assetId` into an address and calls no asset
+          read. What is on at the venue under the chosen tab (map, waits, food, shows, shop, services). The
+          venue is the one the guest picked on Home (`venueId` from the session, audit R267), never typed.
+          Was the generated table ''Every product''; staff and plumbing columns removed (decided by Chinmay,
+          fix before Block A starts, 2 October 2026 (GFIX-3)).'
       - kind: selectField
         label: Map · Waits · Food · Shows · Shop · Services
         notes: The view switcher. Map and Waits are GST-021 and GST-022 rendered in place.
@@ -9142,8 +9190,16 @@ screens:
     - name: performanceId
       from: navigation
       optional: true
+    - name: holdIds
+      from: navigation
+      optional: true
+      notes: 'The seat holds GST-049 carries, one per seat, as on WEB-010 (ADAM CR-187, 25 October 2026).'
     - name: holdId
       from: navigation
+      optional: true
+      notes: 'The resource hold (a cabana or spot held on the venue map) that `getResourceHold` reads for its
+        countdown, when an edge carries one; otherwise each line''s own `resourceHoldId`. Not a seat hold: the
+        seat holds are `holdIds` (ADAM CR-187, 25 October 2026).'
     - name: venueId
       from: session
     coldEntry: Resolves from the session; a cold arrival is the ordinary case. **A cold arrival without
@@ -9293,7 +9349,11 @@ screens:
       - kind: textField
         label: Code
         operation: verifyGuestOtp
-        notes: Shown once a code has been sent; `verifyGuestOtp` returns the `GuestSession`.
+        notes: '**Two codes, one field.** After *Send me a code* the code goes to `verifyGuestOtp`, which returns
+          the `GuestSession`. **After *Create an account* the code `registerGuest` sent goes to `verifyGuestEmail`
+          with `mode` `code`**, under the `GuestSession` `registerGuest` returned (a wrong code is 422 with
+          `attemptsRemaining`), never to `verifyGuestOtp` (ADAM CR-177 and CR-222, settled 21 and 25 October
+          2026).'
         provenance: contract identity.yaml POST /auth/guest/otp/verify
       - kind: primaryButton
         label: Sign in with the code
@@ -9364,8 +9424,11 @@ screens:
   - id: formRegisterGuest
     component: modal
     trigger: Create an account
-    body: '**Collects what `registerGuest` sends before it is called.** Required: `identifier`, `channel`.
-      Optional: `displayName`, `password`, `preferredLanguage`, `consents`. Dismissing sends nothing;
+    body: '**Collects what `registerGuest` sends before it is called.** Required: `identifier`. The guest
+      never picks a channel: an email address is sent with `channel` `email`; a mobile number is sent with
+      none, and the server picks WhatsApp or SMS from the tenant''s configured delivery (ADAM CR-222).
+      Optional: `displayName`, `password`, `preferredLanguage`, `consents`. The code it sends is typed in
+      the Code field and confirmed with `verifyGuestEmail` (`mode` `code`). Dismissing sends nothing;
       the screen behind is unchanged.'
     bindsTo: RegisterGuestRequest
     confirm:
@@ -9415,8 +9478,10 @@ screens:
   - id: formRequestGuestOtp
     component: modal
     trigger: Send me a code
-    body: '**Collects only the email or mobile number.** The channel follows from the identifier and the
-      tenant''s configured delivery (DI-209). Dismissing sends nothing.'
+    body: '**Collects only the email or mobile number.** The guest is never asked to pick a channel: an email
+      address is sent with `channel` `email`; a mobile number is sent with no `channel`, and the server picks
+      WhatsApp or SMS from the tenant''s configured delivery (DI-209; ADAM CR-222, 25 October 2026).
+      Dismissing sends nothing.'
     confirm:
       label: Request guest OTP
       operation: requestGuestOtp
@@ -9514,6 +9579,15 @@ screens:
     trigger: onAction
     invalidates:
     - getGuestSession
+  - operationId: verifyGuestEmail
+    contract: identity
+    purpose: 'Sent by the Code field after Create an account, not a control of its own: confirms the code
+      `registerGuest` sent (`mode` `code`) under the session `registerGuest` returned; `verifyGuestOtp`
+      stays for Send me a code (ADAM CR-177, CR-222)'
+    trigger: background
+    invalidates:
+    - getGuestSession
+    provenance: ADAM CR-177 option A (accepted 21 October 2026) and CR-222 (1), settled 25 October 2026
   - operationId: createMfaChallenge
     contract: identity
     purpose: 'Sent by the screen after sign-in returns requiresMfa at a venue with guest two-step verification
@@ -9629,8 +9703,10 @@ screens:
         label: Language
         bindsTo: PublishedTenantConfig.languages
         operation: getPublishedTenantConfig
-        notes: The languages the venue published; the choice is stored on the device and, for a signed-in
-          guest, as the profile's language (GST-039). Arabic mirrors every layout (CF-42).
+        notes: 'The languages the venue published; the choice is stored on the device and, for a signed-in
+          guest, as the profile''s language (GST-039). Arabic mirrors every layout (CF-42). **For a signed-in
+          guest the screen then calls `updateMyProfile`, sending only `preferredLanguage`**, after the device
+          copy is saved (ADAM CR-186, 25 October 2026); signed out, the device copy is all there is.'
         provenance: corrected 2 October 2026 (CHG-SGU-022, design-notes correction)
   states:
     loading: The arabic rtl experience list.
@@ -9645,6 +9721,21 @@ screens:
     contract: white-label
     purpose: The published languages
     trigger: onLoad
+  - operationId: updateMyProfile
+    contract: marketing-crm
+    purpose: 'Sent by the Language choice for a signed-in guest, not a control of its own: after the device
+      copy is saved, the chosen language is written to the profile, sending only `preferredLanguage` (ADAM
+      CR-186, 25 October 2026); signed out, nothing is sent'
+    trigger: background
+    provenance: ADAM CR-186, settled by Chinmay 25 October 2026 (option A)
+  - operationId: getMyProfile
+    contract: marketing-crm
+    purpose: 'Signed in only: the profile''s current `preferredLanguage`, so Language shows what the profile holds
+      and the write above changes what was read (ADAM CR-186; check-screen-patterns READ: an edit reads what it
+      edits). Signed out, nothing is read and the device copy is shown'
+    trigger: onLoad
+    shownBy: Language
+    provenance: ADAM CR-186, settled by Chinmay 25 October 2026 (option A)
   wireframe:
     status: notStarted
     provenance: client-verified
@@ -9999,6 +10090,7 @@ screens:
         sends it as `X-Admission-Token` on `addCartLine` until `admission.expiresAt`'
       carries:
       - performanceId
+      - waitingEntryId
       provenance: ADR-0066 (accepted 1 October 2026) and its 1 October amendment
   notes: '**The on-sale waiting room (Q2), not the ride queue (Q1). Re-pointed 1 October under ADR-0066**
     from `getWaitTimes`, `getWaitingGuest` and `joinQueue`, which are the ride queue and wrote a `queue.entry`
@@ -10070,8 +10162,12 @@ screens:
     - name: performanceId
       from: GST-007
     - name: waitingEntryId
-      from: GST-046
+      from: GST-007
       optional: true
+      notes: 'Carried back on the GST-007 edge when an admitted guest is sent here again, so the poll resumes
+        the same entry and the guest keeps their place, as on WEB-015 (ADAM CR-216, 25 October 2026). A `404`
+        from `getWaitingRoomPosition` for a performance the app knows means the entry is gone: the guest
+        re-enters.'
     coldEntry: '**Named, closed or expired — never a 404** (ADR-0030). Opened with no performance, or
       one no longer selling, the room says so and offers the event.'
   wireframe:
@@ -10120,7 +10216,16 @@ screens:
     7 and G8 panel 10 — which is a **board convention for a screen every journey can land on**, not two
     screens. Both had the same single operation and the same purpose. **Bound 28 September** to `getTenantAppStatus.minimumAppVersion`
     for the forced upgrade and to `availability` and `availabilityMessage` for sold out and closed (decided
-    28 September, audit R073 (b)(f)). Build note (r8, WHITE-C10): the store link comes from `MinimumAppVersion.storeUrl`.'
+    28 September, audit R073 (b)(f)). Build note (r8, WHITE-C10): the store link comes from `MinimumAppVersion.storeUrl`.
+
+
+    **No raw status panel** (ADAM CR-181, option A, accepted by Chinmay 21 October 2026; raised by Chitrangi
+    Mestry on #31074). The detail panel that listed `TenantAppStatus` publishedAt, expectedBackAt,
+    minimumAppVersion, availability and availabilityMessage is removed: each value already appears, in words,
+    in the state or banner that binds it (forced upgrade, maintenance with its back-at time, closed and sold out
+    with the tenant''s message), and the screen''s purpose is one clear message. **Which state wins**, as on WEB-029
+    (ADAM CR-178): forced upgrade first (nothing works until the app is updated), then maintenance, then closed,
+    then sold out.'
   density: comfortable
   pattern: statusTracker
   patternReason: '`getTenantAppStatus` reads one record and nothing reads a population — the screen is
@@ -10139,17 +10244,6 @@ screens:
         notes: 'The main case: `isInMaintenance` with its message and the expected-back time ("Back at
           14:00"), set live on CMS-001 (DI-215).'
         provenance: corrected 2 October 2026 (CHG-SGU-022, design-notes correction)
-      - kind: detailPanel
-        label: The tenant app status
-        bindsTo: TenantAppStatus
-        columns:
-        - TenantAppStatus.publishedAt
-        - TenantAppStatus.expectedBackAt
-        - TenantAppStatus.minimumAppVersion
-        - TenantAppStatus.availability
-        - TenantAppStatus.availabilityMessage
-        operation: getTenantAppStatus
-        provenance: contract white-label.yaml GET /tenant-config/status
       - kind: banner
         label: Update the app to continue
         bindsTo: TenantAppStatus.minimumAppVersion
@@ -10438,9 +10532,11 @@ screens:
       - performanceId
     - to: GST-041
       trigger: Go to basket
-      provenance: corrected 2 October 2026 (CHG-SGU-020, design-notes correction)
+      provenance: 'corrected 2 October 2026 (CHG-SGU-020, design-notes correction). Carries the list of `holdIds`,
+        one per seat held (seating.yaml `createSeatHold`: one hold per tap), as WEB-007 does (ADAM CR-187, 25
+        October 2026)'
       carries:
-      - holdId
+      - holdIds
       - performanceId
   notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement. **Drawn 26 August**
@@ -10582,11 +10678,11 @@ screens:
       optional: true
       notes: 'r8 (GPS-C05): read from `Performance.eventId` (`getPerformance`) when a deep link or the
         GST-077 edge carries only `performanceId`.'
-    - name: holdId
+    - name: holdIds
       from: navigation
       optional: true
-      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `createSeatHold`;
-        a link or an edge that holds one opens it instead.'
+      notes: 'The list of the guest''s seat holds, one per seat (seating.yaml `createSeatHold`: one hold per tap),
+        as on WEB-007 (ADAM CR-187, 25 October 2026). Opened without it, each tap makes one with `createSeatHold`.'
     coldEntry: '**A link to a performance that has happened.** Offers the next performance of the same
       event.'
     preloaded:
@@ -10622,8 +10718,9 @@ screens:
     component: modal
     trigger: Recommend seats
     body: '**How many seats, and best available or together.** The guest sets the party size (a How many
-      seats stepper, at most `maxSeatsPerGuestOrder`) and picks the preference, then `recommendSeats`
-      places them. Tickets are chosen after seats, so there are none to count yet.'
+      seats stepper, at most `SeatAvailability.maxSeatsPerGuestOrder`, read with `getSeatAvailability`; ADAM
+      CR-187) and picks the preference, then `recommendSeats` places them. A 422 still reads *Up to {maxSeats}
+      seats per booking*. Tickets are chosen after seats, so there are none to count yet.'
     bindsTo: SeatRecommendationRequest
     confirm:
       label: Recommend seats
@@ -10717,10 +10814,13 @@ screens:
         - Product.media
         operation: listProducts
         provenance: decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)
-        notes: The venue's cabanas and other bookable spaces. The venue is the one the guest picked on
-          Home (`venueId` from the session, audit R267), never typed. Was the generated table 'Every product';
-          staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October
-          2026 (GFIX-3)).
+        notes: '**The photo is the primary item''s `ProductMedia.thumbnailUrl`** (`isPrimary`; `url` for the
+          full-size view): the stable CDN address the guest read returns for a public, ready asset (ADAM
+          CR-221, 25 October 2026). The client never turns an `assetId` into an address and calls no asset
+          read. The venue''s cabanas and other bookable spaces. The venue is the one the guest picked on
+          Home (`venueId` from the session, audit R267), never typed. Was the generated table ''Every
+          product''; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2
+          October 2026 (GFIX-3)).'
       - kind: dataTable
         label: Availability
         operation: getAvailability
@@ -10962,18 +11062,29 @@ screens:
         provenance: decided 29 September 2026, MOB-6
       - kind: multiSelect
         label: Any shops you'd like to visit?
-        notes: '**Shown when Shopping is chosen above** (client meeting 30 September, MoM 4.7: retail
-          and kiosk shops join F&B in the planner). Options are the `retailTags` of the shops and retail
-          kiosks of the chosen parks (souvenirs, toys, apparel ...); sent as `VisitPlanRequest.retailTags`.
-          A shop stop is planned only at a shop or kiosk of that day''s park.'
+        bindsTo: VisitPlannerOptions.retailTags
+        operation: getVisitPlannerOptions
+        notes: '**Shown when Shopping is chosen above** (client meeting 30 September, MoM 4.7: retail and kiosk
+          shops join F&B in the planner). Options are the `retailTags` of the shops and retail kiosks of the
+          chosen parks (souvenirs, toys, apparel ...); sent as `VisitPlanRequest.retailTags`. A shop stop is
+          planned only at a shop or kiosk of that day''s park. **Bound to `VisitPlannerOptions.retailTags`**
+          (per map, `{mapId, mapName, tags}`, from the published shops and retail kiosks; ADAM CR-220, 25
+          October 2026), read with `getVisitPlannerOptions` per chosen park, so each tag names the park(s)
+          that have it and the preferenceNotAtVenue chip comes from the same read.'
         provenance: decided 30 September 2026, client meeting MoM 4.7 (Allam)
       - kind: selectField
         label: What would you like for lunch?
-        notes: '**Cuisines from the dining points of the chosen parks only** (`VenuePoint.cuisineTags`
-          of restaurants, cafes and food kiosks; client meeting 30 September, MoM 4.7). Lunch is planned
-          at a restaurant **of that day''s park** that serves it, never another park''s. In a multi-venue
-          plan each cuisine names the park(s) that serve it (*Indian · Summit Peaks only*), so the guest
-          sees before planning that it will not be on every day.'
+        bindsTo: VisitPlannerOptions.cuisineTags
+        operation: getVisitPlannerOptions
+        notes: '**Cuisines from the dining points of the chosen parks only** (`VenuePoint.cuisineTags` of
+          restaurants, cafes and food kiosks; client meeting 30 September, MoM 4.7). Lunch is planned at a
+          restaurant **of that day''s park** that serves it, never another park''s. In a multi-venue plan
+          each cuisine names the park(s) that serve it (*Indian · Summit Peaks only*), so the guest sees
+          before planning that it will not be on every day. **Bound to `VisitPlannerOptions.cuisineTags`**
+          (per map, `{mapId, mapName, tags}`, from the published dining points: restaurant, cafe, food
+          kiosk; ADAM CR-220, 25 October 2026), read with `getVisitPlannerOptions` per chosen park, so each
+          cuisine names the park(s) that serve it and the preferenceNotAtVenue chip comes from the same
+          read.'
         provenance: decided 29 September 2026, MOB-6; decided 30 September 2026, client meeting MoM 4.7
           (Allam)
     - name: submit
@@ -11023,8 +11134,9 @@ screens:
   - operationId: getVisitPlannerOptions
     contract: venue-map
     purpose: 'The planner''s choices from the venue''s data (r8, GPS-C21): the interest tags of its parks
-      fill What are you most interested in?, and the ready-made plans and Fast Track bundles come from
-      the same read.'
+      fill What are you most interested in?, its cuisineTags and retailTags fill the lunch and shop questions
+      and the preferenceNotAtVenue chip (ADAM CR-220), and the ready-made plans and Fast Track bundles come
+      from the same read.'
     trigger: onLoad
     provenance: r8 integration, GPS-C21 (CHG-R8INT-007)
   entryState:
@@ -12863,7 +12975,10 @@ screens:
       - kind: searchField
         label: Search
         operation: searchCatalogue
-        notes: Sends `?q=` to `searchCatalogue`.
+        notes: '**Type-ahead** (ADAM CR-223, 25 October 2026, as built and as the client-approved prototype
+          searches): `searchCatalogue` is called with `?q=` once typing pauses (300 ms debounce), only for 2
+          or more characters (the contract''s minLength; fewer sends nothing), Enter searches at once, and
+          the latest answer wins (an earlier one that arrives late is dropped). frontend-patterns 4.6.'
         provenance: contract catalogue.yaml GET /search
       - kind: selectField
         label: Kind
@@ -12874,11 +12989,14 @@ screens:
         label: Results
         operation: searchCatalogue
         provenance: decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)
-        notes: 'One card per result: name, summary, photo (`primaryMedia`), from-price (`fromPrice`),
-          sold out shown rather than hidden (`isAvailable`), and `notBookableLabel` for an info-only product.
-          `searchCatalogue` answers with no named schema, so the card binds none. Was the generated table
-          ''Every money''; staff and plumbing columns removed (decided by Chinmay, fix before Block A
-          starts, 2 October 2026 (GFIX-3)).'
+        notes: '**The photo is `primaryMedia.thumbnailUrl`** (`url` for the full-size view): the stable CDN
+          address `searchCatalogue` returns to a guest for a public, ready asset (ADAM CR-221, 25 October
+          2026); the client never turns an `assetId` into an address and calls no asset read. One card per
+          result: name, summary, photo (`primaryMedia`), from-price (`fromPrice`), sold out shown rather
+          than hidden (`isAvailable`), and `notBookableLabel` for an info-only product. `searchCatalogue`
+          answers with no named schema, so the card binds none. Was the generated table ''Every money'';
+          staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October 2026
+          (GFIX-3)).'
   states:
     loading: The search list.
     error: Could not load. Names which read failed and leaves the search untouched.
@@ -12891,7 +13009,8 @@ screens:
   apis:
   - operationId: searchCatalogue
     contract: catalogue
-    purpose: Find something by name
+    purpose: 'Find something by name, type-ahead: called once typing pauses (300 ms debounce), for 2 or more
+      characters, Enter at once, the latest answer wins (ADAM CR-223)'
     trigger: onAction
   entryState:
     preloaded:

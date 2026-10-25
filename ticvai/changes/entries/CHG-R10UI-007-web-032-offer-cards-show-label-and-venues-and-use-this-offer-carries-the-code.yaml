@@ -1,0 +1,51 @@
+id: CHG-R10UI-007
+date: '2026-10-25'
+source: cr
+kind: spec
+summary: WEB-032 Offers & Promotions binds the guest shape GuestPromotion, shows its label (the pill) and venues (the venue
+  line, empty meaning all venues), and gains Use this offer, which opens the booking flow (WEB-002) with the code; WEB-010
+  takes the code and applies it with applyCartPromoCode, so WEB-032 needs no cart. GST-037 binds GuestPromotion too.
+decision:
+  what: 'ADAM CR-225 (screen side), option A, settled 25 October 2026: "Add to GuestPromotion a guest-facing label (LocalisedText,
+    the card''s pill) and venues: [{venueId, name}] (empty means all venues), set in the back office. Use this offer carries
+    the code into the booking flow to WEB-010, where applyCartPromoCode already runs, so WEB-032 needs no cart operation."
+    screens/P01 WEB-032: cardList and detailPanel on GuestPromotion with label and venues, the Use this offer button, the
+    transition to WEB-002 carrying code, the notes; WEB-002 entryFrom WEB-032; WEB-010 entryState code (a deep link or WEB-032,
+    applied once the cart has a line). Sibling GST-037: bound to GuestPromotion (no visible change). approved-ui-changes.yaml
+    WEB-032 navigation and region:collection, logged as CR-225.'
+  by: Chinmay
+  date: '2026-10-25'
+why: 'ADAM CR-225 (Chinmay Patkar, #28185 WEB-032). The client-approved frame (exact match) draws Use this offer, a category
+  pill and a venue line that neither the record nor GuestPromotion supported; the r8 note left the button waiting on ORDERS-MONEY-C11,
+  which nobody tracked.'
+keys_touched:
+  screens:
+  - WEB-032
+  - WEB-010
+  - WEB-002
+  - GST-037
+  operations:
+  - listPromotions
+  - getPromotion
+  - applyCartPromoCode
+  schemas:
+  - GuestPromotion
+  files:
+  - screens/P01-guest-web-storefront.yaml
+  - screens/P02-guest-mobile-app.yaml
+  - docs/active/approved-ui-changes.yaml
+root_class: an approved frame drawing what its data could not fill
+tickets:
+  started:
+  - '28185 (WEB-032): through CR-225''s comment, as CHG-ADM-002 says; its text is not rewritten.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-225
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-bindings.py
+status: open
+notes: 'GuestPromotion.label and .venues are lane B''s half of CR-225 (contracts/satellite/promotions.yaml): until it merges,
+  check-bindings names WEB-032''s two columns as fields the schema does not have.'

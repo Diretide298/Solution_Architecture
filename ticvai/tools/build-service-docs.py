@@ -1554,17 +1554,24 @@ def main() -> int:
          "The frontend mock API is SETUP-MOCK-API's (since 21 October 2026): it mirrors this fixture's reference data "
          "beside the prototypes' sample venues. Done when: it loads on a migrated database and integration tests run "
          "against it."),
-        ("SETUP-CLIENTS", "Generate the typed API clients from contracts/ for the frontend workspace", 3, ["SETUP-CI"],
+        ("SETUP-CLIENTS", "Publish @ticvai/api-client as a versioned package, generated from ticvai-contracts at each release tag", 3, ["SETUP-CI"],
          # **Where the client lives** (r8 re-walk, CHG-R8RW-006): the text said "ticvai-frontend packages/api-client", a
          # repository and folder that do not exist since the frontend became six repositories (ADR-0007 amendment,
          # docs/active/frontend-repos.yaml). The client is generated and published from ticvai-contracts.
+         # **Re-scoped to the package** (ADAM CR-195, settled by Chinmay 25 October 2026, option A; CHG-R10UI-011): the
+         # title still said "for the frontend workspace", the one-workspace layout retired on 13 October, and no app
+         # repository depended on the client, so every FE "connect to API" sub-task stubbed its calls.
          "In **ticvai-contracts**, the repository that holds the OpenAPI, the event schemas and the generated "
-         "clients: `@ticvai/api-client` is generated from `contracts/` by one command, checked in GitLab CI, and "
-         "published to the `ticvai-frontend` group's GitLab npm registry on each contracts tag (`v*`); each of the "
-         "six frontend repositories pins it by exact version (ADR-0007 amendment; setup/dependencies.md, since 20 "
-         "October 2026). No frontend repository generates or holds its own copy. Done when: every in-release "
-         "operation has a typed call in the published package, the contracts pipeline fails if the contracts change "
-         "without a re-generate, and screen tickets stop stubbing calls."),
+         "clients: `@ticvai/api-client` is generated from `contracts/` by one command at each release tag (the `v*` "
+         "tag the contracts repository takes when the package releases), checked in GitLab CI, and published as a "
+         "versioned package to the `ticvai-frontend` group's GitLab package registry (npm). Every app repository "
+         "depends on it by exact version, **ticvai-guest-web first**, then each repository as its first screen is "
+         "connected (ADR-0007 amendment; setup/dependencies.md, since 20 October 2026). No frontend repository "
+         "generates, holds or hand-writes its own client, and there is no per-repository generator (ADAM CR-195). "
+         "Every FE screen task's \"connect to API\" sub-task uses this package and waits for it. Done when: every "
+         "in-release operation has a typed call in the published package, the contracts pipeline fails if the "
+         "contracts change without a re-generate, ticvai-guest-web builds against the published version, and screen "
+         "tickets stop stubbing calls."),
         ("SETUP-AUTH", "Sign-in working end to end against IdentityService", 5, ["SETUP-DB"],
          # **Names the operations it wires** (4 October, the Sprint 1-2 judging; CHG-FXP-005): "the identity sign-in
          # operations" named none and the pull linked nothing, so request, response and the permission set were unknown.
