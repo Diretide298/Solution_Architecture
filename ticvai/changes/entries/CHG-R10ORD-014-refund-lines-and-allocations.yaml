@@ -49,7 +49,8 @@ notes: 'The decision names the payment table orders.refund_allocation; naming-an
   refunded_amount, applied_percentage) and orders.refund_payment (id, refund_id -> orders.refund, payment_id -> orders.payment,
   refunded_amount, tender_amount). Not done: ''state when each refundType applies in the operation''. The decision asks
   for it without giving the rule for fullRefund, partialRefund, percentageRefund, proRataRefund and originalValueLessFees;
-  listed for the lead rather than guessed.'
+  listed for the lead rather than guessed. The lead answered on 25 October 2026 (the r10 lanes'' questions 2 and 17): keep
+  orders.refund_payment; the refund type per time band is CHG-R10ORD-021.'
 release_tag: pending
 decision_owner: Chinmay
 status: open

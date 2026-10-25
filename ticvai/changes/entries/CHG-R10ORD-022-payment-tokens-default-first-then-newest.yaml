@@ -1,0 +1,32 @@
+id: CHG-R10ORD-022
+date: '2026-10-25'
+source: cr
+kind: contract
+summary: 'listPaymentTokens has one order: the default method first, then newest first by id; its description and its response
+  say the same.'
+decision:
+  what: 'Question 21 (ADAM CR-099): listPaymentTokens'' order is the default card first, then newest. contracts/spine/orders.yaml
+    listPaymentTokens.'
+  by: Chinmay
+  date: '2026-10-25'
+why: ADAM CR-099 found listPaymentTokens' two sort orders disagreeing (description by expiresAt, response by default then
+  id); the lead's answers of 25 October 2026 to the r10 lanes' open questions (audit LEAD-QUESTIONS-r10, every recommended
+  answer accepted), question 21.
+keys_touched:
+  operations:
+  - listPaymentTokens
+  files:
+  - contracts/spine/orders.yaml
+root_class: 'new: an order on a nullable field'
+tickets:
+  started:
+  - '27863 (payByLink and the payment tokens): through CR-099''s comment; its text is not rewritten.'
+  unstarted: []
+adam_cr: CR-099
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-list-order.py
+release_tag: pending
+decision_owner: Chinmay
+status: open

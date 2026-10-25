@@ -60,16 +60,22 @@ transitions:
   operation: overrideWaitingGuest
   trigger: operation
   guard: Admitted against a failed redemption, with the override fields set (ADAM CR-237, option A)
+  emits:
+  - queueEntry.redeemed
 - from: expired
   to: redeemed
   operation: overrideWaitingGuest
   trigger: operation
   guard: A late party admitted after its window passed, with the override fields set (ADAM CR-237)
+  emits:
+  - queueEntry.redeemed
 - from: noShow
   to: redeemed
   operation: overrideWaitingGuest
   trigger: operation
   guard: A party recorded as a no-show admitted after all, with the override fields set (ADAM CR-237)
+  emits:
+  - queueEntry.redeemed
 notes: '**expired and noShow are no longer terminal** (ADAM CR-237, 25 October 2026): an override admits from
   them, so each has one way out, to redeemed by overrideWaitingGuest.
 

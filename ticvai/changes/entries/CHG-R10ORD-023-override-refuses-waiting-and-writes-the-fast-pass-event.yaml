@@ -1,0 +1,42 @@
+id: CHG-R10ORD-023
+date: '2026-10-25'
+source: cr
+kind: contract
+summary: overrideWaitingGuest refuses an entry still waiting (409 queue-entry-not-called), and an override that admits a
+  Fast Pass entry writes queueEntry.redeemed through the outbox as redeemWaitingGuest does; resolveCalledWaitingGuest keeps
+  QUEUE_MANAGE.
+decision:
+  what: 'Questions 18 and 19 (ADAM CR-237, CR-238): overriding a waiting entry is 409 because it has not been called; resolveCalledWaitingGuest''s
+    permission is QUEUE_MANAGE (already so); an override that admits a Fast Pass entry also writes queueEntry.redeemed.
+    contracts/satellite/queue.yaml overrideWaitingGuest (409 types, x-ticvai-emits, platform.outbox write), events/queueEntry-redeemed.yaml
+    emittedBy, states/queue-entry.yaml the three override transitions emit it, docs/active/breaking-changes.yaml BC-491.'
+  by: Chinmay
+  date: '2026-10-25'
+why: CHG-R10ORD-006 and CHG-R10ORD-007 left both for the lead; the lead's answers of 25 October 2026 to the r10 lanes' open
+  questions (audit LEAD-QUESTIONS-r10, every recommended answer accepted), question 18 and 19.
+keys_touched:
+  operations:
+  - overrideWaitingGuest
+  - resolveCalledWaitingGuest
+  tables:
+  - queue.entry
+  - platform.outbox
+  files:
+  - contracts/satellite/queue.yaml
+  - events/queueEntry-redeemed.yaml
+  - states/queue-entry.yaml
+  - docs/active/breaking-changes.yaml
+root_class: 'new: refusals that disagree with the state model'
+tickets:
+  started:
+  - '33058 (overrideWaitingGuest): through CR-237''s comment; its text is not rewritten.'
+  unstarted: []
+adam_cr: CR-237
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-state-refusals.py
+notes: No database change. BC-491 approves the added emitted event (numbered after the integration's BC-490).
+release_tag: pending
+decision_owner: Chinmay
+status: open

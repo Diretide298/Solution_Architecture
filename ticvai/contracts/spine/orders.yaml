@@ -3076,7 +3076,8 @@ paths:
 
         
 
-        **Order.** Soonest first, by `expiresAt` ascending, then by `id`. Where `expiresAt` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)'
+        **Order.** The default method first (`isDefault`), then newest first, by `id` descending (a UUIDv7);
+        one order for the description and the response (ADAM CR-099; (the lead''s answer of 25 October 2026 to the r10 lanes'' questions; CHG-R10ORD-022)).'
       tags:
       - orders
       parameters:
@@ -3101,7 +3102,7 @@ paths:
       x-ticvai-conflict-policy: serverWins
       responses:
         '200':
-          description: Tokens, the default first, then by `id`.
+          description: Tokens, the default first, then newest first by `id` descending (ADAM CR-099).
           content:
             application/json:
               schema:
@@ -6166,7 +6167,10 @@ paths:
         line, or each payment, paid minus what earlier refunds took from it (their `refund_line` and
         `refund_payment` rows). **Allocation across payments**: the most recent payment first, cash last. **Time
         bands apply per line**, by that line''s own performance: each line''s percentage is the band its own
-        performance falls in, so one refund of lines for two performances can carry two percentages.
+        performance falls in, so one refund of lines for two performances can carry two percentages. **The refund
+        type is the band''s** (`RefundPolicy.timeBands[].refundType`; (the lead''s answer of 25 October 2026 to the r10 lanes'' questions; CHG-R10ORD-021)): a
+        venue with no bands refunds in full before the cut-off (the line''s performance, or the end of
+        `refundWindowDays` for an undated line) and nothing after it.
         **`settleTo` onto the venue''s `refundDestinations`** (`RefundCalculationPolicyView`): `originalTender` is
         `originalPayment`; `advanceBalance` is `walletCredit`; `storeCredit` is `voucherCreditNote` (issued as a
         gift card, CHG-CSP-037); `wireTransfer` is `originalPayment`, paid out by transfer. A `settleTo` whose
@@ -6251,7 +6255,10 @@ paths:
         line, or each payment, paid minus what earlier refunds took from it (their `refund_line` and
         `refund_payment` rows). **Allocation across payments**: the most recent payment first, cash last. **Time
         bands apply per line**, by that line''s own performance: each line''s percentage is the band its own
-        performance falls in, so one refund of lines for two performances can carry two percentages.
+        performance falls in, so one refund of lines for two performances can carry two percentages. **The refund
+        type is the band''s** (`RefundPolicy.timeBands[].refundType`; (the lead''s answer of 25 October 2026 to the r10 lanes'' questions; CHG-R10ORD-021)): a
+        venue with no bands refunds in full before the cut-off (the line''s performance, or the end of
+        `refundWindowDays` for an undated line) and nothing after it.
         **`settleTo` onto the venue''s `refundDestinations`** (`RefundCalculationPolicyView`): `originalTender` is
         `originalPayment`; `advanceBalance` is `walletCredit`; `storeCredit` is `voucherCreditNote` (issued as a
         gift card, CHG-CSP-037); `wireTransfer` is `originalPayment`, paid out by transfer. A `settleTo` whose
@@ -23467,7 +23474,8 @@ components:
                   CHG-R10ORD-012): `admission`, `timedAdmission`, `datedAdmission`, `openDated` and `seated` are
                   `admission`; `membership`, `fnb`, `retail` and `rental` are themselves. A product of any other kind is
                   answered without `kind` (it is optional) until its value is decided; `locker`, `parking` and
-                  `experience` have no product kind yet.'
+                  `experience` have no product kind yet, and are answered without `kind` until ProductKind gains them
+                  (the lead''s answer of 25 October 2026 to the r10 lanes'' questions; docs/active/left-out.yaml LO-R10ORD-001).'
               orderId:
                 type: string
                 format: uuid
@@ -25080,6 +25088,11 @@ components:
           description: 'Refundable percentage by time before the performance. Evaluated most-specific
             first.
 
+
+            **Each band names the refund type that applies in it** (`refundType`, ADAM CR-208; (the lead''s answer of 25 October 2026 to the r10 lanes'' questions; CHG-R10ORD-021)).
+            A venue that has set no bands refunds in full (`fullRefund`) before the cut-off (the line''s performance, or
+            the end of `refundWindowDays` for an undated line) and nothing after it.
+
             '
           items:
             type: object
@@ -25094,6 +25107,18 @@ components:
                 type: number
                 minimum: 0
                 maximum: 100
+              refundType:
+                type: string
+                nullable: true
+                enum:
+                - fullRefund
+                - partialRefund
+                - percentageRefund
+                - proRataRefund
+                - originalValueLessFees
+                description: 'The refund type that applies in this band (the values of
+                  `RefundCalculationPolicyView.refundTypes`; ADAM CR-208). Null on a band saved before r10, which is
+                  `percentageRefund` at its `percentage`.'
         allowPartial:
           type: boolean
           default: true

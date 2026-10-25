@@ -1624,8 +1624,11 @@ paths:
         the product''s `entitlement_template_id` (`catalogue#productRecords`); a line whose product has no template
         is issued nothing. `valid_from` and `valid_to` follow from the template''s `validityKind`, its offsets
         (`validFromOffsetDays`, `validForDays`) and `expiryAnchor` (`expiryDate` where it is `fixedDate`), and for a
-        dated line from the performance''s `startsAt` and `endsAt` (`catalogue#performanceRecords`). **`mediaCode`
-        is minted here, at issue**, by Access, and **the rotation seed is stored on the entitlement**
+        dated line from the performance''s `startsAt` and `endsAt` (`catalogue#performanceRecords`); an `expiryAnchor`
+        of `seasonEnd` ends at the end of the product''s validity, the product''s `onSaleTo` (the lead''s answer of 25 October 2026 to the r10 lanes'' questions,
+        question 28; CHG-R10ORD-026). **`mediaCode` is minted here, at issue**, by Access: the venue prefix and 12
+        base32 characters (for example `DXB1-7K3QW9MZ2PXA`), unique in the tenant; **the rotation seed is stored on
+        the entitlement**
         (`Entitlement.rotationSecret`, field-encrypted; `getEntitlementCredential` returns it as `rotation` and
         `rotate=true` replaces it). **`subjectId` is null for a guest checkout** (the order''s subject, where
         `order.paid` names one).

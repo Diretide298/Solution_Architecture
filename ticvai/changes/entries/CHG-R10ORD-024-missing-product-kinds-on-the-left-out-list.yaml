@@ -1,0 +1,33 @@
+id: CHG-R10ORD-024
+date: '2026-10-25'
+source: cr
+kind: contract
+summary: The product kinds locker, parking and experience are logged on the left-out list (LO-R10ORD-001); MediaEntitlements
+  answers such an entitlement without kind until ProductKind gains them.
+decision:
+  what: 'Question 20 (ADAM CR-226): answer without kind until ProductKind gains locker, parking and experience, logged on
+    the left-out list. docs/active/left-out.yaml LO-R10ORD-001; contracts/spine/orders.yaml MediaEntitlements.entitlements[].kind.'
+  by: Chinmay
+  date: '2026-10-25'
+why: CHG-R10ORD-012 left the kinds with no ProductKind for the lead; the lead's answers of 25 October 2026 to the r10 lanes'
+  open questions (audit LEAD-QUESTIONS-r10, every recommended answer accepted), question 20; the left-out rule of 20 October
+  (an item left out exists only on the one list).
+keys_touched:
+  schemas:
+  - MediaEntitlements
+  files:
+  - contracts/spine/orders.yaml
+  - docs/active/left-out.yaml
+root_class: 'new: a response field with no source'
+tickets:
+  started:
+  - '30686 (getMediaEntitlements): through CR-226''s comment; its text is not rewritten.'
+  unstarted: []
+adam_cr: CR-226
+triage: defer
+prevention:
+  type: none
+  reason: A deferral, recorded where the left-out rule requires; no check tells a kind the catalogue lacks.
+release_tag: pending
+decision_owner: Chinmay
+status: open
