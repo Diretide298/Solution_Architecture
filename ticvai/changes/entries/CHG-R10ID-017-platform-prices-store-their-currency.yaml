@@ -1,0 +1,46 @@
+id: CHG-R10ID-017
+date: '2026-10-25'
+source: cr
+kind: contract
+summary: 'Every platform price row stores its currency: control.plan, control.contract, control.licence_add_on,
+  control.capacity_pack, control.module_listing and control.licensing_model gain currency_code, and control.credit_note
+  copies the credited invoice''s currency_code (the billing entity''s billing currency, as control.invoice already
+  does since CHG-R10ID-013). check-money-currency''s 19 platform billing findings clear.'
+decision:
+  what: 'ADAM CR-202, option A for the currency, as the lead''s r10 rulings default it (accepted 25 October 2026: "the
+    currency is stored on the row"). contracts/satellite/subscription.yaml: currencyCode (ISO 4217, three upper-case
+    letters) on CreatePlanRequest (so Plan), Subscription, LicenceAddOn, CapacityPack, ModuleListing, LicensingModel;
+    SubscriptionCreditNote.currencyCode (readOnly, copied from the credited invoice). Database: the seven currency_code
+    columns, from the generator.'
+  by: Chinmay
+  date: '2026-10-25'
+why: 'r10 lane E''s new check-money-currency (CHG-R10GEN-002) found 19 platform operations answering Money from control
+  rows that store the amount only; a platform row has no venue to resolve a currency from (naming-and-style 5.1),
+  and CR-202 settled the invoice''s currency on the row.'
+keys_touched:
+  operations: [addCapacityPack, addLicenceAddOn, cancelSubscription, createPlan, createPlanVersion, generateInvoice,
+    getPlan, getSubscription, getTenant, issueCreditNote, issueInvoice, listCreditNotes, listLicensingModels,
+    listModuleCatalogue, listPlans, listSubscriptionInvoices, setLicensingModel, setModuleListing, setSubscription]
+  schemas: [CreatePlanRequest, Plan, Subscription, LicenceAddOn, CapacityPack, ModuleListing, LicensingModel,
+    SubscriptionCreditNote]
+  tables: [control.plan, control.contract, control.licence_add_on, control.capacity_pack, control.module_listing,
+    control.licensing_model, control.credit_note]
+  files:
+  - contracts/satellite/subscription.yaml
+root_class: 'new: a platform price stored with no currency'
+tickets:
+  started: []
+  unstarted:
+  - 'The seven columns are migration work for Hrushikant Patkar (control database), a child task of the affected MIG
+    ticket; existing rows need the currency backfilled (the columns are nullable for that reason).'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-202
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-money-currency.py
+status: open
+notes: 'Measured on a locally re-derived schema reference (derived files not committed): the 19 named operations pass.
+  The check still lists 19 others, none of them in this ruling: three Platform computed answers (getCommercialMetrics,
+  listMemberExceptionOverride, scoreVsiAssessment) and wallet, marketing, orders and catalogue rows.'

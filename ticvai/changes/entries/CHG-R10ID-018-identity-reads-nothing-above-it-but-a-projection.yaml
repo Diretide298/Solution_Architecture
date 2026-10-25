@@ -1,0 +1,65 @@
+id: CHG-R10ID-018
+date: '2026-10-25'
+source: audit
+kind: contract
+summary: 'Identity reads nothing above it but a projection (ADR-0028), in the three places check-cross-module-reads
+  still found: getMembership names the guest''s link from the session (guestLinkId, homeCellName), not sync.guest_link;
+  guestUaePassLogin checks its redirect host against identity.redirect_host, a projection of White-label''s custom
+  domains fed by the new whitelabel.customDomainChanged (white-label#customDomainRedirectHosts); linkGuestCheckout
+  matches orders in identity.subject_holding (orders#guestCheckoutOrders, fed by order.created, which now carries
+  orderNumber) and emits identity.guestCheckoutLinked, which Orders'' new attachGuestCheckoutOrders consumes to set
+  each order''s subject and announce order.linkedToGuest.'
+decision:
+  what: 'The lead''s r10 rulings, accepted by default on 25 October 2026 (getMembership "word its text against the
+    session''s guestLinkId"; guestUaePassLogin "a projection of white-label''s custom domains, fed by white-label''s
+    domain events (ADR-0028)"; linkGuestCheckout "fix it the ADR-0028 way, by a projection or an event, not raw").
+    contracts/spine/identity.yaml: getMembership text; guestUaePassLogin read-via (route projection) and text;
+    RedirectHost (identity.redirect_host); SubjectHolding orderNumber and verifiedContactRef; linkGuestCheckout
+    x-ticvai-reads, read-via orders#guestCheckoutOrders (projection), emits identity.guestCheckoutLinked, text.
+    contracts/spine/orders.yaml: query guestCheckoutOrders (projection) and operation attachGuestCheckoutOrders
+    (serviceAuth, the event''s consumer). contracts/satellite/white-label.yaml: query customDomainRedirectHosts
+    (projection) and x-ticvai-emits on claimCustomDomain, verifyCustomDomain, relinquishCustomDomain, setPrimaryDomain,
+    regenerateDomainToken. events: identity-guestCheckoutLinked.yaml and whitelabel-customDomainChanged.yaml (new),
+    order-created.yaml (orderNumber, the identity consumer), order-linkedToGuest.yaml (emitted by
+    attachGuestCheckoutOrders). handoff/api-data-lineage-overrides.json: linkGuestCheckout''s carried entry removed
+    (carriedCeiling 1616 to 1615). docs/active/breaking-changes.yaml BC-489, BC-490. Database: identity.redirect_host
+    (new), identity.subject_holding order_number and verified_contact_ref, from the generator.'
+  by: Chinmay
+  date: '2026-10-25'
+why: 'Finding: check-cross-module-reads on the merged r10 tree (XR-FACT getMembership, guestUaePassLogin; XR-UNCOVERED
+  and XR-FOUNDATION linkGuestCheckout, built on by started tickets #30686 and #30688) and check-error-sources E-READ-VIA
+  (linkGuestCheckout''s 403, #30699). Identity is Foundation (ADR-0028) and read Orders'' and White-label''s tables raw.'
+keys_touched:
+  operations: [getMembership, guestUaePassLogin, linkGuestCheckout, attachGuestCheckoutOrders, claimCustomDomain,
+    verifyCustomDomain, relinquishCustomDomain, setPrimaryDomain, regenerateDomainToken]
+  schemas: [RedirectHost, SubjectHolding]
+  tables: [identity.redirect_host, identity.subject_holding, orders.sales_order]
+  files:
+  - contracts/spine/identity.yaml
+  - contracts/spine/orders.yaml
+  - contracts/satellite/white-label.yaml
+  - events/identity-guestCheckoutLinked.yaml
+  - events/whitelabel-customDomainChanged.yaml
+  - events/order-created.yaml
+  - events/order-linkedToGuest.yaml
+  - handoff/api-data-lineage-overrides.json
+  - docs/active/breaking-changes.yaml
+root_class: 'existing: Identity (Foundation) reading a module above it other than through a projection'
+tickets:
+  started:
+  - '#30699 (linkGuestCheckout), #30686, #30688: their text is not rewritten; the next pull shows the change.'
+  unstarted:
+  - 'attachGuestCheckoutOrders and the two event consumers need tasks (integration files them); identity.redirect_host
+    and the two subject_holding columns are migration work for Hrushikant Patkar.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: r10 integration finding'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-cross-module-reads.py
+status: open
+notes: 'After the change, on a locally re-derived lineage (not committed): check-cross-module-reads PASS (0 new, the
+  linkGuestCheckout XR-UNCOVERED and XR-FOUNDATION entries gone); check-error-sources has only captureWalletAuthorisation
+  left, which is not this lane''s. linkGuestCheckout''s verificationCode is still checked against nothing stored (no
+  table holds a confirmation code); the match rests on the verified contact, as before.'
