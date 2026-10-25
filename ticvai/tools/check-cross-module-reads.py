@@ -28,7 +28,10 @@ Rules:
                     or served, or a query whose module does not own the contract that declares it
     XR-ROUTE        a route that is not in-process, service or projection, not one the query serves, or in-process
                     across deployables, unless the lead granted that read (docs/active/cross-deployable-writes.yaml
-                    `reads`: the reader's deployable, the query; ADAM CR-196, CHG-R9CR-005)
+                    `reads`: the reader's deployable, the query; ADAM CR-196, CHG-R9CR-005). An event consumer (an
+                    operation with `x-ticvai-consumes`) runs in the `workers` host, which composes every module
+                    (ADR-0055; ADAM CR-167, 25 October 2026, CHG-R10ORD-010), so its in-process reads cross no
+                    deployable
     XR-FOUNDATION   Identity (the foundation module every request resolves through, ADR-0028 tiers) reads a module
                     above it other than through a projection
     XR-LINEAGE      the lineage's readVia differs from the contract's x-ticvai-read-via (derive-lineage --apply)
@@ -413,6 +416,11 @@ def main() -> int:
         if reader not in services:
             continue
         rdep = dep_of.get(reader)
+        # **An event consumer runs in workers, which composes every module** (ADR-0055: "event consumers for every
+        # module"; ADAM CR-167, option A, decided 18 October 2026, CHG-R10ORD-010). Its in-process reads are within
+        # its own host, as finance.postOrderRevenue's of Orders are; DB-ROLES gives the workers role every schema
+        # its consumers touch. Only the route rule reads this: the operation's module stays its owner.
+        consumer = bool((ops.get(o) or {}).get("x-ticvai-consumes"))
         via = e.get("readVia") or []
         for r in via:
             key = str(r.get("query") or "")
@@ -428,7 +436,8 @@ def main() -> int:
             elif route not in (q.get("served") or []):
                 guard.add("XR-ROUTE", f"{o}:{key}", f"{o} asks {key} by {route}, which the query does not serve "
                           f"({', '.join(q.get('served') or []) or 'none'})")
-            if route == "in-process" and owner and dep_of.get(owner) != rdep and (rdep, key) not in granted:
+            if route == "in-process" and owner and dep_of.get(owner) != rdep and (rdep, key) not in granted \
+                    and not consumer:
                 guard.add("XR-ROUTE", f"{o}:{key}", f"{o} ({rdep}) asks {key} in-process, and {owner} is in "
                           f"{dep_of.get(owner)}: across deployables a query is a service call or a projection")
             if reader in FOUNDATION_STRICT and owner and tier_of.get(owner) != "foundation" and route != "projection":

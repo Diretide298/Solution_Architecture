@@ -223,6 +223,9 @@ x-ticvai-queries:
       own operation, and a question with a rule of its own (open, live, sellable) is declared as a query of its
       own. It is asked in process within commerce, through the C# query interface Catalogue implements, and
       asked from another deployable through Catalogue's service route (serviceAuth).
+      It is asked in process by the access host too (ADAM CR-240, option A, 25 October 2026; CHG-R10ORD-009; XDR-003),
+      and by the workers host for the consumers it runs, issueOrderEntitlements among them (ADAM CR-167; ADR-0055,
+      amended 25 October 2026).
     served: [in-process, service]
   eventRecords:
     module: catalogue
@@ -296,6 +299,27 @@ x-ticvai-queries:
       a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
       process within commerce, through the C# query interface Catalogue implements, and asked from another
       deployable through Catalogue's service route (serviceAuth).
+      It is asked in process by the workers host for the consumers it runs, issueOrderEntitlements among them (ADAM
+      CR-167; ADR-0055, amended 25 October 2026).
+    served: [in-process, service]
+  salesChannelRecords:
+    module: catalogue
+    table: catalogue.sales_channel
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The catalogue.sales_channel rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Catalogue stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/SalesChannelProfile'}
+    rule: >-
+      A data read, not a rule question (ADR-0055 rule 2 as amended 14 October; declared for ADAM CR-167, 25 October
+      2026, CHG-R10ORD-010, so access issueOrderEntitlements reads the order's sales channel profile and its
+      ticketCredentialFormat). Catalogue answers with its catalogue.sales_channel rows, as it stores them and as the
+      caller's scope lets it see them (the table's row-level security, under the caller's connection and
+      transaction). It decides nothing. It is asked in process within commerce and by the workers host, which
+      composes every module's query interfaces for the event consumers it runs (ADR-0055, amended 25 October 2026),
+      and from another deployable through Catalogue's service route (serviceAuth).
     served: [in-process, service]
   priceRecords:
     module: catalogue
@@ -356,6 +380,8 @@ x-ticvai-queries:
       a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
       process within commerce, through the C# query interface Catalogue implements, and asked from another
       deployable through Catalogue's service route (serviceAuth).
+      It is asked in process by the workers host for the consumers it runs, issueOrderEntitlements among them (ADAM
+      CR-167; ADR-0055, amended 25 October 2026).
     served: [in-process, service]
   bundleApplicationRecords:
     module: catalogue
@@ -463,6 +489,8 @@ x-ticvai-queries:
       a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
       process within commerce, through the C# query interface Catalogue implements, and asked from another
       deployable through Catalogue's service route (serviceAuth).
+      It is asked in process by the workers host for the consumers it runs, issueOrderEntitlements among them (ADAM
+      CR-167; ADR-0055, amended 25 October 2026).
     served: [in-process, service]
   variantDimensionRecords:
     module: catalogue

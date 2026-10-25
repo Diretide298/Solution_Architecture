@@ -217,6 +217,8 @@ x-ticvai-queries:
       a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
       process within commerce, through the C# query interface Tenancy implements, and asked from another
       deployable through Tenancy's service route (serviceAuth).
+      It is asked in process by the operations host too (ADAM CR-234, option A, 25 October 2026; CHG-R10ORD-008;
+      XDR-002), and by the workers host for the consumers it runs (ADR-0055, amended 25 October 2026).
     served: [in-process, service]
   tenantRecords:
     module: tenancy
@@ -254,6 +256,9 @@ x-ticvai-queries:
       with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in process within
       commerce, through the C# query interface Tenancy implements, and asked from another deployable through
       Tenancy's service route (serviceAuth).
+      It is asked in process by the operations host too, which composes it for every F&B operation that answers Money
+      (ADAM CR-234, option A, 25 October 2026; CHG-R10ORD-008; docs/active/cross-deployable-writes.yaml XDR-002), and
+      by the workers host for the consumers it runs (ADR-0055, amended 25 October 2026).
     served: [in-process, service]
   workstationRecords:
     module: tenancy
@@ -273,6 +278,9 @@ x-ticvai-queries:
       a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
       process within commerce, through the C# query interface Tenancy implements, and asked from another
       deployable through Tenancy's service route (serviceAuth).
+      It is asked in process by the access host too, for the session's access point (ADAM CR-240, option A, 25 October
+      2026; CHG-R10ORD-009; XDR-003), and by the workers host for the consumers it runs (ADR-0055, amended 25 October
+      2026).
     served: [in-process, service]
   dataRetentionSettingRecords:
     module: tenancy

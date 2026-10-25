@@ -823,7 +823,13 @@ paths:
           description: The entry, now `noShow` or `waiting`
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/WaitingGuest' }
+              schema:
+                type: object
+                required: [entryId, status, recordedAt]
+                properties:
+                  entryId: { type: string, format: uuid }
+                  status: { $ref: '#/components/schemas/QueueEntryStatus' }
+                  recordedAt: { type: string, format: date-time }
         '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
         '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
         '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
