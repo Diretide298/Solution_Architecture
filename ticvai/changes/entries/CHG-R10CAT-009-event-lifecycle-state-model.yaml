@@ -16,7 +16,7 @@ decision:
     events/event-lifecycleChanged.yaml; contracts/spine/catalogue.yaml setEventLifecycleState (x-ticvai-reads,
     x-ticvai-writes, x-ticvai-emits, the body stored as, 200 Event, 404, 409), cloneEvent (reads, writes, the mapping,
     404, 422), Event.scheduledLifecycleState / scheduledLifecycleAt / scheduledLifecycleReason, EventLifecycleState
-    (the named list the state model checks against); docs/active/breaking-changes.yaml BC-481 (the new emitted event).'
+    (the named list the state model checks against); docs/active/breaking-changes.yaml BC-486 (the new emitted event).'
   by: Chinmay
   date: '2026-10-15'
 why: 'ADAM CR-109 (Deep Khanvilkar, #28020 cloneEvent and setEventLifecycleState), accepted 15 October 2026 for the
@@ -34,7 +34,7 @@ keys_touched:
   - contracts/spine/catalogue.yaml
   - docs/active/breaking-changes.yaml
   other:
-  - 'BC-481'
+  - 'BC-486'
 root_class: 'undecided rule: a lifecycle with no state model'
 tickets:
   started: []

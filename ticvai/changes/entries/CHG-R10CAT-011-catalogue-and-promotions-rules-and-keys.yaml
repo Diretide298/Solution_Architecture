@@ -14,7 +14,7 @@ decision:
     resolveProductByCode, setAlternativeCodes and AlternativeCode, ProductEligibilityRule, GroupPackageDefinition,
     relinquishChannelAllocation, createChannelCapacity and ChannelCapacity.isSeated, getPerformance;
     contracts/satellite/promotions.yaml publishPromotion, updatePromotion, createPromotion (its 400 names its problem
-    types), listPromotions; docs/active/breaking-changes.yaml BC-482 (isPaused removed from updatePromotion''s body).'
+    types), listPromotions; docs/active/breaking-changes.yaml BC-487 (isPaused removed from updatePromotion''s body).'
   by: Chinmay
   date: '2026-10-15'
 why: 'ADAM CR-111 (Deep Khanvilkar, #27852, #28097, #28027, #28018), accepted 15 October 2026 for the next release
@@ -31,7 +31,7 @@ keys_touched:
   - contracts/satellite/promotions.yaml
   - docs/active/breaking-changes.yaml
   other:
-  - 'BC-482'
+  - 'BC-487'
 root_class: 'missing keys and undocumented refusals'
 tickets:
   started: []

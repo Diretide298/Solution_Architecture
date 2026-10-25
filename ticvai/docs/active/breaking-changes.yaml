@@ -1472,7 +1472,7 @@ changes:
     tag: r10
     producer-tickets: [SVC-IDENTITY-ADMINISTRATION-8, SVC-IDENTITY-IDENTITY-2]
     consumer-tickets: [APP-MOB-GST-015, APP-MOB-GST-069, APP-PARTNER-PTR-020, APP-WEB-WEB-024, TEST-AM-ADMISSION-ACCESS-P02, TEST-AM-IDENTITY-SECURITY-P10, TEST-AM-MARKETING-CRM-P01, TEST-AM-ORDERS-RESERVATIONS-P02]
-  - id: BC-480
+  - id: BC-484
     contract: white-label
     operation: recordStorefrontSessionEvents
     change: "params `header:Idempotency-Key` removed"
@@ -1486,7 +1486,7 @@ changes:
     consumer-tickets: [AM-WHITE-LABEL-P01, AM-WHITE-LABEL-P02]
   # BC-480 to BC-482: lane B of r10 (CHG-R10CAT-003, -009, -011). Numbered from 480 so the parallel r10 lanes never
   # take one id twice; integration may renumber.
-  - id: BC-480
+  - id: BC-485
     contract: catalogue
     operation: publishChannelReadinessValidation
     change: "response `status`"
@@ -1498,7 +1498,7 @@ changes:
     tag: r10
     producer-tickets: ['29762', '35237']
     consumer-tickets: ['29774', '35819', '35820', '35821']
-  - id: BC-481
+  - id: BC-486
     contract: catalogue
     operation: setEventLifecycleState
     change: "x-ticvai-emits changed"
@@ -1510,7 +1510,7 @@ changes:
     tag: r10
     producer-tickets: ['28020', '31410']
     consumer-tickets: ['28041', '29902', '31464', '35442']
-  - id: BC-482
+  - id: BC-487
     contract: promotions
     operation: updatePromotion
     change: "request `isPaused` removed"
@@ -1522,7 +1522,7 @@ changes:
     consumer-tickets: ['28043', '31470', '31471', '31472']
   # BC-480 onward: r10 lane C (orders, shift, F&B, queue, access, AI, venue map, retail). Numbered from 480 so the
   # r10 lanes, which add entries on separate branches the same day, do not collide on an id.
-  - id: BC-480
+  - id: BC-488
     contract: queue
     operation: redeemWaitingGuest
     change: "x-ticvai-emits changed"
