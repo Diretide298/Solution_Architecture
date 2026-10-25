@@ -52,6 +52,10 @@ Decisions file (JSON):
   fields of ChangeIn) unless one whose title starts with `match` is already there -- the way a decision made
   outside ADAM gets its ADAM record -- and then settles it.
 
+  `"release": false` (per item, else the file's) is a decision no release will carry (Chinmay, 25 October
+  2026: "we dont need a Release for these"): the comment tells the agent the decision is the whole change and
+  to build it in the ticket now, instead of leaving the changed part to a release. Give no `ref` with it.
+
   python3 settle_changes.py decisions.json            # dry run: what would change
   python3 settle_changes.py decisions.json --apply
   python3 settle_changes.py decisions.json --link-existing [--apply]
@@ -220,7 +224,7 @@ def heading(cr: str, status: str) -> str:
 
 
 def tell_ticket(adam, op, project: str, row: dict, cr: str, status: str, resolution: str, ref: str,
-                apply: bool, notify: bool, prepare=None, link_existing: bool = False) -> list:
+                apply: bool, notify: bool, prepare=None, link_existing: bool = False, release: bool = True) -> list:
     """Step 2 for one request: the lines to print. Changes nothing unless `apply`. Raises on a failure.
 
     `prepare` runs just before a child task is filed: it settles the request as accepted with its
@@ -233,7 +237,8 @@ def tell_ticket(adam, op, project: str, row: dict, cr: str, status: str, resolut
         return [f"      ticket: nothing to tell ({step['why']})"]
     step = cr_notice.plan(status, ticket, child, op.is_closed(step["key"]))
     text = lambda key: cr_notice.comment_text(  # noqa: E731
-        cr, row.get("title") or "", status, resolution, ref, key, (adam.served(project) if hasattr(adam, "served") else ""), row.get("artefacts") or [])
+        cr, row.get("title") or "", status, resolution, ref, key, (adam.served(project) if hasattr(adam, "served") else ""),
+        row.get("artefacts") or [], release)
 
     if step["action"] == "ticket":
         if link_existing:
@@ -340,7 +345,8 @@ def settle(adam, op, spec: dict, project: str, default_ref: str, apply: bool, no
                 try:
                     for line in tell_ticket(adam, op, project, row, cr, status, resolution, ref, apply, notify,
                                             prepare=prepare if status in ("accepted", "done") else None,
-                                            link_existing=link_existing):
+                                            link_existing=link_existing,
+                                            release=it.get("release", spec.get("release", True))):
                         print(line)
                 except Exception as e:  # noqa: BLE001
                     print(f"      ticket FAILED: {e}"); failed += 1

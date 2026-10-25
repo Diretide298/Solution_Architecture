@@ -80,12 +80,16 @@ def _tag_number(tag: str) -> int:
     return int(digits) if digits else 0
 
 
-def _release_line(status: str, ref: str, served: str) -> str:
+def _release_line(status: str, ref: str, served: str, release: bool = True) -> str:
     """Where the package change is. "Your next pull already has it" only when ADAM is serving that release:
     on 15 October 2026 the settlement of CR-092..CR-136 named r7 while ADAM served r6, and 23 comments told
     agents to look for a change that was not out yet (corrected by hand)."""
     if status == "rejected":
         return "Nothing in the package changes."
+    if not release:
+        # Chinmay, 25 October 2026: "we dont need a Release for these" -- the decision is the change.
+        return ("No release carries this, and none is coming for it: the decision above is the whole change. "
+                "Build it in this ticket now; do not wait for the package to show it.")
     if ref and served and _tag_number(ref) <= _tag_number(served):
         return (f"The package change is in release `{ref}`. ADAM always serves the latest release"
                 f"{f' (now `{served}`)' if served != ref else ''}, so your next pull already has it: README.md lists "
@@ -100,19 +104,26 @@ def _release_line(status: str, ref: str, served: str) -> str:
 
 
 def comment_text(cr: str, title: str, status: str, resolution: str, ref: str, ticket: str,
-                 served: str = "", artefacts=None) -> str:
-    """The comment on an open ticket, written for the AI agent that pulls it next."""
+                 served: str = "", artefacts=None, release: bool = True) -> str:
+    """The comment on an open ticket, written for the AI agent that pulls it next.
+
+    `release` False: no release will carry the change, so the agent builds the decision now rather
+    than leaving the changed part to a release."""
     status = (status or "").strip().lower()
     lines = [heading(cr, status), "",
              f"For the AI agent that pulls #{ticket} (and the developer): ADAM change request {cr}, "
              f"\"{(title or '').strip()}\", raised from this ticket, was **{status}**.", "",
              f"**What was decided:** {(resolution or '').strip() or '(no note was given)'}", "",
-             f"**What changed, and where:** {_release_line(status, ref, served)}"]
+             f"**What changed, and where:** {_release_line(status, ref, served, release)}"]
     if artefacts:
         lines += ["", "**Artefacts it touches:** " + ", ".join(f"`{a}`" for a in artefacts)]
     if status == "rejected":
         todo = ("Build as this ticket and its linked files say. Do not work around it in code; if it still "
                 "blocks you, raise a new change request with what is new.")
+    elif not release:
+        todo = ("Build to the decision above, in this ticket. Where this ticket's description or the "
+                "package's contracts say otherwise, the decision wins (a started ticket's description is "
+                "never rewritten, and the package is not changed for this request).")
     elif status == "accepted":
         todo = ("Build to the decision above. Where this ticket's description says otherwise, the decision "
                 "wins (a started ticket's description is never rewritten). If the package change has not "
