@@ -1,0 +1,48 @@
+id: CHG-R10UI-003
+date: '2026-10-25'
+source: cr
+kind: spec
+summary: 'BO-1144 Peer-to-Peer Transfer Configuration is trimmed to WalletTransferRules: P2P enabled, Eligible credit types,
+  Maximum transfer, Daily transfer amount and Recipient verification bound to their properties, Approval above amount and
+  Within a shared wallet only added, a Save bound to setWalletTransferRules, and every pack field with no contract property
+  and the pack''s example prose dropped. The other pack rules are on the left-out list (LO-R10UI-001).'
+decision:
+  what: 'ADAM CR-193, option C, as settled on 25 October 2026: "Build BO-1144 against WalletTransferRules as it stands ...
+    add fields for approvalAboveAmount and withinSharedWalletOnly. Drop every field with no contract property and the pack''s
+    example prose ... The pack''s other rules ... are not built: they wait on a client and compliance decision and will
+    come as a separate request." screens/P08 BO-1144: the fields and publish regions rebuilt; listCreditTypes onLoad for
+    the credit-type choices; apisNote. docs/active/left-out.yaml LO-R10UI-001; approved-ui-changes.yaml BO-1144 region:fields
+    and region:publish, logged as CR-193.'
+  by: Chinmay
+  date: '2026-10-25'
+why: 'ADAM CR-193 (Surendra Loke, #36207 BO-1144), settled 25 October 2026. One of 20 fields was bound; most had no contract
+  property, two contract fields had no field, and "Example", "Wallet A" and "Cash Credit: AED 500" were worked-example prose
+  from the pack.'
+keys_touched:
+  screens:
+  - BO-1144
+  operations:
+  - getWalletTransferRules
+  - setWalletTransferRules
+  - listCreditTypes
+  schemas:
+  - WalletTransferRules
+  files:
+  - screens/P08-venue-back-office.yaml
+  - docs/active/left-out.yaml
+  - docs/active/approved-ui-changes.yaml
+root_class: a workshop-pack screen whose fields were never reconciled with its contract
+tickets:
+  started:
+  - '36207 (BO-1144): through CR-193''s comment, as CHG-ADM-002 says; its text is not rewritten.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-193
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-bindings.py
+status: open
+notes: Visible change to an approved screen, logged in ADAM as CR-193 (approved-ui-changes.yaml); the screen has no client
+  drawing (wireframe notStarted), only the pack-generated definition.
