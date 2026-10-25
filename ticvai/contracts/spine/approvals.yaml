@@ -5397,7 +5397,7 @@ components:
         ShiftSwap id: an existing kind narrowed by `subjectTypes`, as the optional review steps above, so no kind is added.
 
         **A guest's privacy request** (ADAM CR-101, accepted 15 October 2026; CHG-R10ID-016). `configurationChange`,
-        `subjectContract` `identity`, `subjectId` the guest's `pii.subject` id, subject `subjectDataExport` for
+        `subjectContract` `identity`, `subjectId` the guest's subject id, subject `subjectDataExport` for
         `exportSubjectData` and `subjectErasure` for `deleteGuestAccount`: an existing kind narrowed by `subjectTypes`,
         so no kind is added. Raised by Identity in process for the guest, it records the guest as `requestedBySubjectId`
         (`requestedByPrincipalId` null). A guest's own request needs no human approval step (ADR-0047 section 7); a
@@ -5977,7 +5977,7 @@ components:
           nullable: true
           x-ticvai-references: identity.principal
           description: 'The principal who raised the request, or for whom the raising contract raised it. **Null when a
-            guest raised it** (ADAM CR-101, accepted 15 October 2026; CHG-R10ID-016): a guest is a `pii.subject`, not a
+            guest raised it** (ADAM CR-101, accepted 15 October 2026; CHG-R10ID-016): a guest is a subject, not a
             principal, so a guest''s privacy request (`exportSubjectData`, `deleteGuestAccount`) records
             `requestedBySubjectId` instead. Exactly one of the two is set.'
         requestedBySubjectId:

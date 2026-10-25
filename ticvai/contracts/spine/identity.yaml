@@ -1348,7 +1348,7 @@ paths:
 
 
         **The statutory clock** (CR-101). The call emits `identity.privacyRequestRaised`, which Marketing turns into a
-        `marketing.privacy_request` (request type `access`), so the request sits in the privacy queue and its `dueAt`
+        privacy case in its queue (request type `access`), so the request sits in the privacy queue and its `dueAt`
         (the jurisdiction''s configured response period) applies. **The statutory period itself is the client''s to
         give** (`setPrivacyRequestTypes` `deadlines[].responseDays`); until it is configured the queue shows no
         deadline, and `estimatedCompletionAt` stays null.
@@ -1379,8 +1379,6 @@ paths:
       x-ticvai-writes:
       - table: identity.subject_data_export
         for: 'the export''s row, status awaitingApproval, which the export job moves on (ADAM CR-101, CHG-R10ID-016)'
-      # Marketing writes the privacy case from identity.privacyRequestRaised; this operation only emits it (CR-101).
-      x-ticvai-names-for-context: [marketing.privacy_request]
       tags:
       - identity
       x-ticvai-emits:
@@ -9504,7 +9502,7 @@ components:
           type: string
           format: uuid
           x-ticvai-column: id
-          description: The `approvals.request` id `exportSubjectData` answered with; one export per request.
+          description: The Approvals request id `exportSubjectData` answered with; one export per request.
         subjectId:
           type: string
           format: uuid
@@ -9541,7 +9539,7 @@ components:
           format: date-time
           nullable: true
     SubjectDataExportStatus:
-      x-ticvai-persistence: none — computed from identity.subject_data_export and the approvals.request it names
+      x-ticvai-persistence: none — computed from identity.subject_data_export
       type: object
       description: >-
         **Where a guest's data export has got to, and the link to download it** (ADAM CR-101; CHG-R10ID-016), the
