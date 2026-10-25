@@ -6,7 +6,7 @@ summary: 'The 19 operations check-money-currency found answering Money from a ro
   now state their currency: 16 read the venue they act at (the caller''s working venue) through tenancy#venueSettingsRecords
   in process, and the three platform-level answers use the platform billing currency (control.billing_entity.billing_currency).'
 decision:
-  what: 'The lead''s default rulings on lane E''s check-money-currency (audit/ticvai/r10/LANE-E-RULINGS.md section 2, accepted
+  what: 'The lead''s default rulings on lane E''s check-money-currency (the lead''s r10 rulings note, section 2, accepted
     25 October 2026): a row with no venue and a computed answer take the currency of the venue the operation acts at, read
     through tenancy#venueSettingsRecords, and the operation says so; a clearly platform-level answer uses the platform billing
     currency. Venue: activateGiftCard, blockGiftCard, getGiftCard, issueGiftCard, redeemGiftCard, createSharedWallet, listSharedWallets,
