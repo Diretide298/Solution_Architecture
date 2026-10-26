@@ -1,0 +1,33 @@
+id: CHG-R10INT-004
+date: '2026-10-26'
+source: audit
+kind: contract
+summary: 'createMenu, updateMenu and setMenuSections answer the whole Menu with each item''s price, so they declare the
+  same two in-process reads as getMenu: the outlet''s venue, then that venue''s trading currency (ADAM CR-260 siblings).'
+decision:
+  what: 'Each of the three gains x-ticvai-read-via tenancy#outletRecords and tenancy#venueSettingsRecords, in process,
+    as XDR-004 already grants them (it lists all three operations). rollbackMenu answers a MenuVersion, which carries no
+    Money, and is unchanged.'
+  by: Chinmay
+  date: '2026-10-26'
+why: 'ADAM CR-260 (Sanket Keluskar, ticket 32301, accepted 26 October 2026: "Accept all (Recommended)"): F&B answers
+  Money through XDR-004 (CR-234). Lane F''s round 3 report found these three are in XDR-004 but declared no currency
+  read. Sibling rule: the same gap gets the same fix.'
+keys_touched:
+  operations: [createMenu, updateMenu, setMenuSections]
+  files:
+  - contracts/satellite/fnb.yaml
+root_class: 'a grant lists operations whose own contracts do not declare the read it grants'
+tickets:
+  started: []
+  unstarted:
+  - 'The F&B menu management tasks that build createMenu, updateMenu and setMenuSections pick the reads up at the r10
+    tag.'
+release_tag: r10
+decision_owner: Chinmay
+adam_cr: CR-260
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-money-currency.py
+status: open

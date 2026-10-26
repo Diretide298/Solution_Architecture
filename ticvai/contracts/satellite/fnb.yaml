@@ -5949,6 +5949,15 @@ paths:
       - query: tenancy#regionSettingsRecords
         route: in-process
         for: 'what its text calls "Region''s time zone": platform.region_settings, Tenancy''s data (CHG-RTE-001)'
+      - query: tenancy#outletRecords
+        route: in-process
+        for: 'the outlet''s venue (platform.outlet.venue_id), since a menu reaches its venue only through
+          fnb.menu.outlet_id: the venue whose settings give the Money''s currency (ADAM CR-260 as the r10 package
+          carries CR-234; XDR-004; CHG-R10INT-004)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the currency and scale of the Money it answers: the venue''s frozen trading currency, from
+          platform.venue_settings, Tenancy''s data, in process (ADAM CR-234; XDR-004; CHG-R10INT-004)'
       x-ticvai-audience:
       - staff
       x-ticvai-config-scope: outlet
@@ -6035,6 +6044,15 @@ paths:
       - query: tenancy#regionSettingsRecords
         route: in-process
         for: 'what its text calls "Region''s time zone": platform.region_settings, Tenancy''s data (CHG-RTE-001)'
+      - query: tenancy#outletRecords
+        route: in-process
+        for: 'the outlet''s venue (platform.outlet.venue_id), since a menu reaches its venue only through
+          fnb.menu.outlet_id: the venue whose settings give the Money''s currency (ADAM CR-260 as the r10 package
+          carries CR-234; XDR-004; CHG-R10INT-004)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the currency and scale of the Money it answers: the venue''s frozen trading currency, from
+          platform.venue_settings, Tenancy''s data, in process (ADAM CR-234; XDR-004; CHG-R10INT-004)'
       x-ticvai-audience:
       - staff
       x-ticvai-config-scope: outlet
@@ -6094,6 +6112,15 @@ paths:
       - query: tenancy#regionSettingsRecords
         route: in-process
         for: 'what its text calls "Region''s time zone": platform.region_settings, Tenancy''s data (CHG-RTE-001)'
+      - query: tenancy#outletRecords
+        route: in-process
+        for: 'the outlet''s venue (platform.outlet.venue_id), since a menu reaches its venue only through
+          fnb.menu.outlet_id: the venue whose settings give the Money''s currency (ADAM CR-260 as the r10 package
+          carries CR-234; XDR-004; CHG-R10INT-004)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the currency and scale of the Money it answers: the venue''s frozen trading currency, from
+          platform.venue_settings, Tenancy''s data, in process (ADAM CR-234; XDR-004; CHG-R10INT-004)'
       x-ticvai-audience:
       - staff
       x-ticvai-config-scope: outlet
