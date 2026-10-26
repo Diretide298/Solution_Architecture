@@ -1,0 +1,40 @@
+id: CHG-R10INT-001
+date: '2026-10-26'
+source: audit
+kind: contract
+summary: 'Three contract-shape findings the r10 integration gate raised on the merged tree, fixed at the source:
+  setApiLicensing and listApiLicences act at platform scope, listMarketplaceListings says which statuses it returns,
+  and relinquishSeatHold''s 409 names its problem type.'
+decision:
+  what: '(1) setApiLicensing and listApiLicences: x-ticvai-scope-level tenant becomes platform. ADAM CR-098
+    (CHG-R10ID-011) has the TICVAI programme admin (DEV-008), who acts for no tenant of their own, name the tenant
+    in the body, and the row is control.api_licence in the control database: a platform-console write, which is
+    why C-REQUEST-SERVER-FIELDS flagged the now-required tenantId under tenant scope. (2) listMarketplaceListings
+    (ADAM CR-203, CHG-R10ID-014) states in words that only `status` `certified` is returned and that there is no
+    status filter (C-PAGED-STATUS, ADAM CR-088). (3) relinquishSeatHold''s 409 carries x-ticvai-problem-types
+    [hold-not-active], the type catalogue''s hold operations already use, and its text spells the type that way
+    instead of `holdNotActive` (C-ERROR-PROBLEM-TYPE, R075 R133).'
+  by: Chinmay
+  date: '2026-10-26'
+why: 'The r10 integration gate of 26 October 2026 (run 20261026-135604-1087) failed check-contract-shapes on these
+  three. The lead''s instruction for r10: fix every gate finding at the source; never baseline, acknowledge or exempt.'
+keys_touched:
+  operations: [setApiLicensing, listApiLicences, listMarketplaceListings, relinquishSeatHold]
+  files:
+  - contracts/satellite/public-api.yaml
+  - contracts/satellite/seating.yaml
+root_class: 'a lane''s change made a field required or a list narrower without the operation-level marker the
+  shape rules read (scope level, a status sentence, a problem type)'
+tickets:
+  started:
+  - '31848 (relinquishSeatHold, In progress, Chitrangi Mestry): the problem type is spelled hold-not-active; told
+    through a ticket comment, its text is not rewritten.'
+  unstarted: []
+release_tag: r10
+decision_owner: Chinmay
+adam_cr: CR-098
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-contract-shapes.py
+status: open

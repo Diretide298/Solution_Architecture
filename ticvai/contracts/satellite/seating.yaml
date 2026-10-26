@@ -1848,7 +1848,7 @@ paths:
         leaving them locked until `expiresAt`). On a guest channel only a hold the same guest session or
         subject placed with `createSeatHold` can be released; any other hold answers `404`, as anything
         outside the caller''s scope does, so hold ids cannot be probed. A hold already converted to an
-        order, released or expired answers `409` `holdNotActive`. Staff at a till keep releasing any
+        order, released or expired answers `409` `hold-not-active`. Staff at a till keep releasing any
         hold at their venue under `ORDER_CREATE`.
 
         '
@@ -1871,8 +1871,9 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
-          description: The hold is no longer active (`holdNotActive`) - converted to an order, already
+          description: The hold is no longer active (`hold-not-active`) - converted to an order, already
             released or expired. Nothing changes. Also refused when the seat hold is `sold`; states/seat-hold.yaml moves this call only from `held`. (r10 default ruling, CHG-R10GEN-005)
+          x-ticvai-problem-types: [hold-not-active]
           content:
             application/problem+json:
               schema:

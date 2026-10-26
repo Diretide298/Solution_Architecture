@@ -1322,6 +1322,9 @@ paths:
         or later); a draft, private, rejected, revoked, delisted or lapsed listing is never in it, whoever asks.
         A separate operation, so a filter mistake on the authenticated list cannot leak a draft here.
 
+        **Statuses.** Only `status` `certified`: a listing in any other status is never returned, and there is
+        no status filter.
+
         **Order.** By `name` ascending, then by `id`. Paged.
 
         **Third-party code does not execute inside TICVAI**: a listing points at an integration running on the
@@ -1518,7 +1521,7 @@ paths:
         DEV-008 sets licences with `setApiLicensing`; `listApiScopes` lists the scopes a licence may grant,
         not the licences. Returns what the write stores, in the write's own shape. Ordered by creation (`id`, a UUIDv7), oldest first.
       x-ticvai-permission: DEVELOPER_ADMIN
-      x-ticvai-scope-level: tenant
+      x-ticvai-scope-level: platform
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
@@ -1584,7 +1587,7 @@ paths:
       tags: [publicApi]
       x-ticvai-permission: DEVELOPER_ADMIN
       x-ticvai-audience: [staff]
-      x-ticvai-scope-level: tenant
+      x-ticvai-scope-level: platform
       x-ticvai-config-scope: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
