@@ -612,6 +612,11 @@ def main() -> int:
     for r, k, m in rows:
         guard.add(r, k, m)
     guard.note(f"{len(rows)} value(s) with no source on {len({k.split(':')[0] for _r, k, _m in rows})} screen(s)")
+    if rows:
+        guard.note("no mechanical fixer (CHG-R10GEN-006): each fix adds to the screen's `apis` the operation that "
+                   "answers the value, wired to the component that shows it, or rebinds it to an answer the screen "
+                   "already declares; the screen generators keep generated screens to their declared answers "
+                   "(contract_shapes.drop_unsourced, CHG-R10GEN-007)")
     return guard.finish()
 
 

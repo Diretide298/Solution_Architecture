@@ -122,3 +122,22 @@ instead of a sprint.
 
 **After Gate 2 the contract is frozen for the context.** Changes need a version bump and
 review. This is what stops contract-first collapsing into code-first with extra steps.
+
+---
+
+## 8. Rules the r10 change requests settled (the build's defaults)
+
+Forty-eight change requests of 21 to 24 October 2026 found gaps every build had passed (PROCESS-LOG P-30). Each rule
+below is stated once here; a check fails a contract or screen that breaks it, a fixer writes the default where the
+fix is mechanical, and the generators (`tools/contract_shapes.py`, CHG-R10GEN-007) write it into what they generate.
+Run the fixer a check names; a second run writes nothing.
+
+| # | Rule | Check | Fixer |
+|---|---|---|---|
+| a | **Money has a currency source.** An operation that answers or accepts common `Money` from a row that stores the amount only asks the currency of its owner: `x-ticvai-read-via` to `tenancy#venueSettingsRecords` (the venue's frozen trading currency) or `tenancy#regionSettingsRecords` (a row with only a region), unless the row or a parent row keeps a currency column (naming-and-style 5.1, ADR-0018; CR-197, CR-202, CR-217, CR-234, CR-235). | `check-money-currency` | `tools/fix-money-currency.py` |
+| b | **A list states its order, and the order is total.** Every list says how it is ordered; a key that can be null says where the rows without it go (default: after every row that has it, then `id`), and `id` breaks ties (CR-190, CR-206, CR-236). | `check-list-order` | `tools/fix-order-and-refusals.py` |
+| c | **A refusal agrees with its state model.** An operation named in a `states/*.yaml` transition refuses (`409`) exactly the states the model does not move it from, and its words name no allowed state the model lacks (CR-237). | `check-state-refusals` | `tools/fix-order-and-refusals.py` (the rest are rulings) |
+| d | **A screen value has a declared source.** Every `bindsTo`, state and entry value a screen shows is a field of an answer of an operation in its `apis` (or what the app shell preloads), and every write its text describes is an operation it declares (CR-186, CR-187, CR-220, CR-221, CR-233). | `check-screen-value-sources` | none: declare the read, or rebind |
+| e | **Another module's fact is asked of its owner.** An operation whose words name another module's table, field or fact declares `x-ticvai-read-via` to the owner's query over that table (`in-process` within one deployable, `service` across); a read (GET) does so for what its own words name or its response says is worked out on read (ADR-0055 rule 2; CR-096, CR-218). | `check-cross-module-reads` XR-FACT | `tools/fix-read-routes.py` |
+| f | **A public guest read of venue data names its venue.** A GET a guest calls without a session at venue scope takes the shared `GuestVenue` parameter (`X-Venue-Id`) and declares `400 venue-required`, unless its path or a required query already names the venue (CR-198). | `check-business-rules` BR-GUEST-VENUE | the generators write it |
+| g | **A permission is evaluated per scope.** `x-ticvai-permission` holds at the scope the operation acts on or an ancestor, from the per-scope set (`Session.permissionsByScope`), never the flat `effectivePermissions`; a list reaches the scope paths where it holds (a filter outside them is `403`), and a tenant-level operation needs it at the tenant root (CR-189). | `check-business-rules` BR-SCOPE-AUTHZ | the generators write it |

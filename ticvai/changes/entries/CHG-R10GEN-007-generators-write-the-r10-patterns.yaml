@@ -1,0 +1,52 @@
+id: CHG-R10GEN-007
+date: '2026-10-26'
+source: audit
+kind: process
+summary: 'The generators write the r10 patterns by default, so the next generation needs no one-off fixer. Shared
+  rules in tools/contract_shapes.py (the module every generator already imports): a drafted or shaped list states
+  its order, nulls last then id; its permission is evaluated per scope; a public guest read of venue data takes
+  GuestVenue and declares 400 venue-required; Money it answers or accepts declares the venue''s or region''s
+  currency read; a fact another module owns named in its purpose is asked of the owner''s query; and a generated
+  screen component bound to a schema none of its declared operations answers or sends is unbound with a note.'
+decision:
+  what: 'The lead, 26 October 2026: "the patterns we should update the build as well". Every rule r10 settled
+    becomes the build''s default. draft-pack-operations.block (r10_parts) writes (b) the order sentence on the
+    envelope''s keys, (g) the per-scope permission sentence, (f) GuestVenue and 400 VenueRequired, (e) the read
+    routes of its purpose; (a) does not arise (the envelope has no Money). specify-pack-operations.build
+    (apply_r10) writes (a) the currency read when its schemas carry Money (venue or outlet level: the venue''s
+    settings; region level: the region''s; in process within commerce, service across), (e), (b), (g) and (f).
+    generate-screens-from-contracts.build and generate-screens-from-pack.build apply (d) to their own components
+    (drop_unsourced over declared_io). (c) has no generator rule: no generator writes a refusal. Other writers read:
+    derive-screen-wiring binds only to the response of a read the screen declares, derive-pack-linkage writes apis
+    without bindings, splice-contract copies authored blocks, fix-audit-contract-screens is a one-off: no change.'
+  by: Chinmay
+  date: '2026-10-26'
+why: 'r10 lane E round 2 (coordinator''s brief of 26 October). The r10 checks (check-money-currency,
+  check-list-order, check-state-refusals, check-screen-value-sources, check-cross-module-reads XR-FACT,
+  check-business-rules BR-GUEST-VENUE and BR-SCOPE-AUTHZ) and their fixers (CHG-R10GEN-001..005) found and fixed what
+  the generators had drafted without them (ADAM CR-186, 187, 189, 190, 197, 198, 202, 206, 217, 220, 221, 233, 234,
+  235, 236); a generator left as it was would draft the same gaps again (fix-at-source rule).'
+keys_touched:
+  files:
+  - tools/contract_shapes.py
+  - tools/draft-pack-operations.py
+  - tools/specify-pack-operations.py
+  - tools/generate-screens-from-contracts.py
+  - tools/generate-screens-from-pack.py
+  - tools/tests/test_generators_r10_patterns.py
+root_class: 'a generator that drafts what a check later fails: the rule lived in the checks and fixers only'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r10
+decision_owner: Chinmay
+adam_cr: CR-186, CR-187, CR-189, CR-190, CR-197, CR-198, CR-202, CR-206, CR-217, CR-220, CR-221, CR-233, CR-234,
+  CR-235, CR-236
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/tests/test_generators_r10_patterns.py
+status: open
+notes: 'Measured: dry runs of generate-screens-from-contracts (P05, P06, P08, P09) and generate-screens-from-pack
+  (P05, P08, P09) unbind 0 components (both bind only declared answers today; the rule keeps it so). Nothing
+  generated is committed: the generators are not on the refresh, and their output is authored once and maintained.'

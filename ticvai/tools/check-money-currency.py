@@ -35,7 +35,7 @@ Rules:
 
 The key is the operationId. The message names the Money fields, the tables that store the amount only, and the
 route the read would take (in-process within one deployable, service across, as tools/applied/read-routes-18-
-october.py writes them). `tools/applied/money-currency-reads-r10.py` writes that read where the row holds the venue
+october.py writes them). `tools/fix-money-currency.py` writes that read where the row holds the venue
 (`venue_id`, `outlet_id`) or the region (`region_id`), and lists for the lead the rows that hold neither.
 
 **Precision first.** An operation is a finding only where nothing it touches can denominate the Money: a computed
@@ -249,9 +249,17 @@ def main() -> int:
         guard.add("MC-NO-CURRENCY", o,
                   f"{o} ({svc}) answers or accepts Money ({shown}); {'; '.join(where)}; and it asks no read of the "
                   f"venue's or region's currency: add x-ticvai-read-via tenancy#venueSettingsRecords ({route}), or "
-                  "store the currency on the row (naming-and-style 5.1, ADR-0018; CR-234)")
+                  "store the currency on the row (naming-and-style 5.1, ADR-0018; CR-234). Fixer: "
+                  "python tools/fix-money-currency.py --apply, then python tools/derive-lineage.py --apply")
     guard.note(f"{len(rows)} operation(s) answer or accept Money with no currency source")
+    if rows:
+        guard.note(FIXER)
     return guard.finish()
+
+
+FIXER = ("the fix (CHG-R10GEN-006): python tools/fix-money-currency.py --apply writes the venue's or region's "
+         "currency read; then python tools/derive-lineage.py --apply. It prints, with a default ruling, what it cannot "
+         "decide. A second run writes nothing.")
 
 
 if __name__ == "__main__":

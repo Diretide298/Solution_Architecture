@@ -234,8 +234,12 @@ def main() -> int:
     guard = g.Guard("check-list-order", RULES)
     found = findings()
     for rule, key, msg in found:
-        guard.add(rule, key, msg)
+        guard.add(rule, key, f"{msg}. Fixer: python tools/fix-order-and-refusals.py --apply")
     guard.note(f"{len(found)} finding(s)")
+    if found:
+        guard.note("the fix (CHG-R10GEN-006): python tools/fix-order-and-refusals.py --apply writes the default "
+                   "ruling (an order stated, nulls last then id); a finding it cannot rule on it prints for the lead. A second run writes "
+                   "nothing.")
     return guard.finish()
 
 
