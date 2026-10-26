@@ -627,9 +627,6 @@ paths:
       - query: ai#policyRecords
         route: service
         for: 'its read of ai.policy, AI''s data (CHG-MOD-001)'
-      - query: tenancy#regionSettingsRecords
-        route: service
-        for: 'the region''s trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: body.billedAmount, body.providerCost (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
       - staff
       summary: Turn metered AI interactions into a billable usage record
@@ -2131,9 +2128,6 @@ paths:
       - query: tenancy#tenantRecords
         route: service
         for: 'its read of platform.tenant, Tenancy''s data (CHG-MOD-001)'
-      - query: tenancy#regionSettingsRecords
-        route: service
-        for: 'the region''s trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: SubscriptionPreview.priceChange, SubscriptionPreview.proratedAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       security:
       - bearerAuth: []
       - prospectAuth: []
@@ -2192,10 +2186,6 @@ paths:
         - "P09 ADM-422 Administrator & Security Initialization"
         - "P09 ADM-424 Module Activation & Dependency Validation"
         - "P09 ADM-450 Entitlement & License Inventory"
-      x-ticvai-read-via:
-      - query: tenancy#regionSettingsRecords
-        route: service
-        for: 'the region''s trading currency and scale (currency_code, currency_scale) for the Money it answers: EntitlementLimit.overageUnitPrice (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: primary
@@ -2289,10 +2279,6 @@ paths:
         - "P09 ADM-005 Tenant Directory"
         - "P09 ADM-007 Module & Feature Entitlement"
         - "P09 ADM-011 Licence & Seat Management"
-      x-ticvai-read-via:
-      - query: tenancy#regionSettingsRecords
-        route: service
-        for: 'the region''s trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: EntitlementLimit.overageUnitPrice (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
       - staff
       x-ticvai-calls:
@@ -9443,10 +9429,6 @@ paths:
         - "P09 ADM-466 Commercial Scenario Simulator"
         - "P17 SGN-011 Recommended Package Overview"
         - "P17 SGN-012 Commercial Model & Tier Selection"
-      x-ticvai-read-via:
-      - query: tenancy#regionSettingsRecords
-        route: service
-        for: 'the region''s trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: PackageSimulation.amount, PackageSimulation.contractTotal, PackageSimulation.minimumGuarantee, PackageSimulation.oneOffTotal and 2 more (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -9645,10 +9627,6 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-377 Subscription Exceptions & Commercial Alerts"
         - "P09 ADM-454 Minimum Guarantee & Variable Consumption Monitor"
-      x-ticvai-read-via:
-      - query: tenancy#venueSettingsRecords
-        route: service
-        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: LicenceEnforcement.overageCharge (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       summary: Where a tenant stands against its entitlements, and what happens next
       description: 'Board 9.5. **`getEntitlementUsage` reported consumption and nothing said what to do
         about it.** Approaching a limit, at it, and over it are three states with three responses —
@@ -9769,10 +9747,6 @@ paths:
         - "P09 ADM-456 Usage Alerts, Reconciliation & Exception Center"
         - "P09 ADM-461 Consumption Reconciliation & Billing Approval"
         - "P09 ADM-468 Renewal Approval, Activation & Commercial Handoff"
-      x-ticvai-read-via:
-      - query: tenancy#venueSettingsRecords
-        route: service
-        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: BillingReconciliation.amount, BillingReconciliation.unitPrice (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       summary: Metered consumption against what was invoiced
       description: 'Boards 10.2 and 10.3. **The customer will check, and the first invoice sets the
         tone for the relationship.** Every billable event, grouped and priced, against the invoice line
@@ -11591,10 +11565,6 @@ paths:
         - "P09 ADM-378 Executive AI Commercial Intelligence"
         - "P09 ADM-452 Operational Usage & Threshold Monitor"
         - "P09 ADM-465 AI Upgrade, Downgrade & Commercial Right-Sizing"
-      x-ticvai-read-via:
-      - query: tenancy#venueSettingsRecords
-        route: service
-        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: SubscriptionPlanRecommendation.projectedAddedCost, SubscriptionPlanRecommendation.projectedMonthlyCost, SubscriptionPlanRecommendation.projectedSaving, body.currentMonthlyCost (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: our build plan (20.8.4, 20.8.5 plan-fit and cost-saving recommendations to

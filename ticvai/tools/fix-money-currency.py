@@ -62,10 +62,18 @@ OWN_FOR = re.compile(r".*\(naming-and-style 5\.1, ADR-0018; CHG-R10GEN-002\)$")
 VENUE_KEYS = {"venue_id", "outlet_id"}
 VENUE_PARAMS = {"venueId", "outletId"}
 
+# **The lead accepted every default on 25 October 2026** ("Accept all defaults", audit LANE-E-RULINGS.md; r10 lane E
+# round 3, CHG-R10GEN-009). So they are this script's defaults, not holds: a platform billing row (control.*) stores
+# its billing currency on the row (CR-202, as CHG-R10ID-013 and -017 built it: the billing entity's billingCurrency,
+# copied when the row is written); a platform computed answer reads the billing entity's billingCurrency; a row with
+# no venue, and a computed answer, take the venue the operation acts at (the caller's working venue). Only a row that
+# keeps a scope_path while tenancy#scopeRecords is not declared is still held.
+PLATFORM_TAG = "(ADAM CR-202, the lead's default of 25 October 2026; CHG-R10GEN-009)"
+BILLING_TABLE = "control.billing_entity"
 DECISIONS = {
-    "platform": "a control.* row is the platform's own billing to a tenant, and no venue denominates it. Recommended "
-                "default (CR-202 option A): a billing currency on the billing entity, copied to a currency_code "
-                "column on the row when it is made",
+    "platform": "a control.* row is the platform's own billing to a tenant, and no venue denominates it (CR-202): "
+                "this script gives its schema a stored currencyCode, the billing entity's billingCurrency copied "
+                "when the row is written",
     "scope": "the row keeps only its scope_path, and reaching its venue needs platform.scope. Recommended default "
              "(CR-217 and CR-235 option A): Tenancy declares tenancy#scopeRecords (platform.scope by id and by path, "
              "in-process and service); a second run of this script then routes these through it and "
@@ -140,6 +148,8 @@ def queries_for(kind: str, declared: set) -> list:
         return [REGION_Q]
     if kind == "scope" and SCOPE_Q in declared:
         return [SCOPE_Q, VENUE_Q]
+    if kind in ("no venue", "no row"):     # the venue the operation acts at (the lead's default, 25 October)
+        return [VENUE_Q]
     return []
 
 
@@ -147,11 +157,67 @@ def why(kind: str, query: str, verb: str, fields: list) -> str:
     shown = ", ".join(fields[:4]) + (f" and {len(fields) - 4} more" if len(fields) > 4 else "")
     if query == SCOPE_Q:
         what = "the venue its row's scope_path names, whose settings give the currency"
+    elif kind in ("no venue", "no row"):
+        what = ("the venue the operation acts at (the caller's working venue): its frozen trading currency and scale "
+                "(currency_code, currency_scale)")
     elif query == REGION_Q:
         what = "the region's trading currency and scale (currency_code, currency_scale)"
     else:
         what = "the venue's frozen trading currency and scale (currency_code, currency_scale)"
     return f"{what} for the Money it {verb}: {shown} {TAG}"
+
+
+def currency_property(fields: list) -> list:
+    """The `currencyCode` property a platform billing schema gains (the shape CHG-R10ID-017 wrote), as lines at the
+    eight-space indent of a component schema's properties."""
+    shown = ", ".join(f"`{x}`" for x in fields[:4]) + (f" and {len(fields) - 4} more" if len(fields) > 4 else "")
+    desc = (f"**The ISO 4217 currency of {shown}** {PLATFORM_TAG}: a platform row has no venue to resolve a currency "
+            "from (naming-and-style 5.1), so it stores the tenant's billing currency (the billing entity's "
+            "`billingCurrency`), copied when the row is written; a later change of the billing currency never "
+            "re-denominates a row already written.")
+    return ["        currencyCode:", "          type: string", "          minLength: 3", "          maxLength: 3",
+            "          pattern: '^[A-Z]{3}$'", "          description: '" + desc.replace("'", "''") + "'"]
+
+
+def add_currency_property(text: str, schema: str, fields: list):
+    """Gives component schema `schema` a stored `currencyCode` (first of its properties) unless it has a currency
+    property already. Returns (text, added)."""
+    lines = text.split("\n")
+    i = next((n for n, l in enumerate(lines) if l == f"    {schema}:"), None)
+    if i is None:
+        return text, False
+    end = i + 1
+    while end < len(lines) and (not lines[end].strip() or lines[end].startswith("      ")):
+        end += 1
+    k = next((n for n in range(i, end) if lines[n] == "      properties:"), None)
+    if k is None:
+        return text, False
+    props = {m.group(1) for n in range(k + 1, end) for m in [re.match(r"^        ([A-Za-z_]\w*):", lines[n])] if m}
+    if any(re.fullmatch(r"(?:[a-z]+)?[Cc]urrency(?:Code)?", p) for p in props):
+        return text, False
+    lines[k + 1:k + 1] = currency_property(fields)
+    return "\n".join(lines), True
+
+
+def add_billing_read(text: str, op: str, fields: list):
+    """A platform computed answer states its currency source: an `x-ticvai-reads` entry for the billing entity
+    (CHG-R10ORD-019's shape). Returns (text, added)."""
+    lines = text.split("\n")
+    i, end, ind = rr._op_block(lines, op)
+    if any(re.match(r"^\s+- table:\s*%s\s*$" % re.escape(BILLING_TABLE), lines[n]) for n in range(i, end)):
+        return text, False
+    shown = ", ".join(fields[:4]) + (f" and {len(fields) - 4} more" if len(fields) > 4 else "")
+    why_ = f"the platform billing currency its Money is in (billingCurrency) for {shown} {PLATFORM_TAG}"
+    entry = [f"{ind}- table: {BILLING_TABLE}", f"{ind}  for: '" + why_.replace("'", "''") + "'"]
+    k = next((n for n in range(i, end) if lines[n] == f"{ind}x-ticvai-reads:"), None)
+    if k is None:
+        lines[i + 1:i + 1] = [f"{ind}x-ticvai-reads:"] + entry
+    else:
+        at = k + 1
+        while at < end and (lines[at].startswith(f"{ind}- ") or lines[at].startswith(f"{ind}  ")):
+            at += 1
+        lines[at:at] = entry
+    return "\n".join(lines), True
 
 
 def add_read_via(text: str, op: str, entries: list):
@@ -229,9 +295,16 @@ def main() -> int:
             texts[rel] = rr._read(ROOT / rel)
         return texts[rel]
 
-    plan, held = {}, {}
+    plan, held, platform = {}, {}, []
     for o, svc, fields, bare, computed in mc.findings(ctx, ignore=is_own):
         f = ops[o]
+        # a platform row (control.*), or a platform answer computed from control.* rows it reads; a venue's own Money
+        # that happens to live in the subscription contract (a household membership fee) is not platform billing
+        reads_control = any(str(t).startswith("control.") for t in (lin.get(o) or {}).get("reads") or [])
+        if owner_of_schema.get("control") == svc and (any(t.startswith("control.") for t in bare)
+                                                      or (computed and not bare and reads_control)):
+            platform.append((o, f, fields, bare, computed))
+            continue
         rows = list(bare)
         if computed:
             rows += [t for t in (lin.get(o) or {}).get("reads") or []
@@ -244,6 +317,23 @@ def main() -> int:
         verb = "answers" if f["method"] == "get" else "accepts or answers"
         route = route_for(dep_of.get(svc), tenancy_dep)
         plan[o] = [(q, route, why(kind, q, verb, fields)) for q in qs]
+    # platform billing (CR-202): a stored currency on each control.* schema, or the billing entity's for a computed one
+    n_cur = 0
+    for o, f, fields, bare, computed in platform:
+        rel = f["file"]
+        if bare:
+            for t in bare:
+                for stem, sch in sorted(k for k, sc in by.items() if k[0] == f["contract"] and re.match(
+                        r"\s*" + re.escape(t) + r"\b", str((sc or {}).get("x-ticvai-persistence") or ""))):
+                    texts[rel], added = add_currency_property(text(rel), sch, list(fields))
+                    n_cur += added
+                    if added:
+                        print(f"  {sch}: currencyCode stored ({t}, for {o}) - CR-202")
+        else:
+            texts[rel], added = add_billing_read(text(rel), o, fields)
+            n_cur += added
+            if added:
+                print(f"  {o}: x-ticvai-reads {BILLING_TABLE} (a platform computed answer) - CR-202")
     n_via = 0
     for o, entries in sorted(plan.items()):
         rel = ops[o]["file"]
@@ -275,7 +365,10 @@ def main() -> int:
             for s in items:
                 print(f"  {s}")
     changed = [rel for rel, t in texts.items() if t != rr._read(ROOT / rel)]
-    print(f"\n{n_gone} route(s) removed; {n_via} read route(s) in {len(plan)} operation(s); "
+    print(f"\n{n_cur} platform currency source(s) written (CR-202); python tools/derive-schema.py and "
+          "derive-lineage.py --apply then carry them into the schema reference (and the forward migration) and the "
+          "lineage")
+    print(f"{n_gone} route(s) removed; {n_via} read route(s) in {len(plan)} operation(s); "
           f"{sum(len(v) for v in held.values())} held for the lead; {len(changed)} contract file(s) change"
           + ("" if a.apply else " (nothing written, pass --apply)"))
     if a.apply:

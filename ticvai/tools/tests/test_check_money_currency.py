@@ -113,7 +113,7 @@ def test_a_scope_path_row_is_routed_only_once_tenancy_declares_scope_records():
     assert fx.queries_for("scope", set()) == []
     assert fx.queries_for("scope", {fx.SCOPE_Q}) == [fx.SCOPE_Q, fx.VENUE_Q]
     assert fx.queries_for("venue", set()) == [fx.VENUE_Q]
-    assert fx.queries_for("platform", {fx.SCOPE_Q}) == []
+    assert fx.queries_for("platform", {fx.SCOPE_Q}) == []   # a platform row stores its currency instead
 
 
 CONTRACT = """paths:
@@ -156,17 +156,53 @@ def test_only_a_route_this_script_wrote_is_removed():
     assert fx.remove_own(CONTRACT, "makeA", "other#xRecords") == (CONTRACT, 0)
 
 
-def test_the_five_operations_the_crs_named_answer_money_with_no_currency_of_their_own():
+def test_the_five_operations_the_crs_named_now_have_a_currency_source():
+    """On r9 all five were findings (CHG-R10GEN-002). Since r10 each has a source: a settings read, or a stored
+    currency on the schema behind its Money (CR-202's control.* rows, CHG-R10ID-017), which the schema reference
+    carries once tools/derive-schema.py has run."""
     ctx = mc.load()
-    tables = set(ctx["cols_of"])
-
-    def mod(t):
-        return ctx["owner_of_schema"].get(t.split(".", 1)[0])
-
-    want = {"mergeTableVisits": "fnb.table_visit", "createEntitlementTemplate": "catalogue.entitlement_template",
-            "setEntitlementTemplateBlackoutDates": "catalogue.entitlement_template",
-            "generateInvoice": "control.invoice", "getGuestBundle": "promotions.GuestBundle"}
-    for op, where in want.items():
+    found = {o: bare for o, _s, _f, bare, _c in mc.findings(ctx)}
+    for op in ("mergeTableVisits", "createEntitlementTemplate", "setEntitlementTemplateBlackoutDates",
+               "generateInvoice", "getGuestBundle"):
         f = ctx["ops"][op]
-        bare, computed = mc.judge(mc.op_money(f["contract"], f["op"], ctx["by"], tables), ctx["cols_of"], mod, False)
-        assert where in bare + computed, (op, bare, computed)
+        for t in found.get(op, ()):
+            schemas = [s for (stem, _n), s in ctx["by"].items() if stem == f["contract"]
+                       and str((s or {}).get("x-ticvai-persistence") or "").strip().startswith(t)]
+            assert any("currencyCode" in ((s or {}).get("properties") or {}) for s in schemas), (op, t)
+
+
+PLATFORM = """components:
+  schemas:
+    Widget:
+      type: object
+      x-ticvai-persistence: control.widget
+      properties:
+        price:
+          $ref: '../shared/common.yaml#/components/schemas/Money'
+paths:
+  /w:
+    get:
+      operationId: getWidgetMetrics
+      summary: Metrics
+"""
+
+
+def test_a_platform_row_stores_its_billing_currency_once():
+    out, added = fx.add_currency_property(PLATFORM, "Widget", ["Widget.price"])
+    props = yaml.safe_load(out)["components"]["schemas"]["Widget"]["properties"]
+    assert added and list(props)[0] == "currencyCode" and props["currencyCode"]["pattern"] == "^[A-Z]{3}$"
+    assert "CR-202" in props["currencyCode"]["description"] and "billingCurrency" in props["currencyCode"]["description"]
+    assert fx.add_currency_property(out, "Widget", ["Widget.price"]) == (out, False)
+
+
+def test_a_platform_computed_answer_reads_the_billing_entity_once():
+    out, added = fx.add_billing_read(PLATFORM, "getWidgetMetrics", ["WidgetMetric.value"])
+    reads = yaml.safe_load(out)["paths"]["/w"]["get"]["x-ticvai-reads"]
+    assert added and reads[0]["table"] == "control.billing_entity" and "CR-202" in reads[0]["for"]
+    assert fx.add_billing_read(out, "getWidgetMetrics", ["x"]) == (out, False)
+
+
+def test_the_leads_defaults_are_the_fixers_defaults():
+    assert fx.queries_for("no venue", set()) == [fx.VENUE_Q]
+    assert fx.queries_for("no row", set()) == [fx.VENUE_Q]
+    assert "working venue" in fx.why("no row", fx.VENUE_Q, "answers", ["X.total"])
