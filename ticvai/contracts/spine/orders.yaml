@@ -6236,6 +6236,27 @@ paths:
         format: uuid
     post:
       operationId: simulateRefund
+      # What the answer is computed from, as its text says (CHG-R10GFC-003): the order, its lines and payments, what
+      # earlier refunds took from each (CR-208's refund_line and refund_payment), the venue's refund policy and bands,
+      # and its refund calculation policy (refundDestinations). A simulation writes none of them.
+      x-ticvai-reads:
+      - table: orders.sales_order
+        for: the order named in the path, whose refundable balance is simulated
+      - table: orders.order_line
+        for: 'the lines refunded (lineIds, or all of them): what each paid, and its performance for the time band'
+      - table: orders.payment
+        for: 'the payments the refund would go back to: the allocation, most recent first and cash last, and each
+          tender''s currency'
+      - table: orders.refund_line
+        for: 'what earlier refunds took from each line, for its refundableAmount (ADAM CR-208, CHG-R10ORD-014)'
+      - table: orders.refund_payment
+        for: 'what earlier refunds took from each payment, for its refundableAmount (ADAM CR-208, CHG-R10ORD-014)'
+      - table: orders.refund_policy
+        for: the venue's refund policy, its authority thresholds and refundWindowDays
+      - table: orders.refund_policy_time_band
+        for: the time bands, each line's percentage and refund type (CHG-R10ORD-021)
+      - table: orders.refund_calculation_policy
+        for: the venue's refundDestinations, which settleTo maps onto
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
         route: in-process

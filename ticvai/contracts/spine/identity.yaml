@@ -1351,7 +1351,7 @@ paths:
 
 
         **The export job and the file** (CR-101). The call writes an `identity.subject_data_export` row
-        (`SubjectDataExport`, status `awaitingApproval`) beside the request. The job runs when the request is approved
+        (`SubjectDataExport`, status `awaitingApproval`; `running` where no request is raised) beside the request. The job runs when the request is approved
         (Identity consumes `approval.granted` for subject type `subjectDataExport`), or at once where the tenant''s
         matrix asks for no approval step; a rejected, withdrawn or expired request ends the row `rejected` with no file.
         **No matrix means it runs at once** (the lead, 25 October 2026, r10 round 3; CHG-R10ID-024): where Approvals
@@ -1398,7 +1398,8 @@ paths:
         for: which orders the export reports as open
       x-ticvai-writes:
       - table: identity.subject_data_export
-        for: 'the export''s row, status awaitingApproval, which the export job moves on (ADAM CR-101, CHG-R10ID-016)'
+        for: 'the export''s row, status awaitingApproval where a request was raised, else running (no matrix means it
+          runs at once, CHG-R10ID-024), which the export job moves on (ADAM CR-101, CHG-R10ID-016, CHG-R10GFC-001)'
       tags:
       - identity
       x-ticvai-emits:
@@ -9577,7 +9578,7 @@ components:
       description: >-
         **One guest data export, as stored** (ADAM CR-101, accepted 15 October 2026; CHG-R10ID-016). One row per
         `exportSubjectData` request, keyed by the Approvals request id, written by `exportSubjectData` (status
-        `awaitingApproval`) and by the export job, which runs when the request is approved (`approval.granted`) or at
+        `awaitingApproval` where a request was raised, else `running`, the default) and by the export job, which runs when the request is approved (`approval.granted`) or at
         once where the tenant's matrix asks for no approval step, assembles the file and writes it to the tenant's
         private object storage (never a public or CDN path; encrypted at rest under the tenant's keys, ADR-0063).
         The file is deleted 7 days after `readyAt` and the row becomes `expired` (the lead, 25 October 2026, r10 round
@@ -9603,10 +9604,13 @@ components:
         status:
           type: string
           enum: [awaitingApproval, running, ready, failed, rejected, expired]
-          description: '`awaitingApproval` until the request is approved (or at once `running` where the matrix asks
-            for no step); `running` while the job assembles the file; `ready` once the file is stored; `failed` when
-            the job stops with `failureReason`; `rejected` when the request was rejected, withdrawn or expired, and
-            no file is made.'
+          default: running
+          description: '`running` by default: **no matrix means it runs at once** (the lead, 25 October 2026, r10
+            round 3; CHG-R10ID-024), so a row written with no approval request starts with the job running.
+            `exportSubjectData` writes `awaitingApproval` where Approvals raised a request, until it is approved;
+            `running` while the job assembles the file; `ready` once the file is stored; `failed` when the job stops
+            with `failureReason`; `rejected` when the request was rejected, withdrawn or expired, and no file is made;
+            `expired` once the file is deleted, 7 days after `readyAt` (CHG-R10GFC-001).'
         fileRef:
           type: string
           maxLength: 500

@@ -1804,6 +1804,9 @@ paths:
                   format: date-time
       responses:
         '204':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: The use is taken, or was already taken for this entry, or the entitlement had none left to take.
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound

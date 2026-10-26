@@ -1,0 +1,54 @@
+id: CHG-R10GFC-003
+date: '2026-10-26'
+source: audit
+kind: contract
+summary: 'The tables an operation''s text names are in its lineage: simulateRefund declares the eight orders tables it
+  computes from (CR-208''s refund_line and refund_payment among them), check-parameter-columns counts a table read
+  through its owner''s declared query on either route, and reportIncident says it takes people by id and names
+  pii.subject for context.'
+decision:
+  what: '(1) contracts/spine/orders.yaml simulateRefund: x-ticvai-reads orders.sales_order, order_line, payment,
+    refund_line, refund_payment, refund_policy, refund_policy_time_band and refund_calculation_policy, each with what it
+    is read for; it stays pure (writes nothing), and its orderId now matches orders.payment.order_id. (2)
+    tools/check-parameter-columns.py P-NAMED-TABLE: a table reached by the operation''s x-ticvai-read-via query (the
+    lineage''s readVia, in-process or service) counts as listed; parameters are still matched only against the tables
+    the operation itself reads or writes. This clears cancelPerformance (access.entitlement through
+    access#entitlementRecords) and addIncidentPerson (pii.subject through identity#subjectRecords). (3)
+    contracts/satellite/maintenance.yaml reportIncident: a paragraph says it takes people by id only
+    (involvedSubjectIds, involvedStaffPrincipalIds), stores no name or contact and asks Identity for none, and
+    x-ticvai-names-for-context [pii.subject].'
+  by: Chinmay
+  date: '2026-10-26'
+why: 'The r10 integration gate of 26 October 2026 (run 20261026-135604-1087), check-parameter-columns: simulateRefund
+  P-PARAM-NO-COLUMN (its lineage held only platform.venue_settings, read in process since CHG-R10ORD-019) and
+  P-NAMED-TABLE for orders.refund_line and orders.refund_payment (ADAM CR-208, CHG-R10ORD-014); P-NAMED-TABLE on started
+  ticket #30686 for addIncidentPerson, reportIncident and cancelPerformance. CHG-R10GEN-001 routed named tables of
+  another module to the owner''s query, and the check counted only in-process routes (CHG-R9INT-001). reportIncident''s
+  request carries only ids, so pii.subject is where the details live, not a read of it.'
+keys_touched:
+  operations: [simulateRefund, cancelPerformance, addIncidentPerson, reportIncident]
+  tables: [orders.refund_line, orders.refund_payment, orders.refund_calculation_policy]
+  files:
+  - contracts/spine/orders.yaml
+  - contracts/satellite/maintenance.yaml
+  - tools/check-parameter-columns.py
+root_class: 'a check that reads one route of a declared cross-module read and not the other'
+tickets:
+  started:
+  - '30686 (In progress, Pranay Shinde: addIncidentPerson, reportIncident, cancelPerformance): no behaviour changes;
+    reportIncident''s text now says it stores no personal details. Told through a ticket comment; its text is not
+    rewritten.'
+  unstarted:
+  - 'simulateRefund (#28284, #32077, New on 22 October): picks up its reads at the r10 tag.'
+release_tag: r10
+decision_owner: Chinmay
+adam_cr: CR-208
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-parameter-columns.py
+status: open
+notes: 'For the lead: addIncidentPerson writes the name and contact to pii.subject (Identity, in commerce) from
+  maintenance (in operations), and no route exists: no Identity operation creates a subject for a person who is not a
+  registered guest, and no event does. check-cross-deployable-writes cannot see it, because the contract declares no
+  write. The question and its recommended answer are in the lane''s report.'

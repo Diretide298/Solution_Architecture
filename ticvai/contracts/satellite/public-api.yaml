@@ -2519,13 +2519,16 @@ components:
         hash here. A client has one row per secret it was ever given; rotation inserts a row and cuts the earlier
         live rows'' `expiresAt` to the overlap, revocation sets `revokedAt` on every row. A secret verifies
         (`issueApiToken`) while its row has `revokedAt` null and `expiresAt` in the future.'
-      required: [id, clientId, secretHash, hashKeyVersion, issuedAt, expiresAt]
+      required: [id, apiClientId, secretHash, hashKeyVersion, issuedAt, expiresAt]
       properties:
         id: { type: string, format: uuid, readOnly: true }
-        clientId:
+        apiClientId:
           type: string
           format: uuid
           x-ticvai-references: control.api_client
+          description: The API client this secret belongs to (`control.api_client`). Named `apiClientId`, as
+            `ApprovalExternalProvider` and `WalletIntegrationMapping` name an API client, because the glossary bans
+            the bare word `client` in a name (CHG-R10GFC-002).
         secretHash:
           type: string
           writeOnly: true

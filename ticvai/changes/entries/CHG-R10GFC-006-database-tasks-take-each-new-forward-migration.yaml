@@ -1,0 +1,50 @@
+id: CHG-R10GFC-006
+date: '2026-10-26'
+source: audit
+kind: process
+summary: 'A hand-written database update task takes every forward migration newer than those it names, at each plan
+  build: the eleven R8-DB tasks now build and list backend/tenant and backend/control V0116 (and every later file)
+  without a hand edit per release.'
+decision:
+  what: 'tools/ticket_done.py db_update_task(): for each database a hand-written task builds a `file
+    backend/<db>/V01xx__*.sql` of, every forward migration on disk that sorts after the newest it names is added to its
+    `builds` and named in its text, in one sentence before its check or its Done when (apply after the files above, in
+    name order, `psql -1 -v ON_ERROR_STOP=1 -f`, twice). tools/build-service-docs.py builds the plan''s task from it,
+    and tools/check-ticket-builds.py B-DB-FILES judges the same expanded task, so an older file a task skipped still
+    fails. docs/active/block-a-extra-tasks.json is not changed. tools/tests/test_gate2_fixc_r10.py holds the rule.'
+  by: Chinmay
+  date: '2026-10-26'
+why: 'The r10 integration gate of 26 October 2026 (run 20261026-135604-1087), check-ticket-builds B-DB-FILES, 22 new
+  (CHG-R8INT-035): the eleven R8-DB tasks did not build V0116__after_r1_20261026.sql in either database. r9 added V0114
+  and V0115 by hand (CHG-R9INT-002, 901bc1bd). The file''s name is chosen by tools/derive-ddl.py frozen_mode at the
+  derive that writes it: the next number after every forward file on disk, shared by both databases, and the run''s
+  date (`V0116__after_r1_<yyyymmdd>.sql`); everything derived in that run, lane F''s CRs included, lands in it, and
+  once committed the next change is V0117. A name typed into the plan before the gate passes is wrong when the gate
+  runs on another day. The nearest r10 CR is CR-242, whose decision names "one additive forward migration (r10 derives
+  it)".'
+keys_touched:
+  tickets: [R8-DB-LOCAL-PRANAY-SHINDE, R8-DB-LOCAL-NARAYAN-GAONKAR, R8-DB-LOCAL-DEEP-KHANVILKAR, R8-DB-LOCAL-PALLAVI-SAWANT,
+    R8-DB-LOCAL-SANKET-KELUSKAR, R8-DB-LOCAL-CHINMAY-PATKAR, R8-DB-LOCAL-CHITRANGI-MESTRY, R8-DB-LOCAL-PRADNYA-YERAM,
+    R8-DB-LOCAL-SURENDRA, R8-DB-LOCAL-KALPITA-MEJARI, R8-DB-SHARED]
+  files:
+  - tools/ticket_done.py
+  - tools/build-service-docs.py
+  - tools/check-ticket-builds.py
+  - tools/tests/test_gate2_fixc_r10.py
+root_class: 'a list of generated files kept by hand in a plan input'
+tickets:
+  started:
+  - '#36186, #36188, #36193, #36194, #36195 (Ready for QA: Chinmay Patkar, Deep Khanvilkar, Pranay Shinde, Sanket
+    Keluskar, Surendra Loke): V0116 is one more file to apply, told through a ticket comment; their text is not rewritten.'
+  - '#36196 R8-DB-SHARED (Closed, Hrushikant Patkar): the shared database needs V0116 too, a child task under it
+    (CLAUDE.md rule 7), for the lead to create.'
+  unstarted:
+  - '#36187, #36189, #36190, #36191, #36192 (New): the text at the r10 tag names V0116.'
+release_tag: r10
+decision_owner: Chinmay
+adam_cr: CR-242
+triage: blocker
+prevention:
+  type: generator-rule
+  ref: tools/ticket_done.py::db_update_task
+status: open

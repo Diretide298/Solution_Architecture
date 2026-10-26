@@ -2112,6 +2112,11 @@ paths:
         Personal details of anyone involved go to the erasable store (`pii.subject`,
         ADR-0023), referenced by opaque ID, so the incident record survives an erasure request
         intact. Each involved person is a `maintenance.incident_involved_party` row.
+
+        **This operation takes people by id only** (CHG-R10GFC-003): `involvedSubjectIds` and
+        `involvedStaffPrincipalIds`. It stores no name or contact and asks Identity for none; a
+        person whose details are taken at the scene is added with `addIncidentPerson`.
+      x-ticvai-names-for-context: [pii.subject]
       tags: [incident]
       x-ticvai-permission: INCIDENT_REPORT
       x-ticvai-scope-level: venue

@@ -1,0 +1,38 @@
+id: CHG-R10GFC-007
+date: '2026-10-26'
+source: audit
+kind: process
+summary: 'The six project-bible copies of frontend-patterns.md (five repos'' project-bible/setup and ticvai-docs/setup)
+  take lane D''s r10 text from the starter: 4.2''s HttpOnly edge cookie, 4.5 the API client package and 4.6 search as
+  you type.'
+decision:
+  what: 'repos/ticvai-{ai,backend,contracts,frontend,infra}/project-bible/setup/frontend-patterns.md and
+    repos/ticvai-docs/setup/frontend-patterns.md: replaced with viewer/mcp/setup/starters/docs/frontend-patterns.md, byte
+    for byte. Change rule CR-6 (docs/active/change-rules.md): a standard is changed at its source and every copy in the
+    same change; the setup standards are not written by derive-mirrors or sync-project-bible (no docs/ file of that
+    name), so the copies are kept by the change, as CHG-OFL-005 (d9d8c63c) did for all seven.'
+  by: Chinmay
+  date: '2026-10-26'
+why: 'The r10 integration gate of 26 October 2026 (run 20261026-135604-1087), check-starter-fit SF-DOCS-MIRROR (R028,
+  R030): lane D edited only the starter copy, in 89c501a9 (ADAM CR-195, CHG-R10UI-011; CR-216, CHG-R10UI-004; CR-223,
+  CHG-R10UI-006).'
+keys_touched:
+  files:
+  - repos/ticvai-ai/project-bible/setup/frontend-patterns.md
+  - repos/ticvai-backend/project-bible/setup/frontend-patterns.md
+  - repos/ticvai-contracts/project-bible/setup/frontend-patterns.md
+  - repos/ticvai-docs/setup/frontend-patterns.md
+  - repos/ticvai-frontend/project-bible/setup/frontend-patterns.md
+  - repos/ticvai-infra/project-bible/setup/frontend-patterns.md
+root_class: 'a standard changed in one of its copies (CR-6)'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r10
+decision_owner: Chinmay
+adam_cr: CR-195
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-starter-fit.py
+status: open
