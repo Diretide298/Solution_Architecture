@@ -1,0 +1,42 @@
+id: CHG-R10CRF-014
+date: '2026-10-26'
+source: cr
+kind: contract
+summary: 'Product gains addOnProductIds (uuid[], the kind addOn products of the same venue offered with it, in display
+  order), set by createProduct and updateProduct and answered by listProducts; any other id is 400 validation on
+  addOnProductIds. WEB-048 and GST-075 read a room type''s add-ons from it.'
+decision:
+  what: 'ADAM CR-252, option A, as recommended. contracts/spine/catalogue.yaml: Product.addOnProductIds,
+    CreateProductRequest and UpdateProductRequest.addOnProductIds, and the 400 of createProduct and updateProduct.
+    screens P01 WEB-048 and P02 GST-075: the add-ons component notes and the listProducts purpose (bindings only).'
+  by: Chinmay
+  date: '2026-10-26'
+why: 'ADAM CR-252 (Chinmay Patkar, #28149 WEB-048), accepted by the lead on 26 October 2026 ("Accept all
+  (Recommended)", "Comment now + in r10"): nothing said which add-ons go with a room type, and listing every addOn
+  product of the venue would offer ticket and F&B extras on a meeting-room booking.'
+keys_touched:
+  operations: [createProduct, updateProduct, listProducts]
+  schemas: [Product, CreateProductRequest, UpdateProductRequest]
+  tables: [catalogue.product]
+  screens: [WEB-048, GST-075]
+  files:
+  - contracts/spine/catalogue.yaml
+  - screens/P01-guest-web-storefront.yaml
+  - screens/P02-guest-mobile-app.yaml
+root_class: 'a relation a screen relies on that no field holds'
+tickets:
+  started:
+  - '28149 (WEB-048): through CR-252''s comment; build the add-ons step to it now.'
+  unstarted:
+  - 'GST-075 and the catalogue product tickets: through their pointer bodies at the r10 tag.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-252
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-contract-compat.py
+status: open
+notes: 'Database: catalogue.product gains add_on_product_ids text[] (forward migration; migration task under the
+  catalogue MIG ticket). Cross-lane: Product is shared with lane G (Product.validTo); this edit is only the new
+  property and the two request schemas'' new property.'

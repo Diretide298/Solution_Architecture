@@ -1,0 +1,53 @@
+id: CHG-R10CRF-015
+date: '2026-10-26'
+source: cr
+kind: contract
+summary: 'Bound for WEB-048 and GST-075: the venue''s start-time step (VenueSettings.stepMinutes, which
+  listProductStartTimes applies when the screen sends none) and the length saving (ProductVariant.referencePrice, set by
+  updateProductVariant, and the server''s savingPercent; a tile shows Save n% only when it is set). Dropped from the
+  client-approved frame, logged in approved-ui-changes.yaml: the per-date price dots and the pre-cart Subtotal / VAT /
+  Total.'
+decision:
+  what: 'ADAM CR-253, option C, as recommended. contracts/spine/tenancy.yaml VenueSettings.stepMinutes;
+    contracts/satellite/resources.yaml listProductStartTimes (the venue''s step when none is sent, read in process
+    through tenancy#venueSettingsRecords; stepMinutes parameter text); contracts/spine/catalogue.yaml
+    ProductVariant.referencePrice and savingPercent, updateProductVariant''s body and text;
+    docs/active/cross-deployable-writes.yaml XDR-004 names listProductStartTimes; screens WEB-048 and GST-075 notes and
+    purposes; docs/active/approved-ui-changes.yaml, one entry per screen for the dropped frame content.'
+  by: Chinmay
+  date: '2026-10-26'
+why: 'ADAM CR-253 (Chinmay Patkar, #28149 WEB-048), accepted by the lead on 26 October 2026 ("Accept all
+  (Recommended)", "Comment now + in r10"): the client frame showed four things no bound operation gave.'
+keys_touched:
+  operations: [listProductStartTimes, updateProductVariant, listProductVariants]
+  schemas: [VenueSettings, ProductVariant]
+  tables: [platform.venue_settings, catalogue.variant]
+  screens: [WEB-048, GST-075]
+  files:
+  - contracts/spine/tenancy.yaml
+  - contracts/satellite/resources.yaml
+  - contracts/spine/catalogue.yaml
+  - docs/active/cross-deployable-writes.yaml
+  - screens/P01-guest-web-storefront.yaml
+  - screens/P02-guest-mobile-app.yaml
+  - docs/active/approved-ui-changes.yaml
+root_class: 'a client frame showing data no bound operation provides'
+tickets:
+  started:
+  - '28149 (WEB-048): through CR-253''s comment; keep what was built and add the two bound items.'
+  unstarted:
+  - 'GST-075: through its pointer body at the r10 tag.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-253
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-approved-ui.py
+status: open
+notes: 'Database: platform.venue_settings gains step_minutes integer (CHECK 15, 30 or 60; null inherits the tenant
+  default) and catalogue.variant gains reference_price numeric(18,4) (forward migration; MIG tasks for tenancy and
+  catalogue). One reading made: a guest has no read of venue settings (getVenueSettings is staff only), so the screens
+  do not read stepMinutes themselves; listProductStartTimes applies it when stepMinutes is not sent. savingPercent is
+  rounded down (proposed, client to correct). The screen records never drew the dots or the totals, so their approved
+  fields are unchanged and check-approved-ui notes the two log entries as already held.'

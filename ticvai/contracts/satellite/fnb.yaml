@@ -1207,6 +1207,11 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-045 Menu Management"
       x-ticvai-read-via:
+      - query: tenancy#outletRecords
+        route: in-process
+        for: 'the outlet''s venue (platform.outlet.venue_id), since a menu reaches its venue only through
+          fnb.menu.outlet_id: the venue whose settings give the Money''s currency (ADAM CR-260 as the r10 package
+          carries CR-234; XDR-004)'
       - query: tenancy#venueSettingsRecords
         route: in-process
         for: 'the currency and scale of the Money it accepts: the venue''s frozen trading currency, from platform.venue_settings, Tenancy''s data, in process (ADAM CR-234; ADR-0055 as amended 25 October 2026)'
@@ -1560,6 +1565,11 @@ paths:
     put:
       operationId: attachModifierGroup
       x-ticvai-read-via:
+      - query: tenancy#outletRecords
+        route: in-process
+        for: 'the outlet''s venue (platform.outlet.venue_id), since a menu reaches its venue only through
+          fnb.menu.outlet_id: the venue whose settings give the Money''s currency (ADAM CR-260 as the r10 package
+          carries CR-234; XDR-004)'
       - query: tenancy#venueSettingsRecords
         route: in-process
         for: 'the currency and scale of the Money it answers: the venue''s frozen trading currency, from platform.venue_settings, Tenancy''s data, in process (ADAM CR-234; ADR-0055 as amended 25 October 2026)'
@@ -2765,6 +2775,11 @@ paths:
     post:
       operationId: publishMenu
       x-ticvai-read-via:
+      - query: tenancy#outletRecords
+        route: in-process
+        for: 'the outlet''s venue (platform.outlet.venue_id), since a menu reaches its venue only through
+          fnb.menu.outlet_id: the venue whose settings give the Money''s currency (ADAM CR-260 as the r10 package
+          carries CR-234; XDR-004)'
       - query: tenancy#venueSettingsRecords
         route: in-process
         for: 'the currency and scale of the Money it answers: the venue''s frozen trading currency, from platform.venue_settings, Tenancy''s data, in process (ADAM CR-234; ADR-0055 as amended 25 October 2026)'
@@ -2915,6 +2930,11 @@ paths:
     get:
       operationId: listMenuVersions
       x-ticvai-read-via:
+      - query: tenancy#outletRecords
+        route: in-process
+        for: 'the outlet''s venue (platform.outlet.venue_id), since a menu reaches its venue only through
+          fnb.menu.outlet_id: the venue whose settings give the Money''s currency (ADAM CR-260 as the r10 package
+          carries CR-234; XDR-004)'
       - query: tenancy#venueSettingsRecords
         route: in-process
         for: 'the currency and scale of the Money it answers: the venue''s frozen trading currency, from platform.venue_settings, Tenancy''s data, in process (ADAM CR-234; ADR-0055 as amended 25 October 2026)'
@@ -4961,6 +4981,11 @@ paths:
     get:
       operationId: getGuestMenu
       x-ticvai-read-via:
+      - query: tenancy#outletRecords
+        route: in-process
+        for: 'the outlet''s venue (platform.outlet.venue_id), since a menu reaches its venue only through
+          fnb.menu.outlet_id: the venue whose settings give the Money''s currency (ADAM CR-260 as the r10 package
+          carries CR-234; XDR-004)'
       - query: tenancy#venueSettingsRecords
         route: in-process
         for: 'the currency and scale of the Money it answers: the venue''s frozen trading currency, from platform.venue_settings, Tenancy''s data, in process (ADAM CR-234; ADR-0055 as amended 25 October 2026)'
@@ -5857,6 +5882,11 @@ paths:
     get:
       operationId: listMenus
       x-ticvai-read-via:
+      - query: tenancy#outletRecords
+        route: in-process
+        for: 'the outlet''s venue (platform.outlet.venue_id), since a menu reaches its venue only through
+          fnb.menu.outlet_id: the venue whose settings give the Money''s currency (ADAM CR-260 as the r10 package
+          carries CR-234; XDR-004)'
       - query: tenancy#venueSettingsRecords
         route: in-process
         for: 'the currency and scale of the Money it answers: the venue''s frozen trading currency, from platform.venue_settings, Tenancy''s data, in process (ADAM CR-234; ADR-0055 as amended 25 October 2026)'
@@ -5964,6 +5994,11 @@ paths:
     get:
       operationId: getMenu
       x-ticvai-read-via:
+      - query: tenancy#outletRecords
+        route: in-process
+        for: 'the outlet''s venue (platform.outlet.venue_id), since a menu reaches its venue only through
+          fnb.menu.outlet_id: the venue whose settings give the Money''s currency (ADAM CR-260 as the r10 package
+          carries CR-234; XDR-004)'
       - query: tenancy#venueSettingsRecords
         route: in-process
         for: 'the currency and scale of the Money it answers: the venue''s frozen trading currency, from platform.venue_settings, Tenancy''s data, in process (ADAM CR-234; ADR-0055 as amended 25 October 2026)'
@@ -6113,6 +6148,11 @@ paths:
     put:
       operationId: setItemAvailability
       x-ticvai-read-via:
+      - query: tenancy#outletRecords
+        route: in-process
+        for: 'the outlet''s venue (platform.outlet.venue_id), since a menu reaches its venue only through
+          fnb.menu.outlet_id: the venue whose settings give the Money''s currency (ADAM CR-260 as the r10 package
+          carries CR-234; XDR-004)'
       - query: tenancy#venueSettingsRecords
         route: in-process
         for: 'the currency and scale of the Money it answers: the venue''s frozen trading currency, from platform.venue_settings, Tenancy''s data, in process (ADAM CR-234; ADR-0055 as amended 25 October 2026)'
@@ -6210,6 +6250,11 @@ paths:
     put:
       operationId: setMenuItemDailyCount
       x-ticvai-read-via:
+      - query: tenancy#outletRecords
+        route: in-process
+        for: 'the outlet''s venue (platform.outlet.venue_id), since a menu reaches its venue only through
+          fnb.menu.outlet_id: the venue whose settings give the Money''s currency (ADAM CR-260 as the r10 package
+          carries CR-234; XDR-004)'
       - query: tenancy#venueSettingsRecords
         route: in-process
         for: 'the currency and scale of the Money it answers: the venue''s frozen trading currency, from platform.venue_settings, Tenancy''s data, in process (ADAM CR-234; ADR-0055 as amended 25 October 2026)'

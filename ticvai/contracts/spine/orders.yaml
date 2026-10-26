@@ -1143,7 +1143,12 @@ paths:
       x-ticvai-conflict-policy: serverWins
       responses:
         '200':
-          description: The group
+          description: The group. `ETag` is its `version` (ADAM CR-257), for `updateGroupBooking`'s `If-Match`.
+          headers:
+            ETag:
+              description: The group booking's `version` (orders.group_booking.version), quoted.
+              schema:
+                type: string
           content:
             application/json:
               schema:
@@ -1165,8 +1170,22 @@ paths:
         below the minimum is allowed and recorded, because the group has already arrived. Whether the
         group rate still applies is for pricing to decide, not for this operation to refuse.
 
-        Status moves forward only (provisional, confirmed, namesPending, complete) or to cancelled.
-        Cancelling the group does not refund the order; that is `createRefund` against it.
+        **Status follows `states/group-booking.yaml`** (accepted 26 October 2026, Chinmay, ADAM CR-257 option A:
+        the state model wins). A PATCH may set `confirmed`, `complete` or `cancelled` only; `namesPending` is set by
+        the timer when attendee capture is required and not done, and sending it is `400` on `status`. The moves:
+        `provisional` to `confirmed` when the deposit is taken or the terms are agreed (an `orders.deposit` of the
+        group''s order captured in full, or the group''s `orders.group_quote` `accepted`); `confirmed` to
+        `complete` when no attendee capture is required; `namesPending` to `complete` when the names are collected
+        (every participant on the group''s participant list, `orders.group_participant`, has a `fullName`); and
+        `provisional`, `confirmed` or `namesPending` to `cancelled`. A backward move is `409 statusBackwards`; any
+        other move the model does not allow (a skip such as `provisional` to `complete`, or a guard that does not
+        hold) is `409` with `refusedReason` `statusNotAllowed` (`group-booking-status-not-allowed`). Cancelling the
+        group does not refund the order; that is `createRefund` against it.
+
+
+        **Its ETag is the row''s `version`** (ADAM CR-257): `orders.group_booking.version` is bumped on every write
+        and sent as `ETag` on `getGroupBooking` and here; an `If-Match` that is not the current version is `412`
+        and nothing changes.
 
         '
       tags:
@@ -1193,19 +1212,32 @@ paths:
           headers:
             X-Consistency-Token:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+            ETag:
+              description: The group booking's new `version`, quoted (ADAM CR-257).
+              schema:
+                type: string
           description: Updated
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/GroupBooking'
+        '400':
+          description: 'Validation failed (`validation`), with `errors[]` naming the field. Includes `status`
+            `namesPending`, which only the timer sets (ADAM CR-257).'
+          x-ticvai-problem-types: [validation]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
-          description: The status change goes backwards (`statusBackwards`), or the group is already
-            cancelled or complete (`groupClosed`).
-          x-ticvai-problem-types: [status-backwards, group-closed]
+          description: The status change goes backwards (`statusBackwards`), the group is already cancelled or
+            complete (`groupClosed`), or the move is one the state model does not allow, a skip or a guard that does
+            not hold (`statusNotAllowed`, ADAM CR-257).
+          x-ticvai-problem-types: [status-backwards, group-closed, group-booking-status-not-allowed]
           content:
             application/problem+json:
               schema:
@@ -3534,6 +3566,9 @@ paths:
         `wallet.balance.available` under a row lock) and capturing calls `wallet.captureWalletHold`, each writing
         a `wallet.wallet_transaction` with its `walletId` in the same transaction. The order service never
         writes a wallet balance. An external stored-value card (`StoredValueKind`) keeps its provider path.
+        **The link is stored** (ADAM CR-254 option A, 26 October 2026): `authoriseStoredValue` keeps the id
+        `wallet.holdWalletFunds` returns as `walletHoldId` (orders.stored_value_authorisation.wallet_hold_id), and
+        `captureStoredValue` captures that hold with `wallet.captureWalletHold`.
       x-ticvai-calls:
       - wallet.holdWalletFunds
       - wallet.captureWalletHold
@@ -3640,6 +3675,9 @@ paths:
         `wallet.balance.available` under a row lock) and capturing calls `wallet.captureWalletHold`, each writing
         a `wallet.wallet_transaction` with its `walletId` in the same transaction. The order service never
         writes a wallet balance. An external stored-value card (`StoredValueKind`) keeps its provider path.
+        **The link is stored** (ADAM CR-254 option A, 26 October 2026): `authoriseStoredValue` keeps the id
+        `wallet.holdWalletFunds` returns as `walletHoldId` (orders.stored_value_authorisation.wallet_hold_id), and
+        `captureStoredValue` captures that hold with `wallet.captureWalletHold`.
       x-ticvai-calls:
       - wallet.holdWalletFunds
       - wallet.captureWalletHold
@@ -3732,6 +3770,8 @@ paths:
       - query: tenancy#venueSettingsRecords
         route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: StoredValueAuthorisation.amount, StoredValueAuthorisation.capturedAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      x-ticvai-calls:
+      - wallet.releaseWalletHold
       security:
       - apiKeyAuth: []
       - serviceAuth: []
@@ -3740,6 +3780,12 @@ paths:
       description: 'The play failed, the guest left, the tab closed short. **Released holds return immediately**
         — and expiry releases automatically, because a hold nobody releases is a guest whose balance is
         short with no explanation.
+
+
+        **A wallet hold goes back through WalletService** (accepted 26 October 2026, Chinmay, ADAM CR-254 option A):
+        for kind `wallet` this calls `wallet.releaseWalletHold` with the authorisation''s `walletHoldId` in the same
+        transaction, so WalletService gives the held funds back itself (one wallet debit path, SD-027). The
+        other five kinds (gift card, game card, voucher, loyalty, prepaid entitlement) are released by their row.
 
         '
       tags:
@@ -21040,9 +21086,10 @@ components:
           type: string
           enum:
           - confirmed
-          - namesPending
           - complete
           - cancelled
+          description: '`namesPending` is set by the timer, never by a PATCH: sending it is `400` on `status` (ADAM
+            CR-257). The state model decides which move is allowed (`updateGroupBooking`).'
     VisitReminder:
       type: object
       x-ticvai-persistence: orders.visit_reminder
@@ -21434,6 +21481,14 @@ components:
           - namesPending
           - complete
           - cancelled
+        version:
+          type: integer
+          minimum: 1
+          default: 1
+          readOnly: true
+          description: '**The row''s version, its ETag** (accepted 26 October 2026, Chinmay, ADAM CR-257 option A):
+            1 on create and bumped on every write; `getGroupBooking` and `updateGroupBooking` send it as `ETag`, and
+            `updateGroupBooking` checks `If-Match` against it (`412` on a mismatch).'
     WalletPass:
       type: object
       x-ticvai-persistence: orders.wallet_pass
@@ -25985,6 +26040,7 @@ components:
             - packageUnavailable      # requestGroupBooking
             - aboveParticipantLimit   # requestGroupBooking (422)
             - statusBackwards         # updateGroupBooking: status moves forward only
+            - statusNotAllowed        # updateGroupBooking: a move states/group-booking.yaml does not allow (ADAM CR-257)
             - groupClosed             # updateGroupBooking: already cancelled or complete; the setParticipantGuestList, setGroupPaymentSchedule, setGroupTicketAllocation and setGroupTicketFulfillment 409; recordGroupCheckIn on a cancelled booking
             - quoteNotConvertible     # createGroupBooking: the quote is draft, superseded, rejected, expired or already converted
     PaymentLinkView:

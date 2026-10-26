@@ -1,0 +1,33 @@
+id: CHG-R10CRF-020
+date: '2026-10-26'
+source: cr
+kind: contract
+summary: 'GST-005''s "See everything" button opens GST-002 Explore with nothing carried: the button and its transition
+  are in the screen record, as the client-approved frame already draws them.'
+decision:
+  what: 'ADAM CR-259, option A, as recommended. screens/P02-guest-mobile-app.yaml GST-005: a primaryButton "See
+    everything" and the transition to GST-002. docs/active/approved-ui-changes.yaml: the two fields (navigation,
+    region:collection), logged under CR-259.'
+  by: Chinmay
+  date: '2026-10-26'
+why: 'ADAM CR-259 (Chitrangi Mestry, #31769 GST-005), accepted by the lead on 26 October 2026 ("Accept all
+  (Recommended)", "Comment now + in r10"): the frame drew a button the record did not define.'
+keys_touched:
+  screens: [GST-005]
+  files:
+  - screens/P02-guest-mobile-app.yaml
+  - docs/active/approved-ui-changes.yaml
+root_class: 'a control in the approved frame missing from the screen record'
+tickets:
+  started:
+  - '31769 (GST-005): through CR-259''s comment; enable the button and navigate to GST-002.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-259
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-approved-ui.py
+status: open
+notes: 'No visible change against the client frame; the record catches up with it. No database change.'

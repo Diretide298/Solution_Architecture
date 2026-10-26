@@ -1,0 +1,40 @@
+id: CHG-R10CRF-016
+date: '2026-10-26'
+source: cr
+kind: contract
+summary: 'StoredValueAuthorisation gains walletHoldId (orders.stored_value_authorisation.wallet_hold_id, null for every
+  kind but wallet): authoriseStoredValue stores the id wallet.holdWalletFunds returns, captureStoredValue captures that
+  hold, and relinquishStoredValue declares x-ticvai-calls wallet.releaseWalletHold and calls it with that id in the
+  same transaction. The other five kinds are released by row.'
+decision:
+  what: 'ADAM CR-254, option A, as recommended. contracts/shared/common.yaml StoredValueAuthorisation.walletHoldId;
+    contracts/spine/orders.yaml: the x-ticvai-note of authoriseStoredValue and captureStoredValue, and
+    relinquishStoredValue''s x-ticvai-calls and description.'
+  by: Chinmay
+  date: '2026-10-26'
+why: 'ADAM CR-254 (Sanket Keluskar, #32268 relinquishStoredValue), accepted by the lead on 26 October 2026 ("Accept all
+  (Recommended)", "Comment now + in r10"): a released wallet hold had no way back to WalletService and no id to find it
+  by.'
+keys_touched:
+  operations: [authoriseStoredValue, captureStoredValue, relinquishStoredValue]
+  schemas: [StoredValueAuthorisation]
+  tables: [orders.stored_value_authorisation]
+  files:
+  - contracts/shared/common.yaml
+  - contracts/spine/orders.yaml
+root_class: 'a two-phase hold whose release has no link to the owner''s hold'
+tickets:
+  started:
+  - '32268 (relinquishStoredValue): through CR-254''s comment.'
+  unstarted:
+  - 'The migration child task under the orders MIG ticket, for the migration owner.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-254
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-cross-module-reads.py
+status: open
+notes: 'Database: orders.stored_value_authorisation gains wallet_hold_id uuid (forward migration). No foreign key is
+  declared onto wallet.fund_reservation (another module''s table); the id is the one holdWalletFunds returns.'

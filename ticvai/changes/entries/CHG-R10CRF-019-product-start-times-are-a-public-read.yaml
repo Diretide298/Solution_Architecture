@@ -1,0 +1,36 @@
+id: CHG-R10CRF-019
+date: '2026-10-26'
+source: cr
+kind: contract
+summary: 'listProductStartTimes is a public read like listProducts and listProductVariants: {} is added to its
+  security, it takes X-Venue-Id and runs under the venue the request names (CR-198), with 400 venue-required; a visitor
+  sees start times with no session, and the anonymous cart session still opens on the first add (CR-183).'
+decision:
+  what: 'ADAM CR-258, option A, as recommended. contracts/satellite/resources.yaml listProductStartTimes: security,
+    the GuestVenue parameter, a 400, the description. screens WEB-048 and GST-075: the listProductStartTimes purpose.'
+  by: Chinmay
+  date: '2026-10-26'
+why: 'ADAM CR-258 (Chinmay Patkar, #28149 WEB-048), accepted by the lead on 26 October 2026 ("Accept all
+  (Recommended)", "Comment now + in r10"): a visitor needed a guest token to see start times, and the only token comes
+  from the first add, which needs a start time.'
+keys_touched:
+  operations: [listProductStartTimes]
+  screens: [WEB-048, GST-075]
+  files:
+  - contracts/satellite/resources.yaml
+  - screens/P01-guest-web-storefront.yaml
+  - screens/P02-guest-mobile-app.yaml
+root_class: 'a public guest flow whose middle read needs a session'
+tickets:
+  started:
+  - '28149 (WEB-048): through CR-258''s comment; switch the screen to the public call.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-258
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-contract-compat.py
+status: open
+notes: 'Additive: a security list that only gained an alternative. No database change.'
