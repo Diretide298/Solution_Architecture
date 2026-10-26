@@ -1,0 +1,37 @@
+id: CHG-R10CRF-013
+date: '2026-10-26'
+source: cr
+kind: contract
+summary: 'recordSyncRejectionResolution is split as recordSyncRejection is: the write is CrossRegion''s in-process API
+  now (validation, an RLS-scoped update of sync.rejection, the resolved-once rule, durable idempotency on the rejection
+  id), and its HTTP route and 401 wait for serviceAuth between deployables (the same x-ticvai-auth-note).'
+decision:
+  what: 'The lead''s answer to lane F question 5 (CR-241''s sibling), 26 October 2026: "Yes, same split (Recommended)".
+    contracts/spine/cross-region.yaml recordSyncRejectionResolution: x-ticvai-auth-note, the description (the two
+    parts) and the 401 text.'
+  by: Chinmay
+  date: '2026-10-26'
+why: 'ADAM CR-241 (Deep Khanvilkar, #35807 recordSyncRejection; CHG-R10CRF-001) split the write from its serviceAuth route;
+  lane F found recordSyncRejectionResolution is the same kind of serviceAuth route called across deployables
+  (orders.resolveSyncRejection in commerce), and the lead applied the same split.'
+keys_touched:
+  operations: [recordSyncRejectionResolution]
+  tables: [sync.rejection]
+  files:
+  - contracts/spine/cross-region.yaml
+root_class: 'a serviceAuth route between deployables before serviceAuth exists (the CR-174 class)'
+tickets:
+  started:
+  - 'The ticket that builds recordSyncRejectionResolution, if started: through CR-241''s comment; its text is not
+    rewritten.'
+  unstarted:
+  - 'Its HTTP route joins the follow-up the lead files after the serviceAuth ticket (LEAD-QUESTIONS-r10, plan items).'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-241
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-cross-module-reads.py
+status: open
+notes: 'No database change.'

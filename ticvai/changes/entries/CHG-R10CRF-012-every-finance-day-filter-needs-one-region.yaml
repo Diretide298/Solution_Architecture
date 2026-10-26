@@ -1,0 +1,40 @@
+id: CHG-R10CRF-012
+date: '2026-10-26'
+source: cr
+kind: contract
+summary: 'CR-251''s rule on every other finance day filter: getUnifiedReconciliation (from, to), getDeferredRevenue
+  (asAt), getForeignTenderReport (from, to), listPriceVariances (occurredFrom, occurredTo), listTaxInvoices (issuedFrom,
+  issuedTo) and getVatReturn (periodFrom, periodTo) take days in the time zone of the region at or above the caller''s
+  scope; a caller whose scope gives no single region who sends a day filter gets 400 validation on that parameter;
+  without a day filter each works at any scope.'
+decision:
+  what: 'The lead''s answer to lane F question 4 (the CR-251 siblings), 26 October 2026: "Yes, same rule (Recommended)".
+    contracts/spine/finance.yaml: each operation''s description, its day parameters and a 400 validation.'
+  by: Chinmay
+  date: '2026-10-26'
+why: 'ADAM CR-251 (Deep Khanvilkar, #32326 listLedgerEntries; CHG-R10CRF-011) named listLedgerEntries only; lane F found
+  six more finance operations whose day filters are "in the region''s time zone" with the same gap for a caller above
+  the regions, and the lead applied the same rule to them.'
+keys_touched:
+  operations: [getUnifiedReconciliation, getDeferredRevenue, getForeignTenderReport, listPriceVariances,
+    listTaxInvoices, getVatReturn]
+  files:
+  - contracts/spine/finance.yaml
+root_class: 'a local-day filter at a scope with no single time zone (CHG-R10CRF-011''s class)'
+tickets:
+  started:
+  - 'Any started ticket of these six operations: through CR-251''s comment; its text is not rewritten.'
+  unstarted:
+  - 'The rest: through their pointer bodies at the r10 tag.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-251
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-cross-module-reads.py
+status: open
+notes: 'ingestSettlementFile''s periodStart and periodEnd are body fields of one venue''s settlement file, not a filter,
+  so the rule does not reach it; the schema fields with region days (dates of record) are unchanged. getUnifiedReconciliation
+  and getVatReturn require their day parameters, so a caller above the regions always gets the 400 there. No database
+  change.'
